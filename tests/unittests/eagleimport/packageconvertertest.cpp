@@ -17,57 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <gtest/gtest.h>
-#include <parseagle/library.h>
 #include <librepcb/eagleimport/converterdb.h>
 #include <librepcb/eagleimport/packageconverter.h>
 #include <librepcb/library/pkg/package.h>
+#include <parseagle/library.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace eagleimport {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class PackageConverterTest : public ::testing::Test
-{
-};
+class PackageConverterTest : public ::testing::Test {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_F(PackageConverterTest, testConversion)
-{
-    FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
+TEST_F(PackageConverterTest, testConversion) {
+  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
 
-    // load eagle package
-    FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-    parseagle::Library eagleLibrary(eagleLibFp.toStr());
-    ASSERT_EQ(1, eagleLibrary.getPackages().count());
-    const parseagle::Package& eaglePackage = eagleLibrary.getPackages().first();
+  // load eagle package
+  FilePath           eagleLibFp = testDataDir.getPathTo("resistor.lbr");
+  parseagle::Library eagleLibrary(eagleLibFp.toStr());
+  ASSERT_EQ(1, eagleLibrary.getPackages().count());
+  const parseagle::Package& eaglePackage = eagleLibrary.getPackages().first();
 
-    // load converter database
-    ConverterDb db(testDataDir.getPathTo("db.ini"));
+  // load converter database
+  ConverterDb db(testDataDir.getPathTo("db.ini"));
 
-    // convert package
-    PackageConverter converter(eaglePackage, db);
-    std::unique_ptr<library::Package> package = converter.generate();
+  // convert package
+  PackageConverter                  converter(eaglePackage, db);
+  std::unique_ptr<library::Package> package = converter.generate();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace tests
+}  // namespace eagleimport
+}  // namespace librepcb

@@ -20,64 +20,61 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
 #define LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../items/bi_netline.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardNetLineEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardNetLineEdit class
  */
-class CmdBoardNetLineEdit final : public UndoCommand
-{
-    public:
+class CmdBoardNetLineEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBoardNetLineEdit(BI_NetLine& netline) noexcept;
+  ~CmdBoardNetLineEdit() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdBoardNetLineEdit(BI_NetLine& netline) noexcept;
-        ~CmdBoardNetLineEdit() noexcept;
+  // Setters
+  void setLayer(GraphicsLayer& layer) noexcept;
+  void setWidth(const PositiveLength& width) noexcept;
 
-        // Setters
-        void setLayer(GraphicsLayer& layer) noexcept;
-        void setWidth(const PositiveLength& width) noexcept;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        BI_NetLine& mNetLine;
-        GraphicsLayer* mOldLayer;
-        GraphicsLayer* mNewLayer;
-        PositiveLength mOldWidth;
-        PositiveLength mNewWidth;
+private:  // Data
+  BI_NetLine&    mNetLine;
+  GraphicsLayer* mOldLayer;
+  GraphicsLayer* mNewLayer;
+  PositiveLength mOldWidth;
+  PositiveLength mNewWidth;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H

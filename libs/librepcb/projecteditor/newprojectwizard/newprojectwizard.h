@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARD_H
 #define LIBREPCB_PROJECT_NEWPROJECTWIZARD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 
 namespace librepcb {
 
@@ -46,15 +47,15 @@ namespace editor {
 
 class NewProjectWizardPage_Metadata;
 class NewProjectWizardPage_Initialization;
-//class NewProjectWizardPage_VersionControl;
+// class NewProjectWizardPage_VersionControl;
 
 namespace Ui {
 class NewProjectWizard;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewProjectWizard
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewProjectWizard class
@@ -62,43 +63,40 @@ class NewProjectWizard;
  * @author ubruhin
  * @date 2016-08-13
  */
-class NewProjectWizard final : public QWizard
-{
-        Q_OBJECT
+class NewProjectWizard final : public QWizard {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewProjectWizard()                              = delete;
+  NewProjectWizard(const NewProjectWizard& other) = delete;
+  explicit NewProjectWizard(const workspace::Workspace& ws,
+                            QWidget* parent = nullptr) noexcept;
+  ~NewProjectWizard() noexcept;
 
-        // Constructors / Destructor
-        NewProjectWizard() = delete;
-        NewProjectWizard(const NewProjectWizard& other) = delete;
-        explicit NewProjectWizard(const workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
-        ~NewProjectWizard() noexcept;
+  // Setters
+  void setLocation(const FilePath& dir) noexcept;
 
-        // Setters
-        void setLocation(const FilePath& dir) noexcept;
+  // General Methods
+  Project* createProject() const;
 
-        // General Methods
-        Project* createProject() const;
+  // Operator Overloadings
+  NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;
 
-        // Operator Overloadings
-        NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;
-
-
-    private: // Data
-
-        const workspace::Workspace& mWorkspace;
-        QScopedPointer<Ui::NewProjectWizard> mUi;
-        NewProjectWizardPage_Metadata* mPageMetadata;
-        NewProjectWizardPage_Initialization* mPageInitialization;
-        //NewProjectWizardPage_VersionControl* mPageVersionControl;
+private:  // Data
+  const workspace::Workspace&          mWorkspace;
+  QScopedPointer<Ui::NewProjectWizard> mUi;
+  NewProjectWizardPage_Metadata*       mPageMetadata;
+  NewProjectWizardPage_Initialization* mPageInitialization;
+  // NewProjectWizardPage_VersionControl* mPageVersionControl;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_NEWPROJECTWIZARD_H
+#endif  // LIBREPCB_PROJECT_NEWPROJECTWIZARD_H

@@ -20,67 +20,69 @@
 #ifndef LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
 #define LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "categorytreeitem.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
 class WorkspaceLibraryDb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CategoryTreeModel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CategoryTreeModel class
  */
 template <typename ElementType>
-class CategoryTreeModel final : public QAbstractItemModel
-{
-    public:
+class CategoryTreeModel final : public QAbstractItemModel {
+public:
+  // Constructors / Destructor
+  CategoryTreeModel()                               = delete;
+  CategoryTreeModel(const CategoryTreeModel& other) = delete;
+  explicit CategoryTreeModel(const WorkspaceLibraryDb& library,
+                             const QStringList&        localeOrder) noexcept;
+  ~CategoryTreeModel() noexcept;
 
-        // Constructors / Destructor
-        CategoryTreeModel() = delete;
-        CategoryTreeModel(const CategoryTreeModel& other) = delete;
-        explicit CategoryTreeModel(const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept;
-        ~CategoryTreeModel() noexcept;
+  // Getters
+  CategoryTreeItem<ElementType>* getItem(const QModelIndex& index) const;
 
-        // Getters
-        CategoryTreeItem<ElementType>* getItem(const QModelIndex& index) const;
+  // Inherited Methods
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual QModelIndex index(int row, int column,
+                            const QModelIndex& parent = QModelIndex()) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
+  virtual QVariant    headerData(int section, Qt::Orientation orientation,
+                                 int role = Qt::DisplayRole) const;
+  virtual QVariant    data(const QModelIndex& index,
+                           int                role = Qt::DisplayRole) const;
 
-        // Inherited Methods
-        virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
-        virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-        virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
-        virtual QModelIndex parent(const QModelIndex& index) const;
-        virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-        virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  // Operator Overloadings
+  CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
 
-        // Operator Overloadings
-        CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
-
-
-    private:
-
-        // Attributes
-        QScopedPointer<CategoryTreeItem<ElementType>> mRootItem;
+private:
+  // Attributes
+  QScopedPointer<CategoryTreeItem<ElementType>> mRootItem;
 };
 
-typedef CategoryTreeModel<library::ComponentCategory> ComponentCategoryTreeModel;
+typedef CategoryTreeModel<library::ComponentCategory>
+                                                    ComponentCategoryTreeModel;
 typedef CategoryTreeModel<library::PackageCategory> PackageCategoryTreeModel;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
+#endif  // LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H

@@ -20,69 +20,67 @@
 #ifndef LIBREPCB_LIBRARY_CMDDEVICEPADSIGNALMAPITEMEDIT_H
 #define LIBREPCB_LIBRARY_CMDDEVICEPADSIGNALMAPITEMEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
 class DevicePadSignalMapItem;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdDevicePadSignalMapItemEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdDevicePadSignalMapItemEdit class
  */
-class CmdDevicePadSignalMapItemEdit final : public UndoCommand
-{
-    public:
+class CmdDevicePadSignalMapItemEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdDevicePadSignalMapItemEdit() = delete;
+  CmdDevicePadSignalMapItemEdit(const CmdDevicePadSignalMapItemEdit& other) =
+      delete;
+  explicit CmdDevicePadSignalMapItemEdit(DevicePadSignalMapItem& item) noexcept;
+  ~CmdDevicePadSignalMapItemEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdDevicePadSignalMapItemEdit() = delete;
-        CmdDevicePadSignalMapItemEdit(const CmdDevicePadSignalMapItemEdit& other) = delete;
-        explicit CmdDevicePadSignalMapItemEdit(DevicePadSignalMapItem& item) noexcept;
-        ~CmdDevicePadSignalMapItemEdit() noexcept;
+  // Setters
+  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
-        // Setters
-        void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  // Operator Overloadings
+  CmdDevicePadSignalMapItemEdit& operator       =(
+      const CmdDevicePadSignalMapItemEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdDevicePadSignalMapItemEdit& operator=(const CmdDevicePadSignalMapItemEdit& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+private:  // Data
+  DevicePadSignalMapItem& mItem;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        DevicePadSignalMapItem& mItem;
-
-        tl::optional<Uuid> mOldSignalUuid;
-        tl::optional<Uuid> mNewSignalUuid;
+  tl::optional<Uuid> mOldSignalUuid;
+  tl::optional<Uuid> mNewSignalUuid;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDDEVICEPADSIGNALMAPITEMEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDDEVICEPADSIGNALMAPITEMEDIT_H

@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
 #define LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/uuid.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Version;
@@ -41,127 +42,129 @@ namespace workspace {
 class Workspace;
 class WorkspaceLibraryScanner;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WorkspaceLibraryDb
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The WorkspaceLibraryDb class
  */
-class WorkspaceLibraryDb final : public QObject
-{
-        Q_OBJECT
+class WorkspaceLibraryDb final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  WorkspaceLibraryDb()                                = delete;
+  WorkspaceLibraryDb(const WorkspaceLibraryDb& other) = delete;
 
-        // Constructors / Destructor
-        WorkspaceLibraryDb() = delete;
-        WorkspaceLibraryDb(const WorkspaceLibraryDb& other) = delete;
+  /**
+   * @brief Constructor to open the library database of an existing workspace
+   *
+   * @param ws     The workspace object
+   *
+   * @throw Exception If the library could not be opened, this constructor
+   * throws an exception.
+   */
+  explicit WorkspaceLibraryDb(Workspace& ws);
+  ~WorkspaceLibraryDb() noexcept;
 
-        /**
-        * @brief Constructor to open the library database of an existing workspace
-        *
-        * @param ws     The workspace object
-        *
-        * @throw Exception If the library could not be opened, this constructor throws
-        *                  an exception.
-        */
-        explicit WorkspaceLibraryDb(Workspace& ws);
-        ~WorkspaceLibraryDb() noexcept;
+  // Getters: Library Elements by their UUID
+  QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const;
+  QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const;
+  QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const;
+  QMultiMap<Version, FilePath> getPackages(const Uuid& uuid) const;
+  QMultiMap<Version, FilePath> getComponents(const Uuid& uuid) const;
+  QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const;
 
-        // Getters: Library Elements by their UUID
-        QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const;
-        QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const;
-        QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const;
-        QMultiMap<Version, FilePath> getPackages(const Uuid& uuid) const;
-        QMultiMap<Version, FilePath> getComponents(const Uuid& uuid) const;
-        QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const;
+  // Getters: Best Match Library Elements by their UUID
+  FilePath getLatestComponentCategory(const Uuid& uuid) const;
+  FilePath getLatestPackageCategory(const Uuid& uuid) const;
+  FilePath getLatestSymbol(const Uuid& uuid) const;
+  FilePath getLatestPackage(const Uuid& uuid) const;
+  FilePath getLatestComponent(const Uuid& uuid) const;
+  FilePath getLatestDevice(const Uuid& uuid) const;
 
-        // Getters: Best Match Library Elements by their UUID
-        FilePath getLatestComponentCategory(const Uuid& uuid) const;
-        FilePath getLatestPackageCategory(const Uuid& uuid) const;
-        FilePath getLatestSymbol(const Uuid& uuid) const;
-        FilePath getLatestPackage(const Uuid& uuid) const;
-        FilePath getLatestComponent(const Uuid& uuid) const;
-        FilePath getLatestDevice(const Uuid& uuid) const;
+  // Getters: Library elements of a specified library
+  template <typename ElementType>
+  QList<FilePath> getLibraryElements(const FilePath& lib) const;
 
-        // Getters: Library elements of a specified library
-        template <typename ElementType>
-        QList<FilePath> getLibraryElements(const FilePath& lib) const;
+  // Getters: Element Metadata
+  template <typename ElementType>
+  void getElementTranslations(const FilePath&    elemDir,
+                              const QStringList& localeOrder,
+                              QString* name = nullptr, QString* desc = nullptr,
+                              QString* keywords = nullptr) const;
+  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
 
-        // Getters: Element Metadata
-        template <typename ElementType>
-        void getElementTranslations(const FilePath& elemDir, const QStringList& localeOrder,
-                                    QString* name = nullptr, QString* desc = nullptr,
-                                    QString* keywords = nullptr) const;
-        void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
+  // Getters: Special
+  QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;
+  QSet<Uuid> getPackageCategoryChilds(const tl::optional<Uuid>& parent) const;
+  QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
+  QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
+  QSet<Uuid>  getSymbolsByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid>  getPackagesByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid>  getComponentsByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid>  getDevicesByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid>  getDevicesOfComponent(const Uuid& component) const;
+  QSet<Uuid>  getComponentsBySearchKeyword(const QString& keyword) const;
 
-        // Getters: Special
-        QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;
-        QSet<Uuid> getPackageCategoryChilds(const tl::optional<Uuid>& parent) const;
-        QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
-        QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
-        QSet<Uuid> getSymbolsByCategory(const tl::optional<Uuid>& category) const;
-        QSet<Uuid> getPackagesByCategory(const tl::optional<Uuid>& category) const;
-        QSet<Uuid> getComponentsByCategory(const tl::optional<Uuid>& category) const;
-        QSet<Uuid> getDevicesByCategory(const tl::optional<Uuid>& category) const;
-        QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
-        QSet<Uuid> getComponentsBySearchKeyword(const QString& keyword) const;
+  // General Methods
 
-        // General Methods
+  /**
+   * @brief Rescan the whole library directory and update the SQLite database
+   */
+  void startLibraryRescan() noexcept;
 
-        /**
-         * @brief Rescan the whole library directory and update the SQLite database
-         */
-        void startLibraryRescan() noexcept;
+  // Operator Overloadings
+  WorkspaceLibraryDb& operator=(const WorkspaceLibraryDb& rhs) = delete;
 
-        // Operator Overloadings
-        WorkspaceLibraryDb& operator=(const WorkspaceLibraryDb& rhs) = delete;
+signals:
 
+  void scanStarted();
+  void scanProgressUpdate(int percent);
+  void scanSucceeded(int elementCount);
+  void scanFailed(QString errorMsg);
 
-    signals:
+private:
+  // Private Methods
+  void getElementTranslations(const QString& table, const QString& idRow,
+                              const FilePath&    elemDir,
+                              const QStringList& localeOrder, QString* name,
+                              QString* desc, QString* keywords) const;
+  QMultiMap<Version, FilePath> getElementFilePathsFromDb(
+      const QString& tablename, const Uuid& uuid) const;
+  FilePath getLatestVersionFilePath(
+      const QMultiMap<Version, FilePath>& list) const noexcept;
+  QSet<Uuid>         getCategoryChilds(const QString&            tablename,
+                                       const tl::optional<Uuid>& categoryUuid) const;
+  QList<Uuid>        getCategoryParents(const QString& tablename,
+                                        const Uuid&    category) const;
+  tl::optional<Uuid> getCategoryParent(const QString& tablename,
+                                       const Uuid&    category) const;
+  QSet<Uuid>         getElementsByCategory(
+              const QString& tablename, const QString& idrowname,
+              const tl::optional<Uuid>& categoryUuid) const;
+  int             getLibraryId(const FilePath& lib) const;
+  QList<FilePath> getLibraryElements(const FilePath& lib,
+                                     const QString&  tablename) const;
+  void            createAllTables();
+  void            setDbVersion(int version);
+  int             getDbVersion() const noexcept;
 
-        void scanStarted();
-        void scanProgressUpdate(int percent);
-        void scanSucceeded(int elementCount);
-        void scanFailed(QString errorMsg);
+  // Attributes
+  Workspace&                     mWorkspace;
+  QScopedPointer<SQLiteDatabase> mDb;  ///< the SQLite database "cache.sqlite"
+  QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
-
-    private:
-
-        // Private Methods
-        void getElementTranslations(const QString& table, const QString& idRow,
-                                    const FilePath& elemDir, const QStringList& localeOrder,
-                                    QString* name, QString* desc, QString* keywords) const;
-        QMultiMap<Version, FilePath> getElementFilePathsFromDb(const QString& tablename,
-                                                               const Uuid& uuid) const;
-        FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
-        QSet<Uuid> getCategoryChilds(const QString& tablename, const tl::optional<Uuid>& categoryUuid) const;
-        QList<Uuid> getCategoryParents(const QString& tablename, const Uuid& category) const;
-        tl::optional<Uuid> getCategoryParent(const QString& tablename, const Uuid& category) const;
-        QSet<Uuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
-                                         const tl::optional<Uuid>& categoryUuid) const;
-        int getLibraryId(const FilePath& lib) const;
-        QList<FilePath> getLibraryElements(const FilePath& lib, const QString& tablename) const;
-        void createAllTables();
-        void setDbVersion(int version);
-        int getDbVersion() const noexcept;
-
-
-        // Attributes
-        Workspace& mWorkspace;
-        QScopedPointer<SQLiteDatabase> mDb; ///< the SQLite database "cache.sqlite"
-        QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
-
-        // Constants
-        static const int sCurrentDbVersion = 1;
+  // Constants
+  static const int sCurrentDbVersion = 1;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
+#endif  // LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H

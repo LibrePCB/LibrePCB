@@ -17,59 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetlabelremove.h"
-#include "../schematic.h"
+
 #include "../items/si_netlabel.h"
 #include "../items/si_netsegment.h"
+#include "../schematic.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept :
-    UndoCommand(tr("Remove netlabel")),
-    mNetSegment(netlabel.getNetSegment()), mNetLabel(netlabel)
-{
+CmdSchematicNetLabelRemove::CmdSchematicNetLabelRemove(
+    SI_NetLabel& netlabel) noexcept
+  : UndoCommand(tr("Remove netlabel")),
+    mNetSegment(netlabel.getNetSegment()),
+    mNetLabel(netlabel) {
 }
 
-CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept
-{
+CmdSchematicNetLabelRemove::~CmdSchematicNetLabelRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetLabelRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdSchematicNetLabelRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicNetLabelRemove::performUndo()
-{
-    mNetSegment.addNetLabel(mNetLabel); // can throw
+void CmdSchematicNetLabelRemove::performUndo() {
+  mNetSegment.addNetLabel(mNetLabel);  // can throw
 }
 
-void CmdSchematicNetLabelRemove::performRedo()
-{
-    mNetSegment.removeNetLabel(mNetLabel); // can throw
+void CmdSchematicNetLabelRemove::performRedo() {
+  mNetSegment.removeNetLabel(mNetLabel);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

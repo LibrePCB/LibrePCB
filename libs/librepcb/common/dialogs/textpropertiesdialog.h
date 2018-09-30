@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_TEXTPROPERTIESDIALOG_H
 #define LIBREPCB_TEXTPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -39,47 +39,44 @@ namespace Ui {
 class TextPropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class TextPropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The TextPropertiesDialog class
  */
-class TextPropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class TextPropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  TextPropertiesDialog()                                  = delete;
+  TextPropertiesDialog(const TextPropertiesDialog& other) = delete;
+  TextPropertiesDialog(Text& text, UndoStack& undoStack,
+                       QList<GraphicsLayer*> layers,
+                       QWidget*              parent = nullptr) noexcept;
+  ~TextPropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        TextPropertiesDialog() = delete;
-        TextPropertiesDialog(const TextPropertiesDialog& other) = delete;
-        TextPropertiesDialog(Text& text, UndoStack& undoStack, QList<GraphicsLayer*> layers,
-                             QWidget* parent = nullptr) noexcept;
-        ~TextPropertiesDialog() noexcept;
+  // Operator Overloadings
+  TextPropertiesDialog& operator=(const TextPropertiesDialog& rhs) = delete;
 
-        // Operator Overloadings
-        TextPropertiesDialog& operator=(const TextPropertiesDialog& rhs) = delete;
+private:  // Methods
+  void on_buttonBox_clicked(QAbstractButton* button);
+  bool applyChanges() noexcept;
+  void addLayersToCombobox(const QList<QString>& names) noexcept;
+  void selectLayerNameInCombobox(const QString& name) noexcept;
 
-
-    private: // Methods
-        void on_buttonBox_clicked(QAbstractButton *button);
-        bool applyChanges() noexcept;
-        void addLayersToCombobox(const QList<QString>& names) noexcept;
-        void selectLayerNameInCombobox(const QString& name) noexcept;
-
-
-    private: // Data
-        Text& mText;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::TextPropertiesDialog> mUi;
+private:  // Data
+  Text&                                    mText;
+  UndoStack&                               mUndoStack;
+  QScopedPointer<Ui::TextPropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_TEXTPROPERTIESDIALOG_H
+#endif  // LIBREPCB_TEXTPROPERTIESDIALOG_H

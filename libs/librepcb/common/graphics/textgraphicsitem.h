@@ -20,68 +20,69 @@
 #ifndef LIBREPCB_TEXTGRAPHICSITEM_H
 #define LIBREPCB_TEXTGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "../geometry/text.h"
+#include "primitivetextgraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "primitivetextgraphicsitem.h"
-#include "../geometry/text.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class OriginCrossGraphicsItem;
 class IF_GraphicsLayerProvider;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class TextGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The TextGraphicsItem class is the graphical representation of a librepcb::Text
+ * @brief The TextGraphicsItem class is the graphical representation of a
+ * librepcb::Text
  *
  * @author ubruhin
  * @date 2017-05-28
  */
-class TextGraphicsItem final : public PrimitiveTextGraphicsItem, public IF_TextObserver
-{
-    public:
+class TextGraphicsItem final : public PrimitiveTextGraphicsItem,
+                               public IF_TextObserver {
+public:
+  // Constructors / Destructor
+  TextGraphicsItem()                              = delete;
+  TextGraphicsItem(const TextGraphicsItem& other) = delete;
+  TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& lp,
+                   QGraphicsItem* parent = nullptr) noexcept;
+  ~TextGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        TextGraphicsItem() = delete;
-        TextGraphicsItem(const TextGraphicsItem& other) = delete;
-        TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& lp, QGraphicsItem* parent = nullptr) noexcept;
-        ~TextGraphicsItem() noexcept;
+  // Getters
+  Text& getText() noexcept { return mText; }
 
-        // Getters
-        Text& getText() noexcept {return mText;}
+  // Operator Overloadings
+  TextGraphicsItem& operator=(const TextGraphicsItem& rhs) = delete;
 
-        // Operator Overloadings
-        TextGraphicsItem& operator=(const TextGraphicsItem& rhs) = delete;
+private:  // Methods
+  void textLayerNameChanged(
+      const GraphicsLayerName& newLayerName) noexcept override;
+  void textTextChanged(const QString& newText) noexcept override;
+  void textPositionChanged(const Point& newPos) noexcept override;
+  void textRotationChanged(const Angle& newRot) noexcept override;
+  void textHeightChanged(const PositiveLength& newHeight) noexcept override;
+  void textAlignChanged(const Alignment& newAlign) noexcept override;
 
-
-    private: // Methods
-        void textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept override;
-        void textTextChanged(const QString& newText) noexcept override;
-        void textPositionChanged(const Point& newPos) noexcept override;
-        void textRotationChanged(const Angle& newRot) noexcept override;
-        void textHeightChanged(const PositiveLength& newHeight) noexcept override;
-        void textAlignChanged(const Alignment& newAlign) noexcept override;
-
-
-    private: // Data
-        Text& mText;
-        const IF_GraphicsLayerProvider& mLayerProvider;
-        QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+private:  // Data
+  Text&                                   mText;
+  const IF_GraphicsLayerProvider&         mLayerProvider;
+  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_TEXTGRAPHICSITEM_H
+#endif  // LIBREPCB_TEXTGRAPHICSITEM_H

@@ -17,58 +17,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmddeviceinstanceremove.h"
-#include "../items/bi_device.h"
-#include "../board.h"
 
-/*****************************************************************************************
+#include "../board.h"
+#include "../items/bi_device.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(BI_Device& dev) noexcept :
-    UndoCommand(tr("Remove device instance")),
-    mBoard(dev.getBoard()), mDevice(dev)
-{
+CmdDeviceInstanceRemove::CmdDeviceInstanceRemove(BI_Device& dev) noexcept
+  : UndoCommand(tr("Remove device instance")),
+    mBoard(dev.getBoard()),
+    mDevice(dev) {
 }
 
-CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept
-{
+CmdDeviceInstanceRemove::~CmdDeviceInstanceRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdDeviceInstanceRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdDeviceInstanceRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdDeviceInstanceRemove::performUndo()
-{
-    mBoard.addDeviceInstance(mDevice); // can throw
+void CmdDeviceInstanceRemove::performUndo() {
+  mBoard.addDeviceInstance(mDevice);  // can throw
 }
 
-void CmdDeviceInstanceRemove::performRedo()
-{
-    mBoard.removeDeviceInstance(mDevice); // can throw
+void CmdDeviceInstanceRemove::performRedo() {
+  mBoard.removeDeviceInstance(mDevice);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

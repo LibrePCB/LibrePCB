@@ -17,58 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdfootprintstroketextadd.h"
+
 #include "../items/bi_footprint.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdFootprintStrokeTextAdd::CmdFootprintStrokeTextAdd(BI_Footprint& footprint,
-                                                     BI_StrokeText& text) noexcept :
-    UndoCommand(tr("Add footprint text")),
-    mFootprint(footprint), mText(text)
-{
+CmdFootprintStrokeTextAdd::CmdFootprintStrokeTextAdd(
+    BI_Footprint& footprint, BI_StrokeText& text) noexcept
+  : UndoCommand(tr("Add footprint text")), mFootprint(footprint), mText(text) {
 }
 
-CmdFootprintStrokeTextAdd::~CmdFootprintStrokeTextAdd() noexcept
-{
+CmdFootprintStrokeTextAdd::~CmdFootprintStrokeTextAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdFootprintStrokeTextAdd::performExecute()
-{
-    performRedo(); // can throw
+bool CmdFootprintStrokeTextAdd::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdFootprintStrokeTextAdd::performUndo()
-{
-    mFootprint.removeStrokeText(mText); // can throw
+void CmdFootprintStrokeTextAdd::performUndo() {
+  mFootprint.removeStrokeText(mText);  // can throw
 }
 
-void CmdFootprintStrokeTextAdd::performRedo()
-{
-    mFootprint.addStrokeText(mText); // can throw
+void CmdFootprintStrokeTextAdd::performRedo() {
+  mFootprint.addStrokeText(mText);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

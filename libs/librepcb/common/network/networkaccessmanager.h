@@ -20,73 +20,76 @@
 #ifndef LIBREPCB_NETWORKACCESSMANAGER_H
 #define LIBREPCB_NETWORKACCESSMANAGER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtNetwork>
+ ******************************************************************************/
 #include "../fileio/filepath.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtNetwork>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NetworkAccessManager
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief A network access manager which processes network requests in a separate thread
+ * @brief A network access manager which processes network requests in a
+ separate thread
  *
- * @note    One instance of this class must be created in the main application thread, and
- *          must be deleted before stopping the main application thread. It's not allowed
- *          to create a librepcb::NetworkAccessManager object in other threads, or to
+ * @note    One instance of this class must be created in the main application
+ thread, and
+ *          must be deleted before stopping the main application thread. It's
+ not allowed
+ *          to create a librepcb::NetworkAccessManager object in other threads,
+ or to
  *          create multiple instances at the same time.
  *
- * After the singleton was created, you can get it with the static method #instance().
- * But for executing network requests, you don't need to access this object directly.
- * You only need the classes librepcb::NetworkRequest and librepcb::FileDownload instead.
+ * After the singleton was created, you can get it with the static method
+ #instance().
+ * But for executing network requests, you don't need to access this object
+ directly.
+ * You only need the classes librepcb::NetworkRequest and librepcb::FileDownload
+ instead.
 
- * @see librepcb::NetworkRequestBase, librepcb::NetworkRequest, librepcb::FileDownload
+ * @see librepcb::NetworkRequestBase, librepcb::NetworkRequest,
+ librepcb::FileDownload
  *
  * @author ubruhin
  * @date 2016-09-15
  */
-class NetworkAccessManager final : public QThread
-{
-        Q_OBJECT
+class NetworkAccessManager final : public QThread {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NetworkAccessManager() noexcept;
+  NetworkAccessManager(const NetworkAccessManager& other) = delete;
+  ~NetworkAccessManager() noexcept;
 
-        // Constructors / Destructor
-        NetworkAccessManager() noexcept;
-        NetworkAccessManager(const NetworkAccessManager& other) = delete;
-        ~NetworkAccessManager() noexcept;
+  // General Methods
+  QNetworkReply* get(const QNetworkRequest& request) noexcept;
 
-        // General Methods
-        QNetworkReply* get(const QNetworkRequest& request) noexcept;
+  // Operator Overloadings
+  NetworkAccessManager& operator=(const NetworkAccessManager& rhs) = delete;
 
-        // Operator Overloadings
-        NetworkAccessManager& operator=(const NetworkAccessManager& rhs) = delete;
+  // Static Methods
+  static NetworkAccessManager* instance() noexcept;
 
-        // Static Methods
-        static NetworkAccessManager* instance() noexcept;
+private:  // Methods
+  void run() noexcept override;
+  void stop() noexcept;
 
-
-    private: // Methods
-
-        void run() noexcept override;
-        void stop() noexcept;
-
-
-    private: // Data
-
-        QSemaphore mThreadStartSemaphore;
-        QNetworkAccessManager* mManager;
-        static NetworkAccessManager* sInstance;
+private:  // Data
+  QSemaphore                   mThreadStartSemaphore;
+  QNetworkAccessManager*       mManager;
+  static NetworkAccessManager* sInstance;
 };
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_NETWORKACCESSMANAGER_H
+#endif  // LIBREPCB_NETWORKACCESSMANAGER_H

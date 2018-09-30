@@ -20,21 +20,23 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
+#include "../common/categorylisteditorwidget.h"
+#include "../common/editorwidgetbase.h"
+#include "if_componentsymbolvarianteditorprovider.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
-#include "if_componentsymbolvarianteditorprovider.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
@@ -48,9 +50,9 @@ namespace Ui {
 class ComponentEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ComponentEditorWidget class
@@ -58,51 +60,48 @@ class ComponentEditorWidget;
  * @author ubruhin
  * @date 2016-10-16
  */
-class ComponentEditorWidget final : public EditorWidgetBase,
-                                    public IF_ComponentSymbolVariantEditorProvider
-{
-        Q_OBJECT
+class ComponentEditorWidget final
+  : public EditorWidgetBase,
+    public IF_ComponentSymbolVariantEditorProvider {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentEditorWidget()                                   = delete;
+  ComponentEditorWidget(const ComponentEditorWidget& other) = delete;
+  ComponentEditorWidget(const Context& context, const FilePath& fp,
+                        QWidget* parent = nullptr);
+  ~ComponentEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        ComponentEditorWidget() = delete;
-        ComponentEditorWidget(const ComponentEditorWidget& other) = delete;
-        ComponentEditorWidget(const Context& context, const FilePath& fp,
-                              QWidget* parent = nullptr);
-        ~ComponentEditorWidget() noexcept;
+  // Operator Overloadings
+  ComponentEditorWidget& operator=(const ComponentEditorWidget& rhs) = delete;
 
-        // Operator Overloadings
-        ComponentEditorWidget& operator=(const ComponentEditorWidget& rhs) = delete;
+public slots:
+  bool save() noexcept override;
 
+private:  // Methods
+  bool openComponentSymbolVariantEditor(
+      ComponentSymbolVariant& variant) noexcept override;
+  void memorizeComponentInterface() noexcept;
+  bool isInterfaceBroken() const noexcept override;
 
-    public slots:
-        bool save() noexcept override;
+private:  // Data
+  QScopedPointer<Ui::ComponentEditorWidget>         mUi;
+  QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+  QSharedPointer<Component>                         mComponent;
 
-
-    private: // Methods
-        bool openComponentSymbolVariantEditor(ComponentSymbolVariant& variant) noexcept override;
-        void memorizeComponentInterface() noexcept;
-        bool isInterfaceBroken() const noexcept override;
-
-
-    private: // Data
-        QScopedPointer<Ui::ComponentEditorWidget> mUi;
-        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-        QSharedPointer<Component> mComponent;
-
-        // broken interface detection
-        bool mOriginalIsSchematicOnly;
-        QSet<Uuid> mOriginalSignalUuids;
-        ComponentSymbolVariantList mOriginalSymbolVariants;
+  // broken interface detection
+  bool                       mOriginalIsSchematicOnly;
+  QSet<Uuid>                 mOriginalSignalUuids;
+  ComponentSymbolVariantList mOriginalSymbolVariants;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H

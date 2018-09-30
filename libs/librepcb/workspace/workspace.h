@@ -20,25 +20,26 @@
 #ifndef LIBREPCB_WORKSPACE_H
 #define LIBREPCB_WORKSPACE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/fileio/directorylock.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/version.h>
+#include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/uuid.h>
+#include <librepcb/common/version.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
 class Library;
 }
 
-namespace project{
+namespace project {
 class Project;
 }
 
@@ -50,281 +51,290 @@ class FavoriteProjectsModel;
 class WorkspaceSettings;
 class WorkspaceLibraryDb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Workspace
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The Workspace class represents a workspace with all its data (library, projects,
- * settings, ...)
+ * @brief The Workspace class represents a workspace with all its data (library,
+ * projects, settings, ...)
  *
  * To access the settings of the workspace, use the method #getSettings().
  *
  * @author ubruhin
  * @date 2014-06-23
  */
-class Workspace final : public QObject
-{
-        Q_OBJECT
+class Workspace final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Workspace()                       = delete;
+  Workspace(const Workspace& other) = delete;
 
-        // Constructors / Destructor
-        Workspace() = delete;
-        Workspace(const Workspace& other) = delete;
+  /**
+   * @brief Constructor to open an existing workspace
+   *
+   * @param wsPath    The filepath to the workspace directory
+   *
+   * @throw Exception If the workspace could not be opened, this constructor
+   * throws an exception.
+   */
+  explicit Workspace(const FilePath& wsPath);
 
-        /**
-         * @brief Constructor to open an existing workspace
-         *
-         * @param wsPath    The filepath to the workspace directory
-         *
-         * @throw Exception If the workspace could not be opened, this constructor throws
-         *                  an exception.
-         */
-        explicit Workspace(const FilePath& wsPath);
+  /**
+   * The destructor
+   */
+  ~Workspace() noexcept;
 
-        /**
-         * The destructor
-         */
-        ~Workspace() noexcept;
+  // Getters
 
+  /**
+   * @brief Get the filepath to the workspace directory
+   */
+  const FilePath& getPath() const { return mPath; }
 
-        // Getters
+  /**
+   * @brief Get the filepath to the "projects" directory in the workspace
+   */
+  const FilePath& getProjectsPath() const { return mProjectsPath; }
 
-        /**
-         * @brief Get the filepath to the workspace directory
-         */
-        const FilePath& getPath() const {return mPath;}
+  /**
+   * @brief Get the filepath to the version directory (v#) in the workspace
+   */
+  const FilePath& getMetadataPath() const { return mMetadataPath; }
 
-        /**
-         * @brief Get the filepath to the "projects" directory in the workspace
-         */
-        const FilePath& getProjectsPath() const {return mProjectsPath;}
+  /**
+   * @brief Get the filepath to the "v#/libraries" directory in the workspace
+   */
+  const FilePath& getLibrariesPath() const { return mLibrariesPath; }
 
-        /**
-         * @brief Get the filepath to the version directory (v#) in the workspace
-         */
-        const FilePath& getMetadataPath() const {return mMetadataPath;}
+  ProjectTreeModel&      getProjectTreeModel() const noexcept;
+  RecentProjectsModel&   getRecentProjectsModel() const noexcept;
+  FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
 
-        /**
-         * @brief Get the filepath to the "v#/libraries" directory in the workspace
-         */
-        const FilePath& getLibrariesPath() const {return mLibrariesPath;}
+  /**
+   * @brief Get the workspace settings
+   */
+  WorkspaceSettings& getSettings() const { return *mWorkspaceSettings; }
 
-        ProjectTreeModel& getProjectTreeModel() const noexcept;
-        RecentProjectsModel& getRecentProjectsModel() const noexcept;
-        FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
+  // Library Management
 
-        /**
-         * @brief Get the workspace settings
-         */
-        WorkspaceSettings& getSettings() const {return *mWorkspaceSettings;}
+  /**
+   * @brief Get the (highest) version of a specific library
+   *
+   * @param uuid      The uuid of the library
+   * @param local     If true, local libraries are searched
+   * @param remote    If true, remote libraries are searched
+   *
+   * @return The highest version of the library (tl::nullopt if library not
+   * installed)
+   */
+  tl::optional<Version> getVersionOfLibrary(const Uuid& uuid, bool local = true,
+                                            bool remote = true) const noexcept;
 
+  /**
+   * @brief Get all local libraries (located in "workspace/v#/libraries/local")
+   *
+   * @return A list of all local libraries
+   */
+  const QMap<QString, QSharedPointer<library::Library>> getLocalLibraries()
+      const noexcept {
+    return mLocalLibraries;
+  }
 
-        // Library Management
+  /**
+   * @brief Get all remote libraries (located in
+   * "workspace/v#/libraries/remote")
+   *
+   * @return A list of all remote libraries
+   */
+  const QMap<QString, QSharedPointer<library::Library>> getRemoteLibraries()
+      const noexcept {
+    return mRemoteLibraries;
+  }
 
-        /**
-         * @brief Get the (highest) version of a specific library
-         *
-         * @param uuid      The uuid of the library
-         * @param local     If true, local libraries are searched
-         * @param remote    If true, remote libraries are searched
-         *
-         * @return The highest version of the library (tl::nullopt if library not installed)
-         */
-        tl::optional<Version> getVersionOfLibrary(const Uuid& uuid, bool local = true,
-                                                  bool remote = true) const noexcept;
+  /**
+   * @brief Add a new local library
+   *
+   * @param libDirName    The name of the (existing) local library directory
+   *
+   * @throws Exception on error
+   */
+  void addLocalLibrary(const QString& libDirName);
 
-        /**
-         * @brief Get all local libraries (located in "workspace/v#/libraries/local")
-         *
-         * @return A list of all local libraries
-         */
-        const QMap<QString, QSharedPointer<library::Library>> getLocalLibraries() const noexcept
-        {return mLocalLibraries;}
+  /**
+   * @brief Add a new remote library
+   *
+   * @param libDirName    The name of the (existing) remote library directory
+   *
+   * @throws Exception on error
+   */
+  void addRemoteLibrary(const QString& libDirName);
 
-        /**
-         * @brief Get all remote libraries (located in "workspace/v#/libraries/remote")
-         *
-         * @return A list of all remote libraries
-         */
-        const QMap<QString, QSharedPointer<library::Library>> getRemoteLibraries() const noexcept
-        {return mRemoteLibraries;}
+  /**
+   * @brief Remove a local library
+   *
+   * @param libDirName    The name of the (existing) local library directory
+   * @param rmDir         It true, the library's directory will be removed
+   *
+   * @throws Exception on error
+   */
+  void removeLocalLibrary(const QString& libDirName, bool rmDir = true);
 
-        /**
-         * @brief Add a new local library
-         *
-         * @param libDirName    The name of the (existing) local library directory
-         *
-         * @throws Exception on error
-         */
-        void addLocalLibrary(const QString& libDirName);
+  /**
+   * @brief Remove a remote library
+   *
+   * @param libDirName    The name of the (existing) remote library directory
+   * @param rmDir         It true, the library's directory will be removed
+   *
+   * @throws Exception on error
+   */
+  void removeRemoteLibrary(const QString& libDirName, bool rmDir = true);
 
-        /**
-         * @brief Add a new remote library
-         *
-         * @param libDirName    The name of the (existing) remote library directory
-         *
-         * @throws Exception on error
-         */
-        void addRemoteLibrary(const QString& libDirName);
+  /**
+   * @brief Get the workspace library database
+   */
+  WorkspaceLibraryDb& getLibraryDb() const { return *mLibraryDb; }
 
-        /**
-         * @brief Remove a local library
-         *
-         * @param libDirName    The name of the (existing) local library directory
-         * @param rmDir         It true, the library's directory will be removed
-         *
-         * @throws Exception on error
-         */
-        void removeLocalLibrary(const QString& libDirName, bool rmDir = true);
+  // Project Management
 
-        /**
-         * @brief Remove a remote library
-         *
-         * @param libDirName    The name of the (existing) remote library directory
-         * @param rmDir         It true, the library's directory will be removed
-         *
-         * @throws Exception on error
-         */
-        void removeRemoteLibrary(const QString& libDirName, bool rmDir = true);
+  /**
+   * @brief setLastRecentlyUsedProject
+   * @param filepath
+   */
+  void setLastRecentlyUsedProject(const FilePath& filepath) noexcept;
 
+  /**
+   * @brief Check whether a project is in the favorite project list or not
+   *
+   * @param filepath  The filepath to a *.lpp project file
+   *
+   * @return True if the specified project is in the favorites list, false
+   * otherwise
+   */
+  bool isFavoriteProject(const FilePath& filepath) const noexcept;
 
-        /**
-         * @brief Get the workspace library database
-         */
-        WorkspaceLibraryDb& getLibraryDb() const {return *mLibraryDb;}
+  /**
+   * @brief Add a project to the favorite projects list
+   *
+   * @param filepath  The filepath to a *.lpp project file
+   */
+  void addFavoriteProject(const FilePath& filepath) noexcept;
 
+  /**
+   * @brief Remove a project from the favorite projects list
+   *
+   * @param filepath  The filepath to a *.lpp project file
+   */
+  void removeFavoriteProject(const FilePath& filepath) noexcept;
 
-        // Project Management
+  // Operator Overloadings
+  Workspace& operator=(const Workspace& rhs) = delete;
 
-        /**
-         * @brief setLastRecentlyUsedProject
-         * @param filepath
-         */
-        void setLastRecentlyUsedProject(const FilePath& filepath) noexcept;
+  // Static Methods
 
-        /**
-         * @brief Check whether a project is in the favorite project list or not
-         *
-         * @param filepath  The filepath to a *.lpp project file
-         *
-         * @return True if the specified project is in the favorites list, false otherwise
-         */
-        bool isFavoriteProject(const FilePath& filepath) const noexcept;
+  /**
+   * @brief Check whether a filepath points to a valid workspace directory or
+   * not
+   *
+   * @param path  A path to a directory
+   *
+   * @return True if the path is a valid workspace directory, false otherwise
+   */
+  static bool isValidWorkspacePath(const FilePath& path) noexcept;
 
-        /**
-         * @brief Add a project to the favorite projects list
-         *
-         * @param filepath  The filepath to a *.lpp project file
-         */
-        void addFavoriteProject(const FilePath& filepath) noexcept;
+  /**
+   * @brief getFileFormatVersionsOfWorkspace
+   * @param path
+   * @return
+   */
+  static QList<Version> getFileFormatVersionsOfWorkspace(
+      const FilePath& path) noexcept;
 
-        /**
-         * @brief Remove a project from the favorite projects list
-         *
-         * @param filepath  The filepath to a *.lpp project file
-         */
-        void removeFavoriteProject(const FilePath& filepath) noexcept;
+  /**
+   * @brief getHighestFileFormatVersionOfWorkspace
+   * @param path
+   * @return
+   */
+  static tl::optional<Version> getHighestFileFormatVersionOfWorkspace(
+      const FilePath& path) noexcept;
 
+  /**
+   * @brief Create a new workspace
+   *
+   * @param path  A path to a directory where to create the new workspace
+   *
+   * @throws Exception on error.
+   */
+  static void createNewWorkspace(const FilePath& path);
 
-        // Operator Overloadings
-        Workspace& operator=(const Workspace& rhs) = delete;
+  /**
+   * @brief Get the most recently used workspace path
+   *
+   * @return The filepath to the last recently used workspace (may be invalid)
+   */
+  static FilePath getMostRecentlyUsedWorkspacePath() noexcept;
 
+  /**
+   * @brief Set the most recently used workspace path
+   *
+   * @param path  The filepath to the workspace directory
+   */
+  static void setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept;
 
-        // Static Methods
+  /**
+   * @brief Let the user choose a workspace path (with a directory chooser
+   * dialog)
+   *
+   * @return The choosen filepath (is invalid on error or user cancel)
+   */
+  static FilePath chooseWorkspacePath() noexcept;
 
-        /**
-         * @brief Check whether a filepath points to a valid workspace directory or not
-         *
-         * @param path  A path to a directory
-         *
-         * @return True if the path is a valid workspace directory, false otherwise
-         */
-        static bool isValidWorkspacePath(const FilePath& path) noexcept;
+  /**
+   * @brief Current workspace file format version (constant)
+   *
+   * @warning Don't change this value unless you know exactly what you're doing!
+   *
+   * @return File format version
+   */
+  static Version FILE_FORMAT_VERSION() noexcept {
+    return Version::fromString("0.1");
+  }
 
-        /**
-         * @brief getFileFormatVersionsOfWorkspace
-         * @param path
-         * @return
-         */
-        static QList<Version> getFileFormatVersionsOfWorkspace(const FilePath& path) noexcept;
+signals:
 
-        /**
-         * @brief getHighestFileFormatVersionOfWorkspace
-         * @param path
-         * @return
-         */
-        static tl::optional<Version> getHighestFileFormatVersionOfWorkspace(const FilePath& path) noexcept;
+  void libraryAdded(const FilePath& libDir);
+  void libraryRemoved(const FilePath& libDir);
 
-        /**
-         * @brief Create a new workspace
-         *
-         * @param path  A path to a directory where to create the new workspace
-         *
-         * @throws Exception on error.
-         */
-        static void createNewWorkspace(const FilePath& path);
-
-        /**
-         * @brief Get the most recently used workspace path
-         *
-         * @return The filepath to the last recently used workspace (may be invalid)
-         */
-        static FilePath getMostRecentlyUsedWorkspacePath() noexcept;
-
-        /**
-         * @brief Set the most recently used workspace path
-         *
-         * @param path  The filepath to the workspace directory
-         */
-        static void setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept;
-
-        /**
-         * @brief Let the user choose a workspace path (with a directory chooser dialog)
-         *
-         * @return The choosen filepath (is invalid on error or user cancel)
-         */
-        static FilePath chooseWorkspacePath() noexcept;
-
-
-        /**
-         * @brief Current workspace file format version (constant)
-         *
-         * @warning Don't change this value unless you know exactly what you're doing!
-         *
-         * @return File format version
-         */
-        static Version FILE_FORMAT_VERSION() noexcept {return Version::fromString("0.1");}
-
-
-    signals:
-
-        void libraryAdded(const FilePath& libDir);
-        void libraryRemoved(const FilePath& libDir);
-
-
-    private: // Data
-
-        FilePath mPath; ///< a FilePath object which represents the workspace directory
-        FilePath mProjectsPath; ///< the directory "projects"
-        FilePath mMetadataPath; ///< the subdirectory of the current file format version
-        FilePath mLibrariesPath; ///< the directory "v#/libraries"
-        DirectoryLock mLock; ///< to lock the version directory (#mVersionPath)
-        QScopedPointer<WorkspaceSettings> mWorkspaceSettings; ///< the WorkspaceSettings object
-        QMap<QString, QSharedPointer<library::Library>> mLocalLibraries; ///< all local libraries
-        QMap<QString, QSharedPointer<library::Library>> mRemoteLibraries; ///< all remote libraries
-        QScopedPointer<WorkspaceLibraryDb> mLibraryDb; ///< the library database
-        QScopedPointer<ProjectTreeModel> mProjectTreeModel; ///< a tree model for the whole projects directory
-        QScopedPointer<RecentProjectsModel> mRecentProjectsModel; ///< a list model of all recent projects
-        QScopedPointer<FavoriteProjectsModel> mFavoriteProjectsModel; ///< a list model of all favorite projects
+private:  // Data
+  FilePath
+           mPath;  ///< a FilePath object which represents the workspace directory
+  FilePath mProjectsPath;  ///< the directory "projects"
+  FilePath
+                mMetadataPath;  ///< the subdirectory of the current file format version
+  FilePath      mLibrariesPath;  ///< the directory "v#/libraries"
+  DirectoryLock mLock;  ///< to lock the version directory (#mVersionPath)
+  QScopedPointer<WorkspaceSettings>
+      mWorkspaceSettings;  ///< the WorkspaceSettings object
+  QMap<QString, QSharedPointer<library::Library>>
+      mLocalLibraries;  ///< all local libraries
+  QMap<QString, QSharedPointer<library::Library>>
+                                     mRemoteLibraries;  ///< all remote libraries
+  QScopedPointer<WorkspaceLibraryDb> mLibraryDb;  ///< the library database
+  QScopedPointer<ProjectTreeModel>
+      mProjectTreeModel;  ///< a tree model for the whole projects directory
+  QScopedPointer<RecentProjectsModel>
+      mRecentProjectsModel;  ///< a list model of all recent projects
+  QScopedPointer<FavoriteProjectsModel>
+      mFavoriteProjectsModel;  ///< a list model of all favorite projects
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_H
+#endif  // LIBREPCB_WORKSPACE_H

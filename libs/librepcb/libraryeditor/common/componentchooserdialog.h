@@ -20,18 +20,20 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTCHOOSERDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_COMPONENTCHOOSERDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
+ ******************************************************************************/
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsScene;
@@ -53,9 +55,9 @@ namespace Ui {
 class ComponentChooserDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentChooserDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ComponentChooserDialog class
@@ -63,62 +65,60 @@ class ComponentChooserDialog;
  * @author ubruhin
  * @date 2017-03-25
  */
-class ComponentChooserDialog final : public QDialog
-{
-        Q_OBJECT
+class ComponentChooserDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentChooserDialog()                                    = delete;
+  ComponentChooserDialog(const ComponentChooserDialog& other) = delete;
+  ComponentChooserDialog(const workspace::Workspace&     ws,
+                         const IF_GraphicsLayerProvider* layerProvider,
+                         QWidget* parent = nullptr) noexcept;
+  ~ComponentChooserDialog() noexcept;
 
-        // Constructors / Destructor
-        ComponentChooserDialog() = delete;
-        ComponentChooserDialog(const ComponentChooserDialog& other) = delete;
-        ComponentChooserDialog(const workspace::Workspace& ws,
-                               const IF_GraphicsLayerProvider* layerProvider,
-                               QWidget* parent = nullptr) noexcept;
-        ~ComponentChooserDialog() noexcept;
+  // Getters
+  const tl::optional<Uuid>& getSelectedComponentUuid() const noexcept {
+    return mSelectedComponentUuid;
+  }
 
-        // Getters
-        const tl::optional<Uuid>& getSelectedComponentUuid() const noexcept {return mSelectedComponentUuid;}
+  // Operator Overloadings
+  ComponentChooserDialog& operator=(const ComponentChooserDialog& rhs) = delete;
 
-        // Operator Overloadings
-        ComponentChooserDialog& operator=(const ComponentChooserDialog& rhs) = delete;
+private:  // Methods
+  void treeCategories_currentItemChanged(const QModelIndex& current,
+                                         const QModelIndex& previous) noexcept;
+  void listComponents_currentItemChanged(QListWidgetItem* current,
+                                         QListWidgetItem* previous) noexcept;
+  void listComponents_itemDoubleClicked(QListWidgetItem* item) noexcept;
+  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedComponent(const tl::optional<Uuid>& uuid) noexcept;
+  void updatePreview() noexcept;
+  void accept() noexcept override;
+  const QStringList& localeOrder() const noexcept;
 
+private:  // Data
+  const workspace::Workspace&                mWorkspace;
+  const IF_GraphicsLayerProvider*            mLayerProvider;
+  QScopedPointer<Ui::ComponentChooserDialog> mUi;
+  QScopedPointer<QAbstractItemModel>         mCategoryTreeModel;
+  tl::optional<Uuid>                         mSelectedCategoryUuid;
+  tl::optional<Uuid>                         mSelectedComponentUuid;
 
-    private: // Methods
-        void treeCategories_currentItemChanged(const QModelIndex& current,
-                                               const QModelIndex& previous) noexcept;
-        void listComponents_currentItemChanged(QListWidgetItem* current,
-                                               QListWidgetItem* previous) noexcept;
-        void listComponents_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
-        void setSelectedComponent(const tl::optional<Uuid>& uuid) noexcept;
-        void updatePreview() noexcept;
-        void accept() noexcept override;
-        const QStringList& localeOrder() const noexcept;
-
-
-    private: // Data
-        const workspace::Workspace& mWorkspace;
-        const IF_GraphicsLayerProvider* mLayerProvider;
-        QScopedPointer<Ui::ComponentChooserDialog> mUi;
-        QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-        tl::optional<Uuid> mSelectedCategoryUuid;
-        tl::optional<Uuid> mSelectedComponentUuid;
-
-        // preview
-        FilePath mComponentFilePath;
-        QScopedPointer<Component> mComponent;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QList<std::shared_ptr<Symbol>> mSymbols;
-        QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
+  // preview
+  FilePath                                          mComponentFilePath;
+  QScopedPointer<Component>                         mComponent;
+  QScopedPointer<GraphicsScene>                     mGraphicsScene;
+  QList<std::shared_ptr<Symbol>>                    mSymbols;
+  QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_COMPONENTCHOOSERDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTCHOOSERDIALOG_H

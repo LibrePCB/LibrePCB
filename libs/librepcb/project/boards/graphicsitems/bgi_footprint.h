@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_FOOTPRINT_H
 #define LIBREPCB_PROJECT_BGI_FOOTPRINT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class StrokeText;
@@ -43,9 +44,9 @@ namespace project {
 
 class BI_Footprint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_Footprint
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_Footprint class
@@ -53,51 +54,47 @@ class BI_Footprint;
  * @author ubruhin
  * @date 2015-05-24
  */
-class BGI_Footprint final : public BGI_Base
-{
-    public:
+class BGI_Footprint final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
+  ~BGI_Footprint() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
-        ~BGI_Footprint() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QPainterPath shape() const noexcept { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept {return mBoundingRect;}
-        QPainterPath shape() const noexcept {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+private:
+  // make some methods inaccessible...
+  BGI_Footprint()                           = delete;
+  BGI_Footprint(const BGI_Footprint& other) = delete;
+  BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(QString name) const noexcept;
 
-    private:
+  // General Attributes
+  BI_Footprint&             mFootprint;
+  const library::Footprint& mLibFootprint;
 
-        // make some methods inaccessible...
-        BGI_Footprint() = delete;
-        BGI_Footprint(const BGI_Footprint& other) = delete;
-        BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(QString name) const noexcept;
-
-
-        // General Attributes
-        BI_Footprint& mFootprint;
-        const library::Footprint& mLibFootprint;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  QRectF       mBoundingRect;
+  QPainterPath mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_FOOTPRINT_H
+#endif  // LIBREPCB_PROJECT_BGI_FOOTPRINT_H

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_WORKSPACE_LIBRARYLISTWIDGETITEM_H
 #define LIBREPCB_WORKSPACE_LIBRARYLISTWIDGETITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -46,9 +47,9 @@ namespace Ui {
 class LibraryListWidgetItem;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryListWidgetItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The LibraryListWidgetItem class
@@ -56,48 +57,43 @@ class LibraryListWidgetItem;
  * @author ubruhin
  * @date 2016-08-03
  */
-class LibraryListWidgetItem final : public QWidget
-{
-        Q_OBJECT
+class LibraryListWidgetItem final : public QWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryListWidgetItem() noexcept;
+  LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
+  LibraryListWidgetItem(workspace::Workspace&   ws,
+                        QSharedPointer<Library> lib) noexcept;
+  ~LibraryListWidgetItem() noexcept;
 
-        // Constructors / Destructor
-        LibraryListWidgetItem() noexcept;
-        LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
-        LibraryListWidgetItem(workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept;
-        ~LibraryListWidgetItem() noexcept;
+  // Getters
+  QSharedPointer<Library> getLibrary() const noexcept { return mLib; }
+  QString                 getName() const noexcept;
+  bool                    isRemoteLibrary() const noexcept;
 
-        // Getters
-        QSharedPointer<Library> getLibrary() const noexcept {return mLib;}
-        QString getName() const noexcept;
-        bool isRemoteLibrary() const noexcept;
+  // Operator Overloadings
+  LibraryListWidgetItem& operator=(const LibraryListWidgetItem& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryListWidgetItem& operator=(const LibraryListWidgetItem& rhs) = delete;
+protected:  // Methods
+  void mouseDoubleClickEvent(QMouseEvent* e) noexcept override;
 
+signals:
+  void openLibraryEditorTriggered(QSharedPointer<Library> lib);
 
-    protected: // Methods
-        void mouseDoubleClickEvent(QMouseEvent* e) noexcept override;
-
-
-    signals:
-        void openLibraryEditorTriggered(QSharedPointer<Library> lib);
-
-
-    private: // Data
-
-        QScopedPointer<Ui::LibraryListWidgetItem> mUi;
-        workspace::Workspace& mWorkspace;
-        QSharedPointer<Library> mLib;
+private:  // Data
+  QScopedPointer<Ui::LibraryListWidgetItem> mUi;
+  workspace::Workspace&                     mWorkspace;
+  QSharedPointer<Library>                   mLib;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_LIBRARYLISTWIDGETITEM_H
+#endif  // LIBREPCB_WORKSPACE_LIBRARYLISTWIDGETITEM_H

@@ -17,76 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "wsi_appearance.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WSI_Appearance::WSI_Appearance(const SExpression& node) :
-    WSI_Base(), mUseOpenGl(false)
-{
-    if (const SExpression* child = node.tryGetChildByPath("use_opengl")) {
-        mUseOpenGl = child->getValueOfFirstChild<bool>();
-    }
+WSI_Appearance::WSI_Appearance(const SExpression& node)
+  : WSI_Base(), mUseOpenGl(false) {
+  if (const SExpression* child = node.tryGetChildByPath("use_opengl")) {
+    mUseOpenGl = child->getValueOfFirstChild<bool>();
+  }
 
-    // create widgets
-    mUseOpenGlWidget.reset(new QWidget());
-    QGridLayout* openGlLayout = new QGridLayout(mUseOpenGlWidget.data());
-    openGlLayout->setContentsMargins(0, 0, 0, 0);
-    mUseOpenGlCheckBox.reset(new QCheckBox(tr("Use OpenGL Hardware Acceleration")));
-    mUseOpenGlCheckBox->setChecked(mUseOpenGl);
-    openGlLayout->addWidget(mUseOpenGlCheckBox.data(), openGlLayout->rowCount(), 0);
-    openGlLayout->addWidget(new QLabel(tr("This setting will be applied only to newly "
-                            "opened windows.")), openGlLayout->rowCount(), 0);
+  // create widgets
+  mUseOpenGlWidget.reset(new QWidget());
+  QGridLayout* openGlLayout = new QGridLayout(mUseOpenGlWidget.data());
+  openGlLayout->setContentsMargins(0, 0, 0, 0);
+  mUseOpenGlCheckBox.reset(
+      new QCheckBox(tr("Use OpenGL Hardware Acceleration")));
+  mUseOpenGlCheckBox->setChecked(mUseOpenGl);
+  openGlLayout->addWidget(mUseOpenGlCheckBox.data(), openGlLayout->rowCount(),
+                          0);
+  openGlLayout->addWidget(
+      new QLabel(tr("This setting will be applied only to newly "
+                    "opened windows.")),
+      openGlLayout->rowCount(), 0);
 }
 
-WSI_Appearance::~WSI_Appearance() noexcept
-{
+WSI_Appearance::~WSI_Appearance() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_Appearance::restoreDefault() noexcept
-{
-    mUseOpenGlCheckBox->setChecked(false);
+void WSI_Appearance::restoreDefault() noexcept {
+  mUseOpenGlCheckBox->setChecked(false);
 }
 
-void WSI_Appearance::apply() noexcept
-{
-    mUseOpenGl = mUseOpenGlCheckBox->isChecked();
+void WSI_Appearance::apply() noexcept {
+  mUseOpenGl = mUseOpenGlCheckBox->isChecked();
 }
 
-void WSI_Appearance::revert() noexcept
-{
-    mUseOpenGlCheckBox->setChecked(mUseOpenGl);
+void WSI_Appearance::revert() noexcept {
+  mUseOpenGlCheckBox->setChecked(mUseOpenGl);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_Appearance::serialize(SExpression& root) const
-{
-    root.appendChild("use_opengl", mUseOpenGlCheckBox->isChecked(), true);
+void WSI_Appearance::serialize(SExpression& root) const {
+  root.appendChild("use_opengl", mUseOpenGlCheckBox->isChecked(), true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

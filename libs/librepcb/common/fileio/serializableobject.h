@@ -20,111 +20,114 @@
 #ifndef LIBREPCB_SERIALIZABLEOBJECT_H
 #define LIBREPCB_SERIALIZABLEOBJECT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "sexpression.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SerializableObject
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The SerializableObject class is the base class for all classes which need to be
- *        serializable/deserializable from/to librepcb::SExpression nodes
+ * @brief The SerializableObject class is the base class for all classes which
+ * need to be serializable/deserializable from/to librepcb::SExpression nodes
  *
  * @author ubruhin
  * @date 2015-02-06
  */
-class SerializableObject
-{
-    public:
-        SerializableObject() noexcept {}
-        virtual ~SerializableObject() noexcept {}
+class SerializableObject {
+public:
+  SerializableObject() noexcept {}
+  virtual ~SerializableObject() noexcept {}
 
+  /**
+   * @brief Serialize the object to a new S-Expression node
+   *
+   * This method creates a new S-Expression node, serializes the whole object
+   * into it and then returns the whole S-Expression node. See #serialize() for
+   * details.
+   *
+   * @param name          The root name of the returned S-Expression node
+   *
+   * @return The created S-Expression node (the caller takes the ownership!)
+   *
+   * @throw Exception     This method throws an exception if an error occurs.
+   *
+   * @see #serialize()
+   */
+  SExpression serializeToDomElement(const QString& name) const {
+    SExpression root = SExpression::createList(name);
+    serialize(root);
+    return root;
+  }
 
-        /**
-         * @brief Serialize the object to a new S-Expression node
-         *
-         * This method creates a new S-Expression node, serializes the whole object into
-         * it and then returns the whole S-Expression node. See #serialize() for details.
-         *
-         * @param name          The root name of the returned S-Expression node
-         *
-         * @return The created S-Expression node (the caller takes the ownership!)
-         *
-         * @throw Exception     This method throws an exception if an error occurs.
-         *
-         * @see #serialize()
-         */
-        SExpression serializeToDomElement(const QString& name) const {
-            SExpression root = SExpression::createList(name);
-            serialize(root);
-            return root;
-        }
+  /**
+   * @brief Serialize the object into an existing S-Expression node
+   *
+   * This method inserts/appends all attributes and childs of the object to an
+   * existing S-Expression node. The content which already exists in the given
+   * S-Expression node will not be removed.
+   *
+   * @note    The generated S-Expression node has always the format of the
+   *          application's major version (it's not possible to generate DOMs of
+   *          older versions).
+   *
+   * @param root          The target DOM root node
+   *
+   * @throw Exception     This method throws an exception if an error occurs.
+   */
+  virtual void serialize(SExpression& root) const = 0;
 
-        /**
-         * @brief Serialize the object into an existing S-Expression node
-         *
-         * This method inserts/appends all attributes and childs of the object to an
-         * existing S-Expression node. The content which already exists in the given
-         * S-Expression node will not be removed.
-         *
-         * @note    The generated S-Expression node has always the format of the
-         *          application's major version (it's not possible to generate DOMs of
-         *          older versions).
-         *
-         * @param root          The target DOM root node
-         *
-         * @throw Exception     This method throws an exception if an error occurs.
-         */
-        virtual void serialize(SExpression& root) const = 0;
+  template <typename T>
+  static void serializeObjectContainer(SExpression& root, const T& container,
+                                       const QString& itemName) {
+    for (const auto& object : container) {
+      root.appendChild(object.serializeToDomElement(itemName),
+                       true);  // can throw
+    }
+  }
 
-        template <typename T>
-        static void serializeObjectContainer(SExpression& root, const T& container,
-            const QString& itemName)
-        {
-            for (const auto& object : container) {
-                root.appendChild(object.serializeToDomElement(itemName), true); // can throw
-            }
-        }
+  template <typename T>
+  static void serializePointerContainer(SExpression& root, const T& container,
+                                        const QString& itemName) {
+    for (const auto& pointer : container) {
+      root.appendChild(pointer->serializeToDomElement(itemName),
+                       true);  // can throw
+    }
+  }
 
-        template <typename T>
-        static void serializePointerContainer(SExpression& root, const T& container,
-            const QString& itemName)
-        {
-            for (const auto& pointer : container) {
-                root.appendChild(pointer->serializeToDomElement(itemName), true); // can throw
-            }
-        }
-
-        template <typename T>
-        static void serializePointerContainerUuidSorted(SExpression& root, const T& container,
-            const QString& itemName)
-        {
-            T copy = container;
-            std::sort(copy.begin(), copy.end(),
-                      [](const typename T::value_type& a, const typename T::value_type& b)
-                      {return a->getUuid() < b->getUuid();});
-            serializePointerContainer(root, copy, itemName);
-        }
+  template <typename T>
+  static void serializePointerContainerUuidSorted(SExpression&   root,
+                                                  const T&       container,
+                                                  const QString& itemName) {
+    T copy = container;
+    std::sort(
+        copy.begin(), copy.end(),
+        [](const typename T::value_type& a, const typename T::value_type& b) {
+          return a->getUuid() < b->getUuid();
+        });
+    serializePointerContainer(root, copy, itemName);
+  }
 };
 
-// Make sure that the SerializableObject class does not contain any data (except the vptr).
-// Otherwise it could introduce issues when using multiple inheritance.
+// Make sure that the SerializableObject class does not contain any data (except
+// the vptr). Otherwise it could introduce issues when using multiple
+// inheritance.
 static_assert(sizeof(SerializableObject) == sizeof(void*),
               "SerializableObject must not contain any data!");
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SERIALIZABLEOBJECT_H
+#endif  // LIBREPCB_SERIALIZABLEOBJECT_H

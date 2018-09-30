@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
@@ -41,9 +42,9 @@ namespace Ui {
 class NewElementWizardPage_CopyFrom;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_CopyFrom
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_CopyFrom class
@@ -54,61 +55,58 @@ class NewElementWizardPage_CopyFrom;
  * @todo All names/descriptions/keywords other than en_US are not yet copied.
  * @todo All categories other than the first one are not yet copied.
  */
-class NewElementWizardPage_CopyFrom final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_CopyFrom final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_CopyFrom() = delete;
+  NewElementWizardPage_CopyFrom(const NewElementWizardPage_CopyFrom& other) =
+      delete;
+  explicit NewElementWizardPage_CopyFrom(NewElementWizardContext& context,
+                                         QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_CopyFrom() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_CopyFrom() = delete;
-        NewElementWizardPage_CopyFrom(const NewElementWizardPage_CopyFrom& other) = delete;
-        explicit NewElementWizardPage_CopyFrom(NewElementWizardContext& context,
-                                               QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_CopyFrom() noexcept;
+  // Getters
+  bool validatePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_CopyFrom& operator       =(
+      const NewElementWizardPage_CopyFrom& rhs) = delete;
 
-        // Getters
-        bool validatePage() noexcept override;
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
-
-
-        // Operator Overloadings
-        NewElementWizardPage_CopyFrom& operator=(const NewElementWizardPage_CopyFrom& rhs) = delete;
-
-
-    private: // Methods
-        void treeView_currentItemChanged(const QModelIndex& current,
+private:  // Methods
+  void       treeView_currentItemChanged(const QModelIndex& current,
                                          const QModelIndex& previous) noexcept;
-        void treeView_doubleClicked(const QModelIndex& item) noexcept;
-        void listWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) noexcept;
-        void listWidget_itemDoubleClicked(QListWidgetItem* item) noexcept;
-        void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
-        void setSelectedElement(const FilePath& fp) noexcept;
-        void setCategoryTreeModel(QAbstractItemModel* model) noexcept;
-        FilePath getCategoryFilePath(const tl::optional<Uuid>& category) const;
-        QSet<Uuid> getElementsByCategory(const tl::optional<Uuid>& category) const;
-        void getElementMetadata(const Uuid& uuid, FilePath& fp, QString& name) const;
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
+  void       treeView_doubleClicked(const QModelIndex& item) noexcept;
+  void       listWidget_currentItemChanged(QListWidgetItem* current,
+                                           QListWidgetItem* previous) noexcept;
+  void       listWidget_itemDoubleClicked(QListWidgetItem* item) noexcept;
+  void       setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void       setSelectedElement(const FilePath& fp) noexcept;
+  void       setCategoryTreeModel(QAbstractItemModel* model) noexcept;
+  FilePath   getCategoryFilePath(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getElementsByCategory(const tl::optional<Uuid>& category) const;
+  void getElementMetadata(const Uuid& uuid, FilePath& fp, QString& name) const;
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_CopyFrom> mUi;
-        QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-        bool mIsCategoryElement;
-        tl::optional<Uuid> mSelectedCategoryUuid;
-        QScopedPointer<LibraryBaseElement> mSelectedElement;
+private:  // Data
+  NewElementWizardContext&                          mContext;
+  QScopedPointer<Ui::NewElementWizardPage_CopyFrom> mUi;
+  QScopedPointer<QAbstractItemModel>                mCategoryTreeModel;
+  bool                                              mIsCategoryElement;
+  tl::optional<Uuid>                                mSelectedCategoryUuid;
+  QScopedPointer<LibraryBaseElement>                mSelectedElement;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H

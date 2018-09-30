@@ -20,51 +20,50 @@
 #ifndef LIBREPCB_ATTRTYPECAPACITANCE_H
 #define LIBREPCB_ATTRTYPECAPACITANCE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributetype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttrTypeCapacitance
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttrTypeCapacitance class
  */
-class AttrTypeCapacitance final : public AttributeType
-{
+class AttrTypeCapacitance final : public AttributeType {
+public:
+  bool    isValueValid(const QString& value) const noexcept;
+  QString valueFromTr(const QString& value) const noexcept;
+  QString printableValueTr(const QString&       value,
+                           const AttributeUnit* unit = nullptr) const noexcept;
+  static const AttrTypeCapacitance& instance() noexcept {
+    static AttrTypeCapacitance x;
+    return x;
+  }
 
-    public:
+private:
+  // make some methods inaccessible...
+  AttrTypeCapacitance(const AttrTypeCapacitance& other) = delete;
+  AttrTypeCapacitance& operator=(const AttrTypeCapacitance& rhs) = delete;
 
-        bool isValueValid(const QString& value) const noexcept;
-        QString valueFromTr(const QString& value) const noexcept;
-        QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept;
-        static const AttrTypeCapacitance& instance() noexcept {static AttrTypeCapacitance x; return x;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        AttrTypeCapacitance(const AttrTypeCapacitance& other) = delete;
-        AttrTypeCapacitance& operator=(const AttrTypeCapacitance& rhs) = delete;
-
-        // Constructors / Destructor
-        AttrTypeCapacitance() noexcept;
-        ~AttrTypeCapacitance() noexcept;
-
+  // Constructors / Destructor
+  AttrTypeCapacitance() noexcept;
+  ~AttrTypeCapacitance() noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRTYPECAPACITANCE_H
+#endif  // LIBREPCB_ATTRTYPECAPACITANCE_H

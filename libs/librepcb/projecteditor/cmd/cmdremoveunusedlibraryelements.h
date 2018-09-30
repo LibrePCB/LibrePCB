@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_CMDREMOVEUNUSEDLIBRARYELEMENTS_H
 #define LIBREPCB_PROJECT_EDITOR_CMDREMOVEUNUSEDLIBRARYELEMENTS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -36,38 +37,33 @@ class Project;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRemoveUnusedLibraryElements
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRemoveUnusedLibraryElements class
  */
-class CmdRemoveUnusedLibraryElements final : public UndoCommandGroup
-{
-    public:
+class CmdRemoveUnusedLibraryElements final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRemoveUnusedLibraryElements(Project& project) noexcept;
+  ~CmdRemoveUnusedLibraryElements() noexcept;
 
-        // Constructors / Destructor
-        CmdRemoveUnusedLibraryElements(Project& project) noexcept;
-        ~CmdRemoveUnusedLibraryElements() noexcept;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-
-    private: // Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-    private: // Data
-        Project& mProject;
+private:  // Data
+  Project& mProject;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_CMDREMOVEUNUSEDLIBRARYELEMENTS_H
+#endif  // LIBREPCB_PROJECT_EDITOR_CMDREMOVEUNUSEDLIBRARYELEMENTS_H

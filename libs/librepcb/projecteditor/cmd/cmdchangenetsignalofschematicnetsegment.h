@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
 #define LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/uuid.h>
 #include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -40,48 +41,45 @@ class SI_NetSegment;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdChangeNetSignalOfSchematicNetSegment
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdChangeNetSignalOfSchematicNetSegment class
  */
-class CmdChangeNetSignalOfSchematicNetSegment final : public UndoCommandGroup
-{
-    public:
+class CmdChangeNetSignalOfSchematicNetSegment final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdChangeNetSignalOfSchematicNetSegment() = delete;
+  CmdChangeNetSignalOfSchematicNetSegment(
+      const CmdChangeNetSignalOfSchematicNetSegment& other) = delete;
+  CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg,
+                                          NetSignal&     newSig) noexcept;
+  ~CmdChangeNetSignalOfSchematicNetSegment() noexcept;
 
-        // Constructors / Destructor
-        CmdChangeNetSignalOfSchematicNetSegment() = delete;
-        CmdChangeNetSignalOfSchematicNetSegment(const CmdChangeNetSignalOfSchematicNetSegment& other) = delete;
-        CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg, NetSignal& newSig) noexcept;
-        ~CmdChangeNetSignalOfSchematicNetSegment() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  void changeNetSignalOfNetSegment();
+  void updateCompSigInstNetSignal(ComponentSignalInstance& cmpSig);
 
-        // Private Methods
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        void changeNetSignalOfNetSegment();
-        void updateCompSigInstNetSignal(ComponentSignalInstance& cmpSig);
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        SI_NetSegment& mNetSegment;
-        NetSignal& mNewNetSignal;
+  // Attributes from the constructor
+  SI_NetSegment& mNetSegment;
+  NetSignal&     mNewNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#endif  // LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H

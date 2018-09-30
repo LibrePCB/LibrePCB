@@ -17,125 +17,117 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdprojectlibraryremoveelement.h"
+
 #include "../projectlibrary.h"
+
 #include <librepcb/library/elements.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-CmdProjectLibraryRemoveElement<ElementType>::CmdProjectLibraryRemoveElement(ProjectLibrary& library,
-                                                                            ElementType& element) noexcept :
-    UndoCommand(tr("Remove element from library")),
-    mLibrary(library), mElement(element)
-{
+CmdProjectLibraryRemoveElement<ElementType>::CmdProjectLibraryRemoveElement(
+    ProjectLibrary& library, ElementType& element) noexcept
+  : UndoCommand(tr("Remove element from library")),
+    mLibrary(library),
+    mElement(element) {
 }
 
 template <typename ElementType>
-CmdProjectLibraryRemoveElement<ElementType>::~CmdProjectLibraryRemoveElement() noexcept
-{
+CmdProjectLibraryRemoveElement<
+    ElementType>::~CmdProjectLibraryRemoveElement() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-bool CmdProjectLibraryRemoveElement<ElementType>::performExecute()
-{
-    performRedo(); // can throw
+bool CmdProjectLibraryRemoveElement<ElementType>::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
 template <typename ElementType>
-void CmdProjectLibraryRemoveElement<ElementType>::performUndo()
-{
-    addElement(); // can throw
+void CmdProjectLibraryRemoveElement<ElementType>::performUndo() {
+  addElement();  // can throw
 }
 
 template <typename ElementType>
-void CmdProjectLibraryRemoveElement<ElementType>::performRedo()
-{
-    removeElement(); // can throw
+void CmdProjectLibraryRemoveElement<ElementType>::performRedo() {
+  removeElement();  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Symbol>::addElement()
-{
-    mLibrary.addSymbol(mElement);
+void CmdProjectLibraryRemoveElement<library::Symbol>::addElement() {
+  mLibrary.addSymbol(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Package>::addElement()
-{
-    mLibrary.addPackage(mElement);
+void CmdProjectLibraryRemoveElement<library::Package>::addElement() {
+  mLibrary.addPackage(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Component>::addElement()
-{
-    mLibrary.addComponent(mElement);
+void CmdProjectLibraryRemoveElement<library::Component>::addElement() {
+  mLibrary.addComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Device>::addElement()
-{
-    mLibrary.addDevice(mElement);
+void CmdProjectLibraryRemoveElement<library::Device>::addElement() {
+  mLibrary.addDevice(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Symbol>::removeElement()
-{
-    mLibrary.removeSymbol(mElement);
+void CmdProjectLibraryRemoveElement<library::Symbol>::removeElement() {
+  mLibrary.removeSymbol(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Package>::removeElement()
-{
-    mLibrary.removePackage(mElement);
+void CmdProjectLibraryRemoveElement<library::Package>::removeElement() {
+  mLibrary.removePackage(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Component>::removeElement()
-{
-    mLibrary.removeComponent(mElement);
+void CmdProjectLibraryRemoveElement<library::Component>::removeElement() {
+  mLibrary.removeComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Device>::removeElement()
-{
-    mLibrary.removeDevice(mElement);
+void CmdProjectLibraryRemoveElement<library::Device>::removeElement() {
+  mLibrary.removeDevice(mElement);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Explicit Template Instantiation
- ****************************************************************************************/
+ ******************************************************************************/
 
 template class CmdProjectLibraryRemoveElement<library::Symbol>;
 template class CmdProjectLibraryRemoveElement<library::Package>;
 template class CmdProjectLibraryRemoveElement<library::Component>;
 template class CmdProjectLibraryRemoveElement<library::Device>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

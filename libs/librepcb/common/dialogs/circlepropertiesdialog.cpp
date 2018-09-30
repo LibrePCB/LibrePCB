@@ -17,102 +17,114 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "circlepropertiesdialog.h"
-#include "ui_circlepropertiesdialog.h"
+
 #include "../geometry/circle.h"
 #include "../geometry/cmd/cmdcircleedit.h"
 #include "../graphics/graphicslayer.h"
 #include "../undostack.h"
+#include "ui_circlepropertiesdialog.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
-        QList<GraphicsLayer*> layers, QWidget* parent) noexcept :
-    QDialog(parent), mCircle(circle), mUndoStack(undoStack),
-    mUi(new Ui::CirclePropertiesDialog)
-{
-    mUi->setupUi(this);
+CirclePropertiesDialog::CirclePropertiesDialog(Circle&               circle,
+                                               UndoStack&            undoStack,
+                                               QList<GraphicsLayer*> layers,
+                                               QWidget* parent) noexcept
+  : QDialog(parent),
+    mCircle(circle),
+    mUndoStack(undoStack),
+    mUi(new Ui::CirclePropertiesDialog) {
+  mUi->setupUi(this);
 
-    foreach (const GraphicsLayer* layer, layers) {
-        mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
-    }
+  foreach (const GraphicsLayer* layer, layers) {
+    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
+  }
 
-    connect(mUi->buttonBox, &QDialogButtonBox::clicked,
-            this, &CirclePropertiesDialog::buttonBoxClicked);
+  connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
+          &CirclePropertiesDialog::buttonBoxClicked);
 
-    // load circle attributes
-    selectLayerNameInCombobox(*mCircle.getLayerName());
-    mUi->spbLineWidth->setValue(mCircle.getLineWidth()->toMm());
-    mUi->cbxFillArea->setChecked(mCircle.isFilled());
-    mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
-    mUi->spbDiameter->setValue(mCircle.getDiameter()->toMm());
-    mUi->spbPosX->setValue(mCircle.getCenter().getX().toMm());
-    mUi->spbPosY->setValue(mCircle.getCenter().getY().toMm());
+  // load circle attributes
+  selectLayerNameInCombobox(*mCircle.getLayerName());
+  mUi->spbLineWidth->setValue(mCircle.getLineWidth()->toMm());
+  mUi->cbxFillArea->setChecked(mCircle.isFilled());
+  mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
+  mUi->spbDiameter->setValue(mCircle.getDiameter()->toMm());
+  mUi->spbPosX->setValue(mCircle.getCenter().getX().toMm());
+  mUi->spbPosY->setValue(mCircle.getCenter().getY().toMm());
 }
 
-CirclePropertiesDialog::~CirclePropertiesDialog() noexcept
-{
+CirclePropertiesDialog::~CirclePropertiesDialog() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CirclePropertiesDialog::buttonBoxClicked(QAbstractButton* button) noexcept
-{
-    switch (mUi->buttonBox->buttonRole(button)) {
-        case QDialogButtonBox::ApplyRole:
-            applyChanges();
-            break;
-        case QDialogButtonBox::AcceptRole:
-            if (applyChanges()) {
-                accept();
-            }
-            break;
-        case QDialogButtonBox::RejectRole:
-            reject();
-            break;
-        default: Q_ASSERT(false); break;
+void CirclePropertiesDialog::buttonBoxClicked(
+    QAbstractButton* button) noexcept {
+  switch (mUi->buttonBox->buttonRole(button)) {
+    case QDialogButtonBox::ApplyRole:
+      applyChanges();
+      break;
+    case QDialogButtonBox::AcceptRole:
+      if (applyChanges()) {
+        accept();
+      }
+      break;
+    case QDialogButtonBox::RejectRole:
+      reject();
+      break;
+    default:
+      Q_ASSERT(false);
+      break;
+  }
+}
+
+bool CirclePropertiesDialog::applyChanges() noexcept {
+  try {
+    PositiveLength diameter =
+        PositiveLength(Length::fromMm(mUi->spbDiameter->value()));  // can throw
+
+    QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
+    if (mUi->cbxLayer->currentIndex() >= 0 &&
+        mUi->cbxLayer->currentData().isValid()) {
+      cmd->setLayerName(
+          GraphicsLayerName(mUi->cbxLayer->currentData().toString()),
+          false);  // can throw
     }
+    cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
+    cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
+    cmd->setLineWidth(
+        UnsignedLength(Length::fromMm(mUi->spbLineWidth->value())),
+        false);  // can throw
+    cmd->setDiameter(diameter, false);
+    cmd->setCenter(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()),
+                   false);
+    mUndoStack.execCmd(cmd.take());
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+    return false;
+  }
 }
 
-bool CirclePropertiesDialog::applyChanges() noexcept
-{
-    try {
-        PositiveLength diameter = PositiveLength(Length::fromMm(mUi->spbDiameter->value())); // can throw
-
-        QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
-        if (mUi->cbxLayer->currentIndex() >= 0 && mUi->cbxLayer->currentData().isValid()) {
-            cmd->setLayerName(GraphicsLayerName(mUi->cbxLayer->currentData().toString()), false); // can throw
-        }
-        cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
-        cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
-        cmd->setLineWidth(UnsignedLength(Length::fromMm(mUi->spbLineWidth->value())), false); // can throw
-        cmd->setDiameter(diameter, false);
-        cmd->setCenter(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-        mUndoStack.execCmd(cmd.take());
-        return true;
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-        return false;
-    }
+void CirclePropertiesDialog::selectLayerNameInCombobox(
+    const QString& name) noexcept {
+  mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
 }
 
-void CirclePropertiesDialog::selectLayerNameInCombobox(const QString& name) noexcept
-{
-    mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
-}
-
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

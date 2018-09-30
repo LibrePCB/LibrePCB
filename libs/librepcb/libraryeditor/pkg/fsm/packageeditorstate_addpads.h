@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate.h"
+
 #include <librepcb/library/pkg/footprintpad.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
@@ -41,9 +43,9 @@ namespace editor {
 
 class PackagePadComboBox;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_AddPads
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_AddPads class
@@ -51,63 +53,64 @@ class PackagePadComboBox;
  * @author  ubruhin
  * @date    2017-05-31
  */
-class PackageEditorState_AddPads : public PackageEditorState
-{
-        Q_OBJECT
+class PackageEditorState_AddPads : public PackageEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class PadType { THT, SMT };
 
-        // Types
-        enum class PadType {THT, SMT};
+  // Constructors / Destructor
+  PackageEditorState_AddPads()                                        = delete;
+  PackageEditorState_AddPads(const PackageEditorState_AddPads& other) = delete;
+  explicit PackageEditorState_AddPads(Context& context, PadType type) noexcept;
+  virtual ~PackageEditorState_AddPads() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_AddPads() = delete;
-        PackageEditorState_AddPads(const PackageEditorState_AddPads& other) = delete;
-        explicit PackageEditorState_AddPads(Context& context, PadType type) noexcept;
-        virtual ~PackageEditorState_AddPads() noexcept;
+  // General Methods
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-        // General Methods
-        virtual bool entry() noexcept override;
-        virtual bool exit() noexcept override;
+  // Event Handlers
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processRotateCw() noexcept override;
+  virtual bool processRotateCcw() noexcept override;
 
-        // Event Handlers
-        virtual bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        virtual bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
-        virtual bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent &e) noexcept override;
-        virtual bool processRotateCw() noexcept override;
-        virtual bool processRotateCcw() noexcept override;
+  // Operator Overloadings
+  PackageEditorState_AddPads& operator=(const PackageEditorState_AddPads& rhs) =
+      delete;
 
-        // Operator Overloadings
-        PackageEditorState_AddPads& operator=(const PackageEditorState_AddPads& rhs) = delete;
+private:  // Methods
+  bool startAddPad(const Point& pos) noexcept;
+  bool finishAddPad(const Point& pos) noexcept;
+  bool abortAddPad() noexcept;
+  void packagePadComboBoxCurrentPadChanged(PackagePad* pad) noexcept;
+  void boardSideSelectorCurrentSideChanged(
+      FootprintPad::BoardSide side) noexcept;
+  void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
+  void widthSpinBoxValueChanged(double value) noexcept;
+  void heightSpinBoxValueChanged(double value) noexcept;
+  void drillDiameterSpinBoxValueChanged(double value) noexcept;
 
+private:  // Types / Data
+  PadType                             mPadType;
+  Point                               mStartPos;
+  QScopedPointer<CmdFootprintPadEdit> mEditCmd;
+  std::shared_ptr<FootprintPad>       mCurrentPad;
+  FootprintPadGraphicsItem*           mCurrentGraphicsItem;
+  PackagePadComboBox*                 mPackagePadComboBox;
 
-    private: // Methods
-        bool startAddPad(const Point& pos) noexcept;
-        bool finishAddPad(const Point& pos) noexcept;
-        bool abortAddPad() noexcept;
-        void packagePadComboBoxCurrentPadChanged(PackagePad* pad) noexcept;
-        void boardSideSelectorCurrentSideChanged(FootprintPad::BoardSide side) noexcept;
-        void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
-        void widthSpinBoxValueChanged(double value) noexcept;
-        void heightSpinBoxValueChanged(double value) noexcept;
-        void drillDiameterSpinBoxValueChanged(double value) noexcept;
-
-
-    private: // Types / Data
-        PadType mPadType;
-        Point mStartPos;
-        QScopedPointer<CmdFootprintPadEdit> mEditCmd;
-        std::shared_ptr<FootprintPad> mCurrentPad;
-        FootprintPadGraphicsItem* mCurrentGraphicsItem;
-        PackagePadComboBox* mPackagePadComboBox;
-
-        // parameter memory
-        FootprintPad mLastPad;
+  // parameter memory
+  FootprintPad mLastPad;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_AddPadsTht
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_AddPadsTht class
@@ -115,26 +118,26 @@ class PackageEditorState_AddPads : public PackageEditorState
  * @author  ubruhin
  * @date    2017-05-31
  */
-class PackageEditorState_AddPadsTht final : public PackageEditorState_AddPads
-{
-        Q_OBJECT
+class PackageEditorState_AddPadsTht final : public PackageEditorState_AddPads {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_AddPadsTht() = delete;
+  PackageEditorState_AddPadsTht(const PackageEditorState_AddPadsTht& other) =
+      delete;
+  explicit PackageEditorState_AddPadsTht(Context& context) noexcept
+    : PackageEditorState_AddPads(context, PadType::THT) {}
+  ~PackageEditorState_AddPadsTht() noexcept {}
 
-        // Constructors / Destructor
-        PackageEditorState_AddPadsTht() = delete;
-        PackageEditorState_AddPadsTht(const PackageEditorState_AddPadsTht& other) = delete;
-        explicit PackageEditorState_AddPadsTht(Context& context) noexcept :
-            PackageEditorState_AddPads(context, PadType::THT) {}
-        ~PackageEditorState_AddPadsTht() noexcept {}
-
-        // Operator Overloadings
-        PackageEditorState_AddPadsTht& operator=(const PackageEditorState_AddPadsTht& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_AddPadsTht& operator       =(
+      const PackageEditorState_AddPadsTht& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_AddPadsSmt
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_AddPadsSmt class
@@ -142,29 +145,29 @@ class PackageEditorState_AddPadsTht final : public PackageEditorState_AddPads
  * @author  ubruhin
  * @date    2017-05-31
  */
-class PackageEditorState_AddPadsSmt final : public PackageEditorState_AddPads
-{
-        Q_OBJECT
+class PackageEditorState_AddPadsSmt final : public PackageEditorState_AddPads {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_AddPadsSmt() = delete;
+  PackageEditorState_AddPadsSmt(const PackageEditorState_AddPadsSmt& other) =
+      delete;
+  explicit PackageEditorState_AddPadsSmt(Context& context) noexcept
+    : PackageEditorState_AddPads(context, PadType::SMT) {}
+  ~PackageEditorState_AddPadsSmt() noexcept {}
 
-        // Constructors / Destructor
-        PackageEditorState_AddPadsSmt() = delete;
-        PackageEditorState_AddPadsSmt(const PackageEditorState_AddPadsSmt& other) = delete;
-        explicit PackageEditorState_AddPadsSmt(Context& context) noexcept :
-            PackageEditorState_AddPads(context, PadType::SMT) {}
-        ~PackageEditorState_AddPadsSmt() noexcept {}
-
-        // Operator Overloadings
-        PackageEditorState_AddPadsSmt& operator=(const PackageEditorState_AddPadsSmt& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_AddPadsSmt& operator       =(
+      const PackageEditorState_AddPadsSmt& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H

@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
 #define LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsScene;
@@ -41,7 +42,7 @@ class Device;
 class Package;
 class Footprint;
 class FootprintPreviewGraphicsItem;
-}
+}  // namespace library
 
 namespace project {
 
@@ -57,93 +58,89 @@ namespace Ui {
 class UnplacedComponentsDock;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SchematicPagesDock
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The UnplacedComponentsDock class
  *
  * @todo This class is very provisional and may contain dangerous bugs...
  */
-class UnplacedComponentsDock final : public QDockWidget
-{
-        Q_OBJECT
+class UnplacedComponentsDock final : public QDockWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit UnplacedComponentsDock(ProjectEditor& editor);
+  ~UnplacedComponentsDock();
 
-        // Constructors / Destructor
-        explicit UnplacedComponentsDock(ProjectEditor& editor);
-        ~UnplacedComponentsDock();
+  // Setters
+  void setBoard(Board* board);
 
-        // Setters
-        void setBoard(Board* board);
+signals:
 
+  void addDeviceTriggered(ComponentInstance& cmp, const Uuid& deviceUuid,
+                          Uuid footprintUuid);
 
-    signals:
+private slots:
 
-        void addDeviceTriggered(ComponentInstance& cmp, const Uuid& deviceUuid, Uuid footprintUuid);
+  void on_lstUnplacedComponents_currentItemChanged(QListWidgetItem* current,
+                                                   QListWidgetItem* previous);
+  void on_cbxSelectedDevice_currentIndexChanged(int index);
+  void on_cbxSelectedFootprint_currentIndexChanged(int index);
+  void on_btnAdd_clicked();
+  void on_pushButton_clicked();
+  void on_btnAddAll_clicked();
 
+private:
+  // make some methods inaccessible...
+  UnplacedComponentsDock();
+  UnplacedComponentsDock(const UnplacedComponentsDock& other);
+  UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs);
 
-    private slots:
+  // Private Methods
+  void updateComponentsList() noexcept;
+  void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
+  void setSelectedDeviceAndPackage(const library::Device*  device,
+                                   const library::Package* package) noexcept;
+  void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
+  void beginUndoCmdGroup() noexcept;
+  void addNextDeviceToCmdGroup(
+      ComponentInstance& cmp, const Uuid& deviceUuid,
+      const tl::optional<Uuid>& footprintUuid) noexcept;
+  void commitUndoCmdGroup() noexcept;
+  void addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid,
+                         Uuid footprintUuid) noexcept;
 
-        void on_lstUnplacedComponents_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
-        void on_cbxSelectedDevice_currentIndexChanged(int index);
-        void on_cbxSelectedFootprint_currentIndexChanged(int index);
-        void on_btnAdd_clicked();
-        void on_pushButton_clicked();
-        void on_btnAddAll_clicked();
-
-
-    private:
-
-        // make some methods inaccessible...
-        UnplacedComponentsDock();
-        UnplacedComponentsDock(const UnplacedComponentsDock& other);
-        UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs);
-
-        // Private Methods
-        void updateComponentsList() noexcept;
-        void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
-        void setSelectedDeviceAndPackage(const library::Device* device,
-                                         const library::Package* package) noexcept;
-        void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
-        void beginUndoCmdGroup() noexcept;
-        void addNextDeviceToCmdGroup(ComponentInstance& cmp, const Uuid& deviceUuid,
-                                     const tl::optional<Uuid>& footprintUuid) noexcept;
-        void commitUndoCmdGroup() noexcept;
-        void addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid,
-                               Uuid footprintUuid) noexcept;
-
-
-        // General
-        ProjectEditor& mProjectEditor;
-        Project& mProject;
-        Board* mBoard;
-        Ui::UnplacedComponentsDock* mUi;
-        GraphicsScene* mFootprintPreviewGraphicsScene;
-        library::FootprintPreviewGraphicsItem* mFootprintPreviewGraphicsItem;
-        ComponentInstance* mSelectedComponent;
-        const library::Device* mSelectedDevice;
-        const library::Package* mSelectedPackage;
-        tl::optional<Uuid> mSelectedFootprintUuid;
-        QMetaObject::Connection mCircuitConnection1;
-        QMetaObject::Connection mCircuitConnection2;
-        QMetaObject::Connection mBoardConnection1;
-        QMetaObject::Connection mBoardConnection2;
-        Point mNextPosition;
-        bool mDisableListUpdate;
-        QHash<Uuid, Uuid> mLastDeviceOfComponent;
-        QHash<Uuid, tl::optional<Uuid>> mLastFootprintOfDevice;
-        QScopedPointer<UndoCommandGroup> mCurrentUndoCmdGroup;
+  // General
+  ProjectEditor&                         mProjectEditor;
+  Project&                               mProject;
+  Board*                                 mBoard;
+  Ui::UnplacedComponentsDock*            mUi;
+  GraphicsScene*                         mFootprintPreviewGraphicsScene;
+  library::FootprintPreviewGraphicsItem* mFootprintPreviewGraphicsItem;
+  ComponentInstance*                     mSelectedComponent;
+  const library::Device*                 mSelectedDevice;
+  const library::Package*                mSelectedPackage;
+  tl::optional<Uuid>                     mSelectedFootprintUuid;
+  QMetaObject::Connection                mCircuitConnection1;
+  QMetaObject::Connection                mCircuitConnection2;
+  QMetaObject::Connection                mBoardConnection1;
+  QMetaObject::Connection                mBoardConnection2;
+  Point                                  mNextPosition;
+  bool                                   mDisableListUpdate;
+  QHash<Uuid, Uuid>                      mLastDeviceOfComponent;
+  QHash<Uuid, tl::optional<Uuid>>        mLastFootprintOfDevice;
+  QScopedPointer<UndoCommandGroup>       mCurrentUndoCmdGroup;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
+#endif  // LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H

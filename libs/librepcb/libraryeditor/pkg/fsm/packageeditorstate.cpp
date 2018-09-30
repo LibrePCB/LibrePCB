@@ -17,48 +17,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "packageeditorstate.h"
+
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-PackageEditorState::PackageEditorState(Context& context) noexcept :
-    QObject(nullptr), mContext(context)
-{
+PackageEditorState::PackageEditorState(Context& context) noexcept
+  : QObject(nullptr), mContext(context) {
 }
 
-PackageEditorState::~PackageEditorState() noexcept
-{
+PackageEditorState::~PackageEditorState() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Protected Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-const PositiveLength& PackageEditorState::getGridInterval() const noexcept
-{
-    return mContext.graphicsView.getGridProperties().getInterval();
+const PositiveLength& PackageEditorState::getGridInterval() const noexcept {
+  return mContext.graphicsView.getGridProperties().getInterval();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
-
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

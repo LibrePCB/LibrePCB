@@ -20,99 +20,99 @@
 #ifndef LIBREPCB_PROJECT_BOARDLAYERSTACK_H
 #define LIBREPCB_PROJECT_BOARDLAYERSTACK_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/fileio/serializableobject.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardLayerStack
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The BoardLayerStack class provides and manages all available layers of a board
+ * @brief The BoardLayerStack class provides and manages all available layers of
+ * a board
  */
-class BoardLayerStack final : public QObject, public SerializableObject,
-                              public IF_GraphicsLayerProvider
-{
-        Q_OBJECT
+class BoardLayerStack final : public QObject,
+                              public SerializableObject,
+                              public IF_GraphicsLayerProvider {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardLayerStack()                             = delete;
+  BoardLayerStack(const BoardLayerStack& other) = delete;
+  BoardLayerStack(Board& board, const BoardLayerStack& other);
+  BoardLayerStack(Board& board, const SExpression& node);
+  explicit BoardLayerStack(Board& board);
+  ~BoardLayerStack() noexcept;
 
-        // Constructors / Destructor
-        BoardLayerStack() = delete;
-        BoardLayerStack(const BoardLayerStack& other) = delete;
-        BoardLayerStack(Board& board, const BoardLayerStack& other);
-        BoardLayerStack(Board& board, const SExpression& node);
-        explicit BoardLayerStack(Board& board);
-        ~BoardLayerStack() noexcept;
+  // Getters
+  Board& getBoard() const noexcept { return mBoard; }
+  int    getInnerLayerCount() const noexcept { return mInnerLayerCount; }
+  QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
-        // Getters
-        Board& getBoard() const noexcept {return mBoard;}
-        int getInnerLayerCount() const noexcept {return mInnerLayerCount;}
-        QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
+  /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
+  QList<GraphicsLayer*> getAllLayers() const noexcept override {
+    return mLayers;
+  }
 
-        /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
-        QList<GraphicsLayer*> getAllLayers() const noexcept override {return mLayers;}
+  /// @copydoc IF_BoardLayerProvider#getLayer()
+  GraphicsLayer* getLayer(const QString& name) const noexcept override {
+    foreach (GraphicsLayer* layer, mLayers) {
+      if (layer->getName() == name) {
+        return layer;
+      }
+    }
+    return nullptr;
+  }
 
-        /// @copydoc IF_BoardLayerProvider#getLayer()
-        GraphicsLayer* getLayer(const QString& name) const noexcept override {
-            foreach (GraphicsLayer* layer, mLayers) {
-                if (layer->getName() == name) {
-                    return layer;
-                }
-            }
-            return nullptr;
-        }
+  // Setters
+  void setInnerLayerCount(int count) noexcept;
 
-        // Setters
-        void setInnerLayerCount(int count) noexcept;
+  // General Methods
 
-        // General Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
 
-        // Operator Overloadings
-        BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
+private slots:
+  void layerAttributesChanged() noexcept;
+  void boardAttributesChanged() noexcept;
 
+private:
+  void addAllLayers() noexcept;
+  void addLayer(const QString& name, bool disable = false) noexcept;
+  void addLayer(GraphicsLayer* layer) noexcept;
 
-    private slots:
-        void layerAttributesChanged() noexcept;
-        void boardAttributesChanged() noexcept;
+  // General
+  Board& mBoard;  ///< A reference to the Board object (from the ctor)
+  QList<GraphicsLayer*> mLayers;
+  bool                  mLayersChanged;
 
-
-    private:
-        void addAllLayers() noexcept;
-        void addLayer(const QString& name, bool disable = false) noexcept;
-        void addLayer(GraphicsLayer* layer) noexcept;
-
-
-        // General
-        Board& mBoard; ///< A reference to the Board object (from the ctor)
-        QList<GraphicsLayer*> mLayers;
-        bool mLayersChanged;
-
-        // Settings
-        int mInnerLayerCount;
+  // Settings
+  int mInnerLayerCount;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDLAYERSTACK_H
+#endif  // LIBREPCB_PROJECT_BOARDLAYERSTACK_H

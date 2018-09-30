@@ -20,20 +20,22 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
+#include "../common/categorylisteditorwidget.h"
+#include "../common/editorwidgetbase.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GridProperties;
@@ -52,9 +54,9 @@ namespace Ui {
 class SymbolEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorWidget class
@@ -62,67 +64,63 @@ class SymbolEditorWidget;
  * @author ubruhin
  * @date 2016-10-16
  */
-class SymbolEditorWidget final : public EditorWidgetBase, public IF_GraphicsViewEventHandler
-{
-        Q_OBJECT
+class SymbolEditorWidget final : public EditorWidgetBase,
+                                 public IF_GraphicsViewEventHandler {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolEditorWidget()                                = delete;
+  SymbolEditorWidget(const SymbolEditorWidget& other) = delete;
+  SymbolEditorWidget(const Context& context, const FilePath& fp,
+                     QWidget* parent = nullptr);
+  ~SymbolEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorWidget() = delete;
-        SymbolEditorWidget(const SymbolEditorWidget& other) = delete;
-        SymbolEditorWidget(const Context& context, const FilePath& fp,
-                           QWidget* parent = nullptr);
-        ~SymbolEditorWidget() noexcept;
+  // Getters
+  virtual bool hasGraphicalEditor() const noexcept override { return true; }
 
-        // Getters
-        virtual bool hasGraphicalEditor() const noexcept override {return true;}
+  // Setters
+  void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
 
-        // Setters
-        void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
+  // Operator Overloadings
+  SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
+public slots:
 
+  bool save() noexcept override;
+  bool rotateCw() noexcept override;
+  bool rotateCcw() noexcept override;
+  bool remove() noexcept override;
+  bool zoomIn() noexcept override;
+  bool zoomOut() noexcept override;
+  bool zoomAll() noexcept override;
+  bool abortCommand() noexcept override;
+  bool editGridProperties() noexcept override;
 
-    public slots:
+private:  // Methods
+  /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
+  bool graphicsViewEventHandler(QEvent* event) noexcept override;
+  bool toolChangeRequested(Tool newTool) noexcept override;
+  bool isInterfaceBroken() const noexcept override;
 
-        bool save() noexcept override;
-        bool rotateCw() noexcept override;
-        bool rotateCcw() noexcept override;
-        bool remove() noexcept override;
-        bool zoomIn() noexcept override;
-        bool zoomOut() noexcept override;
-        bool zoomAll() noexcept override;
-        bool abortCommand() noexcept override;
-        bool editGridProperties() noexcept override;
+private:  // Data
+  QScopedPointer<Ui::SymbolEditorWidget>            mUi;
+  QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<GraphicsScene>                     mGraphicsScene;
+  QScopedPointer<Symbol>                            mSymbol;
+  QScopedPointer<SymbolGraphicsItem>                mGraphicsItem;
+  QScopedPointer<SymbolEditorFsm>                   mFsm;
 
-
-    private: // Methods
-        /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
-        bool graphicsViewEventHandler(QEvent* event) noexcept override;
-        bool toolChangeRequested(Tool newTool) noexcept override;
-        bool isInterfaceBroken() const noexcept override;
-
-
-    private: // Data
-        QScopedPointer<Ui::SymbolEditorWidget> mUi;
-        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QScopedPointer<Symbol> mSymbol;
-        QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
-        QScopedPointer<SymbolEditorFsm> mFsm;
-
-        // broken interface detection
-        QSet<Uuid> mOriginalSymbolPinUuids;
+  // broken interface detection
+  QSet<Uuid> mOriginalSymbolPinUuids;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H

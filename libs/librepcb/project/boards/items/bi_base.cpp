@@ -17,84 +17,80 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_base.h"
-#include <librepcb/common/graphics/graphicsscene.h>
-#include "../graphicsitems/bgi_base.h"
-#include "../board.h"
-#include "../../project.h"
 
-/*****************************************************************************************
+#include "../../project.h"
+#include "../board.h"
+#include "../graphicsitems/bgi_base.h"
+
+#include <librepcb/common/graphics/graphicsscene.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-BI_Base::BI_Base(Board& board) noexcept :
-    QObject(&board), mBoard(board), mIsAddedToBoard(false), mIsSelected(false)
-{
+BI_Base::BI_Base(Board& board) noexcept
+  : QObject(&board), mBoard(board), mIsAddedToBoard(false), mIsSelected(false) {
 }
 
-BI_Base::~BI_Base() noexcept
-{
-    Q_ASSERT(!mIsAddedToBoard);
+BI_Base::~BI_Base() noexcept {
+  Q_ASSERT(!mIsAddedToBoard);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-Project& BI_Base::getProject() const noexcept
-{
-    return mBoard.getProject();
+Project& BI_Base::getProject() const noexcept {
+  return mBoard.getProject();
 }
 
-Circuit& BI_Base::getCircuit() const noexcept
-{
-    return mBoard.getProject().getCircuit();
+Circuit& BI_Base::getCircuit() const noexcept {
+  return mBoard.getProject().getCircuit();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BI_Base::setSelected(bool selected) noexcept
-{
-    mIsSelected = selected;
+void BI_Base::setSelected(bool selected) noexcept {
+  mIsSelected = selected;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void BI_Base::addToBoard(QGraphicsItem* item) noexcept
-{
-    Q_ASSERT(!mIsAddedToBoard);
-    if (item) {
-        mBoard.getGraphicsScene().addItem(*item);
-    }
-    mIsAddedToBoard = true;
+void BI_Base::addToBoard(QGraphicsItem* item) noexcept {
+  Q_ASSERT(!mIsAddedToBoard);
+  if (item) {
+    mBoard.getGraphicsScene().addItem(*item);
+  }
+  mIsAddedToBoard = true;
 }
 
-void BI_Base::removeFromBoard(QGraphicsItem* item) noexcept
-{
-    Q_ASSERT(mIsAddedToBoard);
-    if (item) {
-        mBoard.getGraphicsScene().removeItem(*item);
-    }
-    mIsAddedToBoard = false;
+void BI_Base::removeFromBoard(QGraphicsItem* item) noexcept {
+  Q_ASSERT(mIsAddedToBoard);
+  if (item) {
+    mBoard.getGraphicsScene().removeItem(*item);
+  }
+  mIsAddedToBoard = false;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

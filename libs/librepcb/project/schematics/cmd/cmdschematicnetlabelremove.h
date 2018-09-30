@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLABELREMOVE_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETLABELREMOVE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -36,47 +37,42 @@ class Schematic;
 class SI_NetLabel;
 class SI_NetSegment;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetLabelRemove
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetLabelRemove class
  */
-class CmdSchematicNetLabelRemove final : public UndoCommand
-{
-    public:
+class CmdSchematicNetLabelRemove final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept;
+  ~CmdSchematicNetLabelRemove() noexcept;
 
-        // Constructors / Destructor
-        CmdSchematicNetLabelRemove(SI_NetLabel& netlabel) noexcept;
-        ~CmdSchematicNetLabelRemove() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        SI_NetSegment& mNetSegment;
-        SI_NetLabel& mNetLabel;
+  SI_NetSegment& mNetSegment;
+  SI_NetLabel&   mNetLabel;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELREMOVE_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELREMOVE_H

@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/graphics/graphicslayername.h>
+ ******************************************************************************/
 #include "packageeditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicslayername.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class StrokeText;
@@ -41,9 +43,9 @@ namespace library {
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_DrawTextBase
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_DrawTextBase class
@@ -51,67 +53,69 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_DrawTextBase : public PackageEditorState
-{
-        Q_OBJECT
+class PackageEditorState_DrawTextBase : public PackageEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  enum class Mode { NAME, VALUE, TEXT };
 
-        // Types
-        enum class Mode {NAME, VALUE, TEXT};
+  // Constructors / Destructor
+  PackageEditorState_DrawTextBase() = delete;
+  PackageEditorState_DrawTextBase(
+      const PackageEditorState_DrawTextBase& other) = delete;
+  explicit PackageEditorState_DrawTextBase(Context& context,
+                                           Mode     mode) noexcept;
+  virtual ~PackageEditorState_DrawTextBase() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_DrawTextBase() = delete;
-        PackageEditorState_DrawTextBase(const PackageEditorState_DrawTextBase& other) = delete;
-        explicit PackageEditorState_DrawTextBase(Context& context, Mode mode) noexcept;
-        virtual ~PackageEditorState_DrawTextBase() noexcept;
+  // General Methods
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
-        // General Methods
-        bool entry() noexcept override;
-        bool exit() noexcept override;
+  // Event Handlers
+  bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processRotateCw() noexcept override;
+  bool processRotateCcw() noexcept override;
 
-        // Event Handlers
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent &e)  noexcept override;
-        bool processRotateCw() noexcept override;
-        bool processRotateCcw() noexcept override;
+  // Operator Overloadings
+  PackageEditorState_DrawTextBase& operator       =(
+      const PackageEditorState_DrawTextBase& rhs) = delete;
 
-        // Operator Overloadings
-        PackageEditorState_DrawTextBase& operator=(const PackageEditorState_DrawTextBase& rhs) = delete;
+private:  // Methods
+  bool startAddText(const Point& pos) noexcept;
+  bool finishAddText(const Point& pos) noexcept;
+  bool abortAddText() noexcept;
+  void resetToDefaultParameters() noexcept;
 
+  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void heightSpinBoxValueChanged(double value) noexcept;
+  void textComboBoxValueChanged(const QString& value) noexcept;
 
-    private: // Methods
-        bool startAddText(const Point& pos) noexcept;
-        bool finishAddText(const Point& pos) noexcept;
-        bool abortAddText() noexcept;
-        void resetToDefaultParameters() noexcept;
+private:  // Types / Data
+  Mode                              mMode;
+  Point                             mStartPos;
+  QScopedPointer<CmdStrokeTextEdit> mEditCmd;
+  StrokeText*                       mCurrentText;
+  StrokeTextGraphicsItem*           mCurrentGraphicsItem;
 
-        void layerComboBoxValueChanged(const QString& layerName) noexcept;
-        void heightSpinBoxValueChanged(double value) noexcept;
-        void textComboBoxValueChanged(const QString& value) noexcept;
-
-
-    private: // Types / Data
-        Mode mMode;
-        Point mStartPos;
-        QScopedPointer<CmdStrokeTextEdit> mEditCmd;
-        StrokeText* mCurrentText;
-        StrokeTextGraphicsItem* mCurrentGraphicsItem;
-
-        // parameter memory
-        GraphicsLayerName mLastLayerName;
-        Angle mLastRotation;
-        PositiveLength mLastHeight;
-        QString mLastText;
+  // parameter memory
+  GraphicsLayerName mLastLayerName;
+  Angle             mLastRotation;
+  PositiveLength    mLastHeight;
+  QString           mLastText;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H

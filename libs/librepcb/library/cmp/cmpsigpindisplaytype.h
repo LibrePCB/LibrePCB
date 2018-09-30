@@ -20,21 +20,22 @@
 #ifndef LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H
 #define LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/sexpression.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmpSigPinDisplayType
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmpSigPinDisplayType clas
@@ -42,110 +43,107 @@ namespace library {
  * @author ubruhin
  * @date 2016-10-23
  */
-class CmpSigPinDisplayType final
-{
-        Q_DECLARE_TR_FUNCTIONS(CmpSigPinDisplayType)
+class CmpSigPinDisplayType final {
+  Q_DECLARE_TR_FUNCTIONS(CmpSigPinDisplayType)
 
-    public:
+public:
+  // Constructors / Destructor
+  CmpSigPinDisplayType() noexcept;
+  CmpSigPinDisplayType(const CmpSigPinDisplayType& other) noexcept;
+  ~CmpSigPinDisplayType() noexcept;
 
-        // Constructors / Destructor
-        CmpSigPinDisplayType() noexcept;
-        CmpSigPinDisplayType(const CmpSigPinDisplayType& other) noexcept;
-        ~CmpSigPinDisplayType() noexcept;
+  // Getters
 
+  /**
+   * @brief Serialize the display type to a string (e.g. to write it into a
+   * file)
+   *
+   * @return The generated string
+   */
+  const QString& toString() const noexcept { return mDisplayType; }
 
-        // Getters
+  /**
+   * @brief Get the name of the display type (human readable and translated)
+   *
+   * @return The name of the display type
+   */
+  const QString& getNameTr() const noexcept { return mName; }
 
-        /**
-         * @brief Serialize the display type to a string (e.g. to write it into a file)
-         *
-         * @return The generated string
-         */
-        const QString& toString() const noexcept {return mDisplayType;}
+  // Operator Overloadings
+  bool operator==(const CmpSigPinDisplayType& rhs) const noexcept;
+  bool operator!=(const CmpSigPinDisplayType& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  CmpSigPinDisplayType& operator=(const CmpSigPinDisplayType& rhs) noexcept;
 
-        /**
-         * @brief Get the name of the display type (human readable and translated)
-         *
-         * @return The name of the display type
-         */
-        const QString& getNameTr() const noexcept {return mName;}
+  // Static Methods
 
+  /**
+   * @brief Deserialize a display type from a string
+   *
+   * @param str   The string (e.g. from a file)
+   *
+   * @return The CmpSigPinDisplayType object of the given string
+   *
+   * @throw Exception if the given string is not a valid CmpSigPinDisplayType
+   */
+  static const CmpSigPinDisplayType& fromString(const QString& str);
 
-        // Operator Overloadings
-        bool operator==(const CmpSigPinDisplayType& rhs) const noexcept;
-        bool operator!=(const CmpSigPinDisplayType& rhs) const noexcept {return !(*this == rhs);}
-        CmpSigPinDisplayType& operator=(const CmpSigPinDisplayType& rhs) noexcept;
+  /**
+   * @brief Get a list of all available display types
+   *
+   * @return A list of all display types
+   */
+  static const QList<CmpSigPinDisplayType>& getAllTypes() noexcept;
 
+  /// @brief None (no text)
+  static const CmpSigPinDisplayType& none() noexcept {
+    static CmpSigPinDisplayType type("none", tr("None (no text)"));
+    return type;
+  }
 
-        // Static Methods
+  /// @brief display the name of the symbol pin
+  static const CmpSigPinDisplayType& pinName() noexcept {
+    static CmpSigPinDisplayType type("pin", tr("Symbol pin name"));
+    return type;
+  }
 
-        /**
-         * @brief Deserialize a display type from a string
-         *
-         * @param str   The string (e.g. from a file)
-         *
-         * @return The CmpSigPinDisplayType object of the given string
-         *
-         * @throw Exception if the given string is not a valid CmpSigPinDisplayType
-         */
-        static const CmpSigPinDisplayType& fromString(const QString& str);
+  /// @brief display the name of the component signal
+  static const CmpSigPinDisplayType& componentSignal() noexcept {
+    static CmpSigPinDisplayType type("signal", tr("Component signal name"));
+    return type;
+  }
 
-        /**
-         * @brief Get a list of all available display types
-         *
-         * @return A list of all display types
-         */
-        static const QList<CmpSigPinDisplayType>& getAllTypes() noexcept;
+  /// @brief display the name of the connected net signal
+  static const CmpSigPinDisplayType& netSignal() noexcept {
+    static CmpSigPinDisplayType type("net", tr("Schematic net name"));
+    return type;
+  }
 
-        /// @brief None (no text)
-        static const CmpSigPinDisplayType& none() noexcept {
-            static CmpSigPinDisplayType type("none", tr("None (no text)"));
-            return type;
-        }
+private:  // Methods
+  CmpSigPinDisplayType(const QString& type, const QString& name) noexcept;
 
-        /// @brief display the name of the symbol pin
-        static const CmpSigPinDisplayType& pinName() noexcept {
-            static CmpSigPinDisplayType type("pin", tr("Symbol pin name"));
-            return type;
-        }
-
-        /// @brief display the name of the component signal
-        static const CmpSigPinDisplayType& componentSignal() noexcept {
-            static CmpSigPinDisplayType type("signal", tr("Component signal name"));
-            return type;
-        }
-
-        /// @brief display the name of the connected net signal
-        static const CmpSigPinDisplayType& netSignal() noexcept {
-            static CmpSigPinDisplayType type("net", tr("Schematic net name"));
-            return type;
-        }
-
-
-    private: // Methods
-        CmpSigPinDisplayType(const QString& type, const QString& name) noexcept;
-
-
-    private: // Data
-        QString mDisplayType;   ///< used for serialization (DO NOT MODIFY VALUES!)
-        QString mName;          ///< human readable (translated)
+private:                 // Data
+  QString mDisplayType;  ///< used for serialization (DO NOT MODIFY VALUES!)
+  QString mName;         ///< human readable (translated)
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
+}  // namespace library
 
 template <>
-inline SExpression serializeToSExpression(const library::CmpSigPinDisplayType& obj) {
-    return SExpression::createToken(obj.toString());
+inline SExpression serializeToSExpression(
+    const library::CmpSigPinDisplayType& obj) {
+  return SExpression::createToken(obj.toString());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H
+#endif  // LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H

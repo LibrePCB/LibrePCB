@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_PROJECTSETTINGS_H
 #define LIBREPCB_PROJECT_PROJECTSETTINGS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class SmartSExprFile;
@@ -38,9 +39,9 @@ namespace project {
 
 class Project;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ProjectSettings
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ProjectSettings class
@@ -48,70 +49,67 @@ class Project;
  * @author ubruhin
  * @date 2015-03-22
  */
-class ProjectSettings final : public QObject, public SerializableObject
-{
-        Q_OBJECT
+class ProjectSettings final : public QObject, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit ProjectSettings(Project& project, bool restore, bool readOnly,
+                           bool create);
+  ~ProjectSettings() noexcept;
 
-        // Constructors / Destructor
-        explicit ProjectSettings(Project& project, bool restore, bool readOnly, bool create);
-        ~ProjectSettings() noexcept;
+  // Getters: General
+  Project& getProject() const noexcept { return mProject; }
 
-        // Getters: General
-        Project& getProject() const noexcept {return mProject;}
+  // Getters: Settings
+  const QStringList& getLocaleOrder() const noexcept { return mLocaleOrder; }
+  const QStringList& getNormOrder() const noexcept { return mNormOrder; }
 
-        // Getters: Settings
-        const QStringList& getLocaleOrder() const noexcept {return mLocaleOrder;}
-        const QStringList& getNormOrder() const noexcept {return mNormOrder;}
+  // Setters: Settings
+  void setLocaleOrder(const QStringList& locales) noexcept {
+    mLocaleOrder = locales;
+  }
+  void setNormOrder(const QStringList& norms) noexcept { mNormOrder = norms; }
 
-        // Setters: Settings
-        void setLocaleOrder(const QStringList& locales) noexcept {mLocaleOrder = locales;}
-        void setNormOrder(const QStringList& norms) noexcept {mNormOrder = norms;}
+  // General Methods
+  void restoreDefaults() noexcept;
+  void triggerSettingsChanged() noexcept;
+  bool save(bool toOriginal, QStringList& errors) noexcept;
 
-        // General Methods
-        void restoreDefaults() noexcept;
-        void triggerSettingsChanged() noexcept;
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+signals:
 
+  void settingsChanged();
 
-    signals:
+private:
+  // make some methods inaccessible...
+  ProjectSettings();
+  ProjectSettings(const ProjectSettings& other);
+  ProjectSettings& operator=(const ProjectSettings& rhs);
 
-        void settingsChanged();
+  // Private Methods
 
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-    private:
+  // General
+  Project& mProject;      ///< a reference to the Project object (from the ctor)
+  FilePath mLibraryPath;  ///< the "lib" directory of the project
 
-        // make some methods inaccessible...
-        ProjectSettings();
-        ProjectSettings(const ProjectSettings& other);
-        ProjectSettings& operator=(const ProjectSettings& rhs);
+  // File "project/settings.lp"
+  FilePath        mFilepath;
+  SmartSExprFile* mFile;
 
-        // Private Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-        // General
-        Project& mProject; ///< a reference to the Project object (from the ctor)
-        FilePath mLibraryPath; ///< the "lib" directory of the project
-
-        // File "project/settings.lp"
-        FilePath mFilepath;
-        SmartSExprFile* mFile;
-
-
-        // All Settings
-        QStringList mLocaleOrder; ///< The list of locales (like "de_CH") in the right order
-        QStringList mNormOrder; ///< the list of norms in the right order
+  // All Settings
+  QStringList
+              mLocaleOrder;  ///< The list of locales (like "de_CH") in the right order
+  QStringList mNormOrder;  ///< the list of norms in the right order
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_PROJECTSETTINGS_H
+#endif  // LIBREPCB_PROJECT_PROJECTSETTINGS_H

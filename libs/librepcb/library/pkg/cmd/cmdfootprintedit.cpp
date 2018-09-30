@@ -17,68 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdfootprintedit.h"
+
 #include "../footprint.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdFootprintEdit::CmdFootprintEdit(Footprint& fpt) noexcept :
-    UndoCommand(tr("Edit footprint")), mFootprint(fpt),
-    mOldName(fpt.getNames().getDefaultValue()), mNewName(mOldName)
-{
+CmdFootprintEdit::CmdFootprintEdit(Footprint& fpt) noexcept
+  : UndoCommand(tr("Edit footprint")),
+    mFootprint(fpt),
+    mOldName(fpt.getNames().getDefaultValue()),
+    mNewName(mOldName) {
 }
 
-CmdFootprintEdit::~CmdFootprintEdit() noexcept
-{
+CmdFootprintEdit::~CmdFootprintEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdFootprintEdit::setName(const ElementName& name) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewName = name;
+void CmdFootprintEdit::setName(const ElementName& name) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = name;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdFootprintEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdFootprintEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewName != mOldName)           return true;
-    return false;
+  if (mNewName != mOldName) return true;
+  return false;
 }
 
-void CmdFootprintEdit::performUndo()
-{
-    mFootprint.getNames().setDefaultValue(mOldName);
+void CmdFootprintEdit::performUndo() {
+  mFootprint.getNames().setDefaultValue(mOldName);
 }
 
-void CmdFootprintEdit::performRedo()
-{
-    mFootprint.getNames().setDefaultValue(mNewName);
+void CmdFootprintEdit::performRedo() {
+  mFootprint.getNames().setDefaultValue(mNewName);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

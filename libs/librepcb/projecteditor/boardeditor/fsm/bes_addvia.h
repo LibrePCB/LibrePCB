@@ -20,16 +20,18 @@
 #ifndef LIBREPCB_PROJECT_BES_ADDVIA_H
 #define LIBREPCB_PROJECT_BES_ADDVIA_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
+
 #include <librepcb/project/boards/items/bi_via.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -39,67 +41,62 @@ class CmdBoardViaEdit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_AddVia
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_AddVia class
  */
-class BES_AddVia final : public BES_Base
-{
-        Q_OBJECT
+class BES_AddVia final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                      GraphicsView& editorGraphicsView, UndoStack& undoStack);
+  ~BES_AddVia();
 
-        // Constructors / Destructor
-        explicit BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                            GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_AddVia();
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:
+  // Private Methods
+  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
+  bool       addVia(Board& board) noexcept;
+  bool       updateVia(Board& board, const Point& pos) noexcept;
+  bool       fixVia(const Point& pos) noexcept;
+  void       updateShapeActionsCheckedState() noexcept;
+  void       setNetSignal(NetSignal* netsignal) noexcept;
 
+  // General Attributes
+  bool                            mUndoCmdActive;
+  BI_Via*                         mCurrentVia;
+  BI_Via::Shape                   mCurrentViaShape;
+  PositiveLength                  mCurrentViaSize;
+  PositiveLength                  mCurrentViaDrillDiameter;
+  NetSignal*                      mCurrentViaNetSignal;
+  QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
-    private:
-
-        // Private Methods
-        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-        bool addVia(Board& board) noexcept;
-        bool updateVia(Board& board, const Point& pos) noexcept;
-        bool fixVia(const Point& pos) noexcept;
-        void updateShapeActionsCheckedState() noexcept;
-        void setNetSignal(NetSignal* netsignal) noexcept;
-
-
-        // General Attributes
-        bool mUndoCmdActive;
-        BI_Via* mCurrentVia;
-        BI_Via::Shape mCurrentViaShape;
-        PositiveLength mCurrentViaSize;
-        PositiveLength mCurrentViaDrillDiameter;
-        NetSignal* mCurrentViaNetSignal;
-        QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
-
-        // Widgets for the command toolbar
-        QHash<int, QAction*> mShapeActions;
-        QList<QAction*> mActionSeparators;
-        QLabel* mSizeLabel;
-        QComboBox* mSizeComboBox;
-        QLabel* mDrillLabel;
-        QComboBox* mDrillComboBox;
-        QLabel* mNetSignalLabel;
-        QComboBox* mNetSignalComboBox;
+  // Widgets for the command toolbar
+  QHash<int, QAction*> mShapeActions;
+  QList<QAction*>      mActionSeparators;
+  QLabel*              mSizeLabel;
+  QComboBox*           mSizeComboBox;
+  QLabel*              mDrillLabel;
+  QComboBox*           mDrillComboBox;
+  QLabel*              mNetSignalLabel;
+  QComboBox*           mNetSignalComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_ADDVIA_H
+#endif  // LIBREPCB_PROJECT_BES_ADDVIA_H

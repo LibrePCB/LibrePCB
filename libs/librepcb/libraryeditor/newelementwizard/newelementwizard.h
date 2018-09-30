@@ -20,16 +20,17 @@
 #ifndef NEWELEMENTWIZARD_H
 #define NEWELEMENTWIZARD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
@@ -50,9 +51,9 @@ namespace Ui {
 class NewElementWizard;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizard
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizard class
@@ -60,48 +61,44 @@ class NewElementWizard;
  * @author ubruhin
  * @date 2017-03-21
  */
-class NewElementWizard final : public QWizard
-{
-        Q_OBJECT
+class NewElementWizard final : public QWizard {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizard()                              = delete;
+  NewElementWizard(const NewElementWizard& other) = delete;
+  NewElementWizard(const workspace::Workspace& ws, const Library& lib,
+                   const IF_GraphicsLayerProvider& lp,
+                   QWidget*                        parent = 0) noexcept;
+  ~NewElementWizard() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizard() = delete;
-        NewElementWizard(const NewElementWizard& other) = delete;
-        NewElementWizard(const workspace::Workspace& ws, const Library& lib,
-                         const IF_GraphicsLayerProvider& lp, QWidget* parent = 0) noexcept;
-        ~NewElementWizard() noexcept;
+  // Getters
+  const NewElementWizardContext& getContext() const noexcept {
+    return *mContext;
+  }
 
+  // General Methods
+  bool validateCurrentPage() noexcept override;
 
-        // Getters
-        const NewElementWizardContext& getContext() const noexcept {return *mContext;}
+  // Operator Overloadings
+  NewElementWizard& operator=(const NewElementWizard& rhs) = delete;
 
+private:  // Methods
+  void insertPage(int index, QWizardPage* page) noexcept;
 
-        // General Methods
-        bool validateCurrentPage() noexcept override;
-
-
-        // Operator Overloadings
-        NewElementWizard& operator=(const NewElementWizard& rhs) = delete;
-
-
-    private: // Methods
-        void insertPage(int index, QWizardPage* page) noexcept;
-
-
-    private: // Data
-        QScopedPointer<Ui::NewElementWizard> mUi;
-        QScopedPointer<NewElementWizardContext> mContext;
-        QList<QWizardPage*> mPages;
+private:  // Data
+  QScopedPointer<Ui::NewElementWizard>    mUi;
+  QScopedPointer<NewElementWizardContext> mContext;
+  QList<QWizardPage*>                     mPages;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // NEWELEMENTWIZARD_H
+#endif  // NEWELEMENTWIZARD_H

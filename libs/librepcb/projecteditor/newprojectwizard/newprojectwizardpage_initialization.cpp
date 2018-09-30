@@ -17,132 +17,135 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newprojectwizardpage_initialization.h"
+
 #include "ui_newprojectwizardpage_initialization.h"
+
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NewProjectWizardPage_Initialization::NewProjectWizardPage_Initialization(QWidget *parent) noexcept :
-    QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_Initialization)
-{
-    mUi->setupUi(this);
-    setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
-    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
+NewProjectWizardPage_Initialization::NewProjectWizardPage_Initialization(
+    QWidget* parent) noexcept
+  : QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_Initialization) {
+  mUi->setupUi(this);
+  setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 
-    // signal/slot connections
-    connect(mUi->cbxAddSchematic, &QGroupBox::toggled,
-            this, &NewProjectWizardPage_Initialization::completeChanged);
-    connect(mUi->cbxAddBoard, &QGroupBox::toggled,
-            this, &NewProjectWizardPage_Initialization::completeChanged);
-    connect(mUi->edtSchematicName, &QLineEdit::textChanged,
-            this, &NewProjectWizardPage_Initialization::schematicNameChanged);
-    connect(mUi->edtBoardName, &QLineEdit::textChanged,
-            this, &NewProjectWizardPage_Initialization::boardNameChanged);
+  // signal/slot connections
+  connect(mUi->cbxAddSchematic, &QGroupBox::toggled, this,
+          &NewProjectWizardPage_Initialization::completeChanged);
+  connect(mUi->cbxAddBoard, &QGroupBox::toggled, this,
+          &NewProjectWizardPage_Initialization::completeChanged);
+  connect(mUi->edtSchematicName, &QLineEdit::textChanged, this,
+          &NewProjectWizardPage_Initialization::schematicNameChanged);
+  connect(mUi->edtBoardName, &QLineEdit::textChanged, this,
+          &NewProjectWizardPage_Initialization::boardNameChanged);
 
-    // insert values
-    mUi->edtSchematicName->setText("Main"); // do not translate this into other languages!
-    mUi->edtBoardName->setText("default");  // do not translate this into other languages!
+  // insert values
+  mUi->edtSchematicName->setText(
+      "Main");  // do not translate this into other languages!
+  mUi->edtBoardName->setText(
+      "default");  // do not translate this into other languages!
 }
 
-NewProjectWizardPage_Initialization::~NewProjectWizardPage_Initialization() noexcept
-{
+NewProjectWizardPage_Initialization::
+    ~NewProjectWizardPage_Initialization() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewProjectWizardPage_Initialization::getCreateSchematic() const noexcept
-{
-    return mUi->cbxAddSchematic->isChecked();
+bool NewProjectWizardPage_Initialization::getCreateSchematic() const noexcept {
+  return mUi->cbxAddSchematic->isChecked();
 }
 
-QString NewProjectWizardPage_Initialization::getSchematicName() const noexcept
-{
-    return mUi->edtSchematicName->text();
+QString NewProjectWizardPage_Initialization::getSchematicName() const noexcept {
+  return mUi->edtSchematicName->text();
 }
 
-QString NewProjectWizardPage_Initialization::getSchematicFileName() const noexcept
-{
-    return mUi->lblSchematicFileName->text();
+QString NewProjectWizardPage_Initialization::getSchematicFileName() const
+    noexcept {
+  return mUi->lblSchematicFileName->text();
 }
 
-bool NewProjectWizardPage_Initialization::getCreateBoard() const noexcept
-{
-    return mUi->cbxAddBoard->isChecked();
+bool NewProjectWizardPage_Initialization::getCreateBoard() const noexcept {
+  return mUi->cbxAddBoard->isChecked();
 }
 
-QString NewProjectWizardPage_Initialization::getBoardName() const noexcept
-{
-    return mUi->edtBoardName->text();
+QString NewProjectWizardPage_Initialization::getBoardName() const noexcept {
+  return mUi->edtBoardName->text();
 }
 
-QString NewProjectWizardPage_Initialization::getBoardFileName() const noexcept
-{
-    return mUi->lblBoardFileName->text();
+QString NewProjectWizardPage_Initialization::getBoardFileName() const noexcept {
+  return mUi->lblBoardFileName->text();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  GUI Action Handlers
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NewProjectWizardPage_Initialization::schematicNameChanged(const QString& name) noexcept
-{
-    QString filename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (!filename.isEmpty()) filename.append(".lp");
-    mUi->lblSchematicFileName->setText(filename);
-    emit completeChanged();
+void NewProjectWizardPage_Initialization::schematicNameChanged(
+    const QString& name) noexcept {
+  QString filename = FilePath::cleanFileName(
+      name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+  if (!filename.isEmpty()) filename.append(".lp");
+  mUi->lblSchematicFileName->setText(filename);
+  emit completeChanged();
 }
 
-void NewProjectWizardPage_Initialization::boardNameChanged(const QString& name) noexcept
-{
-    QString filename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-    if (!filename.isEmpty()) filename.append(".lp");
-    mUi->lblBoardFileName->setText(filename);
-    emit completeChanged();
+void NewProjectWizardPage_Initialization::boardNameChanged(
+    const QString& name) noexcept {
+  QString filename = FilePath::cleanFileName(
+      name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+  if (!filename.isEmpty()) filename.append(".lp");
+  mUi->lblBoardFileName->setText(filename);
+  emit completeChanged();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewProjectWizardPage_Initialization::isComplete() const noexcept
-{
-    // check base class
-    if (!QWizardPage::isComplete()) return false;
+bool NewProjectWizardPage_Initialization::isComplete() const noexcept {
+  // check base class
+  if (!QWizardPage::isComplete()) return false;
 
-    // check schematic filename
-    if (mUi->cbxAddSchematic->isChecked() && mUi->lblSchematicFileName->text().isEmpty()) {
-        return false;
-    }
+  // check schematic filename
+  if (mUi->cbxAddSchematic->isChecked() &&
+      mUi->lblSchematicFileName->text().isEmpty()) {
+    return false;
+  }
 
-    // check board filename
-    if (mUi->cbxAddBoard->isChecked() && mUi->lblBoardFileName->text().isEmpty()) {
-        return false;
-    }
+  // check board filename
+  if (mUi->cbxAddBoard->isChecked() &&
+      mUi->lblBoardFileName->text().isEmpty()) {
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

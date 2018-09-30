@@ -20,94 +20,105 @@
 #ifndef LIBREPCB_GRIDPROPERTIES_H
 #define LIBREPCB_GRIDPROPERTIES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "fileio/serializableobject.h"
 #include "units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GridProperties
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The GridProperties class
  */
-class GridProperties final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(GridProperties)
+class GridProperties final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(GridProperties)
 
-    public:
+public:
+  // Types
+  enum class Type_t { Off, Lines, Dots };
 
-        // Types
-        enum class Type_t {Off, Lines, Dots};
+  // Constructors / Destructor
+  GridProperties() noexcept;
+  explicit GridProperties(const SExpression& node);
+  GridProperties(Type_t type, const PositiveLength& interval,
+                 const LengthUnit& unit) noexcept;
+  GridProperties(const GridProperties& other) noexcept;
+  ~GridProperties() noexcept;
 
-        // Constructors / Destructor
-        GridProperties() noexcept;
-        explicit GridProperties(const SExpression& node);
-        GridProperties(Type_t type, const PositiveLength& interval,
-                       const LengthUnit& unit) noexcept;
-        GridProperties(const GridProperties& other) noexcept;
-        ~GridProperties() noexcept;
+  // Getters
+  Type_t                getType() const noexcept { return mType; }
+  const PositiveLength& getInterval() const noexcept { return mInterval; }
+  const LengthUnit&     getUnit() const noexcept { return mUnit; }
 
-        // Getters
-        Type_t getType() const noexcept {return mType;}
-        const PositiveLength& getInterval() const noexcept {return mInterval;}
-        const LengthUnit& getUnit() const noexcept {return mUnit;}
+  // Setters
+  void setType(Type_t type) noexcept { mType = type; }
+  void setInterval(const PositiveLength& interval) noexcept {
+    mInterval = interval;
+  }
+  void setUnit(const LengthUnit& unit) noexcept { mUnit = unit; }
 
-        // Setters
-        void setType(Type_t type) noexcept {mType = type;}
-        void setInterval(const PositiveLength& interval) noexcept {mInterval = interval;}
-        void setUnit(const LengthUnit& unit) noexcept {mUnit = unit;}
+  // General Methods
 
-        // General Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operators
+  GridProperties& operator=(const GridProperties& rhs) noexcept;
 
-        // Operators
-        GridProperties& operator=(const GridProperties& rhs) noexcept;
-
-
-    private: // Data
-        Type_t mType;
-        PositiveLength mInterval;
-        LengthUnit mUnit;
+private:  // Data
+  Type_t         mType;
+  PositiveLength mInterval;
+  LengthUnit     mUnit;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
 inline SExpression serializeToSExpression(const GridProperties::Type_t& obj) {
-    switch (obj) {
-        case GridProperties::Type_t::Off:   return SExpression::createToken("off");
-        case GridProperties::Type_t::Lines: return SExpression::createToken("lines");
-        case GridProperties::Type_t::Dots:  return SExpression::createToken("dots");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+  switch (obj) {
+    case GridProperties::Type_t::Off:
+      return SExpression::createToken("off");
+    case GridProperties::Type_t::Lines:
+      return SExpression::createToken("lines");
+    case GridProperties::Type_t::Dots:
+      return SExpression::createToken("dots");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline GridProperties::Type_t deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == "off")     return GridProperties::Type_t::Off;
-    else if (str == "lines")   return GridProperties::Type_t::Lines;
-    else if (str == "dots")    return GridProperties::Type_t::Dots;
-    else throw RuntimeError(__FILE__, __LINE__, QString(GridProperties::tr("Unknown grid type: \"%1\"")).arg(str));
+inline GridProperties::Type_t deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == "off")
+    return GridProperties::Type_t::Off;
+  else if (str == "lines")
+    return GridProperties::Type_t::Lines;
+  else if (str == "dots")
+    return GridProperties::Type_t::Dots;
+  else
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(GridProperties::tr("Unknown grid type: \"%1\"")).arg(str));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRIDPROPERTIES_H
+#endif  // LIBREPCB_GRIDPROPERTIES_H

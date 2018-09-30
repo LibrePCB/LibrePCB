@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
 #define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/units/point.h>
+ ******************************************************************************/
 #include "../items/bi_via.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/point.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -39,60 +41,55 @@ class BI_NetPoint;
 class BI_NetLine;
 class BI_NetLineAnchor;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardNetSegmentAddElements
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardNetSegmentAddElements class
  */
-class CmdBoardNetSegmentAddElements final : public UndoCommand
-{
-    public:
+class CmdBoardNetSegmentAddElements final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardNetSegmentAddElements(BI_NetSegment& segment) noexcept;
+  ~CmdBoardNetSegmentAddElements() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardNetSegmentAddElements(BI_NetSegment& segment) noexcept;
-        ~CmdBoardNetSegmentAddElements() noexcept;
+  // General Methods
+  BI_Via*      addVia(BI_Via& via);
+  BI_Via*      addVia(const Point& position, BI_Via::Shape shape,
+                      const PositiveLength& size,
+                      const PositiveLength& drillDiameter);
+  BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
+  BI_NetPoint* addNetPoint(const Point& position);
+  BI_NetLine*  addNetLine(BI_NetLine& netline);
+  BI_NetLine*  addNetLine(BI_NetLineAnchor& startPoint,
+                          BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
+                          const PositiveLength& width);
 
-        // General Methods
-        BI_Via* addVia(BI_Via& via);
-        BI_Via* addVia(const Point& position, BI_Via::Shape shape,
-                       const PositiveLength& size, const PositiveLength& drillDiameter);
-        BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
-        BI_NetPoint* addNetPoint(const Point& position);
-        BI_NetLine* addNetLine(BI_NetLine& netline);
-        BI_NetLine* addNetLine(BI_NetLineAnchor& startPoint,
-                               BI_NetLineAnchor& endPoint,
-                               GraphicsLayer& layer,
-                               const PositiveLength& width);
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-        BI_NetSegment& mNetSegment;
-        QList<BI_Via*> mVias;
-        QList<BI_NetPoint*> mNetPoints;
-        QList<BI_NetLine*> mNetLines;
+  // Private Member Variables
+  BI_NetSegment&      mNetSegment;
+  QList<BI_Via*>      mVias;
+  QList<BI_NetPoint*> mNetPoints;
+  QList<BI_NetLine*>  mNetLines;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H

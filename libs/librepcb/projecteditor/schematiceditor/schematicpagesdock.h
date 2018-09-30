@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
 #define LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -42,58 +42,55 @@ namespace Ui {
 class SchematicPagesDock;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SchematicPagesDock
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SchematicPagesDock class
  */
-class SchematicPagesDock final : public QDockWidget
-{
-        Q_OBJECT
+class SchematicPagesDock final : public QDockWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit SchematicPagesDock(Project& project, SchematicEditor& editor);
+  ~SchematicPagesDock();
 
-        // Constructors / Destructor
-        explicit SchematicPagesDock(Project& project, SchematicEditor& editor);
-        ~SchematicPagesDock();
+  // Inherited from QDockWidget
+  void resizeEvent(QResizeEvent* event);
 
-        // Inherited from QDockWidget
-        void resizeEvent(QResizeEvent* event);
+public slots:
 
-    public slots:
+  void activeSchematicChanged(int oldIndex, int newIndex);
+  void schematicAdded(int newIndex);
+  void schematicRemoved(int oldIndex);
 
-        void activeSchematicChanged(int oldIndex, int newIndex);
-        void schematicAdded(int newIndex);
-        void schematicRemoved(int oldIndex);
+private slots:
 
-    private slots:
+  // UI
+  void on_btnNewSchematic_clicked();
+  void on_btnRemoveSchematic_clicked();
+  void on_listWidget_currentRowChanged(int currentRow);
 
-        // UI
-        void on_btnNewSchematic_clicked();
-        void on_btnRemoveSchematic_clicked();
-        void on_listWidget_currentRowChanged(int currentRow);
+private:
+  // make some methods inaccessible...
+  SchematicPagesDock();
+  SchematicPagesDock(const SchematicPagesDock& other);
+  SchematicPagesDock& operator=(const SchematicPagesDock& rhs);
 
-    private:
-
-        // make some methods inaccessible...
-        SchematicPagesDock();
-        SchematicPagesDock(const SchematicPagesDock& other);
-        SchematicPagesDock& operator=(const SchematicPagesDock& rhs);
-
-        // General
-        Project& mProject;
-        SchematicEditor& mEditor;
-        Ui::SchematicPagesDock* mUi;
+  // General
+  Project&                mProject;
+  SchematicEditor&        mEditor;
+  Ui::SchematicPagesDock* mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
+#endif  // LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H

@@ -17,80 +17,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "device.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 Device::Device(const Uuid& uuid, const Version& version, const QString& author,
                const ElementName& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US, const Uuid& component, const Uuid& package) :
-    LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
-                   name_en_US, description_en_US, keywords_en_US),
-    mComponentUuid(component), mPackageUuid(package), mAttributes(), mPadSignalMap()
-{
+               const QString& keywords_en_US, const Uuid& component,
+               const Uuid& package)
+  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
+                   author, name_en_US, description_en_US, keywords_en_US),
+    mComponentUuid(component),
+    mPackageUuid(package),
+    mAttributes(),
+    mPadSignalMap() {
 }
 
-Device::Device(const FilePath& elementDirectory, bool readOnly) :
-    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
+Device::Device(const FilePath& elementDirectory, bool readOnly)
+  : LibraryElement(elementDirectory, getShortElementName(),
+                   getLongElementName(), readOnly),
     mComponentUuid(mLoadingFileDocument.getValueByPath<Uuid>("component")),
     mPackageUuid(mLoadingFileDocument.getValueByPath<Uuid>("package")),
     mAttributes(mLoadingFileDocument),
-    mPadSignalMap(mLoadingFileDocument)
-{
-    cleanupAfterLoadingElementFromFile();
+    mPadSignalMap(mLoadingFileDocument) {
+  cleanupAfterLoadingElementFromFile();
 }
 
-Device::~Device() noexcept
-{
+Device::~Device() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Device::setComponentUuid(const Uuid& uuid) noexcept
-{
-    if (uuid == mComponentUuid) return;
-    mComponentUuid = uuid;
-    emit componentUuidChanged(mComponentUuid);
+void Device::setComponentUuid(const Uuid& uuid) noexcept {
+  if (uuid == mComponentUuid) return;
+  mComponentUuid = uuid;
+  emit componentUuidChanged(mComponentUuid);
 }
 
-void Device::setPackageUuid(const Uuid& uuid) noexcept
-{
-    if (uuid == mPackageUuid) return;
-    mPackageUuid = uuid;
-    emit packageUuidChanged(mPackageUuid);
+void Device::setPackageUuid(const Uuid& uuid) noexcept {
+  if (uuid == mPackageUuid) return;
+  mPackageUuid = uuid;
+  emit packageUuidChanged(mPackageUuid);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Device::serialize(SExpression& root) const
-{
-    LibraryElement::serialize(root);
-    root.appendChild("component", mComponentUuid, true);
-    root.appendChild("package", mPackageUuid, true);
-    mAttributes.serialize(root);
-    mPadSignalMap.sortedByUuid().serialize(root);
+void Device::serialize(SExpression& root) const {
+  LibraryElement::serialize(root);
+  root.appendChild("component", mComponentUuid, true);
+  root.appendChild("package", mPackageUuid, true);
+  mAttributes.serialize(root);
+  mPadSignalMap.sortedByUuid().serialize(root);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

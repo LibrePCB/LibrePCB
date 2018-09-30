@@ -17,92 +17,87 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "wsi_user.h"
+
 #include <librepcb/common/systeminfo.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WSI_User::WSI_User(const SExpression& node) :
-    WSI_Base()
-{
-    if (const SExpression* child = node.tryGetChildByPath("user")) {
-        mName = child->getValueOfFirstChild<QString>();
-    } else {
-        // Fallback to system's username if no user name defined. This should actually
-        // only happen once when upgrading older workspace settings.
-        mName = SystemInfo::getFullUsername();
-    }
+WSI_User::WSI_User(const SExpression& node) : WSI_Base() {
+  if (const SExpression* child = node.tryGetChildByPath("user")) {
+    mName = child->getValueOfFirstChild<QString>();
+  } else {
+    // Fallback to system's username if no user name defined. This should
+    // actually only happen once when upgrading older workspace settings.
+    mName = SystemInfo::getFullUsername();
+  }
 
-    // create widget
-    mWidget.reset(new QWidget());
-    QVBoxLayout* layout = new QVBoxLayout(mWidget.data());
-    layout->setContentsMargins(0, 0, 0, 0);
-    mNameEdit.reset(new QLineEdit(mName));
-    mNameEdit->setMaxLength(100);
-    mNameEdit->setPlaceholderText(tr("e.g. \"John Doe\""));
-    layout->addWidget(mNameEdit.data());
-    layout->addWidget(new QLabel(tr("This name will be used as author when creating new "
-                                    "projects or libraries.")));
+  // create widget
+  mWidget.reset(new QWidget());
+  QVBoxLayout* layout = new QVBoxLayout(mWidget.data());
+  layout->setContentsMargins(0, 0, 0, 0);
+  mNameEdit.reset(new QLineEdit(mName));
+  mNameEdit->setMaxLength(100);
+  mNameEdit->setPlaceholderText(tr("e.g. \"John Doe\""));
+  layout->addWidget(mNameEdit.data());
+  layout->addWidget(
+      new QLabel(tr("This name will be used as author when creating new "
+                    "projects or libraries.")));
 }
 
-WSI_User::~WSI_User() noexcept
-{
+WSI_User::~WSI_User() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  * Direct Access
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_User::setName(const QString& name) noexcept
-{
-    mName = name;
-    mNameEdit->setText(name);
+void WSI_User::setName(const QString& name) noexcept {
+  mName = name;
+  mNameEdit->setText(name);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_User::restoreDefault() noexcept
-{
-    mNameEdit->setText(SystemInfo::getFullUsername());
+void WSI_User::restoreDefault() noexcept {
+  mNameEdit->setText(SystemInfo::getFullUsername());
 }
 
-void WSI_User::apply() noexcept
-{
-    mName = mNameEdit->text();
+void WSI_User::apply() noexcept {
+  mName = mNameEdit->text();
 }
 
-void WSI_User::revert() noexcept
-{
-    mNameEdit->setText(mName);
+void WSI_User::revert() noexcept {
+  mNameEdit->setText(mName);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_User::serialize(SExpression& root) const
-{
-    root.appendChild("user", mName, true);
+void WSI_User::serialize(SExpression& root) const {
+  root.appendChild("user", mName, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

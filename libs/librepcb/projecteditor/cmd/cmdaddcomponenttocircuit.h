@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H
 #define LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -48,53 +49,50 @@ class CmdComponentInstanceAdd;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdAddComponentToCircuit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdAddComponentToCircuit class
  */
-class CmdAddComponentToCircuit final : public UndoCommandGroup
-{
-    public:
+class CmdAddComponentToCircuit final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdAddComponentToCircuit(
+      workspace::Workspace& workspace, Project& project, const Uuid& component,
+      const Uuid&               symbolVariant,
+      const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
+  ~CmdAddComponentToCircuit() noexcept;
 
-        // Constructors / Destructor
-        CmdAddComponentToCircuit(workspace::Workspace& workspace, Project& project,
-                                 const Uuid& component, const Uuid& symbolVariant,
-                                 const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
-        ~CmdAddComponentToCircuit() noexcept;
+  // Getters
+  ComponentInstance* getComponentInstance() const noexcept;
 
-        // Getters
-        ComponentInstance* getComponentInstance() const noexcept;
+private:
+  // Private Methods
 
-    private:
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-        // Private Methods
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Attributes from the constructor
+  workspace::Workspace& mWorkspace;
+  Project&              mProject;
+  Uuid                  mComponentUuid;
+  Uuid                  mSymbVarUuid;
+  tl::optional<Uuid>    mDefaultDeviceUuid;
 
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        workspace::Workspace& mWorkspace;
-        Project& mProject;
-        Uuid mComponentUuid;
-        Uuid mSymbVarUuid;
-        tl::optional<Uuid> mDefaultDeviceUuid;
-
-        // child commands
-        CmdComponentInstanceAdd* mCmdAddToCircuit;
+  // child commands
+  CmdComponentInstanceAdd* mCmdAddToCircuit;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H
+#endif  // LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H

@@ -20,200 +20,197 @@
 #ifndef LIBREPCB_NETWORKREQUESTBASE_H
 #define LIBREPCB_NETWORKREQUESTBASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtNetwork>
+ ******************************************************************************/
 #include "../exceptions.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtNetwork>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NetworkRequestBase
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief Base class for network requests which are processed in the network access manager
+ * @brief Base class for network requests which are processed in the network
+ * access manager
  *
- * This class lets you execute a network request without blocking the main application
- * thread. After creating an object derived from #NetworkRequestBase, you can connect to
- * signals of that class to track the progress of the request. Then you need to call
- * #start() to start the request processing.
+ * This class lets you execute a network request without blocking the main
+ * application thread. After creating an object derived from
+ * #NetworkRequestBase, you can connect to signals of that class to track the
+ * progress of the request. Then you need to call #start() to start the request
+ * processing.
  *
- * @note    You need to ensure that an instance of librepcb::NetworkAccessManager exists
- *          while starting a new network request. Otherwise the request will fail. Read
- *          the documentation of librepcb::NetworkAccessManager for more information.
+ * @note    You need to ensure that an instance of
+ * librepcb::NetworkAccessManager exists while starting a new network request.
+ * Otherwise the request will fail. Read the documentation of
+ * librepcb::NetworkAccessManager for more information.
  *
  * @see librepcb::NetworkAccessManager
  *
  * @author ubruhin
  * @date 2016-09-12
  */
-class NetworkRequestBase : public QObject
-{
-        Q_OBJECT
+class NetworkRequestBase : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NetworkRequestBase()                                = delete;
+  NetworkRequestBase(const NetworkRequestBase& other) = delete;
+  NetworkRequestBase(const QUrl& url) noexcept;
+  virtual ~NetworkRequestBase() noexcept;
 
-        // Constructors / Destructor
-        NetworkRequestBase() = delete;
-        NetworkRequestBase(const NetworkRequestBase& other) = delete;
-        NetworkRequestBase(const QUrl& url) noexcept;
-        virtual ~NetworkRequestBase() noexcept;
+  // Setters
 
-        // Setters
+  /**
+   * @brief Set a HTTP header field for the network request
+   *
+   * @param name      Header field name
+   * @param value     Header field value
+   */
+  void setHeaderField(const QByteArray& name, const QByteArray& value) noexcept;
 
-        /**
-         * @brief Set a HTTP header field for the network request
-         *
-         * @param name      Header field name
-         * @param value     Header field value
-         */
-        void setHeaderField(const QByteArray& name, const QByteArray& value) noexcept;
+  /**
+   * @brief Set the expected size of the requested content
+   *
+   * If set, this size will be used to calculate the download progress in
+   * percent in case that there is no "Content-Length" attribute in the received
+   * HTTP header.
+   *
+   * @param bytes         Expected content size of the reply in bytes
+   */
+  void setExpectedReplyContentSize(qint64 bytes) noexcept;
 
-        /**
-         * @brief Set the expected size of the requested content
-         *
-         * If set, this size will be used to calculate the download progress in percent in
-         * case that there is no "Content-Length" attribute in the received HTTP header.
-         *
-         * @param bytes         Expected content size of the reply in bytes
-         */
-        void setExpectedReplyContentSize(qint64 bytes) noexcept;
+  // Operator Overloadings
+  NetworkRequestBase& operator=(const NetworkRequestBase& rhs) = delete;
 
-        // Operator Overloadings
-        NetworkRequestBase& operator=(const NetworkRequestBase& rhs) = delete;
+public slots:
 
+  /**
+   * @brief Start downloading the requested content
+   *
+   * @warning It is not save to access this object after calling this method!
+   *          The object will be moved to another thread and will be deleted
+   * after an error occurs or the request succeeds. Any further access to the
+   *          pointer which you have received from the constructor is unsave and
+   *          could cause an application crash.
+   */
+  void start() noexcept;
 
-    public slots:
+  /**
+   * @brief Abort downloading the requested content
+   *
+   * @warning Because calling this method makes only sense *after* calling
+   * #start(), but which is unsave as described in #start(), this method must
+   * only be used indirectly with the signals/slots concept of Qt (Qt
+   * automatically disconnects the callers signal from this slot as soon as this
+   * object gets destroyed, so the connection is always safe).
+   */
+  void abort() noexcept;
 
-        /**
-         * @brief Start downloading the requested content
-         *
-         * @warning It is not save to access this object after calling this method!
-         *          The object will be moved to another thread and will be deleted after
-         *          an error occurs or the request succeeds. Any further access to the
-         *          pointer which you have received from the constructor is unsave and
-         *          could cause an application crash.
-         */
-        void start() noexcept;
+signals:
 
-        /**
-         * @brief Abort downloading the requested content
-         *
-         * @warning Because calling this method makes only sense *after* calling #start(),
-         *          but which is unsave as described in #start(), this method must only be
-         *          used indirectly with the signals/slots concept of Qt (Qt automatically
-         *          disconnects the callers signal from this slot as soon as this object
-         *          gets destroyed, so the connection is always safe).
-         */
-        void abort() noexcept;
+  /**
+   * @brief Internal signal, don't use it from outside
+   */
+  void startRequested();
 
+  /**
+   * @brief Reply progress / state changed signal
+   *
+   * This signal shows which actions are executed. Or in other words, it shows
+   * the current state of the request processing.
+   *
+   * @param action                Short description about the current
+   * action/state
+   */
+  void progressState(QString state);
 
-    signals:
+  /**
+   * @brief Reply content download progress signal (simple)
+   *
+   * @param percent               (Estimated) progress in percent (0..100)
+   */
+  void progressPercent(int percent);
 
-        /**
-         * @brief Internal signal, don't use it from outside
-         */
-        void startRequested();
+  /**
+   * @brief Reply content download progress signal (extended)
+   *
+   * @param bytesReceived         Count of bytes received
+   * @param bytesTotal            Count of total bytes (-1 if unknown)
+   * @param percent               (Estimated) progress in percent (0..100)
+   */
+  void progress(qint64 bytesReceived, qint64 bytesTotal, int percent);
 
-        /**
-         * @brief Reply progress / state changed signal
-         *
-         * This signal shows which actions are executed. Or in other words, it shows the
-         * current state of the request processing.
-         *
-         * @param action                Short description about the current action/state
-         */
-        void progressState(QString state);
+  /**
+   * @brief Request aborted signal (emited right before #finished())
+   */
+  void aborted();
 
-        /**
-         * @brief Reply content download progress signal (simple)
-         *
-         * @param percent               (Estimated) progress in percent (0..100)
-         */
-        void progressPercent(int percent);
+  /**
+   * @brief Request succeeded signal (emited right before #finished())
+   */
+  void succeeded();
 
-        /**
-         * @brief Reply content download progress signal (extended)
-         *
-         * @param bytesReceived         Count of bytes received
-         * @param bytesTotal            Count of total bytes (-1 if unknown)
-         * @param percent               (Estimated) progress in percent (0..100)
-         */
-        void progress(qint64 bytesReceived, qint64 bytesTotal, int percent);
+  /**
+   * @brief Request errored signal (emited right before #finished())
+   *
+   * @param errorMsg              An error message
+   */
+  void errored(QString errorMsg);
 
-        /**
-         * @brief Request aborted signal (emited right before #finished())
-         */
-        void aborted();
+  /**
+   * @brief Request finished signal
+   *
+   * This signal is emited right after #aborted(), #succeeded() or #errored().
+   *
+   * @param success               True if succeeded, false if aborted or errored
+   */
+  void finished(bool success);
 
-        /**
-         * @brief Request succeeded signal (emited right before #finished())
-         */
-        void succeeded();
+public:  // Methods
+  virtual void prepareRequest()                           = 0;
+  virtual void finalizeRequest()                          = 0;
+  virtual void emitSuccessfullyFinishedSignals() noexcept = 0;
+  virtual void fetchNewData() noexcept                    = 0;
 
-        /**
-         * @brief Request errored signal (emited right before #finished())
-         *
-         * @param errorMsg              An error message
-         */
-        void errored(QString errorMsg);
+private:  // Methods
+  void           executeRequest() noexcept;
+  void           replyReadyReadSlot() noexcept;
+  void           replyErrorSlot(QNetworkReply::NetworkError code) noexcept;
+  void           replySslErrorsSlot(const QList<QSslError>& errors) noexcept;
+  void           replyDownloadProgressSlot(qint64 bytesReceived,
+                                           qint64 bytesTotal) noexcept;
+  void           replyFinishedSlot() noexcept;
+  void           finalize(const QString& errorMsg = QString()) noexcept;
+  static QString formatFileSize(qint64 bytes) noexcept;
 
-        /**
-         * @brief Request finished signal
-         *
-         * This signal is emited right after #aborted(), #succeeded() or #errored().
-         *
-         * @param success               True if succeeded, false if aborted or errored
-         */
-        void finished(bool success);
+protected:  // Data
+  // from constructor
+  QUrl   mUrl;
+  qint64 mExpectedContentSize;
 
-
-    public: // Methods
-
-        virtual void prepareRequest() = 0;
-        virtual void finalizeRequest() = 0;
-        virtual void emitSuccessfullyFinishedSignals() noexcept = 0;
-        virtual void fetchNewData() noexcept = 0;
-
-
-    private: // Methods
-
-        void executeRequest() noexcept;
-        void replyReadyReadSlot() noexcept;
-        void replyErrorSlot(QNetworkReply::NetworkError code) noexcept;
-        void replySslErrorsSlot(const QList<QSslError>& errors) noexcept;
-        void replyDownloadProgressSlot(qint64 bytesReceived, qint64 bytesTotal) noexcept;
-        void replyFinishedSlot() noexcept;
-        void finalize(const QString& errorMsg = QString()) noexcept;
-        static QString formatFileSize(qint64 bytes) noexcept;
-
-
-    protected: // Data
-
-        // from constructor
-        QUrl mUrl;
-        qint64 mExpectedContentSize;
-
-        // internal data
-        QList<QUrl> mRedirectedUrls;
-        QNetworkRequest mRequest;
-        QScopedPointer<QNetworkReply> mReply;
-        bool mStarted;
-        bool mAborted;
-        bool mErrored;
-        bool mFinished;
+  // internal data
+  QList<QUrl>                   mRedirectedUrls;
+  QNetworkRequest               mRequest;
+  QScopedPointer<QNetworkReply> mReply;
+  bool                          mStarted;
+  bool                          mAborted;
+  bool                          mErrored;
+  bool                          mFinished;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_NETWORKREQUESTBASE_H
+#endif  // LIBREPCB_NETWORKREQUESTBASE_H

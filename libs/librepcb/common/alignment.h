@@ -20,20 +20,21 @@
 #ifndef LIBREPCB_ALIGNMENT_H
 #define LIBREPCB_ALIGNMENT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "fileio/serializableobject.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class HAlign
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The HAlign class
@@ -41,60 +42,73 @@ namespace librepcb {
  * @author ubruhin
  * @date 2015-02-27
  */
-class HAlign final
-{
-        Q_DECLARE_TR_FUNCTIONS(HAlign)
+class HAlign final {
+  Q_DECLARE_TR_FUNCTIONS(HAlign)
 
-    public:
+public:
+  HAlign() noexcept : mAlign(Qt::AlignLeft) {}
+  HAlign(const HAlign& other) noexcept : mAlign(other.mAlign) {}
+  Qt::AlignmentFlag toQtAlignFlag() const noexcept { return mAlign; }
+  HAlign&           mirror() noexcept;
+  HAlign            mirrored() const noexcept { return HAlign(*this).mirror(); }
+  static HAlign     left() noexcept { return HAlign(Qt::AlignLeft); }
+  static HAlign     center() noexcept { return HAlign(Qt::AlignHCenter); }
+  static HAlign     right() noexcept { return HAlign(Qt::AlignRight); }
+  HAlign&           operator=(const HAlign& rhs) noexcept {
+    mAlign = rhs.mAlign;
+    return *this;
+  }
+  bool operator==(const HAlign& rhs) const noexcept {
+    return mAlign == rhs.mAlign;
+  }
+  bool operator!=(const HAlign& rhs) const noexcept {
+    return mAlign != rhs.mAlign;
+  }
 
-        HAlign() noexcept : mAlign(Qt::AlignLeft) {}
-        HAlign(const HAlign& other) noexcept : mAlign(other.mAlign) {}
-        Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
-        HAlign& mirror() noexcept;
-        HAlign mirrored() const noexcept {return HAlign(*this).mirror();}
-        static HAlign left() noexcept {return HAlign(Qt::AlignLeft);}
-        static HAlign center() noexcept {return HAlign(Qt::AlignHCenter);}
-        static HAlign right() noexcept {return HAlign(Qt::AlignRight);}
-        HAlign& operator=(const HAlign& rhs) noexcept {mAlign = rhs.mAlign; return *this;}
-        bool operator==(const HAlign& rhs) const noexcept {return mAlign == rhs.mAlign;}
-        bool operator!=(const HAlign& rhs) const noexcept {return mAlign != rhs.mAlign;}
+private:
+  explicit HAlign(Qt::AlignmentFlag align) noexcept : mAlign(align) {}
 
-    private:
-
-        explicit HAlign(Qt::AlignmentFlag align) noexcept : mAlign(align) {}
-
-        Qt::AlignmentFlag mAlign;
+  Qt::AlignmentFlag mAlign;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  HAlign Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
 inline SExpression serializeToSExpression(const HAlign& obj) {
-    switch (obj.toQtAlignFlag()) {
-        case Qt::AlignLeft:         return SExpression::createToken("left");
-        case Qt::AlignHCenter:      return SExpression::createToken("center");
-        case Qt::AlignRight:        return SExpression::createToken("right");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+  switch (obj.toQtAlignFlag()) {
+    case Qt::AlignLeft:
+      return SExpression::createToken("left");
+    case Qt::AlignHCenter:
+      return SExpression::createToken("center");
+    case Qt::AlignRight:
+      return SExpression::createToken("right");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline HAlign deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == "left")    return HAlign::left();
-    else if (str == "center")  return HAlign::center();
-    else if (str == "right")   return HAlign::right();
-    else {
-        throw RuntimeError(__FILE__, __LINE__, QString(
-            HAlign::tr("Invalid horizontal alignment: \"%1\"")).arg(str));
-    }
+inline HAlign deserializeFromSExpression(const SExpression& sexpr,
+                                         bool               throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == "left")
+    return HAlign::left();
+  else if (str == "center")
+    return HAlign::center();
+  else if (str == "right")
+    return HAlign::right();
+  else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(HAlign::tr("Invalid horizontal alignment: \"%1\"")).arg(str));
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class VAlign
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The VAlign class
@@ -102,60 +116,73 @@ inline HAlign deserializeFromSExpression(const SExpression& sexpr, bool throwIfE
  * @author ubruhin
  * @date 2015-02-27
  */
-class VAlign final
-{
-        Q_DECLARE_TR_FUNCTIONS(VAlign)
+class VAlign final {
+  Q_DECLARE_TR_FUNCTIONS(VAlign)
 
-    public:
+public:
+  VAlign() noexcept : mAlign(Qt::AlignTop) {}
+  VAlign(const VAlign& other) noexcept : mAlign(other.mAlign) {}
+  Qt::AlignmentFlag toQtAlignFlag() const noexcept { return mAlign; }
+  VAlign&           mirror() noexcept;
+  VAlign            mirrored() const noexcept { return VAlign(*this).mirror(); }
+  static VAlign     top() noexcept { return VAlign(Qt::AlignTop); }
+  static VAlign     center() noexcept { return VAlign(Qt::AlignVCenter); }
+  static VAlign     bottom() noexcept { return VAlign(Qt::AlignBottom); }
+  VAlign&           operator=(const VAlign& rhs) noexcept {
+    mAlign = rhs.mAlign;
+    return *this;
+  }
+  bool operator==(const VAlign& rhs) const noexcept {
+    return mAlign == rhs.mAlign;
+  }
+  bool operator!=(const VAlign& rhs) const noexcept {
+    return mAlign != rhs.mAlign;
+  }
 
-        VAlign() noexcept : mAlign(Qt::AlignTop) {}
-        VAlign(const VAlign& other) noexcept : mAlign(other.mAlign) {}
-        Qt::AlignmentFlag toQtAlignFlag() const noexcept {return mAlign;}
-        VAlign& mirror() noexcept;
-        VAlign mirrored() const noexcept {return VAlign(*this).mirror();}
-        static VAlign top() noexcept {return VAlign(Qt::AlignTop);}
-        static VAlign center() noexcept {return VAlign(Qt::AlignVCenter);}
-        static VAlign bottom() noexcept {return VAlign(Qt::AlignBottom);}
-        VAlign& operator=(const VAlign& rhs) noexcept {mAlign = rhs.mAlign; return *this;}
-        bool operator==(const VAlign& rhs) const noexcept {return mAlign == rhs.mAlign;}
-        bool operator!=(const VAlign& rhs) const noexcept {return mAlign != rhs.mAlign;}
+private:
+  explicit VAlign(Qt::AlignmentFlag align) noexcept : mAlign(align) {}
 
-    private:
-
-        explicit VAlign(Qt::AlignmentFlag align) noexcept : mAlign(align) {}
-
-        Qt::AlignmentFlag mAlign;
+  Qt::AlignmentFlag mAlign;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  VAlign Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
 inline SExpression serializeToSExpression(const VAlign& obj) {
-    switch (obj.toQtAlignFlag()) {
-        case Qt::AlignTop:          return SExpression::createToken("top");
-        case Qt::AlignVCenter:      return SExpression::createToken("center");
-        case Qt::AlignBottom:       return SExpression::createToken("bottom");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+  switch (obj.toQtAlignFlag()) {
+    case Qt::AlignTop:
+      return SExpression::createToken("top");
+    case Qt::AlignVCenter:
+      return SExpression::createToken("center");
+    case Qt::AlignBottom:
+      return SExpression::createToken("bottom");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline VAlign deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == "top")     return VAlign::top();
-    else if (str == "center")  return VAlign::center();
-    else if (str == "bottom")  return VAlign::bottom();
-    else {
-        throw RuntimeError(__FILE__, __LINE__, QString(
-            VAlign::tr("Invalid vertical alignment: \"%1\"")).arg(str));
-    }
+inline VAlign deserializeFromSExpression(const SExpression& sexpr,
+                                         bool               throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == "top")
+    return VAlign::top();
+  else if (str == "center")
+    return VAlign::center();
+  else if (str == "bottom")
+    return VAlign::bottom();
+  else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(VAlign::tr("Invalid vertical alignment: \"%1\"")).arg(str));
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Alignment
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Alignment class
@@ -163,45 +190,53 @@ inline VAlign deserializeFromSExpression(const SExpression& sexpr, bool throwIfE
  * @author ubruhin
  * @date 2015-02-27
  */
-class Alignment final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(Alignment)
+class Alignment final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(Alignment)
 
-    public:
+public:
+  Alignment() noexcept : mH(HAlign::left()), mV(VAlign::bottom()) {}
+  Alignment(const Alignment& other) noexcept : mH(other.mH), mV(other.mV) {}
+  explicit Alignment(const HAlign& h, const VAlign& v) noexcept
+    : mH(h), mV(v) {}
+  explicit Alignment(const SExpression& node);
+  const HAlign  getH() const noexcept { return mH; }
+  const VAlign  getV() const noexcept { return mV; }
+  void          setH(const HAlign& h) noexcept { mH = h; }
+  void          setV(const VAlign& v) noexcept { mV = v; }
+  Qt::Alignment toQtAlign() const noexcept {
+    return mH.toQtAlignFlag() | mV.toQtAlignFlag();
+  }
+  Alignment& mirror() noexcept;
+  Alignment& mirrorH() noexcept;
+  Alignment& mirrorV() noexcept;
+  Alignment  mirrored() const noexcept { return Alignment(*this).mirror(); }
+  Alignment  mirroredH() const noexcept { return Alignment(*this).mirrorH(); }
+  Alignment  mirroredV() const noexcept { return Alignment(*this).mirrorV(); }
 
-        Alignment() noexcept : mH(HAlign::left()), mV(VAlign::bottom()) {}
-        Alignment(const Alignment& other) noexcept : mH(other.mH), mV(other.mV) {}
-        explicit Alignment(const HAlign& h, const VAlign& v) noexcept : mH(h), mV(v) {}
-        explicit Alignment(const SExpression& node);
-        const HAlign getH() const noexcept {return mH;}
-        const VAlign getV() const noexcept {return mV;}
-        void setH(const HAlign& h) noexcept {mH = h;}
-        void setV(const VAlign& v) noexcept {mV = v;}
-        Qt::Alignment toQtAlign() const noexcept {return mH.toQtAlignFlag() | mV.toQtAlignFlag();}
-        Alignment& mirror() noexcept;
-        Alignment& mirrorH() noexcept;
-        Alignment& mirrorV() noexcept;
-        Alignment mirrored() const noexcept {return Alignment(*this).mirror();}
-        Alignment mirroredH() const noexcept {return Alignment(*this).mirrorH();}
-        Alignment mirroredV() const noexcept {return Alignment(*this).mirrorV();}
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  Alignment& operator=(const Alignment& rhs) noexcept {
+    mH = rhs.mH;
+    mV = rhs.mV;
+    return *this;
+  }
+  bool operator==(const Alignment& rhs) const noexcept {
+    return mH == rhs.mH && mV == rhs.mV;
+  }
+  bool operator!=(const Alignment& rhs) const noexcept {
+    return mH != rhs.mH || mV != rhs.mV;
+  }
 
-        Alignment& operator=(const Alignment& rhs) noexcept {mH = rhs.mH; mV = rhs.mV; return *this;}
-        bool operator==(const Alignment& rhs) const noexcept {return mH == rhs.mH && mV == rhs.mV;}
-        bool operator!=(const Alignment& rhs) const noexcept {return mH != rhs.mH || mV != rhs.mV;}
-
-    private:
-
-        HAlign mH;
-        VAlign mV;
+private:
+  HAlign mH;
+  VAlign mV;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ALIGNMENT_H
+#endif  // LIBREPCB_ALIGNMENT_H

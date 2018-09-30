@@ -20,72 +20,68 @@
 #ifndef LIBREPCB_LIBRARY_CMDDEVICEEDIT_H
 #define LIBREPCB_LIBRARY_CMDDEVICEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
 class Device;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdDeviceEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdDeviceEdit class
  */
-class CmdDeviceEdit final : public UndoCommand
-{
-    public:
+class CmdDeviceEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdDeviceEdit()                           = delete;
+  CmdDeviceEdit(const CmdDeviceEdit& other) = delete;
+  explicit CmdDeviceEdit(Device& device) noexcept;
+  ~CmdDeviceEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdDeviceEdit() = delete;
-        CmdDeviceEdit(const CmdDeviceEdit& other) = delete;
-        explicit CmdDeviceEdit(Device& device) noexcept;
-        ~CmdDeviceEdit() noexcept;
+  // Setters
+  void setComponentUuid(const Uuid& uuid) noexcept;
+  void setPackageUuid(const Uuid& uuid) noexcept;
 
-        // Setters
-        void setComponentUuid(const Uuid& uuid) noexcept;
-        void setPackageUuid(const Uuid& uuid) noexcept ;
+  // Operator Overloadings
+  CmdDeviceEdit& operator=(const CmdDeviceEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdDeviceEdit& operator=(const CmdDeviceEdit& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+private:  // Data
+  Device& mDevice;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        Device& mDevice;
-
-        Uuid mOldComponentUuid;
-        Uuid mNewComponentUuid;
-        Uuid mOldPackageUuid;
-        Uuid mNewPackageUuid;
+  Uuid mOldComponentUuid;
+  Uuid mNewComponentUuid;
+  Uuid mOldPackageUuid;
+  Uuid mNewPackageUuid;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDDEVICEEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDDEVICEEDIT_H

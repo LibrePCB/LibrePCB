@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWRECT_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWRECT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate_drawpolygonbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_DrawRect
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_DrawRect class
@@ -44,28 +45,29 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_DrawRect final : public PackageEditorState_DrawPolygonBase
-{
-        Q_OBJECT
+class PackageEditorState_DrawRect final
+  : public PackageEditorState_DrawPolygonBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_DrawRect() = delete;
+  PackageEditorState_DrawRect(const PackageEditorState_DrawRect& other) =
+      delete;
+  explicit PackageEditorState_DrawRect(Context& context) noexcept;
+  ~PackageEditorState_DrawRect() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_DrawRect() = delete;
-        PackageEditorState_DrawRect(const PackageEditorState_DrawRect& other) = delete;
-        explicit PackageEditorState_DrawRect(Context& context) noexcept;
-        ~PackageEditorState_DrawRect() noexcept;
-
-        // Operator Overloadings
-        PackageEditorState_DrawRect& operator=(const PackageEditorState_DrawRect& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_DrawRect& operator       =(
+      const PackageEditorState_DrawRect& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWRECT_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWRECT_H

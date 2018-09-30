@@ -20,86 +20,87 @@
 #ifndef LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
 #define LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 class ComponentCategory;
 class PackageCategory;
-}
+}  // namespace library
 
 namespace workspace {
 
 class WorkspaceLibraryDb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CategoryTreeItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CategoryTreeItem class
  */
 template <typename ElementType>
-class CategoryTreeItem final
-{
-    public:
+class CategoryTreeItem final {
+public:
+  // Constructors / Destructor
+  CategoryTreeItem()                              = delete;
+  CategoryTreeItem(const CategoryTreeItem& other) = delete;
+  CategoryTreeItem(const WorkspaceLibraryDb& library,
+                   const QStringList localeOrder, CategoryTreeItem* parent,
+                   const tl::optional<Uuid>& uuid) noexcept;
+  ~CategoryTreeItem() noexcept;
 
-        // Constructors / Destructor
-        CategoryTreeItem() = delete;
-        CategoryTreeItem(const CategoryTreeItem& other) = delete;
-        CategoryTreeItem(const WorkspaceLibraryDb& library, const QStringList localeOrder,
-                         CategoryTreeItem* parent, const tl::optional<Uuid>& uuid) noexcept;
-        ~CategoryTreeItem() noexcept;
+  // Getters
+  const tl::optional<Uuid>& getUuid() const noexcept { return mUuid; }
+  unsigned int              getDepth() const noexcept { return mDepth; }
+  int                       getColumnCount() const noexcept { return 1; }
+  CategoryTreeItem*         getParent() const noexcept { return mParent; }
+  CategoryTreeItem*         getChild(int index) const noexcept {
+    return mChilds.value(index).data();
+  }
+  int      getChildCount() const noexcept { return mChilds.count(); }
+  int      getChildNumber() const noexcept;
+  QVariant data(int role) const noexcept;
 
-        // Getters
-        const tl::optional<Uuid>& getUuid()     const noexcept {return mUuid;}
-        unsigned int getDepth()                 const noexcept {return mDepth;}
-        int getColumnCount()                    const noexcept {return 1;}
-        CategoryTreeItem* getParent()           const noexcept {return mParent;}
-        CategoryTreeItem* getChild(int index)   const noexcept {return mChilds.value(index).data();}
-        int getChildCount()                     const noexcept {return mChilds.count();}
-        int getChildNumber()                    const noexcept;
-        QVariant data(int role)                 const noexcept;
+  // Operator Overloadings
+  CategoryTreeItem& operator=(const CategoryTreeItem& rhs) = delete;
 
-        // Operator Overloadings
-        CategoryTreeItem& operator=(const CategoryTreeItem& rhs) = delete;
+private:
+  // Types
+  using ChildType = QSharedPointer<CategoryTreeItem<ElementType>>;
 
+  // Methods
+  FilePath   getLatestCategory(const WorkspaceLibraryDb& lib) const;
+  QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
 
-    private:
-
-        // Types
-        using ChildType = QSharedPointer<CategoryTreeItem<ElementType>>;
-
-        // Methods
-        FilePath getLatestCategory(const WorkspaceLibraryDb& lib) const;
-        QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
-
-        // Attributes
-        QStringList mLocaleOrder;
-        CategoryTreeItem* mParent;
-        tl::optional<Uuid> mUuid;
-        QScopedPointer<ElementType> mCategory;
-        unsigned int mDepth; ///< this is to avoid endless recursion in the parent-child relationship
-        QString mExceptionMessage;
-        QList<ChildType> mChilds;
+  // Attributes
+  QStringList                 mLocaleOrder;
+  CategoryTreeItem*           mParent;
+  tl::optional<Uuid>          mUuid;
+  QScopedPointer<ElementType> mCategory;
+  unsigned int mDepth;  ///< this is to avoid endless recursion in the
+                        ///< parent-child relationship
+  QString          mExceptionMessage;
+  QList<ChildType> mChilds;
 };
 
 typedef CategoryTreeItem<library::ComponentCategory> ComponentCategoryTreeItem;
-typedef CategoryTreeItem<library::PackageCategory> PackageCategoryTreeItem;
+typedef CategoryTreeItem<library::PackageCategory>   PackageCategoryTreeItem;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
+#endif  // LIBREPCB_LIBRARY_CATEGORYTREEITEM_H

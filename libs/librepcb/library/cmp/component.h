@@ -20,43 +20,46 @@
 #ifndef LIBREPCB_LIBRARY_COMPONENT_H
 #define LIBREPCB_LIBRARY_COMPONENT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/fileio/serializablekeyvaluemap.h>
+ ******************************************************************************/
 #include "../libraryelement.h"
+#include "componentprefix.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
-#include "componentprefix.h"
 
-/*****************************************************************************************
+#include <librepcb/common/attributes/attribute.h>
+#include <librepcb/common/fileio/serializablekeyvaluemap.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NormDependentPrefixMap
- ****************************************************************************************/
+ ******************************************************************************/
 
 struct NormDependentPrefixMapPolicy {
-    typedef ComponentPrefix ValueType;
-    static constexpr const char* tagname = "prefix";
-    static constexpr const char* keyname = "norm";
+  typedef ComponentPrefix      ValueType;
+  static constexpr const char* tagname = "prefix";
+  static constexpr const char* keyname = "norm";
 };
-using NormDependentPrefixMap = SerializableKeyValueMap<NormDependentPrefixMapPolicy>;
+using NormDependentPrefixMap =
+    SerializableKeyValueMap<NormDependentPrefixMapPolicy>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Component
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Component class represents a "generic" device in the library
  *
- * Following information is considered as the "interface" of a component and must
- * therefore never be changed:
+ * Following information is considered as the "interface" of a component and
+ * must therefore never be changed:
  *  - UUID
  *  - Property "is schematic only"
  *  - All signal UUIDs (and their meaning)
@@ -67,83 +70,93 @@ using NormDependentPrefixMap = SerializableKeyValueMap<NormDependentPrefixMapPol
  *      - Symbol UUID
  *      - Pin-signal-mapping
  */
-class Component final : public LibraryElement
-{
-        Q_OBJECT
+class Component final : public LibraryElement {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Component()                       = delete;
+  Component(const Component& other) = delete;
+  Component(const Uuid& uuid, const Version& version, const QString& author,
+            const ElementName& name_en_US, const QString& description_en_US,
+            const QString& keywords_en_US);
+  Component(const FilePath& elementDirectory, bool readOnly);
+  ~Component() noexcept;
 
-        // Constructors / Destructor
-        Component() = delete;
-        Component(const Component& other) = delete;
-        Component(const Uuid& uuid, const Version& version, const QString& author,
-                  const ElementName& name_en_US, const QString& description_en_US,
-                  const QString& keywords_en_US);
-        Component(const FilePath& elementDirectory, bool readOnly);
-        ~Component() noexcept;
+  // General
+  bool isSchematicOnly() const noexcept { return mSchematicOnly; }
+  void setIsSchematicOnly(bool schematicOnly) noexcept {
+    mSchematicOnly = schematicOnly;
+  }
 
-        // General
-        bool isSchematicOnly() const noexcept {return mSchematicOnly;}
-        void setIsSchematicOnly(bool schematicOnly) noexcept {mSchematicOnly = schematicOnly;}
+  // Attribute Methods
+  AttributeList&       getAttributes() noexcept { return mAttributes; }
+  const AttributeList& getAttributes() const noexcept { return mAttributes; }
 
-        // Attribute Methods
-        AttributeList& getAttributes() noexcept {return mAttributes;}
-        const AttributeList& getAttributes() const noexcept {return mAttributes;}
+  // Default Value Methods
+  const QString& getDefaultValue() const noexcept { return mDefaultValue; }
+  void setDefaultValue(const QString& value) noexcept { mDefaultValue = value; }
 
-        // Default Value Methods
-        const QString& getDefaultValue() const noexcept {return mDefaultValue;}
-        void setDefaultValue(const QString& value) noexcept {mDefaultValue = value;}
+  // Prefix Methods
+  NormDependentPrefixMap&       getPrefixes() noexcept { return mPrefixes; }
+  const NormDependentPrefixMap& getPrefixes() const noexcept {
+    return mPrefixes;
+  }
 
-        // Prefix Methods
-        NormDependentPrefixMap& getPrefixes() noexcept {return mPrefixes;}
-        const NormDependentPrefixMap& getPrefixes() const noexcept {return mPrefixes;}
+  // Signal Methods
+  ComponentSignalList&       getSignals() noexcept { return mSignals; }
+  const ComponentSignalList& getSignals() const noexcept { return mSignals; }
 
-        // Signal Methods
-        ComponentSignalList& getSignals() noexcept {return mSignals;}
-        const ComponentSignalList& getSignals() const noexcept {return mSignals;}
+  // Symbol Variant Methods
+  ComponentSymbolVariantList& getSymbolVariants() noexcept {
+    return mSymbolVariants;
+  }
+  const ComponentSymbolVariantList& getSymbolVariants() const noexcept {
+    return mSymbolVariants;
+  }
 
-        // Symbol Variant Methods
-        ComponentSymbolVariantList& getSymbolVariants() noexcept {return mSymbolVariants;}
-        const ComponentSymbolVariantList& getSymbolVariants() const noexcept {return mSymbolVariants;}
-
-        // Convenience Methods
-        std::shared_ptr<ComponentSignal> getSignalOfPin(const Uuid& symbVar, const Uuid& item,
+  // Convenience Methods
+  std::shared_ptr<ComponentSignal>       getSignalOfPin(const Uuid& symbVar,
+                                                        const Uuid& item,
                                                         const Uuid& pin);
-        std::shared_ptr<const ComponentSignal> getSignalOfPin(const Uuid& symbVar, const Uuid& item,
-                                                              const Uuid& pin) const;
-        std::shared_ptr<ComponentSymbolVariantItem> getSymbVarItem(const Uuid& symbVar,
-                                                                   const Uuid& item);
-        std::shared_ptr<const ComponentSymbolVariantItem> getSymbVarItem(const Uuid& symbVar,
-                                                                         const Uuid& item) const;
+  std::shared_ptr<const ComponentSignal> getSignalOfPin(const Uuid& symbVar,
+                                                        const Uuid& item,
+                                                        const Uuid& pin) const;
+  std::shared_ptr<ComponentSymbolVariantItem> getSymbVarItem(
+      const Uuid& symbVar, const Uuid& item);
+  std::shared_ptr<const ComponentSymbolVariantItem> getSymbVarItem(
+      const Uuid& symbVar, const Uuid& item) const;
 
-        // Operator Overloadings
-        Component& operator=(const Component& rhs) = delete;
+  // Operator Overloadings
+  Component& operator=(const Component& rhs) = delete;
 
-        // Static Methods
-        static QString getShortElementName() noexcept {return QStringLiteral("cmp");}
-        static QString getLongElementName() noexcept {return QStringLiteral("component");}
+  // Static Methods
+  static QString getShortElementName() noexcept {
+    return QStringLiteral("cmp");
+  }
+  static QString getLongElementName() noexcept {
+    return QStringLiteral("component");
+  }
 
+private:  // Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-    private: // Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-    private: // Data
-        bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
-        QString mDefaultValue;
-        NormDependentPrefixMap mPrefixes;
-        AttributeList mAttributes; ///< all attributes in a specific order
-        ComponentSignalList mSignals;
-        ComponentSymbolVariantList mSymbolVariants;
+private:                // Data
+  bool mSchematicOnly;  ///< if true, this component is schematic-only (no
+                        ///< package)
+  QString                mDefaultValue;
+  NormDependentPrefixMap mPrefixes;
+  AttributeList          mAttributes;  ///< all attributes in a specific order
+  ComponentSignalList    mSignals;
+  ComponentSymbolVariantList mSymbolVariants;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_COMPONENT_H
+#endif  // LIBREPCB_LIBRARY_COMPONENT_H

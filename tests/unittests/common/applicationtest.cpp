@@ -17,83 +17,80 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
-#include <QtCore>
 #include <gtest/gtest.h>
 #include <librepcb/common/application.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class ApplicationTest : public ::testing::Test
-{
-};
+class ApplicationTest : public ::testing::Test {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST(ApplicationTest, testAppVersion)
-{
-    // read application version and check validity
-    Version v = qApp->getAppVersion();
-    EXPECT_GE(Version::fromString("0.1"), v);
+TEST(ApplicationTest, testAppVersion) {
+  // read application version and check validity
+  Version v = qApp->getAppVersion();
+  EXPECT_GE(Version::fromString("0.1"), v);
 
-    // compare with QApplication version
-    Version v1 = Version::fromString(qApp->applicationVersion().section('-', 0, 0));
-    EXPECT_GE(Version::fromString("0.1"), v1);
-    EXPECT_EQ(v, v1);
+  // compare with QApplication version
+  Version v1 =
+      Version::fromString(qApp->applicationVersion().section('-', 0, 0));
+  EXPECT_GE(Version::fromString("0.1"), v1);
+  EXPECT_EQ(v, v1);
 }
 
-TEST(ApplicationTest, testFileFormatVersion)
-{
-    // check minimum
-    EXPECT_GE(Version::fromString("0.1"), qApp->getFileFormatVersion());
+TEST(ApplicationTest, testFileFormatVersion) {
+  // check minimum
+  EXPECT_GE(Version::fromString("0.1"), qApp->getFileFormatVersion());
 
-    // it can't be greater then the application version
-    EXPECT_LE(qApp->getFileFormatVersion(), qApp->getAppVersion());
+  // it can't be greater then the application version
+  EXPECT_LE(qApp->getFileFormatVersion(), qApp->getAppVersion());
 }
 
-TEST(ApplicationTest, testGetResourcesDir)
-{
-    // check if the resources directory is valid, exists and is not empty
-    EXPECT_TRUE(qApp->getResourcesDir().isValid());
-    EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
-    EXPECT_FALSE(qApp->getResourcesDir().isEmptyDir());
+TEST(ApplicationTest, testGetResourcesDir) {
+  // check if the resources directory is valid, exists and is not empty
+  EXPECT_TRUE(qApp->getResourcesDir().isValid());
+  EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
+  EXPECT_FALSE(qApp->getResourcesDir().isEmptyDir());
 
-    // as the tests can't be installed, the resources must be located in the repository root
-    FilePath repoRoot = qApp->getResourcesDir().getParentDir().getParentDir();
-    EXPECT_TRUE(repoRoot.getPathTo("librepcb.pro").isExistingFile());
+  // as the tests can't be installed, the resources must be located in the
+  // repository root
+  FilePath repoRoot = qApp->getResourcesDir().getParentDir().getParentDir();
+  EXPECT_TRUE(repoRoot.getPathTo("librepcb.pro").isExistingFile());
 }
 
-TEST(ApplicationTest, testGetResourcesFilePath)
-{
-    FilePath dir = qApp->getResourcesDir();
-    EXPECT_EQ(dir, qApp->getResourcesFilePath(""));
-    EXPECT_EQ(dir, qApp->getResourcesFilePath(QString()));
-    EXPECT_EQ(dir.getPathTo("foo"), qApp->getResourcesFilePath("foo"));
-    EXPECT_EQ(dir.getPathTo("foo/bar.ext"), qApp->getResourcesFilePath("foo/bar.ext"));
+TEST(ApplicationTest, testGetResourcesFilePath) {
+  FilePath dir = qApp->getResourcesDir();
+  EXPECT_EQ(dir, qApp->getResourcesFilePath(""));
+  EXPECT_EQ(dir, qApp->getResourcesFilePath(QString()));
+  EXPECT_EQ(dir.getPathTo("foo"), qApp->getResourcesFilePath("foo"));
+  EXPECT_EQ(dir.getPathTo("foo/bar.ext"),
+            qApp->getResourcesFilePath("foo/bar.ext"));
 }
 
-TEST(ApplicationTest, testExistenceOfResourceFiles)
-{
-    EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
-    EXPECT_TRUE(qApp->getResourcesFilePath("README.md").isExistingFile());
+TEST(ApplicationTest, testExistenceOfResourceFiles) {
+  EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
+  EXPECT_TRUE(qApp->getResourcesFilePath("README.md").isExistingFile());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb

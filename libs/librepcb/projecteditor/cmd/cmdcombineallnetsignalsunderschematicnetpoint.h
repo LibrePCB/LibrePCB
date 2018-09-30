@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
 #define LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/point.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -39,48 +40,44 @@ class SI_NetPoint;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdCombineAllNetSignalsUnderSchematicNetPoint
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdCombineAllNetSignalsUnderSchematicNetPoint class
  */
-class CmdCombineAllNetSignalsUnderSchematicNetPoint final : public UndoCommandGroup
-{
-    public:
+class CmdCombineAllNetSignalsUnderSchematicNetPoint final
+  : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdCombineAllNetSignalsUnderSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
+  ~CmdCombineAllNetSignalsUnderSchematicNetPoint() noexcept;
 
-        // Constructors / Destructor
-        CmdCombineAllNetSignalsUnderSchematicNetPoint(SI_NetPoint& netpoint) noexcept;
-        ~CmdCombineAllNetSignalsUnderSchematicNetPoint() noexcept;
+  // Getters
+  bool hasCombinedSomeItems() const noexcept { return mHasCombinedSomeItems; }
 
-        // Getters
-        bool hasCombinedSomeItems() const noexcept {return mHasCombinedSomeItems;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Attributes from the constructor
+  Circuit&     mCircuit;
+  Schematic&   mSchematic;
+  SI_NetPoint& mNetPoint;
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        Schematic& mSchematic;
-        SI_NetPoint& mNetPoint;
-
-        // Private Member Variables
-        bool mHasCombinedSomeItems;
+  // Private Member Variables
+  bool mHasCombinedSomeItems;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
+#endif  // LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H

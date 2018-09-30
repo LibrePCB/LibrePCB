@@ -20,91 +20,109 @@
 #ifndef LIBREPCB_ATTRIBUTEKEY_H
 #define LIBREPCB_ATTRIBUTEKEY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <type_safe/constrained_type.hpp>
+ ******************************************************************************/
 #include "../fileio/sexpression.h"
 
-/*****************************************************************************************
+#include <type_safe/constrained_type.hpp>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttributeKey
- ****************************************************************************************/
+ ******************************************************************************/
 
 struct AttributeKeyVerifier {
-    template <typename Value, typename Predicate>
-    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
-        return p(val) ? std::forward<Value>(val) : (
-            throw RuntimeError(__FILE__, __LINE__, QString(
-                QApplication::translate("AttributeKey", "Invalid attribute key: '%1'")).arg(val)),
-            std::forward<Value>(val));
-    }
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val)
+               ? std::forward<Value>(val)
+               : (throw RuntimeError(__FILE__, __LINE__,
+                                     QString(QApplication::translate(
+                                                 "AttributeKey",
+                                                 "Invalid attribute key: '%1'"))
+                                         .arg(val)),
+                  std::forward<Value>(val));
+  }
 };
 
 struct AttributeKeyConstraint {
-    bool operator()(const QString& value) const noexcept {
-        return QRegularExpression("^[_0-9A-Z]{1,40}$")
-            .match(value, 0, QRegularExpression::PartialPreferCompleteMatch).hasMatch();
-    }
+  bool operator()(const QString& value) const noexcept {
+    return QRegularExpression("^[_0-9A-Z]{1,40}$")
+        .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
+        .hasMatch();
+  }
 };
 
 /**
- * AttributeKey is a wrapper around QString which guarantees to contain a valid key for
- * librepcb::Attribute.
+ * AttributeKey is a wrapper around QString which guarantees to contain a valid
+ * key for librepcb::Attribute.
  *
  * An attribute key is considered as valid if it:
  *   - contains minimum 1 and maximum 40 characters
  *   - only contains the characters [A-Z] (uppercase), [0-9] or [_] (underscore)
  *
- * The constructor throws an exception if constructed from a QString which is not a valid
- * attribute key according these rules.
+ * The constructor throws an exception if constructed from a QString which is
+ * not a valid attribute key according these rules.
  */
-using AttributeKey = type_safe::constrained_type<QString, AttributeKeyConstraint,
-                                                 AttributeKeyVerifier>;
+using AttributeKey =
+    type_safe::constrained_type<QString, AttributeKeyConstraint,
+                                AttributeKeyVerifier>;
 
-inline bool operator==(const AttributeKey& lhs, const QString& rhs) noexcept {return (*lhs) == rhs;}
-inline bool operator==(const QString& lhs, const AttributeKey& rhs) noexcept {return lhs == (*rhs);}
-inline bool operator!=(const AttributeKey& lhs, const QString& rhs) noexcept {return (*lhs) != rhs;}
-inline bool operator!=(const QString& lhs, const AttributeKey& rhs) noexcept {return lhs != (*rhs);}
+inline bool operator==(const AttributeKey& lhs, const QString& rhs) noexcept {
+  return (*lhs) == rhs;
+}
+inline bool operator==(const QString& lhs, const AttributeKey& rhs) noexcept {
+  return lhs == (*rhs);
+}
+inline bool operator!=(const AttributeKey& lhs, const QString& rhs) noexcept {
+  return (*lhs) != rhs;
+}
+inline bool operator!=(const QString& lhs, const AttributeKey& rhs) noexcept {
+  return lhs != (*rhs);
+}
 
 template <>
 inline SExpression serializeToSExpression(const AttributeKey& obj) {
-    return SExpression::createString(*obj);
+  return SExpression::createString(*obj);
 }
 
 template <>
-inline AttributeKey deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    // backward compatibility - remove this some time!
-    str = str.toUpper();
-    str.remove(QRegularExpression("[^0-9A-Z_]"));
-    str.truncate(40);
-    return AttributeKey(str); // can throw
+inline AttributeKey deserializeFromSExpression(const SExpression& sexpr,
+                                               bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  // backward compatibility - remove this some time!
+  str = str.toUpper();
+  str.remove(QRegularExpression("[^0-9A-Z_]"));
+  str.truncate(40);
+  return AttributeKey(str);  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const AttributeKey& obj) {
-    stream << *obj;
-    return stream;
+  stream << *obj;
+  return stream;
 }
 
 inline QDebug operator<<(QDebug stream, const AttributeKey& obj) {
-    stream << QString("AttributeKey('%1'')").arg(*obj);
-    return stream;
+  stream << QString("AttributeKey('%1'')").arg(*obj);
+  return stream;
 }
 
 inline uint qHash(const AttributeKey& key, uint seed = 0) noexcept {
-    return ::qHash(*key, seed);
+  return ::qHash(*key, seed);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRIBUTEKEY_H
+#endif  // LIBREPCB_ATTRIBUTEKEY_H

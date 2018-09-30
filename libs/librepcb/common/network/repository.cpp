@@ -17,116 +17,110 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "repository.h"
-#include "network/networkrequest.h"
-#include "../application.h"
 
-/*****************************************************************************************
+#include "../application.h"
+#include "network/networkrequest.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-Repository::Repository(const Repository& other) noexcept :
-    QObject(nullptr), mUrl(other.mUrl)
-{
+Repository::Repository(const Repository& other) noexcept
+  : QObject(nullptr), mUrl(other.mUrl) {
 }
 
-Repository::Repository(const QUrl& url) noexcept :
-    QObject(nullptr), mUrl(url)
-{
+Repository::Repository(const QUrl& url) noexcept : QObject(nullptr), mUrl(url) {
 }
 
-Repository::Repository(const SExpression& node) :
-    QObject(nullptr), mUrl()
-{
-    mUrl = node.getChildByIndex(0).getValue<QUrl>(); // can throw
+Repository::Repository(const SExpression& node) : QObject(nullptr), mUrl() {
+  mUrl = node.getChildByIndex(0).getValue<QUrl>();  // can throw
 }
 
-Repository::~Repository() noexcept
-{
+Repository::~Repository() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool Repository::setUrl(const QUrl& url) noexcept
-{
-    if (url.isValid()) {
-        mUrl = url;
-        return true;
-    } else {
-        return false;
-    }
+bool Repository::setUrl(const QUrl& url) noexcept {
+  if (url.isValid()) {
+    mUrl = url;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Repository::requestLibraryList() const noexcept
-{
-    QString path = "/api/v1/libraries/v" % qApp->getFileFormatVersion().toStr();
-    requestLibraryList(QUrl(mUrl.toString() % path));
+void Repository::requestLibraryList() const noexcept {
+  QString path = "/api/v1/libraries/v" % qApp->getFileFormatVersion().toStr();
+  requestLibraryList(QUrl(mUrl.toString() % path));
 }
 
-void Repository::serialize(SExpression& root) const
-{
-    root.appendChild(mUrl);
+void Repository::serialize(SExpression& root) const {
+  root.appendChild(mUrl);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Repository::requestLibraryList(const QUrl& url) const noexcept
-{
-    NetworkRequest* request = new NetworkRequest(url);
-    request->setHeaderField("Accept", "application/json;charset=UTF-8");
-    request->setHeaderField("Accept-Charset", "UTF-8");
-    connect(request, &NetworkRequest::errored,
-            this, &Repository::errorWhileFetchingLibraryList, Qt::QueuedConnection);
-    connect(request, &NetworkRequest::dataReceived,
-            this, &Repository::requestedDataReceived, Qt::QueuedConnection);
-    request->start();
+void Repository::requestLibraryList(const QUrl& url) const noexcept {
+  NetworkRequest* request = new NetworkRequest(url);
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(request, &NetworkRequest::errored, this,
+          &Repository::errorWhileFetchingLibraryList, Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this,
+          &Repository::requestedDataReceived, Qt::QueuedConnection);
+  request->start();
 }
 
-void Repository::requestedDataReceived(const QByteArray& data) noexcept
-{
-    QJsonDocument doc = QJsonDocument::fromJson(data);
-    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-        emit errorWhileFetchingLibraryList(tr("Received JSON object is not valid."));
-        return;
+void Repository::requestedDataReceived(const QByteArray& data) noexcept {
+  QJsonDocument doc = QJsonDocument::fromJson(data);
+  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+    emit errorWhileFetchingLibraryList(
+        tr("Received JSON object is not valid."));
+    return;
+  }
+  QJsonValue nextResultsLink = doc.object().value("next");
+  if (nextResultsLink.isString()) {
+    QUrl url = QUrl(nextResultsLink.toString());
+    if (url.isValid()) {
+      qDebug() << "Request more results from repository:" << url.toString();
+      requestLibraryList(url);
+    } else {
+      qWarning() << "Invalid URL in received JSON object:"
+                 << nextResultsLink.toString();
     }
-    QJsonValue nextResultsLink = doc.object().value("next");
-    if (nextResultsLink.isString()) {
-        QUrl url = QUrl(nextResultsLink.toString());
-        if (url.isValid()) {
-            qDebug() << "Request more results from repository:" << url.toString();
-            requestLibraryList(url);
-        } else {
-            qWarning() << "Invalid URL in received JSON object:" << nextResultsLink.toString();
-        }
-    }
-    QJsonValue reposVal = doc.object().value("results");
-    if ((reposVal.isNull()) || (!reposVal.isArray())) {
-        emit errorWhileFetchingLibraryList(tr("Received JSON object does not contain "
-                                              "any results."));
-        return;
-    }
-    emit libraryListReceived(reposVal.toArray());
+  }
+  QJsonValue reposVal = doc.object().value("results");
+  if ((reposVal.isNull()) || (!reposVal.isArray())) {
+    emit errorWhileFetchingLibraryList(
+        tr("Received JSON object does not contain "
+           "any results."));
+    return;
+  }
+  emit libraryListReceived(reposVal.toArray());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

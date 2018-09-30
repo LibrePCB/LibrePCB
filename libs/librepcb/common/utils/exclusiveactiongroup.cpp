@@ -17,93 +17,91 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "exclusiveactiongroup.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ExclusiveActionGroup::ExclusiveActionGroup() noexcept :
-    QObject(nullptr), mCurrentAction()
-{
+ExclusiveActionGroup::ExclusiveActionGroup() noexcept
+  : QObject(nullptr), mCurrentAction() {
 }
 
-ExclusiveActionGroup::~ExclusiveActionGroup() noexcept
-{
+ExclusiveActionGroup::~ExclusiveActionGroup() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ExclusiveActionGroup::reset() noexcept
-{
-    setCurrentAction(QVariant());
-    setEnabled(false);
+void ExclusiveActionGroup::reset() noexcept {
+  setCurrentAction(QVariant());
+  setEnabled(false);
 }
 
-void ExclusiveActionGroup::setEnabled(bool enabled) noexcept
-{
-    foreach (QAction* action, mActions) {
-        if (action) action->setEnabled(enabled);
-    }
-}
-
-void ExclusiveActionGroup::addAction(const QVariant& key, QAction* action) noexcept
-{
-    Q_ASSERT(!key.isNull());
-    Q_ASSERT(!mActions.contains(key));
-    mActions.insert(key, action);
-    if (action) {
-        connect(action, &QAction::triggered, this, &ExclusiveActionGroup::actionTriggered);
-        action->setCheckable(key == mCurrentAction);
-        action->setChecked(key == mCurrentAction);
-    }
-}
-
-void ExclusiveActionGroup::setActionEnabled(const QVariant& key, bool enabled) noexcept
-{
-    QAction* action = mActions.value(key);
+void ExclusiveActionGroup::setEnabled(bool enabled) noexcept {
+  foreach (QAction* action, mActions) {
     if (action) action->setEnabled(enabled);
+  }
 }
 
-void ExclusiveActionGroup::setCurrentAction(const QVariant& key) noexcept
-{
-    mCurrentAction = key;
-    foreach (const QVariant& val, mActions.keys()) {
-        QAction* action = mActions.value(val);
-        if (action) {
-            action->setCheckable(val == mCurrentAction);
-            action->setChecked(val == mCurrentAction);
-        }
+void ExclusiveActionGroup::addAction(const QVariant& key,
+                                     QAction*        action) noexcept {
+  Q_ASSERT(!key.isNull());
+  Q_ASSERT(!mActions.contains(key));
+  mActions.insert(key, action);
+  if (action) {
+    connect(action, &QAction::triggered, this,
+            &ExclusiveActionGroup::actionTriggered);
+    action->setCheckable(key == mCurrentAction);
+    action->setChecked(key == mCurrentAction);
+  }
+}
+
+void ExclusiveActionGroup::setActionEnabled(const QVariant& key,
+                                            bool            enabled) noexcept {
+  QAction* action = mActions.value(key);
+  if (action) action->setEnabled(enabled);
+}
+
+void ExclusiveActionGroup::setCurrentAction(const QVariant& key) noexcept {
+  mCurrentAction = key;
+  foreach (const QVariant& val, mActions.keys()) {
+    QAction* action = mActions.value(val);
+    if (action) {
+      action->setCheckable(val == mCurrentAction);
+      action->setChecked(val == mCurrentAction);
     }
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ExclusiveActionGroup::actionTriggered() noexcept
-{
-    QAction* action = dynamic_cast<QAction*>(sender()); Q_ASSERT(action);
-    QVariant key = mActions.key(action); Q_ASSERT(!key.isNull());
-    if (key != mCurrentAction) {
-        emit changeRequestTriggered(key);
-    }
+void ExclusiveActionGroup::actionTriggered() noexcept {
+  QAction* action = dynamic_cast<QAction*>(sender());
+  Q_ASSERT(action);
+  QVariant key = mActions.key(action);
+  Q_ASSERT(!key.isNull());
+  if (key != mCurrentAction) {
+    emit changeRequestTriggered(key);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

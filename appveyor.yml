@@ -26,6 +26,7 @@ install:
   - bash -c "./ci/install_dependencies.sh"
 
 build_script:
+  - bash -c "./ci/stylecheck.sh"
   - bash -c "./ci/build.sh"
   - bash -c "./ci/test.sh"
   - bash -c "./ci/upload_artifacts.sh"

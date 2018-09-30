@@ -17,43 +17,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
+
 #include "../boardeditor.h"
+
 #include <librepcb/project/project.h>
 #include <librepcb/projecteditor/projecteditor.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 BES_Base::BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                   GraphicsView& editorGraphicsView, UndoStack& undoStack) :
-    QObject(0), mWorkspace(editor.getProjectEditor().getWorkspace()),
-    mProject(editor.getProject()), mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor), mEditorUi(editorUi), mEditorGraphicsView(editorGraphicsView),
-    mUndoStack(undoStack)
-{
+                   GraphicsView& editorGraphicsView, UndoStack& undoStack)
+  : QObject(0),
+    mWorkspace(editor.getProjectEditor().getWorkspace()),
+    mProject(editor.getProject()),
+    mCircuit(editor.getProject().getCircuit()),
+    mEditor(editor),
+    mEditorUi(editorUi),
+    mEditorGraphicsView(editorGraphicsView),
+    mUndoStack(undoStack) {
 }
 
-BES_Base::~BES_Base()
-{
+BES_Base::~BES_Base() {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

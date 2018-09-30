@@ -17,82 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "cmpsigpindisplaytypecombobox.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmpSigPinDisplayTypeComboBox::CmpSigPinDisplayTypeComboBox(QWidget* parent) noexcept :
-    QWidget(parent), mComboBox(new QComboBox(this))
-{
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox);
+CmpSigPinDisplayTypeComboBox::CmpSigPinDisplayTypeComboBox(
+    QWidget* parent) noexcept
+  : QWidget(parent), mComboBox(new QComboBox(this)) {
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mComboBox);
 
-    foreach (const CmpSigPinDisplayType& role, CmpSigPinDisplayType::getAllTypes()) {
-        mComboBox->addItem(role.getNameTr());
-    }
-    mComboBox->setCurrentIndex(0);
-    connect(mComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &CmpSigPinDisplayTypeComboBox::currentIndexChanged);
+  foreach (const CmpSigPinDisplayType& role,
+           CmpSigPinDisplayType::getAllTypes()) {
+    mComboBox->addItem(role.getNameTr());
+  }
+  mComboBox->setCurrentIndex(0);
+  connect(
+      mComboBox,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &CmpSigPinDisplayTypeComboBox::currentIndexChanged);
 }
 
-CmpSigPinDisplayTypeComboBox::~CmpSigPinDisplayTypeComboBox() noexcept
-{
+CmpSigPinDisplayTypeComboBox::~CmpSigPinDisplayTypeComboBox() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmpSigPinDisplayType CmpSigPinDisplayTypeComboBox::getCurrentItem() const noexcept
-{
-    int index = mComboBox->currentIndex();
-    Q_ASSERT(index >= 0);
-    Q_ASSERT(index < CmpSigPinDisplayType::getAllTypes().count());
-    return CmpSigPinDisplayType::getAllTypes().value(index);
+CmpSigPinDisplayType CmpSigPinDisplayTypeComboBox::getCurrentItem() const
+    noexcept {
+  int index = mComboBox->currentIndex();
+  Q_ASSERT(index >= 0);
+  Q_ASSERT(index < CmpSigPinDisplayType::getAllTypes().count());
+  return CmpSigPinDisplayType::getAllTypes().value(index);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmpSigPinDisplayTypeComboBox::setCurrentItem(const CmpSigPinDisplayType& type) noexcept
-{
-    int index = CmpSigPinDisplayType::getAllTypes().indexOf(type);
-    Q_ASSERT(index >= 0);
-    Q_ASSERT(index < CmpSigPinDisplayType::getAllTypes().count());
-    mComboBox->setCurrentIndex(index);
+void CmpSigPinDisplayTypeComboBox::setCurrentItem(
+    const CmpSigPinDisplayType& type) noexcept {
+  int index = CmpSigPinDisplayType::getAllTypes().indexOf(type);
+  Q_ASSERT(index >= 0);
+  Q_ASSERT(index < CmpSigPinDisplayType::getAllTypes().count());
+  mComboBox->setCurrentIndex(index);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmpSigPinDisplayTypeComboBox::currentIndexChanged(int index) noexcept
-{
-    Q_UNUSED(index);
-    emit currentItemChanged(getCurrentItem());
+void CmpSigPinDisplayTypeComboBox::currentIndexChanged(int index) noexcept {
+  Q_UNUSED(index);
+  emit currentItemChanged(getCurrentItem());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
-
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

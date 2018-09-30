@@ -20,84 +20,86 @@
 #ifndef LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H
 #define LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "wsi_base.h"
+
 #include <librepcb/common/units/lengthunit.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WSI_AppDefaultMeasurementUnits
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The WSI_AppDefaultMeasurementUnits class represents the application's default
- *        measurement units (for example the application's default length unit)
+ * @brief The WSI_AppDefaultMeasurementUnits class represents the application's
+ * default measurement units (for example the application's default length unit)
  *
  * @author ubruhin
  * @date 2014-10-04
  */
-class WSI_AppDefaultMeasurementUnits final : public WSI_Base
-{
-        Q_OBJECT
+class WSI_AppDefaultMeasurementUnits final : public WSI_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  WSI_AppDefaultMeasurementUnits() = delete;
+  WSI_AppDefaultMeasurementUnits(const WSI_AppDefaultMeasurementUnits& other) =
+      delete;
+  explicit WSI_AppDefaultMeasurementUnits(const SExpression& node);
+  ~WSI_AppDefaultMeasurementUnits() noexcept;
 
-        // Constructors / Destructor
-        WSI_AppDefaultMeasurementUnits() = delete;
-        WSI_AppDefaultMeasurementUnits(const WSI_AppDefaultMeasurementUnits& other) = delete;
-        explicit WSI_AppDefaultMeasurementUnits(const SExpression& node);
-        ~WSI_AppDefaultMeasurementUnits() noexcept;
+  // Getters
+  const LengthUnit& getLengthUnit() const noexcept { return mLengthUnit; }
 
-        // Getters
-        const LengthUnit& getLengthUnit() const noexcept {return mLengthUnit;}
+  // Getters: Widgets
+  QString getLengthUnitLabelText() const noexcept {
+    return tr("Default Length Unit:");
+  }
+  QComboBox* getLengthUnitComboBox() const noexcept {
+    return mLengthUnitComboBox.data();
+  }
 
-        // Getters: Widgets
-        QString getLengthUnitLabelText() const noexcept {return tr("Default Length Unit:");}
-        QComboBox* getLengthUnitComboBox() const noexcept {return mLengthUnitComboBox.data();}
+  // General Methods
+  void restoreDefault() noexcept override;
+  void apply() noexcept override;
+  void revert() noexcept override;
 
-        // General Methods
-        void restoreDefault() noexcept override;
-        void apply() noexcept override;
-        void revert() noexcept override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  WSI_AppDefaultMeasurementUnits& operator       =(
+      const WSI_AppDefaultMeasurementUnits& rhs) = delete;
 
-        // Operator Overloadings
-        WSI_AppDefaultMeasurementUnits& operator=(const WSI_AppDefaultMeasurementUnits& rhs) = delete;
+private:  // Methods
+  void lengthUnitComboBoxIndexChanged(int index) noexcept;
+  void updateLengthUnitComboBoxIndex() noexcept;
 
+private:  // Data
+  /**
+   * @brief The application's default length unit
+   *
+   * Default: millimeters
+   */
+  LengthUnit mLengthUnit;
+  LengthUnit mLengthUnitTmp;
 
-    private: // Methods
-        void lengthUnitComboBoxIndexChanged(int index) noexcept;
-        void updateLengthUnitComboBoxIndex() noexcept;
-
-
-    private: // Data
-
-        /**
-         * @brief The application's default length unit
-         *
-         * Default: millimeters
-         */
-        LengthUnit mLengthUnit;
-        LengthUnit mLengthUnitTmp;
-
-        // Widgets
-        QScopedPointer<QComboBox> mLengthUnitComboBox;
+  // Widgets
+  QScopedPointer<QComboBox> mLengthUnitComboBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H
+#endif  // LIBREPCB_WSI_APPDEFAULTMEASUREMENTUNITS_H

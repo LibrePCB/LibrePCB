@@ -17,114 +17,103 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "angle.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Angle
- ****************************************************************************************/
+ ******************************************************************************/
 
 // General Methods
 
-QString Angle::toDegString() const noexcept
-{
-    QString str = QLocale::c().toString(toDeg(), 'f', 6);
-    for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
-        str.chop(1);
-    }
-    return str;
+QString Angle::toDegString() const noexcept {
+  QString str = QLocale::c().toString(toDeg(), 'f', 6);
+  for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
+    str.chop(1);
+  }
+  return str;
 }
 
-Angle Angle::abs() const noexcept
-{
-    Angle a(*this);
-    a.makeAbs();
-    return a;
+Angle Angle::abs() const noexcept {
+  Angle a(*this);
+  a.makeAbs();
+  return a;
 }
 
-Angle& Angle::makeAbs() noexcept
-{
-    mMicrodegrees = qAbs(mMicrodegrees);
-    return *this;
+Angle& Angle::makeAbs() noexcept {
+  mMicrodegrees = qAbs(mMicrodegrees);
+  return *this;
 }
 
-Angle Angle::mappedTo0_360deg() const noexcept
-{
-    Angle a(*this);
-    a.mapTo0_360deg();
-    return a;
+Angle Angle::mappedTo0_360deg() const noexcept {
+  Angle a(*this);
+  a.mapTo0_360deg();
+  return a;
 }
 
-Angle& Angle::mapTo0_360deg() noexcept
-{
-    if (mMicrodegrees < 0)
-        mMicrodegrees += 360000000;
-    return *this;
+Angle& Angle::mapTo0_360deg() noexcept {
+  if (mMicrodegrees < 0) mMicrodegrees += 360000000;
+  return *this;
 }
 
-Angle Angle::mappedTo180deg() const noexcept
-{
-    Angle a(*this);
-    a.mapTo180deg();
-    return a;
+Angle Angle::mappedTo180deg() const noexcept {
+  Angle a(*this);
+  a.mapTo180deg();
+  return a;
 }
 
-Angle& Angle::mapTo180deg() noexcept
-{
-    if (mMicrodegrees < -180000000)
-        mMicrodegrees += 360000000;
-    else if (mMicrodegrees >= 180000000)
-        mMicrodegrees -= 360000000;
-    return *this;
+Angle& Angle::mapTo180deg() noexcept {
+  if (mMicrodegrees < -180000000)
+    mMicrodegrees += 360000000;
+  else if (mMicrodegrees >= 180000000)
+    mMicrodegrees -= 360000000;
+  return *this;
 }
 
 // Static Methods
 
-Angle Angle::fromDeg(qreal degrees) noexcept
-{
-    Angle angle;
-    angle.setAngleDeg(degrees);
-    return angle;
+Angle Angle::fromDeg(qreal degrees) noexcept {
+  Angle angle;
+  angle.setAngleDeg(degrees);
+  return angle;
 }
 
-Angle Angle::fromDeg(const QString& degrees)
-{
-    Angle angle;
-    angle.setAngleDeg(degrees);
-    return angle;
+Angle Angle::fromDeg(const QString& degrees) {
+  Angle angle;
+  angle.setAngleDeg(degrees);
+  return angle;
 }
 
-Angle Angle::fromRad(qreal radians) noexcept
-{
-    Angle angle;
-    angle.setAngleRad(radians);
-    return angle;
+Angle Angle::fromRad(qreal radians) noexcept {
+  Angle angle;
+  angle.setAngleRad(radians);
+  return angle;
 }
 
 // Private Static Methods
 
-qint32 Angle::degStringToMicrodeg(const QString& degrees)
-{
-    bool ok;
-    qreal angle = qRound(QLocale::c().toDouble(degrees, &ok) * 1e6);
-    if (!ok)
-    {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("Invalid angle string: \"%1\"")).arg(degrees));
-    }
-    return angle;
+qint32 Angle::degStringToMicrodeg(const QString& degrees) {
+  bool  ok;
+  qreal angle = qRound(QLocale::c().toDouble(degrees, &ok) * 1e6);
+  if (!ok) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("Invalid angle string: \"%1\"")).arg(degrees));
+  }
+  return angle;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

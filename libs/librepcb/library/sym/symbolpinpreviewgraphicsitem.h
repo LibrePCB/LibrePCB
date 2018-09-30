@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
 #define LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../cmp/cmpsigpindisplaytype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -40,9 +41,9 @@ namespace library {
 class SymbolPin;
 class ComponentSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolPinPreviewGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolPinPreviewGraphicsItem class
@@ -50,61 +51,60 @@ class ComponentSignal;
  * @author ubruhin
  * @date 2015-04-21
  */
-class SymbolPinPreviewGraphicsItem final : public QGraphicsItem
-{
-    public:
+class SymbolPinPreviewGraphicsItem final : public QGraphicsItem {
+public:
+  // Constructors / Destructor
+  explicit SymbolPinPreviewGraphicsItem(
+      const IF_GraphicsLayerProvider& layerProvider, const SymbolPin& pin,
+      const ComponentSignal*      compSignal,
+      const CmpSigPinDisplayType& displayType) noexcept;
+  ~SymbolPinPreviewGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        explicit SymbolPinPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
-            const SymbolPin& pin, const ComponentSignal* compSignal,
-            const CmpSigPinDisplayType& displayType) noexcept;
-        ~SymbolPinPreviewGraphicsItem() noexcept;
+  // Setters
+  void setDrawBoundingRect(bool enable) noexcept { mDrawBoundingRect = enable; }
 
-        // Setters
-        void setDrawBoundingRect(bool enable) noexcept {mDrawBoundingRect = enable;}
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+private:
+  // make some methods inaccessible...
+  SymbolPinPreviewGraphicsItem() = delete;
+  SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) =
+      delete;
+  SymbolPinPreviewGraphicsItem& operator       =(
+      const SymbolPinPreviewGraphicsItem& rhs) = delete;
 
+  // General Attributes
+  const SymbolPin&       mPin;
+  const ComponentSignal* mComponentSignal;
+  CmpSigPinDisplayType   mDisplayType;
+  GraphicsLayer*         mCircleLayer;
+  GraphicsLayer*         mLineLayer;
+  GraphicsLayer*         mTextLayer;
+  QFont                  mFont;
+  qreal                  mRadiusPx;
+  bool                   mDrawBoundingRect;
 
-    private:
-
-        // make some methods inaccessible...
-        SymbolPinPreviewGraphicsItem() = delete;
-        SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) = delete;
-        SymbolPinPreviewGraphicsItem& operator=(const SymbolPinPreviewGraphicsItem& rhs) = delete;
-
-
-        // General Attributes
-        const SymbolPin& mPin;
-        const ComponentSignal* mComponentSignal;
-        CmpSigPinDisplayType mDisplayType;
-        GraphicsLayer* mCircleLayer;
-        GraphicsLayer* mLineLayer;
-        GraphicsLayer* mTextLayer;
-        QFont mFont;
-        qreal mRadiusPx;
-        bool mDrawBoundingRect;
-
-        // Cached Attributes
-        QStaticText mStaticText;
-        bool mRotate180;
-        QRectF mBoundingRect;
-        QPointF mTextOrigin;
-        QRectF mTextBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  QStaticText  mStaticText;
+  bool         mRotate180;
+  QRectF       mBoundingRect;
+  QPointF      mTextOrigin;
+  QRectF       mTextBoundingRect;
+  QPainterPath mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
+#endif  // LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H

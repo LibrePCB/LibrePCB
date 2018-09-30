@@ -20,63 +20,59 @@
 #ifndef LIBREPCB_ATTRIBUTEUNIT_H
 #define LIBREPCB_ATTRIBUTEUNIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../fileio/sexpression.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttributeUnit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttributeUnit class
  */
-class AttributeUnit final
-{
-    public:
+class AttributeUnit final {
+public:
+  // Constructors / Destructor
+  explicit AttributeUnit(const QString& name, const QString& symbolTr) noexcept;
+  ~AttributeUnit() noexcept;
 
-        // Constructors / Destructor
-        explicit AttributeUnit(const QString& name, const QString& symbolTr) noexcept;
-        ~AttributeUnit() noexcept;
+  // Getters
+  const QString& getName() const noexcept { return mName; }
+  const QString& getSymbolTr() const noexcept { return mSymbolTr; }
 
-        // Getters
-        const QString& getName() const noexcept {return mName;}
-        const QString& getSymbolTr() const noexcept {return mSymbolTr;}
+private:
+  // make some methods inaccessible...
+  AttributeUnit()                           = delete;
+  AttributeUnit(const AttributeUnit& other) = delete;
+  AttributeUnit& operator=(const AttributeUnit& rhs) = delete;
 
-
-    private:
-
-        // make some methods inaccessible...
-        AttributeUnit() = delete;
-        AttributeUnit(const AttributeUnit& other) = delete;
-        AttributeUnit& operator=(const AttributeUnit& rhs) = delete;
-
-
-        // General Attributes
-        QString mName;          ///< to convert from/to string, e.g. "millivolt"
-        QString mSymbolTr;      ///< e.g. "mV"
+  // General Attributes
+  QString mName;      ///< to convert from/to string, e.g. "millivolt"
+  QString mSymbolTr;  ///< e.g. "mV"
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
 inline SExpression serializeToSExpression(const AttributeUnit& obj) {
-    return SExpression::createToken(obj.getName());
+  return SExpression::createToken(obj.getName());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRIBUTEUNIT_H
+#endif  // LIBREPCB_ATTRIBUTEUNIT_H

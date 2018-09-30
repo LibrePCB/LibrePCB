@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_PROJECTLIBRARY_H
 #define LIBREPCB_PROJECT_PROJECTLIBRARY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/uuid.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
@@ -39,102 +40,112 @@ class Symbol;
 class Package;
 class Component;
 class Device;
-}
+}  // namespace library
 
 namespace project {
 
 class Project;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ProjectLibrary
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ProjectLibrary class
  *
- * @todo Adding and removing elements is very provisional. It does not really work
- *       together with the automatic backup/restore feature of projects.
+ * @todo Adding and removing elements is very provisional. It does not really
+ * work together with the automatic backup/restore feature of projects.
  */
-class ProjectLibrary final : public QObject
-{
-        Q_OBJECT
+class ProjectLibrary final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit ProjectLibrary(const FilePath& libDir, bool restore, bool readOnly);
+  ~ProjectLibrary() noexcept;
 
-        // Constructors / Destructor
-        explicit ProjectLibrary(const FilePath& libDir, bool restore, bool readOnly);
-        ~ProjectLibrary() noexcept;
+  // Getters: Library Elements
+  const QHash<Uuid, library::Symbol*>& getSymbols() const noexcept {
+    return mSymbols;
+  }
+  const QHash<Uuid, library::Package*>& getPackages() const noexcept {
+    return mPackages;
+  }
+  const QHash<Uuid, library::Component*>& getComponents() const noexcept {
+    return mComponents;
+  }
+  const QHash<Uuid, library::Device*>& getDevices() const noexcept {
+    return mDevices;
+  }
+  library::Symbol* getSymbol(const Uuid& uuid) const noexcept {
+    return mSymbols.value(uuid);
+  }
+  library::Package* getPackage(const Uuid& uuid) const noexcept {
+    return mPackages.value(uuid);
+  }
+  library::Component* getComponent(const Uuid& uuid) const noexcept {
+    return mComponents.value(uuid);
+  }
+  library::Device* getDevice(const Uuid& uuid) const noexcept {
+    return mDevices.value(uuid);
+  }
 
-        // Getters: Library Elements
-        const QHash<Uuid, library::Symbol*>&     getSymbols()        const noexcept {return mSymbols;}
-        const QHash<Uuid, library::Package*>&    getPackages()       const noexcept {return mPackages;}
-        const QHash<Uuid, library::Component*>&  getComponents()     const noexcept {return mComponents;}
-        const QHash<Uuid, library::Device*>&     getDevices()        const noexcept {return mDevices;}
-        library::Symbol*      getSymbol(     const Uuid& uuid) const noexcept {return mSymbols.value(uuid);}
-        library::Package*     getPackage(    const Uuid& uuid) const noexcept {return mPackages.value(uuid);}
-        library::Component*   getComponent(  const Uuid& uuid) const noexcept {return mComponents.value(uuid);}
-        library::Device*      getDevice(     const Uuid& uuid) const noexcept {return mDevices.value(uuid);}
+  // Getters: Special Queries
+  QHash<Uuid, library::Device*> getDevicesOfComponent(
+      const Uuid& compUuid) const noexcept;
 
-        // Getters: Special Queries
-        QHash<Uuid, library::Device*> getDevicesOfComponent(const Uuid& compUuid) const noexcept;
+  // Add/Remove Methods
+  void addSymbol(library::Symbol& s);
+  void addPackage(library::Package& p);
+  void addComponent(library::Component& c);
+  void addDevice(library::Device& d);
+  void removeSymbol(library::Symbol& s);
+  void removePackage(library::Package& p);
+  void removeComponent(library::Component& c);
+  void removeDevice(library::Device& d);
 
+  // General Methods
+  bool save(bool toOriginal, QStringList& errors) noexcept;
 
-        // Add/Remove Methods
-        void addSymbol(library::Symbol& s);
-        void addPackage(library::Package& p);
-        void addComponent(library::Component& c);
-        void addDevice(library::Device& d);
-        void removeSymbol(library::Symbol& s);
-        void removePackage(library::Package& p);
-        void removeComponent(library::Component& c);
-        void removeDevice(library::Device& d);
+private:
+  // make some methods inaccessible...
+  ProjectLibrary();
+  ProjectLibrary(const ProjectLibrary& other);
+  ProjectLibrary& operator=(const ProjectLibrary& rhs);
 
+  // Private Methods
+  QSet<library::LibraryBaseElement*> getCurrentElements() const noexcept;
+  template <typename ElementType>
+  void loadElements(const FilePath& directory, const QString& type,
+                    QHash<Uuid, ElementType*>& elementList);
+  template <typename ElementType>
+  void addElement(ElementType& element, QHash<Uuid, ElementType*>& elementList);
+  template <typename ElementType>
+  void removeElement(ElementType&               element,
+                     QHash<Uuid, ElementType*>& elementList);
 
-        // General Methods
-        bool save(bool toOriginal, QStringList& errors) noexcept;
+  // General
+  FilePath mLibraryPath;  ///< the "library" directory of the project
+  FilePath mBackupPath;   ///< same as #mLibraryPath, but with trailing "~"
+  FilePath mTmpDir;       ///< path to a temporary directory
 
+  // The currently added library elements
+  QHash<Uuid, library::Symbol*>    mSymbols;
+  QHash<Uuid, library::Package*>   mPackages;
+  QHash<Uuid, library::Component*> mComponents;
+  QHash<Uuid, library::Device*>    mDevices;
 
-    private:
-
-        // make some methods inaccessible...
-        ProjectLibrary();
-        ProjectLibrary(const ProjectLibrary& other);
-        ProjectLibrary& operator=(const ProjectLibrary& rhs);
-
-        // Private Methods
-        QSet<library::LibraryBaseElement*> getCurrentElements() const noexcept;
-        template <typename ElementType>
-        void loadElements(const FilePath& directory, const QString& type,
-                          QHash<Uuid, ElementType*>& elementList);
-        template <typename ElementType>
-        void addElement(ElementType& element,
-                        QHash<Uuid, ElementType*>& elementList);
-        template <typename ElementType>
-        void removeElement(ElementType& element,
-                           QHash<Uuid, ElementType*>& elementList);
-
-        // General
-        FilePath mLibraryPath; ///< the "library" directory of the project
-        FilePath mBackupPath; ///< same as #mLibraryPath, but with trailing "~"
-        FilePath mTmpDir; ///< path to a temporary directory
-
-        // The currently added library elements
-        QHash<Uuid, library::Symbol*> mSymbols;
-        QHash<Uuid, library::Package*> mPackages;
-        QHash<Uuid, library::Component*> mComponents;
-        QHash<Uuid, library::Device*> mDevices;
-
-        QSet<library::LibraryBaseElement*> mAllElements;
-        QSet<library::LibraryBaseElement*> mLoadedElements;
-        QSet<library::LibraryBaseElement*> mSavedToTemporary;
-        QSet<library::LibraryBaseElement*> mSavedToOriginal;
+  QSet<library::LibraryBaseElement*> mAllElements;
+  QSet<library::LibraryBaseElement*> mLoadedElements;
+  QSet<library::LibraryBaseElement*> mSavedToTemporary;
+  QSet<library::LibraryBaseElement*> mSavedToOriginal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_PROJECTLIBRARY_H
+#endif  // LIBREPCB_PROJECT_PROJECTLIBRARY_H

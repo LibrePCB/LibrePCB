@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
 #define LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -44,54 +45,52 @@ namespace Ui {
 class EditNetClassesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class EditNetclassesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The EditNetClassesDialog class
  *
- * @todo This class contains very ugly code (static casts) and is not really finished...
+ * @todo This class contains very ugly code (static casts) and is not really
+ * finished...
  *
  * @author ubruhin
  * @date 2014-10-05
  */
-class EditNetClassesDialog final : public QDialog
-{
-        Q_OBJECT
+class EditNetClassesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack,
+                                QWidget* parent = 0);
+  ~EditNetClassesDialog() noexcept;
 
-        // Constructors / Destructor
-        explicit EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack,
-                                      QWidget* parent = 0);
-        ~EditNetClassesDialog() noexcept;
+private slots:
 
-    private slots:
+  void on_tableWidget_itemChanged(QTableWidgetItem* item);
+  void on_btnAdd_clicked();
+  void on_btnRemove_clicked();
 
-        void on_tableWidget_itemChanged(QTableWidgetItem *item);
-        void on_btnAdd_clicked();
-        void on_btnRemove_clicked();
+private:
+  // make some methods inaccessible...
+  EditNetClassesDialog();
+  EditNetClassesDialog(const EditNetClassesDialog& other);
+  EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs);
 
-    private:
-
-        // make some methods inaccessible...
-        EditNetClassesDialog();
-        EditNetClassesDialog(const EditNetClassesDialog& other);
-        EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs);
-
-        // General Attributes
-        Circuit& mCircuit;
-        Ui::EditNetClassesDialog* mUi;
-        UndoStack& mUndoStack;
+  // General Attributes
+  Circuit&                  mCircuit;
+  Ui::EditNetClassesDialog* mUi;
+  UndoStack&                mUndoStack;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
+#endif  // LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H

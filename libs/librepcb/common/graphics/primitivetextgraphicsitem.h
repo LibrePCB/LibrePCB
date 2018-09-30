@@ -20,90 +20,95 @@
 #ifndef LIBREPCB_PRIMITIVETEXTGRAPHICSITEM_H
 #define LIBREPCB_PRIMITIVETEXTGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../alignment.h"
 #include "../graphics/graphicslayer.h"
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PrimitiveTextGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The PrimitiveTextGraphicsItem class is the graphical representation of a text
+ * @brief The PrimitiveTextGraphicsItem class is the graphical representation of
+ * a text
  *
  * @todo Would QStaticText improve the performance?
  *
  * @author ubruhin
  * @date 2017-05-28
  */
-class PrimitiveTextGraphicsItem : public QGraphicsItem, public IF_GraphicsLayerObserver
-{
-    public:
+class PrimitiveTextGraphicsItem : public QGraphicsItem,
+                                  public IF_GraphicsLayerObserver {
+public:
+  // Types
+  enum class Font { SansSerif, Monospace };
 
-        // Types
-        enum class Font {SansSerif, Monospace};
+  // Constructors / Destructor
+  // PrimitiveTextGraphicsItem() = delete;
+  PrimitiveTextGraphicsItem(const PrimitiveTextGraphicsItem& other) = delete;
+  explicit PrimitiveTextGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
+  virtual ~PrimitiveTextGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        //PrimitiveTextGraphicsItem() = delete;
-        PrimitiveTextGraphicsItem(const PrimitiveTextGraphicsItem& other) = delete;
-        explicit PrimitiveTextGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-        virtual ~PrimitiveTextGraphicsItem() noexcept;
+  // Setters
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+  void setText(const QString& text) noexcept;
+  void setHeight(const PositiveLength& height) noexcept;
+  void setAlignment(const Alignment& align) noexcept;
+  void setFont(Font font) noexcept;
+  void setLayer(const GraphicsLayer* layer) noexcept;
 
-        // Setters
-        void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setText(const QString& text) noexcept;
-        void setHeight(const PositiveLength& height) noexcept;
-        void setAlignment(const Alignment& align) noexcept;
-        void setFont(Font font) noexcept;
-        void setLayer(const GraphicsLayer* layer) noexcept;
+  // Inherited from IF_LayerObserver
+  void layerColorChanged(const GraphicsLayer& layer,
+                         const QColor&        newColor) noexcept override;
+  void layerHighlightColorChanged(const GraphicsLayer& layer,
+                                  const QColor& newColor) noexcept override;
+  void layerVisibleChanged(const GraphicsLayer& layer,
+                           bool                 newVisible) noexcept override;
+  void layerEnabledChanged(const GraphicsLayer& layer,
+                           bool                 newEnabled) noexcept override;
+  void layerDestroyed(const GraphicsLayer& layer) noexcept override;
 
-        // Inherited from IF_LayerObserver
-        void layerColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept override;
-        void layerHighlightColorChanged(const GraphicsLayer& layer, const QColor& newColor) noexcept override;
-        void layerVisibleChanged(const GraphicsLayer& layer, bool newVisible) noexcept override;
-        void layerEnabledChanged(const GraphicsLayer& layer, bool newEnabled) noexcept override;
-        void layerDestroyed(const GraphicsLayer& layer) noexcept override;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+  // Operator Overloadings
+  PrimitiveTextGraphicsItem& operator=(const PrimitiveTextGraphicsItem& rhs) =
+      delete;
 
-        // Operator Overloadings
-        PrimitiveTextGraphicsItem& operator=(const PrimitiveTextGraphicsItem& rhs) = delete;
+private:  // Methods
+  void updateBoundingRectAndShape() noexcept;
 
-
-    private: // Methods
-        void updateBoundingRectAndShape() noexcept;
-
-
-    private: // Data
-        const GraphicsLayer* mLayer;
-        QString mText;
-        Alignment mAlignment;
-        QFont mFont;
-        QPen mPen;
-        QPen mPenHighlighted;
-        int mTextFlags;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+private:  // Data
+  const GraphicsLayer* mLayer;
+  QString              mText;
+  Alignment            mAlignment;
+  QFont                mFont;
+  QPen                 mPen;
+  QPen                 mPenHighlighted;
+  int                  mTextFlags;
+  QRectF               mBoundingRect;
+  QPainterPath         mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_PRIMITIVETEXTGRAPHICSITEM_H
+#endif  // LIBREPCB_PRIMITIVETEXTGRAPHICSITEM_H

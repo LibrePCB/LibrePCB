@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H
 #define LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
+ ******************************************************************************/
 #include <QtCore>
 
-/*****************************************************************************************
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 
 namespace parseagle {
 class DeviceSet;
@@ -44,42 +45,40 @@ namespace eagleimport {
 
 class ConverterDb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class DeviceSetConverter
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The DeviceSetConverter class
  */
-class DeviceSetConverter final
-{
-    public:
+class DeviceSetConverter final {
+public:
+  // Constructors / Destructor
+  DeviceSetConverter()                                = delete;
+  DeviceSetConverter(const DeviceSetConverter& other) = delete;
+  DeviceSetConverter(const parseagle::DeviceSet& deviceSet,
+                     ConverterDb&                db) noexcept;
+  ~DeviceSetConverter() noexcept;
 
-        // Constructors / Destructor
-        DeviceSetConverter() = delete;
-        DeviceSetConverter(const DeviceSetConverter& other) = delete;
-        DeviceSetConverter(const parseagle::DeviceSet& deviceSet, ConverterDb& db) noexcept;
-        ~DeviceSetConverter() noexcept;
+  // General Methods
+  std::unique_ptr<library::Component> generate() const;
 
-        // General Methods
-        std::unique_ptr<library::Component> generate() const;
+  // Operator Overloadings
+  DeviceSetConverter& operator=(const DeviceSetConverter& rhs) = delete;
 
-        // Operator Overloadings
-        DeviceSetConverter& operator=(const DeviceSetConverter& rhs) = delete;
+private:
+  QString createDescription() const noexcept;
 
-
-    private:
-        QString createDescription() const noexcept;
-
-        const parseagle::DeviceSet& mDeviceSet;
-        ConverterDb& mDb;
+  const parseagle::DeviceSet& mDeviceSet;
+  ConverterDb&                mDb;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace eagleimport
+}  // namespace librepcb
 
-#endif // LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H
+#endif  // LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H

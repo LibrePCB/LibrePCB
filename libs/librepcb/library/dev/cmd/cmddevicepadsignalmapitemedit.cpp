@@ -17,68 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmddevicepadsignalmapitemedit.h"
+
 #include "../devicepadsignalmap.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdDevicePadSignalMapItemEdit::CmdDevicePadSignalMapItemEdit(DevicePadSignalMapItem& item) noexcept :
-    UndoCommand(tr("Edit device pad-signal-map")), mItem(item),
-    mOldSignalUuid(item.getSignalUuid()), mNewSignalUuid(mOldSignalUuid)
-{
+CmdDevicePadSignalMapItemEdit::CmdDevicePadSignalMapItemEdit(
+    DevicePadSignalMapItem& item) noexcept
+  : UndoCommand(tr("Edit device pad-signal-map")),
+    mItem(item),
+    mOldSignalUuid(item.getSignalUuid()),
+    mNewSignalUuid(mOldSignalUuid) {
 }
 
-CmdDevicePadSignalMapItemEdit::~CmdDevicePadSignalMapItemEdit() noexcept
-{
+CmdDevicePadSignalMapItemEdit::~CmdDevicePadSignalMapItemEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdDevicePadSignalMapItemEdit::setSignalUuid(const tl::optional<Uuid>& uuid) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewSignalUuid = uuid;
+void CmdDevicePadSignalMapItemEdit::setSignalUuid(
+    const tl::optional<Uuid>& uuid) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewSignalUuid = uuid;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdDevicePadSignalMapItemEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdDevicePadSignalMapItemEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewSignalUuid != mOldSignalUuid)           return true;
-    return false;
+  if (mNewSignalUuid != mOldSignalUuid) return true;
+  return false;
 }
 
-void CmdDevicePadSignalMapItemEdit::performUndo()
-{
-    mItem.setSignalUuid(mOldSignalUuid);
+void CmdDevicePadSignalMapItemEdit::performUndo() {
+  mItem.setSignalUuid(mOldSignalUuid);
 }
 
-void CmdDevicePadSignalMapItemEdit::performRedo()
-{
-    mItem.setSignalUuid(mNewSignalUuid);
+void CmdDevicePadSignalMapItemEdit::performRedo() {
+  mItem.setSignalUuid(mNewSignalUuid);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

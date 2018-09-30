@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
 #define LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -43,47 +43,45 @@ namespace Ui {
 class BoardLayerStackSetupDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardLayerStackSetupDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardLayerStackSetupDialog class
  */
-class BoardLayerStackSetupDialog final : public QDialog
-{
-        Q_OBJECT
+class BoardLayerStackSetupDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        BoardLayerStackSetupDialog() = delete;
-        BoardLayerStackSetupDialog(const BoardLayerStackSetupDialog& other) = delete;
-        BoardLayerStackSetupDialog(BoardLayerStack& layerStack, UndoStack& undoStack,
-                                   QWidget* parent) noexcept;
-        ~BoardLayerStackSetupDialog() noexcept;
+public:
+  // Constructors / Destructor
+  BoardLayerStackSetupDialog()                                        = delete;
+  BoardLayerStackSetupDialog(const BoardLayerStackSetupDialog& other) = delete;
+  BoardLayerStackSetupDialog(BoardLayerStack& layerStack, UndoStack& undoStack,
+                             QWidget* parent) noexcept;
+  ~BoardLayerStackSetupDialog() noexcept;
 
-        // Operator Overloadings
-        BoardLayerStackSetupDialog& operator=(const BoardLayerStackSetupDialog& rhs) = delete;
+  // Operator Overloadings
+  BoardLayerStackSetupDialog& operator=(const BoardLayerStackSetupDialog& rhs) =
+      delete;
 
+private:  // Methods
+  void keyPressEvent(QKeyEvent* e);
+  void accept();
+  bool applyChanges() noexcept;
 
-    private: // Methods
-        void keyPressEvent(QKeyEvent* e);
-        void accept();
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        BoardLayerStack& mLayerStack;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::BoardLayerStackSetupDialog> mUi;
+private:  // Data
+  BoardLayerStack&                               mLayerStack;
+  UndoStack&                                     mUndoStack;
+  QScopedPointer<Ui::BoardLayerStackSetupDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H

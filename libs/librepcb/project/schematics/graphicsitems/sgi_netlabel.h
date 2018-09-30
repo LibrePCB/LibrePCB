@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SGI_NETLABEL_H
 #define LIBREPCB_PROJECT_SGI_NETLABEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "sgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -39,61 +40,57 @@ namespace project {
 
 class SI_NetLabel;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SGI_NetLabel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SGI_NetLabel class
  */
-class SGI_NetLabel final : public SGI_Base
-{
-    public:
+class SGI_NetLabel final : public SGI_Base {
+public:
+  // Constructors / Destructor
+  explicit SGI_NetLabel(SI_NetLabel& netlabel) noexcept;
+  ~SGI_NetLabel() noexcept;
 
-        // Constructors / Destructor
-        explicit SGI_NetLabel(SI_NetLabel& netlabel) noexcept;
-        ~SGI_NetLabel() noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
+  void setAnchor(const Point& pos) noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
-        void setAnchor(const Point& pos) noexcept;
+  // Inherited from QGraphicsItem
+  QRectF boundingRect() const { return mBoundingRect; }
+  void   paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+               QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  SGI_NetLabel()                          = delete;
+  SGI_NetLabel(const SGI_NetLabel& other) = delete;
+  SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // Attributes
+  SI_NetLabel&                     mNetLabel;
+  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
-        // make some methods inaccessible...
-        SGI_NetLabel() = delete;
-        SGI_NetLabel(const SGI_NetLabel& other) = delete;
-        SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
+  // Cached Attributes
+  QStaticText mStaticText;
+  QFont       mFont;
+  bool        mRotate180;
+  QPointF     mTextOrigin;
+  QRectF      mBoundingRect;
 
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-
-        // Attributes
-        SI_NetLabel& mNetLabel;
-        QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
-
-        // Cached Attributes
-        QStaticText mStaticText;
-        QFont mFont;
-        bool mRotate180;
-        QPointF mTextOrigin;
-        QRectF mBoundingRect;
-
-        // Static Stuff
-        static QVector<QLineF> sOriginCrossLines;
+  // Static Stuff
+  static QVector<QLineF> sOriginCrossLines;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_NETLABEL_H
+#endif  // LIBREPCB_PROJECT_SGI_NETLABEL_H

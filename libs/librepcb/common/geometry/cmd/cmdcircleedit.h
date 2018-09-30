@@ -20,87 +20,83 @@
 #ifndef LIBREPCB_CMDCIRCLEEDIT_H
 #define LIBREPCB_CMDCIRCLEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "../circle.h"
+ ******************************************************************************/
 #include "../../undocommand.h"
+#include "../circle.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdCircleEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdCircleEdit class
  */
-class CmdCircleEdit final : public UndoCommand
-{
-    public:
+class CmdCircleEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdCircleEdit()                           = delete;
+  CmdCircleEdit(const CmdCircleEdit& other) = delete;
+  explicit CmdCircleEdit(Circle& circle) noexcept;
+  ~CmdCircleEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdCircleEdit() = delete;
-        CmdCircleEdit(const CmdCircleEdit& other) = delete;
-        explicit CmdCircleEdit(Circle& circle) noexcept;
-        ~CmdCircleEdit() noexcept;
+  // Setters
+  void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+  void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
+  void setIsFilled(bool filled, bool immediate) noexcept;
+  void setIsGrabArea(bool grabArea, bool immediate) noexcept;
+  void setDiameter(const PositiveLength& dia, bool immediate) noexcept;
+  void setCenter(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
-        // Setters
-        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
-        void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
-        void setIsFilled(bool filled, bool immediate) noexcept;
-        void setIsGrabArea(bool grabArea, bool immediate) noexcept;
-        void setDiameter(const PositiveLength& dia, bool immediate) noexcept;
-        void setCenter(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdCircleEdit& operator=(const CmdCircleEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdCircleEdit& operator=(const CmdCircleEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Circle& mCircle;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Circle& mCircle;
-
-        // General Attributes
-        GraphicsLayerName mOldLayerName;
-        GraphicsLayerName mNewLayerName;
-        UnsignedLength mOldLineWidth;
-        UnsignedLength mNewLineWidth;
-        bool mOldIsFilled;
-        bool mNewIsFilled;
-        bool mOldIsGrabArea;
-        bool mNewIsGrabArea;
-        PositiveLength mOldDiameter;
-        PositiveLength mNewDiameter;
-        Point mOldCenter;
-        Point mNewCenter;
+  // General Attributes
+  GraphicsLayerName mOldLayerName;
+  GraphicsLayerName mNewLayerName;
+  UnsignedLength    mOldLineWidth;
+  UnsignedLength    mNewLineWidth;
+  bool              mOldIsFilled;
+  bool              mNewIsFilled;
+  bool              mOldIsGrabArea;
+  bool              mNewIsGrabArea;
+  PositiveLength    mOldDiameter;
+  PositiveLength    mNewDiameter;
+  Point             mOldCenter;
+  Point             mNewCenter;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDCIRCLEEDIT_H
+#endif  // LIBREPCB_CMDCIRCLEEDIT_H

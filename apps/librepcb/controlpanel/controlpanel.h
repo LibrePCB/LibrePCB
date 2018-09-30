@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_CONTROLPANEL_H
 #define LIBREPCB_CONTROLPANEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class FilePath;
@@ -44,7 +45,7 @@ class LibraryEditor;
 namespace manager {
 class LibraryManager;
 }
-}
+}  // namespace library
 
 namespace project {
 class Project;
@@ -52,7 +53,7 @@ class Project;
 namespace editor {
 class ProjectEditor;
 }
-}
+}  // namespace project
 
 namespace workspace {
 class Workspace;
@@ -66,9 +67,9 @@ namespace Ui {
 class ControlPanel;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ControlPanel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ControlPanel class
@@ -76,158 +77,161 @@ class ControlPanel;
  * @author ubruhin
  * @date 2014-06-23
  */
-class ControlPanel final : public QMainWindow
-{
-        Q_OBJECT
+class ControlPanel final : public QMainWindow {
+  Q_OBJECT
 
-        friend class ProjectLibraryUpdater; // needs access to openProject() and getOpenProject()
+  friend class ProjectLibraryUpdater;  // needs access to openProject() and
+                                       // getOpenProject()
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit ControlPanel(workspace::Workspace& workspace);
+  ~ControlPanel();
 
-        // Constructors / Destructor
-        explicit ControlPanel(workspace::Workspace& workspace);
-        ~ControlPanel();
+public slots:
 
+  void showControlPanel() noexcept;
+  void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
-    public slots:
+protected:
+  // Inherited Methods
+  virtual void closeEvent(QCloseEvent* event);
 
-        void showControlPanel() noexcept;
-        void openProjectLibraryUpdater(const FilePath& project) noexcept;
+private slots:
 
+  // private slots
+  void projectEditorClosed() noexcept;
 
-    protected:
+  // Actions
+  void on_actionNew_Project_triggered();
+  void on_actionOpen_Project_triggered();
+  void on_actionOpen_Library_Manager_triggered();
+  void on_actionClose_all_open_projects_triggered();
+  void on_actionSwitch_Workspace_triggered();
+  void on_projectTreeView_clicked(const QModelIndex& index);
+  void on_projectTreeView_doubleClicked(const QModelIndex& index);
+  void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
+  void on_recentProjectsListView_entered(const QModelIndex& index);
+  void on_favoriteProjectsListView_entered(const QModelIndex& index);
+  void on_recentProjectsListView_clicked(const QModelIndex& index);
+  void on_favoriteProjectsListView_clicked(const QModelIndex& index);
+  void on_recentProjectsListView_customContextMenuRequested(const QPoint& pos);
+  void on_favoriteProjectsListView_customContextMenuRequested(
+      const QPoint& pos);
+  void on_actionRescanLibrary_triggered();
 
-        // Inherited Methods
-        virtual void closeEvent(QCloseEvent* event);
+private:
+  // make some methods inaccessible...
+  ControlPanel();
+  ControlPanel(const ControlPanel& other);
+  ControlPanel& operator=(const ControlPanel& rhs);
 
+  // General private methods
+  void saveSettings();
+  void loadSettings();
+  void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
 
-    private slots:
+  // Project Management
 
-        // private slots
-        void projectEditorClosed() noexcept;
+  project::editor::ProjectEditor* newProject(
+      const FilePath& parentDir) noexcept;
 
-        // Actions
-        void on_actionNew_Project_triggered();
-        void on_actionOpen_Project_triggered();
-        void on_actionOpen_Library_Manager_triggered();
-        void on_actionClose_all_open_projects_triggered();
-        void on_actionSwitch_Workspace_triggered();
-        void on_projectTreeView_clicked(const QModelIndex& index);
-        void on_projectTreeView_doubleClicked(const QModelIndex& index);
-        void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
-        void on_recentProjectsListView_entered(const QModelIndex &index);
-        void on_favoriteProjectsListView_entered(const QModelIndex &index);
-        void on_recentProjectsListView_clicked(const QModelIndex &index);
-        void on_favoriteProjectsListView_clicked(const QModelIndex &index);
-        void on_recentProjectsListView_customContextMenuRequested(const QPoint &pos);
-        void on_favoriteProjectsListView_customContextMenuRequested(const QPoint &pos);
-        void on_actionRescanLibrary_triggered();
+  /**
+   * @brief Open a project with the editor (or bring an already opened editor to
+   * front)
+   *
+   * @param project       An already opened project (but without the editor)
+   *
+   * @return The pointer to the opened project editor (nullptr on error)
+   */
+  project::editor::ProjectEditor* openProject(
+      project::Project& project) noexcept;
 
+  /**
+   * @brief Open a project with the editor (or bring an already opened editor to
+   * front)
+   *
+   * @param filepath  The filepath to the *.lpp project file to open
+   *
+   * @return The pointer to the opened project editor (nullptr on error)
+   */
+  project::editor::ProjectEditor* openProject(
+      const FilePath& filepath) noexcept;
 
-    private:
+  /**
+   * @brief Close an opened project editor
+   *
+   * @param editor        The reference to the open project editor
+   * @param askForSave    If true, the user will be asked to save the projects
+   *
+   * @retval  true if the project was successfully closed, false otherwise
+   */
+  bool closeProject(project::editor::ProjectEditor& editor,
+                    bool                            askForSave) noexcept;
 
-        // make some methods inaccessible...
-        ControlPanel();
-        ControlPanel(const ControlPanel& other);
-        ControlPanel& operator=(const ControlPanel& rhs);
+  /**
+   * @brief Close an opened project editor
+   *
+   * @param filepath      The filepath to the *.lpp project file to close
+   * @param askForSave    If true, the user will be asked to save the projects
+   *
+   * @retval  true if the project was successfully closed, false otherwise
+   */
+  bool closeProject(const FilePath& filepath, bool askForSave) noexcept;
 
+  /**
+   * @brief Close all open project editors
+   *
+   * @param askForSave    If true, the user will be asked to save all modified
+   * projects
+   *
+   * @retval  true if all projects successfully closed, false otherwise
+   */
+  bool closeAllProjects(bool askForSave) noexcept;
 
-        // General private methods
-        void saveSettings();
-        void loadSettings();
-        void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
+  /**
+   * @brief Get the pointer to an already open project editor by its project
+   * filepath
+   *
+   * This method can also be used to check whether a project (by its filepath)
+   * is already open or not.
+   *
+   * @param filepath  The filepath to a *.lpp project file
+   *
+   * @return The pointer to the open project editor, or nullptr if the project
+   * is not open
+   */
+  project::editor::ProjectEditor* getOpenProject(const FilePath& filepath) const
+      noexcept;
 
-        // Project Management
+  // Library Management
+  void openLibraryEditor(QSharedPointer<library::Library> lib) noexcept;
+  void libraryEditorDestroyed() noexcept;
 
-        project::editor::ProjectEditor* newProject(const FilePath& parentDir) noexcept;
+  /**
+   * @brief Close all open library editors
+   *
+   * @param askForSave    If true, the user will be asked to save all modified
+   * libraries
+   *
+   * @retval  true if all library editors successfully closed, false otherwise
+   */
+  bool closeAllLibraryEditors(bool askForSave) noexcept;
 
-        /**
-         * @brief Open a project with the editor (or bring an already opened editor to front)
-         *
-         * @param project       An already opened project (but without the editor)
-         *
-         * @return The pointer to the opened project editor (nullptr on error)
-         */
-        project::editor::ProjectEditor* openProject(project::Project& project) noexcept;
-
-        /**
-         * @brief Open a project with the editor (or bring an already opened editor to front)
-         *
-         * @param filepath  The filepath to the *.lpp project file to open
-         *
-         * @return The pointer to the opened project editor (nullptr on error)
-         */
-        project::editor::ProjectEditor* openProject(const FilePath& filepath) noexcept;
-
-        /**
-         * @brief Close an opened project editor
-         *
-         * @param editor        The reference to the open project editor
-         * @param askForSave    If true, the user will be asked to save the projects
-         *
-         * @retval  true if the project was successfully closed, false otherwise
-         */
-        bool closeProject(project::editor::ProjectEditor& editor, bool askForSave) noexcept;
-
-        /**
-         * @brief Close an opened project editor
-         *
-         * @param filepath      The filepath to the *.lpp project file to close
-         * @param askForSave    If true, the user will be asked to save the projects
-         *
-         * @retval  true if the project was successfully closed, false otherwise
-         */
-        bool closeProject(const FilePath& filepath, bool askForSave) noexcept;
-
-        /**
-         * @brief Close all open project editors
-         *
-         * @param askForSave    If true, the user will be asked to save all modified projects
-         *
-         * @retval  true if all projects successfully closed, false otherwise
-         */
-        bool closeAllProjects(bool askForSave) noexcept;
-
-        /**
-         * @brief Get the pointer to an already open project editor by its project filepath
-         *
-         * This method can also be used to check whether a project (by its filepath) is
-         * already open or not.
-         *
-         * @param filepath  The filepath to a *.lpp project file
-         *
-         * @return The pointer to the open project editor, or nullptr if the project is not open
-         */
-        project::editor::ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
-
-
-        // Library Management
-        void openLibraryEditor(QSharedPointer<library::Library> lib) noexcept;
-        void libraryEditorDestroyed() noexcept;
-
-        /**
-         * @brief Close all open library editors
-         *
-         * @param askForSave    If true, the user will be asked to save all modified libraries
-         *
-         * @retval  true if all library editors successfully closed, false otherwise
-         */
-        bool closeAllLibraryEditors(bool askForSave) noexcept;
-
-        // Attributes
-        workspace::Workspace& mWorkspace;
-        QScopedPointer<Ui::ControlPanel> mUi;
-        QScopedPointer<library::manager::LibraryManager> mLibraryManager;
-        QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
-        QHash<library::Library*, library::editor::LibraryEditor*> mOpenLibraryEditors;
-        QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;
+  // Attributes
+  workspace::Workspace&                                     mWorkspace;
+  QScopedPointer<Ui::ControlPanel>                          mUi;
+  QScopedPointer<library::manager::LibraryManager>          mLibraryManager;
+  QHash<QString, project::editor::ProjectEditor*>           mOpenProjectEditors;
+  QHash<library::Library*, library::editor::LibraryEditor*> mOpenLibraryEditors;
+  QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_CONTROLPANEL_H
+#endif  // LIBREPCB_CONTROLPANEL_H

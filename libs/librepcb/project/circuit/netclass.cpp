@@ -17,133 +17,134 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "netclass.h"
-#include <librepcb/common/exceptions.h>
-#include "netsignal.h"
-#include "circuit.h"
-#include "../erc/ercmsg.h"
 
-/*****************************************************************************************
+#include "../erc/ercmsg.h"
+#include "circuit.h"
+#include "netsignal.h"
+
+#include <librepcb/common/exceptions.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const SExpression& node) :
-    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
+NetClass::NetClass(Circuit& circuit, const SExpression& node)
+  : QObject(&circuit),
+    mCircuit(circuit),
+    mIsAddedToCircuit(false),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<ElementName>("name"))
-{
+    mName(node.getValueByPath<ElementName>("name")) {
 }
 
-NetClass::NetClass(Circuit& circuit, const ElementName& name) :
-    QObject(&circuit), mCircuit(circuit), mIsAddedToCircuit(false),
-    mUuid(Uuid::createRandom()), mName(name)
-{
+NetClass::NetClass(Circuit& circuit, const ElementName& name)
+  : QObject(&circuit),
+    mCircuit(circuit),
+    mIsAddedToCircuit(false),
+    mUuid(Uuid::createRandom()),
+    mName(name) {
 }
 
-NetClass::~NetClass() noexcept
-{
-    Q_ASSERT(!mIsAddedToCircuit);
-    Q_ASSERT(!isUsed());
+NetClass::~NetClass() noexcept {
+  Q_ASSERT(!mIsAddedToCircuit);
+  Q_ASSERT(!isUsed());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NetClass::setName(const ElementName& name) noexcept
-{
-    if (name == mName) {
-        return;
-    }
-    mName = name;
-    updateErcMessages();
+void NetClass::setName(const ElementName& name) noexcept {
+  if (name == mName) {
+    return;
+  }
+  mName = name;
+  updateErcMessages();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NetClass::addToCircuit()
-{
-    if (mIsAddedToCircuit || isUsed()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mIsAddedToCircuit = true;
-    updateErcMessages();
+void NetClass::addToCircuit() {
+  if (mIsAddedToCircuit || isUsed()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mIsAddedToCircuit = true;
+  updateErcMessages();
 }
 
-void NetClass::removeFromCircuit()
-{
-    if (!mIsAddedToCircuit) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    if (isUsed()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The net class \"%1\" cannot be removed because it is still in use!"))
-            .arg(*mName));
-    }
-    mIsAddedToCircuit = false;
-    updateErcMessages();
+void NetClass::removeFromCircuit() {
+  if (!mIsAddedToCircuit) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (isUsed()) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("The net class \"%1\" cannot be removed "
+                                  "because it is still in use!"))
+                           .arg(*mName));
+  }
+  mIsAddedToCircuit = false;
+  updateErcMessages();
 }
 
-void NetClass::registerNetSignal(NetSignal& signal)
-{
-    if ((!mIsAddedToCircuit) || (mRegisteredNetSignals.contains(signal.getUuid()))
-        || (signal.getCircuit() != mCircuit))
-    {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredNetSignals.insert(signal.getUuid(), &signal);
-    updateErcMessages();
+void NetClass::registerNetSignal(NetSignal& signal) {
+  if ((!mIsAddedToCircuit) ||
+      (mRegisteredNetSignals.contains(signal.getUuid())) ||
+      (signal.getCircuit() != mCircuit)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredNetSignals.insert(signal.getUuid(), &signal);
+  updateErcMessages();
 }
 
-void NetClass::unregisterNetSignal(NetSignal& signal)
-{
-    if ((!mIsAddedToCircuit) || (mRegisteredNetSignals.value(signal.getUuid()) != &signal)) {
-        throw LogicError(__FILE__, __LINE__);
-    }
-    mRegisteredNetSignals.remove(signal.getUuid());
-    updateErcMessages();
+void NetClass::unregisterNetSignal(NetSignal& signal) {
+  if ((!mIsAddedToCircuit) ||
+      (mRegisteredNetSignals.value(signal.getUuid()) != &signal)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredNetSignals.remove(signal.getUuid());
+  updateErcMessages();
 }
 
-void NetClass::serialize(SExpression& root) const
-{
-    root.appendChild(mUuid);
-    root.appendChild("name", mName, false);
+void NetClass::serialize(SExpression& root) const {
+  root.appendChild(mUuid);
+  root.appendChild("name", mName, false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NetClass::updateErcMessages() noexcept
-{
-    if (mIsAddedToCircuit && (!isUsed())) {
-        if (!mErcMsgUnusedNetClass) {
-            mErcMsgUnusedNetClass.reset(new ErcMsg(mCircuit.getProject(), *this,
-                mUuid.toStr(), "Unused", ErcMsg::ErcMsgType_t::CircuitWarning));
-        }
-        mErcMsgUnusedNetClass->setMsg(QString(tr("Unused net class: \"%1\"")).arg(*mName));
-        mErcMsgUnusedNetClass->setVisible(true);
+void NetClass::updateErcMessages() noexcept {
+  if (mIsAddedToCircuit && (!isUsed())) {
+    if (!mErcMsgUnusedNetClass) {
+      mErcMsgUnusedNetClass.reset(
+          new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(), "Unused",
+                     ErcMsg::ErcMsgType_t::CircuitWarning));
     }
-    else if (mErcMsgUnusedNetClass) {
-        mErcMsgUnusedNetClass.reset();
-    }
+    mErcMsgUnusedNetClass->setMsg(
+        QString(tr("Unused net class: \"%1\"")).arg(*mName));
+    mErcMsgUnusedNetClass->setVisible(true);
+  } else if (mErcMsgUnusedNetClass) {
+    mErcMsgUnusedNetClass.reset();
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

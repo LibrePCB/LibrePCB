@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSYMBOLS_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSYMBOLS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_ComponentSymbols;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_ComponentSymbols
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_ComponentSymbols class
@@ -48,47 +49,43 @@ class NewElementWizardPage_ComponentSymbols;
  * @author ubruhin
  * @date 2017-03-26
  */
-class NewElementWizardPage_ComponentSymbols final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_ComponentSymbols final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_ComponentSymbols() = delete;
+  NewElementWizardPage_ComponentSymbols(
+      const NewElementWizardPage_ComponentSymbols& other) = delete;
+  explicit NewElementWizardPage_ComponentSymbols(
+      NewElementWizardContext& context, QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_ComponentSymbols() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_ComponentSymbols() = delete;
-        NewElementWizardPage_ComponentSymbols(const NewElementWizardPage_ComponentSymbols& other) = delete;
-        explicit NewElementWizardPage_ComponentSymbols(NewElementWizardContext& context,
-                                                       QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_ComponentSymbols() noexcept;
+  // Getters
+  bool validatePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_ComponentSymbols& operator       =(
+      const NewElementWizardPage_ComponentSymbols& rhs) = delete;
 
-        // Getters
-        bool validatePage() noexcept override;
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_ComponentSymbols& operator=(const NewElementWizardPage_ComponentSymbols& rhs) = delete;
-
-
-    private: // Methods
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_ComponentSymbols> mUi;
-        ComponentSymbolVariantList mSymbolVariantList;
+private:  // Data
+  NewElementWizardContext&                                  mContext;
+  QScopedPointer<Ui::NewElementWizardPage_ComponentSymbols> mUi;
+  ComponentSymbolVariantList                                mSymbolVariantList;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSYMBOLS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSYMBOLS_H

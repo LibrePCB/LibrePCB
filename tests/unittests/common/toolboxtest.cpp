@@ -17,58 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/common/toolbox.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class ToolboxTest : public ::testing::Test
-{
-};
+class ToolboxTest : public ::testing::Test {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST(ToolboxTest, testStringOrNumberToQVariant_numeric)
-{
-    QString string = "1337";
-    QVariant variant = Toolbox::stringOrNumberToQVariant(string);
-    EXPECT_EQ(QVariant::Int, variant.type());
-    EXPECT_EQ(QVariant(1337), variant);
+TEST(ToolboxTest, testStringOrNumberToQVariant_numeric) {
+  QString  string  = "1337";
+  QVariant variant = Toolbox::stringOrNumberToQVariant(string);
+  EXPECT_EQ(QVariant::Int, variant.type());
+  EXPECT_EQ(QVariant(1337), variant);
 }
 
-TEST(ToolboxTest, testStringOrNumberToQVariant_nonNumeric)
-{
-    QString string = "leet";
-    QVariant variant = Toolbox::stringOrNumberToQVariant(string);
-    EXPECT_EQ(QVariant::String, variant.type());
-    EXPECT_EQ(QVariant("leet"), variant);
+TEST(ToolboxTest, testStringOrNumberToQVariant_nonNumeric) {
+  QString  string  = "leet";
+  QVariant variant = Toolbox::stringOrNumberToQVariant(string);
+  EXPECT_EQ(QVariant::String, variant.type());
+  EXPECT_EQ(QVariant("leet"), variant);
 }
 
-TEST(ToolboxTest, testStringOrNumberToQVariant_mixed)
-{
-    QString string = "l33t";
-    QVariant variant = Toolbox::stringOrNumberToQVariant(string);
-    EXPECT_EQ(QVariant::String, variant.type());
-    EXPECT_EQ(QVariant("l33t"), variant);
+TEST(ToolboxTest, testStringOrNumberToQVariant_mixed) {
+  QString  string  = "l33t";
+  QVariant variant = Toolbox::stringOrNumberToQVariant(string);
+  EXPECT_EQ(QVariant::String, variant.type());
+  EXPECT_EQ(QVariant("l33t"), variant);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb

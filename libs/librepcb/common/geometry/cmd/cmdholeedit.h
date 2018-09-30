@@ -20,76 +20,72 @@
 #ifndef LIBREPCB_CMDHOLEEDIT_H
 #define LIBREPCB_CMDHOLEEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../../undocommand.h"
 #include "../../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Hole;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdHoleEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdHoleEdit class
  */
-class CmdHoleEdit final : public UndoCommand
-{
-    public:
+class CmdHoleEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdHoleEdit()                         = delete;
+  CmdHoleEdit(const CmdHoleEdit& other) = delete;
+  explicit CmdHoleEdit(Hole& hole) noexcept;
+  ~CmdHoleEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdHoleEdit() = delete;
-        CmdHoleEdit(const CmdHoleEdit& other) = delete;
-        explicit CmdHoleEdit(Hole& hole) noexcept;
-        ~CmdHoleEdit() noexcept;
+  // Setters
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
 
-        // Setters
-        void setPosition(const Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdHoleEdit& operator=(const CmdHoleEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdHoleEdit& operator=(const CmdHoleEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Hole& mHole;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Hole& mHole;
-
-        // General Attributes
-        Point mOldPosition;
-        Point mNewPosition;
-        PositiveLength mOldDiameter;
-        PositiveLength mNewDiameter;
+  // General Attributes
+  Point          mOldPosition;
+  Point          mNewPosition;
+  PositiveLength mOldDiameter;
+  PositiveLength mNewDiameter;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDHOLEEDIT_H
+#endif  // LIBREPCB_CMDHOLEEDIT_H

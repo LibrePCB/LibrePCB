@@ -20,147 +20,159 @@
 #ifndef LIBREPCB_PROJECT_BI_VIA_H
 #define LIBREPCB_PROJECT_BI_VIA_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "bi_base.h"
+ ******************************************************************************/
+#include "../graphicsitems/bgi_via.h"
 #include "./bi_netline.h"
+#include "bi_base.h"
+
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
-#include "../graphicsitems/bgi_via.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_Via
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_Via class
  */
 class BI_Via final : public BI_Base,
                      public BI_NetLineAnchor,
-                     public SerializableObject
-{
-        Q_OBJECT
+                     public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Public Types
+  enum class Shape { Round, Square, Octagon };
 
-        // Public Types
-        enum class Shape {Round, Square, Octagon};
+  // Constructors / Destructor
+  BI_Via()                    = delete;
+  BI_Via(const BI_Via& other) = delete;
+  BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
+  BI_Via(BI_NetSegment& netsegment, const SExpression& node);
+  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
+         const PositiveLength& size, const PositiveLength& drillDiameter);
+  ~BI_Via() noexcept;
 
-        // Constructors / Destructor
-        BI_Via() = delete;
-        BI_Via(const BI_Via& other) = delete;
-        BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
-        BI_Via(BI_NetSegment& netsegment, const SExpression& node);
-        BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
-               const PositiveLength& size, const PositiveLength& drillDiameter);
-        ~BI_Via() noexcept;
+  // Getters
+  BI_NetSegment&        getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal&            getNetSignalOfNetSegment() const noexcept;
+  const Uuid&           getUuid() const noexcept { return mUuid; }
+  Shape                 getShape() const noexcept { return mShape; }
+  const PositiveLength& getDrillDiameter() const noexcept {
+    return mDrillDiameter;
+  }
+  const PositiveLength& getSize() const noexcept { return mSize; }
+  bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
+  bool isOnLayer(const QString& layerName) const noexcept;
+  bool isSelectable() const noexcept override;
+  Path getOutline(const Length& expansion = Length(0)) const noexcept;
+  Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
+  QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const
+      noexcept;
 
-        // Getters
-        BI_NetSegment& getNetSegment() const noexcept {return mNetSegment;}
-        NetSignal& getNetSignalOfNetSegment() const noexcept;
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        Shape getShape() const noexcept {return mShape;}
-        const PositiveLength& getDrillDiameter() const noexcept {return mDrillDiameter;}
-        const PositiveLength& getSize() const noexcept {return mSize;}
-        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
-        bool isOnLayer(const QString& layerName) const noexcept;
-        bool isSelectable() const noexcept override;
-        Path getOutline(const Length& expansion = Length(0)) const noexcept;
-        Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
-        QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const noexcept;
+  // Setters
+  void setPosition(const Point& position) noexcept;
+  void setShape(Shape shape) noexcept;
+  void setSize(const PositiveLength& size) noexcept;
+  void setDrillDiameter(const PositiveLength& diameter) noexcept;
 
-        // Setters
-        void setPosition(const Point& position) noexcept;
-        void setShape(Shape shape) noexcept;
-        void setSize(const PositiveLength& size) noexcept;
-        void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  // General Methods
+  void addToBoard() override;
+  void removeFromBoard() override;
 
-        // General Methods
-        void addToBoard() override;
-        void removeFromBoard() override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override { return BI_Base::Type_t::Via; }
+  const Point& getPosition() const noexcept override { return mPosition; }
+  bool         getIsMirrored() const noexcept override { return false; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::Via;}
-        const Point& getPosition() const noexcept override {return mPosition;}
-        bool getIsMirrored() const noexcept override {return false;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Inherited from BI_NetLineAnchor
+  void                     registerNetLine(BI_NetLine& netline) override;
+  void                     unregisterNetLine(BI_NetLine& netline) override;
+  const QSet<BI_NetLine*>& getNetLines() const noexcept override {
+    return mRegisteredNetLines;
+  }
 
-        // Inherited from BI_NetLineAnchor
-        void registerNetLine(BI_NetLine& netline) override;
-        void unregisterNetLine(BI_NetLine& netline) override;
-        const QSet<BI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
+  // Operator Overloadings
+  BI_Via& operator=(const BI_Via& rhs) = delete;
+  bool    operator==(const BI_Via& rhs) noexcept { return (this == &rhs); }
+  bool    operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
-        // Operator Overloadings
-        BI_Via& operator=(const BI_Via& rhs) = delete;
-        bool operator==(const BI_Via& rhs) noexcept {return (this == &rhs);}
-        bool operator!=(const BI_Via& rhs) noexcept {return (this != &rhs);}
+private:
+  void init();
+  void boardAttributesChanged();
 
+  // General
+  BI_NetSegment&          mNetSegment;
+  QScopedPointer<BGI_Via> mGraphicsItem;
+  QMetaObject::Connection mHighlightChangedConnection;
 
-    private:
+  // Attributes
+  Uuid           mUuid;
+  Point          mPosition;
+  Shape          mShape;
+  PositiveLength mSize;
+  PositiveLength mDrillDiameter;
 
-        void init();
-        void boardAttributesChanged();
-
-
-        // General
-        BI_NetSegment& mNetSegment;
-        QScopedPointer<BGI_Via> mGraphicsItem;
-        QMetaObject::Connection mHighlightChangedConnection;
-
-        // Attributes
-        Uuid mUuid;
-        Point mPosition;
-        Shape mShape;
-        PositiveLength mSize;
-        PositiveLength mDrillDiameter;
-
-        // Registered Elements
-        QSet<BI_NetLine*> mRegisteredNetLines;
+  // Registered Elements
+  QSet<BI_NetLine*> mRegisteredNetLines;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
+}  // namespace project
 
 template <>
 inline SExpression serializeToSExpression(const project::BI_Via::Shape& obj) {
-    switch (obj) {
-        case project::BI_Via::Shape::Round:     return SExpression::createToken("round");
-        case project::BI_Via::Shape::Square:    return SExpression::createToken("square");
-        case project::BI_Via::Shape::Octagon:   return SExpression::createToken("octagon");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+  switch (obj) {
+    case project::BI_Via::Shape::Round:
+      return SExpression::createToken("round");
+    case project::BI_Via::Shape::Square:
+      return SExpression::createToken("square");
+    case project::BI_Via::Shape::Octagon:
+      return SExpression::createToken("octagon");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline project::BI_Via::Shape deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == "round")    return project::BI_Via::Shape::Round;
-    else if (str == "square")   return project::BI_Via::Shape::Square;
-    else if (str == "octagon")  return project::BI_Via::Shape::Octagon;
-    else throw RuntimeError(__FILE__, __LINE__,
+inline project::BI_Via::Shape deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == "round")
+    return project::BI_Via::Shape::Round;
+  else if (str == "square")
+    return project::BI_Via::Shape::Square;
+  else if (str == "octagon")
+    return project::BI_Via::Shape::Octagon;
+  else
+    throw RuntimeError(
+        __FILE__, __LINE__,
         QString(project::BI_Via::tr("Unknown via shape: \"%1\"")).arg(str));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_VIA_H
+#endif  // LIBREPCB_PROJECT_BI_VIA_H

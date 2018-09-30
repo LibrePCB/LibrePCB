@@ -17,65 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+
+#include <gtest/gtest.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
-#include <gtest/gtest.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/units/angle.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data Type
- ****************************************************************************************/
+ ******************************************************************************/
 
 typedef struct {
-    Point pA;
-    Point pB;
-    Point pCenter;
-    Angle aRot;
+  Point pA;
+  Point pB;
+  Point pCenter;
+  Angle aRot;
 } PointTestData_t;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class PointTest : public ::testing::TestWithParam<PointTestData_t>
-{
-};
+class PointTest : public ::testing::TestWithParam<PointTestData_t> {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_P(PointTest, testDefaultConstructor)
-{
-    Point p;
-    EXPECT_EQ(0, p.getX().toNm());
-    EXPECT_EQ(0, p.getY().toNm());
-    EXPECT_TRUE(p.isOrigin());
+TEST_P(PointTest, testDefaultConstructor) {
+  Point p;
+  EXPECT_EQ(0, p.getX().toNm());
+  EXPECT_EQ(0, p.getY().toNm());
+  EXPECT_TRUE(p.isOrigin());
 }
 
-TEST_P(PointTest, testRotate)
-{
-    const PointTestData_t& data = GetParam();
+TEST_P(PointTest, testRotate) {
+  const PointTestData_t& data = GetParam();
 
-    Point p(data.pA);
-    p.rotate(data.aRot, data.pCenter);
-    EXPECT_EQ(data.pB, p);
+  Point p(data.pA);
+  p.rotate(data.aRot, data.pCenter);
+  EXPECT_EQ(data.pB, p);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data
- ****************************************************************************************/
+ ******************************************************************************/
 
+// clang-format off
 INSTANTIATE_TEST_CASE_P(PointTest, PointTest, ::testing::Values(
     //              {pA,                     pB,                     pCenter,                aRot}
     PointTestData_t({Point::fromMm(0, 0),    Point::fromMm(0, 0),    Point::fromMm(0, 0),    Angle::fromDeg(90)}),
@@ -90,10 +88,11 @@ INSTANTIATE_TEST_CASE_P(PointTest, PointTest, ::testing::Values(
     PointTestData_t({Point::fromMm(90, 50),  Point::fromMm(100, 40), Point::fromMm(100, 50), Angle::fromDeg(90)}),
     PointTestData_t({Point::fromMm(100, 40), Point::fromMm(110, 50), Point::fromMm(100, 50), Angle::fromDeg(90)})
 ));
+// clang-format on
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb

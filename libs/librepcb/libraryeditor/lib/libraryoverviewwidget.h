@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_LIBRARYOVERVIEWWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_LIBRARYOVERVIEWWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/exceptions.h>
+ ******************************************************************************/
 #include "../common/editorwidgetbase.h"
 
-/*****************************************************************************************
+#include <librepcb/common/exceptions.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
@@ -44,9 +46,9 @@ namespace Ui {
 class LibraryOverviewWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryOverviewWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The LibraryOverviewWidget class
@@ -54,65 +56,59 @@ class LibraryOverviewWidget;
  * @author ubruhin
  * @date 2016-10-08
  */
-class LibraryOverviewWidget final : public EditorWidgetBase
-{
-        Q_OBJECT
+class LibraryOverviewWidget final : public EditorWidgetBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryOverviewWidget()                                   = delete;
+  LibraryOverviewWidget(const LibraryOverviewWidget& other) = delete;
+  LibraryOverviewWidget(const Context& context, QSharedPointer<Library> lib,
+                        QWidget* parent = nullptr) noexcept;
+  ~LibraryOverviewWidget() noexcept;
 
-        // Constructors / Destructor
-        LibraryOverviewWidget() = delete;
-        LibraryOverviewWidget(const LibraryOverviewWidget& other) = delete;
-        LibraryOverviewWidget(const Context& context, QSharedPointer<Library> lib,
-                              QWidget* parent = nullptr) noexcept;
-        ~LibraryOverviewWidget() noexcept;
+  // Operator Overloadings
+  LibraryOverviewWidget& operator=(const LibraryOverviewWidget& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryOverviewWidget& operator=(const LibraryOverviewWidget& rhs) = delete;
+public slots:
+  bool save() noexcept override;
 
+signals:
+  void editComponentCategoryTriggered(const FilePath& fp);
+  void editPackageCategoryTriggered(const FilePath& fp);
+  void editSymbolTriggered(const FilePath& fp);
+  void editPackageTriggered(const FilePath& fp);
+  void editComponentTriggered(const FilePath& fp);
+  void editDeviceTriggered(const FilePath& fp);
 
-    public slots:
-        bool save() noexcept override;
+private:  // Methods
+  bool isInterfaceBroken() const noexcept override { return false; }
+  void updateIcon() noexcept;
+  void updateElementLists() noexcept;
+  template <typename ElementType>
+  void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
 
+  // Event Handlers
+  void btnIconClicked() noexcept;
+  void lstCmpCatDoubleClicked(const QModelIndex& index) noexcept;
+  void lstPkgCatDoubleClicked(const QModelIndex& index) noexcept;
+  void lstSymDoubleClicked(const QModelIndex& index) noexcept;
+  void lstPkgDoubleClicked(const QModelIndex& index) noexcept;
+  void lstCmpDoubleClicked(const QModelIndex& index) noexcept;
+  void lstDevDoubleClicked(const QModelIndex& index) noexcept;
 
-    signals:
-        void editComponentCategoryTriggered(const FilePath& fp);
-        void editPackageCategoryTriggered(const FilePath& fp);
-        void editSymbolTriggered(const FilePath& fp);
-        void editPackageTriggered(const FilePath& fp);
-        void editComponentTriggered(const FilePath& fp);
-        void editDeviceTriggered(const FilePath& fp);
-
-
-    private: // Methods
-        bool isInterfaceBroken() const noexcept override {return false;}
-        void updateIcon() noexcept;
-        void updateElementLists() noexcept;
-        template <typename ElementType>
-        void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
-
-        // Event Handlers
-        void btnIconClicked() noexcept;
-        void lstCmpCatDoubleClicked(const QModelIndex& index) noexcept;
-        void lstPkgCatDoubleClicked(const QModelIndex& index) noexcept;
-        void lstSymDoubleClicked(const QModelIndex& index) noexcept;
-        void lstPkgDoubleClicked(const QModelIndex& index) noexcept;
-        void lstCmpDoubleClicked(const QModelIndex& index) noexcept;
-        void lstDevDoubleClicked(const QModelIndex& index) noexcept;
-
-
-    private: // Data
-        QSharedPointer<Library> mLibrary;
-        QScopedPointer<Ui::LibraryOverviewWidget> mUi;
-        QScopedPointer<LibraryListEditorWidget> mDependenciesEditorWidget;
+private:  // Data
+  QSharedPointer<Library>                   mLibrary;
+  QScopedPointer<Ui::LibraryOverviewWidget> mUi;
+  QScopedPointer<LibraryListEditorWidget>   mDependenciesEditorWidget;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_LIBRARYOVERVIEWWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_LIBRARYOVERVIEWWIDGET_H

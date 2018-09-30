@@ -20,39 +20,37 @@
 #ifndef LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
 #define LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Interface IF_GraphicsViewEventHandler
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The IF_GraphicsViewEventHandler class
  */
-class IF_GraphicsViewEventHandler
-{
-    public:
+class IF_GraphicsViewEventHandler {
+public:
+  // Constructors / Destructor
+  explicit IF_GraphicsViewEventHandler() noexcept {}
+  virtual ~IF_GraphicsViewEventHandler() noexcept {}
 
-        // Constructors / Destructor
-        explicit IF_GraphicsViewEventHandler() noexcept {}
-        virtual ~IF_GraphicsViewEventHandler() noexcept {}
-
-        /// The event handler method
-        virtual bool graphicsViewEventHandler(QEvent* event) = 0;
+  /// The event handler method
+  virtual bool graphicsViewEventHandler(QEvent* event) = 0;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
+#endif  // LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H

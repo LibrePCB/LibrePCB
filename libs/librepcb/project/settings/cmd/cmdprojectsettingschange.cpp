@@ -17,106 +17,100 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdprojectsettingschange.h"
+
 #include "../projectsettings.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdProjectSettingsChange::CmdProjectSettingsChange(ProjectSettings& settings) noexcept :
-    UndoCommand(tr("Change Project Settings")), mSettings(settings),
+CmdProjectSettingsChange::CmdProjectSettingsChange(
+    ProjectSettings& settings) noexcept
+  : UndoCommand(tr("Change Project Settings")),
+    mSettings(settings),
     mRestoreDefaults(false),
-    mLocaleOrderOld(settings.getLocaleOrder()), mLocaleOrderNew(mLocaleOrderOld),
-    mNormOrderOld(settings.getNormOrder()), mNormOrderNew(mNormOrderOld)
-{
+    mLocaleOrderOld(settings.getLocaleOrder()),
+    mLocaleOrderNew(mLocaleOrderOld),
+    mNormOrderOld(settings.getNormOrder()),
+    mNormOrderNew(mNormOrderOld) {
 }
 
-CmdProjectSettingsChange::~CmdProjectSettingsChange() noexcept
-{
+CmdProjectSettingsChange::~CmdProjectSettingsChange() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdProjectSettingsChange::restoreDefaults() noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mRestoreDefaults = true;
+void CmdProjectSettingsChange::restoreDefaults() noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mRestoreDefaults = true;
 }
 
-void CmdProjectSettingsChange::setLocaleOrder(const QStringList& locales) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mLocaleOrderNew = locales;
+void CmdProjectSettingsChange::setLocaleOrder(
+    const QStringList& locales) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mLocaleOrderNew = locales;
 }
 
-void CmdProjectSettingsChange::setNormOrder(const QStringList& norms) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNormOrderNew = norms;
+void CmdProjectSettingsChange::setNormOrder(const QStringList& norms) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNormOrderNew = norms;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdProjectSettingsChange::performExecute()
-{
-    performRedo(); // can throw
+bool CmdProjectSettingsChange::performExecute() {
+  performRedo();  // can throw
 
-    return true; // TODO: determine if the settings were really modified
+  return true;  // TODO: determine if the settings were really modified
 }
 
-void CmdProjectSettingsChange::performUndo()
-{
-    applyOldSettings(); // can throw
-    mSettings.triggerSettingsChanged();
+void CmdProjectSettingsChange::performUndo() {
+  applyOldSettings();  // can throw
+  mSettings.triggerSettingsChanged();
 }
 
-void CmdProjectSettingsChange::performRedo()
-{
-    applyNewSettings(); // can throw
-    mSettings.triggerSettingsChanged();
+void CmdProjectSettingsChange::performRedo() {
+  applyNewSettings();  // can throw
+  mSettings.triggerSettingsChanged();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdProjectSettingsChange::applyNewSettings()
-{
-    if (mRestoreDefaults)
-    {
-        mSettings.restoreDefaults();
-    }
-    else
-    {
-        mSettings.setLocaleOrder(mLocaleOrderNew);
-        mSettings.setNormOrder(mNormOrderNew);
-    }
+void CmdProjectSettingsChange::applyNewSettings() {
+  if (mRestoreDefaults) {
+    mSettings.restoreDefaults();
+  } else {
+    mSettings.setLocaleOrder(mLocaleOrderNew);
+    mSettings.setNormOrder(mNormOrderNew);
+  }
 }
 
-void CmdProjectSettingsChange::applyOldSettings()
-{
-    mSettings.setLocaleOrder(mLocaleOrderOld);
-    mSettings.setNormOrder(mNormOrderOld);
+void CmdProjectSettingsChange::applyOldSettings() {
+  mSettings.setLocaleOrder(mLocaleOrderOld);
+  mSettings.setNormOrder(mNormOrderOld);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

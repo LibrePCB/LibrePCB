@@ -17,81 +17,80 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "graphicslayerstackappearancesettings.h"
+
 #include "../graphics/graphicslayer.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
-        IF_GraphicsLayerProvider& layers) noexcept :
-    mLayers(layers)
-{
+    IF_GraphicsLayerProvider& layers) noexcept
+  : mLayers(layers) {
 }
 
 GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
-        IF_GraphicsLayerProvider& layers, const GraphicsLayerStackAppearanceSettings& other) noexcept :
-    mLayers(layers)
-{
-    *this = other;
+    IF_GraphicsLayerProvider&                   layers,
+    const GraphicsLayerStackAppearanceSettings& other) noexcept
+  : mLayers(layers) {
+  *this = other;
 }
 
 GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
-        IF_GraphicsLayerProvider& layers, const SExpression& node) :
-    mLayers(layers)
-{
-    for (const SExpression& child : node.getChildren("layer")) {
-        QString name = child.getChildByIndex(0).getValue<QString>(true);
-        if (GraphicsLayer* layer = mLayers.getLayer(name)) {
-            layer->setColor(child.getValueByPath<QColor>("color"));
-            layer->setColorHighlighted(child.getValueByPath<QColor>("color_hl"));
-            layer->setVisible(child.getValueByPath<bool>("visible"));
-        }
+    IF_GraphicsLayerProvider& layers, const SExpression& node)
+  : mLayers(layers) {
+  for (const SExpression& child : node.getChildren("layer")) {
+    QString name = child.getChildByIndex(0).getValue<QString>(true);
+    if (GraphicsLayer* layer = mLayers.getLayer(name)) {
+      layer->setColor(child.getValueByPath<QColor>("color"));
+      layer->setColorHighlighted(child.getValueByPath<QColor>("color_hl"));
+      layer->setVisible(child.getValueByPath<bool>("visible"));
     }
+  }
 }
 
-GraphicsLayerStackAppearanceSettings::~GraphicsLayerStackAppearanceSettings() noexcept
-{
+GraphicsLayerStackAppearanceSettings::
+    ~GraphicsLayerStackAppearanceSettings() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void GraphicsLayerStackAppearanceSettings::serialize(SExpression& root) const
-{
-    for (const GraphicsLayer* layer : mLayers.getAllLayers()) { Q_ASSERT(layer);
-        SExpression& child = root.appendList("layer", true);
-        child.appendChild(SExpression::createToken(layer->getName()));
-        child.appendChild("color",    layer->getColor(false), false);
-        child.appendChild("color_hl", layer->getColor(true), false);
-        child.appendChild("visible",  layer->getVisible(), false);
-    }
+void GraphicsLayerStackAppearanceSettings::serialize(SExpression& root) const {
+  for (const GraphicsLayer* layer : mLayers.getAllLayers()) {
+    Q_ASSERT(layer);
+    SExpression& child = root.appendList("layer", true);
+    child.appendChild(SExpression::createToken(layer->getName()));
+    child.appendChild("color", layer->getColor(false), false);
+    child.appendChild("color_hl", layer->getColor(true), false);
+    child.appendChild("visible", layer->getVisible(), false);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayerStackAppearanceSettings& GraphicsLayerStackAppearanceSettings::operator=(
-        const GraphicsLayerStackAppearanceSettings& rhs) noexcept
-{
-    Q_UNUSED(rhs); // actually there is nothing to copy here...
-    return *this;
+GraphicsLayerStackAppearanceSettings& GraphicsLayerStackAppearanceSettings::
+                                      operator=(const GraphicsLayerStackAppearanceSettings& rhs) noexcept {
+  Q_UNUSED(rhs);  // actually there is nothing to copy here...
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

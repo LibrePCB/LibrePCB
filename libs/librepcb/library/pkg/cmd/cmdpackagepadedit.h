@@ -20,72 +20,69 @@
 #ifndef LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H
 #define LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../packagepad.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdPackagePadEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdPackagePadEdit class
  */
-class CmdPackagePadEdit final : public UndoCommand
-{
-    public:
+class CmdPackagePadEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdPackagePadEdit()                               = delete;
+  CmdPackagePadEdit(const CmdPackagePadEdit& other) = delete;
+  explicit CmdPackagePadEdit(PackagePad& pad) noexcept;
+  ~CmdPackagePadEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdPackagePadEdit() = delete;
-        CmdPackagePadEdit(const CmdPackagePadEdit& other) = delete;
-        explicit CmdPackagePadEdit(PackagePad& pad) noexcept;
-        ~CmdPackagePadEdit() noexcept;
+  // Setters
+  void setName(const CircuitIdentifier& name) noexcept;
 
-        // Setters
-        void setName(const CircuitIdentifier& name) noexcept;
+  // Operator Overloadings
+  CmdPackagePadEdit& operator=(const CmdPackagePadEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdPackagePadEdit& operator=(const CmdPackagePadEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  PackagePad& mPad;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        PackagePad& mPad;
-
-        // General Attributes
-        CircuitIdentifier mOldName;
-        CircuitIdentifier mNewName;
+  // General Attributes
+  CircuitIdentifier mOldName;
+  CircuitIdentifier mNewName;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDPACKAGEPADEDIT_H

@@ -20,69 +20,73 @@
 #ifndef LIBREPCB_LIBRARY_LIBRARYCATEGORY_H
 #define LIBREPCB_LIBRARY_LIBRARYCATEGORY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../librarybaseelement.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryCategory
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The LibraryCategory class extends the LibraryBaseElement class with some
- *        attributes and methods which are used for all library category classes.
+ * @brief The LibraryCategory class extends the LibraryBaseElement class with
+ * some attributes and methods which are used for all library category classes.
  */
-class LibraryCategory : public LibraryBaseElement
-{
-        Q_OBJECT
+class LibraryCategory : public LibraryBaseElement {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryCategory()                             = delete;
+  LibraryCategory(const LibraryCategory& other) = delete;
+  LibraryCategory(const QString& shortElementName,
+                  const QString& longElementName, const Uuid& uuid,
+                  const Version& version, const QString& author,
+                  const ElementName& name_en_US,
+                  const QString&     description_en_US,
+                  const QString&     keywords_en_US);
+  LibraryCategory(const FilePath& elementDirectory,
+                  const QString&  shortElementName,
+                  const QString& longElementName, bool readOnly);
+  virtual ~LibraryCategory() noexcept;
 
-        // Constructors / Destructor
-        LibraryCategory() = delete;
-        LibraryCategory(const LibraryCategory& other) = delete;
-        LibraryCategory(const QString& shortElementName, const QString& longElementName,
-                        const Uuid& uuid, const Version& version, const QString& author,
-                        const ElementName& name_en_US, const QString& description_en_US,
-                        const QString& keywords_en_US );
-        LibraryCategory(const FilePath& elementDirectory, const QString& shortElementName,
-                        const QString& longElementName, bool readOnly);
-        virtual ~LibraryCategory() noexcept;
+  // Getters: Attributes
+  const tl::optional<Uuid>& getParentUuid() const noexcept {
+    return mParentUuid;
+  }
 
-        // Getters: Attributes
-        const tl::optional<Uuid>& getParentUuid() const noexcept {return mParentUuid;}
+  // Setters: Attributes
+  void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept {
+    mParentUuid = parentUuid;
+  }
 
-        // Setters: Attributes
-        void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept {mParentUuid = parentUuid;}
+  // Operator Overloadings
+  LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
+protected:
+  // Protected Methods
 
+  /// @copydoc librepcb::SerializableObject::serialize()
+  virtual void serialize(SExpression& root) const override;
 
-    protected:
-
-        // Protected Methods
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(SExpression& root) const override;
-
-        // General Library Category Attributes
-        tl::optional<Uuid> mParentUuid;
+  // General Library Category Attributes
+  tl::optional<Uuid> mParentUuid;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_LIBRARYCATEGORY_H
+#endif  // LIBREPCB_LIBRARY_LIBRARYCATEGORY_H

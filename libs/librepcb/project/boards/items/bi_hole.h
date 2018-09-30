@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_PROJECT_BI_HOLE_H
 #define LIBREPCB_PROJECT_BI_HOLE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_base.h"
+
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/hole.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class HoleGraphicsItem;
@@ -40,65 +42,62 @@ namespace project {
 class Project;
 class Board;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_Hole
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_Hole class
  */
-class BI_Hole final : public BI_Base, public SerializableObject
-{
-        Q_OBJECT
+class BI_Hole final : public BI_Base, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BI_Hole()                     = delete;
+  BI_Hole(const BI_Hole& other) = delete;
+  BI_Hole(Board& board, const BI_Hole& other);
+  BI_Hole(Board& board, const SExpression& node);
+  BI_Hole(Board& board, const Hole& hole);
+  ~BI_Hole() noexcept;
 
-        // Constructors / Destructor
-        BI_Hole() = delete;
-        BI_Hole(const BI_Hole& other) = delete;
-        BI_Hole(Board& board, const BI_Hole& other);
-        BI_Hole(Board& board, const SExpression& node);
-        BI_Hole(Board& board, const Hole& hole);
-        ~BI_Hole() noexcept;
+  // Getters
+  Hole&       getHole() noexcept { return *mHole; }
+  const Hole& getHole() const noexcept { return *mHole; }
+  const Uuid& getUuid() const
+      noexcept;  // convenience function, e.g. for template usage
+  bool isSelectable() const noexcept override;
 
-        // Getters
-        Hole& getHole() noexcept {return *mHole;}
-        const Hole& getHole() const noexcept {return *mHole;}
-        const Uuid& getUuid() const noexcept; // convenience function, e.g. for template usage
-        bool isSelectable() const noexcept override;
+  // General Methods
+  void addToBoard() override;
+  void removeFromBoard() override;
 
-        // General Methods
-        void addToBoard() override;
-        void removeFromBoard() override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override { return BI_Base::Type_t::Hole; }
+  const Point& getPosition() const noexcept override;
+  bool         getIsMirrored() const noexcept override { return false; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::Hole;}
-        const Point& getPosition() const noexcept override;
-        bool getIsMirrored() const noexcept override {return false;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Operator Overloadings
+  BI_Hole& operator=(const BI_Hole& rhs) = delete;
 
-        // Operator Overloadings
-        BI_Hole& operator=(const BI_Hole& rhs) = delete;
+private:  // Methods
+  void init();
 
-
-    private: // Methods
-        void init();
-
-
-    private: // Data
-        QScopedPointer<Hole> mHole;
-        QScopedPointer<HoleGraphicsItem> mGraphicsItem;
+private:  // Data
+  QScopedPointer<Hole>             mHole;
+  QScopedPointer<HoleGraphicsItem> mGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_HOLE_H
+#endif  // LIBREPCB_PROJECT_BI_HOLE_H

@@ -17,68 +17,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "markdownconverter.h"
+
+#include <QtCore>
 
 extern "C" {
 #include <hoedown/src/html.h>
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Static Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString MarkdownConverter::convertMarkdownToHtml(const FilePath& markdownFile) noexcept
-{
-    QFile file(markdownFile.toStr());
-    if (file.open(QFile::ReadOnly)) {
-        return convertMarkdownToHtml(file.readAll());
-    } else {
-        return QString();
-    }
+QString MarkdownConverter::convertMarkdownToHtml(
+    const FilePath& markdownFile) noexcept {
+  QFile file(markdownFile.toStr());
+  if (file.open(QFile::ReadOnly)) {
+    return convertMarkdownToHtml(file.readAll());
+  } else {
+    return QString();
+  }
 }
 
-QString MarkdownConverter::convertMarkdownToHtml(const QString& markdown) noexcept
-{
-    // create HTML renderer
-    hoedown_html_flags flags = static_cast<hoedown_html_flags>(0);
-    hoedown_renderer* renderer = hoedown_html_renderer_new(flags, 0);
+QString MarkdownConverter::convertMarkdownToHtml(
+    const QString& markdown) noexcept {
+  // create HTML renderer
+  hoedown_html_flags flags    = static_cast<hoedown_html_flags>(0);
+  hoedown_renderer*  renderer = hoedown_html_renderer_new(flags, 0);
 
-    // create document parser
-    hoedown_extensions extensions = static_cast<hoedown_extensions>(
-        HOEDOWN_EXT_TABLES | HOEDOWN_EXT_FENCED_CODE | HOEDOWN_EXT_AUTOLINK |
-        HOEDOWN_EXT_STRIKETHROUGH | HOEDOWN_EXT_NO_INTRA_EMPHASIS);
-    hoedown_document* document = hoedown_document_new(renderer, extensions, 16);
+  // create document parser
+  hoedown_extensions extensions = static_cast<hoedown_extensions>(
+      HOEDOWN_EXT_TABLES | HOEDOWN_EXT_FENCED_CODE | HOEDOWN_EXT_AUTOLINK |
+      HOEDOWN_EXT_STRIKETHROUGH | HOEDOWN_EXT_NO_INTRA_EMPHASIS);
+  hoedown_document* document = hoedown_document_new(renderer, extensions, 16);
 
-    // render markdown
-    QByteArray markdownUtf8 = markdown.toUtf8();
-    const uchar* markdownData = reinterpret_cast<const uchar*>(markdownUtf8.constData());
-    hoedown_buffer* htmlBuffer = hoedown_buffer_new(64);
-    hoedown_document_render(document, htmlBuffer, markdownData, markdownUtf8.size());
+  // render markdown
+  QByteArray   markdownUtf8 = markdown.toUtf8();
+  const uchar* markdownData =
+      reinterpret_cast<const uchar*>(markdownUtf8.constData());
+  hoedown_buffer* htmlBuffer = hoedown_buffer_new(64);
+  hoedown_document_render(document, htmlBuffer, markdownData,
+                          markdownUtf8.size());
 
-    // get HTML output
-    QString html = QString::fromUtf8(hoedown_buffer_cstr(htmlBuffer));
+  // get HTML output
+  QString html = QString::fromUtf8(hoedown_buffer_cstr(htmlBuffer));
 
-    // clean up
-    hoedown_buffer_free(htmlBuffer);
-    hoedown_document_free(document);
-    hoedown_html_renderer_free(renderer);
+  // clean up
+  hoedown_buffer_free(htmlBuffer);
+  hoedown_document_free(document);
+  hoedown_html_renderer_free(renderer);
 
-    return html;
+  return html;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb

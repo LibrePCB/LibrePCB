@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXT_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate_drawtextbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_DrawText
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_DrawText class
@@ -44,28 +45,29 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_DrawText final : public PackageEditorState_DrawTextBase
-{
-        Q_OBJECT
+class PackageEditorState_DrawText final
+  : public PackageEditorState_DrawTextBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_DrawText() = delete;
+  PackageEditorState_DrawText(const PackageEditorState_DrawText& other) =
+      delete;
+  explicit PackageEditorState_DrawText(Context& context) noexcept;
+  ~PackageEditorState_DrawText() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_DrawText() = delete;
-        PackageEditorState_DrawText(const PackageEditorState_DrawText& other) = delete;
-        explicit PackageEditorState_DrawText(Context& context) noexcept;
-        ~PackageEditorState_DrawText() noexcept;
-
-        // Operator Overloadings
-        PackageEditorState_DrawText& operator=(const PackageEditorState_DrawText& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_DrawText& operator       =(
+      const PackageEditorState_DrawText& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXT_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXT_H

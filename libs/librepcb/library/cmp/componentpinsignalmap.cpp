@@ -17,93 +17,94 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "componentpinsignalmap.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept :
-    mPinUuid(other.mPinUuid),
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(
+    const ComponentPinSignalMapItem& other) noexcept
+  : mPinUuid(other.mPinUuid),
     mSignalUuid(other.mSignalUuid),
-    mDisplayType(other.mDisplayType)
-{
+    mDisplayType(other.mDisplayType) {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin,
-        const tl::optional<Uuid>& signal, const CmpSigPinDisplayType& displayType) noexcept :
-    mPinUuid(pin), mSignalUuid(signal), mDisplayType(displayType)
-{
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(
+    const Uuid& pin, const tl::optional<Uuid>& signal,
+    const CmpSigPinDisplayType& displayType) noexcept
+  : mPinUuid(pin), mSignalUuid(signal), mDisplayType(displayType) {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node) :
-    mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(Uuid::createRandom()), // backward compatibility, remove this some time!
-    mDisplayType(CmpSigPinDisplayType::componentSignal())
-{
-    if (node.tryGetChildByPath("signal")) {
-        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
-    } else {
-        // backward compatibility, remove this some time!
-        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
-    }
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
+  : mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mSignalUuid(Uuid::createRandom()),  // backward compatibility, remove this
+                                        // some time!
+    mDisplayType(CmpSigPinDisplayType::componentSignal()) {
+  if (node.tryGetChildByPath("signal")) {
+    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
+  } else {
+    // backward compatibility, remove this some time!
+    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
+  }
 
-    if (node.tryGetChildByPath("text")) {
-        mDisplayType = CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("text"));
-    } else {
-        // backward compatibility, remove this some time!
-        mDisplayType = CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("disp"));
-    }
+  if (node.tryGetChildByPath("text")) {
+    mDisplayType =
+        CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("text"));
+  } else {
+    // backward compatibility, remove this some time!
+    mDisplayType =
+        CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("disp"));
+  }
 }
 
-ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
-{
+ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ComponentPinSignalMapItem::serialize(SExpression& root) const
-{
-    root.appendChild(mPinUuid);
-    root.appendChild("signal", mSignalUuid, false);
-    root.appendChild("text", mDisplayType, false);
+void ComponentPinSignalMapItem::serialize(SExpression& root) const {
+  root.appendChild(mPinUuid);
+  root.appendChild("signal", mSignalUuid, false);
+  root.appendChild("text", mDisplayType, false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool ComponentPinSignalMapItem::operator==(const ComponentPinSignalMapItem& rhs) const noexcept
-{
-    if (mPinUuid != rhs.mPinUuid)           return false;
-    if (mSignalUuid != rhs.mSignalUuid)     return false;
-    if (mDisplayType != rhs.mDisplayType)   return false;
-    return true;
+bool ComponentPinSignalMapItem::operator==(
+    const ComponentPinSignalMapItem& rhs) const noexcept {
+  if (mPinUuid != rhs.mPinUuid) return false;
+  if (mSignalUuid != rhs.mSignalUuid) return false;
+  if (mDisplayType != rhs.mDisplayType) return false;
+  return true;
 }
 
-ComponentPinSignalMapItem& ComponentPinSignalMapItem::operator=(const ComponentPinSignalMapItem& rhs) noexcept
-{
-    mPinUuid = rhs.mPinUuid;
-    mSignalUuid = rhs.mSignalUuid;
-    mDisplayType = rhs.mDisplayType;
-    return *this;
+ComponentPinSignalMapItem& ComponentPinSignalMapItem::operator=(
+    const ComponentPinSignalMapItem& rhs) noexcept {
+  mPinUuid     = rhs.mPinUuid;
+  mSignalUuid  = rhs.mSignalUuid;
+  mDisplayType = rhs.mDisplayType;
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H
 #define LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/angle.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -37,43 +38,39 @@ class Schematic;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRotateSelectedSchematicItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRotateSelectedSchematicItems class
  */
-class CmdRotateSelectedSchematicItems final : public UndoCommandGroup
-{
-    public:
+class CmdRotateSelectedSchematicItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRotateSelectedSchematicItems(Schematic&   schematic,
+                                  const Angle& angle) noexcept;
+  ~CmdRotateSelectedSchematicItems() noexcept;
 
-        // Constructors / Destructor
-        CmdRotateSelectedSchematicItems(Schematic& schematic, const Angle& angle) noexcept;
-        ~CmdRotateSelectedSchematicItems() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Schematic& mSchematic;
-        Angle mAngle;
+  // Attributes from the constructor
+  Schematic& mSchematic;
+  Angle      mAngle;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H

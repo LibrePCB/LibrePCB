@@ -17,58 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdsymbolinstanceremove.h"
-#include "../schematic.h"
-#include "../items/si_symbol.h"
 
-/*****************************************************************************************
+#include "../items/si_symbol.h"
+#include "../schematic.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic, SI_Symbol& symbol) noexcept :
-    UndoCommand(tr("Remove symbol")),
-    mSchematic(schematic), mSymbol(symbol)
-{
+CmdSymbolInstanceRemove::CmdSymbolInstanceRemove(Schematic& schematic,
+                                                 SI_Symbol& symbol) noexcept
+  : UndoCommand(tr("Remove symbol")), mSchematic(schematic), mSymbol(symbol) {
 }
 
-CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept
-{
+CmdSymbolInstanceRemove::~CmdSymbolInstanceRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSymbolInstanceRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdSymbolInstanceRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSymbolInstanceRemove::performUndo()
-{
-    mSchematic.addSymbol(mSymbol); // can throw
+void CmdSymbolInstanceRemove::performUndo() {
+  mSchematic.addSymbol(mSymbol);  // can throw
 }
 
-void CmdSymbolInstanceRemove::performRedo()
-{
-    mSchematic.removeSymbol(mSymbol); // can throw
+void CmdSymbolInstanceRemove::performRedo() {
+  mSchematic.removeSymbol(mSymbol);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

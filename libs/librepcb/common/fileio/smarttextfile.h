@@ -20,146 +20,139 @@
 #ifndef LIBREPCB_SMARTTEXTFILE_H
 #define LIBREPCB_SMARTTEXTFILE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "smartfile.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SmartTextFile
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The SmartTextFile class represents a text file and provides access to its content
+ * @brief The SmartTextFile class represents a text file and provides access to
+ * its content
  *
  * @note See class #SmartFile for more information.
  *
  * @author ubruhin
  * @date 2015-01-19
  */
-class SmartTextFile final : public SmartFile
-{
-        Q_DECLARE_TR_FUNCTIONS(SmartTextFile)
+class SmartTextFile final : public SmartFile {
+  Q_DECLARE_TR_FUNCTIONS(SmartTextFile)
 
-    public:
+public:
+  // Constructors / Destructor
+  SmartTextFile()                           = delete;
+  SmartTextFile(const SmartTextFile& other) = delete;
 
-        // Constructors / Destructor
-        SmartTextFile() = delete;
-        SmartTextFile(const SmartTextFile& other) = delete;
+  /**
+   * @brief The constructor to open an existing text file
+   *
+   * This constructor tries to open an existing file and throws an exception if
+   * an error occurs.
+   *
+   * @param filepath  See SmartFile#SmartFile()
+   * @param restore   See SmartFile#SmartFile()
+   * @param readOnly  See SmartFile#SmartFile()
+   *
+   * @throw Exception See SmartFile#SmartFile()
+   */
+  SmartTextFile(const FilePath& filepath, bool restore, bool readOnly)
+    : SmartTextFile(filepath, restore, readOnly, false) {}
 
-        /**
-         * @brief The constructor to open an existing text file
-         *
-         * This constructor tries to open an existing file and throws an exception if an
-         * error occurs.
-         *
-         * @param filepath  See SmartFile#SmartFile()
-         * @param restore   See SmartFile#SmartFile()
-         * @param readOnly  See SmartFile#SmartFile()
-         *
-         * @throw Exception See SmartFile#SmartFile()
-         */
-        SmartTextFile(const FilePath& filepath, bool restore, bool readOnly) :
-            SmartTextFile(filepath, restore, readOnly, false) {}
+  /**
+   * @copydoc SmartFile#~SmartFile()
+   */
+  ~SmartTextFile() noexcept;
 
-        /**
-         * @copydoc SmartFile#~SmartFile()
-         */
-        ~SmartTextFile() noexcept;
+  // Getters
 
+  /**
+   * @brief Get the content of the file
+   *
+   * @return The content of the file
+   */
+  const QByteArray& getContent() const noexcept { return mContent; }
 
-        // Getters
+  // Setters
 
-        /**
-         * @brief Get the content of the file
-         *
-         * @return The content of the file
-         */
-        const QByteArray& getContent() const noexcept {return mContent;}
+  /**
+   * @brief Set the content of the file
+   *
+   * @note The content won't be written to the file until #save() is called.
+   *
+   * @param content   The new content of the file
+   */
+  void setContent(const QByteArray& content) noexcept { mContent = content; }
 
+  // General Methods
 
-        // Setters
+  /**
+   * @brief Write all changes to the file system
+   *
+   * @param toOriginal    Specifies whether the original or the backup file
+   * should be overwritten/created.
+   *
+   * @throw Exception If an error occurs
+   */
+  void save(bool toOriginal);
 
-        /**
-         * @brief Set the content of the file
-         *
-         * @note The content won't be written to the file until #save() is called.
-         *
-         * @param content   The new content of the file
-         */
-        void setContent(const QByteArray& content) noexcept {mContent = content;}
+  // Operator Overloadings
+  SmartTextFile& operator=(const SmartTextFile& rhs) = delete;
 
+  // Static Methods
 
-        // General Methods
+  /**
+   * @brief Create a new text file
+   *
+   * @note    This method will NOT immediately create the file! The file will be
+   *          created after calling #save().
+   *
+   * @param filepath  The filepath to the file to create (always to the original
+   * file, not to the backup file with "~" at the end of the filename!)
+   *
+   * @return The #SmartTextFile object of the created file
+   *
+   * @throw Exception If an error occurs
+   */
+  static SmartTextFile* create(const FilePath& filepath);
 
-        /**
-         * @brief Write all changes to the file system
-         *
-         * @param toOriginal    Specifies whether the original or the backup file should
-         *                      be overwritten/created.
-         *
-         * @throw Exception If an error occurs
-         */
-        void save(bool toOriginal);
+protected:
+  // Protected Methods
 
+  /**
+   * @brief Constructor to create or open a text file
+   *
+   * @param filepath  See SmartFile#SmartFile()
+   * @param restore   See SmartFile#SmartFile()
+   * @param readOnly  See SmartFile#SmartFile()
+   * @param create    See SmartFile#SmartFile()
+   *
+   * @throw Exception See SmartFile#SmartFile()
+   */
+  SmartTextFile(const FilePath& filepath, bool restore, bool readOnly,
+                bool create);
 
-        // Operator Overloadings
-        SmartTextFile& operator=(const SmartTextFile& rhs) = delete;
+  // General Attributes
 
-
-        // Static Methods
-
-        /**
-         * @brief Create a new text file
-         *
-         * @note    This method will NOT immediately create the file! The file will be
-         *          created after calling #save().
-         *
-         * @param filepath  The filepath to the file to create (always to the original file,
-         *                  not to the backup file with "~" at the end of the filename!)
-         *
-         * @return The #SmartTextFile object of the created file
-         *
-         * @throw Exception If an error occurs
-         */
-        static SmartTextFile* create(const FilePath& filepath);
-
-
-    protected:
-
-        // Protected Methods
-
-        /**
-         * @brief Constructor to create or open a text file
-         *
-         * @param filepath  See SmartFile#SmartFile()
-         * @param restore   See SmartFile#SmartFile()
-         * @param readOnly  See SmartFile#SmartFile()
-         * @param create    See SmartFile#SmartFile()
-         *
-         * @throw Exception See SmartFile#SmartFile()
-         */
-        SmartTextFile(const FilePath& filepath, bool restore, bool readOnly, bool create);
-
-
-        // General Attributes
-
-        /**
-         * @brief The content of the text file
-         */
-        QByteArray mContent;
+  /**
+   * @brief The content of the text file
+   */
+  QByteArray mContent;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SMARTTEXTFILE_H
+#endif  // LIBREPCB_SMARTTEXTFILE_H

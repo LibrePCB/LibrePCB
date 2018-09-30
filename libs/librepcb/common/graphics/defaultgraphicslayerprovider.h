@@ -20,46 +20,47 @@
 #ifndef LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
 #define LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "graphicslayer.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class DefaultGraphicsLayerProvider
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The DefaultGraphicsLayerProvider class
  */
-class DefaultGraphicsLayerProvider final : public IF_GraphicsLayerProvider
-{
-    public:
+class DefaultGraphicsLayerProvider final : public IF_GraphicsLayerProvider {
+public:
+  // Constructors / Destructor
+  DefaultGraphicsLayerProvider() noexcept;
+  ~DefaultGraphicsLayerProvider() noexcept;
 
-        // Constructors / Destructor
-        DefaultGraphicsLayerProvider() noexcept;
-        ~DefaultGraphicsLayerProvider() noexcept;
+  // Getters
+  GraphicsLayer*        getLayer(const QString& name) const noexcept override;
+  QList<GraphicsLayer*> getAllLayers() const noexcept override {
+    return mLayers;
+  }
 
-        // Getters
-        GraphicsLayer* getLayer(const QString& name) const noexcept override;
-        QList<GraphicsLayer*> getAllLayers() const noexcept override {return mLayers;}
+private:
+  void addLayer(const QString& name) noexcept;
 
-    private:
-        void addLayer(const QString& name) noexcept;
-
-        QList<GraphicsLayer*> mLayers;
+  QList<GraphicsLayer*> mLayers;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
+#endif  // LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H

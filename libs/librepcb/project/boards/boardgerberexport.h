@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_BOARDGERBEREXPORT_H
 #define LIBREPCB_PROJECT_BOARDGERBEREXPORT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Polygon;
@@ -46,9 +47,9 @@ class BI_Via;
 class BI_Footprint;
 class BI_FootprintPad;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardGerberExport
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardGerberExport class
@@ -56,89 +57,91 @@ class BI_FootprintPad;
  * @author ubruhin
  * @date 2016-01-10
  */
-class BoardGerberExport final : public QObject, public AttributeProvider
-{
-        Q_OBJECT
+class BoardGerberExport final : public QObject, public AttributeProvider {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardGerberExport()                               = delete;
+  BoardGerberExport(const BoardGerberExport& other) = delete;
+  BoardGerberExport(const Board& board) noexcept;
+  ~BoardGerberExport() noexcept;
 
-        // Constructors / Destructor
-        BoardGerberExport() = delete;
-        BoardGerberExport(const BoardGerberExport& other) = delete;
-        BoardGerberExport(const Board& board) noexcept;
-        ~BoardGerberExport() noexcept;
+  // Getters
+  FilePath                 getOutputDirectory() const noexcept;
+  const QVector<FilePath>& getWrittenFiles() const noexcept {
+    return mWrittenFiles;
+  }
 
-        // Getters
-        FilePath getOutputDirectory() const noexcept;
-        const QVector<FilePath>& getWrittenFiles() const noexcept {return mWrittenFiles;}
+  // General Methods
+  void exportAllLayers() const;
 
-        // General Methods
-        void exportAllLayers() const;
+  // Inherited from AttributeProvider
+  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  QVector<const AttributeProvider*> getAttributeProviderParents() const
+      noexcept override;
 
-        // Inherited from AttributeProvider
-        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
-        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
-        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
+  // Operator Overloadings
+  BoardGerberExport& operator=(const BoardGerberExport& rhs) = delete;
 
-        // Operator Overloadings
-        BoardGerberExport& operator=(const BoardGerberExport& rhs) = delete;
+signals:
+  void attributesChanged() override;
 
+private:
+  // Private Methods
+  void exportDrills() const;
+  void exportDrillsNpth() const;
+  void exportDrillsPth() const;
+  void exportLayerBoardOutlines() const;
+  void exportLayerTopCopper() const;
+  void exportLayerInnerCopper() const;
+  void exportLayerBottomCopper() const;
+  void exportLayerTopSolderMask() const;
+  void exportLayerBottomSolderMask() const;
+  void exportLayerTopSilkscreen() const;
+  void exportLayerBottomSilkscreen() const;
+  void exportLayerTopSolderPaste() const;
+  void exportLayerBottomSolderPaste() const;
 
-    signals:
-        void attributesChanged() override;
+  int  drawNpthDrills(ExcellonGenerator& gen) const;
+  int  drawPthDrills(ExcellonGenerator& gen) const;
+  void drawLayer(GerberGenerator& gen, const QString& layerName) const;
+  void drawVia(GerberGenerator& gen, const BI_Via& via,
+               const QString& layerName) const;
+  void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint,
+                     const QString& layerName) const;
+  void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
+                        const QString& layerName) const;
 
+  FilePath getOutputFilePath(const QString& suffix) const noexcept;
 
-    private:
+  // Static Methods
+  static UnsignedLength calcWidthOfLayer(const UnsignedLength& width,
+                                         const QString&        name) noexcept;
+  template <typename T>
+  static QList<T*> sortedByUuid(const QList<T*>& list) noexcept {
+    // sort a list of objects by their UUID to get reproducable gerber files
+    QList<T*> copy = list;
+    qSort(copy.begin(), copy.end(), [](const T* o1, const T* o2) {
+      return o1->getUuid() < o2->getUuid();
+    });
+    return copy;
+  }
 
-        // Private Methods
-        void exportDrills() const;
-        void exportDrillsNpth() const;
-        void exportDrillsPth() const;
-        void exportLayerBoardOutlines() const;
-        void exportLayerTopCopper() const;
-        void exportLayerInnerCopper() const;
-        void exportLayerBottomCopper() const;
-        void exportLayerTopSolderMask() const;
-        void exportLayerBottomSolderMask() const;
-        void exportLayerTopSilkscreen() const;
-        void exportLayerBottomSilkscreen() const;
-        void exportLayerTopSolderPaste() const;
-        void exportLayerBottomSolderPaste() const;
-
-        int drawNpthDrills(ExcellonGenerator& gen) const;
-        int drawPthDrills(ExcellonGenerator& gen) const;
-        void drawLayer(GerberGenerator& gen, const QString& layerName) const;
-        void drawVia(GerberGenerator& gen, const BI_Via& via, const QString& layerName) const;
-        void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint, const QString& layerName) const;
-        void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad, const QString& layerName) const;
-
-        FilePath getOutputFilePath(const QString& suffix) const noexcept;
-
-        // Static Methods
-        static UnsignedLength calcWidthOfLayer(const UnsignedLength& width, const QString& name) noexcept;
-        template <typename T>
-        static QList<T*> sortedByUuid(const QList<T*>& list) noexcept {
-            // sort a list of objects by their UUID to get reproducable gerber files
-            QList<T*> copy = list;
-            qSort(copy.begin(), copy.end(),
-                  [](const T* o1, const T* o2){return o1->getUuid() < o2->getUuid();});
-            return copy;
-        }
-
-
-        // Private Member Variables
-        const Project& mProject;
-        const Board& mBoard;
-        mutable int mCurrentInnerCopperLayer;
-        mutable QVector<FilePath> mWrittenFiles;
+  // Private Member Variables
+  const Project&            mProject;
+  const Board&              mBoard;
+  mutable int               mCurrentInnerCopperLayer;
+  mutable QVector<FilePath> mWrittenFiles;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDGERBEREXPORT_H
+#endif  // LIBREPCB_PROJECT_BOARDGERBEREXPORT_H

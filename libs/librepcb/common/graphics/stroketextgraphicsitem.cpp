@@ -17,160 +17,159 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "stroketextgraphicsitem.h"
+
+#include "../application.h"
+#include "../font/strokefontpool.h"
+#include "../graphics/graphicslayer.h"
+#include "../toolbox.h"
+#include "origincrossgraphicsitem.h"
+
 #include <QtCore>
 #include <QtWidgets>
-#include "stroketextgraphicsitem.h"
-#include "origincrossgraphicsitem.h"
-#include "../graphics/graphicslayer.h"
-#include "../font/strokefontpool.h"
-#include "../application.h"
-#include "../toolbox.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-StrokeTextGraphicsItem::StrokeTextGraphicsItem(StrokeText& text,
-        const IF_GraphicsLayerProvider& lp, QGraphicsItem* parent) noexcept :
-    PrimitivePathGraphicsItem(parent), mText(text), mLayerProvider(lp)
-{
-    // add origin cross
-    mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-    mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
+StrokeTextGraphicsItem::StrokeTextGraphicsItem(
+    StrokeText& text, const IF_GraphicsLayerProvider& lp,
+    QGraphicsItem* parent) noexcept
+  : PrimitivePathGraphicsItem(parent), mText(text), mLayerProvider(lp) {
+  // add origin cross
+  mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
 
-    // set text properties
-    setPosition(mText.getPosition());
-    setLineWidth(mText.getStrokeWidth());
-    setPath(Path::toQPainterPathPx(mText.getPaths()));
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-    setZValue(5);
-    updateLayer(mText.getLayerName());
-    updateTransform();
+  // set text properties
+  setPosition(mText.getPosition());
+  setLineWidth(mText.getStrokeWidth());
+  setPath(Path::toQPainterPathPx(mText.getPaths()));
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setZValue(5);
+  updateLayer(mText.getLayerName());
+  updateTransform();
 
-    // register to the text to get attribute updates
-    mText.registerObserver(*this);
+  // register to the text to get attribute updates
+  mText.registerObserver(*this);
 }
 
-StrokeTextGraphicsItem::~StrokeTextGraphicsItem() noexcept
-{
-    mText.unregisterObserver(*this);
+StrokeTextGraphicsItem::~StrokeTextGraphicsItem() noexcept {
+  mText.unregisterObserver(*this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-QPainterPath StrokeTextGraphicsItem::shape() const noexcept
-{
-    return PrimitivePathGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
+QPainterPath StrokeTextGraphicsItem::shape() const noexcept {
+  return PrimitivePathGraphicsItem::shape() + mOriginCrossGraphicsItem->shape();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void StrokeTextGraphicsItem::strokeTextLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept
-{
-    updateLayer(newLayerName);
+void StrokeTextGraphicsItem::strokeTextLayerNameChanged(
+    const GraphicsLayerName& newLayerName) noexcept {
+  updateLayer(newLayerName);
 }
 
-void StrokeTextGraphicsItem::strokeTextTextChanged(const QString& newText) noexcept
-{
-    Q_UNUSED(newText);
-    // do nothing because strokeTextPathsChanged() will be called too
+void StrokeTextGraphicsItem::strokeTextTextChanged(
+    const QString& newText) noexcept {
+  Q_UNUSED(newText);
+  // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextPositionChanged(const Point& newPos) noexcept
-{
-    setPosition(newPos);
+void StrokeTextGraphicsItem::strokeTextPositionChanged(
+    const Point& newPos) noexcept {
+  setPosition(newPos);
 }
 
-void StrokeTextGraphicsItem::strokeTextRotationChanged(const Angle& newRot) noexcept
-{
-    Q_UNUSED(newRot);
-    updateTransform();
+void StrokeTextGraphicsItem::strokeTextRotationChanged(
+    const Angle& newRot) noexcept {
+  Q_UNUSED(newRot);
+  updateTransform();
 }
 
-void StrokeTextGraphicsItem::strokeTextHeightChanged(const PositiveLength& newHeight) noexcept
-{
-    Q_UNUSED(newHeight);
-    // do nothing because strokeTextPathsChanged() will be called too
+void StrokeTextGraphicsItem::strokeTextHeightChanged(
+    const PositiveLength& newHeight) noexcept {
+  Q_UNUSED(newHeight);
+  // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(const UnsignedLength& newStrokeWidth) noexcept
-{
-    // only line width must be updated because strokeTextPathsChanged() will be called too
-    setLineWidth(newStrokeWidth);
+void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(
+    const UnsignedLength& newStrokeWidth) noexcept {
+  // only line width must be updated because strokeTextPathsChanged() will be
+  // called too
+  setLineWidth(newStrokeWidth);
 }
 
-void StrokeTextGraphicsItem::strokeTextLetterSpacingChanged(const StrokeTextSpacing& spacing) noexcept
-{
-    Q_UNUSED(spacing);
-    // do nothing because strokeTextPathsChanged() will be called too
+void StrokeTextGraphicsItem::strokeTextLetterSpacingChanged(
+    const StrokeTextSpacing& spacing) noexcept {
+  Q_UNUSED(spacing);
+  // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextLineSpacingChanged(const StrokeTextSpacing& spacing) noexcept
-{
-    Q_UNUSED(spacing);
-    // do nothing because strokeTextPathsChanged() will be called too
+void StrokeTextGraphicsItem::strokeTextLineSpacingChanged(
+    const StrokeTextSpacing& spacing) noexcept {
+  Q_UNUSED(spacing);
+  // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextAlignChanged(const Alignment& newAlign) noexcept
-{
-    Q_UNUSED(newAlign);
-    // do nothing because strokeTextPathsChanged() will be called too
+void StrokeTextGraphicsItem::strokeTextAlignChanged(
+    const Alignment& newAlign) noexcept {
+  Q_UNUSED(newAlign);
+  // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextMirroredChanged(bool mirrored) noexcept
-{
-    Q_UNUSED(mirrored);
-    updateTransform();
+void StrokeTextGraphicsItem::strokeTextMirroredChanged(bool mirrored) noexcept {
+  Q_UNUSED(mirrored);
+  updateTransform();
 }
 
-void StrokeTextGraphicsItem::strokeTextAutoRotateChanged(bool newAutoRotate) noexcept
-{
-    Q_UNUSED(newAutoRotate);
-    // do nothing because strokeTextPathsChanged() will be called too
+void StrokeTextGraphicsItem::strokeTextAutoRotateChanged(
+    bool newAutoRotate) noexcept {
+  Q_UNUSED(newAutoRotate);
+  // do nothing because strokeTextPathsChanged() will be called too
 }
 
-void StrokeTextGraphicsItem::strokeTextPathsChanged(const QVector<Path>& paths) noexcept
-{
-    setPath(Path::toQPainterPathPx(paths));
+void StrokeTextGraphicsItem::strokeTextPathsChanged(
+    const QVector<Path>& paths) noexcept {
+  setPath(Path::toQPainterPathPx(paths));
 }
 
-void StrokeTextGraphicsItem::updateLayer(const GraphicsLayerName& layerName) noexcept
-{
-    const GraphicsLayer* layer = mLayerProvider.getLayer(*layerName);
-    setLineLayer(layer);
-    mOriginCrossGraphicsItem->setLayer(layer);
+void StrokeTextGraphicsItem::updateLayer(
+    const GraphicsLayerName& layerName) noexcept {
+  const GraphicsLayer* layer = mLayerProvider.getLayer(*layerName);
+  setLineLayer(layer);
+  mOriginCrossGraphicsItem->setLayer(layer);
 }
 
-void StrokeTextGraphicsItem::updateTransform() noexcept
-{
-    QTransform t;
-    if (mText.getMirrored()) t.scale(qreal(-1), qreal(1));
-    t.rotate(-mText.getRotation().toDeg());
-    setTransform(t);
+void StrokeTextGraphicsItem::updateTransform() noexcept {
+  QTransform t;
+  if (mText.getMirrored()) t.scale(qreal(-1), qreal(1));
+  t.rotate(-mText.getRotation().toDeg());
+  setTransform(t);
 }
 
-QVariant StrokeTextGraphicsItem::itemChange(GraphicsItemChange change, const QVariant& value) noexcept
-{
-    if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
-        mOriginCrossGraphicsItem->setSelected(value.toBool());
-    }
-    return QGraphicsItem::itemChange(change, value);
+QVariant StrokeTextGraphicsItem::itemChange(GraphicsItemChange change,
+                                            const QVariant&    value) noexcept {
+  if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
+    mOriginCrossGraphicsItem->setSelected(value.toBool());
+  }
+  return QGraphicsItem::itemChange(change, value);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

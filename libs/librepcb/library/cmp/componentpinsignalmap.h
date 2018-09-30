@@ -20,109 +20,133 @@
 #ifndef LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAP_H
 #define LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAP_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/fileio/serializableobjectlist.h>
+ ******************************************************************************/
+#include "cmpsigpindisplaytype.h"
+
 #include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/uuid.h>
-#include "cmpsigpindisplaytype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentPinSignalMapItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The ComponentPinSignalMapItem class maps a symbol pin to a component signal
+ * @brief The ComponentPinSignalMapItem class maps a symbol pin to a component
+ * signal
  *
- * Following information is considered as the "interface" of a pin-signal-mapping and must
- * therefore never be changed:
+ * Following information is considered as the "interface" of a
+ * pin-signal-mapping and must therefore never be changed:
  *  - Pin UUID
  *  - Signal UUID
  */
-class ComponentPinSignalMapItem final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(ComponentPinSignalMapItem)
+class ComponentPinSignalMapItem final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(ComponentPinSignalMapItem)
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentPinSignalMapItem() = delete;
+  ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
+  ComponentPinSignalMapItem(const Uuid& pin, const tl::optional<Uuid>& signal,
+                            const CmpSigPinDisplayType& displayType) noexcept;
+  explicit ComponentPinSignalMapItem(const SExpression& node);
+  ~ComponentPinSignalMapItem() noexcept;
 
-        // Constructors / Destructor
-        ComponentPinSignalMapItem() = delete;
-        ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
-        ComponentPinSignalMapItem(const Uuid& pin, const tl::optional<Uuid>& signal,
-                                  const CmpSigPinDisplayType& displayType) noexcept;
-        explicit ComponentPinSignalMapItem(const SExpression& node);
-        ~ComponentPinSignalMapItem() noexcept;
+  // Getters
+  const Uuid& getUuid() const noexcept {
+    return mPinUuid;
+  }  // used for UuidObjectMap
+  const Uuid&               getPinUuid() const noexcept { return mPinUuid; }
+  const tl::optional<Uuid>& getSignalUuid() const noexcept {
+    return mSignalUuid;
+  }
+  const CmpSigPinDisplayType& getDisplayType() const noexcept {
+    return mDisplayType;
+  }
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return mPinUuid;} // used for UuidObjectMap
-        const Uuid& getPinUuid() const noexcept {return mPinUuid;}
-        const tl::optional<Uuid>& getSignalUuid() const noexcept {return mSignalUuid;}
-        const CmpSigPinDisplayType& getDisplayType() const noexcept {return mDisplayType;}
+  // Setters
+  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept {
+    mSignalUuid = uuid;
+  }
+  void setDisplayType(const CmpSigPinDisplayType& type) noexcept {
+    mDisplayType = type;
+  }
 
-        // Setters
-        void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept {mSignalUuid = uuid;}
-        void setDisplayType(const CmpSigPinDisplayType& type) noexcept {mDisplayType = type;}
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool operator==(const ComponentPinSignalMapItem& rhs) const noexcept;
+  bool operator!=(const ComponentPinSignalMapItem& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  ComponentPinSignalMapItem& operator=(
+      const ComponentPinSignalMapItem& rhs) noexcept;
 
-        // Operator Overloadings
-        bool operator==(const ComponentPinSignalMapItem& rhs) const noexcept;
-        bool operator!=(const ComponentPinSignalMapItem& rhs) const noexcept {return !(*this == rhs);}
-        ComponentPinSignalMapItem& operator=(const ComponentPinSignalMapItem& rhs) noexcept;
-
-
-    private: // Data
-        Uuid mPinUuid;                      ///< must be valid
-        tl::optional<Uuid> mSignalUuid;     ///< tl::nullopt if not connected to a signal
-        CmpSigPinDisplayType mDisplayType;
+private:                           // Data
+  Uuid               mPinUuid;     ///< must be valid
+  tl::optional<Uuid> mSignalUuid;  ///< tl::nullopt if not connected to a signal
+  CmpSigPinDisplayType mDisplayType;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PinSignalMap
- ****************************************************************************************/
+ ******************************************************************************/
 
-struct ComponentPinSignalMapNameProvider {static constexpr const char* tagname = "pin";};
-using ComponentPinSignalMap = SerializableObjectList<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;
-using CmdComponentPinSignalMapItemInsert = CmdListElementInsert<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;
-using CmdComponentPinSignalMapItemRemove = CmdListElementRemove<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;
-using CmdComponentPinSignalMapItemsSwap = CmdListElementsSwap<ComponentPinSignalMapItem, ComponentPinSignalMapNameProvider>;
+struct ComponentPinSignalMapNameProvider {
+  static constexpr const char* tagname = "pin";
+};
+using ComponentPinSignalMap =
+    SerializableObjectList<ComponentPinSignalMapItem,
+                           ComponentPinSignalMapNameProvider>;
+using CmdComponentPinSignalMapItemInsert =
+    CmdListElementInsert<ComponentPinSignalMapItem,
+                         ComponentPinSignalMapNameProvider>;
+using CmdComponentPinSignalMapItemRemove =
+    CmdListElementRemove<ComponentPinSignalMapItem,
+                         ComponentPinSignalMapNameProvider>;
+using CmdComponentPinSignalMapItemsSwap =
+    CmdListElementsSwap<ComponentPinSignalMapItem,
+                        ComponentPinSignalMapNameProvider>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentPinSignalMapHelpers
- ****************************************************************************************/
+ ******************************************************************************/
 
-class ComponentPinSignalMapHelpers
-{
-    public:
-        ComponentPinSignalMapHelpers() = delete; // disable instantiation
+class ComponentPinSignalMapHelpers {
+public:
+  ComponentPinSignalMapHelpers() = delete;  // disable instantiation
 
-        static ComponentPinSignalMap create(const QSet<Uuid> pins,
-            const CmpSigPinDisplayType& display = CmpSigPinDisplayType::componentSignal()) noexcept
-        {
-            ComponentPinSignalMap map;
-            foreach (const Uuid& pin, pins) {
-                map.append(std::make_shared<ComponentPinSignalMapItem>(pin, tl::nullopt, display));
-            }
-            return map;
-        }
+  static ComponentPinSignalMap create(
+      const QSet<Uuid>            pins,
+      const CmpSigPinDisplayType& display =
+          CmpSigPinDisplayType::componentSignal()) noexcept {
+    ComponentPinSignalMap map;
+    foreach (const Uuid& pin, pins) {
+      map.append(std::make_shared<ComponentPinSignalMapItem>(pin, tl::nullopt,
+                                                             display));
+    }
+    return map;
+  }
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAP_H
+#endif  // LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAP_H

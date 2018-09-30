@@ -17,55 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetlabelanchorsupdate.h"
+
 #include "../schematic.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetLabelAnchorsUpdate::CmdSchematicNetLabelAnchorsUpdate(Schematic& schematic) noexcept :
-    UndoCommand(tr("Update netlabel anchors")), mSchematic(schematic)
-{
+CmdSchematicNetLabelAnchorsUpdate::CmdSchematicNetLabelAnchorsUpdate(
+    Schematic& schematic) noexcept
+  : UndoCommand(tr("Update netlabel anchors")), mSchematic(schematic) {
 }
 
-CmdSchematicNetLabelAnchorsUpdate::~CmdSchematicNetLabelAnchorsUpdate() noexcept
-{
+CmdSchematicNetLabelAnchorsUpdate::
+    ~CmdSchematicNetLabelAnchorsUpdate() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetLabelAnchorsUpdate::performExecute()
-{
-    performRedo(); // can throw
-    return true;
+bool CmdSchematicNetLabelAnchorsUpdate::performExecute() {
+  performRedo();  // can throw
+  return true;
 }
 
-void CmdSchematicNetLabelAnchorsUpdate::performUndo()
-{
-    mSchematic.updateAllNetLabelAnchors();
+void CmdSchematicNetLabelAnchorsUpdate::performUndo() {
+  mSchematic.updateAllNetLabelAnchors();
 }
 
-void CmdSchematicNetLabelAnchorsUpdate::performRedo()
-{
-    mSchematic.updateAllNetLabelAnchors();
+void CmdSchematicNetLabelAnchorsUpdate::performRedo() {
+  mSchematic.updateAllNetLabelAnchors();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -17,90 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "firstrunwizard.h"
-#include "ui_firstrunwizard.h"
+
 #include "firstrunwizardpage_welcome.h"
 #include "firstrunwizardpage_workspacepath.h"
 #include "firstrunwizardpage_workspacesettings.h"
+#include "ui_firstrunwizard.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-FirstRunWizard::FirstRunWizard(QWidget *parent) noexcept :
-    QWizard(parent), mUi(new Ui::FirstRunWizard)
-{
-    mUi->setupUi(this);
+FirstRunWizard::FirstRunWizard(QWidget *parent) noexcept
+  : QWizard(parent), mUi(new Ui::FirstRunWizard) {
+  mUi->setupUi(this);
 
-    // add pages
-    setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
-    setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
-    setPage(Page_WorkspaceSettings, new FirstRunWizardPage_WorkspaceSettings());
+  // add pages
+  setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
+  setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
+  setPage(Page_WorkspaceSettings, new FirstRunWizardPage_WorkspaceSettings());
 
-    // set header logo
-    setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
+  // set header logo
+  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
 }
 
-FirstRunWizard::~FirstRunWizard() noexcept
-{
+FirstRunWizard::~FirstRunWizard() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool FirstRunWizard::getCreateNewWorkspace() const noexcept
-{
-    return field("CreateWorkspace").toBool();
+bool FirstRunWizard::getCreateNewWorkspace() const noexcept {
+  return field("CreateWorkspace").toBool();
 }
 
-FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept
-{
-    if (getCreateNewWorkspace())
-        return FilePath(field("CreateWorkspacePath").toString());
-    else
-        return FilePath(field("OpenWorkspacePath").toString());
+FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept {
+  if (getCreateNewWorkspace())
+    return FilePath(field("CreateWorkspacePath").toString());
+  else
+    return FilePath(field("OpenWorkspacePath").toString());
 }
 
-QString FirstRunWizard::getNewWorkspaceUserName() const noexcept
-{
-    return field("NewWorkspaceUserName").toString();
+QString FirstRunWizard::getNewWorkspaceUserName() const noexcept {
+  return field("NewWorkspaceUserName").toString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QWizard
- ****************************************************************************************/
+ ******************************************************************************/
 
-int FirstRunWizard::nextId() const
-{
-    switch (currentId()) {
-        case Page_Welcome: {
-            return Page_WorkspacePath;
-        }
-        case Page_WorkspacePath: {
-            return getCreateNewWorkspace() ? Page_WorkspaceSettings : -1;
-        }
-        case Page_WorkspaceSettings: {
-            return -1;
-        }
-        default: {
-            return -1;
-        }
+int FirstRunWizard::nextId() const {
+  switch (currentId()) {
+    case Page_Welcome: {
+      return Page_WorkspacePath;
     }
+    case Page_WorkspacePath: {
+      return getCreateNewWorkspace() ? Page_WorkspaceSettings : -1;
+    }
+    case Page_WorkspaceSettings: {
+      return -1;
+    }
+    default: { return -1; }
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb

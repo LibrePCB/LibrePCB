@@ -20,28 +20,30 @@
 #ifndef LIBREPCB_PROJECT_BI_DEVICE_H
 #define LIBREPCB_PROJECT_BI_DEVICE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
+#include "../../erc/if_ercmsgprovider.h"
+#include "../graphicsitems/bgi_footprint.h"
 #include "bi_base.h"
-#include <librepcb/common/uuid.h>
+
 #include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/attributes/attributeprovider.h>
-#include "../../erc/if_ercmsgprovider.h"
 #include <librepcb/common/fileio/serializableobject.h>
-#include "../graphicsitems/bgi_footprint.h"
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
 class Device;
 class Package;
 class Footprint;
-}
+}  // namespace library
 
 namespace project {
 
@@ -50,112 +52,117 @@ class Board;
 class ComponentInstance;
 class BI_Footprint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_Device
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_Device class
  */
-class BI_Device final : public BI_Base, public AttributeProvider,
-                        public IF_ErcMsgProvider, public SerializableObject
-{
-        Q_OBJECT
-        DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
+class BI_Device final : public BI_Base,
+                        public AttributeProvider,
+                        public IF_ErcMsgProvider,
+                        public SerializableObject {
+  Q_OBJECT
+  DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
 
-    public:
+public:
+  // Constructors / Destructor
+  BI_Device()                       = delete;
+  BI_Device(const BI_Device& other) = delete;
+  BI_Device(Board& board, const BI_Device& other);
+  BI_Device(Board& board, const SExpression& node);
+  BI_Device(Board& board, ComponentInstance& compInstance,
+            const Uuid& deviceUuid, const Uuid& footprintUuid,
+            const Point& position, const Angle& rotation, bool mirror);
+  ~BI_Device() noexcept;
 
-        // Constructors / Destructor
-        BI_Device() = delete;
-        BI_Device(const BI_Device& other) = delete;
-        BI_Device(Board& board, const BI_Device& other);
-        BI_Device(Board& board, const SExpression& node);
-        BI_Device(Board& board, ComponentInstance& compInstance, const Uuid& deviceUuid,
-                  const Uuid& footprintUuid, const Point& position, const Angle& rotation,
-                  bool mirror);
-        ~BI_Device() noexcept;
+  // Getters
+  const Uuid&        getComponentInstanceUuid() const noexcept;
+  ComponentInstance& getComponentInstance() const noexcept {
+    return *mCompInstance;
+  }
+  const library::Device&  getLibDevice() const noexcept { return *mLibDevice; }
+  const library::Package& getLibPackage() const noexcept {
+    return *mLibPackage;
+  }
+  const library::Footprint& getLibFootprint() const noexcept {
+    return *mLibFootprint;
+  }
+  BI_Footprint& getFootprint() const noexcept { return *mFootprint; }
+  const Angle&  getRotation() const noexcept { return mRotation; }
+  bool          isSelectable() const noexcept override;
+  bool          isUsed() const noexcept;
 
-        // Getters
-        const Uuid& getComponentInstanceUuid() const noexcept;
-        ComponentInstance& getComponentInstance() const noexcept {return *mCompInstance;}
-        const library::Device& getLibDevice() const noexcept {return *mLibDevice;}
-        const library::Package& getLibPackage() const noexcept {return *mLibPackage;}
-        const library::Footprint& getLibFootprint() const noexcept {return *mLibFootprint;}
-        BI_Footprint& getFootprint() const noexcept {return *mFootprint;}
-        const Angle& getRotation() const noexcept {return mRotation;}
-        bool isSelectable() const noexcept override;
-        bool isUsed() const noexcept;
+  // Setters
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+  void setIsMirrored(bool mirror);
 
-        // Setters
-        void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setIsMirrored(bool mirror);
+  // General Methods
+  void addToBoard() override;
+  void removeFromBoard() override;
 
-        // General Methods
-        void addToBoard() override;
-        void removeFromBoard() override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from AttributeProvider
+  /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+  QString getUserDefinedAttributeValue(const QString& key) const
+      noexcept override;
+  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  QVector<const AttributeProvider*> getAttributeProviderParents() const
+      noexcept override;
 
-        // Inherited from AttributeProvider
-        /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
-        QString getUserDefinedAttributeValue(const QString& key) const noexcept override;
-        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
-        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
-        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override { return BI_Base::Type_t::Device; }
+  const Point& getPosition() const noexcept override { return mPosition; }
+  bool         getIsMirrored() const noexcept override { return mIsMirrored; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::Device;}
-        const Point& getPosition() const noexcept override {return mPosition;}
-        bool getIsMirrored() const noexcept override {return mIsMirrored;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Operator Overloadings
+  BI_Device& operator=(const BI_Device& rhs) = delete;
 
-        // Operator Overloadings
-        BI_Device& operator=(const BI_Device& rhs) = delete;
+signals:
 
+  /// @copydoc AttributeProvider::attributesChanged()
+  void attributesChanged() override;
 
-    signals:
+  void moved(const Point& newPos);
+  void rotated(const Angle& newRotation);
+  void mirrored(bool newIsMirrored);
 
-        /// @copydoc AttributeProvider::attributesChanged()
-        void attributesChanged() override;
+private:
+  void               initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
+                                                      const Uuid& footprintUuid);
+  void               init();
+  bool               checkAttributesValidity() const noexcept;
+  void               updateErcMessages() noexcept;
+  const QStringList& getLocaleOrder() const noexcept;
 
-        void moved(const Point& newPos);
-        void rotated(const Angle& newRotation);
-        void mirrored(bool newIsMirrored);
+  // General
+  ComponentInstance*           mCompInstance;
+  const library::Device*       mLibDevice;
+  const library::Package*      mLibPackage;
+  const library::Footprint*    mLibFootprint;
+  QScopedPointer<BI_Footprint> mFootprint;
 
-
-    private:
-
-        void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                              const Uuid& footprintUuid);
-        void init();
-        bool checkAttributesValidity() const noexcept;
-        void updateErcMessages() noexcept;
-        const QStringList& getLocaleOrder() const noexcept;
-
-
-        // General
-        ComponentInstance* mCompInstance;
-        const library::Device* mLibDevice;
-        const library::Package* mLibPackage;
-        const library::Footprint* mLibFootprint;
-        QScopedPointer<BI_Footprint> mFootprint;
-
-        // Attributes
-        Point mPosition;
-        Angle mRotation;
-        bool mIsMirrored;
-        AttributeList mAttributes; ///< not yet used, but already specified in file format
+  // Attributes
+  Point mPosition;
+  Angle mRotation;
+  bool  mIsMirrored;
+  AttributeList
+      mAttributes;  ///< not yet used, but already specified in file format
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_DEVICE_H
+#endif  // LIBREPCB_PROJECT_BI_DEVICE_H

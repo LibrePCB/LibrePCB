@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
 #define LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include <librepcb/common/circuitidentifier.h>
+#include <librepcb/common/units/all_length_units.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/circuitidentifier.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
@@ -42,9 +43,9 @@ namespace library {
 
 class SymbolPin;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolPinGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolPinGraphicsItem class
@@ -52,52 +53,49 @@ class SymbolPin;
  * @author ubruhin
  * @date 2016-11-05
  */
-class SymbolPinGraphicsItem final : public QGraphicsItem
-{
-    public:
+class SymbolPinGraphicsItem final : public QGraphicsItem {
+public:
+  // Constructors / Destructor
+  SymbolPinGraphicsItem()                                   = delete;
+  SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
+  SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLayerProvider& lp,
+                        QGraphicsItem* parent = nullptr) noexcept;
+  ~SymbolPinGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        SymbolPinGraphicsItem() = delete;
-        SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
-        SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLayerProvider& lp,
-                              QGraphicsItem* parent = nullptr) noexcept;
-        ~SymbolPinGraphicsItem() noexcept;
+  // Getters
+  SymbolPin& getPin() noexcept { return mPin; }
 
-        // Getters
-        SymbolPin& getPin() noexcept {return mPin;}
+  // Setters
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+  void setLength(const UnsignedLength& length) noexcept;
+  void setName(const CircuitIdentifier& name) noexcept;
+  void setSelected(bool selected) noexcept;
 
-        // Setters
-        void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setLength(const UnsignedLength& length) noexcept;
-        void setName(const CircuitIdentifier& name) noexcept;
-        void setSelected(bool selected) noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return QRectF(); }
+  QPainterPath shape() const noexcept override;
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return QRectF();}
-        QPainterPath shape() const noexcept override;
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+  // Operator Overloadings
+  SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
 
-        // Operator Overloadings
-        SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
+private:  // Methods
+  void updateShape() noexcept;
 
-
-    private: // Methods
-        void updateShape() noexcept;
-
-
-    private: // Data
-        SymbolPin& mPin;
-        QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
-        QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
-        QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+private:  // Data
+  SymbolPin&                                  mPin;
+  QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
+  QScopedPointer<LineGraphicsItem>            mLineGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem>   mTextGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
+#endif  // LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H

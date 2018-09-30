@@ -17,108 +17,112 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "newelementwizardpage_componentsignals.h"
-#include "ui_newelementwizardpage_componentsignals.h"
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/workspace/workspace.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
 
-/*****************************************************************************************
+#include "ui_newelementwizardpage_componentsignals.h"
+
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/workspace/workspace.h>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NewElementWizardPage_ComponentSignals::NewElementWizardPage_ComponentSignals(NewElementWizardContext& context, QWidget *parent) noexcept :
-    QWizardPage(parent), mContext(context), mUi(new Ui::NewElementWizardPage_ComponentSignals)
-{
-    mUi->setupUi(this);
+NewElementWizardPage_ComponentSignals::NewElementWizardPage_ComponentSignals(
+    NewElementWizardContext& context, QWidget* parent) noexcept
+  : QWizardPage(parent),
+    mContext(context),
+    mUi(new Ui::NewElementWizardPage_ComponentSignals) {
+  mUi->setupUi(this);
 }
 
-NewElementWizardPage_ComponentSignals::~NewElementWizardPage_ComponentSignals() noexcept
-{
+NewElementWizardPage_ComponentSignals::
+    ~NewElementWizardPage_ComponentSignals() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewElementWizardPage_ComponentSignals::validatePage() noexcept
-{
-    return true;
+bool NewElementWizardPage_ComponentSignals::validatePage() noexcept {
+  return true;
 }
 
-bool NewElementWizardPage_ComponentSignals::isComplete() const noexcept
-{
-    return true;
+bool NewElementWizardPage_ComponentSignals::isComplete() const noexcept {
+  return true;
 }
 
-int NewElementWizardPage_ComponentSignals::nextId() const noexcept
-{
-    return NewElementWizardContext::ID_ComponentPinSignalMap;
+int NewElementWizardPage_ComponentSignals::nextId() const noexcept {
+  return NewElementWizardContext::ID_ComponentPinSignalMap;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QHash<Uuid, CircuitIdentifier> NewElementWizardPage_ComponentSignals::getPinNames(
-        const Uuid& symbol, const QString& suffix) const noexcept
-{
-    QHash<Uuid, CircuitIdentifier> names;
-    try {
-        FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(symbol); // can throw
-        Symbol sym(fp, true); // can throw
-        for (const SymbolPin& pin : sym.getPins()) {
-            names.insert(pin.getUuid(), CircuitIdentifier(suffix % pin.getName())); // can throw
-        }
-    } catch (const Exception& e) {
-        // TODO: what could we do here?
+QHash<Uuid, CircuitIdentifier>
+NewElementWizardPage_ComponentSignals::getPinNames(const Uuid&    symbol,
+                                                   const QString& suffix) const
+    noexcept {
+  QHash<Uuid, CircuitIdentifier> names;
+  try {
+    FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(
+        symbol);           // can throw
+    Symbol sym(fp, true);  // can throw
+    for (const SymbolPin& pin : sym.getPins()) {
+      names.insert(pin.getUuid(),
+                   CircuitIdentifier(suffix % pin.getName()));  // can throw
     }
-    return names;
+  } catch (const Exception& e) {
+    // TODO: what could we do here?
+  }
+  return names;
 }
 
-void NewElementWizardPage_ComponentSignals::initializePage() noexcept
-{
-    QWizardPage::initializePage();
+void NewElementWizardPage_ComponentSignals::initializePage() noexcept {
+  QWizardPage::initializePage();
 
-    // automatically create signals if no signals exist
-    const ComponentSymbolVariant* variant = mContext.mComponentSymbolVariants.value(0).get();
-    if (variant && mContext.mComponentSignals.count() < 1) {
-        for (const ComponentSymbolVariantItem& item : variant->getSymbolItems()) {
-            QHash<Uuid, CircuitIdentifier> names = getPinNames(item.getSymbolUuid(),
-                                                               *item.getSuffix());
-            for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-                auto i = names.find(map.getPinUuid());
-                if (i != names.end() && (i.key() == map.getPinUuid())) {
-                    mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
-                        Uuid::createRandom(), i.value()));
-                }
-            }
+  // automatically create signals if no signals exist
+  const ComponentSymbolVariant* variant =
+      mContext.mComponentSymbolVariants.value(0).get();
+  if (variant && mContext.mComponentSignals.count() < 1) {
+    for (const ComponentSymbolVariantItem& item : variant->getSymbolItems()) {
+      QHash<Uuid, CircuitIdentifier> names =
+          getPinNames(item.getSymbolUuid(), *item.getSuffix());
+      for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
+        auto i = names.find(map.getPinUuid());
+        if (i != names.end() && (i.key() == map.getPinUuid())) {
+          mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
+              Uuid::createRandom(), i.value()));
         }
+      }
     }
+  }
 
-    mUi->signalListEditorWidget->setReferences(nullptr, &mContext.mComponentSignals);
+  mUi->signalListEditorWidget->setReferences(nullptr,
+                                             &mContext.mComponentSignals);
 }
 
-void NewElementWizardPage_ComponentSignals::cleanupPage() noexcept
-{
-    QWizardPage::cleanupPage();
+void NewElementWizardPage_ComponentSignals::cleanupPage() noexcept {
+  QWizardPage::cleanupPage();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

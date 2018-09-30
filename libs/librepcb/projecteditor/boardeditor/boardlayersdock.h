@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_BOARDLAYERDOCK_H
 #define LIBREPCB_PROJECT_BOARDLAYERDOCK_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -47,66 +47,60 @@ namespace Ui {
 class BoardLayersDock;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardLayersDock
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardLayersDock class
  */
-class BoardLayersDock final : public QDockWidget
-{
-        Q_OBJECT
+class BoardLayersDock final : public QDockWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BoardLayersDock(BoardEditor& editor) noexcept;
+  ~BoardLayersDock() noexcept;
 
-        // Constructors / Destructor
-        explicit BoardLayersDock(BoardEditor& editor) noexcept;
-        ~BoardLayersDock() noexcept;
+  // Setters
+  void setActiveBoard(Board* board);
 
-        // Setters
-        void setActiveBoard(Board* board);
+private slots:
 
+  void on_listWidget_itemChanged(QListWidgetItem* item);
+  void on_btnTop_clicked();
+  void on_btnBottom_clicked();
+  void on_btnTopBottom_clicked();
+  void on_btnAll_clicked();
+  void on_btnNone_clicked();
 
-    private slots:
+private:
+  // make some methods inaccessible...
+  BoardLayersDock();
+  BoardLayersDock(const BoardLayersDock& other);
+  BoardLayersDock& operator=(const BoardLayersDock& rhs);
 
-        void on_listWidget_itemChanged(QListWidgetItem *item);
-        void on_btnTop_clicked();
-        void on_btnBottom_clicked();
-        void on_btnTopBottom_clicked();
-        void on_btnAll_clicked();
-        void on_btnNone_clicked();
+  // Private Methods
+  void           updateListWidget() noexcept;
+  void           setVisibleLayers(const QList<QString>& layers) noexcept;
+  QList<QString> getCommonLayers() const noexcept;
+  QList<QString> getTopLayers() const noexcept;
+  QList<QString> getBottomLayers() const noexcept;
+  QList<QString> getAllLayers() const noexcept;
 
-
-    private:
-
-        // make some methods inaccessible...
-        BoardLayersDock();
-        BoardLayersDock(const BoardLayersDock& other);
-        BoardLayersDock& operator=(const BoardLayersDock& rhs);
-
-        // Private Methods
-        void updateListWidget() noexcept;
-        void setVisibleLayers(const QList<QString>& layers) noexcept;
-        QList<QString> getCommonLayers() const noexcept;
-        QList<QString> getTopLayers() const noexcept;
-        QList<QString> getBottomLayers() const noexcept;
-        QList<QString> getAllLayers() const noexcept;
-
-
-        // General
-        QScopedPointer<Ui::BoardLayersDock> mUi;
-        BoardEditor& mBoardEditor;
-        Board* mActiveBoard;
-        QMetaObject::Connection mActiveBoardConnection;
+  // General
+  QScopedPointer<Ui::BoardLayersDock> mUi;
+  BoardEditor&                        mBoardEditor;
+  Board*                              mActiveBoard;
+  QMetaObject::Connection             mActiveBoardConnection;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDLAYERDOCK_H
+#endif  // LIBREPCB_PROJECT_BOARDLAYERDOCK_H

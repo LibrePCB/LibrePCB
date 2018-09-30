@@ -20,64 +20,60 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDHOLEADD_H
 #define LIBREPCB_PROJECT_CMDBOARDHOLEADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 class BI_Hole;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardHoleAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardHoleAdd class
  */
-class CmdBoardHoleAdd final : public UndoCommand
-{
-    public:
+class CmdBoardHoleAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBoardHoleAdd(BI_Hole& hole) noexcept;
+  ~CmdBoardHoleAdd() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdBoardHoleAdd(BI_Hole& hole) noexcept;
-        ~CmdBoardHoleAdd() noexcept;
+  // Getters
+  BI_Hole* getHole() const noexcept { return mHole; }
 
-        // Getters
-        BI_Hole* getHole() const noexcept {return mHole;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-        Board& mBoard;
-        BI_Hole* mHole;
+  // Private Member Variables
+  Board&   mBoard;
+  BI_Hole* mHole;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDHOLEADD_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDHOLEADD_H

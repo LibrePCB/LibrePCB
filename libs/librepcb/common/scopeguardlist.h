@@ -17,83 +17,77 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LIBREPCB_SCOPEGUARDLIST_H
 #define LIBREPCB_SCOPEGUARDLIST_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
 #include "scopeguard.h"
+
+#include <algorithm>
 #include <functional>
 #include <vector>
-#include <algorithm>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ScopeGuardList
- ****************************************************************************************/
+ ******************************************************************************/
 /**
  * @brief Keeps a list of functions to call.
  *
  * @see ScopeGuard
  */
-class ScopeGuardList final : public ScopeGuardBase
-{
-    public:
-        ScopeGuardList() = default;
+class ScopeGuardList final : public ScopeGuardBase {
+public:
+  ScopeGuardList() = default;
 
-        ScopeGuardList(size_t size) noexcept :
-            ScopeGuardBase(),
-            mScopeGuards()
-        {
-            mScopeGuards.reserve(size);
+  ScopeGuardList(size_t size) noexcept : ScopeGuardBase(), mScopeGuards() {
+    mScopeGuards.reserve(size);
+  }
+
+  ScopeGuardList(ScopeGuardList&& rhs) noexcept
+    : ScopeGuardBase(std::move(rhs)),
+      mScopeGuards(std::move(rhs.mScopeGuards)) {}
+
+  ScopeGuardList(const ScopeGuardList&) = delete;
+  ScopeGuardList& operator=(const ScopeGuardList&) = delete;
+
+  /**
+   * Calls the added functions in reverse order
+   */
+  ~ScopeGuardList() noexcept {
+    if (mActive) {
+      for (auto scopeGuard = mScopeGuards.rbegin();
+           scopeGuard != mScopeGuards.rend(); ++scopeGuard) {
+        // skip empty functions
+        if (!*scopeGuard) continue;
+        try {
+          (*scopeGuard)();
+        } catch (const std::exception& e) {
+          qFatal("Cleanup function threw an exception: %s", e.what());
         }
+      }
+    }
+  }
 
-        ScopeGuardList(ScopeGuardList&& rhs) noexcept :
-            ScopeGuardBase(std::move(rhs)),
-            mScopeGuards(std::move(rhs.mScopeGuards))
-        { }
+  /**
+   * Add a function
+   */
+  template <class Fun>
+  void add(Fun f) {
+    mScopeGuards.emplace_back(std::move(f));
+  }
 
-        ScopeGuardList(const ScopeGuardList&) = delete;
-        ScopeGuardList& operator=(const ScopeGuardList&) = delete;
-
-        /**
-         * Calls the added functions in reverse order
-         */
-        ~ScopeGuardList() noexcept
-        {
-            if (mActive) {
-                for (auto scopeGuard = mScopeGuards.rbegin(); scopeGuard != mScopeGuards.rend(); ++scopeGuard) {
-                    // skip empty functions
-                    if (! *scopeGuard) continue;
-                    try { (*scopeGuard)(); } catch(const std::exception& e) {
-                        qFatal("Cleanup function threw an exception: %s", e.what());
-                    }
-                }
-            }
-        }
-
-        /**
-         * Add a function
-         */
-        template<class Fun>
-        void add(Fun f)
-        {
-            mScopeGuards.emplace_back(std::move(f));
-        }
-
-
-    private:
-
-        std::vector<std::function<void()>> mScopeGuards;
+private:
+  std::vector<std::function<void()>> mScopeGuards;
 };
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SCOPEGUARDLIST_H
+#endif  // LIBREPCB_SCOPEGUARDLIST_H

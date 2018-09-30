@@ -17,86 +17,85 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "graphicslayercombobox.h"
+
 #include "../graphics/graphicslayer.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept :
-    QWidget(parent), mComboBox(new QComboBox(this))
-{
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox);
+GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept
+  : QWidget(parent), mComboBox(new QComboBox(this)) {
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mComboBox);
 
-    mComboBox->setEditable(false);
+  mComboBox->setEditable(false);
 
-    connect(mComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &GraphicsLayerComboBox::currentIndexChanged);
+  connect(
+      mComboBox,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &GraphicsLayerComboBox::currentIndexChanged);
 }
 
-GraphicsLayerComboBox::~GraphicsLayerComboBox() noexcept
-{
+GraphicsLayerComboBox::~GraphicsLayerComboBox() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString GraphicsLayerComboBox::getCurrentLayerName() const noexcept
-{
-    return mComboBox->currentData(Qt::UserRole).toString();
+QString GraphicsLayerComboBox::getCurrentLayerName() const noexcept {
+  return mComboBox->currentData(Qt::UserRole).toString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void GraphicsLayerComboBox::setLayers(const QList<GraphicsLayer*>& layers) noexcept
-{
-    blockSignals(true);
-    QString selected = getCurrentLayerName();
-    mComboBox->clear();
-    foreach (const GraphicsLayer* layer, layers) {
-        mComboBox->addItem(layer->getNameTr(), layer->getName());
-    }
-    setCurrentLayer(selected);
-    blockSignals(false);
+void GraphicsLayerComboBox::setLayers(
+    const QList<GraphicsLayer*>& layers) noexcept {
+  blockSignals(true);
+  QString selected = getCurrentLayerName();
+  mComboBox->clear();
+  foreach (const GraphicsLayer* layer, layers) {
+    mComboBox->addItem(layer->getNameTr(), layer->getName());
+  }
+  setCurrentLayer(selected);
+  blockSignals(false);
 
-    if (getCurrentLayerName() != selected) {
-        emit currentLayerChanged(getCurrentLayerName());
-    }
-}
-
-void GraphicsLayerComboBox::setCurrentLayer(const QString& name) noexcept
-{
-    mComboBox->setCurrentIndex(mComboBox->findData(name, Qt::UserRole));
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void GraphicsLayerComboBox::currentIndexChanged(int index) noexcept
-{
-    Q_UNUSED(index);
+  if (getCurrentLayerName() != selected) {
     emit currentLayerChanged(getCurrentLayerName());
+  }
 }
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+void GraphicsLayerComboBox::setCurrentLayer(const QString& name) noexcept {
+  mComboBox->setCurrentIndex(mComboBox->findData(name, Qt::UserRole));
+}
 
-} // namespace librepcb
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void GraphicsLayerComboBox::currentIndexChanged(int index) noexcept {
+  Q_UNUSED(index);
+  emit currentLayerChanged(getCurrentLayerName());
+}
+
+/*******************************************************************************
+ *  End of File
+ ******************************************************************************/
+
+}  // namespace librepcb

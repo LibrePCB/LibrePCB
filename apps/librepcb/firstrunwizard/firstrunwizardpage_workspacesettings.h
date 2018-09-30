@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
 #define LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
@@ -36,40 +36,36 @@ namespace Ui {
 class FirstRunWizardPage_WorkspaceSettings;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FirstRunWizardPage_WorkspaceSettings
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FirstRunWizardPage_WorkspaceSettings class
  */
-class FirstRunWizardPage_WorkspaceSettings final : public QWizardPage
-{
-        Q_OBJECT
+class FirstRunWizardPage_WorkspaceSettings final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit FirstRunWizardPage_WorkspaceSettings(QWidget *parent = 0) noexcept;
+  ~FirstRunWizardPage_WorkspaceSettings() noexcept;
 
-        // Constructors / Destructor
-        explicit FirstRunWizardPage_WorkspaceSettings(QWidget *parent = 0) noexcept;
-        ~FirstRunWizardPage_WorkspaceSettings() noexcept;
+  // Inherited Methods
+  bool validatePage() noexcept override;
 
-        // Inherited Methods
-        bool validatePage() noexcept override;
+private:  // Methods
+  Q_DISABLE_COPY(FirstRunWizardPage_WorkspaceSettings)
 
-
-    private: // Methods
-        Q_DISABLE_COPY(FirstRunWizardPage_WorkspaceSettings)
-
-
-    private: // Data
-        QScopedPointer<Ui::FirstRunWizardPage_WorkspaceSettings> mUi;
+private:  // Data
+  QScopedPointer<Ui::FirstRunWizardPage_WorkspaceSettings> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
+#endif  // LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H

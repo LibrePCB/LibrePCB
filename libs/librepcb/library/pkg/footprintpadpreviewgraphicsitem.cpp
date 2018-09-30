@@ -17,100 +17,105 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <QPrinter>
+ ******************************************************************************/
 #include "footprintpadpreviewgraphicsitem.h"
-#include "packagepad.h"
+
 #include "footprintpad.h"
+#include "packagepad.h"
+
 #include <librepcb/common/application.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 
-/*****************************************************************************************
+#include <QPrinter>
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
-        const PackagePad* pkgPad) noexcept :
-    QGraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad), mDrawBoundingRect(false)
-{
-    mFont = qApp->getDefaultSansSerifFont();
-    mFont.setPixelSize(2);
+FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(
+    const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
+    const PackagePad* pkgPad) noexcept
+  : QGraphicsItem(),
+    mFootprintPad(fptPad),
+    mPackagePad(pkgPad),
+    mDrawBoundingRect(false) {
+  mFont = qApp->getDefaultSansSerifFont();
+  mFont.setPixelSize(2);
 
-    if (mPackagePad)
-        setToolTip(*mPackagePad->getName());
+  if (mPackagePad) setToolTip(*mPackagePad->getName());
 
-    mLayer = layerProvider.getLayer(mFootprintPad.getLayerName());
-    Q_ASSERT(mLayer);
+  mLayer = layerProvider.getLayer(mFootprintPad.getLayerName());
+  Q_ASSERT(mLayer);
 
-    updateCacheAndRepaint();
+  updateCacheAndRepaint();
 }
 
-FootprintPadPreviewGraphicsItem::~FootprintPadPreviewGraphicsItem() noexcept
-{
+FootprintPadPreviewGraphicsItem::~FootprintPadPreviewGraphicsItem() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void FootprintPadPreviewGraphicsItem::updateCacheAndRepaint() noexcept
-{
-    mShape = mFootprintPad.toQPainterPathPx();
-    mBoundingRect = mShape.boundingRect();
+void FootprintPadPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
+  mShape        = mFootprintPad.toQPainterPathPx();
+  mBoundingRect = mShape.boundingRect();
 
-    update();
+  update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-void FootprintPadPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
-{
-    Q_UNUSED(widget);
-    const bool selected = option->state.testFlag(QStyle::State_Selected);
-    const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
+void FootprintPadPreviewGraphicsItem::paint(
+    QPainter* painter, const QStyleOptionGraphicsItem* option,
+    QWidget* widget) noexcept {
+  Q_UNUSED(widget);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const bool deviceIsPrinter =
+      (dynamic_cast<QPrinter*>(painter->device()) != 0);
+  const qreal lod =
+      option->levelOfDetailFromTransform(painter->worldTransform());
 
-    // draw shape
-    QBrush brush(mLayer->getColor(selected), Qt::SolidPattern);
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(brush);
-    painter->drawPath(mShape);
+  // draw shape
+  QBrush brush(mLayer->getColor(selected), Qt::SolidPattern);
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(brush);
+  painter->drawPath(mShape);
 
-    // draw text
-    if (mPackagePad && (!deviceIsPrinter) && (lod > 3)) {
-        QColor color = mLayer->getColor(selected).lighter(150);
-        color.setAlpha(255);
-        painter->setPen(color);
-        painter->setFont(mFont);
-        painter->drawText(mBoundingRect, Qt::AlignCenter, *mPackagePad->getName());
-    }
+  // draw text
+  if (mPackagePad && (!deviceIsPrinter) && (lod > 3)) {
+    QColor color = mLayer->getColor(selected).lighter(150);
+    color.setAlpha(255);
+    painter->setPen(color);
+    painter->setFont(mFont);
+    painter->drawText(mBoundingRect, Qt::AlignCenter, *mPackagePad->getName());
+  }
 
 #ifdef QT_DEBUG
-    if (mDrawBoundingRect)
-    {
-        // draw bounding rect
-        painter->setPen(QPen(Qt::red, 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(mBoundingRect);
-    }
+  if (mDrawBoundingRect) {
+    // draw bounding rect
+    painter->setPen(QPen(Qt::red, 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(mBoundingRect);
+  }
 #endif
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

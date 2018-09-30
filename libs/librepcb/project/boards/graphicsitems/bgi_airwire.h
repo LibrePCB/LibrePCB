@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BGI_AIRWIRE_H
 #define LIBREPCB_PROJECT_BGI_AIRWIRE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "bgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -38,58 +39,55 @@ namespace project {
 
 class BI_AirWire;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_AirWire
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BGI_AirWire class
  */
-class BGI_AirWire final : public BGI_Base
-{
-    public:
+class BGI_AirWire final : public BGI_Base {
+public:
+  // Constructors / Destructor
+  explicit BGI_AirWire(BI_AirWire& airwire) noexcept;
+  ~BGI_AirWire() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_AirWire(BI_AirWire& airwire) noexcept;
-        ~BGI_AirWire() noexcept;
+  // Getters
+  bool isSelectable() const noexcept;
 
-        // Getters
-        bool isSelectable() const noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const { return mBoundingRect; }
+  QPainterPath shape() const { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return mBoundingRect;}
-        QPainterPath shape() const {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  BGI_AirWire()                         = delete;
+  BGI_AirWire(const BGI_AirWire& other) = delete;
+  BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // Attributes
+  BI_AirWire&    mAirWire;
+  GraphicsLayer* mLayer;
 
-        // make some methods inaccessible...
-        BGI_AirWire() = delete;
-        BGI_AirWire(const BGI_AirWire& other) = delete;
-        BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
-
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-        // Attributes
-        BI_AirWire& mAirWire;
-        GraphicsLayer* mLayer;
-
-        // Cached Attributes
-        QVector<QLineF> mLines;
-        QRectF mBoundingRect;
-        QPainterPath mShape;
+  // Cached Attributes
+  QVector<QLineF> mLines;
+  QRectF          mBoundingRect;
+  QPainterPath    mShape;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_AIRWIRE_H
+#endif  // LIBREPCB_PROJECT_BGI_AIRWIRE_H

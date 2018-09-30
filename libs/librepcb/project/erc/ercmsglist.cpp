@@ -17,135 +17,131 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "ercmsglist.h"
+
+#include "../project.h"
 #include "ercmsg.h"
 #include "if_ercmsgprovider.h"
-#include "../project.h"
-#include <librepcb/common/fileio/smartsexprfile.h>
-#include <librepcb/common/fileio/sexpression.h>
 
-/*****************************************************************************************
+#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/fileio/smartsexprfile.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly, bool create) :
-    QObject(&project), mProject(project),
-    mFilepath(project.getPath().getPathTo("circuit/erc.lp")), mFile(nullptr)
-{
-    // try to create/open the file "erc.lp"
-    if (create) {
-        mFile.reset(SmartSExprFile::create(mFilepath));
-    } else {
-        mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
-    }
+ErcMsgList::ErcMsgList(Project& project, bool restore, bool readOnly,
+                       bool create)
+  : QObject(&project),
+    mProject(project),
+    mFilepath(project.getPath().getPathTo("circuit/erc.lp")),
+    mFile(nullptr) {
+  // try to create/open the file "erc.lp"
+  if (create) {
+    mFile.reset(SmartSExprFile::create(mFilepath));
+  } else {
+    mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
+  }
 }
 
-ErcMsgList::~ErcMsgList() noexcept
-{
-    Q_ASSERT(mItems.isEmpty());
+ErcMsgList::~ErcMsgList() noexcept {
+  Q_ASSERT(mItems.isEmpty());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void ErcMsgList::add(ErcMsg* ercMsg) noexcept
-{
-    Q_ASSERT(ercMsg);
-    Q_ASSERT(!mItems.contains(ercMsg));
-    Q_ASSERT(!ercMsg->isIgnored());
-    mItems.append(ercMsg);
-    emit ercMsgAdded(ercMsg);
+void ErcMsgList::add(ErcMsg* ercMsg) noexcept {
+  Q_ASSERT(ercMsg);
+  Q_ASSERT(!mItems.contains(ercMsg));
+  Q_ASSERT(!ercMsg->isIgnored());
+  mItems.append(ercMsg);
+  emit ercMsgAdded(ercMsg);
 }
 
-void ErcMsgList::remove(ErcMsg* ercMsg) noexcept
-{
-    Q_ASSERT(ercMsg);
-    Q_ASSERT(mItems.contains(ercMsg));
-    Q_ASSERT(!ercMsg->isIgnored());
-    mItems.removeOne(ercMsg);
-    emit ercMsgRemoved(ercMsg);
+void ErcMsgList::remove(ErcMsg* ercMsg) noexcept {
+  Q_ASSERT(ercMsg);
+  Q_ASSERT(mItems.contains(ercMsg));
+  Q_ASSERT(!ercMsg->isIgnored());
+  mItems.removeOne(ercMsg);
+  emit ercMsgRemoved(ercMsg);
 }
 
-void ErcMsgList::update(ErcMsg* ercMsg) noexcept
-{
-    Q_ASSERT(ercMsg);
-    Q_ASSERT(mItems.contains(ercMsg));
-    Q_ASSERT(ercMsg->isVisible());
-    emit ercMsgChanged(ercMsg);
+void ErcMsgList::update(ErcMsg* ercMsg) noexcept {
+  Q_ASSERT(ercMsg);
+  Q_ASSERT(mItems.contains(ercMsg));
+  Q_ASSERT(ercMsg->isVisible());
+  emit ercMsgChanged(ercMsg);
 }
 
-void ErcMsgList::restoreIgnoreState()
-{
-    if (mFile->isCreated()) return; // the file does not yet exist
+void ErcMsgList::restoreIgnoreState() {
+  if (mFile->isCreated()) return;  // the file does not yet exist
 
-    SExpression root = mFile->parseFileAndBuildDomTree();
+  SExpression root = mFile->parseFileAndBuildDomTree();
 
-    // reset all ignore attributes
-    foreach (ErcMsg* ercMsg, mItems)
-        ercMsg->setIgnored(false);
+  // reset all ignore attributes
+  foreach (ErcMsg* ercMsg, mItems)
+    ercMsg->setIgnored(false);
 
-    // scan approved items and set ignore attributes
-    foreach (const SExpression& node, root.getChildren("approved")) {
-        foreach (ErcMsg* ercMsg, mItems) {
-            if ((ercMsg->getOwner().getErcMsgOwnerClassName() == node.getValueByPath<QString>("class"))
-             && (ercMsg->getOwnerKey() == node.getValueByPath<QString>("instance"))
-             && (ercMsg->getMsgKey() == node.getValueByPath<QString>("message")))
-            {
-                ercMsg->setIgnored(true);
-            }
-        }
-    }
-}
-
-bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept
-{
-    bool success = true;
-
-    // Save "circuit/erc.lp"
-    try
-    {
-        SExpression doc(serializeToDomElement("librepcb_erc"));
-        mFile->save(doc, toOriginal);
-    }
-    catch (Exception& e)
-    {
-        success = false;
-        errors.append(e.getMsg());
-    }
-
-    return success;
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void ErcMsgList::serialize(SExpression& root) const
-{
+  // scan approved items and set ignore attributes
+  foreach (const SExpression& node, root.getChildren("approved")) {
     foreach (ErcMsg* ercMsg, mItems) {
-        if (ercMsg->isIgnored()) {
-            SExpression& itemNode = root.appendList("approved", true);
-            itemNode.appendChild<QString>("class", ercMsg->getOwner().getErcMsgOwnerClassName(), true);
-            itemNode.appendChild("instance", ercMsg->getOwnerKey(), true);
-            itemNode.appendChild("message", ercMsg->getMsgKey(), true);
-        }
+      if ((ercMsg->getOwner().getErcMsgOwnerClassName() ==
+           node.getValueByPath<QString>("class")) &&
+          (ercMsg->getOwnerKey() == node.getValueByPath<QString>("instance")) &&
+          (ercMsg->getMsgKey() == node.getValueByPath<QString>("message"))) {
+        ercMsg->setIgnored(true);
+      }
     }
+  }
 }
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+bool ErcMsgList::save(bool toOriginal, QStringList& errors) noexcept {
+  bool success = true;
 
-} // namespace project
-} // namespace librepcb
+  // Save "circuit/erc.lp"
+  try {
+    SExpression doc(serializeToDomElement("librepcb_erc"));
+    mFile->save(doc, toOriginal);
+  } catch (Exception& e) {
+    success = false;
+    errors.append(e.getMsg());
+  }
+
+  return success;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void ErcMsgList::serialize(SExpression& root) const {
+  foreach (ErcMsg* ercMsg, mItems) {
+    if (ercMsg->isIgnored()) {
+      SExpression& itemNode = root.appendList("approved", true);
+      itemNode.appendChild<QString>(
+          "class", ercMsg->getOwner().getErcMsgOwnerClassName(), true);
+      itemNode.appendChild("instance", ercMsg->getOwnerKey(), true);
+      itemNode.appendChild("message", ercMsg->getMsgKey(), true);
+    }
+  }
+}
+
+/*******************************************************************************
+ *  End of File
+ ******************************************************************************/
+
+}  // namespace project
+}  // namespace librepcb

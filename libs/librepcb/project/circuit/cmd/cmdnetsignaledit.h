@@ -20,73 +20,69 @@
 #ifndef LIBREPCB_PROJECT_CMDNETSIGNALEDIT_H
 #define LIBREPCB_PROJECT_CMDNETSIGNALEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
+#include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Circuit;
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdNetSignalSetName
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdNetSignalSetName class
  */
-class CmdNetSignalEdit final : public UndoCommand
-{
-    public:
+class CmdNetSignalEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal) noexcept;
+  ~CmdNetSignalEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal) noexcept;
-        ~CmdNetSignalEdit() noexcept;
+  // Setters
+  void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;
 
-        // Setters
-        void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Circuit&   mCircuit;
+  NetSignal& mNetSignal;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Circuit& mCircuit;
-        NetSignal& mNetSignal;
-
-        // General Attributes
-        CircuitIdentifier mOldName;
-        CircuitIdentifier mNewName;
-        bool mOldIsAutoName;
-        bool mNewIsAutoName;
+  // General Attributes
+  CircuitIdentifier mOldName;
+  CircuitIdentifier mNewName;
+  bool              mOldIsAutoName;
+  bool              mNewIsAutoName;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDNETSIGNALEDIT_H
+#endif  // LIBREPCB_PROJECT_CMDNETSIGNALEDIT_H

@@ -20,20 +20,20 @@
 #ifndef LIBREPCB_CENTEREDCHECKBOX_H
 #define LIBREPCB_CENTEREDCHECKBOX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CenteredCheckBox
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CenteredCheckBox class is a centered variant of the QCheckBox
@@ -41,41 +41,38 @@ namespace librepcb {
  * @author ubruhin
  * @date 2017-03-13
  */
-class CenteredCheckBox final : public QWidget
-{
-        Q_OBJECT
+class CenteredCheckBox final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit CenteredCheckBox(QWidget* parent = nullptr) noexcept;
-        explicit CenteredCheckBox(const QString& text, QWidget* parent = nullptr) noexcept;
-        CenteredCheckBox(const CenteredCheckBox& other) = delete;
-        ~CenteredCheckBox() noexcept;
+public:
+  // Constructors / Destructor
+  explicit CenteredCheckBox(QWidget* parent = nullptr) noexcept;
+  explicit CenteredCheckBox(const QString& text,
+                            QWidget*       parent = nullptr) noexcept;
+  CenteredCheckBox(const CenteredCheckBox& other) = delete;
+  ~CenteredCheckBox() noexcept;
 
-        // Wrapper Methods
-        void setText(const QString& text) noexcept {mCheckBox->setText(text);}
-        bool isChecked() const noexcept {return mCheckBox->isChecked();}
-        void setChecked(bool checked) noexcept {mCheckBox->setChecked(checked);}
+  // Wrapper Methods
+  void setText(const QString& text) noexcept { mCheckBox->setText(text); }
+  bool isChecked() const noexcept { return mCheckBox->isChecked(); }
+  void setChecked(bool checked) noexcept { mCheckBox->setChecked(checked); }
 
+  // Operator Overloadings
+  CenteredCheckBox& operator=(const CenteredCheckBox& rhs) = delete;
 
-        // Operator Overloadings
-        CenteredCheckBox& operator=(const CenteredCheckBox& rhs) = delete;
+signals:
+  void toggled(bool checked);
+  void clicked(bool checked);
+  void stateChanged(int state);
 
-
-    signals:
-        void toggled(bool checked);
-        void clicked(bool checked);
-        void stateChanged(int state);
-
-
-    private: // Data
-        QCheckBox* mCheckBox; // ownership by Qt's parent-child-mechanism
+private:                 // Data
+  QCheckBox* mCheckBox;  // ownership by Qt's parent-child-mechanism
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CENTEREDCHECKBOX_H
+#endif  // LIBREPCB_CENTEREDCHECKBOX_H

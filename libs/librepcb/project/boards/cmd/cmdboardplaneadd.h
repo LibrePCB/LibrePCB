@@ -20,61 +20,57 @@
 #ifndef LIBREPCB_PROJECT_CMDBOARDPLANEADD_H
 #define LIBREPCB_PROJECT_CMDBOARDPLANEADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Board;
 class BI_Plane;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdBoardPlaneAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdBoardPlaneAdd class
  */
-class CmdBoardPlaneAdd final : public UndoCommand
-{
-    public:
+class CmdBoardPlaneAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdBoardPlaneAdd()                              = delete;
+  CmdBoardPlaneAdd(const CmdBoardPlaneAdd& other) = delete;
+  explicit CmdBoardPlaneAdd(BI_Plane& plane) noexcept;
+  ~CmdBoardPlaneAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdBoardPlaneAdd() = delete;
-        CmdBoardPlaneAdd(const CmdBoardPlaneAdd& other) = delete;
-        explicit CmdBoardPlaneAdd(BI_Plane& plane) noexcept;
-        ~CmdBoardPlaneAdd() noexcept;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        Board& mBoard;
-        BI_Plane& mPlane;
+private:  // Data
+  Board&    mBoard;
+  BI_Plane& mPlane;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDBOARDPLANEADD_H
+#endif  // LIBREPCB_PROJECT_CMDBOARDPLANEADD_H

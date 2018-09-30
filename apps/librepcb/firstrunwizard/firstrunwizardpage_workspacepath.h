@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
 #define LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
@@ -36,9 +36,9 @@ namespace Ui {
 class FirstRunWizardPage_WorkspacePath;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FirstRunWizardPage_WorkspacePath
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FirstRunWizardPage_WorkspacePath class
@@ -46,43 +46,38 @@ class FirstRunWizardPage_WorkspacePath;
  * @author ubruhin
  * @date 2015-09-22
  */
-class FirstRunWizardPage_WorkspacePath final : public QWizardPage
-{
-        Q_OBJECT
+class FirstRunWizardPage_WorkspacePath final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit FirstRunWizardPage_WorkspacePath(QWidget *parent = 0) noexcept;
+  ~FirstRunWizardPage_WorkspacePath() noexcept;
 
-        // Constructors / Destructor
-        explicit FirstRunWizardPage_WorkspacePath(QWidget *parent = 0) noexcept;
-        ~FirstRunWizardPage_WorkspacePath() noexcept;
+  // Inherited Methods
+  bool validatePage() noexcept override;
 
-        // Inherited Methods
-        bool validatePage() noexcept override;
+private slots:
 
+  // Event Handlers
+  void on_rbtnCreateWs_toggled(bool checked);
+  void on_rbtnOpenWs_toggled(bool checked);
+  void on_btnCreateWsBrowse_clicked();
+  void on_btnOpenWsBrowse_clicked();
 
-    private slots:
+private:
+  // Private Methods
+  Q_DISABLE_COPY(FirstRunWizardPage_WorkspacePath)
 
-        // Event Handlers
-        void on_rbtnCreateWs_toggled(bool checked);
-        void on_rbtnOpenWs_toggled(bool checked);
-        void on_btnCreateWsBrowse_clicked();
-        void on_btnOpenWsBrowse_clicked();
-
-
-    private:
-
-        // Private Methods
-        Q_DISABLE_COPY(FirstRunWizardPage_WorkspacePath)
-
-        // Private Membervariables
-        QScopedPointer<Ui::FirstRunWizardPage_WorkspacePath> mUi;
+  // Private Membervariables
+  QScopedPointer<Ui::FirstRunWizardPage_WorkspacePath> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+#endif  // LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H

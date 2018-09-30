@@ -20,18 +20,20 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
+ ******************************************************************************/
 #include "../common/editorwidgetbase.h"
 
-/*****************************************************************************************
+#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
@@ -43,9 +45,9 @@ namespace Ui {
 class ComponentCategoryEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentCategoryEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ComponentCategoryEditorWidget class
@@ -53,47 +55,43 @@ class ComponentCategoryEditorWidget;
  * @author ubruhin
  * @date 2016-10-16
  */
-class ComponentCategoryEditorWidget final : public EditorWidgetBase
-{
-        Q_OBJECT
+class ComponentCategoryEditorWidget final : public EditorWidgetBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ComponentCategoryEditorWidget() = delete;
+  ComponentCategoryEditorWidget(const ComponentCategoryEditorWidget& other) =
+      delete;
+  ComponentCategoryEditorWidget(const Context& context, const FilePath& fp,
+                                QWidget* parent = nullptr);
+  ~ComponentCategoryEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        ComponentCategoryEditorWidget() = delete;
-        ComponentCategoryEditorWidget(const ComponentCategoryEditorWidget& other) = delete;
-        ComponentCategoryEditorWidget(const Context& context, const FilePath& fp,
-                                      QWidget* parent = nullptr);
-        ~ComponentCategoryEditorWidget() noexcept;
+  // Operator Overloadings
+  ComponentCategoryEditorWidget& operator       =(
+      const ComponentCategoryEditorWidget& rhs) = delete;
 
-        // Operator Overloadings
-        ComponentCategoryEditorWidget& operator=(const ComponentCategoryEditorWidget& rhs) = delete;
+public slots:
 
+  bool save() noexcept override;
 
-    public slots:
+private:  // Methods
+  bool isInterfaceBroken() const noexcept override { return false; }
+  void btnChooseParentCategoryClicked() noexcept;
+  void edtnameTextChanged(const QString& text) noexcept;
+  void edtParentTextChanged(const QString& text) noexcept;
 
-        bool save() noexcept override;
-
-
-    private: // Methods
-        bool isInterfaceBroken() const noexcept override {return false;}
-        void btnChooseParentCategoryClicked() noexcept;
-        void edtnameTextChanged(const QString& text) noexcept;
-        void edtParentTextChanged(const QString& text) noexcept;
-
-
-    private: // Data
-
-        QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
-        QScopedPointer<ComponentCategory> mCategory;
+private:  // Data
+  QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
+  QScopedPointer<ComponentCategory>                 mCategory;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H

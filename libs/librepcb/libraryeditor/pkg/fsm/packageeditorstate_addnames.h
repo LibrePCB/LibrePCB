@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDNAMES_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDNAMES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packageeditorstate_drawtextbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorState_AddNames
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorState_AddNames class
@@ -44,28 +45,29 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-29
  */
-class PackageEditorState_AddNames final : public PackageEditorState_DrawTextBase
-{
-        Q_OBJECT
+class PackageEditorState_AddNames final
+  : public PackageEditorState_DrawTextBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorState_AddNames() = delete;
+  PackageEditorState_AddNames(const PackageEditorState_AddNames& other) =
+      delete;
+  explicit PackageEditorState_AddNames(Context& context) noexcept;
+  ~PackageEditorState_AddNames() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorState_AddNames() = delete;
-        PackageEditorState_AddNames(const PackageEditorState_AddNames& other) = delete;
-        explicit PackageEditorState_AddNames(Context& context) noexcept;
-        ~PackageEditorState_AddNames() noexcept;
-
-        // Operator Overloadings
-        PackageEditorState_AddNames& operator=(const PackageEditorState_AddNames& rhs) = delete;
+  // Operator Overloadings
+  PackageEditorState_AddNames& operator       =(
+      const PackageEditorState_AddNames& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDNAMES_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDNAMES_H

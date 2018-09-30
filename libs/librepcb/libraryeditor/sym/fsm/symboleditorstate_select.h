@@ -20,25 +20,26 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "symboleditorstate.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
 class CmdMoveSelectedSymbolItems;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState_Select
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorState_Select class
@@ -46,53 +47,55 @@ class CmdMoveSelectedSymbolItems;
  * @author  ubruhin
  * @date    2016-11-02
  */
-class SymbolEditorState_Select final : public SymbolEditorState
-{
-        Q_OBJECT
+class SymbolEditorState_Select final : public SymbolEditorState {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolEditorState_Select()                                      = delete;
+  SymbolEditorState_Select(const SymbolEditorState_Select& other) = delete;
+  explicit SymbolEditorState_Select(const Context& context) noexcept;
+  ~SymbolEditorState_Select() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState_Select() = delete;
-        SymbolEditorState_Select(const SymbolEditorState_Select& other) = delete;
-        explicit SymbolEditorState_Select(const Context& context) noexcept;
-        ~SymbolEditorState_Select() noexcept;
+  // Event Handlers
+  bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processRotateCw() noexcept override;
+  bool processRotateCcw() noexcept override;
+  bool processRemove() noexcept override;
 
-        // Event Handlers
-        bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneLeftMouseButtonDoubleClicked(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processGraphicsSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept override;
-        bool processRotateCw() noexcept override;
-        bool processRotateCcw() noexcept override;
-        bool processRemove() noexcept override;
+  // Operator Overloadings
+  SymbolEditorState_Select& operator=(const SymbolEditorState_Select& rhs) =
+      delete;
 
-        // Operator Overloadings
-        SymbolEditorState_Select& operator=(const SymbolEditorState_Select& rhs) = delete;
+private:  // Methods
+  bool openContextMenuAtPos(const Point& pos) noexcept;
+  bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
+  bool rotateSelectedItems(const Angle& angle) noexcept;
+  bool removeSelectedItems() noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2) noexcept;
+  void clearSelectionRect(bool updateItemsSelectionState) noexcept;
 
-
-    private: // Methods
-        bool openContextMenuAtPos(const Point& pos) noexcept;
-        bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
-        bool rotateSelectedItems(const Angle& angle) noexcept;
-        bool removeSelectedItems() noexcept;
-        void setSelectionRect(const Point& p1, const Point& p2) noexcept;
-        void clearSelectionRect(bool updateItemsSelectionState) noexcept;
-
-
-    private: // Types / Data
-        enum class SubState {IDLE, SELECTING, MOVING};
-        SubState mState;
-        QScopedPointer<CmdMoveSelectedSymbolItems> mCmdMoveSelectedItems;
+private:  // Types / Data
+  enum class SubState { IDLE, SELECTING, MOVING };
+  SubState                                   mState;
+  QScopedPointer<CmdMoveSelectedSymbolItems> mCmdMoveSelectedItems;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H

@@ -20,53 +20,49 @@
 #ifndef LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
 #define LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class BI_Footprint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdFootprintStrokeTextsReset
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdFootprintStrokeTextsReset class
  */
-class CmdFootprintStrokeTextsReset final : public UndoCommandGroup
-{
-    public:
+class CmdFootprintStrokeTextsReset final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdFootprintStrokeTextsReset(BI_Footprint& footprint) noexcept;
+  ~CmdFootprintStrokeTextsReset() noexcept;
 
-        // Constructors / Destructor
-        CmdFootprintStrokeTextsReset(BI_Footprint& footprint) noexcept;
-        ~CmdFootprintStrokeTextsReset() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-        BI_Footprint& mFootprint;
+  // Private Member Variables
+  BI_Footprint& mFootprint;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
+#endif  // LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H

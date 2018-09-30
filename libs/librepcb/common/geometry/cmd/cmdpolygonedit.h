@@ -20,85 +20,82 @@
 #ifndef LIBREPCB_CMDPOLYGONEDIT_H
 #define LIBREPCB_CMDPOLYGONEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "../polygon.h"
+ ******************************************************************************/
 #include "../../undocommand.h"
+#include "../polygon.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdPolygonEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdPolygonEdit class
  */
-class CmdPolygonEdit final : public UndoCommand
-{
-    public:
+class CmdPolygonEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdPolygonEdit()                            = delete;
+  CmdPolygonEdit(const CmdPolygonEdit& other) = delete;
+  explicit CmdPolygonEdit(Polygon& polygon) noexcept;
+  ~CmdPolygonEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdPolygonEdit() = delete;
-        CmdPolygonEdit(const CmdPolygonEdit& other) = delete;
-        explicit CmdPolygonEdit(Polygon& polygon) noexcept;
-        ~CmdPolygonEdit() noexcept;
+  // Setters
+  void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+  void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
+  void setIsFilled(bool filled, bool immediate) noexcept;
+  void setIsGrabArea(bool grabArea, bool immediate) noexcept;
+  void setPath(const Path& path, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirror(const Point& center, Qt::Orientation orientation,
+              bool immediate) noexcept;
 
-        // Setters
-        void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
-        void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
-        void setIsFilled(bool filled, bool immediate) noexcept;
-        void setIsGrabArea(bool grabArea, bool immediate) noexcept;
-        void setPath(const Path& path, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept;
+  // Operator Overloadings
+  CmdPolygonEdit& operator=(const CmdPolygonEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdPolygonEdit& operator=(const CmdPolygonEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Polygon& mPolygon;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Polygon& mPolygon;
-
-        // General Attributes
-        GraphicsLayerName mOldLayerName;
-        GraphicsLayerName mNewLayerName;
-        UnsignedLength mOldLineWidth;
-        UnsignedLength mNewLineWidth;
-        bool mOldIsFilled;
-        bool mNewIsFilled;
-        bool mOldIsGrabArea;
-        bool mNewIsGrabArea;
-        Path mOldPath;
-        Path mNewPath;
+  // General Attributes
+  GraphicsLayerName mOldLayerName;
+  GraphicsLayerName mNewLayerName;
+  UnsignedLength    mOldLineWidth;
+  UnsignedLength    mNewLineWidth;
+  bool              mOldIsFilled;
+  bool              mNewIsFilled;
+  bool              mOldIsGrabArea;
+  bool              mNewIsGrabArea;
+  Path              mOldPath;
+  Path              mNewPath;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDPOLYGONEDIT_H
+#endif  // LIBREPCB_CMDPOLYGONEDIT_H

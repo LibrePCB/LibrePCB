@@ -20,67 +20,63 @@
 #ifndef LIBREPCB_PROJECT_CMDNETCLASSADD_H
 #define LIBREPCB_PROJECT_CMDNETCLASSADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include <librepcb/common/elementname.h>
+#include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Circuit;
 class NetClass;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdNetClassAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdNetClassAdd class
  */
-class CmdNetClassAdd final : public UndoCommand
-{
-    public:
+class CmdNetClassAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdNetClassAdd(Circuit& circuit, const ElementName& name) noexcept;
+  ~CmdNetClassAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdNetClassAdd(Circuit& circuit, const ElementName& name) noexcept;
-        ~CmdNetClassAdd() noexcept;
+  // Getters
+  NetClass* getNetClass() const noexcept { return mNetClass; }
 
-        // Getters
-        NetClass* getNetClass() const noexcept {return mNetClass;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Circuit& mCircuit;
-        ElementName mName;
-        NetClass* mNetClass;
+  Circuit&    mCircuit;
+  ElementName mName;
+  NetClass*   mNetClass;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDNETCLASSADD_H
+#endif  // LIBREPCB_PROJECT_CMDNETCLASSADD_H

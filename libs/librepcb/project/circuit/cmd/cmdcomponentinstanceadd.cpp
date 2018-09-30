@@ -17,76 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdcomponentinstanceadd.h"
+
+#include "../../library/projectlibrary.h"
+#include "../../project.h"
+#include "../../settings/projectsettings.h"
 #include "../circuit.h"
 #include "../componentinstance.h"
-#include "../../project.h"
-#include "../../library/projectlibrary.h"
-#include <librepcb/library/cmp/component.h>
-#include "../../settings/projectsettings.h"
 
-/*****************************************************************************************
+#include <librepcb/library/cmp/component.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdComponentInstanceAdd::CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
-        const Uuid& symbVar, const tl::optional<Uuid>& defaultDevice) noexcept :
-    UndoCommand(tr("Add component")),
-    mCircuit(circuit), mComponentUuid(cmp), mSymbVarUuid(symbVar),
-    mDefaultDeviceUuid(defaultDevice), mComponentInstance(nullptr)
-{
+CmdComponentInstanceAdd::CmdComponentInstanceAdd(
+    Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
+    const tl::optional<Uuid>& defaultDevice) noexcept
+  : UndoCommand(tr("Add component")),
+    mCircuit(circuit),
+    mComponentUuid(cmp),
+    mSymbVarUuid(symbVar),
+    mDefaultDeviceUuid(defaultDevice),
+    mComponentInstance(nullptr) {
 }
 
-CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept
-{
+CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdComponentInstanceAdd::performExecute()
-{
-    library::Component* cmp = mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
-    if (!cmp) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The component with the UUID \"%1\" does not exist in the "
-            "project's library!")).arg(mComponentUuid.toStr()));
-    }
-    const QStringList& normOrder = mCircuit.getProject().getSettings().getNormOrder();
-    QString name = mCircuit.generateAutoComponentInstanceName(cmp->getPrefixes().value(normOrder));
-    mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid,
-                                               CircuitIdentifier(name),
-                                               mDefaultDeviceUuid); // can throw
+bool CmdComponentInstanceAdd::performExecute() {
+  library::Component* cmp =
+      mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
+  if (!cmp) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("The component with the UUID \"%1\" does not exist in the "
+                   "project's library!"))
+            .arg(mComponentUuid.toStr()));
+  }
+  const QStringList& normOrder =
+      mCircuit.getProject().getSettings().getNormOrder();
+  QString name = mCircuit.generateAutoComponentInstanceName(
+      cmp->getPrefixes().value(normOrder));
+  mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid,
+                                             CircuitIdentifier(name),
+                                             mDefaultDeviceUuid);  // can throw
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdComponentInstanceAdd::performUndo()
-{
-    mCircuit.removeComponentInstance(*mComponentInstance); // can throw
+void CmdComponentInstanceAdd::performUndo() {
+  mCircuit.removeComponentInstance(*mComponentInstance);  // can throw
 }
 
-void CmdComponentInstanceAdd::performRedo()
-{
-    mCircuit.addComponentInstance(*mComponentInstance); // can throw
+void CmdComponentInstanceAdd::performRedo() {
+  mCircuit.addComponentInstance(*mComponentInstance);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

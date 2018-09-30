@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
 #define LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+ ******************************************************************************/
 #include "../symboleditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/all_length_units.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class CmdCircleEdit;
@@ -43,9 +45,9 @@ class CmdSymbolPinEdit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdMoveSelectedSymbolItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdMoveSelectedSymbolItems class
@@ -53,52 +55,48 @@ namespace editor {
  * @author  ubruhin
  * @date    2016-11-05
  */
-class CmdMoveSelectedSymbolItems final : public UndoCommandGroup
-{
-    public:
+class CmdMoveSelectedSymbolItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdMoveSelectedSymbolItems()                                        = delete;
+  CmdMoveSelectedSymbolItems(const CmdMoveSelectedSymbolItems& other) = delete;
+  CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
+                             const Point& startPos) noexcept;
+  ~CmdMoveSelectedSymbolItems() noexcept;
 
-        // Constructors / Destructor
-        CmdMoveSelectedSymbolItems() = delete;
-        CmdMoveSelectedSymbolItems(const CmdMoveSelectedSymbolItems& other) = delete;
-        CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                   const Point& startPos) noexcept;
-        ~CmdMoveSelectedSymbolItems() noexcept;
+  // General Methods
+  void setCurrentPosition(const Point& pos) noexcept;
 
-        // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
+  // Operator Overloadings
+  CmdMoveSelectedSymbolItems& operator=(const CmdMoveSelectedSymbolItems& rhs) =
+      delete;
 
-        // Operator Overloadings
-        CmdMoveSelectedSymbolItems& operator=(const CmdMoveSelectedSymbolItems& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  void deleteAllCommands() noexcept;
 
-        // Private Methods
+  // Private Member Variables
+  const SymbolEditorState::Context& mContext;
+  Point                             mStartPos;
+  Point                             mDeltaPos;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        void deleteAllCommands() noexcept;
-
-
-        // Private Member Variables
-        const SymbolEditorState::Context& mContext;
-        Point mStartPos;
-        Point mDeltaPos;
-
-        // Move commands
-        QList<CmdSymbolPinEdit*> mPinEditCmds;
-        QList<CmdCircleEdit*> mCircleEditCmds;
-        QList<CmdPolygonEdit*> mPolygonEditCmds;
-        QList<CmdTextEdit*> mTextEditCmds;
+  // Move commands
+  QList<CmdSymbolPinEdit*> mPinEditCmds;
+  QList<CmdCircleEdit*>    mCircleEditCmds;
+  QList<CmdPolygonEdit*>   mPolygonEditCmds;
+  QList<CmdTextEdit*>      mTextEditCmds;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H

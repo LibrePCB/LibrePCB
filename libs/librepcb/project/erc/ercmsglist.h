@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_ERCMSGLIST_H
 #define LIBREPCB_PROJECT_ERCMSGLIST_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/fileio/serializableobject.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/serializableobject.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class SmartSExprFile;
@@ -40,68 +41,64 @@ namespace project {
 class Project;
 class ErcMsg;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ErcMsgList
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The ErcMsgList class contains a list of ERC messages which are visible for the user
+ * @brief The ErcMsgList class contains a list of ERC messages which are visible
+ * for the user
  */
-class ErcMsgList final : public QObject, public SerializableObject
-{
-        Q_OBJECT
+class ErcMsgList final : public QObject, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ErcMsgList()                        = delete;
+  ErcMsgList(const ErcMsgList& other) = delete;
+  explicit ErcMsgList(Project& project, bool restore, bool readOnly,
+                      bool create);
+  ~ErcMsgList() noexcept;
 
-        // Constructors / Destructor
-        ErcMsgList() = delete;
-        ErcMsgList(const ErcMsgList& other) = delete;
-        explicit ErcMsgList(Project& project, bool restore, bool readOnly, bool create);
-        ~ErcMsgList() noexcept;
+  // Getters
+  const QList<ErcMsg*>& getItems() const noexcept { return mItems; }
 
-        // Getters
-        const QList<ErcMsg*>& getItems() const noexcept {return mItems;}
+  // General Methods
+  void add(ErcMsg* ercMsg) noexcept;
+  void remove(ErcMsg* ercMsg) noexcept;
+  void update(ErcMsg* ercMsg) noexcept;
+  void restoreIgnoreState();
+  bool save(bool toOriginal, QStringList& errors) noexcept;
 
-        // General Methods
-        void add(ErcMsg* ercMsg) noexcept;
-        void remove(ErcMsg* ercMsg) noexcept;
-        void update(ErcMsg* ercMsg) noexcept;
-        void restoreIgnoreState();
-        bool save(bool toOriginal, QStringList& errors) noexcept;
-        
-        // Operator Overloadings
-        ErcMsgList& operator=(const ErcMsgList& rhs) = delete;
+  // Operator Overloadings
+  ErcMsgList& operator=(const ErcMsgList& rhs) = delete;
 
+signals:
 
-    signals:
+  void ercMsgAdded(ErcMsg* ercMsg);
+  void ercMsgRemoved(ErcMsg* ercMsg);
+  void ercMsgChanged(ErcMsg* ercMsg);
 
-        void ercMsgAdded(ErcMsg* ercMsg);
-        void ercMsgRemoved(ErcMsg* ercMsg);
-        void ercMsgChanged(ErcMsg* ercMsg);
+private:  // Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
+  // General
+  Project& mProject;
 
-    private: // Methods
+  // File "circuit/erc.lp"
+  FilePath                       mFilepath;
+  QScopedPointer<SmartSExprFile> mFile;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-        // General
-        Project& mProject;
-
-        // File "circuit/erc.lp"
-        FilePath mFilepath;
-        QScopedPointer<SmartSExprFile> mFile;
-
-        // Misc
-        QList<ErcMsg*> mItems; ///< contains all visible ERC messages
+  // Misc
+  QList<ErcMsg*> mItems;  ///< contains all visible ERC messages
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_ERCMSGLIST_H
+#endif  // LIBREPCB_PROJECT_ERCMSGLIST_H

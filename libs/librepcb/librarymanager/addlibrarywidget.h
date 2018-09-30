@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H
 #define LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -46,9 +47,9 @@ namespace Ui {
 class AddLibraryWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AddLibraryWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AddLibraryWidget class
@@ -56,61 +57,55 @@ class AddLibraryWidget;
  * @author ubruhin
  * @date 2016-08-03
  */
-class AddLibraryWidget final : public QWidget
-{
-        Q_OBJECT
+class AddLibraryWidget final : public QWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  AddLibraryWidget() noexcept;
+  AddLibraryWidget(const AddLibraryWidget& other) = delete;
+  explicit AddLibraryWidget(workspace::Workspace& ws) noexcept;
+  ~AddLibraryWidget() noexcept;
 
-        // Constructors / Destructor
-        AddLibraryWidget() noexcept;
-        AddLibraryWidget(const AddLibraryWidget& other) = delete;
-        explicit AddLibraryWidget(workspace::Workspace& ws) noexcept;
-        ~AddLibraryWidget() noexcept;
+  // General Methods
+  void updateRepositoryLibraryList() noexcept;
+  void updateInstalledStatusOfRepositoryLibraries() noexcept;
 
-        // General Methods
-        void updateRepositoryLibraryList() noexcept;
-        void updateInstalledStatusOfRepositoryLibraries() noexcept;
+  // Operator Overloadings
+  AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
 
-        // Operator Overloadings
-        AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
+signals:
 
+  void libraryAdded(const FilePath& libDir, bool select);
 
-    signals:
+private:  // Methods
+  void localLibraryNameLineEditTextChanged(QString name) noexcept;
+  void downloadZipUrlLineEditTextChanged(QString urlStr) noexcept;
+  void createLocalLibraryButtonClicked() noexcept;
+  void downloadZippedLibraryButtonClicked() noexcept;
+  void downloadZipFinished(bool success, const QString& errMsg) noexcept;
+  void repositoryLibraryListReceived(const QJsonArray& libs) noexcept;
+  void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
+  void clearRepositoryLibraryList() noexcept;
+  void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
+  void downloadLibrariesFromRepositoryButtonClicked() noexcept;
 
-        void libraryAdded(const FilePath& libDir, bool select);
+  static QString getTextOrPlaceholderFromQLineEdit(QLineEdit* edit,
+                                                   bool isFilename) noexcept;
 
-
-    private: // Methods
-        void localLibraryNameLineEditTextChanged(QString name) noexcept;
-        void downloadZipUrlLineEditTextChanged(QString urlStr) noexcept;
-        void createLocalLibraryButtonClicked() noexcept;
-        void downloadZippedLibraryButtonClicked() noexcept;
-        void downloadZipFinished(bool success, const QString& errMsg) noexcept;
-        void repositoryLibraryListReceived(const QJsonArray& libs) noexcept;
-        void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
-        void clearRepositoryLibraryList() noexcept;
-        void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
-        void downloadLibrariesFromRepositoryButtonClicked() noexcept;
-
-        static QString getTextOrPlaceholderFromQLineEdit(QLineEdit* edit, bool isFilename) noexcept;
-
-
-    private: // Data
-
-        workspace::Workspace& mWorkspace;
-        QScopedPointer<Ui::AddLibraryWidget> mUi;
-        QScopedPointer<LibraryDownload> mManualLibraryDownload;
-        QList<QMetaObject::Connection> mLibraryDownloadConnections;
+private:  // Data
+  workspace::Workspace&                mWorkspace;
+  QScopedPointer<Ui::AddLibraryWidget> mUi;
+  QScopedPointer<LibraryDownload>      mManualLibraryDownload;
+  QList<QMetaObject::Connection>       mLibraryDownloadConnections;
 };
 
-
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H
+#endif  // LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H

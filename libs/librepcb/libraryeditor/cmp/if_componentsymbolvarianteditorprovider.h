@@ -20,14 +20,14 @@
 #ifndef IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER
 #define IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
@@ -35,9 +35,9 @@ class ComponentSymbolVariant;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Interface IF_ComponentSymbolVariantEditorProvider
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The IF_ComponentSymbolVariantEditorProvider interface
@@ -45,31 +45,29 @@ namespace editor {
  * @author ubruhin
  * @date 2017-03-18
  */
-class IF_ComponentSymbolVariantEditorProvider
-{
-    public:
+class IF_ComponentSymbolVariantEditorProvider {
+public:
+  // Constructors / Destructor
+  IF_ComponentSymbolVariantEditorProvider() {}
+  IF_ComponentSymbolVariantEditorProvider(
+      const IF_ComponentSymbolVariantEditorProvider& other) = delete;
+  virtual ~IF_ComponentSymbolVariantEditorProvider() {}
 
-        // Constructors / Destructor
-        IF_ComponentSymbolVariantEditorProvider() {}
-        IF_ComponentSymbolVariantEditorProvider(const IF_ComponentSymbolVariantEditorProvider& other) = delete;
-        virtual ~IF_ComponentSymbolVariantEditorProvider() {}
+  // General Methods
+  virtual bool openComponentSymbolVariantEditor(
+      ComponentSymbolVariant& variant) noexcept = 0;
 
-
-        // General Methods
-        virtual bool openComponentSymbolVariantEditor(ComponentSymbolVariant& variant) noexcept = 0;
-
-
-        // Operator Overloadings
-        IF_ComponentSymbolVariantEditorProvider& operator=(const IF_ComponentSymbolVariantEditorProvider& rhs) = delete;
+  // Operator Overloadings
+  IF_ComponentSymbolVariantEditorProvider& operator       =(
+      const IF_ComponentSymbolVariantEditorProvider& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER
-
+#endif  // IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER

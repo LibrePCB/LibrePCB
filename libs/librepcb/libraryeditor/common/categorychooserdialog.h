@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/uuid.h>
 #include <librepcb/workspace/library/cat/categorytreemodel.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -44,9 +45,9 @@ namespace Ui {
 class CategoryChooserDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CategoryChooserDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CategoryChooserDialog class
@@ -55,36 +56,37 @@ class CategoryChooserDialog;
  * @date    2016-10-25
  */
 template <typename ElementType>
-class CategoryChooserDialog final : public QDialog
-{
-    public:
+class CategoryChooserDialog final : public QDialog {
+public:
+  // Constructors / Destructor
+  CategoryChooserDialog()                                   = delete;
+  CategoryChooserDialog(const CategoryChooserDialog& other) = delete;
+  explicit CategoryChooserDialog(const workspace::Workspace& ws,
+                                 QWidget* parent = 0) noexcept;
+  ~CategoryChooserDialog() noexcept;
 
-        // Constructors / Destructor
-        CategoryChooserDialog() = delete;
-        CategoryChooserDialog(const CategoryChooserDialog& other) = delete;
-        explicit CategoryChooserDialog(const workspace::Workspace& ws, QWidget* parent = 0) noexcept;
-        ~CategoryChooserDialog() noexcept;
+  // Getters
+  tl::optional<Uuid> getSelectedCategoryUuid() const noexcept;
 
-        // Getters
-        tl::optional<Uuid> getSelectedCategoryUuid() const noexcept;
+  // Operator Overloadings
+  CategoryChooserDialog& operator=(const CategoryChooserDialog& rhs) = delete;
 
-        // Operator Overloadings
-        CategoryChooserDialog& operator=(const CategoryChooserDialog& rhs) = delete;
-
-    private: // Data
-        QScopedPointer<Ui::CategoryChooserDialog> mUi;
-        QScopedPointer<workspace::CategoryTreeModel<ElementType>> mModel;
+private:  // Data
+  QScopedPointer<Ui::CategoryChooserDialog>                 mUi;
+  QScopedPointer<workspace::CategoryTreeModel<ElementType>> mModel;
 };
 
-typedef CategoryChooserDialog<library::ComponentCategory> ComponentCategoryChooserDialog;
-typedef CategoryChooserDialog<library::PackageCategory> PackageCategoryChooserDialog;
+typedef CategoryChooserDialog<library::ComponentCategory>
+    ComponentCategoryChooserDialog;
+typedef CategoryChooserDialog<library::PackageCategory>
+    PackageCategoryChooserDialog;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H

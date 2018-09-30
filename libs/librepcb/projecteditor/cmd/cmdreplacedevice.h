@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDREPLACEDEVICE_H
 #define LIBREPCB_PROJECT_CMDREPLACEDEVICE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -43,47 +44,43 @@ class BI_Device;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdReplaceDevice
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdReplaceDevice class
  */
-class CmdReplaceDevice final : public UndoCommandGroup
-{
-    public:
+class CmdReplaceDevice final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdReplaceDevice(workspace::Workspace& workspace, Board& board,
+                   BI_Device& device, const Uuid& newDeviceUuid,
+                   const tl::optional<Uuid>& newFootprintUuid) noexcept;
+  ~CmdReplaceDevice() noexcept;
 
-        // Constructors / Destructor
-        CmdReplaceDevice(workspace::Workspace& workspace, Board& board, BI_Device& device,
-                         const Uuid& newDeviceUuid, const tl::optional<Uuid>& newFootprintUuid) noexcept;
-        ~CmdReplaceDevice() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        workspace::Workspace& mWorkspace;
-        Board& mBoard;
-        BI_Device& mDeviceInstance;
-        Uuid mNewDeviceUuid;
-        tl::optional<Uuid> mNewFootprintUuid;
+  // Attributes from the constructor
+  workspace::Workspace& mWorkspace;
+  Board&                mBoard;
+  BI_Device&            mDeviceInstance;
+  Uuid                  mNewDeviceUuid;
+  tl::optional<Uuid>    mNewFootprintUuid;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDREPLACEDEVICE_H
+#endif  // LIBREPCB_PROJECT_CMDREPLACEDEVICE_H

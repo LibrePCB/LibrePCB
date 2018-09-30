@@ -17,71 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "wsi_debugtools.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WSI_DebugTools::WSI_DebugTools(const SExpression& node) :
-    WSI_Base()
-{
-    Q_UNUSED(node);
+WSI_DebugTools::WSI_DebugTools(const SExpression& node) : WSI_Base() {
+  Q_UNUSED(node);
 
-    // create a QWidget
-    mWidget.reset(new QWidget());
-    QGridLayout* layout = new QGridLayout(mWidget.data());
+  // create a QWidget
+  mWidget.reset(new QWidget());
+  QGridLayout* layout = new QGridLayout(mWidget.data());
 #ifndef QT_DEBUG
-    layout->addWidget(new QLabel(tr("Warning: Some of these settings may only work in DEBUG mode!")), 0, 0);
+  layout->addWidget(
+      new QLabel(
+          tr("Warning: Some of these settings may only work in DEBUG mode!")),
+      0, 0);
 #endif
 
-    // stretch the last row
-    layout->setRowStretch(layout->rowCount(), 1);
+  // stretch the last row
+  layout->setRowStretch(layout->rowCount(), 1);
 }
 
-WSI_DebugTools::~WSI_DebugTools() noexcept
-{
+WSI_DebugTools::~WSI_DebugTools() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_DebugTools::restoreDefault() noexcept
-{
+void WSI_DebugTools::restoreDefault() noexcept {
 }
 
-void WSI_DebugTools::apply() noexcept
-{
+void WSI_DebugTools::apply() noexcept {
 }
 
-void WSI_DebugTools::revert() noexcept
-{
+void WSI_DebugTools::revert() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WSI_DebugTools::serialize(SExpression& root) const
-{
-    Q_UNUSED(root);
+void WSI_DebugTools::serialize(SExpression& root) const {
+  Q_UNUSED(root);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

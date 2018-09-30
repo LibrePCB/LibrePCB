@@ -17,74 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attrtypevoltage.h"
+
 #include "attributeunit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttrTypeVoltage::AttrTypeVoltage() noexcept :
-    AttributeType(Type_t::Voltage, "voltage", tr("Voltage"))
-{
-    mDefaultUnit = new AttributeUnit("volt", tr("V"));
+AttrTypeVoltage::AttrTypeVoltage() noexcept
+  : AttributeType(Type_t::Voltage, "voltage", tr("Voltage")) {
+  mDefaultUnit = new AttributeUnit("volt", tr("V"));
 
-    mAvailableUnits.append(new AttributeUnit("nanovolt",    tr("nV")));
-    mAvailableUnits.append(new AttributeUnit("microvolt",   tr("μV")));
-    mAvailableUnits.append(new AttributeUnit("millivolt",   tr("mV")));
-    mAvailableUnits.append(mDefaultUnit);
-    mAvailableUnits.append(new AttributeUnit("kilovolt",    tr("kV")));
-    mAvailableUnits.append(new AttributeUnit("megavolt",    tr("MV")));
+  mAvailableUnits.append(new AttributeUnit("nanovolt", tr("nV")));
+  mAvailableUnits.append(new AttributeUnit("microvolt", tr("μV")));
+  mAvailableUnits.append(new AttributeUnit("millivolt", tr("mV")));
+  mAvailableUnits.append(mDefaultUnit);
+  mAvailableUnits.append(new AttributeUnit("kilovolt", tr("kV")));
+  mAvailableUnits.append(new AttributeUnit("megavolt", tr("MV")));
 }
 
-AttrTypeVoltage::~AttrTypeVoltage() noexcept
-{
+AttrTypeVoltage::~AttrTypeVoltage() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool AttrTypeVoltage::isValueValid(const QString& value) const noexcept
-{
-    bool ok = false;
-    value.toFloat(&ok);
-    return (ok || value.isEmpty());
+bool AttrTypeVoltage::isValueValid(const QString& value) const noexcept {
+  bool ok = false;
+  value.toFloat(&ok);
+  return (ok || value.isEmpty());
 }
 
-QString AttrTypeVoltage::valueFromTr(const QString& value) const noexcept
-{
-    bool ok = false;
-    float v = QLocale().toFloat(value, &ok);
-    if (ok)
-        return QString::number(v);
-    else
-        return QString();
+QString AttrTypeVoltage::valueFromTr(const QString& value) const noexcept {
+  bool  ok = false;
+  float v  = QLocale().toFloat(value, &ok);
+  if (ok)
+    return QString::number(v);
+  else
+    return QString();
 }
 
-QString AttrTypeVoltage::printableValueTr(const QString& value, const AttributeUnit* unit) const noexcept
-{
-    bool ok = false;
-    float v = value.toFloat(&ok);
-    if (ok && unit)
-        return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
-    else if (ok)
-        return QLocale().toString(v);
-    else
-        return QString();
+QString AttrTypeVoltage::printableValueTr(const QString&       value,
+                                          const AttributeUnit* unit) const
+    noexcept {
+  bool  ok = false;
+  float v  = value.toFloat(&ok);
+  if (ok && unit)
+    return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
+  else if (ok)
+    return QLocale().toString(v);
+  else
+    return QString();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

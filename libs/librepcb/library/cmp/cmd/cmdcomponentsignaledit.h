@@ -20,82 +20,79 @@
 #ifndef LIBREPCB_LIBRARY_CMDCOMPONENTSIGNALEDIT_H
 #define LIBREPCB_LIBRARY_CMDCOMPONENTSIGNALEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include "../componentsignal.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommand.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdComponentSignalEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdComponentSignalEdit class
  */
-class CmdComponentSignalEdit final : public UndoCommand
-{
-    public:
+class CmdComponentSignalEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdComponentSignalEdit()                                    = delete;
+  CmdComponentSignalEdit(const CmdComponentSignalEdit& other) = delete;
+  explicit CmdComponentSignalEdit(ComponentSignal& signal) noexcept;
+  ~CmdComponentSignalEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdComponentSignalEdit() = delete;
-        CmdComponentSignalEdit(const CmdComponentSignalEdit& other) = delete;
-        explicit CmdComponentSignalEdit(ComponentSignal& signal) noexcept;
-        ~CmdComponentSignalEdit() noexcept;
+  // Setters
+  void setName(const CircuitIdentifier& name) noexcept;
+  void setRole(const SignalRole& role) noexcept;
+  void setForcedNetName(const QString& name) noexcept;
+  void setIsRequired(bool required) noexcept;
+  void setIsNegated(bool negated) noexcept;
+  void setIsClock(bool clock) noexcept;
 
-        // Setters
-        void setName(const CircuitIdentifier& name) noexcept;
-        void setRole(const SignalRole& role) noexcept;
-        void setForcedNetName(const QString& name) noexcept;
-        void setIsRequired(bool required) noexcept;
-        void setIsNegated(bool negated) noexcept;
-        void setIsClock(bool clock) noexcept;
+  // Operator Overloadings
+  CmdComponentSignalEdit& operator=(const CmdComponentSignalEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdComponentSignalEdit& operator=(const CmdComponentSignalEdit& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+private:  // Data
+  ComponentSignal& mSignal;
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-    private: // Data
-        ComponentSignal& mSignal;
-
-        CircuitIdentifier mOldName;
-        CircuitIdentifier mNewName;
-        SignalRole mOldRole;
-        SignalRole mNewRole;
-        QString mOldForcedNetName;
-        QString mNewForcedNetName;
-        bool mOldIsRequired;
-        bool mNewIsRequired;
-        bool mOldIsNegated;
-        bool mNewIsNegated;
-        bool mOldIsClock;
-        bool mNewIsClock;
+  CircuitIdentifier mOldName;
+  CircuitIdentifier mNewName;
+  SignalRole        mOldRole;
+  SignalRole        mNewRole;
+  QString           mOldForcedNetName;
+  QString           mNewForcedNetName;
+  bool              mOldIsRequired;
+  bool              mNewIsRequired;
+  bool              mOldIsNegated;
+  bool              mNewIsNegated;
+  bool              mOldIsClock;
+  bool              mNewIsClock;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDCOMPONENTSIGNALEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDCOMPONENTSIGNALEDIT_H

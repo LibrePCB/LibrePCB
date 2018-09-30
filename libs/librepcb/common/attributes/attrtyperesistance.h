@@ -20,51 +20,50 @@
 #ifndef LIBREPCB_ATTRTYPERESISTANCE_H
 #define LIBREPCB_ATTRTYPERESISTANCE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributetype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttrTypeResistance
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttrTypeResistance class
  */
-class AttrTypeResistance final : public AttributeType
-{
+class AttrTypeResistance final : public AttributeType {
+public:
+  bool    isValueValid(const QString& value) const noexcept;
+  QString valueFromTr(const QString& value) const noexcept;
+  QString printableValueTr(const QString&       value,
+                           const AttributeUnit* unit = nullptr) const noexcept;
+  static const AttrTypeResistance& instance() noexcept {
+    static AttrTypeResistance x;
+    return x;
+  }
 
-    public:
+private:
+  // make some methods inaccessible...
+  AttrTypeResistance(const AttrTypeResistance& other) = delete;
+  AttrTypeResistance& operator=(const AttrTypeResistance& rhs) = delete;
 
-        bool isValueValid(const QString& value) const noexcept;
-        QString valueFromTr(const QString& value) const noexcept;
-        QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept;
-        static const AttrTypeResistance& instance() noexcept {static AttrTypeResistance x; return x;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        AttrTypeResistance(const AttrTypeResistance& other) = delete;
-        AttrTypeResistance& operator=(const AttrTypeResistance& rhs) = delete;
-
-
-        // Constructors / Destructor
-        AttrTypeResistance() noexcept;
-        ~AttrTypeResistance() noexcept;
+  // Constructors / Destructor
+  AttrTypeResistance() noexcept;
+  ~AttrTypeResistance() noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRTYPERESISTANCE_H
+#endif  // LIBREPCB_ATTRTYPERESISTANCE_H

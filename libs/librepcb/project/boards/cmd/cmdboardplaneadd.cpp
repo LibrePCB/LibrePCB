@@ -17,57 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardplaneadd.h"
-#include "../items/bi_plane.h"
-#include "../board.h"
 
-/*****************************************************************************************
+#include "../board.h"
+#include "../items/bi_plane.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardPlaneAdd::CmdBoardPlaneAdd(BI_Plane& plane) noexcept :
-    UndoCommand(tr("Add plane to board")),
-    mBoard(plane.getBoard()), mPlane(plane)
-{
+CmdBoardPlaneAdd::CmdBoardPlaneAdd(BI_Plane& plane) noexcept
+  : UndoCommand(tr("Add plane to board")),
+    mBoard(plane.getBoard()),
+    mPlane(plane) {
 }
 
-CmdBoardPlaneAdd::~CmdBoardPlaneAdd() noexcept
-{
+CmdBoardPlaneAdd::~CmdBoardPlaneAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardPlaneAdd::performExecute()
-{
-    performRedo(); // can throw
-    return true;
+bool CmdBoardPlaneAdd::performExecute() {
+  performRedo();  // can throw
+  return true;
 }
 
-void CmdBoardPlaneAdd::performUndo()
-{
-    mBoard.removePlane(mPlane);
+void CmdBoardPlaneAdd::performUndo() {
+  mBoard.removePlane(mPlane);
 }
 
-void CmdBoardPlaneAdd::performRedo()
-{
-    mBoard.addPlane(mPlane);
+void CmdBoardPlaneAdd::performRedo() {
+  mBoard.addPlane(mPlane);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

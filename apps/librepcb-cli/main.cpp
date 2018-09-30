@@ -17,93 +17,97 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <QTranslator>
-#include <librepcb/common/application.h>
-#include <librepcb/common/debug.h>
+ ******************************************************************************/
 #include "./commandlineinterface.h"
 
-/*****************************************************************************************
+#include <librepcb/common/application.h>
+#include <librepcb/common/debug.h>
+
+#include <QTranslator>
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 using namespace librepcb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Function Prototypes
- ****************************************************************************************/
+ ******************************************************************************/
 
 static void setApplicationMetadata() noexcept;
 static void installTranslations() noexcept;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  main()
- ****************************************************************************************/
+ ******************************************************************************/
 
-int main(int argc, char* argv[])
-{
-    // --------------------------------- INITIALIZATION ----------------------------------
+int main(int argc, char* argv[]) {
+  // --------------------------------- INITIALIZATION
+  // ----------------------------------
 
-    // Creates the Debug object which installs the message handler. This must be done as
-    // early as possible.
-    Debug::instance();
+  // Creates the Debug object which installs the message handler. This must be
+  // done as early as possible.
+  Debug::instance();
 
-    // Silence debug output, it's a command line tool
-    Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
+  // Silence debug output, it's a command line tool
+  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
 
-    // Create Application instance
-    Application app(argc, argv);
+  // Create Application instance
+  Application app(argc, argv);
 
-    // Set the organization / application names must be done very early because some other
-    // classes will use these values (for example QSettings, Debug)!
-    setApplicationMetadata();
+  // Set the organization / application names must be done very early because
+  // some other classes will use these values (for example QSettings, Debug)!
+  setApplicationMetadata();
 
-    // Install translation files. This must be done before any widget is shown.
-    installTranslations();
+  // Install translation files. This must be done before any widget is shown.
+  installTranslations();
 
-    // --------------------------------- RUN APPLICATION ---------------------------------
-    cli::CommandLineInterface cli(app);
-    return cli.execute();
+  // --------------------------------- RUN APPLICATION
+  // ---------------------------------
+  cli::CommandLineInterface cli(app);
+  return cli.execute();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  setApplicationMetadata()
- ****************************************************************************************/
+ ******************************************************************************/
 
-static void setApplicationMetadata() noexcept
-{
-    Application::setOrganizationName("LibrePCB");
-    Application::setOrganizationDomain("librepcb.org");
-    Application::setApplicationName("LibrePCB CLI");
+static void setApplicationMetadata() noexcept {
+  Application::setOrganizationName("LibrePCB");
+  Application::setOrganizationDomain("librepcb.org");
+  Application::setApplicationName("LibrePCB CLI");
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  installTranslations()
- ****************************************************************************************/
+ ******************************************************************************/
 
-static void installTranslations() noexcept
-{
-    // Install Qt translations
-    QTranslator* qtTranslator = new QTranslator(qApp);
-    qtTranslator->load("qt_" % QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    qApp->installTranslator(qtTranslator);
+static void installTranslations() noexcept {
+  // Install Qt translations
+  QTranslator* qtTranslator = new QTranslator(qApp);
+  qtTranslator->load("qt_" % QLocale::system().name(),
+                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  qApp->installTranslator(qtTranslator);
 
-    // Install system language translations (all system languages defined in the system settings, in the defined order)
-    const QString dir = qApp->getResourcesFilePath("i18n").toStr();
-    QTranslator* systemTranslator = new QTranslator(qApp);
-    systemTranslator->load(QLocale::system(), "librepcb", "_", dir);
-    qApp->installTranslator(systemTranslator);
+  // Install system language translations (all system languages defined in the
+  // system settings, in the defined order)
+  const QString dir              = qApp->getResourcesFilePath("i18n").toStr();
+  QTranslator*  systemTranslator = new QTranslator(qApp);
+  systemTranslator->load(QLocale::system(), "librepcb", "_", dir);
+  qApp->installTranslator(systemTranslator);
 
-    // Install language translations (like "de" for German)
-    QTranslator* appTranslator1 = new QTranslator(qApp);
-    appTranslator1->load("librepcb_" % QLocale::system().name().split("_").at(0), dir);
-    qApp->installTranslator(appTranslator1);
+  // Install language translations (like "de" for German)
+  QTranslator* appTranslator1 = new QTranslator(qApp);
+  appTranslator1->load("librepcb_" % QLocale::system().name().split("_").at(0),
+                       dir);
+  qApp->installTranslator(appTranslator1);
 
-    // Install language/country translations (like "de_ch" for German/Switzerland)
-    QTranslator* appTranslator2 = new QTranslator(qApp);
-    appTranslator2->load("librepcb_" % QLocale::system().name(), dir);
-    qApp->installTranslator(appTranslator2);
+  // Install language/country translations (like "de_ch" for German/Switzerland)
+  QTranslator* appTranslator2 = new QTranslator(qApp);
+  appTranslator2->load("librepcb_" % QLocale::system().name(), dir);
+  qApp->installTranslator(appTranslator2);
 }

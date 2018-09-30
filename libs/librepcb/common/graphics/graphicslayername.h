@@ -20,89 +20,111 @@
 #ifndef LIBREPCB_GRAPHICSLAYERNAME_H
 #define LIBREPCB_GRAPHICSLAYERNAME_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <type_safe/constrained_type.hpp>
+ ******************************************************************************/
 #include "../fileio/sexpression.h"
 
-/*****************************************************************************************
+#include <type_safe/constrained_type.hpp>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GraphicsLayerName
- ****************************************************************************************/
+ ******************************************************************************/
 
 struct GraphicsLayerNameVerifier {
-    template <typename Value, typename Predicate>
-    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
-        return p(val) ? std::forward<Value>(val) : (
-            throw RuntimeError(__FILE__, __LINE__, QString(
-                QApplication::translate("GraphicsLayerName",
-                                        "Not a valid graphics layer name: '%1'")).arg(val)),
-            std::forward<Value>(val));
-    }
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val) ? std::forward<Value>(val)
+                  : (throw RuntimeError(
+                         __FILE__, __LINE__,
+                         QString(QApplication::translate(
+                                     "GraphicsLayerName",
+                                     "Not a valid graphics layer name: '%1'"))
+                             .arg(val)),
+                     std::forward<Value>(val));
+  }
 };
 
 struct GraphicsLayerNameConstraint {
-    bool operator()(const QString& value) const noexcept {
-        return QRegularExpression("^[a-z][_0-9a-z]{0,39}$")
-            .match(value, 0, QRegularExpression::PartialPreferCompleteMatch).hasMatch();
-    }
+  bool operator()(const QString& value) const noexcept {
+    return QRegularExpression("^[a-z][_0-9a-z]{0,39}$")
+        .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
+        .hasMatch();
+  }
 };
 
 /**
- * GraphicsLayerName is a wrapper around QString which guarantees to contain a valid
- * name for librepcb::GraphicsLayer
+ * GraphicsLayerName is a wrapper around QString which guarantees to contain a
+ * valid name for librepcb::GraphicsLayer
  *
  * A string is considered as valid graphics layer name if:
  *   - it contains minimum 1 and maximum 40 characters
  *   - the first character is one of [a-z] (lowercase)
  *   - the following characters are [a-z] (lowercase), [0-9] or [_] (underscore)
  *
- * The constructor throws an exception if constructed from a QString which is not a valid
- * graphics layer name according these rules.
+ * The constructor throws an exception if constructed from a QString which is
+ * not a valid graphics layer name according these rules.
  */
-using GraphicsLayerName = type_safe::constrained_type<QString, GraphicsLayerNameConstraint,
-                                                      GraphicsLayerNameVerifier>;
+using GraphicsLayerName =
+    type_safe::constrained_type<QString, GraphicsLayerNameConstraint,
+                                GraphicsLayerNameVerifier>;
 
-inline bool operator==(const GraphicsLayerName& lhs, const QString& rhs) noexcept {return (*lhs) == rhs;}
-inline bool operator==(const QString& lhs, const GraphicsLayerName& rhs) noexcept {return lhs == (*rhs);}
-inline bool operator!=(const GraphicsLayerName& lhs, const QString& rhs) noexcept {return (*lhs) != rhs;}
-inline bool operator!=(const QString& lhs, const GraphicsLayerName& rhs) noexcept {return lhs != (*rhs);}
+inline bool operator==(const GraphicsLayerName& lhs,
+                       const QString&           rhs) noexcept {
+  return (*lhs) == rhs;
+}
+inline bool operator==(const QString&           lhs,
+                       const GraphicsLayerName& rhs) noexcept {
+  return lhs == (*rhs);
+}
+inline bool operator!=(const GraphicsLayerName& lhs,
+                       const QString&           rhs) noexcept {
+  return (*lhs) != rhs;
+}
+inline bool operator!=(const QString&           lhs,
+                       const GraphicsLayerName& rhs) noexcept {
+  return lhs != (*rhs);
+}
 
 template <>
 inline SExpression serializeToSExpression(const GraphicsLayerName& obj) {
-    return SExpression::createToken(*obj);
+  return SExpression::createToken(*obj);
 }
 
 template <>
-inline GraphicsLayerName deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    return GraphicsLayerName(str); // can throw
+inline GraphicsLayerName deserializeFromSExpression(const SExpression& sexpr,
+                                                    bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  return GraphicsLayerName(str);  // can throw
 }
 
-inline QDataStream& operator<<(QDataStream& stream, const GraphicsLayerName& obj) {
-    stream << *obj;
-    return stream;
+inline QDataStream& operator<<(QDataStream&             stream,
+                               const GraphicsLayerName& obj) {
+  stream << *obj;
+  return stream;
 }
 
 inline QDebug operator<<(QDebug stream, const GraphicsLayerName& obj) {
-    stream << QString("GraphicsLayerName('%1'')").arg(*obj);
-    return stream;
+  stream << QString("GraphicsLayerName('%1'')").arg(*obj);
+  return stream;
 }
 
 inline uint qHash(const GraphicsLayerName& key, uint seed = 0) noexcept {
-    return ::qHash(*key, seed);
+  return ::qHash(*key, seed);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRAPHICSLAYERNAME_H
+#endif  // LIBREPCB_GRAPHICSLAYERNAME_H

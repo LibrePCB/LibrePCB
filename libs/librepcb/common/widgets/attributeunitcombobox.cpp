@@ -17,101 +17,102 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "attributeunitcombobox.h"
+
 #include "../attributes/attributetype.h"
 #include "../attributes/attributeunit.h"
 #include "../attributes/attrtypestring.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AttributeUnitComboBox::AttributeUnitComboBox(QWidget* parent) noexcept :
-    QWidget(parent), mComboBox(new QComboBox(this)), mAttributeType(nullptr)
-{
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox);
+AttributeUnitComboBox::AttributeUnitComboBox(QWidget* parent) noexcept
+  : QWidget(parent), mComboBox(new QComboBox(this)), mAttributeType(nullptr) {
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mComboBox);
 
-    connect(mComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &AttributeUnitComboBox::currentIndexChanged);
+  connect(
+      mComboBox,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &AttributeUnitComboBox::currentIndexChanged);
 
-    setAttributeType(AttrTypeString::instance());
+  setAttributeType(AttrTypeString::instance());
 }
 
-AttributeUnitComboBox::~AttributeUnitComboBox() noexcept
-{
+AttributeUnitComboBox::~AttributeUnitComboBox() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-const AttributeUnit* AttributeUnitComboBox::getCurrentItem() const noexcept
-{
-    int index = mComboBox->currentIndex();
-    Q_ASSERT(index >= 0 || mComboBox->count() == 0);
-    Q_ASSERT(index < mAttributeType->getAvailableUnits().count());
-    return mAttributeType->getAvailableUnits().value(index);
+const AttributeUnit* AttributeUnitComboBox::getCurrentItem() const noexcept {
+  int index = mComboBox->currentIndex();
+  Q_ASSERT(index >= 0 || mComboBox->count() == 0);
+  Q_ASSERT(index < mAttributeType->getAvailableUnits().count());
+  return mAttributeType->getAvailableUnits().value(index);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void AttributeUnitComboBox::setAttributeType(const AttributeType& type) noexcept
-{
-    if (&type == mAttributeType) {
-        return;
-    }
+void AttributeUnitComboBox::setAttributeType(
+    const AttributeType& type) noexcept {
+  if (&type == mAttributeType) {
+    return;
+  }
 
-    blockSignals(true);
+  blockSignals(true);
 
-    mAttributeType = &type;
-    mComboBox->clear();
-    foreach (const AttributeUnit* unit, type.getAvailableUnits()) {
-        mComboBox->addItem(unit->getSymbolTr());
-    }
-    mComboBox->setCurrentIndex(type.getAvailableUnits().indexOf(type.getDefaultUnit()));
-    if (mComboBox->count() > 0 && mComboBox->currentIndex() < 0) {
-        mComboBox->setCurrentIndex(0);
-    }
+  mAttributeType = &type;
+  mComboBox->clear();
+  foreach (const AttributeUnit* unit, type.getAvailableUnits()) {
+    mComboBox->addItem(unit->getSymbolTr());
+  }
+  mComboBox->setCurrentIndex(
+      type.getAvailableUnits().indexOf(type.getDefaultUnit()));
+  if (mComboBox->count() > 0 && mComboBox->currentIndex() < 0) {
+    mComboBox->setCurrentIndex(0);
+  }
 
-    blockSignals(false);
+  blockSignals(false);
 
-    emit currentItemChanged(getCurrentItem());
+  emit currentItemChanged(getCurrentItem());
 }
 
-void AttributeUnitComboBox::setCurrentItem(const AttributeUnit* unit) noexcept
-{
-    int index = mAttributeType->getAvailableUnits().indexOf(unit);
-    Q_ASSERT((index >= 0) || (mAttributeType->getAvailableUnits().isEmpty() && (!unit)));
-    Q_ASSERT(index < mAttributeType->getAvailableUnits().count());
-    mComboBox->setCurrentIndex(index);
+void AttributeUnitComboBox::setCurrentItem(const AttributeUnit* unit) noexcept {
+  int index = mAttributeType->getAvailableUnits().indexOf(unit);
+  Q_ASSERT((index >= 0) ||
+           (mAttributeType->getAvailableUnits().isEmpty() && (!unit)));
+  Q_ASSERT(index < mAttributeType->getAvailableUnits().count());
+  mComboBox->setCurrentIndex(index);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void AttributeUnitComboBox::currentIndexChanged(int index) noexcept
-{
-    Q_UNUSED(index);
-    emit currentItemChanged(getCurrentItem());
+void AttributeUnitComboBox::currentIndexChanged(int index) noexcept {
+  Q_UNUSED(index);
+  emit currentItemChanged(getCurrentItem());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

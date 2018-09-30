@@ -20,54 +20,53 @@
 #ifndef LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H
 #define LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/units/point.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class NetSignal;
 class Board;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardAirWiresBuilder
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardAirWiresBuilder class
  */
-class BoardAirWiresBuilder final
-{
-    public:
+class BoardAirWiresBuilder final {
+public:
+  // Constructors / Destructor
+  BoardAirWiresBuilder()                                  = delete;
+  BoardAirWiresBuilder(const BoardAirWiresBuilder& other) = delete;
+  BoardAirWiresBuilder(const Board& board, const NetSignal& netsignal) noexcept;
+  ~BoardAirWiresBuilder() noexcept;
 
-        // Constructors / Destructor
-        BoardAirWiresBuilder() = delete;
-        BoardAirWiresBuilder(const BoardAirWiresBuilder& other) = delete;
-        BoardAirWiresBuilder(const Board& board, const NetSignal& netsignal) noexcept;
-        ~BoardAirWiresBuilder() noexcept;
+  // General Methods
+  QVector<QPair<Point, Point>> buildAirWires() const;
 
-        // General Methods
-        QVector<QPair<Point, Point>> buildAirWires() const;
+  // Operator Overloadings
+  BoardAirWiresBuilder& operator=(const BoardAirWiresBuilder& rhs) = delete;
 
-        // Operator Overloadings
-        BoardAirWiresBuilder& operator=(const BoardAirWiresBuilder& rhs) = delete;
-
-    private: // Data
-        const Board& mBoard;
-        const NetSignal& mNetSignal;
+private:  // Data
+  const Board&     mBoard;
+  const NetSignal& mNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H
+#endif  // LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H

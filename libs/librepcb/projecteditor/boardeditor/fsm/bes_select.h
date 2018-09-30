@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_PROJECT_BES_SELECT_H
 #define LIBREPCB_PROJECT_BES_SELECT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoCommandGroup;
@@ -46,74 +47,68 @@ namespace editor {
 
 class CmdMoveSelectedBoardItems;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_Select
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_Select class
  */
-class BES_Select final : public BES_Base
-{
-        Q_OBJECT
+class BES_Select final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                      GraphicsView& editorGraphicsView, UndoStack& undoStack);
+  ~BES_Select();
 
-        // Constructors / Destructor
-        explicit BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                            GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_Select();
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:
+  // Private Methods
+  ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
+  ProcRetVal processSubStateIdleSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal processSubStateMoving(BEE_Base* event) noexcept;
+  ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                        Board& board) noexcept;
+  ProcRetVal proccessIdleSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept;
+  ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                          Board* board) noexcept;
+  bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
+  bool rotateSelectedItems(const Angle& angle) noexcept;
+  bool flipSelectedItems(Qt::Orientation orientation) noexcept;
+  bool removeSelectedItems() noexcept;
+  void openDevicePropertiesDialog(BI_Device& device) noexcept;
+  void openViaPropertiesDialog(BI_Via& via) noexcept;
+  void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
+  void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
+  void openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept;
+  void openHolePropertiesDialog(Board& board, Hole& hole) noexcept;
 
+  // Types
+  /// enum for all possible substates
+  enum SubState {
+    SubState_Idle,   ///< left mouse button is not pressed (default state)
+    SubState_Moving  ///< left mouse button is pressed
+  };
 
-    private:
-
-        // Private Methods
-        ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
-        ProcRetVal processSubStateIdleSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal processSubStateMoving(BEE_Base* event) noexcept;
-        ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
-        ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                              Board& board) noexcept;
-        ProcRetVal proccessIdleSceneRightMouseButtonReleased(QGraphicsSceneMouseEvent* mouseEvent,
-                                                             Board* board) noexcept;
-        ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                                Board* board) noexcept;
-        bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
-        bool rotateSelectedItems(const Angle& angle) noexcept;
-        bool flipSelectedItems(Qt::Orientation orientation) noexcept;
-        bool removeSelectedItems() noexcept;
-        void openDevicePropertiesDialog(BI_Device& device) noexcept;
-        void openViaPropertiesDialog(BI_Via& via) noexcept;
-        void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
-        void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
-        void openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept;
-        void openHolePropertiesDialog(Board& board, Hole& hole) noexcept;
-
-
-        // Types
-        /// enum for all possible substates
-        enum SubState {
-            SubState_Idle,      ///< left mouse button is not pressed (default state)
-            SubState_Moving     ///< left mouse button is pressed
-        };
-
-
-        // Attributes
-        SubState mSubState;     ///< the current substate
-        QScopedPointer<CmdMoveSelectedBoardItems> mSelectedItemsMoveCommand;
+  // Attributes
+  SubState mSubState;  ///< the current substate
+  QScopedPointer<CmdMoveSelectedBoardItems> mSelectedItemsMoveCommand;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_SELECT_H
+#endif  // LIBREPCB_PROJECT_BES_SELECT_H

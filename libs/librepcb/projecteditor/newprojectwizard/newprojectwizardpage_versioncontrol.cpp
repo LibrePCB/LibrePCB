@@ -17,62 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newprojectwizardpage_versioncontrol.h"
+
 #include "ui_newprojectwizardpage_versioncontrol.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NewProjectWizardPage_VersionControl::NewProjectWizardPage_VersionControl(QWidget *parent) noexcept :
-    QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_VersionControl)
-{
-    mUi->setupUi(this);
-    setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
-    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
+NewProjectWizardPage_VersionControl::NewProjectWizardPage_VersionControl(
+    QWidget *parent) noexcept
+  : QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_VersionControl) {
+  mUi->setupUi(this);
+  setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 }
 
-NewProjectWizardPage_VersionControl::~NewProjectWizardPage_VersionControl() noexcept
-{
+NewProjectWizardPage_VersionControl::
+    ~NewProjectWizardPage_VersionControl() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewProjectWizardPage_VersionControl::getInitGitRepository() const noexcept
-{
-    return mUi->gbxInitGitRepo->isChecked();
+bool NewProjectWizardPage_VersionControl::getInitGitRepository() const
+    noexcept {
+  return mUi->gbxInitGitRepo->isChecked();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  GUI Action Handlers
- ****************************************************************************************/
+ ******************************************************************************/
 
-
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-
-
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

@@ -17,58 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "package.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version, const QString& author,
-                 const ElementName& name_en_US, const QString& description_en_US,
-                 const QString& keywords_en_US) :
-    LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
-                   name_en_US, description_en_US, keywords_en_US)
-{
+Package::Package(const Uuid& uuid, const Version& version,
+                 const QString& author, const ElementName& name_en_US,
+                 const QString& description_en_US,
+                 const QString& keywords_en_US)
+  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
+                   author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly) :
-    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
-{
-    mPads.loadFromDomElement(mLoadingFileDocument);
-    mFootprints.loadFromDomElement(mLoadingFileDocument);
+Package::Package(const FilePath& elementDirectory, bool readOnly)
+  : LibraryElement(elementDirectory, getShortElementName(),
+                   getLongElementName(), readOnly) {
+  mPads.loadFromDomElement(mLoadingFileDocument);
+  mFootprints.loadFromDomElement(mLoadingFileDocument);
 
-    cleanupAfterLoadingElementFromFile();
+  cleanupAfterLoadingElementFromFile();
 }
 
-Package::~Package() noexcept
-{
+Package::~Package() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void Package::serialize(SExpression& root) const
-{
-    LibraryElement::serialize(root);
-    mPads.serialize(root);
-    mFootprints.serialize(root);
+void Package::serialize(SExpression& root) const {
+  LibraryElement::serialize(root);
+  mPads.serialize(root);
+  mFootprints.serialize(root);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

@@ -17,70 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "schematiclayerprovider.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SchematicLayerProvider::SchematicLayerProvider(Project& project):
-    mProject(project)
-{
-    // add all required layers
-    addLayer(GraphicsLayer::sSchematicReferences);
-    addLayer(GraphicsLayer::sSchematicSheetFrames);
-    addLayer(GraphicsLayer::sSymbolOutlines);
-    addLayer(GraphicsLayer::sSymbolGrabAreas);
-    addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
-    addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
-    addLayer(GraphicsLayer::sSymbolPinCirclesReq);
-    addLayer(GraphicsLayer::sSymbolPinNames);
-    addLayer(GraphicsLayer::sSymbolPinNumbers);
-    addLayer(GraphicsLayer::sSymbolNames);
-    addLayer(GraphicsLayer::sSymbolValues);
-    addLayer(GraphicsLayer::sSchematicNetLines);
-    addLayer(GraphicsLayer::sSchematicNetLabels);
-    addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
-    addLayer(GraphicsLayer::sSchematicDocumentation);
-    addLayer(GraphicsLayer::sSchematicComments);
-    addLayer(GraphicsLayer::sSchematicGuide);
+SchematicLayerProvider::SchematicLayerProvider(Project& project)
+  : mProject(project) {
+  // add all required layers
+  addLayer(GraphicsLayer::sSchematicReferences);
+  addLayer(GraphicsLayer::sSchematicSheetFrames);
+  addLayer(GraphicsLayer::sSymbolOutlines);
+  addLayer(GraphicsLayer::sSymbolGrabAreas);
+  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
+  addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
+  addLayer(GraphicsLayer::sSymbolPinCirclesReq);
+  addLayer(GraphicsLayer::sSymbolPinNames);
+  addLayer(GraphicsLayer::sSymbolPinNumbers);
+  addLayer(GraphicsLayer::sSymbolNames);
+  addLayer(GraphicsLayer::sSymbolValues);
+  addLayer(GraphicsLayer::sSchematicNetLines);
+  addLayer(GraphicsLayer::sSchematicNetLabels);
+  addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
+  addLayer(GraphicsLayer::sSchematicDocumentation);
+  addLayer(GraphicsLayer::sSchematicComments);
+  addLayer(GraphicsLayer::sSchematicGuide);
 #ifdef QT_DEBUG
-    addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-    addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-    addLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
-    addLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
-    addLayer(GraphicsLayer::sDebugInvisibleNetPoints);
-    addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
+  addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+  addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
+  addLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
+  addLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
+  addLayer(GraphicsLayer::sDebugInvisibleNetPoints);
+  addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
 #endif
 }
 
-SchematicLayerProvider::~SchematicLayerProvider() noexcept
-{
-    qDeleteAll(mLayers); mLayers.clear();
+SchematicLayerProvider::~SchematicLayerProvider() noexcept {
+  qDeleteAll(mLayers);
+  mLayers.clear();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SchematicLayerProvider::addLayer(const QString& name) noexcept
-{
-    mLayers.append(new GraphicsLayer(name));
+void SchematicLayerProvider::addLayer(const QString& name) noexcept {
+  mLayers.append(new GraphicsLayer(name));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

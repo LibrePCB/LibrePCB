@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWPOLYGON_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWPOLYGON_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "symboleditorstate_drawpolygonbase.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolEditorState_DrawPolygon
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolEditorState_DrawPolygon class
@@ -44,28 +45,29 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-02-23
  */
-class SymbolEditorState_DrawPolygon final : public SymbolEditorState_DrawPolygonBase
-{
-        Q_OBJECT
+class SymbolEditorState_DrawPolygon final
+  : public SymbolEditorState_DrawPolygonBase {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolEditorState_DrawPolygon() = delete;
+  SymbolEditorState_DrawPolygon(const SymbolEditorState_DrawPolygon& other) =
+      delete;
+  explicit SymbolEditorState_DrawPolygon(const Context& context) noexcept;
+  ~SymbolEditorState_DrawPolygon() noexcept;
 
-        // Constructors / Destructor
-        SymbolEditorState_DrawPolygon() = delete;
-        SymbolEditorState_DrawPolygon(const SymbolEditorState_DrawPolygon& other) = delete;
-        explicit SymbolEditorState_DrawPolygon(const Context& context) noexcept;
-        ~SymbolEditorState_DrawPolygon() noexcept;
-
-        // Operator Overloadings
-        SymbolEditorState_DrawPolygon& operator=(const SymbolEditorState_DrawPolygon& rhs) = delete;
+  // Operator Overloadings
+  SymbolEditorState_DrawPolygon& operator       =(
+      const SymbolEditorState_DrawPolygon& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWPOLYGON_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWPOLYGON_H

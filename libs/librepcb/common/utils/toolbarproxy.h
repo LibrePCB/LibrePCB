@@ -20,65 +20,63 @@
 #ifndef LIBREPCB_TOOLBARPROXY_H
 #define LIBREPCB_TOOLBARPROXY_H
 
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ToolBarProxy
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The ToolBarProxy class allows to map a list of QAction's to one QToolBar
+ * @brief The ToolBarProxy class allows to map a list of QAction's to one
+ * QToolBar
  *
  * @author ubruhin
  * @date 2017-08-13
  */
-class ToolBarProxy final : public QObject
-{
-        Q_OBJECT
+class ToolBarProxy final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  ToolBarProxy(QObject* parent = nullptr) noexcept;
+  ToolBarProxy(const ToolBarProxy& other) = delete;
+  ~ToolBarProxy() noexcept;
 
-        // Constructors / Destructor
-        ToolBarProxy(QObject* parent = nullptr) noexcept;
-        ToolBarProxy(const ToolBarProxy& other) = delete;
-        ~ToolBarProxy() noexcept;
+  // Setters
+  void setToolBar(QToolBar* toolbar) noexcept;
+  void setEnabled(bool enabled) noexcept;
 
-        // Setters
-        void setToolBar(QToolBar* toolbar) noexcept;
-        void setEnabled(bool enabled) noexcept;
+  // General Methods
+  void     clear() noexcept;
+  QAction* addAction(std::unique_ptr<QAction> action) noexcept;
+  QAction* addLabel(const QString& text, int indent = 0) noexcept;
+  QAction* addWidget(std::unique_ptr<QWidget> widget) noexcept;
+  QAction* addSeparator() noexcept;
+  void     removeAction(QAction* action) noexcept;
 
-        // General Methods
-        void clear() noexcept;
-        QAction* addAction(std::unique_ptr<QAction> action) noexcept;
-        QAction* addLabel(const QString& text, int indent = 0) noexcept;
-        QAction* addWidget(std::unique_ptr<QWidget> widget) noexcept;
-        QAction* addSeparator() noexcept;
-        void removeAction(QAction* action) noexcept;
+  // Operator Overloadings
+  ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;
 
-        // Operator Overloadings
-        ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;
-
-
-    private: // Data
-        QToolBar* mToolBar;
-        QList<QAction*> mActions;
+private:  // Data
+  QToolBar*       mToolBar;
+  QList<QAction*> mActions;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_TOOLBARPROXY_H
+#endif  // LIBREPCB_TOOLBARPROXY_H

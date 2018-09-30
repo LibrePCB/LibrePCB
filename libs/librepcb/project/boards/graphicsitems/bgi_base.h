@@ -20,53 +20,48 @@
 #ifndef LIBREPCB_PROJECT_BGI_BASE_H
 #define LIBREPCB_PROJECT_BGI_BASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../board.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BGI_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Board Graphics Item Base (BGI_Base) class
  */
-class BGI_Base : public QGraphicsItem
-{
-    public:
+class BGI_Base : public QGraphicsItem {
+public:
+  // Constructors / Destructor
+  explicit BGI_Base() noexcept;
+  virtual ~BGI_Base() noexcept;
 
-        // Constructors / Destructor
-        explicit BGI_Base() noexcept;
-        virtual ~BGI_Base() noexcept;
+protected:
+  static qreal getZValueOfCopperLayer(const QString& name) noexcept;
 
-
-    protected:
-
-        static qreal getZValueOfCopperLayer(const QString& name) noexcept;
-
-
-    private:
-
-        // make some methods inaccessible...
-        //BGI_Base() = delete;
-        BGI_Base(const BGI_Base& other) = delete;
-        BGI_Base& operator=(const BGI_Base& rhs) = delete;
+private:
+  // make some methods inaccessible...
+  // BGI_Base() = delete;
+  BGI_Base(const BGI_Base& other) = delete;
+  BGI_Base& operator=(const BGI_Base& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BGI_BASE_H
+#endif  // LIBREPCB_PROJECT_BGI_BASE_H

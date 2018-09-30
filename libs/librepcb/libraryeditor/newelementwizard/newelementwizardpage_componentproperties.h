@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPROPERTIES_H
 #define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPROPERTIES_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
@@ -38,9 +39,9 @@ namespace Ui {
 class NewElementWizardPage_ComponentProperties;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class NewElementWizardPage_ComponentProperties
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The NewElementWizardPage_ComponentProperties class
@@ -48,46 +49,42 @@ class NewElementWizardPage_ComponentProperties;
  * @author ubruhin
  * @date 2017-03-26
  */
-class NewElementWizardPage_ComponentProperties final : public QWizardPage
-{
-        Q_OBJECT
+class NewElementWizardPage_ComponentProperties final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  NewElementWizardPage_ComponentProperties() = delete;
+  NewElementWizardPage_ComponentProperties(
+      const NewElementWizardPage_ComponentProperties& other) = delete;
+  explicit NewElementWizardPage_ComponentProperties(
+      NewElementWizardContext& context, QWidget* parent = 0) noexcept;
+  ~NewElementWizardPage_ComponentProperties() noexcept;
 
-        // Constructors / Destructor
-        NewElementWizardPage_ComponentProperties() = delete;
-        NewElementWizardPage_ComponentProperties(const NewElementWizardPage_ComponentProperties& other) = delete;
-        explicit NewElementWizardPage_ComponentProperties(NewElementWizardContext& context,
-                                                          QWidget* parent = 0) noexcept;
-        ~NewElementWizardPage_ComponentProperties() noexcept;
+  // Getters
+  bool validatePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
+  // Operator Overloadings
+  NewElementWizardPage_ComponentProperties& operator       =(
+      const NewElementWizardPage_ComponentProperties& rhs) = delete;
 
-        // Getters
-        bool validatePage() noexcept override;
-        bool isComplete() const noexcept override;
-        int nextId() const noexcept override;
+private:  // Methods
+  void initializePage() noexcept override;
+  void cleanupPage() noexcept override;
 
-
-        // Operator Overloadings
-        NewElementWizardPage_ComponentProperties& operator=(const NewElementWizardPage_ComponentProperties& rhs) = delete;
-
-
-    private: // Methods
-        void initializePage() noexcept override;
-        void cleanupPage() noexcept override;
-
-
-    private: // Data
-        NewElementWizardContext& mContext;
-        QScopedPointer<Ui::NewElementWizardPage_ComponentProperties> mUi;
+private:  // Data
+  NewElementWizardContext&                                     mContext;
+  QScopedPointer<Ui::NewElementWizardPage_ComponentProperties> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPROPERTIES_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTPROPERTIES_H

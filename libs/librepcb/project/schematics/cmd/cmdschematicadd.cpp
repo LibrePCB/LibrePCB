@@ -17,60 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicadd.h"
-#include "../schematic.h"
-#include "../../project.h"
 
-/*****************************************************************************************
+#include "../../project.h"
+#include "../schematic.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicAdd::CmdSchematicAdd(Project& project, const ElementName& name) noexcept :
-    UndoCommand(tr("Add schematic")),
-    mProject(project), mName(name), mSchematic(nullptr), mPageIndex(-1)
-{
+CmdSchematicAdd::CmdSchematicAdd(Project&           project,
+                                 const ElementName& name) noexcept
+  : UndoCommand(tr("Add schematic")),
+    mProject(project),
+    mName(name),
+    mSchematic(nullptr),
+    mPageIndex(-1) {
 }
 
-CmdSchematicAdd::~CmdSchematicAdd() noexcept
-{
+CmdSchematicAdd::~CmdSchematicAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicAdd::performExecute()
-{
-    mSchematic = mProject.createSchematic(mName); // can throw
+bool CmdSchematicAdd::performExecute() {
+  mSchematic = mProject.createSchematic(mName);  // can throw
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicAdd::performUndo()
-{
-    mProject.removeSchematic(*mSchematic); // can throw
+void CmdSchematicAdd::performUndo() {
+  mProject.removeSchematic(*mSchematic);  // can throw
 }
 
-void CmdSchematicAdd::performRedo()
-{
-    mProject.addSchematic(*mSchematic, mPageIndex); // can throw
+void CmdSchematicAdd::performRedo() {
+  mProject.addSchematic(*mSchematic, mPageIndex);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

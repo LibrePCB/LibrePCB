@@ -20,71 +20,73 @@
 #ifndef LIBREPCB_CLIPPERHELPERS_H
 #define LIBREPCB_CLIPPERHELPERS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <clipper/clipper.hpp>
+ ******************************************************************************/
 #include "../geometry/path.h"
 
-/*****************************************************************************************
+#include <clipper/clipper.hpp>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ClipperHelpers
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ClipperHelpers class
  */
-class ClipperHelpers final
-{
-        Q_DECLARE_TR_FUNCTIONS(ClipperHelpers)
+class ClipperHelpers final {
+  Q_DECLARE_TR_FUNCTIONS(ClipperHelpers)
 
-    public:
+public:
+  // Disable instantiation
+  ClipperHelpers()  = delete;
+  ~ClipperHelpers() = delete;
 
-        // Disable instantiation
-        ClipperHelpers() = delete;
-        ~ClipperHelpers() = delete;
+  // General Methods
+  static void offset(ClipperLib::Paths& paths, const Length& offset,
+                     const PositiveLength& maxArcTolerance);
+  static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
 
-        // General Methods
-        static void offset(ClipperLib::Paths& paths, const Length& offset,
-                           const PositiveLength& maxArcTolerance);
-        static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
+  // Type Conversions
+  static QVector<Path>     convert(const ClipperLib::Paths& paths) noexcept;
+  static Path              convert(const ClipperLib::Path& path) noexcept;
+  static Point             convert(const ClipperLib::IntPoint& point) noexcept;
+  static ClipperLib::Paths convert(
+      const QVector<Path>&  paths,
+      const PositiveLength& maxArcTolerance) noexcept;
+  static ClipperLib::Path convert(
+      const Path& path, const PositiveLength& maxArcTolerance) noexcept;
+  static ClipperLib::IntPoint convert(const Point& point) noexcept;
 
-        // Type Conversions
-        static QVector<Path> convert(const ClipperLib::Paths& paths) noexcept;
-        static Path convert(const ClipperLib::Path& path) noexcept;
-        static Point convert(const ClipperLib::IntPoint& point) noexcept;
-        static ClipperLib::Paths convert(const QVector<Path>& paths,
-                                         const PositiveLength& maxArcTolerance) noexcept;
-        static ClipperLib::Path convert(const Path& path,
-                                        const PositiveLength& maxArcTolerance) noexcept;
-        static ClipperLib::IntPoint convert(const Point& point) noexcept;
-
-
-    private: // Internal Helper Methods
-        static ClipperLib::Path convertHolesToCutIns(const ClipperLib::Path& outline,
-                                                     const ClipperLib::Paths& holes);
-        static ClipperLib::Paths prepareHoles(const ClipperLib::Paths& holes) noexcept;
-        static ClipperLib::Path rotateCutInHole(const ClipperLib::Path& hole) noexcept;
-        static int getHoleConnectionPointIndex(const ClipperLib::Path& hole) noexcept;
-        static void addCutInToPath(ClipperLib::Path& outline, const ClipperLib::Path& hole);
-        static int insertConnectionPointToPath(ClipperLib::Path& path,
-                                               const ClipperLib::IntPoint& p);
-        static bool calcIntersectionPos(const ClipperLib::IntPoint& p1,
-                                        const ClipperLib::IntPoint& p2,
-                                        const ClipperLib::cInt& x,
-                                        ClipperLib::cInt& y) noexcept;
-
+private:  // Internal Helper Methods
+  static ClipperLib::Path  convertHolesToCutIns(const ClipperLib::Path&  outline,
+                                                const ClipperLib::Paths& holes);
+  static ClipperLib::Paths prepareHoles(
+      const ClipperLib::Paths& holes) noexcept;
+  static ClipperLib::Path rotateCutInHole(
+      const ClipperLib::Path& hole) noexcept;
+  static int getHoleConnectionPointIndex(const ClipperLib::Path& hole) noexcept;
+  static void addCutInToPath(ClipperLib::Path&       outline,
+                             const ClipperLib::Path& hole);
+  static int  insertConnectionPointToPath(ClipperLib::Path&           path,
+                                          const ClipperLib::IntPoint& p);
+  static bool calcIntersectionPos(const ClipperLib::IntPoint& p1,
+                                  const ClipperLib::IntPoint& p2,
+                                  const ClipperLib::cInt&     x,
+                                  ClipperLib::cInt&           y) noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CLIPPERHELPERS_H
+#endif  // LIBREPCB_CLIPPERHELPERS_H

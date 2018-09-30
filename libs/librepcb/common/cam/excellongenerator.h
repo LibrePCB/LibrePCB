@@ -20,22 +20,23 @@
 #ifndef LIBREPCB_EXCELLONGENERATOR_H
 #define LIBREPCB_EXCELLONGENERATOR_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GerberGenerator
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ExcellonGenerator class
@@ -43,48 +44,43 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-03-31
  */
-class ExcellonGenerator final
-{
-        Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
+class ExcellonGenerator final {
+  Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
 
-    public:
+public:
+  // Constructors / Destructor
+  // ExcellonGenerator() = delete;
+  ExcellonGenerator(const ExcellonGenerator& other) = delete;
+  ExcellonGenerator() noexcept;
+  ~ExcellonGenerator() noexcept;
 
-        // Constructors / Destructor
-        //ExcellonGenerator() = delete;
-        ExcellonGenerator(const ExcellonGenerator& other) = delete;
-        ExcellonGenerator() noexcept;
-        ~ExcellonGenerator() noexcept;
+  // Getters
+  const QString& toStr() const noexcept { return mOutput; }
 
-        // Getters
-        const QString& toStr() const noexcept {return mOutput;}
+  // General Methods
+  void drill(const Point& pos, const PositiveLength& dia) noexcept;
+  void generate();
+  void saveToFile(const FilePath& filepath) const;
+  void reset() noexcept;
 
-        // General Methods
-        void drill(const Point& pos, const PositiveLength& dia) noexcept;
-        void generate();
-        void saveToFile(const FilePath& filepath) const;
-        void reset() noexcept;
+  // Operator Overloadings
+  ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
 
-        // Operator Overloadings
-        ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
+private:
+  void printHeader() noexcept;
+  void printToolList() noexcept;
+  void printDrills() noexcept;
+  void printFooter() noexcept;
 
-
-    private:
-
-        void printHeader() noexcept;
-        void printToolList() noexcept;
-        void printDrills() noexcept;
-        void printFooter() noexcept;
-
-
-        // Excellon Data
-        QString mOutput;
-        QMultiMap<Length, Point> mDrillList;
+  // Excellon Data
+  QString                  mOutput;
+  QMultiMap<Length, Point> mDrillList;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_EXCELLONGENERATOR_H
+#endif  // LIBREPCB_EXCELLONGENERATOR_H

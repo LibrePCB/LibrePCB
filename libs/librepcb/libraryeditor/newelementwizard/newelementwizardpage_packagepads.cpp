@@ -17,71 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "newelementwizardpage_packagepads.h"
+
 #include "ui_newelementwizardpage_packagepads.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-NewElementWizardPage_PackagePads::NewElementWizardPage_PackagePads(NewElementWizardContext& context, QWidget *parent) noexcept :
-    QWizardPage(parent), mContext(context), mUi(new Ui::NewElementWizardPage_PackagePads)
-{
-    mUi->setupUi(this);
+NewElementWizardPage_PackagePads::NewElementWizardPage_PackagePads(
+    NewElementWizardContext& context, QWidget* parent) noexcept
+  : QWizardPage(parent),
+    mContext(context),
+    mUi(new Ui::NewElementWizardPage_PackagePads) {
+  mUi->setupUi(this);
 }
 
-NewElementWizardPage_PackagePads::~NewElementWizardPage_PackagePads() noexcept
-{
+NewElementWizardPage_PackagePads::~NewElementWizardPage_PackagePads() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool NewElementWizardPage_PackagePads::validatePage() noexcept
-{
-    return true;
+bool NewElementWizardPage_PackagePads::validatePage() noexcept {
+  return true;
 }
 
-bool NewElementWizardPage_PackagePads::isComplete() const noexcept
-{
-    return true;
+bool NewElementWizardPage_PackagePads::isComplete() const noexcept {
+  return true;
 }
 
-int NewElementWizardPage_PackagePads::nextId() const noexcept
-{
-    return NewElementWizardContext::ID_None;
+int NewElementWizardPage_PackagePads::nextId() const noexcept {
+  return NewElementWizardContext::ID_None;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void NewElementWizardPage_PackagePads::initializePage() noexcept
-{
-    QWizardPage::initializePage();
-    mUi->padListEditorWidget->setReferences(mContext.mPackagePads, nullptr);
+void NewElementWizardPage_PackagePads::initializePage() noexcept {
+  QWizardPage::initializePage();
+  mUi->padListEditorWidget->setReferences(mContext.mPackagePads, nullptr);
 }
 
-void NewElementWizardPage_PackagePads::cleanupPage() noexcept
-{
-    QWizardPage::cleanupPage();
+void NewElementWizardPage_PackagePads::cleanupPage() noexcept {
+  QWizardPage::cleanupPage();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

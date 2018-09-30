@@ -20,73 +20,68 @@
 #ifndef LIBREPCB_CMDLISTELEMENTINSERT
 #define LIBREPCB_CMDLISTELEMENTINSERT
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../../undocommand.h"
 #include "../serializableobjectlist.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdListElementInsert
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdListElementInsert class
  */
 template <typename T, typename P>
-class CmdListElementInsert final : public UndoCommand
-{
-    public:
+class CmdListElementInsert final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdListElementInsert()                                  = delete;
+  CmdListElementInsert(const CmdListElementInsert& other) = delete;
+  CmdListElementInsert(SerializableObjectList<T, P>& list,
+                       const std::shared_ptr<T>&     element,
+                       int                           index = -1) noexcept
+    : UndoCommand(QString(tr("Add %1")).arg(P::tagname)),
+      mList(list),
+      mElement(element),
+      mIndex(index) {}
+  ~CmdListElementInsert() noexcept {}
 
-        // Constructors / Destructor
-        CmdListElementInsert() = delete;
-        CmdListElementInsert(const CmdListElementInsert& other) = delete;
-        CmdListElementInsert(SerializableObjectList<T, P>& list,
-                             const std::shared_ptr<T>& element, int index = -1) noexcept :
-            UndoCommand(QString(tr("Add %1")).arg(P::tagname)), mList(list),
-            mElement(element), mIndex(index) {}
-        ~CmdListElementInsert() noexcept {}
+  // Operator Overloadings
+  CmdListElementInsert& operator=(const CmdListElementInsert& rhs) = delete;
 
-        // Operator Overloadings
-        CmdListElementInsert& operator=(const CmdListElementInsert& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override {
+    if (mIndex < 0) mIndex = mList.count();
+    performRedo();  // can throw
+    return true;
+  }
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override { mList.remove(mIndex); }
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override { mIndex = mList.insert(mIndex, mElement); }
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override {
-            if (mIndex < 0) mIndex = mList.count();
-            performRedo(); // can throw
-            return true;
-        }
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override {
-            mList.remove(mIndex);
-        }
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override {
-            mIndex = mList.insert(mIndex, mElement);
-        }
-
-
-    private: // Data
-        SerializableObjectList<T, P>& mList;
-        std::shared_ptr<T> mElement;
-        int mIndex;
+private:  // Data
+  SerializableObjectList<T, P>& mList;
+  std::shared_ptr<T>            mElement;
+  int                           mIndex;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDLISTELEMENTINSERT
+#endif  // LIBREPCB_CMDLISTELEMENTINSERT

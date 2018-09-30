@@ -17,63 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetlabeladd.h"
-#include "../schematic.h"
+
 #include "../items/si_netlabel.h"
 #include "../items/si_netsegment.h"
+#include "../schematic.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetSegment& segment,
-                                                 const Point& position,
-                                                 const Angle& rotation) noexcept :
-    UndoCommand(tr("Add netlabel")),
-    mNetSegment(segment), mPosition(position), mRotation(rotation), mNetLabel(nullptr)
-{
+                                                 const Point&   position,
+                                                 const Angle& rotation) noexcept
+  : UndoCommand(tr("Add netlabel")),
+    mNetSegment(segment),
+    mPosition(position),
+    mRotation(rotation),
+    mNetLabel(nullptr) {
 }
 
-CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept
-{
+CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetLabelAdd::performExecute()
-{
-    mNetLabel = new SI_NetLabel(mNetSegment, mPosition, mRotation); // can throw
+bool CmdSchematicNetLabelAdd::performExecute() {
+  mNetLabel = new SI_NetLabel(mNetSegment, mPosition, mRotation);  // can throw
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicNetLabelAdd::performUndo()
-{
-    mNetSegment.removeNetLabel(*mNetLabel); // can throw
+void CmdSchematicNetLabelAdd::performUndo() {
+  mNetSegment.removeNetLabel(*mNetLabel);  // can throw
 }
 
-void CmdSchematicNetLabelAdd::performRedo()
-{
-    mNetSegment.addNetLabel(*mNetLabel); // can throw
+void CmdSchematicNetLabelAdd::performRedo() {
+  mNetSegment.addNetLabel(*mNetLabel);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

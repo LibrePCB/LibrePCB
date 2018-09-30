@@ -20,23 +20,25 @@
 #ifndef LIBREPCB_PROJECT_SCHEMATIC_H
 #define LIBREPCB_PROJECT_SCHEMATIC_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <memory>
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/uuid.h>
+ ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GridProperties;
@@ -58,15 +60,16 @@ class SI_NetLine;
 class SI_NetLabel;
 class SchematicSelectionQuery;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Schematic
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The Schematic class represents one schematic page of a project and is always
- * part of a circuit
+ * @brief The Schematic class represents one schematic page of a project and is
+ * always part of a circuit
  *
- * A schematic can contain following items (see #project#SI_Base and #project#SGI_Base):
+ * A schematic can contain following items (see #project#SI_Base and
+ * #project#SGI_Base):
  *  - netsegment:       #project#SI_NetSegment
  *      - netpoint:     #project#SI_NetPoint    + #project#SGI_NetPoint
  *      - netline:      #project#SI_NetLine     + #project#SGI_NetLine
@@ -77,141 +80,144 @@ class SchematicSelectionQuery;
  *  - circle:           TODO
  *  - text:             TODO
  */
-class Schematic final : public QObject, public AttributeProvider,
-                        public SerializableObject
-{
-        Q_OBJECT
+class Schematic final : public QObject,
+                        public AttributeProvider,
+                        public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
 
-        // Types
+  /**
+   * @brief Z Values of all items in a schematic scene (to define the stacking
+   * order)
+   *
+   * These values are used for QGraphicsItem::setZValue() to define the stacking
+   * order of all items in a schematic QGraphicsScene. We use integer values,
+   * even if the z-value of QGraphicsItem is a qreal attribute...
+   *
+   * Low number = background, high number = foreground
+   */
+  enum ItemZValue {
+    ZValue_Default = 0,  ///< this is the default value (behind all other items)
+    ZValue_Symbols,      ///< Z value for #project#SI_Symbol items
+    ZValue_NetLabels,    ///< Z value for #project#SI_NetLabel items
+    ZValue_NetLines,     ///< Z value for #project#SI_NetLine items
+    ZValue_HiddenNetPoints,   ///< Z value for hidden #project#SI_NetPoint items
+    ZValue_VisibleNetPoints,  ///< Z value for visible #project#SI_NetPoint
+                              ///< items
+  };
 
-        /**
-         * @brief Z Values of all items in a schematic scene (to define the stacking order)
-         *
-         * These values are used for QGraphicsItem::setZValue() to define the stacking
-         * order of all items in a schematic QGraphicsScene. We use integer values, even
-         * if the z-value of QGraphicsItem is a qreal attribute...
-         *
-         * Low number = background, high number = foreground
-         */
-        enum ItemZValue {
-            ZValue_Default = 0,         ///< this is the default value (behind all other items)
-            ZValue_Symbols,             ///< Z value for #project#SI_Symbol items
-            ZValue_NetLabels,           ///< Z value for #project#SI_NetLabel items
-            ZValue_NetLines,            ///< Z value for #project#SI_NetLine items
-            ZValue_HiddenNetPoints,     ///< Z value for hidden #project#SI_NetPoint items
-            ZValue_VisibleNetPoints,    ///< Z value for visible #project#SI_NetPoint items
-        };
+  // Constructors / Destructor
+  Schematic()                       = delete;
+  Schematic(const Schematic& other) = delete;
+  Schematic(Project& project, const FilePath& filepath, bool restore,
+            bool readOnly)
+    : Schematic(project, filepath, restore, readOnly, false, QString()) {}
+  ~Schematic() noexcept;
 
+  // Getters: General
+  Project&              getProject() const noexcept { return mProject; }
+  const FilePath&       getFilePath() const noexcept { return mFilePath; }
+  const GridProperties& getGridProperties() const noexcept {
+    return *mGridProperties;
+  }
+  GraphicsScene&  getGraphicsScene() const noexcept { return *mGraphicsScene; }
+  bool            isEmpty() const noexcept;
+  QList<SI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
+  QList<SI_NetPoint*>  getNetPointsAtScenePos(const Point& pos) const noexcept;
+  QList<SI_NetLine*>   getNetLinesAtScenePos(const Point& pos) const noexcept;
+  QList<SI_NetLabel*>  getNetLabelsAtScenePos(const Point& pos) const noexcept;
+  QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
 
-        // Constructors / Destructor
-        Schematic() = delete;
-        Schematic(const Schematic& other) = delete;
-        Schematic(Project& project, const FilePath& filepath, bool restore, bool readOnly) :
-            Schematic(project, filepath, restore, readOnly, false, QString()) {}
-        ~Schematic() noexcept;
+  // Setters: General
+  void setGridProperties(const GridProperties& grid) noexcept;
 
-        // Getters: General
-        Project& getProject() const noexcept {return mProject;}
-        const FilePath& getFilePath() const noexcept {return mFilePath;}
-        const GridProperties& getGridProperties() const noexcept {return *mGridProperties;}
-        GraphicsScene& getGraphicsScene () const noexcept {return *mGraphicsScene;}
-        bool isEmpty() const noexcept;
-        QList<SI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
-        QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
-        QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
-        QList<SI_NetLabel*> getNetLabelsAtScenePos(const Point& pos) const noexcept;
-        QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
+  // Getters: Attributes
+  const Uuid&        getUuid() const noexcept { return mUuid; }
+  const ElementName& getName() const noexcept { return mName; }
+  const QIcon&       getIcon() const noexcept { return mIcon; }
 
-        // Setters: General
-        void setGridProperties(const GridProperties& grid) noexcept;
+  // Symbol Methods
+  QList<SI_Symbol*> getSymbols() const noexcept { return mSymbols; }
+  SI_Symbol*        getSymbolByUuid(const Uuid& uuid) const noexcept;
+  void              addSymbol(SI_Symbol& symbol);
+  void              removeSymbol(SI_Symbol& symbol);
 
-        // Getters: Attributes
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const ElementName& getName() const noexcept {return mName;}
-        const QIcon& getIcon() const noexcept {return mIcon;}
+  // NetSegment Methods
+  SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
+  void           addNetSegment(SI_NetSegment& netsegment);
+  void           removeNetSegment(SI_NetSegment& netsegment);
 
-        // Symbol Methods
-        QList<SI_Symbol*> getSymbols() const noexcept {return mSymbols;}
-        SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
-        void addSymbol(SI_Symbol& symbol);
-        void removeSymbol(SI_Symbol& symbol);
+  // General Methods
+  void addToProject();
+  void removeFromProject();
+  bool save(bool toOriginal, QStringList& errors) noexcept;
+  void showInView(GraphicsView& view) noexcept;
+  void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
+  const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
+  void          setSelectionRect(const Point& p1, const Point& p2,
+                                 bool updateItems) noexcept;
+  void          clearSelection() const noexcept;
+  void          updateAllNetLabelAnchors() noexcept;
+  void          renderToQPainter(QPainter& painter) const noexcept;
+  std::unique_ptr<SchematicSelectionQuery> createSelectionQuery() const
+      noexcept;
 
-        // NetSegment Methods
-        SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
-        void addNetSegment(SI_NetSegment& netsegment);
-        void removeNetSegment(SI_NetSegment& netsegment);
+  // Inherited from AttributeProvider
+  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
+  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  QVector<const AttributeProvider*> getAttributeProviderParents() const
+      noexcept override;
 
-        // General Methods
-        void addToProject();
-        void removeFromProject();
-        bool save(bool toOriginal, QStringList& errors) noexcept;
-        void showInView(GraphicsView& view) noexcept;
-        void saveViewSceneRect(const QRectF& rect) noexcept {mViewRect = rect;}
-        const QRectF& restoreViewSceneRect() const noexcept {return mViewRect;}
-        void setSelectionRect(const Point& p1, const Point& p2, bool updateItems) noexcept;
-        void clearSelection() const noexcept;
-        void updateAllNetLabelAnchors() noexcept;
-        void renderToQPainter(QPainter& painter) const noexcept;
-        std::unique_ptr<SchematicSelectionQuery> createSelectionQuery() const noexcept;
+  // Operator Overloadings
+  Schematic& operator=(const Schematic& rhs) = delete;
+  bool operator==(const Schematic& rhs) noexcept { return (this == &rhs); }
+  bool operator!=(const Schematic& rhs) noexcept { return (this != &rhs); }
 
-        // Inherited from AttributeProvider
-        /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
-        QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-        /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
-        QVector<const AttributeProvider*> getAttributeProviderParents() const noexcept override;
+  // Static Methods
+  static Schematic* create(Project& project, const FilePath& filepath,
+                           const ElementName& name);
 
-        // Operator Overloadings
-        Schematic& operator=(const Schematic& rhs) = delete;
-        bool operator==(const Schematic& rhs) noexcept {return (this == &rhs);}
-        bool operator!=(const Schematic& rhs) noexcept {return (this != &rhs);}
+signals:
 
-        // Static Methods
-        static Schematic* create(Project& project, const FilePath& filepath,
-                                 const ElementName& name);
+  /// @copydoc AttributeProvider::attributesChanged()
+  void attributesChanged() override;
 
+private:
+  Schematic(Project& project, const FilePath& filepath, bool restore,
+            bool readOnly, bool create, const QString& newName);
+  void updateIcon() noexcept;
 
-    signals:
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc AttributeProvider::attributesChanged()
-        void attributesChanged() override;
+  // General
+  Project& mProject;  ///< A reference to the Project object (from the ctor)
+  FilePath
+                                 mFilePath;  ///< the filepath of the schematic *.lp file (from the ctor)
+  QScopedPointer<SmartSExprFile> mFile;
+  bool                           mIsAddedToProject;
 
+  QScopedPointer<GraphicsScene>  mGraphicsScene;
+  QScopedPointer<GridProperties> mGridProperties;
+  QRectF                         mViewRect;
 
-    private:
+  // Attributes
+  Uuid        mUuid;
+  ElementName mName;
+  QIcon       mIcon;
 
-        Schematic(Project& project, const FilePath& filepath, bool restore,
-                  bool readOnly, bool create, const QString& newName);
-        void updateIcon() noexcept;
-
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
-
-
-        // General
-        Project& mProject; ///< A reference to the Project object (from the ctor)
-        FilePath mFilePath; ///< the filepath of the schematic *.lp file (from the ctor)
-        QScopedPointer<SmartSExprFile> mFile;
-        bool mIsAddedToProject;
-
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QScopedPointer<GridProperties> mGridProperties;
-        QRectF mViewRect;
-
-        // Attributes
-        Uuid mUuid;
-        ElementName mName;
-        QIcon mIcon;
-
-        QList<SI_Symbol*> mSymbols;
-        QList<SI_NetSegment*> mNetSegments;
+  QList<SI_Symbol*>     mSymbols;
+  QList<SI_NetSegment*> mNetSegments;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SCHEMATIC_H
+#endif  // LIBREPCB_PROJECT_SCHEMATIC_H

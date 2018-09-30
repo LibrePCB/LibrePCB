@@ -20,96 +20,131 @@
 #ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
 #define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <type_safe/constrained_type.hpp>
+ ******************************************************************************/
 #include <librepcb/common/fileio/sexpression.h>
+#include <type_safe/constrained_type.hpp>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ComponentSymbolVariantItemSuffix
- ****************************************************************************************/
+ ******************************************************************************/
 
 struct ComponentSymbolVariantItemSuffixVerifier {
-    template <typename Value, typename Predicate>
-    static constexpr auto verify(Value&& val, const Predicate& p) -> typename std::decay<Value>::type {
-        return p(val) ? std::forward<Value>(val) : (
-            throw RuntimeError(__FILE__, __LINE__, QString(
-                QApplication::translate("ComponentSymbolVariantItemSuffix",
-                                        "Invalid component symbol suffix: '%1'")).arg(val)),
-            std::forward<Value>(val));
-    }
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val) ? std::forward<Value>(val)
+                  : (throw RuntimeError(
+                         __FILE__, __LINE__,
+                         QString(QApplication::translate(
+                                     "ComponentSymbolVariantItemSuffix",
+                                     "Invalid component symbol suffix: '%1'"))
+                             .arg(val)),
+                     std::forward<Value>(val));
+  }
 };
 
 struct ComponentSymbolVariantItemSuffixConstraint {
-    bool operator()(const QString& value) const noexcept {
-        return QRegularExpression("^[0-9a-zA-Z_]{0,16}$")
-            .match(value, 0, QRegularExpression::PartialPreferCompleteMatch).hasMatch();
-    }
+  bool operator()(const QString& value) const noexcept {
+    return QRegularExpression("^[0-9a-zA-Z_]{0,16}$")
+        .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
+        .hasMatch();
+  }
 };
 
 /**
- * ComponentSymbolVariantItemSuffix is a wrapper around QString which guarantees to
- * contain a valid suffix used for librepcb::library::ComponentSymbolVariantItem
+ * ComponentSymbolVariantItemSuffix is a wrapper around QString which guarantees
+ * to contain a valid suffix used for
+ * librepcb::library::ComponentSymbolVariantItem
  *
  * Such a suffix is considered as valid if it:
  *   - contains only the characters [0-9a-zA-Z_-]
  *   - is not longer than 16 characters
  *
- * The constructor throws an exception if constructed from a QString which is not a valid
- * suffix according these rules.
+ * The constructor throws an exception if constructed from a QString which is
+ * not a valid suffix according these rules.
  */
-using ComponentSymbolVariantItemSuffix = type_safe::constrained_type<QString,
-    ComponentSymbolVariantItemSuffixConstraint, ComponentSymbolVariantItemSuffixVerifier>;
+using ComponentSymbolVariantItemSuffix =
+    type_safe::constrained_type<QString,
+                                ComponentSymbolVariantItemSuffixConstraint,
+                                ComponentSymbolVariantItemSuffixVerifier>;
 
-} // namespace library
+}  // namespace library
 
-inline bool operator==(const library::ComponentSymbolVariantItemSuffix& lhs, const QString& rhs) noexcept {return (*lhs) == rhs;}
-inline bool operator==(const QString& lhs, const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {return lhs == (*rhs);}
-inline bool operator!=(const library::ComponentSymbolVariantItemSuffix& lhs, const QString& rhs) noexcept {return (*lhs) != rhs;}
-inline bool operator!=(const QString& lhs, const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {return lhs != (*rhs);}
-inline QString operator%(const library::ComponentSymbolVariantItemSuffix& lhs, const QString& rhs) noexcept {return (*lhs) % rhs;}
-inline QString operator%(const QString& lhs, const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {return lhs % (*rhs);}
-
-template <>
-inline SExpression serializeToSExpression(const library::ComponentSymbolVariantItemSuffix& obj) {
-    return SExpression::createString(*obj);
+inline bool operator==(const library::ComponentSymbolVariantItemSuffix& lhs,
+                       const QString& rhs) noexcept {
+  return (*lhs) == rhs;
+}
+inline bool operator==(
+    const QString&                                   lhs,
+    const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
+  return lhs == (*rhs);
+}
+inline bool operator!=(const library::ComponentSymbolVariantItemSuffix& lhs,
+                       const QString& rhs) noexcept {
+  return (*lhs) != rhs;
+}
+inline bool operator!=(
+    const QString&                                   lhs,
+    const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
+  return lhs != (*rhs);
+}
+inline QString operator%(const library::ComponentSymbolVariantItemSuffix& lhs,
+                         const QString& rhs) noexcept {
+  return (*lhs) % rhs;
+}
+inline QString operator%(
+    const QString&                                   lhs,
+    const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
+  return lhs % (*rhs);
 }
 
 template <>
-inline library::ComponentSymbolVariantItemSuffix deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    // backward compatibility - remove this some time!
-    str.remove(QRegularExpression("[^0-9a-zA-Z_]"));
-    str.truncate(16);
-    return library::ComponentSymbolVariantItemSuffix(str); // can throw
+inline SExpression serializeToSExpression(
+    const library::ComponentSymbolVariantItemSuffix& obj) {
+  return SExpression::createString(*obj);
 }
 
-inline QDataStream& operator<<(QDataStream& stream, const library::ComponentSymbolVariantItemSuffix& obj) {
-    stream << *obj;
-    return stream;
+template <>
+inline library::ComponentSymbolVariantItemSuffix deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  // backward compatibility - remove this some time!
+  str.remove(QRegularExpression("[^0-9a-zA-Z_]"));
+  str.truncate(16);
+  return library::ComponentSymbolVariantItemSuffix(str);  // can throw
 }
 
-inline QDebug operator<<(QDebug stream, const library::ComponentSymbolVariantItemSuffix& obj) {
-    stream << QString("ComponentSymbolVariantItemSuffix('%1'')").arg(*obj);
-    return stream;
+inline QDataStream& operator<<(
+    QDataStream& stream, const library::ComponentSymbolVariantItemSuffix& obj) {
+  stream << *obj;
+  return stream;
 }
 
-inline uint qHash(const library::ComponentSymbolVariantItemSuffix& key, uint seed = 0) noexcept {
-    return ::qHash(*key, seed);
+inline QDebug operator<<(QDebug stream,
+                         const library::ComponentSymbolVariantItemSuffix& obj) {
+  stream << QString("ComponentSymbolVariantItemSuffix('%1'')").arg(*obj);
+  return stream;
 }
 
-/*****************************************************************************************
+inline uint qHash(const library::ComponentSymbolVariantItemSuffix& key,
+                  uint seed = 0) noexcept {
+  return ::qHash(*key, seed);
+}
+
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
+#endif  // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H

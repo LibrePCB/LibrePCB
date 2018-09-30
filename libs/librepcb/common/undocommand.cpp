@@ -17,70 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "undocommand.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-UndoCommand::UndoCommand(const QString& text) noexcept :
-    mText(text), mIsExecuted(false), mRedoCount(0), mUndoCount(0)
-{
+UndoCommand::UndoCommand(const QString& text) noexcept
+  : mText(text), mIsExecuted(false), mRedoCount(0), mUndoCount(0) {
 }
 
-UndoCommand::~UndoCommand() noexcept
-{
-    Q_ASSERT(qAbs(mRedoCount - mUndoCount) <= 1);
+UndoCommand::~UndoCommand() noexcept {
+  Q_ASSERT(qAbs(mRedoCount - mUndoCount) <= 1);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool UndoCommand::execute()
-{
-    if (mIsExecuted) {
-        throw LogicError(__FILE__, __LINE__);
-    }
+bool UndoCommand::execute() {
+  if (mIsExecuted) {
+    throw LogicError(__FILE__, __LINE__);
+  }
 
-    mIsExecuted = true; // set this flag BEFORE performing the execution!
-    bool retval = performExecute(); // can throw
-    mRedoCount++;
+  mIsExecuted = true;  // set this flag BEFORE performing the execution!
+  bool retval = performExecute();  // can throw
+  mRedoCount++;
 
-    return retval;
+  return retval;
 }
 
-void UndoCommand::undo()
-{
-    if (!isCurrentlyExecuted()) {
-        throw LogicError(__FILE__, __LINE__);
-    }
+void UndoCommand::undo() {
+  if (!isCurrentlyExecuted()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
 
-    performUndo(); // can throw
-    mUndoCount++;
+  performUndo();  // can throw
+  mUndoCount++;
 }
 
-void UndoCommand::redo()
-{
-    if ((!wasEverExecuted()) || (isCurrentlyExecuted())) {
-        throw LogicError(__FILE__, __LINE__);
-    }
+void UndoCommand::redo() {
+  if ((!wasEverExecuted()) || (isCurrentlyExecuted())) {
+    throw LogicError(__FILE__, __LINE__);
+  }
 
-    performRedo(); // can throw
-    mRedoCount++;
+  performRedo();  // can throw
+  mRedoCount++;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

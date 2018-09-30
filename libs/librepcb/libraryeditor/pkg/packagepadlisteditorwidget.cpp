@@ -17,299 +17,315 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "packagepadlisteditorwidget.h"
-#include <librepcb/common/undostack.h>
+
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/undostack.h>
 #include <librepcb/library/pkg/cmd/cmdpackagepadedit.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept :
-    QWidget(parent), mTable(new QTableWidget(this)),
-    mPadList(nullptr), mUndoStack(nullptr)
-{
-    mTable->setCornerButtonEnabled(false);
-    mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    mTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    mTable->setColumnCount(_COLUMN_COUNT);
-    mTable->setHorizontalHeaderItem(COLUMN_NAME,    new QTableWidgetItem(tr("Name")));
-    mTable->setHorizontalHeaderItem(COLUMN_BUTTONS, new QTableWidgetItem(""));
-    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NAME,    QHeaderView::Stretch);
-    mTable->horizontalHeader()->setSectionResizeMode(COLUMN_BUTTONS, QHeaderView::ResizeToContents);
-    mTable->horizontalHeader()->setMinimumSectionSize(10);
-    mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    mTable->verticalHeader()->setMinimumSectionSize(20);
-    mTable->sortByColumn(COLUMN_NAME, Qt::AscendingOrder);
-    connect(mTable, &QTableWidget::currentCellChanged,
-            this, &PackagePadListEditorWidget::currentCellChanged);
-    connect(mTable, &QTableWidget::cellChanged,
-            this, &PackagePadListEditorWidget::tableCellChanged);
+PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
+  : QWidget(parent),
+    mTable(new QTableWidget(this)),
+    mPadList(nullptr),
+    mUndoStack(nullptr) {
+  mTable->setCornerButtonEnabled(false);
+  mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+  mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setColumnCount(_COLUMN_COUNT);
+  mTable->setHorizontalHeaderItem(COLUMN_NAME,
+                                  new QTableWidgetItem(tr("Name")));
+  mTable->setHorizontalHeaderItem(COLUMN_BUTTONS, new QTableWidgetItem(""));
+  mTable->horizontalHeader()->setSectionResizeMode(COLUMN_NAME,
+                                                   QHeaderView::Stretch);
+  mTable->horizontalHeader()->setSectionResizeMode(
+      COLUMN_BUTTONS, QHeaderView::ResizeToContents);
+  mTable->horizontalHeader()->setMinimumSectionSize(10);
+  mTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+  mTable->verticalHeader()->setMinimumSectionSize(20);
+  mTable->sortByColumn(COLUMN_NAME, Qt::AscendingOrder);
+  connect(mTable, &QTableWidget::currentCellChanged, this,
+          &PackagePadListEditorWidget::currentCellChanged);
+  connect(mTable, &QTableWidget::cellChanged, this,
+          &PackagePadListEditorWidget::tableCellChanged);
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mTable);
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mTable);
 }
 
-PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept
-{
-    if (mPadList) mPadList->unregisterObserver(this);
+PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
+  if (mPadList) mPadList->unregisterObserver(this);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadListEditorWidget::setReferences(PackagePadList& list, UndoStack* stack) noexcept
-{
-    if (mPadList) mPadList->unregisterObserver(this);
-    mPadList = &list;
-    mUndoStack = stack;
-    mSelectedPad = tl::nullopt;
-    mPadList->registerObserver(this);
-    updateTable();
+void PackagePadListEditorWidget::setReferences(PackagePadList& list,
+                                               UndoStack*      stack) noexcept {
+  if (mPadList) mPadList->unregisterObserver(this);
+  mPadList     = &list;
+  mUndoStack   = stack;
+  mSelectedPad = tl::nullopt;
+  mPadList->registerObserver(this);
+  updateTable();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Slots
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadListEditorWidget::currentCellChanged(int currentRow, int currentColumn,
-                                                    int previousRow, int previousColumn) noexcept
-{
-    Q_UNUSED(currentColumn);
-    Q_UNUSED(previousRow);
-    Q_UNUSED(previousColumn);
-    mSelectedPad = getUuidOfRow(currentRow);
+void PackagePadListEditorWidget::currentCellChanged(
+    int currentRow, int currentColumn, int previousRow,
+    int previousColumn) noexcept {
+  Q_UNUSED(currentColumn);
+  Q_UNUSED(previousRow);
+  Q_UNUSED(previousColumn);
+  mSelectedPad = getUuidOfRow(currentRow);
 }
 
-void PackagePadListEditorWidget::tableCellChanged(int row, int column) noexcept
-{
-    QTableWidgetItem* item = mTable->item(row, column); Q_ASSERT(item);
-    tl::optional<Uuid> uuid = getUuidOfRow(row);
+void PackagePadListEditorWidget::tableCellChanged(int row,
+                                                  int column) noexcept {
+  QTableWidgetItem* item = mTable->item(row, column);
+  Q_ASSERT(item);
+  tl::optional<Uuid> uuid = getUuidOfRow(row);
 
-    if (isNewPadRow(row)) {
-        if (column == COLUMN_NAME) {
-            item->setText(cleanName(item->text()));
-        }
-    } else if (isExistingPadRow(row) && uuid) {
-        if (column == COLUMN_NAME) {
-            item->setText(*setName(*uuid, cleanName(item->text())));
-        }
+  if (isNewPadRow(row)) {
+    if (column == COLUMN_NAME) {
+      item->setText(cleanName(item->text()));
     }
-}
-
-void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept
-{
-    int row = getRowOfTableCellWidget(sender());
-    tl::optional<Uuid> uuid = getUuidOfRow(row);
-    if (isNewPadRow(row)) {
-        const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME); Q_ASSERT(nameItem);
-        QString name = cleanName(nameItem->text());
-        addPad(!name.isEmpty() ? name : getNextPadNameProposal());
-    } else if (isExistingPadRow(row) && uuid) {
-        removePad(*uuid);
+  } else if (isExistingPadRow(row) && uuid) {
+    if (column == COLUMN_NAME) {
+      item->setText(*setName(*uuid, cleanName(item->text())));
     }
+  }
 }
 
-/*****************************************************************************************
+void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept {
+  int                row  = getRowOfTableCellWidget(sender());
+  tl::optional<Uuid> uuid = getUuidOfRow(row);
+  if (isNewPadRow(row)) {
+    const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME);
+    Q_ASSERT(nameItem);
+    QString name = cleanName(nameItem->text());
+    addPad(!name.isEmpty() ? name : getNextPadNameProposal());
+  } else if (isExistingPadRow(row) && uuid) {
+    removePad(*uuid);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadListEditorWidget::updateTable(const tl::optional<Uuid>& selected) noexcept
-{
-    mTable->blockSignals(true);
+void PackagePadListEditorWidget::updateTable(
+    const tl::optional<Uuid>& selected) noexcept {
+  mTable->blockSignals(true);
 
-    // remove all rows
-    int selectedRow = newPadRow();
-    mTable->clearSelection();
-    mTable->clearContents();
-    mTable->setRowCount(mPadList->count() + 1);
+  // remove all rows
+  int selectedRow = newPadRow();
+  mTable->clearSelection();
+  mTable->clearContents();
+  mTable->setRowCount(mPadList->count() + 1);
 
-    // special row for adding a new pad
-    setTableRowContent(newPadRow(), tl::nullopt, "");
+  // special row for adding a new pad
+  setTableRowContent(newPadRow(), tl::nullopt, "");
 
-    // existing signals
-    for (int i = 0; i < mPadList->count(); ++i) {
-        const PackagePad& pad = *mPadList->at(i);
-        setTableRowContent(indexToRow(i), pad.getUuid(), *pad.getName());
-        if (pad.getUuid() == selected) {
-            selectedRow = indexToRow(i);
-        }
+  // existing signals
+  for (int i = 0; i < mPadList->count(); ++i) {
+    const PackagePad& pad = *mPadList->at(i);
+    setTableRowContent(indexToRow(i), pad.getUuid(), *pad.getName());
+    if (pad.getUuid() == selected) {
+      selectedRow = indexToRow(i);
     }
+  }
 
-    // workaround to trigger column resizing because sometimes auto-resizing does not work
-    mTable->hide(); mTable->show();
+  // workaround to trigger column resizing because sometimes auto-resizing does
+  // not work
+  mTable->hide();
+  mTable->show();
 
-    // set selected row
-    mTable->selectRow(selectedRow);
-    mSelectedPad = selected;
+  // set selected row
+  mTable->selectRow(selectedRow);
+  mSelectedPad = selected;
 
-    mTable->blockSignals(false);
+  mTable->blockSignals(false);
 }
 
-void PackagePadListEditorWidget::setTableRowContent(int row, const tl::optional<Uuid>& uuid,
-                                                    const QString& name) noexcept
-{
-    // header
-    QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new pad:");
-    QTableWidgetItem* headerItem = new QTableWidgetItem(header);
-    headerItem->setToolTip(uuid ? uuid->toStr() : QString());
-    QFont headerFont = headerItem->font();
-    headerFont.setStyleHint(QFont::Monospace); // ensure that the column width is fixed
-    headerFont.setFamily("Monospace");
-    headerItem->setFont(headerFont);
-    mTable->setVerticalHeaderItem(row, headerItem);
+void PackagePadListEditorWidget::setTableRowContent(
+    int row, const tl::optional<Uuid>& uuid, const QString& name) noexcept {
+  // header
+  QString header = uuid ? uuid->toStr().left(13) % "..." : tr("Add new pad:");
+  QTableWidgetItem* headerItem = new QTableWidgetItem(header);
+  headerItem->setToolTip(uuid ? uuid->toStr() : QString());
+  QFont headerFont = headerItem->font();
+  headerFont.setStyleHint(
+      QFont::Monospace);  // ensure that the column width is fixed
+  headerFont.setFamily("Monospace");
+  headerItem->setFont(headerFont);
+  mTable->setVerticalHeaderItem(row, headerItem);
 
-    // name
-    mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));
+  // name
+  mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));
 
-    // button
-    int btnSize = 23; // TODO: can we determine this value dynamically?
-    QToolButton* btnAddRemove = new QToolButton(this);
-    btnAddRemove->setProperty("row", row);
-    btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    btnAddRemove->setFixedSize(btnSize, btnSize);
-    btnAddRemove->setIconSize(QSize(btnSize - 6, btnSize - 6));
-    connect(btnAddRemove, &QToolButton::clicked,
-            this, &PackagePadListEditorWidget::btnAddRemoveClicked);
-    if (isExistingPadRow(row)) {
-        btnAddRemove->setIcon(QIcon(":/img/actions/minus.png"));
-    } else {
-        btnAddRemove->setIcon(QIcon(":/img/actions/add.png"));
-    }
-    mTable->setCellWidget(row, COLUMN_BUTTONS, btnAddRemove);
+  // button
+  int          btnSize = 23;  // TODO: can we determine this value dynamically?
+  QToolButton* btnAddRemove = new QToolButton(this);
+  btnAddRemove->setProperty("row", row);
+  btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  btnAddRemove->setFixedSize(btnSize, btnSize);
+  btnAddRemove->setIconSize(QSize(btnSize - 6, btnSize - 6));
+  connect(btnAddRemove, &QToolButton::clicked, this,
+          &PackagePadListEditorWidget::btnAddRemoveClicked);
+  if (isExistingPadRow(row)) {
+    btnAddRemove->setIcon(QIcon(":/img/actions/minus.png"));
+  } else {
+    btnAddRemove->setIcon(QIcon(":/img/actions/add.png"));
+  }
+  mTable->setCellWidget(row, COLUMN_BUTTONS, btnAddRemove);
 
-    // adjust the height of the row according to the size of the contained widgets
-    mTable->verticalHeader()->resizeSection(row, btnSize);
+  // adjust the height of the row according to the size of the contained widgets
+  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
-void PackagePadListEditorWidget::addPad(const QString& name) noexcept
-{
-    try {
-        CircuitIdentifier constrainedName = validateNameOrThrow(name); // can throw
-        executeCommand(new CmdPackagePadInsert(*mPadList,
-            std::make_shared<PackagePad>(Uuid::createRandom(), constrainedName))); // can throw
-        //updateTable();
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Could not add pad"), e.getMsg());
-    }
+void PackagePadListEditorWidget::addPad(const QString& name) noexcept {
+  try {
+    CircuitIdentifier constrainedName = validateNameOrThrow(name);  // can throw
+    executeCommand(new CmdPackagePadInsert(
+        *mPadList, std::make_shared<PackagePad>(
+                       Uuid::createRandom(), constrainedName)));  // can throw
+    // updateTable();
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Could not add pad"), e.getMsg());
+  }
 }
 
-void PackagePadListEditorWidget::removePad(const Uuid& uuid) noexcept
-{
-    try {
-        const PackagePad* pad = mPadList->get(uuid).get(); // can throw
-        executeCommand(new CmdPackagePadRemove(*mPadList, pad)); // can throw
-        //updateTable(mSelectedPad);
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Could not remove footprint"), e.getMsg());
-    }
+void PackagePadListEditorWidget::removePad(const Uuid& uuid) noexcept {
+  try {
+    const PackagePad* pad = mPadList->get(uuid).get();        // can throw
+    executeCommand(new CmdPackagePadRemove(*mPadList, pad));  // can throw
+    // updateTable(mSelectedPad);
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Could not remove footprint"), e.getMsg());
+  }
 }
 
-CircuitIdentifier PackagePadListEditorWidget::setName(const Uuid& uuid, const QString& name) noexcept
-{
-    PackagePad* pad = mPadList->find(uuid).get(); Q_ASSERT(pad);
-    if (pad->getName() == name) {
-        return pad->getName();
-    }
+CircuitIdentifier PackagePadListEditorWidget::setName(
+    const Uuid& uuid, const QString& name) noexcept {
+  PackagePad* pad = mPadList->find(uuid).get();
+  Q_ASSERT(pad);
+  if (pad->getName() == name) {
+    return pad->getName();
+  }
 
-    try {
-        CircuitIdentifier constrainedName = validateNameOrThrow(name); // can throw
-        QScopedPointer<CmdPackagePadEdit> cmd(new CmdPackagePadEdit(*pad));
-        cmd->setName(constrainedName);
-        executeCommand(cmd.take());
-        return constrainedName;
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Invalid name"), e.getMsg());
-        return pad->getName();
-    }
+  try {
+    CircuitIdentifier constrainedName = validateNameOrThrow(name);  // can throw
+    QScopedPointer<CmdPackagePadEdit> cmd(new CmdPackagePadEdit(*pad));
+    cmd->setName(constrainedName);
+    executeCommand(cmd.take());
+    return constrainedName;
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Invalid name"), e.getMsg());
+    return pad->getName();
+  }
 }
 
-int PackagePadListEditorWidget::getRowOfTableCellWidget(QObject* obj) const noexcept
-{
-    bool ok = false;
-    int row = obj->property("row").toInt(&ok); Q_ASSERT(ok);
-    Q_ASSERT(row >= 0 && row < mTable->rowCount());
-    return row;
+int PackagePadListEditorWidget::getRowOfTableCellWidget(QObject* obj) const
+    noexcept {
+  bool ok  = false;
+  int  row = obj->property("row").toInt(&ok);
+  Q_ASSERT(ok);
+  Q_ASSERT(row >= 0 && row < mTable->rowCount());
+  return row;
 }
 
-tl::optional<Uuid> PackagePadListEditorWidget::getUuidOfRow(int row) const noexcept
-{
-    if (isExistingPadRow(row)) {
-        return mPadList->value(rowToIndex(row))->getUuid();
-    } else {
-        return tl::nullopt;
-    }
+tl::optional<Uuid> PackagePadListEditorWidget::getUuidOfRow(int row) const
+    noexcept {
+  if (isExistingPadRow(row)) {
+    return mPadList->value(rowToIndex(row))->getUuid();
+  } else {
+    return tl::nullopt;
+  }
 }
 
-CircuitIdentifier PackagePadListEditorWidget::validateNameOrThrow(const QString& name) const
-{
-    if (mPadList->contains(name)) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("There is already a pad with the name \"%1\".")).arg(name));
-    }
-    return CircuitIdentifier(name); // can throw
+CircuitIdentifier PackagePadListEditorWidget::validateNameOrThrow(
+    const QString& name) const {
+  if (mPadList->contains(name)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("There is already a pad with the name \"%1\".")).arg(name));
+  }
+  return CircuitIdentifier(name);  // can throw
 }
 
-QString PackagePadListEditorWidget::cleanName(const QString& name) noexcept
-{
-    // TODO: it's ugly to use a method from FilePath...
-    return FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::KeepCase);
+QString PackagePadListEditorWidget::cleanName(const QString& name) noexcept {
+  // TODO: it's ugly to use a method from FilePath...
+  return FilePath::cleanFileName(name,
+                                 FilePath::ReplaceSpaces | FilePath::KeepCase);
 }
 
-void PackagePadListEditorWidget::executeCommand(UndoCommand* cmd)
-{
-    if (mUndoStack) {
-        mUndoStack->execCmd(cmd); // can throw
-    } else {
-        QScopedPointer<UndoCommand> guardedCmd(cmd);
-        guardedCmd->execute(); // can throw
-    }
+void PackagePadListEditorWidget::executeCommand(UndoCommand* cmd) {
+  if (mUndoStack) {
+    mUndoStack->execCmd(cmd);  // can throw
+  } else {
+    QScopedPointer<UndoCommand> guardedCmd(cmd);
+    guardedCmd->execute();  // can throw
+  }
 }
 
-QString PackagePadListEditorWidget::getNextPadNameProposal() const noexcept
-{
-    int i = 1;
-    while (mPadList->contains(QString::number(i))) {++i;}
-    return QString::number(i);
+QString PackagePadListEditorWidget::getNextPadNameProposal() const noexcept {
+  int i = 1;
+  while (mPadList->contains(QString::number(i))) {
+    ++i;
+  }
+  return QString::number(i);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Observer Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void PackagePadListEditorWidget::listObjectAdded(const PackagePadList& list, int newIndex,
-                                                 const std::shared_ptr<PackagePad>& ptr) noexcept
-{
-    Q_ASSERT(&list == mPadList); Q_UNUSED(list); Q_UNUSED(newIndex); Q_UNUSED(ptr);
-    updateTable(mSelectedPad);
+void PackagePadListEditorWidget::listObjectAdded(
+    const PackagePadList& list, int newIndex,
+    const std::shared_ptr<PackagePad>& ptr) noexcept {
+  Q_ASSERT(&list == mPadList);
+  Q_UNUSED(list);
+  Q_UNUSED(newIndex);
+  Q_UNUSED(ptr);
+  updateTable(mSelectedPad);
 }
 
-void PackagePadListEditorWidget::listObjectRemoved(const PackagePadList& list, int oldIndex,
-                                                   const std::shared_ptr<PackagePad>& ptr) noexcept
-{
-    Q_ASSERT(&list == mPadList); Q_UNUSED(list); Q_UNUSED(oldIndex); Q_UNUSED(ptr);
-    updateTable(mSelectedPad);
+void PackagePadListEditorWidget::listObjectRemoved(
+    const PackagePadList& list, int oldIndex,
+    const std::shared_ptr<PackagePad>& ptr) noexcept {
+  Q_ASSERT(&list == mPadList);
+  Q_UNUSED(list);
+  Q_UNUSED(oldIndex);
+  Q_UNUSED(ptr);
+  updateTable(mSelectedPad);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

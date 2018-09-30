@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_POLYGONPROPERTIESDIALOG_H
 #define LIBREPCB_POLYGONPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../geometry/vertex.h"
 #include "../units/all_length_units.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -41,48 +42,46 @@ namespace Ui {
 class PolygonPropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PolygonPropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PolygonPropertiesDialog class
  */
-class PolygonPropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class PolygonPropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PolygonPropertiesDialog()                                     = delete;
+  PolygonPropertiesDialog(const PolygonPropertiesDialog& other) = delete;
+  PolygonPropertiesDialog(Polygon& polygon, UndoStack& undoStack,
+                          QList<GraphicsLayer*> layers,
+                          QWidget*              parent = nullptr) noexcept;
+  ~PolygonPropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        PolygonPropertiesDialog() = delete;
-        PolygonPropertiesDialog(const PolygonPropertiesDialog& other) = delete;
-        PolygonPropertiesDialog(Polygon& polygon, UndoStack& undoStack,
-                                QList<GraphicsLayer*> layers, QWidget* parent = nullptr) noexcept;
-        ~PolygonPropertiesDialog() noexcept;
+  // Operator Overloadings
+  PolygonPropertiesDialog& operator=(const PolygonPropertiesDialog& rhs) =
+      delete;
 
-        // Operator Overloadings
-        PolygonPropertiesDialog& operator=(const PolygonPropertiesDialog& rhs) = delete;
+private:  // GUI Events
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
 
+private:  // Methods
+  bool applyChanges() noexcept;
+  void selectLayerNameInCombobox(const QString& name) noexcept;
 
-    private: // GUI Events
-        void buttonBoxClicked(QAbstractButton* button) noexcept;
-
-    private: // Methods
-        bool applyChanges() noexcept;
-        void selectLayerNameInCombobox(const QString& name) noexcept;
-
-
-    private: // Data
-        Polygon& mPolygon;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::PolygonPropertiesDialog> mUi;
+private:  // Data
+  Polygon&                                    mPolygon;
+  UndoStack&                                  mUndoStack;
+  QScopedPointer<Ui::PolygonPropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_POLYGONPROPERTIESDIALOG_H
+#endif  // LIBREPCB_POLYGONPROPERTIESDIALOG_H

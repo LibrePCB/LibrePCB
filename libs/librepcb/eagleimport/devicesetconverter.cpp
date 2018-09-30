@@ -17,126 +17,131 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "devicesetconverter.h"
-#include "converterdb.h"
-#include <parseagle/deviceset/deviceset.h>
-#include <librepcb/library/cmp/component.h>
 
-/*****************************************************************************************
+#include "converterdb.h"
+
+#include <librepcb/library/cmp/component.h>
+#include <parseagle/deviceset/deviceset.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace eagleimport {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-DeviceSetConverter::DeviceSetConverter(const parseagle::DeviceSet& deviceSet, ConverterDb& db) noexcept :
-    mDeviceSet(deviceSet), mDb(db)
-{
+DeviceSetConverter::DeviceSetConverter(const parseagle::DeviceSet& deviceSet,
+                                       ConverterDb&                db) noexcept
+  : mDeviceSet(deviceSet), mDb(db) {
 }
 
-DeviceSetConverter::~DeviceSetConverter() noexcept
-{
+DeviceSetConverter::~DeviceSetConverter() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-std::unique_ptr<library::Component> DeviceSetConverter::generate() const
-{
-    // create  component
-    std::unique_ptr<library::Component> component(
-        new library::Component(mDb.getComponentUuid(mDeviceSet.getName()),
-                               Version::fromString("0.1"), "LibrePCB",
-                               ElementName(mDeviceSet.getName()),
-                               createDescription(), "")); // can throw
+std::unique_ptr<library::Component> DeviceSetConverter::generate() const {
+  // create  component
+  std::unique_ptr<library::Component> component(new library::Component(
+      mDb.getComponentUuid(mDeviceSet.getName()), Version::fromString("0.1"),
+      "LibrePCB", ElementName(mDeviceSet.getName()), createDescription(),
+      ""));  // can throw
 
-    // properties
-    component->getPrefixes().setDefaultValue(
-        library::ComponentPrefix(mDeviceSet.getPrefix())); // can throw
+  // properties
+  component->getPrefixes().setDefaultValue(
+      library::ComponentPrefix(mDeviceSet.getPrefix()));  // can throw
 
-    // symbol variant
-    std::shared_ptr<library::ComponentSymbolVariant> symbolVariant(
-        new library::ComponentSymbolVariant(mDb.getSymbolVariantUuid(component->getUuid()),
-                                            "", ElementName("default"), "")); // can throw
-    component->getSymbolVariants().append(symbolVariant);
+  // symbol variant
+  std::shared_ptr<library::ComponentSymbolVariant> symbolVariant(
+      new library::ComponentSymbolVariant(
+          mDb.getSymbolVariantUuid(component->getUuid()), "",
+          ElementName("default"), ""));  // can throw
+  component->getSymbolVariants().append(symbolVariant);
 
-    // signals
-    if (mDeviceSet.getDevices().isEmpty()) {
-        throw Exception(__FILE__, __LINE__, "Empty device set");
+  // signals
+  if (mDeviceSet.getDevices().isEmpty()) {
+    throw Exception(__FILE__, __LINE__, "Empty device set");
+  }
+  const parseagle::Device firstDevice = mDeviceSet.getDevices().first();
+  foreach (const parseagle::Connection& connection,
+           firstDevice.getConnections()) {
+    QString gateName = connection.getGate();
+    QString pinName  = connection.getPin();
+    if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
+    if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
+    Uuid signalUuid =
+        mDb.getComponentSignalUuid(component->getUuid(), gateName, pinName);
+    CircuitIdentifier signalName(pinName);  // can throw
+    if (!component->getSignals().contains(signalUuid)) {
+      // create signal
+      component->getSignals().append(
+          std::make_shared<library::ComponentSignal>(signalUuid, signalName));
     }
-    const parseagle::Device firstDevice = mDeviceSet.getDevices().first();
-    foreach (const parseagle::Connection& connection, firstDevice.getConnections()) {
-        QString gateName = connection.getGate();
+  }
+
+  // symbol variant items
+  foreach (const parseagle::Gate& gate, mDeviceSet.getGates()) {
+    QString gateName   = gate.getName();
+    QString symbolName = gate.getSymbol();
+    Uuid    symbolUuid = mDb.getSymbolUuid(symbolName);
+    library::ComponentSymbolVariantItemSuffix suffix(
+        (gateName == "G$1") ? "" : gateName);  // can throw
+
+    // create symbol variant item
+    std::shared_ptr<library::ComponentSymbolVariantItem> item(
+        new library::ComponentSymbolVariantItem(
+            mDb.getSymbolVariantItemUuid(component->getUuid(), gateName),
+            symbolUuid, true, suffix));
+
+    // connect pins
+    foreach (const parseagle::Connection& connection,
+             firstDevice.getConnections()) {
+      if (connection.getGate() == gateName) {
         QString pinName = connection.getPin();
         if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
         if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
-        Uuid signalUuid = mDb.getComponentSignalUuid(component->getUuid(), gateName, pinName);
-        CircuitIdentifier signalName(pinName); // can throw
-        if (!component->getSignals().contains(signalUuid)) {
-            // create signal
-            component->getSignals().append(std::make_shared<library::ComponentSignal>(
-                                               signalUuid, signalName));
-        }
+        item->getPinSignalMap().append(
+            std::make_shared<library::ComponentPinSignalMapItem>(
+                mDb.getSymbolPinUuid(symbolUuid, pinName),
+                mDb.getComponentSignalUuid(component->getUuid(), gateName,
+                                           pinName),
+                library::CmpSigPinDisplayType::componentSignal()));
+      }
     }
 
-    // symbol variant items
-    foreach (const parseagle::Gate& gate, mDeviceSet.getGates()) {
-        QString gateName = gate.getName();
-        QString symbolName = gate.getSymbol();
-        Uuid symbolUuid = mDb.getSymbolUuid(symbolName);
-        library::ComponentSymbolVariantItemSuffix suffix((gateName == "G$1") ? "" : gateName); // can throw
+    symbolVariant->getSymbolItems().append(item);
+  }
 
-        // create symbol variant item
-        std::shared_ptr<library::ComponentSymbolVariantItem> item(
-            new library::ComponentSymbolVariantItem(
-                mDb.getSymbolVariantItemUuid(component->getUuid(), gateName),
-                symbolUuid, true, suffix));
-
-        // connect pins
-        foreach (const parseagle::Connection& connection, firstDevice.getConnections()) {
-            if (connection.getGate() == gateName) {
-                QString pinName = connection.getPin();
-                if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
-                if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
-                item->getPinSignalMap().append(
-                    std::make_shared<library::ComponentPinSignalMapItem>(
-                        mDb.getSymbolPinUuid(symbolUuid, pinName),
-                        mDb.getComponentSignalUuid(component->getUuid(), gateName, pinName),
-                        library::CmpSigPinDisplayType::componentSignal()));
-            }
-        }
-
-        symbolVariant->getSymbolItems().append(item);
-    }
-
-    return component;
+  return component;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QString DeviceSetConverter::createDescription() const noexcept
-{
-    QString desc = mDeviceSet.getDescription() + "\n\n";
-    desc += "This component was automatically imported from Eagle.\n";
-    desc += "Library: " % mDb.getCurrentLibraryFilePath().getFilename() % "\n";
-    desc += "DeviceSet: " % mDeviceSet.getName() % "\n";
-    desc += "NOTE: Please remove this text after manual rework!";
-    return desc.trimmed();
+QString DeviceSetConverter::createDescription() const noexcept {
+  QString desc = mDeviceSet.getDescription() + "\n\n";
+  desc += "This component was automatically imported from Eagle.\n";
+  desc += "Library: " % mDb.getCurrentLibraryFilePath().getFilename() % "\n";
+  desc += "DeviceSet: " % mDeviceSet.getName() % "\n";
+  desc += "NOTE: Please remove this text after manual rework!";
+  return desc.trimmed();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace eagleimport
+}  // namespace librepcb

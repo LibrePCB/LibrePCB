@@ -17,67 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetsegmentedit.h"
+
 #include "../items/si_netsegment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetSegmentEdit::CmdSchematicNetSegmentEdit(SI_NetSegment& netsegment) noexcept :
-    UndoCommand(tr("Edit net segment")), mNetSegment(netsegment),
-    mOldNetSignal(&netsegment.getNetSignal()), mNewNetSignal(mOldNetSignal)
-{
+CmdSchematicNetSegmentEdit::CmdSchematicNetSegmentEdit(
+    SI_NetSegment& netsegment) noexcept
+  : UndoCommand(tr("Edit net segment")),
+    mNetSegment(netsegment),
+    mOldNetSignal(&netsegment.getNetSignal()),
+    mNewNetSignal(mOldNetSignal) {
 }
 
-CmdSchematicNetSegmentEdit::~CmdSchematicNetSegmentEdit() noexcept
-{
+CmdSchematicNetSegmentEdit::~CmdSchematicNetSegmentEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdSchematicNetSegmentEdit::setNetSignal(NetSignal& netsignal) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNetSignal = &netsignal;
+void CmdSchematicNetSegmentEdit::setNetSignal(NetSignal& netsignal) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewNetSignal = &netsignal;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetSegmentEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdSchematicNetSegmentEdit::performExecute() {
+  performRedo();  // can throw
 
-    return (mNewNetSignal != mOldNetSignal);
+  return (mNewNetSignal != mOldNetSignal);
 }
 
-void CmdSchematicNetSegmentEdit::performUndo()
-{
-    mNetSegment.setNetSignal(*mOldNetSignal); // can throw
+void CmdSchematicNetSegmentEdit::performUndo() {
+  mNetSegment.setNetSignal(*mOldNetSignal);  // can throw
 }
 
-void CmdSchematicNetSegmentEdit::performRedo()
-{
-    mNetSegment.setNetSignal(*mNewNetSignal); // can throw
+void CmdSchematicNetSegmentEdit::performRedo() {
+  mNetSegment.setNetSignal(*mNewNetSignal);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_FIRSTRUNWIZARD_H
 #define LIBREPCB_FIRSTRUNWIZARD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
@@ -37,9 +38,9 @@ namespace Ui {
 class FirstRunWizard;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FirstRunWizard
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FirstRunWizard class
@@ -47,45 +48,41 @@ class FirstRunWizard;
  * @author ubruhin
  * @date 2015-09-22
  */
-class FirstRunWizard final : public QWizard
-{
-        Q_OBJECT
+class FirstRunWizard final : public QWizard {
+  Q_OBJECT
 
-        enum PageId {
-            Page_Welcome,
-            Page_WorkspacePath,
-            Page_WorkspaceSettings,
-        };
+  enum PageId {
+    Page_Welcome,
+    Page_WorkspacePath,
+    Page_WorkspaceSettings,
+  };
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit FirstRunWizard(QWidget* parent = 0) noexcept;
+  ~FirstRunWizard() noexcept;
 
-        // Constructors / Destructor
-        explicit FirstRunWizard(QWidget* parent = 0) noexcept;
-        ~FirstRunWizard() noexcept;
+  // Getters
+  bool     getCreateNewWorkspace() const noexcept;
+  FilePath getWorkspaceFilePath() const noexcept;
+  QString  getNewWorkspaceUserName() const noexcept;
 
-        // Getters
-        bool getCreateNewWorkspace() const noexcept;
-        FilePath getWorkspaceFilePath() const noexcept;
-        QString getNewWorkspaceUserName() const noexcept;
+  // Inherited from QWizard
+  int nextId() const override;
 
-        // Inherited from QWizard
-        int nextId() const override;
+private:
+  // Private Methods
+  Q_DISABLE_COPY(FirstRunWizard)
 
-
-    private:
-
-        // Private Methods
-        Q_DISABLE_COPY(FirstRunWizard)
-
-        // Private Membervariables
-        QScopedPointer<Ui::FirstRunWizard> mUi;
+  // Private Membervariables
+  QScopedPointer<Ui::FirstRunWizard> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_FIRSTRUNWIZARD_H
+#endif  // LIBREPCB_FIRSTRUNWIZARD_H

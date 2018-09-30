@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_HOLEPROPERTIESDIALOG_H
 #define LIBREPCB_HOLEPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -38,44 +38,41 @@ namespace Ui {
 class HolePropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class HolePropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The HolePropertiesDialog class
  */
-class HolePropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class HolePropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  HolePropertiesDialog()                                  = delete;
+  HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
+  HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
+                       QWidget* parent = nullptr) noexcept;
+  ~HolePropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        HolePropertiesDialog() = delete;
-        HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
-        HolePropertiesDialog(Hole& hole, UndoStack& undoStack, QWidget* parent = nullptr) noexcept;
-        ~HolePropertiesDialog() noexcept;
+  // Operator Overloadings
+  HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
 
-        // Operator Overloadings
-        HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
+private:  // Methods
+  void on_buttonBox_clicked(QAbstractButton* button);
+  bool applyChanges() noexcept;
 
-
-    private: // Methods
-        void on_buttonBox_clicked(QAbstractButton *button);
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        Hole& mHole;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::HolePropertiesDialog> mUi;
+private:  // Data
+  Hole&                                    mHole;
+  UndoStack&                               mUndoStack;
+  QScopedPointer<Ui::HolePropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_HOLEPROPERTIESDIALOG_H
+#endif  // LIBREPCB_HOLEPROPERTIESDIALOG_H

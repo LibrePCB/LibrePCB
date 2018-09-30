@@ -17,107 +17,104 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "smartfile.h"
+
 #include "fileutils.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
-    mFilePath(filepath), mTmpFilePath(filepath.toStr() % '~'),
-    mOpenedFilePath(filepath), mIsRestored(restore), mIsReadOnly(readOnly),
-    mIsCreated(create)
-{
-    if (create)
-    {
-        Q_ASSERT(mIsRestored == false);
-        Q_ASSERT(mIsReadOnly == false);
+SmartFile::SmartFile(const FilePath& filepath, bool restore, bool readOnly,
+                     bool create)
+  : mFilePath(filepath),
+    mTmpFilePath(filepath.toStr() % '~'),
+    mOpenedFilePath(filepath),
+    mIsRestored(restore),
+    mIsReadOnly(readOnly),
+    mIsCreated(create) {
+  if (create) {
+    Q_ASSERT(mIsRestored == false);
+    Q_ASSERT(mIsReadOnly == false);
 
-        // remove the files if they exists already
-        if (mFilePath.isExistingFile()) {
-            FileUtils::removeFile(mFilePath);
-        }
-        if (mTmpFilePath.isExistingFile()) {
-            FileUtils::removeFile(mTmpFilePath);
-        }
+    // remove the files if they exists already
+    if (mFilePath.isExistingFile()) {
+      FileUtils::removeFile(mFilePath);
     }
-    else
-    {
-        // decide if we open the original file (*.*) or the backup (*.*~)
-        if ((mIsRestored) && (mTmpFilePath.isExistingFile())) {
-            mOpenedFilePath = mTmpFilePath;
-        }
-
-        // check if the file exists
-        if (!mOpenedFilePath.isExistingFile()) {
-            throw RuntimeError(__FILE__, __LINE__,
-                QString(tr("The file \"%1\" does not exist!")).arg(mOpenedFilePath.toNative()));
-        }
+    if (mTmpFilePath.isExistingFile()) {
+      FileUtils::removeFile(mTmpFilePath);
     }
+  } else {
+    // decide if we open the original file (*.*) or the backup (*.*~)
+    if ((mIsRestored) && (mTmpFilePath.isExistingFile())) {
+      mOpenedFilePath = mTmpFilePath;
+    }
+
+    // check if the file exists
+    if (!mOpenedFilePath.isExistingFile()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString(tr("The file \"%1\" does not exist!"))
+                             .arg(mOpenedFilePath.toNative()));
+    }
+  }
 }
 
-SmartFile::~SmartFile() noexcept
-{
-    // remove temporary file, if required
-    if ((!mIsRestored) && (!mIsReadOnly) && (mTmpFilePath.isExistingFile())) {
-        try {
-            FileUtils::removeFile(mTmpFilePath);
-        } catch (const Exception& e) {
-            qWarning() << "Could not remove temporary file:" << e.getMsg();
-        }
+SmartFile::~SmartFile() noexcept {
+  // remove temporary file, if required
+  if ((!mIsRestored) && (!mIsReadOnly) && (mTmpFilePath.isExistingFile())) {
+    try {
+      FileUtils::removeFile(mTmpFilePath);
+    } catch (const Exception& e) {
+      qWarning() << "Could not remove temporary file:" << e.getMsg();
     }
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SmartFile::removeFile(bool original)
-{
-    if (mIsReadOnly) {
-        throw LogicError(__FILE__, __LINE__, tr("Cannot remove read-only file!"));
-    }
+void SmartFile::removeFile(bool original) {
+  if (mIsReadOnly) {
+    throw LogicError(__FILE__, __LINE__, tr("Cannot remove read-only file!"));
+  }
 
-    FilePath filepath(original ? mFilePath : mTmpFilePath);
-    if (filepath.isExistingFile()) {
-        FileUtils::removeFile(filepath);
-    }
+  FilePath filepath(original ? mFilePath : mTmpFilePath);
+  if (filepath.isExistingFile()) {
+    FileUtils::removeFile(filepath);
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Protected Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal)
-{
-    if (mIsReadOnly) {
-        throw LogicError(__FILE__, __LINE__, tr("Cannot save read-only file!"));
-    }
+const FilePath& SmartFile::prepareSaveAndReturnFilePath(bool toOriginal) {
+  if (mIsReadOnly) {
+    throw LogicError(__FILE__, __LINE__, tr("Cannot save read-only file!"));
+  }
 
-    return toOriginal ? mFilePath : mTmpFilePath;
+  return toOriginal ? mFilePath : mTmpFilePath;
 }
 
-void SmartFile::updateMembersAfterSaving(bool toOriginal) noexcept
-{
-    if (toOriginal && mIsRestored)
-        mIsRestored = false;
+void SmartFile::updateMembersAfterSaving(bool toOriginal) noexcept {
+  if (toOriginal && mIsRestored) mIsRestored = false;
 
-    if (toOriginal && mIsCreated)
-        mIsCreated = false;
+  if (toOriginal && mIsCreated) mIsCreated = false;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

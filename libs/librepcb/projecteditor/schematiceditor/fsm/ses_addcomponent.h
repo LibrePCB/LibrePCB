@@ -20,22 +20,23 @@
 #ifndef LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
 #define LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "ses_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
 class Component;
 class ComponentSymbolVariant;
 class ComponentSymbolVariantItem;
-}
+}  // namespace library
 
 namespace project {
 
@@ -47,57 +48,54 @@ namespace editor {
 
 class AddComponentDialog;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SES_AddComponent
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SES_AddComponent class
  */
-class SES_AddComponent final : public SES_Base
-{
-        Q_OBJECT
+class SES_AddComponent final : public SES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit SES_AddComponent(SchematicEditor&     editor,
+                            Ui::SchematicEditor& editorUi,
+                            GraphicsView&        editorGraphicsView,
+                            UndoStack&           undoStack);
+  ~SES_AddComponent();
 
-        // Constructors / Destructor
-        explicit SES_AddComponent(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                                  GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~SES_AddComponent();
+  // General Methods
+  ProcRetVal process(SEE_Base* event) noexcept override;
+  bool       entry(SEE_Base* event) noexcept override;
+  bool       exit(SEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(SEE_Base* event) noexcept override;
-        bool entry(SEE_Base* event) noexcept override;
-        bool exit(SEE_Base* event) noexcept override;
-
-
-    private:
-
-        // Private Methods
-        ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-        void startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
+private:
+  // Private Methods
+  ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
+  void       startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
                                   const tl::optional<Uuid>& symbVar = tl::nullopt);
-        bool abortCommand(bool showErrMsgBox) noexcept;
+  bool       abortCommand(bool showErrMsgBox) noexcept;
 
+  // Attributes
+  bool                mIsUndoCmdActive;
+  AddComponentDialog* mAddComponentDialog;
+  Angle               mLastAngle;
 
-        // Attributes
-        bool mIsUndoCmdActive;
-        AddComponentDialog* mAddComponentDialog;
-        Angle mLastAngle;
-
-        // information about the current component/symbol to place
-        ComponentInstance* mCurrentComponent;
-        int mCurrentSymbVarItemIndex;
-        SI_Symbol* mCurrentSymbolToPlace;
-        CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
+  // information about the current component/symbol to place
+  ComponentInstance*     mCurrentComponent;
+  int                    mCurrentSymbVarItemIndex;
+  SI_Symbol*             mCurrentSymbolToPlace;
+  CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
+#endif  // LIBREPCB_PROJECT_SES_ADDCOMPONENT_H

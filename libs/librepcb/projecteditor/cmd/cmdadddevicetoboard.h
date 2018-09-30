@@ -20,17 +20,18 @@
 #ifndef LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
 #define LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/uuid.h>
 #include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -49,59 +50,55 @@ class BI_Device;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdAddDeviceToBoard
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdAddDeviceToBoard class
  */
-class CmdAddDeviceToBoard final : public UndoCommandGroup
-{
-    public:
+class CmdAddDeviceToBoard final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
+                      ComponentInstance& cmpInstance, const Uuid& deviceUuid,
+                      const tl::optional<Uuid>& footprintUuid,
+                      const Point&              position = Point(),
+                      const Angle&              rotation = Angle(),
+                      bool                      mirror   = false) noexcept;
+  ~CmdAddDeviceToBoard() noexcept;
 
-        // Constructors / Destructor
-        CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
-                            ComponentInstance& cmpInstance, const Uuid& deviceUuid,
-                            const tl::optional<Uuid>& footprintUuid,
-                            const Point& position = Point(),
-                            const Angle& rotation = Angle(), bool mirror = false) noexcept;
-        ~CmdAddDeviceToBoard() noexcept;
+  // Getters
+  BI_Device* getDeviceInstance() const noexcept { return mDeviceInstance; }
 
-        // Getters
-        BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  // Private Member Variables
 
-        // Private Methods
+  // Attributes from the constructor
+  workspace::Workspace& mWorkspace;
+  Board&                mBoard;
+  ComponentInstance&    mComponentInstance;
+  Uuid                  mDeviceUuid;
+  tl::optional<Uuid>    mFootprintUuid;
+  Point                 mPosition;
+  Angle                 mRotation;
+  bool                  mMirror;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        workspace::Workspace& mWorkspace;
-        Board& mBoard;
-        ComponentInstance& mComponentInstance;
-        Uuid mDeviceUuid;
-        tl::optional<Uuid> mFootprintUuid;
-        Point mPosition;
-        Angle mRotation;
-        bool mMirror;
-
-        // child commands
-        BI_Device* mDeviceInstance;
+  // child commands
+  BI_Device* mDeviceInstance;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
+#endif  // LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H

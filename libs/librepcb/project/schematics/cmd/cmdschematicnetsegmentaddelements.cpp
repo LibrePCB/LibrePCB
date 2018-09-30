@@ -17,88 +17,85 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetsegmentaddelements.h"
-#include "../items/si_netpoint.h"
+
 #include "../items/si_netline.h"
+#include "../items/si_netpoint.h"
 #include "../items/si_netsegment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetSegmentAddElements::CmdSchematicNetSegmentAddElements(SI_NetSegment& segment) noexcept :
-    UndoCommand(tr("Add net segment elements")),
-    mNetSegment(segment)
-{
+CmdSchematicNetSegmentAddElements::CmdSchematicNetSegmentAddElements(
+    SI_NetSegment& segment) noexcept
+  : UndoCommand(tr("Add net segment elements")), mNetSegment(segment) {
 }
 
-CmdSchematicNetSegmentAddElements::~CmdSchematicNetSegmentAddElements() noexcept
-{
+CmdSchematicNetSegmentAddElements::
+    ~CmdSchematicNetSegmentAddElements() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(SI_NetPoint& netpoint)
-{
-    mNetPoints.append(&netpoint);
-    return &netpoint;
+SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(
+    SI_NetPoint& netpoint) {
+  mNetPoints.append(&netpoint);
+  return &netpoint;
 }
 
-SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(const Point& position)
-{
-    SI_NetPoint* netpoint = new SI_NetPoint(mNetSegment, position); // can throw
-    return addNetPoint(*netpoint);
+SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(
+    const Point& position) {
+  SI_NetPoint* netpoint = new SI_NetPoint(mNetSegment, position);  // can throw
+  return addNetPoint(*netpoint);
 }
 
-SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(SI_NetLine& netline)
-{
-    mNetLines.append(&netline);
-    return &netline;
+SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(SI_NetLine& netline) {
+  mNetLines.append(&netline);
+  return &netline;
 }
 
-SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(SI_NetLineAnchor& startPoint,
-                                                          SI_NetLineAnchor& endPoint)
-{
-    SI_NetLine* netline = new SI_NetLine(mNetSegment, startPoint, endPoint, UnsignedLength(158750)); // can throw
-    return addNetLine(*netline);
+SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(
+    SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint) {
+  SI_NetLine* netline = new SI_NetLine(mNetSegment, startPoint, endPoint,
+                                       UnsignedLength(158750));  // can throw
+  return addNetLine(*netline);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetSegmentAddElements::performExecute()
-{
-    performRedo(); // can throw
+bool CmdSchematicNetSegmentAddElements::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicNetSegmentAddElements::performUndo()
-{
-    mNetSegment.removeNetPointsAndNetLines(mNetPoints, mNetLines); // can throw
+void CmdSchematicNetSegmentAddElements::performUndo() {
+  mNetSegment.removeNetPointsAndNetLines(mNetPoints, mNetLines);  // can throw
 }
 
-void CmdSchematicNetSegmentAddElements::performRedo()
-{
-    mNetSegment.addNetPointsAndNetLines(mNetPoints, mNetLines); // can throw
+void CmdSchematicNetSegmentAddElements::performRedo() {
+  mNetSegment.addNetPointsAndNetLines(mNetPoints, mNetLines);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

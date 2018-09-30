@@ -17,186 +17,188 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "directorylock.h"
-#include "fileutils.h"
-#include "../systeminfo.h"
 
-/*****************************************************************************************
+#include "../systeminfo.h"
+#include "fileutils.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-DirectoryLock::DirectoryLock() noexcept :
-    mDirToLock(), mLockFilePath(), mLockedByThisObject(false)
-{
-    // nothing to do...
+DirectoryLock::DirectoryLock() noexcept
+  : mDirToLock(), mLockFilePath(), mLockedByThisObject(false) {
+  // nothing to do...
 }
 
-DirectoryLock::DirectoryLock(const FilePath& dir) noexcept :
-    mDirToLock(), mLockFilePath(), mLockedByThisObject(false)
-{
-    setDirToLock(dir);
+DirectoryLock::DirectoryLock(const FilePath& dir) noexcept
+  : mDirToLock(), mLockFilePath(), mLockedByThisObject(false) {
+  setDirToLock(dir);
 }
 
-DirectoryLock::~DirectoryLock() noexcept
-{
-    try {
-        unlockIfLocked(); // can throw
-    } catch (const Exception& e) {
-        qCritical() << "Could not remove lock file:" << e.getMsg();
-    }
+DirectoryLock::~DirectoryLock() noexcept {
+  try {
+    unlockIfLocked();  // can throw
+  } catch (const Exception& e) {
+    qCritical() << "Could not remove lock file:" << e.getMsg();
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void DirectoryLock::setDirToLock(const FilePath& dir) noexcept
-{
-    Q_ASSERT(!mLockedByThisObject);
-    mDirToLock = dir;
-    mLockFilePath = dir.getPathTo(".lock");
+void DirectoryLock::setDirToLock(const FilePath& dir) noexcept {
+  Q_ASSERT(!mLockedByThisObject);
+  mDirToLock    = dir;
+  mLockFilePath = dir.getPathTo(".lock");
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-DirectoryLock::LockStatus DirectoryLock::getStatus() const
-{
-    // check if the directory to lock does exist
-    if (!mDirToLock.isExistingDir()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The directory \"%1\" does not exist.")).arg(mDirToLock.toNative()));
-    }
+DirectoryLock::LockStatus DirectoryLock::getStatus() const {
+  // check if the directory to lock does exist
+  if (!mDirToLock.isExistingDir()) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("The directory \"%1\" does not exist."))
+                           .arg(mDirToLock.toNative()));
+  }
 
-    // when the directory is valid, the lock filepath must be valid too
-    Q_ASSERT(mLockFilePath.isValid());
+  // when the directory is valid, the lock filepath must be valid too
+  Q_ASSERT(mLockFilePath.isValid());
 
-    // check if the lock file exists
-    if (!mLockFilePath.isExistingFile()) {
-        return LockStatus::Unlocked;
-    }
+  // check if the lock file exists
+  if (!mLockFilePath.isExistingFile()) {
+    return LockStatus::Unlocked;
+  }
 
-    // read the content of the lock file
-    QString content = QString::fromUtf8(FileUtils::readFile(mLockFilePath)); // can throw
-    QStringList lines = content.split("\n", QString::KeepEmptyParts);
-    // check count of lines
-    if (lines.count() < 6) {
-        throw RuntimeError(__FILE__, __LINE__, QString(
-            tr("The lock file \"%1\" has too few lines.")).arg(mLockFilePath.toNative()));
-    }
-    // read lock metadata
-    QString lockUser = lines.at(1);
-    QString lockHost = lines.at(2);
-    qint64 lockPid = lines.at(3).toLongLong();
-    QString lockAppName = lines.at(4);
+  // read the content of the lock file
+  QString content =
+      QString::fromUtf8(FileUtils::readFile(mLockFilePath));  // can throw
+  QStringList lines = content.split("\n", QString::KeepEmptyParts);
+  // check count of lines
+  if (lines.count() < 6) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("The lock file \"%1\" has too few lines."))
+                           .arg(mLockFilePath.toNative()));
+  }
+  // read lock metadata
+  QString lockUser    = lines.at(1);
+  QString lockHost    = lines.at(2);
+  qint64  lockPid     = lines.at(3).toLongLong();
+  QString lockAppName = lines.at(4);
 
-    // read metadata about this application instance
-    QString thisUser = SystemInfo::getUsername();
-    QString thisHost = SystemInfo::getHostname();
+  // read metadata about this application instance
+  QString thisUser = SystemInfo::getUsername();
+  QString thisHost = SystemInfo::getHostname();
 
-    // check if the lock file was created with another computer or user
-    if ((lockUser != thisUser) || (lockHost != thisHost)) {
-        return LockStatus::Locked;
-    }
+  // check if the lock file was created with another computer or user
+  if ((lockUser != thisUser) || (lockHost != thisHost)) {
+    return LockStatus::Locked;
+  }
 
-    // the lock file was created with an application instance on this computer, now check
-    // if that process is still running (if not, the lock is considered as stale)
-    if (SystemInfo::isProcessRunning(lockPid)) {
-        if (SystemInfo::getProcessNameByPid(lockPid) == lockAppName) {
-            return LockStatus::Locked; // the application which holds the lock is still running
-        } else {
-            return LockStatus::StaleLock; // the process which holds the lock seems to be crashed
-        }
+  // the lock file was created with an application instance on this computer,
+  // now check if that process is still running (if not, the lock is considered
+  // as stale)
+  if (SystemInfo::isProcessRunning(lockPid)) {
+    if (SystemInfo::getProcessNameByPid(lockPid) == lockAppName) {
+      return LockStatus::Locked;  // the application which holds the lock is
+                                  // still running
     } else {
-        // the process which holds the lock is no longer running
-        return LockStatus::StaleLock;
+      return LockStatus::StaleLock;  // the process which holds the lock seems
+                                     // to be crashed
     }
+  } else {
+    // the process which holds the lock is no longer running
+    return LockStatus::StaleLock;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void DirectoryLock::tryLock(bool* wasStale)
-{
-    LockStatus status = getStatus(); // can throw
-    if (wasStale) {
-        *wasStale = (status == LockStatus::StaleLock);
-    }
-    switch (status)
-    {
-        case LockStatus::Unlocked:
-        case LockStatus::StaleLock:
-            lock(); // can throw
-            break;
-        case LockStatus::Locked:
-            throw RuntimeError(__FILE__, __LINE__, QString(tr("The directory is locked, "
-                "check if it is already opened elsewhere: %1")).arg(mDirToLock.toNative()));
-        default:
-            Q_ASSERT(false);
-            throw LogicError(__FILE__, __LINE__);
-    }
+void DirectoryLock::tryLock(bool* wasStale) {
+  LockStatus status = getStatus();  // can throw
+  if (wasStale) {
+    *wasStale = (status == LockStatus::StaleLock);
+  }
+  switch (status) {
+    case LockStatus::Unlocked:
+    case LockStatus::StaleLock:
+      lock();  // can throw
+      break;
+    case LockStatus::Locked:
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString(tr("The directory is locked, "
+                     "check if it is already opened elsewhere: %1"))
+              .arg(mDirToLock.toNative()));
+    default:
+      Q_ASSERT(false);
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
-bool DirectoryLock::unlockIfLocked()
-{
-    if (mLockedByThisObject) {
-        unlock(); // can throw
-        return true;
-    } else {
-        return false;
-    }
+bool DirectoryLock::unlockIfLocked() {
+  if (mLockedByThisObject) {
+    unlock();  // can throw
+    return true;
+  } else {
+    return false;
+  }
 }
 
-void DirectoryLock::lock()
-{
-    // check if the directory to lock does exist
-    if (!mDirToLock.isExistingDir()) {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(tr("The directory \"%1\" does not exist.")).arg(mDirToLock.toNative()));
-    }
+void DirectoryLock::lock() {
+  // check if the directory to lock does exist
+  if (!mDirToLock.isExistingDir()) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString(tr("The directory \"%1\" does not exist."))
+                           .arg(mDirToLock.toNative()));
+  }
 
-    // when the directory is valid, the lock filepath must be valid too
-    Q_ASSERT(mLockFilePath.isValid());
+  // when the directory is valid, the lock filepath must be valid too
+  Q_ASSERT(mLockFilePath.isValid());
 
-    // prepare the content which will be written to the lock file
-    QStringList lines;
-    lines.append(SystemInfo::getFullUsername());
-    lines.append(SystemInfo::getUsername());
-    lines.append(SystemInfo::getHostname());
-    lines.append(QString::number(QCoreApplication::applicationPid()));
-    lines.append(SystemInfo::getProcessNameByPid(qApp->applicationPid()));
-    lines.append(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-    QByteArray utf8content = lines.join('\n').toUtf8();
+  // prepare the content which will be written to the lock file
+  QStringList lines;
+  lines.append(SystemInfo::getFullUsername());
+  lines.append(SystemInfo::getUsername());
+  lines.append(SystemInfo::getHostname());
+  lines.append(QString::number(QCoreApplication::applicationPid()));
+  lines.append(SystemInfo::getProcessNameByPid(qApp->applicationPid()));
+  lines.append(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+  QByteArray utf8content = lines.join('\n').toUtf8();
 
-    // create/overwrite lock file
-    FileUtils::writeFile(mLockFilePath, utf8content); // can throw
+  // create/overwrite lock file
+  FileUtils::writeFile(mLockFilePath, utf8content);  // can throw
 
-    // File Lock successfully created
-    mLockedByThisObject = true;
+  // File Lock successfully created
+  mLockedByThisObject = true;
 }
 
-void DirectoryLock::unlock()
-{
-    // remove the lock file
-    FileUtils::removeFile(mLockFilePath); // can throw
+void DirectoryLock::unlock() {
+  // remove the lock file
+  FileUtils::removeFile(mLockFilePath);  // can throw
 
-    // File Lock successfully removed
-    mLockedByThisObject = false;
+  // File Lock successfully removed
+  mLockedByThisObject = false;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

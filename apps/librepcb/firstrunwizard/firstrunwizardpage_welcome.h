@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H
 #define LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
@@ -36,9 +36,9 @@ namespace Ui {
 class FirstRunWizardPage_Welcome;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FirstRunWizardPage_Welcome
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FirstRunWizardPage_Welcome class
@@ -46,31 +46,27 @@ class FirstRunWizardPage_Welcome;
  * @author ubruhin
  * @date 2015-09-22
  */
-class FirstRunWizardPage_Welcome final : public QWizardPage
-{
-        Q_OBJECT
+class FirstRunWizardPage_Welcome final : public QWizardPage {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit FirstRunWizardPage_Welcome(QWidget *parent = 0) noexcept;
+  ~FirstRunWizardPage_Welcome() noexcept;
 
-        // Constructors / Destructor
-        explicit FirstRunWizardPage_Welcome(QWidget *parent = 0) noexcept;
-        ~FirstRunWizardPage_Welcome() noexcept;
+private:
+  // Private Methods
+  Q_DISABLE_COPY(FirstRunWizardPage_Welcome)
 
-
-    private:
-
-        // Private Methods
-        Q_DISABLE_COPY(FirstRunWizardPage_Welcome)
-
-        // Private Membervariables
-        QScopedPointer<Ui::FirstRunWizardPage_Welcome> mUi;
+  // Private Membervariables
+  QScopedPointer<Ui::FirstRunWizardPage_Welcome> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H
+#endif  // LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H

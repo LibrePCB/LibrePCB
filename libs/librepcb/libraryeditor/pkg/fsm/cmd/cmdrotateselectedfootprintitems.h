@@ -20,24 +20,26 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
 #define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+ ******************************************************************************/
 #include "../packageeditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/angle.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRotateSelectedFootprintItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRotateSelectedFootprintItems class
@@ -45,40 +47,37 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-28
  */
-class CmdRotateSelectedFootprintItems final : public UndoCommandGroup
-{
-    public:
+class CmdRotateSelectedFootprintItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRotateSelectedFootprintItems() = delete;
+  CmdRotateSelectedFootprintItems(
+      const CmdRotateSelectedFootprintItems& other) = delete;
+  CmdRotateSelectedFootprintItems(const PackageEditorState::Context& context,
+                                  const Angle& angle) noexcept;
+  ~CmdRotateSelectedFootprintItems() noexcept;
 
-        // Constructors / Destructor
-        CmdRotateSelectedFootprintItems() = delete;
-        CmdRotateSelectedFootprintItems(const CmdRotateSelectedFootprintItems& other) = delete;
-        CmdRotateSelectedFootprintItems(const PackageEditorState::Context& context,
-                                        const Angle& angle) noexcept;
-        ~CmdRotateSelectedFootprintItems() noexcept;
+  // Operator Overloadings
+  CmdRotateSelectedFootprintItems& operator       =(
+      const CmdRotateSelectedFootprintItems& rhs) = delete;
 
-        // Operator Overloadings
-        CmdRotateSelectedFootprintItems& operator=(const CmdRotateSelectedFootprintItems& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-        const PackageEditorState::Context& mContext;
-        Angle mAngle;
+  // Private Member Variables
+  const PackageEditorState::Context& mContext;
+  Angle                              mAngle;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H

@@ -17,93 +17,91 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "devicepadsignalmap.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-DevicePadSignalMapItem::DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept :
-    QObject(nullptr),
-    mPadUuid(other.mPadUuid),
-    mSignalUuid(other.mSignalUuid)
-{
+DevicePadSignalMapItem::DevicePadSignalMapItem(
+    const DevicePadSignalMapItem& other) noexcept
+  : QObject(nullptr), mPadUuid(other.mPadUuid), mSignalUuid(other.mSignalUuid) {
 }
 
-DevicePadSignalMapItem::DevicePadSignalMapItem(const Uuid& pad, const tl::optional<Uuid>& signal) noexcept :
-    QObject(nullptr), mPadUuid(pad), mSignalUuid(signal)
-{
+DevicePadSignalMapItem::DevicePadSignalMapItem(
+    const Uuid& pad, const tl::optional<Uuid>& signal) noexcept
+  : QObject(nullptr), mPadUuid(pad), mSignalUuid(signal) {
 }
 
-DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node) :
-    QObject(nullptr),
+DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node)
+  : QObject(nullptr),
     mPadUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(Uuid::createRandom()) // backward compatibility, remove this some time!
+    mSignalUuid(Uuid::createRandom())  // backward compatibility, remove this
+                                       // some time!
 {
-    if (node.tryGetChildByPath("signal")) {
-        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
-    } else {
-        // backward compatibility, remove this some time!
-        mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
-    }
+  if (node.tryGetChildByPath("signal")) {
+    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
+  } else {
+    // backward compatibility, remove this some time!
+    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
+  }
 }
 
-DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept
-{
+DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void DevicePadSignalMapItem::setSignalUuid(const tl::optional<Uuid>& uuid) noexcept
-{
-    if (uuid == mSignalUuid) return;
-    mSignalUuid = uuid;
-    emit signalUuidChanged(mSignalUuid);
+void DevicePadSignalMapItem::setSignalUuid(
+    const tl::optional<Uuid>& uuid) noexcept {
+  if (uuid == mSignalUuid) return;
+  mSignalUuid = uuid;
+  emit signalUuidChanged(mSignalUuid);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void DevicePadSignalMapItem::serialize(SExpression& root) const
-{
-    root.appendChild(mPadUuid);
-    root.appendChild("signal", mSignalUuid, false);
+void DevicePadSignalMapItem::serialize(SExpression& root) const {
+  root.appendChild(mPadUuid);
+  root.appendChild("signal", mSignalUuid, false);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Operator Overloadings
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool DevicePadSignalMapItem::operator==(const DevicePadSignalMapItem& rhs) const noexcept
-{
-    if (mPadUuid != rhs.mPadUuid)           return false;
-    if (mSignalUuid != rhs.mSignalUuid)     return false;
-    return true;
+bool DevicePadSignalMapItem::operator==(const DevicePadSignalMapItem& rhs) const
+    noexcept {
+  if (mPadUuid != rhs.mPadUuid) return false;
+  if (mSignalUuid != rhs.mSignalUuid) return false;
+  return true;
 }
 
-DevicePadSignalMapItem& DevicePadSignalMapItem::operator=(const DevicePadSignalMapItem& rhs) noexcept
-{
-    mPadUuid = rhs.mPadUuid;
-    setSignalUuid(rhs.mSignalUuid);
-    return *this;
+DevicePadSignalMapItem& DevicePadSignalMapItem::operator=(
+    const DevicePadSignalMapItem& rhs) noexcept {
+  mPadUuid = rhs.mPadUuid;
+  setSignalUuid(rhs.mSignalUuid);
+  return *this;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

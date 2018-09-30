@@ -17,122 +17,121 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "defaultgraphicslayerprovider.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider() noexcept
-{
-    // schematic layers
-    addLayer(GraphicsLayer::sSchematicReferences);
-    addLayer(GraphicsLayer::sSchematicSheetFrames);
-    addLayer(GraphicsLayer::sSymbolOutlines);
-    addLayer(GraphicsLayer::sSymbolGrabAreas);
-    addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
-    addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
-    addLayer(GraphicsLayer::sSymbolPinCirclesReq);
-    addLayer(GraphicsLayer::sSymbolPinNames);
-    addLayer(GraphicsLayer::sSymbolPinNumbers);
-    addLayer(GraphicsLayer::sSymbolNames);
-    addLayer(GraphicsLayer::sSymbolValues);
-    addLayer(GraphicsLayer::sSchematicNetLines);
-    addLayer(GraphicsLayer::sSchematicNetLabels);
-    addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
-    addLayer(GraphicsLayer::sSchematicDocumentation);
-    addLayer(GraphicsLayer::sSchematicComments);
-    addLayer(GraphicsLayer::sSchematicGuide);
+DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider() noexcept {
+  // schematic layers
+  addLayer(GraphicsLayer::sSchematicReferences);
+  addLayer(GraphicsLayer::sSchematicSheetFrames);
+  addLayer(GraphicsLayer::sSymbolOutlines);
+  addLayer(GraphicsLayer::sSymbolGrabAreas);
+  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
+  addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
+  addLayer(GraphicsLayer::sSymbolPinCirclesReq);
+  addLayer(GraphicsLayer::sSymbolPinNames);
+  addLayer(GraphicsLayer::sSymbolPinNumbers);
+  addLayer(GraphicsLayer::sSymbolNames);
+  addLayer(GraphicsLayer::sSymbolValues);
+  addLayer(GraphicsLayer::sSchematicNetLines);
+  addLayer(GraphicsLayer::sSchematicNetLabels);
+  addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
+  addLayer(GraphicsLayer::sSchematicDocumentation);
+  addLayer(GraphicsLayer::sSchematicComments);
+  addLayer(GraphicsLayer::sSchematicGuide);
 
-    // asymmetric board layers
-    addLayer(GraphicsLayer::sBoardSheetFrames);
-    addLayer(GraphicsLayer::sBoardOutlines);
-    addLayer(GraphicsLayer::sBoardMillingPth);
-    addLayer(GraphicsLayer::sBoardDrillsNpth);
-    addLayer(GraphicsLayer::sBoardViasTht);
-    addLayer(GraphicsLayer::sBoardPadsTht);
-    addLayer(GraphicsLayer::sBoardAirWires);
+  // asymmetric board layers
+  addLayer(GraphicsLayer::sBoardSheetFrames);
+  addLayer(GraphicsLayer::sBoardOutlines);
+  addLayer(GraphicsLayer::sBoardMillingPth);
+  addLayer(GraphicsLayer::sBoardDrillsNpth);
+  addLayer(GraphicsLayer::sBoardViasTht);
+  addLayer(GraphicsLayer::sBoardPadsTht);
+  addLayer(GraphicsLayer::sBoardAirWires);
 
-    // copper layers
-    addLayer(GraphicsLayer::sTopCopper);
-    for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
-        addLayer(GraphicsLayer::getInnerLayerName(i));
-    }
-    addLayer(GraphicsLayer::sBotCopper);
+  // copper layers
+  addLayer(GraphicsLayer::sTopCopper);
+  for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
+    addLayer(GraphicsLayer::getInnerLayerName(i));
+  }
+  addLayer(GraphicsLayer::sBotCopper);
 
-    // symmetric board layers
-    addLayer(GraphicsLayer::sTopReferences);
-    addLayer(GraphicsLayer::sBotReferences);
-    addLayer(GraphicsLayer::sTopGrabAreas);
-    addLayer(GraphicsLayer::sBotGrabAreas);
-    addLayer(GraphicsLayer::sTopHiddenGrabAreas);
-    addLayer(GraphicsLayer::sBotHiddenGrabAreas);
-    addLayer(GraphicsLayer::sTopPlacement);
-    addLayer(GraphicsLayer::sBotPlacement);
-    addLayer(GraphicsLayer::sTopDocumentation);
-    addLayer(GraphicsLayer::sBotDocumentation);
-    addLayer(GraphicsLayer::sTopNames);
-    addLayer(GraphicsLayer::sBotNames);
-    addLayer(GraphicsLayer::sTopValues);
-    addLayer(GraphicsLayer::sBotValues);
-    addLayer(GraphicsLayer::sTopCourtyard);
-    addLayer(GraphicsLayer::sBotCourtyard);
-    addLayer(GraphicsLayer::sTopStopMask);
-    addLayer(GraphicsLayer::sBotStopMask);
-    addLayer(GraphicsLayer::sTopSolderPaste);
-    addLayer(GraphicsLayer::sBotSolderPaste);
-    addLayer(GraphicsLayer::sTopGlue);
-    addLayer(GraphicsLayer::sBotGlue);
+  // symmetric board layers
+  addLayer(GraphicsLayer::sTopReferences);
+  addLayer(GraphicsLayer::sBotReferences);
+  addLayer(GraphicsLayer::sTopGrabAreas);
+  addLayer(GraphicsLayer::sBotGrabAreas);
+  addLayer(GraphicsLayer::sTopHiddenGrabAreas);
+  addLayer(GraphicsLayer::sBotHiddenGrabAreas);
+  addLayer(GraphicsLayer::sTopPlacement);
+  addLayer(GraphicsLayer::sBotPlacement);
+  addLayer(GraphicsLayer::sTopDocumentation);
+  addLayer(GraphicsLayer::sBotDocumentation);
+  addLayer(GraphicsLayer::sTopNames);
+  addLayer(GraphicsLayer::sBotNames);
+  addLayer(GraphicsLayer::sTopValues);
+  addLayer(GraphicsLayer::sBotValues);
+  addLayer(GraphicsLayer::sTopCourtyard);
+  addLayer(GraphicsLayer::sBotCourtyard);
+  addLayer(GraphicsLayer::sTopStopMask);
+  addLayer(GraphicsLayer::sBotStopMask);
+  addLayer(GraphicsLayer::sTopSolderPaste);
+  addLayer(GraphicsLayer::sBotSolderPaste);
+  addLayer(GraphicsLayer::sTopGlue);
+  addLayer(GraphicsLayer::sBotGlue);
 
-    // other asymmetric board layers
-    addLayer(GraphicsLayer::sBoardMeasures);
-    addLayer(GraphicsLayer::sBoardAlignment);
-    addLayer(GraphicsLayer::sBoardDocumentation);
-    addLayer(GraphicsLayer::sBoardComments);
-    addLayer(GraphicsLayer::sBoardGuide);
+  // other asymmetric board layers
+  addLayer(GraphicsLayer::sBoardMeasures);
+  addLayer(GraphicsLayer::sBoardAlignment);
+  addLayer(GraphicsLayer::sBoardDocumentation);
+  addLayer(GraphicsLayer::sBoardComments);
+  addLayer(GraphicsLayer::sBoardGuide);
 }
 
-DefaultGraphicsLayerProvider::~DefaultGraphicsLayerProvider() noexcept
-{
-    qDeleteAll(mLayers); mLayers.clear();
+DefaultGraphicsLayerProvider::~DefaultGraphicsLayerProvider() noexcept {
+  qDeleteAll(mLayers);
+  mLayers.clear();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayer* DefaultGraphicsLayerProvider::getLayer(const QString& name) const noexcept
-{
-    foreach (GraphicsLayer* layer, mLayers) {
-        if (layer->getName() == name) {
-            return layer;
-        }
+GraphicsLayer* DefaultGraphicsLayerProvider::getLayer(const QString& name) const
+    noexcept {
+  foreach (GraphicsLayer* layer, mLayers) {
+    if (layer->getName() == name) {
+      return layer;
     }
-    return nullptr;
+  }
+  return nullptr;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void DefaultGraphicsLayerProvider::addLayer(const QString& name) noexcept
-{
-    if (!getLayer(name)) {
-        mLayers.append(new GraphicsLayer(name));
-    }
+void DefaultGraphicsLayerProvider::addLayer(const QString& name) noexcept {
+  if (!getLayer(name)) {
+    mLayers.append(new GraphicsLayer(name));
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

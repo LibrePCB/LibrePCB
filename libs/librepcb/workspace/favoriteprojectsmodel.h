@@ -20,15 +20,16 @@
 #ifndef LIBREPCB_FAVORITEPROJECTSMODEL_H
 #define LIBREPCB_FAVORITEPROJECTSMODEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class SmartSExprFile;
@@ -37,54 +38,50 @@ namespace workspace {
 
 class Workspace;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FavoriteProjectsModel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FavoriteProjectsModel class
  */
-class FavoriteProjectsModel : public QAbstractListModel
-{
-        Q_OBJECT
+class FavoriteProjectsModel : public QAbstractListModel {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  FavoriteProjectsModel()                                   = delete;
+  FavoriteProjectsModel(const FavoriteProjectsModel& other) = delete;
+  explicit FavoriteProjectsModel(const Workspace& workspace) noexcept;
+  ~FavoriteProjectsModel() noexcept;
 
-        // Constructors / Destructor
-        FavoriteProjectsModel() = delete;
-        FavoriteProjectsModel(const FavoriteProjectsModel& other) = delete;
-        explicit FavoriteProjectsModel(const Workspace& workspace) noexcept;
-        ~FavoriteProjectsModel() noexcept;
+  // General Methods
+  bool isFavoriteProject(const FilePath& filepath) const noexcept;
+  void addFavoriteProject(const FilePath& filepath) noexcept;
+  void removeFavoriteProject(const FilePath& filepath) noexcept;
 
-        // General Methods
-        bool isFavoriteProject(const FilePath& filepath) const noexcept;
-        void addFavoriteProject(const FilePath& filepath) noexcept;
-        void removeFavoriteProject(const FilePath& filepath) noexcept;
+  // Operator Overloadings
+  FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs) = delete;
 
-        // Operator Overloadings
-        FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs) = delete;
+private:
+  // General Methods
+  void save() noexcept;
 
+  // Inherited Methods
+  int      rowCount(const QModelIndex& parent = QModelIndex()) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-    private:
-
-        // General Methods
-        void save() noexcept;
-
-        // Inherited Methods
-        int rowCount(const QModelIndex& parent = QModelIndex()) const;
-        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-
-        // Attributes
-        const Workspace& mWorkspace;
-        QScopedPointer<SmartSExprFile> mFile;
-        QList<FilePath> mFavoriteProjects;
+  // Attributes
+  const Workspace&               mWorkspace;
+  QScopedPointer<SmartSExprFile> mFile;
+  QList<FilePath>                mFavoriteProjects;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_FAVORITEPROJECTSMODEL_H
+#endif  // LIBREPCB_FAVORITEPROJECTSMODEL_H

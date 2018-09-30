@@ -20,71 +20,65 @@
 #ifndef LIBREPCB_CMDLISTELEMENTSSWAP_H
 #define LIBREPCB_CMDLISTELEMENTSSWAP_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../../undocommand.h"
 #include "../serializableobjectlist.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdListElementsSwap
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdListElementsSwap class
  */
 template <typename T, typename P>
-class CmdListElementsSwap final : public UndoCommand
-{
-    public:
+class CmdListElementsSwap final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdListElementsSwap()                                 = delete;
+  CmdListElementsSwap(const CmdListElementsSwap& other) = delete;
+  CmdListElementsSwap(SerializableObjectList<T, P>& list, int i, int j) noexcept
+    : UndoCommand(QString(tr("Move %1")).arg(P::tagname)),
+      mList(list),
+      mI(i),
+      mJ(j) {}
+  ~CmdListElementsSwap() noexcept {}
 
-        // Constructors / Destructor
-        CmdListElementsSwap() = delete;
-        CmdListElementsSwap(const CmdListElementsSwap& other) = delete;
-        CmdListElementsSwap(SerializableObjectList<T, P>& list, int i, int j) noexcept :
-            UndoCommand(QString(tr("Move %1")).arg(P::tagname)), mList(list), mI(i), mJ(j)
-            {}
-        ~CmdListElementsSwap() noexcept {}
+  // Operator Overloadings
+  CmdListElementsSwap& operator=(const CmdListElementsSwap& rhs) = delete;
 
-        // Operator Overloadings
-        CmdListElementsSwap& operator=(const CmdListElementsSwap& rhs) = delete;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override {
+    performRedo();  // can throw
+    return true;
+  }
 
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override { mList.swap(mJ, mI); }
 
-    private: // Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override { mList.swap(mI, mJ); }
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override {
-            performRedo(); // can throw
-            return true;
-        }
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override {
-            mList.swap(mJ, mI);
-        }
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override {
-            mList.swap(mI, mJ);
-        }
-
-
-    private: // Data
-        SerializableObjectList<T, P>& mList;
-        int mI;
-        int mJ;
+private:  // Data
+  SerializableObjectList<T, P>& mList;
+  int                           mI;
+  int                           mJ;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CMDLISTELEMENTSSWAP_H
+#endif  // LIBREPCB_CMDLISTELEMENTSSWAP_H

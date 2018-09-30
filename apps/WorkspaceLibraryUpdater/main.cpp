@@ -17,28 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+
+#include "mainwindow.h"
+
+#include <librepcb/common/application.h>
 
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/application.h>
-#include "mainwindow.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  main()
- ****************************************************************************************/
+ ******************************************************************************/
 
-int main(int argc, char* argv[])
-{
-    librepcb::Application app(argc, argv);
+int main(int argc, char* argv[]) {
+  librepcb::Application app(argc, argv);
 
-    QCoreApplication::setOrganizationName("LibrePCB");
-    QCoreApplication::setApplicationName("WorkspaceLibraryUpdater");
+  QCoreApplication::setOrganizationName("LibrePCB");
+  QCoreApplication::setApplicationName("WorkspaceLibraryUpdater");
 
-    MainWindow w;
-    w.show();
+  MainWindow w;
+  w.show();
 
-    return QApplication::exec();
+  return QApplication::exec();
 }

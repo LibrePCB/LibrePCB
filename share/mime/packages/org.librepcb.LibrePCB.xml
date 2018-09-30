@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-	<mime-type type="application/x-librepcb-file">
-		<sub-class-of type="text/plain"/>
-		<comment>LibrePCB File</comment>
-		<glob pattern="*.lp"/>
-		<magic priority="50">
-		  <match value="(librepcb" type="string" offset="0"/>
-		</magic>
-		<icon name="org.librepcb.LibrePCB-file"/>
-	</mime-type>
-	<mime-type type="application/x-librepcb-project">
-		<sub-class-of type="text/plain"/>
-		<comment>LibrePCB Project</comment>
-		<glob pattern="*.lpp"/>
-		<magic priority="50">
-		  <match value="LIBREPCB-PROJECT" type="string" offset="0"/>
-		</magic>
-		<icon name="org.librepcb.LibrePCB-project"/>
-	</mime-type>
+  <mime-type type="application/x-librepcb-file">
+    <sub-class-of type="text/plain"/>
+    <comment>LibrePCB File</comment>
+    <glob pattern="*.lp"/>
+    <magic priority="50">
+      <match value="(librepcb" type="string" offset="0"/>
+    </magic>
+    <icon name="org.librepcb.LibrePCB-file"/>
+  </mime-type>
+  <mime-type type="application/x-librepcb-project">
+    <sub-class-of type="text/plain"/>
+    <comment>LibrePCB Project</comment>
+    <glob pattern="*.lpp"/>
+    <magic priority="50">
+      <match value="LIBREPCB-PROJECT" type="string" offset="0"/>
+    </magic>
+    <icon name="org.librepcb.LibrePCB-project"/>
+  </mime-type>
 </mime-info>

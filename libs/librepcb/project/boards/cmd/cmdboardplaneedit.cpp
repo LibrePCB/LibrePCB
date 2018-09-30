@@ -17,171 +17,177 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardplaneedit.h"
-#include <librepcb/common/graphics/graphicslayer.h>
+
 #include "../board.h"
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicslayer.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane, bool rebuildOnChanges) noexcept :
-    UndoCommand(tr("Edit plane")), mPlane(plane), mDoRebuildOnChanges(rebuildOnChanges),
-    mOldOutline(plane.getOutline()), mNewOutline(mOldOutline),
-    mOldLayerName(plane.getLayerName()), mNewLayerName(mOldLayerName),
-    mOldNetSignal(&plane.getNetSignal()), mNewNetSignal(mOldNetSignal),
-    mOldMinWidth(plane.getMinWidth()), mNewMinWidth(mOldMinWidth),
-    mOldMinClearance(plane.getMinClearance()), mNewMinClearance(mOldMinClearance),
-    mOldConnectStyle(plane.getConnectStyle()), mNewConnectStyle(mOldConnectStyle),
-    mOldPriority(plane.getPriority()), mNewPriority(mOldPriority),
-    mOldKeepOrphans(plane.getKeepOrphans()), mNewKeepOrphans(mOldKeepOrphans)
-{
+CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane,
+                                     bool      rebuildOnChanges) noexcept
+  : UndoCommand(tr("Edit plane")),
+    mPlane(plane),
+    mDoRebuildOnChanges(rebuildOnChanges),
+    mOldOutline(plane.getOutline()),
+    mNewOutline(mOldOutline),
+    mOldLayerName(plane.getLayerName()),
+    mNewLayerName(mOldLayerName),
+    mOldNetSignal(&plane.getNetSignal()),
+    mNewNetSignal(mOldNetSignal),
+    mOldMinWidth(plane.getMinWidth()),
+    mNewMinWidth(mOldMinWidth),
+    mOldMinClearance(plane.getMinClearance()),
+    mNewMinClearance(mOldMinClearance),
+    mOldConnectStyle(plane.getConnectStyle()),
+    mNewConnectStyle(mOldConnectStyle),
+    mOldPriority(plane.getPriority()),
+    mNewPriority(mOldPriority),
+    mOldKeepOrphans(plane.getKeepOrphans()),
+    mNewKeepOrphans(mOldKeepOrphans) {
 }
 
-CmdBoardPlaneEdit::~CmdBoardPlaneEdit() noexcept
-{
-    if (!wasEverExecuted()) {
-        mPlane.setOutline(mOldOutline);
-        mPlane.setLayerName(mOldLayerName);
-    }
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void CmdBoardPlaneEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewOutline = mOldOutline.translated(deltaPos);
-    if (immediate) mPlane.setOutline(mNewOutline);
-}
-
-void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewOutline = mOldOutline.rotated(angle, center);
-    if (immediate) mPlane.setOutline(mNewOutline);
-}
-
-void CmdBoardPlaneEdit::mirror(const Point& center, Qt::Orientation orientation, bool immediate) noexcept
-{
-    setLayerName(GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)), immediate);
-    setOutline(mNewOutline.mirrored(orientation, center), immediate);
-}
-
-void CmdBoardPlaneEdit::setOutline(const Path& outline, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewOutline = outline;
-    if (immediate) mPlane.setOutline(mNewOutline);
-}
-
-void CmdBoardPlaneEdit::setLayerName(const GraphicsLayerName& layerName, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewLayerName = layerName;
-    if (immediate) mPlane.setLayerName(mNewLayerName);
-}
-
-void CmdBoardPlaneEdit::setNetSignal(NetSignal& netsignal) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNetSignal = &netsignal;
-}
-
-void CmdBoardPlaneEdit::setMinWidth(const UnsignedLength& minWidth) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewMinWidth = minWidth;
-}
-
-void CmdBoardPlaneEdit::setMinClearance(const UnsignedLength& minClearance) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewMinClearance = minClearance;
-}
-
-void CmdBoardPlaneEdit::setConnectStyle(BI_Plane::ConnectStyle style) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewConnectStyle = style;
-}
-
-void CmdBoardPlaneEdit::setPriority(int priority) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPriority = priority;
-}
-
-void CmdBoardPlaneEdit::setKeepOrphans(bool keepOrphans) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewKeepOrphans = keepOrphans;
-}
-
-/*****************************************************************************************
- *  Inherited from UndoCommand
- ****************************************************************************************/
-
-bool CmdBoardPlaneEdit::performExecute()
-{
-    performRedo(); // can throw
-
-    if (mNewOutline != mOldOutline)             return true;
-    if (mNewLayerName != mOldLayerName)         return true;
-    if (mNewNetSignal != mOldNetSignal)         return true;
-    if (mNewMinWidth != mOldMinWidth)           return true;
-    if (mNewMinClearance != mOldMinClearance)   return true;
-    if (mNewConnectStyle != mOldConnectStyle)   return true;
-    if (mNewPriority != mOldPriority)           return true;
-    if (mNewKeepOrphans != mOldKeepOrphans)     return true;
-    return false;
-}
-
-void CmdBoardPlaneEdit::performUndo()
-{
-    mPlane.setNetSignal(*mOldNetSignal); // can throw
+CmdBoardPlaneEdit::~CmdBoardPlaneEdit() noexcept {
+  if (!wasEverExecuted()) {
     mPlane.setOutline(mOldOutline);
     mPlane.setLayerName(mOldLayerName);
-    mPlane.setMinWidth(mOldMinWidth);
-    mPlane.setMinClearance(mOldMinClearance);
-    mPlane.setConnectStyle(mOldConnectStyle);
-    mPlane.setPriority(mOldPriority);
-    mPlane.setKeepOrphans(mOldKeepOrphans);
-
-    // rebuild all planes to see the changes
-    if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
+  }
 }
 
-void CmdBoardPlaneEdit::performRedo()
-{
-    mPlane.setNetSignal(*mNewNetSignal); // can throw
-    mPlane.setOutline(mNewOutline);
-    mPlane.setLayerName(mNewLayerName);
-    mPlane.setMinWidth(mNewMinWidth);
-    mPlane.setMinClearance(mNewMinClearance);
-    mPlane.setConnectStyle(mNewConnectStyle);
-    mPlane.setPriority(mNewPriority);
-    mPlane.setKeepOrphans(mNewKeepOrphans);
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
 
-    // rebuild all planes to see the changes
-    if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
+void CmdBoardPlaneEdit::setDeltaToStartPos(const Point& deltaPos,
+                                           bool         immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewOutline = mOldOutline.translated(deltaPos);
+  if (immediate) mPlane.setOutline(mNewOutline);
 }
 
-/*****************************************************************************************
+void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center,
+                               bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewOutline = mOldOutline.rotated(angle, center);
+  if (immediate) mPlane.setOutline(mNewOutline);
+}
+
+void CmdBoardPlaneEdit::mirror(const Point& center, Qt::Orientation orientation,
+                               bool immediate) noexcept {
+  setLayerName(
+      GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
+      immediate);
+  setOutline(mNewOutline.mirrored(orientation, center), immediate);
+}
+
+void CmdBoardPlaneEdit::setOutline(const Path& outline,
+                                   bool        immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewOutline = outline;
+  if (immediate) mPlane.setOutline(mNewOutline);
+}
+
+void CmdBoardPlaneEdit::setLayerName(const GraphicsLayerName& layerName,
+                                     bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLayerName = layerName;
+  if (immediate) mPlane.setLayerName(mNewLayerName);
+}
+
+void CmdBoardPlaneEdit::setNetSignal(NetSignal& netsignal) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewNetSignal = &netsignal;
+}
+
+void CmdBoardPlaneEdit::setMinWidth(const UnsignedLength& minWidth) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMinWidth = minWidth;
+}
+
+void CmdBoardPlaneEdit::setMinClearance(
+    const UnsignedLength& minClearance) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMinClearance = minClearance;
+}
+
+void CmdBoardPlaneEdit::setConnectStyle(BI_Plane::ConnectStyle style) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewConnectStyle = style;
+}
+
+void CmdBoardPlaneEdit::setPriority(int priority) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPriority = priority;
+}
+
+void CmdBoardPlaneEdit::setKeepOrphans(bool keepOrphans) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewKeepOrphans = keepOrphans;
+}
+
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
+
+bool CmdBoardPlaneEdit::performExecute() {
+  performRedo();  // can throw
+
+  if (mNewOutline != mOldOutline) return true;
+  if (mNewLayerName != mOldLayerName) return true;
+  if (mNewNetSignal != mOldNetSignal) return true;
+  if (mNewMinWidth != mOldMinWidth) return true;
+  if (mNewMinClearance != mOldMinClearance) return true;
+  if (mNewConnectStyle != mOldConnectStyle) return true;
+  if (mNewPriority != mOldPriority) return true;
+  if (mNewKeepOrphans != mOldKeepOrphans) return true;
+  return false;
+}
+
+void CmdBoardPlaneEdit::performUndo() {
+  mPlane.setNetSignal(*mOldNetSignal);  // can throw
+  mPlane.setOutline(mOldOutline);
+  mPlane.setLayerName(mOldLayerName);
+  mPlane.setMinWidth(mOldMinWidth);
+  mPlane.setMinClearance(mOldMinClearance);
+  mPlane.setConnectStyle(mOldConnectStyle);
+  mPlane.setPriority(mOldPriority);
+  mPlane.setKeepOrphans(mOldKeepOrphans);
+
+  // rebuild all planes to see the changes
+  if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
+}
+
+void CmdBoardPlaneEdit::performRedo() {
+  mPlane.setNetSignal(*mNewNetSignal);  // can throw
+  mPlane.setOutline(mNewOutline);
+  mPlane.setLayerName(mNewLayerName);
+  mPlane.setMinWidth(mNewMinWidth);
+  mPlane.setMinClearance(mNewMinClearance);
+  mPlane.setConnectStyle(mNewConnectStyle);
+  mPlane.setPriority(mNewPriority);
+  mPlane.setKeepOrphans(mNewKeepOrphans);
+
+  // rebuild all planes to see the changes
+  if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
+}
+
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

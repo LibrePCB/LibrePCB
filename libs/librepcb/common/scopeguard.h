@@ -20,112 +20,95 @@
 #ifndef LIBREPCB_SCOPEGUARD_H
 #define LIBREPCB_SCOPEGUARD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
+
 #include <utility>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ScopeGuardBase
- ****************************************************************************************/
+ ******************************************************************************/
 /**
  * Base class for ScopGuard mainly providing dismiss()
  */
-class ScopeGuardBase
-{
-    public:
+class ScopeGuardBase {
+public:
+  ScopeGuardBase() noexcept : mActive(true) {}
 
-        ScopeGuardBase() noexcept :
-            mActive(true)
-        { }
+  ScopeGuardBase(ScopeGuardBase&& rhs) noexcept : mActive(rhs.mActive) {
+    rhs.dismiss();
+  }
 
-        ScopeGuardBase(ScopeGuardBase&& rhs) noexcept :
-            mActive(rhs.mActive)
-        {
-            rhs.dismiss();
-        }
+  /**
+   * Do not execute cleanup code
+   */
+  void dismiss() noexcept { mActive = false; }
 
-        /**
-         * Do not execute cleanup code
-         */
-        void dismiss() noexcept
-        {
-            mActive = false;
-        }
-
-    protected:
-
-        /**
-         * Do not allow to delete a ScopeGuardBase directly. So we can avoid a
-         * virtual destructor.
-         */
-        ~ScopeGuardBase() = default;
-        bool mActive;
+protected:
+  /**
+   * Do not allow to delete a ScopeGuardBase directly. So we can avoid a
+   * virtual destructor.
+   */
+  ~ScopeGuardBase() = default;
+  bool mActive;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ScopeGuard
- ****************************************************************************************/
+ ******************************************************************************/
 /**
  * Implementation of a ScopeGuard based on
  * https://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C
  */
-template<class Fun>
-class ScopeGuard final : public ScopeGuardBase
-{
-    public:
-        ScopeGuard() = delete;
-        ScopeGuard(const ScopeGuard&) = delete;
+template <class Fun>
+class ScopeGuard final : public ScopeGuardBase {
+public:
+  ScopeGuard()                  = delete;
+  ScopeGuard(const ScopeGuard&) = delete;
 
-        ScopeGuard(Fun f) noexcept :
-            mF(std::move(f))
-        { }
+  ScopeGuard(Fun f) noexcept : mF(std::move(f)) {}
 
-        ScopeGuard(ScopeGuard&& rhs) noexcept :
-            ScopeGuardBase(std::move(rhs)),
-            mF(std::move(rhs.mF))
-        {
-        }
+  ScopeGuard(ScopeGuard&& rhs) noexcept
+    : ScopeGuardBase(std::move(rhs)), mF(std::move(rhs.mF)) {}
 
-        /**
-         * Calls the attached cleanup function
-         */
-        ~ScopeGuard() noexcept
-        {
-            if (mActive) {
-                try { mF(); } catch(const std::exception& e) {
-                    qFatal("Cleanup function threw an exception: %s", e.what());
-                }
-            }
-        }
+  /**
+   * Calls the attached cleanup function
+   */
+  ~ScopeGuard() noexcept {
+    if (mActive) {
+      try {
+        mF();
+      } catch (const std::exception& e) {
+        qFatal("Cleanup function threw an exception: %s", e.what());
+      }
+    }
+  }
 
-        ScopeGuard& operator=(const ScopeGuard&) = delete;
+  ScopeGuard& operator=(const ScopeGuard&) = delete;
 
-
-    private:
-
-        Fun mF;
+private:
+  Fun mF;
 };
 
 /**
  * Create a ScopeGuard using argument deduction.
  */
-template<class Fun>
-ScopeGuard<Fun> scopeGuard(Fun f)
-{
-    return ScopeGuard<Fun>(std::move(f));
+template <class Fun>
+ScopeGuard<Fun> scopeGuard(Fun f) {
+  return ScopeGuard<Fun>(std::move(f));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SCOPEGUARD_H
+#endif  // LIBREPCB_SCOPEGUARD_H

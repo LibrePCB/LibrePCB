@@ -20,25 +20,26 @@
 #ifndef LIBREPCB_ALIGNMENTSELECTOR_H
 #define LIBREPCB_ALIGNMENTSELECTOR_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../alignment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace Ui {
 class AlignmentSelector;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AlignmentSelector
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AlignmentSelector class
@@ -46,33 +47,31 @@ class AlignmentSelector;
  * @author ubruhin
  * @date 2017-01-29
  */
-class AlignmentSelector final : public QWidget
-{
-        Q_OBJECT
+class AlignmentSelector final : public QWidget {
+  Q_OBJECT
 
-    public:
-        // Constructors / Destructor
-        explicit AlignmentSelector(QWidget* parent = nullptr) noexcept;
-        AlignmentSelector(const AlignmentSelector& other) = delete;
-        ~AlignmentSelector() noexcept;
+public:
+  // Constructors / Destructor
+  explicit AlignmentSelector(QWidget* parent = nullptr) noexcept;
+  AlignmentSelector(const AlignmentSelector& other) = delete;
+  ~AlignmentSelector() noexcept;
 
-        // General Methods
-        Alignment getAlignment() const noexcept;
-        void setAlignment(const Alignment& align) noexcept;
+  // General Methods
+  Alignment getAlignment() const noexcept;
+  void      setAlignment(const Alignment& align) noexcept;
 
-        // Operator Overloadings
-        AlignmentSelector& operator=(const AlignmentSelector& rhs) = delete;
+  // Operator Overloadings
+  AlignmentSelector& operator=(const AlignmentSelector& rhs) = delete;
 
-
-    private: // Data
-        QScopedPointer<Ui::AlignmentSelector> mUi;
-        QMap<QRadioButton*, Alignment> mLookupTable;
+private:  // Data
+  QScopedPointer<Ui::AlignmentSelector> mUi;
+  QMap<QRadioButton*, Alignment>        mLookupTable;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ALIGNMENTSELECTOR_H
+#endif  // LIBREPCB_ALIGNMENTSELECTOR_H

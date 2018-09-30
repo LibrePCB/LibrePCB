@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_PROJECTLIBRARYUPDATER_H
 #define LIBREPCB_PROJECTLIBRARYUPDATER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
 class Workspace;
 class WorkspaceLibraryDb;
-}
+}  // namespace workspace
 
 namespace application {
 
@@ -46,48 +47,48 @@ namespace Ui {
 class ProjectLibraryUpdater;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ProjectLibraryUpdater
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ProjectLibraryUpdater class
  *
- * @note This updater is currently an ugly hack with very limited functionality. The whole
- *       project library update concept needs to be refactored some time to provide an
- *       updater with much more functionality and higher reliability.
+ * @note This updater is currently an ugly hack with very limited functionality.
+ * The whole project library update concept needs to be refactored some time to
+ * provide an updater with much more functionality and higher reliability.
  */
-class ProjectLibraryUpdater : public QMainWindow
-{
-        Q_OBJECT
+class ProjectLibraryUpdater : public QMainWindow {
+  Q_OBJECT
 
-    public:
+public:
+  explicit ProjectLibraryUpdater(workspace::Workspace& ws,
+                                 const FilePath&       project,
+                                 ControlPanel&         cp) noexcept;
+  ~ProjectLibraryUpdater();
 
-        explicit ProjectLibraryUpdater(workspace::Workspace& ws, const FilePath& project,
-                                       ControlPanel& cp) noexcept;
-        ~ProjectLibraryUpdater();
+private slots:
+  void btnUpdateClicked();
 
-    private slots:
-        void btnUpdateClicked();
+private:
+  void    log(const QString& msg) noexcept;
+  QString prettyPath(const FilePath& fp) const noexcept;
+  void    updateElements(
+         const QString& type,
+         FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const);
 
-    private:
-        void log(const QString& msg) noexcept;
-        QString prettyPath(const FilePath& fp) const noexcept;
-        void updateElements(const QString& type,
-                            FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const);
-
-    private:
-        workspace::Workspace& mWorkspace;
-        FilePath mProjectFilePath;
-        ControlPanel& mControlPanel;
-        QScopedPointer<Ui::ProjectLibraryUpdater> mUi;
+private:
+  workspace::Workspace&                     mWorkspace;
+  FilePath                                  mProjectFilePath;
+  ControlPanel&                             mControlPanel;
+  QScopedPointer<Ui::ProjectLibraryUpdater> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECTLIBRARYUPDATER_H
+#endif  // LIBREPCB_PROJECTLIBRARYUPDATER_H

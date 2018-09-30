@@ -6,6 +6,20 @@ Code Style Guide {#doc_code_style_guide}
 This page describes the code style guide for LibrePCB developers.
 
 
+# Format {#doc_code_style_guide_format}
+
+- All files must have UNIX line endings (CI rejects Windows line endings).
+- Always use spaces, never tabulators (CI rejects tabulators).
+- Generally just follow the style of existing code and it will be fine :-)
+- In the repository root there is a `.clang-format` file with the exact rules.
+  You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
+  (version 6.0.0) to automatically format files according these rules. Use the
+  command `clang-format -style=file -i <FILE>` to format single files, or the
+  script `./dev/format_code.sh` to format all files which are modified compared
+  to the `master` branch (this avoids formatting of files other than the ones
+  you modified).
+
+
 # General {#doc_code_style_guide_general}
 
 - Qt >= 5.2

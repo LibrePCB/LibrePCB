@@ -20,23 +20,23 @@
 #ifndef LIBREPCB_PROJECTTREEMODEL_H
 #define LIBREPCB_PROJECTTREEMODEL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
 class Workspace;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class ProjectTreeModel
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The ProjectTreeModel class
@@ -45,29 +45,31 @@ class Workspace;
  *
  * @date 2014-06-24
  */
-class ProjectTreeModel : public QFileSystemModel
-{
-    public:
+class ProjectTreeModel : public QFileSystemModel {
+public:
+  // Constructors / Destructor
+  ProjectTreeModel()                              = delete;
+  ProjectTreeModel(const ProjectTreeModel& other) = delete;
+  explicit ProjectTreeModel(const Workspace& workspace,
+                            QObject*         parent = nullptr) noexcept;
+  ~ProjectTreeModel() noexcept;
 
-        // Constructors / Destructor
-        ProjectTreeModel() = delete;
-        ProjectTreeModel(const ProjectTreeModel& other) = delete;
-        explicit ProjectTreeModel(const Workspace& workspace, QObject* parent = nullptr) noexcept;
-        ~ProjectTreeModel() noexcept;
+  // General methods
+  QModelIndexList getPersistentIndexList() const {
+    return persistentIndexList();
+  }
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role) const override;
 
-        // General methods
-        QModelIndexList getPersistentIndexList() const {return persistentIndexList();}
-        QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-        // Operator Overloadings
-        ProjectTreeModel& operator=(const ProjectTreeModel& rhs) = delete;
+  // Operator Overloadings
+  ProjectTreeModel& operator=(const ProjectTreeModel& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECTTREEMODEL_H
+#endif  // LIBREPCB_PROJECTTREEMODEL_H

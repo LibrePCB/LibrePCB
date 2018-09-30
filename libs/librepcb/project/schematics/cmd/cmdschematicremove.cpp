@@ -17,60 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicremove.h"
-#include "../schematic.h"
-#include "../../project.h"
 
-/*****************************************************************************************
+#include "../../project.h"
+#include "../schematic.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicRemove::CmdSchematicRemove(Project& project, Schematic& schematic) noexcept :
-    UndoCommand(tr("Remove schematic")),
-    mProject(project), mSchematic(schematic), mPageIndex(-1)
-{
+CmdSchematicRemove::CmdSchematicRemove(Project&   project,
+                                       Schematic& schematic) noexcept
+  : UndoCommand(tr("Remove schematic")),
+    mProject(project),
+    mSchematic(schematic),
+    mPageIndex(-1) {
 }
 
-CmdSchematicRemove::~CmdSchematicRemove() noexcept
-{
+CmdSchematicRemove::~CmdSchematicRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicRemove::performExecute()
-{
-    mPageIndex = mProject.getSchematicIndex(mSchematic);
+bool CmdSchematicRemove::performExecute() {
+  mPageIndex = mProject.getSchematicIndex(mSchematic);
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicRemove::performUndo()
-{
-    mProject.addSchematic(mSchematic, mPageIndex); // can throw
+void CmdSchematicRemove::performUndo() {
+  mProject.addSchematic(mSchematic, mPageIndex);  // can throw
 }
 
-void CmdSchematicRemove::performRedo()
-{
-    mProject.removeSchematic(mSchematic); // can throw
+void CmdSchematicRemove::performRedo() {
+  mProject.removeSchematic(mSchematic);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

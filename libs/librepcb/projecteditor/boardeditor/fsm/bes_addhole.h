@@ -20,16 +20,18 @@
 #ifndef LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
 #define LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bes_base.h"
+
 #include <librepcb/project/boards/items/bi_hole.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class CmdHoleEdit;
@@ -40,58 +42,53 @@ class Board;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_AddHole
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_AddHole class
  */
-class BES_AddHole final : public BES_Base
-{
-        Q_OBJECT
+class BES_AddHole final : public BES_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  explicit BES_AddHole(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                       GraphicsView& editorGraphicsView, UndoStack& undoStack);
+  ~BES_AddHole();
 
-        // Constructors / Destructor
-        explicit BES_AddHole(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                             GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        ~BES_AddHole();
+  // General Methods
+  ProcRetVal process(BEE_Base* event) noexcept override;
+  bool       entry(BEE_Base* event) noexcept override;
+  bool       exit(BEE_Base* event) noexcept override;
 
-        // General Methods
-        ProcRetVal process(BEE_Base* event) noexcept override;
-        bool entry(BEE_Base* event) noexcept override;
-        bool exit(BEE_Base* event) noexcept override;
+private:
+  // Private Methods
+  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
+  bool       addHole(Board& board, const Point& pos) noexcept;
+  void       updateHolePosition(const Point& pos) noexcept;
+  bool       fixHole(const Point& pos) noexcept;
+  void       diameterSpinBoxValueChanged(double value) noexcept;
+  void       makeLayerVisible() noexcept;
 
+  // State
+  bool                        mUndoCmdActive;
+  BI_Hole*                    mHole;
+  QScopedPointer<CmdHoleEdit> mEditCmd;
+  PositiveLength              mCurrentDiameter;
 
-    private:
-
-        // Private Methods
-        ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-        bool addHole(Board& board, const Point& pos) noexcept;
-        void updateHolePosition(const Point& pos) noexcept;
-        bool fixHole(const Point& pos) noexcept;
-        void diameterSpinBoxValueChanged(double value) noexcept;
-        void makeLayerVisible() noexcept;
-
-
-        // State
-        bool mUndoCmdActive;
-        BI_Hole* mHole;
-        QScopedPointer<CmdHoleEdit> mEditCmd;
-        PositiveLength mCurrentDiameter;
-
-        // Widgets for the command toolbar
-        QScopedPointer<QLabel> mDiameterLabel;
-        QScopedPointer<QDoubleSpinBox> mDiameterSpinBox;
+  // Widgets for the command toolbar
+  QScopedPointer<QLabel>         mDiameterLabel;
+  QScopedPointer<QDoubleSpinBox> mDiameterSpinBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H

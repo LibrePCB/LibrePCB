@@ -20,23 +20,24 @@
 #ifndef LIBREPCB_GERBERAPERTURELIST_H
 #define LIBREPCB_GERBERAPERTURELIST_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../units/all_length_units.h"
 #include "../uuid.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GerberApertureList
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The GerberApertureList class
@@ -44,68 +45,69 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-03-31
  */
-class GerberApertureList final
-{
-        Q_DECLARE_TR_FUNCTIONS(GerberApertureList)
+class GerberApertureList final {
+  Q_DECLARE_TR_FUNCTIONS(GerberApertureList)
 
-    public:
+public:
+  // Constructors / Destructor
+  // GerberApertureList() = delete;
+  GerberApertureList(const GerberApertureList& other) = delete;
+  GerberApertureList() noexcept;
+  ~GerberApertureList() noexcept;
 
-        // Constructors / Destructor
-        //GerberApertureList() = delete;
-        GerberApertureList(const GerberApertureList& other) = delete;
-        GerberApertureList() noexcept;
-        ~GerberApertureList() noexcept;
+  // Getters
+  QString generateString() const noexcept;
 
-        // Getters
-        QString generateString() const noexcept;
+  // General Methods
+  int  setCircle(const UnsignedLength& dia, const UnsignedLength& hole);
+  int  setRect(const UnsignedLength& w, const UnsignedLength& h,
+               const Angle& rot, const UnsignedLength& hole) noexcept;
+  int  setObround(const UnsignedLength& w, const UnsignedLength& h,
+                  const Angle& rot, const UnsignedLength& hole) noexcept;
+  int  setRegularPolygon(const UnsignedLength& dia, int n, const Angle& rot,
+                         const UnsignedLength& hole) noexcept;
+  void reset() noexcept;
 
-        // General Methods
-        int setCircle(const UnsignedLength& dia, const UnsignedLength& hole);
-        int setRect(const UnsignedLength& w, const UnsignedLength& h, const Angle& rot,
-                    const UnsignedLength& hole) noexcept;
-        int setObround(const UnsignedLength& w, const UnsignedLength& h, const Angle& rot,
-                       const UnsignedLength& hole) noexcept;
-        int setRegularPolygon(const UnsignedLength& dia, int n, const Angle& rot,
+  // Operator Overloadings
+  GerberApertureList& operator=(const GerberApertureList& rhs) = delete;
+
+private:
+  // Private Methods
+  int  setCurrentAperture(const QString& aperture) noexcept;
+  void addMacro(const QString& macro) noexcept;
+
+  // Aperture Generator Methods
+  static QString generateCircle(const UnsignedLength& dia,
+                                const UnsignedLength& hole) noexcept;
+  static QString generateRect(const UnsignedLength& w, const UnsignedLength& h,
                               const UnsignedLength& hole) noexcept;
-        void reset() noexcept;
+  static QString generateObround(const UnsignedLength& w,
+                                 const UnsignedLength& h,
+                                 const UnsignedLength& hole) noexcept;
+  static QString generateRegularPolygon(const UnsignedLength& dia, int n,
+                                        const Angle&          rot,
+                                        const UnsignedLength& hole) noexcept;
+  static QString generateRotatedRectMacro();
+  static QString generateRotatedRectMacroWithHole();
+  static QString generateRotatedObroundMacro();
+  static QString generateRotatedObroundMacroWithHole();
+  static QString generateRotatedRect(const UnsignedLength& w,
+                                     const UnsignedLength& h, const Angle& rot,
+                                     const UnsignedLength& hole) noexcept;
+  static QString generateRotatedObround(const UnsignedLength& w,
+                                        const UnsignedLength& h,
+                                        const Angle&          rot,
+                                        const UnsignedLength& hole) noexcept;
 
-        // Operator Overloadings
-        GerberApertureList& operator=(const GerberApertureList& rhs) = delete;
-
-
-    private:
-
-        // Private Methods
-        int setCurrentAperture(const QString& aperture) noexcept;
-        void addMacro(const QString& macro) noexcept;
-
-        // Aperture Generator Methods
-        static QString generateCircle(const UnsignedLength& dia,
-                                      const UnsignedLength& hole) noexcept;
-        static QString generateRect(const UnsignedLength& w, const UnsignedLength& h,
-                                    const UnsignedLength& hole) noexcept;
-        static QString generateObround(const UnsignedLength& w, const UnsignedLength& h,
-                                       const UnsignedLength& hole) noexcept;
-        static QString generateRegularPolygon(const UnsignedLength& dia, int n,
-                                              const Angle& rot, const UnsignedLength& hole) noexcept;
-        static QString generateRotatedRectMacro();
-        static QString generateRotatedRectMacroWithHole();
-        static QString generateRotatedObroundMacro();
-        static QString generateRotatedObroundMacroWithHole();
-        static QString generateRotatedRect(const UnsignedLength& w, const UnsignedLength& h,
-                                           const Angle& rot, const UnsignedLength& hole) noexcept;
-        static QString generateRotatedObround(const UnsignedLength& w, const UnsignedLength& h,
-                                              const Angle& rot, const UnsignedLength& hole) noexcept;
-
-
-        QList<QString> mApertureMacros;
-        QMap<int, QString> mApertures; ///< key: aperture number (>= 10); value: aperture definition
+  QList<QString> mApertureMacros;
+  QMap<int, QString>
+      mApertures;  ///< key: aperture number (>= 10); value: aperture definition
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GERBERAPERTURELIST_H
+#endif  // LIBREPCB_GERBERAPERTURELIST_H

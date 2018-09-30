@@ -20,19 +20,21 @@
 #ifndef LIBREPCB_PROJECT_BES_BASE_H
 #define LIBREPCB_PROJECT_BES_BASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "boardeditorevent.h"
+ ******************************************************************************/
 #include "../boardeditor.h"
+#include "boardeditorevent.h"
 #include "ui_boardeditor.h"
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/graphics/graphicsview.h>
 
-/*****************************************************************************************
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/units/all_length_units.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -48,54 +50,58 @@ class Circuit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BES_Base
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BES_Base (BoardEditorState Base) class
  */
-class BES_Base : public QObject
-{
-        Q_OBJECT
+class BES_Base : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  /// process() return values
+  enum ProcRetVal {
+    ForceStayInState,   ///< event handled, stay in the current state
+    ForceLeaveState,    ///< event handled, leave the current state
+    PassToParentState,  ///< event unhandled, pass it to the parent
+  };
 
-        /// process() return values
-        enum ProcRetVal {
-            ForceStayInState,   ///< event handled, stay in the current state
-            ForceLeaveState,    ///< event handled, leave the current state
-            PassToParentState,  ///< event unhandled, pass it to the parent
-        };
+  // Constructors / Destructor
+  explicit BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
+                    GraphicsView& editorGraphicsView, UndoStack& undoStack);
+  virtual ~BES_Base();
 
-        // Constructors / Destructor
-        explicit BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                          GraphicsView& editorGraphicsView, UndoStack& undoStack);
-        virtual ~BES_Base();
+  // General Methods
+  virtual ProcRetVal process(BEE_Base* event) noexcept = 0;
+  virtual bool       entry(BEE_Base* event) noexcept {
+    Q_UNUSED(event);
+    return true;
+  }
+  virtual bool exit(BEE_Base* event) noexcept {
+    Q_UNUSED(event);
+    return true;
+  }
 
-        // General Methods
-        virtual ProcRetVal process(BEE_Base* event) noexcept = 0;
-        virtual bool entry(BEE_Base* event) noexcept {Q_UNUSED(event); return true;}
-        virtual bool exit(BEE_Base* event) noexcept {Q_UNUSED(event); return true;}
-
-    protected:
-
-        // General Attributes which are needed by some state objects
-        workspace::Workspace& mWorkspace;
-        Project& mProject;
-        Circuit& mCircuit;
-        BoardEditor& mEditor;
-        Ui::BoardEditor& mEditorUi; ///< allows access to BoardEditor UI
-        GraphicsView& mEditorGraphicsView; ///< allows access to the board editor graphics view
-        UndoStack& mUndoStack;
+protected:
+  // General Attributes which are needed by some state objects
+  workspace::Workspace& mWorkspace;
+  Project&              mProject;
+  Circuit&              mCircuit;
+  BoardEditor&          mEditor;
+  Ui::BoardEditor&      mEditorUi;  ///< allows access to BoardEditor UI
+  GraphicsView&
+             mEditorGraphicsView;  ///< allows access to the board editor graphics view
+  UndoStack& mUndoStack;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BES_BASE_H
+#endif  // LIBREPCB_PROJECT_BES_BASE_H

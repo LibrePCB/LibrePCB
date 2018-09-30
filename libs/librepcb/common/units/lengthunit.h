@@ -20,303 +20,315 @@
 #ifndef LIBREPCB_LENGTHUNIT_H
 #define LIBREPCB_LENGTHUNIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../fileio/sexpression.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Length;
 class Point;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LengthUnit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
- * @brief The LengthUnit class represents a length unit (millimeters, inches,...)
- *        and provides some useful methods to make the life easier
+ * @brief The LengthUnit class represents a length unit (millimeters,
+ * inches,...) and provides some useful methods to make the life easier
  *
- * With this class, lengths (#Length) and points (#Point) can be converted to other units.
+ * With this class, lengths (#Length) and points (#Point) can be converted to
+ * other units.
  *
- * @note    Please note that the classes #Length and #Point do *not* need a length unit
- *          as they represent the values always in nanometers! The class LengthUnit is
- *          only needed to show these values in the unit which the user wants, and
- *          provides some useful methods to do this.
+ * @note    Please note that the classes #Length and #Point do *not* need a
+ * length unit as they represent the values always in nanometers! The class
+ * LengthUnit is only needed to show these values in the unit which the user
+ * wants, and provides some useful methods to do this.
  *
- * @warning It's possible to convert lengths and points between all available units. But
- *          as the converting methods #convertFromUnit() and #convertToUnit() work always
- *          with floating point numbers, there is a little risk that the conversion is not
- *          lossless! Example: If you begin with 1mm and convert via other units back
- *          to millimeters, you may get 0,999mm or 1,001mm as result. So be careful on
- *          converting lengths and points between different units!
+ * @warning It's possible to convert lengths and points between all available
+ * units. But as the converting methods #convertFromUnit() and #convertToUnit()
+ * work always with floating point numbers, there is a little risk that the
+ * conversion is not lossless! Example: If you begin with 1mm and convert via
+ * other units back to millimeters, you may get 0,999mm or 1,001mm as result. So
+ * be careful on converting lengths and points between different units!
  *
  * @author ubruhin
  * @date 2014-10-07
  */
-class LengthUnit final
-{
-        Q_DECLARE_TR_FUNCTIONS(LengthUnit)
+class LengthUnit final {
+  Q_DECLARE_TR_FUNCTIONS(LengthUnit)
 
-    private:
+private:
+  // Private Types
 
-        // Private Types
+  /**
+   * @brief An enum which contains all available length units
+   *
+   * The enum items should be sorted (not alphabetical but by meaning) because
+   * the enum order will also define the order of these units in comboboxes and
+   * other lists/widgets.
+   *
+   * @warning The enum must begin with value 0 and end with _COUNT.
+   *          Between these values the enum must not contain unused indexes!
+   *          This is neccessary for #getIndex() and #fromIndex().
+   */
+  enum class LengthUnit_t {
+    Millimeters = 0,
+    Micrometers,
+    Nanometers,
+    Inches,
+    Mils,
+    _COUNT  ///< count of units, must be the last entry of the enum
+  };
 
-        /**
-         * @brief An enum which contains all available length units
-         *
-         * The enum items should be sorted (not alphabetical but by meaning) because the
-         * enum order will also define the order of these units in comboboxes and other
-         * lists/widgets.
-         *
-         * @warning The enum must begin with value 0 and end with _COUNT.
-         *          Between these values the enum must not contain unused indexes!
-         *          This is neccessary for #getIndex() and #fromIndex().
-         */
-        enum class LengthUnit_t {
-            Millimeters = 0,
-            Micrometers,
-            Nanometers,
-            Inches,
-            Mils,
-            _COUNT ///< count of units, must be the last entry of the enum
-        };
+public:
+  // Constructors / Destructor
 
+  /**
+   * @brief Default constructor which uses millimeters as unit
+   */
+  LengthUnit() noexcept : mUnit(LengthUnit_t::Millimeters) {}
 
-    public:
+  /**
+   * @brief Copy constructor
+   *
+   * @param other Another LengthUnit object
+   */
+  LengthUnit(const LengthUnit& other) noexcept : mUnit(other.mUnit) {}
 
-        // Constructors / Destructor
+  /**
+   * @brief Destructor
+   */
+  ~LengthUnit() noexcept {}
 
-        /**
-         * @brief Default constructor which uses millimeters as unit
-         */
-        LengthUnit() noexcept : mUnit(LengthUnit_t::Millimeters) {}
+  // Getters
 
-        /**
-         * @brief Copy constructor
-         *
-         * @param other Another LengthUnit object
-         */
-        LengthUnit(const LengthUnit& other) noexcept : mUnit(other.mUnit) {}
+  /**
+   * @brief Get the Index of the length unit of this object
+   *
+   * This method is useful in combination with #getAllUnits() to create lists of
+   * all available length units (QListWidget, QComboBox, ...). With this method
+   * you are able to get the index of this unit in the QList returned by
+   * #getAllUnits().
+   *
+   * @warning The index of an unit can change between different application
+   * versions! So you must never save/load such an index to/from files. Use
+   * #toString() and #fromString() instead for this purpose.
+   *
+   * @return The index
+   *
+   * @see #fromIndex(), #getAllUnits()
+   */
+  int getIndex() const noexcept { return static_cast<int>(mUnit); }
 
-        /**
-         * @brief Destructor
-         */
-        ~LengthUnit() noexcept {}
+  /**
+   * @brief Serialize this object into a string
+   *
+   * @return This object as a string
+   */
+  QString toStr() const noexcept;
 
+  /**
+   * @brief Convert the length unit to a localized string
+   *
+   * This method uses the application's locale settings to translate the name of
+   * the length unit to the user's language.
+   *
+   * @return The unit as a localized string (like "Millimeters" or "Millimeter")
+   */
+  QString toStringTr() const noexcept;
 
-        // Getters
+  /**
+   * @brief Convert the length unit to a localized string (short form)
+   *
+   * @return The unit as a localized short string (like "mm", "μm" or "″")
+   */
+  QString toShortStringTr() const noexcept;
 
-        /**
-         * @brief Get the Index of the length unit of this object
-         *
-         * This method is useful in combination with #getAllUnits() to create lists of
-         * all available length units (QListWidget, QComboBox, ...). With this method
-         * you are able to get the index of this unit in the QList returned by
-         * #getAllUnits().
-         *
-         * @warning The index of an unit can change between different application versions!
-         *          So you must never save/load such an index to/from files.
-         *          Use #toString() and #fromString() instead for this purpose.
-         *
-         * @return The index
-         *
-         * @see #fromIndex(), #getAllUnits()
-         */
-        int getIndex() const noexcept {return static_cast<int>(mUnit);}
+  // General Methods
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString toStr() const noexcept;
+  /**
+   * @brief Convert a Length to this length unit
+   *
+   * This method calls the method Length::to*() (* = the unit of this object)
+   *
+   * @param length    The length to convert (the Length object will not be
+   * modified)
+   *
+   * @return The specified length in the unit of this object
+   *
+   * @warning As this method always returns a floating point number, there is a
+   *          little risk that the conversion is not lossless. So be careful
+   * with it.
+   */
+  qreal convertToUnit(const Length& length) const noexcept;
 
-        /**
-         * @brief Convert the length unit to a localized string
-         *
-         * This method uses the application's locale settings to translate the name of the
-         * length unit to the user's language.
-         *
-         * @return The unit as a localized string (like "Millimeters" or "Millimeter")
-         */
-        QString toStringTr() const noexcept;
+  /**
+   * @brief Convert a Point to this length unit
+   *
+   * This method calls the method Point::to*QPointF() (* = the unit of this
+   * object)
+   *
+   * @param point     The point to convert (the Point object will not be
+   * modified)
+   *
+   * @return The specified point in the unit of this object
+   *
+   * @warning As this method always returns floating point numbers, there is a
+   *          little risk that the conversion is not lossless. So be careful
+   * with it.
+   */
+  QPointF convertToUnit(const Point& point) const noexcept;
 
-        /**
-         * @brief Convert the length unit to a localized string (short form)
-         *
-         * @return The unit as a localized short string (like "mm", "μm" or "″")
-         */
-        QString toShortStringTr() const noexcept;
+  /**
+   * @brief Convert a floating point number with this unit to a Length object
+   *
+   * This method calls the method Length::from*() (* = the unit of this object)
+   *
+   * @param length    A length in the unit of this object
+   *
+   * @return A Length object with the converted length
+   *
+   * @warning As this method always uses floating point numbers, there is a
+   * little risk that the conversion is not lossless. So be careful with it.
+   */
+  Length convertFromUnit(qreal length) const noexcept;
 
+  /**
+   * @brief Convert floating point numbers with this unit to a Point object
+   *
+   * This method calls the method Point::from*() (* = the unit of this object)
+   *
+   * @param point     A point in the unit of this object
+   *
+   * @return A Point object with the converted point
+   *
+   * @warning As this method always uses floating point numbers, there is a
+   * little risk that the conversion is not lossless. So be careful with it.
+   */
+  Point convertFromUnit(const QPointF& point) const noexcept;
 
-        // General Methods
+  // Static Methods
 
-        /**
-         * @brief Convert a Length to this length unit
-         *
-         * This method calls the method Length::to*() (* = the unit of this object)
-         *
-         * @param length    The length to convert (the Length object will not be modified)
-         *
-         * @return The specified length in the unit of this object
-         *
-         * @warning As this method always returns a floating point number, there is a
-         *          little risk that the conversion is not lossless. So be careful with it.
-         */
-        qreal convertToUnit(const Length& length) const noexcept;
+  /**
+   * @brief Get the length unit of a specific index (to use with #getIndex())
+   *
+   * @param index         The index of the unit in the list of #getAllUnits().
+   *                      This number equals to the number returned by
+   * #getIndex().
+   *
+   * @return The LengthUnit object with the specified index
+   *
+   * @throw Exception     If index was invalid
+   *
+   * @see #getIndex(), #getAllUnits()
+   */
+  static LengthUnit fromIndex(int index);
+  ;
 
-        /**
-         * @brief Convert a Point to this length unit
-         *
-         * This method calls the method Point::to*QPointF() (* = the unit of this object)
-         *
-         * @param point     The point to convert (the Point object will not be modified)
-         *
-         * @return The specified point in the unit of this object
-         *
-         * @warning As this method always returns floating point numbers, there is a
-         *          little risk that the conversion is not lossless. So be careful with it.
-         */
-        QPointF convertToUnit(const Point& point) const noexcept;
+  /**
+   * @brief Get all available length units
+   *
+   * This method returns a list of all available length units. The index of the
+   * objects in the list equals to the value from #getIndex() of them.
+   *
+   * @return A list of all available length units
+   *
+   * @see #getIndex(), #fromIndex()
+   */
+  static QList<LengthUnit> getAllUnits() noexcept;
 
-        /**
-         * @brief Convert a floating point number with this unit to a Length object
-         *
-         * This method calls the method Length::from*() (* = the unit of this object)
-         *
-         * @param length    A length in the unit of this object
-         *
-         * @return A Length object with the converted length
-         *
-         * @warning As this method always uses floating point numbers, there is a little
-         *          risk that the conversion is not lossless. So be careful with it.
-         */
-        Length convertFromUnit(qreal length) const noexcept;
+  // Static Methods to get all available length units
+  static LengthUnit millimeters() noexcept {
+    return LengthUnit(LengthUnit_t::Millimeters);
+  }
+  static LengthUnit micrometers() noexcept {
+    return LengthUnit(LengthUnit_t::Micrometers);
+  }
+  static LengthUnit nanometers() noexcept {
+    return LengthUnit(LengthUnit_t::Nanometers);
+  }
+  static LengthUnit inches() noexcept {
+    return LengthUnit(LengthUnit_t::Inches);
+  }
+  static LengthUnit mils() noexcept { return LengthUnit(LengthUnit_t::Mils); }
 
-        /**
-         * @brief Convert floating point numbers with this unit to a Point object
-         *
-         * This method calls the method Point::from*() (* = the unit of this object)
-         *
-         * @param point     A point in the unit of this object
-         *
-         * @return A Point object with the converted point
-         *
-         * @warning As this method always uses floating point numbers, there is a little
-         *          risk that the conversion is not lossless. So be careful with it.
-         */
-        Point convertFromUnit(const QPointF& point) const noexcept;
+  // Operators
+  LengthUnit& operator=(const LengthUnit& rhs) noexcept {
+    mUnit = rhs.mUnit;
+    return *this;
+  }
+  bool operator==(const LengthUnit& rhs) noexcept { return mUnit == rhs.mUnit; }
 
+private:
+  // Private Methods
 
-        // Static Methods
+  /**
+   * @brief Private Constructor to create a LengthUnit object with a specific
+   * unit
+   *
+   * @param unit  The length unit of the new object
+   */
+  explicit LengthUnit(LengthUnit_t unit) noexcept : mUnit(unit) {}
 
-        /**
-         * @brief Get the length unit of a specific index (to use with #getIndex())
-         *
-         * @param index         The index of the unit in the list of #getAllUnits().
-         *                      This number equals to the number returned by #getIndex().
-         *
-         * @return The LengthUnit object with the specified index
-         *
-         * @throw Exception     If index was invalid
-         *
-         * @see #getIndex(), #getAllUnits()
-         */
-        static LengthUnit fromIndex(int index);;
+  // Attributes
 
-        /**
-         * @brief Get all available length units
-         *
-         * This method returns a list of all available length units. The index of the
-         * objects in the list equals to the value from #getIndex() of them.
-         *
-         * @return A list of all available length units
-         *
-         * @see #getIndex(), #fromIndex()
-         */
-        static QList<LengthUnit> getAllUnits() noexcept;
-
-
-        // Static Methods to get all available length units
-        static LengthUnit millimeters() noexcept {return LengthUnit(LengthUnit_t::Millimeters);}
-        static LengthUnit micrometers() noexcept {return LengthUnit(LengthUnit_t::Micrometers);}
-        static LengthUnit nanometers() noexcept {return LengthUnit(LengthUnit_t::Nanometers);}
-        static LengthUnit inches() noexcept {return LengthUnit(LengthUnit_t::Inches);}
-        static LengthUnit mils() noexcept {return LengthUnit(LengthUnit_t::Mils);}
-
-        // Operators
-        LengthUnit& operator=(const LengthUnit& rhs) noexcept {mUnit = rhs.mUnit; return *this;}
-        bool operator==(const LengthUnit& rhs) noexcept {return mUnit == rhs.mUnit;}
-
-
-    private:
-
-        // Private Methods
-
-        /**
-         * @brief Private Constructor to create a LengthUnit object with a specific unit
-         *
-         * @param unit  The length unit of the new object
-         */
-        explicit LengthUnit(LengthUnit_t unit) noexcept : mUnit(unit) {}
-
-
-        // Attributes
-
-        /**
-         * @brief Holds the length unit of the object
-         */
-        LengthUnit_t mUnit;
+  /**
+   * @brief Holds the length unit of the object
+   */
+  LengthUnit_t mUnit;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
 inline SExpression serializeToSExpression(const LengthUnit& obj) {
-    return SExpression::createToken(obj.toStr());
+  return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline LengthUnit deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if (str == "millimeters")
-        return LengthUnit::millimeters();
-    else if (str == "micrometers")
-        return LengthUnit::micrometers();
-    else if (str == "nanometers")
-        return LengthUnit::nanometers();
-    else if (str == "inches")
-        return LengthUnit::inches();
-    else if (str == "mils")
-        return LengthUnit::mils();
-    else {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
-    }
+inline LengthUnit deserializeFromSExpression(const SExpression& sexpr,
+                                             bool               throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == "millimeters")
+    return LengthUnit::millimeters();
+  else if (str == "micrometers")
+    return LengthUnit::micrometers();
+  else if (str == "nanometers")
+    return LengthUnit::nanometers();
+  else if (str == "inches")
+    return LengthUnit::inches();
+  else if (str == "mils")
+    return LengthUnit::mils();
+  else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
+  }
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {
-    stream << unit.toStr();
-    return stream;
+  stream << unit.toStr();
+  return stream;
 }
 
 inline QDebug operator<<(QDebug stream, const LengthUnit& unit) {
-    stream << QString("LengthUnit(%1)").arg(unit.toStr());
-    return stream;
+  stream << QString("LengthUnit(%1)").arg(unit.toStr());
+  return stream;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_LENGTHUNIT_H
+#endif  // LIBREPCB_LENGTHUNIT_H

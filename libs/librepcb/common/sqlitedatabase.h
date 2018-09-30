@@ -20,22 +20,23 @@
 #ifndef LIBREPCB_SQLITEDATABASE_H
 #define LIBREPCB_SQLITEDATABASE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtSql>
+ ******************************************************************************/
 #include "exceptions.h"
 #include "fileio/filepath.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtSql>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SQLiteDatabase
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SQLiteDatabase class
@@ -43,86 +44,76 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-09-03
  */
-class SQLiteDatabase final : public QObject
-{
-        Q_OBJECT
+class SQLiteDatabase final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Types
+  class TransactionScopeGuard final {
+  public:
+    TransactionScopeGuard()                                   = delete;
+    TransactionScopeGuard(const TransactionScopeGuard& other) = delete;
+    TransactionScopeGuard(SQLiteDatabase& db);
+    ~TransactionScopeGuard() noexcept;
+    void                   commit();
+    TransactionScopeGuard& operator=(const TransactionScopeGuard& rhs) = delete;
 
-        // Types
-        class TransactionScopeGuard final
-        {
-            public:
-                TransactionScopeGuard() = delete;
-                TransactionScopeGuard(const TransactionScopeGuard& other) = delete;
-                TransactionScopeGuard(SQLiteDatabase& db);
-                ~TransactionScopeGuard() noexcept;
-                void commit();
-                TransactionScopeGuard& operator=(const TransactionScopeGuard& rhs) = delete;
-            private:
-                SQLiteDatabase& mDb;
-                bool mIsCommited;
-        };
+  private:
+    SQLiteDatabase& mDb;
+    bool            mIsCommited;
+  };
 
+  // Constructors / Destructor
+  SQLiteDatabase()                            = delete;
+  SQLiteDatabase(const SQLiteDatabase& other) = delete;
+  SQLiteDatabase(const FilePath& filepath);
+  ~SQLiteDatabase() noexcept;
 
-        // Constructors / Destructor
-        SQLiteDatabase() = delete;
-        SQLiteDatabase(const SQLiteDatabase& other) = delete;
-        SQLiteDatabase(const FilePath& filepath);
-        ~SQLiteDatabase() noexcept;
+  // SQL Commands
+  void beginTransaction();
+  void commitTransaction();
+  void rollbackTransaction();
+  void clearTable(const QString& table);
 
+  // General Methods
+  QSqlQuery prepareQuery(const QString& query) const;
+  int       insert(QSqlQuery& query);
+  void      exec(QSqlQuery& query);
+  void      exec(const QString& query);
 
-        // SQL Commands
-        void beginTransaction();
-        void commitTransaction();
-        void rollbackTransaction();
-        void clearTable(const QString& table);
+  // Operator Overloadings
+  SQLiteDatabase& operator=(const SQLiteDatabase& rhs) = delete;
 
+private:  // Methods
+  /**
+   * @brief Enable the "Write-Ahead Logging" (WAL) featur of SQLite
+   *
+   * @note LibrePCB requires to enable WAL to avoid blocking readers by writers.
+   * If not enabled, the library scanner would also block all read-only accesses
+   *       to the library database.
+   *
+   * @see http://www.sqlite.org/wal.html
+   */
+  void enableSqliteWriteAheadLogging();
 
-        // General Methods
-        QSqlQuery prepareQuery(const QString& query) const;
-        int insert(QSqlQuery& query);
-        void exec(QSqlQuery& query);
-        void exec(const QString& query);
+  /**
+   * @brief Get compile options of the SQLite driver library
+   *
+   * @return A hashmap of all compile options (without the "SQLITE_" prefix)
+   *
+   * @see https://sqlite.org/pragma.html#pragma_compile_options
+   */
+  QHash<QString, QString> getSqliteCompileOptions();
 
-
-        // Operator Overloadings
-        SQLiteDatabase& operator=(const SQLiteDatabase& rhs) = delete;
-
-
-    private: // Methods
-
-        /**
-         * @brief Enable the "Write-Ahead Logging" (WAL) featur of SQLite
-         *
-         * @note LibrePCB requires to enable WAL to avoid blocking readers by writers. If
-         *       not enabled, the library scanner would also block all read-only accesses
-         *       to the library database.
-         *
-         * @see http://www.sqlite.org/wal.html
-         */
-        void enableSqliteWriteAheadLogging();
-
-        /**
-         * @brief Get compile options of the SQLite driver library
-         *
-         * @return A hashmap of all compile options (without the "SQLITE_" prefix)
-         *
-         * @see https://sqlite.org/pragma.html#pragma_compile_options
-         */
-        QHash<QString, QString> getSqliteCompileOptions();
-
-
-    private: // Data
-
-        QSqlDatabase mDb;
-        //int mNestedTransactionCount;
+private:  // Data
+  QSqlDatabase mDb;
+  // int mNestedTransactionCount;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SQLITEDATABASE_H
+#endif  // LIBREPCB_SQLITEDATABASE_H

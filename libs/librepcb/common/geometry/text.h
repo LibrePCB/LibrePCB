@@ -20,26 +20,27 @@
 #ifndef LIBREPCB_TEXT_H
 #define LIBREPCB_TEXT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "../fileio/serializableobjectlist.h"
+ ******************************************************************************/
+#include "../alignment.h"
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
+#include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
-#include "../alignment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Interface IF_TextObserver
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The IF_TextObserver class
@@ -47,103 +48,103 @@ namespace librepcb {
  * @author ubruhin
  * @date 2017-01-02
  */
-class IF_TextObserver
-{
-    public:
-        virtual void textLayerNameChanged(const GraphicsLayerName& newLayerName) noexcept = 0;
-        virtual void textTextChanged(const QString& newText) noexcept = 0;
-        virtual void textPositionChanged(const Point& newPos) noexcept = 0;
-        virtual void textRotationChanged(const Angle& newRot) noexcept = 0;
-        virtual void textHeightChanged(const PositiveLength& newHeight) noexcept = 0;
-        virtual void textAlignChanged(const Alignment& newAlign) noexcept = 0;
+class IF_TextObserver {
+public:
+  virtual void textLayerNameChanged(
+      const GraphicsLayerName& newLayerName) noexcept                      = 0;
+  virtual void textTextChanged(const QString& newText) noexcept            = 0;
+  virtual void textPositionChanged(const Point& newPos) noexcept           = 0;
+  virtual void textRotationChanged(const Angle& newRot) noexcept           = 0;
+  virtual void textHeightChanged(const PositiveLength& newHeight) noexcept = 0;
+  virtual void textAlignChanged(const Alignment& newAlign) noexcept        = 0;
 
-    protected:
-        IF_TextObserver() noexcept {}
-        explicit IF_TextObserver(const IF_TextObserver& other) = delete;
-        virtual ~IF_TextObserver() noexcept {}
-        IF_TextObserver& operator=(const IF_TextObserver& rhs) = delete;
+protected:
+  IF_TextObserver() noexcept {}
+  explicit IF_TextObserver(const IF_TextObserver& other) = delete;
+  virtual ~IF_TextObserver() noexcept {}
+  IF_TextObserver& operator=(const IF_TextObserver& rhs) = delete;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Text
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The Text class
  */
-class Text final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(Text)
+class Text final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(Text)
 
-    public:
+public:
+  // Constructors / Destructor
+  Text() = delete;
+  Text(const Text& other) noexcept;
+  Text(const Uuid& uuid, const Text& other) noexcept;
+  Text(const Uuid& uuid, const GraphicsLayerName& layerName,
+       const QString& text, const Point& pos, const Angle& rotation,
+       const PositiveLength& height, const Alignment& align) noexcept;
+  explicit Text(const SExpression& node);
+  ~Text() noexcept;
 
-        // Constructors / Destructor
-        Text() = delete;
-        Text(const Text& other) noexcept;
-        Text(const Uuid& uuid, const Text& other) noexcept;
-        Text(const Uuid& uuid, const GraphicsLayerName& layerName, const QString& text,
-             const Point& pos, const Angle& rotation, const PositiveLength& height,
-             const Alignment& align) noexcept;
-        explicit Text(const SExpression& node);
-        ~Text() noexcept;
+  // Getters
+  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
+  const Point&             getPosition() const noexcept { return mPosition; }
+  const Angle&             getRotation() const noexcept { return mRotation; }
+  const PositiveLength&    getHeight() const noexcept { return mHeight; }
+  const Alignment&         getAlign() const noexcept { return mAlign; }
+  const QString&           getText() const noexcept { return mText; }
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return mUuid;}
-        const GraphicsLayerName& getLayerName() const noexcept {return mLayerName;}
-        const Point& getPosition() const noexcept {return mPosition;}
-        const Angle& getRotation() const noexcept {return mRotation;}
-        const PositiveLength& getHeight() const noexcept {return mHeight;}
-        const Alignment& getAlign() const noexcept {return mAlign;}
-        const QString& getText() const noexcept {return mText;}
+  // Setters
+  void setLayerName(const GraphicsLayerName& name) noexcept;
+  void setText(const QString& text) noexcept;
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rotation) noexcept;
+  void setHeight(const PositiveLength& height) noexcept;
+  void setAlign(const Alignment& align) noexcept;
 
-        // Setters
-        void setLayerName(const GraphicsLayerName& name) noexcept;
-        void setText(const QString& text) noexcept;
-        void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rotation) noexcept;
-        void setHeight(const PositiveLength& height) noexcept;
-        void setAlign(const Alignment& align) noexcept;
+  // General Methods
+  void registerObserver(IF_TextObserver& object) const noexcept;
+  void unregisterObserver(IF_TextObserver& object) const noexcept;
 
-        // General Methods
-        void registerObserver(IF_TextObserver& object) const noexcept;
-        void unregisterObserver(IF_TextObserver& object) const noexcept;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool  operator==(const Text& rhs) const noexcept;
+  bool  operator!=(const Text& rhs) const noexcept { return !(*this == rhs); }
+  Text& operator=(const Text& rhs) noexcept;
 
-        // Operator Overloadings
-        bool operator==(const Text& rhs) const noexcept;
-        bool operator!=(const Text& rhs) const noexcept {return !(*this == rhs);}
-        Text& operator=(const Text& rhs) noexcept;
+private:  // Data
+  Uuid              mUuid;
+  GraphicsLayerName mLayerName;
+  QString           mText;
+  Point             mPosition;
+  Angle             mRotation;
+  PositiveLength    mHeight;
+  Alignment         mAlign;
 
-
-    private: // Data
-        Uuid mUuid;
-        GraphicsLayerName mLayerName;
-        QString mText;
-        Point mPosition;
-        Angle mRotation;
-        PositiveLength mHeight;
-        Alignment mAlign;
-
-        // Misc
-        mutable QSet<IF_TextObserver*> mObservers; ///< A list of all observer objects
+  // Misc
+  mutable QSet<IF_TextObserver*>
+      mObservers;  ///< A list of all observer objects
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class TextList
- ****************************************************************************************/
+ ******************************************************************************/
 
-struct TextListNameProvider {static constexpr const char* tagname = "text";};
-using TextList = SerializableObjectList<Text, TextListNameProvider>;
+struct TextListNameProvider {
+  static constexpr const char* tagname = "text";
+};
+using TextList      = SerializableObjectList<Text, TextListNameProvider>;
 using CmdTextInsert = CmdListElementInsert<Text, TextListNameProvider>;
 using CmdTextRemove = CmdListElementRemove<Text, TextListNameProvider>;
-using CmdTextsSwap = CmdListElementsSwap<Text, TextListNameProvider>;
+using CmdTextsSwap  = CmdListElementsSwap<Text, TextListNameProvider>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_TEXT_H
+#endif  // LIBREPCB_TEXT_H

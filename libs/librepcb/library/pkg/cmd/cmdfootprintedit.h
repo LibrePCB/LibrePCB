@@ -20,74 +20,70 @@
 #ifndef LIBREPCB_LIBRARY_CMDFOOTPRINTEDIT_H
 #define LIBREPCB_LIBRARY_CMDFOOTPRINTEDIT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommand.h>
+ ******************************************************************************/
 #include <librepcb/common/elementname.h>
+#include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
 class Footprint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdFootprintEdit
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdFootprintEdit class
  */
-class CmdFootprintEdit final : public UndoCommand
-{
-    public:
+class CmdFootprintEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdFootprintEdit()                              = delete;
+  CmdFootprintEdit(const CmdFootprintEdit& other) = delete;
+  explicit CmdFootprintEdit(Footprint& fpt) noexcept;
+  ~CmdFootprintEdit() noexcept;
 
-        // Constructors / Destructor
-        CmdFootprintEdit() = delete;
-        CmdFootprintEdit(const CmdFootprintEdit& other) = delete;
-        explicit CmdFootprintEdit(Footprint& fpt) noexcept;
-        ~CmdFootprintEdit() noexcept;
+  // Setters
+  void setName(const ElementName& name) noexcept;
 
-        // Setters
-        void setName(const ElementName& name) noexcept;
+  // Operator Overloadings
+  CmdFootprintEdit& operator=(const CmdFootprintEdit& rhs) = delete;
 
-        // Operator Overloadings
-        CmdFootprintEdit& operator=(const CmdFootprintEdit& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  Footprint& mFootprint;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        Footprint& mFootprint;
-
-        // General Attributes
-        ElementName mOldName;
-        ElementName mNewName;
+  // General Attributes
+  ElementName mOldName;
+  ElementName mNewName;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_CMDFOOTPRINTEDIT_H
+#endif  // LIBREPCB_LIBRARY_CMDFOOTPRINTEDIT_H

@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -45,48 +45,46 @@ namespace Ui {
 class FootprintPadPropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FootprintPadPropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FootprintPadPropertiesDialog class
  */
-class FootprintPadPropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class FootprintPadPropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  FootprintPadPropertiesDialog() = delete;
+  FootprintPadPropertiesDialog(const FootprintPadPropertiesDialog& other) =
+      delete;
+  FootprintPadPropertiesDialog(const Package& pkg, const Footprint& fpt,
+                               FootprintPad& pad, UndoStack& undoStack,
+                               QWidget* parent = nullptr) noexcept;
+  ~FootprintPadPropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        FootprintPadPropertiesDialog() = delete;
-        FootprintPadPropertiesDialog(const FootprintPadPropertiesDialog& other) = delete;
-        FootprintPadPropertiesDialog(const Package& pkg, const Footprint& fpt,
-                                     FootprintPad& pad, UndoStack& undoStack,
-                                     QWidget* parent = nullptr) noexcept;
-        ~FootprintPadPropertiesDialog() noexcept;
+  // Operator Overloadings
+  FootprintPadPropertiesDialog& operator       =(
+      const FootprintPadPropertiesDialog& rhs) = delete;
 
-        // Operator Overloadings
-        FootprintPadPropertiesDialog& operator=(const FootprintPadPropertiesDialog& rhs) = delete;
+private:  // Methods
+  void on_buttonBox_clicked(QAbstractButton* button);
+  bool applyChanges() noexcept;
 
-
-    private: // Methods
-        void on_buttonBox_clicked(QAbstractButton *button);
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        FootprintPad& mPad;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
+private:  // Data
+  FootprintPad&                                    mPad;
+  UndoStack&                                       mUndoStack;
+  QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H

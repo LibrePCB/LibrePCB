@@ -17,98 +17,96 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdprojectmetadataedit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdProjectMetadataEdit::CmdProjectMetadataEdit(ProjectMetadata& metadata) noexcept :
-    UndoCommand(tr("Edit Project Metadata")),
+CmdProjectMetadataEdit::CmdProjectMetadataEdit(
+    ProjectMetadata& metadata) noexcept
+  : UndoCommand(tr("Edit Project Metadata")),
     mMetadata(metadata),
-    mOldName(mMetadata.getName()),               mNewName(mMetadata.getName()),
-    mOldAuthor(mMetadata.getAuthor()),           mNewAuthor(mMetadata.getAuthor()),
-    mOldVersion(mMetadata.getVersion()),         mNewVersion(mMetadata.getVersion()),
-    mOldAttributes(mMetadata.getAttributes()),   mNewAttributes(mOldAttributes)
-{
+    mOldName(mMetadata.getName()),
+    mNewName(mMetadata.getName()),
+    mOldAuthor(mMetadata.getAuthor()),
+    mNewAuthor(mMetadata.getAuthor()),
+    mOldVersion(mMetadata.getVersion()),
+    mNewVersion(mMetadata.getVersion()),
+    mOldAttributes(mMetadata.getAttributes()),
+    mNewAttributes(mOldAttributes) {
 }
 
-CmdProjectMetadataEdit::~CmdProjectMetadataEdit() noexcept
-{
+CmdProjectMetadataEdit::~CmdProjectMetadataEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdProjectMetadataEdit::setName(const ElementName& newName) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewName = newName;
+void CmdProjectMetadataEdit::setName(const ElementName& newName) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = newName;
 }
 
-void CmdProjectMetadataEdit::setAuthor(const QString& newAuthor) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewAuthor = newAuthor;
+void CmdProjectMetadataEdit::setAuthor(const QString& newAuthor) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewAuthor = newAuthor;
 }
 
-void CmdProjectMetadataEdit::setVersion(const QString& newVersion) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewVersion = newVersion;
+void CmdProjectMetadataEdit::setVersion(const QString& newVersion) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewVersion = newVersion;
 }
 
-void CmdProjectMetadataEdit::setAttributes(const AttributeList& attributes) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewAttributes = attributes;
+void CmdProjectMetadataEdit::setAttributes(
+    const AttributeList& attributes) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewAttributes = attributes;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdProjectMetadataEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdProjectMetadataEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewName != mOldName)               return true;
-    if (mNewAuthor != mOldAuthor)           return true;
-    if (mNewVersion != mOldVersion)         return true;
-    if (mNewAttributes != mOldAttributes)   return true;
-    return false;
+  if (mNewName != mOldName) return true;
+  if (mNewAuthor != mOldAuthor) return true;
+  if (mNewVersion != mOldVersion) return true;
+  if (mNewAttributes != mOldAttributes) return true;
+  return false;
 }
 
-void CmdProjectMetadataEdit::performUndo()
-{
-    mMetadata.setName(mOldName);
-    mMetadata.setAuthor(mOldAuthor);
-    mMetadata.setVersion(mOldVersion);
-    mMetadata.setAttributes(mOldAttributes);
+void CmdProjectMetadataEdit::performUndo() {
+  mMetadata.setName(mOldName);
+  mMetadata.setAuthor(mOldAuthor);
+  mMetadata.setVersion(mOldVersion);
+  mMetadata.setAttributes(mOldAttributes);
 }
 
-void CmdProjectMetadataEdit::performRedo()
-{
-    mMetadata.setName(mNewName);
-    mMetadata.setAuthor(mNewAuthor);
-    mMetadata.setVersion(mNewVersion);
-    mMetadata.setAttributes(mNewAttributes);
+void CmdProjectMetadataEdit::performRedo() {
+  mMetadata.setName(mNewName);
+  mMetadata.setAuthor(mNewAuthor);
+  mMetadata.setVersion(mNewVersion);
+  mMetadata.setAttributes(mNewAttributes);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

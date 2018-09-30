@@ -17,37 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
-#include <QtCore>
 #include <gmock/gmock.h>
 #include <librepcb/common/application.h>
 #include <librepcb/common/debug.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 using namespace librepcb;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  The Unit Testing Program
- ****************************************************************************************/
+ ******************************************************************************/
 
-int main(int argc, char *argv[])
-{
-    // many classes rely on a QApplication instance, so we create it here
-    Application app(argc, argv);
-    Application::setOrganizationName("LibrePCB");
-    Application::setOrganizationDomain("librepcb.org");
-    Application::setApplicationName("LibrePCB-UnitTests");
+int main(int argc, char *argv[]) {
+  // many classes rely on a QApplication instance, so we create it here
+  Application app(argc, argv);
+  Application::setOrganizationName("LibrePCB");
+  Application::setOrganizationDomain("librepcb.org");
+  Application::setApplicationName("LibrePCB-UnitTests");
 
-    // disable the whole debug output (we want only the output from gtest)
-    Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
-    Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
+  // disable the whole debug output (we want only the output from gtest)
+  Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
+  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
 
-    // init gmock and run all tests
-    ::testing::InitGoogleMock(&argc, argv);
-    return RUN_ALL_TESTS();
+  // init gmock and run all tests
+  ::testing::InitGoogleMock(&argc, argv);
+  return RUN_ALL_TESTS();
 }

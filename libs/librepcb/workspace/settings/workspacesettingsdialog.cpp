@@ -17,160 +17,166 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "workspacesettingsdialog.h"
-#include "ui_workspacesettingsdialog.h"
+
 #include "../workspace.h"
+#include "ui_workspacesettingsdialog.h"
 #include "workspacesettings.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings) :
-    QDialog(0), mUi(new Ui::WorkspaceSettingsDialog), mSettings(settings)
-{
-    mUi->setupUi(this);
+WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings)
+  : QDialog(0), mUi(new Ui::WorkspaceSettingsDialog), mSettings(settings) {
+  mUi->setupUi(this);
 
-    // Add all settings widgets
+  // Add all settings widgets
 
-    // tab: general
-    mUi->generalLayout->addRow(mSettings.getUser().getLabelText(),
-                               mSettings.getUser().getWidget());
-    mUi->generalLayout->addRow(mSettings.getAppLocale().getLabelText(),
-                               mSettings.getAppLocale().getWidget());
-    mUi->generalLayout->addRow(mSettings.getAppDefMeasUnits().getLengthUnitLabelText(),
-                               mSettings.getAppDefMeasUnits().getLengthUnitComboBox());
-    mUi->generalLayout->addRow(mSettings.getProjectAutosaveInterval().getLabelText(),
-                               mSettings.getProjectAutosaveInterval().getWidget());
+  // tab: general
+  mUi->generalLayout->addRow(mSettings.getUser().getLabelText(),
+                             mSettings.getUser().getWidget());
+  mUi->generalLayout->addRow(mSettings.getAppLocale().getLabelText(),
+                             mSettings.getAppLocale().getWidget());
+  mUi->generalLayout->addRow(
+      mSettings.getAppDefMeasUnits().getLengthUnitLabelText(),
+      mSettings.getAppDefMeasUnits().getLengthUnitComboBox());
+  mUi->generalLayout->addRow(
+      mSettings.getProjectAutosaveInterval().getLabelText(),
+      mSettings.getProjectAutosaveInterval().getWidget());
 
-    // tab: appearance
-    mUi->appearanceLayout->addRow(mSettings.getAppearance().getUseOpenGlLabelText(),
-                                  mSettings.getAppearance().getUseOpenGlWidget());
+  // tab: appearance
+  mUi->appearanceLayout->addRow(
+      mSettings.getAppearance().getUseOpenGlLabelText(),
+      mSettings.getAppearance().getUseOpenGlWidget());
 
-    // tab: library
-    mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder().getLabelText(),
-                               mSettings.getLibLocaleOrder().getWidget());
-    mUi->libraryLayout->addRow(mSettings.getLibNormOrder().getLabelText(),
-                               mSettings.getLibNormOrder().getWidget());
+  // tab: library
+  mUi->libraryLayout->addRow(mSettings.getLibLocaleOrder().getLabelText(),
+                             mSettings.getLibLocaleOrder().getWidget());
+  mUi->libraryLayout->addRow(mSettings.getLibNormOrder().getLabelText(),
+                             mSettings.getLibNormOrder().getWidget());
 
-    // tab: repositories
-    mUi->repositoriesLayout->addWidget(mSettings.getRepositories().getWidget());
+  // tab: repositories
+  mUi->repositoriesLayout->addWidget(mSettings.getRepositories().getWidget());
 
-    // tab: debug tools
-    mUi->tabWidget->addTab(mSettings.getDebugTools().getWidget(), tr("Debug Tools"));
+  // tab: debug tools
+  mUi->tabWidget->addTab(mSettings.getDebugTools().getWidget(),
+                         tr("Debug Tools"));
 
-    // load the window geometry
-    QSettings clientSettings;
-    restoreGeometry(clientSettings.value("workspace_settings_dialog/window_geometry").toByteArray());
+  // load the window geometry
+  QSettings clientSettings;
+  restoreGeometry(
+      clientSettings.value("workspace_settings_dialog/window_geometry")
+          .toByteArray());
 
-    // just in case that the wrong tab is selected in the UI designer:
-    mUi->tabWidget->setCurrentIndex(0);
+  // just in case that the wrong tab is selected in the UI designer:
+  mUi->tabWidget->setCurrentIndex(0);
 }
 
-WorkspaceSettingsDialog::~WorkspaceSettingsDialog()
-{
-    // save the window geometry
-    QSettings clientSettings;
-    clientSettings.setValue("workspace_settings_dialog/window_geometry", saveGeometry());
+WorkspaceSettingsDialog::~WorkspaceSettingsDialog() {
+  // save the window geometry
+  QSettings clientSettings;
+  clientSettings.setValue("workspace_settings_dialog/window_geometry",
+                          saveGeometry());
 
-    // Remove all settings widgets from the dialog (important for memory management!)
+  // Remove all settings widgets from the dialog (important for memory
+  // management!)
 
-    // tab: general
-    mSettings.getUser().getWidget()->setParent(0);
-    mSettings.getAppLocale().getWidget()->setParent(0);
-    mSettings.getAppDefMeasUnits().getLengthUnitComboBox()->setParent(0);
-    mSettings.getProjectAutosaveInterval().getWidget()->setParent(0);
+  // tab: general
+  mSettings.getUser().getWidget()->setParent(0);
+  mSettings.getAppLocale().getWidget()->setParent(0);
+  mSettings.getAppDefMeasUnits().getLengthUnitComboBox()->setParent(0);
+  mSettings.getProjectAutosaveInterval().getWidget()->setParent(0);
 
-    // tab: appearance
-    mSettings.getAppearance().getUseOpenGlWidget()->setParent(0);
+  // tab: appearance
+  mSettings.getAppearance().getUseOpenGlWidget()->setParent(0);
 
-    // tab: library
-    mSettings.getLibLocaleOrder().getWidget()->setParent(0);
-    mSettings.getLibNormOrder().getWidget()->setParent(0);
+  // tab: library
+  mSettings.getLibLocaleOrder().getWidget()->setParent(0);
+  mSettings.getLibNormOrder().getWidget()->setParent(0);
 
-    // tab: repositories
-    mSettings.getRepositories().getWidget()->setParent(0);
+  // tab: repositories
+  mSettings.getRepositories().getWidget()->setParent(0);
 
-    // tab: debug tools
-    mUi->tabWidget->removeTab(mUi->tabWidget->indexOf(mSettings.getDebugTools().getWidget()));
-    mSettings.getDebugTools().getWidget()->setParent(0);
+  // tab: debug tools
+  mUi->tabWidget->removeTab(
+      mUi->tabWidget->indexOf(mSettings.getDebugTools().getWidget()));
+  mSettings.getDebugTools().getWidget()->setParent(0);
 
-    // delete private member objects
-    delete mUi;         mUi = 0;
+  // delete private member objects
+  delete mUi;
+  mUi = 0;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WorkspaceSettingsDialog::accept()
-{
-    try {
-        mSettings.applyAll(); // can throw
-        QDialog::accept();
-    } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-        QDialog::reject();
-    }
-}
-
-void WorkspaceSettingsDialog::reject()
-{
-    mSettings.revertAll();
+void WorkspaceSettingsDialog::accept() {
+  try {
+    mSettings.applyAll();  // can throw
+    QDialog::accept();
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
     QDialog::reject();
+  }
 }
 
-/*****************************************************************************************
+void WorkspaceSettingsDialog::reject() {
+  mSettings.revertAll();
+  QDialog::reject();
+}
+
+/*******************************************************************************
  *  Private Slots for the GUI elements
- ****************************************************************************************/
+ ******************************************************************************/
 
-void WorkspaceSettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
-{
-    switch (mUi->buttonBox->buttonRole(button))
-    {
-        case QDialogButtonBox::AcceptRole:
-        case QDialogButtonBox::ApplyRole:
-            try {
-                mSettings.applyAll(); // can throw
-            } catch (const Exception& e) {
-                QMessageBox::critical(this, tr("Error"), e.getMsg());
-            }
-            break;
+void WorkspaceSettingsDialog::on_buttonBox_clicked(QAbstractButton* button) {
+  switch (mUi->buttonBox->buttonRole(button)) {
+    case QDialogButtonBox::AcceptRole:
+    case QDialogButtonBox::ApplyRole:
+      try {
+        mSettings.applyAll();  // can throw
+      } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+      }
+      break;
 
-        case QDialogButtonBox::RejectRole:
-            mSettings.revertAll();
-            break;
+    case QDialogButtonBox::RejectRole:
+      mSettings.revertAll();
+      break;
 
-        case QDialogButtonBox::ResetRole:
-        {
-            int answer = QMessageBox::question(this, tr("Restore default settings"),
-                tr("Are you sure to reset all settings to their default values?\n"
-                   "After applying you cannot undo this change."));
-            if (answer == QMessageBox::Yes)
-                mSettings.restoreDefaults();
-            break;
-        }
-
-        default:
-            qCritical() << "invalid button role:" << mUi->buttonBox->buttonRole(button);
-            break;
+    case QDialogButtonBox::ResetRole: {
+      int answer = QMessageBox::question(
+          this, tr("Restore default settings"),
+          tr("Are you sure to reset all settings to their default values?\n"
+             "After applying you cannot undo this change."));
+      if (answer == QMessageBox::Yes) mSettings.restoreDefaults();
+      break;
     }
+
+    default:
+      qCritical() << "invalid button role:"
+                  << mUi->buttonBox->buttonRole(button);
+      break;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

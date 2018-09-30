@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
 #define LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -39,9 +39,9 @@ namespace library {
 class PackagePad;
 class FootprintPad;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FootprintPadPreviewGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FootprintPadPreviewGraphicsItem class
@@ -49,53 +49,51 @@ class FootprintPad;
  * @author ubruhin
  * @date 2016-01-09
  */
-class FootprintPadPreviewGraphicsItem final : public QGraphicsItem
-{
-    public:
+class FootprintPadPreviewGraphicsItem final : public QGraphicsItem {
+public:
+  // Constructors / Destructor
+  explicit FootprintPadPreviewGraphicsItem(
+      const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
+      const PackagePad* pkgPad = nullptr) noexcept;
+  ~FootprintPadPreviewGraphicsItem() noexcept;
 
-        // Constructors / Destructor
-        explicit FootprintPadPreviewGraphicsItem(const IF_GraphicsLayerProvider& layerProvider,
-                                                 const FootprintPad& fptPad,
-                                                 const PackagePad* pkgPad = nullptr) noexcept;
-        ~FootprintPadPreviewGraphicsItem() noexcept;
+  // Setters
+  void setDrawBoundingRect(bool enable) noexcept { mDrawBoundingRect = enable; }
 
-        // Setters
-        void setDrawBoundingRect(bool enable) noexcept {mDrawBoundingRect = enable;}
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
+  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = 0) noexcept override;
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const noexcept override {return mBoundingRect;}
-        QPainterPath shape() const noexcept override {return mShape;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
+private:
+  // make some methods inaccessible...
+  FootprintPadPreviewGraphicsItem() = delete;
+  FootprintPadPreviewGraphicsItem(
+      const FootprintPadPreviewGraphicsItem& other) = delete;
+  FootprintPadPreviewGraphicsItem& operator         =(
+      const FootprintPadPreviewGraphicsItem& rhs) = delete;
 
+  // General Attributes
+  const FootprintPad& mFootprintPad;
+  const PackagePad*   mPackagePad;
+  GraphicsLayer*      mLayer;
+  bool                mDrawBoundingRect;
 
-    private:
-
-        // make some methods inaccessible...
-        FootprintPadPreviewGraphicsItem() = delete;
-        FootprintPadPreviewGraphicsItem(const FootprintPadPreviewGraphicsItem& other) = delete;
-        FootprintPadPreviewGraphicsItem& operator=(const FootprintPadPreviewGraphicsItem& rhs) = delete;
-
-
-        // General Attributes
-        const FootprintPad& mFootprintPad;
-        const PackagePad* mPackagePad;
-        GraphicsLayer* mLayer;
-        bool mDrawBoundingRect;
-
-        // Cached Attributes
-        QRectF mBoundingRect;
-        QPainterPath mShape;
-        QFont mFont;
+  // Cached Attributes
+  QRectF       mBoundingRect;
+  QPainterPath mShape;
+  QFont        mFont;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
+#endif  // LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H

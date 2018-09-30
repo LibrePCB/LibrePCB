@@ -17,58 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "fileiconprovider.h"
+
 #include <librepcb/project/project.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-FileIconProvider::FileIconProvider() noexcept :
-    QFileIconProvider()
-{
+FileIconProvider::FileIconProvider() noexcept : QFileIconProvider() {
 }
 
-FileIconProvider::~FileIconProvider() noexcept
-{
+FileIconProvider::~FileIconProvider() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept
-{
-    if (info.isFile()) {
-        if (info.suffix() == "lpp") {
-            return QIcon(":/img/app/librepcb.png");
-        } else {
-            return QIcon(":/img/places/file.png");
-        }
-    } else if (info.isDir()) {
-        if (project::Project::isProjectDirectory(FilePath(info.absoluteFilePath()))) {
-            return QIcon(":/img/places/project_folder.png");
-        } else if (info.isDir()) {
-            return QIcon(":/img/places/folder.png");
-        }
+QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept {
+  if (info.isFile()) {
+    if (info.suffix() == "lpp") {
+      return QIcon(":/img/app/librepcb.png");
+    } else {
+      return QIcon(":/img/places/file.png");
     }
+  } else if (info.isDir()) {
+    if (project::Project::isProjectDirectory(
+            FilePath(info.absoluteFilePath()))) {
+      return QIcon(":/img/places/project_folder.png");
+    } else if (info.isDir()) {
+      return QIcon(":/img/places/folder.png");
+    }
+  }
 
-    return QFileIconProvider::icon(info);
+  return QFileIconProvider::icon(info);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb

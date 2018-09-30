@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_SGI_NETPOINT_H
 #define LIBREPCB_PROJECT_SGI_NETPOINT_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "sgi_base.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GraphicsLayer;
@@ -38,57 +39,53 @@ namespace project {
 
 class SI_NetPoint;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SGI_NetPoint
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SGI_NetPoint class
  */
-class SGI_NetPoint final : public SGI_Base
-{
-    public:
+class SGI_NetPoint final : public SGI_Base {
+public:
+  // Constructors / Destructor
+  explicit SGI_NetPoint(SI_NetPoint& netpoint) noexcept;
+  ~SGI_NetPoint() noexcept;
 
-        // Constructors / Destructor
-        explicit SGI_NetPoint(SI_NetPoint& netpoint) noexcept;
-        ~SGI_NetPoint() noexcept;
+  // General Methods
+  void updateCacheAndRepaint() noexcept;
 
-        // General Methods
-        void updateCacheAndRepaint() noexcept;
+  // Inherited from QGraphicsItem
+  QRectF boundingRect() const { return sBoundingRect; }
+  void   paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+               QWidget* widget);
 
-        // Inherited from QGraphicsItem
-        QRectF boundingRect() const {return sBoundingRect;}
-        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+private:
+  // make some methods inaccessible...
+  SGI_NetPoint()                          = delete;
+  SGI_NetPoint(const SGI_NetPoint& other) = delete;
+  SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;
 
+  // Private Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-    private:
+  // General Attributes
+  SI_NetPoint&   mNetPoint;
+  GraphicsLayer* mLayer;
 
-        // make some methods inaccessible...
-        SGI_NetPoint() = delete;
-        SGI_NetPoint(const SGI_NetPoint& other) = delete;
-        SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;
+  // Cached Attributes
+  bool mIsVisibleJunction;
+  bool mIsOpenLineEnd;
 
-        // Private Methods
-        GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-
-        // General Attributes
-        SI_NetPoint& mNetPoint;
-        GraphicsLayer* mLayer;
-
-        // Cached Attributes
-        bool mIsVisibleJunction;
-        bool mIsOpenLineEnd;
-
-        // Static Stuff
-        static QRectF sBoundingRect;
+  // Static Stuff
+  static QRectF sBoundingRect;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_SGI_NETPOINT_H
+#endif  // LIBREPCB_PROJECT_SGI_NETPOINT_H

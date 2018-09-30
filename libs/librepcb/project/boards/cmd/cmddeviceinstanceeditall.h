@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H
 #define LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/units/all_length_units.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class CmdStrokeTextEdit;
@@ -39,40 +40,37 @@ namespace project {
 class BI_Device;
 class CmdDeviceInstanceEdit;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdDeviceInstanceEditAll
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdDeviceInstanceEditAll class
  */
-class CmdDeviceInstanceEditAll final : public UndoCommandGroup
-{
-    public:
+class CmdDeviceInstanceEditAll final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  explicit CmdDeviceInstanceEditAll(BI_Device& dev) noexcept;
+  ~CmdDeviceInstanceEditAll() noexcept;
 
-        // Constructors / Destructor
-        explicit CmdDeviceInstanceEditAll(BI_Device& dev) noexcept;
-        ~CmdDeviceInstanceEditAll() noexcept;
+  // General Methods
+  void setPosition(Point& pos, bool immediate) noexcept;
+  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void setMirrored(bool mirrored, bool immediate);
+  void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
 
-        // General Methods
-        void setPosition(Point& pos, bool immediate) noexcept;
-        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
-        void setRotation(const Angle& angle, bool immediate) noexcept;
-        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-        void setMirrored(bool mirrored, bool immediate);
-        void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
-
-
-    private:
-        CmdDeviceInstanceEdit* mDevEditCmd;
-        QVector<CmdStrokeTextEdit*> mTextEditCmds;
+private:
+  CmdDeviceInstanceEdit*      mDevEditCmd;
+  QVector<CmdStrokeTextEdit*> mTextEditCmds;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H
+#endif  // LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H

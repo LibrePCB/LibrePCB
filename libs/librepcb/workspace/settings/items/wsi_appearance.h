@@ -20,20 +20,20 @@
 #ifndef LIBREPCB_WSI_APPEARANCE_H
 #define LIBREPCB_WSI_APPEARANCE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "wsi_base.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class WSI_Appearance
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The WSI_Appearance class
@@ -41,51 +41,51 @@ namespace workspace {
  * @author ubruhin
  * @date 2015-02-08
  */
-class WSI_Appearance final : public WSI_Base
-{
-        Q_OBJECT
+class WSI_Appearance final : public WSI_Base {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  WSI_Appearance()                            = delete;
+  WSI_Appearance(const WSI_Appearance& other) = delete;
+  explicit WSI_Appearance(const SExpression& node);
+  ~WSI_Appearance() noexcept;
 
-        // Constructors / Destructor
-        WSI_Appearance() = delete;
-        WSI_Appearance(const WSI_Appearance& other) = delete;
-        explicit WSI_Appearance(const SExpression& node);
-        ~WSI_Appearance() noexcept;
+  // Getters
+  bool getUseOpenGl() const noexcept { return mUseOpenGlCheckBox->isChecked(); }
 
-        // Getters
-        bool getUseOpenGl() const noexcept {return mUseOpenGlCheckBox->isChecked();}
+  // Getters: Widgets
+  QString getUseOpenGlLabelText() const noexcept {
+    return tr("Rendering Method:");
+  }
+  QWidget* getUseOpenGlWidget() const noexcept {
+    return mUseOpenGlWidget.data();
+  }
 
-        // Getters: Widgets
-        QString getUseOpenGlLabelText() const noexcept {return tr("Rendering Method:");}
-        QWidget* getUseOpenGlWidget() const noexcept {return mUseOpenGlWidget.data();}
+  // General Methods
+  void restoreDefault() noexcept override;
+  void apply() noexcept override;
+  void revert() noexcept override;
 
-        // General Methods
-        void restoreDefault() noexcept override;
-        void apply() noexcept override;
-        void revert() noexcept override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  WSI_Appearance& operator=(const WSI_Appearance& rhs) = delete;
 
-        // Operator Overloadings
-        WSI_Appearance& operator=(const WSI_Appearance& rhs) = delete;
+private:  // Data
+  bool mUseOpenGl;
 
-
-    private: // Data
-
-        bool mUseOpenGl;
-
-        // Widgets
-        QScopedPointer<QWidget> mUseOpenGlWidget;
-        QScopedPointer<QCheckBox> mUseOpenGlCheckBox;
+  // Widgets
+  QScopedPointer<QWidget>   mUseOpenGlWidget;
+  QScopedPointer<QCheckBox> mUseOpenGlCheckBox;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace workspace
-} // namespace librepcb
+}  // namespace workspace
+}  // namespace librepcb
 
-#endif // LIBREPCB_WSI_APPEARANCE_H
+#endif  // LIBREPCB_WSI_APPEARANCE_H

@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLPINPROPERTIESDIALOG_H
 #define LIBREPCB_LIBRARY_EDITOR_SYMBOLPINPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -43,47 +43,44 @@ namespace Ui {
 class SymbolPinPropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SymbolPinPropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SymbolPinPropertiesDialog class
  */
-class SymbolPinPropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class SymbolPinPropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  SymbolPinPropertiesDialog()                                       = delete;
+  SymbolPinPropertiesDialog(const SymbolPinPropertiesDialog& other) = delete;
+  SymbolPinPropertiesDialog(SymbolPin& pin, UndoStack& undoStack,
+                            QWidget* parent = nullptr) noexcept;
+  ~SymbolPinPropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        SymbolPinPropertiesDialog() = delete;
-        SymbolPinPropertiesDialog(const SymbolPinPropertiesDialog& other) = delete;
-        SymbolPinPropertiesDialog(SymbolPin& pin, UndoStack& undoStack,
-                                  QWidget* parent = nullptr) noexcept;
-        ~SymbolPinPropertiesDialog() noexcept;
+  // Operator Overloadings
+  SymbolPinPropertiesDialog& operator=(const SymbolPinPropertiesDialog& rhs) =
+      delete;
 
-        // Operator Overloadings
-        SymbolPinPropertiesDialog& operator=(const SymbolPinPropertiesDialog& rhs) = delete;
+private:  // Methods
+  void on_buttonBox_clicked(QAbstractButton* button);
+  bool applyChanges() noexcept;
 
-
-    private: // Methods
-        void on_buttonBox_clicked(QAbstractButton *button);
-        bool applyChanges() noexcept;
-
-
-    private: // Data
-        SymbolPin& mSymbolPin;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::SymbolPinPropertiesDialog> mUi;
+private:  // Data
+  SymbolPin&                                    mSymbolPin;
+  UndoStack&                                    mUndoStack;
+  QScopedPointer<Ui::SymbolPinPropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLPINPROPERTIESDIALOG_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLPINPROPERTIESDIALOG_H

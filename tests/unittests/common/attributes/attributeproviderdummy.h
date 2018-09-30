@@ -20,52 +20,53 @@
 #ifndef ATTRIBUTEPROVIDERDUMMY_H
 #define ATTRIBUTEPROVIDERDUMMY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttributeProviderDummy
- ****************************************************************************************/
+ ******************************************************************************/
 
-class AttributeProviderDummy final : public AttributeProvider
-{
-    public:
-        AttributeProviderDummy() noexcept {}
-        AttributeProviderDummy(const AttributeProviderDummy& other) = delete;
-        AttributeProviderDummy& operator=(const AttributeProviderDummy& rhs) = delete;
-        ~AttributeProviderDummy() noexcept {}
+class AttributeProviderDummy final : public AttributeProvider {
+public:
+  AttributeProviderDummy() noexcept {}
+  AttributeProviderDummy(const AttributeProviderDummy& other) = delete;
+  AttributeProviderDummy& operator=(const AttributeProviderDummy& rhs) = delete;
+  ~AttributeProviderDummy() noexcept {}
 
-        QString getUserDefinedAttributeValue(const QString& key) const noexcept override {
-            if (key == "KEY")   return "";
-            if (key == "KEY_1") return "Normal value";
-            if (key == "KEY_2") return "Value with {}}}{{ noise";
-            if (key == "KEY_3") return "Recursive {{UNDEFINED}} value";
-            if (key == "KEY_4") return "Recursive {{KEY_1}} value";
-            if (key == "KEY_5") return "Recursive {{KEY_4}} value";
-            if (key == "KEY_6") return "Endless {{KEY_7}} part 1";
-            if (key == "KEY_7") return "Endless {{KEY_6}} part 2";
-            if (key == "KEY_8") return "{{KEY}}";
-            return QString();
-        }
+  QString getUserDefinedAttributeValue(const QString& key) const
+      noexcept override {
+    if (key == "KEY") return "";
+    if (key == "KEY_1") return "Normal value";
+    if (key == "KEY_2") return "Value with {}}}{{ noise";
+    if (key == "KEY_3") return "Recursive {{UNDEFINED}} value";
+    if (key == "KEY_4") return "Recursive {{KEY_1}} value";
+    if (key == "KEY_5") return "Recursive {{KEY_4}} value";
+    if (key == "KEY_6") return "Endless {{KEY_7}} part 1";
+    if (key == "KEY_7") return "Endless {{KEY_6}} part 2";
+    if (key == "KEY_8") return "{{KEY}}";
+    return QString();
+  }
 
-    signals:
-        void attributesChanged() override {}
+signals:
+  void attributesChanged() override {}
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb
 
-#endif // ATTRIBUTEPROVIDERDUMMY_H
+#endif  // ATTRIBUTEPROVIDERDUMMY_H

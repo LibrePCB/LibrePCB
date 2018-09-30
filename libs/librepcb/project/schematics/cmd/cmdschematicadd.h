@@ -20,68 +20,64 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICADD_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICADD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/elementname.h>
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Project;
 class Schematic;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicAdd
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicAdd class
  */
-class CmdSchematicAdd final : public UndoCommand
-{
-    public:
+class CmdSchematicAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdSchematicAdd(Project& project, const ElementName& name) noexcept;
+  ~CmdSchematicAdd() noexcept;
 
-        // Constructors / Destructor
-        CmdSchematicAdd(Project& project, const ElementName& name) noexcept;
-        ~CmdSchematicAdd() noexcept;
+  // Getters
+  Schematic* getSchematic() const noexcept { return mSchematic; }
 
-        // Getters
-        Schematic* getSchematic() const noexcept {return mSchematic;}
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        Project& mProject;
-        ElementName mName;
-        Schematic* mSchematic;
-        int mPageIndex;
+  Project&    mProject;
+  ElementName mName;
+  Schematic*  mSchematic;
+  int         mPageIndex;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICADD_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICADD_H

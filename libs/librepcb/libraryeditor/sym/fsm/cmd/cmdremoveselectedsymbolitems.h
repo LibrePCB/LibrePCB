@@ -20,23 +20,25 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
 #define LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+ ******************************************************************************/
 #include "../symboleditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommandgroup.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdRemoveSelectedSymbolItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdRemoveSelectedSymbolItems class
@@ -44,38 +46,36 @@ namespace editor {
  * @author  ubruhin
  * @date    2016-11-05
  */
-class CmdRemoveSelectedSymbolItems final : public UndoCommandGroup
-{
-    public:
+class CmdRemoveSelectedSymbolItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdRemoveSelectedSymbolItems() = delete;
+  CmdRemoveSelectedSymbolItems(const CmdRemoveSelectedSymbolItems& other) =
+      delete;
+  CmdRemoveSelectedSymbolItems(
+      const SymbolEditorState::Context& context) noexcept;
+  ~CmdRemoveSelectedSymbolItems() noexcept;
 
-        // Constructors / Destructor
-        CmdRemoveSelectedSymbolItems() = delete;
-        CmdRemoveSelectedSymbolItems(const CmdRemoveSelectedSymbolItems& other) = delete;
-        CmdRemoveSelectedSymbolItems(const SymbolEditorState::Context& context) noexcept;
-        ~CmdRemoveSelectedSymbolItems() noexcept;
+  // Operator Overloadings
+  CmdRemoveSelectedSymbolItems& operator       =(
+      const CmdRemoveSelectedSymbolItems& rhs) = delete;
 
-        // Operator Overloadings
-        CmdRemoveSelectedSymbolItems& operator=(const CmdRemoveSelectedSymbolItems& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
-
-        // Private Methods
-
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-
-        // Private Member Variables
-        const SymbolEditorState::Context& mContext;
+  // Private Member Variables
+  const SymbolEditorState::Context& mContext;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H

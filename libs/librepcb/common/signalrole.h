@@ -20,20 +20,21 @@
 #ifndef LIBREPCB_SIGNALROLE_H
 #define LIBREPCB_SIGNALROLE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "fileio/sexpression.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class SignalRole
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The SignalRole class provides all supported electrical signal roles
@@ -41,121 +42,120 @@ namespace librepcb {
  * @author ubruhin
  * @date 2016-10-20
  */
-class SignalRole final
-{
-        Q_DECLARE_TR_FUNCTIONS(SignalRole)
+class SignalRole final {
+  Q_DECLARE_TR_FUNCTIONS(SignalRole)
 
-    public:
+public:
+  // Constructors / Destructor
+  SignalRole() noexcept;
+  SignalRole(const SignalRole& other) noexcept;
+  ~SignalRole() noexcept;
 
-        // Constructors / Destructor
-        SignalRole() noexcept;
-        SignalRole(const SignalRole& other) noexcept;
-        ~SignalRole() noexcept;
+  // Getters
 
+  /**
+   * @brief Serialize this object into a string
+   *
+   * @return This object as a string
+   */
+  QString toStr() const noexcept { return mRole; }
 
-        // Getters
+  /**
+   * @brief Get the name of the SignalRole (human readable and translated)
+   *
+   * @return The name of the SignalRole
+   */
+  const QString& getNameTr() const noexcept { return mName; }
 
-        /**
-         * @brief Serialize this object into a string
-         *
-         * @return This object as a string
-         */
-        QString toStr() const noexcept {return mRole;}
+  // Operator Overloadings
+  SignalRole& operator=(const SignalRole& rhs) noexcept;
+  bool        operator==(const SignalRole& rhs) const noexcept {
+    return mRole == rhs.mRole;
+  }
+  bool operator!=(const SignalRole& rhs) const noexcept {
+    return mRole != rhs.mRole;
+  }
 
-        /**
-         * @brief Get the name of the SignalRole (human readable and translated)
-         *
-         * @return The name of the SignalRole
-         */
-        const QString& getNameTr() const noexcept {return mName;}
+  // Static Methods
 
+  /**
+   * @brief Get a list of all available signal roles
+   *
+   * @return A list of all roles
+   */
+  static const QList<SignalRole>& getAllRoles() noexcept;
 
-        // Operator Overloadings
-        SignalRole& operator=(const SignalRole& rhs) noexcept;
-        bool operator==(const SignalRole& rhs) const noexcept {return mRole == rhs.mRole;}
-        bool operator!=(const SignalRole& rhs) const noexcept {return mRole != rhs.mRole;}
+  /// @brief Passive Pins (R, C, L)
+  static const SignalRole& passive() noexcept {
+    static SignalRole role("passive", tr("Passive"));
+    return role;
+  }
 
+  /// @brief Power Pins (GND, VCC, VSS,... of Devices)
+  static const SignalRole& power() noexcept {
+    static SignalRole role("power", tr("Power"));
+    return role;
+  }
 
-        // Static Methods
+  /// @brief Input Pins
+  static const SignalRole& input() noexcept {
+    static SignalRole role("input", tr("Input"));
+    return role;
+  }
 
-        /**
-         * @brief Get a list of all available signal roles
-         *
-         * @return A list of all roles
-         */
-        static const QList<SignalRole>& getAllRoles() noexcept;
+  /// @brief Output Pins
+  static const SignalRole& output() noexcept {
+    static SignalRole role("output", tr("Output"));
+    return role;
+  }
 
-        /// @brief Passive Pins (R, C, L)
-        static const SignalRole& passive() noexcept {
-            static SignalRole role("passive", tr("Passive"));
-            return role;
-        }
+  /// @brief Input/Output Pins
+  static const SignalRole& inout() noexcept {
+    static SignalRole role("inout", tr("I/O"));
+    return role;
+  }
 
-        /// @brief Power Pins (GND, VCC, VSS,... of Devices)
-        static const SignalRole& power() noexcept {
-            static SignalRole role("power", tr("Power"));
-            return role;
-        }
+  /// @brief Open Collector / Open Drain Pins
+  static const SignalRole& opendrain() noexcept {
+    static SignalRole role("opendrain", tr("Open Drain"));
+    return role;
+  }
 
-        /// @brief Input Pins
-        static const SignalRole& input() noexcept {
-            static SignalRole role("input", tr("Input"));
-            return role;
-        }
+private:  // Methods
+  SignalRole(const QString& role, const QString& name) noexcept;
 
-        /// @brief Output Pins
-        static const SignalRole& output() noexcept {
-            static SignalRole role("output", tr("Output"));
-            return role;
-        }
-
-        /// @brief Input/Output Pins
-        static const SignalRole& inout() noexcept {
-            static SignalRole role("inout", tr("I/O"));
-            return role;
-        }
-
-        /// @brief Open Collector / Open Drain Pins
-        static const SignalRole& opendrain() noexcept {
-            static SignalRole role("opendrain", tr("Open Drain"));
-            return role;
-        }
-
-
-    private: // Methods
-        SignalRole(const QString& role, const QString& name) noexcept;
-
-
-    private: // Data
-        QString mRole;  ///< used for serialization (DO NOT MODIFY VALUES!)
-        QString mName;  ///< human readable (translated)
+private:          // Data
+  QString mRole;  ///< used for serialization (DO NOT MODIFY VALUES!)
+  QString mName;  ///< human readable (translated)
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <>
 inline SExpression serializeToSExpression(const SignalRole& obj) {
-    return SExpression::createToken(obj.toStr());
+  return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline SignalRole deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    foreach (const SignalRole& role, SignalRole::getAllRoles()) {
-        if (role.toStr() == str) {
-            return role;
-        }
+inline SignalRole deserializeFromSExpression(const SExpression& sexpr,
+                                             bool               throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  foreach (const SignalRole& role, SignalRole::getAllRoles()) {
+    if (role.toStr() == str) {
+      return role;
     }
-    throw RuntimeError(__FILE__, __LINE__, QString(
-        SignalRole::tr("Invalid signal role: \"%1\"")).arg(str));
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString(SignalRole::tr("Invalid signal role: \"%1\"")).arg(str));
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_SIGNALROLE_H
+#endif  // LIBREPCB_SIGNALROLE_H

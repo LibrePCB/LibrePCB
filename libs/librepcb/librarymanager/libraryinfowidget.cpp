@@ -17,126 +17,136 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
+#include "libraryinfowidget.h"
+
+#include "ui_libraryinfowidget.h"
+
+#include <librepcb/library/library.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
+
 #include <QtCore>
 #include <QtWidgets>
-#include "libraryinfowidget.h"
-#include "ui_libraryinfowidget.h"
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/workspace.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace manager {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept :
-    QWidget(nullptr), mUi(new Ui::LibraryInfoWidget),
-    mWorkspace(ws), mLib(lib)
-{
-    mUi->setupUi(this);
-    connect(mUi->btnOpenLibraryEditor, &QPushButton::clicked,
-            this, &LibraryInfoWidget::btnOpenLibraryEditorClicked);
-    connect(mUi->btnRemove, &QPushButton::clicked,
-            this, &LibraryInfoWidget::btnRemoveLibraryClicked);
+LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace&   ws,
+                                     QSharedPointer<Library> lib) noexcept
+  : QWidget(nullptr),
+    mUi(new Ui::LibraryInfoWidget),
+    mWorkspace(ws),
+    mLib(lib) {
+  mUi->setupUi(this);
+  connect(mUi->btnOpenLibraryEditor, &QPushButton::clicked, this,
+          &LibraryInfoWidget::btnOpenLibraryEditorClicked);
+  connect(mUi->btnRemove, &QPushButton::clicked, this,
+          &LibraryInfoWidget::btnRemoveLibraryClicked);
 
-    const QStringList& localeOrder = ws.getSettings().getLibLocaleOrder().getLocaleOrder();
+  const QStringList& localeOrder =
+      ws.getSettings().getLibLocaleOrder().getLocaleOrder();
 
-    // image
-    if (!lib->getIcon().isNull()) {
-        mUi->lblIcon->setPixmap(lib->getIcon().scaled(mUi->lblIcon->size(),
-            Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  // image
+  if (!lib->getIcon().isNull()) {
+    mUi->lblIcon->setPixmap(lib->getIcon().scaled(
+        mUi->lblIcon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  } else {
+    mUi->lblIcon->setVisible(false);
+    mUi->line->setVisible(false);
+  }
+
+  // general attributes
+  mUi->lblName->setText(*lib->getNames().value(localeOrder));
+  mUi->lblDescription->setText(lib->getDescriptions().value(localeOrder));
+  mUi->lblVersion->setText(lib->getVersion().toStr());
+  mUi->lblAuthor->setText(lib->getAuthor());
+  mUi->lblUrl->setText(
+      QString("<a href='%1'>%2</a>")
+          .arg(lib->getUrl().toEncoded(), lib->getUrl().toDisplayString()));
+  mUi->lblCreated->setText(lib->getCreated().toString(Qt::TextDate));
+  mUi->lblDeprecated->setText(
+      lib->isDeprecated() ? tr("Yes - Consider switching to another library.")
+                          : tr("No"));
+
+  // extended attributes
+  mUi->lblUuid->setText(lib->getUuid().toStr());
+  mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
+  QString dependencies;
+  foreach (const Uuid& uuid, lib->getDependencies()) {
+    tl::optional<Version> installedVersion =
+        mWorkspace.getVersionOfLibrary(uuid, true, true);
+    QString line = dependencies.isEmpty() ? "" : "<br>";
+    if (installedVersion) {
+      line += QString(" <font color=\"green\">%1 ✔</font>").arg(uuid.toStr());
     } else {
-        mUi->lblIcon->setVisible(false);
-        mUi->line->setVisible(false);
+      line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());
     }
-
-    // general attributes
-    mUi->lblName->setText(*lib->getNames().value(localeOrder));
-    mUi->lblDescription->setText(lib->getDescriptions().value(localeOrder));
-    mUi->lblVersion->setText(lib->getVersion().toStr());
-    mUi->lblAuthor->setText(lib->getAuthor());
-    mUi->lblUrl->setText(QString("<a href='%1'>%2</a>").arg(
-        lib->getUrl().toEncoded(), lib->getUrl().toDisplayString()));
-    mUi->lblCreated->setText(lib->getCreated().toString(Qt::TextDate));
-    mUi->lblDeprecated->setText(lib->isDeprecated() ?
-        tr("Yes - Consider switching to another library.") : tr("No"));
-
-    // extended attributes
-    mUi->lblUuid->setText(lib->getUuid().toStr());
-    mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
-    QString dependencies;
-    foreach (const Uuid& uuid, lib->getDependencies()) {
-        tl::optional<Version> installedVersion = mWorkspace.getVersionOfLibrary(uuid, true, true);
-        QString line = dependencies.isEmpty() ? "" : "<br>";
-        if (installedVersion) {
-            line += QString(" <font color=\"green\">%1 ✔</font>").arg(uuid.toStr());
-        } else {
-            line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());
-        }
-        dependencies.append(line);
-    }
-    mUi->lblDependencies->setText(dependencies);
-    mUi->lblDirectory->setText(QString("<a href='%1'>%2</a>").arg(
-        lib->getFilePath().toQUrl().toLocalFile(),
-        lib->getFilePath().toRelative(ws.getLibrariesPath())));
-    mUi->lblDirectory->setToolTip(lib->getFilePath().toNative());
+    dependencies.append(line);
+  }
+  mUi->lblDependencies->setText(dependencies);
+  mUi->lblDirectory->setText(
+      QString("<a href='%1'>%2</a>")
+          .arg(lib->getFilePath().toQUrl().toLocalFile(),
+               lib->getFilePath().toRelative(ws.getLibrariesPath())));
+  mUi->lblDirectory->setToolTip(lib->getFilePath().toNative());
 }
 
-LibraryInfoWidget::~LibraryInfoWidget() noexcept
-{
+LibraryInfoWidget::~LibraryInfoWidget() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept
-{
-    emit openLibraryEditorTriggered(mLib);
+void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept {
+  emit openLibraryEditorTriggered(mLib);
 }
 
-void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept
-{
-    QString title = tr("Remove Library");
-    QString text = QString(tr("Attention! This will remove the whole library directory:"
-                              "\n\n%1\n\nAre you really sure to remove \"%2\"?"))
-                   .arg(mLib->getFilePath().toNative(), mUi->lblName->text());
+void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept {
+  QString title = tr("Remove Library");
+  QString text =
+      QString(tr("Attention! This will remove the whole library directory:"
+                 "\n\n%1\n\nAre you really sure to remove \"%2\"?"))
+          .arg(mLib->getFilePath().toNative(), mUi->lblName->text());
 
-    int res = QMessageBox::question(this, title, text, QMessageBox::Yes | QMessageBox::No);
+  int res = QMessageBox::question(this, title, text,
+                                  QMessageBox::Yes | QMessageBox::No);
 
-    if (res == QMessageBox::Yes) {
-        try {
-            if (isRemoteLibrary()) {
-                mWorkspace.removeRemoteLibrary(mLib->getFilePath().getFilename()); // can throw
-            } else {
-                mWorkspace.removeLocalLibrary(mLib->getFilePath().getFilename()); // can throw
-            }
-            emit libraryRemoved(mLib->getFilePath());
-        } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Error"), e.getMsg());
-        }
+  if (res == QMessageBox::Yes) {
+    try {
+      if (isRemoteLibrary()) {
+        mWorkspace.removeRemoteLibrary(
+            mLib->getFilePath().getFilename());  // can throw
+      } else {
+        mWorkspace.removeLocalLibrary(
+            mLib->getFilePath().getFilename());  // can throw
+      }
+      emit libraryRemoved(mLib->getFilePath());
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
+  }
 }
 
-bool LibraryInfoWidget::isRemoteLibrary() const noexcept
-{
-    return mLib->isOpenedReadOnly();
+bool LibraryInfoWidget::isRemoteLibrary() const noexcept {
+  return mLib->isOpenedReadOnly();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb

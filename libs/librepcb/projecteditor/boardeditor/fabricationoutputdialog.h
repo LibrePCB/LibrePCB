@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H
 #define LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -41,9 +41,9 @@ namespace Ui {
 class FabricationOutputDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FabricationOutputDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FabricationOutputDialog class
@@ -51,40 +51,37 @@ class FabricationOutputDialog;
  * @author ubruhin
  * @date 2016-03-31
  */
-class FabricationOutputDialog final : public QDialog
-{
-        Q_OBJECT
+class FabricationOutputDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  FabricationOutputDialog()                                     = delete;
+  FabricationOutputDialog(const FabricationOutputDialog& other) = delete;
+  explicit FabricationOutputDialog(Board& board, QWidget* parent = 0);
+  ~FabricationOutputDialog();
 
-        // Constructors / Destructor
-        FabricationOutputDialog() = delete;
-        FabricationOutputDialog(const FabricationOutputDialog& other) = delete;
-        explicit FabricationOutputDialog(Board& board, QWidget* parent = 0);
-        ~FabricationOutputDialog();
+private slots:
+  void on_btnDefaultSuffixes_clicked();
+  void on_btnProtelSuffixes_clicked();
+  void on_btnGenerate_clicked();
+  void on_btnBrowseOutputDir_clicked();
 
+private:
+  QStringList getTopSilkscreenLayers() const noexcept;
+  QStringList getBotSilkscreenLayers() const noexcept;
 
-    private slots:
-        void on_btnDefaultSuffixes_clicked();
-        void on_btnProtelSuffixes_clicked();
-        void on_btnGenerate_clicked();
-        void on_btnBrowseOutputDir_clicked();
-
-    private:
-        QStringList getTopSilkscreenLayers() const noexcept;
-        QStringList getBotSilkscreenLayers() const noexcept;
-
-        Project& mProject;
-        Board& mBoard;
-        Ui::FabricationOutputDialog* mUi;
+  Project&                     mProject;
+  Board&                       mBoard;
+  Ui::FabricationOutputDialog* mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H
+#endif  // LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H

@@ -20,51 +20,50 @@
 #ifndef LIBREPCB_ATTRTYPEINDUCTANCE_H
 #define LIBREPCB_ATTRTYPEINDUCTANCE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "attributetype.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class AttrTypeInductance
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The AttrTypeInductance class
  */
-class AttrTypeInductance final : public AttributeType
-{
+class AttrTypeInductance final : public AttributeType {
+public:
+  bool    isValueValid(const QString& value) const noexcept;
+  QString valueFromTr(const QString& value) const noexcept;
+  QString printableValueTr(const QString&       value,
+                           const AttributeUnit* unit = nullptr) const noexcept;
+  static const AttrTypeInductance& instance() noexcept {
+    static AttrTypeInductance x;
+    return x;
+  }
 
-    public:
+private:
+  // make some methods inaccessible...
+  AttrTypeInductance(const AttrTypeInductance& other) = delete;
+  AttrTypeInductance& operator=(const AttrTypeInductance& rhs) = delete;
 
-        bool isValueValid(const QString& value) const noexcept;
-        QString valueFromTr(const QString& value) const noexcept;
-        QString printableValueTr(const QString& value, const AttributeUnit* unit = nullptr) const noexcept;
-        static const AttrTypeInductance& instance() noexcept {static AttrTypeInductance x; return x;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        AttrTypeInductance(const AttrTypeInductance& other) = delete;
-        AttrTypeInductance& operator=(const AttrTypeInductance& rhs) = delete;
-
-
-        // Constructors / Destructor
-        AttrTypeInductance() noexcept;
-        ~AttrTypeInductance() noexcept;
+  // Constructors / Destructor
+  AttrTypeInductance() noexcept;
+  ~AttrTypeInductance() noexcept;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_ATTRTYPEINDUCTANCE_H
+#endif  // LIBREPCB_ATTRTYPEINDUCTANCE_H

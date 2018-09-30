@@ -20,117 +20,121 @@
 #ifndef LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
 #define LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include "bi_base.h"
-#include "./bi_netline.h"
+ ******************************************************************************/
 #include "../graphicsitems/bgi_footprintpad.h"
+#include "./bi_netline.h"
+#include "bi_base.h"
+
 #include <librepcb/common/geometry/path.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace library {
 class FootprintPad;
 class ComponentSignal;
-}
+}  // namespace library
 
 namespace project {
 
 class BI_Footprint;
 class ComponentSignalInstance;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_FootprintPad
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_FootprintPad class
  */
-class BI_FootprintPad final : public BI_Base, public BI_NetLineAnchor
-{
-        Q_OBJECT
+class BI_FootprintPad final : public BI_Base, public BI_NetLineAnchor {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BI_FootprintPad()                             = delete;
+  BI_FootprintPad(const BI_FootprintPad& other) = delete;
+  BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid);
+  ~BI_FootprintPad();
 
-        // Constructors / Destructor
-        BI_FootprintPad() = delete;
-        BI_FootprintPad(const BI_FootprintPad& other) = delete;
-        BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid);
-        ~BI_FootprintPad();
+  // Getters
+  const Uuid&   getLibPadUuid() const noexcept;
+  QString       getDisplayText() const noexcept;
+  const Angle&  getRotation() const noexcept { return mRotation; }
+  BI_Footprint& getFootprint() const noexcept { return mFootprint; }
+  QString       getLayerName() const noexcept;
+  bool          isOnLayer(const QString& layerName) const noexcept;
+  const library::FootprintPad& getLibPad() const noexcept {
+    return *mFootprintPad;
+  }
+  ComponentSignalInstance* getComponentSignalInstance() const noexcept {
+    return mComponentSignalInstance;
+  }
+  NetSignal* getCompSigInstNetSignal() const noexcept;
+  bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
+  bool isSelectable() const noexcept override;
+  Path getOutline(const Length& expansion = Length(0)) const noexcept;
+  Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
 
-        // Getters
-        const Uuid& getLibPadUuid() const noexcept;
-        QString getDisplayText() const noexcept;
-        const Angle& getRotation() const noexcept {return mRotation;}
-        BI_Footprint& getFootprint() const noexcept {return mFootprint;}
-        QString getLayerName() const noexcept;
-        bool isOnLayer(const QString& layerName) const noexcept;
-        const library::FootprintPad& getLibPad() const noexcept {return *mFootprintPad;}
-        ComponentSignalInstance* getComponentSignalInstance() const noexcept {return mComponentSignalInstance;}
-        NetSignal* getCompSigInstNetSignal() const noexcept;
-        bool isUsed() const noexcept {return (mRegisteredNetLines.count() > 0);}
-        bool isSelectable() const noexcept override;
-        Path getOutline(const Length& expansion = Length(0)) const noexcept;
-        Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
+  // General Methods
+  void addToBoard() override;
+  void removeFromBoard() override;
+  void updatePosition() noexcept;
 
-        // General Methods
-        void addToBoard() override;
-        void removeFromBoard() override;
-        void updatePosition() noexcept;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override {
+    return BI_Base::Type_t::FootprintPad;
+  }
+  const Point& getPosition() const noexcept override { return mPosition; }
+  bool         getIsMirrored() const noexcept override;
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::FootprintPad;}
-        const Point& getPosition() const noexcept override {return mPosition;}
-        bool getIsMirrored() const noexcept override;
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Inherited from BI_NetLineAnchor
+  void                     registerNetLine(BI_NetLine& netline) override;
+  void                     unregisterNetLine(BI_NetLine& netline) override;
+  const QSet<BI_NetLine*>& getNetLines() const noexcept override {
+    return mRegisteredNetLines;
+  }
 
-        // Inherited from BI_NetLineAnchor
-        void registerNetLine(BI_NetLine& netline) override;
-        void unregisterNetLine(BI_NetLine& netline) override;
-        const QSet<BI_NetLine*>& getNetLines() const noexcept override {return mRegisteredNetLines;}
+  // Operator Overloadings
+  BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
 
-        // Operator Overloadings
-        BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
+private slots:
 
+  void footprintAttributesChanged();
+  void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
 
-    private slots:
+private:
+  void updateGraphicsItemTransform() noexcept;
 
-        void footprintAttributesChanged();
-        void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
+  // General
+  BI_Footprint&                mFootprint;
+  const library::FootprintPad* mFootprintPad;
+  const library::PackagePad*   mPackagePad;
+  ComponentSignalInstance*     mComponentSignalInstance;
+  QMetaObject::Connection      mHighlightChangedConnection;
 
+  // Misc
+  Point                            mPosition;
+  Angle                            mRotation;
+  QScopedPointer<BGI_FootprintPad> mGraphicsItem;
 
-    private:
-
-        void updateGraphicsItemTransform() noexcept;
-
-
-        // General
-        BI_Footprint& mFootprint;
-        const library::FootprintPad* mFootprintPad;
-        const library::PackagePad* mPackagePad;
-        ComponentSignalInstance* mComponentSignalInstance;
-        QMetaObject::Connection mHighlightChangedConnection;
-
-        // Misc
-        Point mPosition;
-        Angle mRotation;
-        QScopedPointer<BGI_FootprintPad> mGraphicsItem;
-
-        // Registered Elements
-        QSet<BI_NetLine*> mRegisteredNetLines;
+  // Registered Elements
+  QSet<BI_NetLine*> mRegisteredNetLines;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
+#endif  // LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H

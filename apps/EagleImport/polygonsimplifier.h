@@ -20,56 +20,52 @@
 #ifndef POLYGONSIMPLIFIER_H
 #define POLYGONSIMPLIFIER_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
-#include <QtCore>
 #include <librepcb/common/geometry/polygon.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PolygonSimplifier
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PolygonSimplifier class
  */
 template <typename LibElemType>
-class PolygonSimplifier
-{
-    public:
+class PolygonSimplifier {
+public:
+  // Constructors / Destructor
+  PolygonSimplifier(LibElemType& libraryElement);
+  ~PolygonSimplifier();
 
-        // Constructors / Destructor
-        PolygonSimplifier(LibElemType& libraryElement);
-        ~PolygonSimplifier();
+  // General Methods
+  void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
 
-        // General Methods
-        void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
+private:
+  // Private Methods
+  bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
+  bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
+                 UnsignedLength* width, librepcb::Polygon** line) noexcept;
+  bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
+                 UnsignedLength* width, librepcb::Polygon** line) noexcept;
 
-
-    private:
-
-        // Private Methods
-        bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-        bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       UnsignedLength* width, librepcb::Polygon** line) noexcept;
-        bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                       UnsignedLength* width, librepcb::Polygon** line) noexcept;
-
-
-        // Attributes
-        LibElemType& mLibraryElement;
+  // Attributes
+  LibElemType& mLibraryElement;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // POLYGONSIMPLIFIER_H
+#endif  // POLYGONSIMPLIFIER_H

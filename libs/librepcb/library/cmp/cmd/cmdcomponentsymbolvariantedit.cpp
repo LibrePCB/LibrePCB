@@ -17,97 +17,98 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdcomponentsymbolvariantedit.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdComponentSymbolVariantEdit::CmdComponentSymbolVariantEdit(ComponentSymbolVariant& variant) noexcept :
-    UndoCommand(tr("Edit component symbol variant")), mVariant(variant),
-    mOldNorm(variant.getNorm()), mNewNorm(mOldNorm),
-    mOldNames(variant.getNames()), mNewNames(mOldNames),
-    mOldDescriptions(variant.getDescriptions()), mNewDescriptions(mOldDescriptions),
-    mOldSymbolItems(variant.getSymbolItems()), mNewSymbolItems(mOldSymbolItems)
-{
+CmdComponentSymbolVariantEdit::CmdComponentSymbolVariantEdit(
+    ComponentSymbolVariant& variant) noexcept
+  : UndoCommand(tr("Edit component symbol variant")),
+    mVariant(variant),
+    mOldNorm(variant.getNorm()),
+    mNewNorm(mOldNorm),
+    mOldNames(variant.getNames()),
+    mNewNames(mOldNames),
+    mOldDescriptions(variant.getDescriptions()),
+    mNewDescriptions(mOldDescriptions),
+    mOldSymbolItems(variant.getSymbolItems()),
+    mNewSymbolItems(mOldSymbolItems) {
 }
 
-CmdComponentSymbolVariantEdit::~CmdComponentSymbolVariantEdit() noexcept
-{
+CmdComponentSymbolVariantEdit::~CmdComponentSymbolVariantEdit() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdComponentSymbolVariantEdit::setNorm(const QString& norm) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNorm = norm;
+void CmdComponentSymbolVariantEdit::setNorm(const QString& norm) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewNorm = norm;
 }
 
-void CmdComponentSymbolVariantEdit::setNames(const LocalizedNameMap& names) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewNames = names;
+void CmdComponentSymbolVariantEdit::setNames(
+    const LocalizedNameMap& names) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewNames = names;
 }
 
-void CmdComponentSymbolVariantEdit::setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewDescriptions = descriptions;
+void CmdComponentSymbolVariantEdit::setDescriptions(
+    const LocalizedDescriptionMap& descriptions) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDescriptions = descriptions;
 }
 
-void CmdComponentSymbolVariantEdit::setSymbolItems(const ComponentSymbolVariantItemList& items) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewSymbolItems = items;
+void CmdComponentSymbolVariantEdit::setSymbolItems(
+    const ComponentSymbolVariantItemList& items) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewSymbolItems = items;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdComponentSymbolVariantEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdComponentSymbolVariantEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewNorm != mOldNorm)                       return true;
-    if (mNewNames != mOldNames)                     return true;
-    if (mNewDescriptions != mOldDescriptions)       return true;
-    if (mNewSymbolItems != mOldSymbolItems)         return true;
-    return false;
+  if (mNewNorm != mOldNorm) return true;
+  if (mNewNames != mOldNames) return true;
+  if (mNewDescriptions != mOldDescriptions) return true;
+  if (mNewSymbolItems != mOldSymbolItems) return true;
+  return false;
 }
 
-void CmdComponentSymbolVariantEdit::performUndo()
-{
-    mVariant.setNorm(mOldNorm);
-    mVariant.setNames(mOldNames);
-    mVariant.setDescriptions(mOldDescriptions);
-    mVariant.getSymbolItems() = mOldSymbolItems;
+void CmdComponentSymbolVariantEdit::performUndo() {
+  mVariant.setNorm(mOldNorm);
+  mVariant.setNames(mOldNames);
+  mVariant.setDescriptions(mOldDescriptions);
+  mVariant.getSymbolItems() = mOldSymbolItems;
 }
 
-void CmdComponentSymbolVariantEdit::performRedo()
-{
-    mVariant.setNorm(mNewNorm);
-    mVariant.setNames(mNewNames);
-    mVariant.setDescriptions(mNewDescriptions);
-    mVariant.getSymbolItems() = mNewSymbolItems;
+void CmdComponentSymbolVariantEdit::performRedo() {
+  mVariant.setNorm(mNewNorm);
+  mVariant.setNames(mNewNames);
+  mVariant.setDescriptions(mNewDescriptions);
+  mVariant.getSymbolItems() = mNewSymbolItems;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb

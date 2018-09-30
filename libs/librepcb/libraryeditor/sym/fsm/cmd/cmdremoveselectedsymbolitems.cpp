@@ -17,72 +17,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdremoveselectedsymbolitems.h"
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
+
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/library/sym/symbolpingraphicsitem.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdRemoveSelectedSymbolItems::CmdRemoveSelectedSymbolItems(const SymbolEditorState::Context& context) noexcept :
-    UndoCommandGroup(tr("Remove Symbol Elements")), mContext(context)
-{
+CmdRemoveSelectedSymbolItems::CmdRemoveSelectedSymbolItems(
+    const SymbolEditorState::Context& context) noexcept
+  : UndoCommandGroup(tr("Remove Symbol Elements")), mContext(context) {
 }
 
-CmdRemoveSelectedSymbolItems::~CmdRemoveSelectedSymbolItems() noexcept
-{
+CmdRemoveSelectedSymbolItems::~CmdRemoveSelectedSymbolItems() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdRemoveSelectedSymbolItems::performExecute()
-{
-    // remove pins
-    foreach (const auto& pin, mContext.symbolGraphicsItem.getSelectedPins()) {
-        appendChild(new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getPin()));
-    }
+bool CmdRemoveSelectedSymbolItems::performExecute() {
+  // remove pins
+  foreach (const auto& pin, mContext.symbolGraphicsItem.getSelectedPins()) {
+    appendChild(
+        new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getPin()));
+  }
 
-    // remove circles
-    foreach (const auto& circle, mContext.symbolGraphicsItem.getSelectedCircles()) {
-        appendChild(new CmdCircleRemove(mContext.symbol.getCircles(), &circle->getCircle()));
-    }
+  // remove circles
+  foreach (const auto& circle,
+           mContext.symbolGraphicsItem.getSelectedCircles()) {
+    appendChild(new CmdCircleRemove(mContext.symbol.getCircles(),
+                                    &circle->getCircle()));
+  }
 
-    // remove polygons
-    foreach (const auto& polygon, mContext.symbolGraphicsItem.getSelectedPolygons()) {
-        appendChild(new CmdPolygonRemove(mContext.symbol.getPolygons(), &polygon->getPolygon()));
-    }
+  // remove polygons
+  foreach (const auto& polygon,
+           mContext.symbolGraphicsItem.getSelectedPolygons()) {
+    appendChild(new CmdPolygonRemove(mContext.symbol.getPolygons(),
+                                     &polygon->getPolygon()));
+  }
 
-    // remove texts
-    foreach (const auto& text, mContext.symbolGraphicsItem.getSelectedTexts()) {
-        appendChild(new CmdTextRemove(mContext.symbol.getTexts(), &text->getText()));
-    }
+  // remove texts
+  foreach (const auto& text, mContext.symbolGraphicsItem.getSelectedTexts()) {
+    appendChild(
+        new CmdTextRemove(mContext.symbol.getTexts(), &text->getText()));
+  }
 
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+  // execute all child commands
+  return UndoCommandGroup::performExecute();  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

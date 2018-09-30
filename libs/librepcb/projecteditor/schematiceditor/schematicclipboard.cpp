@@ -17,36 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "schematicclipboard.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SchematicClipboard::SchematicClipboard() noexcept :
-    QObject(nullptr), mCutActive(false)
-{
+SchematicClipboard::SchematicClipboard() noexcept
+  : QObject(nullptr), mCutActive(false) {
 }
 
-SchematicClipboard::~SchematicClipboard() noexcept
-{
-    //clear();
+SchematicClipboard::~SchematicClipboard() noexcept {
+  // clear();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 /*void SchematicClipboard::clear() noexcept
 {
@@ -65,7 +64,8 @@ void SchematicClipboard::copy(const QList<SymbolInstance*>& symbols)
     setElements(symbols);
 }
 
-void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& symbols)
+void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>&
+symbols)
 {
     Q_ASSERT(symbols.isEmpty() == true);
 
@@ -77,9 +77,9 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
     mCutActive = false;
 }*/
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 /*void SchematicClipboard::setElements(const QList<SymbolInstance*>& symbols)
 {
@@ -89,10 +89,10 @@ void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>& sym
         mSymbolInstances.append(symbol->serializeToDomElement());
 }*/
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

@@ -17,432 +17,477 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "addlibrarywidget.h"
+
+#include "librarydownload.h"
+#include "repositorylibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
+
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/network/repository.h>
 #include <librepcb/library/library.h>
-#include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
-#include "repositorylibrarylistwidgetitem.h"
-#include "librarydownload.h"
+#include <librepcb/workspace/workspace.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace manager {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept :
-    QWidget(nullptr), mWorkspace(ws), mUi(new Ui::AddLibraryWidget)
-{
-    mUi->setupUi(this);
-    connect(mUi->btnDownloadZip, &QPushButton::clicked,
-            this, &AddLibraryWidget::downloadZippedLibraryButtonClicked);
-    connect(mUi->btnLocalCreate, &QPushButton::clicked,
-            this, &AddLibraryWidget::createLocalLibraryButtonClicked);
-    connect(mUi->edtLocalName, &QLineEdit::textChanged,
-            this, &AddLibraryWidget::localLibraryNameLineEditTextChanged);
-    connect(mUi->edtDownloadZipUrl, &QLineEdit::textChanged,
-            this, &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
-    connect(mUi->btnRepoLibsDownload, &QPushButton::clicked,
-            this, &AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked);
+AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept
+  : QWidget(nullptr), mWorkspace(ws), mUi(new Ui::AddLibraryWidget) {
+  mUi->setupUi(this);
+  connect(mUi->btnDownloadZip, &QPushButton::clicked, this,
+          &AddLibraryWidget::downloadZippedLibraryButtonClicked);
+  connect(mUi->btnLocalCreate, &QPushButton::clicked, this,
+          &AddLibraryWidget::createLocalLibraryButtonClicked);
+  connect(mUi->edtLocalName, &QLineEdit::textChanged, this,
+          &AddLibraryWidget::localLibraryNameLineEditTextChanged);
+  connect(mUi->edtDownloadZipUrl, &QLineEdit::textChanged, this,
+          &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
+  connect(mUi->btnRepoLibsDownload, &QPushButton::clicked, this,
+          &AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked);
 
-    // tab "create local library": set placeholder texts
-    mUi->edtLocalName->setPlaceholderText("My Library");
-    mUi->edtLocalAuthor->setPlaceholderText(mWorkspace.getSettings().getUser().getName());
-    mUi->edtLocalVersion->setPlaceholderText("0.1");
-    mUi->edtLocalUrl->setPlaceholderText(tr("e.g. the URL to the Git repository (optional)"));
-    localLibraryNameLineEditTextChanged(mUi->edtLocalName->text());
+  // tab "create local library": set placeholder texts
+  mUi->edtLocalName->setPlaceholderText("My Library");
+  mUi->edtLocalAuthor->setPlaceholderText(
+      mWorkspace.getSettings().getUser().getName());
+  mUi->edtLocalVersion->setPlaceholderText("0.1");
+  mUi->edtLocalUrl->setPlaceholderText(
+      tr("e.g. the URL to the Git repository (optional)"));
+  localLibraryNameLineEditTextChanged(mUi->edtLocalName->text());
 
-    // tab "download ZIP": set placeholder texts and hide widgets
-    mUi->edtDownloadZipUrl->setPlaceholderText(tr("e.g. https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/archive/master.zip"));
-    mUi->prgDownloadZipProgress->setVisible(false);
-    mUi->btnDownloadZipAbort->setVisible(false);
-    mUi->lblDownloadZipStatusMsg->setText("");
+  // tab "download ZIP": set placeholder texts and hide widgets
+  mUi->edtDownloadZipUrl->setPlaceholderText(
+      tr("e.g. "
+         "https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/archive/"
+         "master.zip"));
+  mUi->prgDownloadZipProgress->setVisible(false);
+  mUi->btnDownloadZipAbort->setVisible(false);
+  mUi->lblDownloadZipStatusMsg->setText("");
 
-    // select the default tab
-    mUi->tabWidget->setCurrentIndex(0);
+  // select the default tab
+  mUi->tabWidget->setCurrentIndex(0);
 }
 
-AddLibraryWidget::~AddLibraryWidget() noexcept
-{
-    clearRepositoryLibraryList();
+AddLibraryWidget::~AddLibraryWidget() noexcept {
+  clearRepositoryLibraryList();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void AddLibraryWidget::updateRepositoryLibraryList() noexcept
-{
-    clearRepositoryLibraryList();
-    QList<const Repository*> repos = mWorkspace.getSettings().getRepositories().getRepositories();
-    foreach (const Repository* repo, repos) { Q_ASSERT(repo);
-        mLibraryDownloadConnections.append(
-                    connect(repo, &Repository::libraryListReceived,
-                            this, &AddLibraryWidget::repositoryLibraryListReceived));
-        mLibraryDownloadConnections.append(
-                    connect(repo, &Repository::errorWhileFetchingLibraryList,
-                            this, &AddLibraryWidget::errorWhileFetchingLibraryList));
-        repo->requestLibraryList();
-    }
+void AddLibraryWidget::updateRepositoryLibraryList() noexcept {
+  clearRepositoryLibraryList();
+  QList<const Repository*> repos =
+      mWorkspace.getSettings().getRepositories().getRepositories();
+  foreach (const Repository* repo, repos) {
+    Q_ASSERT(repo);
+    mLibraryDownloadConnections.append(
+        connect(repo, &Repository::libraryListReceived, this,
+                &AddLibraryWidget::repositoryLibraryListReceived));
+    mLibraryDownloadConnections.append(
+        connect(repo, &Repository::errorWhileFetchingLibraryList, this,
+                &AddLibraryWidget::errorWhileFetchingLibraryList));
+    repo->requestLibraryList();
+  }
 }
 
-void AddLibraryWidget::updateInstalledStatusOfRepositoryLibraries() noexcept
-{
-    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-        QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-        auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-                           mUi->lstRepoLibs->itemWidget(item));
-        if (widget) widget->updateInstalledStatus();
-    }
+void AddLibraryWidget::updateInstalledStatusOfRepositoryLibraries() noexcept {
+  for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
+    QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    Q_ASSERT(item);
+    auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
+        mUi->lstRepoLibs->itemWidget(item));
+    if (widget) widget->updateInstalledStatus();
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void AddLibraryWidget::localLibraryNameLineEditTextChanged(QString name) noexcept
-{
-    if (name.isEmpty()) name = mUi->edtLocalName->placeholderText();
-    QString dirname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces | FilePath::KeepCase);
-    if (!dirname.endsWith(".lplib")) dirname.append(".lplib");
-    mUi->edtLocalDirectory->setPlaceholderText(dirname);
+void AddLibraryWidget::localLibraryNameLineEditTextChanged(
+    QString name) noexcept {
+  if (name.isEmpty()) name = mUi->edtLocalName->placeholderText();
+  QString dirname = FilePath::cleanFileName(
+      name, FilePath::ReplaceSpaces | FilePath::KeepCase);
+  if (!dirname.endsWith(".lplib")) dirname.append(".lplib");
+  mUi->edtLocalDirectory->setPlaceholderText(dirname);
 }
 
-void AddLibraryWidget::downloadZipUrlLineEditTextChanged(QString urlStr) noexcept
-{
-    QString left = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
-    QString libName = left.right(left.length() - left.lastIndexOf("/"));
-    if (libName == urlStr) {libName = QUrl(urlStr).fileName();}
-    QString dirname = FilePath::cleanFileName(libName, FilePath::ReplaceSpaces | FilePath::KeepCase);
-    if (dirname.contains(".zip")) {dirname.remove(".zip");}
-    if (!dirname.isEmpty()) {dirname.append(".lplib");}
-    mUi->edtDownloadZipDirectory->setPlaceholderText(dirname);
+void AddLibraryWidget::downloadZipUrlLineEditTextChanged(
+    QString urlStr) noexcept {
+  QString left    = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
+  QString libName = left.right(left.length() - left.lastIndexOf("/"));
+  if (libName == urlStr) {
+    libName = QUrl(urlStr).fileName();
+  }
+  QString dirname = FilePath::cleanFileName(
+      libName, FilePath::ReplaceSpaces | FilePath::KeepCase);
+  if (dirname.contains(".zip")) {
+    dirname.remove(".zip");
+  }
+  if (!dirname.isEmpty()) {
+    dirname.append(".lplib");
+  }
+  mUi->edtDownloadZipDirectory->setPlaceholderText(dirname);
 }
 
-void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept
-{
-    // get attributes
-    QString name = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalName, false);
-    QString desc = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDescription, false);
-    QString author = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
-    QString versionStr = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
-    tl::optional<Version> version = Version::tryFromString(versionStr);
-    QString urlStr = mUi->edtLocalUrl->text().trimmed();
-    QUrl url = QUrl::fromUserInput(urlStr);
-    bool useCc0License = mUi->cbxLocalCc0License->isChecked();
-    QString directoryStr = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDirectory, true);
-    if ((!directoryStr.isEmpty()) && (!directoryStr.endsWith(".lplib"))) {
-        directoryStr.append(".lplib");
-    }
-    FilePath directory = mWorkspace.getLibrariesPath().getPathTo("local/" % directoryStr);
+void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
+  // get attributes
+  QString name = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalName, false);
+  QString desc =
+      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDescription, false);
+  QString author =
+      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
+  QString versionStr =
+      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
+  tl::optional<Version> version       = Version::tryFromString(versionStr);
+  QString               urlStr        = mUi->edtLocalUrl->text().trimmed();
+  QUrl                  url           = QUrl::fromUserInput(urlStr);
+  bool                  useCc0License = mUi->cbxLocalCc0License->isChecked();
+  QString               directoryStr =
+      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDirectory, true);
+  if ((!directoryStr.isEmpty()) && (!directoryStr.endsWith(".lplib"))) {
+    directoryStr.append(".lplib");
+  }
+  FilePath directory =
+      mWorkspace.getLibrariesPath().getPathTo("local/" % directoryStr);
 
-    // check attributes validity
-    if (name.isEmpty()) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter a name."));
-        return;
-    }
-    if (author.isEmpty()) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter an author."));
-        return;
-    }
-    if (!version) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("The specified version number is not valid."));
-        return;
-    }
-    if (!url.isValid() && !urlStr.isEmpty()) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("The specified URL is not valid."));
-        return;
-    }
-    if (directoryStr.isEmpty()) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter a directory name."));
-        return;
-    }
-    if (directory.isExistingFile() || directory.isExistingDir()) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("The specified directory exists already."));
-        return;
+  // check attributes validity
+  if (name.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("Please enter a name."));
+    return;
+  }
+  if (author.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("Please enter an author."));
+    return;
+  }
+  if (!version) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("The specified version number is not valid."));
+    return;
+  }
+  if (!url.isValid() && !urlStr.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("The specified URL is not valid."));
+    return;
+  }
+  if (directoryStr.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("Please enter a directory name."));
+    return;
+  }
+  if (directory.isExistingFile() || directory.isExistingDir()) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("The specified directory exists already."));
+    return;
+  }
+
+  try {
+    // create the new library
+    QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version,
+                                            author, ElementName(name), desc,
+                                            QString("")));  // can throw
+    lib->setUrl(url);
+    lib->setIconFilePath(
+        qApp->getResourcesDir().getPathTo("library/default_image.png"));
+    lib->saveTo(directory);  // can throw
+
+    // copy license file
+    if (useCc0License) {
+      try {
+        FilePath source =
+            qApp->getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
+        FilePath destination = directory.getPathTo("LICENSE.txt");
+        FileUtils::copyFile(source, destination);  // can throw
+      } catch (Exception& e) {
+        qCritical() << "Could not copy the license file:" << e.getMsg();
+      }
     }
 
+    // copy readme file
     try {
-        // create the new library
-        QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version, author,
-                                                ElementName(name), desc, QString(""))); // can throw
-        lib->setUrl(url);
-        lib->setIconFilePath(qApp->getResourcesDir().getPathTo("library/default_image.png"));
-        lib->saveTo(directory); // can throw
-
-        // copy license file
-        if (useCc0License) {
-            try {
-                FilePath source = qApp->getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
-                FilePath destination = directory.getPathTo("LICENSE.txt");
-                FileUtils::copyFile(source, destination); // can throw
-            } catch (Exception& e) {
-                qCritical() << "Could not copy the license file:" << e.getMsg();
-            }
-        }
-
-        // copy readme file
-        try {
-            FilePath source = qApp->getResourcesDir().getPathTo("library/readme_template");
-            FilePath destination = directory.getPathTo("README.md");
-            QByteArray content = FileUtils::readFile(source); // can throw
-            content.replace("{LIBRARY_NAME}", name.toUtf8());
-            if (useCc0License) {
-                content.replace("{LICENSE_TEXT}", "Creative Commons (CC0-1.0). For the "
-                                "license text, see [LICENSE.txt](LICENSE.txt).");
-            } else {
-                content.replace("{LICENSE_TEXT}", "No license set.");
-            }
-            FileUtils::writeFile(destination, content); // can throw
-        } catch (Exception& e) {
-            qCritical() << "Could not copy the readme file:" << e.getMsg();
-        }
-
-        // copy .gitignore
-        try {
-            FilePath source = qApp->getResourcesDir().getPathTo("library/gitignore_template");
-            FilePath destination = directory.getPathTo(".gitignore");
-            FileUtils::copyFile(source, destination); // can throw
-        } catch (Exception& e) {
-            qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
-        }
-
-        // copy .gitattributes
-        try {
-            FilePath source = qApp->getResourcesDir().getPathTo("library/gitattributes_template");
-            FilePath destination = directory.getPathTo(".gitattributes");
-            FileUtils::copyFile(source, destination); // can throw
-        } catch (Exception& e) {
-            qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
-        }
-
-        // add the new library to the workspace
-        mWorkspace.addLocalLibrary(directory.getFilename()); // can throw
-
-        // library successfully added! reset input fields and emit signal
-        mUi->edtLocalName->clear();
-        mUi->edtLocalDescription->clear();
-        mUi->edtLocalAuthor->clear();
-        mUi->edtLocalVersion->clear();
-        mUi->edtLocalUrl->clear();
-        mUi->cbxLocalCc0License->setChecked(false);
-        mUi->edtLocalDirectory->clear();
-        emit libraryAdded(directory, true);
+      FilePath source =
+          qApp->getResourcesDir().getPathTo("library/readme_template");
+      FilePath   destination = directory.getPathTo("README.md");
+      QByteArray content     = FileUtils::readFile(source);  // can throw
+      content.replace("{LIBRARY_NAME}", name.toUtf8());
+      if (useCc0License) {
+        content.replace("{LICENSE_TEXT}",
+                        "Creative Commons (CC0-1.0). For the "
+                        "license text, see [LICENSE.txt](LICENSE.txt).");
+      } else {
+        content.replace("{LICENSE_TEXT}", "No license set.");
+      }
+      FileUtils::writeFile(destination, content);  // can throw
     } catch (Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
+      qCritical() << "Could not copy the readme file:" << e.getMsg();
     }
+
+    // copy .gitignore
+    try {
+      FilePath source =
+          qApp->getResourcesDir().getPathTo("library/gitignore_template");
+      FilePath destination = directory.getPathTo(".gitignore");
+      FileUtils::copyFile(source, destination);  // can throw
+    } catch (Exception& e) {
+      qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
+    }
+
+    // copy .gitattributes
+    try {
+      FilePath source =
+          qApp->getResourcesDir().getPathTo("library/gitattributes_template");
+      FilePath destination = directory.getPathTo(".gitattributes");
+      FileUtils::copyFile(source, destination);  // can throw
+    } catch (Exception& e) {
+      qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
+    }
+
+    // add the new library to the workspace
+    mWorkspace.addLocalLibrary(directory.getFilename());  // can throw
+
+    // library successfully added! reset input fields and emit signal
+    mUi->edtLocalName->clear();
+    mUi->edtLocalDescription->clear();
+    mUi->edtLocalAuthor->clear();
+    mUi->edtLocalVersion->clear();
+    mUi->edtLocalUrl->clear();
+    mUi->cbxLocalCc0License->setChecked(false);
+    mUi->edtLocalDirectory->clear();
+    emit libraryAdded(directory, true);
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
 }
 
-void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept
-{
-    if (mManualLibraryDownload) {
-        QMessageBox::critical(this, tr("Busy"), tr("A download is already running."));
-        return;
-    }
+void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {
+  if (mManualLibraryDownload) {
+    QMessageBox::critical(this, tr("Busy"),
+                          tr("A download is already running."));
+    return;
+  }
 
-    // get attributes
-    QUrl url = QUrl::fromUserInput(mUi->edtDownloadZipUrl->text().trimmed());
-    QString dirStr = getTextOrPlaceholderFromQLineEdit(mUi->edtDownloadZipDirectory, true);
-    if ((!dirStr.isEmpty()) && (!dirStr.endsWith(".lplib"))) {
-        dirStr.append(".lplib");
-    }
-    FilePath extractToDir = mWorkspace.getLibrariesPath().getPathTo("local/" % dirStr);
+  // get attributes
+  QUrl    url = QUrl::fromUserInput(mUi->edtDownloadZipUrl->text().trimmed());
+  QString dirStr =
+      getTextOrPlaceholderFromQLineEdit(mUi->edtDownloadZipDirectory, true);
+  if ((!dirStr.isEmpty()) && (!dirStr.endsWith(".lplib"))) {
+    dirStr.append(".lplib");
+  }
+  FilePath extractToDir =
+      mWorkspace.getLibrariesPath().getPathTo("local/" % dirStr);
 
-    // check attributes validity
-    if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter a valid URL."));
-        return;
-    }
-    if ((dirStr.isEmpty()) || (!extractToDir.isValid())) {
-        QMessageBox::critical(this, tr("Invalid Input"), tr("Please enter a valid directory."));
-        return;
-    }
-    if (extractToDir.isExistingFile() || extractToDir.isExistingDir()) {
-        QMessageBox::critical(this, tr("Directory exists already"),
-            QString(tr("The directory \"%1\" exists already.")).arg(extractToDir.toNative()));
-        return;
-    }
+  // check attributes validity
+  if (!url.isValid()) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("Please enter a valid URL."));
+    return;
+  }
+  if ((dirStr.isEmpty()) || (!extractToDir.isValid())) {
+    QMessageBox::critical(this, tr("Invalid Input"),
+                          tr("Please enter a valid directory."));
+    return;
+  }
+  if (extractToDir.isExistingFile() || extractToDir.isExistingDir()) {
+    QMessageBox::critical(this, tr("Directory exists already"),
+                          QString(tr("The directory \"%1\" exists already."))
+                              .arg(extractToDir.toNative()));
+    return;
+  }
 
-    // update widgets
-    mUi->btnDownloadZip->setEnabled(false);
-    mUi->btnDownloadZipAbort->setVisible(true);
-    mUi->prgDownloadZipProgress->setVisible(true);
-    mUi->prgDownloadZipProgress->setValue(0);
-    mUi->lblDownloadZipStatusMsg->setText("");
-    mUi->lblDownloadZipStatusMsg->setStyleSheet("");
+  // update widgets
+  mUi->btnDownloadZip->setEnabled(false);
+  mUi->btnDownloadZipAbort->setVisible(true);
+  mUi->prgDownloadZipProgress->setVisible(true);
+  mUi->prgDownloadZipProgress->setValue(0);
+  mUi->lblDownloadZipStatusMsg->setText("");
+  mUi->lblDownloadZipStatusMsg->setStyleSheet("");
 
-    // download library
-    mManualLibraryDownload.reset(new LibraryDownload(url, extractToDir));
-    connect(mManualLibraryDownload.data(), &LibraryDownload::progressState,
-            mUi->lblDownloadZipStatusMsg, &QLabel::setText);
-    connect(mManualLibraryDownload.data(), &LibraryDownload::progressPercent,
-            mUi->prgDownloadZipProgress, &QProgressBar::setValue);
-    connect(mManualLibraryDownload.data(), &LibraryDownload::finished,
-            this, &AddLibraryWidget::downloadZipFinished);
-    connect(mUi->btnDownloadZipAbort, &QPushButton::clicked,
-            mManualLibraryDownload.data(), &LibraryDownload::abort);
-    mManualLibraryDownload->start();
+  // download library
+  mManualLibraryDownload.reset(new LibraryDownload(url, extractToDir));
+  connect(mManualLibraryDownload.data(), &LibraryDownload::progressState,
+          mUi->lblDownloadZipStatusMsg, &QLabel::setText);
+  connect(mManualLibraryDownload.data(), &LibraryDownload::progressPercent,
+          mUi->prgDownloadZipProgress, &QProgressBar::setValue);
+  connect(mManualLibraryDownload.data(), &LibraryDownload::finished, this,
+          &AddLibraryWidget::downloadZipFinished);
+  connect(mUi->btnDownloadZipAbort, &QPushButton::clicked,
+          mManualLibraryDownload.data(), &LibraryDownload::abort);
+  mManualLibraryDownload->start();
 }
 
-void AddLibraryWidget::downloadZipFinished(bool success, const QString& errMsg) noexcept
-{
-    Q_ASSERT(mManualLibraryDownload);
+void AddLibraryWidget::downloadZipFinished(bool           success,
+                                           const QString& errMsg) noexcept {
+  Q_ASSERT(mManualLibraryDownload);
 
-    if (success) {
-        try {
-            // add library to workspace
-            mWorkspace.addLocalLibrary(mManualLibraryDownload->getDestinationDir().getFilename());
+  if (success) {
+    try {
+      // add library to workspace
+      mWorkspace.addLocalLibrary(
+          mManualLibraryDownload->getDestinationDir().getFilename());
 
-            // finish
-            mUi->lblDownloadZipStatusMsg->setText("");
-            emit libraryAdded(mManualLibraryDownload->getDestinationDir(), true);
-        } catch (const Exception& e) {
-            mUi->lblDownloadZipStatusMsg->setText(e.getMsg());
-        }
-    } else {
-        mUi->lblDownloadZipStatusMsg->setText(errMsg);
+      // finish
+      mUi->lblDownloadZipStatusMsg->setText("");
+      emit libraryAdded(mManualLibraryDownload->getDestinationDir(), true);
+    } catch (const Exception& e) {
+      mUi->lblDownloadZipStatusMsg->setText(e.getMsg());
     }
+  } else {
+    mUi->lblDownloadZipStatusMsg->setText(errMsg);
+  }
 
-    // update widgets
-    mUi->btnDownloadZip->setEnabled(true);
-    mUi->btnDownloadZipAbort->setVisible(false);
-    mUi->prgDownloadZipProgress->setVisible(false);
-    mUi->lblDownloadZipStatusMsg->setStyleSheet("QLabel {color: red;}");
+  // update widgets
+  mUi->btnDownloadZip->setEnabled(true);
+  mUi->btnDownloadZipAbort->setVisible(false);
+  mUi->prgDownloadZipProgress->setVisible(false);
+  mUi->lblDownloadZipStatusMsg->setStyleSheet("QLabel {color: red;}");
 
-    // delete download helper
-    mManualLibraryDownload.reset();
+  // delete download helper
+  mManualLibraryDownload.reset();
 }
 
-void AddLibraryWidget::repositoryLibraryListReceived(const QJsonArray& libs) noexcept
-{
-    foreach (const QJsonValue& libVal, libs) {
-        RepositoryLibraryListWidgetItem* widget = new RepositoryLibraryListWidgetItem(
-                                                      mWorkspace, libVal.toObject());
-        connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged,
-                this, &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
-        connect(widget, &RepositoryLibraryListWidgetItem::libraryAdded,
-                this, &AddLibraryWidget::libraryAdded);
-        QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);
-        item->setSizeHint(widget->sizeHint());
-        mUi->lstRepoLibs->setItemWidget(item, widget);
-    }
+void AddLibraryWidget::repositoryLibraryListReceived(
+    const QJsonArray& libs) noexcept {
+  foreach (const QJsonValue& libVal, libs) {
+    RepositoryLibraryListWidgetItem* widget =
+        new RepositoryLibraryListWidgetItem(mWorkspace, libVal.toObject());
+    connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged, this,
+            &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
+    connect(widget, &RepositoryLibraryListWidgetItem::libraryAdded, this,
+            &AddLibraryWidget::libraryAdded);
+    QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);
+    item->setSizeHint(widget->sizeHint());
+    mUi->lstRepoLibs->setItemWidget(item, widget);
+  }
 }
 
-void AddLibraryWidget::errorWhileFetchingLibraryList(const QString& errorMsg) noexcept
-{
-    QListWidgetItem* item = new QListWidgetItem(errorMsg, mUi->lstRepoLibs);
-    item->setBackgroundColor(Qt::red);
-    item->setForeground(Qt::white);
+void AddLibraryWidget::errorWhileFetchingLibraryList(
+    const QString& errorMsg) noexcept {
+  QListWidgetItem* item = new QListWidgetItem(errorMsg, mUi->lstRepoLibs);
+  item->setBackgroundColor(Qt::red);
+  item->setForeground(Qt::white);
 }
 
-void AddLibraryWidget::clearRepositoryLibraryList() noexcept
-{
-    foreach (const QMetaObject::Connection& connection, mLibraryDownloadConnections) {
-        disconnect(connection);
-    }
-    for (int i = mUi->lstRepoLibs->count()-1; i >= 0; i--) {
-        QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-        delete mUi->lstRepoLibs->itemWidget(item);
-        delete item;
-    }
-    Q_ASSERT(mUi->lstRepoLibs->count() == 0);
+void AddLibraryWidget::clearRepositoryLibraryList() noexcept {
+  foreach (const QMetaObject::Connection& connection,
+           mLibraryDownloadConnections) {
+    disconnect(connection);
+  }
+  for (int i = mUi->lstRepoLibs->count() - 1; i >= 0; i--) {
+    QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    Q_ASSERT(item);
+    delete mUi->lstRepoLibs->itemWidget(item);
+    delete item;
+  }
+  Q_ASSERT(mUi->lstRepoLibs->count() == 0);
 }
 
-void AddLibraryWidget::repoLibraryDownloadCheckedChanged(bool checked) noexcept
-{
-    if (checked) {
-        // one more library is checked, check all dependencies too
-        QSet<Uuid> libs;
-        for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-            QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-            auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-                               mUi->lstRepoLibs->itemWidget(item));
-            if (widget && widget->isChecked()) {
-                libs.unite(widget->getDependencies());
-            }
-        }
-        for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-            QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-            auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-                               mUi->lstRepoLibs->itemWidget(item));
-            if (widget && widget->getUuid() && (libs.contains(*widget->getUuid()))) {
-                widget->setChecked(true);
-            }
-        }
-    } else {
-        // one library was unchecked, uncheck all libraries with missing dependencies
-        QSet<Uuid> libs;
-        for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-            QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-            auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-                               mUi->lstRepoLibs->itemWidget(item));
-            if (widget && widget->isChecked() && widget->getUuid()) {
-                libs.insert(*widget->getUuid());
-            }
-        }
-        for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-            QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-            auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-                               mUi->lstRepoLibs->itemWidget(item));
-            if (widget && (!libs.contains(widget->getDependencies()))) {
-                widget->setChecked(false);
-            }
-        }
-    }
-}
-
-void AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked() noexcept
-{
+void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
+    bool checked) noexcept {
+  if (checked) {
+    // one more library is checked, check all dependencies too
+    QSet<Uuid> libs;
     for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-        QListWidgetItem* item = mUi->lstRepoLibs->item(i); Q_ASSERT(item);
-        auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-                           mUi->lstRepoLibs->itemWidget(item));
-        if (widget) {
-            widget->startDownloadIfSelected();
-        } else {
-            qWarning() << "Invalid item widget detected.";
-        }
+      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+      Q_ASSERT(item);
+      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
+          mUi->lstRepoLibs->itemWidget(item));
+      if (widget && widget->isChecked()) {
+        libs.unite(widget->getDependencies());
+      }
     }
+    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
+      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+      Q_ASSERT(item);
+      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
+          mUi->lstRepoLibs->itemWidget(item));
+      if (widget && widget->getUuid() && (libs.contains(*widget->getUuid()))) {
+        widget->setChecked(true);
+      }
+    }
+  } else {
+    // one library was unchecked, uncheck all libraries with missing
+    // dependencies
+    QSet<Uuid> libs;
+    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
+      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+      Q_ASSERT(item);
+      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
+          mUi->lstRepoLibs->itemWidget(item));
+      if (widget && widget->isChecked() && widget->getUuid()) {
+        libs.insert(*widget->getUuid());
+      }
+    }
+    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
+      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+      Q_ASSERT(item);
+      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
+          mUi->lstRepoLibs->itemWidget(item));
+      if (widget && (!libs.contains(widget->getDependencies()))) {
+        widget->setChecked(false);
+      }
+    }
+  }
 }
 
-/*****************************************************************************************
- *  Private Static Methods
- ****************************************************************************************/
-
-QString AddLibraryWidget::getTextOrPlaceholderFromQLineEdit(QLineEdit* edit, bool isFilename) noexcept
-{
-    if (edit) {
-        QString text = edit->text().trimmed();
-        QString placeholder = edit->placeholderText().trimmed();
-        QString retval = (text.length() > 0) ? text : placeholder;
-        if (isFilename) {
-            return FilePath::cleanFileName(retval, FilePath::ReplaceSpaces | FilePath::KeepCase);
-        } else {
-            return retval;
-        }
+void AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked() noexcept {
+  for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
+    QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    Q_ASSERT(item);
+    auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
+        mUi->lstRepoLibs->itemWidget(item));
+    if (widget) {
+      widget->startDownloadIfSelected();
     } else {
-        return QString("");
+      qWarning() << "Invalid item widget detected.";
     }
+  }
 }
 
-/*****************************************************************************************
- *  End of File
- ****************************************************************************************/
+/*******************************************************************************
+ *  Private Static Methods
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+QString AddLibraryWidget::getTextOrPlaceholderFromQLineEdit(
+    QLineEdit* edit, bool isFilename) noexcept {
+  if (edit) {
+    QString text        = edit->text().trimmed();
+    QString placeholder = edit->placeholderText().trimmed();
+    QString retval      = (text.length() > 0) ? text : placeholder;
+    if (isFilename) {
+      return FilePath::cleanFileName(
+          retval, FilePath::ReplaceSpaces | FilePath::KeepCase);
+    } else {
+      return retval;
+    }
+  } else {
+    return QString("");
+  }
+}
+
+/*******************************************************************************
+ *  End of File
+ ******************************************************************************/
+
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb

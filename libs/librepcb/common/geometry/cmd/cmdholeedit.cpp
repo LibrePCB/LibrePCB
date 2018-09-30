@@ -17,88 +17,87 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdholeedit.h"
+
 #include "../hole.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdHoleEdit::CmdHoleEdit(Hole& hole) noexcept :
-    UndoCommand(tr("Edit hole")), mHole(hole),
-    mOldPosition(hole.getPosition()), mNewPosition(mOldPosition),
-    mOldDiameter(hole.getDiameter()), mNewDiameter(mOldDiameter)
-{
+CmdHoleEdit::CmdHoleEdit(Hole& hole) noexcept
+  : UndoCommand(tr("Edit hole")),
+    mHole(hole),
+    mOldPosition(hole.getPosition()),
+    mNewPosition(mOldPosition),
+    mOldDiameter(hole.getDiameter()),
+    mNewDiameter(mOldDiameter) {
 }
 
-CmdHoleEdit::~CmdHoleEdit() noexcept
-{
-    if (!wasEverExecuted()) {
-        performUndo(); // discard possible executed immediate changes
-    }
+CmdHoleEdit::~CmdHoleEdit() noexcept {
+  if (!wasEverExecuted()) {
+    performUndo();  // discard possible executed immediate changes
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void CmdHoleEdit::setPosition(const Point& pos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPosition = pos;
-    if (immediate) mHole.setPosition(mNewPosition);
+void CmdHoleEdit::setPosition(const Point& pos, bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPosition = pos;
+  if (immediate) mHole.setPosition(mNewPosition);
 }
 
-void CmdHoleEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewPosition = mOldPosition + deltaPos;
-    if (immediate) mHole.setPosition(mNewPosition);
+void CmdHoleEdit::setDeltaToStartPos(const Point& deltaPos,
+                                     bool         immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPosition = mOldPosition + deltaPos;
+  if (immediate) mHole.setPosition(mNewPosition);
 }
 
-void CmdHoleEdit::setDiameter(const PositiveLength& diameter, bool immediate) noexcept
-{
-    Q_ASSERT(!wasEverExecuted());
-    mNewDiameter = diameter;
-    if (immediate) mHole.setDiameter(mNewDiameter);
+void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
+                              bool                  immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDiameter = diameter;
+  if (immediate) mHole.setDiameter(mNewDiameter);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdHoleEdit::performExecute()
-{
-    performRedo(); // can throw
+bool CmdHoleEdit::performExecute() {
+  performRedo();  // can throw
 
-    if (mNewPosition != mOldPosition) return true;
-    if (mNewDiameter != mOldDiameter) return true;
-    return false;
+  if (mNewPosition != mOldPosition) return true;
+  if (mNewDiameter != mOldDiameter) return true;
+  return false;
 }
 
-void CmdHoleEdit::performUndo()
-{
-    mHole.setPosition(mOldPosition);
-    mHole.setDiameter(mOldDiameter);
+void CmdHoleEdit::performUndo() {
+  mHole.setPosition(mOldPosition);
+  mHole.setDiameter(mOldDiameter);
 }
 
-void CmdHoleEdit::performRedo()
-{
-    mHole.setPosition(mNewPosition);
-    mHole.setDiameter(mNewDiameter);
+void CmdHoleEdit::performRedo() {
+  mHole.setPosition(mNewPosition);
+  mHole.setDiameter(mNewDiameter);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

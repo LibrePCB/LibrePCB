@@ -17,36 +17,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "symboleditorstate_drawrect.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SymbolEditorState_DrawRect::SymbolEditorState_DrawRect(const Context& context) noexcept :
-    SymbolEditorState_DrawPolygonBase(context, Mode::RECT)
-{
+SymbolEditorState_DrawRect::SymbolEditorState_DrawRect(
+    const Context& context) noexcept
+  : SymbolEditorState_DrawPolygonBase(context, Mode::RECT) {
 }
 
-SymbolEditorState_DrawRect::~SymbolEditorState_DrawRect() noexcept
-{
+SymbolEditorState_DrawRect::~SymbolEditorState_DrawRect() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

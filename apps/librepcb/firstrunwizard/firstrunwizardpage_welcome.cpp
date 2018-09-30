@@ -17,36 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include "firstrunwizardpage_welcome.h"
+
 #include "ui_firstrunwizardpage_welcome.h"
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace application {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget *parent) noexcept :
-    QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_Welcome)
-{
-    mUi->setupUi(this);
-    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
+FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget *parent) noexcept
+  : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_Welcome) {
+  mUi->setupUi(this);
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 }
 
-FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept
-{
+FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace application
-} // namespace librepcb
+}  // namespace application
+}  // namespace librepcb

@@ -17,210 +17,218 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "repositorylibrarylistwidgetitem.h"
+
+#include "librarydownload.h"
 #include "ui_repositorylibrarylistwidgetitem.h"
+
 #include <librepcb/common/network/networkrequest.h>
 #include <librepcb/workspace/workspace.h>
-#include "librarydownload.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace manager {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(workspace::Workspace& ws,
-                                                                 const QJsonObject& obj) noexcept :
-    QWidget(nullptr), mWorkspace(ws), mJsonObject(obj),
-    mUi(new Ui::RepositoryLibraryListWidgetItem)
-{
-    mUi->setupUi(this);
-    mUi->lblIcon->setText("");
-    mUi->prgProgress->setVisible(false);
-    connect(mUi->cbxDownload, &QCheckBox::toggled,
-            this, &RepositoryLibraryListWidgetItem::checkedChanged);
+RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
+    workspace::Workspace& ws, const QJsonObject& obj) noexcept
+  : QWidget(nullptr),
+    mWorkspace(ws),
+    mJsonObject(obj),
+    mUi(new Ui::RepositoryLibraryListWidgetItem) {
+  mUi->setupUi(this);
+  mUi->lblIcon->setText("");
+  mUi->prgProgress->setVisible(false);
+  connect(mUi->cbxDownload, &QCheckBox::toggled, this,
+          &RepositoryLibraryListWidgetItem::checkedChanged);
 
-    mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
-    mVersion = Version::tryFromString(mJsonObject.value("version").toString());
-    mIsRecommended = mJsonObject.value("recommended").toBool();
-    QString name = mJsonObject.value("name").toObject().value("default").toString();
-    QString desc = mJsonObject.value("description").toObject().value("default").toString();
-    QString author = mJsonObject.value("author").toString();
-    QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
-    foreach (const QJsonValue& value, mJsonObject.value("dependencies").toArray()) {
-        tl::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
-        if (uuid) {
-            mDependencies.insert(*uuid);
-        } else {
-            qWarning() << "Invalid dependency UUID:" << value.toString();
-        }
-    }
-
-    mUi->lblName->setText(QString("%1 v%2").arg(name, mVersion ? mVersion->toStr() : QString()));
-    mUi->lblDescription->setText(desc);
-    mUi->lblAuthor->setText(QString("Author: %1").arg(author));
-
-    NetworkRequest* request = new NetworkRequest(iconUrl);
-    connect(request, &NetworkRequest::dataReceived,
-            this, &RepositoryLibraryListWidgetItem::iconReceived, Qt::QueuedConnection);
-    request->start();
-
-    // check if this library is already installed
-    updateInstalledStatus();
-}
-
-RepositoryLibraryListWidgetItem::~RepositoryLibraryListWidgetItem() noexcept
-{
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-bool RepositoryLibraryListWidgetItem::isChecked() const noexcept
-{
-    return mUi->cbxDownload->isChecked();
-}
-
-/*****************************************************************************************
- *  Setters
- ****************************************************************************************/
-
-void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept
-{
-    mUi->cbxDownload->setChecked(checked);
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept
-{
-    if (mUuid) {
-        tl::optional<Version> installedVersion = mWorkspace.getVersionOfLibrary(*mUuid, true, true);
-        if (installedVersion) {
-            mUi->lblInstalledVersion->setText(QString(tr("Installed: v%1"))
-                                              .arg(installedVersion->toStr()));
-            mUi->lblInstalledVersion->setVisible(true);
-            if (installedVersion < mVersion) {
-                mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-                mUi->cbxDownload->setText(tr("Update"));
-                mUi->cbxDownload->setVisible(true);
-            } else {
-                mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
-                mUi->cbxDownload->setVisible(false);
-            }
-        } else {
-            if (mIsRecommended) {
-                mUi->lblInstalledVersion->setText(tr("Recommended"));
-                mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
-                mUi->lblInstalledVersion->setVisible(true);
-            } else {
-                mUi->lblInstalledVersion->setVisible(false);
-            }
-            mUi->cbxDownload->setText(tr("Install"));
-            mUi->cbxDownload->setVisible(true);
-        }
+  mUuid    = Uuid::tryFromString(mJsonObject.value("uuid").toString());
+  mVersion = Version::tryFromString(mJsonObject.value("version").toString());
+  mIsRecommended = mJsonObject.value("recommended").toBool();
+  QString name =
+      mJsonObject.value("name").toObject().value("default").toString();
+  QString desc =
+      mJsonObject.value("description").toObject().value("default").toString();
+  QString author  = mJsonObject.value("author").toString();
+  QUrl    iconUrl = QUrl(mJsonObject.value("icon_url").toString());
+  foreach (const QJsonValue& value,
+           mJsonObject.value("dependencies").toArray()) {
+    tl::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
+    if (uuid) {
+      mDependencies.insert(*uuid);
     } else {
-        mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));
+      qWarning() << "Invalid dependency UUID:" << value.toString();
+    }
+  }
+
+  mUi->lblName->setText(
+      QString("%1 v%2").arg(name, mVersion ? mVersion->toStr() : QString()));
+  mUi->lblDescription->setText(desc);
+  mUi->lblAuthor->setText(QString("Author: %1").arg(author));
+
+  NetworkRequest* request = new NetworkRequest(iconUrl);
+  connect(request, &NetworkRequest::dataReceived, this,
+          &RepositoryLibraryListWidgetItem::iconReceived, Qt::QueuedConnection);
+  request->start();
+
+  // check if this library is already installed
+  updateInstalledStatus();
+}
+
+RepositoryLibraryListWidgetItem::~RepositoryLibraryListWidgetItem() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+bool RepositoryLibraryListWidgetItem::isChecked() const noexcept {
+  return mUi->cbxDownload->isChecked();
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept {
+  mUi->cbxDownload->setChecked(checked);
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
+  if (mUuid) {
+    tl::optional<Version> installedVersion =
+        mWorkspace.getVersionOfLibrary(*mUuid, true, true);
+    if (installedVersion) {
+      mUi->lblInstalledVersion->setText(
+          QString(tr("Installed: v%1")).arg(installedVersion->toStr()));
+      mUi->lblInstalledVersion->setVisible(true);
+      if (installedVersion < mVersion) {
         mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+        mUi->cbxDownload->setText(tr("Update"));
+        mUi->cbxDownload->setVisible(true);
+      } else {
+        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
+        mUi->cbxDownload->setVisible(false);
+      }
+    } else {
+      if (mIsRecommended) {
+        mUi->lblInstalledVersion->setText(tr("Recommended"));
+        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
         mUi->lblInstalledVersion->setVisible(true);
-        mUi->cbxDownload->setVisible(false);
+      } else {
+        mUi->lblInstalledVersion->setVisible(false);
+      }
+      mUi->cbxDownload->setText(tr("Install"));
+      mUi->cbxDownload->setVisible(true);
     }
+  } else {
+    mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));
+    mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+    mUi->lblInstalledVersion->setVisible(true);
+    mUi->cbxDownload->setVisible(false);
+  }
 }
 
-void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept
-{
-    if (mUuid && mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() && (!mLibraryDownload)) {
-        mUi->cbxDownload->setVisible(false);
-        mUi->prgProgress->setVisible(true);
+void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept {
+  if (mUuid && mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() &&
+      (!mLibraryDownload)) {
+    mUi->cbxDownload->setVisible(false);
+    mUi->prgProgress->setVisible(true);
 
-        // read ZIP metadata from JSON
-        QUrl url = QUrl(mJsonObject.value("download_url").toString());
-        qint64 zipSize = mJsonObject.value("download_size").toInt(-1);
-        QByteArray zipSha256 = mJsonObject.value("download_sha256").toString().toUtf8();
+    // read ZIP metadata from JSON
+    QUrl       url     = QUrl(mJsonObject.value("download_url").toString());
+    qint64     zipSize = mJsonObject.value("download_size").toInt(-1);
+    QByteArray zipSha256 =
+        mJsonObject.value("download_sha256").toString().toUtf8();
 
-        // determine destination directory
-        QString libDirName = mUuid->toStr() % ".lplib";
-        FilePath destDir = mWorkspace.getLibrariesPath().getPathTo("remote/" % libDirName);
+    // determine destination directory
+    QString  libDirName = mUuid->toStr() % ".lplib";
+    FilePath destDir =
+        mWorkspace.getLibrariesPath().getPathTo("remote/" % libDirName);
 
-        // start download
-        mLibraryDownload.reset(new LibraryDownload(url, destDir));
-        if (zipSize > 0) {
-            mLibraryDownload->setExpectedZipFileSize(zipSize);
-        }
-        if (!zipSha256.isEmpty()) {
-            mLibraryDownload->setExpectedChecksum(QCryptographicHash::Sha256,
-                                                  QByteArray::fromHex(zipSha256));
-        }
-        connect(mLibraryDownload.data(), &LibraryDownload::progressPercent,
-                mUi->prgProgress, &QProgressBar::setValue, Qt::QueuedConnection);
-        connect(mLibraryDownload.data(), &LibraryDownload::finished,
-                this, &RepositoryLibraryListWidgetItem::downloadFinished, Qt::QueuedConnection);
-        mLibraryDownload->start();
+    // start download
+    mLibraryDownload.reset(new LibraryDownload(url, destDir));
+    if (zipSize > 0) {
+      mLibraryDownload->setExpectedZipFileSize(zipSize);
     }
+    if (!zipSha256.isEmpty()) {
+      mLibraryDownload->setExpectedChecksum(QCryptographicHash::Sha256,
+                                            QByteArray::fromHex(zipSha256));
+    }
+    connect(mLibraryDownload.data(), &LibraryDownload::progressPercent,
+            mUi->prgProgress, &QProgressBar::setValue, Qt::QueuedConnection);
+    connect(mLibraryDownload.data(), &LibraryDownload::finished, this,
+            &RepositoryLibraryListWidgetItem::downloadFinished,
+            Qt::QueuedConnection);
+    mLibraryDownload->start();
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void RepositoryLibraryListWidgetItem::downloadFinished(bool success, const QString& errMsg) noexcept
-{
-    Q_ASSERT(mLibraryDownload);
+void RepositoryLibraryListWidgetItem::downloadFinished(
+    bool success, const QString& errMsg) noexcept {
+  Q_ASSERT(mLibraryDownload);
 
-    if (success) {
-        try {
-            // if the library exists already in the workspace, remove it first
-            QString libDirName = mLibraryDownload->getDestinationDir().getFilename();
-            if (mWorkspace.getRemoteLibraries().contains(libDirName)) {
-                mWorkspace.removeRemoteLibrary(libDirName, false); // can throw
-            }
+  if (success) {
+    try {
+      // if the library exists already in the workspace, remove it first
+      QString libDirName = mLibraryDownload->getDestinationDir().getFilename();
+      if (mWorkspace.getRemoteLibraries().contains(libDirName)) {
+        mWorkspace.removeRemoteLibrary(libDirName, false);  // can throw
+      }
 
-            // add downloaded library to workspace
-            mWorkspace.addRemoteLibrary(libDirName); // can throw
+      // add downloaded library to workspace
+      mWorkspace.addRemoteLibrary(libDirName);  // can throw
 
-            // finish
-            emit libraryAdded(mLibraryDownload->getDestinationDir(), false);
-        } catch (const Exception& e) {
-            QMessageBox::critical(this, tr("Download failed"), e.getMsg());
-        }
-    } else if (!errMsg.isEmpty()) {
-        QMessageBox::critical(this, tr("Download failed"), errMsg);
+      // finish
+      emit libraryAdded(mLibraryDownload->getDestinationDir(), false);
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Download failed"), e.getMsg());
     }
+  } else if (!errMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Download failed"), errMsg);
+  }
 
-    // update widgets
-    mUi->cbxDownload->setChecked(!success);
-    mUi->cbxDownload->setVisible(true);
-    mUi->prgProgress->setVisible(false);
-    updateInstalledStatus();
+  // update widgets
+  mUi->cbxDownload->setChecked(!success);
+  mUi->cbxDownload->setVisible(true);
+  mUi->prgProgress->setVisible(false);
+  updateInstalledStatus();
 
-    // delete download helper
-    mLibraryDownload.reset();
+  // delete download helper
+  mLibraryDownload.reset();
 }
 
-void RepositoryLibraryListWidgetItem::iconReceived(const QByteArray& data) noexcept
-{
-    QPixmap pixmap;
-    pixmap.loadFromData(data);
-    mUi->lblIcon->setPixmap(pixmap);
+void RepositoryLibraryListWidgetItem::iconReceived(
+    const QByteArray& data) noexcept {
+  QPixmap pixmap;
+  pixmap.loadFromData(data);
+  mUi->lblIcon->setPixmap(pixmap);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb

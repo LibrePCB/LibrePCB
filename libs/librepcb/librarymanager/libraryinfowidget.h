@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_WORKSPACE_LIBRARYINFOWIDGET_H
 #define LIBREPCB_WORKSPACE_LIBRARYINFOWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace workspace {
@@ -46,9 +47,9 @@ namespace Ui {
 class LibraryInfoWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class LibraryInfoWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The LibraryInfoWidget class
@@ -56,51 +57,45 @@ class LibraryInfoWidget;
  * @author ubruhin
  * @date 2016-08-03
  */
-class LibraryInfoWidget final : public QWidget
-{
-        Q_OBJECT
+class LibraryInfoWidget final : public QWidget {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  LibraryInfoWidget() noexcept;
+  LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
+  LibraryInfoWidget(workspace::Workspace&   ws,
+                    QSharedPointer<Library> lib) noexcept;
+  ~LibraryInfoWidget() noexcept;
 
-        // Constructors / Destructor
-        LibraryInfoWidget() noexcept;
-        LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
-        LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept;
-        ~LibraryInfoWidget() noexcept;
+  // Getters
+  QString getName() const noexcept;
 
-        // Getters
-        QString getName() const noexcept;
+  // Operator Overloadings
+  LibraryInfoWidget& operator=(const LibraryInfoWidget& rhs) = delete;
 
-        // Operator Overloadings
-        LibraryInfoWidget& operator=(const LibraryInfoWidget& rhs) = delete;
+signals:
 
+  void libraryRemoved(const FilePath& libDir);
+  void openLibraryEditorTriggered(QSharedPointer<Library> lib);
 
-    signals:
+private:  // Methods
+  void btnOpenLibraryEditorClicked() noexcept;
+  void btnRemoveLibraryClicked() noexcept;
+  bool isRemoteLibrary() const noexcept;
 
-        void libraryRemoved(const FilePath& libDir);
-        void openLibraryEditorTriggered(QSharedPointer<Library> lib);
-
-
-    private: // Methods
-
-        void btnOpenLibraryEditorClicked() noexcept;
-        void btnRemoveLibraryClicked() noexcept;
-        bool isRemoteLibrary() const noexcept;
-
-
-    private: // Data
-
-        QScopedPointer<Ui::LibraryInfoWidget> mUi;
-        workspace::Workspace& mWorkspace;
-        QSharedPointer<Library> mLib;
+private:  // Data
+  QScopedPointer<Ui::LibraryInfoWidget> mUi;
+  workspace::Workspace&                 mWorkspace;
+  QSharedPointer<Library>               mLib;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace manager
-} // namespace library
-} // namespace librepcb
+}  // namespace manager
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_WORKSPACE_LIBRARYINFOWIDGET_H
+#endif  // LIBREPCB_WORKSPACE_LIBRARYINFOWIDGET_H

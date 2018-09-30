@@ -17,116 +17,111 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "version.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool Version::isPrefixOf(const Version& other) const noexcept
-{
-    if ((other.mNumbers.count() >= mNumbers.count()) && (mNumbers.count() > 0)) {
-        for (int i = 0; i < mNumbers.count(); i++) {
-            if (mNumbers.at(i) != other.mNumbers.at(i)) {
-                return false;
-            }
-        }
-        return true;
-    } else {
+bool Version::isPrefixOf(const Version& other) const noexcept {
+  if ((other.mNumbers.count() >= mNumbers.count()) && (mNumbers.count() > 0)) {
+    for (int i = 0; i < mNumbers.count(); i++) {
+      if (mNumbers.at(i) != other.mNumbers.at(i)) {
         return false;
+      }
     }
+    return true;
+  } else {
+    return false;
+  }
 }
 
-QString Version::toStr() const noexcept
-{
-    return toPrettyStr(0);
+QString Version::toStr() const noexcept {
+  return toPrettyStr(0);
 }
 
-QString Version::toPrettyStr(int minSegCount, int maxSegCount) const noexcept
-{
-    Q_ASSERT(maxSegCount >= minSegCount);
+QString Version::toPrettyStr(int minSegCount, int maxSegCount) const noexcept {
+  Q_ASSERT(maxSegCount >= minSegCount);
 
-    QString str;
-    for (int i = 0; i < qMin(qMax(mNumbers.count(), minSegCount), maxSegCount); i++) {
-        if (i > 0) str.append(".");
-        str.append(QString::number((i < mNumbers.count()) ? mNumbers.at(i) : 0));
+  QString str;
+  for (int i = 0; i < qMin(qMax(mNumbers.count(), minSegCount), maxSegCount);
+       i++) {
+    if (i > 0) str.append(".");
+    str.append(QString::number((i < mNumbers.count()) ? mNumbers.at(i) : 0));
+  }
+  return str;
+}
+
+QString Version::toComparableStr() const noexcept {
+  QString str;
+  if (mNumbers.count() > 0) {
+    for (int i = 0; i < 10; i++) {
+      int number = (mNumbers.count() > i) ? mNumbers.at(i) : 0;
+      if (i > 0) str.append(".");
+      str.append(QString("%1").arg(number, 5, 10, QLatin1Char('0')));
     }
-    return str;
+    Q_ASSERT(str.length() == 59);
+  }
+  return str;
 }
 
-QString Version::toComparableStr() const noexcept
-{
-    QString str;
-    if (mNumbers.count() > 0)
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            int number = (mNumbers.count() > i) ? mNumbers.at(i) : 0;
-            if (i > 0) str.append(".");
-            str.append(QString("%1").arg(number, 5, 10, QLatin1Char('0')));
-        }
-        Q_ASSERT(str.length() == 59);
-    }
-    return str;
-}
-
-/*****************************************************************************************
+/*******************************************************************************
  *  Static Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool Version::isValid(const QString& str) noexcept
-{
-    tl::optional<Version> version = tryFromString(str);
-    return version.has_value();
+bool Version::isValid(const QString& str) noexcept {
+  tl::optional<Version> version = tryFromString(str);
+  return version.has_value();
 }
 
-Version Version::fromString(const QString& str)
-{
-    tl::optional<Version> version = tryFromString(str);
-    if (version) {
-        return *version;
-    } else {
-        throw RuntimeError(__FILE__, __LINE__,
-            QString(Version::tr("Invalid version number: \"%1\"")).arg(str));
-    }
+Version Version::fromString(const QString& str) {
+  tl::optional<Version> version = tryFromString(str);
+  if (version) {
+    return *version;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(Version::tr("Invalid version number: \"%1\"")).arg(str));
+  }
 }
 
-tl::optional<Version> Version::tryFromString(const QString& str) noexcept
-{
-    QVector<uint> numbers;
-    // split and convert to integer
-    QStringList splitted = str.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
-    foreach (const QString& numberStr, splitted) {
-        bool ok = false;
-        uint number = numberStr.toUInt(&ok);
-        if ((!ok) || (number > 99999)) {
-            return tl::nullopt;
-        }
-        numbers.append(number);
+tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
+  QVector<uint> numbers;
+  // split and convert to integer
+  QStringList splitted =
+      str.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
+  foreach (const QString& numberStr, splitted) {
+    bool ok     = false;
+    uint number = numberStr.toUInt(&ok);
+    if ((!ok) || (number > 99999)) {
+      return tl::nullopt;
     }
-    // remove trailing zeros
-    for (int i = numbers.count()-1; i > 0; i--) {
-        if (numbers.at(i) != 0) break;
-        numbers.removeAt(i);
-    }
-    // check number count
-    if (numbers.empty() || (numbers.count() > 10)) {
-        return tl::nullopt;
-    }
-    return Version(numbers);
+    numbers.append(number);
+  }
+  // remove trailing zeros
+  for (int i = numbers.count() - 1; i > 0; i--) {
+    if (numbers.at(i) != 0) break;
+    numbers.removeAt(i);
+  }
+  // check number count
+  if (numbers.empty() || (numbers.count() > 10)) {
+    return tl::nullopt;
+  }
+  return Version(numbers);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

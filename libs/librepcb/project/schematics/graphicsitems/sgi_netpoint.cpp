@@ -17,122 +17,125 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <QPrinter>
+ ******************************************************************************/
 #include "sgi_netpoint.h"
+
+#include "../../circuit/netsignal.h"
+#include "../../project.h"
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-#include "../../project.h"
-#include "../../circuit/netsignal.h"
 
-/*****************************************************************************************
+#include <QPrinter>
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 QRectF SGI_NetPoint::sBoundingRect;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint) noexcept :
-    SGI_Base(), mNetPoint(netpoint), mLayer(nullptr)
-{
-    setZValue(Schematic::ZValue_VisibleNetPoints);
+SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint) noexcept
+  : SGI_Base(), mNetPoint(netpoint), mLayer(nullptr) {
+  setZValue(Schematic::ZValue_VisibleNetPoints);
 
-    mLayer = getLayer(GraphicsLayer::sSchematicNetLines);
-    Q_ASSERT(mLayer);
+  mLayer = getLayer(GraphicsLayer::sSchematicNetLines);
+  Q_ASSERT(mLayer);
 
-    if (sBoundingRect.isNull())
-    {
-        qreal radius = Length(600000).toPx();
-        sBoundingRect = QRectF(-radius, -radius, 2*radius, 2*radius);
-    }
+  if (sBoundingRect.isNull()) {
+    qreal radius  = Length(600000).toPx();
+    sBoundingRect = QRectF(-radius, -radius, 2 * radius, 2 * radius);
+  }
 
-    updateCacheAndRepaint();
+  updateCacheAndRepaint();
 }
 
-SGI_NetPoint::~SGI_NetPoint() noexcept
-{
+SGI_NetPoint::~SGI_NetPoint() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SGI_NetPoint::updateCacheAndRepaint() noexcept
-{
-    setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
+void SGI_NetPoint::updateCacheAndRepaint() noexcept {
+  setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
 
-    prepareGeometryChange();
-    mIsVisibleJunction = mNetPoint.isVisibleJunction();
-    mIsOpenLineEnd = mNetPoint.isOpenLineEnd();
-    setZValue(mIsVisibleJunction ? Schematic::ZValue_VisibleNetPoints : Schematic::ZValue_HiddenNetPoints);
-    update();
+  prepareGeometryChange();
+  mIsVisibleJunction = mNetPoint.isVisibleJunction();
+  mIsOpenLineEnd     = mNetPoint.isOpenLineEnd();
+  setZValue(mIsVisibleJunction ? Schematic::ZValue_VisibleNetPoints
+                               : Schematic::ZValue_HiddenNetPoints);
+  update();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from QGraphicsItem
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SGI_NetPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+void SGI_NetPoint::paint(QPainter*                       painter,
+                         const QStyleOptionGraphicsItem* option,
+                         QWidget*                        widget) {
+  Q_UNUSED(option);
+  Q_UNUSED(widget);
 
-    const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
-    bool highlight = mNetPoint.isSelected() || mNetPoint.getNetSignalOfNetSegment().isHighlighted();
+  const bool deviceIsPrinter =
+      (dynamic_cast<QPrinter*>(painter->device()) != 0);
+  bool highlight = mNetPoint.isSelected() ||
+                   mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
-    if (mLayer->isVisible() && mIsVisibleJunction) {
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
-        painter->drawEllipse(sBoundingRect);
-    } else if (mLayer->isVisible() && mIsOpenLineEnd && !deviceIsPrinter) {
-        painter->setPen(QPen(mLayer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawLine(sBoundingRect.topLeft()/2, sBoundingRect.bottomRight()/2);
-        painter->drawLine(sBoundingRect.topRight()/2, sBoundingRect.bottomLeft()/2);
-    }
+  if (mLayer->isVisible() && mIsVisibleJunction) {
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
+    painter->drawEllipse(sBoundingRect);
+  } else if (mLayer->isVisible() && mIsOpenLineEnd && !deviceIsPrinter) {
+    painter->setPen(QPen(mLayer->getColor(highlight), 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawLine(sBoundingRect.topLeft() / 2,
+                      sBoundingRect.bottomRight() / 2);
+    painter->drawLine(sBoundingRect.topRight() / 2,
+                      sBoundingRect.bottomLeft() / 2);
+  }
 
 #ifdef QT_DEBUG
-    GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugInvisibleNetPoints); Q_ASSERT(layer);
-    if ((layer->isVisible()) && (!mIsVisibleJunction))
-    {
-        // draw circle
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawEllipse(sBoundingRect);
-    }
-    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects); Q_ASSERT(layer);
-    if (layer->isVisible())
-    {
-        // draw bounding rect
-        painter->setPen(QPen(layer->getColor(highlight), 0));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(sBoundingRect);
-    }
+  GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugInvisibleNetPoints);
+  Q_ASSERT(layer);
+  if ((layer->isVisible()) && (!mIsVisibleJunction)) {
+    // draw circle
+    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawEllipse(sBoundingRect);
+  }
+  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
+  Q_ASSERT(layer);
+  if (layer->isVisible()) {
+    // draw bounding rect
+    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(sBoundingRect);
+  }
 #endif
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-GraphicsLayer* SGI_NetPoint::getLayer(const QString& name) const noexcept
-{
-    return mNetPoint.getSchematic().getProject().getLayers().getLayer(name);
+GraphicsLayer* SGI_NetPoint::getLayer(const QString& name) const noexcept {
+  return mNetPoint.getSchematic().getProject().getLayers().getLayer(name);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

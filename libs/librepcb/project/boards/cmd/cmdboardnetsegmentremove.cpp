@@ -17,58 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdboardnetsegmentremove.h"
+
 #include "../board.h"
 #include "../items/bi_netsegment.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdBoardNetSegmentRemove::CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept :
-    UndoCommand(tr("Remove net segment")),
-    mBoard(segment.getBoard()), mNetSegment(segment)
-{
+CmdBoardNetSegmentRemove::CmdBoardNetSegmentRemove(
+    BI_NetSegment& segment) noexcept
+  : UndoCommand(tr("Remove net segment")),
+    mBoard(segment.getBoard()),
+    mNetSegment(segment) {
 }
 
-CmdBoardNetSegmentRemove::~CmdBoardNetSegmentRemove() noexcept
-{
+CmdBoardNetSegmentRemove::~CmdBoardNetSegmentRemove() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdBoardNetSegmentRemove::performExecute()
-{
-    performRedo(); // can throw
+bool CmdBoardNetSegmentRemove::performExecute() {
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdBoardNetSegmentRemove::performUndo()
-{
-    mBoard.addNetSegment(mNetSegment); // can throw
+void CmdBoardNetSegmentRemove::performUndo() {
+  mBoard.addNetSegment(mNetSegment);  // can throw
 }
 
-void CmdBoardNetSegmentRemove::performRedo()
-{
-    mBoard.removeNetSegment(mNetSegment); // can throw
+void CmdBoardNetSegmentRemove::performRedo() {
+  mBoard.removeNetSegment(mNetSegment);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

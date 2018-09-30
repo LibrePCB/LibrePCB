@@ -17,63 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "smartsexprfile.h"
+
 #include "fileutils.h"
 #include "sexpression.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartSExprFile::SmartSExprFile(const FilePath& filepath, bool restore, bool readOnly, bool create) :
-    SmartFile(filepath, restore, readOnly, create)
-{
+SmartSExprFile::SmartSExprFile(const FilePath& filepath, bool restore,
+                               bool readOnly, bool create)
+  : SmartFile(filepath, restore, readOnly, create) {
 }
 
-SmartSExprFile::~SmartSExprFile() noexcept
-{
+SmartSExprFile::~SmartSExprFile() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-SExpression SmartSExprFile::parseFileAndBuildDomTree() const
-{
-    return SExpression::parse(FileUtils::readFile(mOpenedFilePath), mOpenedFilePath);
+SExpression SmartSExprFile::parseFileAndBuildDomTree() const {
+  return SExpression::parse(FileUtils::readFile(mOpenedFilePath),
+                            mOpenedFilePath);
 }
 
-void SmartSExprFile::save(const SExpression& domDocument, bool toOriginal)
-{
-    FilePath filepath = prepareSaveAndReturnFilePath(toOriginal); // can throw
-    QString content = domDocument.toString(0); // can throw
-    if (!content.endsWith('\n')) {
-        content.append('\n');
-    }
-    FileUtils::writeFile(filepath, content.toUtf8()); // can throw
-    updateMembersAfterSaving(toOriginal);
+void SmartSExprFile::save(const SExpression& domDocument, bool toOriginal) {
+  FilePath filepath = prepareSaveAndReturnFilePath(toOriginal);  // can throw
+  QString  content  = domDocument.toString(0);                   // can throw
+  if (!content.endsWith('\n')) {
+    content.append('\n');
+  }
+  FileUtils::writeFile(filepath, content.toUtf8());  // can throw
+  updateMembersAfterSaving(toOriginal);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Static Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-SmartSExprFile* SmartSExprFile::create(const FilePath &filepath)
-{
-    return new SmartSExprFile(filepath, false, false, true);
+SmartSExprFile* SmartSExprFile::create(const FilePath& filepath) {
+  return new SmartSExprFile(filepath, false, false, true);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

@@ -20,16 +20,17 @@
 #ifndef LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H
 #define LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/uuid.h>
+ ******************************************************************************/
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
@@ -45,85 +46,90 @@ class BI_Polygon;
 class BI_StrokeText;
 class BI_Hole;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardSelectionQuery
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardSelectionQuery class
  */
-class BoardSelectionQuery final : public QObject
-{
-        Q_OBJECT
+class BoardSelectionQuery final : public QObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardSelectionQuery()                                 = delete;
+  BoardSelectionQuery(const BoardSelectionQuery& other) = delete;
+  BoardSelectionQuery(const QMap<Uuid, BI_Device*>& deviceInstances,
+                      const QList<BI_NetSegment*>&  netsegments,
+                      const QList<BI_Plane*>&       planes,
+                      const QList<BI_Polygon*>&     polygons,
+                      const QList<BI_StrokeText*>&  strokeTexts,
+                      const QList<BI_Hole*>& holes, QObject* parent = nullptr);
+  ~BoardSelectionQuery() noexcept;
 
-        // Constructors / Destructor
-        BoardSelectionQuery() = delete;
-        BoardSelectionQuery(const BoardSelectionQuery& other) = delete;
-        BoardSelectionQuery(const QMap<Uuid, BI_Device*>& deviceInstances,
-                            const QList<BI_NetSegment*>& netsegments,
-                            const QList<BI_Plane*>& planes,
-                            const QList<BI_Polygon*>& polygons,
-                            const QList<BI_StrokeText*>& strokeTexts,
-                            const QList<BI_Hole*>& holes,
-                            QObject* parent = nullptr);
-        ~BoardSelectionQuery() noexcept;
+  // Getters
+  const QSet<BI_Device*>& getDeviceInstances() const noexcept {
+    return mResultDeviceInstances;
+  }
+  const QSet<BI_NetPoint*>& getNetPoints() const noexcept {
+    return mResultNetPoints;
+  }
+  const QSet<BI_NetLine*>& getNetLines() const noexcept {
+    return mResultNetLines;
+  }
+  const QSet<BI_Via*>&     getVias() const noexcept { return mResultVias; }
+  const QSet<BI_Plane*>&   getPlanes() const noexcept { return mResultPlanes; }
+  const QSet<BI_Polygon*>& getPolygons() const noexcept {
+    return mResultPolygons;
+  }
+  const QSet<BI_StrokeText*>& getStrokeTexts() const noexcept {
+    return mResultStrokeTexts;
+  }
+  const QSet<BI_Hole*>& getHoles() const noexcept { return mResultHoles; }
+  int                   getResultCount() const noexcept;
+  bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
-        // Getters
-        const QSet<BI_Device*>& getDeviceInstances() const noexcept { return mResultDeviceInstances; }
-        const QSet<BI_NetPoint*>& getNetPoints() const noexcept { return mResultNetPoints; }
-        const QSet<BI_NetLine*>& getNetLines() const noexcept { return mResultNetLines; }
-        const QSet<BI_Via*>& getVias() const noexcept { return mResultVias; }
-        const QSet<BI_Plane*>& getPlanes() const noexcept { return mResultPlanes; }
-        const QSet<BI_Polygon*>& getPolygons() const noexcept { return mResultPolygons; }
-        const QSet<BI_StrokeText*>& getStrokeTexts() const noexcept { return mResultStrokeTexts; }
-        const QSet<BI_Hole*>& getHoles() const noexcept { return mResultHoles; }
-        int getResultCount() const noexcept;
-        bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
+  // General Methods
+  void addDeviceInstancesOfSelectedFootprints() noexcept;
+  void addSelectedVias() noexcept;
+  void addSelectedNetPoints() noexcept;
+  void addSelectedNetLines() noexcept;
+  void addSelectedPlanes() noexcept;
+  void addSelectedPolygons() noexcept;
+  void addSelectedBoardStrokeTexts() noexcept;
+  void addSelectedFootprintStrokeTexts() noexcept;
+  void addSelectedHoles() noexcept;
+  void addNetPointsOfNetLines() noexcept;
 
-        // General Methods
-        void addDeviceInstancesOfSelectedFootprints() noexcept;
-        void addSelectedVias() noexcept;
-        void addSelectedNetPoints() noexcept;
-        void addSelectedNetLines() noexcept;
-        void addSelectedPlanes() noexcept;
-        void addSelectedPolygons() noexcept;
-        void addSelectedBoardStrokeTexts() noexcept;
-        void addSelectedFootprintStrokeTexts() noexcept;
-        void addSelectedHoles() noexcept;
-        void addNetPointsOfNetLines() noexcept;
+  // Operator Overloadings
+  BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;
 
-        // Operator Overloadings
-        BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;
+private:
+  // references to the Board object
+  const QMap<Uuid, BI_Device*>& mDevices;
+  const QList<BI_NetSegment*>&  mNetSegments;
+  const QList<BI_Plane*>&       mPlanes;
+  const QList<BI_Polygon*>&     mPolygons;
+  const QList<BI_StrokeText*>&  mStrokeTexts;
+  const QList<BI_Hole*>&        mHoles;
 
-
-    private:
-
-        // references to the Board object
-        const QMap<Uuid, BI_Device*>& mDevices;
-        const QList<BI_NetSegment*>& mNetSegments;
-        const QList<BI_Plane*>& mPlanes;
-        const QList<BI_Polygon*>& mPolygons;
-        const QList<BI_StrokeText*>& mStrokeTexts;
-        const QList<BI_Hole*>& mHoles;
-
-        // query result
-        QSet<BI_Device*> mResultDeviceInstances;
-        QSet<BI_NetPoint*> mResultNetPoints;
-        QSet<BI_NetLine*> mResultNetLines;
-        QSet<BI_Via*> mResultVias;
-        QSet<BI_Plane*> mResultPlanes;
-        QSet<BI_Polygon*> mResultPolygons;
-        QSet<BI_StrokeText*> mResultStrokeTexts;
-        QSet<BI_Hole*> mResultHoles;
+  // query result
+  QSet<BI_Device*>     mResultDeviceInstances;
+  QSet<BI_NetPoint*>   mResultNetPoints;
+  QSet<BI_NetLine*>    mResultNetLines;
+  QSet<BI_Via*>        mResultVias;
+  QSet<BI_Plane*>      mResultPlanes;
+  QSet<BI_Polygon*>    mResultPolygons;
+  QSet<BI_StrokeText*> mResultStrokeTexts;
+  QSet<BI_Hole*>       mResultHoles;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H
+#endif  // LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H

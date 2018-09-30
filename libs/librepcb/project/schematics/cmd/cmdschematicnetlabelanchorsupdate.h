@@ -20,61 +20,58 @@
 #ifndef LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H
 #define LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class Schematic;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdSchematicNetLabelAnchorsUpdate
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdSchematicNetLabelAnchorsUpdate class
  *
- * This is just a convenience undo cummand to update all netlabel anchors in a schematic.
+ * This is just a convenience undo cummand to update all netlabel anchors in a
+ * schematic.
  */
-class CmdSchematicNetLabelAnchorsUpdate final : public UndoCommand
-{
-    public:
+class CmdSchematicNetLabelAnchorsUpdate final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdSchematicNetLabelAnchorsUpdate(Schematic& schematic) noexcept;
+  ~CmdSchematicNetLabelAnchorsUpdate() noexcept;
 
-        // Constructors / Destructor
-        CmdSchematicNetLabelAnchorsUpdate(Schematic& schematic) noexcept;
-        ~CmdSchematicNetLabelAnchorsUpdate() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
-
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-        Schematic& mSchematic;
+  // Private Member Variables
+  Schematic& mSchematic;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELANCHORSUPDATE_H

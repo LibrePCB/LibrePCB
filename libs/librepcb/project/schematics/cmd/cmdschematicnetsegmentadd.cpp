@@ -17,71 +17,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdschematicnetsegmentadd.h"
-#include "../schematic.h"
-#include "../items/si_netsegment.h"
 
-/*****************************************************************************************
+#include "../items/si_netsegment.h"
+#include "../schematic.h"
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdSchematicNetSegmentAdd::CmdSchematicNetSegmentAdd(SI_NetSegment& segment) noexcept :
-    UndoCommand(tr("Add net segment")),
-    mSchematic(segment.getSchematic()), mNetSignal(segment.getNetSignal()),
-    mNetSegment(&segment)
-{
+CmdSchematicNetSegmentAdd::CmdSchematicNetSegmentAdd(
+    SI_NetSegment& segment) noexcept
+  : UndoCommand(tr("Add net segment")),
+    mSchematic(segment.getSchematic()),
+    mNetSignal(segment.getNetSignal()),
+    mNetSegment(&segment) {
 }
 
-CmdSchematicNetSegmentAdd::CmdSchematicNetSegmentAdd(Schematic& schematic,
-                                                     NetSignal& netsignal) noexcept :
-    UndoCommand(tr("Add net segment")),
-    mSchematic(schematic), mNetSignal(netsignal), mNetSegment(nullptr)
-{
+CmdSchematicNetSegmentAdd::CmdSchematicNetSegmentAdd(
+    Schematic& schematic, NetSignal& netsignal) noexcept
+  : UndoCommand(tr("Add net segment")),
+    mSchematic(schematic),
+    mNetSignal(netsignal),
+    mNetSegment(nullptr) {
 }
 
-CmdSchematicNetSegmentAdd::~CmdSchematicNetSegmentAdd() noexcept
-{
+CmdSchematicNetSegmentAdd::~CmdSchematicNetSegmentAdd() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdSchematicNetSegmentAdd::performExecute()
-{
-    if (!mNetSegment) {
-        // create new net segment
-        mNetSegment = new SI_NetSegment(mSchematic, mNetSignal); // can throw
-    }
+bool CmdSchematicNetSegmentAdd::performExecute() {
+  if (!mNetSegment) {
+    // create new net segment
+    mNetSegment = new SI_NetSegment(mSchematic, mNetSignal);  // can throw
+  }
 
-    performRedo(); // can throw
+  performRedo();  // can throw
 
-    return true;
+  return true;
 }
 
-void CmdSchematicNetSegmentAdd::performUndo()
-{
-    mSchematic.removeNetSegment(*mNetSegment); // can throw
+void CmdSchematicNetSegmentAdd::performUndo() {
+  mSchematic.removeNetSegment(*mNetSegment);  // can throw
 }
 
-void CmdSchematicNetSegmentAdd::performRedo()
-{
-    mSchematic.addNetSegment(*mNetSegment); // can throw
+void CmdSchematicNetSegmentAdd::performRedo() {
+  mSchematic.addNetSegment(*mNetSegment);  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb

@@ -20,23 +20,25 @@
 #ifndef LIBREPCB_LIBRARY_LIBRARY_H
 #define LIBREPCB_LIBRARY_LIBRARY_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/uuid.h>
+ ******************************************************************************/
 #include "librarybaseelement.h"
 
-/*****************************************************************************************
+#include <librepcb/common/uuid.h>
+
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class Library
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief   The Library class represents a library directory
@@ -44,67 +46,68 @@ namespace library {
  * @author  ubruhin
  * @date    2016-08-03
  */
-class Library final : public LibraryBaseElement
-{
-        Q_OBJECT
+class Library final : public LibraryBaseElement {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  Library()                     = delete;
+  Library(const Library& other) = delete;
+  Library(const Uuid& uuid, const Version& version, const QString& author,
+          const ElementName& name_en_US, const QString& description_en_US,
+          const QString& keywords_en_US);
+  Library(const FilePath& libDir, bool readOnly);
+  ~Library() noexcept;
 
-        // Constructors / Destructor
-        Library() = delete;
-        Library(const Library& other) = delete;
-        Library(const Uuid& uuid, const Version& version, const QString& author,
-                const ElementName& name_en_US, const QString& description_en_US,
-                const QString& keywords_en_US);
-        Library(const FilePath& libDir, bool readOnly);
-        ~Library() noexcept;
+  // Getters
+  template <typename ElementType>
+  FilePath          getElementsDirectory() const noexcept;
+  const QUrl&       getUrl() const noexcept { return mUrl; }
+  const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
+  FilePath          getIconFilePath() const noexcept;
+  const QPixmap&    getIcon() const noexcept { return mIcon; }
 
-        // Getters
-        template <typename ElementType>
-        FilePath getElementsDirectory() const noexcept;
-        const QUrl& getUrl() const noexcept {return mUrl;}
-        const QSet<Uuid>& getDependencies() const noexcept {return mDependencies;}
-        FilePath getIconFilePath() const noexcept;
-        const QPixmap& getIcon() const noexcept {return mIcon;}
+  // Setters
+  void setUrl(const QUrl& url) noexcept { mUrl = url; }
+  void setDependencies(const QSet<Uuid>& deps) noexcept {
+    mDependencies = deps;
+  }
+  void setIconFilePath(const FilePath& png) noexcept;
 
-        // Setters
-        void setUrl(const QUrl& url) noexcept {mUrl = url;}
-        void setDependencies(const QSet<Uuid>& deps) noexcept {mDependencies = deps;}
-        void setIconFilePath(const FilePath& png) noexcept;
+  // General Methods
+  void addDependency(const Uuid& uuid) noexcept;
+  void removeDependency(const Uuid& uuid) noexcept;
+  template <typename ElementType>
+  QList<FilePath> searchForElements() const noexcept;
 
-        // General Methods
-        void addDependency(const Uuid& uuid) noexcept;
-        void removeDependency(const Uuid& uuid) noexcept;
-        template <typename ElementType>
-        QList<FilePath> searchForElements() const noexcept;
+  // Operator Overloadings
+  Library& operator=(const Library& rhs) = delete;
 
-        // Operator Overloadings
-        Library& operator=(const Library& rhs) = delete;
+  // Static Methods
+  static QString getShortElementName() noexcept {
+    return QStringLiteral("lib");
+  }
+  static QString getLongElementName() noexcept {
+    return QStringLiteral("library");
+  }
 
-        // Static Methods
-        static QString getShortElementName() noexcept {return QStringLiteral("lib");}
-        static QString getLongElementName() noexcept {return QStringLiteral("library");}
+private:  // Methods
+  // Private Methods
+  virtual void copyTo(const FilePath& destination, bool removeSource) override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  virtual void serialize(SExpression& root) const override;
 
-
-    private: // Methods
-
-        // Private Methods
-        virtual void copyTo(const FilePath& destination, bool removeSource) override;
-        /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(SExpression& root) const override;
-
-
-    private: // Data
-        QUrl mUrl;
-        QSet<Uuid> mDependencies;
-        QPixmap mIcon;
+private:  // Data
+  QUrl       mUrl;
+  QSet<Uuid> mDependencies;
+  QPixmap    mIcon;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
-} // namespace librepcb
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_LIBRARY_H
+#endif  // LIBREPCB_LIBRARY_LIBRARY_H

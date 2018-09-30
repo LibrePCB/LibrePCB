@@ -20,18 +20,20 @@
 #ifndef LIBREPCB_PROJECT_BI_POLYGON_H
 #define LIBREPCB_PROJECT_BI_POLYGON_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "bi_base.h"
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/graphics/graphicslayername.h>
-#include <librepcb/common/fileio/serializableobject.h>
 
-/*****************************************************************************************
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/graphics/graphicslayername.h>
+#include <librepcb/common/uuid.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class Path;
@@ -44,9 +46,9 @@ class Project;
 class Board;
 class BGI_Polygon;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BI_Polygon
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BI_Polygon class
@@ -54,65 +56,65 @@ class BGI_Polygon;
  * @author ubruhin
  * @date 2016-01-12
  */
-class BI_Polygon final : public BI_Base, public SerializableObject
-{
-        Q_OBJECT
+class BI_Polygon final : public BI_Base, public SerializableObject {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BI_Polygon()                        = delete;
+  BI_Polygon(const BI_Polygon& other) = delete;
+  BI_Polygon(Board& board, const BI_Polygon& other);
+  BI_Polygon(Board& board, const SExpression& node);
+  BI_Polygon(Board& board, const Polygon& polygon);
+  BI_Polygon(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
+             const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
+             const Path& path);
+  ~BI_Polygon() noexcept;
 
-        // Constructors / Destructor
-        BI_Polygon() = delete;
-        BI_Polygon(const BI_Polygon& other) = delete;
-        BI_Polygon(Board& board, const BI_Polygon& other);
-        BI_Polygon(Board& board, const SExpression& node);
-        BI_Polygon(Board& board, const Polygon& polygon);
-        BI_Polygon(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
-                   const UnsignedLength& lineWidth, bool fill, bool isGrabArea, const Path& path);
-        ~BI_Polygon() noexcept;
+  // Getters
+  Polygon&       getPolygon() noexcept { return *mPolygon; }
+  const Polygon& getPolygon() const noexcept { return *mPolygon; }
+  const Uuid&    getUuid() const
+      noexcept;  // convenience function, e.g. for template usage
+  bool isSelectable() const noexcept override;
 
-        // Getters
-        Polygon& getPolygon() noexcept {return *mPolygon;}
-        const Polygon& getPolygon() const noexcept {return *mPolygon;}
-        const Uuid& getUuid() const noexcept; // convenience function, e.g. for template usage
-        bool isSelectable() const noexcept override;
+  // General Methods
+  void addToBoard() override;
+  void removeFromBoard() override;
 
-        // General Methods
-        void addToBoard() override;
-        void removeFromBoard() override;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Inherited from BI_Base
+  Type_t getType() const noexcept override { return BI_Base::Type_t::Polygon; }
+  const Point& getPosition() const noexcept override {
+    static Point p(0, 0);
+    return p;
+  }
+  bool         getIsMirrored() const noexcept override { return false; }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void         setSelected(bool selected) noexcept override;
 
-        // Inherited from BI_Base
-        Type_t getType() const noexcept override {return BI_Base::Type_t::Polygon;}
-        const Point& getPosition() const noexcept override {static Point p(0, 0); return p;}
-        bool getIsMirrored() const noexcept override {return false;}
-        QPainterPath getGrabAreaScenePx() const noexcept override;
-        void setSelected(bool selected) noexcept override;
+  // Operator Overloadings
+  BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
 
-        // Operator Overloadings
-        BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
+private slots:
 
+  void boardAttributesChanged();
 
-    private slots:
+private:
+  void init();
 
-        void boardAttributesChanged();
-
-
-    private:
-        void init();
-
-
-        // General
-        QScopedPointer<Polygon> mPolygon;
-        QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
+  // General
+  QScopedPointer<Polygon>             mPolygon;
+  QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_BI_POLYGON_H
+#endif  // LIBREPCB_PROJECT_BI_POLYGON_H

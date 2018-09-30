@@ -20,15 +20,15 @@
 #ifndef LIBREPCB_CIRCLEPROPERTIESDIALOG_H
 #define LIBREPCB_CIRCLEPROPERTIESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class UndoStack;
@@ -39,48 +39,45 @@ namespace Ui {
 class CirclePropertiesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CirclePropertiesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CirclePropertiesDialog class
  */
-class CirclePropertiesDialog final : public QDialog
-{
-        Q_OBJECT
+class CirclePropertiesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  CirclePropertiesDialog()                                    = delete;
+  CirclePropertiesDialog(const CirclePropertiesDialog& other) = delete;
+  CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
+                         QList<GraphicsLayer*> layers,
+                         QWidget*              parent = nullptr) noexcept;
+  ~CirclePropertiesDialog() noexcept;
 
-        // Constructors / Destructor
-        CirclePropertiesDialog() = delete;
-        CirclePropertiesDialog(const CirclePropertiesDialog& other) = delete;
-        CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
-                                QList<GraphicsLayer*> layers, QWidget* parent = nullptr) noexcept;
-        ~CirclePropertiesDialog() noexcept;
+  // Operator Overloadings
+  CirclePropertiesDialog& operator=(const CirclePropertiesDialog& rhs) = delete;
 
-        // Operator Overloadings
-        CirclePropertiesDialog& operator=(const CirclePropertiesDialog& rhs) = delete;
+private:  // GUI Events
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
 
+private:  // Methods
+  bool applyChanges() noexcept;
+  void selectLayerNameInCombobox(const QString& name) noexcept;
 
-    private: // GUI Events
-        void buttonBoxClicked(QAbstractButton* button) noexcept;
-
-    private: // Methods
-        bool applyChanges() noexcept;
-        void selectLayerNameInCombobox(const QString& name) noexcept;
-
-
-    private: // Data
-        Circle& mCircle;
-        UndoStack& mUndoStack;
-        QScopedPointer<Ui::CirclePropertiesDialog> mUi;
+private:  // Data
+  Circle&                                    mCircle;
+  UndoStack&                                 mUndoStack;
+  QScopedPointer<Ui::CirclePropertiesDialog> mUi;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_CIRCLEPROPERTIESDIALOG_H
+#endif  // LIBREPCB_CIRCLEPROPERTIESDIALOG_H

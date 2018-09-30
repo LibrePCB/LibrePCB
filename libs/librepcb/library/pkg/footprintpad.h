@@ -20,161 +20,193 @@
 #ifndef LIBREPCB_LIBRARY_FOOTPRINTPAD_H
 #define LIBREPCB_LIBRARY_FOOTPRINTPAD_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
-#include <librepcb/common/fileio/serializableobjectlist.h>
+ ******************************************************************************/
 #include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/geometry/path.h>
+#include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 
 class FootprintPadGraphicsItem;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FootprintPad
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The FootprintPad class represents a pad of a footprint
  */
-class FootprintPad final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(FootprintPad)
+class FootprintPad final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(FootprintPad)
 
-    public:
+public:
+  // Types
+  enum class Shape { ROUND, RECT, OCTAGON };
+  enum class BoardSide { TOP, BOTTOM, THT };
 
-        // Types
-        enum class Shape { ROUND, RECT, OCTAGON };
-        enum class BoardSide { TOP, BOTTOM, THT };
+  // Constructors / Destructor
+  FootprintPad() = delete;
+  FootprintPad(const FootprintPad& other) noexcept;
+  FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
+               Shape shape, const PositiveLength& width,
+               const PositiveLength& height,
+               const UnsignedLength& drillDiameter, BoardSide side) noexcept;
+  explicit FootprintPad(const SExpression& node);
+  ~FootprintPad() noexcept;
 
-        // Constructors / Destructor
-        FootprintPad() = delete;
-        FootprintPad(const FootprintPad& other) noexcept;
-        FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
-                     Shape shape, const PositiveLength& width, const PositiveLength& height,
-                     const UnsignedLength& drillDiameter, BoardSide side) noexcept;
-        explicit FootprintPad(const SExpression& node);
-        ~FootprintPad() noexcept;
+  // Getters
+  const Uuid& getUuid() const noexcept {
+    return getPackagePadUuid();
+  }  // for SerializableObjectList
+  const Uuid&  getPackagePadUuid() const noexcept { return mPackagePadUuid; }
+  const Point& getPosition() const noexcept { return mPosition; }
+  const Angle& getRotation() const noexcept { return mRotation; }
+  Shape        getShape() const noexcept { return mShape; }
+  const PositiveLength& getWidth() const noexcept { return mWidth; }
+  const PositiveLength& getHeight() const noexcept { return mHeight; }
+  const UnsignedLength& getDrillDiameter() const noexcept {
+    return mDrillDiameter;
+  }
+  BoardSide    getBoardSide() const noexcept { return mBoardSide; }
+  QString      getLayerName() const noexcept;
+  bool         isOnLayer(const QString& name) const noexcept;
+  Path         getOutline(const Length& expansion = Length(0)) const noexcept;
+  QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const
+      noexcept;
 
-        // Getters
-        const Uuid& getUuid() const noexcept {return getPackagePadUuid();} // for SerializableObjectList
-        const Uuid& getPackagePadUuid() const noexcept {return mPackagePadUuid;}
-        const Point& getPosition() const noexcept {return mPosition;}
-        const Angle& getRotation() const noexcept {return mRotation;}
-        Shape getShape() const noexcept {return mShape;}
-        const PositiveLength& getWidth() const noexcept {return mWidth;}
-        const PositiveLength& getHeight() const noexcept {return mHeight;}
-        const UnsignedLength& getDrillDiameter() const noexcept {return mDrillDiameter;}
-        BoardSide getBoardSide() const noexcept {return mBoardSide;}
-        QString getLayerName() const noexcept;
-        bool isOnLayer(const QString& name) const noexcept;
-        Path getOutline(const Length& expansion = Length(0)) const noexcept;
-        QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const noexcept;
+  // Setters
+  void setPackagePadUuid(const Uuid& pad) noexcept;
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+  void setShape(Shape shape) noexcept;
+  void setWidth(const PositiveLength& width) noexcept;
+  void setHeight(const PositiveLength& height) noexcept;
+  void setDrillDiameter(const UnsignedLength& diameter) noexcept;
+  void setBoardSide(BoardSide side) noexcept;
 
-        // Setters
-        void setPackagePadUuid(const Uuid& pad) noexcept;
-        void setPosition(const Point& pos) noexcept;
-        void setRotation(const Angle& rot) noexcept;
-        void setShape(Shape shape) noexcept;
-        void setWidth(const PositiveLength& width) noexcept;
-        void setHeight(const PositiveLength& height) noexcept;
-        void setDrillDiameter(const UnsignedLength& diameter) noexcept;
-        void setBoardSide(BoardSide side) noexcept;
+  // General Methods
+  void registerGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
+  void unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
 
-        // General Methods
-        void registerGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
-        void unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  virtual void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        virtual void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  bool operator==(const FootprintPad& rhs) const noexcept;
+  bool operator!=(const FootprintPad& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  FootprintPad& operator=(const FootprintPad& rhs) noexcept;
 
-        // Operator Overloadings
-        bool operator==(const FootprintPad& rhs) const noexcept;
-        bool operator!=(const FootprintPad& rhs) const noexcept {return !(*this == rhs);}
-        FootprintPad& operator=(const FootprintPad& rhs) noexcept;
-
-
-    protected: // Data
-        Uuid mPackagePadUuid;
-        Point mPosition;
-        Angle mRotation;
-        Shape mShape;
-        PositiveLength mWidth;
-        PositiveLength mHeight;
-        UnsignedLength mDrillDiameter; // no effect if BoardSide != THT!
-        BoardSide mBoardSide;
-        FootprintPadGraphicsItem* mRegisteredGraphicsItem;
+protected:  // Data
+  Uuid                      mPackagePadUuid;
+  Point                     mPosition;
+  Angle                     mRotation;
+  Shape                     mShape;
+  PositiveLength            mWidth;
+  PositiveLength            mHeight;
+  UnsignedLength            mDrillDiameter;  // no effect if BoardSide != THT!
+  BoardSide                 mBoardSide;
+  FootprintPadGraphicsItem* mRegisteredGraphicsItem;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class FootprintPadList
- ****************************************************************************************/
+ ******************************************************************************/
 
-struct FootprintPadListNameProvider {static constexpr const char* tagname = "pad";};
-using FootprintPadList = SerializableObjectList<FootprintPad, FootprintPadListNameProvider>;
-using CmdFootprintPadInsert = CmdListElementInsert<FootprintPad, FootprintPadListNameProvider>;
-using CmdFootprintPadRemove = CmdListElementRemove<FootprintPad, FootprintPadListNameProvider>;
-using CmdFootprintPadsSwap = CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider>;
+struct FootprintPadListNameProvider {
+  static constexpr const char* tagname = "pad";
+};
+using FootprintPadList =
+    SerializableObjectList<FootprintPad, FootprintPadListNameProvider>;
+using CmdFootprintPadInsert =
+    CmdListElementInsert<FootprintPad, FootprintPadListNameProvider>;
+using CmdFootprintPadRemove =
+    CmdListElementRemove<FootprintPad, FootprintPadListNameProvider>;
+using CmdFootprintPadsSwap =
+    CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Non-Member Functions
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace library
+}  // namespace library
 
 template <>
-inline SExpression serializeToSExpression(const library::FootprintPad::BoardSide& obj) {
-    switch (obj) {
-        case library::FootprintPad::BoardSide::TOP:    return SExpression::createToken("top");
-        case library::FootprintPad::BoardSide::BOTTOM: return SExpression::createToken("bottom");
-        case library::FootprintPad::BoardSide::THT:    return SExpression::createToken("tht");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+inline SExpression serializeToSExpression(
+    const library::FootprintPad::BoardSide& obj) {
+  switch (obj) {
+    case library::FootprintPad::BoardSide::TOP:
+      return SExpression::createToken("top");
+    case library::FootprintPad::BoardSide::BOTTOM:
+      return SExpression::createToken("bottom");
+    case library::FootprintPad::BoardSide::THT:
+      return SExpression::createToken("tht");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline library::FootprintPad::BoardSide deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == QLatin1String("top"))      return library::FootprintPad::BoardSide::TOP;
-    else if (str == QLatin1String("bottom"))   return library::FootprintPad::BoardSide::BOTTOM;
-    else if (str == QLatin1String("tht"))      return library::FootprintPad::BoardSide::THT;
-    else throw RuntimeError(__FILE__, __LINE__, str);
+inline library::FootprintPad::BoardSide deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == QLatin1String("top"))
+    return library::FootprintPad::BoardSide::TOP;
+  else if (str == QLatin1String("bottom"))
+    return library::FootprintPad::BoardSide::BOTTOM;
+  else if (str == QLatin1String("tht"))
+    return library::FootprintPad::BoardSide::THT;
+  else
+    throw RuntimeError(__FILE__, __LINE__, str);
 }
 
 template <>
-inline SExpression serializeToSExpression(const library::FootprintPad::Shape& obj) {
-    switch (obj) {
-        case library::FootprintPad::Shape::ROUND:   return SExpression::createToken("round");
-        case library::FootprintPad::Shape::RECT:    return SExpression::createToken("rect");
-        case library::FootprintPad::Shape::OCTAGON: return SExpression::createToken("octagon");
-        default: throw LogicError(__FILE__, __LINE__);
-    }
+inline SExpression serializeToSExpression(
+    const library::FootprintPad::Shape& obj) {
+  switch (obj) {
+    case library::FootprintPad::Shape::ROUND:
+      return SExpression::createToken("round");
+    case library::FootprintPad::Shape::RECT:
+      return SExpression::createToken("rect");
+    case library::FootprintPad::Shape::OCTAGON:
+      return SExpression::createToken("octagon");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 template <>
-inline library::FootprintPad::Shape deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-    QString str = sexpr.getStringOrToken(throwIfEmpty);
-    if      (str == QLatin1String("round"))   return library::FootprintPad::Shape::ROUND;
-    else if (str == QLatin1String("rect"))    return library::FootprintPad::Shape::RECT;
-    else if (str == QLatin1String("octagon")) return library::FootprintPad::Shape::OCTAGON;
-    else throw RuntimeError(__FILE__, __LINE__, str);
+inline library::FootprintPad::Shape deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == QLatin1String("round"))
+    return library::FootprintPad::Shape::ROUND;
+  else if (str == QLatin1String("rect"))
+    return library::FootprintPad::Shape::RECT;
+  else if (str == QLatin1String("octagon"))
+    return library::FootprintPad::Shape::OCTAGON;
+  else
+    throw RuntimeError(__FILE__, __LINE__, str);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_FOOTPRINTPAD_H
+#endif  // LIBREPCB_LIBRARY_FOOTPRINTPAD_H

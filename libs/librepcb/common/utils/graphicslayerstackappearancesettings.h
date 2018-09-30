@@ -20,22 +20,23 @@
 #ifndef LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
 #define LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "../fileio/serializableobject.h"
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class GraphicsLayerStackAppearanceSettings
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The GraphicsLayerStackAppearanceSettings class
@@ -43,37 +44,38 @@ class IF_GraphicsLayerProvider;
  * @author ubruhin
  * @date 2017-07-31
  */
-class GraphicsLayerStackAppearanceSettings final : public SerializableObject
-{
-        Q_DECLARE_TR_FUNCTIONS(GraphicsLayerStackAppearanceSettings)
+class GraphicsLayerStackAppearanceSettings final : public SerializableObject {
+  Q_DECLARE_TR_FUNCTIONS(GraphicsLayerStackAppearanceSettings)
 
-    public:
+public:
+  // Constructors / Destructor
+  GraphicsLayerStackAppearanceSettings() noexcept = delete;
+  GraphicsLayerStackAppearanceSettings(
+      const GraphicsLayerStackAppearanceSettings& other) = delete;
+  explicit GraphicsLayerStackAppearanceSettings(
+      IF_GraphicsLayerProvider& layers) noexcept;
+  GraphicsLayerStackAppearanceSettings(
+      IF_GraphicsLayerProvider&                   layers,
+      const GraphicsLayerStackAppearanceSettings& other) noexcept;
+  GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
+                                       const SExpression&        node);
+  ~GraphicsLayerStackAppearanceSettings() noexcept;
 
-        // Constructors / Destructor
-        GraphicsLayerStackAppearanceSettings() noexcept = delete;
-        GraphicsLayerStackAppearanceSettings(const GraphicsLayerStackAppearanceSettings& other) = delete;
-        explicit GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers) noexcept;
-        GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
-                                             const GraphicsLayerStackAppearanceSettings& other) noexcept;
-        GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
-                                             const SExpression& node);
-        ~GraphicsLayerStackAppearanceSettings() noexcept;
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-        /// @copydoc librepcb::SerializableObject::serialize()
-        void serialize(SExpression& root) const override;
+  // Operator Overloadings
+  GraphicsLayerStackAppearanceSettings& operator=(
+      const GraphicsLayerStackAppearanceSettings& rhs) noexcept;
 
-        // Operator Overloadings
-        GraphicsLayerStackAppearanceSettings& operator=(const GraphicsLayerStackAppearanceSettings& rhs) noexcept;
-
-
-    private: // Data
-        IF_GraphicsLayerProvider& mLayers;
+private:  // Data
+  IF_GraphicsLayerProvider& mLayers;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#endif  // LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H

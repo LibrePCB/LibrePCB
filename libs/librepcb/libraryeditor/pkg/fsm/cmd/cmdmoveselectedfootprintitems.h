@@ -20,17 +20,19 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
 #define LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+ ******************************************************************************/
 #include "../packageeditorstate.h"
 
-/*****************************************************************************************
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/all_length_units.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class CmdCircleEdit;
@@ -44,9 +46,9 @@ class CmdFootprintPadEdit;
 
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdMoveSelectedFootprintItems
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdMoveSelectedFootprintItems class
@@ -54,53 +56,50 @@ namespace editor {
  * @author  ubruhin
  * @date    2017-05-28
  */
-class CmdMoveSelectedFootprintItems final : public UndoCommandGroup
-{
-    public:
+class CmdMoveSelectedFootprintItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdMoveSelectedFootprintItems() = delete;
+  CmdMoveSelectedFootprintItems(const CmdMoveSelectedFootprintItems& other) =
+      delete;
+  CmdMoveSelectedFootprintItems(const PackageEditorState::Context& context,
+                                const Point& startPos) noexcept;
+  ~CmdMoveSelectedFootprintItems() noexcept;
 
-        // Constructors / Destructor
-        CmdMoveSelectedFootprintItems() = delete;
-        CmdMoveSelectedFootprintItems(const CmdMoveSelectedFootprintItems& other) = delete;
-        CmdMoveSelectedFootprintItems(const PackageEditorState::Context& context,
-                                      const Point& startPos) noexcept;
-        ~CmdMoveSelectedFootprintItems() noexcept;
+  // General Methods
+  void setCurrentPosition(const Point& pos) noexcept;
 
-        // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
+  // Operator Overloadings
+  CmdMoveSelectedFootprintItems& operator       =(
+      const CmdMoveSelectedFootprintItems& rhs) = delete;
 
-        // Operator Overloadings
-        CmdMoveSelectedFootprintItems& operator=(const CmdMoveSelectedFootprintItems& rhs) = delete;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  void deleteAllCommands() noexcept;
 
-        // Private Methods
+  // Private Member Variables
+  const PackageEditorState::Context& mContext;
+  Point                              mStartPos;
+  Point                              mDeltaPos;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
-
-        void deleteAllCommands() noexcept;
-
-
-        // Private Member Variables
-        const PackageEditorState::Context& mContext;
-        Point mStartPos;
-        Point mDeltaPos;
-
-        // Move commands
-        QList<CmdFootprintPadEdit*> mPadEditCmds;
-        QList<CmdCircleEdit*> mCircleEditCmds;
-        QList<CmdPolygonEdit*> mPolygonEditCmds;
-        QList<CmdStrokeTextEdit*> mTextEditCmds;
-        QList<CmdHoleEdit*> mHoleEditCmds;
+  // Move commands
+  QList<CmdFootprintPadEdit*> mPadEditCmds;
+  QList<CmdCircleEdit*>       mCircleEditCmds;
+  QList<CmdPolygonEdit*>      mPolygonEditCmds;
+  QList<CmdStrokeTextEdit*>   mTextEditCmds;
+  QList<CmdHoleEdit*>         mHoleEditCmds;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H

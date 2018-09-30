@@ -17,77 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "signalrolecombobox.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-SignalRoleComboBox::SignalRoleComboBox(QWidget* parent) noexcept :
-    QWidget(parent), mComboBox(new QComboBox(this))
-{
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mComboBox);
+SignalRoleComboBox::SignalRoleComboBox(QWidget* parent) noexcept
+  : QWidget(parent), mComboBox(new QComboBox(this)) {
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(mComboBox);
 
-    foreach (const SignalRole& role, SignalRole::getAllRoles()) {
-        mComboBox->addItem(role.getNameTr());
-    }
-    mComboBox->setCurrentIndex(0);
-    connect(mComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &SignalRoleComboBox::currentIndexChanged);
+  foreach (const SignalRole& role, SignalRole::getAllRoles()) {
+    mComboBox->addItem(role.getNameTr());
+  }
+  mComboBox->setCurrentIndex(0);
+  connect(
+      mComboBox,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &SignalRoleComboBox::currentIndexChanged);
 }
 
-SignalRoleComboBox::~SignalRoleComboBox() noexcept
-{
+SignalRoleComboBox::~SignalRoleComboBox() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Getters
- ****************************************************************************************/
+ ******************************************************************************/
 
-SignalRole SignalRoleComboBox::getCurrentItem() const noexcept
-{
-    int index = mComboBox->currentIndex();
-    Q_ASSERT(index >= 0);
-    Q_ASSERT(index < SignalRole::getAllRoles().count());
-    return SignalRole::getAllRoles().value(index);
+SignalRole SignalRoleComboBox::getCurrentItem() const noexcept {
+  int index = mComboBox->currentIndex();
+  Q_ASSERT(index >= 0);
+  Q_ASSERT(index < SignalRole::getAllRoles().count());
+  return SignalRole::getAllRoles().value(index);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SignalRoleComboBox::setCurrentItem(const SignalRole& role) noexcept
-{
-    int index = SignalRole::getAllRoles().indexOf(role);
-    Q_ASSERT(index >= 0);
-    Q_ASSERT(index < SignalRole::getAllRoles().count());
-    mComboBox->setCurrentIndex(index);
+void SignalRoleComboBox::setCurrentItem(const SignalRole& role) noexcept {
+  int index = SignalRole::getAllRoles().indexOf(role);
+  Q_ASSERT(index >= 0);
+  Q_ASSERT(index < SignalRole::getAllRoles().count());
+  mComboBox->setCurrentIndex(index);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-void SignalRoleComboBox::currentIndexChanged(int index) noexcept
-{
-    Q_UNUSED(index);
-    emit currentItemChanged(getCurrentItem());
+void SignalRoleComboBox::currentIndexChanged(int index) noexcept {
+  Q_UNUSED(index);
+  emit currentItemChanged(getCurrentItem());
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb

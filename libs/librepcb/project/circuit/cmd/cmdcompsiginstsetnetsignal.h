@@ -20,67 +20,63 @@
 #ifndef LIBREPCB_PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H
 #define LIBREPCB_PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <librepcb/common/undocommand.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 
 class ComponentSignalInstance;
 class NetSignal;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class CmdCompSigInstSetNetSignal
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The CmdCompSigInstSetNetSignal class
  */
-class CmdCompSigInstSetNetSignal final : public UndoCommand
-{
-    public:
+class CmdCompSigInstSetNetSignal final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
+                             NetSignal*               netsignal) noexcept;
+  ~CmdCompSigInstSetNetSignal() noexcept;
 
-        // Constructors / Destructor
-        CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
-                                   NetSignal* netsignal) noexcept;
-        ~CmdCompSigInstSetNetSignal() noexcept;
+private:
+  // Private Methods
 
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-    private:
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
 
-        // Private Methods
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
-        /// @copydoc UndoCommand::performExecute()
-        bool performExecute() override;
+  // Private Member Variables
 
-        /// @copydoc UndoCommand::performUndo()
-        void performUndo() override;
+  // Attributes from the constructor
+  ComponentSignalInstance& mComponentSignalInstance;
+  NetSignal*               mNetSignal;
 
-        /// @copydoc UndoCommand::performRedo()
-        void performRedo() override;
-
-
-        // Private Member Variables
-
-        // Attributes from the constructor
-        ComponentSignalInstance& mComponentSignalInstance;
-        NetSignal* mNetSignal;
-
-        // General Attributes
-        NetSignal* mOldNetSignal;
+  // General Attributes
+  NetSignal* mOldNetSignal;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace project
-} // namespace librepcb
+}  // namespace project
+}  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H
+#endif  // LIBREPCB_PROJECT_CMDCOMPSIGINSTSETNETSIGNAL_H

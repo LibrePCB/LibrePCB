@@ -17,121 +17,131 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include "cmdchangenetsignalofschematicnetsegment.h"
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentedit.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
+
 #include "cmdcombinenetsignals.h"
 #include "cmdremoveboarditems.h"
 
-/*****************************************************************************************
+#include <librepcb/common/scopeguard.h>
+#include <librepcb/project/boards/items/bi_footprintpad.h>
+#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
+#include <librepcb/project/circuit/componentsignalinstance.h>
+#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentedit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
+#include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/project/schematics/items/si_symbolpin.h>
+
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
-CmdChangeNetSignalOfSchematicNetSegment::CmdChangeNetSignalOfSchematicNetSegment(
-        SI_NetSegment& seg, NetSignal& newSig) noexcept :
-    UndoCommandGroup(tr("Change netsignal of netsegment")),
-    mNetSegment(seg), mNewNetSignal(newSig)
-{
+CmdChangeNetSignalOfSchematicNetSegment::
+    CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg,
+                                            NetSignal&     newSig) noexcept
+  : UndoCommandGroup(tr("Change netsignal of netsegment")),
+    mNetSegment(seg),
+    mNewNetSignal(newSig) {
 }
 
-CmdChangeNetSignalOfSchematicNetSegment::~CmdChangeNetSignalOfSchematicNetSegment() noexcept
-{
+CmdChangeNetSignalOfSchematicNetSegment::
+    ~CmdChangeNetSignalOfSchematicNetSegment() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Inherited from UndoCommand
- ****************************************************************************************/
+ ******************************************************************************/
 
-bool CmdChangeNetSignalOfSchematicNetSegment::performExecute()
-{
-    // if an error occurs, undo all already executed child commands
-    auto undoScopeGuard = scopeGuard([&](){performUndo();});
+bool CmdChangeNetSignalOfSchematicNetSegment::performExecute() {
+  // if an error occurs, undo all already executed child commands
+  auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
-    if (mNewNetSignal == mNetSegment.getNetSignal()) {
-        // nothing to do, the netsignal is already correct
-        undoScopeGuard.dismiss();
-        return false;
-    } else if (mNetSegment.getNetSignal().getSchematicNetSegments().count() == 1) {
-        // this netsegment is the only one in its netsignal,
-        // we just need to combine both netsignals
-        Circuit& circuit = mNetSegment.getCircuit();
-        NetSignal& toBeRemoved = mNetSegment.getNetSignal();
-        NetSignal& result = mNewNetSignal;
-        execNewChildCmd(new CmdCombineNetSignals(circuit, toBeRemoved, result)); // can throw
-    } else {
-        // there are still some other netsegments with the same netsignal
-        Q_ASSERT(mNetSegment.getNetSignal().getSchematicNetSegments().count() > 1);
-        changeNetSignalOfNetSegment(); // can throw
-    }
+  if (mNewNetSignal == mNetSegment.getNetSignal()) {
+    // nothing to do, the netsignal is already correct
+    undoScopeGuard.dismiss();
+    return false;
+  } else if (mNetSegment.getNetSignal().getSchematicNetSegments().count() ==
+             1) {
+    // this netsegment is the only one in its netsignal,
+    // we just need to combine both netsignals
+    Circuit&   circuit     = mNetSegment.getCircuit();
+    NetSignal& toBeRemoved = mNetSegment.getNetSignal();
+    NetSignal& result      = mNewNetSignal;
+    execNewChildCmd(
+        new CmdCombineNetSignals(circuit, toBeRemoved, result));  // can throw
+  } else {
+    // there are still some other netsegments with the same netsignal
+    Q_ASSERT(mNetSegment.getNetSignal().getSchematicNetSegments().count() > 1);
+    changeNetSignalOfNetSegment();  // can throw
+  }
 
-    undoScopeGuard.dismiss(); // no undo required
-    return true;
+  undoScopeGuard.dismiss();  // no undo required
+  return true;
 }
 
-void CmdChangeNetSignalOfSchematicNetSegment::changeNetSignalOfNetSegment()
-{
-    // memorize pins of netsegment
-    QSet<SI_SymbolPin*> pins = mNetSegment.getAllConnectedPins();
+void CmdChangeNetSignalOfSchematicNetSegment::changeNetSignalOfNetSegment() {
+  // memorize pins of netsegment
+  QSet<SI_SymbolPin*> pins = mNetSegment.getAllConnectedPins();
 
-    // remove netsegment
-    execNewChildCmd(new CmdSchematicNetSegmentRemove(mNetSegment)); // can throw
+  // remove netsegment
+  execNewChildCmd(new CmdSchematicNetSegmentRemove(mNetSegment));  // can throw
 
-    // set netsignal of netsegment
-    CmdSchematicNetSegmentEdit* cmd = new CmdSchematicNetSegmentEdit(mNetSegment);
-    cmd->setNetSignal(mNewNetSignal);
-    execNewChildCmd(cmd); // can throw
+  // set netsignal of netsegment
+  CmdSchematicNetSegmentEdit* cmd = new CmdSchematicNetSegmentEdit(mNetSegment);
+  cmd->setNetSignal(mNewNetSignal);
+  execNewChildCmd(cmd);  // can throw
 
-    // change netsignal of all connected symbol pins (resp. their component signals)
-    foreach (SI_SymbolPin* pin, pins) { Q_ASSERT(pin);
-        ComponentSignalInstance* sig = pin->getComponentSignalInstance();
-        if (sig) { updateCompSigInstNetSignal(*sig); }
+  // change netsignal of all connected symbol pins (resp. their component
+  // signals)
+  foreach (SI_SymbolPin* pin, pins) {
+    Q_ASSERT(pin);
+    ComponentSignalInstance* sig = pin->getComponentSignalInstance();
+    if (sig) {
+      updateCompSigInstNetSignal(*sig);
     }
+  }
 
-    // re-add netsegment
-    execNewChildCmd(new CmdSchematicNetSegmentAdd(mNetSegment)); // can throw
+  // re-add netsegment
+  execNewChildCmd(new CmdSchematicNetSegmentAdd(mNetSegment));  // can throw
 }
 
-void CmdChangeNetSignalOfSchematicNetSegment::updateCompSigInstNetSignal(ComponentSignalInstance& cmpSig)
-{
-    // disconnect traces from pads in all boards
-    QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
-    foreach (BI_FootprintPad* pad, cmpSig.getRegisteredFootprintPads()) {
-        Q_ASSERT(pad && pad->isAddedToBoard());
-        boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
-    }
-    for (auto it = boardNetLinesToRemove.constBegin(); it != boardNetLinesToRemove.constEnd(); ++it) {
-        QScopedPointer<CmdRemoveBoardItems> cmd(new CmdRemoveBoardItems(*it.key()));
-        cmd->removeNetLines(it.value());
-        execNewChildCmd(cmd.take()); // can throw
-    }
+void CmdChangeNetSignalOfSchematicNetSegment::updateCompSigInstNetSignal(
+    ComponentSignalInstance& cmpSig) {
+  // disconnect traces from pads in all boards
+  QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
+  foreach (BI_FootprintPad* pad, cmpSig.getRegisteredFootprintPads()) {
+    Q_ASSERT(pad && pad->isAddedToBoard());
+    boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
+  }
+  for (auto it = boardNetLinesToRemove.constBegin();
+       it != boardNetLinesToRemove.constEnd(); ++it) {
+    QScopedPointer<CmdRemoveBoardItems> cmd(new CmdRemoveBoardItems(*it.key()));
+    cmd->removeNetLines(it.value());
+    execNewChildCmd(cmd.take());  // can throw
+  }
 
-    // change netsignal of component signal instance
-    execNewChildCmd(new CmdCompSigInstSetNetSignal(cmpSig, &mNewNetSignal)); // can throw
+  // change netsignal of component signal instance
+  execNewChildCmd(
+      new CmdCompSigInstSetNetSignal(cmpSig, &mNewNetSignal));  // can throw
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace project
-} // namespace librepcb
+}  // namespace editor
+}  // namespace project
+}  // namespace librepcb

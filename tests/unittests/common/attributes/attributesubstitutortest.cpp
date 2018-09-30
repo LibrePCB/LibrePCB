@@ -17,57 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
+ ******************************************************************************/
 
-#include <QtCore>
-#include <gtest/gtest.h>
 #include "attributeproviderdummy.h"
+
+#include <gtest/gtest.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data Type
- ****************************************************************************************/
+ ******************************************************************************/
 
 typedef struct {
-    const QString input;
-    const QString output;
+  const QString input;
+  const QString output;
 } AttributeSubstitutorTestData;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class AttributeSubstitutorTest : public ::testing::TestWithParam<AttributeSubstitutorTestData>
-{
-};
+class AttributeSubstitutorTest
+  : public ::testing::TestWithParam<AttributeSubstitutorTestData> {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_P(AttributeSubstitutorTest, testData)
-{
-    const AttributeSubstitutorTestData& data = GetParam();
+TEST_P(AttributeSubstitutorTest, testData) {
+  const AttributeSubstitutorTestData& data = GetParam();
 
-    AttributeProviderDummy ap;
-    QString output = AttributeSubstitutor::substitute(data.input, &ap);
-    EXPECT_EQ(data.output, output) << "Actual value: '" << qPrintable(output) << "'";
+  AttributeProviderDummy ap;
+  QString output = AttributeSubstitutor::substitute(data.input, &ap);
+  EXPECT_EQ(data.output, output)
+      << "Actual value: '" << qPrintable(output) << "'";
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Data
- ****************************************************************************************/
+ ******************************************************************************/
 
 using ASTD = AttributeSubstitutorTestData;
 
+// clang-format off
 INSTANTIATE_TEST_CASE_P(AttributeSubstitutorTest, AttributeSubstitutorTest, ::testing::Values(
     ASTD({"",                                   ""}),
     ASTD({"Hello { World! }} {{",               "Hello { World! }} {{"}),
@@ -97,12 +99,14 @@ INSTANTIATE_TEST_CASE_P(AttributeSubstitutorTest, AttributeSubstitutorTest, ::te
     ASTD({"{{KEY_1}}KEY_2",                     "Normal valueKEY_2"}),
     ASTD({"{{KEY_1 or FOO}} or KEY_1",          "Normal value or KEY_1"})
 ));
+// clang-format on
 
-// TODO: disabled test cases fail because of bugs in the librepcb::AttributeSubstitutor!
+// TODO: disabled test cases fail because of bugs in the
+// librepcb::AttributeSubstitutor!
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace librepcb
+}  // namespace tests
+}  // namespace librepcb

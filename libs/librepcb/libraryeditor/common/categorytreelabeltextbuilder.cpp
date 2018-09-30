@@ -17,163 +17,170 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "categorytreelabeltextbuilder.h"
+
 #include <librepcb/library/cat/componentcategory.h>
 #include <librepcb/library/cat/packagecategory.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Constructors / Destructor
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
 CategoryTreeLabelTextBuilder<ElementType>::CategoryTreeLabelTextBuilder(
-        const workspace::WorkspaceLibraryDb& db, const QStringList& localeOrder, QLabel& label) noexcept :
-    mDb(db), mLocaleOrder(localeOrder), mLabel(label), mHighlightLastLine(false),
-    mEndlessRecursionUuid(), mOneLine(false)
-{
+    const workspace::WorkspaceLibraryDb& db, const QStringList& localeOrder,
+    QLabel& label) noexcept
+  : mDb(db),
+    mLocaleOrder(localeOrder),
+    mLabel(label),
+    mHighlightLastLine(false),
+    mEndlessRecursionUuid(),
+    mOneLine(false) {
 }
 
 template <typename ElementType>
-CategoryTreeLabelTextBuilder<ElementType>::~CategoryTreeLabelTextBuilder() noexcept
-{
+CategoryTreeLabelTextBuilder<
+    ElementType>::~CategoryTreeLabelTextBuilder() noexcept {
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Setters
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-void CategoryTreeLabelTextBuilder<ElementType>::setText(const QString& text) noexcept
-{
-    mLabel.setText(text);
-    mLabel.setStyleSheet(QString());
+void CategoryTreeLabelTextBuilder<ElementType>::setText(
+    const QString& text) noexcept {
+  mLabel.setText(text);
+  mLabel.setStyleSheet(QString());
 }
 
 template <typename ElementType>
-void CategoryTreeLabelTextBuilder<ElementType>::setErrorText(const QString& error) noexcept
-{
-    mLabel.setText(error);
-    mLabel.setStyleSheet("QLabel { color: red; }");
+void CategoryTreeLabelTextBuilder<ElementType>::setErrorText(
+    const QString& error) noexcept {
+  mLabel.setText(error);
+  mLabel.setStyleSheet("QLabel { color: red; }");
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  General Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-bool CategoryTreeLabelTextBuilder<ElementType>::updateText(const tl::optional<Uuid>& category,
-                                                           const QString& lastLine) noexcept
-{
-    try {
-        QList<Uuid> uuids;
-        if (category) {
-            uuids.append(*category);
-            uuids.append(getCategoryParents(*category)); // can throw
-            if (mEndlessRecursionUuid && uuids.contains(*mEndlessRecursionUuid)) {
-                throw RuntimeError(__FILE__, __LINE__, tr("Endless recursion detected!"));
-            }
-        }
-        return updateText(uuids, lastLine);
-    } catch (const Exception& e) {
-        setErrorText(e.getMsg());
-        return false;
+bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
+    const tl::optional<Uuid>& category, const QString& lastLine) noexcept {
+  try {
+    QList<Uuid> uuids;
+    if (category) {
+      uuids.append(*category);
+      uuids.append(getCategoryParents(*category));  // can throw
+      if (mEndlessRecursionUuid && uuids.contains(*mEndlessRecursionUuid)) {
+        throw RuntimeError(__FILE__, __LINE__,
+                           tr("Endless recursion detected!"));
+      }
     }
+    return updateText(uuids, lastLine);
+  } catch (const Exception& e) {
+    setErrorText(e.getMsg());
+    return false;
+  }
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Private Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
 template <typename ElementType>
-bool CategoryTreeLabelTextBuilder<ElementType>::updateText(const  QList<Uuid>& uuids, const QString& lastLine) noexcept
-{
-    try {
-        QStringList lines;
-        foreach (const Uuid& uuid, uuids) {
-            FilePath filepath = getLatestCategory(uuid); // can throw
-            QString name;
-            mDb.getElementTranslations<ElementType>(filepath, mLocaleOrder, &name); // can throw
-            lines.prepend(name);
-        }
-        lines.prepend(tr("Root category"));
-        if (!lastLine.isNull()) {
-            lines.append(lastLine);
-        }
-        setText(lines);
-        return true;
-    } catch (const Exception& e) {
-        setErrorText(e.getMsg());
-        return false;
+bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
+    const QList<Uuid>& uuids, const QString& lastLine) noexcept {
+  try {
+    QStringList lines;
+    foreach (const Uuid& uuid, uuids) {
+      FilePath filepath = getLatestCategory(uuid);  // can throw
+      QString  name;
+      mDb.getElementTranslations<ElementType>(filepath, mLocaleOrder,
+                                              &name);  // can throw
+      lines.prepend(name);
     }
+    lines.prepend(tr("Root category"));
+    if (!lastLine.isNull()) {
+      lines.append(lastLine);
+    }
+    setText(lines);
+    return true;
+  } catch (const Exception& e) {
+    setErrorText(e.getMsg());
+    return false;
+  }
 }
 
 template <typename ElementType>
-void CategoryTreeLabelTextBuilder<ElementType>::setText(const QStringList& lines) noexcept
-{
-    QString text;
-    for (int i = 0; i < lines.count(); ++i) {
-        QString line = lines.value(i);
-        QString spaces =  QString("&nbsp;").repeated(i * 2);
-        QString separator = mOneLine ? QString(" &rArr; ") : QString("<br>%1⤷ ").arg(spaces);
-        if (i == 0) {
-            text.append(line);
-        } else if ((i == lines.count() - 1) && mHighlightLastLine) {
-            text.append(QString("%1<b>%2</b>").arg(separator, line));
-        } else {
-            text.append(QString("%1%2").arg(separator, line));
-        }
+void CategoryTreeLabelTextBuilder<ElementType>::setText(
+    const QStringList& lines) noexcept {
+  QString text;
+  for (int i = 0; i < lines.count(); ++i) {
+    QString line   = lines.value(i);
+    QString spaces = QString("&nbsp;").repeated(i * 2);
+    QString separator =
+        mOneLine ? QString(" &rArr; ") : QString("<br>%1⤷ ").arg(spaces);
+    if (i == 0) {
+      text.append(line);
+    } else if ((i == lines.count() - 1) && mHighlightLastLine) {
+      text.append(QString("%1<b>%2</b>").arg(separator, line));
+    } else {
+      text.append(QString("%1%2").arg(separator, line));
     }
-    setText(text);
+  }
+  setText(text);
 }
 
 template <>
-FilePath CategoryTreeLabelTextBuilder<ComponentCategory>::getLatestCategory(const Uuid& category) const
-{
-    return mDb.getLatestComponentCategory(category);
+FilePath CategoryTreeLabelTextBuilder<ComponentCategory>::getLatestCategory(
+    const Uuid& category) const {
+  return mDb.getLatestComponentCategory(category);
 }
 
 template <>
-FilePath CategoryTreeLabelTextBuilder<PackageCategory>::getLatestCategory(const Uuid& category) const
-{
-    return mDb.getLatestPackageCategory(category);
+FilePath CategoryTreeLabelTextBuilder<PackageCategory>::getLatestCategory(
+    const Uuid& category) const {
+  return mDb.getLatestPackageCategory(category);
 }
 
 template <>
-QList<Uuid> CategoryTreeLabelTextBuilder<ComponentCategory>::getCategoryParents(const Uuid& category) const
-{
-    return mDb.getComponentCategoryParents(category);
+QList<Uuid> CategoryTreeLabelTextBuilder<ComponentCategory>::getCategoryParents(
+    const Uuid& category) const {
+  return mDb.getComponentCategoryParents(category);
 }
 
 template <>
-QList<Uuid> CategoryTreeLabelTextBuilder<PackageCategory>::getCategoryParents(const Uuid& category) const
-{
-    return mDb.getPackageCategoryParents(category);
+QList<Uuid> CategoryTreeLabelTextBuilder<PackageCategory>::getCategoryParents(
+    const Uuid& category) const {
+  return mDb.getPackageCategoryParents(category);
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Explicit template instantiations
- ****************************************************************************************/
+ ******************************************************************************/
 template class CategoryTreeLabelTextBuilder<library::ComponentCategory>;
 template class CategoryTreeLabelTextBuilder<library::PackageCategory>;
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
-
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb

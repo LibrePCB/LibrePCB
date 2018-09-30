@@ -20,25 +20,26 @@
 #ifndef LIBREPCB_BOARDDESIGNRULESDIALOG_H
 #define LIBREPCB_BOARDDESIGNRULESDIALOG_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
 #include "../boarddesignrules.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 namespace Ui {
 class BoardDesignRulesDialog;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class BoardDesignRulesDialog
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The BoardDesignRulesDialog class
@@ -46,48 +47,45 @@ class BoardDesignRulesDialog;
  * @author ubruhin
  * @date 2016-04-01
  */
-class BoardDesignRulesDialog final : public QDialog
-{
-        Q_OBJECT
+class BoardDesignRulesDialog final : public QDialog {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  BoardDesignRulesDialog()                                    = delete;
+  BoardDesignRulesDialog(const BoardDesignRulesDialog& other) = delete;
+  explicit BoardDesignRulesDialog(const BoardDesignRules& rules,
+                                  QWidget*                parent = 0);
+  ~BoardDesignRulesDialog();
 
-        // Constructors / Destructor
-        BoardDesignRulesDialog() = delete;
-        BoardDesignRulesDialog(const BoardDesignRulesDialog& other) = delete;
-        explicit BoardDesignRulesDialog(const BoardDesignRules& rules, QWidget* parent = 0);
-        ~BoardDesignRulesDialog();
+  // Getters
+  const BoardDesignRules& getDesignRules() const noexcept {
+    return mDesignRules;
+  }
 
-        // Getters
-        const BoardDesignRules& getDesignRules() const noexcept {return mDesignRules;}
+  // Operator Overloadings
+  BoardDesignRulesDialog& operator=(const BoardDesignRulesDialog& rhs) = delete;
 
-        // Operator Overloadings
-        BoardDesignRulesDialog& operator=(const BoardDesignRulesDialog& rhs) = delete;
+signals:
 
+  void rulesChanged(const BoardDesignRules& newRules);
 
-    signals:
+private slots:
 
-        void rulesChanged(const BoardDesignRules& newRules);
+  void on_buttonBox_clicked(QAbstractButton* button);
 
+private:
+  void updateWidgets() noexcept;
+  void applyRules() noexcept;
 
-    private slots:
-
-        void on_buttonBox_clicked(QAbstractButton *button);
-
-
-    private:
-
-        void updateWidgets() noexcept;
-        void applyRules() noexcept;
-
-        Ui::BoardDesignRulesDialog* mUi;
-        BoardDesignRules mDesignRules;
+  Ui::BoardDesignRulesDialog* mUi;
+  BoardDesignRules            mDesignRules;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace librepcb
+}  // namespace librepcb
 
-#endif // LIBREPCB_BOARDDESIGNRULESDIALOG_H
+#endif  // LIBREPCB_BOARDDESIGNRULESDIALOG_H

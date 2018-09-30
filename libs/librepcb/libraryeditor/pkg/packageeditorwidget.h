@@ -20,21 +20,23 @@
 #ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORWIDGET_H
 #define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORWIDGET_H
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+ ******************************************************************************/
+#include "../common/categorylisteditorwidget.h"
+#include "../common/editorwidgetbase.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 #include <librepcb/library/pkg/footprint.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
 
-/*****************************************************************************************
+#include <QtCore>
+#include <QtWidgets>
+
+/*******************************************************************************
  *  Namespace / Forward Declarations
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 
 class GridProperties;
@@ -53,9 +55,9 @@ namespace Ui {
 class PackageEditorWidget;
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Class PackageEditorWidget
- ****************************************************************************************/
+ ******************************************************************************/
 
 /**
  * @brief The PackageEditorWidget class
@@ -63,68 +65,64 @@ class PackageEditorWidget;
  * @author ubruhin
  * @date 2016-10-16
  */
-class PackageEditorWidget final : public EditorWidgetBase, public IF_GraphicsViewEventHandler
-{
-        Q_OBJECT
+class PackageEditorWidget final : public EditorWidgetBase,
+                                  public IF_GraphicsViewEventHandler {
+  Q_OBJECT
 
-    public:
+public:
+  // Constructors / Destructor
+  PackageEditorWidget()                                 = delete;
+  PackageEditorWidget(const PackageEditorWidget& other) = delete;
+  PackageEditorWidget(const Context& context, const FilePath& fp,
+                      QWidget* parent = nullptr);
+  ~PackageEditorWidget() noexcept;
 
-        // Constructors / Destructor
-        PackageEditorWidget() = delete;
-        PackageEditorWidget(const PackageEditorWidget& other) = delete;
-        PackageEditorWidget(const Context& context, const FilePath& fp,
-                            QWidget* parent = nullptr);
-        ~PackageEditorWidget() noexcept;
+  // Getters
+  virtual bool hasGraphicalEditor() const noexcept override { return true; }
 
-        // Getters
-        virtual bool hasGraphicalEditor() const noexcept override {return true;}
+  // Setters
+  void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
 
-        // Setters
-        void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
+  // Operator Overloadings
+  PackageEditorWidget& operator=(const PackageEditorWidget& rhs) = delete;
 
-        // Operator Overloadings
-        PackageEditorWidget& operator=(const PackageEditorWidget& rhs) = delete;
+public slots:
+  bool save() noexcept override;
+  bool rotateCw() noexcept override;
+  bool rotateCcw() noexcept override;
+  bool remove() noexcept override;
+  bool zoomIn() noexcept override;
+  bool zoomOut() noexcept override;
+  bool zoomAll() noexcept override;
+  bool abortCommand() noexcept override;
+  bool editGridProperties() noexcept override;
 
+private:  // Methods
+  /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
+  bool graphicsViewEventHandler(QEvent* event) noexcept override;
+  bool toolChangeRequested(Tool newTool) noexcept override;
+  void currentFootprintChanged(int index) noexcept;
+  void memorizePackageInterface() noexcept;
+  bool isInterfaceBroken() const noexcept override;
 
-    public slots:
-        bool save() noexcept override;
-        bool rotateCw() noexcept override;
-        bool rotateCcw() noexcept override;
-        bool remove() noexcept override;
-        bool zoomIn() noexcept override;
-        bool zoomOut() noexcept override;
-        bool zoomAll() noexcept override;
-        bool abortCommand() noexcept override;
-        bool editGridProperties() noexcept override;
+private:  // Data
+  QScopedPointer<Ui::PackageEditorWidget>         mUi;
+  QScopedPointer<PackageCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<GraphicsScene>                   mGraphicsScene;
+  QScopedPointer<Package>                         mPackage;
+  QScopedPointer<PackageEditorFsm>                mFsm;
 
-
-    private: // Methods
-        /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
-        bool graphicsViewEventHandler(QEvent* event) noexcept override;
-        bool toolChangeRequested(Tool newTool) noexcept override;
-        void currentFootprintChanged(int index) noexcept;
-        void memorizePackageInterface() noexcept;
-        bool isInterfaceBroken() const noexcept override;
-
-
-    private: // Data
-        QScopedPointer<Ui::PackageEditorWidget> mUi;
-        QScopedPointer<PackageCategoryListEditorWidget> mCategoriesEditorWidget;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QScopedPointer<Package> mPackage;
-        QScopedPointer<PackageEditorFsm> mFsm;
-
-        // broken interface detection
-        QSet<Uuid> mOriginalPadUuids;
-        FootprintList mOriginalFootprints;
+  // broken interface detection
+  QSet<Uuid>    mOriginalPadUuids;
+  FootprintList mOriginalFootprints;
 };
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace editor
-} // namespace library
-} // namespace librepcb
+}  // namespace editor
+}  // namespace library
+}  // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORWIDGET_H

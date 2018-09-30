@@ -17,59 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Includes
- ****************************************************************************************/
-#include <QtCore>
+ ******************************************************************************/
 #include <gtest/gtest.h>
-#include <parseagle/library.h>
 #include <librepcb/eagleimport/converterdb.h>
 #include <librepcb/eagleimport/deviceconverter.h>
 #include <librepcb/library/dev/device.h>
+#include <parseagle/library.h>
 
-/*****************************************************************************************
+#include <QtCore>
+
+/*******************************************************************************
  *  Namespace
- ****************************************************************************************/
+ ******************************************************************************/
 namespace librepcb {
 namespace eagleimport {
 namespace tests {
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Class
- ****************************************************************************************/
+ ******************************************************************************/
 
-class DeviceConverterTest : public ::testing::Test
-{
-};
+class DeviceConverterTest : public ::testing::Test {};
 
-/*****************************************************************************************
+/*******************************************************************************
  *  Test Methods
- ****************************************************************************************/
+ ******************************************************************************/
 
-TEST_F(DeviceConverterTest, testConversion)
-{
-    FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
+TEST_F(DeviceConverterTest, testConversion) {
+  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
 
-    // load eagle device
-    FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-    parseagle::Library eagleLibrary(eagleLibFp.toStr());
-    ASSERT_EQ(1, eagleLibrary.getDeviceSets().count());
-    const parseagle::DeviceSet& eagleDeviceSet = eagleLibrary.getDeviceSets().first();
-    ASSERT_EQ(1, eagleDeviceSet.getDevices().count());
-    const parseagle::Device& eagleDevice = eagleDeviceSet.getDevices().first();
+  // load eagle device
+  FilePath           eagleLibFp = testDataDir.getPathTo("resistor.lbr");
+  parseagle::Library eagleLibrary(eagleLibFp.toStr());
+  ASSERT_EQ(1, eagleLibrary.getDeviceSets().count());
+  const parseagle::DeviceSet& eagleDeviceSet =
+      eagleLibrary.getDeviceSets().first();
+  ASSERT_EQ(1, eagleDeviceSet.getDevices().count());
+  const parseagle::Device& eagleDevice = eagleDeviceSet.getDevices().first();
 
-    // load converter database
-    ConverterDb db(testDataDir.getPathTo("db.ini"));
+  // load converter database
+  ConverterDb db(testDataDir.getPathTo("db.ini"));
 
-    // convert device set
-    DeviceConverter converter(eagleDeviceSet, eagleDevice, db);
-    std::unique_ptr<library::Device> device = converter.generate();
+  // convert device set
+  DeviceConverter                  converter(eagleDeviceSet, eagleDevice, db);
+  std::unique_ptr<library::Device> device = converter.generate();
 }
 
-/*****************************************************************************************
+/*******************************************************************************
  *  End of File
- ****************************************************************************************/
+ ******************************************************************************/
 
-} // namespace tests
-} // namespace eagleimport
-} // namespace librepcb
+}  // namespace tests
+}  // namespace eagleimport
+}  // namespace librepcb
