@@ -81,6 +81,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mBoardLayersDock(nullptr),
     mFsm(nullptr) {
   mUi->setupUi(this);
+  mUi->lblUnplacedComponentsNote->hide();
   mUi->actionProjectSave->setEnabled(!mProject.isReadOnly());
 
   // set window title
@@ -90,6 +91,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
 
   // Add Dock Widgets
   mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
+  connect(mUnplacedComponentsDock,
+          &UnplacedComponentsDock::unplacedComponentsCountChanged, this,
+          &BoardEditor::unplacedComponentsCountChanged);
   connect(mUnplacedComponentsDock, &UnplacedComponentsDock::addDeviceTriggered,
           [this](ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt) {
             mFsm->processEvent(new BEE_StartAddDevice(cmp, dev, fpt), true);
@@ -536,6 +540,11 @@ void BoardEditor::on_tabBar_currentChanged(int index) {
   setActiveBoardIndex(index);
 }
 
+void BoardEditor::on_lblUnplacedComponentsNote_linkActivated() {
+  mUnplacedComponentsDock->show();
+  mUnplacedComponentsDock->raise();
+}
+
 void BoardEditor::boardListActionGroupTriggered(QAction* action) {
   setActiveBoardIndex(mBoardListActions.indexOf(action));
 }
@@ -579,6 +588,10 @@ void BoardEditor::toolActionGroupChangeTriggered(
       qCritical() << "Unknown tool triggered!";
       break;
   }
+}
+
+void BoardEditor::unplacedComponentsCountChanged(int count) noexcept {
+  mUi->lblUnplacedComponentsNote->setVisible(count > 0);
 }
 
 /*******************************************************************************

@@ -109,6 +109,7 @@ private slots:
   void on_actionModifyDesignRules_triggered();
   void on_actionRebuildPlanes_triggered();
   void on_tabBar_currentChanged(int index);
+  void on_lblUnplacedComponentsNote_linkActivated();
   void boardListActionGroupTriggered(QAction* action);
 
 signals:
@@ -124,6 +125,7 @@ private:
   // Private Methods
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void unplacedComponentsCountChanged(int count) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;

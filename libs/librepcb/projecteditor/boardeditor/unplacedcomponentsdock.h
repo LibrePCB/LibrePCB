@@ -75,11 +75,15 @@ public:
   explicit UnplacedComponentsDock(ProjectEditor& editor);
   ~UnplacedComponentsDock();
 
+  // Getters
+  int getUnplacedComponentsCount() const noexcept;
+
   // Setters
   void setBoard(Board* board);
 
 signals:
 
+  void unplacedComponentsCountChanged(int count);
   void addDeviceTriggered(ComponentInstance& cmp, const Uuid& deviceUuid,
                           Uuid footprintUuid);
 

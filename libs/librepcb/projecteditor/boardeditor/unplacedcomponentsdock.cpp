@@ -120,6 +120,14 @@ UnplacedComponentsDock::~UnplacedComponentsDock() {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+int UnplacedComponentsDock::getUnplacedComponentsCount() const noexcept {
+  return mUi->lstUnplacedComponents->count();
+}
+
+/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
@@ -304,6 +312,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
 
   setWindowTitle(QString(tr("Place Devices [%1]"))
                      .arg(mUi->lstUnplacedComponents->count()));
+  emit unplacedComponentsCountChanged(getUnplacedComponentsCount());
 }
 
 void UnplacedComponentsDock::setSelectedComponentInstance(
