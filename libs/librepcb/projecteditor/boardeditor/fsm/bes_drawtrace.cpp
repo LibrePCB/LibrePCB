@@ -141,7 +141,7 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
     foreach (const auto& layer,
              mEditor.getActiveBoard()->getLayerStack().getAllLayers()) {
       if (layer->isCopperLayer() && layer->isEnabled()) {
-        mLayerComboBox->addItem(layer->getName(), layer->getName());
+        mLayerComboBox->addItem(layer->getNameTr(), layer->getName());
       }
     }
   }
