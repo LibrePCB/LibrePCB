@@ -68,6 +68,7 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
   // insert category list editor widget
   mCategoriesEditorWidget.reset(
       new PackageCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int                   row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);

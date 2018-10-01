@@ -71,6 +71,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
   // insert category list editor widget
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int                   row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);

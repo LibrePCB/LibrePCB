@@ -84,6 +84,7 @@ private:  // Methods
       ComponentSymbolVariant& variant) noexcept override;
   void memorizeComponentInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
+  void categoriesUpdated() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::ComponentEditorWidget>         mUi;

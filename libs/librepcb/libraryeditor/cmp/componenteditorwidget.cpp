@@ -54,6 +54,7 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   // insert category list editor widget
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int                   row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);
@@ -95,6 +96,10 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   connect(mUi->cbxSchematicOnly, &QCheckBox::toggled, this,
           &ComponentEditorWidget::undoStackStateModified);
 
+  // show "no categories selected" warning if no categories selected
+  mUi->lblWarnAboutMissingCategory->setVisible(
+      mComponent->getCategories().isEmpty());
+
   // set dirty state when properties are modified
   connect(mUi->edtName, &QLineEdit::textEdited, this,
           &ComponentEditorWidget::setDirty);
@@ -110,10 +115,10 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
           &ComponentEditorWidget::setDirty);
   connect(mCategoriesEditorWidget.data(),
           &ComponentCategoryListEditorWidget::categoryAdded, this,
-          &ComponentEditorWidget::setDirty);
+          &ComponentEditorWidget::categoriesUpdated);
   connect(mCategoriesEditorWidget.data(),
           &ComponentCategoryListEditorWidget::categoryRemoved, this,
-          &ComponentEditorWidget::setDirty);
+          &ComponentEditorWidget::categoriesUpdated);
   connect(mUi->cbxSchematicOnly, &QCheckBox::clicked, this,
           &ComponentEditorWidget::setDirty);
   connect(mUi->edtPrefix, &QLineEdit::textEdited, this,
@@ -208,6 +213,12 @@ bool ComponentEditorWidget::isInterfaceBroken() const noexcept {
     }
   }
   return false;
+}
+
+void ComponentEditorWidget::categoriesUpdated() noexcept {
+  mUi->lblWarnAboutMissingCategory->setVisible(
+      mCategoriesEditorWidget->getUuids().isEmpty());
+  setDirty();
 }
 
 /*******************************************************************************

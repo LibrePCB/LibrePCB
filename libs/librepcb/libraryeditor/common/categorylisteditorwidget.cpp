@@ -45,7 +45,10 @@ namespace editor {
 
 CategoryListEditorWidgetBase::CategoryListEditorWidgetBase(
     const workspace::Workspace& ws, QWidget* parent) noexcept
-  : QWidget(parent), mWorkspace(ws), mUi(new Ui::CategoryListEditorWidget) {
+  : QWidget(parent),
+    mWorkspace(ws),
+    mUi(new Ui::CategoryListEditorWidget),
+    mRequiresMinimumOneEntry(false) {
   mUi->setupUi(this);
   connect(mUi->btnAdd, &QPushButton::clicked, this,
           &CategoryListEditorWidgetBase::btnAddClicked);
@@ -59,6 +62,11 @@ CategoryListEditorWidgetBase::~CategoryListEditorWidgetBase() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void CategoryListEditorWidgetBase::setRequiresMinimumOneEntry(bool v) noexcept {
+  mRequiresMinimumOneEntry = v;
+  updateColor();
+}
 
 void CategoryListEditorWidgetBase::setUuids(const QSet<Uuid>& uuids) noexcept {
   mUuids = uuids;
@@ -88,6 +96,7 @@ void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
     mUuids.remove(*uuid);
     emit categoryRemoved(*uuid);
     delete item;
+    updateColor();
   }
 }
 
@@ -129,6 +138,15 @@ void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
                                            const QString& text) noexcept {
   QListWidgetItem* item = new QListWidgetItem(text, mUi->listWidget);
   item->setData(Qt::UserRole, category ? category->toStr() : QString());
+  updateColor();
+}
+
+void CategoryListEditorWidgetBase::updateColor() noexcept {
+  if (mRequiresMinimumOneEntry && (mUi->listWidget->count() == 0)) {
+    mUi->listWidget->setStyleSheet("background-color: #FF5555;");
+  } else {
+    mUi->listWidget->setStyleSheet("");
+  }
 }
 
 /*******************************************************************************

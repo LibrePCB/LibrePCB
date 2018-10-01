@@ -71,6 +71,7 @@ public:
   const QSet<Uuid>& getUuids() const noexcept { return mUuids; }
 
   // Setters
+  void setRequiresMinimumOneEntry(bool v) noexcept;
   void setUuids(const QSet<Uuid>& uuids) noexcept;
 
   // Operator Overloadings
@@ -91,6 +92,7 @@ private:
                const QStringList&        lines) noexcept;
   void addItem(const tl::optional<Uuid>& category,
                const QString&            text) noexcept;
+  void updateColor() noexcept;
 
 signals:
   void categoryAdded(const Uuid& category);
@@ -99,6 +101,7 @@ signals:
 protected:  // Data
   const workspace::Workspace&                  mWorkspace;
   QScopedPointer<Ui::CategoryListEditorWidget> mUi;
+  bool                                         mRequiresMinimumOneEntry;
   QSet<Uuid>                                   mUuids;
 };
 
