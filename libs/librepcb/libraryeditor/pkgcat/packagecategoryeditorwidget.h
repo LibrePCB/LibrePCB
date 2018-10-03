@@ -27,6 +27,8 @@
 
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/uuid.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -78,12 +80,14 @@ public slots:
 private:  // Methods
   bool isInterfaceBroken() const noexcept override { return false; }
   void btnChooseParentCategoryClicked() noexcept;
+  void btnResetParentCategoryClicked() noexcept;
   void edtnameTextChanged(const QString& text) noexcept;
-  void edtParentTextChanged(const QString& text) noexcept;
+  void updateCategoryLabel() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageCategoryEditorWidget> mUi;
   QSharedPointer<PackageCategory>                 mCategory;
+  tl::optional<Uuid>                              mParentUuid;
 };
 
 /*******************************************************************************

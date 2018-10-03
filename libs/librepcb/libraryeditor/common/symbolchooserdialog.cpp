@@ -159,7 +159,6 @@ void SymbolChooserDialog::setSelectedCategory(
 void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
   if (mSelectedSymbol && (mSelectedSymbol->getFilePath() == fp)) return;
 
-  mUi->lblSymbolUuid->setText("00000000-0000-0000-0000-000000000000");
   mUi->lblSymbolName->setText(tr("No symbol selected"));
   mUi->lblSymbolDescription->setText("");
   mGraphicsItem.reset();
@@ -168,7 +167,6 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
   if (fp.isValid()) {
     try {
       mSelectedSymbol.reset(new Symbol(fp, true));  // can throw
-      mUi->lblSymbolUuid->setText(mSelectedSymbol->getUuid().toStr());
       mUi->lblSymbolName->setText(
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(

@@ -56,10 +56,10 @@ NewElementWizardPage_EnterMetadata::NewElementWizardPage_EnterMetadata(
           &NewElementWizardPage_EnterMetadata::edtAuthorTextChanged);
   connect(mUi->edtVersion, &QLineEdit::textChanged, this,
           &NewElementWizardPage_EnterMetadata::edtVersionTextChanged);
-  connect(mUi->edtCategory, &QLineEdit::textChanged, this,
-          &NewElementWizardPage_EnterMetadata::edtCategoryTextChanged);
   connect(mUi->btnChooseCategory, &QToolButton::clicked, this,
           &NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked);
+  connect(mUi->btnResetCategory, &QToolButton::clicked, this,
+          &NewElementWizardPage_EnterMetadata::btnResetCategoryClicked);
 }
 
 NewElementWizardPage_EnterMetadata::
@@ -73,8 +73,6 @@ NewElementWizardPage_EnterMetadata::
 bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept {
   if (!mContext.mElementName) return false;
   if (!mContext.mElementVersion) return false;
-  QString category = mUi->edtCategory->text().trimmed();
-  if (!mContext.mElementCategoryUuid && !category.isEmpty()) return false;
   return true;
 }
 
@@ -129,13 +127,6 @@ void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(
   emit completeChanged();
 }
 
-void NewElementWizardPage_EnterMetadata::edtCategoryTextChanged(
-    const QString& text) noexcept {
-  mContext.mElementCategoryUuid = Uuid::tryFromString(text.trimmed());
-  updateCategoryTreeLabel();
-  emit completeChanged();
-}
-
 void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
   tl::optional<Uuid> categoryUuid;
   switch (mContext.mElementType) {
@@ -161,7 +152,13 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
       return;
     }
   }
-  mUi->edtCategory->setText(categoryUuid ? categoryUuid->toStr() : QString());
+  mContext.mElementCategoryUuid = categoryUuid;
+  updateCategoryTreeLabel();
+}
+
+void NewElementWizardPage_EnterMetadata::btnResetCategoryClicked() noexcept {
+  mContext.mElementCategoryUuid = tl::nullopt;
+  updateCategoryTreeLabel();
 }
 
 void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
@@ -212,9 +209,6 @@ void NewElementWizardPage_EnterMetadata::initializePage() noexcept {
   mUi->edtAuthor->setText(mContext.mElementAuthor);
   mUi->edtVersion->setText(
       mContext.mElementVersion ? mContext.mElementVersion->toStr() : QString());
-  mUi->edtCategory->setText(mContext.mElementCategoryUuid
-                                ? mContext.mElementCategoryUuid->toStr()
-                                : QString());
   updateCategoryTreeLabel();
 }
 

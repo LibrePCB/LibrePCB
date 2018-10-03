@@ -47,10 +47,6 @@ NewElementWizardPage_DeviceProperties::NewElementWizardPage_DeviceProperties(
     mContext(context),
     mUi(new Ui::NewElementWizardPage_DeviceProperties) {
   mUi->setupUi(this);
-  connect(mUi->edtComponentUuid, &QLineEdit::textChanged, this,
-          &NewElementWizardPage_DeviceProperties::edtComponentUuidTextChanged);
-  connect(mUi->edtPackageUuid, &QLineEdit::textChanged, this,
-          &NewElementWizardPage_DeviceProperties::edtPackageUuidTextChanged);
   connect(mUi->btnChooseComponent, &QToolButton::clicked, this,
           &NewElementWizardPage_DeviceProperties::btnChooseComponentClicked);
   connect(mUi->btnChoosePackage, &QToolButton::clicked, this,
@@ -79,23 +75,13 @@ int NewElementWizardPage_DeviceProperties::nextId() const noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void NewElementWizardPage_DeviceProperties::edtComponentUuidTextChanged(
-    const QString& text) noexcept {
-  setComponent(Uuid::tryFromString(text.trimmed()));
-}
-
-void NewElementWizardPage_DeviceProperties::edtPackageUuidTextChanged(
-    const QString& text) noexcept {
-  setPackage(Uuid::tryFromString(text.trimmed()));
-}
-
 void NewElementWizardPage_DeviceProperties::
     btnChooseComponentClicked() noexcept {
   ComponentChooserDialog dialog(mContext.getWorkspace(),
                                 &mContext.getLayerProvider(), this);
   if (dialog.exec() == QDialog::Accepted) {
     tl::optional<Uuid> uuid = dialog.getSelectedComponentUuid();
-    mUi->edtComponentUuid->setText(uuid ? uuid->toStr() : QString());
+    setComponent(uuid);
   }
 }
 
@@ -104,7 +90,7 @@ void NewElementWizardPage_DeviceProperties::btnChoosePackageClicked() noexcept {
                               &mContext.getLayerProvider(), this);
   if (dialog.exec() == QDialog::Accepted) {
     tl::optional<Uuid> uuid = dialog.getSelectedPackageUuid();
-    mUi->edtPackageUuid->setText(uuid ? uuid->toStr() : QString());
+    setPackage(uuid);
   }
 }
 
@@ -159,12 +145,6 @@ void NewElementWizardPage_DeviceProperties::setPackage(
 
 void NewElementWizardPage_DeviceProperties::initializePage() noexcept {
   QWizardPage::initializePage();
-  mUi->edtComponentUuid->setText(mContext.mDeviceComponentUuid
-                                     ? mContext.mDeviceComponentUuid->toStr()
-                                     : QString());
-  mUi->edtPackageUuid->setText(mContext.mDevicePackageUuid
-                                   ? mContext.mDevicePackageUuid->toStr()
-                                   : QString());
   setComponent(mContext.mDeviceComponentUuid);
   setPackage(mContext.mDevicePackageUuid);
 }

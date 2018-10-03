@@ -75,8 +75,8 @@ private:  // Methods
   void edtKeywordsTextChanged(const QString& text) noexcept;
   void edtAuthorTextChanged(const QString& text) noexcept;
   void edtVersionTextChanged(const QString& text) noexcept;
-  void edtCategoryTextChanged(const QString& text) noexcept;
   void btnChooseCategoryClicked() noexcept;
+  void btnResetCategoryClicked() noexcept;
   void updateCategoryTreeLabel() noexcept;
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;

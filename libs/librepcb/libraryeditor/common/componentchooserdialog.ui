@@ -57,29 +57,14 @@
           </font>
          </property>
          <property name="text">
-          <string>Name</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblComponentUuid">
-         <property name="font">
-          <font>
-           <family>Liberation Mono</family>
-          </font>
-         </property>
-         <property name="text">
-          <string notr="true">00000000-0000-0000-0000-000000000000</string>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <string notr="true">Name</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="lblComponentDescription">
          <property name="text">
-          <string>Description</string>
+          <string notr="true">Description</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

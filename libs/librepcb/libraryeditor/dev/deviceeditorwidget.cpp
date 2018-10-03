@@ -80,10 +80,6 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
 
   mDevice.reset(new Device(fp, false));  // can throw
   setWindowTitle(*mDevice->getNames().value(getLibLocaleOrder()));
-  mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>")
-                            .arg(mDevice->getFilePath().toQUrl().toString(),
-                                 mDevice->getUuid().toStr()));
-  mUi->lblUuid->setToolTip(mDevice->getFilePath().toNative());
   mUi->edtName->setText(*mDevice->getNames().value(getLibLocaleOrder()));
   mUi->edtDescription->setPlainText(
       mDevice->getDescriptions().value(getLibLocaleOrder()));
@@ -267,7 +263,6 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
 void DeviceEditorWidget::updateDeviceComponentUuid(const Uuid& uuid) noexcept {
   mSymbolGraphicsItems.clear();
   mSymbols.clear();
-  mUi->lblComponentUuid->setText(uuid.toStr());
   try {
     FilePath fp = mContext.workspace.getLibraryDb().getLatestComponent(
         uuid);  // can throw
@@ -278,11 +273,14 @@ void DeviceEditorWidget::updateDeviceComponentUuid(const Uuid& uuid) noexcept {
     mUi->padSignalMapEditorWidget->setSignalList(mComponent->getSignals());
     mUi->lblComponentName->setText(
         *mComponent->getNames().value(getLibLocaleOrder()));
+    mUi->lblComponentName->setToolTip(
+        mComponent->getDescriptions().value(getLibLocaleOrder()));
     mUi->lblComponentName->setStyleSheet("");
     updateComponentPreview();
   } catch (const Exception& e) {
     mUi->padSignalMapEditorWidget->setSignalList(ComponentSignalList());
     mUi->lblComponentName->setText(e.getMsg());
+    mUi->lblComponentName->setToolTip(QString());
     mUi->lblComponentName->setStyleSheet("color: red;");
   }
 }
@@ -316,7 +314,6 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
 
 void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
   mFootprintGraphicsItem.reset();
-  mUi->lblPackageUuid->setText(uuid.toStr());
   try {
     FilePath fp =
         mContext.workspace.getLibraryDb().getLatestPackage(uuid);  // can throw
@@ -327,11 +324,14 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
     mUi->padSignalMapEditorWidget->setPadList(mPackage->getPads());
     mUi->lblPackageName->setText(
         *mPackage->getNames().value(getLibLocaleOrder()));
+    mUi->lblPackageName->setToolTip(
+        mPackage->getDescriptions().value(getLibLocaleOrder()));
     mUi->lblPackageName->setStyleSheet("");
     updatePackagePreview();
   } catch (const Exception& e) {
     mUi->padSignalMapEditorWidget->setPadList(PackagePadList());
     mUi->lblPackageName->setText(e.getMsg());
+    mUi->lblPackageName->setToolTip(QString());
     mUi->lblPackageName->setStyleSheet("color: red;");
   }
 }
