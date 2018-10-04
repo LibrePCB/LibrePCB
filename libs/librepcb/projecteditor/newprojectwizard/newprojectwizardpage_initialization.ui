@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="title">
-   <string>Initiali&amp;zation</string>
+   <string>Initialization</string>
   </property>
   <property name="subTitle">
    <string>Specify how the project should be initialized.</string>
@@ -60,7 +60,7 @@
    <item>
     <widget class="QGroupBox" name="cbxAddBoard">
      <property name="title">
-      <string>Add Board</string>
+      <string>Add B&amp;oard</string>
      </property>
      <property name="checkable">
       <bool>true</bool>

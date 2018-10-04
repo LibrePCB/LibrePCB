@@ -14,7 +14,7 @@
    <string>WizardPage</string>
   </property>
   <property name="title">
-   <string>Select Wor&amp;kspace Path</string>
+   <string>Select Workspace Path</string>
   </property>
   <property name="subTitle">
    <string>Please select a directory to open or create a LibrePCB workspace.</string>
@@ -48,7 +48,7 @@ Workspaces are platform independent, so they can be used across different operat
    <item>
     <widget class="QRadioButton" name="rbtnCreateWs">
      <property name="text">
-      <string>Create a new workspace</string>
+      <string>Create a n&amp;ew workspace</string>
      </property>
      <property name="checked">
       <bool>true</bool>

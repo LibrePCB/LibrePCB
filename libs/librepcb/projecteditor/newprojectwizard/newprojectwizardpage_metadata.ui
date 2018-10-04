@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="title">
-   <string>Project &amp;Metadata</string>
+   <string>Project Metadata</string>
   </property>
   <property name="subTitle">
    <string>Specify some metadata of the project to be created.</string>
