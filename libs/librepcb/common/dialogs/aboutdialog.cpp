@@ -35,8 +35,12 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   : QDialog(parent), mUi(new Ui::AboutDialog) {
   // Set up base dialog
   mUi->setupUi(this);
+  mUi->txtDetails->setFont(qApp->getDefaultMonospaceFont());
 
   // Event handlers
+  connect(mUi->btnCopyDetailsToClipboard, &QPushButton::clicked, [this]() {
+    QApplication::clipboard()->setText(mUi->txtDetails->toPlainText());
+  });
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &AboutDialog::close);
 
@@ -82,6 +86,20 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   formatLabelText(mUi->textContributeFinancially, false, true);
   formatLabelText(mUi->textContributeCode, false, true);
   formatLabelText(mUi->textContributeShare, false, false);
+
+  // Information text (always English, not translatable)
+  QStringList details;
+  QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+  details << "LibrePCB Version: " + qApp->applicationVersion();
+  details << "Git Revision:     " + qApp->getGitRevision();
+  details << "Build Date:       " + qApp->getBuildDate().toString(Qt::ISODate);
+  details << "Qt Version:       " + qt;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+  details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
+  details << "Operating System: " + QSysInfo::prettyProductName();
+#endif
+  details << "Platform Plugin:  " + qApp->platformName();
+  mUi->txtDetails->setPlainText(details.join("\n"));
 }
 
 /**
