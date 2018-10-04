@@ -59,9 +59,6 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project&   project,
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardPlanePropertiesDialog::buttonBoxClicked);
 
-  // UUID label
-  mUi->lblUuid->setText(mPlane.getUuid().toStr());
-
   // net signal combobox
   foreach (NetSignal* netsignal, mPlane.getCircuit().getNetSignals()) {
     mUi->cbxNetSignal->addItem(*netsignal->getName(),

@@ -64,10 +64,6 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   // load component
   mComponent.reset(new Component(fp, false));  // can throw
   setWindowTitle(*mComponent->getNames().value(getLibLocaleOrder()));
-  mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>")
-                            .arg(mComponent->getFilePath().toQUrl().toString(),
-                                 mComponent->getUuid().toStr()));
-  mUi->lblUuid->setToolTip(mComponent->getFilePath().toNative());
   mUi->edtName->setText(*mComponent->getNames().value(getLibLocaleOrder()));
   mUi->edtDescription->setPlainText(
       mComponent->getDescriptions().value(getLibLocaleOrder()));

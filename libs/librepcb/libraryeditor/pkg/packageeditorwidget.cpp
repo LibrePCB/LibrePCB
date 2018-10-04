@@ -78,10 +78,6 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
   // load package
   mPackage.reset(new Package(fp, false));  // can throw
   setWindowTitle(*mPackage->getNames().value(getLibLocaleOrder()));
-  mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>")
-                            .arg(mPackage->getFilePath().toQUrl().toString(),
-                                 mPackage->getUuid().toStr()));
-  mUi->lblUuid->setToolTip(mPackage->getFilePath().toNative());
   mUi->edtName->setText(*mPackage->getNames().value(getLibLocaleOrder()));
   mUi->edtDescription->setPlainText(
       mPackage->getDescriptions().value(getLibLocaleOrder()));

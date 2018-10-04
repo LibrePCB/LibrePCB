@@ -86,6 +86,7 @@
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionRemoveElement"/>
+    <addaction name="actionShowElementInFileManager"/>
     <addaction name="separator"/>
     <addaction name="actionUpdateLibraryDb"/>
     <addaction name="separator"/>
@@ -592,6 +593,15 @@
    </property>
    <property name="text">
     <string>Add Value</string>
+   </property>
+  </action>
+  <action name="actionShowElementInFileManager">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/search.png</normaloff>:/img/actions/search.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show element in file manager</string>
    </property>
   </action>
  </widget>

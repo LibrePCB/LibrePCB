@@ -159,7 +159,6 @@ void PackageChooserDialog::setSelectedPackage(
     }
   }
 
-  mUi->lblPackageUuid->setText(uuidStr);
   mUi->lblPackageName->setText(name);
   mUi->lblPackageDescription->setText(desc);
   updatePreview();

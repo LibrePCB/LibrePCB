@@ -52,17 +52,13 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
   setWindowIcon(QIcon(":/img/places/folder_green.png"));
   connect(mUi->btnChooseParentCategory, &QToolButton::clicked, this,
           &PackageCategoryEditorWidget::btnChooseParentCategoryClicked);
+  connect(mUi->btnResetParentCategory, &QToolButton::clicked, this,
+          &PackageCategoryEditorWidget::btnResetParentCategoryClicked);
   connect(mUi->edtName, &QLineEdit::textChanged, this,
           &PackageCategoryEditorWidget::edtnameTextChanged);
-  connect(mUi->edtParent, &QLineEdit::textChanged, this,
-          &PackageCategoryEditorWidget::edtParentTextChanged);
 
   mCategory.reset(new PackageCategory(fp, false));  // can throw
   setWindowTitle(*mCategory->getNames().value(getLibLocaleOrder()));
-  mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>")
-                            .arg(mCategory->getFilePath().toQUrl().toString(),
-                                 mCategory->getUuid().toStr()));
-  mUi->lblUuid->setToolTip(mCategory->getFilePath().toNative());
   mUi->edtName->setText(*mCategory->getNames().value(getLibLocaleOrder()));
   mUi->edtDescription->setPlainText(
       mCategory->getDescriptions().value(getLibLocaleOrder()));
@@ -70,10 +66,9 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
       mCategory->getKeywords().value(getLibLocaleOrder()));
   mUi->edtAuthor->setText(mCategory->getAuthor());
   mUi->edtVersion->setText(mCategory->getVersion().toStr());
-  mUi->edtParent->setText(mCategory->getParentUuid()
-                              ? mCategory->getParentUuid()->toStr()
-                              : QString());
   mUi->cbxDeprecated->setChecked(mCategory->isDeprecated());
+  mParentUuid = mCategory->getParentUuid();
+  updateCategoryLabel();
 
   connect(mUi->edtName, &QLineEdit::textChanged, this,
           &QWidget::setWindowTitle);
@@ -89,8 +84,6 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
           &PackageCategoryEditorWidget::setDirty);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &PackageCategoryEditorWidget::setDirty);
-  connect(mUi->edtParent, &QLineEdit::textChanged, this,
-          &PackageCategoryEditorWidget::setDirty);
 }
 
 PackageCategoryEditorWidget::~PackageCategoryEditorWidget() noexcept {
@@ -105,18 +98,12 @@ bool PackageCategoryEditorWidget::save() noexcept {
     ElementName name(mUi->edtName->text().trimmed());  // can throw
     Version     version =
         Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
-    QString            parentUuidStr = mUi->edtParent->text().trimmed();
-    tl::optional<Uuid> parentUuid    = Uuid::tryFromString(parentUuidStr);
-    if (!parentUuid && !parentUuidStr.isEmpty()) {
-      throw RuntimeError(__FILE__, __LINE__, tr("The parent UUID is invalid."));
-    }
-
     mCategory->setName("", name);
     mCategory->setDescription("", mUi->edtDescription->toPlainText().trimmed());
     mCategory->setKeywords("", mUi->edtKeywords->text().trimmed());
     mCategory->setAuthor(mUi->edtAuthor->text().trimmed());
     mCategory->setVersion(version);
-    mCategory->setParentUuid(parentUuid);
+    mCategory->setParentUuid(mParentUuid);
     mCategory->setDeprecated(mUi->cbxDeprecated->isChecked());
     mCategory->save();
     return EditorWidgetBase::save();
@@ -133,33 +120,32 @@ bool PackageCategoryEditorWidget::save() noexcept {
 void PackageCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {
   PackageCategoryChooserDialog dialog(mContext.workspace);
   if (dialog.exec()) {
-    tl::optional<Uuid> uuid = dialog.getSelectedCategoryUuid();
-    mUi->edtParent->setText(uuid ? uuid->toStr() : QString());
+    mParentUuid = dialog.getSelectedCategoryUuid();
+    updateCategoryLabel();
+    setDirty();
   }
+}
+
+void PackageCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
+  mParentUuid = tl::nullopt;
+  updateCategoryLabel();
+  setDirty();
 }
 
 void PackageCategoryEditorWidget::edtnameTextChanged(
     const QString& text) noexcept {
   // force updating parent categories
   Q_UNUSED(text);
-  edtParentTextChanged(mUi->edtParent->text());
+  updateCategoryLabel();
 }
 
-void PackageCategoryEditorWidget::edtParentTextChanged(
-    const QString& text) noexcept {
+void PackageCategoryEditorWidget::updateCategoryLabel() noexcept {
   const workspace::WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
   PackageCategoryTreeLabelTextBuilder  textBuilder(db, getLibLocaleOrder(),
                                                   *mUi->lblParentCategories);
   textBuilder.setEndlessRecursionUuid(mCategory->getUuid());
   textBuilder.setHighlightLastLine(true);
-
-  QString            trimmed    = text.trimmed();
-  tl::optional<Uuid> parentUuid = Uuid::tryFromString(trimmed);
-  if ((trimmed.length() > 0) && !parentUuid) {
-    textBuilder.setErrorText(tr("Invalid UUID!"));
-  } else {
-    textBuilder.updateText(parentUuid, mUi->edtName->text());
-  }
+  textBuilder.updateText(mParentUuid, mUi->edtName->text());
 }
 
 /*******************************************************************************

@@ -64,7 +64,6 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
 
   // Component Instance Attributes
   ComponentInstance& cmp = mDevice.getComponentInstance();
-  mUi->lblCompInstUuid->setText(cmp.getUuid().toStr());
   mUi->edtCompInstName->setText(*cmp.getName());
   mUi->edtCompInstValue->setText(cmp.getValue());
   mUi->attributeListEditorWidget->setAttributeList(cmp.getAttributes());
@@ -73,28 +72,20 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
 
   // Library Element Information
   QString htmlLink("<a href=\"%1\">%2<a>");
-  mUi->lblLibDeviceUuid->setText(
-      htmlLink.arg(mDevice.getLibDevice().getFilePath().toQUrl().toString(),
-                   mDevice.getLibDevice().getUuid().toStr()));
-  mUi->lblLibDeviceUuid->setToolTip(
-      mDevice.getLibDevice().getFilePath().toNative());
   mUi->lblLibDeviceName->setText(
-      *mDevice.getLibDevice().getNames().value(localeOrder));
+      htmlLink.arg(mDevice.getLibDevice().getFilePath().toQUrl().toString(),
+                   *mDevice.getLibDevice().getNames().value(localeOrder)));
   mUi->lblLibDeviceName->setToolTip(
-      mDevice.getLibDevice().getDescriptions().value(localeOrder));
+      mDevice.getLibDevice().getDescriptions().value(localeOrder) + "<p>" +
+      mDevice.getLibDevice().getFilePath().toNative());
 
-  mUi->lblLibPackageUuid->setText(
-      htmlLink.arg(mDevice.getLibPackage().getFilePath().toQUrl().toString(),
-                   mDevice.getLibPackage().getUuid().toStr()));
-  mUi->lblLibPackageUuid->setToolTip(
-      mDevice.getLibPackage().getFilePath().toNative());
   mUi->lblLibPackageName->setText(
-      *mDevice.getLibPackage().getNames().value(localeOrder));
+      htmlLink.arg(mDevice.getLibPackage().getFilePath().toQUrl().toString(),
+                   *mDevice.getLibPackage().getNames().value(localeOrder)));
   mUi->lblLibPackageName->setToolTip(
-      mDevice.getLibPackage().getDescriptions().value(localeOrder));
+      mDevice.getLibPackage().getDescriptions().value(localeOrder) + "<p>" +
+      mDevice.getLibPackage().getFilePath().toNative());
 
-  mUi->lblLibFootprintUuid->setText(
-      mDevice.getLibFootprint().getUuid().toStr());
   mUi->lblLibFootprintName->setText(
       *mDevice.getLibFootprint().getNames().value(localeOrder));
   mUi->lblLibFootprintName->setToolTip(

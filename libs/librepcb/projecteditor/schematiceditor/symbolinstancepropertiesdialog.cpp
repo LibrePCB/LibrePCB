@@ -64,7 +64,6 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
 
   // Component Instance Attributes
-  mUi->lblCompInstUuid->setText(mComponentInstance.getUuid().toStr());
   mUi->edtCompInstName->setText(*mComponentInstance.getName());
   mUi->edtCompInstValue->setText(mComponentInstance.getValue());
   mUi->attributeListEditorWidget->setAttributeList(
@@ -74,18 +73,13 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
 
   // Component Library Element Attributes
   QString htmlLink("<a href=\"%1\">%2<a>");
-  mUi->lblCompLibUuid->setText(htmlLink.arg(
+  mUi->lblCompLibName->setText(htmlLink.arg(
       mComponentInstance.getLibComponent().getFilePath().toQUrl().toString(),
-      mComponentInstance.getLibComponent().getUuid().toStr()));
-  mUi->lblCompLibUuid->setToolTip(
-      mComponentInstance.getLibComponent().getFilePath().toNative());
-  mUi->lblCompLibName->setText(
-      *mComponentInstance.getLibComponent().getNames().value(localeOrder));
+      *mComponentInstance.getLibComponent().getNames().value(localeOrder)));
   mUi->lblCompLibName->setToolTip(
       mComponentInstance.getLibComponent().getDescriptions().value(
-          localeOrder));
-  mUi->lblSymbVarUuid->setText(
-      mComponentInstance.getSymbolVariant().getUuid().toStr());
+          localeOrder) +
+      "<p>" + mComponentInstance.getLibComponent().getFilePath().toNative());
   mUi->lblSymbVarName->setText(
       *mComponentInstance.getSymbolVariant().getNames().value(localeOrder));
   mUi->lblSymbVarName->setToolTip(
@@ -93,7 +87,6 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           localeOrder));
 
   // Symbol Instance Attributes
-  mUi->lblSymbInstUuid->setText(mSymbol.getUuid().toStr());
   mUi->lblSymbInstName->setText(mSymbol.getName());
   mUi->spbxSymbInstPosX->setValue(mSymbol.getPosition().getX().toMm());
   mUi->spbxSymbInstPosY->setValue(mSymbol.getPosition().getY().toMm());
@@ -101,15 +94,12 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   mUi->cbxMirror->setChecked(mSymbol.getMirrored());
 
   // Symbol Library Element Attributes
-  mUi->lblSymbLibUuid->setText(
-      htmlLink.arg(mSymbol.getLibSymbol().getFilePath().toQUrl().toString(),
-                   mSymbol.getLibSymbol().getUuid().toStr()));
-  mUi->lblSymbLibUuid->setToolTip(
-      mSymbol.getLibSymbol().getFilePath().toNative());
   mUi->lblSymbLibName->setText(
-      *mSymbol.getLibSymbol().getNames().value(localeOrder));
+      htmlLink.arg(mSymbol.getLibSymbol().getFilePath().toQUrl().toString(),
+                   *mSymbol.getLibSymbol().getNames().value(localeOrder)));
   mUi->lblSymbLibName->setToolTip(
-      mSymbol.getLibSymbol().getDescriptions().value(localeOrder));
+      mSymbol.getLibSymbol().getDescriptions().value(localeOrder) + "<p>" +
+      mSymbol.getLibSymbol().getFilePath().toNative());
 
   // set focus to component instance name
   mUi->edtCompInstName->selectAll();

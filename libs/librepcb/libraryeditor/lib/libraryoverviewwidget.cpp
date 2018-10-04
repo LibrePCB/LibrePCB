@@ -64,7 +64,6 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mDependenciesEditorWidget.data());
 
-  mUi->lblUuid->setText(mLibrary->getUuid().toStr());
   mUi->edtName->setText(*mLibrary->getNames().value(getLibLocaleOrder()));
   mUi->edtDescription->setPlainText(
       mLibrary->getDescriptions().value(getLibLocaleOrder()));

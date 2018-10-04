@@ -79,10 +79,6 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   // load symbol
   mSymbol.reset(new Symbol(fp, false));  // can throw
   setWindowTitle(*mSymbol->getNames().value(getLibLocaleOrder()));
-  mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>")
-                            .arg(mSymbol->getFilePath().toQUrl().toString(),
-                                 mSymbol->getUuid().toStr()));
-  mUi->lblUuid->setToolTip(mSymbol->getFilePath().toNative());
   mUi->edtName->setText(*mSymbol->getNames().value(getLibLocaleOrder()));
   mUi->edtDescription->setPlainText(
       mSymbol->getDescriptions().value(getLibLocaleOrder()));

@@ -50,7 +50,6 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin,
           &SymbolPinPropertiesDialog::on_buttonBox_clicked);
 
   // load pin attributes
-  mUi->lblUuid->setText(mSymbolPin.getUuid().toStr());
   mUi->edtName->setText(*mSymbolPin.getName());
   mUi->spbPosX->setValue(mSymbolPin.getPosition().getX().toMm());
   mUi->spbPosY->setValue(mSymbolPin.getPosition().getY().toMm());

@@ -158,7 +158,6 @@ void ComponentChooserDialog::setSelectedComponent(
     }
   }
 
-  mUi->lblComponentUuid->setText(uuidStr);
   mUi->lblComponentName->setText(name);
   mUi->lblComponentDescription->setText(desc);
   updatePreview();

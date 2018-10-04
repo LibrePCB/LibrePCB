@@ -54,9 +54,6 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
     mUndoStack(undoStack) {
   mUi->setupUi(this);
 
-  // UUID label
-  mUi->lblUuid->setText(mVia.getUuid().toStr());
-
   // shape combobox
   mUi->cbxShape->addItem(tr("Round"), static_cast<int>(BI_Via::Shape::Round));
   mUi->cbxShape->addItem(tr("Square"), static_cast<int>(BI_Via::Shape::Square));

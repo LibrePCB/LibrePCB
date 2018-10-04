@@ -26,6 +26,7 @@
 #include "ui_repositorylibrarylistwidgetitem.h"
 
 #include <librepcb/common/network/networkrequest.h>
+#include <librepcb/library/library.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -112,13 +113,13 @@ void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept {
 
 void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
   if (mUuid) {
-    tl::optional<Version> installedVersion =
-        mWorkspace.getVersionOfLibrary(*mUuid, true, true);
-    if (installedVersion) {
+    QSharedPointer<library::Library> lib =
+        mWorkspace.getLibrary(*mUuid, true, true);
+    if (lib) {
       mUi->lblInstalledVersion->setText(
-          QString(tr("Installed: v%1")).arg(installedVersion->toStr()));
+          QString(tr("Installed: v%1")).arg(lib->getVersion().toStr()));
       mUi->lblInstalledVersion->setVisible(true);
-      if (installedVersion < mVersion) {
+      if (lib->getVersion() < mVersion) {
         mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
         mUi->cbxDownload->setText(tr("Update"));
         mUi->cbxDownload->setVisible(true);

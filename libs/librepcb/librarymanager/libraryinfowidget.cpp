@@ -80,15 +80,15 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace&   ws,
                           : tr("No"));
 
   // extended attributes
-  mUi->lblUuid->setText(lib->getUuid().toStr());
   mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
   QString dependencies;
   foreach (const Uuid& uuid, lib->getDependencies()) {
-    tl::optional<Version> installedVersion =
-        mWorkspace.getVersionOfLibrary(uuid, true, true);
+    QSharedPointer<library::Library> installedLib =
+        mWorkspace.getLibrary(uuid, true, true);
     QString line = dependencies.isEmpty() ? "" : "<br>";
-    if (installedVersion) {
-      line += QString(" <font color=\"green\">%1 ✔</font>").arg(uuid.toStr());
+    if (installedLib) {
+      line += QString(" <font color=\"green\">%1 ✔</font>")
+                  .arg(*installedLib->getNames().value(localeOrder));
     } else {
       line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());
     }

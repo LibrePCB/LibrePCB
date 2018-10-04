@@ -70,8 +70,6 @@ public:
       const NewElementWizardPage_DeviceProperties& rhs) = delete;
 
 private:  // Methods
-  void edtComponentUuidTextChanged(const QString& text) noexcept;
-  void edtPackageUuidTextChanged(const QString& text) noexcept;
   void btnChooseComponentClicked() noexcept;
   void btnChoosePackageClicked() noexcept;
   void setComponent(const tl::optional<Uuid>& uuid) noexcept;

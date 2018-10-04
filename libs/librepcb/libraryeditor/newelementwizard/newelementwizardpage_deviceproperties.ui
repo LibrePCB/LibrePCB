@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>277</height>
+    <height>210</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,14 +30,21 @@
        <number>3</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
         <property name="spacing">
          <number>0</number>
         </property>
         <item>
-         <widget class="QLineEdit" name="edtComponentUuid">
-          <property name="maxLength">
-           <number>50</number>
+         <widget class="QLabel" name="lblComponentName">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string notr="true">TextLabel</string>
           </property>
          </widget>
         </item>
@@ -55,20 +62,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblComponentName">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">TextLabel</string>
-        </property>
-       </widget>
       </item>
       <item>
        <widget class="QLabel" name="lblComponentDescription">
@@ -106,14 +99,21 @@
        <number>3</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
         <property name="spacing">
          <number>0</number>
         </property>
         <item>
-         <widget class="QLineEdit" name="edtPackageUuid">
-          <property name="maxLength">
-           <number>50</number>
+         <widget class="QLabel" name="lblPackageName">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string notr="true">TextLabel</string>
           </property>
          </widget>
         </item>
@@ -131,20 +131,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblPackageName">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">TextLabel</string>
-        </property>
-       </widget>
       </item>
       <item>
        <widget class="QLabel" name="lblPackageDescription">
