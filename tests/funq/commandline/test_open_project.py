@@ -4,22 +4,18 @@
 import time
 
 """
-Test opening projects from within control panel
+Test opening projects by command line arguments
 """
 
 project = 'data/fixtures/Empty Project/Empty Project.lpp'
 
 
-def test_open_dialog(librepcb):
+def test_open_project(librepcb):
     """
-    Open project by open dialog in control panel
+    Open project by command line argument
     """
+    librepcb.set_project(project)
     with librepcb.open() as app:
-        path = librepcb.abspath(project)
-        app.widget('controlPanelOpenProjectButton').click()
-        app.widget('controlPanelOpenProjectDialogFileNameEdit').set_property('text', path)
-        app.widget('controlPanelOpenProjectDialogOkButton').click()
-
         # Check if both editors were opened
         assert app.widget('schematicEditor').properties()['visible'] is True
         assert app.widget('boardEditor').properties()['visible'] is True
