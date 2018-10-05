@@ -170,6 +170,37 @@ This is an example how a project could look like:
 See @ref doc_versioning.
 
 
+# File format upgrade procedure {#doc_project_upgrade}
+
+*Note: The upgrade procedure is not implemented yet, so this description is
+about how it's **intended** to be implemented*.
+
+When opening a project with an older file format, LibrePCB first upgrades it to
+the latest file format version. Afterwards, it is opened as usual. The exact
+steps are following:
+
+1. If project file format is older than the application's file format version:
+  1. Inform the user that the project will be upgraded and thus older versions of
+     LibrePCB will no longer be able to open that project. If the user doesn't
+     accept, the procedure is aborted and the project will not be opened.
+  2. Create a backup of the whole project into the subdirectory `.backup`.
+  3. Upgrade the project file to the *next* file format version. This is done in
+     a loop until the file format matches the application's file format version.
+  4. If an error occured during the upgrade, abort the procedure, completely
+     restore the backup and display the error message to the user.
+2. Open the project as usual.
+
+Currently the file format upgrade is immediately written to disk, so it's not
+possible to open an old project read-only. Once we have implemented a
+[file system abstraction layer](https://github.com/LibrePCB/LibrePCB/issues/172),
+we can (hopefully) fix this restriction to allow opening old projects read-only
+(i.e. the upgrade can be done completely in RAM).
+
+If the LibrePCB CLI is used to open an old project, it should abort with an
+error to avoid upgrading a project by accident. A flag `--upgrade` could be
+added to explicitly upgrade old projects before processing it.
+
+
 # Avoid opening a project multiple times (Directory Lock) {#doc_project_lock}
 
 Opening a project multiple times simultaneously can be dangerous. Even if the application's design
