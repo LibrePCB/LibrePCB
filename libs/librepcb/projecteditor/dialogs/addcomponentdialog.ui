@@ -204,5 +204,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>treeComponents</sender>
+   <signal>itemDoubleClicked(QTreeWidgetItem*,int)</signal>
+   <receiver>librepcb::project::editor::AddComponentDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>419</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
