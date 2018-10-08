@@ -339,7 +339,7 @@
   <action name="actionShow_Board_Editor">
    <property name="icon">
     <iconset resource="../../../../img/images.qrc">
-     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
+     <normaloff>:/img/actions/board_editor.png</normaloff>:/img/actions/board_editor.png</iconset>
    </property>
    <property name="text">
     <string>Show Board Editor</string>
@@ -447,7 +447,7 @@
      <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
    </property>
    <property name="text">
-     <string>M&amp;irror</string>
+    <string>M&amp;irror</string>
    </property>
    <property name="shortcut">
     <string>M</string>
@@ -531,7 +531,7 @@
   <action name="actionToolAddComponent">
    <property name="icon">
     <iconset resource="../../../../img/images.qrc">
-     <normaloff>:/img/actions/chip.png</normaloff>:/img/actions/chip.png</iconset>
+     <normaloff>:/img/actions/add_component.png</normaloff>:/img/actions/add_component.png</iconset>
    </property>
    <property name="text">
     <string>Add &amp;Component</string>

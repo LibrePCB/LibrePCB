@@ -13,7 +13,8 @@
         <file>actions/bookmark.png</file>
         <file>actions/bookmark_gray.png</file>
         <file>actions/cancel.png</file>
-        <file>actions/chip.png</file>
+        <file>actions/add_component.png</file>
+        <file>actions/board_editor.png</file>
         <file>actions/copy.png</file>
         <file>actions/cut.png</file>
         <file>actions/delete.png</file>
