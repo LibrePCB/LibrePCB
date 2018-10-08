@@ -27,10 +27,15 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Attribute;
+class AttributeUnitComboBox;
 
 namespace library {
 class Component;
@@ -75,8 +80,17 @@ private:
   // Private Methods
   ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
   void       startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
-                                  const tl::optional<Uuid>& symbVar = tl::nullopt);
+                                  const tl::optional<Uuid>& symbVar = tl::nullopt,
+                                  bool                      keepValue = false);
   bool       abortCommand(bool showErrMsgBox) noexcept;
+  std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
+  void                             valueChanged(QString text) noexcept;
+  void                             attributeChanged() noexcept;
+  void                             updateValueToolbar() noexcept;
+  void                             updateAttributeToolbar() noexcept;
+  void                             setFocusToToolbar() noexcept;
+  static QString                   toSingleLine(const QString& text) noexcept;
+  static QString                   toMultiLine(const QString& text) noexcept;
 
   // Attributes
   bool                mIsUndoCmdActive;
@@ -88,6 +102,14 @@ private:
   int                    mCurrentSymbVarItemIndex;
   SI_Symbol*             mCurrentSymbolToPlace;
   CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
+
+  // Widgets for the command toolbar
+  QLabel*                mValueLabel;
+  QComboBox*             mValueComboBox;
+  QLineEdit*             mAttributeValueEdit;
+  QAction*               mAttributeValueEditAction;
+  AttributeUnitComboBox* mAttributeUnitComboBox;
+  QAction*               mAttributeUnitComboBoxAction;
 };
 
 /*******************************************************************************

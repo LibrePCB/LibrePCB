@@ -28,8 +28,12 @@
 #include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 
+#include <librepcb/common/attributes/attributetype.h>
+#include <librepcb/common/attributes/attributeunit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/widgets/attributetypecombobox.h>
+#include <librepcb/common/widgets/attributeunitcombobox.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/project/circuit/componentinstance.h>
@@ -63,7 +67,16 @@ SES_AddComponent::SES_AddComponent(SchematicEditor&     editor,
     mCurrentComponent(nullptr),
     mCurrentSymbVarItemIndex(-1),
     mCurrentSymbolToPlace(nullptr),
-    mCurrentSymbolEditCommand(nullptr) {
+    mCurrentSymbolEditCommand(nullptr),
+    // command toolbar actions / widgets:
+    mValueLabel(nullptr),
+    mValueComboBox(nullptr),
+    mAttributeValueEdit(nullptr),
+    mAttributeValueEditAction(nullptr),
+    mAttributeUnitComboBox(nullptr),
+    mAttributeUnitComboBoxAction(nullptr)
+
+{
 }
 
 SES_AddComponent::~SES_AddComponent() {
@@ -146,15 +159,72 @@ bool SES_AddComponent::entry(SEE_Base* event) noexcept {
     mAddComponentDialog = nullptr;
     return false;
   }
+  Q_ASSERT(mCurrentComponent);
+
+  // add the "Value:" label to the toolbar
+  mValueLabel = new QLabel(tr("Value:"));
+  mValueLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mValueLabel);
+
+  // add the value text edit to the toolbar
+  mValueComboBox = new QComboBox();
+  mValueComboBox->setEditable(true);
+  mValueComboBox->setFixedHeight(QLineEdit().sizeHint().height());
+  mValueComboBox->setMinimumWidth(200);
+  mValueComboBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  mEditorUi.commandToolbar->addWidget(mValueComboBox);
+
+  // add the attribute text edit to the toolbar
+  mAttributeValueEdit = new QLineEdit();
+  mAttributeValueEdit->setClearButtonEnabled(true);
+  mAttributeValueEdit->setSizePolicy(QSizePolicy::Preferred,
+                                     QSizePolicy::Fixed);
+  mAttributeValueEditAction =
+      mEditorUi.commandToolbar->addWidget(mAttributeValueEdit);
+
+  // add the attribute unit combobox to the toolbar
+  mAttributeUnitComboBox = new AttributeUnitComboBox();
+  mAttributeUnitComboBox->setFixedHeight(QLineEdit().sizeHint().height());
+  mAttributeUnitComboBoxAction =
+      mEditorUi.commandToolbar->addWidget(mAttributeUnitComboBox);
+
+  // Update attribute toolbar widgets and start watching for modifications
+  updateValueToolbar();
+  updateAttributeToolbar();
+  setFocusToToolbar();
+  connect(mValueComboBox, &QComboBox::currentTextChanged, this,
+          &SES_AddComponent::valueChanged);
+  connect(mAttributeValueEdit, &QLineEdit::textChanged, this,
+          &SES_AddComponent::attributeChanged);
+  connect(mAttributeUnitComboBox, &AttributeUnitComboBox::currentItemChanged,
+          this, &SES_AddComponent::attributeChanged);
+
   return true;
 }
 
 bool SES_AddComponent::exit(SEE_Base* event) noexcept {
   Q_UNUSED(event);
+
+  // Abort the currently active command
   if (!abortCommand(true)) return false;
   Q_ASSERT(mIsUndoCmdActive == false);
+
+  // Delete the "Add Component" dialog
   delete mAddComponentDialog;
   mAddComponentDialog = nullptr;
+
+  // Remove actions / widgets from the "command" toolbar
+  mAttributeUnitComboBoxAction = nullptr;
+  mAttributeValueEditAction    = nullptr;
+  delete mAttributeUnitComboBox;
+  mAttributeUnitComboBox = nullptr;
+  delete mAttributeValueEdit;
+  mAttributeValueEdit = nullptr;
+  delete mValueComboBox;
+  mValueComboBox = nullptr;
+  delete mValueLabel;
+  mValueLabel = nullptr;
+
   return true;
 }
 
@@ -237,7 +307,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(
               mUndoStack.commitCmdGroup();
               mIsUndoCmdActive = false;
               abortCommand(false);  // reset attributes
-              startAddingComponent(componentUuid, symbVarUuid);
+              startAddingComponent(componentUuid, symbVarUuid, true);
               return ForceStayInState;
             }
           } catch (Exception& e) {
@@ -294,7 +364,8 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(
 }
 
 void SES_AddComponent::startAddingComponent(const tl::optional<Uuid>& cmp,
-                                            const tl::optional<Uuid>& symbVar) {
+                                            const tl::optional<Uuid>& symbVar,
+                                            bool keepValue) {
   Schematic* schematic = mEditor.getActiveSchematic();
   Q_ASSERT(schematic);
   if (!schematic) throw LogicError(__FILE__, __LINE__);
@@ -332,6 +403,18 @@ void SES_AddComponent::startAddingComponent(const tl::optional<Uuid>& cmp,
       mUndoStack.appendToCmdGroup(cmd);
       mCurrentComponent = cmd->getComponentInstance();
     }
+
+    // set value
+    if (keepValue && mValueComboBox) {
+      mCurrentComponent->setValue(toMultiLine(mValueComboBox->currentText()));
+      attributeChanged();  // sets the attribute on the component
+    } else if (mValueComboBox) {
+      updateValueToolbar();
+      updateAttributeToolbar();
+    }
+
+    // set focus to toolbar so the value can be changed by typing
+    setFocusToToolbar();
 
     // create the first symbol instance and add it to the schematic
     mCurrentSymbVarItemIndex = 0;
@@ -393,6 +476,105 @@ bool SES_AddComponent::abortCommand(bool showErrMsgBox) noexcept {
     if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     return false;
   }
+}
+
+std::shared_ptr<const Attribute> SES_AddComponent::getToolbarAttribute() const
+    noexcept {
+  Q_ASSERT(mCurrentComponent);
+  QString value = mCurrentComponent->getValue();
+  QString key   = QString(value).remove("{{").remove("}}").trimmed();
+  auto    attr  = mCurrentComponent->getAttributes().find(key);
+  if (attr && value.startsWith("{{") && value.endsWith("}}")) {
+    return attr;
+  } else {
+    return std::shared_ptr<Attribute>();
+  }
+}
+
+void SES_AddComponent::valueChanged(QString text) noexcept {
+  Q_ASSERT(mCurrentComponent);
+  mCurrentComponent->setValue(toMultiLine(text));
+  updateAttributeToolbar();
+}
+
+void SES_AddComponent::attributeChanged() noexcept {
+  Q_ASSERT(mCurrentComponent);
+  std::shared_ptr<const Attribute> selected = getToolbarAttribute();
+  if (!selected) return;
+  AttributeList              attributes = mCurrentComponent->getAttributes();
+  std::shared_ptr<Attribute> attribute  = attributes.find(*selected->getKey());
+  if (!attribute) return;
+  const AttributeType& type  = attribute->getType();
+  QString              value = toMultiLine(mAttributeValueEdit->text());
+  const AttributeUnit* unit  = mAttributeUnitComboBox->getCurrentItem();
+  if (type.isValueValid(value) && type.isUnitAvailable(unit)) {
+    attribute->setTypeValueUnit(attribute->getType(), value, unit);
+    mCurrentComponent->setAttributes(attributes);
+  }
+}
+
+void SES_AddComponent::updateValueToolbar() noexcept {
+  mValueComboBox->blockSignals(true);
+  mValueComboBox->clear();
+  for (const Attribute& attribute : mCurrentComponent->getAttributes()) {
+    mValueComboBox->addItem("{{" + *attribute.getKey() + "}}");
+  }
+  mValueComboBox->setCurrentText(toSingleLine(mCurrentComponent->getValue()));
+  mValueComboBox->blockSignals(false);
+}
+
+void SES_AddComponent::updateAttributeToolbar() noexcept {
+  Q_ASSERT(mCurrentComponent);
+  std::shared_ptr<const Attribute> attribute = getToolbarAttribute();
+  if (attribute) {
+    mAttributeValueEdit->blockSignals(true);
+    mAttributeUnitComboBox->blockSignals(true);
+    mAttributeValueEdit->setText(toSingleLine(attribute->getValue()));
+    mAttributeValueEdit->setPlaceholderText(*attribute->getKey());
+    mAttributeValueEditAction->setVisible(true);
+    mAttributeUnitComboBox->setAttributeType(attribute->getType());
+    mAttributeUnitComboBox->setCurrentItem(attribute->getUnit());
+    if (attribute->getType().getAvailableUnits().count() > 0) {
+      mAttributeValueEdit->setMinimumWidth(50);
+      mAttributeUnitComboBoxAction->setVisible(true);
+    } else {
+      mAttributeValueEdit->setMinimumWidth(200);
+      mAttributeUnitComboBoxAction->setVisible(false);
+    }
+    mAttributeValueEdit->blockSignals(false);
+    mAttributeUnitComboBox->blockSignals(false);
+  } else {
+    mAttributeValueEditAction->setVisible(false);
+    mAttributeUnitComboBoxAction->setVisible(false);
+  }
+}
+
+void SES_AddComponent::setFocusToToolbar() noexcept {
+  QLineEdit* widget = nullptr;
+  if (mAttributeValueEditAction && mAttributeValueEditAction->isVisible()) {
+    widget = mAttributeValueEdit;
+  } else if (mValueComboBox) {
+    widget = mValueComboBox->lineEdit();
+  }
+  if (widget) {
+    // Slightly delay it to make it working properly...
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    QTimer::singleShot(0, widget, &QLineEdit::selectAll);
+    QTimer::singleShot(
+        0, widget, static_cast<void (QLineEdit::*)()>(&QLineEdit::setFocus));
+#else
+    QTimer::singleShot(0, widget, SLOT(selectAll()));
+    QTimer::singleShot(0, widget, SLOT(setFocus()));
+#endif
+  }
+}
+
+QString SES_AddComponent::toSingleLine(const QString& text) noexcept {
+  return QString(text).replace("\n", "\\n");
+}
+
+QString SES_AddComponent::toMultiLine(const QString& text) noexcept {
+  return text.trimmed().replace("\\n", "\n");
 }
 
 /*******************************************************************************
