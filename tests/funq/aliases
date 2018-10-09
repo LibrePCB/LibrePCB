@@ -84,6 +84,9 @@ libraryManagerLibraryInfoWidgetOpenEditorButton = {libraryManagerLibraryInfoWidg
 libraryEditor = librepcb__library__editor__LibraryEditor
 libraryEditorWidget = {libraryEditor}::centralWidget
 
+# Actions
+libraryEditorActionNewElement = {libraryEditor}::actionNew
+
 # Tab widget
 libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
 libraryEditorStackedWidget = {libraryEditorTabWidget}::qt_tabwidget_stackedwidget
@@ -101,10 +104,10 @@ libraryEditorOverviewUrlEdit = {libraryEditorOverviewMetadataWidget}::edtUrl
 
 # New element wizard
 libraryEditorNewElementWizard = librepcb__library__editor__NewElementWizard
-libraryEditorNewElementWizardWidget = {libraryEditorNewElementWizard}::centralWidget
+libraryEditorNewElementWizardWidget = {libraryEditorNewElementWizard}::QWidget
 libraryEditorNewElementWizardNextButton = {libraryEditorNewElementWizardWidget}::__qt__passive_wizardbutton1
 libraryEditorNewElementWizardFinishButton = {libraryEditorNewElementWizardWidget}::qt_wizard_finish
-libraryEditorNewElementWizardFrame = {libraryEditorNewElementWizard}::QFrame
+libraryEditorNewElementWizardFrame = {libraryEditorNewElementWizardWidget}::QFrame
 libraryEditorNewElementWizardChooseTypePage = {libraryEditorNewElementWizardFrame}::librepcb__library__editor__NewElementWizardPage_ChooseType
 libraryEditorNewElementWizardChooseTypeCmpCatButton = {libraryEditorNewElementWizardChooseTypePage}::btnComponentCategory
 libraryEditorNewElementWizardChooseTypePkgCatButton = {libraryEditorNewElementWizardChooseTypePage}::btnPackageCategory
@@ -121,6 +124,30 @@ libraryEditorNewElementWizardMetadataVersionEdit = {libraryEditorNewElementWizar
 libraryEditorNewElementWizardMetadataCategoryEdit = {libraryEditorNewElementWizardMetadataPage}::edtCategory
 libraryEditorNewElementWizardMetadataCategoryLabel = {libraryEditorNewElementWizardMetadataPage}::lblCategoryTree
 libraryEditorNewElementWizardMetadataCategoryButton = {libraryEditorNewElementWizardMetadataPage}::btnChooseCategory
+libraryEditorNewElementWizardComponentPropertiesPage = {libraryEditorNewElementWizardFrame}::librepcb__library__editor__NewElementWizardPage_ComponentProperties
+libraryEditorNewElementWizardComponentPropertiesSchematicOnlyComboBox = {libraryEditorNewElementWizardComponentPropertiesPage}::cbxSchematicOnly
+libraryEditorNewElementWizardComponentPropertiesDefaultValueEdit = {libraryEditorNewElementWizardComponentPropertiesPage}::edtDefaultValue
+libraryEditorNewElementWizardComponentPropertiesPrefixEdit = {libraryEditorNewElementWizardComponentPropertiesPage}::edtPrefix
+libraryEditorNewElementWizardComponentSymbolsPage = {libraryEditorNewElementWizardFrame}::librepcb__library__editor__NewElementWizardPage_ComponentSymbols
+libraryEditorNewElementWizardComponentSymbolsListEditorWidget = {libraryEditorNewElementWizardComponentSymbolsPage}::symbolListEditorWidget
+libraryEditorNewElementWizardComponentSymbolsTableWidget = {libraryEditorNewElementWizardComponentSymbolsListEditorWidget}::QTableWidget
+libraryEditorNewElementWizardComponentSymbolsChooseSymbolButton = {libraryEditorNewElementWizardComponentSymbolsTableWidget}::qt_scrollarea_viewport::QWidget::QToolButton
+libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialog = {libraryEditorNewElementWizardComponentSymbolsListEditorWidget}::librepcb__library__editor__SymbolChooserDialog
+libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogCategoriesTree = {libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialog}::treeCategories
+libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogSymbolsList = {libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialog}::listSymbols
+libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogAcceptButton = {libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialog}::buttonBox_2::QPushButton
+libraryEditorNewElementWizardComponentSymbolsAddSymbolButton = {libraryEditorNewElementWizardComponentSymbolsTableWidget}::qt_scrollarea_viewport::QWidget-1::QToolButton
+libraryEditorNewElementWizardDevicePropertiesPage = {libraryEditorNewElementWizardFrame}::librepcb__library__editor__NewElementWizardPage_DeviceProperties
+libraryEditorNewElementWizardDevicePropertiesChooseComponentButton = {libraryEditorNewElementWizardDevicePropertiesPage}::groupBox::btnChooseComponent
+libraryEditorNewElementWizardDevicePropertiesChoosePackageButton = {libraryEditorNewElementWizardDevicePropertiesPage}::groupBox_2::btnChoosePackage
+libraryEditorNewElementWizardDevicePropertiesChooseComponentDialog = {libraryEditorNewElementWizardDevicePropertiesPage}::librepcb__library__editor__ComponentChooserDialog
+libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogCategoriesTree = {libraryEditorNewElementWizardDevicePropertiesChooseComponentDialog}::treeCategories
+libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogComponentsList = {libraryEditorNewElementWizardDevicePropertiesChooseComponentDialog}::listComponents
+libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogAcceptButton = {libraryEditorNewElementWizardDevicePropertiesChooseComponentDialog}::buttonBox_2::QPushButton
+libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog = {libraryEditorNewElementWizardDevicePropertiesPage}::librepcb__library__editor__PackageChooserDialog
+libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogCategoriesTree = {libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog}::treeCategories
+libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogPackagesList = {libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog}::listPackages
+libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogAcceptButton = {libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog}::buttonBox_2::QPushButton
 
 
 ################################################################################
@@ -131,9 +158,25 @@ libraryEditorNewElementWizardMetadataCategoryButton = {libraryEditorNewElementWi
 schematicEditor = librepcb__project__editor__SchematicEditor
 schematicEditorWidget = {schematicEditor}::centralWidget
 
+# Actions
+schematicEditorActionAddComponent = {schematicEditor}::actionToolAddComponent
+
 # Graphics view
 schematicEditorGraphicsView = {schematicEditor}::librepcb:_:GraphicsView
 schematicEditorGraphicsViewWidget = {schematicEditorGraphicsView}::QWidget
+
+# Add Component Dialog
+schematicEditorAddComponentDialog = {schematicEditor}::librepcb__project__editor__AddComponentDialog
+schematicEditorAddComponentDialogButtonBox = {schematicEditorAddComponentDialog}::buttonBox
+schematicEditorAddComponentDialogButtonAccept = {schematicEditorAddComponentDialogButtonBox}::QPushButton
+schematicEditorAddComponentDialogButtonCancel = {schematicEditorAddComponentDialogButtonBox}::QPushButton-1
+schematicEditorAddComponentDialogSearchEdit = {schematicEditorAddComponentDialog}::edtSearch
+schematicEditorAddComponentDialogCategoryTree = {schematicEditorAddComponentDialog}::treeCategories
+schematicEditorAddComponentDialogComponentTree = {schematicEditorAddComponentDialog}::treeComponents
+schematicEditorAddComponentDialogSymVarCombobox = {schematicEditorAddComponentDialog}::cbxSymbVar
+schematicEditorAddComponentDialogComponentNameLabel = {schematicEditorAddComponentDialog}::lblCompName
+schematicEditorAddComponentDialogComponentDescriptionLabel = {schematicEditorAddComponentDialog}::lblCompDescription
+schematicEditorAddComponentDialogDeviceNameLabel = {schematicEditorAddComponentDialog}::lblDeviceName
 
 
 ################################################################################

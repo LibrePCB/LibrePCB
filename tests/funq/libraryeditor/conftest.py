@@ -3,13 +3,15 @@
 
 import pytest
 
+library = 'data/fixtures/Populated Library.lplib'
+
 
 @pytest.fixture
 def library_editor(librepcb):
     """
     Fixture opening the library editor with an empty library
     """
-    librepcb.add_local_library_to_workspace()
+    librepcb.add_local_library_to_workspace(path=library)
     with librepcb.open() as app:
         # Open library manager
         app.widget('controlPanelOpenLibraryManagerButton').click()

@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import platform
 import shutil
 import pytest
 import funq
 from funq.client import ApplicationContext, ApplicationConfig
+from funq.errors import FunqError
 
 
 FUNQ_DIR = os.path.dirname(__file__)
@@ -73,7 +75,7 @@ class LibrePcbFixture(object):
             path = self.abspath(path)
         self.project_path = path
 
-    def add_local_library_to_workspace(self, path='data/fixtures/Empty Library.lplib'):
+    def add_local_library_to_workspace(self, path):
         if not os.path.isabs(path):
             path = self.abspath(path)
         dest = os.path.join(self.workspace_path, 'v0.1', 'libraries', 'local')
@@ -112,6 +114,42 @@ class LibrePcbFixture(object):
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
         env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
         return env
+
+
+class Helpers(object):
+    @staticmethod
+    def wait_until_widget_hidden(widget, timeout=5.0):
+        for i in range(0, 100):
+            try:
+                if widget.properties()['visible'] is False:
+                    return
+            except FunqError as e:
+                if e.classname == 'NotRegisteredObject':
+                    return
+                raise
+            time.sleep(timeout / 100.0)
+        raise Exception('Widget "{}" is still visible!'.format(
+            widget.properties().get('objectName')))
+
+    @staticmethod
+    def wait_for_active_window(funq, widget, timeout=5.0):
+        Helpers._wait_for_active_widget(funq, widget, timeout, 'window')
+
+    @staticmethod
+    def wait_for_active_dialog(funq, widget, timeout=5.0):
+        Helpers._wait_for_active_widget(funq, widget, timeout, 'modal')
+
+    @staticmethod
+    def _wait_for_active_widget(funq, widget, timeout, widget_type):
+        active_widget = None
+        for i in range(0, 100):
+            active_widget = funq.active_widget(widget_type=widget_type)
+            if active_widget is not None and active_widget.oid == widget.oid:
+                return
+            time.sleep(timeout / 100.0)
+        properties = active_widget.properties() if active_widget else dict()
+        raise Exception('Active widget is "{}" ({})!'.format(
+            properties.get('windowTitle'), properties.get('objectName')))
 
 
 @pytest.fixture(scope="session")
@@ -161,3 +199,11 @@ def librepcb(create_librepcb):
     Fixture allowing to create one application instance
     """
     yield create_librepcb()
+
+
+@pytest.fixture(scope="session")
+def helpers():
+    """
+    Fixture providing some helper functions
+    """
+    return Helpers()
