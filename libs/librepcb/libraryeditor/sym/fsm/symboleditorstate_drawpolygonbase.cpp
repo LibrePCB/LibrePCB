@@ -54,7 +54,7 @@ SymbolEditorState_DrawPolygonBase::SymbolEditorState_DrawPolygonBase(
     mCurrentPolygon(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sSymbolOutlines),
-    mLastLineWidth(250000),
+    mLastLineWidth(254000),
     mLastAngle(0),
     mLastFill(false),
     mLastGrabArea(mode != Mode::LINE) {

@@ -250,17 +250,17 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
       mLastLayerName = GraphicsLayer::sSymbolNames;
-      mLastHeight    = Length(3000000);
+      mLastHeight    = Length(2540000);
       mLastText      = "{{NAME}}";
       break;
     case Mode::VALUE:
       mLastLayerName = GraphicsLayer::sSymbolValues;
-      mLastHeight    = Length(2500000);
+      mLastHeight    = Length(2540000);
       mLastText      = "{{VALUE}}";
       break;
     default:
       mLastLayerName = GraphicsLayer::sSymbolOutlines;
-      mLastHeight    = Length(2000000);
+      mLastHeight    = Length(2540000);
       mLastText      = "Text";
       break;
   }

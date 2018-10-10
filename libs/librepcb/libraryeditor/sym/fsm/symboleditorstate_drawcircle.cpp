@@ -53,7 +53,7 @@ SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sSymbolOutlines),
-    mLastLineWidth(250000),
+    mLastLineWidth(254000),
     mLastFill(false),
     mLastGrabArea(true) {
 }

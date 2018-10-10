@@ -54,7 +54,7 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
     mCurrentPolygon(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sTopPlacement),
-    mLastLineWidth(250000),
+    mLastLineWidth(254000),
     mLastAngle(0),
     mLastFill(false),
     mLastGrabArea(mode != Mode::LINE) {

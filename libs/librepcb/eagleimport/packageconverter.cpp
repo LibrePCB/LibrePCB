@@ -126,6 +126,9 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
       textStr = "{{" + textStr.mid(1) + "}}";
     }
     PositiveLength height(Length::fromMm(text.getSize()));  // can throw
+    if ((textStr == "{{NAME}}") || (textStr == "{{VALUE}}")) {
+      height = Length::fromMm(1);
+    }
     Point     pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
     Angle     rot = Angle::fromDeg(text.getRotation().getAngle());
     Alignment align(HAlign::left(), VAlign::bottom());

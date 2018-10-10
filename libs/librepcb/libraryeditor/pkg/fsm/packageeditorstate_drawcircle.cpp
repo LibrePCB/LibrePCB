@@ -53,7 +53,7 @@ PackageEditorState_DrawCircle::PackageEditorState_DrawCircle(
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sTopPlacement),
-    mLastLineWidth(250000),
+    mLastLineWidth(254000),
     mLastFill(false),
     mLastGrabArea(true) {
 }
