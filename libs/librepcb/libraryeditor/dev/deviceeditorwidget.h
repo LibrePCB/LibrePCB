@@ -39,6 +39,7 @@
 namespace librepcb {
 
 class GraphicsScene;
+class DefaultGraphicsLayerProvider;
 
 namespace library {
 
@@ -99,6 +100,7 @@ private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget>            mUi;
   QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<Device>                            mDevice;
+  QScopedPointer<DefaultGraphicsLayerProvider>      mGraphicsLayerProvider;
 
   // component
   QScopedPointer<Component>                         mComponent;

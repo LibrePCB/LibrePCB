@@ -166,8 +166,8 @@ bool ComponentEditorWidget::save() noexcept {
 
 bool ComponentEditorWidget::openComponentSymbolVariantEditor(
     ComponentSymbolVariant& variant) noexcept {
-  ComponentSymbolVariantEditDialog dialog(
-      mContext.workspace, mContext.layerProvider, *mComponent, variant);
+  ComponentSymbolVariantEditDialog dialog(mContext.workspace, *mComponent,
+                                          variant);
   return (dialog.exec() == QDialog::Accepted);
 }
 

@@ -26,6 +26,7 @@
 #include "../common/packagechooserdialog.h"
 #include "ui_deviceeditorwidget.h"
 
+#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/library/cmp/component.h>
@@ -67,6 +68,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
   mUi->viewComponent->setScene(mComponentGraphicsScene.data());
   mUi->viewPackage->setScene(mPackageGraphicsScene.data());
   mUi->viewPackage->setBackgroundBrush(Qt::black);
+  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
   // insert category list editor widget
   mCategoriesEditorWidget.reset(
@@ -180,8 +182,8 @@ bool DeviceEditorWidget::zoomAll() noexcept {
  ******************************************************************************/
 
 void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
-  ComponentChooserDialog dialog(mContext.workspace, &mContext.layerProvider,
-                                this);
+  ComponentChooserDialog dialog(mContext.workspace,
+                                mGraphicsLayerProvider.data(), this);
   if (dialog.exec() == QDialog::Accepted) {
     tl::optional<Uuid> cmpUuid = dialog.getSelectedComponentUuid();
     if (cmpUuid && (*cmpUuid != mDevice->getComponentUuid())) {
@@ -218,7 +220,7 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
 }
 
 void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
-  PackageChooserDialog dialog(mContext.workspace, &mContext.layerProvider,
+  PackageChooserDialog dialog(mContext.workspace, mGraphicsLayerProvider.data(),
                               this);
   if (dialog.exec() == QDialog::Accepted) {
     tl::optional<Uuid> pkgUuid = dialog.getSelectedPackageUuid();
@@ -298,7 +300,7 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
         mSymbols.append(sym);
         std::shared_ptr<SymbolPreviewGraphicsItem> graphicsItem =
             std::make_shared<SymbolPreviewGraphicsItem>(
-                mContext.layerProvider, QStringList(), *sym, mComponent.data(),
+                *mGraphicsLayerProvider, QStringList(), *sym, mComponent.data(),
                 symbVar.getUuid(), item.getUuid());
         graphicsItem->setPos(item.getSymbolPosition().toPxQPointF());
         graphicsItem->setRotation(-item.getSymbolRotation().toDeg());
@@ -339,7 +341,7 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
 void DeviceEditorWidget::updatePackagePreview() noexcept {
   if (mPackage && mPackage->getFootprints().count() > 0) {
     mFootprintGraphicsItem.reset(
-        new FootprintPreviewGraphicsItem(mContext.layerProvider, QStringList(),
+        new FootprintPreviewGraphicsItem(*mGraphicsLayerProvider, QStringList(),
                                          *mPackage->getFootprints().first(),
                                          mPackage.data(), mComponent.data()));
     mPackageGraphicsScene->addItem(*mFootprintGraphicsItem);

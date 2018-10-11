@@ -34,7 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerProvider;
+class DefaultGraphicsLayerProvider;
 class GraphicsScene;
 
 namespace workspace {
@@ -71,11 +71,10 @@ public:
   ComponentSymbolVariantEditDialog() = delete;
   ComponentSymbolVariantEditDialog(
       const ComponentSymbolVariantEditDialog& other) = delete;
-  ComponentSymbolVariantEditDialog(
-      const workspace::Workspace&               ws,
-      const librepcb::IF_GraphicsLayerProvider& layerProvider,
-      const Component& cmp, ComponentSymbolVariant& symbVar,
-      QWidget* parent = nullptr) noexcept;
+  ComponentSymbolVariantEditDialog(const workspace::Workspace& ws,
+                                   const Component&            cmp,
+                                   ComponentSymbolVariant&     symbVar,
+                                   QWidget* parent = nullptr) noexcept;
   ~ComponentSymbolVariantEditDialog() noexcept;
 
   // Operator Overloadings
@@ -88,12 +87,12 @@ private:  // Methods
 
 private:  // Data
   const workspace::Workspace&                          mWorkspace;
-  const IF_GraphicsLayerProvider&                      mLayerProvider;
   const Component&                                     mComponent;
   ComponentSymbolVariant&                              mOriginalSymbVar;
   ComponentSymbolVariant                               mSymbVar;
   QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
   QScopedPointer<GraphicsScene>                        mGraphicsScene;
+  QScopedPointer<DefaultGraphicsLayerProvider>         mGraphicsLayerProvider;
 
   QList<std::shared_ptr<Symbol>>             mSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;

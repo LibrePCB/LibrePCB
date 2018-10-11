@@ -24,6 +24,7 @@
 
 #include "ui_componentsymbolvarianteditdialog.h"
 
+#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
@@ -47,12 +48,10 @@ namespace editor {
  ******************************************************************************/
 
 ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
-    const workspace::Workspace&     ws,
-    const IF_GraphicsLayerProvider& layerProvider, const Component& cmp,
+    const workspace::Workspace& ws, const Component& cmp,
     ComponentSymbolVariant& symbVar, QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
-    mLayerProvider(layerProvider),
     mComponent(cmp),
     mOriginalSymbVar(symbVar),
     mSymbVar(symbVar),
@@ -61,6 +60,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   mUi->setupUi(this);
   mUi->graphicsView->setScene(mGraphicsScene.data());
   mUi->graphicsView->setOriginCrossVisible(false);
+  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
   // load metadata
   mUi->edtName->setText(*mSymbVar.getNames().getDefaultValue());
@@ -68,7 +68,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   mUi->edtNorm->setText(mSymbVar.getNorm());
 
   // load symbol items
-  mUi->symbolListWidget->setVariant(mWorkspace, layerProvider,
+  mUi->symbolListWidget->setVariant(mWorkspace, *mGraphicsLayerProvider,
                                     mSymbVar.getSymbolItems());
   connect(mUi->symbolListWidget,
           &ComponentSymbolVariantItemListEditorWidget::edited, this,
@@ -115,7 +115,7 @@ void ComponentSymbolVariantEditDialog::updateGraphicsItems() noexcept {
           std::make_shared<Symbol>(fp, true);  // can throw
       mSymbols.append(sym);
       std::shared_ptr<SymbolGraphicsItem> graphicsItem =
-          std::make_shared<SymbolGraphicsItem>(*sym, mLayerProvider);
+          std::make_shared<SymbolGraphicsItem>(*sym, *mGraphicsLayerProvider);
       graphicsItem->setPosition(item.getSymbolPosition());
       graphicsItem->setRotation(item.getSymbolRotation());
       mGraphicsScene->addItem(*graphicsItem);

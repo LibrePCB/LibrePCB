@@ -231,6 +231,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
     // set colors
     layer = mLayerProvider.getLayer(*polygon.getLayerName());
     if (layer) {
+      if (!layer->isVisible()) layer = nullptr;
+    }
+    if (layer) {
       pen = QPen(layer->getColor(selected), polygon.getLineWidth()->toPx(),
                  Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
       painter->setPen(pen);
@@ -243,6 +246,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
       layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
     else
       layer = nullptr;
+    if (layer) {
+      if (!layer->isVisible()) layer = nullptr;
+    }
     painter->setBrush(layer
                           ? QBrush(layer->getColor(selected), Qt::SolidPattern)
                           : Qt::NoBrush);
@@ -255,7 +261,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
   for (const Circle& circle : mSymbol.getCircles()) {
     // set colors
     layer = mLayerProvider.getLayer(*circle.getLayerName());
-    if (!layer) continue;
+    if (layer) {
+      if (!layer->isVisible()) layer = nullptr;
+    }
     if (layer) {
       pen = QPen(layer->getColor(selected), circle.getLineWidth()->toPx(),
                  Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -268,6 +276,9 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
       layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);
     else
       layer = nullptr;
+    if (layer) {
+      if (!layer->isVisible()) layer = nullptr;
+    }
     painter->setBrush(layer
                           ? QBrush(layer->getColor(selected), Qt::SolidPattern)
                           : Qt::NoBrush);
@@ -276,14 +287,15 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
     painter->drawEllipse(circle.getCenter().toPxQPointF(),
                          circle.getDiameter()->toPx() / 2,
                          circle.getDiameter()->toPx() / 2);
-    // TODO: rotation
   }
 
   // draw all texts
   for (const Text& text : mSymbol.getTexts()) {
     // get layer
     layer = mLayerProvider.getLayer(*text.getLayerName());
-    if (!layer) continue;
+    if (layer) {
+      if (!layer->isVisible()) layer = nullptr;
+    }
 
     // get cached text properties
     const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
