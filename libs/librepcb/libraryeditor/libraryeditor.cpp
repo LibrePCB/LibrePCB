@@ -168,8 +168,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   addLayer(GraphicsLayer::sSchematicSheetFrames);
   addLayer(GraphicsLayer::sSymbolOutlines);
   addLayer(GraphicsLayer::sSymbolGrabAreas);
-  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas,
-           true);  // force it to be visible!
+  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas, true);
   addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
   addLayer(GraphicsLayer::sSymbolPinCirclesReq);
   addLayer(GraphicsLayer::sSymbolPinNames);
@@ -205,10 +204,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   addLayer(GraphicsLayer::sBotReferences);
   addLayer(GraphicsLayer::sTopGrabAreas);
   addLayer(GraphicsLayer::sBotGrabAreas);
-  addLayer(GraphicsLayer::sTopHiddenGrabAreas,
-           true);  // force it to be visible!
-  addLayer(GraphicsLayer::sBotHiddenGrabAreas,
-           true);  // force it to be visible!
+  addLayer(GraphicsLayer::sTopHiddenGrabAreas, true);
+  addLayer(GraphicsLayer::sBotHiddenGrabAreas, true);
   addLayer(GraphicsLayer::sTopPlacement);
   addLayer(GraphicsLayer::sBotPlacement);
   addLayer(GraphicsLayer::sTopDocumentation);
@@ -217,14 +214,14 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   addLayer(GraphicsLayer::sBotNames);
   addLayer(GraphicsLayer::sTopValues);
   addLayer(GraphicsLayer::sBotValues);
-  addLayer(GraphicsLayer::sTopCourtyard);
-  addLayer(GraphicsLayer::sBotCourtyard);
-  addLayer(GraphicsLayer::sTopStopMask);
-  addLayer(GraphicsLayer::sBotStopMask);
-  addLayer(GraphicsLayer::sTopSolderPaste);
-  addLayer(GraphicsLayer::sBotSolderPaste);
-  addLayer(GraphicsLayer::sTopGlue);
-  addLayer(GraphicsLayer::sBotGlue);
+  addLayer(GraphicsLayer::sTopCourtyard, true);
+  addLayer(GraphicsLayer::sBotCourtyard, true);
+  addLayer(GraphicsLayer::sTopStopMask, true);
+  addLayer(GraphicsLayer::sBotStopMask, true);
+  addLayer(GraphicsLayer::sTopSolderPaste, true);
+  addLayer(GraphicsLayer::sBotSolderPaste, true);
+  addLayer(GraphicsLayer::sTopGlue, true);
+  addLayer(GraphicsLayer::sBotGlue, true);
 
   // add debug layers
 #ifdef QT_DEBUG
