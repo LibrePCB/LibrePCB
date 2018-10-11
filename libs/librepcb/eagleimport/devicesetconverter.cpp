@@ -85,8 +85,9 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const {
     CircuitIdentifier signalName(pinName);  // can throw
     if (!component->getSignals().contains(signalUuid)) {
       // create signal
-      component->getSignals().append(
-          std::make_shared<library::ComponentSignal>(signalUuid, signalName));
+      component->getSignals().append(std::make_shared<library::ComponentSignal>(
+          signalUuid, signalName, SignalRole::passive(), QString(), false,
+          false, false));
     }
   }
 
@@ -102,7 +103,7 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const {
     std::shared_ptr<library::ComponentSymbolVariantItem> item(
         new library::ComponentSymbolVariantItem(
             mDb.getSymbolVariantItemUuid(component->getUuid(), gateName),
-            symbolUuid, true, suffix));
+            symbolUuid, Point(0, 0), Angle(0), true, suffix));
 
     // connect pins
     foreach (const parseagle::Connection& connection,

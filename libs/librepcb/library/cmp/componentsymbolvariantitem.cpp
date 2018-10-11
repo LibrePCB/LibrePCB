@@ -50,10 +50,13 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(
 }
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(
-    const Uuid& uuid, const Uuid& symbolUuid, bool isRequired,
+    const Uuid& uuid, const Uuid& symbolUuid, const Point& symbolPos,
+    const Angle& symbolRotation, bool isRequired,
     const ComponentSymbolVariantItemSuffix& suffix) noexcept
   : mUuid(uuid),
     mSymbolUuid(symbolUuid),
+    mSymbolPos(symbolPos),
+    mSymbolRot(symbolRotation),
     mIsRequired(isRequired),
     mSuffix(suffix) {
 }

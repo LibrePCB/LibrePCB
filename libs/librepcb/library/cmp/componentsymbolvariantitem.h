@@ -66,7 +66,8 @@ public:
   ComponentSymbolVariantItem() = delete;
   ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept;
   ComponentSymbolVariantItem(
-      const Uuid& uuid, const Uuid& symbolUuid, bool isRequired,
+      const Uuid& uuid, const Uuid& symbolUuid, const Point& symbolPos,
+      const Angle& symbolRotation, bool isRequired,
       const ComponentSymbolVariantItemSuffix& suffix) noexcept;
   explicit ComponentSymbolVariantItem(const SExpression& node);
   ~ComponentSymbolVariantItem() noexcept;

@@ -395,14 +395,9 @@ void ComponentSignalListEditorWidget::addSignal(
     /*bool negated, bool clock,*/ const QString& forcedNetName) noexcept {
   try {
     CircuitIdentifier constrainedName = validateNameOrThrow(name);  // can throw
-    std::shared_ptr<ComponentSignal> signal(
-        new ComponentSignal(Uuid::createRandom(),
-                            constrainedName));  // can throw
-    // signal->setRole(role);
-    signal->setIsRequired(required);
-    // signal->setIsNegated(negated);
-    // signal->setIsClock(clock);
-    signal->setForcedNetName(forcedNetName);
+    std::shared_ptr<ComponentSignal> signal(new ComponentSignal(
+        Uuid::createRandom(), constrainedName, SignalRole::passive(),
+        forcedNetName, required, false, false));  // can throw
     if (mUndoStack) {
       mUndoStack->execCmd(new CmdComponentSignalInsert(*mSignalList, signal));
     } else {

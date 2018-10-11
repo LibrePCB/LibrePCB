@@ -46,15 +46,18 @@ ComponentSignal::ComponentSignal(const ComponentSignal& other) noexcept
 }
 
 ComponentSignal::ComponentSignal(const Uuid&              uuid,
-                                 const CircuitIdentifier& name) noexcept
+                                 const CircuitIdentifier& name,
+                                 const SignalRole&        role,
+                                 const QString& forcedNetName, bool isRequired,
+                                 bool isNegated, bool isClock) noexcept
   : QObject(nullptr),
     mUuid(uuid),
     mName(name),
-    mRole(SignalRole::passive()),
-    mForcedNetName(),
-    mIsRequired(false),
-    mIsNegated(false),
-    mIsClock(false) {
+    mRole(role),
+    mForcedNetName(forcedNetName),
+    mIsRequired(isRequired),
+    mIsNegated(isNegated),
+    mIsClock(isClock) {
 }
 
 ComponentSignal::ComponentSignal(const SExpression& node)

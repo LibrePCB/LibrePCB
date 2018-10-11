@@ -105,7 +105,8 @@ void NewElementWizardPage_ComponentSignals::initializePage() noexcept {
         auto i = names.find(map.getPinUuid());
         if (i != names.end() && (i.key() == map.getPinUuid())) {
           mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
-              Uuid::createRandom(), i.value()));
+              Uuid::createRandom(), i.value(), SignalRole::passive(), QString(),
+              false, false, false));
         }
       }
     }

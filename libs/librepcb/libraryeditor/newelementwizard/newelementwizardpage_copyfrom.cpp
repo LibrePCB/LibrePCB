@@ -88,29 +88,145 @@ bool NewElementWizardPage_CopyFrom::validatePage() noexcept {
     case NewElementWizardContext::ElementType::Symbol: {
       const Symbol* symbol = dynamic_cast<Symbol*>(mSelectedElement.data());
       Q_ASSERT(symbol);
-      mContext.mSymbolPins     = symbol->getPins();
-      mContext.mSymbolPolygons = symbol->getPolygons();
-      mContext.mSymbolCircles  = symbol->getCircles();
-      mContext.mSymbolTexts    = symbol->getTexts();
+      // copy pins but generate new UUIDs
+      mContext.mSymbolPins.clear();
+      for (const SymbolPin& pin : symbol->getPins()) {
+        mContext.mSymbolPins.append(std::make_shared<SymbolPin>(
+            Uuid::createRandom(), pin.getName(), pin.getPosition(),
+            pin.getLength(), pin.getRotation()));
+      }
+      // copy polygons but generate new UUIDs
+      mContext.mSymbolPolygons.clear();
+      for (const Polygon& polygon : symbol->getPolygons()) {
+        mContext.mSymbolPolygons.append(std::make_shared<Polygon>(
+            Uuid::createRandom(), polygon.getLayerName(),
+            polygon.getLineWidth(), polygon.isFilled(), polygon.isGrabArea(),
+            polygon.getPath()));
+      }
+      // copy circles but generate new UUIDs
+      mContext.mSymbolCircles.clear();
+      for (const Circle& circle : symbol->getCircles()) {
+        mContext.mSymbolCircles.append(std::make_shared<Circle>(
+            Uuid::createRandom(), circle.getLayerName(), circle.getLineWidth(),
+            circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
+            circle.getDiameter()));
+      }
+      // copy texts but generate new UUIDs
+      mContext.mSymbolTexts.clear();
+      for (const Text& text : symbol->getTexts()) {
+        mContext.mSymbolTexts.append(std::make_shared<Text>(
+            Uuid::createRandom(), text.getLayerName(), text.getText(),
+            text.getPosition(), text.getRotation(), text.getHeight(),
+            text.getAlign()));
+      }
       break;
     }
     case NewElementWizardContext::ElementType::Package: {
       const Package* package = dynamic_cast<Package*>(mSelectedElement.data());
       Q_ASSERT(package);
-      mContext.mPackagePads       = package->getPads();
-      mContext.mPackageFootprints = package->getFootprints();
+      // copy pads but generate new UUIDs
+      QHash<Uuid, Uuid> padUuidMap;
+      mContext.mPackagePads.clear();
+      for (const PackagePad& pad : package->getPads()) {
+        Uuid newUuid = Uuid::createRandom();
+        padUuidMap.insert(pad.getUuid(), newUuid);
+        mContext.mPackagePads.append(
+            std::make_shared<PackagePad>(newUuid, pad.getName()));
+      }
+      // copy footprints but generate new UUIDs
+      mContext.mPackageFootprints.clear();
+      for (const Footprint& footprint : package->getFootprints()) {
+        // don't copy translations as they would need to be adjusted anyway
+        std::shared_ptr<Footprint> newFootprint(new Footprint(
+            Uuid::createRandom(), footprint.getNames().getDefaultValue(),
+            footprint.getDescriptions().getDefaultValue()));
+        // copy pads but generate new UUIDs
+        for (const FootprintPad& pad : footprint.getPads()) {
+          newFootprint->getPads().append(std::make_shared<FootprintPad>(
+              *padUuidMap.find(pad.getUuid()), pad.getPosition(),
+              pad.getRotation(), pad.getShape(), pad.getWidth(),
+              pad.getHeight(), pad.getDrillDiameter(), pad.getBoardSide()));
+        }
+        // copy polygons but generate new UUIDs
+        for (const Polygon& polygon : footprint.getPolygons()) {
+          newFootprint->getPolygons().append(std::make_shared<Polygon>(
+              Uuid::createRandom(), polygon.getLayerName(),
+              polygon.getLineWidth(), polygon.isFilled(), polygon.isGrabArea(),
+              polygon.getPath()));
+        }
+        // copy circles but generate new UUIDs
+        for (const Circle& circle : footprint.getCircles()) {
+          newFootprint->getCircles().append(std::make_shared<Circle>(
+              Uuid::createRandom(), circle.getLayerName(),
+              circle.getLineWidth(), circle.isFilled(), circle.isGrabArea(),
+              circle.getCenter(), circle.getDiameter()));
+        }
+        // copy stroke texts but generate new UUIDs
+        for (const StrokeText& text : footprint.getStrokeTexts()) {
+          newFootprint->getStrokeTexts().append(std::make_shared<StrokeText>(
+              Uuid::createRandom(), text.getLayerName(), text.getText(),
+              text.getPosition(), text.getRotation(), text.getHeight(),
+              text.getStrokeWidth(), text.getLetterSpacing(),
+              text.getLineSpacing(), text.getAlign(), text.getMirrored(),
+              text.getAutoRotate()));
+        }
+        // copy holes but generate new UUIDs
+        for (const Hole& hole : footprint.getHoles()) {
+          newFootprint->getHoles().append(std::make_shared<Hole>(
+              Uuid::createRandom(), hole.getPosition(), hole.getDiameter()));
+        }
+        mContext.mPackageFootprints.append(newFootprint);
+      }
       break;
     }
     case NewElementWizardContext::ElementType::Component: {
       const Component* element =
           dynamic_cast<Component*>(mSelectedElement.data());
       Q_ASSERT(element);
-      mContext.mComponentSchematicOnly  = element->isSchematicOnly();
-      mContext.mComponentAttributes     = element->getAttributes();
-      mContext.mComponentDefaultValue   = element->getDefaultValue();
-      mContext.mComponentPrefixes       = element->getPrefixes();
-      mContext.mComponentSignals        = element->getSignals();
-      mContext.mComponentSymbolVariants = element->getSymbolVariants();
+      mContext.mComponentSchematicOnly = element->isSchematicOnly();
+      mContext.mComponentAttributes    = element->getAttributes();
+      mContext.mComponentDefaultValue  = element->getDefaultValue();
+      mContext.mComponentPrefixes      = element->getPrefixes();
+      // copy signals but generate new UUIDs
+      QHash<Uuid, Uuid> signalUuidMap;
+      mContext.mComponentSignals.clear();
+      for (const ComponentSignal& signal : element->getSignals()) {
+        Uuid newUuid = Uuid::createRandom();
+        signalUuidMap.insert(signal.getUuid(), newUuid);
+        mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
+            newUuid, signal.getName(), signal.getRole(),
+            signal.getForcedNetName(), signal.isRequired(), signal.isNegated(),
+            signal.isClock()));
+      }
+      // copy symbol variants but generate new UUIDs
+      mContext.mComponentSymbolVariants.clear();
+      for (const ComponentSymbolVariant& var : element->getSymbolVariants()) {
+        // don't copy translations as they would need to be adjusted anyway
+        std::shared_ptr<ComponentSymbolVariant> copy(new ComponentSymbolVariant(
+            Uuid::createRandom(), var.getNorm(),
+            var.getNames().getDefaultValue(),
+            var.getDescriptions().getDefaultValue()));
+        // copy items
+        for (const ComponentSymbolVariantItem& item : var.getSymbolItems()) {
+          std::shared_ptr<ComponentSymbolVariantItem> itemCopy(
+              new ComponentSymbolVariantItem(
+                  Uuid::createRandom(), item.getSymbolUuid(),
+                  item.getSymbolPosition(), item.getSymbolRotation(),
+                  item.isRequired(), item.getSuffix()));
+          // copy pin-signal-map
+          for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
+            tl::optional<Uuid> signal = map.getSignalUuid();
+            if (signal) {
+              signal = *signalUuidMap.find(*map.getSignalUuid());
+            }
+            itemCopy->getPinSignalMap().append(
+                std::make_shared<ComponentPinSignalMapItem>(
+                    map.getPinUuid(), signal, map.getDisplayType()));
+          }
+          copy->getSymbolItems().append(itemCopy);
+        }
+        mContext.mComponentSymbolVariants.append(copy);
+      }
       break;
     }
     case NewElementWizardContext::ElementType::Device: {

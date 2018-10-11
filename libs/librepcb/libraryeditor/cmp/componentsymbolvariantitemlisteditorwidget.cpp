@@ -458,12 +458,10 @@ void ComponentSymbolVariantItemListEditorWidget::addItem(
         mWorkspace->getLibraryDb().getLatestSymbol(symbol);     // can throw
     Symbol                                      sym(fp, true);  // can throw
     std::shared_ptr<ComponentSymbolVariantItem> item(
-        new ComponentSymbolVariantItem(Uuid::createRandom(), symbol, required,
-                                       constrainedSuffix));
+        new ComponentSymbolVariantItem(Uuid::createRandom(), symbol, pos, rot,
+                                       required, constrainedSuffix));
     item->getPinSignalMap() =
         ComponentPinSignalMapHelpers::create(sym.getPins().getUuidSet());
-    item->setSymbolPosition(pos);
-    item->setSymbolRotation(rot);
     mItems->append(item);
     updateTable();
     emit edited();
