@@ -105,12 +105,13 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   // lock the library directory
   mLock.tryLock();  // can throw
 
-  // set window title
+  // set window title and icon
   const QStringList localeOrder =
       mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
   QString libName = *mLibrary->getNames().value(localeOrder);
   if (mLibrary->isOpenedReadOnly()) libName.append(tr(" [Read-Only]"));
   setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
+  setWindowIcon(mLibrary->getIcon());
 
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);
