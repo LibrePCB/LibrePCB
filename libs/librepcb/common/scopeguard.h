@@ -1,7 +1,7 @@
 /*
  * LibrePCB - Professional EDA for everyone!
  * Copyright (C) 2016 The LibrePCB developers
- * http://librepcb.org/
+ * https://librepcb.org/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

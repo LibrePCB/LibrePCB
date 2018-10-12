@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a [LibrePCB](http://librepcb.org) library!
+This is a [LibrePCB](https://librepcb.org) library!
 Just edit this file to add a description about it.
 
 ## License
