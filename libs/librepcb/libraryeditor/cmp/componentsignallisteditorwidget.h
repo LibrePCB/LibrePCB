@@ -117,7 +117,6 @@ bool clock,*/ const QString& forcedNetName) noexcept;
   int  getRowOfTableCellWidget(QObject* obj) const noexcept;
   tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
   CircuitIdentifier  validateNameOrThrow(const QString& name) const;
-  static QString     cleanName(const QString& name) noexcept;
   static QString     cleanForcedNetName(const QString& name) noexcept;
 
   // row index <-> signal index conversion methods

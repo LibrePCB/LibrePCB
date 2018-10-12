@@ -25,7 +25,6 @@
 #include "../attributes/attributetype.h"
 #include "../attributes/attributeunit.h"
 #include "../attributes/attrtypestring.h"
-#include "../fileio/filepath.h"
 #include "attributetypecombobox.h"
 #include "attributeunitcombobox.h"
 
@@ -115,11 +114,11 @@ void AttributeListEditorWidget::tableCellChanged(int row, int column) noexcept {
 
   if (isNewAttributeRow(row)) {
     if (column == COLUMN_KEY) {
-      item->setText(cleanKey(item->text()));
+      item->setText(cleanAttributeKey(item->text()));
     }
   } else if (isExistingAttributeRow(row)) {
     if (column == COLUMN_KEY) {
-      item->setText(*setKey(rowToIndex(row), cleanKey(item->text())));
+      item->setText(*setKey(rowToIndex(row), cleanAttributeKey(item->text())));
     } else if (column == COLUMN_VALUE) {
       item->setText(setValue(rowToIndex(row), item->text().trimmed()));
     }
@@ -162,7 +161,7 @@ void AttributeListEditorWidget::btnAddRemoveClicked() noexcept {
     const AttributeType* type;
     const AttributeUnit* unit;
     getTableRowContent(row, key, type, value, unit);
-    addAttribute(cleanKey(key), *type, value.trimmed(), unit);
+    addAttribute(cleanAttributeKey(key), *type, value.trimmed(), unit);
   } else if (isExistingAttributeRow(row)) {
     removeAttribute(rowToIndex(row));
   }
@@ -479,13 +478,6 @@ void AttributeListEditorWidget::throwIfValueInvalid(
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("The value \"%1\" is invalid.")).arg(value));
   }
-}
-
-QString AttributeListEditorWidget::cleanKey(const QString& key) noexcept {
-  // TODO: it's ugly to use a method from FilePath...
-  QString str = FilePath::cleanFileName(
-      key, FilePath::ReplaceSpaces | FilePath::ToUpperCase);
-  return str.replace(QRegularExpression("[^_0-9A-Z]"), "_");
 }
 
 /*******************************************************************************

@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../fileio/sexpression.h"
+#include "../toolbox.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -37,6 +38,11 @@ namespace librepcb {
 /*******************************************************************************
  *  Class AttributeKey
  ******************************************************************************/
+
+inline static QString cleanAttributeKey(const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^_0-9A-Z]"), true, false, true, "_", 40);
+}
 
 struct AttributeKeyVerifier {
   template <typename Value, typename Predicate>

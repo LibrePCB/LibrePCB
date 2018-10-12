@@ -134,6 +134,29 @@ QVariant Toolbox::stringOrNumberToQVariant(const QString& string) noexcept {
   return QVariant(string);
 }
 
+QString Toolbox::cleanUserInputString(const QString&            input,
+                                      const QRegularExpression& removeRegex,
+                                      bool trim, bool toLower, bool toUpper,
+                                      const QString& spaceReplacement,
+                                      int            maxLength) noexcept {
+  // perform compatibility decomposition (NFKD)
+  QString ret = input.normalized(QString::NormalizationForm_KD);
+  // change case of all characters
+  if (toLower) ret = ret.toLower();
+  if (toUpper) ret = ret.toUpper();
+  // remove leading and trailing spaces
+  if (trim) ret = ret.trimmed();
+  // replace remaining spaces with replacement
+  ret.replace(" ", spaceReplacement);
+  // remove all invalid characters
+  ret.remove(removeRegex);
+  // truncate to maximum allowed length
+  if (maxLength >= 0) ret.truncate(maxLength);
+  // if there are leading or trailing spaces, remove them again ;)
+  if (trim) ret = ret.trimmed();
+  return ret;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

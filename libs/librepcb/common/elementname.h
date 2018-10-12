@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "fileio/sexpression.h"
+#include "toolbox.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -37,6 +38,17 @@ namespace librepcb {
 /*******************************************************************************
  *  Class ElementName
  ******************************************************************************/
+
+inline static QString cleanElementName(const QString& userInput) noexcept {
+  QString ret = userInput.trimmed();
+  for (int i = ret.length() - 1; i >= 0; --i) {
+    if (!ret[i].isPrint()) {
+      ret.remove(i, 1);
+    }
+  }
+  ret.truncate(70);
+  return ret;
+}
 
 struct ElementNameVerifier {
   template <typename Value, typename Predicate>

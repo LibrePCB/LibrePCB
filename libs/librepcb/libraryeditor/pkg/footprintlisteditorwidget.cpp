@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "footprintlisteditorwidget.h"
 
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/pkg/cmd/cmdfootprintedit.h>
 
@@ -108,11 +107,11 @@ void FootprintListEditorWidget::tableCellChanged(int row, int column) noexcept {
 
   if (isNewFootprintRow(row)) {
     if (column == COLUMN_NAME) {
-      item->setText(cleanName(item->text()));
+      item->setText(cleanElementName(item->text()));
     }
   } else if (isExistingFootprintRow(row) && uuid) {
     if (column == COLUMN_NAME) {
-      item->setText(*setName(*uuid, cleanName(item->text())));
+      item->setText(*setName(*uuid, cleanElementName(item->text())));
     }
   }
 }
@@ -147,7 +146,7 @@ void FootprintListEditorWidget::btnAddRemoveClicked() noexcept {
   if (isNewFootprintRow(row)) {
     const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME);
     Q_ASSERT(nameItem);
-    addFootprint(cleanName(nameItem->text()));
+    addFootprint(cleanElementName(nameItem->text()));
   } else if (isExistingFootprintRow(row)) {
     removeFootprint(*uuid);
   }
@@ -389,12 +388,6 @@ ElementName FootprintListEditorWidget::validateNameOrThrow(
     }
   }
   return ElementName(name);  // can throw
-}
-
-QString FootprintListEditorWidget::cleanName(const QString& name) noexcept {
-  // TODO: it's ugly to use a method from FilePath...
-  return FilePath::cleanFileName(name,
-                                 FilePath::ReplaceSpaces | FilePath::KeepCase);
 }
 
 /*******************************************************************************

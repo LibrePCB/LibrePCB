@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "fileio/sexpression.h"
+#include "toolbox.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -37,6 +38,13 @@ namespace librepcb {
 /*******************************************************************************
  *  Class CircuitIdentifier
  ******************************************************************************/
+
+inline static QString cleanCircuitIdentifier(
+    const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^-a-zA-Z0-9_+/!?@#$]"), true, false,
+      false, "_", 32);
+}
 
 struct CircuitIdentifierVerifier {
   template <typename Value, typename Predicate>

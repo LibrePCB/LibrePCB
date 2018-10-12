@@ -123,6 +123,26 @@ public:
    * @return A QVariant with either a QVariant::Int or a QVariant::String
    */
   static QVariant stringOrNumberToQVariant(const QString& string) noexcept;
+
+  /**
+   * @brief Clean a user input string
+   *
+   * @param input             The string typed by the user
+   * @param removeRegex       Regex for all patterns to remove from the string
+   * @param trim              If true, leading and trailing spaces are removed
+   * @param toLower           If true, all characters are converted to lowercase
+   * @param toUpper           If true, all characters are converted to uppercase
+   * @param spaceReplacement  All spaces are replaced by this string
+   * @param maxLength         If >= 0, the string is truncated to this length
+   *
+   * @return The cleaned string (may be empty)
+   */
+  static QString cleanUserInputString(const QString&            input,
+                                      const QRegularExpression& removeRegex,
+                                      bool trim = true, bool toLower = false,
+                                      bool           toUpper          = false,
+                                      const QString& spaceReplacement = " ",
+                                      int            maxLength = -1) noexcept;
 };
 
 /*******************************************************************************

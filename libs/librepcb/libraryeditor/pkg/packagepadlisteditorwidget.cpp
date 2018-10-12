@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "packagepadlisteditorwidget.h"
 
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/pkg/cmd/cmdpackagepadedit.h>
 
@@ -109,11 +108,11 @@ void PackagePadListEditorWidget::tableCellChanged(int row,
 
   if (isNewPadRow(row)) {
     if (column == COLUMN_NAME) {
-      item->setText(cleanName(item->text()));
+      item->setText(cleanCircuitIdentifier(item->text()));
     }
   } else if (isExistingPadRow(row) && uuid) {
     if (column == COLUMN_NAME) {
-      item->setText(*setName(*uuid, cleanName(item->text())));
+      item->setText(*setName(*uuid, cleanCircuitIdentifier(item->text())));
     }
   }
 }
@@ -124,7 +123,7 @@ void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept {
   if (isNewPadRow(row)) {
     const QTableWidgetItem* nameItem = mTable->item(row, COLUMN_NAME);
     Q_ASSERT(nameItem);
-    QString name = cleanName(nameItem->text());
+    QString name = cleanCircuitIdentifier(nameItem->text());
     addPad(!name.isEmpty() ? name : getNextPadNameProposal());
   } else if (isExistingPadRow(row) && uuid) {
     removePad(*uuid);
@@ -273,12 +272,6 @@ CircuitIdentifier PackagePadListEditorWidget::validateNameOrThrow(
         QString(tr("There is already a pad with the name \"%1\".")).arg(name));
   }
   return CircuitIdentifier(name);  // can throw
-}
-
-QString PackagePadListEditorWidget::cleanName(const QString& name) noexcept {
-  // TODO: it's ugly to use a method from FilePath...
-  return FilePath::cleanFileName(name,
-                                 FilePath::ReplaceSpaces | FilePath::KeepCase);
 }
 
 void PackagePadListEditorWidget::executeCommand(UndoCommand* cmd) {

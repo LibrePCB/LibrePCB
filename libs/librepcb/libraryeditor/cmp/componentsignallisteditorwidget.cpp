@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "componentsignallisteditorwidget.h"
 
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/widgets/centeredcheckbox.h>
 #include <librepcb/common/widgets/signalrolecombobox.h>
@@ -152,15 +151,14 @@ void ComponentSignalListEditorWidget::tableCellChanged(int row,
 
   if (isNewSignalRow(row)) {
     if (column == COLUMN_NAME) {
-      item->setText(cleanName(item->text()));
+      item->setText(cleanCircuitIdentifier(item->text()));
     } else if (column == COLUMN_FORCEDNETNAME) {
       item->setText(cleanForcedNetName(item->text()));
     }
   } else if (isExistingSignalRow(row) && uuid) {
     if (column == COLUMN_NAME) {
-      setName(*uuid, cleanName(item->text()));
+      setName(*uuid, cleanCircuitIdentifier(item->text()));
     } else if (column == COLUMN_FORCEDNETNAME) {
-      item->setText(cleanForcedNetName(item->text()));
       setForcedNetName(*uuid, cleanForcedNetName(item->text()));
     }
   }
@@ -227,7 +225,8 @@ void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept {
     const QTableWidgetItem* netNameItem =
         mTable->item(row, COLUMN_FORCEDNETNAME);
     Q_ASSERT(netNameItem);
-    addSignal(cleanName(nameItem->text()), /*roleComboBox->getCurrentItem(),*/
+    addSignal(cleanCircuitIdentifier(nameItem->text()),
+              // roleComboBox->getCurrentItem(),
               requiredCheckBox->isChecked(),
               // negatedCheckBox->isChecked(),
               // clockCheckBox->isChecked(),
@@ -562,18 +561,14 @@ CircuitIdentifier ComponentSignalListEditorWidget::validateNameOrThrow(
   return CircuitIdentifier(name);  // can throw
 }
 
-QString ComponentSignalListEditorWidget::cleanName(
-    const QString& name) noexcept {
-  // TODO: it's ugly to use a method from FilePath...
-  return FilePath::cleanFileName(name,
-                                 FilePath::ReplaceSpaces | FilePath::KeepCase);
-}
-
 QString ComponentSignalListEditorWidget::cleanForcedNetName(
     const QString& name) noexcept {
-  // TODO: it's ugly to use a method from FilePath...
-  return FilePath::cleanFileName(name,
-                                 FilePath::ReplaceSpaces | FilePath::KeepCase);
+  // Same as cleanCircuitIdentifier(), but allowing '{' and '}' because it's
+  // allowed to have attribute placeholders in a forced net name. Also remove
+  // spaces because they must not be replaced by underscores inside {{ and }}.
+  return Toolbox::cleanUserInputString(
+      name, QRegularExpression("[^-a-zA-Z0-9_+/!?@#$\\{\\}]"), true, false,
+      false, "");
 }
 
 /*******************************************************************************

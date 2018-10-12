@@ -93,7 +93,6 @@ private:  // Methods
   int         getRowOfTableCellWidget(QObject* obj) const noexcept;
   tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
   ElementName        validateNameOrThrow(const QString& name) const;
-  static QString     cleanName(const QString& name) noexcept;
 
   // row index <-> signal index conversion methods
   int  newFootprintRow() const noexcept { return mFootprintList->count(); }

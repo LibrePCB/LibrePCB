@@ -84,7 +84,6 @@ private:  // Methods
   int                getRowOfTableCellWidget(QObject* obj) const noexcept;
   tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
   CircuitIdentifier  validateNameOrThrow(const QString& name) const;
-  static QString     cleanName(const QString& name) noexcept;
   void               executeCommand(UndoCommand* cmd);
   QString            getNextPadNameProposal() const noexcept;
 
