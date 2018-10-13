@@ -120,7 +120,7 @@ Instead, we use the [GitHub Releases] page to list the changes of every release
 
 Releases built by ourselves (Windows builds, installers, AppImage etc.) are
 published at https://download.librepcb.org, inclusive GPG signature. The website
-http://librepcb.org contains direct download links to the corresponding files.
+https://librepcb.org contains direct download links to the corresponding files.
 
 Packages of package managers (e.g. APT, Flatpak, homebrew, ...) are updated by
 the corresponding package maintainers. Typically they clone the tag we released

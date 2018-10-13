@@ -35,27 +35,27 @@
     </screenshot>
     <screenshot>
       <caption>Control panel</caption>
-      <image>http://librepcb.org/img/control_panel.png</image>
+      <image>https://librepcb.org/img/control_panel.png</image>
     </screenshot>
     <screenshot>
       <caption>Schematic Editor</caption>
-      <image>http://librepcb.org/img/schematic_editor.png</image>
+      <image>https://librepcb.org/img/schematic_editor.png</image>
     </screenshot>
     <screenshot>
       <caption>Board editor</caption>
-      <image>http://librepcb.org/img/board_editor.png</image>
+      <image>https://librepcb.org/img/board_editor.png</image>
     </screenshot>
     <screenshot>
       <caption>Library browser</caption>
-      <image>http://librepcb.org/img/thumbs/add_component_dialog.png</image>
+      <image>https://librepcb.org/img/thumbs/add_component_dialog.png</image>
     </screenshot>
     <screenshot>
       <caption>Library manager</caption>
-      <image>http://librepcb.org/img/library_manager.png</image>
+      <image>https://librepcb.org/img/library_manager.png</image>
     </screenshot>
   </screenshots>
 
-  <url type="homepage">http://librepcb.org</url>
+  <url type="homepage">https://librepcb.org</url>
   <url type="bugtracker">https://github.com/LibrePCB/LibrePCB/issues</url>
   <url type="help">https://docs.librepcb.org/</url>
   

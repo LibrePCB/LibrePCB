@@ -4,7 +4,7 @@
   <Version>1.0.0</Version><!-- the installer version is static -->
   <Title>LibrePCB</Title>
   <Publisher>LibrePCB</Publisher>
-  <ProductUrl>http://librepcb.org/</ProductUrl>
+  <ProductUrl>https://librepcb.org/</ProductUrl>
   <Logo>48x48.png</Logo>
   <MaintenanceToolName>librepcb-maintenance</MaintenanceToolName>
   <MaintenanceToolIniFile>librepcb-maintenance.ini</MaintenanceToolIniFile>
