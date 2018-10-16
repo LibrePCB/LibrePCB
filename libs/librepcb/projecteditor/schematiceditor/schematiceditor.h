@@ -94,6 +94,7 @@ private slots:
   void on_actionClose_Project_triggered();
   void on_actionNew_Schematic_Page_triggered();
   void on_actionGrid_triggered();
+  void on_actionPrint_triggered();
   void on_actionPDF_Export_triggered();
   void on_actionAddComp_Resistor_triggered();
   void on_actionAddComp_BipolarCapacitor_triggered();
