@@ -550,6 +550,32 @@ void Project::exportSchematicsAsPdf(const FilePath& filepath) {
   printSchematicPages(printer, pages);
 }
 
+void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) {
+  if (pages.isEmpty())
+    throw RuntimeError(__FILE__, __LINE__, tr("No schematic pages selected."));
+
+  QPainter painter(&printer);
+
+  for (int i = 0; i < pages.count(); i++) {
+    Schematic* schematic = getSchematicByIndex(pages[i]);
+    if (!schematic) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString(tr("No schematic page with the index %1 found."))
+              .arg(pages[i]));
+    }
+    schematic->clearSelection();
+    schematic->renderToQPainter(painter);
+
+    if (i != pages.count() - 1) {
+      if (!printer.newPage()) {
+        throw RuntimeError(__FILE__, __LINE__,
+                           tr("Unknown error while printing."));
+      }
+    }
+  }
+}
+
 /*******************************************************************************
  *  Board Methods
  ******************************************************************************/
@@ -845,32 +871,6 @@ bool Project::save(bool toOriginal, QStringList& errors) noexcept {
   mProjectMetadata->updateLastModified();
 
   return success;
-}
-
-void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) {
-  if (pages.isEmpty())
-    throw RuntimeError(__FILE__, __LINE__, tr("No schematic pages selected."));
-
-  QPainter painter(&printer);
-
-  for (int i = 0; i < pages.count(); i++) {
-    Schematic* schematic = getSchematicByIndex(pages[i]);
-    if (!schematic) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("No schematic page with the index %1 found."))
-              .arg(pages[i]));
-    }
-    schematic->clearSelection();
-    schematic->renderToQPainter(painter);
-
-    if (i != pages.count() - 1) {
-      if (!printer.newPage()) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Unknown error while printing."));
-      }
-    }
-  }
 }
 
 /*******************************************************************************

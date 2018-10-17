@@ -49,6 +49,7 @@
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
+#include <QtPrintSupport>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -334,6 +335,49 @@ void SchematicEditor::on_actionGrid_triggered() {
     foreach (Schematic* schematic, mProject.getSchematics())
       schematic->setGridProperties(*mGridProperties);
     // mProjectEditor.setModifiedFlag(); TODO
+  }
+}
+
+void SchematicEditor::on_actionPrint_triggered() {
+  try {
+    int pageCount = mProject.getSchematics().count();
+    if (pageCount <= 0) {
+      throw Exception(__FILE__, __LINE__, tr("No pages to print."));
+    }
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPaperSize(QPrinter::A4);
+    printer.setOrientation(QPrinter::Landscape);
+    printer.setCreator(QString("LibrePCB %1").arg(qApp->applicationVersion()));
+    printer.setDocName(*mProject.getMetadata().getName());
+    QPrintDialog printDialog(&printer, this);
+    printDialog.setOption(QAbstractPrintDialog::PrintSelection, false);
+    printDialog.setMinMax(1, pageCount);
+    if (printDialog.exec() == QDialog::Accepted) {
+      int minPageIndex = 0;
+      int maxPageIndex = 0;
+      switch (printDialog.printRange()) {
+        case QAbstractPrintDialog::PrintRange::PageRange: {
+          minPageIndex = qMax(printDialog.fromPage() - 1, 0);
+          maxPageIndex = qMax(printDialog.toPage() - 1, 0);
+          break;
+        }
+        case QAbstractPrintDialog::PrintRange::CurrentPage: {
+          minPageIndex = getActiveSchematicIndex();
+          maxPageIndex = getActiveSchematicIndex();
+          break;
+        }
+        default: {
+          minPageIndex = 0;
+          maxPageIndex = pageCount - 1;
+          break;
+        }
+      }
+      QList<int> pages;
+      for (int i = minPageIndex; i <= maxPageIndex; ++i) pages.append(i);
+      mProject.printSchematicPages(printer, pages);  // can throw
+    }
+  } catch (Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 

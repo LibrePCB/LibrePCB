@@ -284,6 +284,17 @@ public:
    */
   void exportSchematicsAsPdf(const FilePath& filepath);
 
+  /**
+   * @brief Print some schematics to a QPrinter (printer or file)
+   *
+   * @param printer   The QPrinter where to print the schematic pages
+   * @param pages     A list with all schematic page indexes which should be
+   * printed
+   *
+   * @throw Exception     On error
+   */
+  void printSchematicPages(QPrinter& printer, QList<int>& pages);
+
   // Board Methods
 
   /**
@@ -479,17 +490,6 @@ private:
    * otherwise
    */
   bool save(bool toOriginal, QStringList& errors) noexcept;
-
-  /**
-   * @brief Print some schematics to a QPrinter (printer or file)
-   *
-   * @param printer   The QPrinter where to print the schematic pages
-   * @param pages     A list with all schematic page indexes which should be
-   * printed
-   *
-   * @throw Exception     On error
-   */
-  void printSchematicPages(QPrinter& printer, QList<int>& pages);
 
   // Project File (*.lpp)
   FilePath mPath;      ///< the path to the project directory

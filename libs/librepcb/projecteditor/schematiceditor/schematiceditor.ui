@@ -46,16 +46,10 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <widget class="QMenu" name="menuExport">
-     <property name="title">
-      <string>&amp;Export</string>
-     </property>
-     <addaction name="actionPDF_Export"/>
-    </widget>
     <addaction name="actionNew_Schematic_Page"/>
     <addaction name="actionSave_Project"/>
+    <addaction name="actionPDF_Export"/>
     <addaction name="actionPrint"/>
-    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Project"/>
     <addaction name="actionQuit"/>
@@ -310,9 +304,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
    </property>
   </action>
   <action name="actionPDF_Export">
