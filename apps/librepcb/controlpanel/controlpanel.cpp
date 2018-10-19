@@ -108,8 +108,10 @@ ControlPanel::ControlPanel(Workspace& workspace)
 
   // connect some actions which are created with the Qt Designer
   connect(mUi->actionQuit, &QAction::triggered, this, &ControlPanel::close);
-  // connect(mUi->actionOpen_Library_Editor, &QAction::triggered,
-  //        &Workspace::instance(), &Workspace::openLibraryEditor);
+  connect(mUi->actionOpenWebsite, &QAction::triggered,
+          []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
+  connect(mUi->actionOnlineDocumentation, &QAction::triggered,
+          []() { QDesktopServices::openUrl(QUrl("https://docs.librepcb.org")); });
   connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
   connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);

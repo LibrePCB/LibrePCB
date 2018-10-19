@@ -142,7 +142,8 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionHelp"/>
+    <addaction name="actionOnlineDocumentation"/>
+    <addaction name="actionOpenWebsite"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAboutQt"/>
    </widget>
@@ -375,19 +376,25 @@
     <string>Ctrl+Y</string>
    </property>
   </action>
-  <action name="actionHelp">
+  <action name="actionOnlineDocumentation">
    <property name="icon">
     <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Help</string>
+    <string>Online Documentation</string>
    </property>
    <property name="shortcut">
     <string>F1</string>
    </property>
-   <property name="visible">
-    <bool>false</bool>
+  </action>
+  <action name="actionOpenWebsite">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibrePCB Website</string>
    </property>
   </action>
   <action name="actionRotate_CCW">
@@ -542,12 +549,18 @@
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;About</string>
+    <string>&amp;About LibrePCB</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
    </property>
   </action>
   <action name="actionAboutQt">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
   <action name="actionToolSelect">

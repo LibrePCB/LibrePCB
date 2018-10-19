@@ -449,6 +449,8 @@ QListView::item
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionOnlineDocumentation"/>
+    <addaction name="actionOpenWebsite"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
@@ -495,7 +497,7 @@ QListView::item
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>&amp;About LibrePCB</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
@@ -560,6 +562,27 @@ QListView::item
   <action name="actionRescanLibrary">
    <property name="text">
     <string>Rescan Library</string>
+   </property>
+  </action>
+  <action name="actionOnlineDocumentation">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Online Documentation</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionOpenWebsite">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibrePCB Website</string>
    </property>
   </action>
  </widget>
