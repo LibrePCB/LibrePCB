@@ -30,8 +30,11 @@ if [ "${TRAVIS_OS_NAME-}" = "linux" -a "$CC" = "clang" ]; then
   BUILDSPEC="-spec linux-clang-libc++"
 fi
 
-# download latest translation files (just pull the i18n submodule)
-git -C ./i18n checkout master && git -C ./i18n pull origin master
+# download latest translation files (just pull the i18n submodule), except on
+# release branches as the translation files are already available there
+if [ ! -f ./i18n/librepcb.ts ]; then
+  git -C ./i18n checkout master && git -C ./i18n pull origin master
+fi
 
 # build librepcb
 mkdir build && pushd build
