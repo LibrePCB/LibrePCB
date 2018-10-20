@@ -1,7 +1,7 @@
 [main]
 host = https://www.transifex.com
 
-[librepcb-application.librepcb]
+[librepcb-application.librepcb-0_1]
 source_lang = en
 source_file = i18n/librepcb.ts
 file_filter = i18n/librepcb_<lang>.ts
