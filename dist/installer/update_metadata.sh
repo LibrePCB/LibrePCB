@@ -40,7 +40,7 @@ cp $ROOT/../../img/logo/*.png $DESTINATION/config/
 cp $ROOT/../../LICENSE.txt $DESTINATION/packages/librepcb.stable.app/meta/license_gplv3.txt
 REGFILEEXT_DIR=$DESTINATION/packages/librepcb.registerfileextensions/data/registerfileextensions
 mkdir -p $REGFILEEXT_DIR/mime
-cp $ROOT/../../share/mime/packages/org.librepcb.LibrePCB.xml $REGFILEEXT_DIR/mime/librepcb-stable-from-installer.xml
+cp $ROOT/../../share/mime/packages/org.librepcb.LibrePCB.xml $REGFILEEXT_DIR/mime/librepcb-from-installer.xml
 
 # remove packages which are not supported by the selected target
 if [[ "$TARGET_NAME" == mac* ]]
