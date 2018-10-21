@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-  <Name>librepcb.nightly</Name>
-  <DisplayName>Nightly Build</DisplayName>
-  <Description>Latest automatically built version. Attention: These are unstable builds, DO NOT USE THEM FOR PRODUCTIVE USE!</Description>
+  <Name>librepcb.stable</Name>
+  <DisplayName>Latest Stable</DisplayName>
+  <Description>Latest stable release of LibrePCB.</Description>
   <Version>0.1.0</Version><!-- it's only a metapackage, so its version is static -->
   <ReleaseDate>RELEASE_DATE</ReleaseDate>
   <SortingPriority>1000</SortingPriority>
