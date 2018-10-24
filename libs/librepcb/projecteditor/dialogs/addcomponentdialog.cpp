@@ -446,9 +446,14 @@ void AddComponentDialog::setSelectedDevice(const library::Device* dev) {
         mSelectedDevice->getPackageUuid());
     if (pkgFp.isValid()) {
       mSelectedPackage = new library::Package(pkgFp, true);
-      mUi->lblDeviceName->setText(QString("%1 [%2]").arg(
-          *mSelectedDevice->getNames().value(localeOrder),
-          *mSelectedPackage->getNames().value(localeOrder)));
+      QString devName  = *mSelectedDevice->getNames().value(localeOrder);
+      QString pkgName  = *mSelectedPackage->getNames().value(localeOrder);
+      if (devName.contains(pkgName, Qt::CaseInsensitive)) {
+        // Package name is already contained in device name, no need to show it.
+        mUi->lblDeviceName->setText(devName);
+      } else {
+        mUi->lblDeviceName->setText(QString("%1 [%2]").arg(devName, pkgName));
+      }
       if (mSelectedPackage->getFootprints().count() > 0) {
         mPreviewFootprintGraphicsItem =
             new library::FootprintPreviewGraphicsItem(

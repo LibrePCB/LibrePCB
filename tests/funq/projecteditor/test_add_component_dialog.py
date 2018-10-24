@@ -161,7 +161,7 @@ def test_select_device(add_component_dialog, helpers):
     component_name_label = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentNameLabel')
     assert component_name_label.properties()['text'] == 'Capacitor Bipolar'
     device_name_label = add_component_dialog.app.widget('schematicEditorAddComponentDialogDeviceNameLabel')
-    assert device_name_label.properties()['text'] == 'C-0805 [C-0805]'
+    assert device_name_label.properties()['text'] == 'C-0805'
 
     # Accept
     add_component_dialog.app.widget('schematicEditorAddComponentDialogButtonAccept').click()
