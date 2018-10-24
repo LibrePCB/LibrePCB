@@ -32,20 +32,18 @@ def test_if_dialog_is_active_widget(add_component_dialog, helpers):
     helpers.wait_for_active_dialog(add_component_dialog.app, add_component_dialog.dialog)  # raises on timeout
 
 
-def test_init_state(add_component_dialog):
+def test_init_state(add_component_dialog, helpers):
     """
     Test if the initial state of various widgets is correct
     """
     # Category tree must be populated
     category_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogCategoryTree')
-    category_items = category_tree.model_items()
-    assert len(category_items.items) > 0
-    assert category_items.items[0].value == 'Capacitors'
+    helpers.wait_for_model_items_count(category_tree, 1)
+    assert category_tree.model_items().items[0].value == 'Capacitors'
 
     # Component tree must be empty
     component_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentTree')
-    component_items = component_tree.model_items()
-    assert len(component_items.items) == 0
+    helpers.wait_for_model_items_count(component_tree, 0, 0)
 
     # Symbol variant combobox must be hidden
     symbvar_combobox = add_component_dialog.app.widget('schematicEditorAddComponentDialogSymVarCombobox', wait_active=False)
@@ -74,12 +72,14 @@ def test_select_component_with_one_symbvar(add_component_dialog, helpers):
     """
     # Select category
     category_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogCategoryTree')
+    helpers.wait_for_model_items_count(category_tree, 3)
     category = category_tree.model_items().items[2]
     assert category.value == 'Diodes'
     category.select()
 
     # Select component
     component_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentTree')
+    helpers.wait_for_model_items_count(component_tree, 1)
     component = component_tree.model_items().items[0]
     assert component.value == 'Diode'
     component.select()
@@ -105,20 +105,22 @@ def test_select_component_with_two_symbvars(add_component_dialog, helpers):
     """
     # Select category
     category_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogCategoryTree')
+    helpers.wait_for_model_items_count(category_tree, 1)
     category = category_tree.model_items().items[0]
     assert category.value == 'Capacitors'
     category.select()
 
     # Select component
     component_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentTree')
+    helpers.wait_for_model_items_count(component_tree, 1)
     component = component_tree.model_items().items[0]
     assert component.value == 'Capacitor Bipolar'
     component.select()
 
     # Symbol variant must be visible
     symbvar_combobox = add_component_dialog.app.widget('schematicEditorAddComponentDialogSymVarCombobox')
+    helpers.wait_for_model_items_count(symbvar_combobox, 2, 2)
     symbvar_items = symbvar_combobox.model_items()
-    assert len(symbvar_items.items) == 2
     assert symbvar_items.items[0].value == 'European [IEC 60617]'
     assert symbvar_items.items[1].value == 'American [IEEE 315]'
     assert symbvar_combobox.properties()['currentText'] == symbvar_items.items[0].value
@@ -140,18 +142,21 @@ def test_select_device(add_component_dialog, helpers):
     """
     # Select category
     category_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogCategoryTree')
+    helpers.wait_for_model_items_count(category_tree, 1)
     category = category_tree.model_items().items[0]
     assert category.value == 'Capacitors'
     category.select()
 
     # Select device
     component_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentTree')
+    helpers.wait_for_model_items_count(component_tree, 1)
     device = component_tree.model_items().items[0].items[1]
     assert device.value == 'C-0805'
     device.select()
 
     # Symbol variant must be visible
     symbvar_combobox = add_component_dialog.app.widget('schematicEditorAddComponentDialogSymVarCombobox')
+    helpers.wait_for_model_items_count(symbvar_combobox, 2, 2)
     symbvar_items = symbvar_combobox.model_items()
     assert symbvar_items.items[0].value == 'European [IEC 60617]'
     assert symbvar_items.items[1].value == 'American [IEEE 315]'
@@ -174,12 +179,14 @@ def test_select_component_by_doubleclick(add_component_dialog, helpers):
     """
     # Select category
     category_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogCategoryTree')
+    helpers.wait_for_model_items_count(category_tree, 3)
     category = category_tree.model_items().items[2]
     assert category.value == 'Diodes'
     category.select()
 
     # Select component
     component_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentTree')
+    helpers.wait_for_model_items_count(component_tree, 1)
     component = component_tree.model_items().items[0]
     assert component.value == 'Diode'
     component.dclick()
@@ -194,12 +201,14 @@ def test_select_device_by_doubleclick(add_component_dialog, helpers):
     """
     # Select category
     category_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogCategoryTree')
+    helpers.wait_for_model_items_count(category_tree, 1)
     category = category_tree.model_items().items[0]
     assert category.value == 'Capacitors'
     category.select()
 
     # Select device
     component_tree = add_component_dialog.app.widget('schematicEditorAddComponentDialogComponentTree')
+    helpers.wait_for_model_items_count(component_tree, 1)
     device = component_tree.model_items().items[0].items[1]
     assert device.value == 'C-0805'
     device.dclick()

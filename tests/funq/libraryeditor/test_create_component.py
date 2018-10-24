@@ -46,8 +46,10 @@ def test(library_editor, helpers):
     # Add a symbol
     library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolButton').click()
     category_tree = library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogCategoriesTree')
+    helpers.wait_for_model_items_count(category_tree, 1)
     category_tree.model_items().items[0].select()
     symbols_list = library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogSymbolsList')
+    helpers.wait_for_model_items_count(symbols_list, 1)
     symbols_list.model_items().items[0].select()
     library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogAcceptButton').click()
     library_editor.widget('libraryEditorNewElementWizardComponentSymbolsAddSymbolButton').click()

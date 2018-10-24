@@ -118,6 +118,20 @@ class LibrePcbFixture(object):
 
 class Helpers(object):
     @staticmethod
+    def wait_for_model_items_count(widget, min_count, max_count=None, timeout=5.0):
+        if max_count == 0:
+            # First wait a bit to be sure the model is really not populated
+            time.sleep(0.1)
+        count = None
+        for i in range(0, 100):
+            count = len(widget.model_items().items)
+            if min_count <= count and (max_count is None or count <= max_count):
+                return
+            time.sleep(timeout / 100.0)
+        raise Exception('Widget "{}" has {} items instead of [{}..{}]!'.format(
+            widget.properties().get('objectName'), count, min_count, max_count))
+
+    @staticmethod
     def wait_until_widget_hidden(widget, timeout=5.0):
         for i in range(0, 100):
             try:

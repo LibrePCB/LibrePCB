@@ -35,16 +35,20 @@ def test(library_editor, helpers):
     # Select component
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentButton').click()
     category_tree = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogCategoriesTree')
+    helpers.wait_for_model_items_count(category_tree, 1)
     category_tree.model_items().items[0].select()
     components_list = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogComponentsList')
+    helpers.wait_for_model_items_count(components_list, 1)
     components_list.model_items().items[0].select()
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogAcceptButton').click()
 
     # Select package
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageButton').click()
     category_tree = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogCategoriesTree')
+    helpers.wait_for_model_items_count(category_tree, 3)
     category_tree.model_items().items[2].select()
     packages_list = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogPackagesList')
+    helpers.wait_for_model_items_count(packages_list, 1)
     packages_list.model_items().items[0].select()
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogAcceptButton').click()
 
