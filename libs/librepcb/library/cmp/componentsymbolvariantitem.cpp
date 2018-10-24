@@ -108,6 +108,8 @@ bool ComponentSymbolVariantItem::operator==(
     const ComponentSymbolVariantItem& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mSymbolUuid != rhs.mSymbolUuid) return false;
+  if (mSymbolPos != rhs.mSymbolPos) return false;
+  if (mSymbolRot != rhs.mSymbolRot) return false;
   if (mIsRequired != rhs.mIsRequired) return false;
   if (mSuffix != rhs.mSuffix) return false;
   if (mPinSignalMap != rhs.mPinSignalMap) return false;
