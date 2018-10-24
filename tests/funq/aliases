@@ -6,9 +6,8 @@
 controlPanel = librepcb__application__ControlPanel
 controlPanelWidget = {controlPanel}::centralWidget
 
-# Menu
-controlPanelMenuBar = {controlPanel}::menuBar
-controlPanelMenuExtras = {controlPanelMenuBar}::menuExtras
+# Actions
+controlPanelActionOpenLibraryManager = {controlPanel}::actionOpen_Library_Manager
 
 # Labels at top
 controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibraries

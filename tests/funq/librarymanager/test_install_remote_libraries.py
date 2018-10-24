@@ -6,7 +6,7 @@ Test installing remote libraries with the library manager
 """
 
 
-def test(librepcb):
+def test(librepcb, helpers):
     """
     Install some remote libraries
     """
@@ -17,12 +17,17 @@ def test(librepcb):
         assert app.widget('libraryManager').properties()['visible'] is True
 
         # Make sure there is only one entry ("New Library") in the libraries list
+        library_count_before = 1
         library_list = app.widget('libraryManagerInstalledLibrariesList')
-        library_count_before = len(library_list.model_items().items)
-        assert library_count_before == 1
+        helpers.wait_for_model_items_count(library_list, library_count_before,
+                                           library_count_before)
 
-        # TODO: Wait until all libraries are fetched and check the count of them
+        # Wait until all libraries are fetched and check the count of them
         remote_library_count = 3  # The dummy API provides 3 libraries
+        remote_library_list = app.widget('libraryManagerDownloadFromRepoLibraryList')
+        helpers.wait_for_model_items_count(remote_library_list,
+                                           remote_library_count,
+                                           remote_library_count)
 
         # Get the required widgets of all libraries and check their initial state
         statuslabels = list()
@@ -64,6 +69,7 @@ def test(librepcb):
             else:
                 assert statuslabels[i].properties()['text'] == 'Recommended'
 
-        # Check if exactly two libraries were added to the library list
-        library_count_after = len(library_list.model_items().items)
-        assert library_count_after == library_count_before + 2
+        # Check if two libraries were added
+        library_count_after = library_count_before + 2
+        helpers.wait_for_model_items_count(library_list, library_count_after,
+                                           library_count_after)

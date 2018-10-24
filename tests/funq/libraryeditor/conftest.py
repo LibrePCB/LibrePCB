@@ -7,7 +7,7 @@ library = 'data/fixtures/Populated Library.lplib'
 
 
 @pytest.fixture
-def library_editor(librepcb):
+def library_editor(librepcb, helpers):
     """
     Fixture opening the library editor with an empty library
     """
@@ -19,9 +19,8 @@ def library_editor(librepcb):
 
         # Select the empty library in library list
         library_list = app.widget('libraryManagerInstalledLibrariesList')
-        assert len(library_list.model_items().items) == 2
-        library_item = library_list.model_items().items[1]
-        library_item.select()
+        helpers.wait_for_model_items_count(library_list, 2)
+        library_list.model_items().items[1].select()
 
         # Open library editor of empty library
         app.widget('libraryManagerLibraryInfoWidgetOpenEditorButton').click()

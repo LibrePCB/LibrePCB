@@ -22,6 +22,7 @@ def test(library_editor, helpers):
 
     # Choose category
     category_tree = library_editor.widget('libraryEditorNewElementWizardCopyFromCategoriesTree')
+    helpers.wait_for_model_items_count(category_tree, 1)
     category_tree.model_items().items[0].select()
     library_editor.widget('libraryEditorNewElementWizardNextButton').click()
 

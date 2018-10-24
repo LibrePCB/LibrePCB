@@ -15,14 +15,13 @@ def test_using_button(librepcb):
         assert app.widget('libraryManager').properties()['visible'] is True
 
 
-# TODO: How to emulate clicks on QMenuBar/QMenu/QAction?
-# def test_using_menu(librepcb):
-#     """
-#     Open library manager with the menu item in the control panel
-#     """
-#     with librepcb.open() as app:
-#         app.widget('controlPanelMenuExtras', wait_active=False).set_property('visible', True)
-#         assert app.widget('libraryManager').properties()['visible'] is True
+def test_using_menu(librepcb):
+    """
+    Open library manager with the menu item in the control panel
+    """
+    with librepcb.open() as app:
+        app.action('controlPanelActionOpenLibraryManager').trigger()
+        assert app.widget('libraryManager').properties()['visible'] is True
 
 
 # TODO: How to emulate a click on the hyperlink in a QLabel?
