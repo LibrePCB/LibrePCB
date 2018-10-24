@@ -81,6 +81,7 @@ SOURCES += \
     eagleimport/devicesetconvertertest.cpp \
     eagleimport/packageconvertertest.cpp \
     eagleimport/symbolconvertertest.cpp \
+    library/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
     main.cpp \
     project/boards/boardplanefragmentsbuildertest.cpp \
