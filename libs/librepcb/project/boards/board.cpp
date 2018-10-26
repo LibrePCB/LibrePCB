@@ -207,8 +207,11 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
       // load default layer stack
       mLayerStack.reset(new BoardLayerStack(*this));
 
-      // load default grid properties
-      mGridProperties.reset(new GridProperties());
+      // load default grid properties (smaller grid than in schematics to avoid
+      // grid snap issues)
+      mGridProperties.reset(new GridProperties(GridProperties::Type_t::Lines,
+                                               PositiveLength(635000),
+                                               LengthUnit::millimeters()));
 
       // load default design rules
       mDesignRules.reset(new BoardDesignRules());
