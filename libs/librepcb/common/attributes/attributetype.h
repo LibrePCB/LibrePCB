@@ -47,19 +47,14 @@ class AttributeType {
 public:
   /// @brief Available Attribute Types
   enum class Type_t {
-    String = 0,  ///< @see class #AttrTypeString
-    // Integer,
-    // Real,
-    // Length,
+    String = 0,   ///< @see class #AttrTypeString
     Resistance,   ///< @see class #AttrTypeResistance
     Capacitance,  ///< @see class #AttrTypeCapacitance
     Inductance,   ///< @see class #AttrTypeInductance
     Voltage,      ///< @see class #AttrTypeVoltage
-    // Current,
-    // Power,
-    Frequency,  ///< @see class #AttrTypeFrequency
-    // Temperature,
-    // Time,
+    Current,      ///< @see class #AttrTypeCurrent
+    Power,        ///< @see class #AttrTypePower
+    Frequency,    ///< @see class #AttrTypeFrequency
     _COUNT
   };
 
