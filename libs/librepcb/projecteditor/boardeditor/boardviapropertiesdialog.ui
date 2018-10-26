@@ -67,7 +67,7 @@
           <enum>QAbstractSpinBox::UpDownArrows</enum>
          </property>
          <property name="suffix">
-          <string>mm</string>
+          <string notr="true">mm</string>
          </property>
          <property name="decimals">
           <number>6</number>
@@ -101,7 +101,7 @@
           <enum>QAbstractSpinBox::UpDownArrows</enum>
          </property>
          <property name="suffix">
-          <string>mm</string>
+          <string notr="true">mm</string>
          </property>
          <property name="decimals">
           <number>6</number>
@@ -129,7 +129,7 @@
      <item row="3" column="1">
       <widget class="QDoubleSpinBox" name="spbxSize">
        <property name="suffix">
-        <string>mm</string>
+        <string notr="true">mm</string>
        </property>
        <property name="minimum">
         <double>0.010000000000000</double>
@@ -149,7 +149,7 @@
      <item row="4" column="1">
       <widget class="QDoubleSpinBox" name="spbxDrillDiameter">
        <property name="suffix">
-        <string>mm</string>
+        <string notr="true">mm</string>
        </property>
        <property name="minimum">
         <double>0.010000000000000</double>

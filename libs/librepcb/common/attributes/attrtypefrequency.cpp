@@ -37,14 +37,14 @@ namespace librepcb {
 
 AttrTypeFrequency::AttrTypeFrequency() noexcept
   : AttributeType(Type_t::Frequency, "frequency", tr("Frequency")) {
-  mDefaultUnit = new AttributeUnit("hertz", tr("Hz"));
+  mDefaultUnit = new AttributeUnit("hertz", "Hz");
 
-  mAvailableUnits.append(new AttributeUnit("microhertz", tr("μHz")));
-  mAvailableUnits.append(new AttributeUnit("millihertz", tr("mHz")));
+  mAvailableUnits.append(new AttributeUnit("microhertz", "μHz"));
+  mAvailableUnits.append(new AttributeUnit("millihertz", "mHz"));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("kilohertz", tr("kHz")));
-  mAvailableUnits.append(new AttributeUnit("megahertz", tr("MHz")));
-  mAvailableUnits.append(new AttributeUnit("gigahertz", tr("GHz")));
+  mAvailableUnits.append(new AttributeUnit("kilohertz", "kHz"));
+  mAvailableUnits.append(new AttributeUnit("megahertz", "MHz"));
+  mAvailableUnits.append(new AttributeUnit("gigahertz", "GHz"));
 }
 
 AttrTypeFrequency::~AttrTypeFrequency() noexcept {

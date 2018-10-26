@@ -37,13 +37,13 @@ namespace librepcb {
 
 AttrTypeResistance::AttrTypeResistance() noexcept
   : AttributeType(Type_t::Resistance, "resistance", tr("Resistance")) {
-  mDefaultUnit = new AttributeUnit("ohm", tr("Ω"));
+  mDefaultUnit = new AttributeUnit("ohm", "Ω");
 
-  mAvailableUnits.append(new AttributeUnit("microohm", tr("μΩ")));
-  mAvailableUnits.append(new AttributeUnit("milliohm", tr("mΩ")));
+  mAvailableUnits.append(new AttributeUnit("microohm", "μΩ"));
+  mAvailableUnits.append(new AttributeUnit("milliohm", "mΩ"));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("kiloohm", tr("kΩ")));
-  mAvailableUnits.append(new AttributeUnit("megaohm", tr("MΩ")));
+  mAvailableUnits.append(new AttributeUnit("kiloohm", "kΩ"));
+  mAvailableUnits.append(new AttributeUnit("megaohm", "MΩ"));
 }
 
 AttrTypeResistance::~AttrTypeResistance() noexcept {

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
+    <width>328</width>
     <height>388</height>
    </rect>
   </property>
@@ -62,7 +62,7 @@
      <item row="3" column="1">
       <widget class="QDoubleSpinBox" name="spbHeight">
        <property name="suffix">
-        <string>mm</string>
+        <string notr="true">mm</string>
        </property>
        <property name="decimals">
         <number>6</number>
@@ -157,7 +157,7 @@
      <item row="4" column="1">
       <widget class="QDoubleSpinBox" name="spbxStrokeWidth">
        <property name="suffix">
-        <string>mm</string>
+        <string notr="true">mm</string>
        </property>
        <property name="decimals">
         <number>6</number>
@@ -200,7 +200,7 @@
        <item>
         <widget class="QDoubleSpinBox" name="spbxLineSpacingRatio">
          <property name="suffix">
-          <string>%</string>
+          <string notr="true">%</string>
          </property>
          <property name="decimals">
           <number>4</number>
@@ -244,7 +244,7 @@
        <item>
         <widget class="QDoubleSpinBox" name="spbxLetterSpacingRatio">
          <property name="suffix">
-          <string>%</string>
+          <string notr="true">%</string>
          </property>
          <property name="decimals">
           <number>4</number>

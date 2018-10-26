@@ -37,13 +37,13 @@ namespace librepcb {
 
 AttrTypeCapacitance::AttrTypeCapacitance() noexcept
   : AttributeType(Type_t::Capacitance, "capacitance", tr("Capacitance")) {
-  mDefaultUnit = new AttributeUnit("microfarad", tr("μF"));
+  mDefaultUnit = new AttributeUnit("microfarad", "μF");
 
-  mAvailableUnits.append(new AttributeUnit("picofarad", tr("pF")));
-  mAvailableUnits.append(new AttributeUnit("nanofarad", tr("nF")));
+  mAvailableUnits.append(new AttributeUnit("picofarad", "pF"));
+  mAvailableUnits.append(new AttributeUnit("nanofarad", "nF"));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("millifarad", tr("mF")));
-  mAvailableUnits.append(new AttributeUnit("farad", tr("F")));
+  mAvailableUnits.append(new AttributeUnit("millifarad", "mF"));
+  mAvailableUnits.append(new AttributeUnit("farad", "F"));
 }
 
 AttrTypeCapacitance::~AttrTypeCapacitance() noexcept {

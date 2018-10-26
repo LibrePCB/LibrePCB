@@ -37,14 +37,14 @@ namespace librepcb {
 
 AttrTypeVoltage::AttrTypeVoltage() noexcept
   : AttributeType(Type_t::Voltage, "voltage", tr("Voltage")) {
-  mDefaultUnit = new AttributeUnit("volt", tr("V"));
+  mDefaultUnit = new AttributeUnit("volt", "V");
 
-  mAvailableUnits.append(new AttributeUnit("nanovolt", tr("nV")));
-  mAvailableUnits.append(new AttributeUnit("microvolt", tr("μV")));
-  mAvailableUnits.append(new AttributeUnit("millivolt", tr("mV")));
+  mAvailableUnits.append(new AttributeUnit("nanovolt", "nV"));
+  mAvailableUnits.append(new AttributeUnit("microvolt", "μV"));
+  mAvailableUnits.append(new AttributeUnit("millivolt", "mV"));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("kilovolt", tr("kV")));
-  mAvailableUnits.append(new AttributeUnit("megavolt", tr("MV")));
+  mAvailableUnits.append(new AttributeUnit("kilovolt", "kV"));
+  mAvailableUnits.append(new AttributeUnit("megavolt", "MV"));
 }
 
 AttrTypeVoltage::~AttrTypeVoltage() noexcept {
