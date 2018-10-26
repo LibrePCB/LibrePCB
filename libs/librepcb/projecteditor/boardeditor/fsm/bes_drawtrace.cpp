@@ -618,7 +618,12 @@ BI_FootprintPad* BES_DrawTrace::findPad(Board& board, const Point& pos,
                                         NetSignal* netsignal) const noexcept {
   QList<BI_FootprintPad*> items =
       board.getPadsAtScenePos(pos, layer, netsignal);
-  return items.count() > 0 ? items.first() : nullptr;
+  foreach (BI_FootprintPad* pad, items) {
+    if (pad->getCompSigInstNetSignal()) {
+      return pad;  // only return pads which are electrically connected!
+    }
+  }
+  return nullptr;
 }
 
 BI_NetPoint* BES_DrawTrace::findNetPoint(Board& board, const Point& pos,
