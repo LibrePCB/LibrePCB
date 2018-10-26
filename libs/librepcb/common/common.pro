@@ -36,8 +36,10 @@ SOURCES += \
     attributes/attributetype.cpp \
     attributes/attributeunit.cpp \
     attributes/attrtypecapacitance.cpp \
+    attributes/attrtypecurrent.cpp \
     attributes/attrtypefrequency.cpp \
     attributes/attrtypeinductance.cpp \
+    attributes/attrtypepower.cpp \
     attributes/attrtyperesistance.cpp \
     attributes/attrtypestring.cpp \
     attributes/attrtypevoltage.cpp \
@@ -137,8 +139,10 @@ HEADERS += \
     attributes/attributetype.h \
     attributes/attributeunit.h \
     attributes/attrtypecapacitance.h \
+    attributes/attrtypecurrent.h \
     attributes/attrtypefrequency.h \
     attributes/attrtypeinductance.h \
+    attributes/attrtypepower.h \
     attributes/attrtyperesistance.h \
     attributes/attrtypestring.h \
     attributes/attrtypevoltage.h \

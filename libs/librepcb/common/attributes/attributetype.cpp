@@ -24,8 +24,10 @@
 
 #include "attributeunit.h"
 #include "attrtypecapacitance.h"
+#include "attrtypecurrent.h"
 #include "attrtypefrequency.h"
 #include "attrtypeinductance.h"
+#include "attrtypepower.h"
 #include "attrtyperesistance.h"
 #include "attrtypestring.h"
 #include "attrtypevoltage.h"
@@ -101,6 +103,8 @@ QList<const AttributeType*> AttributeType::getAllTypes() noexcept {
   types.append(&AttrTypeCapacitance::instance());
   types.append(&AttrTypeInductance::instance());
   types.append(&AttrTypeVoltage::instance());
+  types.append(&AttrTypeCurrent::instance());
+  types.append(&AttrTypePower::instance());
   types.append(&AttrTypeFrequency::instance());
   return types;
 }
