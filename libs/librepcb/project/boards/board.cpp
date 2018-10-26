@@ -223,11 +223,11 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
       mUserSettings.reset(
           new BoardUserSettings(*this, restore, readOnly, create));
 
-      // add 160x100mm board outline (Eurocard size)
+      // add 100x80mm board outline (1/2 Eurocard size)
       Polygon polygon(Uuid::createRandom(),
                       GraphicsLayerName(GraphicsLayer::sBoardOutlines),
                       UnsignedLength(0), false, false,
-                      Path::rect(Point(0, 0), Point(160000000, 100000000)));
+                      Path::rect(Point(0, 0), Point(100000000, 80000000)));
       mPolygons.append(new BI_Polygon(*this, polygon));
     } else {
       mFile.reset(new SmartSExprFile(mFilePath, restore, readOnly));
