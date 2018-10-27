@@ -17,10 +17,11 @@ class AddComponentDialogHelper(object):
 
 
 @pytest.fixture
-def add_component_dialog(project_editor):
+def add_component_dialog(project_editor, helpers):
     """
     Fixture opening the "Add Component"-editor in the schematic editor
     """
+    helpers.wait_for_library_scan_complete(project_editor)
     helper = AddComponentDialogHelper(project_editor)
     yield helper
 
