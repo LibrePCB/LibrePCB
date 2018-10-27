@@ -59,22 +59,21 @@ public:
   bool isFavoriteProject(const FilePath& filepath) const noexcept;
   void addFavoriteProject(const FilePath& filepath) noexcept;
   void removeFavoriteProject(const FilePath& filepath) noexcept;
+  void updateVisibleProjects() noexcept;
 
   // Operator Overloadings
   FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs) = delete;
 
 private:
-  // General Methods
-  void save() noexcept;
-
-  // Inherited Methods
+  void     save() noexcept;
   int      rowCount(const QModelIndex& parent = QModelIndex()) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   // Attributes
   const Workspace&               mWorkspace;
   QScopedPointer<SmartSExprFile> mFile;
-  QList<FilePath>                mFavoriteProjects;
+  QList<FilePath>                mAllProjects;
+  QList<FilePath>                mVisibleProjects;
 };
 
 /*******************************************************************************

@@ -57,22 +57,21 @@ public:
 
   // General Methods
   void setLastRecentProject(const FilePath& filepath) noexcept;
+  void updateVisibleProjects() noexcept;
 
   // Operator Overloadings
   RecentProjectsModel& operator=(const RecentProjectsModel& rhs) = delete;
 
 private:
-  // General Methods
-  void save() noexcept;
-
-  // Inherited Methods
+  void     save() noexcept;
   int      rowCount(const QModelIndex& parent = QModelIndex()) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   // Attributes
   const Workspace&               mWorkspace;
   QScopedPointer<SmartSExprFile> mFile;
-  QList<FilePath>                mRecentProjects;
+  QList<FilePath>                mAllProjects;
+  QList<FilePath>                mVisibleProjects;
 };
 
 /*******************************************************************************

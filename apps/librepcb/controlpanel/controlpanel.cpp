@@ -619,6 +619,9 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
         } catch (const Exception& e) {
           QMessageBox::critical(this, tr("Error"), e.getMsg());
         }
+        // something was removed -> update lists of recent and favorite projects
+        mWorkspace.getRecentProjectsModel().updateVisibleProjects();
+        mWorkspace.getFavoriteProjectsModel().updateVisibleProjects();
       }
       break;
     }
