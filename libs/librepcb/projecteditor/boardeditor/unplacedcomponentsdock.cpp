@@ -26,6 +26,7 @@
 #include "../projecteditor.h"
 #include "ui_unplacedcomponentsdock.h"
 
+#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
@@ -78,6 +79,8 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor)
   mUi->graphicsView->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
   mUi->graphicsView->setOriginCrossVisible(false);
   mUi->graphicsView->setScene(mFootprintPreviewGraphicsScene);
+
+  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
   QSettings clientSettings;
   mUi->splitter->restoreState(
@@ -318,7 +321,9 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
 void UnplacedComponentsDock::setSelectedComponentInstance(
     ComponentInstance* cmp) noexcept {
   setSelectedDeviceAndPackage(nullptr, nullptr);
+  mUi->lblNoDeviceFound->hide();
   mUi->cbxSelectedDevice->clear();
+  mUi->cbxSelectedDevice->show();
   mSelectedComponent = cmp;
 
   if (mBoard && mSelectedComponent) {
@@ -353,8 +358,13 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
           .getElementTranslations<library::Package>(pkgFp, localeOrder,
                                                     &pkgName);
 
-      QString text = QString("%1 [%2]").arg(devName, pkgName);
-      mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
+      if (devName.contains(pkgName, Qt::CaseInsensitive)) {
+        // Package name is already contained in device name, no need to show it.
+        mUi->cbxSelectedDevice->addItem(devName, deviceUuid.toStr());
+      } else {
+        QString text = QString("%1 [%2]").arg(devName, pkgName);
+        mUi->cbxSelectedDevice->addItem(text, deviceUuid.toStr());
+      }
     }
     if (mUi->cbxSelectedDevice->count() > 0) {
       mUi->cbxSelectedDevice->model()->sort(0);
@@ -369,6 +379,9 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
                       ? mUi->cbxSelectedDevice->findData(deviceUuid->toStr())
                       : 0;
       mUi->cbxSelectedDevice->setCurrentIndex(qMax(index, 0));
+    } else {
+      mUi->cbxSelectedDevice->hide();
+      mUi->lblNoDeviceFound->show();
     }
   }
 }
@@ -421,7 +434,7 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
         mSelectedPackage->getFootprints().find(*mSelectedFootprintUuid).get();
     if (fpt) {
       mFootprintPreviewGraphicsItem = new library::FootprintPreviewGraphicsItem(
-          mBoard->getLayerStack(), mProject.getSettings().getLocaleOrder(),
+          *mGraphicsLayerProvider, mProject.getSettings().getLocaleOrder(),
           *fpt, mSelectedPackage, &mSelectedComponent->getLibComponent(),
           mSelectedComponent);
       mFootprintPreviewGraphicsScene->addItem(*mFootprintPreviewGraphicsItem);
