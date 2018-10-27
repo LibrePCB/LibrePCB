@@ -13,6 +13,9 @@ def library_editor(librepcb, helpers):
     """
     librepcb.add_local_library_to_workspace(path=library)
     with librepcb.open() as app:
+        # Wait until the library scan is finished
+        helpers.wait_for_library_scan_complete(app)
+
         # Open library manager
         app.widget('controlPanelOpenLibraryManagerButton').click()
         assert app.widget('libraryManager').properties()['visible'] is True

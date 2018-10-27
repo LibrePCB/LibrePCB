@@ -12,6 +12,10 @@ controlPanelActionOpenLibraryManager = {controlPanel}::actionOpen_Library_Manage
 # Labels at top
 controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibraries
 
+# Status bar at bottom
+controlPanelStatusBar = {controlPanel}::statusBar
+controlPanelStatusBarProgressBar = {controlPanelStatusBar}::QProgressBar
+
 # Buttons in the top right frame
 controlPanelButtonsFrame = {controlPanelWidget}::splitter_h::layoutWidget1::frame
 controlPanelNewProjectButton = {controlPanelButtonsFrame}::newProjectButton

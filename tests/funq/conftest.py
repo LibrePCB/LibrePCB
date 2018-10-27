@@ -132,6 +132,18 @@ class Helpers(object):
             widget.properties().get('objectName'), count, min_count, max_count))
 
     @staticmethod
+    def wait_for_library_scan_complete(app, timeout=10.0):
+        progress_bar = app.widget('controlPanelStatusBarProgressBar', wait_active=False)
+        # wait until scan has started (progress > 10%)
+        for i in range(0, 100):
+            percent = progress_bar.properties()['value']
+            if percent > 10:
+                break
+            time.sleep(timeout / 100.0)
+        # Wait until scan has finished (progressbar hidden)
+        Helpers.wait_until_widget_hidden(progress_bar, timeout=timeout)
+
+    @staticmethod
     def wait_until_widget_hidden(widget, timeout=5.0):
         for i in range(0, 100):
             try:
