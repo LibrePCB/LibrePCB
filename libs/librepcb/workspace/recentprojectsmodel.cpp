@@ -49,13 +49,12 @@ RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept
       mFile.reset(new SmartSExprFile(filepath, false, false));
       SExpression               root   = mFile->parseFileAndBuildDomTree();
       const QList<SExpression>& childs = root.getChildren("project");
-      beginInsertRows(QModelIndex(), 0, childs.count() - 1);
       foreach (const SExpression& child, childs) {
         QString  path    = child.getValueOfFirstChild<QString>(true);
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
-        mRecentProjects.append(absPath);
+        mAllProjects.append(absPath);
       }
-      endInsertRows();
+      updateVisibleProjects();
     } else {
       mFile.reset(SmartSExprFile::create(filepath));
     }
@@ -71,11 +70,42 @@ RecentProjectsModel::~RecentProjectsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void RecentProjectsModel::setLastRecentProject(
+    const FilePath& filepath) noexcept {
+  if ((mAllProjects.count() > 0) && (mAllProjects.first() == filepath)) {
+    // the filename is already on top of the list, so nothing to do here...
+    return;
+  }
+
+  // first remove it from the list, then add it to the top of the list
+  mAllProjects.removeAll(filepath);
+  mAllProjects.prepend(filepath);
+  updateVisibleProjects();
+  save();
+}
+
+void RecentProjectsModel::updateVisibleProjects() noexcept {
+  beginResetModel();
+  mVisibleProjects.clear();
+  foreach (const FilePath& fp, mAllProjects) {
+    if ((!mVisibleProjects.contains(fp)) && (mVisibleProjects.count() < 5) &&
+        fp.isExistingFile()) {
+      // show maximum 5 existing projects
+      mVisibleProjects.append(fp);
+    }
+  }
+  endResetModel();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
 void RecentProjectsModel::save() noexcept {
   try {
     // save the new list in the workspace
     SExpression root = SExpression::createList("librepcb_recent_projects");
-    foreach (const FilePath& filepath, mRecentProjects) {
+    foreach (const FilePath& filepath, mAllProjects) {
       root.appendChild("project", filepath.toRelative(mWorkspace.getPath()),
                        true);
     }
@@ -86,48 +116,11 @@ void RecentProjectsModel::save() noexcept {
   }
 }
 
-void RecentProjectsModel::setLastRecentProject(
-    const FilePath& filepath) noexcept {
-  // if the filepath is already in the list, we just have to move it to the top
-  // of the list
-  for (int i = 0; i < mRecentProjects.count(); i++) {
-    if (mRecentProjects.at(i).toStr() == filepath.toStr()) {
-      if (i == 0)
-        return;  // the filename is already on top of the list, so nothing to do
-                 // here...
-
-      beginMoveRows(QModelIndex(), i, i, QModelIndex(), 0);
-      mRecentProjects.move(i, 0);
-      endMoveRows();
-      save();
-      return;
-    }
-  }
-
-  // limit the maximum count of entries in the list
-  while (mRecentProjects.count() >= 5) {
-    beginRemoveRows(QModelIndex(), mRecentProjects.count() - 1,
-                    mRecentProjects.count() - 1);
-    mRecentProjects.takeLast();
-    endRemoveRows();
-  }
-
-  // add the new filepath to the list
-  beginInsertRows(QModelIndex(), 0, 0);
-  mRecentProjects.prepend(filepath);
-  endInsertRows();
-  save();
-}
-
-/*******************************************************************************
- *  Inherited Methods
- ******************************************************************************/
-
 int RecentProjectsModel::rowCount(const QModelIndex& parent) const {
   if (parent.isValid())
     return 0;
   else
-    return mRecentProjects.count();
+    return mVisibleProjects.count();
 }
 
 QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const {
@@ -135,13 +128,12 @@ QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const {
 
   switch (role) {
     case Qt::DisplayRole: {
-      return mRecentProjects.at(index.row()).getFilename();
+      return mVisibleProjects.value(index.row()).getFilename();
     }
 
-    // case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::UserRole:
-      return mRecentProjects.at(index.row()).toNative();
+      return mVisibleProjects.value(index.row()).toNative();
 
     case Qt::DecorationRole:
       return QIcon(":/img/actions/recent.png");

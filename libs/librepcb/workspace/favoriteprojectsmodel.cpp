@@ -50,13 +50,12 @@ FavoriteProjectsModel::FavoriteProjectsModel(
       mFile.reset(new SmartSExprFile(filepath, false, false));
       SExpression               root   = mFile->parseFileAndBuildDomTree();
       const QList<SExpression>& childs = root.getChildren("project");
-      beginInsertRows(QModelIndex(), 0, childs.count() - 1);
       foreach (const SExpression& child, childs) {
         QString  path    = child.getValueOfFirstChild<QString>(true);
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
-        mFavoriteProjects.append(absPath);
+        mAllProjects.append(absPath);
       }
-      endInsertRows();
+      updateVisibleProjects();
     } else {
       mFile.reset(SmartSExprFile::create(filepath));
     }
@@ -72,11 +71,49 @@ FavoriteProjectsModel::~FavoriteProjectsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
+bool FavoriteProjectsModel::isFavoriteProject(const FilePath& filepath) const
+    noexcept {
+  return mAllProjects.contains(filepath);
+}
+
+void FavoriteProjectsModel::addFavoriteProject(
+    const FilePath& filepath) noexcept {
+  if (!mAllProjects.contains(filepath)) {
+    mAllProjects.append(filepath);
+    updateVisibleProjects();
+    save();
+  }
+}
+
+void FavoriteProjectsModel::removeFavoriteProject(
+    const FilePath& filepath) noexcept {
+  if (mAllProjects.removeAll(filepath) > 0) {
+    updateVisibleProjects();
+    save();
+  }
+}
+
+void FavoriteProjectsModel::updateVisibleProjects() noexcept {
+  beginResetModel();
+  mVisibleProjects.clear();
+  foreach (const FilePath& fp, mAllProjects) {
+    if ((!mVisibleProjects.contains(fp)) && fp.isExistingFile()) {
+      // show only existing projects
+      mVisibleProjects.append(fp);
+    }
+  }
+  endResetModel();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
 void FavoriteProjectsModel::save() noexcept {
   try {
     // save the new list in the workspace
     SExpression root = SExpression::createList("librepcb_favorite_projects");
-    foreach (const FilePath& filepath, mFavoriteProjects) {
+    foreach (const FilePath& filepath, mAllProjects) {
       root.appendChild("project", filepath.toRelative(mWorkspace.getPath()),
                        true);
     }
@@ -87,45 +124,11 @@ void FavoriteProjectsModel::save() noexcept {
   }
 }
 
-bool FavoriteProjectsModel::isFavoriteProject(const FilePath& filepath) const
-    noexcept {
-  return mFavoriteProjects.contains(filepath);
-}
-
-void FavoriteProjectsModel::addFavoriteProject(
-    const FilePath& filepath) noexcept {
-  // if the filepath is already in the list, we have nothing to do
-  if (mFavoriteProjects.contains(filepath)) return;
-
-  // add the new filepath to the list
-  beginInsertRows(QModelIndex(), mFavoriteProjects.count(),
-                  mFavoriteProjects.count());
-  mFavoriteProjects.append(filepath);
-  endInsertRows();
-  save();
-}
-
-void FavoriteProjectsModel::removeFavoriteProject(
-    const FilePath& filepath) noexcept {
-  int index = mFavoriteProjects.indexOf(filepath);
-
-  if (index >= 0) {
-    beginRemoveRows(QModelIndex(), index, index);
-    mFavoriteProjects.removeAt(index);
-    endRemoveRows();
-    save();
-  }
-}
-
-/*******************************************************************************
- *  Inherited Methods
- ******************************************************************************/
-
 int FavoriteProjectsModel::rowCount(const QModelIndex& parent) const {
   if (parent.isValid())
     return 0;
   else
-    return mFavoriteProjects.count();
+    return mVisibleProjects.count();
 }
 
 QVariant FavoriteProjectsModel::data(const QModelIndex& index, int role) const {
@@ -133,12 +136,12 @@ QVariant FavoriteProjectsModel::data(const QModelIndex& index, int role) const {
 
   switch (role) {
     case Qt::DisplayRole:
-      return mFavoriteProjects.at(index.row()).getFilename();
+      return mVisibleProjects.value(index.row()).getFilename();
 
     // case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::UserRole:
-      return mFavoriteProjects.at(index.row()).toNative();
+      return mVisibleProjects.value(index.row()).toNative();
 
     case Qt::DecorationRole:
       return QIcon(":/img/actions/bookmark.png");
