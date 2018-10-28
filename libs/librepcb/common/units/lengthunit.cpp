@@ -79,15 +79,15 @@ QString LengthUnit::toStringTr() const noexcept {
 QString LengthUnit::toShortStringTr() const noexcept {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:
-      return tr("mm");
+      return "mm";
     case LengthUnit_t::Micrometers:
-      return tr("μm");
+      return "μm";
     case LengthUnit_t::Nanometers:
-      return tr("nm");
+      return "nm";
     case LengthUnit_t::Inches:
-      return tr("″");
+      return "″";
     case LengthUnit_t::Mils:
-      return tr("mils");
+      return "mils";
     default:
       qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
       Q_ASSERT(false);

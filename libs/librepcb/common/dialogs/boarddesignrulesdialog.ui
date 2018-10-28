@@ -59,7 +59,7 @@
    <item row="3" column="3">
     <widget class="QDoubleSpinBox" name="spbxStopMaskMaxViaDia">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -82,7 +82,7 @@
    <item row="4" column="1">
     <widget class="QDoubleSpinBox" name="spbxStopMaskClrMin">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -98,7 +98,7 @@
    <item row="4" column="2">
     <widget class="QDoubleSpinBox" name="spbxStopMaskClrRatio">
      <property name="suffix">
-      <string>%</string>
+      <string notr="true">%</string>
      </property>
      <property name="decimals">
       <number>2</number>
@@ -114,7 +114,7 @@
    <item row="4" column="3">
     <widget class="QDoubleSpinBox" name="spbxStopMaskClrMax">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -137,7 +137,7 @@
    <item row="5" column="1">
     <widget class="QDoubleSpinBox" name="spbxCreamMaskClrMin">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -153,7 +153,7 @@
    <item row="5" column="2">
     <widget class="QDoubleSpinBox" name="spbxCreamMaskClrRatio">
      <property name="suffix">
-      <string>%</string>
+      <string notr="true">%</string>
      </property>
      <property name="decimals">
       <number>2</number>
@@ -169,7 +169,7 @@
    <item row="5" column="3">
     <widget class="QDoubleSpinBox" name="spbxCreamMaskClrMax">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -192,7 +192,7 @@
    <item row="6" column="1">
     <widget class="QDoubleSpinBox" name="spbxRestringPadsMin">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -208,7 +208,7 @@
    <item row="6" column="2">
     <widget class="QDoubleSpinBox" name="spbxRestringPadsRatio">
      <property name="suffix">
-      <string>%</string>
+      <string notr="true">%</string>
      </property>
      <property name="decimals">
       <number>2</number>
@@ -224,7 +224,7 @@
    <item row="6" column="3">
     <widget class="QDoubleSpinBox" name="spbxRestringPadsMax">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -247,7 +247,7 @@
    <item row="7" column="1">
     <widget class="QDoubleSpinBox" name="spbxRestringViasMin">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -263,7 +263,7 @@
    <item row="7" column="2">
     <widget class="QDoubleSpinBox" name="spbxRestringViasRatio">
      <property name="suffix">
-      <string>%</string>
+      <string notr="true">%</string>
      </property>
      <property name="decimals">
       <number>2</number>
@@ -279,7 +279,7 @@
    <item row="7" column="3">
     <widget class="QDoubleSpinBox" name="spbxRestringViasMax">
      <property name="suffix">
-      <string>mm</string>
+      <string notr="true">mm</string>
      </property>
      <property name="decimals">
       <number>3</number>
