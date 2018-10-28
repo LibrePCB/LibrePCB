@@ -37,12 +37,12 @@ namespace librepcb {
 
 AttrTypeInductance::AttrTypeInductance() noexcept
   : AttributeType(Type_t::Inductance, "inductance", tr("Inductance")) {
-  mDefaultUnit = new AttributeUnit("millihenry", tr("mH"));
+  mDefaultUnit = new AttributeUnit("millihenry", "mH");
 
-  mAvailableUnits.append(new AttributeUnit("nanohenry", tr("nH")));
-  mAvailableUnits.append(new AttributeUnit("microhenry", tr("μH")));
+  mAvailableUnits.append(new AttributeUnit("nanohenry", "nH"));
+  mAvailableUnits.append(new AttributeUnit("microhenry", "μH"));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("henry", tr("H")));
+  mAvailableUnits.append(new AttributeUnit("henry", "H"));
 }
 
 AttrTypeInductance::~AttrTypeInductance() noexcept {
@@ -73,7 +73,7 @@ QString AttrTypeInductance::printableValueTr(const QString&       value,
   bool  ok = false;
   float v  = value.toFloat(&ok);
   if (ok && unit)
-    return QString(tr("%1%2")).arg(QLocale().toString(v), unit->getSymbolTr());
+    return QLocale().toString(v) % unit->getSymbolTr();
   else if (ok)
     return QLocale().toString(v);
   else

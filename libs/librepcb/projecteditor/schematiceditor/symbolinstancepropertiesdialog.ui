@@ -76,7 +76,7 @@
            <enum>QAbstractSpinBox::UpDownArrows</enum>
           </property>
           <property name="suffix">
-           <string>mm</string>
+           <string notr="true">mm</string>
           </property>
           <property name="decimals">
            <number>6</number>
@@ -114,7 +114,7 @@
            </size>
           </property>
           <property name="suffix">
-           <string>mm</string>
+           <string notr="true">mm</string>
           </property>
           <property name="decimals">
            <number>6</number>
@@ -152,7 +152,7 @@
            </size>
           </property>
           <property name="suffix">
-           <string>°</string>
+           <string notr="true">°</string>
           </property>
           <property name="decimals">
            <number>6</number>
