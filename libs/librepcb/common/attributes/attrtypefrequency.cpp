@@ -75,7 +75,7 @@ QString AttrTypeFrequency::printableValueTr(const QString&       value,
   bool  ok = false;
   float v  = value.toFloat(&ok);
   if (ok && unit)
-    return QString("%1%2").arg(QLocale().toString(v), unit->getSymbolTr());
+    return QLocale().toString(v) % unit->getSymbolTr();
   else if (ok)
     return QLocale().toString(v);
   else
