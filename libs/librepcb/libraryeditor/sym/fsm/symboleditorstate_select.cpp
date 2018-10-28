@@ -118,18 +118,29 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           Q_ASSERT(false);
         }
         bool itemAlreadySelected = topMostItem->isSelected();
-        // remove whole selection if CTRL is not pressed
-        if ((!itemAlreadySelected) &&
-            (!e.modifiers().testFlag(Qt::ControlModifier))) {
+
+        if (e.modifiers().testFlag(Qt::ControlModifier)) {
+          // Toggle selection when CTRL is pressed
+          if (dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)) {
+            // workaround for selection of a SymbolPinGraphicsItem
+            dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)
+                ->setSelected(!itemAlreadySelected);
+          } else {
+            topMostItem->setSelected(!itemAlreadySelected);
+          }
+        } else if (!itemAlreadySelected) {
+          // Only select the topmost item when clicking an unselected item
+          // without CTRL
           clearSelectionRect(true);
+          if (dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)) {
+            // workaround for selection of a SymbolPinGraphicsItem
+            dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)
+                ->setSelected(true);
+          } else {
+            topMostItem->setSelected(true);
+          }
         }
-        // select top most item under the cursor
-        if (dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)) {
-          // workaround for selection of a SymbolPinGraphicsItem
-          dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)->setSelected(true);
-        } else {
-          topMostItem->setSelected(true);
-        }
+
         // start moving
         Q_ASSERT(!mCmdMoveSelectedItems);
         mState = SubState::MOVING;

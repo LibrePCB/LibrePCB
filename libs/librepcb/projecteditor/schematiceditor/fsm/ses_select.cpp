@@ -208,10 +208,16 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(
     schematic.clearSelection();
     return ForceStayInState;
   }
-  if (!items.first()->isSelected()) {
-    if (!(mouseEvent->modifiers() & Qt::ControlModifier))  // CTRL pressed
-      schematic
-          .clearSelection();  // select only the top most item under the mouse
+
+  bool itemAlreadySelected = items.first()->isSelected();
+
+  if ((mouseEvent->modifiers() & Qt::ControlModifier)) {
+    // Toggle selection when CTRL is pressed
+    items.first()->setSelected(!itemAlreadySelected);
+  } else if (!itemAlreadySelected) {
+    // Only select the topmost item when clicking an unselected item
+    // without CTRL
+    schematic.clearSelection();
     items.first()->setSelected(true);
   }
 

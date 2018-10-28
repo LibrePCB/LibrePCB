@@ -221,9 +221,16 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneLeftClick(
     board.clearSelection();
     return ForceStayInState;
   }
-  if (!items.first()->isSelected()) {
-    if (!(mouseEvent->modifiers() & Qt::ControlModifier))  // CTRL pressed
-      board.clearSelection();  // select only the top most item under the mouse
+
+  bool itemAlreadySelected = items.first()->isSelected();
+
+  if ((mouseEvent->modifiers() & Qt::ControlModifier)) {
+    // Toggle selection when CTRL is pressed
+    items.first()->setSelected(!itemAlreadySelected);
+  } else if (!itemAlreadySelected) {
+    // Only select the topmost item when clicking an unselected item
+    // without CTRL
+    board.clearSelection();
     items.first()->setSelected(true);
   }
 
