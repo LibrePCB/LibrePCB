@@ -75,6 +75,7 @@ SOURCES += \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
     common/toolboxtest.cpp \
+    common/units/lengthtest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     eagleimport/deviceconvertertest.cpp \

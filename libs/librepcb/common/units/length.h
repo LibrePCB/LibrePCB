@@ -592,9 +592,6 @@ private:
    * to be "C"! Example: QString("-1234.56") for -1234.56mm
    *
    * @return The length in nanometers
-   *
-   * @todo    don't use double for this purpose!
-   *          and throw an exception if a range error occurs (under-/overflow)!
    */
   static LengthBase_t mmStringToNm(const QString& millimeters);
 
