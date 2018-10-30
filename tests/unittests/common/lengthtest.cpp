@@ -34,12 +34,12 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-class UnitsLengthTest : public ::testing::Test {};
+class LengthTest : public ::testing::Test {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
-TEST(UnitsLengthTest, testFromMm) {
+TEST(LengthTest, testFromMm) {
   EXPECT_EQ(Length::fromMm("0"), Length(0));
   EXPECT_EQ(Length::fromMm("1"), Length(1000000));
   EXPECT_EQ(Length::fromMm("-1"), Length(-1000000));

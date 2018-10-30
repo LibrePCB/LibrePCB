@@ -68,6 +68,7 @@ SOURCES += \
     common/filedownloadtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
     common/filepathtest.cpp \
+    common/lengthtest.cpp \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
     common/ratiotest.cpp \
@@ -75,7 +76,6 @@ SOURCES += \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
     common/toolboxtest.cpp \
-    common/units/lengthtest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     eagleimport/deviceconvertertest.cpp \
