@@ -31,40 +31,68 @@ namespace librepcb {
 namespace tests {
 
 /*******************************************************************************
+ *  Test Data Type
+ ******************************************************************************/
+
+typedef struct {
+  bool    valid;
+  QString str;
+  Length  value;
+} LengthTestData;
+
+/*******************************************************************************
  *  Test Class
  ******************************************************************************/
 
-class LengthTest : public ::testing::Test {};
+class LengthTest : public ::testing::TestWithParam<LengthTestData> {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
-TEST(LengthTest, testFromMm) {
-  EXPECT_EQ(Length::fromMm("0"), Length(0));
-  EXPECT_EQ(Length::fromMm("1"), Length(1000000));
-  EXPECT_EQ(Length::fromMm("-1"), Length(-1000000));
-  EXPECT_EQ(Length::fromMm("0.000001"), Length(1));
-  EXPECT_EQ(Length::fromMm("-0.000001"), Length(-1));
-  EXPECT_EQ(Length::fromMm("1e-6"), Length(1));
-  EXPECT_EQ(Length::fromMm("-1e-6"), Length(-1));
-  EXPECT_EQ(Length::fromMm("1.000001"), Length(1000001));
-  EXPECT_EQ(Length::fromMm("-1.000001"), Length(-1000001));
-  EXPECT_EQ(Length::fromMm("1e3"), Length(1000000000));
-  EXPECT_EQ(Length::fromMm("-1e3"), Length(-1000000000));
-  EXPECT_EQ(Length::fromMm(".1"), Length(100000));
-  EXPECT_EQ(Length::fromMm("1."), Length(1000000));
-  EXPECT_EQ(Length::fromMm("2147483647e-6"), Length(2147483647));
-  EXPECT_EQ(Length::fromMm("-2147483648e-6"), Length(-2147483648));
+TEST_P(LengthTest, testFromMm) {
+  const LengthTestData& data = GetParam();
 
-  EXPECT_THROW(Length::fromMm("."), RuntimeError);
-  EXPECT_THROW(Length::fromMm("0e"), RuntimeError);
-  EXPECT_THROW(Length::fromMm("0e+"), RuntimeError);
-  EXPECT_THROW(Length::fromMm("0e-"), RuntimeError);
-  EXPECT_THROW(Length::fromMm("0e-"), RuntimeError);
-  EXPECT_THROW(Length::fromMm("0.0000001"), RuntimeError);
-  EXPECT_THROW(Length::fromMm("1e-7"), RuntimeError);
-  EXPECT_THROW(Length::fromMm("1e1000"), RuntimeError);
+  if (data.valid) {
+    EXPECT_EQ(Length::fromMm(data.str), data.value);
+  } else {
+    EXPECT_THROW(Length::fromMm(data.str), RuntimeError);
+  }
 }
+
+/*******************************************************************************
+ *  Test Data
+ ******************************************************************************/
+
+// clang-format off
+INSTANTIATE_TEST_CASE_P(LengthTest, LengthTest, ::testing::Values(
+    // DCE Version 4 (random, the only accepted UUID type for us)
+    LengthTestData({true,  "0",              Length(0)          }),
+    LengthTestData({true,  "1",              Length(1000000)    }),
+    LengthTestData({true,  "-1",             Length(-1000000)   }),
+    LengthTestData({true,  "0.000001",       Length(1)          }),
+    LengthTestData({true,  "-0.000001",      Length(-1)         }),
+    LengthTestData({true,  "1e-6",           Length(1)          }),
+    LengthTestData({true,  "-1e-6",          Length(-1)         }),
+    LengthTestData({true,  "1.000001",       Length(1000001)    }),
+    LengthTestData({true,  "-1.000001",      Length(-1000001)   }),
+    LengthTestData({true,  "1e3",            Length(1000000000) }),
+    LengthTestData({true,  "-1e3",           Length(-1000000000)}),
+    LengthTestData({true,  ".1",             Length(100000)     }),
+    LengthTestData({true,  "1.",             Length(1000000)    }),
+    LengthTestData({true,  "2147483647e-6",  Length(2147483647) }),
+    LengthTestData({true,  "-2147483648e-6", Length(-2147483648)}),
+    // invalid cases
+    LengthTestData({false, "",               Length()           }),
+    LengthTestData({false, ".",              Length()           }),
+    LengthTestData({false, "0e",             Length()           }),
+    LengthTestData({false, "0e+",            Length()           }),
+    LengthTestData({false, "0e-",            Length()           }),
+    LengthTestData({false, "0.0000001",      Length()           }),
+    LengthTestData({false, "1e-7",           Length()           }),
+    LengthTestData({false, "1e1000",         Length()           })
+
+));
+// clang-format on
 
 /*******************************************************************************
  *  End of File
