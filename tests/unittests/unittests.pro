@@ -68,6 +68,7 @@ SOURCES += \
     common/filedownloadtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
     common/filepathtest.cpp \
+    common/lengthtest.cpp \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
     common/ratiotest.cpp \
