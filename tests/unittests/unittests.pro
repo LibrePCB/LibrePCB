@@ -71,6 +71,7 @@ SOURCES += \
     common/fileio/transactionalfilesystemtest.cpp \
     common/filepathtest.cpp \
     common/geometry/pathtest.cpp \
+    common/lengthtest.cpp \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
     common/ratiotest.cpp \

@@ -25,6 +25,7 @@
 #include <QtCore>
 
 #include <limits>
+#include <type_traits>
 
 /*******************************************************************************
  *  Namespace
@@ -141,8 +142,253 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t  nanometers,
 }
 
 LengthBase_t Length::mmStringToNm(const QString& millimeters) {
-  bool  ok;
-  qreal nm = qRound(QLocale::c().toDouble(millimeters, &ok) * 1e6);
+  using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
+
+  const LengthBase_t  min   = std::numeric_limits<LengthBase_t>::min();
+  const LengthBase_t  max   = std::numeric_limits<LengthBase_t>::max();
+  const LengthBaseU_t max_u = std::numeric_limits<LengthBaseU_t>::max();
+
+  enum class State {
+    INVALID,
+    START,
+    AFTER_SIGN,
+    LONELY_DOT,
+    INT_PART,
+    FRAC_PART,
+    EXP,
+    EXP_AFTER_SIGN,
+    EXP_DIGITS,
+  };
+  State state = State::START;
+  LengthBaseU_t value_abs = 0;
+  bool sign = false;
+  qint32 exp_offset = 6;
+
+  const quint32 max_exp = std::numeric_limits<quint32>::max();
+  quint32 exp = 0;
+  bool exp_sign = false;
+
+  for (QChar c : millimeters) {
+    if (state == State::INVALID) {
+      // break the loop, not the switch
+      break;
+    }
+    switch (state) {
+    case State::INVALID:
+      // already checked, but needed to avoid compiler warnings
+      break;
+
+    case State::START:
+      if (c == '-') {
+        sign = true;
+        state = State::AFTER_SIGN;
+      } else if (c == '+') {
+        state = State::AFTER_SIGN;
+      } else if (c == '.') {
+        state = State::LONELY_DOT;
+      } else if (c.isDigit()) {
+          value_abs = static_cast<LengthBaseU_t>(c.digitValue());
+          state = State::INT_PART;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::AFTER_SIGN:
+      if (c == '.') {
+        state = State::LONELY_DOT;
+      } else if (c.isDigit()) {
+          value_abs = static_cast<LengthBaseU_t>(c.digitValue());
+          state = State::INT_PART;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::LONELY_DOT:
+      if (c.isDigit()) {
+          value_abs = static_cast<LengthBaseU_t>(c.digitValue());
+          exp_offset -= 1;
+          state = State::FRAC_PART;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::INT_PART:
+      if (c == '.') {
+        state = State::FRAC_PART;
+      } else if (c == 'e' || c == 'E') {
+        state = State::EXP;
+      } else if (c.isDigit()) {
+          LengthBaseU_t digit = static_cast<LengthBaseU_t>(c.digitValue());
+          if (value_abs > (max_u / 10)) {
+            // Would overflow
+            state = State::INVALID;
+            break;
+          }
+          value_abs *= 10;
+          if (value_abs > (max_u - digit)) {
+            // Would overflow
+            state = State::INVALID;
+            break;
+          }
+          value_abs += digit;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::FRAC_PART:
+      if (c == 'e' || c == 'E') {
+        state = State::EXP;
+      } else if (c.isDigit()) {
+          LengthBaseU_t digit = static_cast<LengthBaseU_t>(c.digitValue());
+          if (value_abs > (max_u / 10)) {
+            // Would overflow
+            state = State::INVALID;
+            break;
+          }
+          value_abs *= 10;
+          if (value_abs > (max_u - digit)) {
+            // Would overflow
+            state = State::INVALID;
+            break;
+          }
+          value_abs += digit;
+          exp_offset -= 1;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::EXP:
+      if (c == '-') {
+        exp_sign = true;
+        state = State::EXP_AFTER_SIGN;
+      } else if (c == '+') {
+        state = State::EXP_AFTER_SIGN;
+      } else if (c.isDigit()) {
+        exp = static_cast<quint32>(c.digitValue());
+        state = State::EXP_DIGITS;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::EXP_AFTER_SIGN:
+      if (c.isDigit()) {
+        exp = static_cast<quint32>(c.digitValue());
+        state = State::EXP_DIGITS;
+      } else {
+        state = State::INVALID;
+      }
+      break;
+
+    case State::EXP_DIGITS:
+      if (c.isDigit()) {
+        quint32 digit = static_cast<quint32>(c.digitValue());
+        if (exp > (max_exp / 10)) {
+            // Would overflow
+            state = State::INVALID;
+            break;
+          }
+          exp *= 10;
+          if (exp > (max_exp - digit)) {
+            // Would overflow
+            state = State::INVALID;
+            break;
+          }
+          exp += digit;
+      } else {
+        state = State::INVALID;
+      }
+    }
+  }
+
+  bool ok = true;
+  switch (state) {
+  case State::INVALID:
+  case State::START:
+  case State::AFTER_SIGN:
+  case State::LONELY_DOT:
+  case State::EXP:
+  case State::EXP_AFTER_SIGN:
+    ok = false;
+    break;
+
+  case State::INT_PART:
+  case State::FRAC_PART:
+  case State::EXP_DIGITS:
+    break;
+  }
+
+  if (ok) {
+    quint32 exp_offset_abs;
+    if (exp_offset < 0) {
+      exp_offset_abs = -static_cast<quint32>(exp_offset);
+    } else {
+      exp_offset_abs = static_cast<quint32>(exp_offset);
+    }
+
+    if (exp_sign == (exp_offset < 0)) {
+      if (exp > (max_exp - exp_offset_abs)) {
+        // would overflow
+        ok = false;
+      } else {
+        exp += exp_offset_abs;
+      }
+    } else {
+      if (exp < exp_offset_abs) {
+        // would overflow
+        ok = false;
+      } else {
+        exp -= exp_offset_abs;
+      }
+    }
+  }
+
+  LengthBase_t nm = 0;
+  if (ok) {
+    // No need to apply exponent or sign if value_abs is zero
+    if (value_abs != 0) {
+      if (exp_sign) {
+        for (quint32 i = 0; i < exp; i++) {
+          if ((value_abs % 10) != 0) {
+            // sub-nanometer precision
+            ok = false;
+            break;
+          }
+          value_abs /= 10;
+        }
+      } else {
+        for (quint32 i = 0; i < exp; i++) {
+          if (value_abs > (max_u / 10)) {
+            // would overflow
+            ok = false;
+            break;
+          }
+          value_abs *= 10;
+        }
+      }
+      if (ok) {
+        if (sign) {
+          if (value_abs > static_cast<LengthBaseU_t>(min)) {
+            ok = false;
+          } else {
+            nm = static_cast<LengthBase_t>(-value_abs);
+          }
+        } else {
+          if (value_abs > static_cast<LengthBaseU_t>(max)) {
+            ok = false;
+          } else {
+            nm = static_cast<LengthBase_t>(value_abs);
+          }
+        }
+      }
+    }
+  }
+
   if (!ok) {
     throw RuntimeError(
         __FILE__, __LINE__,
