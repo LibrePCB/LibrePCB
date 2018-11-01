@@ -36,8 +36,9 @@ namespace tests {
 
 typedef struct {
   bool    valid;
-  QString str;
+  QString orig_str;
   Length  value;
+  QString gen_str;
 } LengthTestData;
 
 /*******************************************************************************
@@ -53,9 +54,17 @@ TEST_P(LengthTest, testFromMm) {
   const LengthTestData& data = GetParam();
 
   if (data.valid) {
-    EXPECT_EQ(Length::fromMm(data.str), data.value);
+    EXPECT_EQ(Length::fromMm(data.orig_str), data.value);
   } else {
-    EXPECT_THROW(Length::fromMm(data.str), RuntimeError);
+    EXPECT_THROW(Length::fromMm(data.orig_str), RuntimeError);
+  }
+}
+
+TEST_P(LengthTest, testToMmString) {
+  const LengthTestData& data = GetParam();
+
+  if (data.valid) {
+    EXPECT_EQ(data.value.toMmString(), data.gen_str);
   }
 }
 
@@ -65,31 +74,44 @@ TEST_P(LengthTest, testFromMm) {
 
 // clang-format off
 INSTANTIATE_TEST_CASE_P(LengthTest, LengthTest, ::testing::Values(
-    // DCE Version 4 (random, the only accepted UUID type for us)
-    LengthTestData({true,  "0",              Length(0)          }),
-    LengthTestData({true,  "1",              Length(1000000)    }),
-    LengthTestData({true,  "-1",             Length(-1000000)   }),
-    LengthTestData({true,  "0.000001",       Length(1)          }),
-    LengthTestData({true,  "-0.000001",      Length(-1)         }),
-    LengthTestData({true,  "1e-6",           Length(1)          }),
-    LengthTestData({true,  "-1e-6",          Length(-1)         }),
-    LengthTestData({true,  "1.000001",       Length(1000001)    }),
-    LengthTestData({true,  "-1.000001",      Length(-1000001)   }),
-    LengthTestData({true,  "1e3",            Length(1000000000) }),
-    LengthTestData({true,  "-1e3",           Length(-1000000000)}),
-    LengthTestData({true,  ".1",             Length(100000)     }),
-    LengthTestData({true,  "1.",             Length(1000000)    }),
-    LengthTestData({true,  "2147483647e-6",  Length(2147483647) }),
-    LengthTestData({true,  "-2147483648e-6", Length(-2147483648)}),
+    LengthTestData({true,  "0",              Length(0),           "0"           }),
+    LengthTestData({true,  "1",              Length(1000000),     "1"           }),
+    LengthTestData({true,  "-1",             Length(-1000000),    "-1"          }),
+    LengthTestData({true,  "0.000001",       Length(1),           "1e-6"        }),
+    LengthTestData({true,  "-0.000001",      Length(-1),          "-1e-6"       }),
+    LengthTestData({true,  "1e-6",           Length(1),           "1e-6"        }),
+    LengthTestData({true,  "-1e-6",          Length(-1),          "-1e-6"       }),
+    LengthTestData({true,  "1.000001",       Length(1000001),     "1.000001"    }),
+    LengthTestData({true,  "-1.000001",      Length(-1000001),    "-1.000001"   }),
+    LengthTestData({true,  "1e3",            Length(1000000000),  "1000"        }),
+    LengthTestData({true,  "-1e3",           Length(-1000000000), "-1000"       }),
+    LengthTestData({true,  ".1",             Length(100000),      "0.1"         }),
+    LengthTestData({true,  "1.",             Length(1000000),     "1"           }),
+    LengthTestData({true,  "2147483647e-6",  Length(2147483647),  "2147.483647" }),
+    LengthTestData({true,  "-2147483648e-6", Length(-2147483648), "-2147.483648"}),
+    LengthTestData({true,  "9",              Length(9000000),     "9"           }),
+    LengthTestData({true,  "9.9",            Length(9900000),     "9.9"         }),
+    LengthTestData({true,  "0.9",            Length(900000),      "0.9"         }),
+    LengthTestData({true,  "0.99",           Length(990000),      "0.99"        }),
+    LengthTestData({true,  "0.09",           Length(90000),       "0.09"        }),
+    LengthTestData({true,  "0.099",          Length(99000),       "0.099"       }),
+    LengthTestData({true,  "0.009",          Length(9000),        "0.009"       }),
+    LengthTestData({true,  "0.0099",         Length(9900),        "0.0099"      }),
+    LengthTestData({true,  "0.0009",         Length(900),         "9e-4"        }),
+    LengthTestData({true,  "0.00099",        Length(990),         "9.9e-4"      }),
+    LengthTestData({true,  "0.00009",        Length(90),          "9e-5"        }),
+    LengthTestData({true,  "0.000099",       Length(99),          "9.9e-5"      }),
+    LengthTestData({true,  "0.000009",       Length(9),           "9e-6"        }),
+
     // invalid cases
-    LengthTestData({false, "",               Length()           }),
-    LengthTestData({false, ".",              Length()           }),
-    LengthTestData({false, "0e",             Length()           }),
-    LengthTestData({false, "0e+",            Length()           }),
-    LengthTestData({false, "0e-",            Length()           }),
-    LengthTestData({false, "0.0000001",      Length()           }),
-    LengthTestData({false, "1e-7",           Length()           }),
-    LengthTestData({false, "1e1000",         Length()           })
+    LengthTestData({false, "",               Length(),            QString()     }),
+    LengthTestData({false, ".",              Length(),            QString()     }),
+    LengthTestData({false, "0e",             Length(),            QString()     }),
+    LengthTestData({false, "0e+",            Length(),            QString()     }),
+    LengthTestData({false, "0e-",            Length(),            QString()     }),
+    LengthTestData({false, "0.0000001",      Length(),            QString()     }),
+    LengthTestData({false, "1e-7",           Length(),            QString()     }),
+    LengthTestData({false, "1e1000",         Length(),            QString()     })
 
 ));
 // clang-format on

@@ -37,10 +37,58 @@ namespace librepcb {
  ******************************************************************************/
 
 QString Length::toMmString() const noexcept {
-  QString str = QLocale::c().toString(toMm(), 'f', 6);
-  for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
-    str.chop(1);
+  using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
+
+  LengthBase_t nm = toNm();
+  LengthBaseU_t nm_abs;
+  if (nm < 0) {
+    nm_abs = -static_cast<LengthBaseU_t>(nm);
+  } else {
+    nm_abs = static_cast<LengthBaseU_t>(nm);
   }
+
+  QString str = QString::number(nm_abs);
+  if (nm_abs >= 1000000) {
+    if ((nm_abs % 1000000) == 0) {
+      // exact millimeters
+      str.chop(6);
+    } else {
+      str.insert(str.length() - 6, '.');
+      while (str.endsWith('0'))
+        str.chop(1);
+    }
+  } else if (nm_abs != 0) {
+    while (str.endsWith('0'))
+        str.chop(1);
+
+    if (nm_abs >= 100000) {
+      // number is 0.X, X non zero
+      str.insert(0, "0.");
+    } else if (nm_abs >= 10000) {
+      // number is 0.0X..., X non zero
+      str.insert(0, "0.0");
+    } else if (nm_abs >= 1000) {
+      // number is 0.00X..., X non zero
+      str.insert(0, "0.00");
+    } else if (nm_abs >= 100) {
+      // number is 0.000X..., X non zero
+      if (str.length() > 1)
+        str.insert(1, '.');
+      str.append("e-4");
+    } else if (nm_abs >= 10) {
+      // number is 0.0000X..., X non zero
+      if (str.length() > 1)
+        str.insert(1, '.');
+      str.append("e-5");
+    } else if (nm_abs != 0) {
+      // number is 0.00000X, X non zero
+      str.append("e-6");
+    }
+  }
+
+  if (nm < 0)
+    str.insert(0, '-');
+
   return str;
 }
 
