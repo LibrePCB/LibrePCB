@@ -72,8 +72,10 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings)
   mUi->repositoriesLayout->addWidget(mSettings.getRepositories().getWidget());
 
   // tab: debug tools
+#ifdef QT_DEBUG
   mUi->tabWidget->addTab(mSettings.getDebugTools().getWidget(),
                          tr("Debug Tools"));
+#endif
 
   // load the window geometry
   QSettings clientSettings;
@@ -111,9 +113,11 @@ WorkspaceSettingsDialog::~WorkspaceSettingsDialog() {
   mSettings.getRepositories().getWidget()->setParent(0);
 
   // tab: debug tools
+#ifdef QT_DEBUG
   mUi->tabWidget->removeTab(
       mUi->tabWidget->indexOf(mSettings.getDebugTools().getWidget()));
   mSettings.getDebugTools().getWidget()->setParent(0);
+#endif
 
   // delete private member objects
   delete mUi;
