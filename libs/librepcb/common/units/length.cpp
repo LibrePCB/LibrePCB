@@ -49,15 +49,12 @@ QString Length::toMmString() const noexcept {
 
   QString str = QString::number(nm_abs);
   if (nm_abs >= 1000000) {
-    if ((nm_abs % 1000000) == 0) {
-      // exact millimeters
-      str.chop(6);
-    } else {
-      str.insert(str.length() - 6, '.');
-      while (str.endsWith('0'))
-        str.chop(1);
-    }
-  } else if (nm_abs != 0) {
+    str.insert(str.length() - 6, '.');
+    while (str.endsWith('0') && !str.endsWith(".0"))
+      str.chop(1);
+  } else if (nm_abs == 0) {
+      str.append(".0");
+  } else {
     while (str.endsWith('0'))
         str.chop(1);
 
@@ -72,17 +69,13 @@ QString Length::toMmString() const noexcept {
       str.insert(0, "0.00");
     } else if (nm_abs >= 100) {
       // number is 0.000X..., X non zero
-      if (str.length() > 1)
-        str.insert(1, '.');
-      str.append("e-4");
+      str.insert(0, "0.000");
     } else if (nm_abs >= 10) {
       // number is 0.0000X..., X non zero
-      if (str.length() > 1)
-        str.insert(1, '.');
-      str.append("e-5");
-    } else if (nm_abs != 0) {
+      str.insert(0, "0.0000");
+    } else /*if (nm_abs >= 1)*/ {
       // number is 0.00000X, X non zero
-      str.append("e-6");
+      str.insert(0, "0.00000");
     }
   }
 
