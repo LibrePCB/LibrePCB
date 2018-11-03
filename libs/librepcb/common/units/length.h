@@ -241,8 +241,6 @@ public:
    * @note This method is useful to store lengths in files. The problem with
    * decreased precision does NOT exist by using this method!
    *
-   * @todo don't use double for this purpose!
-   *
    * @see #setLengthMm(const QString&), #fromMm(const QString&, const Length&)
    */
   QString toMmString() const noexcept;
