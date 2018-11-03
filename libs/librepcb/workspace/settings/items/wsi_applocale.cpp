@@ -47,21 +47,19 @@ WSI_AppLocale::WSI_AppLocale(const SExpression& node)
   const QString i18nDir = qApp->getResourcesFilePath("i18n").toStr();
 
   if (!mAppLocale.isEmpty()) {
-    QLocale selectedLocale(mAppLocale);
-    QLocale::setDefault(selectedLocale);  // use the selected locale as the
-                                          // application's default locale
+    // use the selected locale as the application's default locale
+    QLocale::setDefault(QLocale(mAppLocale));
 
     // Install language translations (like "de" for German)
     QTranslator* newTranslator = new QTranslator();
-    newTranslator->load("librepcb_" % selectedLocale.name().split("_").at(0),
-                        i18nDir);
+    newTranslator->load("librepcb_" % mAppLocale.split("_").at(0), i18nDir);
     qApp->installTranslator(newTranslator);
     mInstalledTranslators.append(newTranslator);
 
     // Install language/country translations (like "de_ch" for
     // German/Switzerland)
     newTranslator = new QTranslator();
-    newTranslator->load("librepcb_" % selectedLocale.name(), i18nDir);
+    newTranslator->load("librepcb_" % mAppLocale, i18nDir);
     qApp->installTranslator(newTranslator);
     mInstalledTranslators.append(newTranslator);
   }
@@ -74,11 +72,16 @@ WSI_AppLocale::WSI_AppLocale(const SExpression& node)
     filename.remove("librepcb_");
     QFileInfo fileInfo(filename);
     if (fileInfo.suffix() == "qm") {
-      QLocale loc(fileInfo.baseName());
-      QString str(loc.nativeLanguageName() % " (" % loc.nativeCountryName() %
-                  ")");
-      if (mComboBox->findData(loc.name()) < 0)
-        mComboBox->addItem(str, loc.name());
+      QString code = fileInfo.baseName();
+      QLocale loc(code);
+      QString str = loc.nativeLanguageName();
+      if (str.isEmpty()) {
+        str = code;  // fallback if language code is not recognized
+      }
+      if (!loc.nativeCountryName().isEmpty()) {
+        str += " (" % loc.nativeCountryName() % ")";
+      }
+      mComboBox->addItem(str, code);
     }
   }
   updateComboBoxIndex();
