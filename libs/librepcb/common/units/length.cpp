@@ -96,7 +96,11 @@ Length Length::abs() const noexcept {
 }
 
 Length& Length::makeAbs() noexcept {
-  mNanometers = qAbs(mNanometers);
+  if (mNanometers == std::numeric_limits<LengthBase_t>::min()) {
+    mNanometers = std::numeric_limits<LengthBase_t>::max();
+  } else {
+    mNanometers = qAbs(mNanometers);
+  }
   return *this;
 }
 
@@ -177,8 +181,7 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t  nanometers,
                                  const Length& gridInterval) noexcept {
   using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
 
-  // assume gridInterval >= 0
-  LengthBaseU_t grid_interval = static_cast<LengthBaseU_t>(gridInterval.mNanometers);
+  LengthBaseU_t grid_interval = static_cast<LengthBaseU_t>(gridInterval.abs().mNanometers);
   if (grid_interval == 0)
     return nanometers;
 
