@@ -571,10 +571,6 @@ private:
    *
    * @return  The length which is mapped to the grid (always a multiple of
    * gridInterval)
-   *
-   * @todo    does this work correctly with large 64bit integers?!
-   *          and maybe there is a better, integer-based method for this
-   * purpose?
    */
   static LengthBase_t mapNmToGrid(LengthBase_t  nanometers,
                                   const Length& gridInterval) noexcept;

@@ -68,6 +68,17 @@ TEST_P(LengthTest, testToMmString) {
   }
 }
 
+TEST(LengthTest, testSnapToGrid) {
+  EXPECT_EQ(Length(8).mappedToGrid(10), Length(10));
+  EXPECT_EQ(Length(2).mappedToGrid(10), Length(0));
+  EXPECT_EQ(Length(-8).mappedToGrid(10), Length(-10));
+  EXPECT_EQ(Length(-2).mappedToGrid(10), Length(0));
+  EXPECT_EQ(Length(18).mappedToGrid(10), Length(20));
+  EXPECT_EQ(Length(12).mappedToGrid(10), Length(10));
+  EXPECT_EQ(Length(-18).mappedToGrid(10), Length(-20));
+  EXPECT_EQ(Length(-12).mappedToGrid(10), Length(-10));
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/
@@ -112,7 +123,6 @@ INSTANTIATE_TEST_CASE_P(LengthTest, LengthTest, ::testing::Values(
     LengthTestData({false, "0.0000001",      Length(),            QString()     }),
     LengthTestData({false, "1e-7",           Length(),            QString()     }),
     LengthTestData({false, "1e1000",         Length(),            QString()     })
-
 ));
 // clang-format on
 
