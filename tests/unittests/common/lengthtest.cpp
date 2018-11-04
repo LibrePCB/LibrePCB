@@ -69,6 +69,11 @@ TEST_P(LengthTest, testToMmString) {
 }
 
 TEST(LengthTest, testSnapToGrid) {
+  EXPECT_EQ(Length(0).mappedToGrid(10), Length(0));
+  EXPECT_EQ(Length(10).mappedToGrid(0), Length(10));
+  EXPECT_EQ(Length(-10).mappedToGrid(0), Length(-10));
+  EXPECT_EQ(Length(10).mappedToGrid(1), Length(10));
+  EXPECT_EQ(Length(-10).mappedToGrid(1), Length(-10));
   EXPECT_EQ(Length(8).mappedToGrid(10), Length(10));
   EXPECT_EQ(Length(2).mappedToGrid(10), Length(0));
   EXPECT_EQ(Length(-8).mappedToGrid(10), Length(-10));
@@ -77,6 +82,10 @@ TEST(LengthTest, testSnapToGrid) {
   EXPECT_EQ(Length(12).mappedToGrid(10), Length(10));
   EXPECT_EQ(Length(-18).mappedToGrid(10), Length(-20));
   EXPECT_EQ(Length(-12).mappedToGrid(10), Length(-10));
+  EXPECT_EQ(Length(10).mappedToGrid(10), Length(10));
+  EXPECT_EQ(Length(-10).mappedToGrid(10), Length(-10));
+  EXPECT_EQ(Length(20).mappedToGrid(20), Length(20));
+  EXPECT_EQ(Length(-20).mappedToGrid(20), Length(-20));
 }
 
 /*******************************************************************************

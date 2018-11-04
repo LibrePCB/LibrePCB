@@ -197,7 +197,7 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t  nanometers,
   }
 
   LengthBaseU_t remainder = nm_abs % grid_interval;
-  if (remainder >= (grid_interval / 2)) {
+  if (remainder > (grid_interval / 2)) {
     // snap away from zero, but it might overflow
     LengthBaseU_t tmp_snapped = nm_abs + (grid_interval - remainder);
     if ((tmp_snapped < nm_abs) || (tmp_snapped > max)) {
