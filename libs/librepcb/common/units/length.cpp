@@ -96,7 +96,11 @@ Length Length::abs() const noexcept {
 }
 
 Length& Length::makeAbs() noexcept {
-  mNanometers = qAbs(mNanometers);
+  if (mNanometers == std::numeric_limits<LengthBase_t>::min()) {
+    mNanometers = std::numeric_limits<LengthBase_t>::max();
+  } else {
+    mNanometers = qAbs(mNanometers);
+  }
   return *this;
 }
 
@@ -175,11 +179,42 @@ void Length::setLengthFromFloat(qreal nanometers) {
 
 LengthBase_t Length::mapNmToGrid(LengthBase_t  nanometers,
                                  const Length& gridInterval) noexcept {
-  if (gridInterval.mNanometers != 0)
-    return qRound((qreal)nanometers / gridInterval.mNanometers) *
-           gridInterval.mNanometers;
-  else
+  using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
+
+  LengthBaseU_t grid_interval = static_cast<LengthBaseU_t>(gridInterval.abs().mNanometers);
+  if (grid_interval == 0)
     return nanometers;
+
+  LengthBaseU_t nm_abs;
+  LengthBaseU_t max;
+
+  if (nanometers >= 0) {
+    nm_abs = static_cast<LengthBaseU_t>(nanometers);
+    max = static_cast<LengthBaseU_t>(std::numeric_limits<LengthBase_t>::max());
+  } else {
+    nm_abs = -static_cast<LengthBaseU_t>(nanometers);
+    max = static_cast<LengthBaseU_t>(std::numeric_limits<LengthBase_t>::min());
+  }
+
+  LengthBaseU_t remainder = nm_abs % grid_interval;
+  if (remainder > (grid_interval / 2)) {
+    // snap away from zero, but it might overflow
+    LengthBaseU_t tmp_snapped = nm_abs + (grid_interval - remainder);
+    if ((tmp_snapped < nm_abs) || (tmp_snapped > max)) {
+      // overflow, snap towards zero
+      nm_abs -= remainder;
+    } else {
+      nm_abs = tmp_snapped;
+    }
+  } else {
+    // snap towards zero
+    nm_abs -= remainder;
+  }
+
+  if (nanometers >= 0)
+    return static_cast<LengthBase_t>(nm_abs);
+  else
+    return static_cast<LengthBase_t>(-nm_abs);
 }
 
 LengthBase_t Length::mmStringToNm(const QString& millimeters) {

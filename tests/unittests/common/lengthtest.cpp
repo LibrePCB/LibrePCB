@@ -36,9 +36,9 @@ namespace tests {
 
 typedef struct {
   bool    valid;
-  QString orig_str;
+  QString origStr;
   Length  value;
-  QString gen_str;
+  QString genStr;
 } LengthTestData;
 
 /*******************************************************************************
@@ -54,9 +54,9 @@ TEST_P(LengthTest, testFromMm) {
   const LengthTestData& data = GetParam();
 
   if (data.valid) {
-    EXPECT_EQ(Length::fromMm(data.orig_str), data.value);
+    EXPECT_EQ(Length::fromMm(data.origStr), data.value);
   } else {
-    EXPECT_THROW(Length::fromMm(data.orig_str), RuntimeError);
+    EXPECT_THROW(Length::fromMm(data.origStr), RuntimeError);
   }
 }
 
@@ -64,7 +64,7 @@ TEST_P(LengthTest, testToMmString) {
   const LengthTestData& data = GetParam();
 
   if (data.valid) {
-    EXPECT_EQ(data.value.toMmString(), data.gen_str);
+    EXPECT_EQ(data.value.toMmString(), data.genStr);
   }
 }
 
@@ -74,9 +74,10 @@ TEST_P(LengthTest, testToMmString) {
 
 // clang-format off
 INSTANTIATE_TEST_CASE_P(LengthTest, LengthTest, ::testing::Values(
+    // from/to mm
     LengthTestData({true,  "0",              Length(0),           "0.0"         }),
     LengthTestData({true,  "1",              Length(1000000),     "1.0"         }),
-    LengthTestData({true,  "-1",             Length(-1000000),    "-1.0"        }),
+    LengthTestData({true,  "-1",             Length(-1000000),    "-1.0",       }),
     LengthTestData({true,  "0.000001",       Length(1),           "0.000001"    }),
     LengthTestData({true,  "-0.000001",      Length(-1),          "-0.000001"   }),
     LengthTestData({true,  "1e-6",           Length(1),           "0.000001"    }),
@@ -112,7 +113,6 @@ INSTANTIATE_TEST_CASE_P(LengthTest, LengthTest, ::testing::Values(
     LengthTestData({false, "0.0000001",      Length(),            QString()     }),
     LengthTestData({false, "1e-7",           Length(),            QString()     }),
     LengthTestData({false, "1e1000",         Length(),            QString()     })
-
 ));
 // clang-format on
 
