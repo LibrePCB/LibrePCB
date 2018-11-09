@@ -136,6 +136,7 @@ bool LibraryOverviewWidget::save() noexcept {
     mLibrary->setKeywords("", mUi->edtKeywords->text().trimmed());
     mLibrary->setAuthor(mUi->edtAuthor->text().trimmed());
     mLibrary->setVersion(version);
+    mLibrary->setUrl(QUrl::fromUserInput(mUi->edtUrl->text().trimmed()));
     mLibrary->setDeprecated(mUi->cbxDeprecated->isChecked());
     mLibrary->setDependencies(mDependenciesEditorWidget->getUuids());
     mLibrary->save();
