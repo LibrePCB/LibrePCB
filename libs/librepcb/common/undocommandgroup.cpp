@@ -76,14 +76,17 @@ void UndoCommandGroup::appendChild(UndoCommand* cmd) {
  ******************************************************************************/
 
 bool UndoCommandGroup::performExecute() {
+  bool           modified = false;
   ScopeGuardList sgl(mChilds.count());
   for (int i = 0; i < mChilds.count(); ++i) {  // from bottom to top
     UndoCommand* cmd = mChilds.at(i);
-    cmd->execute();
+    if (cmd->execute()) {
+      modified = true;
+    }
     sgl.add([cmd]() { cmd->undo(); });
   }
   sgl.dismiss();
-  return (mChilds.count() > 0);
+  return modified;
 }
 
 void UndoCommandGroup::performUndo() {
