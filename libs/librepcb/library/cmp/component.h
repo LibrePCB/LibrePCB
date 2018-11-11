@@ -90,17 +90,21 @@ public:
   }
 
   // Attribute Methods
-  AttributeList&       getAttributes() noexcept { return mAttributes; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
+  void                 setAttributes(const AttributeList& attributes) noexcept {
+    mAttributes = attributes;
+  }
 
   // Default Value Methods
   const QString& getDefaultValue() const noexcept { return mDefaultValue; }
   void setDefaultValue(const QString& value) noexcept { mDefaultValue = value; }
 
   // Prefix Methods
-  NormDependentPrefixMap&       getPrefixes() noexcept { return mPrefixes; }
   const NormDependentPrefixMap& getPrefixes() const noexcept {
     return mPrefixes;
+  }
+  void setPrefixes(const NormDependentPrefixMap& prefixes) noexcept {
+    mPrefixes = prefixes;
   }
 
   // Signal Methods
