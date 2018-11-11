@@ -96,6 +96,7 @@ void LibraryListEditorWidget::btnAddClicked() noexcept {
     mUuids.insert(*uuid);
     addItem(*uuid);
     emit libraryAdded(*uuid);
+    emit edited();
   }
 }
 
@@ -106,8 +107,11 @@ void LibraryListEditorWidget::btnRemoveClicked() noexcept {
            : tl::nullopt;
   if (item && uuid) {
     mUuids.remove(*uuid);
-    emit libraryRemoved(*uuid);
     delete item;
+    // Emit signals *after* removing the item to avoid critical issues if a
+    // signal handler modifies the UUID list befor removing was finished.
+    emit libraryRemoved(*uuid);
+    emit edited();
   }
 }
 

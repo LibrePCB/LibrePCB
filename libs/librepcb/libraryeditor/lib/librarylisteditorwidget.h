@@ -81,6 +81,7 @@ private:
   void addItem(const Uuid& library) noexcept;
 
 signals:
+  void edited();
   void libraryAdded(const Uuid& lib);
   void libraryRemoved(const Uuid& lib);
 

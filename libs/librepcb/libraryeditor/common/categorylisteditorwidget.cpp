@@ -84,6 +84,7 @@ void CategoryListEditorWidgetBase::btnAddClicked() noexcept {
     mUuids.insert(*uuid);
     addItem(*uuid);
     emit categoryAdded(*uuid);
+    emit edited();
   }
 }
 
@@ -94,9 +95,12 @@ void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
            : tl::nullopt;
   if (item && uuid) {
     mUuids.remove(*uuid);
-    emit categoryRemoved(*uuid);
     delete item;
     updateColor();
+    // Emit signals *after* removing the item to avoid critical issues if a
+    // signal handler modifies the UUID list befor removing was finished.
+    emit categoryRemoved(*uuid);
+    emit edited();
   }
 }
 
