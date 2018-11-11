@@ -147,6 +147,7 @@ bool ComponentEditorWidget::save() noexcept {
     mComponent->setVersion(version);
     mComponent->setCategories(mCategoriesEditorWidget->getUuids());
     mComponent->setDeprecated(mUi->cbxDeprecated->isChecked());
+    mComponent->setIsSchematicOnly(mUi->cbxSchematicOnly->isChecked());
     mComponent->getPrefixes().setDefaultValue(prefix);
     mComponent->setDefaultValue(mUi->edtDefaultValue->toPlainText().trimmed());
     mComponent->getAttributes() =
