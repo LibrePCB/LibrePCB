@@ -26,6 +26,8 @@
 #include "ui_libraryoverviewwidget.h"
 
 #include <librepcb/common/dialogs/filedialog.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/library/cmd/cmdlibraryedit.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -52,58 +54,8 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
     mLibrary(lib),
     mUi(new Ui::LibraryOverviewWidget) {
   mUi->setupUi(this);
-  setWindowTitle(*mLibrary->getNames().value(getLibLocaleOrder()));
-  updateIcon();
-
-  // insert dependencies editor widget
-  mDependenciesEditorWidget.reset(
-      new LibraryListEditorWidget(mContext.workspace, this));
-  int                   row;
-  QFormLayout::ItemRole role;
-  mUi->formLayout->getWidgetPosition(mUi->lblDependencies, &row, &role);
-  mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
-                             mDependenciesEditorWidget.data());
-
-  mUi->edtName->setText(*mLibrary->getNames().value(getLibLocaleOrder()));
-  mUi->edtDescription->setPlainText(
-      mLibrary->getDescriptions().value(getLibLocaleOrder()));
-  mUi->edtKeywords->setText(mLibrary->getKeywords().value(getLibLocaleOrder()));
-  mUi->edtAuthor->setText(mLibrary->getAuthor());
-  mUi->edtVersion->setText(mLibrary->getVersion().toStr());
-  mUi->edtUrl->setText(mLibrary->getUrl().toString());
-  mUi->cbxDeprecated->setChecked(mLibrary->isDeprecated());
-  mDependenciesEditorWidget->setUuids(mLibrary->getDependencies());
-
   connect(mUi->btnIcon, &QPushButton::clicked, this,
           &LibraryOverviewWidget::btnIconClicked);
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &QWidget::setWindowTitle);
-  connect(mUi->edtName, &QLineEdit::textEdited, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mUi->edtDescription, &QPlainTextEdit::textChanged, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mUi->edtKeywords, &QLineEdit::textEdited, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mUi->edtAuthor, &QLineEdit::textEdited, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mUi->edtVersion, &QLineEdit::textEdited, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mUi->edtUrl, &QLineEdit::textEdited, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mDependenciesEditorWidget.data(),
-          &LibraryListEditorWidget::libraryAdded, this,
-          &LibraryOverviewWidget::setDirty);
-  connect(mDependenciesEditorWidget.data(),
-          &LibraryListEditorWidget::libraryRemoved, this,
-          &LibraryOverviewWidget::setDirty);
-
-  updateElementLists();
-  connect(&mContext.workspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
-          &LibraryOverviewWidget::updateElementLists);
-
   connect(mUi->lstCmpCat, &QListWidget::doubleClicked, this,
           &LibraryOverviewWidget::lstCmpCatDoubleClicked);
   connect(mUi->lstPkgCat, &QListWidget::doubleClicked, this,
@@ -116,6 +68,46 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
           &LibraryOverviewWidget::lstCmpDoubleClicked);
   connect(mUi->lstDev, &QListWidget::doubleClicked, this,
           &LibraryOverviewWidget::lstDevDoubleClicked);
+
+  // Insert dependencies editor widget.
+  mDependenciesEditorWidget.reset(
+      new LibraryListEditorWidget(mContext.workspace, this));
+  int                   row;
+  QFormLayout::ItemRole role;
+  mUi->formLayout->getWidgetPosition(mUi->lblDependencies, &row, &role);
+  mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
+                             mDependenciesEditorWidget.data());
+
+  // Load metadata.
+  updateMetadata();
+
+  // Reload metadata on undo stack state changes.
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &LibraryOverviewWidget::updateMetadata);
+
+  // Handle changes of metadata.
+  connect(mUi->edtName, &QLineEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->edtDescription, &PlainTextEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->edtKeywords, &QLineEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->edtAuthor, &QLineEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->edtUrl, &QLineEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mDependenciesEditorWidget.data(), &LibraryListEditorWidget::edited,
+          this, &LibraryOverviewWidget::commitMetadata);
+
+  // Load all library elements.
+  updateElementLists();
+  connect(&mContext.workspace.getLibraryDb(),
+          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
+          &LibraryOverviewWidget::updateElementLists);
 }
 
 LibraryOverviewWidget::~LibraryOverviewWidget() noexcept {
@@ -126,20 +118,16 @@ LibraryOverviewWidget::~LibraryOverviewWidget() noexcept {
  ******************************************************************************/
 
 bool LibraryOverviewWidget::save() noexcept {
-  try {
-    ElementName name(mUi->edtName->text().trimmed());  // can throw
-    Version     version =
-        Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
+  // Commit metadata.
+  QString errorMsg = commitMetadata();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid metadata"), errorMsg);
+    return false;
+  }
 
-    mLibrary->setName("", name);
-    mLibrary->setDescription("", mUi->edtDescription->toPlainText().trimmed());
-    mLibrary->setKeywords("", mUi->edtKeywords->text().trimmed());
-    mLibrary->setAuthor(mUi->edtAuthor->text().trimmed());
-    mLibrary->setVersion(version);
-    mLibrary->setUrl(QUrl::fromUserInput(mUi->edtUrl->text().trimmed()));
-    mLibrary->setDeprecated(mUi->cbxDeprecated->isChecked());
-    mLibrary->setDependencies(mDependenciesEditorWidget->getUuids());
-    mLibrary->save();
+  // Save element.
+  try {
+    mLibrary->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Save failed"), e.getMsg());
@@ -151,16 +139,57 @@ bool LibraryOverviewWidget::save() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void LibraryOverviewWidget::updateIcon() noexcept {
-  mUi->btnIcon->setToolTip(
-      tr("Click here to choose an icon (PNG, 256x256px)."));
-  setWindowIcon(mLibrary->getIcon());
-  mUi->btnIcon->setIcon(mLibrary->getIcon());
-  if (mLibrary->getIcon().isNull()) {
+void LibraryOverviewWidget::updateMetadata() noexcept {
+  setWindowTitle(*mLibrary->getNames().getDefaultValue());
+  setWindowIcon(mLibrary->getIconAsPixmap());
+  mUi->btnIcon->setIcon(mLibrary->getIconAsPixmap());
+  if (mLibrary->getIconAsPixmap().isNull()) {
     mUi->btnIcon->setText(mUi->btnIcon->toolTip());
   } else {
     mUi->btnIcon->setText(QString());
   }
+  mUi->edtName->setText(*mLibrary->getNames().getDefaultValue());
+  mUi->edtDescription->setPlainText(
+      mLibrary->getDescriptions().getDefaultValue());
+  mUi->edtKeywords->setText(mLibrary->getKeywords().getDefaultValue());
+  mUi->edtAuthor->setText(mLibrary->getAuthor());
+  mUi->edtVersion->setText(mLibrary->getVersion().toStr());
+  mUi->cbxDeprecated->setChecked(mLibrary->isDeprecated());
+  mUi->edtUrl->setText(mLibrary->getUrl().toString());
+  mDependenciesEditorWidget->setUuids(mLibrary->getDependencies());
+  mIcon = mLibrary->getIcon();
+}
+
+QString LibraryOverviewWidget::commitMetadata() noexcept {
+  try {
+    QScopedPointer<CmdLibraryEdit> cmd(new CmdLibraryEdit(*mLibrary));
+    try {
+      // throws on invalid name
+      cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDescription("", mUi->edtDescription->toPlainText().trimmed());
+    cmd->setKeywords("", mUi->edtKeywords->text().trimmed());
+    try {
+      // throws on invalid version
+      cmd->setVersion(Version::fromString(mUi->edtVersion->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    cmd->setUrl(QUrl::fromUserInput(mUi->edtUrl->text().trimmed()));
+    cmd->setDependencies(mDependenciesEditorWidget->getUuids());
+    cmd->setIcon(mIcon);
+
+    // Commit all changes.
+    mUndoStack->execCmd(cmd.take());  // can throw
+
+    // Reload metadata into widgets to discard invalid input.
+    updateMetadata();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
+  return QString();
 }
 
 void LibraryOverviewWidget::updateElementLists() noexcept {
@@ -234,8 +263,12 @@ void LibraryOverviewWidget::btnIconClicked() noexcept {
       this, tr("Choose library icon"), mLibrary->getIconFilePath().toNative(),
       tr("Portable Network Graphics (*.png)"));
   if (!fp.isEmpty()) {
-    mLibrary->setIconFilePath(FilePath(fp));
-    updateIcon();
+    try {
+      mIcon = FileUtils::readFile(FilePath(fp));  // can throw
+      commitMetadata();
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Could not open file"), e.getMsg());
+    }
   }
 }
 

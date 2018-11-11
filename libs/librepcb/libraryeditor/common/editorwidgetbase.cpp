@@ -50,7 +50,6 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
     mFilePath(fp),
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
-    mIsDirty(false),
     mIsInterfaceBroken(false) {
   mUndoStack.reset(new UndoStack());
   connect(mUndoStack.data(), &UndoStack::cleanChanged, this,
@@ -62,14 +61,6 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
 }
 
 EditorWidgetBase::~EditorWidgetBase() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-bool EditorWidgetBase::isDirty() const noexcept {
-  return (!mUndoStack->isClean() || mIsDirty);
 }
 
 /*******************************************************************************
@@ -115,7 +106,6 @@ void EditorWidgetBase::setCommandToolBar(QToolBar* toolbar) noexcept {
  ******************************************************************************/
 
 bool EditorWidgetBase::save() noexcept {
-  mIsDirty           = false;
   mIsInterfaceBroken = false;
   mUndoStack->setClean();
   emit dirtyChanged(false);
@@ -148,13 +138,6 @@ void EditorWidgetBase::setupInterfaceBrokenWarningWidget(
   layout->addWidget(label);
   connect(this, &EditorWidgetBase::interfaceBrokenChanged, &widget,
           &QWidget::setVisible);
-}
-
-void EditorWidgetBase::setDirty() noexcept {
-  if (!mIsDirty) {
-    mIsDirty = true;
-    emit dirtyChanged(true);
-  }
 }
 
 void EditorWidgetBase::undoStackStateModified() noexcept {

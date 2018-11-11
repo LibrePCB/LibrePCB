@@ -26,8 +26,6 @@
 #include "../common/categorylisteditorwidget.h"
 #include "../common/editorwidgetbase.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/library/dev/devicepadsignalmap.h>
 
 #include <QtCore>
@@ -87,14 +85,16 @@ public slots:
   bool zoomAll() noexcept override;
 
 private:  // Methods
-  void btnChooseComponentClicked() noexcept;
-  void btnChoosePackageClicked() noexcept;
-  void updateDeviceComponentUuid(const Uuid& uuid) noexcept;
-  void updateComponentPreview() noexcept;
-  void updateDevicePackageUuid(const Uuid& uuid) noexcept;
-  void updatePackagePreview() noexcept;
-  void memorizeDeviceInterface() noexcept;
-  bool isInterfaceBroken() const noexcept override;
+  void    updateMetadata() noexcept;
+  QString commitMetadata() noexcept;
+  void    btnChooseComponentClicked() noexcept;
+  void    btnChoosePackageClicked() noexcept;
+  void    updateDeviceComponentUuid(const Uuid& uuid) noexcept;
+  void    updateComponentPreview() noexcept;
+  void    updateDevicePackageUuid(const Uuid& uuid) noexcept;
+  void    updatePackagePreview() noexcept;
+  void    memorizeDeviceInterface() noexcept;
+  bool    isInterfaceBroken() const noexcept override;
 
 private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget>            mUi;

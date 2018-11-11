@@ -26,8 +26,6 @@
 #include "../common/categorylisteditorwidget.h"
 #include "../common/editorwidgetbase.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 
 #include <QtCore>
@@ -86,7 +84,6 @@ public:
   SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
 
 public slots:
-
   bool save() noexcept override;
   bool rotateCw() noexcept override;
   bool rotateCcw() noexcept override;
@@ -98,6 +95,8 @@ public slots:
   bool editGridProperties() noexcept override;
 
 private:  // Methods
+  void    updateMetadata() noexcept;
+  QString commitMetadata() noexcept;
   /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
   bool toolChangeRequested(Tool newTool) noexcept override;
