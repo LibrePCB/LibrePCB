@@ -58,7 +58,8 @@ LibraryListEditorWidget::LibraryListEditorWidget(const workspace::Workspace& ws,
   libs.append(mWorkspace.getRemoteLibraries().values());
   mUi->comboBox->addItem(tr("Choose library..."));
   foreach (const QSharedPointer<library::Library>& lib, libs) {
-    mUi->comboBox->addItem(lib->getIcon(), *lib->getNames().value(localeOrder),
+    mUi->comboBox->addItem(lib->getIconAsPixmap(),
+                           *lib->getNames().value(localeOrder),
                            lib->getUuid().toStr());
   }
 }

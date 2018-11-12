@@ -29,6 +29,7 @@
 #include "pkg/package.h"
 #include "sym/symbol.h"
 
+#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/toolbox.h>
@@ -80,7 +81,7 @@ Library::Library(const FilePath& libDir, bool readOnly)
 
   // load image if available
   if (getIconFilePath().isExistingFile()) {
-    mIcon = QPixmap(getIconFilePath().toStr());
+    mIcon = FileUtils::readFile(getIconFilePath());  // can throw
   }
 
   cleanupAfterLoadingElementFromFile();
@@ -112,44 +113,24 @@ FilePath Library::getIconFilePath() const noexcept {
   return mDirectory.getPathTo("library.png");
 }
 
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void Library::setIconFilePath(const FilePath& png) noexcept {
-  if (png == getIconFilePath()) {
-    return;
-  }
-
-  if (getIconFilePath().isExistingFile()) {
-    QFile(getIconFilePath().toStr()).remove();
-  }
-
-  if (png.isExistingFile()) {
-    QFile::copy(png.toStr(), getIconFilePath().toStr());
-    mIcon = QPixmap(getIconFilePath().toStr());
-  } else {
-    mIcon = QPixmap();
-  }
+QPixmap Library::getIconAsPixmap() const noexcept {
+  QPixmap p;
+  p.loadFromData(mIcon, "png");
+  return p;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void Library::addDependency(const Uuid& uuid) noexcept {
-  if (!mDependencies.contains(uuid)) {
-    mDependencies.insert(uuid);
-  } else {
-    qWarning() << "Invalid or duplicate library dependency:" << uuid.toStr();
-  }
-}
+void Library::save() {
+  LibraryBaseElement::save();  // can throw
 
-void Library::removeDependency(const Uuid& uuid) noexcept {
-  if (mDependencies.contains(uuid)) {
-    mDependencies.remove(uuid);
-  } else {
-    qWarning() << "Invalid library dependency:" << uuid.toStr();
+  // Save icon.
+  if (mIcon.isEmpty() && getIconFilePath().isExistingFile()) {
+    FileUtils::removeFile(getIconFilePath());  // can throw
+  } else if (!mIcon.isEmpty()) {
+    FileUtils::writeFile(getIconFilePath(), mIcon);  // can throw
   }
 }
 

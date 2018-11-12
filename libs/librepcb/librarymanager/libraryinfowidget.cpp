@@ -58,8 +58,8 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace&   ws,
       ws.getSettings().getLibLocaleOrder().getLocaleOrder();
 
   // image
-  if (!lib->getIcon().isNull()) {
-    mUi->lblIcon->setPixmap(lib->getIcon().scaled(
+  if (!lib->getIconAsPixmap().isNull()) {
+    mUi->lblIcon->setPixmap(lib->getIconAsPixmap().scaled(
         mUi->lblIcon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
   } else {
     mUi->lblIcon->setVisible(false);
