@@ -214,16 +214,17 @@ TEST_F(SQLiteDatabaseTest, testConcurrentAccessFromMultipleThreads) {
   // This is a flaky test because it depends on how long the threads are
   // interrupted by the operating system. So we repeat it several times if it
   // fails. As long as it succeeds at least once, everything is fine.
-  for (int i = 0; i < 5; ++i) {
+  // EDIT: Increased to 30 times. The more, the higher the possibility that it
+  // even works on Windows.
+  for (int i = 0; i < 30; ++i) {
     // create thread pool to ensure that every worker really runs in a separate
     // thread
     QThreadPool pool;
     pool.setMaxThreadCount(8);
 
-    // remove database before every run
-    if (mTempDbFilePath.isExistingFile()) {
-      FileUtils::removeFile(mTempDbFilePath);
-    }
+    // remove database before every run (ignore failures because on Windows it
+    // fails randomly - as usual...)
+    QFile::remove(mTempDbFilePath.toStr());
 
     // prepare database
     SQLiteDatabase db(mTempDbFilePath);
@@ -273,11 +274,20 @@ TEST_F(SQLiteDatabaseTest, testConcurrentAccessFromMultipleThreads) {
     EXPECT_GT(rowCount, 0);
     EXPECT_EQ(rowCount, w1.result().rowCount + w2.result().rowCount);
     EXPECT_GE(duration, 10000);
-    if (duration < 14000) {  // this fails sometimes...
-      return;                // success
+    if (duration < 14000) {  // this fails sometimes (if OS == Windows)...
+      return;                // success (even on Windows!!!)
     } else {
-      FileUtils::removeFile(mTempDbFilePath);
       std::cout << "Duration too long: " << duration << std::endl;
+
+      // Do some strange things to try to recover Windows, maybe it's then able
+      // to remove a file from the file system (other operating systems can
+      // remove files too, with some luck it even works on Windows).
+      QFile::remove(mTempDbFilePath.toStr());
+      QThread::msleep(200);
+      QFile::remove(mTempDbFilePath.toStr());
+      QThread::msleep(200);
+      QFile::remove(mTempDbFilePath.toStr());
+      QThread::msleep(200);
     }
   }
   FAIL();
