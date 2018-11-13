@@ -65,6 +65,10 @@ This project welcomes non-code contributions, too! The following types of contri
 - **Small Fixes**: Fix typos, clarify language, and generally improve the quality of the content.
 - **Documentation**: Create/improve [documentations for users](https://github.com/LibrePCB/librepcb-doc)
   or developers of LibrePCB.
+- **Part Libraries**: Fork an existing part library from
+  https://github.com/LibrePCB-Libraries/ and add or improve parts. If you want
+  to create a new library create an issue in the
+  https://github.com/LibrePCB/librepcb-rfcs repository.
 - **Translations**: Add/improve translations for LibrePCB using
   [Transifex](https://www.transifex.com/librepcb/librepcb-application/dashboard/).
   Follow [this guide](https://docs.transifex.com/getting-started/translators) to
