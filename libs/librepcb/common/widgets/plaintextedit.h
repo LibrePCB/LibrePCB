@@ -17,17 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#ifndef LIBREPCB_PLAINTEXTEDIT_H
+#define LIBREPCB_PLAINTEXTEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/editorwidgetbase.h"
-
-#include <librepcb/common/uuid.h>
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -35,62 +30,44 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-
-class ComponentCategory;
-
-namespace editor {
-
-namespace Ui {
-class ComponentCategoryEditorWidget;
-}
 
 /*******************************************************************************
- *  Class ComponentCategoryEditorWidget
+ *  Class PlainTextEdit
  ******************************************************************************/
 
 /**
- * @brief The ComponentCategoryEditorWidget class
+ * @brief The PlainTextEdit class is a customized QPlainTextEdit
+ *
+ * Differences compared to QPlainTextEdit:
+ *   - New signal editingFinished() (equivalent of QLineEdit::editingFinished())
  */
-class ComponentCategoryEditorWidget final : public EditorWidgetBase {
+class PlainTextEdit final : public QPlainTextEdit {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ComponentCategoryEditorWidget() = delete;
-  ComponentCategoryEditorWidget(const ComponentCategoryEditorWidget& other) =
-      delete;
-  ComponentCategoryEditorWidget(const Context& context, const FilePath& fp,
-                                QWidget* parent = nullptr);
-  ~ComponentCategoryEditorWidget() noexcept;
+  explicit PlainTextEdit(QWidget* parent = nullptr) noexcept;
+  PlainTextEdit(const PlainTextEdit& other) = delete;
+  ~PlainTextEdit() noexcept;
 
   // Operator Overloadings
-  ComponentCategoryEditorWidget& operator       =(
-      const ComponentCategoryEditorWidget& rhs) = delete;
+  PlainTextEdit& operator=(const PlainTextEdit& rhs) = delete;
 
-public slots:
-  bool save() noexcept override;
+signals:
+  void editingFinished();
 
 private:  // Methods
-  void    updateMetadata() noexcept;
-  QString commitMetadata() noexcept;
-  bool    isInterfaceBroken() const noexcept override { return false; }
-  void    btnChooseParentCategoryClicked() noexcept;
-  void    btnResetParentCategoryClicked() noexcept;
-  void    updateCategoryLabel() noexcept;
+  void focusInEvent(QFocusEvent* e) noexcept override;
+  void focusOutEvent(QFocusEvent* e) noexcept override;
 
 private:  // Data
-  QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
-  QScopedPointer<ComponentCategory>                 mCategory;
-  tl::optional<Uuid>                                mParentUuid;
+  QString mPlainTextBeforeGettingFocus;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#endif  // LIBREPCB_PLAINTEXTEDIT_H

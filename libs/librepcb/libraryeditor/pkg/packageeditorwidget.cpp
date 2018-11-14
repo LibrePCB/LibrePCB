@@ -29,6 +29,7 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
+#include <librepcb/library/cmd/cmdlibraryelementedit.h>
 #include <librepcb/library/pkg/package.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
@@ -62,10 +63,8 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
   connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged, this,
           &PackageEditorWidget::cursorPositionChanged);
   setWindowIcon(QIcon(":/img/library/package.png"));
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &QWidget::setWindowTitle);
 
-  // insert category list editor widget
+  // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new PackageCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
@@ -75,54 +74,47 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mCategoriesEditorWidget.data());
 
-  // load package
+  // Load element.
   mPackage.reset(new Package(fp, false));  // can throw
-  setWindowTitle(*mPackage->getNames().value(getLibLocaleOrder()));
-  mUi->edtName->setText(*mPackage->getNames().value(getLibLocaleOrder()));
-  mUi->edtDescription->setPlainText(
-      mPackage->getDescriptions().value(getLibLocaleOrder()));
-  mUi->edtKeywords->setText(mPackage->getKeywords().value(getLibLocaleOrder()));
-  mUi->edtAuthor->setText(mPackage->getAuthor());
-  mUi->edtVersion->setText(mPackage->getVersion().toStr());
-  mCategoriesEditorWidget->setUuids(mPackage->getCategories());
-  mUi->cbxDeprecated->setChecked(mPackage->isDeprecated());
+  updateMetadata();
 
-  // setup footprint list editor widget
+  // Setup footprint list editor widget.
   mUi->footprintEditorWidget->setReferences(mPackage->getFootprints(),
                                             *mUndoStack);
   connect(mUi->footprintEditorWidget,
           &FootprintListEditorWidget::currentFootprintChanged, this,
           &PackageEditorWidget::currentFootprintChanged);
 
-  // setup pad list editor widget
+  // Setup pad list editor widget.
   mUi->padListEditorWidget->setReferences(mPackage->getPads(),
                                           mUndoStack.data());
 
-  // show "interface broken" warning when related properties are modified
+  // Show "interface broken" warning when related properties are modified.
   memorizePackageInterface();
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
 
-  // set dirty state when properties are modified
-  connect(mUi->edtName, &QLineEdit::textEdited, this,
-          &PackageEditorWidget::setDirty);
-  connect(mUi->edtDescription, &QPlainTextEdit::textChanged, this,
-          &PackageEditorWidget::setDirty);
-  connect(mUi->edtKeywords, &QLineEdit::textEdited, this,
-          &PackageEditorWidget::setDirty);
-  connect(mUi->edtAuthor, &QLineEdit::textEdited, this,
-          &PackageEditorWidget::setDirty);
-  connect(mUi->edtVersion, &QLineEdit::textEdited, this,
-          &PackageEditorWidget::setDirty);
-  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
-          &PackageEditorWidget::setDirty);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryAdded, this,
-          &PackageEditorWidget::setDirty);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryRemoved, this,
-          &PackageEditorWidget::setDirty);
+  // Reload metadata on undo stack state changes.
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &PackageEditorWidget::updateMetadata);
 
-  // load finite state machine (FSM)
+  // Handle changes of metadata.
+  connect(mUi->edtName, &QLineEdit::editingFinished, this,
+          &PackageEditorWidget::commitMetadata);
+  connect(mUi->edtDescription, &PlainTextEdit::editingFinished, this,
+          &PackageEditorWidget::commitMetadata);
+  connect(mUi->edtKeywords, &QLineEdit::editingFinished, this,
+          &PackageEditorWidget::commitMetadata);
+  connect(mUi->edtAuthor, &QLineEdit::editingFinished, this,
+          &PackageEditorWidget::commitMetadata);
+  connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
+          &PackageEditorWidget::commitMetadata);
+  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
+          &PackageEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(),
+          &ComponentCategoryListEditorWidget::edited, this,
+          &PackageEditorWidget::commitMetadata);
+
+  // Load finite state machine (FSM).
   PackageEditorFsm::Context fsmContext{*this,
                                        *mUndoStack,
                                        *mGraphicsScene,
@@ -134,7 +126,8 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
                                        *mCommandToolBarProxy};
   mFsm.reset(new PackageEditorFsm(fsmContext));
   currentFootprintChanged(0);  // small hack to select the first footprint...
-  // last but not least, connect the graphics scene events with the FSM
+
+  // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
 }
 
@@ -180,19 +173,16 @@ void PackageEditorWidget::setToolsActionGroup(
  ******************************************************************************/
 
 bool PackageEditorWidget::save() noexcept {
-  try {
-    ElementName name(mUi->edtName->text().trimmed());  // can throw
-    Version     version =
-        Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
+  // Commit metadata.
+  QString errorMsg = commitMetadata();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid metadata"), errorMsg);
+    return false;
+  }
 
-    mPackage->setName("", name);
-    mPackage->setDescription("", mUi->edtDescription->toPlainText().trimmed());
-    mPackage->setKeywords("", mUi->edtKeywords->text().trimmed());
-    mPackage->setAuthor(mUi->edtAuthor->text().trimmed());
-    mPackage->setVersion(version);
-    mPackage->setCategories(mCategoriesEditorWidget->getUuids());
-    mPackage->setDeprecated(mUi->cbxDeprecated->isChecked());
-    mPackage->save();
+  // Save element.
+  try {
+    mPackage->save();  // can throw
     memorizePackageInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -245,6 +235,49 @@ bool PackageEditorWidget::editGridProperties() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PackageEditorWidget::updateMetadata() noexcept {
+  setWindowTitle(*mPackage->getNames().getDefaultValue());
+  mUi->edtName->setText(*mPackage->getNames().getDefaultValue());
+  mUi->edtDescription->setPlainText(
+      mPackage->getDescriptions().getDefaultValue());
+  mUi->edtKeywords->setText(mPackage->getKeywords().getDefaultValue());
+  mUi->edtAuthor->setText(mPackage->getAuthor());
+  mUi->edtVersion->setText(mPackage->getVersion().toStr());
+  mUi->cbxDeprecated->setChecked(mPackage->isDeprecated());
+  mCategoriesEditorWidget->setUuids(mPackage->getCategories());
+}
+
+QString PackageEditorWidget::commitMetadata() noexcept {
+  try {
+    QScopedPointer<CmdLibraryElementEdit> cmd(
+        new CmdLibraryElementEdit(*mPackage, tr("Edit package metadata")));
+    try {
+      // throws on invalid name
+      cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDescription("", mUi->edtDescription->toPlainText().trimmed());
+    cmd->setKeywords("", mUi->edtKeywords->text().trimmed());
+    try {
+      // throws on invalid version
+      cmd->setVersion(Version::fromString(mUi->edtVersion->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    cmd->setCategories(mCategoriesEditorWidget->getUuids());
+
+    // Commit all changes.
+    mUndoStack->execCmd(cmd.take());  // can throw
+
+    // Reload metadata into widgets to discard invalid input.
+    updateMetadata();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
+  return QString();
+}
 
 bool PackageEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
   Q_ASSERT(event);

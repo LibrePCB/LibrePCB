@@ -207,8 +207,12 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
                                             author, ElementName(name), desc,
                                             QString("")));  // can throw
     lib->setUrl(url);
-    lib->setIconFilePath(
-        qApp->getResourcesDir().getPathTo("library/default_image.png"));
+    try {
+      lib->setIcon(FileUtils::readFile(
+          qApp->getResourcesDir().getPathTo("library/default_image.png")));
+    } catch (const Exception& e) {
+      qCritical() << "Could not open the library image:" << e.getMsg();
+    }
     lib->saveTo(directory);  // can throw
 
     // copy license file

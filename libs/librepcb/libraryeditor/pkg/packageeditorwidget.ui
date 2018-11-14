@@ -173,7 +173,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QPlainTextEdit" name="edtDescription"/>
+        <widget class="librepcb::PlainTextEdit" name="edtDescription">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_6">
@@ -248,6 +252,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>librepcb::PlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header location="global">librepcb/common/widgets/plaintextedit.h</header>
+  </customwidget>
   <customwidget>
    <class>librepcb::GraphicsView</class>
    <extends>QGraphicsView</extends>

@@ -158,9 +158,9 @@ void NewElementWizardContext::createLibraryElement() {
                         *mElementName, mElementDescription, mElementKeywords);
       element.setCategories(categories);
       element.setIsSchematicOnly(mComponentSchematicOnly);
-      element.getAttributes() = mComponentAttributes;
+      element.setAttributes(mComponentAttributes);
       element.setDefaultValue(mComponentDefaultValue);
-      element.getPrefixes()       = mComponentPrefixes;
+      element.setPrefixes(mComponentPrefixes);
       element.getSignals()        = mComponentSignals;
       element.getSymbolVariants() = mComponentSymbolVariants;
       element.saveIntoParentDirectory(

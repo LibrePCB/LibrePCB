@@ -29,6 +29,7 @@
 #include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/undocommandgroup.h>
+#include <librepcb/library/cmd/cmdlibraryelementedit.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/dev/cmd/cmddeviceedit.h>
 #include <librepcb/library/dev/cmd/cmddevicepadsignalmapitemedit.h>
@@ -59,10 +60,8 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::DeviceEditorWidget) {
   mUi->setupUi(this);
   setWindowIcon(QIcon(":/img/library/device.png"));
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &QWidget::setWindowTitle);
 
-  // show graphics scenes
+  // Show graphics scenes.
   mComponentGraphicsScene.reset(new GraphicsScene());
   mPackageGraphicsScene.reset(new GraphicsScene());
   mUi->viewComponent->setScene(mComponentGraphicsScene.data());
@@ -70,7 +69,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
   mUi->viewPackage->setBackgroundBrush(Qt::black);
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
-  // insert category list editor widget
+  // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
@@ -80,45 +79,23 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mCategoriesEditorWidget.data());
 
+  // Load element.
   mDevice.reset(new Device(fp, false));  // can throw
-  setWindowTitle(*mDevice->getNames().value(getLibLocaleOrder()));
-  mUi->edtName->setText(*mDevice->getNames().value(getLibLocaleOrder()));
-  mUi->edtDescription->setPlainText(
-      mDevice->getDescriptions().value(getLibLocaleOrder()));
-  mUi->edtKeywords->setText(mDevice->getKeywords().value(getLibLocaleOrder()));
-  mUi->edtAuthor->setText(mDevice->getAuthor());
-  mUi->edtVersion->setText(mDevice->getVersion().toStr());
-  mCategoriesEditorWidget->setUuids(mDevice->getCategories());
-  mUi->cbxDeprecated->setChecked(mDevice->isDeprecated());
   mUi->padSignalMapEditorWidget->setReferences(mUndoStack.data(),
                                                &mDevice->getPadSignalMap());
   updateDeviceComponentUuid(mDevice->getComponentUuid());
   updateDevicePackageUuid(mDevice->getPackageUuid());
+  updateMetadata();
 
-  // show "interface broken" warning when related properties are modified
+  // Show "interface broken" warning when related properties are modified.
   memorizeDeviceInterface();
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
 
-  // set dirty state when properties are modified
-  connect(mUi->edtName, &QLineEdit::textEdited, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mUi->edtDescription, &QPlainTextEdit::textChanged, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mUi->edtKeywords, &QLineEdit::textEdited, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mUi->edtAuthor, &QLineEdit::textEdited, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mUi->edtVersion, &QLineEdit::textEdited, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryAdded, this,
-          &DeviceEditorWidget::setDirty);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryRemoved, this,
-          &DeviceEditorWidget::setDirty);
+  // Reload metadata on undo stack state changes.
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &DeviceEditorWidget::updateMetadata);
 
+  // Reload data on device object changes.
   connect(mDevice.data(), &Device::componentUuidChanged, this,
           &DeviceEditorWidget::updateDeviceComponentUuid);
   connect(mDevice.data(), &Device::packageUuidChanged, this,
@@ -127,6 +104,23 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
           &DeviceEditorWidget::btnChooseComponentClicked);
   connect(mUi->btnChoosePackage, &QToolButton::clicked, this,
           &DeviceEditorWidget::btnChoosePackageClicked);
+
+  // Handle changes of metadata.
+  connect(mUi->edtName, &QLineEdit::editingFinished, this,
+          &DeviceEditorWidget::commitMetadata);
+  connect(mUi->edtDescription, &PlainTextEdit::editingFinished, this,
+          &DeviceEditorWidget::commitMetadata);
+  connect(mUi->edtKeywords, &QLineEdit::editingFinished, this,
+          &DeviceEditorWidget::commitMetadata);
+  connect(mUi->edtAuthor, &QLineEdit::editingFinished, this,
+          &DeviceEditorWidget::commitMetadata);
+  connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
+          &DeviceEditorWidget::commitMetadata);
+  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
+          &DeviceEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(),
+          &ComponentCategoryListEditorWidget::edited, this,
+          &DeviceEditorWidget::commitMetadata);
 }
 
 DeviceEditorWidget::~DeviceEditorWidget() noexcept {
@@ -138,19 +132,16 @@ DeviceEditorWidget::~DeviceEditorWidget() noexcept {
  ******************************************************************************/
 
 bool DeviceEditorWidget::save() noexcept {
-  try {
-    ElementName name(mUi->edtName->text().trimmed());  // can throw
-    Version     version =
-        Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
+  // Commit metadata.
+  QString errorMsg = commitMetadata();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid metadata"), errorMsg);
+    return false;
+  }
 
-    mDevice->setName("", name);
-    mDevice->setDescription("", mUi->edtDescription->toPlainText().trimmed());
-    mDevice->setKeywords("", mUi->edtKeywords->text().trimmed());
-    mDevice->setAuthor(mUi->edtAuthor->text().trimmed());
-    mDevice->setVersion(version);
-    mDevice->setCategories(mCategoriesEditorWidget->getUuids());
-    mDevice->setDeprecated(mUi->cbxDeprecated->isChecked());
-    mDevice->save();
+  // Save element.
+  try {
+    mDevice->save();  // can throw
     memorizeDeviceInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -180,6 +171,49 @@ bool DeviceEditorWidget::zoomAll() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void DeviceEditorWidget::updateMetadata() noexcept {
+  setWindowTitle(*mDevice->getNames().getDefaultValue());
+  mUi->edtName->setText(*mDevice->getNames().getDefaultValue());
+  mUi->edtDescription->setPlainText(
+      mDevice->getDescriptions().getDefaultValue());
+  mUi->edtKeywords->setText(mDevice->getKeywords().getDefaultValue());
+  mUi->edtAuthor->setText(mDevice->getAuthor());
+  mUi->edtVersion->setText(mDevice->getVersion().toStr());
+  mUi->cbxDeprecated->setChecked(mDevice->isDeprecated());
+  mCategoriesEditorWidget->setUuids(mDevice->getCategories());
+}
+
+QString DeviceEditorWidget::commitMetadata() noexcept {
+  try {
+    QScopedPointer<CmdLibraryElementEdit> cmd(
+        new CmdLibraryElementEdit(*mDevice, tr("Edit device metadata")));
+    try {
+      // throws on invalid name
+      cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDescription("", mUi->edtDescription->toPlainText().trimmed());
+    cmd->setKeywords("", mUi->edtKeywords->text().trimmed());
+    try {
+      // throws on invalid version
+      cmd->setVersion(Version::fromString(mUi->edtVersion->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    cmd->setCategories(mCategoriesEditorWidget->getUuids());
+
+    // Commit all changes.
+    mUndoStack->execCmd(cmd.take());  // can throw
+
+    // Reload metadata into widgets to discard invalid input.
+    updateMetadata();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
+  return QString();
+}
 
 void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
   ComponentChooserDialog dialog(mContext.workspace,

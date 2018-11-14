@@ -65,18 +65,18 @@ public:
   const QUrl&       getUrl() const noexcept { return mUrl; }
   const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
   FilePath          getIconFilePath() const noexcept;
-  const QPixmap&    getIcon() const noexcept { return mIcon; }
+  const QByteArray& getIcon() const noexcept { return mIcon; }
+  QPixmap           getIconAsPixmap() const noexcept;
 
   // Setters
   void setUrl(const QUrl& url) noexcept { mUrl = url; }
   void setDependencies(const QSet<Uuid>& deps) noexcept {
     mDependencies = deps;
   }
-  void setIconFilePath(const FilePath& png) noexcept;
+  void setIcon(const QByteArray& png) noexcept { mIcon = png; }
 
   // General Methods
-  void addDependency(const Uuid& uuid) noexcept;
-  void removeDependency(const Uuid& uuid) noexcept;
+  virtual void save() override;
   template <typename ElementType>
   QList<FilePath> searchForElements() const noexcept;
 
@@ -100,7 +100,7 @@ private:  // Methods
 private:  // Data
   QUrl       mUrl;
   QSet<Uuid> mDependencies;
-  QPixmap    mIcon;
+  QByteArray mIcon;
 };
 
 /*******************************************************************************

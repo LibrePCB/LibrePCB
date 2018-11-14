@@ -25,8 +25,6 @@
  ******************************************************************************/
 #include "../common/editorwidgetbase.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/uuid.h>
 #include <optional/tl/optional.hpp>
 
@@ -53,9 +51,6 @@ class PackageCategoryEditorWidget;
 
 /**
  * @brief The PackageCategoryEditorWidget class
- *
- * @author ubruhin
- * @date 2016-10-16
  */
 class PackageCategoryEditorWidget final : public EditorWidgetBase {
   Q_OBJECT
@@ -74,15 +69,15 @@ public:
       const PackageCategoryEditorWidget& rhs) = delete;
 
 public slots:
-
   bool save() noexcept override;
 
 private:  // Methods
-  bool isInterfaceBroken() const noexcept override { return false; }
-  void btnChooseParentCategoryClicked() noexcept;
-  void btnResetParentCategoryClicked() noexcept;
-  void edtnameTextChanged(const QString& text) noexcept;
-  void updateCategoryLabel() noexcept;
+  void    updateMetadata() noexcept;
+  QString commitMetadata() noexcept;
+  bool    isInterfaceBroken() const noexcept override { return false; }
+  void    btnChooseParentCategoryClicked() noexcept;
+  void    btnResetParentCategoryClicked() noexcept;
+  void    updateCategoryLabel() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageCategoryEditorWidget> mUi;

@@ -95,6 +95,7 @@ private:
   void updateColor() noexcept;
 
 signals:
+  void edited();
   void categoryAdded(const Uuid& category);
   void categoryRemoved(const Uuid& category);
 

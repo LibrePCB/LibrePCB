@@ -59,8 +59,8 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const {
       ""));  // can throw
 
   // properties
-  component->getPrefixes().setDefaultValue(
-      library::ComponentPrefix(mDeviceSet.getPrefix()));  // can throw
+  component->setPrefixes(library::NormDependentPrefixMap(
+      library::ComponentPrefix(mDeviceSet.getPrefix())));  // can throw
 
   // symbol variant
   std::shared_ptr<library::ComponentSymbolVariant> symbolVariant(

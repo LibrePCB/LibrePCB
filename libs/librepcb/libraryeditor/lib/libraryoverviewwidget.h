@@ -25,8 +25,6 @@
  ******************************************************************************/
 #include "../common/editorwidgetbase.h"
 
-#include <librepcb/common/exceptions.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -82,9 +80,10 @@ signals:
   void editDeviceTriggered(const FilePath& fp);
 
 private:  // Methods
-  bool isInterfaceBroken() const noexcept override { return false; }
-  void updateIcon() noexcept;
-  void updateElementLists() noexcept;
+  void    updateMetadata() noexcept;
+  QString commitMetadata() noexcept;
+  bool    isInterfaceBroken() const noexcept override { return false; }
+  void    updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
 
@@ -101,6 +100,7 @@ private:  // Data
   QSharedPointer<Library>                   mLibrary;
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
   QScopedPointer<LibraryListEditorWidget>   mDependenciesEditorWidget;
+  QByteArray                                mIcon;
 };
 
 /*******************************************************************************
