@@ -20,9 +20,14 @@ INCLUDEPATH += \
     ../../type_safe/external/debug_assert \
 
 SOURCES += \
+    cat/cmd/cmdlibrarycategoryedit.cpp \
     cat/componentcategory.cpp \
     cat/librarycategory.cpp \
     cat/packagecategory.cpp \
+    cmd/cmdlibrarybaseelementedit.cpp \
+    cmd/cmdlibraryedit.cpp \
+    cmd/cmdlibraryelementedit.cpp \
+    cmp/cmd/cmdcomponentedit.cpp \
     cmp/cmd/cmdcomponentsignaledit.cpp \
     cmp/cmd/cmdcomponentsymbolvariantedit.cpp \
     cmp/cmpsigpindisplaytype.cpp \
@@ -58,9 +63,14 @@ SOURCES += \
     sym/symbolpreviewgraphicsitem.cpp \
 
 HEADERS += \
+    cat/cmd/cmdlibrarycategoryedit.h \
     cat/componentcategory.h \
     cat/librarycategory.h \
     cat/packagecategory.h \
+    cmd/cmdlibrarybaseelementedit.h \
+    cmd/cmdlibraryedit.h \
+    cmd/cmdlibraryelementedit.h \
+    cmp/cmd/cmdcomponentedit.h \
     cmp/cmd/cmdcomponentsignaledit.h \
     cmp/cmd/cmdcomponentsymbolvariantedit.h \
     cmp/cmpsigpindisplaytype.h \

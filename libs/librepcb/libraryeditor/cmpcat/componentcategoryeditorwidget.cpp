@@ -26,7 +26,9 @@
 #include "../common/categorytreelabeltextbuilder.h"
 #include "ui_componentcategoryeditorwidget.h"
 
+#include <librepcb/library/cat/cmd/cmdlibrarycategoryedit.h>
 #include <librepcb/library/cat/componentcategory.h>
+#include <librepcb/library/cmd/cmdlibrarybaseelementedit.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -53,36 +55,28 @@ ComponentCategoryEditorWidget::ComponentCategoryEditorWidget(
           &ComponentCategoryEditorWidget::btnChooseParentCategoryClicked);
   connect(mUi->btnResetParentCategory, &QToolButton::clicked, this,
           &ComponentCategoryEditorWidget::btnResetParentCategoryClicked);
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &ComponentCategoryEditorWidget::edtnameTextChanged);
 
+  // Load element.
   mCategory.reset(new ComponentCategory(fp, false));  // can throw
-  setWindowTitle(*mCategory->getNames().value(getLibLocaleOrder()));
-  mUi->edtName->setText(*mCategory->getNames().value(getLibLocaleOrder()));
-  mUi->edtDescription->setPlainText(
-      mCategory->getDescriptions().value(getLibLocaleOrder()));
-  mUi->edtKeywords->setText(
-      mCategory->getKeywords().value(getLibLocaleOrder()));
-  mUi->edtAuthor->setText(mCategory->getAuthor());
-  mUi->edtVersion->setText(mCategory->getVersion().toStr());
-  mUi->cbxDeprecated->setChecked(mCategory->isDeprecated());
-  mParentUuid = mCategory->getParentUuid();
-  updateCategoryLabel();
+  updateMetadata();
 
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &QWidget::setWindowTitle);
-  connect(mUi->edtName, &QLineEdit::textEdited, this,
-          &ComponentCategoryEditorWidget::setDirty);
-  connect(mUi->edtDescription, &QPlainTextEdit::textChanged, this,
-          &ComponentCategoryEditorWidget::setDirty);
-  connect(mUi->edtKeywords, &QLineEdit::textEdited, this,
-          &ComponentCategoryEditorWidget::setDirty);
-  connect(mUi->edtAuthor, &QLineEdit::textEdited, this,
-          &ComponentCategoryEditorWidget::setDirty);
-  connect(mUi->edtVersion, &QLineEdit::textEdited, this,
-          &ComponentCategoryEditorWidget::setDirty);
+  // Reload metadata on undo stack state changes.
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &ComponentCategoryEditorWidget::updateMetadata);
+
+  // Handle changes of metadata.
+  connect(mUi->edtName, &QLineEdit::editingFinished, this,
+          &ComponentCategoryEditorWidget::commitMetadata);
+  connect(mUi->edtDescription, &PlainTextEdit::editingFinished, this,
+          &ComponentCategoryEditorWidget::commitMetadata);
+  connect(mUi->edtKeywords, &QLineEdit::editingFinished, this,
+          &ComponentCategoryEditorWidget::commitMetadata);
+  connect(mUi->edtAuthor, &QLineEdit::editingFinished, this,
+          &ComponentCategoryEditorWidget::commitMetadata);
+  connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
+          &ComponentCategoryEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
-          &ComponentCategoryEditorWidget::setDirty);
+          &ComponentCategoryEditorWidget::commitMetadata);
 }
 
 ComponentCategoryEditorWidget::~ComponentCategoryEditorWidget() noexcept {
@@ -93,18 +87,16 @@ ComponentCategoryEditorWidget::~ComponentCategoryEditorWidget() noexcept {
  ******************************************************************************/
 
 bool ComponentCategoryEditorWidget::save() noexcept {
+  // Commit metadata.
+  QString errorMsg = commitMetadata();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid metadata"), errorMsg);
+    return false;
+  }
+
+  // Save element.
   try {
-    ElementName name(mUi->edtName->text().trimmed());  // can throw
-    Version     version =
-        Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
-    mCategory->setName("", name);
-    mCategory->setDescription("", mUi->edtDescription->toPlainText().trimmed());
-    mCategory->setKeywords("", mUi->edtKeywords->text().trimmed());
-    mCategory->setAuthor(mUi->edtAuthor->text().trimmed());
-    mCategory->setVersion(version);
-    mCategory->setParentUuid(mParentUuid);
-    mCategory->setDeprecated(mUi->cbxDeprecated->isChecked());
-    mCategory->save();
+    mCategory->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Save failed"), e.getMsg());
@@ -116,26 +108,61 @@ bool ComponentCategoryEditorWidget::save() noexcept {
  *  Private Methods
  ******************************************************************************/
 
+void ComponentCategoryEditorWidget::updateMetadata() noexcept {
+  setWindowTitle(*mCategory->getNames().getDefaultValue());
+  mUi->edtName->setText(*mCategory->getNames().getDefaultValue());
+  mUi->edtDescription->setPlainText(
+      mCategory->getDescriptions().getDefaultValue());
+  mUi->edtKeywords->setText(mCategory->getKeywords().getDefaultValue());
+  mUi->edtAuthor->setText(mCategory->getAuthor());
+  mUi->edtVersion->setText(mCategory->getVersion().toStr());
+  mUi->cbxDeprecated->setChecked(mCategory->isDeprecated());
+  mParentUuid = mCategory->getParentUuid();
+  updateCategoryLabel();
+}
+
+QString ComponentCategoryEditorWidget::commitMetadata() noexcept {
+  try {
+    QScopedPointer<CmdLibraryCategoryEdit> cmd(
+        new CmdLibraryCategoryEdit(*mCategory));
+    try {
+      // throws on invalid name
+      cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDescription("", mUi->edtDescription->toPlainText().trimmed());
+    cmd->setKeywords("", mUi->edtKeywords->text().trimmed());
+    try {
+      // throws on invalid version
+      cmd->setVersion(Version::fromString(mUi->edtVersion->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    cmd->setParentUuid(mParentUuid);
+
+    // Commit all changes.
+    mUndoStack->execCmd(cmd.take());  // can throw
+
+    // Reload metadata into widgets to discard invalid input.
+    updateMetadata();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
+  return QString();
+}
+
 void ComponentCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {
   ComponentCategoryChooserDialog dialog(mContext.workspace);
   if (dialog.exec()) {
     mParentUuid = dialog.getSelectedCategoryUuid();
-    updateCategoryLabel();
-    setDirty();
+    commitMetadata();
   }
 }
 
 void ComponentCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
   mParentUuid = tl::nullopt;
-  updateCategoryLabel();
-  setDirty();
-}
-
-void ComponentCategoryEditorWidget::edtnameTextChanged(
-    const QString& text) noexcept {
-  // force updating parent categories
-  Q_UNUSED(text);
-  updateCategoryLabel();
+  commitMetadata();
 }
 
 void ComponentCategoryEditorWidget::updateCategoryLabel() noexcept {

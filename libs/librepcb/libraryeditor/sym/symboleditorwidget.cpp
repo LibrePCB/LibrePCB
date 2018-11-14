@@ -31,6 +31,7 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
+#include <librepcb/library/cmd/cmdlibraryelementedit.h>
 #include <librepcb/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
@@ -63,10 +64,8 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged, this,
           &SymbolEditorWidget::cursorPositionChanged);
   setWindowIcon(QIcon(":/img/library/symbol.png"));
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &QWidget::setWindowTitle);
 
-  // insert category list editor widget
+  // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
@@ -76,55 +75,48 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mCategoriesEditorWidget.data());
 
-  // load symbol
+  // Load element.
   mSymbol.reset(new Symbol(fp, false));  // can throw
-  setWindowTitle(*mSymbol->getNames().value(getLibLocaleOrder()));
-  mUi->edtName->setText(*mSymbol->getNames().value(getLibLocaleOrder()));
-  mUi->edtDescription->setPlainText(
-      mSymbol->getDescriptions().value(getLibLocaleOrder()));
-  mUi->edtKeywords->setText(mSymbol->getKeywords().value(getLibLocaleOrder()));
-  mUi->edtAuthor->setText(mSymbol->getAuthor());
-  mUi->edtVersion->setText(mSymbol->getVersion().toStr());
-  mCategoriesEditorWidget->setUuids(mSymbol->getCategories());
-  mUi->cbxDeprecated->setChecked(mSymbol->isDeprecated());
+  updateMetadata();
 
-  // show "interface broken" warning when related properties are modified
+  // Show "interface broken" warning when related properties are modified.
   mOriginalSymbolPinUuids = mSymbol->getPins().getUuidSet();
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
 
-  // set dirty state when properties are modified
-  connect(mUi->edtName, &QLineEdit::textEdited, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mUi->edtDescription, &QPlainTextEdit::textChanged, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mUi->edtKeywords, &QLineEdit::textEdited, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mUi->edtAuthor, &QLineEdit::textEdited, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mUi->edtVersion, &QLineEdit::textEdited, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryAdded, this,
-          &SymbolEditorWidget::setDirty);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryRemoved, this,
-          &SymbolEditorWidget::setDirty);
+  // Reload metadata on undo stack state changes.
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &SymbolEditorWidget::updateMetadata);
 
-  // load graphics items recursively
+  // Handle changes of metadata.
+  connect(mUi->edtName, &QLineEdit::editingFinished, this,
+          &SymbolEditorWidget::commitMetadata);
+  connect(mUi->edtDescription, &PlainTextEdit::editingFinished, this,
+          &SymbolEditorWidget::commitMetadata);
+  connect(mUi->edtKeywords, &QLineEdit::editingFinished, this,
+          &SymbolEditorWidget::commitMetadata);
+  connect(mUi->edtAuthor, &QLineEdit::editingFinished, this,
+          &SymbolEditorWidget::commitMetadata);
+  connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
+          &SymbolEditorWidget::commitMetadata);
+  connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
+          &SymbolEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(),
+          &ComponentCategoryListEditorWidget::edited, this,
+          &SymbolEditorWidget::commitMetadata);
+
+  // Load graphics items recursively.
   mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mContext.layerProvider));
   mGraphicsScene->addItem(*mGraphicsItem);
   mUi->graphicsView->zoomAll();
 
-  // load finite state machine (FSM)
+  // Load finite state machine (FSM).
   SymbolEditorFsm::Context fsmContext{
       *this,           *mUndoStack,          mContext.layerProvider,
       *mGraphicsScene, *mUi->graphicsView,   *mSymbol,
       *mGraphicsItem,  *mCommandToolBarProxy};
   mFsm.reset(new SymbolEditorFsm(fsmContext));
 
-  // last but not least, connect the graphics scene events with the FSM
+  // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
 }
 
@@ -165,19 +157,16 @@ void SymbolEditorWidget::setToolsActionGroup(
  ******************************************************************************/
 
 bool SymbolEditorWidget::save() noexcept {
-  try {
-    ElementName name(mUi->edtName->text().trimmed());  // can throw
-    Version     version =
-        Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
+  // Commit metadata.
+  QString errorMsg = commitMetadata();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid metadata"), errorMsg);
+    return false;
+  }
 
-    mSymbol->setName("", name);
-    mSymbol->setDescription("", mUi->edtDescription->toPlainText().trimmed());
-    mSymbol->setKeywords("", mUi->edtKeywords->text().trimmed());
-    mSymbol->setAuthor(mUi->edtAuthor->text().trimmed());
-    mSymbol->setVersion(version);
-    mSymbol->setCategories(mCategoriesEditorWidget->getUuids());
-    mSymbol->setDeprecated(mUi->cbxDeprecated->isChecked());
-    mSymbol->save();
+  // Save element.
+  try {
+    mSymbol->save();  // can throw
     mOriginalSymbolPinUuids = mSymbol->getPins().getUuidSet();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -230,6 +219,49 @@ bool SymbolEditorWidget::editGridProperties() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void SymbolEditorWidget::updateMetadata() noexcept {
+  setWindowTitle(*mSymbol->getNames().getDefaultValue());
+  mUi->edtName->setText(*mSymbol->getNames().getDefaultValue());
+  mUi->edtDescription->setPlainText(
+      mSymbol->getDescriptions().getDefaultValue());
+  mUi->edtKeywords->setText(mSymbol->getKeywords().getDefaultValue());
+  mUi->edtAuthor->setText(mSymbol->getAuthor());
+  mUi->edtVersion->setText(mSymbol->getVersion().toStr());
+  mUi->cbxDeprecated->setChecked(mSymbol->isDeprecated());
+  mCategoriesEditorWidget->setUuids(mSymbol->getCategories());
+}
+
+QString SymbolEditorWidget::commitMetadata() noexcept {
+  try {
+    QScopedPointer<CmdLibraryElementEdit> cmd(
+        new CmdLibraryElementEdit(*mSymbol, tr("Edit symbol metadata")));
+    try {
+      // throws on invalid name
+      cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDescription("", mUi->edtDescription->toPlainText().trimmed());
+    cmd->setKeywords("", mUi->edtKeywords->text().trimmed());
+    try {
+      // throws on invalid version
+      cmd->setVersion(Version::fromString(mUi->edtVersion->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    cmd->setCategories(mCategoriesEditorWidget->getUuids());
+
+    // Commit all changes.
+    mUndoStack->execCmd(cmd.take());  // can throw
+
+    // Reload metadata into widgets to discard invalid input.
+    updateMetadata();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
+  return QString();
+}
 
 bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
   Q_ASSERT(event);

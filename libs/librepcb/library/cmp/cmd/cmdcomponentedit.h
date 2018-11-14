@@ -17,19 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_CMDCOMPONENTEDIT_H
+#define LIBREPCB_LIBRARY_CMDCOMPONENTEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/editorwidgetbase.h"
-
-#include <librepcb/common/uuid.h>
-#include <optional/tl/optional.hpp>
+#include "../../cmd/cmdlibraryelementedit.h"
+#include "../component.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,60 +34,59 @@
 namespace librepcb {
 namespace library {
 
-class ComponentCategory;
-
-namespace editor {
-
-namespace Ui {
-class ComponentCategoryEditorWidget;
-}
-
 /*******************************************************************************
- *  Class ComponentCategoryEditorWidget
+ *  Class CmdComponentEdit
  ******************************************************************************/
 
 /**
- * @brief The ComponentCategoryEditorWidget class
+ * @brief The CmdComponentEdit class
  */
-class ComponentCategoryEditorWidget final : public EditorWidgetBase {
-  Q_OBJECT
-
+class CmdComponentEdit : public CmdLibraryElementEdit {
 public:
   // Constructors / Destructor
-  ComponentCategoryEditorWidget() = delete;
-  ComponentCategoryEditorWidget(const ComponentCategoryEditorWidget& other) =
-      delete;
-  ComponentCategoryEditorWidget(const Context& context, const FilePath& fp,
-                                QWidget* parent = nullptr);
-  ~ComponentCategoryEditorWidget() noexcept;
+  CmdComponentEdit()                              = delete;
+  CmdComponentEdit(const CmdComponentEdit& other) = delete;
+  explicit CmdComponentEdit(Component& component) noexcept;
+  virtual ~CmdComponentEdit() noexcept;
+
+  // Setters
+  void setIsSchematicOnly(bool schematicOnly) noexcept;
+  void setDefaultValue(const QString& value) noexcept;
+  void setPrefix(const QString& norm, const ComponentPrefix& prefix) noexcept;
+  void setPrefixes(const NormDependentPrefixMap& prefixes) noexcept;
+  void setAttributes(const AttributeList& attributes) noexcept;
 
   // Operator Overloadings
-  ComponentCategoryEditorWidget& operator       =(
-      const ComponentCategoryEditorWidget& rhs) = delete;
+  CmdComponentEdit& operator=(const CmdComponentEdit& rhs) = delete;
 
-public slots:
-  bool save() noexcept override;
+protected:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  virtual bool performExecute() override;
 
-private:  // Methods
-  void    updateMetadata() noexcept;
-  QString commitMetadata() noexcept;
-  bool    isInterfaceBroken() const noexcept override { return false; }
-  void    btnChooseParentCategoryClicked() noexcept;
-  void    btnResetParentCategoryClicked() noexcept;
-  void    updateCategoryLabel() noexcept;
+  /// @copydoc UndoCommand::performUndo()
+  virtual void performUndo() override;
+
+  /// @copydoc UndoCommand::performRedo()
+  virtual void performRedo() override;
 
 private:  // Data
-  QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
-  QScopedPointer<ComponentCategory>                 mCategory;
-  tl::optional<Uuid>                                mParentUuid;
+  Component& mComponent;
+
+  bool                   mOldSchematicOnly;
+  bool                   mNewSchematicOnly;
+  QString                mOldDefaultValue;
+  QString                mNewDefaultValue;
+  NormDependentPrefixMap mOldPrefixes;
+  NormDependentPrefixMap mNewPrefixes;
+  AttributeList          mOldAttributes;
+  AttributeList          mNewAttributes;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_CMDCOMPONENTEDIT_H

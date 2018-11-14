@@ -53,8 +53,8 @@ LibraryListWidgetItem::LibraryListWidgetItem(
   if (lib) {
     const QStringList& localeOrder =
         ws.getSettings().getLibLocaleOrder().getLocaleOrder();
-    if (!lib->getIcon().isNull()) {
-      mUi->lblIcon->setPixmap(lib->getIcon());
+    if (!lib->getIconAsPixmap().isNull()) {
+      mUi->lblIcon->setPixmap(lib->getIconAsPixmap());
     }
     if (isRemoteLibrary()) {
       mUi->lblLibraryType->setText(tr("(remote)"));

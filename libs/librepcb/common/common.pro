@@ -126,6 +126,7 @@ SOURCES += \
     widgets/centeredcheckbox.cpp \
     widgets/graphicslayercombobox.cpp \
     widgets/patheditorwidget.cpp \
+    widgets/plaintextedit.cpp \
     widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
 
@@ -242,6 +243,7 @@ HEADERS += \
     widgets/centeredcheckbox.h \
     widgets/graphicslayercombobox.h \
     widgets/patheditorwidget.h \
+    widgets/plaintextedit.h \
     widgets/signalrolecombobox.h \
     widgets/statusbar.h \
 

@@ -17,19 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_CMDLIBRARYCATEGORYEDIT_H
+#define LIBREPCB_LIBRARY_CMDLIBRARYCATEGORYEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/editorwidgetbase.h"
-
-#include <librepcb/common/uuid.h>
-#include <optional/tl/optional.hpp>
+#include "../../cmd/cmdlibrarybaseelementedit.h"
+#include "../librarycategory.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,60 +34,49 @@
 namespace librepcb {
 namespace library {
 
-class ComponentCategory;
-
-namespace editor {
-
-namespace Ui {
-class ComponentCategoryEditorWidget;
-}
-
 /*******************************************************************************
- *  Class ComponentCategoryEditorWidget
+ *  Class CmdLibraryCategoryEdit
  ******************************************************************************/
 
 /**
- * @brief The ComponentCategoryEditorWidget class
+ * @brief The CmdLibraryCategoryEdit class
  */
-class ComponentCategoryEditorWidget final : public EditorWidgetBase {
-  Q_OBJECT
-
+class CmdLibraryCategoryEdit : public CmdLibraryBaseElementEdit {
 public:
   // Constructors / Destructor
-  ComponentCategoryEditorWidget() = delete;
-  ComponentCategoryEditorWidget(const ComponentCategoryEditorWidget& other) =
-      delete;
-  ComponentCategoryEditorWidget(const Context& context, const FilePath& fp,
-                                QWidget* parent = nullptr);
-  ~ComponentCategoryEditorWidget() noexcept;
+  CmdLibraryCategoryEdit()                                    = delete;
+  CmdLibraryCategoryEdit(const CmdLibraryCategoryEdit& other) = delete;
+  explicit CmdLibraryCategoryEdit(LibraryCategory& category) noexcept;
+  virtual ~CmdLibraryCategoryEdit() noexcept;
+
+  // Setters
+  void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept;
 
   // Operator Overloadings
-  ComponentCategoryEditorWidget& operator       =(
-      const ComponentCategoryEditorWidget& rhs) = delete;
-
-public slots:
-  bool save() noexcept override;
+  CmdLibraryCategoryEdit& operator=(const CmdLibraryCategoryEdit& rhs) = delete;
 
 private:  // Methods
-  void    updateMetadata() noexcept;
-  QString commitMetadata() noexcept;
-  bool    isInterfaceBroken() const noexcept override { return false; }
-  void    btnChooseParentCategoryClicked() noexcept;
-  void    btnResetParentCategoryClicked() noexcept;
-  void    updateCategoryLabel() noexcept;
+  /// @copydoc UndoCommand::performExecute()
+  virtual bool performExecute() override;
+
+  /// @copydoc UndoCommand::performUndo()
+  virtual void performUndo() override;
+
+  /// @copydoc UndoCommand::performRedo()
+  virtual void performRedo() override;
 
 private:  // Data
-  QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
-  QScopedPointer<ComponentCategory>                 mCategory;
-  tl::optional<Uuid>                                mParentUuid;
+  LibraryCategory& mCategory;
+
+  tl::optional<Uuid> mOldParentUuid;
+  tl::optional<Uuid> mNewParentUuid;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_CMDLIBRARYCATEGORYEDIT_H

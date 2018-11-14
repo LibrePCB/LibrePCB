@@ -27,8 +27,6 @@
 #include "../common/editorwidgetbase.h"
 #include "if_componentsymbolvarianteditorprovider.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
@@ -80,11 +78,12 @@ public slots:
   bool save() noexcept override;
 
 private:  // Methods
-  bool openComponentSymbolVariantEditor(
-      ComponentSymbolVariant& variant) noexcept override;
+  void    updateMetadata() noexcept;
+  QString commitMetadata() noexcept;
+  bool    openComponentSymbolVariantEditor(
+         ComponentSymbolVariant& variant) noexcept override;
   void memorizeComponentInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
-  void categoriesUpdated() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::ComponentEditorWidget>         mUi;

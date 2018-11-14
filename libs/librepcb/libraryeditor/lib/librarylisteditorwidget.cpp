@@ -58,7 +58,8 @@ LibraryListEditorWidget::LibraryListEditorWidget(const workspace::Workspace& ws,
   libs.append(mWorkspace.getRemoteLibraries().values());
   mUi->comboBox->addItem(tr("Choose library..."));
   foreach (const QSharedPointer<library::Library>& lib, libs) {
-    mUi->comboBox->addItem(lib->getIcon(), *lib->getNames().value(localeOrder),
+    mUi->comboBox->addItem(lib->getIconAsPixmap(),
+                           *lib->getNames().value(localeOrder),
                            lib->getUuid().toStr());
   }
 }
@@ -95,6 +96,7 @@ void LibraryListEditorWidget::btnAddClicked() noexcept {
     mUuids.insert(*uuid);
     addItem(*uuid);
     emit libraryAdded(*uuid);
+    emit edited();
   }
 }
 
@@ -105,8 +107,11 @@ void LibraryListEditorWidget::btnRemoveClicked() noexcept {
            : tl::nullopt;
   if (item && uuid) {
     mUuids.remove(*uuid);
-    emit libraryRemoved(*uuid);
     delete item;
+    // Emit signals *after* removing the item to avoid critical issues if a
+    // signal handler modifies the UUID list befor removing was finished.
+    emit libraryRemoved(*uuid);
+    emit edited();
   }
 }
 

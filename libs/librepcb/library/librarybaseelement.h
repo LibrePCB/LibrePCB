@@ -92,14 +92,12 @@ public:
   void setVersion(const Version& version) noexcept { mVersion = version; }
   void setAuthor(const QString& author) noexcept { mAuthor = author; }
   void setDeprecated(bool deprecated) noexcept { mIsDeprecated = deprecated; }
-  void setName(const QString& locale, const ElementName& name) noexcept {
-    mNames.insert(locale, name);
+  void setNames(const LocalizedNameMap& names) noexcept { mNames = names; }
+  void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept {
+    mDescriptions = descriptions;
   }
-  void setDescription(const QString& locale, const QString& desc) noexcept {
-    mDescriptions.insert(locale, desc);
-  }
-  void setKeywords(const QString& locale, const QString& keywords) noexcept {
-    mKeywords.insert(locale, keywords);
+  void setKeywords(const LocalizedKeywordsMap& keywords) noexcept {
+    mKeywords = keywords;
   }
 
   // General Methods

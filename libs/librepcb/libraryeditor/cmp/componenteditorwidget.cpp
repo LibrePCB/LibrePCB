@@ -26,6 +26,7 @@
 #include "ui_componenteditorwidget.h"
 
 #include <librepcb/common/widgets/signalrolecombobox.h>
+#include <librepcb/library/cmp/cmd/cmdcomponentedit.h>
 #include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
@@ -48,10 +49,8 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::ComponentEditorWidget) {
   mUi->setupUi(this);
   setWindowIcon(QIcon(":/img/library/component.png"));
-  connect(mUi->edtName, &QLineEdit::textChanged, this,
-          &QWidget::setWindowTitle);
 
-  // insert category list editor widget
+  // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
@@ -61,66 +60,52 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mCategoriesEditorWidget.data());
 
-  // load component
+  // Load element.
   mComponent.reset(new Component(fp, false));  // can throw
-  setWindowTitle(*mComponent->getNames().value(getLibLocaleOrder()));
-  mUi->edtName->setText(*mComponent->getNames().value(getLibLocaleOrder()));
-  mUi->edtDescription->setPlainText(
-      mComponent->getDescriptions().value(getLibLocaleOrder()));
-  mUi->edtKeywords->setText(
-      mComponent->getKeywords().value(getLibLocaleOrder()));
-  mUi->edtAuthor->setText(mComponent->getAuthor());
-  mUi->edtVersion->setText(mComponent->getVersion().toStr());
-  mCategoriesEditorWidget->setUuids(mComponent->getCategories());
-  mUi->cbxDeprecated->setChecked(mComponent->isDeprecated());
-  mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
-  mUi->edtPrefix->setText(*mComponent->getPrefixes().getDefaultValue());
-  mUi->edtDefaultValue->setPlainText(mComponent->getDefaultValue());
   mUi->signalEditorWidget->setReferences(mUndoStack.data(),
                                          &mComponent->getSignals());
   mUi->symbolVariantsEditorWidget->setReferences(
       mUndoStack.data(), &mComponent->getSymbolVariants(), this);
+  updateMetadata();
 
-  // load attributes
-  mUi->attributesEditorWidget->setAttributeList(mComponent->getAttributes());
-  connect(mUi->attributesEditorWidget, &AttributeListEditorWidget::edited, this,
-          &ComponentEditorWidget::setDirty);
-
-  // show "interface broken" warning when related properties are modified
+  // Show "interface broken" warning when related properties are modified.
   memorizeComponentInterface();
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
   connect(mUi->cbxSchematicOnly, &QCheckBox::toggled, this,
           &ComponentEditorWidget::undoStackStateModified);
 
-  // show "no categories selected" warning if no categories selected
+  // Show "no categories selected" warning if no categories selected.
   mUi->lblWarnAboutMissingCategory->setVisible(
       mComponent->getCategories().isEmpty());
 
-  // set dirty state when properties are modified
-  connect(mUi->edtName, &QLineEdit::textEdited, this,
-          &ComponentEditorWidget::setDirty);
-  connect(mUi->edtDescription, &QPlainTextEdit::textChanged, this,
-          &ComponentEditorWidget::setDirty);
-  connect(mUi->edtKeywords, &QLineEdit::textEdited, this,
-          &ComponentEditorWidget::setDirty);
-  connect(mUi->edtAuthor, &QLineEdit::textEdited, this,
-          &ComponentEditorWidget::setDirty);
-  connect(mUi->edtVersion, &QLineEdit::textEdited, this,
-          &ComponentEditorWidget::setDirty);
+  // Reload metadata on undo stack state changes.
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &ComponentEditorWidget::updateMetadata);
+
+  // Handle changes of metadata.
+  connect(mUi->edtName, &QLineEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtDescription, &PlainTextEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtKeywords, &QLineEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtAuthor, &QLineEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
-          &ComponentEditorWidget::setDirty);
+          &ComponentEditorWidget::commitMetadata);
   connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryAdded, this,
-          &ComponentEditorWidget::categoriesUpdated);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::categoryRemoved, this,
-          &ComponentEditorWidget::categoriesUpdated);
+          &ComponentCategoryListEditorWidget::edited, this,
+          &ComponentEditorWidget::commitMetadata);
   connect(mUi->cbxSchematicOnly, &QCheckBox::clicked, this,
-          &ComponentEditorWidget::setDirty);
-  connect(mUi->edtPrefix, &QLineEdit::textEdited, this,
-          &ComponentEditorWidget::setDirty);
-  connect(mUi->edtDefaultValue, &QPlainTextEdit::textChanged, this,
-          &ComponentEditorWidget::setDirty);
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtPrefix, &QLineEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtDefaultValue, &PlainTextEdit::editingFinished, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->attributesEditorWidget, &AttributeListEditorWidget::edited, this,
+          &ComponentEditorWidget::commitMetadata);
 }
 
 ComponentEditorWidget::~ComponentEditorWidget() noexcept {
@@ -133,26 +118,16 @@ ComponentEditorWidget::~ComponentEditorWidget() noexcept {
  ******************************************************************************/
 
 bool ComponentEditorWidget::save() noexcept {
-  try {
-    ElementName name(mUi->edtName->text().trimmed());  // can throw
-    Version     version =
-        Version::fromString(mUi->edtVersion->text().trimmed());  // can throw
-    ComponentPrefix prefix(mUi->edtPrefix->text().trimmed());    // can throw
+  // Commit metadata.
+  QString errorMsg = commitMetadata();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid metadata"), errorMsg);
+    return false;
+  }
 
-    mComponent->setName("", name);
-    mComponent->setDescription("",
-                               mUi->edtDescription->toPlainText().trimmed());
-    mComponent->setKeywords("", mUi->edtKeywords->text().trimmed());
-    mComponent->setAuthor(mUi->edtAuthor->text().trimmed());
-    mComponent->setVersion(version);
-    mComponent->setCategories(mCategoriesEditorWidget->getUuids());
-    mComponent->setDeprecated(mUi->cbxDeprecated->isChecked());
-    mComponent->setIsSchematicOnly(mUi->cbxSchematicOnly->isChecked());
-    mComponent->getPrefixes().setDefaultValue(prefix);
-    mComponent->setDefaultValue(mUi->edtDefaultValue->toPlainText().trimmed());
-    mComponent->getAttributes() =
-        mUi->attributesEditorWidget->getAttributeList();
-    mComponent->save();
+  // Save element.
+  try {
+    mComponent->save();  // can throw
     memorizeComponentInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -164,6 +139,62 @@ bool ComponentEditorWidget::save() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ComponentEditorWidget::updateMetadata() noexcept {
+  setWindowTitle(*mComponent->getNames().getDefaultValue());
+  mUi->edtName->setText(*mComponent->getNames().getDefaultValue());
+  mUi->edtDescription->setPlainText(
+      mComponent->getDescriptions().getDefaultValue());
+  mUi->edtKeywords->setText(mComponent->getKeywords().getDefaultValue());
+  mUi->edtAuthor->setText(mComponent->getAuthor());
+  mUi->edtVersion->setText(mComponent->getVersion().toStr());
+  mUi->cbxDeprecated->setChecked(mComponent->isDeprecated());
+  mCategoriesEditorWidget->setUuids(mComponent->getCategories());
+  mUi->lblWarnAboutMissingCategory->setVisible(
+      mCategoriesEditorWidget->getUuids().isEmpty());
+  mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
+  mUi->edtPrefix->setText(*mComponent->getPrefixes().getDefaultValue());
+  mUi->edtDefaultValue->setPlainText(mComponent->getDefaultValue());
+  mUi->attributesEditorWidget->setAttributeList(mComponent->getAttributes());
+}
+
+QString ComponentEditorWidget::commitMetadata() noexcept {
+  try {
+    QScopedPointer<CmdComponentEdit> cmd(new CmdComponentEdit(*mComponent));
+    try {
+      // throws on invalid name
+      cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDescription("", mUi->edtDescription->toPlainText().trimmed());
+    cmd->setKeywords("", mUi->edtKeywords->text().trimmed());
+    try {
+      // throws on invalid version
+      cmd->setVersion(Version::fromString(mUi->edtVersion->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setAuthor(mUi->edtAuthor->text().trimmed());
+    cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    cmd->setCategories(mCategoriesEditorWidget->getUuids());
+    cmd->setIsSchematicOnly(mUi->cbxSchematicOnly->isChecked());
+    try {
+      // throws on invalid prefix
+      cmd->setPrefix("", ComponentPrefix(mUi->edtPrefix->text().trimmed()));
+    } catch (const Exception& e) {
+    }
+    cmd->setDefaultValue(mUi->edtDefaultValue->toPlainText().trimmed());
+    cmd->setAttributes(mUi->attributesEditorWidget->getAttributeList());
+
+    // Commit all changes.
+    mUndoStack->execCmd(cmd.take());  // can throw
+
+    // Reload metadata into widgets to discard invalid input.
+    updateMetadata();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
+  return QString();
+}
 
 bool ComponentEditorWidget::openComponentSymbolVariantEditor(
     ComponentSymbolVariant& variant) noexcept {
@@ -210,12 +241,6 @@ bool ComponentEditorWidget::isInterfaceBroken() const noexcept {
     }
   }
   return false;
-}
-
-void ComponentEditorWidget::categoriesUpdated() noexcept {
-  mUi->lblWarnAboutMissingCategory->setVisible(
-      mCategoriesEditorWidget->getUuids().isEmpty());
-  setDirty();
 }
 
 /*******************************************************************************

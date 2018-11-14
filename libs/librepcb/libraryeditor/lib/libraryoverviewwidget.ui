@@ -282,6 +282,9 @@
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
+         <property name="toolTip">
+          <string>Click here to choose an icon (PNG, 256x256px).</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -328,7 +331,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QPlainTextEdit" name="edtDescription"/>
+        <widget class="librepcb::PlainTextEdit" name="edtDescription"/>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_4">
@@ -423,6 +426,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::PlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header location="global">librepcb/common/widgets/plaintextedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -115,7 +115,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   QString libName = *mLibrary->getNames().value(localeOrder);
   if (mLibrary->isOpenedReadOnly()) libName.append(tr(" [Read-Only]"));
   setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
-  setWindowIcon(mLibrary->getIcon());
+  setWindowIcon(mLibrary->getIconAsPixmap());
 
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);

@@ -98,7 +98,7 @@ public:
 
   // Getters
   const FilePath& getFilePath() const noexcept { return mFilePath; }
-  bool            isDirty() const noexcept;
+  bool            isDirty() const noexcept { return !mUndoStack->isClean(); }
   virtual bool    hasGraphicalEditor() const noexcept { return false; }
 
   // Setters
@@ -127,7 +127,6 @@ protected:  // Methods
     Q_UNUSED(newTool);
     return false;
   }
-  void               setDirty() noexcept;
   void               undoStackStateModified() noexcept;
   const QStringList& getLibLocaleOrder() const noexcept;
 
@@ -148,7 +147,6 @@ protected:  // Data
   UndoStackActionGroup*        mUndoStackActionGroup;
   ExclusiveActionGroup*        mToolsActionGroup;
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
-  bool                         mIsDirty;
   bool                         mIsInterfaceBroken;
 };
 
