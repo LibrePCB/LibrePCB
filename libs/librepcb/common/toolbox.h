@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <type_traits>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -44,6 +46,8 @@ namespace librepcb {
  * @date    2016-10-30
  */
 class Toolbox final {
+  Q_DECLARE_TR_FUNCTIONS(Toolbox)
+
 public:
   // Constructors / Destructor
   Toolbox()                     = delete;
@@ -143,6 +147,270 @@ public:
                                       bool           toUpper          = false,
                                       const QString& spaceReplacement = " ",
                                       int            maxLength = -1) noexcept;
+
+  /**
+   * @brief Convert a fixed point decimal number from a QString to an integer.
+   *
+   * @param str      A QString that represents the number
+   * @param pointPos Number of decimal positions. If the number has more
+   *                 decimal digits, this function will throw
+   */
+  template <typename T>
+  static T decimalFixedPointFromString(const QString &str, qint32 pointPos) {
+    using UnsignedT = typename std::make_unsigned<T>::type;
+
+    const T         min   = std::numeric_limits<T>::min();
+    const T         max   = std::numeric_limits<T>::max();
+    const UnsignedT max_u = std::numeric_limits<UnsignedT>::max();
+
+    enum class State {
+      INVALID,
+      START,
+      AFTER_SIGN,
+      LONELY_DOT,
+      INT_PART,
+      FRAC_PART,
+      EXP,
+      EXP_AFTER_SIGN,
+      EXP_DIGITS,
+    };
+    State state = State::START;
+    UnsignedT valueAbs = 0;
+    bool sign = false;
+    qint32 expOffset = pointPos;
+
+    const quint32 maxExp = std::numeric_limits<quint32>::max();
+    quint32 exp = 0;
+    bool expSign = false;
+
+    for (QChar c : str) {
+      if (state == State::INVALID) {
+        // break the loop, not the switch
+        break;
+      }
+      switch (state) {
+      case State::INVALID:
+        // already checked, but needed to avoid compiler warnings
+        break;
+
+      case State::START:
+        if (c == '-') {
+          sign = true;
+          state = State::AFTER_SIGN;
+        } else if (c == '+') {
+          state = State::AFTER_SIGN;
+        } else if (c == '.') {
+          state = State::LONELY_DOT;
+        } else if (c.isDigit()) {
+            valueAbs = static_cast<UnsignedT>(c.digitValue());
+            state = State::INT_PART;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::AFTER_SIGN:
+        if (c == '.') {
+          state = State::LONELY_DOT;
+        } else if (c.isDigit()) {
+            valueAbs = static_cast<UnsignedT>(c.digitValue());
+            state = State::INT_PART;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::LONELY_DOT:
+        if (c.isDigit()) {
+            valueAbs = static_cast<UnsignedT>(c.digitValue());
+            expOffset -= 1;
+            state = State::FRAC_PART;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::INT_PART:
+        if (c == '.') {
+          state = State::FRAC_PART;
+        } else if (c == 'e' || c == 'E') {
+          state = State::EXP;
+        } else if (c.isDigit()) {
+            UnsignedT digit = static_cast<UnsignedT>(c.digitValue());
+            if (valueAbs > (max_u / 10)) {
+              // Would overflow
+              state = State::INVALID;
+              break;
+            }
+            valueAbs *= 10;
+            if (valueAbs > (max_u - digit)) {
+              // Would overflow
+              state = State::INVALID;
+              break;
+            }
+            valueAbs += digit;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::FRAC_PART:
+        if (c == 'e' || c == 'E') {
+          state = State::EXP;
+        } else if (c.isDigit()) {
+            UnsignedT digit = static_cast<UnsignedT>(c.digitValue());
+            if (valueAbs > (max_u / 10)) {
+              // Would overflow
+              state = State::INVALID;
+              break;
+            }
+            valueAbs *= 10;
+            if (valueAbs > (max_u - digit)) {
+              // Would overflow
+              state = State::INVALID;
+              break;
+            }
+            valueAbs += digit;
+            expOffset -= 1;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::EXP:
+        if (c == '-') {
+          expSign = true;
+          state = State::EXP_AFTER_SIGN;
+        } else if (c == '+') {
+          state = State::EXP_AFTER_SIGN;
+        } else if (c.isDigit()) {
+          exp = static_cast<quint32>(c.digitValue());
+          state = State::EXP_DIGITS;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::EXP_AFTER_SIGN:
+        if (c.isDigit()) {
+          exp = static_cast<quint32>(c.digitValue());
+          state = State::EXP_DIGITS;
+        } else {
+          state = State::INVALID;
+        }
+        break;
+
+      case State::EXP_DIGITS:
+        if (c.isDigit()) {
+          quint32 digit = static_cast<quint32>(c.digitValue());
+          if (exp > (maxExp / 10)) {
+              // Would overflow
+              state = State::INVALID;
+              break;
+            }
+            exp *= 10;
+            if (exp > (maxExp - digit)) {
+              // Would overflow
+              state = State::INVALID;
+              break;
+            }
+            exp += digit;
+        } else {
+          state = State::INVALID;
+        }
+      }
+    }
+
+    bool ok = true;
+    switch (state) {
+    case State::INVALID:
+    case State::START:
+    case State::AFTER_SIGN:
+    case State::LONELY_DOT:
+    case State::EXP:
+    case State::EXP_AFTER_SIGN:
+      ok = false;
+      break;
+
+    case State::INT_PART:
+    case State::FRAC_PART:
+    case State::EXP_DIGITS:
+      break;
+    }
+
+    if (ok) {
+      quint32 expOffsetAbs;
+      if (expOffset < 0) {
+        expOffsetAbs = -static_cast<quint32>(expOffset);
+      } else {
+        expOffsetAbs = static_cast<quint32>(expOffset);
+      }
+
+      if (expSign == (expOffset < 0)) {
+        if (exp > (maxExp - expOffsetAbs)) {
+          // would overflow
+          ok = false;
+        } else {
+          exp += expOffsetAbs;
+        }
+      } else {
+        if (exp < expOffsetAbs) {
+          // would overflow
+          ok = false;
+        } else {
+          exp -= expOffsetAbs;
+        }
+      }
+    }
+
+    T result = 0;
+    if (ok) {
+      // No need to apply exponent or sign if valueAbs is zero
+      if (valueAbs != 0) {
+        if (expSign) {
+          for (quint32 i = 0; i < exp; i++) {
+            if ((valueAbs % 10) != 0) {
+              // more decimal digits than allowed
+              ok = false;
+              break;
+            }
+            valueAbs /= 10;
+          }
+        } else {
+          for (quint32 i = 0; i < exp; i++) {
+            if (valueAbs > (max_u / 10)) {
+              // would overflow
+              ok = false;
+              break;
+            }
+            valueAbs *= 10;
+          }
+        }
+        if (ok) {
+          if (sign) {
+            if (valueAbs > static_cast<UnsignedT>(min)) {
+              ok = false;
+            } else {
+              result = static_cast<T>(-valueAbs);
+            }
+          } else {
+            if (valueAbs > static_cast<UnsignedT>(max)) {
+              ok = false;
+            } else {
+              result = static_cast<T>(valueAbs);
+            }
+          }
+        }
+      }
+    }
+
+    if (!ok) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString(tr("Invalid fixed point number string: \"%1\"")).arg(str));
+    }
+    return result;
+  }
 };
 
 /*******************************************************************************
