@@ -148,6 +148,48 @@ public:
                                       const QString& spaceReplacement = " ",
                                       int            maxLength = -1) noexcept;
 
+
+  /**
+   * @brief Convert a fixed point decimal number from an integer to a QString
+   *
+   * @param value    Value to convert
+   * @param pointPos Number of fixed point decimal positions
+   */
+  template <typename T>
+  static QString decimalFixedPointToString(T value, qint32 pointPos) noexcept {
+    using UnsignedT = typename std::make_unsigned<T>::type;
+
+    if (value == 0) {
+      // special case
+      return "0.0";
+    }
+
+    UnsignedT valueAbs;
+    if (value < 0) {
+      valueAbs = -static_cast<UnsignedT>(value);
+    } else {
+      valueAbs = static_cast<UnsignedT>(value);
+    }
+
+    QString str = QString::number(valueAbs);
+    if (str.length() > pointPos) {
+      // pointPos must be > 0 for this to work correctly
+      str.insert(str.length() - pointPos, '.');
+    } else {
+      for (qint32 i = pointPos - str.length(); i != 0; i--)
+        str.insert(0, '0');
+      str.insert(0, "0.");
+    }
+
+    while (str.endsWith('0') && !str.endsWith(".0"))
+      str.chop(1);
+
+    if (value < 0)
+      str.insert(0, '-');
+
+    return str;
+  }
+
   /**
    * @brief Convert a fixed point decimal number from a QString to an integer.
    *

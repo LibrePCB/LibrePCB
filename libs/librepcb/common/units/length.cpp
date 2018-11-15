@@ -38,52 +38,7 @@ namespace librepcb {
  ******************************************************************************/
 
 QString Length::toMmString() const noexcept {
-  using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
-
-  LengthBase_t nm = toNm();
-  LengthBaseU_t nm_abs;
-  if (nm < 0) {
-    nm_abs = -static_cast<LengthBaseU_t>(nm);
-  } else {
-    nm_abs = static_cast<LengthBaseU_t>(nm);
-  }
-
-  QString str = QString::number(nm_abs);
-  if (nm_abs >= 1000000) {
-    str.insert(str.length() - 6, '.');
-    while (str.endsWith('0') && !str.endsWith(".0"))
-      str.chop(1);
-  } else if (nm_abs == 0) {
-      str.append(".0");
-  } else {
-    while (str.endsWith('0'))
-        str.chop(1);
-
-    if (nm_abs >= 100000) {
-      // number is 0.X, X non zero
-      str.insert(0, "0.");
-    } else if (nm_abs >= 10000) {
-      // number is 0.0X..., X non zero
-      str.insert(0, "0.0");
-    } else if (nm_abs >= 1000) {
-      // number is 0.00X..., X non zero
-      str.insert(0, "0.00");
-    } else if (nm_abs >= 100) {
-      // number is 0.000X..., X non zero
-      str.insert(0, "0.000");
-    } else if (nm_abs >= 10) {
-      // number is 0.0000X..., X non zero
-      str.insert(0, "0.0000");
-    } else /*if (nm_abs >= 1)*/ {
-      // number is 0.00000X, X non zero
-      str.insert(0, "0.00000");
-    }
-  }
-
-  if (nm < 0)
-    str.insert(0, '-');
-
-  return str;
+  return Toolbox::decimalFixedPointToString<LengthBase_t>(toNm(), 6);
 }
 
 /*******************************************************************************
