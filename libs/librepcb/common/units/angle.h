@@ -146,7 +146,7 @@ public:
    * thrown
    */
   void setAngleDeg(const QString& degrees) {
-    mMicrodegrees = degStringToMicrodeg(degrees);
+    mMicrodegrees = degStringToMicrodeg(degrees) % 360000000;
   }
 
   /**
@@ -189,8 +189,6 @@ public:
    * @return The angle in degrees as a QString
    *
    * @note This method is useful to store lengths in files.
-   *
-   * @todo don't use double for this purpose!
    */
   QString toDegString() const noexcept;
 
@@ -379,10 +377,6 @@ private:
    * to be "C"! Example: QString("-123.456") for -123.456 degrees
    *
    * @return The angle in microdegrees
-   *
-   * @todo    don't use double for this purpose!
-   *          and map the angle to +/- 360 degrees BEFORE converting it to
-   * microdegrees! throw an exception on range errors!
    */
   static qint32 degStringToMicrodeg(const QString& degrees);
 

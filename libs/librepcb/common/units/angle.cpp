@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "angle.h"
+#include "../toolbox.h"
 
 #include <QtCore>
 
@@ -36,11 +37,7 @@ namespace librepcb {
 // General Methods
 
 QString Angle::toDegString() const noexcept {
-  QString str = QLocale::c().toString(toDeg(), 'f', 6);
-  for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
-    str.chop(1);
-  }
-  return str;
+  return Toolbox::decimalFixedPointToString<qint32>(toMicroDeg(), 6);
 }
 
 Angle Angle::abs() const noexcept {
@@ -102,14 +99,7 @@ Angle Angle::fromRad(qreal radians) noexcept {
 // Private Static Methods
 
 qint32 Angle::degStringToMicrodeg(const QString& degrees) {
-  bool  ok;
-  qreal angle = qRound(QLocale::c().toDouble(degrees, &ok) * 1e6);
-  if (!ok) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Invalid angle string: \"%1\"")).arg(degrees));
-  }
-  return angle;
+  return Toolbox::decimalFixedPointFromString<qint32>(degrees, 6);
 }
 
 /*******************************************************************************
