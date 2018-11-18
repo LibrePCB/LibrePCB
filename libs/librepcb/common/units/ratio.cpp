@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "ratio.h"
+#include "../toolbox.h"
 
 #include <QtCore>
 
@@ -34,11 +35,7 @@ namespace librepcb {
  ******************************************************************************/
 
 QString Ratio::toNormalizedString() const noexcept {
-  QString str = QLocale::c().toString(toNormalized(), 'f', 6);
-  for (int i = 0; (i < 5) && str.endsWith(QLatin1Char('0')); ++i) {
-    str.chop(1);
-  }
-  return str;
+  return Toolbox::decimalFixedPointToString<qint32>(toPpm(), 6);
 }
 
 // Static Methods
@@ -64,14 +61,7 @@ Ratio Ratio::fromNormalized(const QString& normalized) {
 // Private Static Methods
 
 qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
-  bool  ok;
-  qreal ratio = qRound(QLocale::c().toDouble(normalized, &ok) * 1e6);
-  if (!ok) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Invalid ratio string: \"%1\"")).arg(normalized));
-  }
-  return ratio;
+  return Toolbox::decimalFixedPointFromString<qint32>(normalized, 6);
 }
 
 /*******************************************************************************

@@ -149,8 +149,6 @@ public:
    * @return The normalized ratio as a QString
    *
    * @note This method is useful to store ratios in files (serialization).
-   *
-   * @todo don't use double for this purpose!
    */
   QString toNormalizedString() const noexcept;
 
@@ -264,8 +262,6 @@ private:
    * percent.
    *
    * @return The ratio in PPM
-   *
-   * @todo    don't use double for this purpose!
    */
   static qint32 normalizedStringToPpm(const QString& normalized);
 
