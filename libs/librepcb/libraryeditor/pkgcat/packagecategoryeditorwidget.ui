@@ -109,21 +109,21 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="7" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Parent:</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="6" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
       <number>0</number>
@@ -200,6 +200,26 @@
      </item>
     </layout>
    </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Messages:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="librepcb::library::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -207,6 +227,12 @@
    <class>librepcb::PlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header location="global">librepcb/common/widgets/plaintextedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::library::editor::LibraryElementCheckListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/libraryeditor/common/libraryelementchecklistwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

@@ -95,6 +95,15 @@ private:  // Methods
   void    updatePackagePreview() noexcept;
   void    memorizeDeviceInterface() noexcept;
   bool    isInterfaceBroken() const noexcept override;
+  bool    runChecks(LibraryElementCheckMessageList& msgs) const override;
+  template <typename MessageType>
+  void fixMsg(const MessageType& msg);
+  template <typename MessageType>
+  bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
+                    bool                                              applyFix);
+  bool processCheckMessage(
+      std::shared_ptr<const LibraryElementCheckMessage> msg,
+      bool                                              applyFix) override;
 
 private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget>            mUi;
