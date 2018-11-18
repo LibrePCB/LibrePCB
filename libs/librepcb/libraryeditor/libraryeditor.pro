@@ -33,6 +33,7 @@ SOURCES += \
     common/categorytreelabeltextbuilder.cpp \
     common/componentchooserdialog.cpp \
     common/editorwidgetbase.cpp \
+    common/libraryelementchecklistwidget.cpp \
     common/packagechooserdialog.cpp \
     common/symbolchooserdialog.cpp \
     dev/deviceeditorwidget.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
     common/categorytreelabeltextbuilder.h \
     common/componentchooserdialog.h \
     common/editorwidgetbase.h \
+    common/libraryelementchecklistwidget.h \
     common/packagechooserdialog.h \
     common/symbolchooserdialog.h \
     dev/deviceeditorwidget.h \
