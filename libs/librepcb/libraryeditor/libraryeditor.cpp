@@ -71,8 +71,6 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::newElementTriggered);
   connect(mUi->actionSave, &QAction::triggered, this,
           &LibraryEditor::saveTriggered);
-  connect(mUi->actionRemoveElement, &QAction::triggered, this,
-          &LibraryEditor::removeElementTriggered);
   connect(mUi->actionShowElementInFileManager, &QAction::triggered, this,
           &LibraryEditor::showElementInFileExplorerTriggered);
   connect(mUi->actionUpdateLibraryDb, &QAction::triggered,
@@ -374,34 +372,6 @@ void LibraryEditor::newElementTriggered() noexcept {
 
 void LibraryEditor::saveTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->save();
-}
-
-void LibraryEditor::removeElementTriggered() noexcept {
-  if (!mCurrentEditorWidget) return;
-  if (dynamic_cast<LibraryOverviewWidget*>(mCurrentEditorWidget)) return;
-  int ret = QMessageBox::warning(
-      this, tr("Remove library element"),
-      QString(tr("WARNING: Library elements must normally NOT be removed "
-                 "because this will break "
-                 "other elements which depend on this one! They should be just "
-                 "marked as "
-                 "deprecated instead.\n\nAre you still sure to delete the "
-                 "whole library element "
-                 "\"%1\"?\n\nThis cannot be undone!"))
-          .arg(mCurrentEditorWidget->windowTitle()),
-      QMessageBox::Yes, QMessageBox::Cancel);
-  if (ret == QMessageBox::Yes) {
-    FilePath elementDir = mCurrentEditorWidget->getFilePath();
-    mUi->tabWidget->removeTab(mUi->tabWidget->currentIndex());
-    setActiveEditorWidget(nullptr);
-    delete mCurrentEditorWidget;
-    try {
-      FileUtils::removeDirRecursively(elementDir);
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Error"), e.getMsg());
-    }
-    mWorkspace.getLibraryDb().startLibraryRescan();
-  }
 }
 
 void LibraryEditor::showElementInFileExplorerTriggered() noexcept {
