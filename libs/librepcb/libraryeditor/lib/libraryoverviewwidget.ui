@@ -62,6 +62,9 @@
           </property>
           <item>
            <widget class="QListWidget" name="lstCmpCat">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="uniformItemSizes">
              <bool>true</bool>
             </property>
@@ -96,6 +99,9 @@
           </property>
           <item>
            <widget class="QListWidget" name="lstSym">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="uniformItemSizes">
              <bool>true</bool>
             </property>
@@ -130,6 +136,9 @@
           </property>
           <item>
            <widget class="QListWidget" name="lstPkgCat">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="uniformItemSizes">
              <bool>true</bool>
             </property>
@@ -164,6 +173,9 @@
           </property>
           <item>
            <widget class="QListWidget" name="lstPkg">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="uniformItemSizes">
              <bool>true</bool>
             </property>
@@ -198,6 +210,9 @@
           </property>
           <item>
            <widget class="QListWidget" name="lstCmp">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="uniformItemSizes">
              <bool>true</bool>
             </property>
@@ -232,6 +247,9 @@
           </property>
           <item>
            <widget class="QListWidget" name="lstDev">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="uniformItemSizes">
              <bool>true</bool>
             </property>

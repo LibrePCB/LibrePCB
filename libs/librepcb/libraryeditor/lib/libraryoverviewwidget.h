@@ -78,6 +78,7 @@ signals:
   void editPackageTriggered(const FilePath& fp);
   void editComponentTriggered(const FilePath& fp);
   void editDeviceTriggered(const FilePath& fp);
+  void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
   void    updateMetadata() noexcept;
@@ -95,6 +96,9 @@ private:  // Methods
   void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
+  void openContextMenuAtPos(const QPoint& pos) noexcept;
+  bool removeSelectedItem(const QString&  itemName,
+                          const FilePath& itemPath) noexcept;
 
   // Event Handlers
   void btnIconClicked() noexcept;

@@ -145,6 +145,7 @@ private:  // GUI Event Handlers
   void editPackageTriggered(const FilePath& fp) noexcept;
   void editComponentTriggered(const FilePath& fp) noexcept;
   void editDeviceTriggered(const FilePath& fp) noexcept;
+  void closeTabIfOpen(const FilePath& fp) noexcept;
   template <typename ElementType, typename EditWidgetType>
   void editLibraryElementTriggered(const FilePath& fp,
                                    bool            isNewElement) noexcept;
