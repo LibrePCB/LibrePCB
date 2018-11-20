@@ -20,11 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "libraryelementcheck.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include "libraryelement.h"
+#include "msg/msgmissingcategories.h"
 
 #include <QtCore>
 
@@ -38,43 +37,31 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+LibraryElementCheck::LibraryElementCheck(const LibraryElement& element) noexcept
+  : LibraryBaseElementCheck(element), mElement(element) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
+LibraryElementCheck::~LibraryElementCheck() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
+LibraryElementCheckMessageList LibraryElementCheck::runChecks() const {
+  LibraryElementCheckMessageList msgs = LibraryBaseElementCheck::runChecks();
+  checkMissingCategories(msgs);
+  return msgs;
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+void LibraryElementCheck::checkMissingCategories(MsgList& msgs) const {
+  if (mElement.getCategories().isEmpty()) {
+    msgs.append(std::make_shared<MsgMissingCategories>());
+  }
 }
 
 /*******************************************************************************

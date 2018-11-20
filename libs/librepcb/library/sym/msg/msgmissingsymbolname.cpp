@@ -20,13 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "msgmissingsymbolname.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +32,16 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgMissingSymbolName::MsgMissingSymbolName() noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning, tr("Missing text: '{{NAME}}'"),
+        tr("Most symbols should have a text element for the component's name, "
+           "otherwise you won't see that name in the schematics. There are "
+           "only a few exceptions (e.g. a schematic frame) which don't need a "
+           "name, for those you can ignore this message.")) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgMissingSymbolName::~MsgMissingSymbolName() noexcept {
 }
 
 /*******************************************************************************

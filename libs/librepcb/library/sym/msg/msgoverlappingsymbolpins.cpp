@@ -20,13 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "msgoverlappingsymbolpins.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "../symbolpin.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +34,31 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgOverlappingSymbolPins::MsgOverlappingSymbolPins(
+    QVector<std::shared_ptr<const SymbolPin>> pins) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error, buildMessage(pins),
+        tr("There are multiple pins at the same position. This is not allowed "
+           "because you cannot connect wires to these pins in the schematic "
+           "editor.")),
+    mPins(pins) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
+MsgOverlappingSymbolPins::~MsgOverlappingSymbolPins() noexcept {
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+QString MsgOverlappingSymbolPins::buildMessage(
+    const QVector<std::shared_ptr<const SymbolPin>>& pins) noexcept {
+  QStringList pinNames;
+  foreach (const auto& pin, pins) {
+    pinNames.append("'" % pin->getName() % "'");
+  }
+  qSort(pinNames);
+  return QString(tr("Overlapping pins: %1")).arg(pinNames.join(", "));
 }
 
 /*******************************************************************************

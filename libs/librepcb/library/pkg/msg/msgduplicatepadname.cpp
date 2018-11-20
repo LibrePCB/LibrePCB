@@ -20,13 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "msgduplicatepadname.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "../packagepad.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +34,20 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        QString(tr("Duplicate pad name: '%1'")).arg(*pad.getName()),
+        tr("All package pads must have unique names, otherwise they cannot be "
+           "distinguished later in the device editor. If your part has several "
+           "leads with same functionality (e.g. multiple GND leads), you can "
+           "assign all these pads to the same component signal later in the "
+           "device editor.\n\nFor neutral packages (e.g. SOT23), pads should "
+           "be named only by numbers anyway, not by functionality (e.g. name "
+           "them '1', '2', '3' instead of 'D', 'G', 'S').")) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgDuplicatePadName::~MsgDuplicatePadName() noexcept {
 }
 
 /*******************************************************************************

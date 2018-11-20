@@ -20,13 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "libraryelementcheckmessage.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +32,63 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+LibraryElementCheckMessage::LibraryElementCheckMessage(
+    const LibraryElementCheckMessage& other) noexcept
+  : mSeverity(other.mSeverity),
+    mSeverityPixmap(other.mSeverityPixmap),
+    mMessage(other.mMessage),
+    mDescription(other.mDescription) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
+LibraryElementCheckMessage::LibraryElementCheckMessage(
+    Severity severity, const QString& msg, const QString& description) noexcept
+  : mSeverity(severity),
+    mSeverityPixmap(getSeverityPixmap(severity)),
+    mMessage(msg),
+    mDescription(description) {
 }
 
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
+LibraryElementCheckMessage::~LibraryElementCheckMessage() noexcept {
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Static Methods
  ******************************************************************************/
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+QPixmap LibraryElementCheckMessage::getSeverityPixmap(
+    Severity severity) noexcept {
+  static QMap<Severity, QPixmap> pixmap = {
+      {Severity::Hint, QPixmap(":/img/status/info.png")},
+      {Severity::Warning, QPixmap(":/img/status/dialog_warning.png")},
+      {Severity::Error, QPixmap(":/img/status/dialog_error.png")},
+  };
+  return pixmap.value(severity);
+}
+
+/*******************************************************************************
+ *  Operator Overloads
+ ******************************************************************************/
+
+bool LibraryElementCheckMessage::operator==(
+    const LibraryElementCheckMessage& rhs) const noexcept {
+  if (mSeverity != rhs.mSeverity) return false;
+  if (mMessage != rhs.mMessage) return false;
+  if (mDescription != rhs.mDescription) return false;
+  return true;
+}
+
+bool LibraryElementCheckMessage::operator!=(
+    const LibraryElementCheckMessage& rhs) const noexcept {
+  return !(*this == rhs);
+}
+
+bool LibraryElementCheckMessage::operator<(
+    const LibraryElementCheckMessage& rhs) const noexcept {
+  if (mSeverity == rhs.mSeverity) {
+    return mMessage < rhs.mMessage;
+  } else {
+    return mSeverity < rhs.mSeverity;
+  }
 }
 
 /*******************************************************************************

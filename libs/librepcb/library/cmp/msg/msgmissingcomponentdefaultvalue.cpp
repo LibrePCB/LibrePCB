@@ -20,13 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "msgmissingcomponentdefaultvalue.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +32,23 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgMissingComponentDefaultValue::MsgMissingComponentDefaultValue() noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning, tr("No default value set"),
+        QString(tr("Most components should have a default value set. The "
+                   "default value becomes the component's value when adding it "
+                   "to a schematic. It can also contain placeholders which are "
+                   "substituted later in the schematic. Commonly used default "
+                   "values are:\n\n"
+                   "Generic parts (e.g. a diode): %1\n"
+                   "Specific parts (e.g. a microcontroller): %2\n"
+                   "Passive parts: Using an attribute, e.g. %3"))
+            .arg("'{{PARTNUMBER or DEVICE}}'",
+                 "'{{PARTNUMBER or DEVICE or COMPONENT}}'",
+                 "'{{RESISTANCE}}'")) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgMissingComponentDefaultValue::~MsgMissingComponentDefaultValue() noexcept {
 }
 
 /*******************************************************************************

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "symbol.h"
 
+#include "symbolcheck.h"
 #include "symbolgraphicsitem.h"
 
 #include <librepcb/common/fileio/sexpression.h>
@@ -79,6 +80,11 @@ Symbol::~Symbol() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+LibraryElementCheckMessageList Symbol::runChecks() const {
+  SymbolCheck check(*this);
+  return check.runChecks();  // can throw
+}
 
 void Symbol::registerGraphicsItem(SymbolGraphicsItem& item) noexcept {
   Q_ASSERT(!mRegisteredGraphicsItem);

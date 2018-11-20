@@ -20,13 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "msgpadoverlapswithplacement.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "../footprint.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +34,23 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgPadOverlapsWithPlacement::MsgPadOverlapsWithPlacement(
+    std::shared_ptr<const Footprint>    footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
+    const Length& clearance) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning,
+        QString(tr("Clearance of pad '%1' in '%2' to placement layer"))
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        QString(tr("Pads should have at least %1 clearance to the outlines "
+                   "layer because outlines are drawn on silkscreen which will "
+                   "be cropped for Gerber export."))
+            .arg(QString::number(clearance.toMm() * 1000) % "μm")),
+    mFootprint(footprint),
+    mPad(pad) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgPadOverlapsWithPlacement::~MsgPadOverlapsWithPlacement() noexcept {
 }
 
 /*******************************************************************************

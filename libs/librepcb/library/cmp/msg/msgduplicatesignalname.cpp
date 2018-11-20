@@ -20,13 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "msgduplicatesignalname.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "../componentsignal.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +34,20 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgDuplicateSignalName::MsgDuplicateSignalName(
+    const ComponentSignal& signal) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        QString(tr("Duplicate signal name: '%1'")).arg(*signal.getName()),
+        tr("All component signals must have unique names, otherwise they "
+           "cannot be distinguished later in the device editor. If your part "
+           "has several pins which are electrically exactly equal (e.g. "
+           "multiple GND pins), you should add only one of these pins as a "
+           "component signal. The assignment to multiple pins should be done "
+           "in the device editor instead.")) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgDuplicateSignalName::~MsgDuplicateSignalName() noexcept {
 }
 
 /*******************************************************************************

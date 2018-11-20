@@ -20,13 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "msgduplicatepinname.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "../symbolpin.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +34,18 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgDuplicatePinName::MsgDuplicatePinName(const SymbolPin& pin) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        QString(tr("Duplicate pin name: '%1'")).arg(*pin.getName()),
+        tr("All symbol pins must have unique names, otherwise they cannot be "
+           "distinguished later in the component editor. If your part has "
+           "several pins with same functionality (e.g. multiple GND pins), you "
+           "should add only one of these pins to the symbol. The assignment to "
+           "multiple leads should be done in the device editor instead.")) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgDuplicatePinName::~MsgDuplicatePinName() noexcept {
 }
 
 /*******************************************************************************

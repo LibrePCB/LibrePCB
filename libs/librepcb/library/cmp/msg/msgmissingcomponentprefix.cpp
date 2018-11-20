@@ -20,13 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "msgmissingcomponentprefix.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +32,16 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgMissingComponentPrefix::MsgMissingComponentPrefix() noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning, tr("No component prefix set"),
+        tr("Most components should have a prefix defined. The prefix is used "
+           "to generate the component's name when adding it to a schematic. "
+           "For example the prefix 'R' (resistor) leads to component names "
+           "'R1', 'R2', 'R3' etc.")) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgMissingComponentPrefix::~MsgMissingComponentPrefix() noexcept {
 }
 
 /*******************************************************************************

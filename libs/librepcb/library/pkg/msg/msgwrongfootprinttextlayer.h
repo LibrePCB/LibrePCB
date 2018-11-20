@@ -17,65 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_MSGWRONGFOOTPRINTTEXTLAYER_H
+#define LIBREPCB_LIBRARY_MSGWRONGFOOTPRINTTEXTLAYER_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class StrokeText;
+
 namespace library {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
-
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
+class Footprint;
 
 /*******************************************************************************
- *  General Methods
+ *  Class MsgWrongFootprintTextLayer
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
+/**
+ * @brief The MsgWrongFootprintTextLayer class
+ */
+class MsgWrongFootprintTextLayer final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgWrongFootprintTextLayer)
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
+public:
+  // Constructors / Destructor
+  MsgWrongFootprintTextLayer() = delete;
+  MsgWrongFootprintTextLayer(std::shared_ptr<const Footprint>  footprint,
+                             std::shared_ptr<const StrokeText> text,
+                             const QString& expectedLayerName) noexcept;
+  MsgWrongFootprintTextLayer(const MsgWrongFootprintTextLayer& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mText(other.mText),
+      mExpectedLayerName(other.mExpectedLayerName) {}
+  virtual ~MsgWrongFootprintTextLayer() noexcept;
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const StrokeText> getText() const noexcept { return mText; }
+  QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
+
+private:
+  std::shared_ptr<const Footprint>  mFootprint;
+  std::shared_ptr<const StrokeText> mText;
+  QString                           mExpectedLayerName;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +80,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGWRONGFOOTPRINTTEXTLAYER_H

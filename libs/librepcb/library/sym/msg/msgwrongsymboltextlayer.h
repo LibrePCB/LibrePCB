@@ -17,65 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
+#define LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Text;
+
 namespace library {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class MsgWrongSymbolTextLayer
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
+/**
+ * @brief The MsgWrongSymbolTextLayer class
+ */
+class MsgWrongSymbolTextLayer final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgWrongSymbolTextLayer)
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
+public:
+  // Constructors / Destructor
+  MsgWrongSymbolTextLayer() = delete;
+  MsgWrongSymbolTextLayer(std::shared_ptr<const Text> text,
+                          const QString& expectedLayerName) noexcept;
+  MsgWrongSymbolTextLayer(const MsgWrongSymbolTextLayer& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mText(other.mText),
+      mExpectedLayerName(other.mExpectedLayerName) {}
+  virtual ~MsgWrongSymbolTextLayer() noexcept;
 
-  cleanupAfterLoadingElementFromFile();
-}
+  // Getters
+  std::shared_ptr<const Text> getText() const noexcept { return mText; }
+  QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
 
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+private:
+  std::shared_ptr<const Text> mText;
+  QString                     mExpectedLayerName;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +72,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H

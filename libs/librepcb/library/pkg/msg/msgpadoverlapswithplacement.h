@@ -17,65 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_MSGPADOVERLAPSWITHPLACEMENT_H
+#define LIBREPCB_LIBRARY_MSGPADOVERLAPSWITHPLACEMENT_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
-
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
+class Footprint;
+class FootprintPad;
 
 /*******************************************************************************
- *  General Methods
+ *  Class MsgPadOverlapsWithPlacement
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
+/**
+ * @brief The MsgPadOverlapsWithPlacement class
+ */
+class MsgPadOverlapsWithPlacement final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadOverlapsWithPlacement)
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
+public:
+  // Constructors / Destructor
+  MsgPadOverlapsWithPlacement() = delete;
+  MsgPadOverlapsWithPlacement(std::shared_ptr<const Footprint>    footprint,
+                              std::shared_ptr<const FootprintPad> pad,
+                              const QString&                      pkgPadName,
+                              const Length& clearance) noexcept;
+  MsgPadOverlapsWithPlacement(const MsgPadOverlapsWithPlacement& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPad(other.mPad) {}
+  virtual ~MsgPadOverlapsWithPlacement() noexcept;
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint>    mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +78,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGPADOVERLAPSWITHPLACEMENT_H

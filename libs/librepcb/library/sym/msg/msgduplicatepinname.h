@@ -17,65 +17,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_MSGDUPLICATEPINNAME_H
+#define LIBREPCB_LIBRARY_MSGDUPLICATEPINNAME_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
-
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
+class SymbolPin;
 
 /*******************************************************************************
- *  General Methods
+ *  Class MsgDuplicatePinName
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
+/**
+ * @brief The MsgDuplicatePinName class
+ */
+class MsgDuplicatePinName final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgDuplicatePinName)
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+public:
+  // Constructors / Destructor
+  MsgDuplicatePinName() = delete;
+  explicit MsgDuplicatePinName(const SymbolPin& pin) noexcept;
+  MsgDuplicatePinName(const MsgDuplicatePinName& other) noexcept
+    : LibraryElementCheckMessage(other) {}
+  virtual ~MsgDuplicatePinName() noexcept;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +60,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGDUPLICATEPINNAME_H

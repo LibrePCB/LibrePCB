@@ -20,13 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "msgnamenottitlecase.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +32,51 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgNameNotTitleCase::MsgNameNotTitleCase(const ElementName& name) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Hint, QString(tr("Name not title case: '%1'")).arg(*name),
+        tr("Generally the library element name should be written in title case "
+           "(for consistency). As the current name has words starting with a "
+           "lowercase character, it seems that it is not title cases. If this "
+           "assumption is wrong, just ignore this message.")),
+    mName(name) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
+MsgNameNotTitleCase::~MsgNameNotTitleCase() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Static Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
+bool MsgNameNotTitleCase::isTitleCase(const ElementName& name) noexcept {
+  bool lastCharWasSpace = true;
+  foreach (const QChar& c, *name) {
+    if (lastCharWasSpace && c.isLetter() && c.isLower()) {
+      return false;
+    }
+    lastCharWasSpace = c.isSpace();
+  }
+  return true;
 }
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+ElementName MsgNameNotTitleCase::getFixedName(
+    const ElementName& name) noexcept {
+  QString newName;
+  bool    lastCharWasSpace = true;
+  foreach (QChar c, *name) {
+    if (lastCharWasSpace && c.isLetter() && c.isLower()) {
+      c = c.toUpper();
+    }
+    newName.append(c);
+    lastCharWasSpace = c.isSpace();
+  }
+  try {
+    return ElementName(newName);  // Could throw, but should really not!
+  } catch (const Exception& e) {
+    qCritical() << "Could not fixup invalid name:" << e.getMsg();
+    return name;
+  }
 }
 
 /*******************************************************************************

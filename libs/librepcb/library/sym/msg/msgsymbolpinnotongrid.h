@@ -17,65 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_MSGSYMBOLPINNOTONGRID_H
+#define LIBREPCB_LIBRARY_MSGSYMBOLPINNOTONGRID_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
-
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
+class SymbolPin;
 
 /*******************************************************************************
- *  General Methods
+ *  Class MsgSymbolPinNotOnGrid
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
+/**
+ * @brief The MsgSymbolPinNotOnGrid class
+ */
+class MsgSymbolPinNotOnGrid final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgSymbolPinNotOnGrid)
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
+public:
+  // Constructors / Destructor
+  MsgSymbolPinNotOnGrid() = delete;
+  MsgSymbolPinNotOnGrid(std::shared_ptr<const SymbolPin> pin,
+                        const PositiveLength&            gridInterval) noexcept;
+  MsgSymbolPinNotOnGrid(const MsgSymbolPinNotOnGrid& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mPin(other.mPin),
+      mGridInterval(other.mGridInterval) {}
+  virtual ~MsgSymbolPinNotOnGrid() noexcept;
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+  // Getters
+  const std::shared_ptr<const SymbolPin>& getPin() const noexcept {
+    return mPin;
+  }
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
+  }
+
+private:
+  std::shared_ptr<const SymbolPin> mPin;
+  PositiveLength                   mGridInterval;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +77,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGSYMBOLPINNOTONGRID_H

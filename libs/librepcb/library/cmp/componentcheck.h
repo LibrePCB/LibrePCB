@@ -17,65 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_COMPONENTCHECK_H
+#define LIBREPCB_LIBRARY_COMPONENTCHECK_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
-
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include "libraryelementcheck.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
-
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
+class Component;
 
 /*******************************************************************************
- *  General Methods
+ *  Class ComponentCheck
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
+/**
+ * @brief The ComponentCheck class
+ */
+class ComponentCheck : public LibraryElementCheck {
+public:
+  // Constructors / Destructor
+  ComponentCheck()                            = delete;
+  ComponentCheck(const ComponentCheck& other) = delete;
+  explicit ComponentCheck(const Component& component) noexcept;
+  virtual ~ComponentCheck() noexcept;
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
+  // General Methods
+  virtual LibraryElementCheckMessageList runChecks() const override;
 
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+  // Operator Overloadings
+  ComponentCheck& operator=(const ComponentCheck& rhs) = delete;
+
+protected:  // Methods
+  void checkMissingPrefix(MsgList& msgs) const;
+  void checkMissingDefaultValue(MsgList& msgs) const;
+  void checkDuplicateSignalNames(MsgList& msgs) const;
+  void checkMissingSymbolVariants(MsgList& msgs) const;
+  void checkMissingSymbolVariantItems(MsgList& msgs) const;
+
+private:  // Data
+  const Component& mComponent;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +73,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_COMPONENTCHECK_H

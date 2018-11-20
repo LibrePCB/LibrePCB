@@ -17,65 +17,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_MSGNAMENOTTITLECASE_H
+#define LIBREPCB_LIBRARY_MSGNAMENOTTITLECASE_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "libraryelementcheckmessage.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/elementname.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace library {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class MsgNameNotTitleCase
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
-}
+/**
+ * @brief The MsgNameNotTitleCase class
+ */
+class MsgNameNotTitleCase final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgNameNotTitleCase)
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
+public:
+  // Constructors / Destructor
+  MsgNameNotTitleCase() = delete;
+  explicit MsgNameNotTitleCase(const ElementName& name) noexcept;
+  MsgNameNotTitleCase(const MsgNameNotTitleCase& other) noexcept
+    : LibraryElementCheckMessage(other), mName(other.mName) {}
+  virtual ~MsgNameNotTitleCase() noexcept;
 
-  cleanupAfterLoadingElementFromFile();
-}
+  const ElementName& getName() const noexcept { return mName; }
+  ElementName getFixedName() const noexcept { return getFixedName(mName); }
 
-Package::~Package() noexcept {
-}
+  static bool        isTitleCase(const ElementName& name) noexcept;
+  static ElementName getFixedName(const ElementName& name) noexcept;
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
-}
+private:
+  ElementName mName;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +69,5 @@ void Package::serialize(SExpression& root) const {
 
 }  // namespace library
 }  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGNAMENOTTITLECASE_H

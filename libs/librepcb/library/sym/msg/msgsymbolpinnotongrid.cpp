@@ -20,13 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "package.h"
+#include "msgsymbolpinnotongrid.h"
 
-#include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-
-#include <QtCore>
+#include "../symbolpin.h"
 
 /*******************************************************************************
  *  Namespace
@@ -38,43 +34,21 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Package::Package(const Uuid& uuid, const Version& version,
-                 const QString& author, const ElementName& name_en_US,
-                 const QString& description_en_US,
-                 const QString& keywords_en_US)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
+    std::shared_ptr<const SymbolPin> pin,
+    const PositiveLength&            gridInterval) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        QString(tr("Pin not on %1mm grid: '%2'"))
+            .arg(gridInterval->toMmString(), *pin->getName()),
+        QString(tr("Every pin must be placed exactly on the %1mm grid, "
+                   "otherwise it cannot be connected in the schematic editor."))
+            .arg(gridInterval->toMmString())),
+    mPin(pin),
+    mGridInterval(gridInterval) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
-
-  cleanupAfterLoadingElementFromFile();
-}
-
-Package::~Package() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-LibraryElementCheckMessageList Package::runChecks() const {
-  PackageCheck check(*this);
-  return check.runChecks();  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Package::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  mPads.serialize(root);
-  mFootprints.serialize(root);
+MsgSymbolPinNotOnGrid::~MsgSymbolPinNotOnGrid() noexcept {
 }
 
 /*******************************************************************************
