@@ -222,6 +222,7 @@ public:
   std::shared_ptr<const T> value(int index) const noexcept {
     return std::const_pointer_cast<const T>(mObjects.value(index));
   }
+  std::shared_ptr<T> find(const T* obj) noexcept { return value(indexOf(obj)); }
   std::shared_ptr<T> find(const Uuid& key) noexcept {
     return value(indexOf(key));
   }
@@ -243,7 +244,12 @@ public:
   std::shared_ptr<const T> first() const noexcept { return mObjects.first(); }
   std::shared_ptr<T>&      last() noexcept { return mObjects.last(); }
   std::shared_ptr<const T> last() const noexcept { return mObjects.last(); }
-  std::shared_ptr<T>       get(const Uuid& key) {
+  std::shared_ptr<T>       get(const T* obj) {
+    std::shared_ptr<T> ptr = find(obj);
+    if (!ptr) throw LogicError(__FILE__, __LINE__);
+    return ptr;
+  }
+  std::shared_ptr<T> get(const Uuid& key) {
     std::shared_ptr<T> ptr = find(key);
     if (!ptr) throwKeyNotFoundException(key);
     return ptr;

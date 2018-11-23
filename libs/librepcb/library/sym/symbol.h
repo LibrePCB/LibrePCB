@@ -82,6 +82,7 @@ public:
   const TextList&      getTexts() const noexcept { return mTexts; }
 
   // General Methods
+  virtual LibraryElementCheckMessageList runChecks() const override;
   void registerGraphicsItem(SymbolGraphicsItem& item) noexcept;
   void unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept;
 

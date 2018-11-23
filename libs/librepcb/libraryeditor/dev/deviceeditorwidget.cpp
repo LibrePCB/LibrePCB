@@ -34,6 +34,9 @@
 #include <librepcb/library/dev/cmd/cmddeviceedit.h>
 #include <librepcb/library/dev/cmd/cmddevicepadsignalmapitemedit.h>
 #include <librepcb/library/dev/device.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgmissingcategories.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
 #include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
 #include <librepcb/library/pkg/package.h>
 #include <librepcb/library/sym/symbol.h>
@@ -59,6 +62,8 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
                                        const FilePath& fp, QWidget* parent)
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::DeviceEditorWidget) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
+  setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/device.png"));
 
   // Show graphics scenes.
@@ -393,6 +398,51 @@ bool DeviceEditorWidget::isInterfaceBroken() const noexcept {
   if (mDevice->getComponentUuid() != mOriginalComponentUuid) return true;
   if (mDevice->getPackageUuid() != mOriginalPackageUuid) return true;
   if (mDevice->getPadSignalMap() != mOriginalPadSignalMap) return true;
+  return false;
+}
+
+bool DeviceEditorWidget::runChecks(LibraryElementCheckMessageList& msgs) const {
+  msgs = mDevice->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void DeviceEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void DeviceEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <>
+void DeviceEditorWidget::fixMsg(const MsgMissingCategories& msg) {
+  Q_UNUSED(msg);
+  mCategoriesEditorWidget->openAddCategoryDialog();
+}
+
+template <typename MessageType>
+bool DeviceEditorWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool DeviceEditorWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
   return false;
 }
 

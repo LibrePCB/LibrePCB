@@ -28,6 +28,11 @@
 #include <librepcb/common/widgets/signalrolecombobox.h>
 #include <librepcb/library/cmp/cmd/cmdcomponentedit.h>
 #include <librepcb/library/cmp/component.h>
+#include <librepcb/library/cmp/msg/msgmissingcomponentdefaultvalue.h>
+#include <librepcb/library/cmp/msg/msgmissingsymbolvariant.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgmissingcategories.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -48,6 +53,8 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
                                              QWidget*        parent)
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::ComponentEditorWidget) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
+  setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/component.png"));
 
   // Insert category list editor widget.
@@ -73,10 +80,6 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
   connect(mUi->cbxSchematicOnly, &QCheckBox::toggled, this,
           &ComponentEditorWidget::undoStackStateModified);
-
-  // Show "no categories selected" warning if no categories selected.
-  mUi->lblWarnAboutMissingCategory->setVisible(
-      mComponent->getCategories().isEmpty());
 
   // Reload metadata on undo stack state changes.
   connect(mUndoStack.data(), &UndoStack::stateModified, this,
@@ -150,8 +153,6 @@ void ComponentEditorWidget::updateMetadata() noexcept {
   mUi->edtVersion->setText(mComponent->getVersion().toStr());
   mUi->cbxDeprecated->setChecked(mComponent->isDeprecated());
   mCategoriesEditorWidget->setUuids(mComponent->getCategories());
-  mUi->lblWarnAboutMissingCategory->setVisible(
-      mCategoriesEditorWidget->getUuids().isEmpty());
   mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
   mUi->edtPrefix->setText(*mComponent->getPrefixes().getDefaultValue());
   mUi->edtDefaultValue->setPlainText(mComponent->getDefaultValue());
@@ -240,6 +241,79 @@ bool ComponentEditorWidget::isInterfaceBroken() const noexcept {
       }
     }
   }
+  return false;
+}
+
+bool ComponentEditorWidget::runChecks(
+    LibraryElementCheckMessageList& msgs) const {
+  msgs = mComponent->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void ComponentEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void ComponentEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <>
+void ComponentEditorWidget::fixMsg(const MsgMissingCategories& msg) {
+  Q_UNUSED(msg);
+  mCategoriesEditorWidget->openAddCategoryDialog();
+}
+
+template <>
+void ComponentEditorWidget::fixMsg(const MsgMissingComponentDefaultValue& msg) {
+  Q_UNUSED(msg);
+  // User has to answer the one-million-dollar question :-)
+  QString title = tr("Determine default value");
+  QString question =
+      tr("Is this rather a (manufacturer-)specific component than a generic "
+         "component?");
+  int answer = QMessageBox::question(this, title, question, QMessageBox::Cancel,
+                                     QMessageBox::Yes, QMessageBox::No);
+  if (answer == QMessageBox::Yes) {
+    mUi->edtDefaultValue->setPlainText("{{PARTNUMBER or DEVICE or COMPONENT}}");
+    commitMetadata();
+  } else if (answer == QMessageBox::No) {
+    mUi->edtDefaultValue->setPlainText("{{PARTNUMBER or DEVICE}}");
+    commitMetadata();
+  }
+}
+
+template <>
+void ComponentEditorWidget::fixMsg(const MsgMissingSymbolVariant& msg) {
+  Q_UNUSED(msg);
+  mUi->symbolVariantsEditorWidget->addDefaultSymbolVariant();
+}
+
+template <typename MessageType>
+bool ComponentEditorWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ComponentEditorWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingComponentDefaultValue>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingSymbolVariant>(msg, applyFix)) return true;
   return false;
 }
 

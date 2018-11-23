@@ -119,6 +119,15 @@ void ComponentSymbolVariantListWidget::setReferences(
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void ComponentSymbolVariantListWidget::addDefaultSymbolVariant() {
+  if (!allReferencesValid()) return;
+  addVariant("default", "", "");
+}
+
+/*******************************************************************************
  *  Private Slots
  ******************************************************************************/
 

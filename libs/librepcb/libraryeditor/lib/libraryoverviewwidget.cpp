@@ -29,6 +29,8 @@
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/library/cmd/cmdlibraryedit.h>
 #include <librepcb/library/elements.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
@@ -54,6 +56,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
     mLibrary(lib),
     mUi(new Ui::LibraryOverviewWidget) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
   connect(mUi->btnIcon, &QPushButton::clicked, this,
           &LibraryOverviewWidget::btnIconClicked);
   connect(mUi->lstCmpCat, &QListWidget::doubleClicked, this,
@@ -190,6 +193,45 @@ QString LibraryOverviewWidget::commitMetadata() noexcept {
     return e.getMsg();
   }
   return QString();
+}
+
+bool LibraryOverviewWidget::runChecks(
+    LibraryElementCheckMessageList& msgs) const {
+  msgs = mLibrary->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void LibraryOverviewWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void LibraryOverviewWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <typename MessageType>
+bool LibraryOverviewWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool LibraryOverviewWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  return false;
 }
 
 void LibraryOverviewWidget::updateElementLists() noexcept {

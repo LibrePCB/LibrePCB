@@ -74,6 +74,9 @@ public:
   void setRequiresMinimumOneEntry(bool v) noexcept;
   void setUuids(const QSet<Uuid>& uuids) noexcept;
 
+  // General Methods
+  void openAddCategoryDialog() noexcept { btnAddClicked(); }
+
   // Operator Overloadings
   CategoryListEditorWidgetBase& operator       =(
       const CategoryListEditorWidgetBase& rhs) = delete;

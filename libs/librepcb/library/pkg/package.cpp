@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "package.h"
 
+#include "packagecheck.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
@@ -54,6 +56,15 @@ Package::Package(const FilePath& elementDirectory, bool readOnly)
 }
 
 Package::~Package() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+LibraryElementCheckMessageList Package::runChecks() const {
+  PackageCheck check(*this);
+  return check.runChecks();  // can throw
 }
 
 /*******************************************************************************

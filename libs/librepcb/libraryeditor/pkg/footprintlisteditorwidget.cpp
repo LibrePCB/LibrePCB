@@ -87,6 +87,14 @@ void FootprintListEditorWidget::setReferences(FootprintList& list,
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void FootprintListEditorWidget::addDefaultFootprint() {
+  addFootprint(cleanElementName("default"));  // can throw
+}
+
+/*******************************************************************************
  *  Private Slots
  ******************************************************************************/
 

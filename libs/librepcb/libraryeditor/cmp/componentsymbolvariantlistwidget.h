@@ -77,6 +77,9 @@ public:
       UndoStack* undoStack, ComponentSymbolVariantList* variants,
       IF_ComponentSymbolVariantEditorProvider* editorProvider) noexcept;
 
+  // General Methods
+  void addDefaultSymbolVariant();
+
   // Operator Overloadings
   ComponentSymbolVariantListWidget& operator       =(
       const ComponentSymbolVariantListWidget& rhs) = delete;
