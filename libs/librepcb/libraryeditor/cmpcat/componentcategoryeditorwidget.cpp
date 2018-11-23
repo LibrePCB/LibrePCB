@@ -29,6 +29,8 @@
 #include <librepcb/library/cat/cmd/cmdlibrarycategoryedit.h>
 #include <librepcb/library/cat/componentcategory.h>
 #include <librepcb/library/cmd/cmdlibrarybaseelementedit.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -50,6 +52,7 @@ ComponentCategoryEditorWidget::ComponentCategoryEditorWidget(
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::ComponentCategoryEditorWidget) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
   setWindowIcon(QIcon(":/img/places/folder.png"));
   connect(mUi->btnChooseParentCategory, &QToolButton::clicked, this,
           &ComponentCategoryEditorWidget::btnChooseParentCategoryClicked);
@@ -150,6 +153,45 @@ QString ComponentCategoryEditorWidget::commitMetadata() noexcept {
     return e.getMsg();
   }
   return QString();
+}
+
+bool ComponentCategoryEditorWidget::runChecks(
+    LibraryElementCheckMessageList& msgs) const {
+  msgs = mCategory->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void ComponentCategoryEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void ComponentCategoryEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <typename MessageType>
+bool ComponentCategoryEditorWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ComponentCategoryEditorWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  return false;
 }
 
 void ComponentCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {

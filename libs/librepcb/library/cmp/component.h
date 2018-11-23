@@ -131,6 +131,9 @@ public:
   std::shared_ptr<const ComponentSymbolVariantItem> getSymbVarItem(
       const Uuid& symbVar, const Uuid& item) const;
 
+  // General Methods
+  virtual LibraryElementCheckMessageList runChecks() const override;
+
   // Operator Overloadings
   Component& operator=(const Component& rhs) = delete;
 

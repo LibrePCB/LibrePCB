@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../common/libraryelementchecklistwidget.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/undostack.h>
@@ -61,7 +63,8 @@ namespace editor {
  * @author ubruhin
  * @date 2016-10-17
  */
-class EditorWidgetBase : public QWidget {
+class EditorWidgetBase : public QWidget,
+                         protected IF_LibraryElementCheckHandler {
   Q_OBJECT
 
 public:
@@ -122,22 +125,38 @@ public slots:
 
 protected:  // Methods
   void         setupInterfaceBrokenWarningWidget(QWidget& widget) noexcept;
+  void         setupErrorNotificationWidget(QWidget& widget) noexcept;
   virtual bool isInterfaceBroken() const noexcept = 0;
   virtual bool toolChangeRequested(Tool newTool) noexcept {
     Q_UNUSED(newTool);
     return false;
   }
+  virtual bool       runChecks(LibraryElementCheckMessageList& msgs) const = 0;
   void               undoStackStateModified() noexcept;
   const QStringList& getLibLocaleOrder() const noexcept;
+  QString            getWorkspaceSettingsUserName() noexcept;
+
+private slots:
+  void updateCheckMessages() noexcept;
 
 private:  // Methods
-  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
-  void undoStackCleanChanged(bool clean) noexcept;
+  void         toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void         undoStackCleanChanged(bool clean) noexcept;
+  void         scheduleLibraryElementChecks() noexcept;
+  virtual bool processCheckMessage(
+      std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) = 0;
+  bool libraryElementCheckFixAvailable(
+      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
+  void libraryElementCheckFixRequested(
+      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
+  void libraryElementCheckDescriptionRequested(
+      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
 
 signals:
   void dirtyChanged(bool dirty);
   void elementEdited(const FilePath& fp);
   void interfaceBrokenChanged(bool broken);
+  void errorsAvailableChanged(bool hasErrors);
   void cursorPositionChanged(const Point& pos);
 
 protected:  // Data

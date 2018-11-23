@@ -28,6 +28,8 @@
 
 #include <librepcb/library/cat/cmd/cmdlibrarycategoryedit.h>
 #include <librepcb/library/cat/packagecategory.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -50,6 +52,7 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::PackageCategoryEditorWidget) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
   setWindowIcon(QIcon(":/img/places/folder_green.png"));
   connect(mUi->btnChooseParentCategory, &QToolButton::clicked, this,
           &PackageCategoryEditorWidget::btnChooseParentCategoryClicked);
@@ -150,6 +153,45 @@ QString PackageCategoryEditorWidget::commitMetadata() noexcept {
     return e.getMsg();
   }
   return QString();
+}
+
+bool PackageCategoryEditorWidget::runChecks(
+    LibraryElementCheckMessageList& msgs) const {
+  msgs = mCategory->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void PackageCategoryEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void PackageCategoryEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <typename MessageType>
+bool PackageCategoryEditorWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool PackageCategoryEditorWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  return false;
 }
 
 void PackageCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {

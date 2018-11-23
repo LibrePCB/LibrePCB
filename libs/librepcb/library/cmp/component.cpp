@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "component.h"
 
+#include "componentcheck.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
@@ -112,6 +114,15 @@ std::shared_ptr<ComponentSymbolVariantItem> Component::getSymbVarItem(
 std::shared_ptr<const ComponentSymbolVariantItem> Component::getSymbVarItem(
     const Uuid& symbVar, const Uuid& item) const {
   return mSymbolVariants.get(symbVar)->getSymbolItems().get(item);  // can throw
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+LibraryElementCheckMessageList Component::runChecks() const {
+  ComponentCheck check(*this);
+  return check.runChecks();  // can throw
 }
 
 /*******************************************************************************

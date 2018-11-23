@@ -83,7 +83,16 @@ private:  // Methods
   void    updateMetadata() noexcept;
   QString commitMetadata() noexcept;
   bool    isInterfaceBroken() const noexcept override { return false; }
-  void    updateElementLists() noexcept;
+  bool    runChecks(LibraryElementCheckMessageList& msgs) const override;
+  template <typename MessageType>
+  void fixMsg(const MessageType& msg);
+  template <typename MessageType>
+  bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
+                    bool                                              applyFix);
+  bool processCheckMessage(
+      std::shared_ptr<const LibraryElementCheckMessage> msg,
+      bool                                              applyFix) override;
+  void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
 

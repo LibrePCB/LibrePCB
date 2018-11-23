@@ -64,6 +64,9 @@ public:
   // Setters
   void setReferences(FootprintList& list, UndoStack& stack) noexcept;
 
+  // General Methods
+  void addDefaultFootprint();
+
   // Operator Overloadings
   FootprintListEditorWidget& operator=(const FootprintListEditorWidget& rhs) =
       delete;

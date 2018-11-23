@@ -66,6 +66,9 @@ public:
   // Setters: Attributes
   void setCategories(const QSet<Uuid>& uuids) noexcept { mCategories = uuids; }
 
+  // General Methods
+  virtual LibraryElementCheckMessageList runChecks() const override;
+
   // Operator Overloadings
   LibraryElement& operator=(const LibraryElement& rhs) = delete;
 

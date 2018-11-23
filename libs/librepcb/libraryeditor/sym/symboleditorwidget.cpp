@@ -26,6 +26,7 @@
 #include "ui_symboleditorwidget.h"
 
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
+#include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsscene.h>
@@ -33,6 +34,14 @@
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/library/cmd/cmdlibraryelementedit.h>
 #include <librepcb/library/cmp/cmpsigpindisplaytype.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgmissingcategories.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
+#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
+#include <librepcb/library/sym/msg/msgmissingsymbolname.h>
+#include <librepcb/library/sym/msg/msgmissingsymbolvalue.h>
+#include <librepcb/library/sym/msg/msgsymbolpinnotongrid.h>
+#include <librepcb/library/sym/msg/msgwrongsymboltextlayer.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -58,6 +67,8 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
     mUi(new Ui::SymbolEditorWidget),
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
+  setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().getAppearance().getUseOpenGl());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -334,6 +345,91 @@ bool SymbolEditorWidget::toolChangeRequested(Tool newTool) noexcept {
 
 bool SymbolEditorWidget::isInterfaceBroken() const noexcept {
   return mSymbol->getPins().getUuidSet() != mOriginalSymbolPinUuids;
+}
+
+bool SymbolEditorWidget::runChecks(LibraryElementCheckMessageList& msgs) const {
+  if ((mFsm->getCurrentTool() != NONE) && (mFsm->getCurrentTool() != SELECT)) {
+    // Do not run checks if a tool is active because it could lead to annoying,
+    // flickering messages. For example when placing pins, they always overlap
+    // right after placing them, so we have to wait until the user has moved the
+    // cursor to place the pin at a different position.
+    return false;
+  }
+  msgs = mSymbol->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgMissingCategories& msg) {
+  Q_UNUSED(msg);
+  mCategoriesEditorWidget->openAddCategoryDialog();
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgMissingSymbolName& msg) {
+  Q_UNUSED(msg);
+  mFsm->processStartAddingNames();
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgMissingSymbolValue& msg) {
+  Q_UNUSED(msg);
+  mFsm->processStartAddingValues();
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgWrongSymbolTextLayer& msg) {
+  std::shared_ptr<Text> text = mSymbol->getTexts().get(msg.getText().get());
+  QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(*text));
+  cmd->setLayerName(GraphicsLayerName(msg.getExpectedLayerName()), false);
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void SymbolEditorWidget::fixMsg(const MsgSymbolPinNotOnGrid& msg) {
+  std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
+  Point newPos = pin->getPosition().mappedToGrid(msg.getGridInterval());
+  QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(*pin));
+  cmd->setPosition(newPos, false);
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <typename MessageType>
+bool SymbolEditorWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool SymbolEditorWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingSymbolName>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingSymbolValue>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgWrongSymbolTextLayer>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgSymbolPinNotOnGrid>(msg, applyFix)) return true;
+  return false;
 }
 
 /*******************************************************************************

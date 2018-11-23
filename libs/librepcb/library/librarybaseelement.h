@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "./msg/libraryelementcheckmessage.h"
+
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include <librepcb/common/fileio/serializableobject.h>
@@ -101,8 +103,9 @@ public:
   }
 
   // General Methods
-  virtual void save();
-  virtual void saveTo(const FilePath& destination);
+  virtual LibraryElementCheckMessageList runChecks() const;
+  virtual void                           save();
+  virtual void                           saveTo(const FilePath& destination);
   virtual void saveIntoParentDirectory(const FilePath& parentDir);
   virtual void moveTo(const FilePath& destination);
   virtual void moveIntoParentDirectory(const FilePath& parentDir);

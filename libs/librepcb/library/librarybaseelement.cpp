@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "librarybaseelement.h"
 
+#include "librarybaseelementcheck.h"
+
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
@@ -174,6 +176,11 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+LibraryElementCheckMessageList LibraryBaseElement::runChecks() const {
+  LibraryBaseElementCheck check(*this);
+  return check.runChecks();  // can throw
+}
 
 void LibraryBaseElement::save() {
   if (mOpenedReadOnly) {

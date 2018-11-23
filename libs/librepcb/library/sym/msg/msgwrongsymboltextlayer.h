@@ -1,0 +1,76 @@
+/*
+ * LibrePCB - Professional EDA for everyone!
+ * Copyright (C) 2013 LibrePCB Developers, see AUTHORS.md for contributors.
+ * https://librepcb.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
+#define LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
+
+/*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include "../../msg/libraryelementcheckmessage.h"
+
+#include <QtCore>
+
+/*******************************************************************************
+ *  Namespace / Forward Declarations
+ ******************************************************************************/
+namespace librepcb {
+
+class Text;
+
+namespace library {
+
+/*******************************************************************************
+ *  Class MsgWrongSymbolTextLayer
+ ******************************************************************************/
+
+/**
+ * @brief The MsgWrongSymbolTextLayer class
+ */
+class MsgWrongSymbolTextLayer final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgWrongSymbolTextLayer)
+
+public:
+  // Constructors / Destructor
+  MsgWrongSymbolTextLayer() = delete;
+  MsgWrongSymbolTextLayer(std::shared_ptr<const Text> text,
+                          const QString& expectedLayerName) noexcept;
+  MsgWrongSymbolTextLayer(const MsgWrongSymbolTextLayer& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mText(other.mText),
+      mExpectedLayerName(other.mExpectedLayerName) {}
+  virtual ~MsgWrongSymbolTextLayer() noexcept;
+
+  // Getters
+  std::shared_ptr<const Text> getText() const noexcept { return mText; }
+  QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
+
+private:
+  std::shared_ptr<const Text> mText;
+  QString                     mExpectedLayerName;
+};
+
+/*******************************************************************************
+ *  End of File
+ ******************************************************************************/
+
+}  // namespace library
+}  // namespace librepcb
+
+#endif  // LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H

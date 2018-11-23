@@ -38,6 +38,16 @@
       </size>
      </property>
     </widget>
+  </item>
+  <item>
+    <widget class="QWidget" name="errorNotificationWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,0,1">
@@ -245,6 +255,33 @@
          </property>
         </widget>
        </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Messages:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="librepcb::library::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -261,6 +298,12 @@
    <class>librepcb::GraphicsView</class>
    <extends>QGraphicsView</extends>
    <header location="global">librepcb/common/graphics/graphicsview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::library::editor::LibraryElementCheckListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/libraryeditor/common/libraryelementchecklistwidget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>librepcb::library::editor::PackagePadListEditorWidget</class>

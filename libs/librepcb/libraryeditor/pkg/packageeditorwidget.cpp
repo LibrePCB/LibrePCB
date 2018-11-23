@@ -26,10 +26,18 @@
 #include "ui_packageeditorwidget.h"
 
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
+#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/library/cmd/cmdlibraryelementedit.h>
+#include <librepcb/library/msg/msgmissingauthor.h>
+#include <librepcb/library/msg/msgmissingcategories.h>
+#include <librepcb/library/msg/msgnamenottitlecase.h>
+#include <librepcb/library/pkg/msg/msgmissingfootprint.h>
+#include <librepcb/library/pkg/msg/msgmissingfootprintname.h>
+#include <librepcb/library/pkg/msg/msgmissingfootprintvalue.h>
+#include <librepcb/library/pkg/msg/msgwrongfootprinttextlayer.h>
 #include <librepcb/library/pkg/package.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
@@ -54,6 +62,8 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
     mUi(new Ui::PackageEditorWidget),
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
+  mUi->lstMessages->setHandler(this);
+  setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().getAppearance().getUseOpenGl());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -370,6 +380,92 @@ bool PackageEditorWidget::isInterfaceBroken() const noexcept {
     if (current->getPads().getUuidSet() != original.getPads().getUuidSet())
       return true;
   }
+  return false;
+}
+
+bool PackageEditorWidget::runChecks(
+    LibraryElementCheckMessageList& msgs) const {
+  if ((mFsm->getCurrentTool() != NONE) && (mFsm->getCurrentTool() != SELECT)) {
+    // Do not run checks if a tool is active because it could lead to annoying,
+    // flickering messages. For example when placing pads, they always overlap
+    // right after placing them, so we have to wait until the user has moved the
+    // cursor to place the pad at a different position.
+    return false;
+  }
+  msgs = mPackage->runChecks();  // can throw
+  mUi->lstMessages->setMessages(msgs);
+  return true;
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
+  mUi->edtName->setText(*msg.getFixedName());
+  commitMetadata();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
+  Q_UNUSED(msg);
+  mUi->edtAuthor->setText(getWorkspaceSettingsUserName());
+  commitMetadata();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingCategories& msg) {
+  Q_UNUSED(msg);
+  mCategoriesEditorWidget->openAddCategoryDialog();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingFootprint& msg) {
+  Q_UNUSED(msg);
+  mUi->footprintEditorWidget->addDefaultFootprint();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingFootprintName& msg) {
+  Q_UNUSED(msg);
+  mFsm->processStartAddingNames();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingFootprintValue& msg) {
+  Q_UNUSED(msg);
+  mFsm->processStartAddingValues();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgWrongFootprintTextLayer& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<StrokeText> text =
+      footprint->getStrokeTexts().get(msg.getText().get());
+  QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*text));
+  cmd->setLayerName(GraphicsLayerName(msg.getExpectedLayerName()), false);
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <typename MessageType>
+bool PackageEditorWidget::fixMsgHelper(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (applyFix) fixMsg(*m);  // can throw
+      return true;
+    }
+  }
+  return false;
+}
+
+bool PackageEditorWidget::processCheckMessage(
+    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingFootprint>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingFootprintName>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingFootprintValue>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
   return false;
 }
 

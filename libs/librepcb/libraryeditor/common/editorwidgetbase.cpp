@@ -58,6 +58,9 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
           &EditorWidgetBase::undoStackStateModified);
 
   mCommandToolBarProxy.reset(new ToolBarProxy());
+
+  // Run checks, but delay it because the subclass is not loaded yet!
+  scheduleLibraryElementChecks();
 }
 
 EditorWidgetBase::~EditorWidgetBase() noexcept {
@@ -140,6 +143,26 @@ void EditorWidgetBase::setupInterfaceBrokenWarningWidget(
           &QWidget::setVisible);
 }
 
+void EditorWidgetBase::setupErrorNotificationWidget(QWidget& widget) noexcept {
+  widget.setVisible(false);
+  widget.setStyleSheet(
+      "background-color: rgb(255, 255, 127); "
+      "color: rgb(170, 0, 0);");
+  QLabel* label = new QLabel(&widget);
+  QFont   font  = label->font();
+  font.setBold(true);
+  label->setFont(font);
+  label->setWordWrap(true);
+  label->setText(
+      tr("WARNING: This library element contains errors, see exact messages "
+         "below. You should fix these errors before saving it, otherwise the "
+         "library element may not work as expected."));
+  QHBoxLayout* layout = new QHBoxLayout(&widget);
+  layout->addWidget(label);
+  connect(this, &EditorWidgetBase::errorsAvailableChanged, &widget,
+          &QWidget::setVisible);
+}
+
 void EditorWidgetBase::undoStackStateModified() noexcept {
   if (!mContext.elementIsNewlyCreated) {
     bool broken = isInterfaceBroken();
@@ -148,10 +171,22 @@ void EditorWidgetBase::undoStackStateModified() noexcept {
       emit interfaceBrokenChanged(mIsInterfaceBroken);
     }
   }
+  scheduleLibraryElementChecks();
 }
 
 const QStringList& EditorWidgetBase::getLibLocaleOrder() const noexcept {
   return mContext.workspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+}
+
+QString EditorWidgetBase::getWorkspaceSettingsUserName() noexcept {
+  QString u = mContext.workspace.getSettings().getUser().getName().trimmed();
+  if (u.isEmpty()) {
+    QMessageBox::warning(
+        this, tr("User name not set"),
+        tr("No user name defined in workspace settings. Please open "
+           "workspace settings to set the default user name."));
+  }
+  return u;
 }
 
 /*******************************************************************************
@@ -166,6 +201,66 @@ void EditorWidgetBase::toolActionGroupChangeTriggered(
 void EditorWidgetBase::undoStackCleanChanged(bool clean) noexcept {
   Q_UNUSED(clean);
   emit dirtyChanged(isDirty());
+}
+
+void EditorWidgetBase::scheduleLibraryElementChecks() noexcept {
+  // Don't run check immediately when requested. Sometimes when the undo stack
+  // reports changes, it's just in the middle of a bigger change, so the whole
+  // change is not done yet. In that case, running checks would lead to wrong
+  // results. Instead, just delay checks for some time to get more stable
+  // messages. But also don't wait too long, otherwise it would feel like a
+  // lagging user interface.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+  QTimer::singleShot(50, this, &EditorWidgetBase::updateCheckMessages);
+#else
+  QTimer::singleShot(50, this, SLOT(updateCheckMessages()));
+#endif
+}
+
+void EditorWidgetBase::updateCheckMessages() noexcept {
+  try {
+    LibraryElementCheckMessageList msgs;
+    if (runChecks(msgs)) {  // can throw
+      int errors = 0;
+      foreach (const auto& msg, msgs) {
+        if (msg->getSeverity() == LibraryElementCheckMessage::Severity::Error) {
+          ++errors;
+        }
+      }
+      emit errorsAvailableChanged(errors > 0);
+    } else {
+      // Failed to run checks (for example because a command is active), try it
+      // later again.
+      scheduleLibraryElementChecks();
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to run checks:" << e.getMsg();
+  }
+}
+
+bool EditorWidgetBase::libraryElementCheckFixAvailable(
+    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+  try {
+    return processCheckMessage(msg, false);  // can throw, but should really not
+  } catch (const Exception&) {
+    return false;
+  }
+}
+
+void EditorWidgetBase::libraryElementCheckFixRequested(
+    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+  try {
+    processCheckMessage(msg, true);  // can throw
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void EditorWidgetBase::libraryElementCheckDescriptionRequested(
+    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+  if (msg) {
+    QMessageBox::information(this, msg->getMessage(), msg->getDescription());
+  }
 }
 
 /*******************************************************************************

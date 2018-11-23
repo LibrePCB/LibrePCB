@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "libraryelement.h"
 
+#include "libraryelementcheck.h"
+
 #include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/toolbox.h>
 
@@ -60,6 +62,15 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory,
 }
 
 LibraryElement::~LibraryElement() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+LibraryElementCheckMessageList LibraryElement::runChecks() const {
+  LibraryElementCheck check(*this);
+  return check.runChecks();  // can throw
 }
 
 /*******************************************************************************
