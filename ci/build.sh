@@ -109,7 +109,7 @@ then
     TARGET="windows-x86"
     EXECUTABLE_EXT="exe"
   fi
-  ./dist/installer/update_metadata.sh "$TARGET" "0.1.0-2"  # TODO: How to determine version number?
+  ./dist/installer/update_metadata.sh "$TARGET" "0.1.0-3"  # TODO: How to determine version number?
   PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
   mkdir -p $PACKAGES_DIR/librepcb.stable.app/data/stable
   cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
