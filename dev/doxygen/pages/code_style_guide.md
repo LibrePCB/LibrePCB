@@ -18,6 +18,9 @@ This page describes the code style guide for LibrePCB developers.
   script `./dev/format_code.sh` to format all files which are modified compared
   to the `master` branch (this avoids formatting of files other than the ones
   you modified).
+- If your operating system does not ship clang-format version 6, you can also
+  run the formatter in a Docker container by using the `./dev/format_code.sh
+  --docker` command.
 
 
 # General {#doc_code_style_guide_general}
