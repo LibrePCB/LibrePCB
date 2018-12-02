@@ -534,8 +534,12 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mCurrentEditorWidget->setCommandToolBar(mUi->commandToolbar);
     hasGraphicalEditor = mCurrentEditorWidget->hasGraphicalEditor();
   }
-  mUi->editToolbar->setEnabled(hasGraphicalEditor);
-  mUi->viewToolbar->setEnabled(hasGraphicalEditor);
+  foreach (QAction* action, mUi->editToolbar->actions()) {
+    action->setEnabled(hasGraphicalEditor);
+  }
+  foreach (QAction* action, mUi->viewToolbar->actions()) {
+    action->setEnabled(hasGraphicalEditor);
+  }
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
   mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
 }
