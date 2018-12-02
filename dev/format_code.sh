@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 # Formats all files which differ from their state on the master branch with
 # clang-format.
@@ -6,8 +7,28 @@
 # Usage:
 #   - Make sure the executables "clang-format" and "git" are available in PATH.
 #   - Run the command "./dev/format_code.sh" in the root of the repository.
+#   - To run clang-format in a docker-container, use the "--docker" parameter.
 
 echo "Formatting modified files with clang-format..."
+
+DOCKER_IMAGE=librepcb/clang-format:6
+if [ "$1" == "--docker" ]; then
+  if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
+    echo "Building clang-format container..."
+    cd clang-format
+    docker build . -t librepcb/clang-format:6
+    cd ..
+  fi
+
+  echo "[Re-running format_code.sh inside Docker container]"
+  docker run --rm -t -i \
+    -v "$(git rev-parse --show-toplevel):/code" \
+    $DOCKER_IMAGE \
+    /bin/bash -c "cd /code && dev/format_code.sh"
+
+  echo "[Docker done.]"
+  exit 0
+fi
 
 COUNTER=0
 
