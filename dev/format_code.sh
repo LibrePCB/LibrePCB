@@ -11,18 +11,20 @@ set -eo pipefail
 
 echo "Formatting modified files with clang-format..."
 
-DOCKER_IMAGE=librepcb/clang-format:6
 if [ "$1" == "--docker" ]; then
+  DOCKER_IMAGE=librepcb/clang-format:6
+  REPO_ROOT=$(git rev-parse --show-toplevel)
+
   if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building clang-format container..."
-    cd clang-format
+    cd "$REPO_ROOT/dev/clang-format"
     docker build . -t librepcb/clang-format:6
-    cd ..
+    cd -
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
   docker run --rm -t -i \
-    -v "$(git rev-parse --show-toplevel):/code" \
+    -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
     /bin/bash -c "cd /code && dev/format_code.sh"
 
