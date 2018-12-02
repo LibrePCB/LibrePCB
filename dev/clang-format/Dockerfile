@@ -1,10 +1,4 @@
-# Usage:
-#
-#   $ docker build . -t librepcb/clang-format:6
-#
-# Then from the main directory:
-#
-#   $ docker run --rm -t -i -v $(pwd):/code librepcb/clang-format:6 /bin/bash -c "cd /code && dev/format_code.sh"
+# Container with clang-format 6. Used in the `dev/format_code.sh` script.
 
 FROM ubuntu:bionic
 
