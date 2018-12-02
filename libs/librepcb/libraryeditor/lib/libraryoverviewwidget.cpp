@@ -106,6 +106,20 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
   connect(mDependenciesEditorWidget.data(), &LibraryListEditorWidget::edited,
           this, &LibraryOverviewWidget::commitMetadata);
 
+  // Set up context menu triggers
+  connect(mUi->lstCmpCat, &QListWidget::customContextMenuRequested, this,
+          &LibraryOverviewWidget::openContextMenuAtPos);
+  connect(mUi->lstSym, &QListWidget::customContextMenuRequested, this,
+          &LibraryOverviewWidget::openContextMenuAtPos);
+  connect(mUi->lstCmp, &QListWidget::customContextMenuRequested, this,
+          &LibraryOverviewWidget::openContextMenuAtPos);
+  connect(mUi->lstPkgCat, &QListWidget::customContextMenuRequested, this,
+          &LibraryOverviewWidget::openContextMenuAtPos);
+  connect(mUi->lstPkg, &QListWidget::customContextMenuRequested, this,
+          &LibraryOverviewWidget::openContextMenuAtPos);
+  connect(mUi->lstDev, &QListWidget::customContextMenuRequested, this,
+          &LibraryOverviewWidget::openContextMenuAtPos);
+
   // Load all library elements.
   updateElementLists();
   connect(&mContext.workspace.getLibraryDb(),
@@ -293,6 +307,72 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
     item->setToolTip(name);
     item->setData(Qt::UserRole, fp.toStr());
     item->setIcon(icon);
+  }
+}
+
+void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
+  // Get selected item (may be null)
+  QListWidget* list = dynamic_cast<QListWidget*>(sender());
+  Q_ASSERT(list);
+  QListWidgetItem* selectedItem = list->itemAt(pos);
+
+  // Get item text and validated file path
+  QString itemName = selectedItem ? selectedItem->text() : QString();
+  tl::optional<FilePath> itemPath = tl::nullopt;
+  if (selectedItem) {
+    FilePath fp = FilePath(selectedItem->data(Qt::UserRole).toString());
+    if (fp.isValid()) {
+      itemPath = tl::make_optional(fp);
+    } else {
+      qWarning() << "File path for selected item is not valid";
+    }
+  }
+
+  // Build the context menu
+  QMenu    menu;
+  QAction* aRemove =
+      menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
+  aRemove->setEnabled(selectedItem && itemPath.has_value());
+
+  // Show context menu, handle action
+  QAction* action = menu.exec(QCursor::pos());
+  if (action == aRemove) {
+    Q_ASSERT(selectedItem);
+    Q_ASSERT(itemPath.has_value());
+    if (removeSelectedItem(itemName, *itemPath)) {
+      delete selectedItem;
+    };
+  }
+}
+
+bool LibraryOverviewWidget::removeSelectedItem(
+    const QString& itemName, const FilePath& itemPath) noexcept {
+  int ret = QMessageBox::warning(
+      this, tr("Remove %1").arg(itemName),
+      QString(tr("WARNING: Library elements must normally NOT be removed "
+                 "because this will break "
+                 "other elements which depend on this one! They should be just "
+                 "marked as "
+                 "deprecated instead.\n\nAre you still sure to delete the "
+                 "whole library element "
+                 "\"%1\"?\n\nThis cannot be undone!"))
+          .arg(itemName),
+      QMessageBox::Yes, QMessageBox::Cancel);
+  if (ret == QMessageBox::Yes) {
+    try {
+      // Emit signal so that the library editor can close any tabs that have
+      // opened this item
+      emit removeElementTriggered(itemPath);
+      FileUtils::removeDirRecursively(itemPath);
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Error"), e.getMsg());
+      mContext.workspace.getLibraryDb().startLibraryRescan();
+      return false;
+    }
+    mContext.workspace.getLibraryDb().startLibraryRescan();
+    return true;
+  } else {
+    return false;
   }
 }
 

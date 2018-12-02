@@ -71,8 +71,6 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::newElementTriggered);
   connect(mUi->actionSave, &QAction::triggered, this,
           &LibraryEditor::saveTriggered);
-  connect(mUi->actionRemoveElement, &QAction::triggered, this,
-          &LibraryEditor::removeElementTriggered);
   connect(mUi->actionShowElementInFileManager, &QAction::triggered, this,
           &LibraryEditor::showElementInFileExplorerTriggered);
   connect(mUi->actionUpdateLibraryDb, &QAction::triggered,
@@ -100,8 +98,9 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::tabCloseRequested);
   connect(mUi->actionOpenWebsite, &QAction::triggered,
           []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
-  connect(mUi->actionOnlineDocumentation, &QAction::triggered,
-          []() { QDesktopServices::openUrl(QUrl("https://docs.librepcb.org")); });
+  connect(mUi->actionOnlineDocumentation, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
+  });
   connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
   connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
@@ -245,6 +244,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::updateTabTitles);
   connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
           &LibraryEditor::updateTabTitles);
+
+  // Edit element signals
   connect(overviewWidget,
           &LibraryOverviewWidget::editComponentCategoryTriggered, this,
           &LibraryEditor::editComponentCategoryTriggered);
@@ -258,6 +259,9 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::editComponentTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editDeviceTriggered, this,
           &LibraryEditor::editDeviceTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::removeElementTriggered, this,
+          &LibraryEditor::closeTabIfOpen);
+
   mUi->tabWidget->addTab(overviewWidget, overviewWidget->windowIcon(),
                          overviewWidget->windowTitle());
   setActiveEditorWidget(overviewWidget);
@@ -314,6 +318,23 @@ bool LibraryEditor::closeAndDestroy(bool askForSave) noexcept {
 }
 
 /*******************************************************************************
+ *  Public Slots
+ ******************************************************************************/
+
+void LibraryEditor::closeTabIfOpen(const FilePath& fp) noexcept {
+  for (int i = 0; i < mUi->tabWidget->count(); i++) {
+    EditorWidgetBase* widget =
+        dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(i));
+    if (widget && (widget->getFilePath() == fp)) {
+      QWidget* widget = mUi->tabWidget->widget(i);
+      mUi->tabWidget->removeTab(i);
+      delete widget;
+      return;
+    }
+  }
+}
+
+/*******************************************************************************
  *  GUI Event Handlers
  ******************************************************************************/
 
@@ -351,34 +372,6 @@ void LibraryEditor::newElementTriggered() noexcept {
 
 void LibraryEditor::saveTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->save();
-}
-
-void LibraryEditor::removeElementTriggered() noexcept {
-  if (!mCurrentEditorWidget) return;
-  if (dynamic_cast<LibraryOverviewWidget*>(mCurrentEditorWidget)) return;
-  int ret = QMessageBox::warning(
-      this, tr("Remove library element"),
-      QString(tr("WARNING: Library elements must normally NOT be removed "
-                 "because this will break "
-                 "other elements which depend on this one! They should be just "
-                 "marked as "
-                 "deprecated instead.\n\nAre you still sure to delete the "
-                 "whole library element "
-                 "\"%1\"?\n\nThis cannot be undone!"))
-          .arg(mCurrentEditorWidget->windowTitle()),
-      QMessageBox::Yes, QMessageBox::Cancel);
-  if (ret == QMessageBox::Yes) {
-    FilePath elementDir = mCurrentEditorWidget->getFilePath();
-    mUi->tabWidget->removeTab(mUi->tabWidget->currentIndex());
-    setActiveEditorWidget(nullptr);
-    delete mCurrentEditorWidget;
-    try {
-      FileUtils::removeDirRecursively(elementDir);
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Error"), e.getMsg());
-    }
-    mWorkspace.getLibraryDb().startLibraryRescan();
-  }
 }
 
 void LibraryEditor::showElementInFileExplorerTriggered() noexcept {
