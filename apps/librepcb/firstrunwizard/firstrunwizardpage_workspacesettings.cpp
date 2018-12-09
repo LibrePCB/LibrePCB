@@ -40,7 +40,7 @@ namespace application {
  ******************************************************************************/
 
 FirstRunWizardPage_WorkspaceSettings::FirstRunWizardPage_WorkspaceSettings(
-    QWidget *parent) noexcept
+    QWidget* parent) noexcept
   : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_WorkspaceSettings) {
   mUi->setupUi(this);
   registerField("NewWorkspaceUserName", mUi->edtUserName);

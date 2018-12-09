@@ -31,38 +31,38 @@ namespace librepcb {
  *  Public Methods
  ******************************************************************************/
 
-QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption,
-                                    const QString &dir, const QString &filter,
-                                    QString *            selectedFilter,
+QString FileDialog::getOpenFileName(QWidget* parent, const QString& caption,
+                                    const QString& dir, const QString& filter,
+                                    QString*             selectedFilter,
                                     QFileDialog::Options options) {
   patchOptions(options);
   return QFileDialog::getOpenFileName(parent, caption, dir, filter,
                                       selectedFilter, options);
 }
 
-QStringList FileDialog::getOpenFileNames(QWidget *            parent,
-                                         const QString &      caption,
-                                         const QString &      dir,
-                                         const QString &      filter,
-                                         QString *            selectedFilter,
+QStringList FileDialog::getOpenFileNames(QWidget*             parent,
+                                         const QString&       caption,
+                                         const QString&       dir,
+                                         const QString&       filter,
+                                         QString*             selectedFilter,
                                          QFileDialog::Options options) {
   patchOptions(options);
   return QFileDialog::getOpenFileNames(parent, caption, dir, filter,
                                        selectedFilter, options);
 }
 
-QString FileDialog::getSaveFileName(QWidget *parent, const QString &caption,
-                                    const QString &dir, const QString &filter,
-                                    QString *            selectedFilter,
+QString FileDialog::getSaveFileName(QWidget* parent, const QString& caption,
+                                    const QString& dir, const QString& filter,
+                                    QString*             selectedFilter,
                                     QFileDialog::Options options) {
   patchOptions(options);
   return QFileDialog::getSaveFileName(parent, caption, dir, filter,
                                       selectedFilter, options);
 }
 
-QString FileDialog::getExistingDirectory(QWidget *            parent,
-                                         const QString &      caption,
-                                         const QString &      dir,
+QString FileDialog::getExistingDirectory(QWidget*             parent,
+                                         const QString&       caption,
+                                         const QString&       dir,
                                          QFileDialog::Options options) {
   patchOptions(options);
   return QFileDialog::getExistingDirectory(parent, caption, dir, options);
@@ -72,7 +72,7 @@ QString FileDialog::getExistingDirectory(QWidget *            parent,
  *  Private Methods
  ******************************************************************************/
 
-void FileDialog::patchOptions(QFileDialog::Options &options) noexcept {
+void FileDialog::patchOptions(QFileDialog::Options& options) noexcept {
   static const bool noNativeDialogs =
       qgetenv("LIBREPCB_DISABLE_NATIVE_DIALOGS") == "1";
   if (noNativeDialogs) {

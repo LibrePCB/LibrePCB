@@ -51,7 +51,7 @@ class FirstRunWizardPage_WorkspacePath final : public QWizardPage {
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizardPage_WorkspacePath(QWidget *parent = 0) noexcept;
+  explicit FirstRunWizardPage_WorkspacePath(QWidget* parent = 0) noexcept;
   ~FirstRunWizardPage_WorkspacePath() noexcept;
 
   // Inherited Methods

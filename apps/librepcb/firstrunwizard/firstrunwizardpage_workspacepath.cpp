@@ -39,7 +39,7 @@ namespace application {
  ******************************************************************************/
 
 FirstRunWizardPage_WorkspacePath::FirstRunWizardPage_WorkspacePath(
-    QWidget *parent) noexcept
+    QWidget* parent) noexcept
   : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_WorkspacePath) {
   mUi->setupUi(this);
   registerField("CreateWorkspace", mUi->rbtnCreateWs);

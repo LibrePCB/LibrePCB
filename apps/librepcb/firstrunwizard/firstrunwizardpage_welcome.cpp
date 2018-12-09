@@ -34,7 +34,7 @@ namespace application {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget *parent) noexcept
+FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget* parent) noexcept
   : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_Welcome) {
   mUi->setupUi(this);
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));

@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "ratio.h"
+
 #include "../toolbox.h"
 
 #include <QtCore>

@@ -21,12 +21,14 @@
  *  Includes
  ******************************************************************************/
 #include "length.h"
+
 #include "../toolbox.h"
+
+#include <type_traits>
 
 #include <QtCore>
 
 #include <limits>
-#include <type_traits>
 
 /*******************************************************************************
  *  Namespace
@@ -137,9 +139,9 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t  nanometers,
                                  const Length& gridInterval) noexcept {
   using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
 
-  LengthBaseU_t grid_interval = static_cast<LengthBaseU_t>(gridInterval.abs().mNanometers);
-  if (grid_interval == 0)
-    return nanometers;
+  LengthBaseU_t grid_interval =
+      static_cast<LengthBaseU_t>(gridInterval.abs().mNanometers);
+  if (grid_interval == 0) return nanometers;
 
   LengthBaseU_t nm_abs;
   LengthBaseU_t max;

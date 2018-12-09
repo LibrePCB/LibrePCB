@@ -39,7 +39,7 @@ namespace editor {
  ******************************************************************************/
 
 NewProjectWizardPage_VersionControl::NewProjectWizardPage_VersionControl(
-    QWidget *parent) noexcept
+    QWidget* parent) noexcept
   : QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_VersionControl) {
   mUi->setupUi(this);
   setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));

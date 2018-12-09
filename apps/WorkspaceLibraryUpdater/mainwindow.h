@@ -24,7 +24,7 @@ class MainWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = 0);
+  explicit MainWindow(QWidget* parent = 0);
   ~MainWindow();
 
 private slots:
@@ -36,10 +36,10 @@ private slots:
 
 private:
   template <typename ElementType>
-  void updateElements(const librepcb::library::Library &lib) noexcept;
+  void updateElements(const librepcb::library::Library& lib) noexcept;
 
   // Attributes
-  Ui::MainWindow *ui;
+  Ui::MainWindow* ui;
   QString         lastDir;
   int             elementCount;
   int             ignoreCount;
