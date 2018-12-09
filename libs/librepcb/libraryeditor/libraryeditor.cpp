@@ -298,7 +298,7 @@ bool LibraryEditor::closeAndDestroy(bool askForSave) noexcept {
   // close tabs
   for (int i = mUi->tabWidget->count() - 1; i >= 0; --i) {
     if (askForSave) {
-      if (!tabCloseRequested(i)) {
+      if (!closeTab(i)) {
         return false;
       }
     } else {
@@ -476,9 +476,28 @@ void LibraryEditor::currentTabChanged(int index) noexcept {
       dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(index)));
 }
 
-bool LibraryEditor::tabCloseRequested(int index) noexcept {
+void LibraryEditor::tabCloseRequested(int index) noexcept {
+  // Don't allow closing the overview widget
+  LibraryOverviewWidget* widget =
+      dynamic_cast<LibraryOverviewWidget*>(mUi->tabWidget->widget(index));
+  if (widget != nullptr) {
+    return;
+  }
+
+  closeTab(index);
+}
+
+bool LibraryEditor::closeTab(int index) noexcept {
+  // Get editor widget reference
   EditorWidgetBase* widget =
       dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(index));
+  if (widget == nullptr) {
+    qCritical()
+        << "Cannot close tab, widget is not an EditorWidgetBase subclass";
+    return false;
+  }
+
+  // Handle closing
   if (widget == mCurrentEditorWidget) {
     setActiveEditorWidget(nullptr);
   }
