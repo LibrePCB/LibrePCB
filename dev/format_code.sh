@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-# Formats files according our coding style with clang-format.
+# Formats files according our coding style with clang-format. And if Python is
+# available, *.pro project files will be sorted with sort_qmake_file_entries.py.
 #
 # Usage:
 #   - Make sure the executables "clang-format" and "git" are available in PATH.
@@ -26,9 +27,10 @@ done
 
 echo "Formatting files with clang-format..."
 
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
 if [ "$DOCKER" == "--docker" ]; then
   DOCKER_IMAGE=librepcb/clang-format:6
-  REPO_ROOT=$(git rev-parse --show-toplevel)
 
   if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building clang-format container..."
@@ -77,3 +79,8 @@ do
 done
 
 echo "Finished: $COUNTER files modified."
+
+# Also run sort_qmake_file_entries.py if Python is available
+if [ -x "$(command -v python)" ]; then
+  python "$REPO_ROOT/dev/sort_qmake_file_entries.py"
+fi
