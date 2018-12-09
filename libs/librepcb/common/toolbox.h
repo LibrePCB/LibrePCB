@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include "units/all_length_units.h"
 
+#include <type_traits>
+
 #include <QtCore>
 #include <QtWidgets>
-
-#include <type_traits>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -148,7 +148,6 @@ public:
                                       const QString& spaceReplacement = " ",
                                       int            maxLength = -1) noexcept;
 
-
   /**
    * @brief Convert a fixed point decimal number from an integer to a QString
    *
@@ -176,16 +175,13 @@ public:
       // pointPos must be > 0 for this to work correctly
       str.insert(str.length() - pointPos, '.');
     } else {
-      for (qint32 i = pointPos - str.length(); i != 0; i--)
-        str.insert(0, '0');
+      for (qint32 i = pointPos - str.length(); i != 0; i--) str.insert(0, '0');
       str.insert(0, "0.");
     }
 
-    while (str.endsWith('0') && !str.endsWith(".0"))
-      str.chop(1);
+    while (str.endsWith('0') && !str.endsWith(".0")) str.chop(1);
 
-    if (value < 0)
-      str.insert(0, '-');
+    if (value < 0) str.insert(0, '-');
 
     return str;
   }
@@ -198,7 +194,7 @@ public:
    *                 decimal digits, this function will throw
    */
   template <typename T>
-  static T decimalFixedPointFromString(const QString &str, qint32 pointPos) {
+  static T decimalFixedPointFromString(const QString& str, qint32 pointPos) {
     using UnsignedT = typename std::make_unsigned<T>::type;
 
     const T         min   = std::numeric_limits<T>::min();
@@ -216,14 +212,14 @@ public:
       EXP_AFTER_SIGN,
       EXP_DIGITS,
     };
-    State state = State::START;
-    UnsignedT valueAbs = 0;
-    bool sign = false;
-    qint32 expOffset = pointPos;
+    State     state     = State::START;
+    UnsignedT valueAbs  = 0;
+    bool      sign      = false;
+    qint32    expOffset = pointPos;
 
-    const quint32 maxExp = std::numeric_limits<quint32>::max();
-    quint32 exp = 0;
-    bool expSign = false;
+    const quint32 maxExp  = std::numeric_limits<quint32>::max();
+    quint32       exp     = 0;
+    bool          expSign = false;
 
     for (QChar c : str) {
       if (state == State::INVALID) {
@@ -231,53 +227,53 @@ public:
         break;
       }
       switch (state) {
-      case State::INVALID:
-        // already checked, but needed to avoid compiler warnings
-        break;
+        case State::INVALID:
+          // already checked, but needed to avoid compiler warnings
+          break;
 
-      case State::START:
-        if (c == '-') {
-          sign = true;
-          state = State::AFTER_SIGN;
-        } else if (c == '+') {
-          state = State::AFTER_SIGN;
-        } else if (c == '.') {
-          state = State::LONELY_DOT;
-        } else if (c.isDigit()) {
+        case State::START:
+          if (c == '-') {
+            sign  = true;
+            state = State::AFTER_SIGN;
+          } else if (c == '+') {
+            state = State::AFTER_SIGN;
+          } else if (c == '.') {
+            state = State::LONELY_DOT;
+          } else if (c.isDigit()) {
             valueAbs = static_cast<UnsignedT>(c.digitValue());
-            state = State::INT_PART;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+            state    = State::INT_PART;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::AFTER_SIGN:
-        if (c == '.') {
-          state = State::LONELY_DOT;
-        } else if (c.isDigit()) {
+        case State::AFTER_SIGN:
+          if (c == '.') {
+            state = State::LONELY_DOT;
+          } else if (c.isDigit()) {
             valueAbs = static_cast<UnsignedT>(c.digitValue());
-            state = State::INT_PART;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+            state    = State::INT_PART;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::LONELY_DOT:
-        if (c.isDigit()) {
+        case State::LONELY_DOT:
+          if (c.isDigit()) {
             valueAbs = static_cast<UnsignedT>(c.digitValue());
             expOffset -= 1;
             state = State::FRAC_PART;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::INT_PART:
-        if (c == '.') {
-          state = State::FRAC_PART;
-        } else if (c == 'e' || c == 'E') {
-          state = State::EXP;
-        } else if (c.isDigit()) {
+        case State::INT_PART:
+          if (c == '.') {
+            state = State::FRAC_PART;
+          } else if (c == 'e' || c == 'E') {
+            state = State::EXP;
+          } else if (c.isDigit()) {
             UnsignedT digit = static_cast<UnsignedT>(c.digitValue());
             if (valueAbs > (max_u / 10)) {
               // Would overflow
@@ -291,15 +287,15 @@ public:
               break;
             }
             valueAbs += digit;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::FRAC_PART:
-        if (c == 'e' || c == 'E') {
-          state = State::EXP;
-        } else if (c.isDigit()) {
+        case State::FRAC_PART:
+          if (c == 'e' || c == 'E') {
+            state = State::EXP;
+          } else if (c.isDigit()) {
             UnsignedT digit = static_cast<UnsignedT>(c.digitValue());
             if (valueAbs > (max_u / 10)) {
               // Would overflow
@@ -314,38 +310,38 @@ public:
             }
             valueAbs += digit;
             expOffset -= 1;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::EXP:
-        if (c == '-') {
-          expSign = true;
-          state = State::EXP_AFTER_SIGN;
-        } else if (c == '+') {
-          state = State::EXP_AFTER_SIGN;
-        } else if (c.isDigit()) {
-          exp = static_cast<quint32>(c.digitValue());
-          state = State::EXP_DIGITS;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+        case State::EXP:
+          if (c == '-') {
+            expSign = true;
+            state   = State::EXP_AFTER_SIGN;
+          } else if (c == '+') {
+            state = State::EXP_AFTER_SIGN;
+          } else if (c.isDigit()) {
+            exp   = static_cast<quint32>(c.digitValue());
+            state = State::EXP_DIGITS;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::EXP_AFTER_SIGN:
-        if (c.isDigit()) {
-          exp = static_cast<quint32>(c.digitValue());
-          state = State::EXP_DIGITS;
-        } else {
-          state = State::INVALID;
-        }
-        break;
+        case State::EXP_AFTER_SIGN:
+          if (c.isDigit()) {
+            exp   = static_cast<quint32>(c.digitValue());
+            state = State::EXP_DIGITS;
+          } else {
+            state = State::INVALID;
+          }
+          break;
 
-      case State::EXP_DIGITS:
-        if (c.isDigit()) {
-          quint32 digit = static_cast<quint32>(c.digitValue());
-          if (exp > (maxExp / 10)) {
+        case State::EXP_DIGITS:
+          if (c.isDigit()) {
+            quint32 digit = static_cast<quint32>(c.digitValue());
+            if (exp > (maxExp / 10)) {
               // Would overflow
               state = State::INVALID;
               break;
@@ -357,27 +353,27 @@ public:
               break;
             }
             exp += digit;
-        } else {
-          state = State::INVALID;
-        }
+          } else {
+            state = State::INVALID;
+          }
       }
     }
 
     bool ok = true;
     switch (state) {
-    case State::INVALID:
-    case State::START:
-    case State::AFTER_SIGN:
-    case State::LONELY_DOT:
-    case State::EXP:
-    case State::EXP_AFTER_SIGN:
-      ok = false;
-      break;
+      case State::INVALID:
+      case State::START:
+      case State::AFTER_SIGN:
+      case State::LONELY_DOT:
+      case State::EXP:
+      case State::EXP_AFTER_SIGN:
+        ok = false;
+        break;
 
-    case State::INT_PART:
-    case State::FRAC_PART:
-    case State::EXP_DIGITS:
-      break;
+      case State::INT_PART:
+      case State::FRAC_PART:
+      case State::EXP_DIGITS:
+        break;
     }
 
     if (ok) {

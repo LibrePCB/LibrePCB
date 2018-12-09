@@ -36,7 +36,7 @@ using namespace librepcb;
  *  The Unit Testing Program
  ******************************************************************************/
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // many classes rely on a QApplication instance, so we create it here
   Application app(argc, argv);
   Application::setOrganizationName("LibrePCB");
