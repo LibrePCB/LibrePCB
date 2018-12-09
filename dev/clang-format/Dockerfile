@@ -6,6 +6,7 @@ RUN apt-get -q update \
  && apt-get -qy install \
   clang-format-6.0 \
   git \
+  python \
  && apt-get clean
 
 RUN update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-6.0 50

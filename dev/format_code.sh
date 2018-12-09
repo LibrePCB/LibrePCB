@@ -1,19 +1,36 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-# Formats all files which differ from their state on the master branch with
-# clang-format.
+# Formats files according our coding style with clang-format. And if Python is
+# available, *.pro project files will be sorted with sort_qmake_file_entries.py.
 #
 # Usage:
 #   - Make sure the executables "clang-format" and "git" are available in PATH.
 #   - Run the command "./dev/format_code.sh" in the root of the repository.
 #   - To run clang-format in a docker-container, use the "--docker" parameter.
+#   - To format all files (instead of only modified ones), add the "--all"
+#     parameter. This is intended only for LibrePCB maintainers, don't use it!
 
-echo "Formatting modified files with clang-format..."
+for i in "$@"
+do
+case $i in
+    --docker)
+    DOCKER="--docker"
+    shift
+    ;;
+    --all)
+    ALL="--all"
+    shift
+    ;;
+esac
+done
 
-if [ "$1" == "--docker" ]; then
+echo "Formatting files with clang-format..."
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+if [ "$DOCKER" == "--docker" ]; then
   DOCKER_IMAGE=librepcb/clang-format:6
-  REPO_ROOT=$(git rev-parse --show-toplevel)
 
   if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building clang-format container..."
@@ -26,7 +43,7 @@ if [ "$1" == "--docker" ]; then
   docker run --rm -t -i --user $(id -u):$(id -g) \
     -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
-    /bin/bash -c "cd /code && dev/format_code.sh"
+    /bin/bash -c "cd /code && dev/format_code.sh $ALL"
 
   echo "[Docker done.]"
   exit 0
@@ -36,9 +53,14 @@ COUNTER=0
 
 for dir in apps/ libs/librepcb/ tests/unittests/
 do
-  MODIFIED=`git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+  if [ "$ALL" == "--all" ]; then
+    TRACKED=`git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+  else
+    # Only files which differ from the master branch
+    TRACKED=`git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+  fi
   UNTRACKED=`git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
-  for file in $MODIFIED $UNTRACKED
+  for file in $TRACKED $UNTRACKED
   do
     # Note: Do NOT use in-place edition of clang-format because this causes
     # "make" to detect the files as changed every time, even if the content was
@@ -57,3 +79,8 @@ do
 done
 
 echo "Finished: $COUNTER files modified."
+
+# Also run sort_qmake_file_entries.py if Python is available
+if [ -x "$(command -v python)" ]; then
+  python "$REPO_ROOT/dev/sort_qmake_file_entries.py"
+fi

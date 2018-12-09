@@ -48,7 +48,7 @@ class FirstRunWizardPage_WorkspaceSettings final : public QWizardPage {
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizardPage_WorkspaceSettings(QWidget *parent = 0) noexcept;
+  explicit FirstRunWizardPage_WorkspaceSettings(QWidget* parent = 0) noexcept;
   ~FirstRunWizardPage_WorkspaceSettings() noexcept;
 
   // Inherited Methods

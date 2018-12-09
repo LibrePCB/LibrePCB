@@ -51,7 +51,7 @@ class FirstRunWizardPage_Welcome final : public QWizardPage {
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizardPage_Welcome(QWidget *parent = 0) noexcept;
+  explicit FirstRunWizardPage_Welcome(QWidget* parent = 0) noexcept;
   ~FirstRunWizardPage_Welcome() noexcept;
 
 private:

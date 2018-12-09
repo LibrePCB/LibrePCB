@@ -61,7 +61,8 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   mUi->textLinks->setText(
       tr("For more information, please check out <a href='%1'>librepcb.org</a> "
          "or our <a href='%2'>GitHub repository</a>.")
-          .arg("https://librepcb.org/", "https://github.com/LibrePCB/LibrePCB"));
+          .arg("https://librepcb.org/",
+               "https://github.com/LibrePCB/LibrePCB"));
   mUi->textContributeFinancially->setText(
       tr("Support sustainable development of LibrePCB by donating financially, "
          "either via <a href='%1'>Patreon</a> or via <a href='%2'>Bitcoin</a>!")

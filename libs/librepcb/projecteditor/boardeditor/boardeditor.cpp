@@ -131,8 +131,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   connect(mUi->actionQuit, &QAction::triggered, this, &BoardEditor::close);
   connect(mUi->actionOpenWebsite, &QAction::triggered,
           []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
-  connect(mUi->actionOnlineDocumentation, &QAction::triggered,
-          []() { QDesktopServices::openUrl(QUrl("https://docs.librepcb.org")); });
+  connect(mUi->actionOnlineDocumentation, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
+  });
   connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
   connect(mUi->actionAboutQt, &QAction::triggered, qApp,
           &QApplication::aboutQt);

@@ -279,10 +279,11 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
 
   // calculate how many lines we need to create
   qreal radiusAbsNm = static_cast<qreal>(radiusAbs.toNm());
-  qreal y =
-      qBound(qreal(0.0), static_cast<qreal>(maxTolerance->toNm()), radiusAbsNm / qreal(4));
-  qreal stepsPerRad = qMin(qreal(0.5) / qAcos(1 - y / radiusAbsNm), radiusAbsNm / qreal(2));
-  int   steps       = qCeil(stepsPerRad * angle.abs().toRad());
+  qreal y = qBound(qreal(0.0), static_cast<qreal>(maxTolerance->toNm()),
+                   radiusAbsNm / qreal(4));
+  qreal stepsPerRad =
+      qMin(qreal(0.5) / qAcos(1 - y / radiusAbsNm), radiusAbsNm / qreal(2));
+  int steps = qCeil(stepsPerRad * angle.abs().toRad());
 
   // some other very complex calculations...
   qreal angleDelta = angle.toMicroDeg() / (qreal)steps;

@@ -37,7 +37,7 @@ namespace application {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FirstRunWizard::FirstRunWizard(QWidget *parent) noexcept
+FirstRunWizard::FirstRunWizard(QWidget* parent) noexcept
   : QWizard(parent), mUi(new Ui::FirstRunWizard) {
   mUi->setupUi(this);
 
