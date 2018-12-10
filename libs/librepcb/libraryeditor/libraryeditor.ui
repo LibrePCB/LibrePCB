@@ -56,7 +56,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="librepcb::TabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>-1</number>
       </property>
@@ -639,6 +639,11 @@
    <class>librepcb::StatusBar</class>
    <extends>QStatusBar</extends>
    <header location="global">librepcb/common/widgets/statusbar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::TabWidget</class>
+   <extends>QTabWidget</extends>
+   <header location="global">librepcb/common/widgets/tabwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

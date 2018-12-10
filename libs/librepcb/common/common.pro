@@ -129,6 +129,7 @@ SOURCES += \
     widgets/plaintextedit.cpp \
     widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
+    widgets/tabwidget.cpp \
 
 HEADERS += \
     alignment.h \
@@ -246,6 +247,7 @@ HEADERS += \
     widgets/plaintextedit.h \
     widgets/signalrolecombobox.h \
     widgets/statusbar.h \
+    widgets/tabwidget.h \
 
 FORMS += \
     dialogs/aboutdialog.ui \
