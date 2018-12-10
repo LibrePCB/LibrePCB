@@ -149,7 +149,8 @@ private:  // GUI Event Handlers
   void editLibraryElementTriggered(const FilePath& fp,
                                    bool            isNewElement) noexcept;
   void currentTabChanged(int index) noexcept;
-  bool tabCloseRequested(int index) noexcept;
+  void tabCloseRequested(int index) noexcept;
+  bool closeTab(int index) noexcept;
   void cursorPositionChanged(const Point& pos) noexcept;
 
 private:  // Methods
