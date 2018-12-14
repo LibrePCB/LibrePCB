@@ -78,9 +78,8 @@ This project welcomes non-code contributions, too! The following types of contri
   get started.
 - **Website**: Improve our [website](https://librepcb.org) which is hosted in the repository [LibrePCB/LibrePCB.github.io](https://github.com/LibrePCB/LibrePCB.github.io).
 - **Sharing**: Speak about LibrePCB with your friends and colleagues, or write about it in the internet!
-- **Donations**: [Become a Patron](https://www.patreon.com/librepcb)
-  or donate to the LibrePCB developers with Bitcoin:
-  [1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8](bitcoin:1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8)
+- **Donations**: There are several ways to contribute financially to LibrePCB,
+  see [details here](https://librepcb.org/donate/).
 
 # Additional Resources
 
