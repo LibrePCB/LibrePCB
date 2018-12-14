@@ -8,8 +8,12 @@
   [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
   Some issues even have a mentor assigned:
   [Browse all mentored issues](https://github.com/LibrePCB/LibrePCB/labels/mentored).
-- To contact us use either GitHub or join our [IRC](https://webchat.freenode.net/?channels=#librepcb)
-  or [Telegram](https://telegram.me/LibrePCB_dev) chat (they are automatically synchronized).
+- To contact us use one of the following options:
+  - Our [discussion platform](https://librepcb.discourse.group/) (preferred)
+  - GitHub issues
+  - [IRC](https://webchat.freenode.net/?channels=#librepcb) or
+    [Telegram](https://telegram.me/LibrePCB_dev) chat (they are automatically
+    synchronized)
 
 ## Getting Started
 
@@ -67,8 +71,7 @@ This project welcomes non-code contributions, too! The following types of contri
   or developers of LibrePCB.
 - **Part Libraries**: Fork an existing part library from
   https://github.com/LibrePCB-Libraries/ and add or improve parts. If you want
-  to create a new library create an issue in the
-  https://github.com/LibrePCB/librepcb-rfcs repository.
+  to create a new library, open a discussion [here](https://librepcb.discourse.group/c/libraries).
 - **Translations**: Add/improve translations for LibrePCB using
   [Transifex](https://www.transifex.com/librepcb/librepcb-application/dashboard/).
   Follow [this guide](https://docs.transifex.com/getting-started/translators) to
