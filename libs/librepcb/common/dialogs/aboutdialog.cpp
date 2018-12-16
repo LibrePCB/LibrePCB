@@ -64,10 +64,10 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
           .arg("https://librepcb.org/",
                "https://github.com/LibrePCB/LibrePCB"));
   mUi->textContributeFinancially->setText(
-      tr("Support sustainable development of LibrePCB by donating financially, "
-         "either via <a href='%1'>Patreon</a> or via <a href='%2'>Bitcoin</a>!")
-          .arg("https://www.patreon.com/librepcb",
-               "bitcoin:1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8"));
+      tr("Support sustainable development of LibrePCB by donating financially "
+         "via Patreon, PayPal or Bitcoin. Check out <a href='%1'>%1</a> for "
+         "details.")
+          .arg("https://librepcb.org/donate/"));
   mUi->textContributeCode->setText(
       tr("Check out our <a href='%1'>Contribution Guidelines</a> if you're "
          "interested in development of LibrePCB!")
