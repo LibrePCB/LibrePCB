@@ -8,8 +8,12 @@
   [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
   Some issues even have a mentor assigned:
   [Browse all mentored issues](https://github.com/LibrePCB/LibrePCB/labels/mentored).
-- To contact us use either GitHub or join our [IRC](https://webchat.freenode.net/?channels=#librepcb)
-  or [Telegram](https://telegram.me/LibrePCB_dev) chat (they are automatically synchronized).
+- To contact us use one of the following options:
+  - Our [discussion platform](https://librepcb.discourse.group/) (preferred)
+  - GitHub issues
+  - [IRC](https://webchat.freenode.net/?channels=#librepcb) or
+    [Telegram](https://telegram.me/LibrePCB_dev) chat (they are automatically
+    synchronized)
 
 ## Getting Started
 
@@ -67,17 +71,15 @@ This project welcomes non-code contributions, too! The following types of contri
   or developers of LibrePCB.
 - **Part Libraries**: Fork an existing part library from
   https://github.com/LibrePCB-Libraries/ and add or improve parts. If you want
-  to create a new library create an issue in the
-  https://github.com/LibrePCB/librepcb-rfcs repository.
+  to create a new library, open a discussion [here](https://librepcb.discourse.group/c/libraries).
 - **Translations**: Add/improve translations for LibrePCB using
   [Transifex](https://www.transifex.com/librepcb/librepcb-application/dashboard/).
   Follow [this guide](https://docs.transifex.com/getting-started/translators) to
   get started.
 - **Website**: Improve our [website](https://librepcb.org) which is hosted in the repository [LibrePCB/LibrePCB.github.io](https://github.com/LibrePCB/LibrePCB.github.io).
 - **Sharing**: Speak about LibrePCB with your friends and colleagues, or write about it in the internet!
-- **Donations**: [Become a Patron](https://www.patreon.com/librepcb)
-  or donate to the LibrePCB developers with Bitcoin:
-  [1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8](bitcoin:1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8)
+- **Donations**: There are several ways to contribute financially to LibrePCB,
+  see [details here](https://librepcb.org/donate/).
 
 # Additional Resources
 

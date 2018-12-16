@@ -10,9 +10,10 @@ Please verify first that your request is not already reported on GitHub.
 Attention: This issue tracker is only for "smaller" feature requests (e.g. "Make
 layer colors configurable") or usability flaws (e.g. "Pressing Enter does not
 close the dialog"). For fundamental, complex, large features (e.g. "Implement 3D
-board viewer") please use our RFC repository instead so we can first discuss how
-the feature should be implemented exactly: https://github.com/LibrePCB/librepcb-rfcs
-We also use the RFC repository for general discussions (like a forum).
+board viewer") please use our discussion platform instead so we can first
+discuss how the feature should be implemented exactly:
+
+https://librepcb.discourse.group/t/about-the-improvement-ideas-category/12
 -->
 
 ##### SUMMARY
