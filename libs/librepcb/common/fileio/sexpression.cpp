@@ -206,8 +206,7 @@ QString SExpression::toString(int indent) const {
                                       ? mChildren.at(i + 1).isLineBreak()
                                       : true;
       if (child.isLineBreak() && nextChildIsLineBreak) {
-        if (child.isLineBreak() && (i > 0) &&
-            mChildren.at(i - 1).isLineBreak()) {
+        if ((i > 0) && mChildren.at(i - 1).isLineBreak()) {
           // too many line breaks ;)
         } else {
           str += '\n';
