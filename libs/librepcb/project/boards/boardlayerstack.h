@@ -64,6 +64,8 @@ public:
   int    getInnerLayerCount() const noexcept { return mInnerLayerCount; }
   QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
+  GraphicsLayer* getCopperLayer(const int index) const noexcept;
+
   /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
     return mLayers;
@@ -106,6 +108,7 @@ private:
 
   // Settings
   int mInnerLayerCount;
+  int mCopperLayerOffset;
 };
 
 /*******************************************************************************

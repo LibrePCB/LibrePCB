@@ -62,6 +62,9 @@ public:
   BI_Via(BI_NetSegment& netsegment, const SExpression& node);
   BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
          const PositiveLength& size, const PositiveLength& drillDiameter);
+  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
+         const PositiveLength& size, const PositiveLength& drillDiameter,
+         const int startLayer, const int stopLayer);
   ~BI_Via() noexcept;
 
   // Getters
@@ -86,6 +89,7 @@ public:
   void setShape(Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  void setLayers(const int startLayer, const int stopLayer) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -128,6 +132,10 @@ private:
   Shape          mShape;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
+  QList<GraphicsLayer*> mLayers;
+//  int mStartLayer;
+//  int mStopLayer;
+//  QMap <GraphicsLayer*, PositiveLength> mLayers; //TODO different mSize for different copper layers
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

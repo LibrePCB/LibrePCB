@@ -84,6 +84,7 @@ BoardLayerStack::~BoardLayerStack() noexcept {
  *  Getters
  ******************************************************************************/
 
+//ChShakenov - Polygon is not allowed in any of inner layers?
 QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
     noexcept {
   static QStringList names = {
@@ -120,11 +121,23 @@ QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
 
 void BoardLayerStack::setInnerLayerCount(int count) noexcept {
   if ((count >= 0) && (count != mInnerLayerCount)) {
-    mInnerLayerCount = count;
-    for (GraphicsLayer* layer : mLayers) {
-      if (layer->isInnerLayer() && layer->isCopperLayer()) {
-        layer->setEnabled(layer->getInnerLayerNumber() <= mInnerLayerCount);
-      }
+    // Do we support odd number of inner layers or
+    // we will have to stick to layer numbers multiplied by 2?
+
+    // I use GraphicsLayer::getInnerLayerCount() as max possible inner copper layers
+    int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
+    if (count > maxInnerLayersCount){
+      mInnerLayerCount = maxInnerLayersCount;
+    }
+    else{
+      mInnerLayerCount = count;
+    }
+
+    //Assuming that we provide even number of inner layers
+    for (int i = 0; i < maxInnerLayersCount / 2; ++i) {
+        bool layerEnabled = (i < mInnerLayerCount / 2);
+        mLayers[mCopperLayerOffset + 1 + i]->setEnabled(layerEnabled);
+        mLayers[mCopperLayerOffset + maxInnerLayersCount - i]->setEnabled(layerEnabled);
     }
   }
 }
@@ -135,6 +148,15 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept {
 
 void BoardLayerStack::serialize(SExpression& root) const {
   root.appendChild("inner", mInnerLayerCount, false);
+}
+
+GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
+  int maxCopperLayersCount = GraphicsLayer::getInnerLayerCount() + 2;
+  if (index > maxCopperLayersCount){
+    //TODO something here, or we will agree not to exceed it?
+    throw LogicError(__FILE__, __LINE__);
+  }
+  return mLayers[mCopperLayerOffset + index];
 }
 
 /*******************************************************************************
@@ -166,6 +188,7 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBoardPadsTht);
   addLayer(GraphicsLayer::sBoardAirWires);
 
+  mCopperLayerOffset = mLayers.count();
   // copper layers
   addLayer(GraphicsLayer::sTopCopper);
   for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {

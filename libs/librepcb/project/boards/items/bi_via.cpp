@@ -75,7 +75,23 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter) {
+    mDrillDiameter(drillDiameter){
+  setLayers(0, GraphicsLayer::getInnerLayerCount() + 2);
+  init();
+}
+
+
+BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
+               const PositiveLength& size, const PositiveLength& drillDiameter,
+               const int startLayer, const int stopLayer)
+  : BI_Base(netsegment.getBoard()),
+    mNetSegment(netsegment),
+    mUuid(Uuid::createRandom()),
+    mPosition(position),
+    mShape(shape),
+    mSize(size),
+    mDrillDiameter(drillDiameter){
+  setLayers(startLayer, stopLayer);
   init();
 }
 
@@ -102,7 +118,9 @@ NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept {
 }
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
-  return GraphicsLayer::isCopperLayer(layerName);
+  GraphicsLayer *layer = mBoard.getLayerStack().getLayer(layerName);
+  return mLayers.contains(layer);
+//  return GraphicsLayer::isCopperLayer(layerName);
 }
 
 Path BI_Via::getOutline(const Length& expansion) const noexcept {
@@ -169,6 +187,21 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   if (diameter != mDrillDiameter) {
     mDrillDiameter = diameter;
     mGraphicsItem->updateCacheAndRepaint();
+  }
+}
+
+void BI_Via::setLayers(const int startLayer, const int stopLayer) noexcept{
+    int maxCopperLayersCount = GraphicsLayer::getInnerLayerCount() + 2;
+  if (startLayer > stopLayer || startLayer < 0
+      || startLayer > maxCopperLayersCount || startLayer < 0
+      || startLayer > maxCopperLayersCount){
+// Throw exception?
+  }
+  else{
+    mLayers.clear();
+    for (int i = startLayer; i <= stopLayer; ++i){
+      mLayers.append(mBoard.getLayerStack().getCopperLayer(i));
+    }
   }
 }
 
