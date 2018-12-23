@@ -28,7 +28,6 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/smarttextfile.h>
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
