@@ -425,7 +425,10 @@ bool ComponentSignalListEditorWidget::setName(const Uuid&    uuid,
                                               const QString& name) noexcept {
   try {
     ComponentSignal* signal = mSignalList->get(uuid).get();  // can throw
-    if (signal->getName() == name) return true;
+    if (signal->getName() == name) {
+        updateTable();
+        return true;
+    }
     CircuitIdentifier constrainedName = validateNameOrThrow(name);  // can throw
     if (mUndoStack) {
       QScopedPointer<CmdComponentSignalEdit> cmd(
