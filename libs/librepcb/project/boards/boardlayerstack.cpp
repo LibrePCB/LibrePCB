@@ -84,7 +84,6 @@ BoardLayerStack::~BoardLayerStack() noexcept {
  *  Getters
  ******************************************************************************/
 
-//ChShakenov - Polygon is not allowed in any of inner layers?
 QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
     noexcept {
   static QStringList names = {
@@ -115,16 +114,29 @@ QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
   return getLayers(names);
 }
 
+GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
+  if (index < 0 || index >= getCopperLayerCount()){
+    qDebug() << "Layer index is not in range";
+    //TODO something here, or we will agree not to exceed it?
+
+    //return bottom layer
+    int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
+    return mLayers[mCopperLayerOffset + maxInnerLayersCount + 1];
+  }
+  if (index == getCopperLayerCount() - 1){ // is it the bottom layer
+    int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
+    return mLayers[mCopperLayerOffset + maxInnerLayersCount + 1];
+  }
+  return mLayers[mCopperLayerOffset + index];
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
 void BoardLayerStack::setInnerLayerCount(int count) noexcept {
   if ((count >= 0) && (count != mInnerLayerCount)) {
-    // Do we support odd number of inner layers or
-    // we will have to stick to layer numbers multiplied by 2?
 
-    // I use GraphicsLayer::getInnerLayerCount() as max possible inner copper layers
     int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
     if (count > maxInnerLayersCount){
       mInnerLayerCount = maxInnerLayersCount;
@@ -133,11 +145,11 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept {
       mInnerLayerCount = count;
     }
 
-    //Assuming that we provide even number of inner layers
-    for (int i = 0; i < maxInnerLayersCount / 2; ++i) {
-        bool layerEnabled = (i < mInnerLayerCount / 2);
-        mLayers[mCopperLayerOffset + 1 + i]->setEnabled(layerEnabled);
-        mLayers[mCopperLayerOffset + maxInnerLayersCount - i]->setEnabled(layerEnabled);
+    mInnerLayerCount = count;
+    for (GraphicsLayer* layer : mLayers) {
+      if (layer->isInnerLayer() && layer->isCopperLayer()) {
+        layer->setEnabled(layer->getInnerLayerNumber() <= mInnerLayerCount);
+      }
     }
   }
 }
@@ -148,15 +160,6 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept {
 
 void BoardLayerStack::serialize(SExpression& root) const {
   root.appendChild("inner", mInnerLayerCount, false);
-}
-
-GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
-  int maxCopperLayersCount = GraphicsLayer::getInnerLayerCount() + 2;
-  if (index > maxCopperLayersCount){
-    //TODO something here, or we will agree not to exceed it?
-    throw LogicError(__FILE__, __LINE__);
-  }
-  return mLayers[mCopperLayerOffset + index];
 }
 
 /*******************************************************************************

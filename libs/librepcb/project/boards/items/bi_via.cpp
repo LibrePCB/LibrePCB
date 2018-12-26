@@ -75,8 +75,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter){
-  setLayers(0, GraphicsLayer::getInnerLayerCount() + 2);
+    mDrillDiameter(drillDiameter),
+    mStartLayer(0),
+    mStopLayer(-1) {
   init();
 }
 
@@ -90,8 +91,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter){
-  setLayers(startLayer, stopLayer);
+    mDrillDiameter(drillDiameter),
+    mStartLayer(startLayer),
+    mStopLayer(stopLayer) {
   init();
 }
 
@@ -118,8 +120,19 @@ NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept {
 }
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
-  GraphicsLayer *layer = mBoard.getLayerStack().getLayer(layerName);
-  return mLayers.contains(layer);
+  if (!GraphicsLayer::isCopperLayer(layerName)){ //Is this check needed?
+    //Throw exception?
+  }
+  if (GraphicsLayer::isTopLayer(layerName)){
+    return mStartLayer == 0;
+  }
+  else if (GraphicsLayer::isBottomLayer(layerName)){
+    return mStopLayer == -1;
+  }
+  else{
+    int layerNum = GraphicsLayer::getInnerLayerNumber(layerName) + 1;
+    return layerNum >= mStartLayer && layerNum <= mStopLayer;
+  }
 //  return GraphicsLayer::isCopperLayer(layerName);
 }
 
@@ -191,17 +204,21 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
 }
 
 void BI_Via::setLayers(const int startLayer, const int stopLayer) noexcept{
-    int maxCopperLayersCount = GraphicsLayer::getInnerLayerCount() + 2;
-  if (startLayer > stopLayer || startLayer < 0
-      || startLayer > maxCopperLayersCount || startLayer < 0
-      || startLayer > maxCopperLayersCount){
+    int copperLayersCount = mBoard.getLayerStack().getCopperLayerCount();
+  if (startLayer >= stopLayer || startLayer < 0
+      || startLayer >= copperLayersCount || stopLayer < -1
+      || stopLayer >= copperLayersCount){ // Do we need this check?
 // Throw exception?
   }
   else{
-    mLayers.clear();
-    for (int i = startLayer; i <= stopLayer; ++i){
-      mLayers.append(mBoard.getLayerStack().getCopperLayer(i));
+    mStartLayer = startLayer;
+    if (stopLayer == copperLayersCount - 1){
+      mStopLayer = -1;
     }
+    else{
+      mStopLayer = stopLayer;
+    }
+    mGraphicsItem->updateCacheAndRepaint();
   }
 }
 

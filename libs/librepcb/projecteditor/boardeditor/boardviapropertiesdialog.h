@@ -69,6 +69,8 @@ private:
   void keyPressEvent(QKeyEvent* e);
   void accept();
   bool applyChanges() noexcept;
+  void startLayerChanged(int index) noexcept;
+  void stopLayerChanged(int index) noexcept;
 
   // General
   Project&                                     mProject;

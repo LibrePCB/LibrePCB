@@ -75,6 +75,9 @@ public:
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
   }
+  int                   getStartLayer() const noexcept { return mStartLayer; }
+  int                   getStopLayer() const noexcept { return mStopLayer; }
+
   const PositiveLength& getSize() const noexcept { return mSize; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOnLayer(const QString& layerName) const noexcept;
@@ -132,9 +135,8 @@ private:
   Shape          mShape;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
-  QList<GraphicsLayer*> mLayers;
-//  int mStartLayer;
-//  int mStopLayer;
+  int mStartLayer;
+  int mStopLayer; // is -1 if stops as bottom copper layer, otherwise is has to be less than bottom copper layer index
 //  QMap <GraphicsLayer*, PositiveLength> mLayers; //TODO different mSize for different copper layers
 
   // Registered Elements

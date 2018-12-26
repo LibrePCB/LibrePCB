@@ -27,7 +27,9 @@
 
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
@@ -39,6 +41,7 @@
 #include <librepcb/project/project.h>
 
 #include <QtCore>
+#include <QtGlobal>
 
 /*******************************************************************************
  *  Namespace
@@ -198,8 +201,50 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   connect(mNetSignalComboBox, &QComboBox::currentTextChanged,
           [this](const QString& value) {
             setNetSignal(
-                mEditor.getProject().getCircuit().getNetSignalByName(value));
+                mEditor.getProject().getCircuit().getNetSignalByName(value)
+            );
           });
+
+
+
+  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+  //raises compile time error "use of deleted function"
+
+  // add the "Start Layer:" label to the toolbar
+  mStartLayerLabel = new QLabel(tr("Start Layer:"));
+  mStartLayerLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mStartLayerLabel);
+
+  // add the start layer combobox to the toolbar
+  mStartLayerComboBox = new QComboBox();
+  mStartLayerComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  mStartLayerComboBox->setInsertPolicy(QComboBox::NoInsert);
+  mStartLayerComboBox->setEditable(false);
+  for (int i = 0; i < layerStack->getCopperLayerCount() - 1; ++i){
+    mStartLayerComboBox->addItem(layerStack->getCopperLayer(i)->getNameTr());
+  }
+  connect(mStartLayerComboBox,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+          this, &BES_AddVia::startLayerChanged);
+  mEditorUi.commandToolbar->addWidget(mStartLayerComboBox);
+
+  // add the "Stop Layer:" label to the toolbar
+  mStopLayerLabel = new QLabel(tr("Stop Layer:"));
+  mStopLayerLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mStopLayerLabel);
+
+  // add the start layer combobox to the toolbar
+  mStopLayerComboBox = new QComboBox();
+  mStopLayerComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  mStopLayerComboBox->setInsertPolicy(QComboBox::NoInsert);
+  mStopLayerComboBox->setEditable(false);
+  for (int i = 1; i < layerStack->getCopperLayerCount(); ++i){
+    mStopLayerComboBox->addItem(layerStack->getCopperLayer(i)->getNameTr());
+  }
+  connect(mStopLayerComboBox,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+          this, &BES_AddVia::stopLayerChanged);
+  mEditorUi.commandToolbar->addWidget(mStopLayerComboBox);
 
   return true;
 }
@@ -230,6 +275,14 @@ bool BES_AddVia::exit(BEE_Base* event) noexcept {
   mSizeComboBox = nullptr;
   delete mSizeLabel;
   mSizeLabel = nullptr;
+  delete mStartLayerComboBox;
+  mStartLayerComboBox = nullptr;
+  delete mStartLayerLabel;
+  mStartLayerLabel = nullptr;
+  delete mStopLayerComboBox;
+  mStopLayerComboBox = nullptr;
+  delete mStopLayerLabel;
+  mStopLayerLabel = nullptr;
   qDeleteAll(mShapeActions);
   mShapeActions.clear();
   qDeleteAll(mActionSeparators);
@@ -404,6 +457,18 @@ void BES_AddVia::setNetSignal(NetSignal* netsignal) noexcept {
         new CmdBoardNetSegmentAdd(mCurrentVia->getNetSegment()));
   } catch (const Exception& e) {
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+  }
+}
+
+void BES_AddVia::startLayerChanged(int index) noexcept {
+  if (mStopLayerComboBox->currentIndex() <= index){
+    mStopLayerComboBox->setCurrentIndex(index);
+  }
+}
+
+void BES_AddVia::stopLayerChanged(int index) noexcept {
+  if (mStartLayerComboBox->currentIndex() >= index){
+    mStartLayerComboBox->setCurrentIndex(index);
   }
 }
 

@@ -27,6 +27,7 @@
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/circuit/netsignal.h>
 
 #include <QtCore>
@@ -74,6 +75,28 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
 
   // netsignal combobox
   mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
+
+  BoardLayerStack* layerStack = &via.getBoard().getLayerStack();
+  for (int i = 0; i < layerStack->getCopperLayerCount() - 1; ++i){
+    mUi->cbxStartLayer->addItem(layerStack->getCopperLayer(i)->getNameTr());
+  }
+  connect(mUi->cbxStartLayer,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+          this, &BoardViaPropertiesDialog::startLayerChanged);
+  mUi->cbxStartLayer->setCurrentIndex(via.getStartLayer());
+
+  for (int i = 1; i < layerStack->getCopperLayerCount(); ++i){
+    mUi->cbxStopLayer->addItem(layerStack->getCopperLayer(i)->getNameTr());
+  }
+  connect(mUi->cbxStopLayer,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+          this, &BoardViaPropertiesDialog::stopLayerChanged);
+  int stopLayerIndex = via.getStopLayer();
+  if (stopLayerIndex > layerStack->getInnerLayerCount()){
+    stopLayerIndex = GraphicsLayer::getInnerLayerCount() + 1;
+  }
+  mUi->cbxStopLayer->setCurrentIndex(stopLayerIndex);
+  qDebug() << "via properties" << via.getStartLayer() << " " << via.getStopLayer() << " " << stopLayerIndex;
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
@@ -128,6 +151,19 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
+}
+
+void BoardViaPropertiesDialog::startLayerChanged(int index) noexcept{
+  if (mUi->cbxStopLayer->currentIndex() <= index){
+    mUi->cbxStopLayer->setCurrentIndex(index);
+  }
+}
+
+void BoardViaPropertiesDialog::stopLayerChanged(int index) noexcept{
+  if (mUi->cbxStartLayer->currentIndex() >= index){
+    mUi->cbxStartLayer->setCurrentIndex(index);
+  }
+
 }
 
 /*******************************************************************************

@@ -61,10 +61,11 @@ public:
 
   // Getters
   Board& getBoard() const noexcept { return mBoard; }
-  int    getInnerLayerCount() const noexcept { return mInnerLayerCount; }
+  int getInnerLayerCount() const noexcept { return mInnerLayerCount; }
+  int getCopperLayerCount() const noexcept { return mInnerLayerCount + 2; }
   QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
-
   GraphicsLayer* getCopperLayer(const int index) const noexcept;
+//  QList<GraphicsLayer*> getInnerLayers() const noexcept;
 
   /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
@@ -107,8 +108,8 @@ private:
   bool                  mLayersChanged;
 
   // Settings
-  int mInnerLayerCount;
   int mCopperLayerOffset;
+  int mInnerLayerCount;
 };
 
 /*******************************************************************************
