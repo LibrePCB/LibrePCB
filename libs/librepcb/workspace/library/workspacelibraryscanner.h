@@ -65,6 +65,9 @@ public:
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
   ~WorkspaceLibraryScanner() noexcept;
 
+  // General Methods
+  void startScan() noexcept;
+
   // Operator Overloadings
   WorkspaceLibraryScanner& operator=(const WorkspaceLibraryScanner& rhs) =
       delete;
@@ -79,6 +82,7 @@ signals:
 
 private:  // Methods
   void                 run() noexcept override;
+  void                 scan() noexcept;
   QHash<FilePath, int> updateLibraries(
       SQLiteDatabase&                                           db,
       const QHash<FilePath, std::shared_ptr<library::Library>>& libs);
@@ -101,6 +105,7 @@ private:  // Methods
 private:  // Data
   Workspace&    mWorkspace;
   FilePath      mDbFilePath;
+  QSemaphore    mSemaphore;
   volatile bool mAbort;
 };
 

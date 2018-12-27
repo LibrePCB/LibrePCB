@@ -43,11 +43,17 @@ using namespace library;
 
 WorkspaceLibraryScanner::WorkspaceLibraryScanner(
     Workspace& ws, const FilePath& dbFilePath) noexcept
-  : QThread(nullptr), mWorkspace(ws), mDbFilePath(dbFilePath), mAbort(false) {
+  : QThread(nullptr),
+    mWorkspace(ws),
+    mDbFilePath(dbFilePath),
+    mSemaphore(0),
+    mAbort(false) {
+  start();
 }
 
 WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
   mAbort = true;
+  mSemaphore.release();
   if (!wait(2000)) {
     qWarning() << "Could not abort the library scanner worker thread!";
     terminate();
@@ -55,6 +61,14 @@ WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
       qCritical() << "Could not terminate the library scanner worker thread!";
     }
   }
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void WorkspaceLibraryScanner::startScan() noexcept {
+  mSemaphore.release();
 }
 
 /*******************************************************************************
@@ -74,10 +88,24 @@ QVariant WorkspaceLibraryScanner::optionalToVariant(
 }
 
 void WorkspaceLibraryScanner::run() noexcept {
+  qDebug() << "Workspace library scanner thread started.";
+
+  while (true) {
+    mSemaphore.acquire();
+    if (mAbort) {
+      break;
+    } else {
+      scan();
+    }
+  }
+
+  qDebug() << "Workspace library scanner thread stopped.";
+}
+
+void WorkspaceLibraryScanner::scan() noexcept {
   try {
     QElapsedTimer timer;
     timer.start();
-    mAbort = false;
     emit scanStarted();
     emit scanProgressUpdate(0);
     qDebug() << "Workspace library scan started.";
@@ -108,37 +136,37 @@ void WorkspaceLibraryScanner::run() noexcept {
       int                             libId = libIds[fp];
       const std::shared_ptr<Library>& lib   = libraries[fp];
       Q_ASSERT(lib);
-      if (mAbort) break;
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addCategoriesToDb<ComponentCategory>(
           db, lib->searchForElements<ComponentCategory>(),
           "component_categories", "cat_id", libId);
       emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addCategoriesToDb<PackageCategory>(
           db, lib->searchForElements<PackageCategory>(), "package_categories",
           "cat_id", libId);
       emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Symbol>(db, lib->searchForElements<Symbol>(),
                                        "symbols", "symbol_id", libId);
       emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Package>(db, lib->searchForElements<Package>(),
                                         "packages", "package_id", libId);
       emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count +=
           addElementsToDb<Component>(db, lib->searchForElements<Component>(),
                                      "components", "component_id", libId);
       emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addDevicesToDb(db, lib->searchForElements<Device>(), "devices",
                               "device_id", libId);
       emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
     }
 
     // commit transaction
-    if (!mAbort) {
+    if ((!mAbort) && (mSemaphore.available() == 0)) {
       transactionGuard.commit();  // can throw
       qDebug() << "Workspace library scan succeeded:" << count << "elements in"
                << timer.elapsed() << "ms";
@@ -300,7 +328,7 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase&        db,
                                                int                    libId) {
   int count = 0;
   foreach (const FilePath& filepath, dirs) {
-    if (mAbort) break;
+    if (mAbort || (mSemaphore.available() > 0)) break;
     try {
       ElementType element(filepath, true);  // can throw
       QSqlQuery   query = db.prepareQuery(
@@ -352,7 +380,7 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase&        db,
                                              int                    libId) {
   int count = 0;
   foreach (const FilePath& filepath, dirs) {
-    if (mAbort) break;
+    if (mAbort || (mSemaphore.available() > 0)) break;
     try {
       ElementType element(filepath, true);  // can throw
       QSqlQuery   query =
@@ -411,7 +439,7 @@ int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase&        db,
                                             int                    libId) {
   int count = 0;
   foreach (const FilePath& filepath, dirs) {
-    if (mAbort) break;
+    if (mAbort || (mSemaphore.available() > 0)) break;
     try {
       Device    element(filepath, true);  // can throw
       QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
