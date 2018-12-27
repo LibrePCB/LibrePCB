@@ -240,7 +240,8 @@ void ProjectLibrary::loadElements(const FilePath&            directory,
     FileUtils::copyDirRecursively(subdirPath, elementDir);  // can throw
 
     // load the library element
-    ElementType* element = new ElementType(elementDir, false);  // can throw
+    QScopedPointer<ElementType> element(
+        new ElementType(elementDir, false));  // can throw
     if (elementList.contains(element->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -250,9 +251,9 @@ void ProjectLibrary::loadElements(const FilePath&            directory,
     }
 
     // everything is ok -> update members
-    elementList.insert(element->getUuid(), element);
-    mAllElements.insert(element);
-    mLoadedElements.insert(element);
+    elementList.insert(element->getUuid(), element.data());
+    mAllElements.insert(element.data());
+    mLoadedElements.insert(element.take());  // Take object from smart pointer!
   }
 
   qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
