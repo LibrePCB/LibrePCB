@@ -140,7 +140,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
       // netsegment
       splitUpNetSegment(*netsegment, items);  // can throw
     } else {
-      throw new LogicError(__FILE__, __LINE__);
+      throw LogicError(__FILE__, __LINE__);
     }
   }
 

@@ -71,7 +71,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(
       const ComponentSignal*           signal  = nullptr;
       const ComponentPinSignalMapItem* mapItem = nullptr;
       CmpSigPinDisplayType displayType = CmpSigPinDisplayType::pinName();
-      if (mComponent && symbVarItemUuid && symbVarItemUuid) {
+      if (mComponent && symbVarUuid && symbVarItemUuid) {
         signal =
             mComponent
                 ->getSignalOfPin(*symbVarUuid, *symbVarItemUuid, pin.getUuid())
