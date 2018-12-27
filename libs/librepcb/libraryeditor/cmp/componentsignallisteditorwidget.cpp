@@ -440,6 +440,7 @@ bool ComponentSignalListEditorWidget::setName(const Uuid&    uuid,
     }
     return true;
   } catch (const Exception& e) {
+    updateTable();
     QMessageBox::critical(this, tr("Could not edit signal"), e.getMsg());
     return false;
   }
