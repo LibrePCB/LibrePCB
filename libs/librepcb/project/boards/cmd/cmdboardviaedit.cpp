@@ -46,7 +46,11 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
     mOldSize(via.getSize()),
     mNewSize(mOldSize),
     mOldDrillDiameter(via.getDrillDiameter()),
-    mNewDrillDiameter(mOldDrillDiameter) {
+    mNewDrillDiameter(mOldDrillDiameter),
+    mOldStartLayer(via.getStartLayer()),
+    mNewStartLayer(mOldStartLayer),
+    mOldStopLayer(via.getStopLayer()),
+    mNewStopLayer(mOldStopLayer) {
 }
 
 CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
@@ -55,6 +59,8 @@ CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
     mVia.setShape(mOldShape);
     mVia.setSize(mOldSize);
     mVia.setDrillDiameter(mOldDrillDiameter);
+    mVia.setStartLayer(mOldStartLayer);
+    mVia.setStopLayer(mOldStopLayer);
   }
 }
 
@@ -95,6 +101,18 @@ void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter,
   if (immediate) mVia.setDrillDiameter(mNewDrillDiameter);
 }
 
+void CmdBoardViaEdit::setStartLayer(const int startLayer, bool immediate) noexcept {
+    Q_ASSERT(!wasEverExecuted());
+    mNewStartLayer = startLayer;
+    if (immediate) mVia.setStartLayer(mNewStartLayer);
+}
+
+void CmdBoardViaEdit::setStopLayer(const int stopLayer, bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewStopLayer = stopLayer;
+  if (immediate) mVia.setStopLayer(mNewStopLayer);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -106,17 +124,23 @@ bool CmdBoardViaEdit::performExecute() {
 }
 
 void CmdBoardViaEdit::performUndo() {
+  qDebug() << "UNDO!!! " << mOldStartLayer << " " << mOldStopLayer;
   mVia.setPosition(mOldPos);
   mVia.setShape(mOldShape);
   mVia.setSize(mOldSize);
   mVia.setDrillDiameter(mOldDrillDiameter);
+  mVia.setStartLayer(mOldStartLayer);
+  mVia.setStopLayer(mOldStopLayer);
 }
 
 void CmdBoardViaEdit::performRedo() {
+  qDebug() << "REDO!!! " << mNewStartLayer << " " << mNewStopLayer;
   mVia.setPosition(mNewPos);
   mVia.setShape(mNewShape);
   mVia.setSize(mNewSize);
   mVia.setDrillDiameter(mNewDrillDiameter);
+  mVia.setStartLayer(mNewStartLayer);
+  mVia.setStopLayer(mNewStopLayer);
 }
 
 /*******************************************************************************

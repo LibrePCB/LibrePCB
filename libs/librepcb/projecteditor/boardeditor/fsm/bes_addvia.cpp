@@ -69,7 +69,11 @@ BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mDrillLabel(nullptr),
     mDrillComboBox(nullptr),
     mNetSignalLabel(nullptr),
-    mNetSignalComboBox(nullptr) {
+    mNetSignalComboBox(nullptr),
+    mStartLayerLabel(nullptr),
+    mStartLayerComboBox(nullptr),
+    mStopLayerLabel(nullptr),
+    mStopLayerComboBox(nullptr) {
 }
 
 BES_AddVia::~BES_AddVia() {
@@ -102,6 +106,12 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
     mCurrentViaNetSignal = mCircuit.getNetSignalWithMostElements();
   }
   if (!mCurrentViaNetSignal) return false;
+
+  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+
+  if (mCurrentViaStopLayer == 0){
+    mCurrentViaStopLayer = layerStack->getCopperLayerCount() - 1;
+  }
 
   // add a new via
   if (!addVia(*board)) return false;
@@ -205,11 +215,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
             );
           });
 
-
-
-  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
-  //raises compile time error "use of deleted function"
-
   // add the "Start Layer:" label to the toolbar
   mStartLayerLabel = new QLabel(tr("Start Layer:"));
   mStartLayerLabel->setIndent(10);
@@ -223,6 +228,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   for (int i = 0; i < layerStack->getCopperLayerCount() - 1; ++i){
     mStartLayerComboBox->addItem(layerStack->getCopperLayer(i)->getNameTr());
   }
+  mStartLayerComboBox->setCurrentIndex(mCurrentViaStartLayer);
   connect(mStartLayerComboBox,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
           this, &BES_AddVia::startLayerChanged);
@@ -241,10 +247,12 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   for (int i = 1; i < layerStack->getCopperLayerCount(); ++i){
     mStopLayerComboBox->addItem(layerStack->getCopperLayer(i)->getNameTr());
   }
+  mStopLayerComboBox->setCurrentIndex(mCurrentViaStopLayer - 1);
   connect(mStopLayerComboBox,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
           this, &BES_AddVia::stopLayerChanged);
   mEditorUi.commandToolbar->addWidget(mStopLayerComboBox);
+  qDebug() << mCurrentViaStartLayer << " " << mCurrentViaStopLayer;
 
   return true;
 }
@@ -367,6 +375,7 @@ bool BES_AddVia::addVia(Board& board) noexcept {
   Q_ASSERT(mCurrentViaNetSignal);
 
   try {
+    qDebug() << "Add via " << mCurrentViaStartLayer << " " << mCurrentViaStopLayer;
     mUndoStack.beginCmdGroup(tr("Add via to board"));
     mUndoCmdActive = true;
     CmdBoardNetSegmentAdd* cmdAddSeg =
@@ -377,7 +386,9 @@ bool BES_AddVia::addVia(Board& board) noexcept {
     CmdBoardNetSegmentAddElements* cmdAddVia =
         new CmdBoardNetSegmentAddElements(*netsegment);
     mCurrentVia = cmdAddVia->addVia(Point(0, 0), mCurrentViaShape,
-                                    mCurrentViaSize, mCurrentViaDrillDiameter);
+                                    mCurrentViaSize, mCurrentViaDrillDiameter,
+                                    mCurrentViaStartLayer,
+                                    mCurrentViaStopLayer);
     Q_ASSERT(mCurrentVia);
     mUndoStack.appendToCmdGroup(cmdAddVia);
     mViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentVia));
@@ -404,6 +415,8 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
     mViaEditCmd->setShape(mCurrentViaShape, true);
     mViaEditCmd->setSize(mCurrentViaSize, true);
     mViaEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
+    mViaEditCmd->setStartLayer(mCurrentViaStartLayer, true);
+    mViaEditCmd->setStopLayer(mCurrentViaStopLayer, true);
     board.triggerAirWiresRebuild();
     return true;
   } catch (Exception& e) {
@@ -464,12 +477,20 @@ void BES_AddVia::startLayerChanged(int index) noexcept {
   if (mStopLayerComboBox->currentIndex() <= index){
     mStopLayerComboBox->setCurrentIndex(index);
   }
+  mCurrentViaStartLayer = mStartLayerComboBox->currentIndex();
+  mCurrentViaStopLayer = mStopLayerComboBox->currentIndex() + 1;
+  mViaEditCmd->setStartLayer(mCurrentViaStartLayer, true);
+  mViaEditCmd->setStopLayer(mCurrentViaStopLayer, true);
 }
 
 void BES_AddVia::stopLayerChanged(int index) noexcept {
   if (mStartLayerComboBox->currentIndex() >= index){
     mStartLayerComboBox->setCurrentIndex(index);
   }
+  mCurrentViaStartLayer = mStartLayerComboBox->currentIndex();
+  mCurrentViaStopLayer = mStopLayerComboBox->currentIndex() + 1;
+  mViaEditCmd->setStartLayer(mCurrentViaStartLayer, true);
+  mViaEditCmd->setStopLayer(mCurrentViaStopLayer, true);
 }
 
 /*******************************************************************************

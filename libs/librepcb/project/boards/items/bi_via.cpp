@@ -45,7 +45,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
     mPosition(other.mPosition),
     mShape(other.mShape),
     mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter) {
+    mDrillDiameter(other.mDrillDiameter),
+    mStartLayer(other.mStartLayer),
+    mStopLayer(other.mStopLayer) {
   init();
 }
 
@@ -64,22 +66,49 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
     mPosition = Point(node.getChildByPath("pos"));
   }
 
+  QString startLayerName, stopLayerName;
+  if (node.tryGetChildByPath("start_layer")){
+    startLayerName = node.getValueByPath<QString>("start_layer");
+  }
+  else{
+    startLayerName = GraphicsLayer::sTopCopper;
+  }
+  if (GraphicsLayer::isTopLayer(startLayerName)){
+    mStartLayer = 0;
+  }
+  else{
+    mStartLayer = GraphicsLayer::getInnerLayerNumber(startLayerName);
+  }
+
+  if (node.tryGetChildByPath("stop_layer")){
+    stopLayerName = node.getValueByPath<QString>("stop_layer");
+  }
+  else{
+    stopLayerName = GraphicsLayer::sBotCopper;
+  }
+  if (GraphicsLayer::isBottomLayer(stopLayerName)){
+    mStopLayer = -1;
+  }
+  else{
+    mStopLayer = GraphicsLayer::getInnerLayerNumber(stopLayerName);
+  }
+
   init();
 }
 
-BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
-               const PositiveLength& size, const PositiveLength& drillDiameter)
-  : BI_Base(netsegment.getBoard()),
-    mNetSegment(netsegment),
-    mUuid(Uuid::createRandom()),
-    mPosition(position),
-    mShape(shape),
-    mSize(size),
-    mDrillDiameter(drillDiameter),
-    mStartLayer(0),
-    mStopLayer(-1) {
-  init();
-}
+//BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
+//               const PositiveLength& size, const PositiveLength& drillDiameter)
+//  : BI_Base(netsegment.getBoard()),
+//    mNetSegment(netsegment),
+//    mUuid(Uuid::createRandom()),
+//    mPosition(position),
+//    mShape(shape),
+//    mSize(size),
+//    mDrillDiameter(drillDiameter),
+//    mStartLayer(0),
+//    mStopLayer(-1) { // -1 is bottom copper layer
+//  init();
+//}
 
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
@@ -167,6 +196,15 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept {
   return p;
 }
 
+int BI_Via::getStopLayer() const noexcept {
+  if (mStopLayer == -1){
+    return mBoard.getLayerStack().getCopperLayerCount() - 1;
+  }
+  else{
+    return mStopLayer;
+  }
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
@@ -203,15 +241,25 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   }
 }
 
-void BI_Via::setLayers(const int startLayer, const int stopLayer) noexcept{
-    int copperLayersCount = mBoard.getLayerStack().getCopperLayerCount();
-  if (startLayer >= stopLayer || startLayer < 0
-      || startLayer >= copperLayersCount || stopLayer < -1
-      || stopLayer >= copperLayersCount){ // Do we need this check?
+void BI_Via::setStartLayer(const int startLayer) noexcept{
+  int copperLayersCount = mBoard.getLayerStack().getCopperLayerCount();
+  if (startLayer >= mStopLayer || startLayer < 0
+      || startLayer >= copperLayersCount){ // Do we need this check?
 // Throw exception?
   }
   else{
     mStartLayer = startLayer;
+    mGraphicsItem->updateCacheAndRepaint();
+  }
+}
+
+void BI_Via::setStopLayer(const int stopLayer) noexcept{
+  int copperLayersCount = mBoard.getLayerStack().getCopperLayerCount();
+  if (stopLayer <= mStartLayer || stopLayer < -1
+      || stopLayer >= copperLayersCount){ // Do we need this check?
+// Throw exception?
+  }
+  else{
     if (stopLayer == copperLayersCount - 1){
       mStopLayer = -1;
     }
@@ -271,6 +319,14 @@ void BI_Via::serialize(SExpression& root) const {
   root.appendChild("size", mSize, false);
   root.appendChild("drill", mDrillDiameter, false);
   root.appendChild("shape", mShape, false);
+
+  BoardLayerStack* layerStack = &mBoard.getLayerStack();
+  QString startLayerName = layerStack->getCopperLayer(mStartLayer)->getName();
+  SExpression startLayerToken = SExpression::createToken(startLayerName);
+  root.appendChild("start_layer", startLayerToken, false);
+  QString stopLayerName = layerStack->getCopperLayer(mStopLayer)->getName();
+  SExpression stopLayerToken = SExpression::createToken(stopLayerName);
+  root.appendChild("stop_layer", stopLayerToken, false);
 }
 
 /*******************************************************************************

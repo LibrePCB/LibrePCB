@@ -58,6 +58,8 @@ public:
   void setSize(const PositiveLength& size, bool immediate) noexcept;
   void setDrillDiameter(const PositiveLength& diameter,
                         bool                  immediate) noexcept;
+  void setStartLayer(const int startLayer, bool immediate) noexcept;
+  void setStopLayer(const int stopLayer, bool immediate) noexcept;
 
 private:
   // Private Methods
@@ -85,6 +87,10 @@ private:
   PositiveLength mNewSize;
   PositiveLength mOldDrillDiameter;
   PositiveLength mNewDrillDiameter;
+  int            mOldStartLayer;
+  int            mNewStartLayer;
+  int            mOldStopLayer;
+  int            mNewStopLayer;
 };
 
 /*******************************************************************************

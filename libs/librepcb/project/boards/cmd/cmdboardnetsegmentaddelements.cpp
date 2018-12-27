@@ -57,8 +57,9 @@ BI_Via* CmdBoardNetSegmentAddElements::addVia(BI_Via& via) {
 
 BI_Via* CmdBoardNetSegmentAddElements::addVia(
     const Point& position, BI_Via::Shape shape, const PositiveLength& size,
-    const PositiveLength& drillDiameter) {
-  BI_Via* via = new BI_Via(mNetSegment, position, shape, size, drillDiameter);
+    const PositiveLength& drillDiameter, int startLayer, int stopLayer) {
+  BI_Via* via = new BI_Via(mNetSegment, position, shape, size, drillDiameter,
+                           startLayer, stopLayer);
   return addVia(*via);
 }
 

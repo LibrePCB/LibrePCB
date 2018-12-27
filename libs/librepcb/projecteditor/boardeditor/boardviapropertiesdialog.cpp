@@ -91,12 +91,8 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
   connect(mUi->cbxStopLayer,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
           this, &BoardViaPropertiesDialog::stopLayerChanged);
-  int stopLayerIndex = via.getStopLayer();
-  if (stopLayerIndex > layerStack->getInnerLayerCount()){
-    stopLayerIndex = GraphicsLayer::getInnerLayerCount() + 1;
-  }
-  mUi->cbxStopLayer->setCurrentIndex(stopLayerIndex);
-  qDebug() << "via properties" << via.getStartLayer() << " " << via.getStopLayer() << " " << stopLayerIndex;
+  mUi->cbxStopLayer->setCurrentIndex(via.getStopLayer() - 1);
+  qDebug() << "via propery" << via.getStartLayer() << " " << via.getStopLayer();
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
@@ -145,6 +141,8 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     cmd->setDrillDiameter(
         PositiveLength(Length::fromMm(mUi->spbxDrillDiameter->value())),
         false);  // can throw
+    cmd->setStartLayer(mUi->cbxStartLayer->currentIndex(), false);
+    cmd->setStopLayer(mUi->cbxStopLayer->currentIndex() + 1, false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

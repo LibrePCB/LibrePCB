@@ -121,13 +121,13 @@ GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
 
     //return bottom layer
     int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
-    return mLayers[mCopperLayerOffset + maxInnerLayersCount + 1];
+    return mLayers[mTopLayerIndex + maxInnerLayersCount + 1];
   }
   if (index == getCopperLayerCount() - 1){ // is it the bottom layer
     int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
-    return mLayers[mCopperLayerOffset + maxInnerLayersCount + 1];
+    return mLayers[mTopLayerIndex + maxInnerLayersCount + 1];
   }
-  return mLayers[mCopperLayerOffset + index];
+  return mLayers[mTopLayerIndex + index];
 }
 
 /*******************************************************************************
@@ -191,12 +191,13 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBoardPadsTht);
   addLayer(GraphicsLayer::sBoardAirWires);
 
-  mCopperLayerOffset = mLayers.count();
+  mTopLayerIndex = mLayers.count();
   // copper layers
   addLayer(GraphicsLayer::sTopCopper);
   for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
     addLayer(GraphicsLayer::getInnerLayerName(i));
   }
+  mBottomLayerIndex = mLayers.count();
   addLayer(GraphicsLayer::sBotCopper);
 
   // symmetric board layers

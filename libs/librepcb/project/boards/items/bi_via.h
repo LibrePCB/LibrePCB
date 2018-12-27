@@ -60,8 +60,8 @@ public:
   BI_Via(const BI_Via& other) = delete;
   BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
   BI_Via(BI_NetSegment& netsegment, const SExpression& node);
-  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
-         const PositiveLength& size, const PositiveLength& drillDiameter);
+//  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
+//         const PositiveLength& size, const PositiveLength& drillDiameter);
   BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
          const PositiveLength& size, const PositiveLength& drillDiameter,
          const int startLayer, const int stopLayer);
@@ -76,7 +76,7 @@ public:
     return mDrillDiameter;
   }
   int                   getStartLayer() const noexcept { return mStartLayer; }
-  int                   getStopLayer() const noexcept { return mStopLayer; }
+  int                   getStopLayer() const noexcept;
 
   const PositiveLength& getSize() const noexcept { return mSize; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
@@ -92,7 +92,8 @@ public:
   void setShape(Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
-  void setLayers(const int startLayer, const int stopLayer) noexcept;
+  void setStartLayer(const int startLayer) noexcept;
+  void setStopLayer(const int stopLayer) noexcept;
 
   // General Methods
   void addToBoard() override;

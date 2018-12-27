@@ -71,6 +71,10 @@ private:
   void       updateShapeActionsCheckedState() noexcept;
   void       setNetSignal(NetSignal* netsignal) noexcept;
 
+  //Making sure that start layer is always on top of stop layer
+  void       startLayerChanged(int index) noexcept;
+  void       stopLayerChanged(int index) noexcept;
+
   // General Attributes
   bool                            mUndoCmdActive;
   BI_Via*                         mCurrentVia;
@@ -78,6 +82,8 @@ private:
   PositiveLength                  mCurrentViaSize;
   PositiveLength                  mCurrentViaDrillDiameter;
   NetSignal*                      mCurrentViaNetSignal;
+  int                             mCurrentViaStartLayer;
+  int                             mCurrentViaStopLayer;
   QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
   // Widgets for the command toolbar
@@ -89,6 +95,10 @@ private:
   QComboBox*           mDrillComboBox;
   QLabel*              mNetSignalLabel;
   QComboBox*           mNetSignalComboBox;
+  QLabel*              mStartLayerLabel;
+  QComboBox*           mStartLayerComboBox;
+  QLabel*              mStopLayerLabel;
+  QComboBox*           mStopLayerComboBox;
 };
 
 /*******************************************************************************
