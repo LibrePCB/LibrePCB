@@ -92,8 +92,37 @@ WorkspaceLibraryDb::~WorkspaceLibraryDb() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters: Libraries
+ ******************************************************************************/
+
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getLibraries() const {
+  QSqlQuery query =
+      mDb->prepareQuery("SELECT version, filepath FROM libraries");
+  mDb->exec(query);
+
+  QMultiMap<Version, FilePath> libraries;
+  while (query.next()) {
+    Version version =
+        Version::fromString(query.value(0).toString());  // can throw
+    FilePath filepath(FilePath::fromRelative(mWorkspace.getLibrariesPath(),
+                                             query.value(1).toString()));
+    if (filepath.isValid()) {
+      libraries.insert(version, filepath);
+    } else {
+      throw LogicError(__FILE__, __LINE__);
+    }
+  }
+  return libraries;
+}
+
+/*******************************************************************************
  *  Getters: Library Elements by their UUID
  ******************************************************************************/
+
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getLibraries(
+    const Uuid& uuid) const {
+  return getElementFilePathsFromDb("libraries", uuid);
+}
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getComponentCategories(
     const Uuid& uuid) const {
@@ -128,6 +157,10 @@ QMultiMap<Version, FilePath> WorkspaceLibraryDb::getDevices(
 /*******************************************************************************
  *  Getters: Best Match Library Elements by their UUID
  ******************************************************************************/
+
+FilePath WorkspaceLibraryDb::getLatestLibrary(const Uuid& uuid) const {
+  return getLatestVersionFilePath(getLibraries(uuid));
+}
 
 FilePath WorkspaceLibraryDb::getLatestComponentCategory(
     const Uuid& uuid) const {
@@ -199,6 +232,14 @@ QList<FilePath> WorkspaceLibraryDb::getLibraryElements<Device>(
  ******************************************************************************/
 
 template <>
+void WorkspaceLibraryDb::getElementTranslations<Library>(
+    const FilePath& elemDir, const QStringList& localeOrder, QString* name,
+    QString* desc, QString* keywords) const {
+  getElementTranslations("libraries", "lib_id", elemDir, localeOrder, name,
+                         desc, keywords);
+}
+
+template <>
 void WorkspaceLibraryDb::getElementTranslations<ComponentCategory>(
     const FilePath& elemDir, const QStringList& localeOrder, QString* name,
     QString* desc, QString* keywords) const {
@@ -244,6 +285,72 @@ void WorkspaceLibraryDb::getElementTranslations<Device>(
     QString* desc, QString* keywords) const {
   getElementTranslations("devices", "device_id", elemDir, localeOrder, name,
                          desc, keywords);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Library>(const FilePath elemDir,
+                                                     Uuid*          uuid,
+                                                     Version* version) const {
+  return getElementMetadata("libraries", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<ComponentCategory>(
+    const FilePath elemDir, Uuid* uuid, Version* version) const {
+  return getElementMetadata("component_categories", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<PackageCategory>(
+    const FilePath elemDir, Uuid* uuid, Version* version) const {
+  return getElementMetadata("package_categories", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Symbol>(const FilePath elemDir,
+                                                    Uuid*          uuid,
+                                                    Version* version) const {
+  return getElementMetadata("symbols", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Package>(const FilePath elemDir,
+                                                     Uuid*          uuid,
+                                                     Version* version) const {
+  return getElementMetadata("packages", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Component>(const FilePath elemDir,
+                                                       Uuid*          uuid,
+                                                       Version* version) const {
+  return getElementMetadata("components", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Device>(const FilePath elemDir,
+                                                    Uuid*          uuid,
+                                                    Version* version) const {
+  return getElementMetadata("devices", elemDir, uuid, version);
+}
+
+void WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
+                                            QPixmap*       icon) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT icon_png FROM libraries WHERE filepath = :filepath");
+  query.bindValue(":filepath",
+                  libDir.toRelative(mWorkspace.getLibrariesPath()));
+  mDb->exec(query);
+
+  if (query.first()) {
+    QByteArray blob = query.value(0).toByteArray();
+    if (icon) icon->loadFromData(blob, "png");
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("Library not found in workspace library: \"%1\""))
+            .arg(libDir.toNative()));
+  }
 }
 
 void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
@@ -382,8 +489,7 @@ void WorkspaceLibraryDb::getElementTranslations(const QString&     table,
     QString locale      = query.value(0).toString();
     QString name        = query.value(1).toString();
     QString description = query.value(2).toString();
-    ;
-    QString keywords = query.value(3).toString();
+    QString keywords    = query.value(3).toString();
     if (!name.isNull()) nameMap.insert(locale, ElementName(name));  // can throw
     if (!description.isNull()) descriptionMap.insert(locale, description);
     if (!keywords.isNull()) keywordsMap.insert(locale, keywords);
@@ -392,6 +498,23 @@ void WorkspaceLibraryDb::getElementTranslations(const QString&     table,
   if (name) *name = *nameMap.value(localeOrder);
   if (desc) *desc = descriptionMap.value(localeOrder);
   if (keywords) *keywords = keywordsMap.value(localeOrder);
+}
+
+void WorkspaceLibraryDb::getElementMetadata(const QString& table,
+                                            const FilePath elemDir, Uuid* uuid,
+                                            Version* version) const {
+  QSqlQuery query = mDb->prepareQuery("SELECT uuid, version FROM " % table %
+                                      " WHERE filepath = :filepath");
+  query.bindValue(":filepath",
+                  elemDir.toRelative(mWorkspace.getLibrariesPath()));
+  mDb->exec(query);
+
+  while (query.next()) {
+    QString uuidStr    = query.value(0).toString();
+    QString versionStr = query.value(1).toString();
+    if (uuid) *uuid = Uuid::fromString(uuidStr);              // can throw
+    if (version) *version = Version::fromString(versionStr);  // can throw
+  }
 }
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(
