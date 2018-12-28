@@ -133,9 +133,11 @@ public:
 signals:
 
   void scanStarted();
+  void scanLibraryListUpdated(int libraryCount);
   void scanProgressUpdate(int percent);
   void scanSucceeded(int elementCount);
   void scanFailed(QString errorMsg);
+  void scanFinished();
 
 private:
   // Private Methods

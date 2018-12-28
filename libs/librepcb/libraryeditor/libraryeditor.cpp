@@ -123,7 +123,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &workspace::WorkspaceLibraryDb::scanStarted, mUi->statusBar,
           &StatusBar::showProgressBar, Qt::QueuedConnection);
   connect(&mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, mUi->statusBar,
+          &workspace::WorkspaceLibraryDb::scanFinished, mUi->statusBar,
           &StatusBar::hideProgressBar, Qt::QueuedConnection);
   connect(&mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusBar,

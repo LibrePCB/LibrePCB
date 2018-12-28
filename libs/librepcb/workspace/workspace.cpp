@@ -113,7 +113,7 @@ Workspace::Workspace(const FilePath& wsPath)
   mWorkspaceSettings.reset(new WorkspaceSettings(*this));
 
   // load local libraries
-  FilePath localLibsDirPath = mLibrariesPath.getPathTo("local");
+  FilePath localLibsDirPath = getLocalLibrariesPath();
   QDir     localLibsDir(localLibsDirPath.toStr());
   foreach (const QString& dir,
            localLibsDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
@@ -136,7 +136,7 @@ Workspace::Workspace(const FilePath& wsPath)
   }
 
   // load remote libraries
-  FilePath remoteLibsDirPath = mLibrariesPath.getPathTo("remote");
+  FilePath remoteLibsDirPath = getRemoteLibrariesPath();
   QDir     remoteLibsDir(remoteLibsDirPath.toStr());
   foreach (const QString& dir,
            remoteLibsDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {

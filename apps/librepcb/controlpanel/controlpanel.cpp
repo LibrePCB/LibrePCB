@@ -81,7 +81,7 @@ ControlPanel::ControlPanel(Workspace& workspace)
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
           mUi->statusBar, &StatusBar::showProgressBar, Qt::QueuedConnection);
-  connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanSucceeded,
+  connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished,
           mUi->statusBar, &StatusBar::hideProgressBar, Qt::QueuedConnection);
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
           mUi->statusBar, &StatusBar::setProgressBarPercent,

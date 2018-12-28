@@ -123,7 +123,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
   // Load all library elements.
   updateElementLists();
   connect(&mContext.workspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
+          &workspace::WorkspaceLibraryDb::scanFinished, this,
           &LibraryOverviewWidget::updateElementLists);
 }
 

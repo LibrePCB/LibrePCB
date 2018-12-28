@@ -190,7 +190,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
           &workspace::WorkspaceLibraryDb::scanStarted, mUi->statusbar,
           &StatusBar::showProgressBar, Qt::QueuedConnection);
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, mUi->statusbar,
+          &workspace::WorkspaceLibraryDb::scanFinished, mUi->statusbar,
           &StatusBar::hideProgressBar, Qt::QueuedConnection);
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,

@@ -76,14 +76,19 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws)
 
   // create library scanner object
   mLibraryScanner.reset(new WorkspaceLibraryScanner(mWorkspace, mFilePath));
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::started, this,
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanStarted, this,
           &WorkspaceLibraryDb::scanStarted, Qt::QueuedConnection);
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::progressUpdate,
+  connect(mLibraryScanner.data(),
+          &WorkspaceLibraryScanner::scanLibraryListUpdated, this,
+          &WorkspaceLibraryDb::scanLibraryListUpdated, Qt::QueuedConnection);
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanProgressUpdate,
           this, &WorkspaceLibraryDb::scanProgressUpdate, Qt::QueuedConnection);
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::succeeded, this,
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanSucceeded, this,
           &WorkspaceLibraryDb::scanSucceeded, Qt::QueuedConnection);
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::failed, this,
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanFailed, this,
           &WorkspaceLibraryDb::scanFailed, Qt::QueuedConnection);
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanFinished, this,
+          &WorkspaceLibraryDb::scanFinished, Qt::QueuedConnection);
 
   qDebug("Workspace library database successfully loaded!");
 }

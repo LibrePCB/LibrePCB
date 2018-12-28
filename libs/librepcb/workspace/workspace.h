@@ -109,6 +109,20 @@ public:
    */
   const FilePath& getLibrariesPath() const { return mLibrariesPath; }
 
+  /**
+   * @brief Get the filepath to the "v#/libraries/local" directory
+   */
+  FilePath getLocalLibrariesPath() const {
+    return mLibrariesPath.getPathTo("local");
+  }
+
+  /**
+   * @brief Get the filepath to the "v#/libraries/remote" directory
+   */
+  FilePath getRemoteLibrariesPath() const {
+    return mLibrariesPath.getPathTo("remote");
+  }
+
   ProjectTreeModel&      getProjectTreeModel() const noexcept;
   RecentProjectsModel&   getRecentProjectsModel() const noexcept;
   FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
