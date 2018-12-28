@@ -426,8 +426,8 @@ bool ComponentSignalListEditorWidget::setName(const Uuid&    uuid,
   try {
     ComponentSignal* signal = mSignalList->get(uuid).get();  // can throw
     if (signal->getName() == name) {
-        updateTable();
-        return true;
+      updateTable();
+      return true;
     }
     CircuitIdentifier constrainedName = validateNameOrThrow(name);  // can throw
     if (mUndoStack) {
