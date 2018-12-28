@@ -244,6 +244,9 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::updateTabTitles);
   connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
           &LibraryEditor::updateTabTitles);
+  connect(overviewWidget, &EditorWidgetBase::elementEdited,
+          &mWorkspace.getLibraryDb(),
+          &workspace::WorkspaceLibraryDb::startLibraryRescan);
 
   // Edit element signals
   connect(overviewWidget,
