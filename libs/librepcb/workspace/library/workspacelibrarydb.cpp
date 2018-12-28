@@ -57,23 +57,25 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws)
   qDebug("Load workspace library database...");
 
   // open SQLite database
-  FilePath dbFilePath = ws.getLibrariesPath().getPathTo("cache.sqlite");
-  mDb.reset(new SQLiteDatabase(dbFilePath));  // can throw
+  mFilePath = ws.getLibrariesPath().getPathTo(
+      QString("cache_v%1.sqlite").arg(sCurrentDbVersion));
+  mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
 
-  // if the db has an old version, just remove the whole db and create a new one
+  // Check database version - actually it must match the version in the
+  // filename, but if not (e.g. due to a mistake by us) we just remove the whole
+  // database and create a new one.
   int dbVersion = getDbVersion();
-  if (dbVersion < sCurrentDbVersion) {
-    qInfo() << "Library database version" << dbVersion
-            << "is outdated -> update triggered";
+  if (dbVersion != sCurrentDbVersion) {
+    qCritical() << "Library database version" << dbVersion << "is wrong!";
     mDb.reset();
-    QFile(dbFilePath.toStr()).remove();
-    mDb.reset(new SQLiteDatabase(dbFilePath));  // can throw
-    createAllTables();                          // can throw
-    setDbVersion(sCurrentDbVersion);            // can throw
+    QFile(mFilePath.toStr()).remove();
+    mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
+    createAllTables();                         // can throw
+    setDbVersion(sCurrentDbVersion);           // can throw
   }
 
   // create library scanner object
-  mLibraryScanner.reset(new WorkspaceLibraryScanner(mWorkspace));
+  mLibraryScanner.reset(new WorkspaceLibraryScanner(mWorkspace, mFilePath));
   connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::started, this,
           &WorkspaceLibraryDb::scanStarted, Qt::QueuedConnection);
   connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::progressUpdate,
