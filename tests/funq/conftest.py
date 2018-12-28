@@ -75,10 +75,13 @@ class LibrePcbFixture(object):
             path = self.abspath(path)
         self.project_path = path
 
+    def get_workspace_libraries_path(self, subdir=''):
+        return os.path.join(self.workspace_path, 'v0.1', 'libraries', subdir)
+
     def add_local_library_to_workspace(self, path):
         if not os.path.isabs(path):
             path = self.abspath(path)
-        dest = os.path.join(self.workspace_path, 'v0.1', 'libraries', 'local')
+        dest = self.get_workspace_libraries_path('local')
         dest = os.path.join(dest, os.path.basename(path))
         shutil.copytree(path, dest)
 

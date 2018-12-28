@@ -74,6 +74,12 @@ libraryManagerCreateLocalLibraryCc0LicenseCheckbox = {libraryManagerCreateLocalL
 libraryManagerCreateLocalLibraryDirectoryEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalDirectory
 libraryManagerCreateLocalLibraryCreateButton = {libraryManagerCreateLocalLibraryTab}::btnLocalCreate
 
+# Download library tab
+libraryManagerDownloadManuallyTab = {libraryManagerAddLibraryStackedWidget}::tabDownloadManually
+libraryManagerDownloadManuallyUrlEdit = {libraryManagerDownloadManuallyTab}::edtDownloadZipUrl
+libraryManagerDownloadManuallyDirectoryEdit = {libraryManagerDownloadManuallyTab}::edtDownloadZipDirectory
+libraryManagerDownloadManuallyDownloadButton = {libraryManagerDownloadManuallyTab}::btnDownloadZip
+
 # Library info widget
 libraryManagerLibraryInfoWidget = {libraryManagerWidget}::librepcb__library__manager__LibraryInfoWidget
 libraryManagerLibraryInfoWidgetOpenEditorButton = {libraryManagerLibraryInfoWidget}::btnOpenLibraryEditor
