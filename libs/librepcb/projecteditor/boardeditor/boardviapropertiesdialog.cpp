@@ -77,22 +77,29 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
   mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
 
   BoardLayerStack* layerStack = &via.getBoard().getLayerStack();
-  for (int i = 0; i < layerStack->getCopperLayerCount() - 1; ++i){
-    mUi->cbxStartLayer->addItem(layerStack->getCopperLayer(i)->getNameTr());
+  QString layerName = GraphicsLayer::sTopCopper;
+  mUi->cbxStartLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                              layerName);
+  for (int i = 1; i <= layerStack->getInnerLayerCount(); ++i){
+    layerName = GraphicsLayer::getInnerLayerName(i);
+    mUi->cbxStartLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                                layerName);
+    mUi->cbxStopLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                               layerName);
   }
+  layerName = GraphicsLayer::sBotCopper;
+  mUi->cbxStopLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                             layerName);
   connect(mUi->cbxStartLayer,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
           this, &BoardViaPropertiesDialog::startLayerChanged);
-  mUi->cbxStartLayer->setCurrentIndex(via.getStartLayer());
-
-  for (int i = 1; i < layerStack->getCopperLayerCount(); ++i){
-    mUi->cbxStopLayer->addItem(layerStack->getCopperLayer(i)->getNameTr());
-  }
   connect(mUi->cbxStopLayer,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
           this, &BoardViaPropertiesDialog::stopLayerChanged);
-  mUi->cbxStopLayer->setCurrentIndex(via.getStopLayer() - 1);
-  qDebug() << "via propery" << via.getStartLayer() << " " << via.getStopLayer();
+  mUi->cbxStartLayer->setCurrentIndex(via.getStartLayerIndex());
+  mUi->cbxStopLayer->setCurrentIndex(via.getStopLayerIndex() - 1);
+
+  qDebug() << "via propery" << via.getStartLayerName() << via.getStopLayerName();
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
@@ -141,8 +148,8 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     cmd->setDrillDiameter(
         PositiveLength(Length::fromMm(mUi->spbxDrillDiameter->value())),
         false);  // can throw
-    cmd->setStartLayer(mUi->cbxStartLayer->currentIndex(), false);
-    cmd->setStopLayer(mUi->cbxStopLayer->currentIndex() + 1, false);
+    cmd->setStartLayerName(mUi->cbxStartLayer->currentData().toString(), false);
+    cmd->setStopLayerName(mUi->cbxStopLayer->currentData().toString(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

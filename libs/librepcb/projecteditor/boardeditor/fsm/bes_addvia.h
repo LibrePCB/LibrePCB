@@ -82,8 +82,8 @@ private:
   PositiveLength                  mCurrentViaSize;
   PositiveLength                  mCurrentViaDrillDiameter;
   NetSignal*                      mCurrentViaNetSignal;
-  int                             mCurrentViaStartLayer;
-  int                             mCurrentViaStopLayer;
+  QString                         mCurrentViaStartLayerName;
+  QString                         mCurrentViaStopLayerName;
   QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
   // Widgets for the command toolbar

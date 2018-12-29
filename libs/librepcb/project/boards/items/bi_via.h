@@ -27,6 +27,8 @@
 #include "./bi_netline.h"
 #include "bi_base.h"
 
+#include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
@@ -64,7 +66,10 @@ public:
 //         const PositiveLength& size, const PositiveLength& drillDiameter);
   BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
          const PositiveLength& size, const PositiveLength& drillDiameter,
-         const int startLayer, const int stopLayer);
+         const QString& startLayerName, const QString& stopLayerName);
+  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
+         const PositiveLength& size, const PositiveLength& drillDiameter,
+         GraphicsLayer* startLayer, GraphicsLayer* stopLayer);
   ~BI_Via() noexcept;
 
   // Getters
@@ -75,8 +80,20 @@ public:
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
   }
-  int                   getStartLayer() const noexcept { return mStartLayer; }
-  int                   getStopLayer() const noexcept;
+  GraphicsLayer*        getStartLayer() const noexcept {
+    return mLayers.first();
+  }
+  GraphicsLayer*        getStopLayer() const noexcept {
+    return mLayers.back();
+  }
+  const QString&        getStartLayerName() const noexcept {
+    return getStartLayer()->getName();
+  }
+  const QString&        getStopLayerName() const noexcept {
+    return getStopLayer()->getName();
+  }
+  int             getStartLayerIndex() const noexcept;
+  int             getStopLayerIndex() const noexcept;
 
   const PositiveLength& getSize() const noexcept { return mSize; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
@@ -92,8 +109,8 @@ public:
   void setShape(Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
-  void setStartLayer(const int startLayer) noexcept;
-  void setStopLayer(const int stopLayer) noexcept;
+  void setLayers(const QString& startLayer, const QString& stopLayer) noexcept;
+  void setLayers(GraphicsLayer* startLayer, GraphicsLayer* stopLayer) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -131,13 +148,13 @@ private:
   QMetaObject::Connection mHighlightChangedConnection;
 
   // Attributes
-  Uuid           mUuid;
-  Point          mPosition;
-  Shape          mShape;
-  PositiveLength mSize;
-  PositiveLength mDrillDiameter;
-  int mStartLayer;
-  int mStopLayer; // is -1 if stops as bottom copper layer, otherwise is has to be less than bottom copper layer index
+  Uuid                  mUuid;
+  Point                 mPosition;
+  Shape                 mShape;
+  PositiveLength        mSize;
+  PositiveLength        mDrillDiameter;
+  QList<GraphicsLayer*> mLayers;
+// is -1 if stops as bottom copper layer, otherwise is has to be less than bottom copper layer index
 //  QMap <GraphicsLayer*, PositiveLength> mLayers; //TODO different mSize for different copper layers
 
   // Registered Elements

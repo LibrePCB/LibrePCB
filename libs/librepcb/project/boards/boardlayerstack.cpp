@@ -113,7 +113,7 @@ QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
   };
   return getLayers(names);
 }
-
+/*
 GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
   if (index < 0 || index >= getCopperLayerCount()){
     qDebug() << "Layer index is not in range";
@@ -128,7 +128,7 @@ GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
     return mLayers[mTopLayerIndex + maxInnerLayersCount + 1];
   }
   return mLayers[mTopLayerIndex + index];
-}
+}*/
 
 /*******************************************************************************
  *  Setters
@@ -191,13 +191,13 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBoardPadsTht);
   addLayer(GraphicsLayer::sBoardAirWires);
 
-  mTopLayerIndex = mLayers.count();
+//  mTopLayerIndex = mLayers.count();
   // copper layers
   addLayer(GraphicsLayer::sTopCopper);
   for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
     addLayer(GraphicsLayer::getInnerLayerName(i));
   }
-  mBottomLayerIndex = mLayers.count();
+//  mBottomLayerIndex = mLayers.count();
   addLayer(GraphicsLayer::sBotCopper);
 
   // symmetric board layers

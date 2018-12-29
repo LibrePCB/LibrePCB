@@ -81,8 +81,8 @@ bool CmdCombineBoardNetSegments::performExecute() {
     } else {
       BI_Via* newVia = cmdAdd->addVia(via->getPosition(), via->getShape(),
                                       via->getSize(), via->getDrillDiameter(),
-                                      via->getStartLayer(),
-                                      via->getStopLayer());
+                                      via->getStartLayerName(),
+                                      via->getStopLayerName());
       anchorMap.insert(via, newVia);
     }
   }

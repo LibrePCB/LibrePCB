@@ -47,10 +47,10 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
     mNewSize(mOldSize),
     mOldDrillDiameter(via.getDrillDiameter()),
     mNewDrillDiameter(mOldDrillDiameter),
-    mOldStartLayer(via.getStartLayer()),
-    mNewStartLayer(mOldStartLayer),
-    mOldStopLayer(via.getStopLayer()),
-    mNewStopLayer(mOldStopLayer) {
+    mOldStartLayerName(via.getStartLayerName()),
+    mNewStartLayerName(mOldStartLayerName),
+    mOldStopLayerName(via.getStopLayerName()),
+    mNewStopLayerName(mOldStopLayerName) {
 }
 
 CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
@@ -59,8 +59,7 @@ CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
     mVia.setShape(mOldShape);
     mVia.setSize(mOldSize);
     mVia.setDrillDiameter(mOldDrillDiameter);
-    mVia.setStartLayer(mOldStartLayer);
-    mVia.setStopLayer(mOldStopLayer);
+    mVia.setLayers(mOldStartLayerName, mOldStopLayerName);
   }
 }
 
@@ -101,16 +100,18 @@ void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter,
   if (immediate) mVia.setDrillDiameter(mNewDrillDiameter);
 }
 
-void CmdBoardViaEdit::setStartLayer(const int startLayer, bool immediate) noexcept {
+void CmdBoardViaEdit::setStartLayerName(const QString& startLayerName,
+                                    bool immediate) noexcept {
     Q_ASSERT(!wasEverExecuted());
-    mNewStartLayer = startLayer;
-    if (immediate) mVia.setStartLayer(mNewStartLayer);
+    mNewStartLayerName = startLayerName;
+    if (immediate) mVia.setLayers(mNewStartLayerName, mOldStopLayerName);
 }
 
-void CmdBoardViaEdit::setStopLayer(const int stopLayer, bool immediate) noexcept {
+void CmdBoardViaEdit::setStopLayerName(const QString& stopLayerName,
+                                   bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewStopLayer = stopLayer;
-  if (immediate) mVia.setStopLayer(mNewStopLayer);
+  mNewStopLayerName = stopLayerName;
+  if (immediate) mVia.setLayers(mOldStartLayerName, mNewStopLayerName);
 }
 
 /*******************************************************************************
@@ -124,23 +125,21 @@ bool CmdBoardViaEdit::performExecute() {
 }
 
 void CmdBoardViaEdit::performUndo() {
-  qDebug() << "UNDO!!! " << mOldStartLayer << " " << mOldStopLayer;
+  qDebug() << "UNDO!!!" << mOldStartLayerName << mOldStopLayerName;
   mVia.setPosition(mOldPos);
   mVia.setShape(mOldShape);
   mVia.setSize(mOldSize);
   mVia.setDrillDiameter(mOldDrillDiameter);
-  mVia.setStartLayer(mOldStartLayer);
-  mVia.setStopLayer(mOldStopLayer);
+  mVia.setLayers(mOldStartLayerName, mOldStopLayerName);
 }
 
 void CmdBoardViaEdit::performRedo() {
-  qDebug() << "REDO!!! " << mNewStartLayer << " " << mNewStopLayer;
+  qDebug() << "REDO!!!" << mNewStartLayerName << mNewStopLayerName;
   mVia.setPosition(mNewPos);
   mVia.setShape(mNewShape);
   mVia.setSize(mNewSize);
   mVia.setDrillDiameter(mNewDrillDiameter);
-  mVia.setStartLayer(mNewStartLayer);
-  mVia.setStopLayer(mNewStopLayer);
+  mVia.setLayers(mNewStartLayerName, mNewStopLayerName);
 }
 
 /*******************************************************************************

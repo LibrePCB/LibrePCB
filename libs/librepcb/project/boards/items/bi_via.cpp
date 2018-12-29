@@ -45,9 +45,8 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
     mPosition(other.mPosition),
     mShape(other.mShape),
     mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter),
-    mStartLayer(other.mStartLayer),
-    mStopLayer(other.mStopLayer) {
+    mDrillDiameter(other.mDrillDiameter) {
+  setLayers(other.getStartLayer(), other.getStopLayer());
   init();
 }
 
@@ -73,12 +72,6 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
   else{
     startLayerName = GraphicsLayer::sTopCopper;
   }
-  if (GraphicsLayer::isTopLayer(startLayerName)){
-    mStartLayer = 0;
-  }
-  else{
-    mStartLayer = GraphicsLayer::getInnerLayerNumber(startLayerName);
-  }
 
   if (node.tryGetChildByPath("stop_layer")){
     stopLayerName = node.getValueByPath<QString>("stop_layer");
@@ -86,12 +79,7 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
   else{
     stopLayerName = GraphicsLayer::sBotCopper;
   }
-  if (GraphicsLayer::isBottomLayer(stopLayerName)){
-    mStopLayer = -1;
-  }
-  else{
-    mStopLayer = GraphicsLayer::getInnerLayerNumber(stopLayerName);
-  }
+  setLayers(startLayerName, stopLayerName);
 
   init();
 }
@@ -110,19 +98,31 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
 //  init();
 //}
 
-
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
                const PositiveLength& size, const PositiveLength& drillDiameter,
-               const int startLayer, const int stopLayer)
+               const QString& startLayerName, const QString& stopLayerName)
   : BI_Base(netsegment.getBoard()),
     mNetSegment(netsegment),
     mUuid(Uuid::createRandom()),
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter),
-    mStartLayer(startLayer),
-    mStopLayer(stopLayer) {
+    mDrillDiameter(drillDiameter) {
+  setLayers(startLayerName, stopLayerName);
+  init();
+}
+
+BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
+               const PositiveLength& size, const PositiveLength& drillDiameter,
+               GraphicsLayer* startLayer, GraphicsLayer* stopLayer)
+  : BI_Base(netsegment.getBoard()),
+    mNetSegment(netsegment),
+    mUuid(Uuid::createRandom()),
+    mPosition(position),
+    mShape(shape),
+    mSize(size),
+    mDrillDiameter(drillDiameter) {
+  setLayers(startLayer, stopLayer);
   init();
 }
 
@@ -149,19 +149,7 @@ NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept {
 }
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
-  if (!GraphicsLayer::isCopperLayer(layerName)){ //Is this check needed?
-    //Throw exception?
-  }
-  if (GraphicsLayer::isTopLayer(layerName)){
-    return mStartLayer == 0;
-  }
-  else if (GraphicsLayer::isBottomLayer(layerName)){
-    return mStopLayer == -1;
-  }
-  else{
-    int layerNum = GraphicsLayer::getInnerLayerNumber(layerName) + 1;
-    return layerNum >= mStartLayer && layerNum <= mStopLayer;
-  }
+  return mLayers.contains(mBoard.getLayerStack().getLayer(layerName));
 //  return GraphicsLayer::isCopperLayer(layerName);
 }
 
@@ -196,12 +184,21 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept {
   return p;
 }
 
-int BI_Via::getStopLayer() const noexcept {
-  if (mStopLayer == -1){
-    return mBoard.getLayerStack().getCopperLayerCount() - 1;
+int BI_Via::getStartLayerIndex() const noexcept {
+  if (getStartLayer()->isTopLayer()){
+    return 0;
   }
   else{
-    return mStopLayer;
+    return getStartLayer()->getInnerLayerNumber();
+  }
+}
+
+int BI_Via::getStopLayerIndex() const noexcept {
+  if (getStopLayer()->isBottomLayer()){
+    return mBoard.getLayerStack().getInnerLayerCount() + 1;
+  }
+  else{
+    return getStopLayer()->getInnerLayerNumber();
   }
 }
 
@@ -241,31 +238,44 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   }
 }
 
-void BI_Via::setStartLayer(const int startLayer) noexcept{
-  int copperLayersCount = mBoard.getLayerStack().getCopperLayerCount();
-  if (startLayer >= mStopLayer || startLayer < 0
-      || startLayer >= copperLayersCount){ // Do we need this check?
-// Throw exception?
-  }
-  else{
-    mStartLayer = startLayer;
-    mGraphicsItem->updateCacheAndRepaint();
-  }
+void BI_Via::setLayers(const QString& startLayerName,
+                       const QString& stopLayerName) noexcept {
+  BoardLayerStack* layerStack = &mBoard.getLayerStack();
+  setLayers(layerStack->getLayer(startLayerName),
+            layerStack->getLayer(stopLayerName));
 }
 
-void BI_Via::setStopLayer(const int stopLayer) noexcept{
-  int copperLayersCount = mBoard.getLayerStack().getCopperLayerCount();
-  if (stopLayer <= mStartLayer || stopLayer < -1
-      || stopLayer >= copperLayersCount){ // Do we need this check?
-// Throw exception?
+void BI_Via::setLayers(GraphicsLayer* startLayer,
+                       GraphicsLayer* stopLayer) noexcept {
+  mLayers.clear();
+  BoardLayerStack* layerStack = &mBoard.getLayerStack();
+  if (startLayer->isTopLayer() && stopLayer->isBottomLayer()){
+    mLayers.append(startLayer);
+    for (int i = 1; i <= layerStack->getInnerLayerCount(); ++i){
+      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
+    }
+    mLayers.append(stopLayer);
+  }
+  else if (startLayer->isTopLayer()){
+    mLayers.append(startLayer);
+    for (int i = 1; i <= stopLayer->getInnerLayerNumber(); ++i){
+      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
+    }
+  }
+  else if (stopLayer->isBottomLayer()){
+    for (int i = startLayer->getInnerLayerNumber();
+         i <= layerStack->getInnerLayerCount(); ++i){
+      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
+    }
+    mLayers.append(stopLayer);
   }
   else{
-    if (stopLayer == copperLayersCount - 1){
-      mStopLayer = -1;
+    for (int i = startLayer->getInnerLayerNumber();
+         i <= stopLayer->getInnerLayerNumber(); ++i){
+      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
     }
-    else{
-      mStopLayer = stopLayer;
-    }
+  }
+  if (mGraphicsItem){
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
@@ -320,12 +330,9 @@ void BI_Via::serialize(SExpression& root) const {
   root.appendChild("drill", mDrillDiameter, false);
   root.appendChild("shape", mShape, false);
 
-  BoardLayerStack* layerStack = &mBoard.getLayerStack();
-  QString startLayerName = layerStack->getCopperLayer(mStartLayer)->getName();
-  SExpression startLayerToken = SExpression::createToken(startLayerName);
+  SExpression startLayerToken = SExpression::createToken(getStartLayerName());
   root.appendChild("start_layer", startLayerToken, false);
-  QString stopLayerName = layerStack->getCopperLayer(mStopLayer)->getName();
-  SExpression stopLayerToken = SExpression::createToken(stopLayerName);
+  SExpression stopLayerToken = SExpression::createToken(getStopLayerName());
   root.appendChild("stop_layer", stopLayerToken, false);
 }
 

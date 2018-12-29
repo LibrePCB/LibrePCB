@@ -58,8 +58,9 @@ public:
   BI_Via*      addVia(BI_Via& via);
   BI_Via*      addVia(const Point& position, BI_Via::Shape shape,
                       const PositiveLength& size,
-                      const PositiveLength& drillDiameter, int startLayer,
-                      int stopLayer);
+                      const PositiveLength& drillDiameter,
+                      const QString& startLayerName,
+                      const QString& stopLayerName);
   BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
   BI_NetPoint* addNetPoint(const Point& position);
   BI_NetLine*  addNetLine(BI_NetLine& netline);
