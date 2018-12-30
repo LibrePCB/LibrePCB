@@ -213,8 +213,11 @@ bool BES_DrawTrace::exit(BEE_Base* event) noexcept {
  *  Private Methods
  ******************************************************************************/
 
+ulong x = 0;
+
 BES_Base::ProcRetVal BES_DrawTrace::processSubStateIdle(
     BEE_Base* event) noexcept {
+  qDebug() << "processSubStateIdle" << x++;
   switch (event->getType()) {
     case BEE_Base::GraphicsViewEvent:
       return processIdleSceneEvent(event);
@@ -225,6 +228,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processSubStateIdle(
 
 BES_Base::ProcRetVal BES_DrawTrace::processIdleSceneEvent(
     BEE_Base* event) noexcept {
+  qDebug() << "processIdleSceneEvent" << x++;
   QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
   Q_ASSERT(qevent);
   if (!qevent) return PassToParentState;
@@ -257,6 +261,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processIdleSceneEvent(
 
 BES_Base::ProcRetVal BES_DrawTrace::processSubStatePositioning(
     BEE_Base* event) noexcept {
+  qDebug() << "processSubStatePositioning" << x++;
   switch (event->getType()) {
     case BEE_Base::AbortCommand:
       abortPositioning(true);
@@ -369,7 +374,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
       if (GraphicsLayer* linesLayer = netpoint->getLayerOfLines()) {
         layer = linesLayer;
       }
-    } else if (BI_Via* via = findVia(board, pos)) {
+    } else if (BI_Via* via = findVia(board, pos, layer)) {
       mFixedStartAnchor = via;
       netsegment        = &via->getNetSegment();
     } else if (BI_FootprintPad* pad = findPad(board, pos)) {
@@ -485,7 +490,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board, const Point& pos) noexcept {
                            {mPositioningNetPoint1, mPositioningNetPoint2})) {
         otherAnchor     = netpoint;
         otherNetSegment = &netpoint->getNetSegment();
-      } else if (BI_Via* via = findVia(board, pos, netsignal)) {
+      } else if (BI_Via* via = findVia(board, pos, layer, netsignal)) {
         otherAnchor     = via;
         otherNetSegment = &via->getNetSegment();
       } else if (BI_FootprintPad* pad = findPad(board, pos, layer, netsignal)) {
@@ -608,8 +613,9 @@ bool BES_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
 }
 
 BI_Via* BES_DrawTrace::findVia(Board& board, const Point& pos,
+                               GraphicsLayer* layer,
                                NetSignal* netsignal) const noexcept {
-  QList<BI_Via*> items = board.getViasAtScenePos(pos, netsignal);
+  QList<BI_Via*> items = board.getViasAtScenePos(pos, layer, netsignal);
   return items.count() > 0 ? items.first() : nullptr;
 }
 

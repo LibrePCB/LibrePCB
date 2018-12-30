@@ -98,6 +98,7 @@ public:
   const PositiveLength& getSize() const noexcept { return mSize; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOnLayer(const QString& layerName) const noexcept;
+  bool isOnLayer(GraphicsLayer* layer) const noexcept;
   bool isSelectable() const noexcept override;
   Path getOutline(const Length& expansion = Length(0)) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;

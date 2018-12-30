@@ -170,6 +170,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
            mPlane.getBoard().getNetSegments()) {
     // subtract vias
     foreach (const BI_Via* via, netsegment->getVias()) {
+      if (!via->isOnLayer(*mPlane.getLayerName())) continue;
       if (&netsegment->getNetSignal() == &mPlane.getNetSignal()) {
         ClipperLib::Path path =
             ClipperHelpers::convert(via->getSceneOutline(), maxArcTolerance());

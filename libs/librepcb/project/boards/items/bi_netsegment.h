@@ -73,7 +73,8 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   NetSignal&  getNetSignal() const noexcept { return *mNetSignal; }
   bool        isUsed() const noexcept;
-  int getViasAtScenePos(const Point& pos, QList<BI_Via*>& vias) const noexcept;
+  int getViasAtScenePos(const Point& pos, GraphicsLayer* layer,
+                        QList<BI_Via*>& vias) const noexcept;
   int getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                              QList<BI_NetPoint*>& points) const noexcept;
   int getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,

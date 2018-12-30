@@ -103,6 +103,7 @@ private:
   bool             addNextNetPoint(Board& board, const Point& pos) noexcept;
   bool             abortPositioning(bool showErrMsgBox) noexcept;
   BI_Via*          findVia(Board& board, const Point& pos,
+                           GraphicsLayer* layer = nullptr,
                            NetSignal* netsignal = nullptr) const noexcept;
   BI_FootprintPad* findPad(Board& board, const Point& pos,
                            GraphicsLayer* layer     = nullptr,

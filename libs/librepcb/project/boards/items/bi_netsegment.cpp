@@ -209,10 +209,11 @@ bool BI_NetSegment::isUsed() const noexcept {
 }
 
 int BI_NetSegment::getViasAtScenePos(const Point&    pos,
+                                     GraphicsLayer* layer,
                                      QList<BI_Via*>& vias) const noexcept {
   int count = 0;
   foreach (BI_Via* via, mVias) {
-    if (via->isSelectable() &&
+    if (via->isSelectable() && via->isOnLayer(layer) &&
         via->getGrabAreaScenePx().contains(pos.toPxQPointF())) {
       vias.append(via);
       ++count;

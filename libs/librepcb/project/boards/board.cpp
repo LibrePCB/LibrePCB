@@ -431,7 +431,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
       list;  // Note: The order of adding the items is very important (the
              // top most item must appear as the first item in the list)!
   // vias
-  foreach (BI_Via* via, getViasAtScenePos(pos, nullptr)) { list.append(via); }
+  foreach (BI_Via* via, getViasAtScenePos(pos, nullptr, nullptr)) { list.append(via); }
   // netpoints
   foreach (BI_NetPoint* netpoint,
            getNetPointsAtScenePos(pos, nullptr, nullptr)) {
@@ -505,12 +505,13 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
 }
 
 QList<BI_Via*> Board::getViasAtScenePos(const Point&     pos,
+                                        GraphicsLayer* layer,
                                         const NetSignal* netsignal) const
     noexcept {
   QList<BI_Via*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
     if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
-      segment->getViasAtScenePos(pos, list);
+      segment->getViasAtScenePos(pos, layer, list);
     }
   }
   return list;

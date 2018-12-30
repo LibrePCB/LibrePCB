@@ -149,8 +149,17 @@ NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept {
 }
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
-  return mLayers.contains(mBoard.getLayerStack().getLayer(layerName));
-//  return GraphicsLayer::isCopperLayer(layerName);
+  if (layerName == nullptr){// pass nullptr for all layers
+    return true;
+  }
+  return isOnLayer(mBoard.getLayerStack().getLayer(layerName));
+}
+
+bool BI_Via::isOnLayer(GraphicsLayer* layer) const noexcept {
+  if (layer == nullptr){// pass nullptr for all layers
+    return true;
+  }
+  return mLayers.contains(layer);
 }
 
 Path BI_Via::getOutline(const Length& expansion) const noexcept {

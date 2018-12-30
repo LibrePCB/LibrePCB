@@ -149,7 +149,9 @@ public:
   bool                isEmpty() const noexcept;
   QList<BI_Base*>     getItemsAtScenePos(const Point& pos) const noexcept;
   QList<BI_Via*>      getViasAtScenePos(const Point&     pos,
-                                        const NetSignal* netsignal) const noexcept;
+                                        GraphicsLayer* layer,
+                                        const NetSignal* netsignal) const
+      noexcept;
   QList<BI_NetPoint*> getNetPointsAtScenePos(const Point&         pos,
                                              const GraphicsLayer* layer,
                                              const NetSignal* netsignal) const
