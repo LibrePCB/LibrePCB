@@ -213,11 +213,8 @@ bool BES_DrawTrace::exit(BEE_Base* event) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-ulong x = 0;
-
 BES_Base::ProcRetVal BES_DrawTrace::processSubStateIdle(
     BEE_Base* event) noexcept {
-  qDebug() << "processSubStateIdle" << x++;
   switch (event->getType()) {
     case BEE_Base::GraphicsViewEvent:
       return processIdleSceneEvent(event);
@@ -228,7 +225,6 @@ BES_Base::ProcRetVal BES_DrawTrace::processSubStateIdle(
 
 BES_Base::ProcRetVal BES_DrawTrace::processIdleSceneEvent(
     BEE_Base* event) noexcept {
-  qDebug() << "processIdleSceneEvent" << x++;
   QEvent* qevent = BEE_RedirectedQEvent::getQEventFromBEE(event);
   Q_ASSERT(qevent);
   if (!qevent) return PassToParentState;
@@ -261,7 +257,6 @@ BES_Base::ProcRetVal BES_DrawTrace::processIdleSceneEvent(
 
 BES_Base::ProcRetVal BES_DrawTrace::processSubStatePositioning(
     BEE_Base* event) noexcept {
-  qDebug() << "processSubStatePositioning" << x++;
   switch (event->getType()) {
     case BEE_Base::AbortCommand:
       abortPositioning(true);
