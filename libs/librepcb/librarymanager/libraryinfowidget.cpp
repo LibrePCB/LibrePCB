@@ -24,7 +24,9 @@
 
 #include "ui_libraryinfowidget.h"
 
+#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/library/library.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -42,24 +44,27 @@ namespace manager {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace&   ws,
-                                     QSharedPointer<Library> lib) noexcept
+LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws,
+                                     const FilePath&       libDir)
   : QWidget(nullptr),
     mUi(new Ui::LibraryInfoWidget),
     mWorkspace(ws),
-    mLib(lib) {
+    mLibDir(libDir) {
   mUi->setupUi(this);
   connect(mUi->btnOpenLibraryEditor, &QPushButton::clicked, this,
           &LibraryInfoWidget::btnOpenLibraryEditorClicked);
   connect(mUi->btnRemove, &QPushButton::clicked, this,
           &LibraryInfoWidget::btnRemoveLibraryClicked);
 
+  // try to load the library
+  Library lib(mLibDir, true);  // can throw
+
   const QStringList& localeOrder =
       ws.getSettings().getLibLocaleOrder().getLocaleOrder();
 
   // image
-  if (!lib->getIconAsPixmap().isNull()) {
-    mUi->lblIcon->setPixmap(lib->getIconAsPixmap().scaled(
+  if (!lib.getIconAsPixmap().isNull()) {
+    mUi->lblIcon->setPixmap(lib.getIconAsPixmap().scaled(
         mUi->lblIcon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
   } else {
     mUi->lblIcon->setVisible(false);
@@ -67,28 +72,29 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace&   ws,
   }
 
   // general attributes
-  mUi->lblName->setText(*lib->getNames().value(localeOrder));
-  mUi->lblDescription->setText(lib->getDescriptions().value(localeOrder));
-  mUi->lblVersion->setText(lib->getVersion().toStr());
-  mUi->lblAuthor->setText(lib->getAuthor());
+  mUi->lblName->setText(*lib.getNames().value(localeOrder));
+  mUi->lblDescription->setText(lib.getDescriptions().value(localeOrder));
+  mUi->lblVersion->setText(lib.getVersion().toStr());
+  mUi->lblAuthor->setText(lib.getAuthor());
   mUi->lblUrl->setText(
       QString("<a href='%1'>%2</a>")
-          .arg(lib->getUrl().toEncoded(), lib->getUrl().toDisplayString()));
-  mUi->lblCreated->setText(lib->getCreated().toString(Qt::TextDate));
+          .arg(lib.getUrl().toEncoded(), lib.getUrl().toDisplayString()));
+  mUi->lblCreated->setText(lib.getCreated().toString(Qt::TextDate));
   mUi->lblDeprecated->setText(
-      lib->isDeprecated() ? tr("Yes - Consider switching to another library.")
-                          : tr("No"));
+      lib.isDeprecated() ? tr("Yes - Consider switching to another library.")
+                         : tr("No"));
 
   // extended attributes
   mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
   QString dependencies;
-  foreach (const Uuid& uuid, lib->getDependencies()) {
-    QSharedPointer<library::Library> installedLib =
-        mWorkspace.getLibrary(uuid, true, true);
-    QString line = dependencies.isEmpty() ? "" : "<br>";
-    if (installedLib) {
-      line += QString(" <font color=\"green\">%1 ✔</font>")
-                  .arg(*installedLib->getNames().value(localeOrder));
+  foreach (const Uuid& uuid, lib.getDependencies()) {
+    QString  line = dependencies.isEmpty() ? "" : "<br>";
+    FilePath fp   = ws.getLibraryDb().getLatestLibrary(uuid);  // can throw
+    if (fp.isValid()) {
+      QString name;
+      ws.getLibraryDb().getElementTranslations<Library>(fp, localeOrder,
+                                                        &name);  // can throw
+      line += QString(" <font color=\"green\">%1 ✔</font>").arg(name);
     } else {
       line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());
     }
@@ -97,9 +103,9 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace&   ws,
   mUi->lblDependencies->setText(dependencies);
   mUi->lblDirectory->setText(
       QString("<a href='%1'>%2</a>")
-          .arg(lib->getFilePath().toQUrl().toLocalFile(),
-               lib->getFilePath().toRelative(ws.getLibrariesPath())));
-  mUi->lblDirectory->setToolTip(lib->getFilePath().toNative());
+          .arg(lib.getFilePath().toQUrl().toLocalFile(),
+               lib.getFilePath().toRelative(ws.getLibrariesPath())));
+  mUi->lblDirectory->setToolTip(lib.getFilePath().toNative());
 }
 
 LibraryInfoWidget::~LibraryInfoWidget() noexcept {
@@ -110,7 +116,7 @@ LibraryInfoWidget::~LibraryInfoWidget() noexcept {
  ******************************************************************************/
 
 void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept {
-  emit openLibraryEditorTriggered(mLib);
+  emit openLibraryEditorTriggered(mLibDir);
 }
 
 void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept {
@@ -118,29 +124,23 @@ void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept {
   QString text =
       QString(tr("Attention! This will remove the whole library directory:"
                  "\n\n%1\n\nAre you really sure to remove \"%2\"?"))
-          .arg(mLib->getFilePath().toNative(), mUi->lblName->text());
+          .arg(mLibDir.toNative(), mUi->lblName->text());
 
   int res = QMessageBox::question(this, title, text,
                                   QMessageBox::Yes | QMessageBox::No);
 
   if (res == QMessageBox::Yes) {
     try {
-      if (isRemoteLibrary()) {
-        mWorkspace.removeRemoteLibrary(
-            mLib->getFilePath().getFilename());  // can throw
-      } else {
-        mWorkspace.removeLocalLibrary(
-            mLib->getFilePath().getFilename());  // can throw
-      }
-      emit libraryRemoved(mLib->getFilePath());
+      FileUtils::removeDirRecursively(mLibDir);  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
+    mWorkspace.getLibraryDb().startLibraryRescan();
   }
 }
 
 bool LibraryInfoWidget::isRemoteLibrary() const noexcept {
-  return mLib->isOpenedReadOnly();
+  return mLibDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
 }
 
 /*******************************************************************************

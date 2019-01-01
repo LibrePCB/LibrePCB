@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -53,9 +53,6 @@ class LibraryInfoWidget;
 
 /**
  * @brief The LibraryInfoWidget class
- *
- * @author ubruhin
- * @date 2016-08-03
  */
 class LibraryInfoWidget final : public QWidget {
   Q_OBJECT
@@ -64,8 +61,7 @@ public:
   // Constructors / Destructor
   LibraryInfoWidget() noexcept;
   LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
-  LibraryInfoWidget(workspace::Workspace&   ws,
-                    QSharedPointer<Library> lib) noexcept;
+  LibraryInfoWidget(workspace::Workspace& ws, const FilePath& libDir);
   ~LibraryInfoWidget() noexcept;
 
   // Getters
@@ -75,9 +71,7 @@ public:
   LibraryInfoWidget& operator=(const LibraryInfoWidget& rhs) = delete;
 
 signals:
-
-  void libraryRemoved(const FilePath& libDir);
-  void openLibraryEditorTriggered(QSharedPointer<Library> lib);
+  void openLibraryEditorTriggered(const FilePath& libDir);
 
 private:  // Methods
   void btnOpenLibraryEditorClicked() noexcept;
@@ -87,7 +81,7 @@ private:  // Methods
 private:  // Data
   QScopedPointer<Ui::LibraryInfoWidget> mUi;
   workspace::Workspace&                 mWorkspace;
-  QSharedPointer<Library>               mLib;
+  FilePath                              mLibDir;
 };
 
 /*******************************************************************************

@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -79,23 +79,23 @@ public:
 private:  // Methods
   void closeEvent(QCloseEvent* event) noexcept override;
   void clearLibraryList() noexcept;
-  void loadLibraryList() noexcept;
+  void updateLibraryList() noexcept;
   void currentListItemChanged(QListWidgetItem* current,
                               QListWidgetItem* previous) noexcept;
-  void libraryAddedSlot(const FilePath& libDir, bool select) noexcept;
-  void libraryRemovedSlot(const FilePath& libDir) noexcept;
+  void libraryAddedSlot(const FilePath& libDir) noexcept;
 
   static bool widgetsLessThan(const LibraryListWidgetItem* a,
                               const LibraryListWidgetItem* b) noexcept;
 
 signals:
-  void openLibraryEditorTriggered(QSharedPointer<Library> lib);
+  void openLibraryEditorTriggered(const FilePath& libDir);
 
 private:  // Data
   workspace::Workspace&              mWorkspace;
   QScopedPointer<Ui::LibraryManager> mUi;
   QScopedPointer<AddLibraryWidget>   mAddLibraryWidget;
   QWidget*                           mCurrentWidget;
+  FilePath                           mSelectedLibrary;
 };
 
 /*******************************************************************************

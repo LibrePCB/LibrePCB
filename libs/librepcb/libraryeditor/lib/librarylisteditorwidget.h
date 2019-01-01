@@ -89,6 +89,7 @@ protected:  // Data
   const workspace::Workspace&                 mWorkspace;
   QScopedPointer<Ui::LibraryListEditorWidget> mUi;
   QSet<Uuid>                                  mUuids;
+  QHash<Uuid, QString>                        mLibNames;
 };
 
 /*******************************************************************************
