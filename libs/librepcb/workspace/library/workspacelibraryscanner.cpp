@@ -41,8 +41,9 @@ using namespace library;
  *  Constructors / Destructor
  ******************************************************************************/
 
-WorkspaceLibraryScanner::WorkspaceLibraryScanner(Workspace& ws) noexcept
-  : QThread(nullptr), mWorkspace(ws), mAbort(false) {
+WorkspaceLibraryScanner::WorkspaceLibraryScanner(
+    Workspace& ws, const FilePath& dbFilePath) noexcept
+  : QThread(nullptr), mWorkspace(ws), mDbFilePath(dbFilePath), mAbort(false) {
 }
 
 WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
@@ -83,9 +84,7 @@ void WorkspaceLibraryScanner::run() noexcept {
     libraries.append(mWorkspace.getRemoteLibraries().values());
 
     // open SQLite database
-    FilePath dbFilePath =
-        mWorkspace.getLibrariesPath().getPathTo("cache.sqlite");
-    SQLiteDatabase db(dbFilePath);  // can throw
+    SQLiteDatabase db(mDbFilePath);  // can throw
 
     // begin database transaction
     SQLiteDatabase::TransactionScopeGuard transactionGuard(db);  // can throw
