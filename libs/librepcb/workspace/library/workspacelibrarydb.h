@@ -68,6 +68,9 @@ public:
   explicit WorkspaceLibraryDb(Workspace& ws);
   ~WorkspaceLibraryDb() noexcept;
 
+  // Getters: Attributes
+  const FilePath& getFilePath() const noexcept { return mFilePath; }
+
   // Getters: Library Elements by their UUID
   QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const;
   QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const;
@@ -153,7 +156,8 @@ private:
 
   // Attributes
   Workspace&                     mWorkspace;
-  QScopedPointer<SQLiteDatabase> mDb;  ///< the SQLite database "cache.sqlite"
+  FilePath                       mFilePath;  ///< path to the SQLite database
+  QScopedPointer<SQLiteDatabase> mDb;        ///< the SQLite database
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants

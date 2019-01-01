@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 
 #include <QtCore>
 
@@ -67,7 +67,7 @@ class WorkspaceLibraryScanner final : public QThread {
 
 public:
   // Constructors / Destructor
-  explicit WorkspaceLibraryScanner(Workspace& ws) noexcept;
+  WorkspaceLibraryScanner(Workspace& ws, const FilePath& dbFilePath) noexcept;
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
   ~WorkspaceLibraryScanner() noexcept;
 
@@ -101,6 +101,7 @@ private:  // Methods
 
 private:  // Data
   Workspace&    mWorkspace;
+  FilePath      mDbFilePath;
   volatile bool mAbort;
 };
 
