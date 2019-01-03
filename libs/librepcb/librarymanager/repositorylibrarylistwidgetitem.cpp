@@ -27,6 +27,7 @@
 
 #include <librepcb/common/network/networkrequest.h>
 #include <librepcb/library/library.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -86,6 +87,9 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
 
   // check if this library is already installed
   updateInstalledStatus();
+  connect(&mWorkspace.getLibraryDb(),
+          &workspace::WorkspaceLibraryDb::scanLibraryListUpdated, this,
+          &RepositoryLibraryListWidgetItem::updateInstalledStatus);
 }
 
 RepositoryLibraryListWidgetItem::~RepositoryLibraryListWidgetItem() noexcept {
@@ -110,41 +114,6 @@ void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
-  if (mUuid) {
-    QSharedPointer<library::Library> lib =
-        mWorkspace.getLibrary(*mUuid, true, true);
-    if (lib) {
-      mUi->lblInstalledVersion->setText(
-          QString(tr("Installed: v%1")).arg(lib->getVersion().toStr()));
-      mUi->lblInstalledVersion->setVisible(true);
-      if (lib->getVersion() < mVersion) {
-        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-        mUi->cbxDownload->setText(tr("Update"));
-        mUi->cbxDownload->setVisible(true);
-      } else {
-        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
-        mUi->cbxDownload->setVisible(false);
-      }
-    } else {
-      if (mIsRecommended) {
-        mUi->lblInstalledVersion->setText(tr("Recommended"));
-        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
-        mUi->lblInstalledVersion->setVisible(true);
-      } else {
-        mUi->lblInstalledVersion->setVisible(false);
-      }
-      mUi->cbxDownload->setText(tr("Install"));
-      mUi->cbxDownload->setVisible(true);
-    }
-  } else {
-    mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));
-    mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-    mUi->lblInstalledVersion->setVisible(true);
-    mUi->cbxDownload->setVisible(false);
-  }
-}
 
 void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept {
   if (mUuid && mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() &&
@@ -189,23 +158,7 @@ void RepositoryLibraryListWidgetItem::downloadFinished(
     bool success, const QString& errMsg) noexcept {
   Q_ASSERT(mLibraryDownload);
 
-  if (success) {
-    try {
-      // if the library exists already in the workspace, remove it first
-      QString libDirName = mLibraryDownload->getDestinationDir().getFilename();
-      if (mWorkspace.getRemoteLibraries().contains(libDirName)) {
-        mWorkspace.removeRemoteLibrary(libDirName, false);  // can throw
-      }
-
-      // add downloaded library to workspace
-      mWorkspace.addRemoteLibrary(libDirName);  // can throw
-
-      // finish
-      emit libraryAdded(mLibraryDownload->getDestinationDir(), false);
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Download failed"), e.getMsg());
-    }
-  } else if (!errMsg.isEmpty()) {
+  if ((!success) && (!errMsg.isEmpty())) {
     QMessageBox::critical(this, tr("Download failed"), errMsg);
   }
 
@@ -217,6 +170,9 @@ void RepositoryLibraryListWidgetItem::downloadFinished(
 
   // delete download helper
   mLibraryDownload.reset();
+
+  // start library scanner to index the new library
+  mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 void RepositoryLibraryListWidgetItem::iconReceived(
@@ -224,6 +180,52 @@ void RepositoryLibraryListWidgetItem::iconReceived(
   QPixmap pixmap;
   pixmap.loadFromData(data);
   mUi->lblIcon->setPixmap(pixmap);
+}
+
+void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
+  if (mUuid) {
+    tl::optional<Version> installedVersion;
+    try {
+      FilePath fp =
+          mWorkspace.getLibraryDb().getLatestLibrary(*mUuid);  // can throw
+      if (fp.isValid()) {
+        Version v = Version::fromString("0.1");  // only for initialization
+        mWorkspace.getLibraryDb().getElementMetadata<Library>(fp, nullptr,
+                                                              &v);  // can throw
+        installedVersion = v;
+      }
+    } catch (const Exception& e) {
+      qCritical() << "Could not determine if library is installed.";
+    }
+    if (installedVersion) {
+      mUi->lblInstalledVersion->setText(
+          QString(tr("Installed: v%1")).arg(installedVersion->toStr()));
+      mUi->lblInstalledVersion->setVisible(true);
+      if (installedVersion < mVersion) {
+        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+        mUi->cbxDownload->setText(tr("Update"));
+        mUi->cbxDownload->setVisible(true);
+      } else {
+        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
+        mUi->cbxDownload->setVisible(false);
+      }
+    } else {
+      if (mIsRecommended) {
+        mUi->lblInstalledVersion->setText(tr("Recommended"));
+        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
+        mUi->lblInstalledVersion->setVisible(true);
+      } else {
+        mUi->lblInstalledVersion->setVisible(false);
+      }
+      mUi->cbxDownload->setText(tr("Install"));
+      mUi->cbxDownload->setVisible(true);
+    }
+  } else {
+    mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));
+    mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+    mUi->lblInstalledVersion->setVisible(true);
+    mUi->cbxDownload->setVisible(false);
+  }
 }
 
 /*******************************************************************************

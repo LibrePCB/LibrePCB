@@ -24,8 +24,6 @@
 
 #include "ui_librarylistwidgetitem.h"
 
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -42,19 +40,20 @@ namespace manager {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryListWidgetItem::LibraryListWidgetItem(
-    workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept
+LibraryListWidgetItem::LibraryListWidgetItem(workspace::Workspace& ws,
+                                             const FilePath&       libDir,
+                                             const QString&        name,
+                                             const QString&        description,
+                                             const QPixmap& icon) noexcept
   : QWidget(nullptr),
     mUi(new Ui::LibraryListWidgetItem),
-    mWorkspace(ws),
-    mLib(lib) {
+    mLibDir(libDir),
+    mIsRemoteLibrary(libDir.isLocatedInDir(ws.getRemoteLibrariesPath())) {
   mUi->setupUi(this);
 
-  if (lib) {
-    const QStringList& localeOrder =
-        ws.getSettings().getLibLocaleOrder().getLocaleOrder();
-    if (!lib->getIconAsPixmap().isNull()) {
-      mUi->lblIcon->setPixmap(lib->getIconAsPixmap());
+  if (mLibDir.isValid()) {
+    if (!icon.isNull()) {
+      mUi->lblIcon->setPixmap(icon);
     }
     if (isRemoteLibrary()) {
       mUi->lblLibraryType->setText(tr("(remote)"));
@@ -63,11 +62,9 @@ LibraryListWidgetItem::LibraryListWidgetItem(
       mUi->lblLibraryType->setText(tr("(local)"));
       mUi->lblLibraryType->setStyleSheet("QLabel { color: blue; }");
     }
-    mUi->lblLibraryName->setText(*lib->getNames().value(localeOrder));
-    mUi->lblLibraryDescription->setText(
-        lib->getDescriptions().value(localeOrder));
-    mUi->lblLibraryUrl->setText(
-        lib->getFilePath().toRelative(ws.getLibrariesPath()));
+    mUi->lblLibraryName->setText(name);
+    mUi->lblLibraryDescription->setText(description);
+    mUi->lblLibraryUrl->setText(libDir.toRelative(ws.getLibrariesPath()));
   } else {
     QPixmap image(":/img/actions/add.png");
     mUi->lblIcon->setPixmap(image.scaled(
@@ -94,17 +91,13 @@ QString LibraryListWidgetItem::getName() const noexcept {
   return mUi->lblLibraryName->text();
 }
 
-bool LibraryListWidgetItem::isRemoteLibrary() const noexcept {
-  return mLib ? mLib->isOpenedReadOnly() : false;
-}
-
 /*******************************************************************************
  *  Inherited from QWidget
  ******************************************************************************/
 
 void LibraryListWidgetItem::mouseDoubleClickEvent(QMouseEvent* e) noexcept {
-  if (mLib) {
-    emit openLibraryEditorTriggered(mLib);
+  if (mLibDir.isValid()) {
+    emit openLibraryEditorTriggered(mLibDir);
     e->accept();
   } else {
     QWidget::mouseDoubleClickEvent(e);

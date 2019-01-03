@@ -107,16 +107,6 @@ void AddLibraryWidget::updateRepositoryLibraryList() noexcept {
   }
 }
 
-void AddLibraryWidget::updateInstalledStatusOfRepositoryLibraries() noexcept {
-  for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-    QListWidgetItem* item = mUi->lstRepoLibs->item(i);
-    Q_ASSERT(item);
-    auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-        mUi->lstRepoLibs->itemWidget(item));
-    if (widget) widget->updateInstalledStatus();
-  }
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -266,9 +256,6 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
       qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
     }
 
-    // add the new library to the workspace
-    mWorkspace.addLocalLibrary(directory.getFilename());  // can throw
-
     // library successfully added! reset input fields and emit signal
     mUi->edtLocalName->clear();
     mUi->edtLocalDescription->clear();
@@ -277,7 +264,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     mUi->edtLocalUrl->clear();
     mUi->cbxLocalCc0License->setChecked(false);
     mUi->edtLocalDirectory->clear();
-    emit libraryAdded(directory, true);
+    emit libraryAdded(directory);
   } catch (Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
@@ -344,17 +331,8 @@ void AddLibraryWidget::downloadZipFinished(bool           success,
   Q_ASSERT(mManualLibraryDownload);
 
   if (success) {
-    try {
-      // add library to workspace
-      mWorkspace.addLocalLibrary(
-          mManualLibraryDownload->getDestinationDir().getFilename());
-
-      // finish
-      mUi->lblDownloadZipStatusMsg->setText("");
-      emit libraryAdded(mManualLibraryDownload->getDestinationDir(), true);
-    } catch (const Exception& e) {
-      mUi->lblDownloadZipStatusMsg->setText(e.getMsg());
-    }
+    mUi->lblDownloadZipStatusMsg->setText("");
+    emit libraryAdded(mManualLibraryDownload->getDestinationDir());
   } else {
     mUi->lblDownloadZipStatusMsg->setText(errMsg);
   }
@@ -376,8 +354,6 @@ void AddLibraryWidget::repositoryLibraryListReceived(
         new RepositoryLibraryListWidgetItem(mWorkspace, libVal.toObject());
     connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged, this,
             &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
-    connect(widget, &RepositoryLibraryListWidgetItem::libraryAdded, this,
-            &AddLibraryWidget::libraryAdded);
     QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);
     item->setSizeHint(widget->sizeHint());
     mUi->lstRepoLibs->setItemWidget(item, widget);

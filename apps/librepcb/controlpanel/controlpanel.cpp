@@ -81,7 +81,7 @@ ControlPanel::ControlPanel(Workspace& workspace)
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
           mUi->statusBar, &StatusBar::showProgressBar, Qt::QueuedConnection);
-  connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanSucceeded,
+  connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished,
           mUi->statusBar, &StatusBar::hideProgressBar, Qt::QueuedConnection);
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
           mUi->statusBar, &StatusBar::setProgressBarPercent,
@@ -94,17 +94,14 @@ ControlPanel::ControlPanel(Workspace& workspace)
       Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
   mUi->lblWarnForNewerAppVersions->setVisible(highestVersion > actualVersion);
 
-  // decide if we have to show the warning about missing workspace libraries
-  if (mWorkspace.getLocalLibraries().isEmpty() &&
-      mWorkspace.getRemoteLibraries().isEmpty()) {
-    mUi->lblWarnForNoLibraries->setVisible(true);
-    connect(mUi->lblWarnForNoLibraries, &QLabel::linkActivated, this,
-            &ControlPanel::on_actionOpen_Library_Manager_triggered);
-    connect(&mWorkspace, &Workspace::libraryAdded, mUi->lblWarnForNoLibraries,
-            &QLabel::hide);
-  } else {
-    mUi->lblWarnForNoLibraries->setVisible(false);
-  }
+  // hide warning about missing libraries, but update visibility each time the
+  // workspace library was scanned
+  mUi->lblWarnForNoLibraries->setVisible(false);
+  connect(mUi->lblWarnForNoLibraries, &QLabel::linkActivated, this,
+          &ControlPanel::on_actionOpen_Library_Manager_triggered);
+  connect(&mWorkspace.getLibraryDb(),
+          &WorkspaceLibraryDb::scanLibraryListUpdated, this,
+          &ControlPanel::updateNoLibrariesWarningVisibility);
 
   // connect some actions which are created with the Qt Designer
   connect(mUi->actionQuit, &QAction::triggered, this, &ControlPanel::close);
@@ -248,6 +245,16 @@ void ControlPanel::loadSettings() {
   clientSettings.endGroup();
 }
 
+void ControlPanel::updateNoLibrariesWarningVisibility() noexcept {
+  bool showWarning = false;
+  try {
+    showWarning = mWorkspace.getLibraryDb().getLibraries().isEmpty();
+  } catch (const Exception& e) {
+    qCritical() << "Could not get library list:" << e.getMsg();
+  }
+  mUi->lblWarnForNoLibraries->setVisible(showWarning);
+}
+
 void ControlPanel::showProjectReadmeInBrowser(
     const FilePath& projectFilePath) noexcept {
   if (projectFilePath.isValid()) {
@@ -371,16 +378,18 @@ ProjectEditor* ControlPanel::getOpenProject(const FilePath& filepath) const
  *  Library Management
  ******************************************************************************/
 
-void ControlPanel::openLibraryEditor(
-    QSharedPointer<library::Library> lib) noexcept {
+void ControlPanel::openLibraryEditor(const FilePath& libDir) noexcept {
+  using library::Library;
   using library::editor::LibraryEditor;
-  LibraryEditor* editor = mOpenLibraryEditors.value(lib.data());
+  LibraryEditor* editor = mOpenLibraryEditors.value(libDir);
   if (!editor) {
     try {
+      bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
+      QSharedPointer<Library> lib(new Library(libDir, remote));
       editor = new LibraryEditor(mWorkspace, lib);
       connect(editor, &LibraryEditor::destroyed, this,
               &ControlPanel::libraryEditorDestroyed);
-      mOpenLibraryEditors.insert(lib.data(), editor);
+      mOpenLibraryEditors.insert(libDir, editor);
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
@@ -398,8 +407,8 @@ void ControlPanel::libraryEditorDestroyed() noexcept {
   // static_cast is used instead ;)
   LibraryEditor* editor = static_cast<LibraryEditor*>(QObject::sender());
   Q_ASSERT(editor);
-  library::Library* library = mOpenLibraryEditors.key(editor);
-  Q_ASSERT(library);
+  FilePath library = mOpenLibraryEditors.key(editor);
+  Q_ASSERT(library.isValid());
   mOpenLibraryEditors.remove(library);
 }
 

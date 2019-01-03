@@ -23,9 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
 
 #include <QtCore>
@@ -109,6 +107,20 @@ public:
    */
   const FilePath& getLibrariesPath() const { return mLibrariesPath; }
 
+  /**
+   * @brief Get the filepath to the "v#/libraries/local" directory
+   */
+  FilePath getLocalLibrariesPath() const {
+    return mLibrariesPath.getPathTo("local");
+  }
+
+  /**
+   * @brief Get the filepath to the "v#/libraries/remote" directory
+   */
+  FilePath getRemoteLibrariesPath() const {
+    return mLibrariesPath.getPathTo("remote");
+  }
+
   ProjectTreeModel&      getProjectTreeModel() const noexcept;
   RecentProjectsModel&   getRecentProjectsModel() const noexcept;
   FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
@@ -119,79 +131,6 @@ public:
   WorkspaceSettings& getSettings() const { return *mWorkspaceSettings; }
 
   // Library Management
-
-  /**
-   * @brief Get the (highest version) library of a given UUID
-   *
-   * @param uuid      The uuid of the library
-   * @param local     If true, local libraries are searched
-   * @param remote    If true, remote libraries are searched
-   *
-   * @return The library with the highest version (nullptr if not installed)
-   */
-  QSharedPointer<library::Library> getLibrary(const Uuid& uuid,
-                                              bool        local  = true,
-                                              bool        remote = true) const
-      noexcept;
-
-  /**
-   * @brief Get all local libraries (located in "workspace/v#/libraries/local")
-   *
-   * @return A list of all local libraries
-   */
-  const QMap<QString, QSharedPointer<library::Library>> getLocalLibraries()
-      const noexcept {
-    return mLocalLibraries;
-  }
-
-  /**
-   * @brief Get all remote libraries (located in
-   * "workspace/v#/libraries/remote")
-   *
-   * @return A list of all remote libraries
-   */
-  const QMap<QString, QSharedPointer<library::Library>> getRemoteLibraries()
-      const noexcept {
-    return mRemoteLibraries;
-  }
-
-  /**
-   * @brief Add a new local library
-   *
-   * @param libDirName    The name of the (existing) local library directory
-   *
-   * @throws Exception on error
-   */
-  void addLocalLibrary(const QString& libDirName);
-
-  /**
-   * @brief Add a new remote library
-   *
-   * @param libDirName    The name of the (existing) remote library directory
-   *
-   * @throws Exception on error
-   */
-  void addRemoteLibrary(const QString& libDirName);
-
-  /**
-   * @brief Remove a local library
-   *
-   * @param libDirName    The name of the (existing) local library directory
-   * @param rmDir         It true, the library's directory will be removed
-   *
-   * @throws Exception on error
-   */
-  void removeLocalLibrary(const QString& libDirName, bool rmDir = true);
-
-  /**
-   * @brief Remove a remote library
-   *
-   * @param libDirName    The name of the (existing) remote library directory
-   * @param rmDir         It true, the library's directory will be removed
-   *
-   * @throws Exception on error
-   */
-  void removeRemoteLibrary(const QString& libDirName, bool rmDir = true);
 
   /**
    * @brief Get the workspace library database
@@ -303,32 +242,36 @@ public:
     return Version::fromString("0.1");
   }
 
-signals:
-
-  void libraryAdded(const FilePath& libDir);
-  void libraryRemoved(const FilePath& libDir);
-
 private:  // Data
-  FilePath
-           mPath;  ///< a FilePath object which represents the workspace directory
-  FilePath mProjectsPath;  ///< the directory "projects"
-  FilePath
-                mMetadataPath;  ///< the subdirectory of the current file format version
-  FilePath      mLibrariesPath;  ///< the directory "v#/libraries"
-  DirectoryLock mLock;  ///< to lock the version directory (#mVersionPath)
-  QScopedPointer<WorkspaceSettings>
-      mWorkspaceSettings;  ///< the WorkspaceSettings object
-  QMap<QString, QSharedPointer<library::Library>>
-      mLocalLibraries;  ///< all local libraries
-  QMap<QString, QSharedPointer<library::Library>>
-                                     mRemoteLibraries;  ///< all remote libraries
-  QScopedPointer<WorkspaceLibraryDb> mLibraryDb;  ///< the library database
-  QScopedPointer<ProjectTreeModel>
-      mProjectTreeModel;  ///< a tree model for the whole projects directory
-  QScopedPointer<RecentProjectsModel>
-      mRecentProjectsModel;  ///< a list model of all recent projects
-  QScopedPointer<FavoriteProjectsModel>
-      mFavoriteProjectsModel;  ///< a list model of all favorite projects
+  /// a FilePath object which represents the workspace directory
+  FilePath mPath;
+
+  /// the directory "projects"
+  FilePath mProjectsPath;
+
+  /// the subdirectory of the current file format version
+  FilePath mMetadataPath;
+
+  /// the directory "v#/libraries"
+  FilePath mLibrariesPath;
+
+  /// to lock the version directory (#mVersionPath)
+  DirectoryLock mLock;
+
+  /// the WorkspaceSettings object
+  QScopedPointer<WorkspaceSettings> mWorkspaceSettings;
+
+  /// the library database
+  QScopedPointer<WorkspaceLibraryDb> mLibraryDb;
+
+  /// a tree model for the whole projects directory
+  QScopedPointer<ProjectTreeModel> mProjectTreeModel;
+
+  /// a list model of all recent projects
+  QScopedPointer<RecentProjectsModel> mRecentProjectsModel;
+
+  /// a list model of all favorite projects
+  QScopedPointer<FavoriteProjectsModel> mFavoriteProjectsModel;
 };
 
 /*******************************************************************************
