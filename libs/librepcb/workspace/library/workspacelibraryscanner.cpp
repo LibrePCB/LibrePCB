@@ -43,11 +43,17 @@ using namespace library;
 
 WorkspaceLibraryScanner::WorkspaceLibraryScanner(
     Workspace& ws, const FilePath& dbFilePath) noexcept
-  : QThread(nullptr), mWorkspace(ws), mDbFilePath(dbFilePath), mAbort(false) {
+  : QThread(nullptr),
+    mWorkspace(ws),
+    mDbFilePath(dbFilePath),
+    mSemaphore(0),
+    mAbort(false) {
+  start();
 }
 
 WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
   mAbort = true;
+  mSemaphore.release();
   if (!wait(2000)) {
     qWarning() << "Could not abort the library scanner worker thread!";
     terminate();
@@ -55,6 +61,14 @@ WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
       qCritical() << "Could not terminate the library scanner worker thread!";
     }
   }
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void WorkspaceLibraryScanner::startScan() noexcept {
+  mSemaphore.release();
 }
 
 /*******************************************************************************
@@ -74,17 +88,39 @@ QVariant WorkspaceLibraryScanner::optionalToVariant(
 }
 
 void WorkspaceLibraryScanner::run() noexcept {
-  try {
-    mAbort = false;
-    emit started();
+  qDebug() << "Workspace library scanner thread started.";
 
-    // get a list of all available libraries
-    QList<QSharedPointer<library::Library>> libraries;
-    libraries.append(mWorkspace.getLocalLibraries().values());
-    libraries.append(mWorkspace.getRemoteLibraries().values());
+  while (true) {
+    mSemaphore.acquire();
+    if (mAbort) {
+      break;
+    } else {
+      scan();
+    }
+  }
+
+  qDebug() << "Workspace library scanner thread stopped.";
+}
+
+void WorkspaceLibraryScanner::scan() noexcept {
+  try {
+    QElapsedTimer timer;
+    timer.start();
+    emit scanStarted();
+    emit scanProgressUpdate(0);
+    qDebug() << "Workspace library scan started.";
 
     // open SQLite database
     SQLiteDatabase db(mDbFilePath);  // can throw
+
+    // update list of libraries
+    QHash<FilePath, std::shared_ptr<Library>> libraries;
+    getLibrariesOfDirectory(mWorkspace.getLocalLibrariesPath(), libraries);
+    getLibrariesOfDirectory(mWorkspace.getRemoteLibrariesPath(), libraries);
+    QHash<FilePath, int> libIds = updateLibraries(db, libraries);  // can throw
+    emit                 scanLibraryListUpdated(libIds.count());
+    qDebug() << "Workspace libraries indexed:" << libIds.count()
+             << "libraries in" << timer.elapsed() << "ms";
 
     // begin database transaction
     SQLiteDatabase::TransactionScopeGuard transactionGuard(db);  // can throw
@@ -95,52 +131,166 @@ void WorkspaceLibraryScanner::run() noexcept {
     // scan all libraries
     int   count   = 0;
     qreal percent = 0;
-    foreach (const QSharedPointer<Library>& lib, libraries) {
-      int libId = addLibraryToDb(db, lib);
-      if (mAbort) break;
+    foreach (const FilePath& fp, libraries.keys()) {
+      Q_ASSERT(libIds.contains(fp));
+      int                             libId = libIds[fp];
+      const std::shared_ptr<Library>& lib   = libraries[fp];
+      Q_ASSERT(lib);
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addCategoriesToDb<ComponentCategory>(
           db, lib->searchForElements<ComponentCategory>(),
           "component_categories", "cat_id", libId);
-      emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addCategoriesToDb<PackageCategory>(
           db, lib->searchForElements<PackageCategory>(), "package_categories",
           "cat_id", libId);
-      emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Symbol>(db, lib->searchForElements<Symbol>(),
                                        "symbols", "symbol_id", libId);
-      emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Package>(db, lib->searchForElements<Package>(),
                                         "packages", "package_id", libId);
-      emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count +=
           addElementsToDb<Component>(db, lib->searchForElements<Component>(),
                                      "components", "component_id", libId);
-      emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
-      if (mAbort) break;
+      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      if (mAbort || (mSemaphore.available() > 0)) break;
       count += addDevicesToDb(db, lib->searchForElements<Device>(), "devices",
                               "device_id", libId);
-      emit progressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
     }
 
     // commit transaction
-    if (!mAbort) {
+    if ((!mAbort) && (mSemaphore.available() == 0)) {
       transactionGuard.commit();  // can throw
-      emit succeeded(count);
+      qDebug() << "Workspace library scan succeeded:" << count << "elements in"
+               << timer.elapsed() << "ms";
+      emit scanSucceeded(count);
+    } else {
+      qDebug() << "Workspace library scan aborted after" << timer.elapsed()
+               << "ms.";
     }
   } catch (const Exception& e) {
-    emit failed(e.getMsg());
+    qDebug() << "Workspace library scan failed:" << e.getMsg();
+    emit scanFailed(e.getMsg());
+  }
+  emit scanFinished();
+}
+
+void WorkspaceLibraryScanner::getLibrariesOfDirectory(
+    const FilePath&                            dir,
+    QHash<FilePath, std::shared_ptr<Library>>& libs) noexcept {
+  foreach (const QString& name,
+           QDir(dir.toStr()).entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
+    FilePath libDirPath = dir.getPathTo(name);
+    if (Library::isValidElementDirectory<Library>(libDirPath)) {
+      try {
+        libs.insert(libDirPath, std::make_shared<Library>(libDirPath, true));
+      } catch (Exception& e) {
+        qCritical() << "Could not open workspace library!";
+        qCritical() << "Library:" << libDirPath.toNative();
+        qCritical() << "Error:" << e.getMsg();
+      }
+    } else {
+      qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();
+    }
   }
 }
 
-void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db) {
-  // libraries
-  db.clearTable("libraries_tr");
-  db.clearTable("libraries");
+QHash<FilePath, int> WorkspaceLibraryScanner::updateLibraries(
+    SQLiteDatabase& db, const QHash<FilePath, std::shared_ptr<Library>>& libs) {
+  SQLiteDatabase::TransactionScopeGuard transactionGuard(db);  // can throw
 
+  // get IDs of libraries in DB
+  QHash<FilePath, int> dbLibIds;
+  QSqlQuery query = db.prepareQuery("SELECT id, filepath FROM libraries");
+  db.exec(query);
+  while (query.next()) {
+    int      id = query.value(0).toInt();
+    FilePath fp(FilePath::fromRelative(mWorkspace.getLibrariesPath(),
+                                       query.value(1).toString()));
+    if (!fp.isValid()) throw LogicError(__FILE__, __LINE__);
+    dbLibIds[fp] = id;
+  }
+
+  // update existing libraries in DB
+  foreach (const FilePath& fp, libs.keys().toSet() & dbLibIds.keys().toSet()) {
+    Q_ASSERT(dbLibIds.contains(fp));
+    std::shared_ptr<Library> lib = libs[fp];
+    Q_ASSERT(lib);
+    query = db.prepareQuery(
+        "UPDATE libraries SET "
+        "filepath = :filepath, "
+        "uuid = :uuid, "
+        "version = :version, "
+        "icon_png = :icon_png "
+        "WHERE id = :id");
+    query.bindValue(":filepath", fp.toRelative(mWorkspace.getLibrariesPath()));
+    query.bindValue(":uuid", lib->getUuid().toStr());
+    query.bindValue(":version", lib->getVersion().toStr());
+    query.bindValue(":icon_png", lib->getIcon());
+    query.bindValue(":id", dbLibIds[fp]);
+    db.exec(query);
+  }
+
+  // add new libraries to DB
+  foreach (const FilePath& fp, libs.keys().toSet() - dbLibIds.keys().toSet()) {
+    Q_ASSERT(!dbLibIds.contains(fp));
+    std::shared_ptr<Library> lib = libs[fp];
+    Q_ASSERT(lib);
+    query = db.prepareQuery(
+        "INSERT INTO libraries "
+        "(filepath, uuid, version, icon_png) VALUES "
+        "(:filepath, :uuid, :version, :icon_png)");
+    query.bindValue(":filepath", fp.toRelative(mWorkspace.getLibrariesPath()));
+    query.bindValue(":uuid", lib->getUuid().toStr());
+    query.bindValue(":version", lib->getVersion().toStr());
+    query.bindValue(":icon_png", lib->getIcon());
+    dbLibIds[fp] = db.insert(query);
+  }
+
+  // remove no longer existing libraries from DB
+  foreach (const FilePath& fp, dbLibIds.keys().toSet() - libs.keys().toSet()) {
+    Q_ASSERT(dbLibIds.contains(fp));
+    query = db.prepareQuery("DELETE FROM libraries WHERE id = :id");
+    query.bindValue(":id", dbLibIds[fp]);
+    db.exec(query);
+    dbLibIds.remove(fp);
+  }
+
+  // update all library translations
+  db.clearTable("libraries_tr");
+  foreach (const FilePath& fp, libs.keys()) {
+    Q_ASSERT(dbLibIds.contains(fp));
+    std::shared_ptr<Library> lib = libs[fp];
+    Q_ASSERT(lib);
+    foreach (const QString& locale, lib->getAllAvailableLocales()) {
+      query = db.prepareQuery(
+          "INSERT INTO libraries_tr "
+          "(lib_id, locale, name, description, keywords) VALUES "
+          "(:lib_id, :locale, :name, :description, :keywords)");
+      query.bindValue(":lib_id", dbLibIds[fp]);
+      query.bindValue(":locale", locale);
+      query.bindValue(":name",
+                      optionalToVariant(lib->getNames().tryGet(locale)));
+      query.bindValue(":description",
+                      optionalToVariant(lib->getDescriptions().tryGet(locale)));
+      query.bindValue(":keywords",
+                      optionalToVariant(lib->getKeywords().tryGet(locale)));
+      db.insert(query);
+    }
+  }
+
+  transactionGuard.commit();  // can throw
+  return dbLibIds;
+}
+
+void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db) {
   // component categories
   db.clearTable("component_categories_tr");
   db.clearTable("component_categories");
@@ -170,34 +320,6 @@ void WorkspaceLibraryScanner::clearAllTables(SQLiteDatabase& db) {
   db.clearTable("devices");
 }
 
-int WorkspaceLibraryScanner::addLibraryToDb(
-    SQLiteDatabase& db, const QSharedPointer<library::Library>& lib) {
-  QSqlQuery query = db.prepareQuery(
-      "INSERT INTO libraries "
-      "(filepath, uuid, version) VALUES "
-      "(:filepath, :uuid, :version)");
-  query.bindValue(":filepath",
-                  lib->getFilePath().toRelative(mWorkspace.getLibrariesPath()));
-  query.bindValue(":uuid", lib->getUuid().toStr());
-  query.bindValue(":version", lib->getVersion().toStr());
-  int id = db.insert(query);
-  foreach (const QString& locale, lib->getAllAvailableLocales()) {
-    QSqlQuery query = db.prepareQuery(
-        "INSERT INTO libraries_tr "
-        "(lib_id, locale, name, description, keywords) VALUES "
-        "(:element_id, :locale, :name, :description, :keywords)");
-    query.bindValue(":element_id", id);
-    query.bindValue(":locale", locale);
-    query.bindValue(":name", optionalToVariant(lib->getNames().tryGet(locale)));
-    query.bindValue(":description",
-                    optionalToVariant(lib->getDescriptions().tryGet(locale)));
-    query.bindValue(":keywords",
-                    optionalToVariant(lib->getKeywords().tryGet(locale)));
-    db.insert(query);
-  }
-  return id;
-}
-
 template <typename ElementType>
 int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase&        db,
                                                const QList<FilePath>& dirs,
@@ -206,7 +328,7 @@ int WorkspaceLibraryScanner::addCategoriesToDb(SQLiteDatabase&        db,
                                                int                    libId) {
   int count = 0;
   foreach (const FilePath& filepath, dirs) {
-    if (mAbort) break;
+    if (mAbort || (mSemaphore.available() > 0)) break;
     try {
       ElementType element(filepath, true);  // can throw
       QSqlQuery   query = db.prepareQuery(
@@ -258,7 +380,7 @@ int WorkspaceLibraryScanner::addElementsToDb(SQLiteDatabase&        db,
                                              int                    libId) {
   int count = 0;
   foreach (const FilePath& filepath, dirs) {
-    if (mAbort) break;
+    if (mAbort || (mSemaphore.available() > 0)) break;
     try {
       ElementType element(filepath, true);  // can throw
       QSqlQuery   query =
@@ -317,7 +439,7 @@ int WorkspaceLibraryScanner::addDevicesToDb(SQLiteDatabase&        db,
                                             int                    libId) {
   int count = 0;
   foreach (const FilePath& filepath, dirs) {
-    if (mAbort) break;
+    if (mAbort || (mSemaphore.available() > 0)) break;
     try {
       Device    element(filepath, true);  // can throw
       QSqlQuery query = db.prepareQuery("INSERT INTO " % table %

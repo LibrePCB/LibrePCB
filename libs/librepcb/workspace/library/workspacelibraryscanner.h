@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -53,14 +55,6 @@ class Workspace;
  * @warning Be very careful with dependencies to other objects as the #run()
  * method is executed in a separate thread! Keep the number of dependencies as
  * small as possible and consider thread synchronization and object lifetimes.
- *
- * @todo    Don't really sure that the #run() method is 100% thread save ;)
- *          Maybe it would be better to put the whole library scanning code into
- * this class instead of having references to objects from the library and
- * workspace namespaces. This way it would be easier to guarantee thread safety.
- *
- * @author ubruhin
- * @date 2016-09-06
  */
 class WorkspaceLibraryScanner final : public QThread {
   Q_OBJECT
@@ -71,22 +65,31 @@ public:
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
   ~WorkspaceLibraryScanner() noexcept;
 
+  // General Methods
+  void startScan() noexcept;
+
   // Operator Overloadings
   WorkspaceLibraryScanner& operator=(const WorkspaceLibraryScanner& rhs) =
       delete;
 
 signals:
-
-  void started();
-  void progressUpdate(int percent);
-  void succeeded(int elementCount);
-  void failed(QString errorMsg);
+  void scanStarted();
+  void scanLibraryListUpdated(int libraryCount);
+  void scanProgressUpdate(int percent);
+  void scanSucceeded(int elementCount);
+  void scanFailed(QString errorMsg);
+  void scanFinished();
 
 private:  // Methods
-  void run() noexcept override;
+  void                 run() noexcept override;
+  void                 scan() noexcept;
+  QHash<FilePath, int> updateLibraries(
+      SQLiteDatabase&                                           db,
+      const QHash<FilePath, std::shared_ptr<library::Library>>& libs);
   void clearAllTables(SQLiteDatabase& db);
-  int  addLibraryToDb(SQLiteDatabase&                         db,
-                      const QSharedPointer<library::Library>& lib);
+  void getLibrariesOfDirectory(
+      const FilePath&                                     dir,
+      QHash<FilePath, std::shared_ptr<library::Library>>& libs) noexcept;
   template <typename ElementType>
   int addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
                         const QString& table, const QString& idColumn,
@@ -102,6 +105,7 @@ private:  // Methods
 private:  // Data
   Workspace&    mWorkspace;
   FilePath      mDbFilePath;
+  QSemaphore    mSemaphore;
   volatile bool mAbort;
 };
 

@@ -80,7 +80,6 @@ public:
   void setChecked(bool checked) noexcept;
 
   // General Methods
-  void updateInstalledStatus() noexcept;
   void startDownloadIfSelected() noexcept;
 
   // Operator Overloadings
@@ -88,13 +87,12 @@ public:
       const RepositoryLibraryListWidgetItem& rhs) = delete;
 
 signals:
-
   void checkedChanged(bool checked);
-  void libraryAdded(const FilePath& libDir, bool select);
 
 private:  // Methods
   void downloadFinished(bool success, const QString& errMsg) noexcept;
   void iconReceived(const QByteArray& data) noexcept;
+  void updateInstalledStatus() noexcept;
 
 private:  // Data
   workspace::Workspace&                               mWorkspace;

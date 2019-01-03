@@ -112,59 +112,8 @@ Workspace::Workspace(const FilePath& wsPath)
   // load workspace settings
   mWorkspaceSettings.reset(new WorkspaceSettings(*this));
 
-  // load local libraries
-  FilePath localLibsDirPath = mLibrariesPath.getPathTo("local");
-  QDir     localLibsDir(localLibsDirPath.toStr());
-  foreach (const QString& dir,
-           localLibsDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
-    FilePath libDirPath = localLibsDirPath.getPathTo(dir);
-    if (Library::isValidElementDirectory<Library>(libDirPath)) {
-      qDebug() << "Load local workspace library:" << dir;
-      try {
-        addLocalLibrary(dir);  // can throw
-      } catch (Exception& e) {
-        // @todo do not show a message box here, better use something like a
-        // getLastError() method which is used by the ControlPanel to show
-        // errors
-        QMessageBox::critical(nullptr, tr("Error"),
-                              QString(tr("Could not open local library %1: %2"))
-                                  .arg(dir, e.getMsg()));
-      }
-    } else {
-      qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();
-    }
-  }
-
-  // load remote libraries
-  FilePath remoteLibsDirPath = mLibrariesPath.getPathTo("remote");
-  QDir     remoteLibsDir(remoteLibsDirPath.toStr());
-  foreach (const QString& dir,
-           remoteLibsDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
-    FilePath libDirPath = remoteLibsDirPath.getPathTo(dir);
-    if (Library::isValidElementDirectory<Library>(libDirPath)) {
-      qDebug() << "Load remote workspace library:" << dir;
-      try {
-        addRemoteLibrary(dir);  // can throw
-      } catch (Exception& e) {
-        // @todo do not show a message box here, better use something like a
-        // getLastError() method which is used by the ControlPanel to show
-        // errors
-        QMessageBox::critical(
-            nullptr, tr("Error"),
-            QString(tr("Could not open remote library %1: %2"))
-                .arg(dir, e.getMsg()));
-      }
-    } else {
-      qWarning() << "Directory is not a valid libary:" << libDirPath.toNative();
-    }
-  }
-
   // load library database
   mLibraryDb.reset(new WorkspaceLibraryDb(*this));  // can throw
-  connect(this, &Workspace::libraryAdded, mLibraryDb.data(),
-          &WorkspaceLibraryDb::startLibraryRescan);
-  connect(this, &Workspace::libraryRemoved, mLibraryDb.data(),
-          &WorkspaceLibraryDb::startLibraryRescan);
 
   // load project models
   mRecentProjectsModel.reset(new RecentProjectsModel(*this));
@@ -189,79 +138,6 @@ RecentProjectsModel& Workspace::getRecentProjectsModel() const noexcept {
 
 FavoriteProjectsModel& Workspace::getFavoriteProjectsModel() const noexcept {
   return *mFavoriteProjectsModel;
-}
-
-/*******************************************************************************
- *  Library Management
- ******************************************************************************/
-
-QSharedPointer<library::Library> Workspace::getLibrary(const Uuid& uuid,
-                                                       bool        local,
-                                                       bool        remote) const
-    noexcept {
-  QSharedPointer<library::Library> library;
-  if (local) {
-    foreach (const auto& lib, mLocalLibraries) {
-      Q_ASSERT(lib);
-      if ((lib->getUuid() == uuid) &&
-          ((!library) || (library->getVersion() < lib->getVersion()))) {
-        library = lib;
-      }
-    }
-  }
-  if (remote) {
-    foreach (const auto& lib, mRemoteLibraries) {
-      Q_ASSERT(lib);
-      if ((lib->getUuid() == uuid) &&
-          ((!library) || (library->getVersion() < lib->getVersion()))) {
-        library = lib;
-      }
-    }
-  }
-  return library;
-}
-
-void Workspace::addLocalLibrary(const QString& libDirName) {
-  if (!mLocalLibraries.contains(libDirName)) {
-    FilePath libDirPath =
-        mLibrariesPath.getPathTo("local").getPathTo(libDirName);
-    QSharedPointer<Library> library(
-        new Library(libDirPath, false));  // can throw
-    mLocalLibraries.insert(libDirName, library);
-    emit libraryAdded(libDirPath);
-  }
-}
-
-void Workspace::addRemoteLibrary(const QString& libDirName) {
-  if (!mRemoteLibraries.contains(libDirName)) {
-    // remote libraries are always opened read-only!
-    FilePath libDirPath =
-        mLibrariesPath.getPathTo("remote").getPathTo(libDirName);
-    QSharedPointer<Library> library(
-        new Library(libDirPath, true));  // can throw
-    mRemoteLibraries.insert(libDirName, library);
-    emit libraryAdded(libDirPath);
-  }
-}
-
-void Workspace::removeLocalLibrary(const QString& libDirName, bool rmDir) {
-  Library* library = mLocalLibraries.value(libDirName).data();
-  if (library) {
-    FilePath libDirPath = library->getFilePath();
-    mLocalLibraries.remove(libDirName);
-    emit libraryRemoved(libDirPath);
-    if (rmDir) FileUtils::removeDirRecursively(libDirPath);  // can throw
-  }
-}
-
-void Workspace::removeRemoteLibrary(const QString& libDirName, bool rmDir) {
-  Library* library = mRemoteLibraries.value(libDirName).data();
-  if (library) {
-    FilePath libDirPath = library->getFilePath();
-    mRemoteLibraries.remove(libDirName);
-    emit libraryRemoved(libDirPath);
-    if (rmDir) FileUtils::removeDirRecursively(libDirPath);  // can throw
-  }
 }
 
 /*******************************************************************************
