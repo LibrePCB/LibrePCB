@@ -70,6 +70,8 @@ def test(librepcb, helpers):
         # Check installed status of libraries in remote library list
         for i in range(0, remote_library_count):
             if i <= 1:
-                assert statuslabels[i].properties()['text'].startswith('Installed')
+                # The downloaded libraries are outdated, thus the installed
+                # version number is displayed.
+                assert statuslabels[i].properties()['text'].startswith('v')
             else:
                 assert statuslabels[i].properties()['text'] == 'Recommended'
