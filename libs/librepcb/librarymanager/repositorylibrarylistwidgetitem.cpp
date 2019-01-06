@@ -162,11 +162,11 @@ void RepositoryLibraryListWidgetItem::downloadFinished(
     QMessageBox::critical(this, tr("Download failed"), errMsg);
   }
 
-  // update widgets
-  mUi->cbxDownload->setChecked(!success);
-  mUi->cbxDownload->setVisible(true);
+  // Hide the progress bar as the download is finished, but don't update the
+  // other widgets because the database has not yet indexed the new library!
+  // The method updateInstalledStatus() will be called automatically once the
+  // new library is indexed.
   mUi->prgProgress->setVisible(false);
-  updateInstalledStatus();
 
   // delete download helper
   mLibraryDownload.reset();
@@ -183,6 +183,12 @@ void RepositoryLibraryListWidgetItem::iconReceived(
 }
 
 void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
+  // Don't update the widgets while the download is running, it would mess up
+  // the UI!
+  if (mLibraryDownload) {
+    return;
+  }
+
   if (mUuid) {
     tl::optional<Version> installedVersion;
     try {
@@ -198,17 +204,18 @@ void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
       qCritical() << "Could not determine if library is installed.";
     }
     if (installedVersion) {
-      mUi->lblInstalledVersion->setText(
-          QString(tr("Installed: v%1")).arg(installedVersion->toStr()));
-      mUi->lblInstalledVersion->setVisible(true);
       if (installedVersion < mVersion) {
+        mUi->lblInstalledVersion->setText(
+            QString(tr("v%1")).arg(installedVersion->toStr()));
         mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-        mUi->cbxDownload->setText(tr("Update"));
+        mUi->cbxDownload->setText(tr("Update") % ":");
         mUi->cbxDownload->setVisible(true);
       } else {
+        mUi->lblInstalledVersion->setText(tr("Installed"));
         mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
         mUi->cbxDownload->setVisible(false);
       }
+      mUi->lblInstalledVersion->setVisible(true);
     } else {
       if (mIsRecommended) {
         mUi->lblInstalledVersion->setText(tr("Recommended"));
@@ -217,7 +224,7 @@ void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
       } else {
         mUi->lblInstalledVersion->setVisible(false);
       }
-      mUi->cbxDownload->setText(tr("Install"));
+      mUi->cbxDownload->setText(tr("Install") % ":");
       mUi->cbxDownload->setVisible(true);
     }
   } else {

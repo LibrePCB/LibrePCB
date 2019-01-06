@@ -66,7 +66,10 @@
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Creates a new local library in the currently opened workspace. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Please specify all attributes in the english language (locale 'en_US').&lt;br&gt;Support for other languages will be added in a later release of LibrePCB.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;p&gt;Creates a new local library in the currently opened workspace.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Please specify all attributes in the english language (locale 'en_US'). Support for other languages will be added in a later release of LibrePCB.&lt;/span&gt;&lt;/p&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -165,15 +168,26 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
          <property name="spacing">
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="cbxLocalCc0License">
+          <widget class="QCheckBox" name="cbxLocalCc0License"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblLicenseDescription">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>Put library under the Public Domain License (CC0-1.0).
-Note: This is mandatory to publish the library on librepcb.org!</string>
+            <string>Put library under the Public Domain License CC0-1.0 (mandatory to publish it on librepcb.org).</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -231,7 +245,10 @@ Note: This is mandatory to publish the library on librepcb.org!</string>
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Downloads a zipped library from the internet and saves it as a local library. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Libraries which are downloaded this way cannot be updated automatically.&lt;br/&gt;It's highly recommended to use &amp;quot;Download from repository&amp;quot; whenever possible. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;p&gt;Downloads a zipped library from the internet and saves it as a local library. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Libraries which are downloaded this way cannot be updated automatically. It's highly recommended to use &amp;quot;Download from repository&amp;quot; whenever possible. &lt;/span&gt;&lt;/p&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

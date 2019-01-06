@@ -67,9 +67,21 @@ LibraryManager::LibraryManager(workspace::Workspace& ws,
   connect(&mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &LibraryManager::updateLibraryList);
+
+  // Restore Window Geometry
+  QSettings clientSettings;
+  restoreGeometry(
+      clientSettings.value("library_manager/window_geometry").toByteArray());
+  restoreState(
+      clientSettings.value("library_manager/window_state").toByteArray());
 }
 
 LibraryManager::~LibraryManager() noexcept {
+  // Save Window Geometry
+  QSettings clientSettings;
+  clientSettings.setValue("library_manager/window_geometry", saveGeometry());
+  clientSettings.setValue("library_manager/window_state", saveState());
+
   clearLibraryList();
   mAddLibraryWidget.reset();
   mUi.reset();

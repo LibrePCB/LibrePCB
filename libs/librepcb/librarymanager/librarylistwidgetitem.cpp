@@ -55,21 +55,16 @@ LibraryListWidgetItem::LibraryListWidgetItem(workspace::Workspace& ws,
     if (!icon.isNull()) {
       mUi->lblIcon->setPixmap(icon);
     }
-    if (isRemoteLibrary()) {
-      mUi->lblLibraryType->setText(tr("(remote)"));
-      mUi->lblLibraryType->setStyleSheet("QLabel { color: red; }");
-    } else {
-      mUi->lblLibraryType->setText(tr("(local)"));
-      mUi->lblLibraryType->setStyleSheet("QLabel { color: blue; }");
-    }
     mUi->lblLibraryName->setText(name);
     mUi->lblLibraryDescription->setText(description);
-    mUi->lblLibraryUrl->setText(libDir.toRelative(ws.getLibrariesPath()));
+    QString path = libDir.toRelative(ws.getLibrariesPath());
+    path.replace("local/", "<font color=\"blue\">local</font>/");
+    path.replace("remote/", "<font color=\"red\">remote</font>/");
+    mUi->lblLibraryUrl->setText(path);
   } else {
     QPixmap image(":/img/actions/add.png");
     mUi->lblIcon->setPixmap(image.scaled(
         mUi->lblIcon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    mUi->lblLibraryType->setVisible(false);
     mUi->lblLibraryName->setText(tr("Add a new library"));
     mUi->lblLibraryDescription->setText(tr("Click here to add a new library."));
     mUi->lblLibraryUrl->setText("");

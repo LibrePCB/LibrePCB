@@ -17,7 +17,7 @@
    <string>Workspace Library Manager</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="4,5">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -29,9 +29,15 @@
     </property>
     <item>
      <widget class="QListWidget" name="lstLibraries">
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>400</width>
+        <width>600</width>
         <height>16777215</height>
        </size>
       </property>
