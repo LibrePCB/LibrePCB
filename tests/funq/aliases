@@ -14,6 +14,7 @@ controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibrarie
 
 # Status bar at bottom
 controlPanelStatusBar = {controlPanel}::statusBar
+controlPanelStatusBarWorkspaceLabel = {controlPanelStatusBar}::QLabel-2
 controlPanelStatusBarProgressBar = {controlPanelStatusBar}::QProgressBar
 
 # Buttons in the top right frame

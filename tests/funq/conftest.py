@@ -127,7 +127,7 @@ class Helpers(object):
             time.sleep(0.1)
         count = None
         for i in range(0, 100):
-            count = len(widget.model_items().items)
+            count = len(widget.model().items().items)
             if min_count <= count and (max_count is None or count <= max_count):
                 return
             time.sleep(timeout / 100.0)
