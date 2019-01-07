@@ -23,7 +23,8 @@ def library_editor(librepcb, helpers):
         # Select the empty library in library list
         library_list = app.widget('libraryManagerInstalledLibrariesList')
         helpers.wait_for_model_items_count(library_list, 2)
-        library_list.model_items().items[1].select()
+        library_item = library_list.model().items().items[1]
+        library_list.select_item(library_item)
 
         # Open library editor of empty library
         app.widget('libraryManagerLibraryInfoWidgetOpenEditorButton').click()

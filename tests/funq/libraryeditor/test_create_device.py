@@ -5,8 +5,6 @@
 Test creating a device with the library editor
 """
 
-import time
-
 
 def test(library_editor, helpers):
     """
@@ -29,27 +27,30 @@ def test(library_editor, helpers):
     }
     for (widget, property), value in widget_properties.items():
         library_editor.widget('libraryEditorNewElementWizardMetadata' + widget).set_property(property, value)
-    time.sleep(0.5)  # Workaround for https://github.com/parkouss/funq/issues/39
     library_editor.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Select component
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentButton').click()
     category_tree = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogCategoriesTree')
     helpers.wait_for_model_items_count(category_tree, 1)
-    category_tree.model_items().items[0].select()
+    category = category_tree.model().items().items[0]
+    category_tree.select_item(category)
     components_list = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogComponentsList')
     helpers.wait_for_model_items_count(components_list, 1)
-    components_list.model_items().items[0].select()
+    component = components_list.model().items().items[0]
+    components_list.select_item(component)
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChooseComponentDialogAcceptButton').click()
 
     # Select package
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageButton').click()
     category_tree = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogCategoriesTree')
     helpers.wait_for_model_items_count(category_tree, 3)
-    category_tree.model_items().items[2].select()
+    category = category_tree.model().items().items[2]
+    category_tree.select_item(category)
     packages_list = library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogPackagesList')
     helpers.wait_for_model_items_count(packages_list, 1)
-    packages_list.model_items().items[0].select()
+    package = packages_list.model().items().items[0]
+    packages_list.select_item(package)
     library_editor.widget('libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogAcceptButton').click()
 
     # Finish

@@ -5,8 +5,6 @@
 Test creating a package category with the library editor
 """
 
-import time
-
 
 def test(library_editor, helpers):
     """
@@ -29,7 +27,6 @@ def test(library_editor, helpers):
     }
     for (widget, property), value in widget_properties.items():
         library_editor.widget('libraryEditorNewElementWizardMetadata' + widget).set_property(property, value)
-    time.sleep(0.5)  # Workaround for https://github.com/parkouss/funq/issues/39
 
     # Finish
     dialog = library_editor.widget('libraryEditorNewElementWizard')

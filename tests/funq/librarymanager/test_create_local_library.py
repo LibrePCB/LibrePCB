@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
-
 """
 Test creating local libraries with the library manager
 """
@@ -36,7 +34,6 @@ def test(librepcb, helpers):
         }
         for (widget, property), value in widget_properties.items():
             app.widget('libraryManagerCreateLocalLibrary' + widget).set_property(property, value)
-        time.sleep(0.5)  # Workaround for https://github.com/parkouss/funq/issues/39
         app.widget('libraryManagerCreateLocalLibraryCreateButton').click()
 
         # Check if one library is added
