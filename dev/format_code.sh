@@ -36,9 +36,7 @@ if [ "$DOCKER" == "--docker" ]; then
 
   if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building clang-format container..."
-    cd "$REPO_ROOT/dev/clang-format"
-    docker build . -t librepcb/clang-format:6
-    cd -
+    docker build "$REPO_ROOT/dev/clang-format" -t librepcb/clang-format:6
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
