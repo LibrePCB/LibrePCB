@@ -54,19 +54,19 @@ COUNTER=0
 for dir in apps/ libs/librepcb/ tests/unittests/
 do
   if [ "$ALL" == "--all" ]; then
-    TRACKED=`git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+    TRACKED=$(git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   else
     # Only files which differ from the master branch
-    TRACKED=`git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+    TRACKED=$(git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   fi
-  UNTRACKED=`git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+  UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   for file in $TRACKED $UNTRACKED
   do
     # Note: Do NOT use in-place edition of clang-format because this causes
     # "make" to detect the files as changed every time, even if the content was
     # not modified! So we only overwrite the files if their content has changed.
-    OLD_CONTENT=`cat "$file"`
-    NEW_CONTENT=`clang-format -style=file "$file"`
+    OLD_CONTENT=$(cat "$file")
+    NEW_CONTENT=$(clang-format -style=file "$file")
     if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
     then
         printf "%s\n" "$NEW_CONTENT" > "$file"
