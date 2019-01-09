@@ -11,6 +11,8 @@ set -eo pipefail
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, don't use it!
 
+DOCKER=""
+ALL=""
 for i in "$@"
 do
 case $i in
