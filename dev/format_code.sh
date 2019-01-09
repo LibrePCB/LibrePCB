@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
 # Formats files according our coding style with clang-format. And if Python is
 # available, *.pro project files will be sorted with sort_qmake_file_entries.py.
