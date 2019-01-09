@@ -66,7 +66,7 @@ public:
 //  int getTopLayerIndex() const noexcept { return mTopLayerIndex; }
 //  int getBottomLayerIndex() const noexcept { return mBottomLayerIndex; }
   QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
-  GraphicsLayer* getCopperLayer(const int index) const noexcept;
+//  GraphicsLayer* getCopperLayer(const int index) const noexcept;
 //  QList<GraphicsLayer*> getInnerLayers() const noexcept;
 
   /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()

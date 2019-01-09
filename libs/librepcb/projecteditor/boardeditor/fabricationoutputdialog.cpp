@@ -116,7 +116,7 @@ void FabricationOutputDialog::on_btnDefaultSuffixes_clicked() {
   mUi->edtSuffixSilkscreenTop->setText("_SILKSCREEN-TOP.gbr");
   mUi->edtSuffixSilkscreenBot->setText("_SILKSCREEN-BOTTOM.gbr");
   mUi->edtSuffixDrillsNpth->setText("_DRILLS-NPTH.drl");
-  mUi->edtSuffixDrillsPth->setText("_DRILLS-PTH.drl");
+  mUi->edtSuffixDrillsPth->setText("_DRILLS-PTH{{CU_LAYER_RANGE}}.drl");
   mUi->edtSuffixDrills->setText("_DRILLS.drl");
   mUi->edtSuffixSolderPasteTop->setText("_SOLDERPASTE-TOP.gbr");
   mUi->edtSuffixSolderPasteBot->setText("_SOLDERPASTE-BOTTOM.gbr");

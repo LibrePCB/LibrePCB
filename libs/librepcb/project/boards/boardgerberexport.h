@@ -106,7 +106,8 @@ private:
   void exportLayerBottomSolderPaste() const;
 
   int  drawNpthDrills(ExcellonGenerator& gen) const;
-  int  drawPthDrills(ExcellonGenerator& gen) const;
+  int  drawPthDrills(ExcellonGenerator& gen, const int startLayerIndex,
+                     const int stopLayerIndex) const;
   void drawLayer(GerberGenerator& gen, const QString& layerName) const;
   void drawVia(GerberGenerator& gen, const BI_Via& via,
                const QString& layerName) const;
@@ -134,6 +135,7 @@ private:
   const Project&            mProject;
   const Board&              mBoard;
   mutable int               mCurrentInnerCopperLayer;
+  mutable QString           mCurrentDrillLayerRange;
   mutable QVector<FilePath> mWrittenFiles;
 };
 

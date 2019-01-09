@@ -61,7 +61,8 @@ namespace project {
  ******************************************************************************/
 
 BoardGerberExport::BoardGerberExport(const Board& board) noexcept
-  : mProject(board.getProject()), mBoard(board), mCurrentInnerCopperLayer(0) {
+  : mProject(board.getProject()), mBoard(board), mCurrentInnerCopperLayer(0),
+    mCurrentDrillLayerRange(""){
 }
 
 BoardGerberExport::~BoardGerberExport() noexcept {
@@ -112,7 +113,12 @@ QString BoardGerberExport::getBuiltInAttributeValue(const QString& key) const
     noexcept {
   if ((key == QLatin1String("CU_LAYER")) && (mCurrentInnerCopperLayer > 0)) {
     return QString::number(mCurrentInnerCopperLayer);
-  } else {
+  }
+  else if ((key == QLatin1String("CU_LAYER_RANGE")) &&
+           !mCurrentDrillLayerRange.isEmpty()) {
+    return QString(mCurrentDrillLayerRange);
+  }
+  else {
     return QString();
   }
 }
@@ -130,7 +136,8 @@ void BoardGerberExport::exportDrills() const {
   FilePath fp = getOutputFilePath(
       mBoard.getFabricationOutputSettings().getSuffixDrills());
   ExcellonGenerator gen;
-  drawPthDrills(gen);
+  int lastCopperLayerIndex = mBoard.getLayerStack().getInnerLayerCount() + 1;
+  drawPthDrills(gen, 0, lastCopperLayerIndex);
   drawNpthDrills(gen);
   gen.generate();
   gen.saveToFile(fp);
@@ -154,13 +161,22 @@ void BoardGerberExport::exportDrillsNpth() const {
 }
 
 void BoardGerberExport::exportDrillsPth() const {
-  FilePath fp = getOutputFilePath(
-      mBoard.getFabricationOutputSettings().getSuffixDrillsPth());
-  ExcellonGenerator gen;
-  drawPthDrills(gen);
-  gen.generate();
-  gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
+  int copperLayerCount = mBoard.getLayerStack().getInnerLayerCount() + 2;
+  for (int i = 0; i < copperLayerCount; ++i){
+    for (int e = i; e < copperLayerCount; ++e){
+      mCurrentDrillLayerRange = QString("_%1-%2").arg(i + 1).arg(e + 1);
+      FilePath fp = getOutputFilePath(
+          mBoard.getFabricationOutputSettings().getSuffixDrillsPth());
+      ExcellonGenerator gen;
+      int count = drawPthDrills(gen, i, e);
+      if (count > 0){
+        gen.generate();
+        gen.saveToFile(fp);
+        mWrittenFiles.append(fp);
+      }
+    }
+  }
+  mCurrentDrillLayerRange = "";
 }
 
 void BoardGerberExport::exportLayerBoardOutlines() const {
@@ -322,18 +338,23 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
   return count;
 }
 
-int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
+int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen,
+                                     const int startLayerIndex,
+                                     const int stopLayerIndex) const {
   int count = 0;
+  int lastCopperLayerIndex = mBoard.getLayerStack().getInnerLayerCount() + 1;
 
   // footprint pads
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
-    foreach (const BI_FootprintPad* pad, footprint.getPads()) {
-      const library::FootprintPad& libPad = pad->getLibPad();
-      if (libPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
-        gen.drill(pad->getPosition(),
-                  PositiveLength(*libPad.getDrillDiameter()));  // can throw
-        ++count;
+  if (startLayerIndex == 0 && stopLayerIndex == lastCopperLayerIndex){
+    foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+      const BI_Footprint& footprint = device->getFootprint();
+      foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+        const library::FootprintPad& libPad = pad->getLibPad();
+        if (libPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
+          gen.drill(pad->getPosition(),
+                    PositiveLength(*libPad.getDrillDiameter()));  // can throw
+          ++count;
+        }
       }
     }
   }
@@ -342,8 +363,11 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
   foreach (const BI_NetSegment* netsegment,
            sortedByUuid(mBoard.getNetSegments())) {
     foreach (const BI_Via* via, sortedByUuid(netsegment->getVias())) {
-      gen.drill(via->getPosition(), via->getDrillDiameter());
-      ++count;
+      if (startLayerIndex == via->getStartLayerIndex() &&
+          stopLayerIndex == via->getStopLayerIndex()){
+        gen.drill(via->getPosition(), via->getDrillDiameter());
+        ++count;
+      }
     }
   }
 
