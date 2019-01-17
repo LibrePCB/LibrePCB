@@ -98,8 +98,6 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
           this, &BoardViaPropertiesDialog::stopLayerChanged);
   mUi->cbxStartLayer->setCurrentIndex(via.getStartLayerIndex());
   mUi->cbxStopLayer->setCurrentIndex(via.getStopLayerIndex() - 1);
-
-  qDebug() << "via propery" << via.getStartLayerName() << via.getStopLayerName();
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {

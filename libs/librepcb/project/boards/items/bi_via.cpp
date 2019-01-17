@@ -45,8 +45,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
     mPosition(other.mPosition),
     mShape(other.mShape),
     mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter) {
-  setLayers(other.getStartLayer(), other.getStopLayer());
+    mDrillDiameter(other.mDrillDiameter),
+    mStartLayerName(other.mStartLayerName),
+    mStopLayerName(other.mStopLayerName) {
   init();
 }
 
@@ -57,7 +58,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
     mPosition(0, 0),
     mShape(node.getValueByPath<Shape>("shape")),
     mSize(node.getValueByPath<PositiveLength>("size")),
-    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")) {
+    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")),
+    mStartLayerName(GraphicsLayer::sTopCopper),
+    mStopLayerName(GraphicsLayer::sBotCopper) {
   if (node.tryGetChildByPath("position")) {
     mPosition = Point(node.getChildByPath("position"));
   } else {
@@ -79,24 +82,11 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
   else{
     stopLayerName = GraphicsLayer::sBotCopper;
   }
-  setLayers(startLayerName, stopLayerName);
+  setLayers((GraphicsLayerName) startLayerName,
+            (GraphicsLayerName) stopLayerName);
 
   init();
 }
-
-//BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
-//               const PositiveLength& size, const PositiveLength& drillDiameter)
-//  : BI_Base(netsegment.getBoard()),
-//    mNetSegment(netsegment),
-//    mUuid(Uuid::createRandom()),
-//    mPosition(position),
-//    mShape(shape),
-//    mSize(size),
-//    mDrillDiameter(drillDiameter),
-//    mStartLayer(0),
-//    mStopLayer(-1) { // -1 is bottom copper layer
-//  init();
-//}
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
                const PositiveLength& size, const PositiveLength& drillDiameter,
@@ -107,8 +97,10 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter) {
-  setLayers(startLayerName, stopLayerName);
+    mDrillDiameter(drillDiameter),
+    mStartLayerName((GraphicsLayerName) startLayerName),
+    mStopLayerName((GraphicsLayerName) stopLayerName) {
+
   init();
 }
 
@@ -121,8 +113,10 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter) {
-  setLayers(startLayer, stopLayer);
+    mDrillDiameter(drillDiameter),
+    mStartLayerName((GraphicsLayerName) startLayer->getName()),
+    mStopLayerName((GraphicsLayerName) stopLayer->getName()) {
+
   init();
 }
 
@@ -150,7 +144,7 @@ NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept {
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
   if (layerName == nullptr){// pass nullptr for all layers
-    return true;
+    return false;
   }
   return isOnLayer(mBoard.getLayerStack().getLayer(layerName));
 }
@@ -159,7 +153,25 @@ bool BI_Via::isOnLayer(GraphicsLayer* layer) const noexcept {
   if (layer == nullptr){// pass nullptr for all layers
     return true;
   }
-  return mLayers.contains(layer);
+  else if (GraphicsLayer::isTopLayer(*mStartLayerName)
+      && GraphicsLayer::isBottomLayer(*mStopLayerName)){
+    return true;
+  }
+  else if (GraphicsLayer::isTopLayer(*mStartLayerName)){
+    GraphicsLayer* stopLr = mBoard.getLayerStack().getLayer(*mStopLayerName);
+    return layer->getInnerLayerNumber() <= stopLr->getInnerLayerNumber();
+  }
+  else if (GraphicsLayer::isBottomLayer(*mStopLayerName)){
+    GraphicsLayer* startLr = mBoard.getLayerStack().getLayer(*mStartLayerName);
+    return layer->getInnerLayerNumber() >= startLr->getInnerLayerNumber();
+  }
+  else{
+    GraphicsLayer* startLr = mBoard.getLayerStack().getLayer(*mStartLayerName);
+    GraphicsLayer* stopLr = mBoard.getLayerStack().getLayer(*mStopLayerName);
+    return layer->getInnerLayerNumber() >= startLr->getInnerLayerNumber()
+        && layer->getInnerLayerNumber() <= stopLr->getInnerLayerNumber();
+  }
+//  return mLayers.contains(layer);
 }
 
 Path BI_Via::getOutline(const Length& expansion) const noexcept {
@@ -247,46 +259,21 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   }
 }
 
-void BI_Via::setLayers(const QString& startLayerName,
-                       const QString& stopLayerName) noexcept {
+void BI_Via::setLayers(const GraphicsLayerName& startLayerName,
+                       const GraphicsLayerName& stopLayerName) {
   BoardLayerStack* layerStack = &mBoard.getLayerStack();
-  setLayers(layerStack->getLayer(startLayerName),
-            layerStack->getLayer(stopLayerName));
+  if (!layerStack->getLayer(*startLayerName)->isEnabled() &&
+      !layerStack->getLayer(*stopLayerName)->isEnabled()){
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mStartLayerName = startLayerName;
+  mStopLayerName = stopLayerName;
 }
 
 void BI_Via::setLayers(GraphicsLayer* startLayer,
-                       GraphicsLayer* stopLayer) noexcept {
-  mLayers.clear();
-  BoardLayerStack* layerStack = &mBoard.getLayerStack();
-  if (startLayer->isTopLayer() && stopLayer->isBottomLayer()){
-    mLayers.append(startLayer);
-    for (int i = 1; i <= layerStack->getInnerLayerCount(); ++i){
-      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
-    }
-    mLayers.append(stopLayer);
-  }
-  else if (startLayer->isTopLayer()){
-    mLayers.append(startLayer);
-    for (int i = 1; i <= stopLayer->getInnerLayerNumber(); ++i){
-      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
-    }
-  }
-  else if (stopLayer->isBottomLayer()){
-    for (int i = startLayer->getInnerLayerNumber();
-         i <= layerStack->getInnerLayerCount(); ++i){
-      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
-    }
-    mLayers.append(stopLayer);
-  }
-  else{
-    for (int i = startLayer->getInnerLayerNumber();
-         i <= stopLayer->getInnerLayerNumber(); ++i){
-      mLayers.append(layerStack->getLayer(GraphicsLayer::getInnerLayerName(i)));
-    }
-  }
-  if (mGraphicsItem){
-    mGraphicsItem->updateCacheAndRepaint();
-  }
+                       GraphicsLayer* stopLayer) {
+  setLayers((GraphicsLayerName) startLayer->getName(),
+            (GraphicsLayerName) stopLayer->getName());
 }
 
 /*******************************************************************************
@@ -315,7 +302,8 @@ void BI_Via::removeFromBoard() {
 
 void BI_Via::registerNetLine(BI_NetLine& netline) {
   if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline)) ||
-      (&netline.getNetSegment() != &mNetSegment)) {
+      (&netline.getNetSegment() != &mNetSegment) ||
+      !isOnLayer(netline.getLayer().getName())) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.insert(&netline);

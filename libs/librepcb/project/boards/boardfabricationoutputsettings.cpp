@@ -40,7 +40,7 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
   : mOutputBasePath("./output/{{VERSION}}/gerber/{{PROJECT}}"),
     mSuffixDrills("_DRILLS.drl"),
     mSuffixDrillsNpth("_DRILLS-NPTH.drl"),
-    mSuffixDrillsPth("_DRILLS-PTH{{CU_LAYER_RANGE}}.drl"),
+    mSuffixDrillsPth("_DRILLS-PTH-{{CU_LAYER_START}}-{{CU_LAYER_STOP}}.drl"),
     mSuffixOutlines("_OUTLINES.gbr"),
     mSuffixCopperTop("_COPPER-TOP.gbr"),
     mSuffixCopperInner("_COPPER-IN{{CU_LAYER}}.gbr"),

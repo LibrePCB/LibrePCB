@@ -135,7 +135,8 @@ private:
   const Project&            mProject;
   const Board&              mBoard;
   mutable int               mCurrentInnerCopperLayer;
-  mutable QString           mCurrentDrillLayerRange;
+  mutable int               mCurrentViaStartLayer;
+  mutable int               mCurrentViaStopLayer;
   mutable QVector<FilePath> mWrittenFiles;
 };
 

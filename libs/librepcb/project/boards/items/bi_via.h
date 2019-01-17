@@ -62,8 +62,6 @@ public:
   BI_Via(const BI_Via& other) = delete;
   BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
   BI_Via(BI_NetSegment& netsegment, const SExpression& node);
-//  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
-//         const PositiveLength& size, const PositiveLength& drillDiameter);
   BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
          const PositiveLength& size, const PositiveLength& drillDiameter,
          const QString& startLayerName, const QString& stopLayerName);
@@ -81,16 +79,16 @@ public:
     return mDrillDiameter;
   }
   GraphicsLayer*        getStartLayer() const noexcept {
-    return mLayers.first();
+    return mBoard.getLayerStack().getLayer(*mStartLayerName);
   }
   GraphicsLayer*        getStopLayer() const noexcept {
-    return mLayers.back();
+    return mBoard.getLayerStack().getLayer(*mStopLayerName);
   }
   const QString&        getStartLayerName() const noexcept {
-    return getStartLayer()->getName();
+    return *mStartLayerName;
   }
   const QString&        getStopLayerName() const noexcept {
-    return getStopLayer()->getName();
+    return *mStopLayerName;
   }
   int             getStartLayerIndex() const noexcept;
   int             getStopLayerIndex() const noexcept;
@@ -110,8 +108,9 @@ public:
   void setShape(Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
-  void setLayers(const QString& startLayer, const QString& stopLayer) noexcept;
-  void setLayers(GraphicsLayer* startLayer, GraphicsLayer* stopLayer) noexcept;
+  void setLayers(const GraphicsLayerName& startLayer,
+                 const GraphicsLayerName& stopLayer);
+  void setLayers(GraphicsLayer* startLayer, GraphicsLayer* stopLayer);
 
   // General Methods
   void addToBoard() override;
@@ -154,9 +153,8 @@ private:
   Shape                 mShape;
   PositiveLength        mSize;
   PositiveLength        mDrillDiameter;
-  QList<GraphicsLayer*> mLayers;
-// is -1 if stops as bottom copper layer, otherwise is has to be less than bottom copper layer index
-//  QMap <GraphicsLayer*, PositiveLength> mLayers; //TODO different mSize for different copper layers
+  GraphicsLayerName     mStartLayerName;
+  GraphicsLayerName     mStopLayerName;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

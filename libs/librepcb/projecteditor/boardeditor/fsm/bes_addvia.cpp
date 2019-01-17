@@ -246,7 +246,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   layerName = GraphicsLayer::sBotCopper;
   mStopLayerComboBox->addItem(layerStack->getLayer(layerName)->getNameTr(),
                                layerName);
-  qDebug() << "add via entry" << mCurrentViaStartLayerName << mCurrentViaStopLayerName;
   mStartLayerComboBox->setCurrentIndex(mCurrentVia->getStartLayerIndex());
   mStopLayerComboBox->setCurrentIndex(mCurrentVia->getStopLayerIndex() - 1);
   connect(mStartLayerComboBox,
@@ -383,7 +382,6 @@ bool BES_AddVia::addVia(Board& board) noexcept {
   Q_ASSERT(mCurrentViaNetSignal);
 
   try {
-    qDebug() << "Add via" << mCurrentViaStartLayerName << mCurrentViaStopLayerName;
     mUndoStack.beginCmdGroup(tr("Add via to board"));
     mUndoCmdActive = true;
     CmdBoardNetSegmentAdd* cmdAddSeg =

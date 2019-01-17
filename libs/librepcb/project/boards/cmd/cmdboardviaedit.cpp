@@ -59,7 +59,8 @@ CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
     mVia.setShape(mOldShape);
     mVia.setSize(mOldSize);
     mVia.setDrillDiameter(mOldDrillDiameter);
-    mVia.setLayers(mOldStartLayerName, mOldStopLayerName);
+    mVia.setLayers((GraphicsLayerName) mOldStartLayerName,
+                   (GraphicsLayerName) mOldStopLayerName);
   }
 }
 
@@ -104,14 +105,20 @@ void CmdBoardViaEdit::setStartLayerName(const QString& startLayerName,
                                     bool immediate) noexcept {
     Q_ASSERT(!wasEverExecuted());
     mNewStartLayerName = startLayerName;
-    if (immediate) mVia.setLayers(mNewStartLayerName, mOldStopLayerName);
+    if (immediate){
+      mVia.setLayers((GraphicsLayerName) mNewStartLayerName,
+                     (GraphicsLayerName) mOldStopLayerName);
+    }
 }
 
 void CmdBoardViaEdit::setStopLayerName(const QString& stopLayerName,
                                    bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewStopLayerName = stopLayerName;
-  if (immediate) mVia.setLayers(mOldStartLayerName, mNewStopLayerName);
+  if (immediate){
+    mVia.setLayers((GraphicsLayerName) mOldStartLayerName,
+                   (GraphicsLayerName)mNewStopLayerName);
+  }
 }
 
 /*******************************************************************************
@@ -125,21 +132,21 @@ bool CmdBoardViaEdit::performExecute() {
 }
 
 void CmdBoardViaEdit::performUndo() {
-  qDebug() << "UNDO!!!" << mOldStartLayerName << mOldStopLayerName;
   mVia.setPosition(mOldPos);
   mVia.setShape(mOldShape);
   mVia.setSize(mOldSize);
   mVia.setDrillDiameter(mOldDrillDiameter);
-  mVia.setLayers(mOldStartLayerName, mOldStopLayerName);
+  mVia.setLayers((GraphicsLayerName) mOldStartLayerName,
+                 (GraphicsLayerName) mOldStopLayerName);
 }
 
 void CmdBoardViaEdit::performRedo() {
-  qDebug() << "REDO!!!" << mNewStartLayerName << mNewStopLayerName;
   mVia.setPosition(mNewPos);
   mVia.setShape(mNewShape);
   mVia.setSize(mNewSize);
   mVia.setDrillDiameter(mNewDrillDiameter);
-  mVia.setLayers(mNewStartLayerName, mNewStopLayerName);
+  mVia.setLayers((GraphicsLayerName) mNewStartLayerName,
+                 (GraphicsLayerName) mNewStopLayerName);
 }
 
 /*******************************************************************************
