@@ -27,6 +27,7 @@
 #include "./bi_netline.h"
 #include "bi_base.h"
 
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
@@ -73,6 +74,12 @@ public:
     return mDrillDiameter;
   }
   const PositiveLength& getSize() const noexcept { return mSize; }
+  const GraphicsLayer* getStartLayer() const noexcept {
+    return mBoard.getLayerStack().getLayer(GraphicsLayer::sTopCopper);
+  }
+  const GraphicsLayer* getStopLayer() const noexcept {
+    return mBoard.getLayerStack().getLayer(GraphicsLayer::sBotCopper);
+  }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOnLayer(const QString& layerName) const noexcept;
   bool isSelectable() const noexcept override;
