@@ -73,6 +73,7 @@ FabricationOutputDialog::FabricationOutputDialog(Board& board, QWidget* parent)
   mUi->edtSuffixSilkscreenBot->setText(s.getSuffixSilkscreenBot());
   mUi->edtSuffixDrillsNpth->setText(s.getSuffixDrillsNpth());
   mUi->edtSuffixDrillsPth->setText(s.getSuffixDrillsPth());
+  mUi->edtSuffixDrillsBnB->setText(s.getSuffixDrillsBnB());
   mUi->edtSuffixDrills->setText(s.getSuffixDrills());
   mUi->edtSuffixSolderPasteTop->setText(s.getSuffixSolderPasteTop());
   mUi->edtSuffixSolderPasteBot->setText(s.getSuffixSolderPasteBot());
@@ -117,7 +118,9 @@ void FabricationOutputDialog::on_btnDefaultSuffixes_clicked() {
   mUi->edtSuffixSilkscreenBot->setText("_SILKSCREEN-BOTTOM.gbr");
   mUi->edtSuffixDrillsNpth->setText("_DRILLS-NPTH.drl");
   mUi->edtSuffixDrillsPth->setText(
-        "_DRILLS-PTH-{{CU_LAYER_START}}-{{CU_LAYER_STOP}}.drl");
+        "_DRILLS-PTH.drl");
+  mUi->edtSuffixDrillsBnB->setText(
+        "_DRILLS-{{CU_LAYER_START}}-{{CU_LAYER_STOP}}.drl");
   mUi->edtSuffixDrills->setText("_DRILLS.drl");
   mUi->edtSuffixSolderPasteTop->setText("_SOLDERPASTE-TOP.gbr");
   mUi->edtSuffixSolderPasteBot->setText("_SOLDERPASTE-BOTTOM.gbr");
@@ -135,6 +138,7 @@ void FabricationOutputDialog::on_btnProtelSuffixes_clicked() {
   mUi->edtSuffixSilkscreenBot->setText(".gbo");
   mUi->edtSuffixDrillsNpth->setText("_NPTH.txt");
   mUi->edtSuffixDrillsPth->setText("_PTH.txt");
+  mUi->edtSuffixDrillsBnB->setText("_{{CU_LAYER_START}}-{{CU_LAYER_STOP}}.txt");
   mUi->edtSuffixDrills->setText(".txt");
   mUi->edtSuffixSolderPasteTop->setText(".gtp");
   mUi->edtSuffixSolderPasteBot->setText(".gbp");
@@ -152,6 +156,7 @@ void FabricationOutputDialog::on_btnGenerate_clicked() {
     s.setSuffixDrills(mUi->edtSuffixDrills->text().trimmed());
     s.setSuffixDrillsNpth(mUi->edtSuffixDrillsNpth->text().trimmed());
     s.setSuffixDrillsPth(mUi->edtSuffixDrillsPth->text().trimmed());
+    s.setSuffixDrillsBnB(mUi->edtSuffixDrillsBnB->text().trimmed());
     s.setSuffixOutlines(mUi->edtSuffixOutlines->text().trimmed());
     s.setSuffixCopperTop(mUi->edtSuffixCopperTop->text().trimmed());
     s.setSuffixCopperInner(mUi->edtSuffixCopperInner->text().trimmed());

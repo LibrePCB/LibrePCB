@@ -40,7 +40,8 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
   : mOutputBasePath("./output/{{VERSION}}/gerber/{{PROJECT}}"),
     mSuffixDrills("_DRILLS.drl"),
     mSuffixDrillsNpth("_DRILLS-NPTH.drl"),
-    mSuffixDrillsPth("_DRILLS-PTH-{{CU_LAYER_START}}-{{CU_LAYER_STOP}}.drl"),
+    mSuffixDrillsPth("_DRILLS-PTH.drl"),
+    mSuffixDrillsBnB("_DRILLS-{{CU_LAYER_START}}-{{CU_LAYER_STOP}}.drl"),
     mSuffixOutlines("_OUTLINES.gbr"),
     mSuffixCopperTop("_COPPER-TOP.gbr"),
     mSuffixCopperInner("_COPPER-IN{{CU_LAYER}}.gbr"),
@@ -86,6 +87,11 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
       node.getValueByPath<QString>("solderpaste_bot/suffix");
   mSuffixDrillsPth      = node.getValueByPath<QString>("drills/suffix_pth");
   mSuffixDrillsNpth     = node.getValueByPath<QString>("drills/suffix_npth");
+  // compatibility
+  if (node.tryGetChildByPath("drills/suffix_blind_buried")){
+    mSuffixDrillsBnB      =
+        node.getValueByPath<QString>("drills/suffix_blind_buried");
+  }
   mSuffixDrills         = node.getValueByPath<QString>("drills/suffix_merged");
   mMergeDrillFiles      = node.getValueByPath<bool>("drills/merge");
   mEnableSolderPasteTop = node.getValueByPath<bool>("solderpaste_top/create");
@@ -144,6 +150,7 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
   drills.appendChild("merge", mMergeDrillFiles, false);
   drills.appendChild("suffix_pth", mSuffixDrillsPth, true);
   drills.appendChild("suffix_npth", mSuffixDrillsNpth, true);
+  drills.appendChild("suffix_blind_buried", mSuffixDrillsBnB, true);
   drills.appendChild("suffix_merged", mSuffixDrills, true);
 
   SExpression& solderPasteTop = root.appendList("solderpaste_top", true);
@@ -165,6 +172,7 @@ BoardFabricationOutputSettings& BoardFabricationOutputSettings::operator=(
   mSuffixDrills         = rhs.mSuffixDrills;
   mSuffixDrillsNpth     = rhs.mSuffixDrillsNpth;
   mSuffixDrillsPth      = rhs.mSuffixDrillsPth;
+  mSuffixDrillsBnB      = rhs.mSuffixDrillsBnB;
   mSuffixOutlines       = rhs.mSuffixOutlines;
   mSuffixCopperTop      = rhs.mSuffixCopperTop;
   mSuffixCopperInner    = rhs.mSuffixCopperInner;
@@ -189,6 +197,7 @@ bool BoardFabricationOutputSettings::operator==(
   if (mSuffixDrills != rhs.mSuffixDrills) return false;
   if (mSuffixDrillsNpth != rhs.mSuffixDrillsNpth) return false;
   if (mSuffixDrillsPth != rhs.mSuffixDrillsPth) return false;
+  if (mSuffixDrillsBnB != rhs.mSuffixDrillsBnB) return false;
   if (mSuffixOutlines != rhs.mSuffixOutlines) return false;
   if (mSuffixCopperTop != rhs.mSuffixCopperTop) return false;
   if (mSuffixCopperInner != rhs.mSuffixCopperInner) return false;

@@ -170,8 +170,15 @@ void BoardGerberExport::exportDrillsPth() const {
     for (int e = i; e < copperLayerCount; ++e){
       mCurrentViaStartLayer = i + 1;
       mCurrentViaStopLayer = e + 1;
-      FilePath fp = getOutputFilePath(
-          mBoard.getFabricationOutputSettings().getSuffixDrillsPth());
+      FilePath fp;
+      if (i == 0 && e == copperLayerCount - 1){
+        fp = getOutputFilePath(
+            mBoard.getFabricationOutputSettings().getSuffixDrillsPth());
+      }
+      else{
+        fp = getOutputFilePath(
+            mBoard.getFabricationOutputSettings().getSuffixDrillsBnB());
+      }
       ExcellonGenerator gen;
       int count = drawPthDrills(gen, i, e);
       if (count > 0){
