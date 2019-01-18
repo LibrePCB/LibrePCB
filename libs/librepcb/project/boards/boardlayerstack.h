@@ -105,9 +105,7 @@ private:
   bool                  mLayersChanged;
 
   // Settings
-//  int mTopLayerIndex;
   int mInnerLayerCount;
-//  int mBottomLayerIndex;
 };
 
 /*******************************************************************************

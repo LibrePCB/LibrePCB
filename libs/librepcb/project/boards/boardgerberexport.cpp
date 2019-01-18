@@ -62,7 +62,7 @@ namespace project {
 
 BoardGerberExport::BoardGerberExport(const Board& board) noexcept
   : mProject(board.getProject()), mBoard(board), mCurrentInnerCopperLayer(0),
-    mCurrentViaStartLayer(-1), mCurrentViaStopLayer(-1){
+    mCurrentViaStartLayer(0), mCurrentViaStopLayer(0){
 }
 
 BoardGerberExport::~BoardGerberExport() noexcept {
@@ -120,7 +120,7 @@ QString BoardGerberExport::getBuiltInAttributeValue(const QString& key) const
   }
   else if ((key == QLatin1String("CU_LAYER_STOP"))
            && (mCurrentViaStopLayer > 0)) {
-    return QString(mCurrentViaStopLayer);
+    return QString::number(mCurrentViaStopLayer);
   }
   else {
     return QString();
@@ -168,8 +168,8 @@ void BoardGerberExport::exportDrillsPth() const {
   int copperLayerCount = mBoard.getLayerStack().getInnerLayerCount() + 2;
   for (int i = 0; i < copperLayerCount; ++i){
     for (int e = i; e < copperLayerCount; ++e){
-      mCurrentViaStartLayer = i;
-      mCurrentViaStopLayer = e;
+      mCurrentViaStartLayer = i + 1;
+      mCurrentViaStopLayer = e + 1;
       FilePath fp = getOutputFilePath(
           mBoard.getFabricationOutputSettings().getSuffixDrillsPth());
       ExcellonGenerator gen;
@@ -181,8 +181,8 @@ void BoardGerberExport::exportDrillsPth() const {
       }
     }
   }
-  mCurrentViaStartLayer = -1;
-  mCurrentViaStopLayer = -1;
+  mCurrentViaStartLayer = 0;
+  mCurrentViaStopLayer = 0;
 }
 
 void BoardGerberExport::exportLayerBoardOutlines() const {

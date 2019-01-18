@@ -113,22 +113,6 @@ QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
   };
   return getLayers(names);
 }
-/*
-GraphicsLayer* BoardLayerStack::getCopperLayer(const int index) const noexcept {
-  if (index < 0 || index >= getCopperLayerCount()){
-    qDebug() << "Layer index is not in range";
-    //TODO something here, or we will agree not to exceed it?
-
-    //return bottom layer
-    int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
-    return mLayers[mTopLayerIndex + maxInnerLayersCount + 1];
-  }
-  if (index == getCopperLayerCount() - 1){ // is it the bottom layer
-    int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
-    return mLayers[mTopLayerIndex + maxInnerLayersCount + 1];
-  }
-  return mLayers[mTopLayerIndex + index];
-}*/
 
 /*******************************************************************************
  *  Setters
