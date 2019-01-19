@@ -136,6 +136,24 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept {
   return p;
 }
 
+int BI_Via::getStartLayerIndex() const noexcept {
+  if (getStartLayer()->isTopLayer()){
+    return 0;
+  }
+  else{
+    return getStartLayer()->getInnerLayerNumber();
+  }
+}
+
+int BI_Via::getStopLayerIndex() const noexcept {
+  if (getStopLayer()->isBottomLayer()){
+    return mBoard.getLayerStack().getInnerLayerCount() + 1;
+  }
+  else{
+    return getStopLayer()->getInnerLayerNumber();
+  }
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

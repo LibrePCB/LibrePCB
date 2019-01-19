@@ -27,6 +27,7 @@
 #include "./bi_netline.h"
 #include "bi_base.h"
 
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
@@ -80,6 +81,15 @@ public:
   const GraphicsLayer* getStopLayer() const noexcept {
     return mBoard.getLayerStack().getLayer(GraphicsLayer::sBotCopper);
   }
+  const QString&        getStartLayerName() const noexcept {
+    return QString(GraphicsLayer::sTopCopper);
+  }
+  const QString&        getStopLayerName() const noexcept {
+    return QString(GraphicsLayer::sBotCopper);
+  }
+  int             getStartLayerIndex() const noexcept;
+  int             getStopLayerIndex() const noexcept;
+
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOnLayer(const QString& layerName) const noexcept;
   bool isSelectable() const noexcept override;
