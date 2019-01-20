@@ -55,11 +55,7 @@ SExpression SmartSExprFile::parseFileAndBuildDomTree() const {
 
 void SmartSExprFile::save(const SExpression& domDocument, bool toOriginal) {
   FilePath filepath = prepareSaveAndReturnFilePath(toOriginal);  // can throw
-  QString  content  = domDocument.toString(0);                   // can throw
-  if (!content.endsWith('\n')) {
-    content.append('\n');
-  }
-  FileUtils::writeFile(filepath, content.toUtf8());  // can throw
+  FileUtils::writeFile(filepath, domDocument.toByteArray());     // can throw
   updateMembersAfterSaving(toOriginal);
 }
 

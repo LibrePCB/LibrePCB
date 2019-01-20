@@ -85,7 +85,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
     actualSexpr.appendChild(child, true);
   }
   FileUtils::writeFile(testDataDir.getPathTo("actual.lp"),
-                       actualSexpr.toString(0).toUtf8());
+                       actualSexpr.toByteArray());
 
   // load expected plane fragments from file
   FilePath    expectedFp = testDataDir.getPathTo("expected.lp");

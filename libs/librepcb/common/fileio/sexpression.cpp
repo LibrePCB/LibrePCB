@@ -189,6 +189,40 @@ void SExpression::removeLineBreaks() noexcept {
   }
 }
 
+QByteArray SExpression::toByteArray() const {
+  QString str = toString(0);  // can throw
+  str += '\n';                // newline at end of file
+  return str.toUtf8();
+}
+
+/*******************************************************************************
+ *  Operator Overloadings
+ ******************************************************************************/
+
+SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
+  mType     = rhs.mType;
+  mValue    = rhs.mValue;
+  mChildren = rhs.mChildren;
+  mFilePath = rhs.mFilePath;
+  return *this;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+QString SExpression::escapeString(const QString& string) const noexcept {
+  return QString::fromStdString(sexpresso::escape(string.toStdString()));
+}
+
+bool SExpression::isValidListName(const QString& name) const noexcept {
+  return QRegExp("[a-z][a-z0-9_]*").exactMatch(name);
+}
+
+bool SExpression::isValidToken(const QString& token) const noexcept {
+  return QRegExp("[a-zA-Z0-9\\.:_-]+").exactMatch(token);
+}
+
 QString SExpression::toString(int indent) const {
   if (mType == Type::List) {
     if (!isValidListName(mValue)) {
@@ -236,34 +270,6 @@ QString SExpression::toString(int indent) const {
 }
 
 /*******************************************************************************
- *  Operator Overloadings
- ******************************************************************************/
-
-SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
-  mType     = rhs.mType;
-  mValue    = rhs.mValue;
-  mChildren = rhs.mChildren;
-  mFilePath = rhs.mFilePath;
-  return *this;
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-QString SExpression::escapeString(const QString& string) const noexcept {
-  return QString::fromStdString(sexpresso::escape(string.toStdString()));
-}
-
-bool SExpression::isValidListName(const QString& name) const noexcept {
-  return QRegExp("[a-z][a-z0-9_]*").exactMatch(name);
-}
-
-bool SExpression::isValidToken(const QString& token) const noexcept {
-  return QRegExp("[a-zA-Z0-9\\.:_-]+").exactMatch(token);
-}
-
-/*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
@@ -283,8 +289,10 @@ SExpression SExpression::createLineBreak() {
   return SExpression(Type::LineBreak, QString());
 }
 
-SExpression SExpression::parse(const QString& str, const FilePath& filePath) {
+SExpression SExpression::parse(const QByteArray& content,
+                               const FilePath&   filePath) {
   std::string     error;
+  QString         str  = QString::fromUtf8(content);
   sexpresso::Sexp tree = sexpresso::parse(str.toStdString(), error);
   if (error.empty()) {
     if (tree.childCount() == 1) {
