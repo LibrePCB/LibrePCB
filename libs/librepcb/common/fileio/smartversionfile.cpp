@@ -23,6 +23,7 @@
 #include "smartversionfile.h"
 
 #include "fileutils.h"
+#include "versionfile.h"
 
 #include <QtCore>
 
@@ -38,12 +39,12 @@ namespace librepcb {
 SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore,
                                    bool readOnly)
   : SmartFile(filepath, restore, readOnly, false),
-    mVersion(readVersionFromFile(mOpenedFilePath)) {
+    mVersionFile(readVersionFromFile(mOpenedFilePath)) {
 }
 
 SmartVersionFile::SmartVersionFile(const FilePath& filepath,
                                    const Version&  newVersion)
-  : SmartFile(filepath, false, false, true), mVersion(newVersion) {
+  : SmartFile(filepath, false, false, true), mVersionFile(newVersion) {
 }
 
 SmartVersionFile::~SmartVersionFile() noexcept {
@@ -55,8 +56,7 @@ SmartVersionFile::~SmartVersionFile() noexcept {
 
 void SmartVersionFile::save(bool toOriginal) {
   const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-  FileUtils::writeFile(filepath,
-                       QString("%1\n").arg(mVersion.toStr()).toUtf8());
+  FileUtils::writeFile(filepath, mVersionFile.toByteArray());
   updateMembersAfterSaving(toOriginal);
 }
 
@@ -69,12 +69,10 @@ SmartVersionFile* SmartVersionFile::create(const FilePath& filepath,
   return new SmartVersionFile(filepath, version);
 }
 
-Version SmartVersionFile::readVersionFromFile(const FilePath& filepath) {
+VersionFile SmartVersionFile::readVersionFromFile(const FilePath& filepath) {
   try {
-    QString     content = QString(FileUtils::readFile(filepath));  // can throw
-    QStringList lines   = content.split("\n", QString::KeepEmptyParts);
-    Q_ASSERT(lines.count() >= 1);
-    return Version::fromString(lines.first());  // can throw
+    return VersionFile::fromByteArray(
+        FileUtils::readFile(filepath));  // can throw
   } catch (const Exception& e) {
     throw RuntimeError(
         __FILE__, __LINE__,
