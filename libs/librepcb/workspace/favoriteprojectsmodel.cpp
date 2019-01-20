@@ -25,7 +25,7 @@
 #include "settings/workspacesettings.h"
 #include "workspace.h"
 
-#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/fileutils.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,11 +44,10 @@ FavoriteProjectsModel::FavoriteProjectsModel(
     const Workspace& workspace) noexcept
   : QAbstractListModel(nullptr), mWorkspace(workspace) {
   try {
-    FilePath filepath =
-        mWorkspace.getMetadataPath().getPathTo("favorite_projects.lp");
-    if (filepath.isExistingFile()) {
-      mFile.reset(new SmartSExprFile(filepath, false, false));
-      SExpression               root   = mFile->parseFileAndBuildDomTree();
+    mFilePath = mWorkspace.getMetadataPath().getPathTo("favorite_projects.lp");
+    if (mFilePath.isExistingFile()) {
+      SExpression root =
+          SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
       const QList<SExpression>& childs = root.getChildren("project");
       foreach (const SExpression& child, childs) {
         QString  path    = child.getValueOfFirstChild<QString>(true);
@@ -56,8 +55,6 @@ FavoriteProjectsModel::FavoriteProjectsModel(
         mAllProjects.append(absPath);
       }
       updateVisibleProjects();
-    } else {
-      mFile.reset(SmartSExprFile::create(filepath));
     }
   } catch (Exception& e) {
     qWarning() << "Could not read favorite projects file:" << e.getMsg();
@@ -117,8 +114,7 @@ void FavoriteProjectsModel::save() noexcept {
       root.appendChild("project", filepath.toRelative(mWorkspace.getPath()),
                        true);
     }
-    if (mFile.isNull()) throw LogicError(__FILE__, __LINE__);
-    mFile->save(root, true);  // can throw
+    FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
   } catch (Exception& e) {
     qWarning() << "Could not save favorite projects file:" << e.getMsg();
   }
