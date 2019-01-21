@@ -3,7 +3,6 @@
 #include "ui_mainwindow.h"
 
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 

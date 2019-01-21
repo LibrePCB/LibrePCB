@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../version.h"
 #include "smartfile.h"
+#include "versionfile.h"
 
 #include <QtCore>
 
@@ -79,7 +79,9 @@ public:
    *
    * @return The content of the file
    */
-  const Version& getVersion() const noexcept { return mVersion; }
+  const Version& getVersion() const noexcept {
+    return mVersionFile.getVersion();
+  }
 
   // Setters
 
@@ -90,7 +92,9 @@ public:
    *
    * @param version   The new version of the file
    */
-  void setVersion(const Version& version) noexcept { mVersion = version; }
+  void setVersion(const Version& version) noexcept {
+    mVersionFile.setVersion(version);
+  }
 
   // General Methods
 
@@ -126,8 +130,6 @@ public:
                                   const Version&  version);
 
 protected:
-  // Protected Methods
-
   /**
    * @brief Constructor to create a new version file
    *
@@ -138,14 +140,10 @@ protected:
    */
   SmartVersionFile(const FilePath& filepath, const Version& newVersion);
 
-  static Version readVersionFromFile(const FilePath& filepath);
+  static VersionFile readVersionFromFile(const FilePath& filepath);
 
-  // General Attributes
-
-  /**
-   * @brief The version number of the file
-   */
-  Version mVersion;
+private:  // Data
+  VersionFile mVersionFile;
 };
 
 /*******************************************************************************

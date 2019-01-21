@@ -31,9 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class SmartSExprFile;
-
 namespace workspace {
 
 class Workspace;
@@ -68,10 +65,10 @@ private:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   // Attributes
-  const Workspace&               mWorkspace;
-  QScopedPointer<SmartSExprFile> mFile;
-  QList<FilePath>                mAllProjects;
-  QList<FilePath>                mVisibleProjects;
+  const Workspace& mWorkspace;
+  FilePath         mFilePath;
+  QList<FilePath>  mAllProjects;
+  QList<FilePath>  mVisibleProjects;
 };
 
 /*******************************************************************************
