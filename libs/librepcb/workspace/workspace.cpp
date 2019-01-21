@@ -33,7 +33,7 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/fileio/versionfile.h>
 #include <librepcb/library/library.h>
 #include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/project/project.h>
@@ -67,8 +67,10 @@ Workspace::Workspace(const FilePath& wsPath)
         __FILE__, __LINE__,
         QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
   }
-  SmartVersionFile wsVersionFile(mPath.getPathTo(".librepcb-workspace"), false,
-                                 true);  // can throw
+  FilePath    versionFp = mPath.getPathTo(".librepcb-workspace");
+  QByteArray  versionRaw(FileUtils::readFile(versionFp));  // can throw
+  VersionFile wsVersionFile =
+      VersionFile::fromByteArray(versionRaw);  // can throw
   if (wsVersionFile.getVersion() != FILE_FORMAT_VERSION()) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("The workspace version %1 is not compatible "
@@ -199,10 +201,9 @@ tl::optional<Version> Workspace::getHighestFileFormatVersionOfWorkspace(
 }
 
 void Workspace::createNewWorkspace(const FilePath& path) {
-  FilePath versionFilePath(path.getPathTo(".librepcb-workspace"));
-  QScopedPointer<SmartVersionFile> versionFile(SmartVersionFile::create(
-      versionFilePath, FILE_FORMAT_VERSION()));  // can throw
-  versionFile->save(true);                       // can throw
+  FileUtils::writeFile(
+      path.getPathTo(".librepcb-workspace"),
+      VersionFile(FILE_FORMAT_VERSION()).toByteArray());  // can throw
 }
 
 FilePath Workspace::getMostRecentlyUsedWorkspacePath() noexcept {

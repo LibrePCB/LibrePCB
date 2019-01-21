@@ -20,10 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "smartsexprfile.h"
+#include "versionfile.h"
 
 #include "fileutils.h"
-#include "sexpression.h"
 
 #include <QtCore>
 
@@ -36,35 +35,29 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SmartSExprFile::SmartSExprFile(const FilePath& filepath, bool restore,
-                               bool readOnly, bool create)
-  : SmartFile(filepath, restore, readOnly, create) {
+VersionFile::VersionFile(const Version& version) noexcept : mVersion(version) {
 }
 
-SmartSExprFile::~SmartSExprFile() noexcept {
+VersionFile::~VersionFile() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-SExpression SmartSExprFile::parseFileAndBuildDomTree() const {
-  return SExpression::parse(FileUtils::readFile(mOpenedFilePath),
-                            mOpenedFilePath);
-}
-
-void SmartSExprFile::save(const SExpression& domDocument, bool toOriginal) {
-  FilePath filepath = prepareSaveAndReturnFilePath(toOriginal);  // can throw
-  FileUtils::writeFile(filepath, domDocument.toByteArray());     // can throw
-  updateMembersAfterSaving(toOriginal);
+QByteArray VersionFile::toByteArray() const noexcept {
+  return QString("%1\n").arg(mVersion.toStr()).toUtf8();
 }
 
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
-SmartSExprFile* SmartSExprFile::create(const FilePath& filepath) {
-  return new SmartSExprFile(filepath, false, false, true);
+VersionFile VersionFile::fromByteArray(const QByteArray& content) {
+  QList<QByteArray> lines = content.split('\n');
+  Q_ASSERT(lines.count() >= 1);
+  Version version = Version::fromString(lines.first());  // can throw
+  return VersionFile(version);
 }
 
 /*******************************************************************************

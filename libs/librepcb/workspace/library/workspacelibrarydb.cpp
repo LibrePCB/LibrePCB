@@ -27,7 +27,6 @@
 
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/sqlitedatabase.h>
 #include <librepcb/library/cat/componentcategory.h>
 #include <librepcb/library/cat/packagecategory.h>

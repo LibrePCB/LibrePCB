@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/common/application.h>
-#include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/versionfile.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -92,11 +93,12 @@ TEST_F(WorkspaceTest, testOpenNonExistingWorkspace) {
 
 TEST_F(WorkspaceTest, testOpenIncompatibleWorkspaceVersion) {
   Workspace::createNewWorkspace(mWsDir);
-  SmartVersionFile versionFile(mVersionFile, false, false);
+  VersionFile versionFile =
+      VersionFile::fromByteArray(FileUtils::readFile(mVersionFile));
   EXPECT_EQ(Workspace::FILE_FORMAT_VERSION(), versionFile.getVersion());
   versionFile.setVersion(
       Version::fromString("0.0.1"));  // version 0.0.1 will never exist
-  versionFile.save(true);
+  FileUtils::writeFile(mVersionFile, versionFile.toByteArray());
   EXPECT_THROW(Workspace ws(mWsDir), Exception);
 }
 

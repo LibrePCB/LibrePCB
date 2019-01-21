@@ -128,8 +128,8 @@ public:
   SExpression& appendChild(const QString& child, const T& obj, bool linebreak) {
     return appendList(child, linebreak).appendChild(obj);
   }
-  void    removeLineBreaks() noexcept;
-  QString toString(int indent) const;
+  void       removeLineBreaks() noexcept;
+  QByteArray toByteArray() const;
 
   // Operator Overloadings
   SExpression& operator=(const SExpression& rhs) noexcept;
@@ -139,7 +139,7 @@ public:
   static SExpression createToken(const QString& token);
   static SExpression createString(const QString& string);
   static SExpression createLineBreak();
-  static SExpression parse(const QString& str, const FilePath& filePath);
+  static SExpression parse(const QByteArray& content, const FilePath& filePath);
 
 private:  // Methods
   SExpression(Type type, const QString& value);
@@ -148,6 +148,7 @@ private:  // Methods
   QString escapeString(const QString& string) const noexcept;
   bool    isValidListName(const QString& name) const noexcept;
   bool    isValidToken(const QString& token) const noexcept;
+  QString toString(int indent) const;
 
 private:  // Data
   Type               mType;

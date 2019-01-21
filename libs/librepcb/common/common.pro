@@ -66,6 +66,7 @@ SOURCES += \
     fileio/smartsexprfile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
+    fileio/versionfile.cpp \
     font/strokefont.cpp \
     font/strokefontpool.cpp \
     geometry/circle.cpp \
@@ -179,6 +180,7 @@ HEADERS += \
     fileio/smartsexprfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
+    fileio/versionfile.h \
     font/strokefont.h \
     font/strokefontpool.h \
     geometry/circle.h \
