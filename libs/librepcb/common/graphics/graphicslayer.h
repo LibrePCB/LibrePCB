@@ -128,6 +128,8 @@ public:
   //static constexpr const char* sInnerCopper#            = "in#_cu";
   static constexpr const char* sBotCopper               = "bot_cu";
 
+  static const QColor sUnfocused;
+
 #ifdef QT_DEBUG
   // debug layers
   static constexpr const char* sDebugGraphicsItemsBoundingRects       = "dbg_GraphicsItemsBoundingRects";

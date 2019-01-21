@@ -115,6 +115,7 @@ public:
     ZValue_TextsTop,  ///< Z value for librepcb::project::BI_StrokeText items
     ZValue_Vias,      ///< Z value for librepcb::project::BI_Via items
     ZValue_Texts,     ///< Z value for librepcb::project::BI_StrokeText items
+    ZValue_FocusedLayer,  ///< Z value for focused layer
     ZValue_AirWires,  ///< Z value for librepcb::project::BI_AirWire items
   };
 
@@ -166,6 +167,11 @@ public:
 
   // Setters: General
   void setGridProperties(const GridProperties& grid) noexcept;
+  void setFocusedLayer(GraphicsLayer* layer) noexcept {
+    mFocusedLayer = layer;
+    emit layerFocusChanged(layer);
+    emit attributesChanged();
+  }
 
   // Getters: Attributes
   const Uuid&        getUuid() const noexcept { return mUuid; }
@@ -173,6 +179,9 @@ public:
   const QIcon&       getIcon() const noexcept { return mIcon; }
   const QString&     getDefaultFontName() const noexcept {
     return mDefaultFontFileName;
+  }
+  const GraphicsLayer* getFocusedLayer() const noexcept {
+    return mFocusedLayer;
   }
 
   // DeviceInstance Methods
@@ -257,6 +266,8 @@ signals:
   void deviceAdded(BI_Device& comp);
   void deviceRemoved(BI_Device& comp);
 
+  void layerFocusChanged(GraphicsLayer* layer);
+
 private:
   Board(Project& project, const FilePath& filepath, bool restore, bool readOnly,
         bool create, const QString& newName);
@@ -271,6 +282,7 @@ private:
   FilePath mFilePath;  ///< the filepath of the board.lp file (from the ctor)
   QScopedPointer<SmartSExprFile> mFile;
   bool                           mIsAddedToProject;
+  GraphicsLayer*                 mFocusedLayer;
 
   QScopedPointer<GraphicsScene>                  mGraphicsScene;
   QScopedPointer<BoardLayerStack>                mLayerStack;

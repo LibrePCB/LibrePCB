@@ -75,17 +75,17 @@ public:
     return mDrillDiameter;
   }
   const PositiveLength& getSize() const noexcept { return mSize; }
-  const GraphicsLayer* getStartLayer() const noexcept {
+  GraphicsLayer* getStartLayer() const noexcept {
     return mBoard.getLayerStack().getLayer(GraphicsLayer::sTopCopper);
   }
-  const GraphicsLayer* getStopLayer() const noexcept {
+  GraphicsLayer* getStopLayer() const noexcept {
     return mBoard.getLayerStack().getLayer(GraphicsLayer::sBotCopper);
   }
   const QString&        getStartLayerName() const noexcept {
-    return QString(GraphicsLayer::sTopCopper);
+    return *mStartLayerName;
   }
   const QString&        getStopLayerName() const noexcept {
-    return QString(GraphicsLayer::sBotCopper);
+    return *mStopLayerName;
   }
   int             getStartLayerIndex() const noexcept;
   int             getStopLayerIndex() const noexcept;
@@ -145,6 +145,8 @@ private:
   Shape          mShape;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
+  GraphicsLayerName     mStartLayerName;
+  GraphicsLayerName     mStopLayerName;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

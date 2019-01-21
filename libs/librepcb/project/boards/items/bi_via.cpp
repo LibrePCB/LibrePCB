@@ -45,7 +45,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
     mPosition(other.mPosition),
     mShape(other.mShape),
     mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter) {
+    mDrillDiameter(other.mDrillDiameter),
+    mStartLayerName(other.mStartLayerName),
+    mStopLayerName(other.mStopLayerName) {
   init();
 }
 
@@ -56,7 +58,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
     mPosition(0, 0),
     mShape(node.getValueByPath<Shape>("shape")),
     mSize(node.getValueByPath<PositiveLength>("size")),
-    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")) {
+    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")),
+    mStartLayerName(GraphicsLayer::sTopCopper),
+    mStopLayerName(GraphicsLayer::sBotCopper) {
   if (node.tryGetChildByPath("position")) {
     mPosition = Point(node.getChildByPath("position"));
   } else {
@@ -75,7 +79,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter) {
+    mDrillDiameter(drillDiameter),
+    mStartLayerName(GraphicsLayer::sTopCopper),
+    mStopLayerName(GraphicsLayer::sBotCopper) {
   init();
 }
 

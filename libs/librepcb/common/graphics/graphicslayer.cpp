@@ -34,6 +34,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
+const QColor GraphicsLayer::sUnfocused = QColor(128, 128, 128, 64);
+
 GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
   : QObject(nullptr),
     mName(other.mName),

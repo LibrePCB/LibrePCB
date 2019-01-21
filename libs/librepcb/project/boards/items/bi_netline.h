@@ -123,6 +123,9 @@ public:
   // Operator Overloadings
   BI_NetLine& operator=(const BI_NetLine& rhs) = delete;
 
+private slots:
+  void boardAttributesChanged();
+
 private:
   void              init();
   BI_NetLineAnchor* deserializeAnchor(

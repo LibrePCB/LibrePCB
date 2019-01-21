@@ -46,7 +46,9 @@ BoardLayersDock::BoardLayersDock(BoardEditor& editor) noexcept
   : QDockWidget(nullptr),
     mUi(new Ui::BoardLayersDock),
     mBoardEditor(editor),
-    mActiveBoard(nullptr) {
+    mActiveBoard(nullptr),
+    mCurrentSelectedItem(nullptr),
+    mItemChanged(false) {
   mUi->setupUi(this);
 }
 
@@ -60,6 +62,7 @@ BoardLayersDock::~BoardLayersDock() noexcept {
 void BoardLayersDock::setActiveBoard(Board* board) {
   if (mActiveBoard) {
     disconnect(mActiveBoardConnection);
+    disconnect(mLayerFocusConnection);
   }
 
   mActiveBoard = board;
@@ -67,6 +70,8 @@ void BoardLayersDock::setActiveBoard(Board* board) {
   if (mActiveBoard) {
     mActiveBoardConnection = connect(mActiveBoard, &Board::attributesChanged,
                                      this, &BoardLayersDock::updateListWidget);
+    mLayerFocusConnection = connect(mActiveBoard, &Board::layerFocusChanged,
+                                    this, &BoardLayersDock::layerFocusChanged);
   }
 
   updateListWidget();
@@ -82,6 +87,27 @@ void BoardLayersDock::on_listWidget_itemChanged(QListWidgetItem* item) {
   GraphicsLayer* layer     = mActiveBoard->getLayerStack().getLayer(layerName);
   if (!layer) return;
   layer->setVisible(item->checkState() == Qt::Checked);
+
+  item->setSelected(false);
+  if (mCurrentSelectedItem){
+    mCurrentSelectedItem->setSelected(true);
+  }
+  mItemChanged = true;
+}
+
+void BoardLayersDock::on_listWidget_itemClicked(QListWidgetItem* item) {
+  if (mItemChanged){
+    mItemChanged = false;
+    return;
+  }
+  if (mCurrentSelectedItem != item){
+    QString layerName = item->data(Qt::UserRole).toString();
+    GraphicsLayer* layer = mActiveBoard->getLayerStack().getLayer(layerName);
+    mActiveBoard->setFocusedLayer(layer);
+  }
+  else{
+    mActiveBoard->setFocusedLayer(nullptr);
+  }
 }
 
 void BoardLayersDock::on_btnTop_clicked() {
@@ -211,6 +237,30 @@ QList<QString> BoardLayersDock::getAllLayers() const noexcept {
     layers.append(layer->getName());
   }
   return layers;
+}
+
+void BoardLayersDock::layerFocusChanged(GraphicsLayer *layer) noexcept{
+  if (mCurrentSelectedItem != nullptr){
+    QString focusedLayer = mCurrentSelectedItem->data(Qt::UserRole).toString();
+    if (layer != nullptr && focusedLayer == layer->getName()){
+      return;
+    }
+  }
+  if (layer == nullptr){
+    mCurrentSelectedItem->setSelected(false);
+    mCurrentSelectedItem = nullptr;
+  }
+  else{
+    for (int i = 0; i < mUi->listWidget->count(); ++i){
+      QListWidgetItem* item = mUi->listWidget->item(i);
+      QString layerName = item->data(Qt::UserRole).toString();
+      if (layer->getName() == layerName){
+        item->setSelected(true);
+        mCurrentSelectedItem = item;
+        break;
+      }
+    }
+  }
 }
 
 /*******************************************************************************

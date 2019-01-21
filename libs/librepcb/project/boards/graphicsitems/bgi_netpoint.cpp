@@ -69,8 +69,14 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   // set Z value
+  const GraphicsLayer* focusedLayer = mNetPoint.getBoard().getFocusedLayer();
   GraphicsLayer* layer = mNetPoint.getLayerOfLines();
-  setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
+  if (focusedLayer && focusedLayer == layer){
+    setZValue(Board::ZValue_FocusedLayer);
+  }
+  else{
+    setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
+  }
 
   qreal radius  = mNetPoint.getMaxLineWidth()->toPx() / 2;
   mBoundingRect = QRectF(-radius, -radius, 2 * radius, 2 * radius);

@@ -168,6 +168,10 @@ void BI_NetLine::init() {
                      tr("BI_NetLine: both endpoints are the same."));
   }
 
+  // connect to the "attributes changed" signal of the board
+  connect(&mBoard, &Board::attributesChanged, this,
+          &BI_NetLine::boardAttributesChanged);
+
   mGraphicsItem.reset(new BGI_NetLine(*this));
   updateLine();
 }
@@ -334,6 +338,14 @@ bool BI_NetLine::isSelectable() const noexcept {
 void BI_NetLine::setSelected(bool selected) noexcept {
   BI_Base::setSelected(selected);
   mGraphicsItem->update();
+}
+
+/*******************************************************************************
+ *  Private Slots
+ ******************************************************************************/
+
+void BI_NetLine::boardAttributesChanged() {
+  mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*******************************************************************************

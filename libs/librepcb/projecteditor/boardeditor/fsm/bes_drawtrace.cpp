@@ -180,6 +180,10 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
   // change the cursor
   mEditorGraphicsView.setCursor(Qt::CrossCursor);
 
+  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+  GraphicsLayer* focusedLayer = layerStack->getLayer(mCurrentLayerName);
+  mEditor.getActiveBoard()->setFocusedLayer(focusedLayer);
+
   return true;
 }
 
@@ -662,6 +666,12 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept {
 
 void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
   mCurrentLayerName = mLayerComboBox->itemData(index).toString();
+
+  // Focus layer
+  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+  GraphicsLayer* focusedLayer = layerStack->getLayer(mCurrentLayerName);
+  mEditor.getActiveBoard()->setFocusedLayer(focusedLayer);
+
   // TODO: add a via to change the layer of the current netline?
 }
 

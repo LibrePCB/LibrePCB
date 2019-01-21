@@ -69,7 +69,14 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   // set Z value
-  setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getName()));
+  const GraphicsLayer* focusedLayer = mNetLine.getBoard().getFocusedLayer();
+  const GraphicsLayer* netLineLayer = &mNetLine.getLayer();
+  if (focusedLayer && focusedLayer == netLineLayer){
+    setZValue(Board::ZValue_FocusedLayer);
+  }
+  else{
+    setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getName()));
+  }
 
   mLayer = &mNetLine.getLayer();
   Q_ASSERT(mLayer);
@@ -104,8 +111,15 @@ void BGI_NetLine::paint(QPainter*                       painter,
   bool highlight = mNetLine.isSelected() ||
                    mNetLine.getNetSignalOfNetSegment().isHighlighted();
 
+  const GraphicsLayer* focusedLayer = mNetLine.getBoard().getFocusedLayer();
   // draw line
-  if (mLayer->isVisible()) {
+  if (focusedLayer && focusedLayer != mLayer){
+    QPen pen(GraphicsLayer::sUnfocused, mNetLine.getWidth()->toPx(),
+             Qt::SolidLine, Qt::RoundCap);
+    painter->setPen(pen);
+    painter->drawLine(mLineF);
+  }
+  else if (mLayer->isVisible()) {
     QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(),
              Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
