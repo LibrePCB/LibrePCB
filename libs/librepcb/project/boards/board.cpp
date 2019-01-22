@@ -76,7 +76,6 @@ Board::Board(const Board& other, const FilePath& filepath,
     mProject(other.getProject()),
     mFilePath(filepath),
     mIsAddedToProject(false),
-    mFocusedLayer(nullptr),
     mUuid(Uuid::createRandom()),
     mName(name),
     mDefaultFontFileName(other.mDefaultFontFileName) {
@@ -192,7 +191,6 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     mProject(project),
     mFilePath(filepath),
     mIsAddedToProject(false),
-    mFocusedLayer(nullptr),
     mUuid(Uuid::createRandom()),
     mName("New Board") {
   try {

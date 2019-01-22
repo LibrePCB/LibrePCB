@@ -98,6 +98,10 @@ BES_Base::ProcRetVal BES_Select::process(BEE_Base* event) noexcept {
 
 bool BES_Select::entry(BEE_Base* event) noexcept {
   Q_UNUSED(event);
+// unfocus layer
+  if (&mEditor.getActiveBoard()->getLayerStack()){
+    mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(nullptr, false);
+  }
   return true;
 }
 

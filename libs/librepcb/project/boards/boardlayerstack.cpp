@@ -40,6 +40,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other)
   : QObject(&board),
     mBoard(board),
     mLayersChanged(false),
+    mFocusedLayer(nullptr),
     mInnerLayerCount(other.mInnerLayerCount) {
   foreach (const GraphicsLayer* layer, other.mLayers) {
     addLayer(new GraphicsLayer(*layer));
@@ -53,6 +54,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node)
   : QObject(&board),
     mBoard(board),
     mLayersChanged(false),
+    mFocusedLayer(nullptr),
     mInnerLayerCount(-1) {
   addAllLayers();
 
@@ -66,6 +68,7 @@ BoardLayerStack::BoardLayerStack(Board& board)
   : QObject(&board),
     mBoard(board),
     mLayersChanged(false),
+    mFocusedLayer(nullptr),
     mInnerLayerCount(-1) {
   addAllLayers();
 
@@ -127,6 +130,17 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept {
       }
     }
   }
+}
+
+
+void BoardLayerStack::setFocusedLayer(GraphicsLayer* layer,
+                                      bool editorCommand) noexcept {
+
+  mFocusedLayer = layer;
+  emit layerFocusChanged(layer, editorCommand);
+  if (&mBoard){
+  }
+  emit mBoard.attributesChanged();
 }
 
 /*******************************************************************************

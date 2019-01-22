@@ -88,7 +88,7 @@ private:
   QList<QString> getTopLayers() const noexcept;
   QList<QString> getBottomLayers() const noexcept;
   QList<QString> getAllLayers() const noexcept;
-  void layerFocusChanged(GraphicsLayer* layer) noexcept;
+  void layerFocusChanged(GraphicsLayer* layer, bool editorCommand) noexcept;
 
   // General
   QScopedPointer<Ui::BoardLayersDock> mUi;
@@ -100,6 +100,7 @@ private:
 
   // Private variable
   mutable bool mItemChanged;
+  mutable bool mEditorCommand;
 };
 
 /*******************************************************************************

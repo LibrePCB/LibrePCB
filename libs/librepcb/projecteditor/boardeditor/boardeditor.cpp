@@ -43,6 +43,7 @@
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardadd.h>
 #include <librepcb/project/boards/cmd/cmdboarddesignrulesmodify.h>
 #include <librepcb/project/boards/cmd/cmdboardremove.h>
@@ -188,6 +189,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // connect the "command" toolbar with the state machine
   connect(mUi->actionCommandAbort, &QAction::triggered, [this]() {
     mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
+    if (getActiveBoard()->getLayerStack().getFocusedLayer() != nullptr){
+      getActiveBoard()->getLayerStack().setFocusedLayer(nullptr, true);
+    }
   });
 
   // connect the "edit" toolbar with the state machine

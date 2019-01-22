@@ -69,7 +69,8 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   // set Z value
-  const GraphicsLayer* focusedLayer = mNetPoint.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mNetPoint.getBoard().getLayerStack().getFocusedLayer();
   GraphicsLayer* layer = mNetPoint.getLayerOfLines();
   if (focusedLayer && focusedLayer == layer){
     setZValue(Board::ZValue_FocusedLayer);

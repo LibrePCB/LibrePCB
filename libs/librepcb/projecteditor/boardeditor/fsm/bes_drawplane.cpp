@@ -151,7 +151,7 @@ bool BES_DrawPlane::entry(BEE_Base* event) noexcept {
   // Focus layer
   BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
   GraphicsLayer* focusedLayer = layerStack->getLayer(*mCurrentLayerName);
-  mEditor.getActiveBoard()->setFocusedLayer(focusedLayer);
+  mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(focusedLayer, true);
 
   return true;
 }
@@ -378,7 +378,7 @@ void BES_DrawPlane::layerComboBoxLayerChanged(
   // Focus layer
   BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
   GraphicsLayer* focusedLayer = layerStack->getLayer(*mCurrentLayerName);
-  mEditor.getActiveBoard()->setFocusedLayer(focusedLayer);
+  mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(focusedLayer, true);
 }
 
 void BES_DrawPlane::makeSelectedLayerVisible() noexcept {

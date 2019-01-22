@@ -48,7 +48,8 @@ BoardLayersDock::BoardLayersDock(BoardEditor& editor) noexcept
     mBoardEditor(editor),
     mActiveBoard(nullptr),
     mCurrentSelectedItem(nullptr),
-    mItemChanged(false) {
+    mItemChanged(false),
+    mEditorCommand(false) {
   mUi->setupUi(this);
 }
 
@@ -70,7 +71,8 @@ void BoardLayersDock::setActiveBoard(Board* board) {
   if (mActiveBoard) {
     mActiveBoardConnection = connect(mActiveBoard, &Board::attributesChanged,
                                      this, &BoardLayersDock::updateListWidget);
-    mLayerFocusConnection = connect(mActiveBoard, &Board::layerFocusChanged,
+    mLayerFocusConnection = connect(&mActiveBoard->getLayerStack(),
+                                    &BoardLayerStack::layerFocusChanged,
                                     this, &BoardLayersDock::layerFocusChanged);
   }
 
@@ -100,13 +102,20 @@ void BoardLayersDock::on_listWidget_itemClicked(QListWidgetItem* item) {
     mItemChanged = false;
     return;
   }
+  if (mEditorCommand){
+    if (mCurrentSelectedItem){
+      mCurrentSelectedItem->setSelected(true);
+    }
+    return;
+  }
+
   if (mCurrentSelectedItem != item){
     QString layerName = item->data(Qt::UserRole).toString();
     GraphicsLayer* layer = mActiveBoard->getLayerStack().getLayer(layerName);
-    mActiveBoard->setFocusedLayer(layer);
+    mActiveBoard->getLayerStack().setFocusedLayer(layer, false);
   }
   else{
-    mActiveBoard->setFocusedLayer(nullptr);
+    mActiveBoard->getLayerStack().setFocusedLayer(nullptr, false);
   }
 }
 
@@ -239,7 +248,10 @@ QList<QString> BoardLayersDock::getAllLayers() const noexcept {
   return layers;
 }
 
-void BoardLayersDock::layerFocusChanged(GraphicsLayer *layer) noexcept{
+void BoardLayersDock::layerFocusChanged(GraphicsLayer *layer,
+                                        bool editorCommand) noexcept{
+  mEditorCommand = layer == nullptr ? false : editorCommand;
+
   if (mCurrentSelectedItem != nullptr){
     QString focusedLayer = mCurrentSelectedItem->data(Qt::UserRole).toString();
     if (layer != nullptr && focusedLayer == layer->getName()){
@@ -247,8 +259,10 @@ void BoardLayersDock::layerFocusChanged(GraphicsLayer *layer) noexcept{
     }
   }
   if (layer == nullptr){
-    mCurrentSelectedItem->setSelected(false);
-    mCurrentSelectedItem = nullptr;
+    if (mCurrentSelectedItem){
+      mCurrentSelectedItem->setSelected(false);
+      mCurrentSelectedItem = nullptr;
+    }
   }
   else{
     for (int i = 0; i < mUi->listWidget->count(); ++i){

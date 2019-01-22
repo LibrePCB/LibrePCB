@@ -182,7 +182,7 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
 
   BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
   GraphicsLayer* focusedLayer = layerStack->getLayer(mCurrentLayerName);
-  mEditor.getActiveBoard()->setFocusedLayer(focusedLayer);
+  mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(focusedLayer, true);
 
   return true;
 }
@@ -670,7 +670,7 @@ void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
   // Focus layer
   BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
   GraphicsLayer* focusedLayer = layerStack->getLayer(mCurrentLayerName);
-  mEditor.getActiveBoard()->setFocusedLayer(focusedLayer);
+  mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(focusedLayer, true);
 
   // TODO: add a via to change the layer of the current netline?
 }

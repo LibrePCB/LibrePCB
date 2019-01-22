@@ -69,7 +69,8 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   // set Z value
-  const GraphicsLayer* focusedLayer = mNetLine.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mNetLine.getBoard().getLayerStack().getFocusedLayer();
   const GraphicsLayer* netLineLayer = &mNetLine.getLayer();
   if (focusedLayer && focusedLayer == netLineLayer){
     setZValue(Board::ZValue_FocusedLayer);
@@ -111,7 +112,8 @@ void BGI_NetLine::paint(QPainter*                       painter,
   bool highlight = mNetLine.isSelected() ||
                    mNetLine.getNetSignalOfNetSegment().isHighlighted();
 
-  const GraphicsLayer* focusedLayer = mNetLine.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mNetLine.getBoard().getLayerStack().getFocusedLayer();
   // draw line
   if (focusedLayer && focusedLayer != mLayer){
     QPen pen(GraphicsLayer::sUnfocused, mNetLine.getWidth()->toPx(),

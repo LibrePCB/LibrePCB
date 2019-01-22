@@ -76,7 +76,8 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept {
   mShape        = QPainterPath();
 
   // set Z value
-  const GraphicsLayer* focusedLayer = mFootprint.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mFootprint.getBoard().getLayerStack().getFocusedLayer();
   GraphicsLayer* footprintLayer = getLayer(GraphicsLayer::sTopCopper);
   if (focusedLayer && focusedLayer == footprintLayer){
     setZValue(Board::ZValue_FocusedLayer);
@@ -138,7 +139,8 @@ void BGI_Footprint::paint(QPainter*                       painter,
   const bool           deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
-  const GraphicsLayer* focusedLayer = mFootprint.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mFootprint.getBoard().getLayerStack().getFocusedLayer();
 
   // draw all polygons
   for (const Polygon& polygon : mLibFootprint.getPolygons()) {

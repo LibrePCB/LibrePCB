@@ -67,7 +67,8 @@ bool BGI_Plane::isSelectable() const noexcept {
 void BGI_Plane::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
-  const GraphicsLayer* focusedLayer = mPlane.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mPlane.getBoard().getLayerStack().getFocusedLayer();
   if (focusedLayer && focusedLayer == mLayer){
     setZValue(Board::ZValue_FocusedLayer);
   }
@@ -109,7 +110,8 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
       option->levelOfDetailFromTransform(painter->worldTransform());
   Q_UNUSED(option);
 
-  const GraphicsLayer* focusedLayer = mPlane.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mPlane.getBoard().getLayerStack().getFocusedLayer();
   if (focusedLayer && focusedLayer != mLayer){
     // draw outline
     painter->setPen(QPen(GraphicsLayer::sUnfocused, 3 / lod, Qt::DashLine, Qt::RoundCap));

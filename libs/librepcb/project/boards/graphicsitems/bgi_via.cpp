@@ -77,7 +77,8 @@ bool BGI_Via::isSelectable() const noexcept {
 void BGI_Via::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
-  const GraphicsLayer* focusedLayer = mVia.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mVia.getBoard().getLayerStack().getFocusedLayer();
   if (focusedLayer && mVia.isOnLayer(focusedLayer->getName())){
     setZValue(Board::ZValue_FocusedLayer);
   }
@@ -126,7 +127,8 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->drawPath(mStopMask);
   }
 
-  const GraphicsLayer* focusedLayer = mVia.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mVia.getBoard().getLayerStack().getFocusedLayer();
   if (focusedLayer == nullptr){
     if (mViaLayer && mViaLayer->isVisible()) {
       // draw via

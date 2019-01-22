@@ -86,7 +86,8 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   // set Z value
-  const GraphicsLayer* focusedLayer = mPad.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mPad.getBoard().getLayerStack().getFocusedLayer();
   if (focusedLayer && mPad.isOnLayer(focusedLayer->getName())){
     setZValue(Board::ZValue_FocusedLayer);
   }
@@ -153,7 +154,8 @@ void BGI_FootprintPad::paint(QPainter*                       painter,
   bool             highlight =
       mPad.isSelected() || (netsignal && netsignal->isHighlighted());
 
-  const GraphicsLayer* focusedLayer = mPad.getBoard().getFocusedLayer();
+  const GraphicsLayer* focusedLayer
+      = mPad.getBoard().getLayerStack().getFocusedLayer();
   if (mBottomCreamMaskLayer){
     if ((mBottomCreamMaskLayer->isVisible() && focusedLayer == nullptr)
         || focusedLayer == mBottomCreamMaskLayer) {
