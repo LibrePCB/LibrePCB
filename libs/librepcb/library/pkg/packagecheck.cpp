@@ -155,7 +155,7 @@ void PackageCheck::checkPadsOverlapWithPlacement(MsgList& msgs) const {
       std::shared_ptr<const PackagePad>   pkgPad =
           mPackage.getPads().find(pad->getUuid());
       Length clearance(150000);  // 150 µm
-      Length tolerance(000100); // 0.1 µm, to avoid rounding issues
+      Length tolerance(10); // 0.01 µm, to avoid rounding issues
       Path   stopMaskPath = pad->getOutline(clearance - tolerance);
       stopMaskPath.rotate(pad->getRotation()).translate(pad->getPosition());
       QPainterPath stopMask = stopMaskPath.toQPainterPathPx();
