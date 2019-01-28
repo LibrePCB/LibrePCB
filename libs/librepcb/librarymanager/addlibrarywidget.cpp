@@ -352,6 +352,9 @@ void AddLibraryWidget::repositoryLibraryListReceived(
   foreach (const QJsonValue& libVal, libs) {
     RepositoryLibraryListWidgetItem* widget =
         new RepositoryLibraryListWidgetItem(mWorkspace, libVal.toObject());
+    widget->setChecked(mUi->cbxRepoLibsSelectAll->isChecked());
+    connect(mUi->cbxRepoLibsSelectAll, &QCheckBox::clicked,
+            widget, &RepositoryLibraryListWidgetItem::setChecked);
     connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged, this,
             &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
     QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);

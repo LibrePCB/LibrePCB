@@ -50,11 +50,22 @@
         <widget class="QListWidget" name="lstRepoLibs"/>
        </item>
        <item>
-        <widget class="QPushButton" name="btnRepoLibsDownload">
-         <property name="text">
-          <string>Download and install/update all selected libraries</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
+         <item>
+          <widget class="QCheckBox" name="cbxRepoLibsSelectAll">
+           <property name="text">
+            <string>Select all</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRepoLibsDownload">
+           <property name="text">
+            <string>Download and install/update selected libraries</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
