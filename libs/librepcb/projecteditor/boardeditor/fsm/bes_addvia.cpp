@@ -41,7 +41,6 @@
 #include <librepcb/project/project.h>
 
 #include <QtCore>
-#include <QtGlobal>
 
 /*******************************************************************************
  *  Namespace
@@ -109,7 +108,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   }
   if (!mCurrentViaNetSignal) return false;
 
-  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+  BoardLayerStack& layerStack = board->getLayerStack();
 
   // add a new via
   if (!addVia(*board)) return false;
@@ -227,24 +226,24 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   mStopLayerLabel = new QLabel(tr("Stop Layer:"));
   mStopLayerLabel->setIndent(10);
 
-  // add the start layer combobox to the toolbar
+  // add the stop layer combobox to the toolbar
   mStopLayerComboBox = new QComboBox();
   mStopLayerComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   mStopLayerComboBox->setInsertPolicy(QComboBox::NoInsert);
   mStopLayerComboBox->setEditable(false);
 
   QString layerName = GraphicsLayer::sTopCopper;
-  mStartLayerComboBox->addItem(layerStack->getLayer(layerName)->getNameTr(),
+  mStartLayerComboBox->addItem(layerStack.getLayer(layerName)->getNameTr(),
                                layerName);
-  for (int i = 1; i <= layerStack->getInnerLayerCount(); ++i){
+  for (int i = 1; i <= layerStack.getInnerLayerCount(); ++i){
     QString layerName = GraphicsLayer::getInnerLayerName(i);
-    mStartLayerComboBox->addItem(layerStack->getLayer(layerName)->getNameTr(),
+    mStartLayerComboBox->addItem(layerStack.getLayer(layerName)->getNameTr(),
                                  layerName);
-    mStopLayerComboBox->addItem(layerStack->getLayer(layerName)->getNameTr(),
+    mStopLayerComboBox->addItem(layerStack.getLayer(layerName)->getNameTr(),
                                 layerName);
   }
   layerName = GraphicsLayer::sBotCopper;
-  mStopLayerComboBox->addItem(layerStack->getLayer(layerName)->getNameTr(),
+  mStopLayerComboBox->addItem(layerStack.getLayer(layerName)->getNameTr(),
                                layerName);
   mStartLayerComboBox->setCurrentIndex(mCurrentVia->getStartLayerIndex());
   mStopLayerComboBox->setCurrentIndex(mCurrentVia->getStopLayerIndex() - 1);

@@ -185,7 +185,7 @@ public:
   // Static Methods
   static int getInnerLayerCount() noexcept {
     return 62;
-  }  // some random number... ;) //ChShakenov - Too much I think, but well, ok. I use this as max layers possible
+  }  // some random number... ;)
   static bool    isTopLayer(const QString& name) noexcept;
   static bool    isBottomLayer(const QString& name) noexcept;
   static bool    isInnerLayer(const QString& name) noexcept;
