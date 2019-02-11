@@ -221,7 +221,18 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
         __FILE__, __LINE__,
         QString(tr("proc_name() failed with error %1.")).arg(errno));
   }
+#elif defined(Q_OS_FREEBSD)
+  char exePath[64];
+  char buf[PATH_MAX + 1];
+  sprintf(exePath, "/proc/%lld/file", pid);
+  size_t len = (size_t)readlink(exePath, buf, sizeof(buf));
+  if (len >= sizeof(buf)) {
+    return QString();  // process not running
+  }
+  buf[len] = 0;
+  processName = QFileInfo(QFile::decodeName(buf)).fileName();
 #elif defined(Q_OS_UNIX)                          // UNIX/Linux
+
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
   if (!FilePath("/proc/version").isExistingFile()) {
