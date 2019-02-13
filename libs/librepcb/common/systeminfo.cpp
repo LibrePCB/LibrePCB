@@ -231,7 +231,7 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   }
   buf[len] = 0;
   processName = QFileInfo(QFile::decodeName(buf)).fileName();
-#elif defined(Q_OS_UNIX)                          // UNIX/Linux
+#elif defined(Q_OS_LINUX)
 
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
