@@ -564,6 +564,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   }
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
   mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
+  updateTabTitles();  // force updating the "Save" action title
 }
 
 void LibraryEditor::updateTabTitles() noexcept {
@@ -580,6 +581,14 @@ void LibraryEditor::updateTabTitles() noexcept {
     } else {
       qWarning() << "Tab widget is not a subclass of EditorWidgetBase!";
     }
+  }
+
+  if (mCurrentEditorWidget) {
+    mUi->actionSave->setEnabled(true);
+    mUi->actionSave->setText(
+        QString(tr("&Save '%1'")).arg(mCurrentEditorWidget->windowTitle()));
+  } else {
+    mUi->actionSave->setEnabled(false);
   }
 }
 
