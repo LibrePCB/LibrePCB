@@ -83,12 +83,12 @@ private:
   QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
 
   // Attributes
-  QStringList                 mLocaleOrder;
-  CategoryTreeItem*           mParent;
-  tl::optional<Uuid>          mUuid;
-  QScopedPointer<ElementType> mCategory;
-  unsigned int mDepth;  ///< this is to avoid endless recursion in the
-                        ///< parent-child relationship
+  CategoryTreeItem*  mParent;
+  tl::optional<Uuid> mUuid;
+  QString            mName;
+  QString            mDescription;
+  unsigned int       mDepth;  ///< this is to avoid endless recursion in the
+                              ///< parent-child relationship
   QString          mExceptionMessage;
   QList<ChildType> mChilds;
 };

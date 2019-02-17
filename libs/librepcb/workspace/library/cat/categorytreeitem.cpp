@@ -24,9 +24,6 @@
 
 #include "../workspacelibrarydb.h"
 
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -34,8 +31,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace workspace {
-
-using namespace library;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -45,22 +40,24 @@ template <typename ElementType>
 CategoryTreeItem<ElementType>::CategoryTreeItem(
     const WorkspaceLibraryDb& library, const QStringList localeOrder,
     CategoryTreeItem* parent, const tl::optional<Uuid>& uuid) noexcept
-  : mLocaleOrder(localeOrder),
-    mParent(parent),
+  : mParent(parent),
     mUuid(uuid),
     mDepth(parent ? parent->getDepth() + 1 : 0),
     mExceptionMessage() {
   try {
     if (mUuid) {
       FilePath fp = getLatestCategory(library);
-      if (fp.isValid()) mCategory.reset(new ElementType(fp, true));
+      if (fp.isValid()) {
+        library.getElementTranslations<ElementType>(fp, localeOrder, &mName,
+                                                    &mDescription);
+      }
     }
 
     if (mUuid || (!mParent)) {
       QSet<Uuid> childs = getCategoryChilds(library);
       foreach (const Uuid& childUuid, childs) {
         ChildType child(
-            new CategoryTreeItem(library, mLocaleOrder, this, childUuid));
+            new CategoryTreeItem(library, localeOrder, this, childUuid));
         mChilds.append(child);
       }
 
@@ -74,7 +71,7 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(
     if (!mParent) {
       // add category for elements without category
       ChildType child(
-          new CategoryTreeItem(library, mLocaleOrder, this, tl::nullopt));
+          new CategoryTreeItem(library, localeOrder, this, tl::nullopt));
       mChilds.append(child);
     }
   } catch (const Exception& e) {
@@ -110,8 +107,8 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept {
     case Qt::DisplayRole:
       if (!mUuid)
         return "(Without Category)";
-      else if (mCategory)
-        return *mCategory->getNames().value(mLocaleOrder);
+      else if (!mName.isEmpty())
+        return mName;
       else
         return "(ERROR)";
 
@@ -125,8 +122,8 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept {
     case Qt::ToolTipRole:
       if (!mUuid)
         return "All library elements without a category";
-      else if (mCategory)
-        return mCategory->getDescriptions().value(mLocaleOrder);
+      else if (!mDescription.isEmpty())
+        return mDescription;
       else
         return mExceptionMessage;
 
@@ -144,25 +141,25 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept {
  ******************************************************************************/
 
 template <>
-FilePath CategoryTreeItem<ComponentCategory>::getLatestCategory(
+FilePath CategoryTreeItem<library::ComponentCategory>::getLatestCategory(
     const WorkspaceLibraryDb& lib) const {
   return lib.getLatestComponentCategory(*mUuid);
 }
 
 template <>
-FilePath CategoryTreeItem<PackageCategory>::getLatestCategory(
+FilePath CategoryTreeItem<library::PackageCategory>::getLatestCategory(
     const WorkspaceLibraryDb& lib) const {
   return lib.getLatestPackageCategory(*mUuid);
 }
 
 template <>
-QSet<Uuid> CategoryTreeItem<ComponentCategory>::getCategoryChilds(
+QSet<Uuid> CategoryTreeItem<library::ComponentCategory>::getCategoryChilds(
     const WorkspaceLibraryDb& lib) const {
   return lib.getComponentCategoryChilds(mUuid);
 }
 
 template <>
-QSet<Uuid> CategoryTreeItem<PackageCategory>::getCategoryChilds(
+QSet<Uuid> CategoryTreeItem<library::PackageCategory>::getCategoryChilds(
     const WorkspaceLibraryDb& lib) const {
   return lib.getPackageCategoryChilds(mUuid);
 }
