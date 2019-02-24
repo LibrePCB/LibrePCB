@@ -103,12 +103,7 @@ inline SExpression serializeToSExpression(const AttributeKey& obj) {
 template <>
 inline AttributeKey deserializeFromSExpression(const SExpression& sexpr,
                                                bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  // backward compatibility - remove this some time!
-  str = str.toUpper();
-  str.remove(QRegularExpression("[^0-9A-Z_]"));
-  str.truncate(40);
-  return AttributeKey(str);  // can throw
+  return AttributeKey(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const AttributeKey& obj) {

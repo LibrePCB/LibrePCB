@@ -47,25 +47,9 @@ Hole::Hole(const Uuid& uuid, const Point& position,
 }
 
 Hole::Hole(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
-    mPosition(0, 0),
-    mDiameter(1) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("diameter")) {
-    mDiameter = node.getValueByPath<PositiveLength>("diameter");
-  } else {
-    // backward compatibility, remove this some time!
-    mDiameter = node.getValueByPath<PositiveLength>("dia");
-  }
-  if (node.getChildByIndex(0).isString()) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-  }
+  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mPosition(node.getChildByPath("position")),
+    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
 }
 
 Hole::~Hole() noexcept {

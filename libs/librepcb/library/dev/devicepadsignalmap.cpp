@@ -47,15 +47,7 @@ DevicePadSignalMapItem::DevicePadSignalMapItem(
 DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node)
   : QObject(nullptr),
     mPadUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(Uuid::createRandom())  // backward compatibility, remove this
-                                       // some time!
-{
-  if (node.tryGetChildByPath("signal")) {
-    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
-  } else {
-    // backward compatibility, remove this some time!
-    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
-  }
+    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("signal")) {
 }
 
 DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {

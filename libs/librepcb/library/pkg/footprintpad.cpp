@@ -69,26 +69,14 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
 
 FootprintPad::FootprintPad(const SExpression& node)
   : mPackagePadUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(0, 0),
-    mRotation(0),
+    mPosition(node.getChildByPath("position")),
+    mRotation(node.getValueByPath<Angle>("rotation")),
     mShape(node.getValueByPath<Shape>("shape")),
     mWidth(Point(node.getChildByPath("size")).getX()),
     mHeight(Point(node.getChildByPath("size")).getY()),
     mDrillDiameter(node.getValueByPath<UnsignedLength>("drill")),
     mBoardSide(node.getValueByPath<BoardSide>("side")),
     mRegisteredGraphicsItem(nullptr) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
 }
 
 FootprintPad::~FootprintPad() noexcept {

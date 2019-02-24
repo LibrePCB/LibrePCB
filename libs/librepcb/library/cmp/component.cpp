@@ -63,12 +63,6 @@ Component::Component(const FilePath& elementDirectory, bool readOnly)
   mSignals.loadFromDomElement(mLoadingFileDocument);
   mSymbolVariants.loadFromDomElement(mLoadingFileDocument);
 
-  // backward compatibility - remove this some time!
-  mDefaultValue.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"),
-                        "{{\\1}}");
-  mDefaultValue.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                        "{{ \\1 or \\2 }}");
-
   cleanupAfterLoadingElementFromFile();
 }
 

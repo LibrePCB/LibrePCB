@@ -60,41 +60,13 @@ Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 Circle::Circle(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(false),
-    mCenter(0, 0),
-    mDiameter(1) {
-  if (node.getChildByIndex(0).isString()) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-  }
-  if (node.tryGetChildByPath("grab_area")) {
-    mIsGrabArea = node.getValueByPath<bool>("grab_area");
-  } else {
-    // backward compatibility, remove this some time!
-    mIsGrabArea = node.getValueByPath<bool>("grab");
-  }
-  if (node.tryGetChildByPath("position")) {
-    mCenter = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mCenter = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("diameter")) {
-    mDiameter = node.getValueByPath<PositiveLength>("diameter");
-  } else if (node.tryGetChildByPath("dia")) {
-    // backward compatibility, remove this some time!
-    mDiameter = node.getValueByPath<PositiveLength>("dia");
-  } else if (node.tryGetChildByPath("size")) {
-    // backward compatibility, remove this some time!
-    mDiameter = Point(node.getChildByPath("size")).getX();
-  } else {
-    // backward compatibility, remove this some time!
-    mDiameter = node.getValueByPath<Length>("rx") * 2;
-  }
+    mIsGrabArea(node.getValueByPath<bool>("grab_area")),
+    mCenter(node.getChildByPath("position")),
+    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
 }
 
 Circle::~Circle() noexcept {

@@ -236,12 +236,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
       // the board seems to be ready to open, so we will create all needed
       // objects
 
-      if (root.getChildByIndex(0).isString()) {
-        mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      } else {
-        // backward compatibility, remove this some time!
-        mUuid = root.getValueByPath<Uuid>("uuid");
-      }
+      mUuid = root.getChildByIndex(0).getValue<Uuid>();
       mName = root.getValueByPath<ElementName>("name");
       if (const SExpression* child = root.tryGetChildByPath("default_font")) {
         mDefaultFontFileName = child->getValueOfFirstChild<QString>(true);
@@ -261,14 +256,8 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
           new BoardDesignRules(root.getChildByPath("design_rules")));
 
       // load fabrication output settings
-      if (const SExpression* child =
-              root.tryGetChildByPath("fabrication_output_settings")) {
-        mFabricationOutputSettings.reset(
-            new BoardFabricationOutputSettings(*child));
-      } else {
-        // backward compatibility - remove this some time!
-        mFabricationOutputSettings.reset(new BoardFabricationOutputSettings());
-      }
+      mFabricationOutputSettings.reset(new BoardFabricationOutputSettings(
+          root.getChildByPath("fabrication_output_settings")));
 
       // load user settings
       mUserSettings.reset(
@@ -323,24 +312,6 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         BI_Hole* hole = new BI_Hole(*this, node);
         mHoles.append(hole);
       }
-
-      //////////////////////////////////////////////////////////////////////////////
-      // TODO: Backward compatibility, remove this some time!
-      int strokeTextCount = mStrokeTexts.count();
-      foreach (const BI_Device* device, mDeviceInstances) {
-        foreach (const BI_StrokeText* text,
-                 device->getFootprint().getStrokeTexts()) {
-          Q_UNUSED(text);
-          ++strokeTextCount;
-        }
-      }
-      if (strokeTextCount == 0) {
-        foreach (const BI_Device* device, mDeviceInstances) {
-          device->getFootprint()
-              .resetStrokeTextsToLibraryFootprint();  // can throw
-        }
-      }
-      //////////////////////////////////////////////////////////////////////////////
     }
 
     rebuildAllPlanes();

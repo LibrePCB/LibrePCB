@@ -63,13 +63,6 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly)
   mPolygons.loadFromDomElement(mLoadingFileDocument);  // can throw
   mCircles.loadFromDomElement(mLoadingFileDocument);   // can throw
   mTexts.loadFromDomElement(mLoadingFileDocument);     // can throw
-
-  // backward compatibility, remove this some time!
-  foreach (const SExpression& child,
-           mLoadingFileDocument.getChildren("ellipse")) {
-    mCircles.append(std::make_shared<Circle>(child));
-  }
-
   cleanupAfterLoadingElementFromFile();
 }
 

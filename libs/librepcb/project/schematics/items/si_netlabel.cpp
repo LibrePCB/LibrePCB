@@ -47,21 +47,8 @@ SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(0, 0),
-    mRotation(0) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
-
+    mPosition(node.getChildByPath("position")),
+    mRotation(node.getValueByPath<Angle>("rotation")) {
   init();
 }
 

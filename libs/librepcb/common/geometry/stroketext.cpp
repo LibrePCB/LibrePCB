@@ -83,68 +83,20 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 StrokeText::StrokeText(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
-    mText(),
-    mPosition(0, 0),
-    mRotation(0),
+    mText(node.getValueByPath<QString>("value")),
+    mPosition(node.getChildByPath("position")),
+    mRotation(node.getValueByPath<Angle>("rotation")),
     mHeight(node.getValueByPath<PositiveLength>("height")),
-    mStrokeWidth(200000),  // backward compatibility, remove this some time!
-    mLetterSpacing(),      // backward compatibility, remove this some time!
-    mLineSpacing(),        // backward compatibility, remove this some time!
+    mStrokeWidth(node.getValueByPath<UnsignedLength>("stroke_width")),
+    mLetterSpacing(node.getValueByPath<StrokeTextSpacing>("letter_spacing")),
+    mLineSpacing(node.getValueByPath<StrokeTextSpacing>("line_spacing")),
     mAlign(node.getChildByPath("align")),
-    mMirrored(false),   // backward compatibility, remove this some time!
-    mAutoRotate(true),  // backward compatibility, remove this some time!
+    mMirrored(node.getValueByPath<bool>("mirror")),
+    mAutoRotate(node.getValueByPath<bool>("auto_rotate")),
     mAttributeProvider(nullptr),
     mFont(nullptr) {
-  if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mText = node.getValueByPath<QString>("value");
-  } else {
-    // backward compatibility, remove this some time!
-    mText = node.getChildByIndex(0).getValue<QString>();
-  }
-
-  // load geometry attributes
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
-  if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
-    mStrokeWidth = child->getValueOfFirstChild<UnsignedLength>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("letter_spacing")) {
-    mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("line_spacing")) {
-    mLineSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("mirror")) {
-    mMirrored = child->getValueOfFirstChild<bool>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("auto_rotate")) {
-    mAutoRotate = child->getValueOfFirstChild<bool>();
-  }
-
-  // backward compatibility, remove this some time!
-  if ((node.getName() == "text") &&
-      ((mText == "#NAME") || (mText == "#VALUE"))) {
-    mHeight = PositiveLength(1000000);
-  }
-
-  // backward compatibility - remove this some time!
-  mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-  mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                "{{ \\1 or \\2 }}");
 }
 
 StrokeText::~StrokeText() noexcept {

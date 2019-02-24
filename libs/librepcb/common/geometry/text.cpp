@@ -60,38 +60,13 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 Text::Text(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
-    mText(),
-    mPosition(0, 0),
-    mRotation(0),
+    mText(node.getValueByPath<QString>("value")),
+    mPosition(node.getChildByPath("position")),
+    mRotation(node.getValueByPath<Angle>("rotation")),
     mHeight(node.getValueByPath<PositiveLength>("height")),
     mAlign(node.getChildByPath("align")) {
-  if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mText = node.getValueByPath<QString>("value");
-  } else {
-    // backward compatibility, remove this some time!
-    mText = node.getChildByIndex(0).getValue<QString>();
-  }
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
-
-  // backward compatibility - remove this some time!
-  mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-  mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                "{{ \\1 or \\2 }}");
 }
 
 Text::~Text() noexcept {

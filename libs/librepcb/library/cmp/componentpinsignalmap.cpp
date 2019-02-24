@@ -49,24 +49,9 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(
 
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
   : mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(Uuid::createRandom()),  // backward compatibility, remove this
-                                        // some time!
-    mDisplayType(CmpSigPinDisplayType::componentSignal()) {
-  if (node.tryGetChildByPath("signal")) {
-    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("signal");
-  } else {
-    // backward compatibility, remove this some time!
-    mSignalUuid = node.getValueByPath<tl::optional<Uuid>>("sig");
-  }
-
-  if (node.tryGetChildByPath("text")) {
-    mDisplayType =
-        CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("text"));
-  } else {
-    // backward compatibility, remove this some time!
-    mDisplayType =
-        CmpSigPinDisplayType::fromString(node.getValueByPath<QString>("disp"));
-  }
+    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("signal")),
+    mDisplayType(CmpSigPinDisplayType::fromString(
+        node.getValueByPath<QString>("text"))) {
 }
 
 ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept {

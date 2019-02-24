@@ -64,11 +64,6 @@ ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node)
     mNames(node),
     mDescriptions(node),
     mSymbolItems(node, this) {
-  // backward compatibility, remove this some time!
-  foreach (const SExpression& node, node.getChildren("item")) {
-    mSymbolItems.append(
-        std::make_shared<ComponentSymbolVariantItem>(node));  // can throw
-  }
 }
 
 ComponentSymbolVariant::~ComponentSymbolVariant() noexcept {

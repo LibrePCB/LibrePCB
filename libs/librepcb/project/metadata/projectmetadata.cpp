@@ -64,10 +64,7 @@ ProjectMetadata::ProjectMetadata(Project& project, bool restore, bool readOnly,
     mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
     SExpression root = mFile->parseFileAndBuildDomTree();
 
-    if (root.getChildByIndex(0)
-            .isString()) {  // backward compatibility, remove this some time!
-      mUuid = root.getChildByIndex(0).getValue<Uuid>();
-    }
+    mUuid    = root.getChildByIndex(0).getValue<Uuid>();
     mName    = root.getValueByPath<ElementName>("name");
     mAuthor  = root.getValueByPath<QString>("author");
     mVersion = root.getValueByPath<QString>("version");
