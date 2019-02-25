@@ -53,17 +53,10 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
   : BI_Base(netsegment.getBoard()),
     mNetSegment(netsegment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(0, 0),
+    mPosition(node.getChildByPath("position")),
     mShape(node.getValueByPath<Shape>("shape")),
     mSize(node.getValueByPath<PositiveLength>("size")),
     mDrillDiameter(node.getValueByPath<PositiveLength>("drill")) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-
   init();
 }
 

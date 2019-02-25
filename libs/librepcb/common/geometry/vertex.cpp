@@ -35,12 +35,7 @@ namespace librepcb {
 
 Vertex::Vertex(const SExpression& node) {
   try {
-    if (node.tryGetChildByPath("position")) {
-      mPos = Point(node.getChildByPath("position"));
-    } else {
-      // backward compatibility, remove this some time!
-      mPos = Point(node.getChildByPath("pos"));
-    }
+    mPos   = Point(node.getChildByPath("position"));
     mAngle = node.getValueByPath<Angle>("angle");
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,

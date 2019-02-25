@@ -42,14 +42,7 @@ SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(0, 0) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-
+    mPosition(node.getChildByPath("position")) {
   init();
 }
 

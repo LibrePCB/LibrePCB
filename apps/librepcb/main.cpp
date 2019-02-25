@@ -144,19 +144,6 @@ static void setApplicationMetadata() noexcept {
  ******************************************************************************/
 
 static void configureApplicationSettings() noexcept {
-  // Migrate from old platform-dependent settings format to INI
-  // backward compatibility - remove this some time!
-  QSettings::setDefaultFormat(QSettings::NativeFormat);
-  QSettings oldSettings;
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings newSettings;
-  if (!FilePath(newSettings.fileName()).isExistingFile()) {
-    qInfo() << "Migrating old settings to" << newSettings.fileName();
-    foreach (const QString& key, oldSettings.allKeys()) {
-      newSettings.setValue(key, oldSettings.value(key));
-    }
-  }
-
   // Make sure the INI format is used for settings on all platforms because:
   // - Consistent storage format on all platforms
   // - Useful for functional testing (control settings by fixtures)

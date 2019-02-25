@@ -103,9 +103,7 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
   init();
 }
 
-BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node,
-                       const QHash<Uuid, QString>&           netpointLayerMap,
-                       const QHash<Uuid, BI_NetLineAnchor*>& netPointAnchorMap)
+BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
     mPosition(),
@@ -114,21 +112,14 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node,
     mEndPoint(nullptr),
     mLayer(nullptr),
     mWidth(node.getValueByPath<PositiveLength>("width")) {
-  Uuid oldPointUuid = Uuid::createRandom();
-  mStartPoint =
-      deserializeAnchor(node, "p1", "from", netPointAnchorMap, oldPointUuid);
-  mEndPoint =
-      deserializeAnchor(node, "p2", "to", netPointAnchorMap, oldPointUuid);
+  mStartPoint = deserializeAnchor(node, "from");
+  mEndPoint   = deserializeAnchor(node, "to");
   if ((!mStartPoint) || (!mEndPoint)) {
     throw RuntimeError(__FILE__, __LINE__, tr("Invalid trace anchor!"));
   }
 
-  QString layerName = netpointLayerMap.value(
-      oldPointUuid);  // backward compatibility, remove this some time!
-  if (const SExpression* layerNode = node.tryGetChildByPath("layer")) {
-    layerName = layerNode->getValueOfFirstChild<QString>();
-  }
-  mLayer = mBoard.getLayerStack().getLayer(layerName);
+  QString layerName = node.getValueByPath<QString>("layer", true);
+  mLayer            = mBoard.getLayerStack().getLayer(layerName);
   if (!mLayer) {
     throw RuntimeError(
         __FILE__, __LINE__,
@@ -274,31 +265,20 @@ void BI_NetLine::serialize(SExpression& root) const {
   serializeAnchor(root.appendList("to", true), mEndPoint);
 }
 
-BI_NetLineAnchor* BI_NetLine::deserializeAnchor(
-    const SExpression& root, const QString& oldKey, const QString& newKey,
-    const QHash<Uuid, BI_NetLineAnchor*>& netPointAnchorMap,
-    Uuid&                                 oldPointUuid) const {
-  if (const SExpression* node = root.tryGetChildByPath(oldKey)) {
-    oldPointUuid = node->getValueOfFirstChild<Uuid>();
-    if (netPointAnchorMap.contains(oldPointUuid)) {
-      return netPointAnchorMap.value(oldPointUuid);
-    } else {
-      return mNetSegment.getNetPointByUuid(oldPointUuid);
-    }
-  } else if (const SExpression* node = root.tryGetChildByPath(newKey)) {
-    if (const SExpression* junctionNode = node->tryGetChildByPath("junction")) {
-      return mNetSegment.getNetPointByUuid(
-          junctionNode->getValueOfFirstChild<Uuid>());
-    } else if (const SExpression* viaNode = node->tryGetChildByPath("via")) {
-      return mNetSegment.getViaByUuid(viaNode->getValueOfFirstChild<Uuid>());
-    } else {
-      Uuid       deviceUuid = node->getValueByPath<Uuid>("device");
-      Uuid       padUuid    = node->getValueByPath<Uuid>("pad");
-      BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(deviceUuid);
-      if (device) return device->getFootprint().getPad(padUuid);
-    }
+BI_NetLineAnchor* BI_NetLine::deserializeAnchor(const SExpression& root,
+                                                const QString&     key) const {
+  const SExpression& node = root.getChildByPath(key);
+  if (const SExpression* junctionNode = node.tryGetChildByPath("junction")) {
+    return mNetSegment.getNetPointByUuid(
+        junctionNode->getValueOfFirstChild<Uuid>());
+  } else if (const SExpression* viaNode = node.tryGetChildByPath("via")) {
+    return mNetSegment.getViaByUuid(viaNode->getValueOfFirstChild<Uuid>());
+  } else {
+    Uuid       deviceUuid = node.getValueByPath<Uuid>("device");
+    Uuid       padUuid    = node.getValueByPath<Uuid>("pad");
+    BI_Device* device     = mBoard.getDeviceInstanceByComponentUuid(deviceUuid);
+    return device ? device->getFootprint().getPad(padUuid) : nullptr;
   }
-  return nullptr;
 }
 
 void BI_NetLine::serializeAnchor(SExpression&      root,

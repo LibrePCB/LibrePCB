@@ -59,22 +59,10 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
 SymbolPin::SymbolPin(const SExpression& node)
   : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mName(node.getValueByPath<CircuitIdentifier>("name", true)),
-    mPosition(0, 0),
+    mPosition(node.getChildByPath("position")),
     mLength(node.getValueByPath<UnsignedLength>("length")),
-    mRotation(0),
+    mRotation(node.getValueByPath<Angle>("rotation")),
     mRegisteredGraphicsItem(nullptr) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
 }
 
 SymbolPin::~SymbolPin() noexcept {

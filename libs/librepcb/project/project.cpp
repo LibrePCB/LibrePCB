@@ -205,97 +205,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
       Q_ASSERT(mVersionFile->getVersion() <= qApp->getFileFormatVersion());
     }
 
-    // migrate project directory structure
-    // backward compatibility - remove this some time!
-    bool filesMoved = false;
-    if (!create) {
-      QHash<FilePath, FilePath> filesToMove;
-      filesToMove.insert(mPath.getPathTo("core/boards.lp"),
-                         mPath.getPathTo("boards/boards.lp"));
-      filesToMove.insert(mPath.getPathTo("core/schematics.lp"),
-                         mPath.getPathTo("schematics/schematics.lp"));
-      filesToMove.insert(mPath.getPathTo("core/circuit.lp"),
-                         mPath.getPathTo("circuit/circuit.lp"));
-      filesToMove.insert(mPath.getPathTo("core/erc.lp"),
-                         mPath.getPathTo("circuit/erc.lp"));
-      filesToMove.insert(mPath.getPathTo("core/metadata.lp"),
-                         mPath.getPathTo("project/metadata.lp"));
-      filesToMove.insert(mPath.getPathTo("core/settings.lp"),
-                         mPath.getPathTo("project/settings.lp"));
-      foreach (const FilePath& fp,
-               FileUtils::getFilesInDirectory(mPath.getPathTo("boards"))) {
-        if ((fp.getFilename() != "boards.lp") &&
-            (!fp.getFilename().endsWith('~'))) {
-          filesToMove.insert(
-              fp, mPath.getPathTo("boards/" % fp.getBasename() % "/board.lp"));
-          filesToMove.insert(mPath.getPathTo("user/boards/" % fp.getFilename()),
-                             mPath.getPathTo("boards/" % fp.getBasename() %
-                                             "/settings.user.lp"));
-        }
-      }
-      foreach (const FilePath& fp,
-               FileUtils::getFilesInDirectory(mPath.getPathTo("schematics"))) {
-        if ((fp.getFilename() != "schematics.lp") &&
-            (!fp.getFilename().endsWith('~'))) {
-          filesToMove.insert(fp,
-                             mPath.getPathTo("schematics/" % fp.getBasename() %
-                                             "/schematic.lp"));
-        }
-      }
-      foreach (const FilePath& src, filesToMove.keys()) {
-        FilePath dst = filesToMove.value(src);
-        if (src.isExistingFile() && !dst.isExistingFile()) {
-          FileUtils::makePath(dst.getParentDir());
-          FileUtils::copyFile(src, dst);
-          filesMoved = true;
-        }
-      }
-      bool     upgradeGitignore = false;
-      FilePath gitignorePath    = mPath.getPathTo(".gitignore");
-      try {
-        QByteArray hash =
-            QCryptographicHash::hash(FileUtils::readFile(gitignorePath),
-                                     QCryptographicHash::Md5)
-                .toHex();
-        upgradeGitignore = (hash == "0a5b717fd1d3946b1d06e67e4ebee362");
-      } catch (...) {
-      }
-      if (filesMoved || upgradeGitignore) {
-        FilePath src =
-            qApp->getResourcesDir().getPathTo("project/gitignore_template");
-        try {
-          FileUtils::removeFile(gitignorePath);
-        } catch (...) {
-        }
-        try {
-          FileUtils::copyFile(src, gitignorePath);
-        } catch (...) {
-        }
-      }
-      if (filesMoved) {
-        foreach (const FilePath& src, filesToMove.keys()) {
-          if (src.isExistingFile()) {
-            try {
-              FileUtils::removeFile(src);
-            } catch (...) {
-            }
-          }
-          if (src.getParentDir().isEmptyDir()) {
-            try {
-              FileUtils::removeDirRecursively(src.getParentDir());
-            } catch (...) {
-            }
-          }
-        }
-        if (mPath.getPathTo("user").isEmptyDir()) {
-          try {
-            FileUtils::removeDirRecursively(mPath.getPathTo("user"));
-          } catch (...) {
-          }
-        }
-      }
-    }
-
     // try to create/open the project file
     if (create) {
       mProjectFile.reset(SmartTextFile::create(mFilepath));
@@ -306,11 +215,8 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
 
     // copy and/or load stroke fonts
     FilePath fontobeneDir = mPath.getPathTo("resources/fontobene");
-    if (create || (!fontobeneDir.isExistingDir()) ||
-        fontobeneDir.isEmptyDir()) {
+    if (create) {
       FilePath src = qApp->getResourcesFilePath("fontobene");
-      qInfo() << "No fonts found in project, copy application fonts from"
-              << src.toNative();
       // don't use FileUtils::copyDirRecursively() because we only want *.bene
       // files
       FileUtils::makePath(fontobeneDir);
@@ -347,11 +253,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
       foreach (const SExpression& node, schRoot.getChildren("schematic")) {
         FilePath fp =
             FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>());
-        if (fp.getFilename() != "schematic.lp") {
-          // backward compatibility - remove this some time!
-          fp = mPath.getPathTo("schematics/" % fp.getBasename() %
-                               "/schematic.lp");
-        }
         Schematic* schematic =
             new Schematic(*this, fp, mIsRestored, mIsReadOnly);
         addSchematic(*schematic);
@@ -370,10 +271,6 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
       foreach (const SExpression& node, brdRoot.getChildren("board")) {
         FilePath fp =
             FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>());
-        if (fp.getFilename() != "board.lp") {
-          // backward compatibility - remove this some time!
-          fp = mPath.getPathTo("boards/" % fp.getBasename() % "/board.lp");
-        }
         Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
         addBoard(*board);
       }
@@ -386,7 +283,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
     // the file.
     mErcMsgList->restoreIgnoreState();  // can throw
 
-    if (create || filesMoved) save(true);  // write all files to harddisc
+    if (create) save(true);  // write all files to harddisc
   } catch (...) {
     // free the allocated memory in the reverse order of their allocation...
     foreach (Board* board, mBoards) {

@@ -44,21 +44,10 @@ Attribute::Attribute(const Attribute& other) noexcept
 }
 
 Attribute::Attribute(const SExpression& node)
-  : mKey("UNKNOWN"),  // backward compatibility - remove this some time!
+  : mKey(node.getChildByIndex(0).getValue<QString>(true)),
     mType(&AttributeType::fromString(node.getValueByPath<QString>("type"))),
     mValue(node.getValueByPath<QString>("value")),
     mUnit(mType->getUnitFromString(node.getValueByPath<QString>("unit"))) {
-  // backward compatibility - remove this some time!
-  QString key = node.getChildByIndex(0).getValue<QString>(true);
-  key.replace(".", "_");
-  key.replace("-", "_");
-  mKey = key.toUpper();
-
-  // backward compatibility - remove this some time!
-  mValue.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-  mValue.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                 "{{ \\1 or \\2 }}");
-
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 

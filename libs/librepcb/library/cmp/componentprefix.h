@@ -112,9 +112,6 @@ template <>
 inline library::ComponentPrefix deserializeFromSExpression(
     const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
-  // backward compatibility - remove this some time!
-  str.remove(QRegularExpression("[^a-zA-Z_]"));
-  str.truncate(16);
   return library::ComponentPrefix(str);  // can throw
 }
 

@@ -64,23 +64,11 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
   : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
-    mSymbolPos(0, 0),
-    mSymbolRot(0),
+    mSymbolPos(node.getChildByPath("position")),
+    mSymbolRot(node.getValueByPath<Angle>("rotation")),
     mIsRequired(node.getValueByPath<bool>("required")),
     mSuffix(node.getValueByPath<ComponentSymbolVariantItemSuffix>("suffix")),
     mPinSignalMap(node) {
-  if (node.tryGetChildByPath("position")) {
-    mSymbolPos = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mSymbolPos = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mSymbolRot = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mSymbolRot = node.getValueByPath<Angle>("rot");
-  }
 }
 
 ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept {

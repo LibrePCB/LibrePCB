@@ -68,8 +68,7 @@ public:
   // Constructors / Destructor
   SI_NetLine()                        = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
-  SI_NetLine(SI_NetSegment& segment, const SExpression& node,
-             const QHash<Uuid, SI_NetLineAnchor*>& netPointAnchorMap);
+  SI_NetLine(SI_NetSegment& segment, const SExpression& node);
   SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
              SI_NetLineAnchor& endPoint, const UnsignedLength& width);
   ~SI_NetLine() noexcept;
@@ -106,9 +105,8 @@ public:
 
 private:
   void              init();
-  SI_NetLineAnchor* deserializeAnchor(
-      const SExpression& root, const QString& oldKey, const QString& newKey,
-      const QHash<Uuid, SI_NetLineAnchor*>& netPointAnchorMap) const;
+  SI_NetLineAnchor* deserializeAnchor(const SExpression& root,
+                                      const QString&     key) const;
   void serializeAnchor(SExpression& root, SI_NetLineAnchor* anchor) const;
 
   // General

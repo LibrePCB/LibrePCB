@@ -75,14 +75,6 @@ Footprint::Footprint(const SExpression& node)
     mHoles(node, this),
     mStrokeFont(nullptr),
     mRegisteredGraphicsItem(nullptr) {
-  // backward compatibility, remove this some time!
-  foreach (const SExpression& child, node.getChildren("text")) {
-    mStrokeTexts.append(std::make_shared<StrokeText>(child));
-  }
-  // backward compatibility, remove this some time!
-  foreach (const SExpression& child, node.getChildren("ellipse")) {
-    mCircles.append(std::make_shared<Circle>(child));
-  }
 }
 
 Footprint::~Footprint() noexcept {

@@ -80,12 +80,7 @@ Schematic::Schematic(Project& project, const FilePath& filepath, bool restore,
       // the schematic seems to be ready to open, so we will create all needed
       // objects
 
-      if (root.getChildByIndex(0).isString()) {
-        mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      } else {
-        // backward compatibility, remove this some time!
-        mUuid = root.getValueByPath<Uuid>("uuid");
-      }
+      mUuid = root.getChildByIndex(0).getValue<Uuid>();
       mName = root.getValueByPath<ElementName>("name");
 
       // Load grid properties
