@@ -123,12 +123,7 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
   mLoadingFileDocument = sexprFile.parseFileAndBuildDomTree();
 
   // read attributes
-  if (mLoadingFileDocument.getChildByIndex(0).isString()) {
-    mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
-  } else {
-    // backward compatibility, remove this some time!
-    mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid");
-  }
+  mUuid         = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
   mVersion      = mLoadingFileDocument.getValueByPath<Version>("version");
   mAuthor       = mLoadingFileDocument.getValueByPath<QString>("author");
   mCreated      = mLoadingFileDocument.getValueByPath<QDateTime>("created");

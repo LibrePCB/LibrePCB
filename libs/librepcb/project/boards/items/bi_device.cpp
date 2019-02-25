@@ -84,18 +84,8 @@ BI_Device::BI_Device(Board& board, const SExpression& node)
   initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
   // get position, rotation and mirrored
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
+  mPosition   = Point(node.getChildByPath("position"));
+  mRotation   = node.getValueByPath<Angle>("rotation");
   mIsMirrored = node.getValueByPath<bool>("mirror");
 
   // load attributes

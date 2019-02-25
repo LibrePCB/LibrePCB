@@ -125,11 +125,7 @@ inline SExpression serializeToSExpression(const CircuitIdentifier& obj) {
 template <>
 inline CircuitIdentifier deserializeFromSExpression(const SExpression& sexpr,
                                                     bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  // backward compatibility - remove this some time!
-  str.remove(QRegularExpression("[^-a-zA-Z0-9_+/!?@#$]"));
-  str.truncate(32);
-  return CircuitIdentifier(str);  // can throw
+  return CircuitIdentifier(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream&             stream,

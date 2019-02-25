@@ -69,11 +69,6 @@ ComponentSignal::ComponentSignal(const SExpression& node)
     mIsRequired(node.getValueByPath<bool>("required")),
     mIsNegated(node.getValueByPath<bool>("negated")),
     mIsClock(node.getValueByPath<bool>("clock")) {
-  // backward compatibility - remove this some time!
-  mForcedNetName.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"),
-                         "{{\\1}}");
-  mForcedNetName.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                         "{{ \\1 or \\2 }}");
 }
 
 ComponentSignal::~ComponentSignal() noexcept {

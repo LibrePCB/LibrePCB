@@ -45,8 +45,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node,
-                       const QHash<Uuid, SI_NetLineAnchor*>& netPointAnchorMap)
+SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
     mPosition(),
@@ -54,8 +53,8 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node,
     mStartPoint(nullptr),
     mEndPoint(nullptr),
     mWidth(node.getValueByPath<UnsignedLength>("width")) {
-  mStartPoint = deserializeAnchor(node, "p1", "from", netPointAnchorMap);
-  mEndPoint   = deserializeAnchor(node, "p2", "to", netPointAnchorMap);
+  mStartPoint = deserializeAnchor(node, "from");
+  mEndPoint   = deserializeAnchor(node, "to");
   if ((!mStartPoint) || (!mEndPoint)) {
     throw RuntimeError(__FILE__, __LINE__, tr("Invalid trace anchor!"));
   }
@@ -166,26 +165,17 @@ void SI_NetLine::serialize(SExpression& root) const {
   serializeAnchor(root.appendList("to", true), mEndPoint);
 }
 
-SI_NetLineAnchor* SI_NetLine::deserializeAnchor(
-    const SExpression& root, const QString& oldKey, const QString& newKey,
-    const QHash<Uuid, SI_NetLineAnchor*>& netPointAnchorMap) const {
-  if (const SExpression* node = root.tryGetChildByPath(oldKey)) {
-    Uuid uuid = node->getValueOfFirstChild<Uuid>();
-    if (netPointAnchorMap.contains(uuid)) {
-      return netPointAnchorMap.value(uuid);
-    } else {
-      return mNetSegment.getNetPointByUuid(uuid);
-    }
-  } else if (const SExpression* node = root.tryGetChildByPath(newKey)) {
-    if (const SExpression* junctionNode = node->tryGetChildByPath("junction")) {
-      return mNetSegment.getNetPointByUuid(
-          junctionNode->getValueOfFirstChild<Uuid>());
-    } else {
-      Uuid       symbolUuid = node->getValueByPath<Uuid>("symbol");
-      Uuid       pinUuid    = node->getValueByPath<Uuid>("pin");
-      SI_Symbol* symbol     = mSchematic.getSymbolByUuid(symbolUuid);
-      if (symbol) return symbol->getPin(pinUuid);
-    }
+SI_NetLineAnchor* SI_NetLine::deserializeAnchor(const SExpression& root,
+                                                const QString&     key) const {
+  const SExpression& node = root.getChildByPath(key);
+  if (const SExpression* junctionNode = node.tryGetChildByPath("junction")) {
+    return mNetSegment.getNetPointByUuid(
+        junctionNode->getValueOfFirstChild<Uuid>());
+  } else {
+    Uuid       symbolUuid = node.getValueByPath<Uuid>("symbol");
+    Uuid       pinUuid    = node.getValueByPath<Uuid>("pin");
+    SI_Symbol* symbol     = mSchematic.getSymbolByUuid(symbolUuid);
+    if (symbol) return symbol->getPin(pinUuid);
   }
   return nullptr;
 }

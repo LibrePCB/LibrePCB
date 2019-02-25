@@ -61,35 +61,12 @@ Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 Polygon::Polygon(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(false),
-    mPath() {
-  if (node.getChildByIndex(0).isString()) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-  }
-  if (node.tryGetChildByPath("grab_area")) {
-    mIsGrabArea = node.getValueByPath<bool>("grab_area");
-  } else {
-    // backward compatibility, remove this some time!
-    mIsGrabArea = node.getValueByPath<bool>("grab");
-  }
-
-  // load vertices
-  if ((!node.tryGetChildByPath("pos")) &&
-      (!node.tryGetChildByPath("position"))) {
-    mPath = Path(node);  // can throw
-  } else {
-    // backward compatibility, remove this some time!
-    mPath.addVertex(Point(node.getChildByPath("pos")));
-    foreach (const SExpression& child, node.getChildren("segment")) {
-      mPath.getVertices().last().setAngle(child.getValueByPath<Angle>("angle"));
-      mPath.addVertex(Point(child.getChildByPath("pos")));
-    }
-  }
+    mIsGrabArea(node.getValueByPath<bool>("grab_area")),
+    mPath(node) {
 }
 
 Polygon::~Polygon() noexcept {
