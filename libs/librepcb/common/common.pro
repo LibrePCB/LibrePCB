@@ -66,6 +66,7 @@ SOURCES += \
     fileio/smartsexprfile.cpp \
     fileio/smarttextfile.cpp \
     fileio/smartversionfile.cpp \
+    fileio/transactionaldirectory.cpp \
     fileio/transactionalfilesystem.cpp \
     fileio/versionfile.cpp \
     font/strokefont.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     fileio/smartsexprfile.h \
     fileio/smarttextfile.h \
     fileio/smartversionfile.h \
+    fileio/transactionaldirectory.h \
     fileio/transactionalfilesystem.h \
     fileio/versionfile.h \
     font/strokefont.h \

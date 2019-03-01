@@ -68,6 +68,7 @@ SOURCES += \
     common/directorylocktest.cpp \
     common/filedownloadtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
+    common/fileio/transactionaldirectorytest.cpp \
     common/fileio/transactionalfilesystemtest.cpp \
     common/filepathtest.cpp \
     common/lengthsnaptest.cpp \
