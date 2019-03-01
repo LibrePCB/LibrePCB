@@ -85,7 +85,8 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mDevice.reset(new Device(fp, false));  // can throw
+  mDevice.reset(new Device(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));  // can throw
   mUi->padSignalMapEditorWidget->setReferences(mUndoStack.data(),
                                                &mDevice->getPadSignalMap());
   updateDeviceComponentUuid(mDevice->getComponentUuid());
@@ -146,7 +147,8 @@ bool DeviceEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mDevice->save();  // can throw
+    mDevice->save();      // can throw
+    mFileSystem->save();  // can throw
     memorizeDeviceInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -233,7 +235,9 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
         if (!fp.isValid()) {
           throw RuntimeError(__FILE__, __LINE__, tr("Component not found!"));
         }
-        Component component(fp, true);  // can throw
+        Component component(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(fp))));  // can throw
 
         // edit device
         QScopedPointer<UndoCommandGroup> cmdGroup(
@@ -271,7 +275,9 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
         if (!fp.isValid()) {
           throw RuntimeError(__FILE__, __LINE__, tr("Package not found!"));
         }
-        Package    package(fp, true);  // can throw
+        Package package(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(fp))));  // can throw
         QSet<Uuid> pads = package.getPads().getUuidSet();
 
         // edit device
@@ -310,7 +316,9 @@ void DeviceEditorWidget::updateDeviceComponentUuid(const Uuid& uuid) noexcept {
     if (!fp.isValid()) {
       throw RuntimeError(__FILE__, __LINE__, tr("Component not found!"));
     }
-    mComponent.reset(new Component(fp, true));  // can throw
+    mComponent.reset(new Component(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(fp)))));  // can throw
     mUi->padSignalMapEditorWidget->setSignalList(mComponent->getSignals());
     mUi->lblComponentName->setText(
         *mComponent->getNames().value(getLibLocaleOrder()));
@@ -334,8 +342,9 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
       try {
         FilePath fp = mContext.workspace.getLibraryDb().getLatestSymbol(
             item.getSymbolUuid());  // can throw
-        std::shared_ptr<Symbol> sym =
-            std::make_shared<Symbol>(fp, true);  // can throw
+        std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(fp))));  // can throw
         mSymbols.append(sym);
         std::shared_ptr<SymbolPreviewGraphicsItem> graphicsItem =
             std::make_shared<SymbolPreviewGraphicsItem>(
@@ -361,7 +370,9 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
     if (!fp.isValid()) {
       throw RuntimeError(__FILE__, __LINE__, tr("Package not found!"));
     }
-    mPackage.reset(new Package(fp, true));  // can throw
+    mPackage.reset(new Package(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(fp)))));  // can throw
     mUi->padSignalMapEditorWidget->setPadList(mPackage->getPads());
     mUi->lblPackageName->setText(
         *mPackage->getNames().value(getLibLocaleOrder()));

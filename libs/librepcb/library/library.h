@@ -56,15 +56,14 @@ public:
   Library(const Uuid& uuid, const Version& version, const QString& author,
           const ElementName& name_en_US, const QString& description_en_US,
           const QString& keywords_en_US);
-  Library(const FilePath& libDir, bool readOnly);
+  explicit Library(std::unique_ptr<TransactionalDirectory> directory);
   ~Library() noexcept;
 
   // Getters
   template <typename ElementType>
-  FilePath          getElementsDirectory() const noexcept;
+  QString           getElementsDirectoryName() const noexcept;
   const QUrl&       getUrl() const noexcept { return mUrl; }
   const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
-  FilePath          getIconFilePath() const noexcept;
   const QByteArray& getIcon() const noexcept { return mIcon; }
   QPixmap           getIconAsPixmap() const noexcept;
 
@@ -77,8 +76,9 @@ public:
 
   // General Methods
   virtual void save() override;
+  virtual void moveTo(TransactionalDirectory& dest) override;
   template <typename ElementType>
-  QList<FilePath> searchForElements() const noexcept;
+  QStringList searchForElements() const noexcept;
 
   // Operator Overloadings
   Library& operator=(const Library& rhs) = delete;
@@ -92,8 +92,6 @@ public:
   }
 
 private:  // Methods
-  // Private Methods
-  virtual void copyTo(const FilePath& destination, bool removeSource) override;
   /// @copydoc librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 

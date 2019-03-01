@@ -51,9 +51,9 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
     mRegisteredGraphicsItem(nullptr) {
 }
 
-Symbol::Symbol(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly),
+Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory)
+  : LibraryElement(std::move(directory), getShortElementName(),
+                   getLongElementName()),
     mPins(this),
     mPolygons(this),
     mCircles(this),

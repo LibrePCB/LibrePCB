@@ -48,9 +48,9 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
     mPadSignalMap() {
 }
 
-Device::Device(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly),
+Device::Device(std::unique_ptr<TransactionalDirectory> directory)
+  : LibraryElement(std::move(directory), getShortElementName(),
+                   getLongElementName()),
     mComponentUuid(mLoadingFileDocument.getValueByPath<Uuid>("component")),
     mPackageUuid(mLoadingFileDocument.getValueByPath<Uuid>("package")),
     mAttributes(mLoadingFileDocument),

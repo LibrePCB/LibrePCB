@@ -24,6 +24,7 @@
 
 #include "ui_packagechooserdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
 #include <librepcb/library/pkg/package.h>
@@ -170,7 +171,9 @@ void PackageChooserDialog::updatePreview() noexcept {
 
   if (mPackageFilePath.isValid() && mLayerProvider) {
     try {
-      mPackage.reset(new Package(mPackageFilePath, true));  // can throw
+      mPackage.reset(new Package(std::unique_ptr<TransactionalDirectory>(
+          new TransactionalDirectory(TransactionalFileSystem::openRO(
+              mPackageFilePath)))));  // can throw
       if (mPackage->getFootprints().count() > 0) {
         mGraphicsItem.reset(new FootprintPreviewGraphicsItem(
             *mLayerProvider, QStringList(), *mPackage->getFootprints().first(),

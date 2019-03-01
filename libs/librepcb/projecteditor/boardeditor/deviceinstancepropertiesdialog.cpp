@@ -72,19 +72,19 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
 
   // Library Element Information
   QString htmlLink("<a href=\"%1\">%2<a>");
-  mUi->lblLibDeviceName->setText(
-      htmlLink.arg(mDevice.getLibDevice().getFilePath().toQUrl().toString(),
-                   *mDevice.getLibDevice().getNames().value(localeOrder)));
+  mUi->lblLibDeviceName->setText(htmlLink.arg(
+      mDevice.getLibDevice().getDirectory().getAbsPath().toQUrl().toString(),
+      *mDevice.getLibDevice().getNames().value(localeOrder)));
   mUi->lblLibDeviceName->setToolTip(
       mDevice.getLibDevice().getDescriptions().value(localeOrder) + "<p>" +
-      mDevice.getLibDevice().getFilePath().toNative());
+      mDevice.getLibDevice().getDirectory().getAbsPath().toNative());
 
-  mUi->lblLibPackageName->setText(
-      htmlLink.arg(mDevice.getLibPackage().getFilePath().toQUrl().toString(),
-                   *mDevice.getLibPackage().getNames().value(localeOrder)));
+  mUi->lblLibPackageName->setText(htmlLink.arg(
+      mDevice.getLibPackage().getDirectory().getAbsPath().toQUrl().toString(),
+      *mDevice.getLibPackage().getNames().value(localeOrder)));
   mUi->lblLibPackageName->setToolTip(
       mDevice.getLibPackage().getDescriptions().value(localeOrder) + "<p>" +
-      mDevice.getLibPackage().getFilePath().toNative());
+      mDevice.getLibPackage().getDirectory().getAbsPath().toNative());
 
   mUi->lblLibFootprintName->setText(
       *mDevice.getLibFootprint().getNames().value(localeOrder));

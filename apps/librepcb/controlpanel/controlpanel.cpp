@@ -385,8 +385,7 @@ void ControlPanel::openLibraryEditor(const FilePath& libDir) noexcept {
   if (!editor) {
     try {
       bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-      QSharedPointer<Library> lib(new Library(libDir, remote));
-      editor = new LibraryEditor(mWorkspace, lib);
+      editor      = new LibraryEditor(mWorkspace, libDir, remote);
       connect(editor, &LibraryEditor::destroyed, this,
               &ControlPanel::libraryEditorDestroyed);
       mOpenLibraryEditors.insert(libDir, editor);

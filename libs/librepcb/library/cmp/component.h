@@ -80,7 +80,7 @@ public:
   Component(const Uuid& uuid, const Version& version, const QString& author,
             const ElementName& name_en_US, const QString& description_en_US,
             const QString& keywords_en_US);
-  Component(const FilePath& elementDirectory, bool readOnly);
+  explicit Component(std::unique_ptr<TransactionalDirectory> directory);
   ~Component() noexcept;
 
   // General

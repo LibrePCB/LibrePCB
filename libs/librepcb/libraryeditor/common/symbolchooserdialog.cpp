@@ -24,6 +24,7 @@
 
 #include "ui_symbolchooserdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
@@ -157,7 +158,8 @@ void SymbolChooserDialog::setSelectedCategory(
 }
 
 void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
-  if (mSelectedSymbol && (mSelectedSymbol->getFilePath() == fp)) return;
+  if (mSelectedSymbol && (mSelectedSymbol->getDirectory().getAbsPath() == fp))
+    return;
 
   mUi->lblSymbolName->setText(tr("No symbol selected"));
   mUi->lblSymbolDescription->setText("");
@@ -166,7 +168,9 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
 
   if (fp.isValid()) {
     try {
-      mSelectedSymbol.reset(new Symbol(fp, true));  // can throw
+      mSelectedSymbol.reset(new Symbol(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(fp)))));  // can throw
       mUi->lblSymbolName->setText(
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(

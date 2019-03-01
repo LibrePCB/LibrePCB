@@ -26,6 +26,7 @@
 #include "../projecteditor.h"
 #include "ui_unplacedcomponentsdock.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
@@ -190,12 +191,16 @@ void UnplacedComponentsDock::on_cbxSelectedDevice_currentIndexChanged(
       devFp = mProjectEditor.getWorkspace().getLibraryDb().getLatestDevice(
           *deviceUuid);
     if (devFp.isValid()) {
-      const library::Device* device = new library::Device(devFp, true);
-      FilePath               pkgFp =
+      const library::Device* device = new library::Device(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(devFp))));
+      FilePath pkgFp =
           mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(
               device->getPackageUuid());
       if (pkgFp.isValid()) {
-        const library::Package* package = new library::Package(pkgFp, true);
+        const library::Package* package = new library::Package(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(pkgFp))));
         setSelectedDeviceAndPackage(device, package);
       } else {
         setSelectedDeviceAndPackage(nullptr, nullptr);
