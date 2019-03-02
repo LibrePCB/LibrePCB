@@ -33,9 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class SmartSExprFile;
-
 namespace project {
 
 class Project;
@@ -56,8 +53,7 @@ public:
   // Constructors / Destructor
   ErcMsgList()                        = delete;
   ErcMsgList(const ErcMsgList& other) = delete;
-  explicit ErcMsgList(Project& project, bool restore, bool readOnly,
-                      bool create);
+  explicit ErcMsgList(Project& project);
   ~ErcMsgList() noexcept;
 
   // Getters
@@ -68,7 +64,7 @@ public:
   void remove(ErcMsg* ercMsg) noexcept;
   void update(ErcMsg* ercMsg) noexcept;
   void restoreIgnoreState();
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+  void save();
 
   // Operator Overloadings
   ErcMsgList& operator=(const ErcMsgList& rhs) = delete;
@@ -85,10 +81,6 @@ private:  // Methods
 
   // General
   Project& mProject;
-
-  // File "circuit/erc.lp"
-  FilePath                       mFilepath;
-  QScopedPointer<SmartSExprFile> mFile;
 
   // Misc
   QList<ErcMsg*> mItems;  ///< contains all visible ERC messages

@@ -75,11 +75,13 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     mErcMsgDock(nullptr),
     mFsm(nullptr) {
   mUi->setupUi(this);
-  mUi->actionSave_Project->setEnabled(!mProject.isReadOnly());
+  mUi->actionSave_Project->setEnabled(mProject.getDirectory().isWritable());
 
   // set window title
   QString filenameStr = mProject.getFilepath().getFilename();
-  if (mProject.isReadOnly()) filenameStr.append(QStringLiteral(" [Read-Only]"));
+  if (!mProject.getDirectory().isWritable()) {
+    filenameStr.append(QStringLiteral(" [Read-Only]"));
+  }
   setWindowTitle(QString("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
   // Add Dock Widgets

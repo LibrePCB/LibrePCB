@@ -30,6 +30,7 @@
 #include <librepcb/common/dialogs/aboutdialog.h>
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/library.h>
 #include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/librarymanager/librarymanager.h>
@@ -294,6 +295,8 @@ ProjectEditor* ControlPanel::openProject(Project& project) noexcept {
               &ControlPanel::projectEditorClosed);
       connect(editor, &ProjectEditor::showControlPanelClicked, this,
               &ControlPanel::showControlPanel);
+      connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
+              &ControlPanel::openProjectLibraryUpdater);
       mOpenProjectEditors.insert(project.getFilepath().toUnique().toStr(),
                                  editor);
       mWorkspace.setLastRecentlyUsedProject(project.getFilepath());
@@ -313,7 +316,13 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
   try {
     ProjectEditor* editor = getOpenProject(filepath);
     if (!editor) {
-      Project* project = new Project(filepath, false, true);
+      std::shared_ptr<TransactionalFileSystem> fs =
+          TransactionalFileSystem::openRW(
+              filepath.getParentDir(),
+              TransactionalFileSystem::RestoreMode::ASK);
+      Project* project = new Project(std::unique_ptr<TransactionalDirectory>(
+                                         new TransactionalDirectory(fs)),
+                                     filepath.getFilename());
       editor           = new ProjectEditor(mWorkspace, *project);
       connect(editor, &ProjectEditor::projectEditorClosed, this,
               &ControlPanel::projectEditorClosed);
@@ -393,9 +402,11 @@ void ControlPanel::openLibraryEditor(const FilePath& libDir) noexcept {
       QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
   }
-  editor->show();
-  editor->raise();
-  editor->activateWindow();
+  if (editor) {
+    editor->show();
+    editor->raise();
+    editor->activateWindow();
+  }
 }
 
 void ControlPanel::libraryEditorDestroyed() noexcept {

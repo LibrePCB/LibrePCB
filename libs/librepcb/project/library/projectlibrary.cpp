@@ -27,7 +27,7 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/dev/device.h>
 #include <librepcb/library/pkg/package.h>
@@ -47,26 +47,17 @@ using namespace library;
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectLibrary::ProjectLibrary(const FilePath& libDir, bool restore,
-                               bool readOnly)
-  : mLibraryPath(libDir),
-    mBackupPath(libDir.toStr() % '~'),
-    mTmpDir(FilePath::getRandomTempPath()) {
+ProjectLibrary::ProjectLibrary(
+    std::unique_ptr<TransactionalDirectory> directory)
+  : mDirectory(std::move(directory)) {
   qDebug() << "load project library...";
-
-  if ((!mLibraryPath.isExistingDir()) && (!readOnly)) {
-    FileUtils::makePath(mLibraryPath);  // can throw
-  }
 
   try {
     // Load all library elements
-    const FilePath& dirToLoad =
-        restore && mBackupPath.isExistingDir() ? mBackupPath : mLibraryPath;
-    loadElements<Symbol>(dirToLoad.getPathTo("sym"), "symbols", mSymbols);
-    loadElements<Package>(dirToLoad.getPathTo("pkg"), "packages", mPackages);
-    loadElements<Component>(dirToLoad.getPathTo("cmp"), "components",
-                            mComponents);
-    loadElements<Device>(dirToLoad.getPathTo("dev"), "devices", mDevices);
+    loadElements<Symbol>("sym", "symbols", mSymbols);
+    loadElements<Package>("pkg", "packages", mPackages);
+    loadElements<Component>("cmp", "components", mComponents);
+    loadElements<Device>("dev", "devices", mDevices);
   } catch (const Exception&) {
     qDeleteAll(mAllElements);
     mAllElements.clear();
@@ -80,16 +71,7 @@ ProjectLibrary::~ProjectLibrary() noexcept {
   // Delete all library elements.
   qDeleteAll(mAllElements);
   mAllElements.clear();
-
-  // Remove backup directory.
-  if (!QDir(mBackupPath.toStr()).removeRecursively()) {
-    qWarning() << "Could not remove backup directory" << mBackupPath.toStr();
-  }
-
-  // Remove temporary directory.
-  if (!QDir(mTmpDir.toStr()).removeRecursively()) {
-    qWarning() << "Could not remove temporary directory" << mTmpDir.toStr();
-  }
+  mElementsToUpgrade.clear();
 }
 
 /*******************************************************************************
@@ -147,113 +129,49 @@ void ProjectLibrary::removeDevice(library::Device& d) {
  *  General Methods
  ******************************************************************************/
 
-bool ProjectLibrary::save(bool toOriginal, QStringList& errors) noexcept {
-  bool success = true;
-
-  QSet<LibraryBaseElement*>  currentElements = getCurrentElements();
-  QSet<LibraryBaseElement*>& savedElements =
-      toOriginal ? mSavedToOriginal : mSavedToTemporary;
-  const FilePath& libDir = toOriginal ? mLibraryPath : mBackupPath;
-
-  // Remove no longer needed elements.
-  foreach (LibraryBaseElement* element,
-           mLoadedElements + savedElements - currentElements) {
-    FilePath dir = libDir.getPathTo(element->getShortElementName())
-                       .getPathTo(element->getUuid().toStr());
-    try {
-      FileUtils::removeDirRecursively(dir);  // can throw
-      savedElements.remove(element);
-    } catch (const Exception& e) {
-      success = false;
-      errors.append(e.getMsg());
-    }
+void ProjectLibrary::save() {
+  // Save library elements to enforce a file format upgrade, but only once for
+  // optimal performance.
+  foreach (LibraryBaseElement* element, mElementsToUpgrade) {
+    element->save();  // can throw
+    mElementsToUpgrade.remove(element);
   }
-
-  // Add new elements and upgrade loaded elements.
-  foreach (LibraryBaseElement* element, currentElements - savedElements) {
-    FilePath dir = libDir.getPathTo(element->getShortElementName())
-                       .getPathTo(element->getUuid().toStr());
-    try {
-      if (toOriginal && mLoadedElements.contains(element)) {
-        // Upgrade library element to latest file format version.
-        element->save();  // can throw
-        mLoadedElements.remove(element);
-      }
-      if (dir.isExistingDir()) {
-        // Avoid copy failure caused by already existing directory.
-        FileUtils::removeDirRecursively(dir);
-      }
-      FileUtils::copyDirRecursively(element->getFilePath(), dir);  // can throw
-      savedElements.insert(element);
-    } catch (const Exception& e) {
-      success = false;
-      errors.append(e.getMsg());
-    }
-  }
-
-  return success;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-QSet<LibraryBaseElement*> ProjectLibrary::getCurrentElements() const noexcept {
-  QSet<LibraryBaseElement*> currentElements;
-  foreach (auto element, mSymbols) { currentElements.insert(element); }
-  foreach (auto element, mPackages) { currentElements.insert(element); }
-  foreach (auto element, mComponents) { currentElements.insert(element); }
-  foreach (auto element, mDevices) { currentElements.insert(element); }
-  return currentElements;
-}
-
 template <typename ElementType>
-void ProjectLibrary::loadElements(const FilePath&            directory,
-                                  const QString&             type,
+void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
                                   QHash<Uuid, ElementType*>& elementList) {
-  QDir dir(directory.toStr());
-
   // search all subdirectories which have a valid UUID as directory name
-  dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable);
-  dir.setNameFilters(QStringList()
-                     << QString("*.%1").arg(directory.getBasename()));
-  foreach (const QString& dirname, dir.entryList()) {
-    FilePath subdirPath(directory.getPathTo(dirname));
+  foreach (const QString& sub, mDirectory->getDirs(dirname)) {
+    std::unique_ptr<TransactionalDirectory> dir(
+        new TransactionalDirectory(*mDirectory, dirname % "/" % sub));
 
     // check if directory is a valid library element
-    if (!LibraryBaseElement::isValidElementDirectory<ElementType>(subdirPath)) {
-      if (subdirPath.isEmptyDir()) {
-        qInfo() << "Empty library element directory will be removed:"
-                << subdirPath.toNative();
-        QDir(subdirPath.toStr()).removeRecursively();
-      } else {
-        qWarning() << "Found an invalid directory in the library:"
-                   << subdirPath.toNative();
-      }
+    if (!LibraryBaseElement::isValidElementDirectory<ElementType>(*dir, "")) {
+      qWarning() << "Found an invalid directory in the library:"
+                 << dir->getAbsPath().toNative();
       continue;
     }
 
-    // Copy element to temporary directory to decouple it from the project
-    // library.
-    FilePath elementDir =
-        mTmpDir.getPathTo(QString::number(qrand())).getPathTo(dirname);
-    FileUtils::copyDirRecursively(subdirPath, elementDir);  // can throw
-
     // load the library element
     QScopedPointer<ElementType> element(
-        new ElementType(elementDir, false));  // can throw
+        new ElementType(std::move(dir)));  // can throw
     if (elementList.contains(element->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString(tr("There are multiple library elements with the same "
                      "UUID in the directory \"%1\""))
-              .arg(subdirPath.toNative()));
+              .arg(dir->getAbsPath().toNative()));
     }
 
     // everything is ok -> update members
     elementList.insert(element->getUuid(), element.data());
-    mAllElements.insert(element.data());
-    mLoadedElements.insert(element.take());  // Take object from smart pointer!
+    mElementsToUpgrade.insert(element.data());
+    mAllElements.insert(element.take());  // Take object from smart pointer!
   }
 
   qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
@@ -268,13 +186,10 @@ void ProjectLibrary::addElement(ElementType&               element,
                                 "UUID in the project's library: %1"))
                          .arg(element.getUuid().toStr()));
   }
-  if (!mAllElements.contains(&element)) {
-    // copy from workspace *immediately* to freeze/backup their state
-    element.saveIntoParentDirectory(
-        mTmpDir.getPathTo(QString::number(qrand())));  // can throw
-    mAllElements.insert(&element);
-  }
+  TransactionalDirectory dir(*mDirectory, element.getShortElementName());
+  element.saveIntoParentDirectory(dir);  // can throw
   elementList.insert(element.getUuid(), &element);
+  mAllElements.insert(&element);
 }
 
 template <typename ElementType>
@@ -282,6 +197,9 @@ void ProjectLibrary::removeElement(ElementType&               element,
                                    QHash<Uuid, ElementType*>& elementList) {
   Q_ASSERT(elementList.value(element.getUuid()) == &element);
   Q_ASSERT(mAllElements.contains(&element));
+  TransactionalDirectory dir(
+      TransactionalFileSystem::openRW(FilePath::getRandomTempPath()));
+  element.moveIntoParentDirectory(dir);  // can throw
   elementList.remove(element.getUuid());
 }
 
