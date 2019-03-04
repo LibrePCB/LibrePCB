@@ -100,17 +100,13 @@ private:  // Methods
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
+  void editItem(QListWidget* list, const FilePath& fp) noexcept;
   void removeItems(
       const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
 
   // Event Handlers
   void btnIconClicked() noexcept;
-  void lstCmpCatDoubleClicked(const QModelIndex& index) noexcept;
-  void lstPkgCatDoubleClicked(const QModelIndex& index) noexcept;
-  void lstSymDoubleClicked(const QModelIndex& index) noexcept;
-  void lstPkgDoubleClicked(const QModelIndex& index) noexcept;
-  void lstCmpDoubleClicked(const QModelIndex& index) noexcept;
-  void lstDevDoubleClicked(const QModelIndex& index) noexcept;
+  void lstDoubleClicked(const QModelIndex& index) noexcept;
 
 private:  // Data
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
