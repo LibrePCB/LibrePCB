@@ -312,18 +312,18 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
 }
 
 void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
-  // Get selected item (may be null)
+  Q_UNUSED(pos);
+
+  // Get list widget
   QListWidget* list = dynamic_cast<QListWidget*>(sender());
   Q_ASSERT(list);
-  QListWidgetItem* selectedItem = list->itemAt(pos);
 
-  // Get item text and validated file path
-  QString itemName = selectedItem ? selectedItem->text() : QString();
-  tl::optional<FilePath> itemPath = tl::nullopt;
-  if (selectedItem) {
-    FilePath fp = FilePath(selectedItem->data(Qt::UserRole).toString());
+  // Get item texts and validated file paths
+  QHash<QListWidgetItem*, FilePath> selectedItemPaths;
+  foreach (QListWidgetItem* item, list->selectedItems()) {
+    FilePath fp = FilePath(item->data(Qt::UserRole).toString());
     if (fp.isValid()) {
-      itemPath = tl::make_optional(fp);
+      selectedItemPaths.insert(item, fp);
     } else {
       qWarning() << "File path for selected item is not valid";
     }
@@ -333,47 +333,52 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QMenu    menu;
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
-  aRemove->setEnabled(selectedItem && itemPath.has_value());
+  aRemove->setVisible(!selectedItemPaths.isEmpty());
 
   // Show context menu, handle action
   QAction* action = menu.exec(QCursor::pos());
   if (action == aRemove) {
-    Q_ASSERT(selectedItem);
-    Q_ASSERT(itemPath.has_value());
-    if (removeSelectedItem(itemName, *itemPath)) {
-      delete selectedItem;
-    };
+    removeItems(selectedItemPaths);
   }
 }
 
-bool LibraryOverviewWidget::removeSelectedItem(
-    const QString& itemName, const FilePath& itemPath) noexcept {
+void LibraryOverviewWidget::removeItems(
+    const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept {
+  // Build message (list only the first few elements to avoid a huge message
+  // box)
+  QString msg = tr("WARNING: Library elements must normally NOT be removed "
+                   "because this will break other elements which depend on "
+                   "this one! They should be just marked as deprecated "
+                   "instead.\n\nAre you still sure to delete the following "
+                   "library elements?") %
+                "\n\n";
+  QList<QListWidgetItem*> listedItems = selectedItemPaths.keys().mid(0, 10);
+  foreach (QListWidgetItem* item, listedItems) {
+    msg.append(" - " % item->text() % "\n");
+  }
+  if (selectedItemPaths.count() > listedItems.count()) {
+    msg.append(" - ...\n");
+  }
+  msg.append("\n" % tr("This cannot be undone!"));
+
+  // Show message box
   int ret = QMessageBox::warning(
-      this, tr("Remove %1").arg(itemName),
-      QString(tr("WARNING: Library elements must normally NOT be removed "
-                 "because this will break "
-                 "other elements which depend on this one! They should be just "
-                 "marked as "
-                 "deprecated instead.\n\nAre you still sure to delete the "
-                 "whole library element "
-                 "\"%1\"?\n\nThis cannot be undone!"))
-          .arg(itemName),
+      this, tr("Remove %1 elements").arg(selectedItemPaths.count()), msg,
       QMessageBox::Yes, QMessageBox::Cancel);
   if (ret == QMessageBox::Yes) {
-    try {
-      // Emit signal so that the library editor can close any tabs that have
-      // opened this item
-      emit removeElementTriggered(itemPath);
-      FileUtils::removeDirRecursively(itemPath);
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Error"), e.getMsg());
-      mContext.workspace.getLibraryDb().startLibraryRescan();
-      return false;
+    foreach (QListWidgetItem* item, selectedItemPaths.keys()) {
+      FilePath itemPath = selectedItemPaths.value(item);
+      try {
+        // Emit signal so that the library editor can close any tabs that have
+        // opened this item
+        emit removeElementTriggered(itemPath);
+        FileUtils::removeDirRecursively(itemPath);
+        delete item;  // Remove from list
+      } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+      }
     }
     mContext.workspace.getLibraryDb().startLibraryRescan();
-    return true;
-  } else {
-    return false;
   }
 }
 
