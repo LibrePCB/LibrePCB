@@ -49,9 +49,9 @@ Component::Component(const Uuid& uuid, const Version& version,
     mPrefixes(ComponentPrefix("")) {
 }
 
-Component::Component(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly),
+Component::Component(std::unique_ptr<TransactionalDirectory> directory)
+  : LibraryElement(std::move(directory), getShortElementName(),
+                   getLongElementName()),
     mSchematicOnly(false),
     mDefaultValue(),
     mPrefixes(ComponentPrefix("")) {

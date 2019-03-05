@@ -32,9 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class SmartSExprFile;
-
 namespace project {
 
 class Project;
@@ -54,8 +51,7 @@ class ProjectSettings final : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  explicit ProjectSettings(Project& project, bool restore, bool readOnly,
-                           bool create);
+  explicit ProjectSettings(Project& project, bool create);
   ~ProjectSettings() noexcept;
 
   // Getters: General
@@ -74,7 +70,7 @@ public:
   // General Methods
   void restoreDefaults() noexcept;
   void triggerSettingsChanged() noexcept;
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+  void save();
 
 signals:
 
@@ -92,12 +88,7 @@ private:
   void serialize(SExpression& root) const override;
 
   // General
-  Project& mProject;      ///< a reference to the Project object (from the ctor)
-  FilePath mLibraryPath;  ///< the "lib" directory of the project
-
-  // File "project/settings.lp"
-  FilePath        mFilepath;
-  SmartSExprFile* mFile;
+  Project& mProject;  ///< a reference to the Project object (from the ctor)
 
   // All Settings
   QStringList

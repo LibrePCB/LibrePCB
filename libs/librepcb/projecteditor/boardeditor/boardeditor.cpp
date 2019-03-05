@@ -82,11 +82,13 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mFsm(nullptr) {
   mUi->setupUi(this);
   mUi->lblUnplacedComponentsNote->hide();
-  mUi->actionProjectSave->setEnabled(!mProject.isReadOnly());
+  mUi->actionProjectSave->setEnabled(mProject.getDirectory().isWritable());
 
   // set window title
   QString filenameStr = mProject.getFilepath().getFilename();
-  if (mProject.isReadOnly()) filenameStr.append(QStringLiteral(" [Read-Only]"));
+  if (!mProject.getDirectory().isWritable()) {
+    filenameStr.append(QStringLiteral(" [Read-Only]"));
+  }
   setWindowTitle(QString("%1 - LibrePCB Board Editor").arg(filenameStr));
 
   // Add Dock Widgets

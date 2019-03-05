@@ -61,6 +61,13 @@ public:
     return list;
   }
 
+  template <typename T>
+  static T sorted(const T& container) noexcept {
+    T copy(container);
+    qSort(copy);
+    return copy;
+  }
+
   static QRectF boundingRectFromRadius(qreal radius) noexcept {
     return QRectF(-radius, -radius, 2 * radius, 2 * radius);
   }

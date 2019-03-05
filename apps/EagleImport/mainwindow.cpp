@@ -4,6 +4,7 @@
 #include "ui_mainwindow.h"
 
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/eagleimport/converterdb.h>
 #include <librepcb/eagleimport/deviceconverter.h>
@@ -173,8 +174,12 @@ bool MainWindow::convertSymbol(eagleimport::ConverterDb& db,
     polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
     // save symbol to file
-    newSymbol->saveIntoParentDirectory(
-        FilePath(QString("%1/sym").arg(ui->output->text())));
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(
+            FilePath(QString("%1/sym").arg(ui->output->text())));
+    TransactionalDirectory dir(fs);
+    newSymbol->moveIntoParentDirectory(dir);
+    fs->save();
   } catch (const std::exception& e) {
     addError(e.what());
     return false;
@@ -197,8 +202,12 @@ bool MainWindow::convertPackage(eagleimport::ConverterDb& db,
     polygonSimplifier.convertLineRectsToPolygonRects(false, true);
 
     // save package to file
-    newPackage->saveIntoParentDirectory(
-        FilePath(QString("%1/pkg").arg(ui->output->text())));
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(
+            FilePath(QString("%1/pkg").arg(ui->output->text())));
+    TransactionalDirectory dir(fs);
+    newPackage->moveIntoParentDirectory(dir);
+    fs->save();
   } catch (const std::exception& e) {
     addError(e.what());
     return false;
@@ -226,13 +235,21 @@ bool MainWindow::convertDevice(eagleimport::ConverterDb&   db,
       std::unique_ptr<Device>      newDevice = devConverter.generate();
 
       // save device
-      newDevice->saveIntoParentDirectory(
-          FilePath(QString("%1/dev").arg(ui->output->text())));
+      std::shared_ptr<TransactionalFileSystem> fs =
+          TransactionalFileSystem::openRW(
+              FilePath(QString("%1/dev").arg(ui->output->text())));
+      TransactionalDirectory dir(fs);
+      newDevice->moveIntoParentDirectory(dir);
+      fs->save();
     }
 
     // save component to file
-    newComponent->saveIntoParentDirectory(
-        FilePath(QString("%1/cmp").arg(ui->output->text())));
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(
+            FilePath(QString("%1/cmp").arg(ui->output->text())));
+    TransactionalDirectory dir(fs);
+    newComponent->moveIntoParentDirectory(dir);
+    fs->save();
   } catch (const std::exception& e) {
     addError(e.what());
     return false;

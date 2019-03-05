@@ -92,7 +92,7 @@ public:
   // Constructors / Destructor
   NewElementWizardContext()                                     = delete;
   NewElementWizardContext(const NewElementWizardContext& other) = delete;
-  NewElementWizardContext(const workspace::Workspace& ws, const Library& lib,
+  NewElementWizardContext(const workspace::Workspace& ws, Library& lib,
                           const IF_GraphicsLayerProvider& lp,
                           QObject* parent = nullptr) noexcept;
   ~NewElementWizardContext() noexcept;
@@ -119,7 +119,7 @@ public:
 
 private:  // Data
   const workspace::Workspace&     mWorkspace;
-  const library::Library&         mLibrary;
+  library::Library&               mLibrary;
   const IF_GraphicsLayerProvider& mLayerProvider;
   FilePath                        mOutputDirectory;
 

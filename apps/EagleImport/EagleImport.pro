@@ -20,6 +20,7 @@ LIBS += \
     -lparseagle \
     -lsexpresso \
     -lclipper \
+    -lquazip -lz \
 
 INCLUDEPATH += \
     ../../libs \

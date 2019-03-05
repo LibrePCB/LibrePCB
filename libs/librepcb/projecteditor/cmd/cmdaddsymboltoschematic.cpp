@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdaddsymboltoschematic.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
@@ -90,7 +91,9 @@ bool CmdAddSymbolToSchematic::performExecute() {
                      "workspace library!"))
               .arg(symbolUuid.toStr()));
     }
-    library::Symbol* sym = new library::Symbol(symFp, true);
+    library::Symbol* sym = new library::Symbol(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(symFp))));
     CmdProjectLibraryAddElement<library::Symbol>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<library::Symbol>(
             mSchematic.getProject().getLibrary(), *sym);

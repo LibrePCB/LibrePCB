@@ -49,12 +49,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
-                                             QSharedPointer<Library> lib,
-                                             QWidget* parent) noexcept
-  : EditorWidgetBase(context, lib->getFilePath(), parent),
-    mLibrary(lib),
-    mUi(new Ui::LibraryOverviewWidget) {
+LibraryOverviewWidget::LibraryOverviewWidget(const Context&  context,
+                                             const FilePath& fp,
+                                             QWidget*        parent) noexcept
+  : EditorWidgetBase(context, fp, parent), mUi(new Ui::LibraryOverviewWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
   connect(mUi->btnIcon, &QPushButton::clicked, this,
@@ -81,7 +79,9 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mDependenciesEditorWidget.data());
 
-  // Load metadata.
+  // Load library.
+  mLibrary.reset(new Library(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));
   updateMetadata();
 
   // Reload metadata on undo stack state changes.
@@ -144,7 +144,8 @@ bool LibraryOverviewWidget::save() noexcept {
 
   // Save element.
   try {
-    mLibrary->save();  // can throw
+    mLibrary->save();     // can throw
+    mFileSystem->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Save failed"), e.getMsg());
@@ -269,7 +270,7 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
     // get all library element names
     QList<FilePath> elements =
         mContext.workspace.getLibraryDb().getLibraryElements<ElementType>(
-            mLibrary->getFilePath());  // can throw
+            mLibrary->getDirectory().getAbsPath());  // can throw
     foreach (const FilePath& filepath, elements) {
       QString name;
       mContext.workspace.getLibraryDb().getElementTranslations<ElementType>(
@@ -382,7 +383,8 @@ bool LibraryOverviewWidget::removeSelectedItem(
 
 void LibraryOverviewWidget::btnIconClicked() noexcept {
   QString fp = FileDialog::getOpenFileName(
-      this, tr("Choose library icon"), mLibrary->getIconFilePath().toNative(),
+      this, tr("Choose library icon"),
+      mLibrary->getDirectory().getAbsPath().toNative(),
       tr("Portable Network Graphics (*.png)"));
   if (!fp.isEmpty()) {
     try {

@@ -61,9 +61,12 @@ public:
   // Constructors / Destructor
   LibraryOverviewWidget()                                   = delete;
   LibraryOverviewWidget(const LibraryOverviewWidget& other) = delete;
-  LibraryOverviewWidget(const Context& context, QSharedPointer<Library> lib,
+  LibraryOverviewWidget(const Context& context, const FilePath& fp,
                         QWidget* parent = nullptr) noexcept;
   ~LibraryOverviewWidget() noexcept;
+
+  // Getters
+  Library& getLibrary() const noexcept { return *mLibrary; }
 
   // Operator Overloadings
   LibraryOverviewWidget& operator=(const LibraryOverviewWidget& rhs) = delete;
@@ -110,9 +113,9 @@ private:  // Methods
   void lstDevDoubleClicked(const QModelIndex& index) noexcept;
 
 private:  // Data
-  QSharedPointer<Library>                   mLibrary;
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
   QScopedPointer<LibraryListEditorWidget>   mDependenciesEditorWidget;
+  QSharedPointer<Library>                   mLibrary;
   QByteArray                                mIcon;
 };
 

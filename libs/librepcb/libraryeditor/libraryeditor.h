@@ -40,6 +40,7 @@ namespace librepcb {
 
 class UndoStackActionGroup;
 class ExclusiveActionGroup;
+class TransactionalFileSystem;
 
 namespace workspace {
 class Workspace;
@@ -76,7 +77,7 @@ public:
   // Constructors / Destructor
   LibraryEditor()                           = delete;
   LibraryEditor(const LibraryEditor& other) = delete;
-  LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> lib);
+  LibraryEditor(workspace::Workspace& ws, const FilePath& libFp, bool readOnly);
   ~LibraryEditor() noexcept;
 
   /**
@@ -161,13 +162,13 @@ private:  // Methods
 
 private:  // Data
   workspace::Workspace&                mWorkspace;
-  QSharedPointer<Library>              mLibrary;
+  bool                                 mIsOpenedReadOnly;
   QScopedPointer<Ui::LibraryEditor>    mUi;
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
   QList<GraphicsLayer*>                mLayers;
   EditorWidgetBase*                    mCurrentEditorWidget;
-  DirectoryLock                        mLock;
+  Library*                             mLibrary;
 };
 
 /*******************************************************************************

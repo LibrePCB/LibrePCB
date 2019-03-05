@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/project.h>
@@ -60,7 +61,12 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
 
   // open project from test data directory
   FilePath projectFp = testDataDir.getPathTo("test_project/test_project.lpp");
-  QScopedPointer<Project> project(new Project(projectFp, true, false));
+  std::shared_ptr<TransactionalFileSystem> projectFs =
+      TransactionalFileSystem::openRO(projectFp.getParentDir());
+  QScopedPointer<Project> project(
+      new Project(std::unique_ptr<TransactionalDirectory>(
+                      new TransactionalDirectory(projectFs)),
+                  projectFp.getFilename()));
 
   // force planes rebuild
   Board* board = project->getBoards().first();

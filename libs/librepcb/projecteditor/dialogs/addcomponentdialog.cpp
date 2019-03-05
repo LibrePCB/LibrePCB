@@ -24,6 +24,7 @@
 
 #include "ui_addcomponentdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
@@ -202,14 +203,20 @@ void AddComponentDialog::treeComponents_currentItemChanged(
           current->parent() ? current->parent() : current;
       FilePath cmpFp = FilePath(cmpItem->data(0, Qt::UserRole).toString());
       if ((!mSelectedComponent) ||
-          (mSelectedComponent->getFilePath() != cmpFp)) {
-        library::Component* component = new library::Component(cmpFp, true);
+          (mSelectedComponent->getDirectory().getAbsPath() != cmpFp)) {
+        library::Component* component = new library::Component(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(cmpFp))));
         setSelectedComponent(component);
       }
       if (current->parent()) {
         FilePath devFp = FilePath(current->data(0, Qt::UserRole).toString());
-        if ((!mSelectedDevice) || (mSelectedDevice->getFilePath() != devFp)) {
-          library::Device* device = new library::Device(devFp, true);
+        if ((!mSelectedDevice) ||
+            (mSelectedDevice->getDirectory().getAbsPath() != devFp)) {
+          library::Device* device =
+              new library::Device(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(
+                      TransactionalFileSystem::openRO(devFp))));
           setSelectedDevice(device);
         }
       } else {
@@ -414,7 +421,9 @@ void AddComponentDialog::setSelectedSymbVar(
           mWorkspace.getLibraryDb().getLatestSymbol(item.getSymbolUuid());
       if (!symbolFp.isValid()) continue;  // TODO: show warning
       const library::Symbol* symbol =
-          new library::Symbol(symbolFp, true);  // TODO: fix memory leak...
+          new library::Symbol(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(TransactionalFileSystem::openRO(
+                  symbolFp))));  // TODO: fix memory leak...
       library::SymbolPreviewGraphicsItem* graphicsItem =
           new library::SymbolPreviewGraphicsItem(
               *mGraphicsLayerProvider, localeOrder, *symbol, mSelectedComponent,
@@ -445,9 +454,11 @@ void AddComponentDialog::setSelectedDevice(const library::Device* dev) {
     FilePath           pkgFp       = mWorkspace.getLibraryDb().getLatestPackage(
         mSelectedDevice->getPackageUuid());
     if (pkgFp.isValid()) {
-      mSelectedPackage = new library::Package(pkgFp, true);
-      QString devName  = *mSelectedDevice->getNames().value(localeOrder);
-      QString pkgName  = *mSelectedPackage->getNames().value(localeOrder);
+      mSelectedPackage = new library::Package(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(pkgFp))));
+      QString devName = *mSelectedDevice->getNames().value(localeOrder);
+      QString pkgName = *mSelectedPackage->getNames().value(localeOrder);
       if (devName.contains(pkgName, Qt::CaseInsensitive)) {
         // Package name is already contained in device name, no need to show it.
         mUi->lblDeviceName->setText(devName);

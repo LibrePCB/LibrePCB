@@ -17,58 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_FILESYSTEM_H
+#define LIBREPCB_FILESYSTEM_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "smarttextfile.h"
-
-#include "fileutils.h"
+#include "filepath.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
+
 namespace librepcb {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class FileSystem
  ******************************************************************************/
 
-SmartTextFile::SmartTextFile(const FilePath& filepath, bool restore,
-                             bool readOnly, bool create)
-  : SmartFile(filepath, restore, readOnly, create) {
-  if (mIsCreated) {
-    // nothing to do, leave "mContent" empty
-  } else {
-    // read the content of the file
-    mContent = FileUtils::readFile(mOpenedFilePath);
-  }
-}
+/**
+ * @brief Base class / interface for all file system implementations
+ */
+class FileSystem : public QObject {
+  Q_OBJECT
 
-SmartTextFile::~SmartTextFile() noexcept {
-}
+public:
+  // Constructors / Destructor
+  FileSystem(QObject* parent = nullptr) noexcept : QObject(parent) {}
+  virtual ~FileSystem() noexcept {}
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void SmartTextFile::save(bool toOriginal) {
-  const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-  FileUtils::writeFile(filepath, mContent);
-  updateMembersAfterSaving(toOriginal);
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-SmartTextFile* SmartTextFile::create(const FilePath& filepath) {
-  return new SmartTextFile(filepath, false, false, true);
-}
+  // File Operations
+  virtual FilePath    getAbsPath(const QString& path = "") const noexcept   = 0;
+  virtual QStringList getDirs(const QString& path = "") const noexcept      = 0;
+  virtual QStringList getFiles(const QString& path = "") const noexcept     = 0;
+  virtual bool        fileExists(const QString& path) const noexcept        = 0;
+  virtual QByteArray  read(const QString& path) const                       = 0;
+  virtual void        write(const QString& path, const QByteArray& content) = 0;
+  virtual void        removeFile(const QString& path)                       = 0;
+  virtual void        removeDirRecursively(const QString& path = "")        = 0;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
+
+#endif  // LIBREPCB_FILESYSTEM_H

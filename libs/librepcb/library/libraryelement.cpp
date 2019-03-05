@@ -49,11 +49,11 @@ LibraryElement::LibraryElement(const QString& shortElementName,
                        author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-LibraryElement::LibraryElement(const FilePath& elementDirectory,
-                               const QString&  shortElementName,
-                               const QString& longElementName, bool readOnly)
-  : LibraryBaseElement(elementDirectory, true, shortElementName,
-                       longElementName, readOnly) {
+LibraryElement::LibraryElement(
+    std::unique_ptr<TransactionalDirectory> directory,
+    const QString& shortElementName, const QString& longElementName)
+  : LibraryBaseElement(std::move(directory), true, shortElementName,
+                       longElementName) {
   // read category UUIDs
   foreach (const SExpression& node,
            mLoadingFileDocument.getChildren("category")) {
