@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include <librepcb/common/attributes/attribute.h>
 #include <librepcb/common/elementname.h>
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
@@ -34,12 +33,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class SmartSExprFile;
-
 namespace project {
-
-class Project;
 
 /*******************************************************************************
  *  Class ProjectMetadata
@@ -47,9 +41,6 @@ class Project;
 
 /**
  * @brief The ProjectMetadata class
- *
- * @author ubruhin
- * @date 2017-09-25
  */
 class ProjectMetadata final : public QObject, public SerializableObject {
   Q_OBJECT
@@ -58,11 +49,13 @@ public:
   // Constructors / Destructor
   ProjectMetadata()                             = delete;
   ProjectMetadata(const ProjectMetadata& other) = delete;
-  ProjectMetadata(Project& project, bool restore, bool readOnly, bool create);
+  ProjectMetadata(const Uuid& uuid, const ElementName& name,
+                  const QString& author, const QString& version,
+                  const QDateTime& created, const QDateTime& lastModified);
+  explicit ProjectMetadata(const SExpression& node);
   ~ProjectMetadata() noexcept;
 
   // Getters
-  Project&    getProject() const noexcept { return mProject; }
   const Uuid& getUuid() const noexcept { return mUuid; }
 
   /**
@@ -154,7 +147,9 @@ public:
   void updateLastModified() noexcept;
 
   // General Methods
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
   // Operator Overloadings
   ProjectMetadata& operator=(const ProjectMetadata& rhs) = delete;
@@ -162,19 +157,7 @@ public:
 signals:
   void attributesChanged();
 
-private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
-private:  // Data
-  // General
-  Project& mProject;  ///< a reference to the Project object (from the ctor)
-
-  // File "project/metadata.lp"
-  FilePath                       mFilepath;
-  QScopedPointer<SmartSExprFile> mFile;
-
-  // Metadata
+private:                      // Data
   Uuid        mUuid;          ///< the UUID of the project
   ElementName mName;          ///< the name of the project
   QString     mAuthor;        ///< the author of the project

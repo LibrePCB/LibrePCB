@@ -24,6 +24,7 @@
 
 #include "ui_newelementwizardpage_copyfrom.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/workspace/library/cat/categorytreemodel.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -320,35 +321,39 @@ void NewElementWizardPage_CopyFrom::setSelectedCategory(
 
 void NewElementWizardPage_CopyFrom::setSelectedElement(
     const FilePath& fp) noexcept {
-  if (mSelectedElement && (mSelectedElement->getFilePath() == fp)) return;
+  if (mSelectedElement && (mSelectedElement->getDirectory().getAbsPath() == fp))
+    return;
 
   mSelectedElement.reset();
+
+  std::unique_ptr<TransactionalDirectory> dir(
+      new TransactionalDirectory(TransactionalFileSystem::openRO(fp)));
 
   if (fp.isValid()) {
     try {
       switch (mContext.mElementType) {
         case NewElementWizardContext::ElementType::ComponentCategory: {
-          mSelectedElement.reset(new ComponentCategory(fp, true));
+          mSelectedElement.reset(new ComponentCategory(std::move(dir)));
           break;
         }
         case NewElementWizardContext::ElementType::PackageCategory: {
-          mSelectedElement.reset(new PackageCategory(fp, true));
+          mSelectedElement.reset(new PackageCategory(std::move(dir)));
           break;
         }
         case NewElementWizardContext::ElementType::Symbol: {
-          mSelectedElement.reset(new Symbol(fp, true));
+          mSelectedElement.reset(new Symbol(std::move(dir)));
           break;
         }
         case NewElementWizardContext::ElementType::Component: {
-          mSelectedElement.reset(new Component(fp, true));
+          mSelectedElement.reset(new Component(std::move(dir)));
           break;
         }
         case NewElementWizardContext::ElementType::Device: {
-          mSelectedElement.reset(new Device(fp, true));
+          mSelectedElement.reset(new Device(std::move(dir)));
           break;
         }
         case NewElementWizardContext::ElementType::Package: {
-          mSelectedElement.reset(new Package(fp, true));
+          mSelectedElement.reset(new Package(std::move(dir)));
           break;
         }
         default: {

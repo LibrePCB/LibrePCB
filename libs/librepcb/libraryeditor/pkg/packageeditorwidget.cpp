@@ -85,7 +85,8 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mPackage.reset(new Package(fp, false));  // can throw
+  mPackage.reset(new Package(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));  // can throw
   updateMetadata();
 
   // Setup footprint list editor widget.
@@ -192,7 +193,8 @@ bool PackageEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mPackage->save();  // can throw
+    mPackage->save();     // can throw
+    mFileSystem->save();  // can throw
     memorizePackageInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {

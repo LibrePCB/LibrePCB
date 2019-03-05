@@ -68,7 +68,7 @@ public:
   // Constructors / Destructor
   NewElementWizard()                              = delete;
   NewElementWizard(const NewElementWizard& other) = delete;
-  NewElementWizard(const workspace::Workspace& ws, const Library& lib,
+  NewElementWizard(const workspace::Workspace& ws, Library& lib,
                    const IF_GraphicsLayerProvider& lp,
                    QWidget*                        parent = 0) noexcept;
   ~NewElementWizard() noexcept;

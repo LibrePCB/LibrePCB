@@ -28,6 +28,7 @@
 #include <librepcb/common/elementname.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/directorylock.h>
+#include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
 
@@ -40,9 +41,6 @@ class QPrinter;
 
 namespace librepcb {
 
-class SmartTextFile;
-class SmartSExprFile;
-class SmartVersionFile;
 class StrokeFontPool;
 
 namespace project {
@@ -98,8 +96,9 @@ public:
    *
    * @throw Exception     If the project could not be opened successfully
    */
-  Project(const FilePath& filepath, bool readOnly, bool interactve)
-    : Project(filepath, false, readOnly, interactve) {}
+  Project(std::unique_ptr<TransactionalDirectory> directory,
+          const QString&                          filename)
+    : Project(std::move(directory), filename, false) {}
 
   /**
    * @brief The destructor will close the whole project (without saving!)
@@ -113,28 +112,22 @@ public:
    *
    * @return The absolute filepath
    */
-  const FilePath& getFilepath() const noexcept { return mFilepath; }
+  FilePath getFilepath() const noexcept {
+    return mDirectory->getAbsPath(mFilename);
+  }
 
   /**
    * @brief Get the path to the project directory
    *
    * @return The filepath to the project directory
    */
-  const FilePath& getPath() const noexcept { return mPath; }
+  FilePath getPath() const noexcept { return mDirectory->getAbsPath(); }
 
-  /**
-   * @brief Check whether this project was opened in read-only mode or not
-   *
-   * @return See #mIsReadOnly
-   */
-  bool isReadOnly() const noexcept { return mIsReadOnly; }
+  const TransactionalDirectory& getDirectory() const noexcept {
+    return *mDirectory;
+  }
 
-  /**
-   * @brief Check whether this project restored from temporary files or not
-   *
-   * @return See #mIsRestored
-   */
-  bool isRestored() const noexcept { return mIsRestored; }
+  TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
 
   /**
    * @brief Get the StrokeFontPool which contains all stroke fonts of the
@@ -392,15 +385,11 @@ public:
   // General Methods
 
   /**
-   * @brief Save the whole project to the harddisc
+   * @brief Save the project to the transactional file system
    *
-   * @param toOriginal    If false, the project is saved only to temporary files
-   *
-   * @note The whole save procedere is described in @ref doc_project_save.
-   *
-   * @throw Exception on error
+   * @throw Exception     If an error occured.
    */
-  void save(bool toOriginal);
+  void save();
 
   // Inherited from AttributeProvider
   /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
@@ -415,8 +404,9 @@ public:
 
   // Static Methods
 
-  static Project* create(const FilePath& filepath) {
-    return new Project(filepath, true, false, false);
+  static Project* create(std::unique_ptr<TransactionalDirectory> directory,
+                         const QString&                          filename) {
+    return new Project(std::move(directory), filename, true);
   }
 
   static bool    isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
@@ -475,38 +465,11 @@ private:
    *
    * @todo Remove interactive message boxes, should be done at a higher layer!
    */
-  explicit Project(const FilePath& filepath, bool create, bool readOnly,
-                   bool interactve);
+  explicit Project(std::unique_ptr<TransactionalDirectory> directory,
+                   const QString& filename, bool create);
 
-  /**
-   * @brief Save the project to the harddisc (to temporary or original files)
-   *
-   * @param toOriginal    True: save to original files; False: save to temporary
-   * files
-   * @param errors        All errors will be added to this string list
-   * (translated)
-   *
-   * @return True on success (then the error list should be empty), false
-   * otherwise
-   */
-  bool save(bool toOriginal, QStringList& errors) noexcept;
-
-  // Project File (*.lpp)
-  FilePath mPath;      ///< the path to the project directory
-  FilePath mFilepath;  ///< the filepath of the *.lpp project file
-  QScopedPointer<SmartVersionFile>
-                                mVersionFile;  ///< the ".librepcb-project" file
-  QScopedPointer<SmartTextFile> mProjectFile;  ///< the *.lpp project file
-  DirectoryLock mLock;  ///< Lock for the whole project directory (see @ref
-                        ///< doc_project_lock)
-  bool mIsRestored;  ///< the constructor will set this to true if the project
-                     ///< was restored
-  bool mIsReadOnly;  ///< the constructor will set this to true if the project
-                     ///< was opened in read only mode
-
-  // schematic and board list files
-  QScopedPointer<SmartSExprFile> mSchematicsFile;  ///< core/schematics.lp
-  QScopedPointer<SmartSExprFile> mBoardsFile;      ///< core/boards.lp
+  std::unique_ptr<TransactionalDirectory> mDirectory;
+  QString mFilename;  ///< the name of the *.lpp project file
 
   // General
   QScopedPointer<StrokeFontPool>

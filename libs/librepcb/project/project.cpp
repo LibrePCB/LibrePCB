@@ -36,9 +36,7 @@
 #include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
-#include <librepcb/common/fileio/smarttextfile.h>
-#include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/fileio/versionfile.h>
 #include <librepcb/common/font/strokefontpool.h>
 
 #include <QPrinter>
@@ -54,49 +52,49 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Project::Project(const FilePath& filepath, bool create, bool readOnly,
-                 bool interactive)
+Project::Project(std::unique_ptr<TransactionalDirectory> directory,
+                 const QString& filename, bool create)
   : QObject(nullptr),
     AttributeProvider(),
-    mPath(filepath.getParentDir()),
-    mFilepath(filepath),
-    mLock(filepath.getParentDir()),
-    mIsRestored(false),
-    mIsReadOnly(readOnly) {
+    mDirectory(std::move(directory)),
+    mFilename(filename) {
   qDebug() << (create ? "create project:" : "open project:")
-           << filepath.toNative();
+           << getFilepath().toNative();
 
   // Check if the file extension is correct
-  if (mFilepath.getSuffix() != "lpp") {
-    qDebug() << mFilepath.toStr();
+  if (!mFilename.endsWith(".lpp")) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("The suffix of the project file must be \"lpp\"!"));
   }
 
-  // Check if the filepath is valid
   if (create) {
-    if (mPath.isExistingDir() && (!mPath.isEmptyDir())) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("The directory \"%1\" is not empty!"))
-                             .arg(mFilepath.toNative()));
+    // Check if there isn't already a project in the selected directory
+    if (mDirectory->fileExists(".librepcb-project") ||
+        mDirectory->fileExists(mFilename)) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString(
+              tr("The directory \"%1\" already contains a LibrePCB project."))
+              .arg(getPath().toNative()));
     }
-    FileUtils::makePath(mPath);  // can throw
   } else {
     // check if the project does exist
-    if (!isProjectDirectory(mPath)) {
+    if (!mDirectory->fileExists(".librepcb-project")) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString(
               tr("The directory \"%1\" does not contain a LibrePCB project."))
-              .arg(mPath.toNative()));
+              .arg(getPath().toNative()));
     }
-    if (!mFilepath.isExistingFile()) {
+    if (!mDirectory->fileExists(mFilename)) {
       throw RuntimeError(__FILE__, __LINE__,
                          QString(tr("The file \"%1\" does not exist."))
-                             .arg(mFilepath.toNative()));
+                             .arg(getFilepath().toNative()));
     }
     // check the project's file format version
-    Version version = getProjectFileFormatVersion(mPath);  // can throw
+    Version version =
+        VersionFile::fromByteArray(mDirectory->read(".librepcb-project"))
+            .getVersion();
     if (version > qApp->getFileFormatVersion()) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -104,85 +102,9 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
               tr("This project was created with a newer application version.\n"
                  "You need at least LibrePCB %1 to open it.\n\n%2"))
               .arg(version.toPrettyStr(3))
-              .arg(mFilepath.toNative()));
+              .arg(getFilepath().toNative()));
     }
   }
-
-  // Check if the project is locked (already open or application was crashed).
-  // In case of a crash, the user can decide if the last backup should be
-  // restored. If the project should be opened, the lock file will be
-  // created/updated here.
-  switch (mLock.getStatus())  // can throw
-  {
-    case DirectoryLock::LockStatus::Unlocked: {
-      // nothing to do here (the project will be locked later)
-      break;
-    }
-    case DirectoryLock::LockStatus::Locked: {
-      if (!mIsReadOnly) {
-        if (interactive) {
-          // the project is locked by another application instance! open read
-          // only?
-          QMessageBox::StandardButton btn = QMessageBox::question(
-              0, tr("Open Read-Only?"),
-              tr("The project is already opened by another application "
-                 "instance or user. "
-                 "Do you want to open the project in read-only mode?"),
-              QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
-          switch (btn) {
-            case QMessageBox::Yes:  // open the project in read-only mode
-              mIsReadOnly = true;
-              break;
-            default:  // abort opening the project
-              throw UserCanceled(__FILE__, __LINE__);
-          }
-        } else {
-          throw RuntimeError(__FILE__, __LINE__,
-                             tr("The project is locked by another process."));
-        }
-      }
-      break;
-    }
-    case DirectoryLock::LockStatus::StaleLock: {
-      if (interactive) {
-        // the application crashed while this project was open! ask the user
-        // what to do
-        QMessageBox::StandardButton btn = QMessageBox::question(
-            0, tr("Restore Project?"),
-            tr("It seems that the application was crashed while this project "
-               "was open. "
-               "Do you want to restore the last automatic backup?"),
-            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-            QMessageBox::Cancel);
-        switch (btn) {
-          case QMessageBox::Yes:  // open the project and restore the last
-                                  // backup
-            mIsRestored = true;
-            break;
-          case QMessageBox::No:  // open the project without restoring the last
-                                 // backup
-            mIsRestored = false;
-            break;
-          default:  // abort opening the project
-            throw UserCanceled(__FILE__, __LINE__);
-        }
-      }
-      break;
-    }
-    default:
-      Q_ASSERT(false);
-      throw LogicError(__FILE__, __LINE__);
-  }
-
-  // the project can be opened by this application, so we will lock the whole
-  // project
-  if (!mIsReadOnly) {
-    mLock.lock();  // can throw
-  }
-
-  // check if the combination of "create", "mIsRestored" and "mIsReadOnly" is
-  // valid
-  Q_ASSERT(!(create && (mIsRestored || mIsReadOnly)));
 
   // OK - the project is locked (or read-only) and can be opened!
   // Until this line, there was no memory allocated on the heap. But in the rest
@@ -193,85 +115,75 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
   // constructor.
 
   try {
-    // try to create/open the version file
-    FilePath versionFilePath = mPath.getPathTo(".librepcb-project");
-    if (create) {
-      mVersionFile.reset(SmartVersionFile::create(
-          versionFilePath, qApp->getFileFormatVersion()));
-    } else {
-      mVersionFile.reset(
-          new SmartVersionFile(versionFilePath, mIsRestored, mIsReadOnly));
-      // the version check was already done above, so we can use an assert here
-      Q_ASSERT(mVersionFile->getVersion() <= qApp->getFileFormatVersion());
-    }
-
-    // try to create/open the project file
-    if (create) {
-      mProjectFile.reset(SmartTextFile::create(mFilepath));
-    } else {
-      mProjectFile.reset(
-          new SmartTextFile(mFilepath, mIsRestored, mIsReadOnly));
-    }
-
     // copy and/or load stroke fonts
-    FilePath fontobeneDir = mPath.getPathTo("resources/fontobene");
+    TransactionalDirectory fontobeneDir(*mDirectory, "resources/fontobene");
     if (create) {
       FilePath src = qApp->getResourcesFilePath("fontobene");
-      // don't use FileUtils::copyDirRecursively() because we only want *.bene
-      // files
-      FileUtils::makePath(fontobeneDir);
       foreach (const FilePath& fp,
                FileUtils::getFilesInDirectory(src, {"*.bene"})) {
-        FileUtils::copyFile(fp, fontobeneDir.getPathTo(fp.getFilename()));
+        if (fp.getSuffix() == "bene") {
+          fontobeneDir.write(fp.getFilename(), FileUtils::readFile(fp));
+        }
       }
     }
     mStrokeFontPool.reset(new StrokeFontPool(fontobeneDir));
 
+    // Create or load metadata
+    if (create) {
+      QString name = cleanElementName(getFilepath().getCompleteBasename());
+      if (!ElementNameConstraint()(name)) {
+        name = "New Project";  // fallback if the filename is not a valid name
+      }
+      mProjectMetadata.reset(new ProjectMetadata(
+          Uuid::createRandom(), ElementName(name), tr("Unknown"), "v1",
+          QDateTime::currentDateTime(), QDateTime::currentDateTime()));
+    } else {
+      QString     fp = "project/metadata.lp";
+      SExpression root =
+          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
+      mProjectMetadata.reset(new ProjectMetadata(root));
+    }
+
     // Create all needed objects
-    mProjectMetadata.reset(
-        new ProjectMetadata(*this, mIsRestored, mIsReadOnly, create));
     connect(mProjectMetadata.data(), &ProjectMetadata::attributesChanged, this,
             &Project::attributesChanged);
-    mProjectSettings.reset(
-        new ProjectSettings(*this, mIsRestored, mIsReadOnly, create));
-    mProjectLibrary.reset(new ProjectLibrary(mPath.getPathTo("library"),
-                                             mIsRestored, mIsReadOnly));
-    mErcMsgList.reset(new ErcMsgList(*this, mIsRestored, mIsReadOnly, create));
-    mCircuit.reset(new Circuit(*this, mIsRestored, mIsReadOnly, create));
+    mProjectSettings.reset(new ProjectSettings(*this, create));
+    mProjectLibrary.reset(
+        new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(*mDirectory, "library"))));
+    mErcMsgList.reset(new ErcMsgList(*this));
+    mCircuit.reset(new Circuit(*this, create));
 
     // Load all schematic layers
     mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 
     // Load all schematics
-    FilePath schematicsFilepath = mPath.getPathTo("schematics/schematics.lp");
-    if (create) {
-      mSchematicsFile.reset(SmartSExprFile::create(schematicsFilepath));
-    } else {
-      mSchematicsFile.reset(
-          new SmartSExprFile(schematicsFilepath, mIsRestored, mIsReadOnly));
-      SExpression schRoot = mSchematicsFile->parseFileAndBuildDomTree();
+    if (!create) {
+      QString     fp = "schematics/schematics.lp";
+      SExpression schRoot =
+          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       foreach (const SExpression& node, schRoot.getChildren("schematic")) {
-        FilePath fp =
-            FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>());
-        Schematic* schematic =
-            new Schematic(*this, fp, mIsRestored, mIsReadOnly);
+        FilePath fp = FilePath::fromRelative(
+            getPath(), node.getValueOfFirstChild<QString>());
+        std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
+            *mDirectory, fp.getParentDir().toRelative(getPath())));
+        Schematic* schematic = new Schematic(*this, std::move(dir));
         addSchematic(*schematic);
       }
       qDebug() << mSchematics.count() << "schematics successfully loaded!";
     }
 
     // Load all boards
-    FilePath boardsFilepath = mPath.getPathTo("boards/boards.lp");
-    if (create) {
-      mBoardsFile.reset(SmartSExprFile::create(boardsFilepath));
-    } else {
-      mBoardsFile.reset(
-          new SmartSExprFile(boardsFilepath, mIsRestored, mIsReadOnly));
-      SExpression brdRoot = mBoardsFile->parseFileAndBuildDomTree();
+    if (!create) {
+      QString     fp = "boards/boards.lp";
+      SExpression brdRoot =
+          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       foreach (const SExpression& node, brdRoot.getChildren("board")) {
-        FilePath fp =
-            FilePath::fromRelative(mPath, node.getValueOfFirstChild<QString>());
-        Board* board = new Board(*this, fp, mIsRestored, mIsReadOnly);
+        FilePath fp = FilePath::fromRelative(
+            getPath(), node.getValueOfFirstChild<QString>());
+        std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
+            *mDirectory, fp.getParentDir().toRelative(getPath())));
+        Board* board = new Board(*this, std::move(dir));
         addBoard(*board);
       }
       qDebug() << mBoards.count() << "boards successfully loaded!";
@@ -283,7 +195,7 @@ Project::Project(const FilePath& filepath, bool create, bool readOnly,
     // the file.
     mErcMsgList->restoreIgnoreState();  // can throw
 
-    if (create) save(true);  // write all files to harddisc
+    if (create) save();  // write all files to file system
   } catch (...) {
     // free the allocated memory in the reverse order of their allocation...
     foreach (Board* board, mBoards) {
@@ -326,7 +238,7 @@ Project::~Project() noexcept {
   qDeleteAll(mRemovedSchematics);
   mRemovedSchematics.clear();
 
-  qDebug() << "closed project:" << mFilepath.toNative();
+  qDebug() << "closed project:" << getFilepath().toNative();
 }
 
 /*******************************************************************************
@@ -359,14 +271,14 @@ Schematic* Project::createSchematic(const ElementName& name) {
         __FILE__, __LINE__,
         QString(tr("Invalid schematic name: \"%1\"")).arg(*name));
   }
-  FilePath filepath =
-      mPath.getPathTo("schematics/" % dirname % "/schematic.lp");
-  if (filepath.isExistingFile()) {
+  std::unique_ptr<TransactionalDirectory> dir(
+      new TransactionalDirectory(*mDirectory, "schematics/" % dirname));
+  if (dir->fileExists("schematic.lp")) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("The schematic exists already: \"%1\""))
-                           .arg(filepath.toNative()));
+                           .arg(dir->getAbsPath().toNative()));
   }
-  return Schematic::create(*this, filepath, name);
+  return Schematic::create(*this, std::move(dir), name);
 }
 
 void Project::addSchematic(Schematic& schematic, int newIndex) {
@@ -502,13 +414,14 @@ Board* Project::createBoard(const ElementName& name) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("Invalid board name: \"%1\"")).arg(*name));
   }
-  FilePath filepath = mPath.getPathTo("boards/" % dirname % "/board.lp");
-  if (filepath.isExistingFile()) {
+  std::unique_ptr<TransactionalDirectory> dir(
+      new TransactionalDirectory(*mDirectory, "boards/" % dirname));
+  if (dir->fileExists("board.lp")) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("The board exists already: \"%1\""))
-                           .arg(filepath.toNative()));
+                           .arg(dir->getAbsPath().toNative()));
   }
-  return Board::create(*this, filepath, name);
+  return Board::create(*this, std::move(dir), name);
 }
 
 Board* Project::createBoard(const Board& other, const ElementName& name) {
@@ -518,13 +431,14 @@ Board* Project::createBoard(const Board& other, const ElementName& name) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("Invalid board name: \"%1\"")).arg(*name));
   }
-  FilePath filepath = mPath.getPathTo("boards/" % dirname % "/board.lp");
-  if (filepath.isExistingFile()) {
+  std::unique_ptr<TransactionalDirectory> dir(
+      new TransactionalDirectory(*mDirectory, "boards/" % dirname));
+  if (dir->fileExists("board.lp")) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("The board exists already: \"%1\""))
-                           .arg(filepath.toNative()));
+                           .arg(dir->getAbsPath().toNative()));
   }
-  return new Board(other, filepath, name);
+  return new Board(other, std::move(dir), name);
 }
 
 void Project::addBoard(Board& board, int newIndex) {
@@ -584,17 +498,72 @@ void Project::removeBoard(Board& board, bool deleteBoard) {
  *  General Methods
  ******************************************************************************/
 
-void Project::save(bool toOriginal) {
-  QStringList errors;
+void Project::save() {
+  qDebug() << "Save project files to transactional file system...";
 
-  if (!save(toOriginal, errors)) {
-    QString msg =
-        QString(tr("The project could not be saved!\n\nError Message:\n%1",
-                   "variable count of error messages", errors.count()))
-            .arg(errors.join("\n"));
-    throw RuntimeError(__FILE__, __LINE__, msg);
+  // Save version file
+  mDirectory->write(
+      ".librepcb-project",
+      VersionFile(qApp->getFileFormatVersion()).toByteArray());  // can throw
+
+  // Save *.lpp project file
+  mDirectory->write(mFilename, "LIBREPCB-PROJECT");  // can throw
+
+  // Save project/metadata.lp
+  mDirectory->write(
+      "project/metadata.lp",
+      mProjectMetadata->serializeToDomElement("librepcb_project_metadata")
+          .toByteArray());  // can throw
+
+  // Save settings
+  mProjectSettings->save();  // can throw
+
+  // Save library
+  mProjectLibrary->save();  // can throw
+
+  // Save circuit
+  mCircuit->save();  // can throw
+
+  // Save ERC messages list
+  mErcMsgList->save();  // can throw
+
+  // Save schematics/schematics.lp
+  SExpression schRoot = SExpression::createList("librepcb_schematics");
+  foreach (Schematic* schematic, mSchematics) {
+    schRoot.appendChild("schematic",
+                        schematic->getFilePath().toRelative(getPath()), true);
   }
-  Q_ASSERT(errors.isEmpty());
+  mDirectory->write("schematics/schematics.lp",
+                    schRoot.toByteArray());  // can throw
+
+  // Save boards/boards.lp
+  SExpression brdRoot = SExpression::createList("librepcb_boards");
+  foreach (Board* board, mBoards) {
+    brdRoot.appendChild("board", board->getFilePath().toRelative(getPath()),
+                        true);
+  }
+  mDirectory->write("boards/boards.lp", brdRoot.toByteArray());  // can throw
+
+  // Save all removed schematics (*.lp files)
+  foreach (Schematic* schematic, mRemovedSchematics) {
+    schematic->save();  // can throw
+  }
+  // Save all added schematics (*.lp files)
+  foreach (Schematic* schematic, mSchematics) {
+    schematic->save();  // can throw
+  }
+
+  // Save all removed boards (*.lp files)
+  foreach (Board* board, mRemovedBoards) {
+    board->save();  // can throw
+  }
+  // Save all added boards (*.lp files)
+  foreach (Board* board, mBoards) {
+    board->save();  // can throw
+  }
+
+  // update the "last modified datetime" attribute of the project
+  mProjectMetadata->updateLastModified();
 }
 
 /*******************************************************************************
@@ -614,13 +583,13 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept {
   if (key == QLatin1String("PROJECT")) {
     return *mProjectMetadata->getName();
   } else if (key == QLatin1String("PROJECT_DIRPATH")) {
-    return mPath.toNative();
+    return getPath().toNative();
   } else if (key == QLatin1String("PROJECT_BASENAME")) {
-    return mFilepath.getBasename();
+    return getFilepath().getBasename();
   } else if (key == QLatin1String("PROJECT_FILENAME")) {
-    return mFilepath.getFilename();
+    return getFilepath().getFilename();
   } else if (key == QLatin1String("PROJECT_FILEPATH")) {
-    return mFilepath.toNative();
+    return getFilepath().toNative();
   } else if (key == QLatin1String("CREATED_DATE")) {
     return mProjectMetadata->getCreated().date().toString(Qt::ISODate);
   } else if (key == QLatin1String("CREATED_TIME")) {
@@ -668,106 +637,9 @@ bool Project::isProjectDirectory(const FilePath& dir) noexcept {
 }
 
 Version Project::getProjectFileFormatVersion(const FilePath& dir) {
-  SmartVersionFile versionFile(dir.getPathTo(".librepcb-project"), false, true);
-  return versionFile.getVersion();
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-bool Project::save(bool toOriginal, QStringList& errors) noexcept {
-  bool success = true;
-
-  if (mIsReadOnly) {
-    errors.append(tr("The project was opened in read-only mode."));
-    return false;
-  }
-
-  // Save version file
-  try {
-    mVersionFile->save(toOriginal);
-  } catch (Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
-  }
-
-  // Save *.lpp project file
-  try {
-    mProjectFile->setContent("LIBREPCB-PROJECT");
-    mProjectFile->save(toOriginal);
-  } catch (const Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
-  }
-
-  // Save schematics/schematics.lp
-  try {
-    SExpression root = SExpression::createList("librepcb_schematics");
-    foreach (Schematic* schematic, mSchematics) {
-      root.appendChild("schematic", schematic->getFilePath().toRelative(mPath),
-                       true);
-    }
-    mSchematicsFile->save(root, toOriginal);  // can throw
-  } catch (const Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
-  }
-
-  // Save boards/boards.lp
-  try {
-    SExpression root = SExpression::createList("librepcb_boards");
-    foreach (Board* board, mBoards) {
-      root.appendChild("board", board->getFilePath().toRelative(mPath), true);
-    }
-    mBoardsFile->save(root, toOriginal);  // can throw
-  } catch (const Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
-  }
-
-  // Save metadata
-  if (!mProjectMetadata->save(toOriginal, errors)) success = false;
-
-  // Save circuit
-  if (!mCircuit->save(toOriginal, errors)) success = false;
-
-  // Save all removed schematics (*.lp files)
-  foreach (Schematic* schematic, mRemovedSchematics) {
-    if (!schematic->save(toOriginal, errors)) success = false;
-  }
-  // Save all added schematics (*.lp files)
-  foreach (Schematic* schematic, mSchematics) {
-    if (!schematic->save(toOriginal, errors)) success = false;
-  }
-
-  // Save all removed boards (*.lp files)
-  foreach (Board* board, mRemovedBoards) {
-    if (!board->save(toOriginal, errors)) success = false;
-  }
-  // Save all added boards (*.lp files)
-  foreach (Board* board, mBoards) {
-    if (!board->save(toOriginal, errors)) success = false;
-  }
-
-  // Save library
-  if (!mProjectLibrary->save(toOriginal, errors)) success = false;
-
-  // Save settings
-  if (!mProjectSettings->save(toOriginal, errors)) success = false;
-
-  // Save ERC messages list
-  if (!mErcMsgList->save(toOriginal, errors)) success = false;
-
-  // if the project was restored from a backup, reset the mIsRestored flag as
-  // the current state of the project is no longer a restored backup but a
-  // properly saved project
-  if (mIsRestored && success && toOriginal) mIsRestored = false;
-
-  // update the "last modified datetime" attribute of the project
-  mProjectMetadata->updateLastModified();
-
-  return success;
+  QByteArray  content = FileUtils::readFile(dir.getPathTo(".librepcb-project"));
+  VersionFile file    = VersionFile::fromByteArray(content);
+  return file.getVersion();
 }
 
 /*******************************************************************************

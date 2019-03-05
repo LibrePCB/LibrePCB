@@ -10,24 +10,25 @@ def test(library_editor, helpers):
     """
     Create new component
     """
+    le = library_editor
 
     # Open "New Library Element" wizard
-    library_editor.action('libraryEditorActionNewElement').trigger(blocking=False)
+    le.action('libraryEditorActionNewElement').trigger(blocking=False)
 
     # Choose type of element
-    library_editor.widget('libraryEditorNewElementWizardChooseTypeComponentButton').click()
+    le.widget('libraryEditorNewElementWizardChooseTypeComponentButton').click()
 
     # Enter metadata
     widget_properties = {
         ('NameEdit', 'text'): 'New Component',
-        ('DescriptionEdit', 'text'): 'Foo Bar',
+        ('DescriptionEdit', 'plainText'): 'Foo Bar',
         ('KeywordsEdit', 'text'): '',
         ('AuthorEdit', 'text'): 'Functional Test',
         ('VersionEdit', 'text'): '1.2.3',
     }
     for (widget, property), value in widget_properties.items():
-        library_editor.widget('libraryEditorNewElementWizardMetadata' + widget).set_property(property, value)
-    library_editor.widget('libraryEditorNewElementWizardNextButton').click()
+        le.widget('libraryEditorNewElementWizardMetadata' + widget).set_property(property, value)
+    le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Enter component properties
     widget_properties = {
@@ -36,31 +37,43 @@ def test(library_editor, helpers):
         ('PrefixEdit', 'text'): 'X',
     }
     for (widget, property), value in widget_properties.items():
-        library_editor.widget('libraryEditorNewElementWizardComponentProperties' + widget).set_property(property, value)
-    library_editor.widget('libraryEditorNewElementWizardNextButton').click()
+        le.widget('libraryEditorNewElementWizardComponentProperties' + widget).set_property(property, value)
+    le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Add a symbol
-    library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolButton').click()
-    category_tree = library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogCategoriesTree')
+    le.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolButton').click()
+    category_tree = le.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogCategoriesTree')
     helpers.wait_for_model_items_count(category_tree, 1)
     category = category_tree.model().items().items[0]
     category_tree.select_item(category)
-    symbols_list = library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogSymbolsList')
+    symbols_list = le.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogSymbolsList')
     helpers.wait_for_model_items_count(symbols_list, 1)
     symbol = symbols_list.model().items().items[0]
     symbols_list.select_item(symbol)
-    library_editor.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogAcceptButton').click()
-    library_editor.widget('libraryEditorNewElementWizardComponentSymbolsAddSymbolButton').click()
-    library_editor.widget('libraryEditorNewElementWizardNextButton').click()
+    le.widget('libraryEditorNewElementWizardComponentSymbolsChooseSymbolDialogAcceptButton').click()
+    le.widget('libraryEditorNewElementWizardComponentSymbolsAddSymbolButton').click()
+    le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Define signals
     # (Do nothing as signals are automatically generated)
-    library_editor.widget('libraryEditorNewElementWizardNextButton').click()
+    le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Define pin-signal-map
     # (Do nothing as pin-signal-map is automatically generated)
 
     # Finish
-    dialog = library_editor.widget('libraryEditorNewElementWizard')
-    library_editor.widget('libraryEditorNewElementWizardFinishButton').click()
+    dialog = le.widget('libraryEditorNewElementWizard')
+    le.widget('libraryEditorNewElementWizardFinishButton').click()
     helpers.wait_until_widget_hidden(dialog)
+
+    # Check if a new tab is opened (indicates that the element was created)
+    tab_props = le.widget('libraryEditorStackedWidget').properties()
+    assert tab_props['count'] == 2
+    assert tab_props['currentIndex'] == 1
+
+    # Check metadata
+    assert le.widget('libraryEditorComponentNameEdit').properties()['text'] == 'New Component'
+    assert le.widget('libraryEditorComponentDescriptionEdit').properties()['plainText'] == 'Foo Bar'
+    assert le.widget('libraryEditorComponentKeywordsEdit').properties()['text'] == ''
+    assert le.widget('libraryEditorComponentAuthorEdit').properties()['text'] == 'Functional Test'
+    assert le.widget('libraryEditorComponentVersionEdit').properties()['text'] == '1.2.3'

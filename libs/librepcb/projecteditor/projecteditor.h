@@ -24,11 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

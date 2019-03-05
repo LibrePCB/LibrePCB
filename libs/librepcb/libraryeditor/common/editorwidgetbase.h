@@ -25,8 +25,7 @@
  ******************************************************************************/
 #include "../common/libraryelementchecklistwidget.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/units/all_length_units.h>
 
@@ -74,6 +73,7 @@ public:
     workspace::Workspace&           workspace;
     const IF_GraphicsLayerProvider& layerProvider;
     bool                            elementIsNewlyCreated;
+    bool                            readOnly;
   };
 
   enum Tool {
@@ -160,13 +160,14 @@ signals:
   void cursorPositionChanged(const Point& pos);
 
 protected:  // Data
-  Context                      mContext;
-  FilePath                     mFilePath;
-  QScopedPointer<UndoStack>    mUndoStack;
-  UndoStackActionGroup*        mUndoStackActionGroup;
-  ExclusiveActionGroup*        mToolsActionGroup;
-  QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
-  bool                         mIsInterfaceBroken;
+  Context                                  mContext;
+  FilePath                                 mFilePath;
+  std::shared_ptr<TransactionalFileSystem> mFileSystem;
+  QScopedPointer<UndoStack>                mUndoStack;
+  UndoStackActionGroup*                    mUndoStackActionGroup;
+  ExclusiveActionGroup*                    mToolsActionGroup;
+  QScopedPointer<ToolBarProxy>             mCommandToolBarProxy;
+  bool                                     mIsInterfaceBroken;
 };
 
 /*******************************************************************************

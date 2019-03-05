@@ -24,6 +24,7 @@
 
 #include "ui_componentchooserdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
@@ -170,7 +171,9 @@ void ComponentChooserDialog::updatePreview() noexcept {
 
   if (mComponentFilePath.isValid() && mLayerProvider) {
     try {
-      mComponent.reset(new Component(mComponentFilePath, true));  // can throw
+      mComponent.reset(new Component(std::unique_ptr<TransactionalDirectory>(
+          new TransactionalDirectory(TransactionalFileSystem::openRO(
+              mComponentFilePath)))));  // can throw
       if (mComponent && mComponent->getSymbolVariants().count() > 0) {
         const ComponentSymbolVariant& symbVar =
             *mComponent->getSymbolVariants().first();
@@ -179,8 +182,10 @@ void ComponentChooserDialog::updatePreview() noexcept {
           try {
             FilePath fp = mWorkspace.getLibraryDb().getLatestSymbol(
                 item.getSymbolUuid());  // can throw
-            std::shared_ptr<Symbol> sym =
-                std::make_shared<Symbol>(fp, true);  // can throw
+            std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
+                std::unique_ptr<TransactionalDirectory>(
+                    new TransactionalDirectory(
+                        TransactionalFileSystem::openRO(fp))));  // can throw
             mSymbols.append(sym);
             std::shared_ptr<SymbolPreviewGraphicsItem> graphicsItem =
                 std::make_shared<SymbolPreviewGraphicsItem>(

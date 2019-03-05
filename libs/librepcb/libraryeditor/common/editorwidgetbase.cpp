@@ -48,6 +48,9 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
   : QWidget(parent),
     mContext(context),
     mFilePath(fp),
+    mFileSystem(TransactionalFileSystem::open(
+        fp, !context.readOnly,
+        TransactionalFileSystem::RestoreMode::ASK)),  // can throw
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
     mIsInterfaceBroken(false) {

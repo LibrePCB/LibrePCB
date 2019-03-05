@@ -6,6 +6,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 namespace Ui {
 class MainWindow;
 }
@@ -13,6 +15,7 @@ class MainWindow;
 namespace librepcb {
 
 class DomElement;
+class TransactionalFileSystem;
 
 namespace library {
 class Library;
@@ -36,7 +39,8 @@ private slots:
 
 private:
   template <typename ElementType>
-  void updateElements(const librepcb::library::Library& lib) noexcept;
+  void updateElements(std::shared_ptr<librepcb::TransactionalFileSystem> fs,
+                      const librepcb::library::Library& lib) noexcept;
 
   // Attributes
   Ui::MainWindow* ui;

@@ -87,7 +87,8 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mSymbol.reset(new Symbol(fp, false));  // can throw
+  mSymbol.reset(new Symbol(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));  // can throw
   updateMetadata();
 
   // Show "interface broken" warning when related properties are modified.
@@ -177,7 +178,8 @@ bool SymbolEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mSymbol->save();  // can throw
+    mSymbol->save();      // can throw
+    mFileSystem->save();  // can throw
     mOriginalSymbolPinUuids = mSymbol->getPins().getUuidSet();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {

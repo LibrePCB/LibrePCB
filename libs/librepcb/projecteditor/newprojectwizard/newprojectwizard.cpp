@@ -28,6 +28,7 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
@@ -76,9 +77,15 @@ void NewProjectWizard::setLocation(const FilePath& dir) noexcept {
  ******************************************************************************/
 
 Project* NewProjectWizard::createProject() const {
+  // create file system
+  std::shared_ptr<TransactionalFileSystem> fs = TransactionalFileSystem::openRW(
+      mPageMetadata->getFullFilePath().getParentDir());
+  TransactionalDirectory dir(fs);
+
   // create project and set some metadata
-  FilePath                projectFilePath = mPageMetadata->getFullFilePath();
-  QScopedPointer<Project> project(Project::create(projectFilePath));
+  QScopedPointer<Project> project(Project::create(
+      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+      mPageMetadata->getFullFilePath().getFilename()));
   project->getMetadata().setName(
       ElementName(mPageMetadata->getProjectName().trimmed()));  // can throw
   project->getMetadata().setAuthor(mPageMetadata->getProjectAuthor());
@@ -104,16 +111,11 @@ Project* NewProjectWizard::createProject() const {
     project->addBoard(*board);
   }
 
-  // save project to filesystem
-  project->save(true);
-
   // copy license file
   if (mPageMetadata->isLicenseSet()) {
     try {
       FilePath source = mPageMetadata->getProjectLicenseFilePath();
-      FilePath destination =
-          projectFilePath.getParentDir().getPathTo("LICENSE.txt");
-      FileUtils::copyFile(source, destination);  // can throw
+      dir.write("LICENSE.txt", FileUtils::readFile(source));  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the license file:" << e.getMsg();
     }
@@ -123,8 +125,6 @@ Project* NewProjectWizard::createProject() const {
   try {
     FilePath source =
         qApp->getResourcesDir().getPathTo("project/readme_template");
-    FilePath destination =
-        projectFilePath.getParentDir().getPathTo("README.md");
     QByteArray content = FileUtils::readFile(source);  // can throw
     content.replace("{PROJECT_NAME}", mPageMetadata->getProjectName().toUtf8());
     if (mPageMetadata->isLicenseSet()) {
@@ -132,36 +132,32 @@ Project* NewProjectWizard::createProject() const {
     } else {
       content.replace("{LICENSE_TEXT}", "No license set.");
     }
-    FileUtils::writeFile(destination, content);  // can throw
+    dir.write("README.md", content);  // can throw
   } catch (Exception& e) {
     qCritical() << "Could not copy the readme file:" << e.getMsg();
   }
 
-  // initialize git repository
-  // if (mPageVersionControl->getInitGitRepository()) {
   // copy .gitignore
   try {
     FilePath source =
         qApp->getResourcesDir().getPathTo("project/gitignore_template");
-    FilePath destination =
-        projectFilePath.getParentDir().getPathTo(".gitignore");
-    FileUtils::copyFile(source, destination);  // can throw
+    dir.write(".gitignore", FileUtils::readFile(source));  // can throw
   } catch (Exception& e) {
     qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
   }
+
   // copy .gitattributes
   try {
     FilePath source =
         qApp->getResourcesDir().getPathTo("project/gitattributes_template");
-    FilePath destination =
-        projectFilePath.getParentDir().getPathTo(".gitattributes");
-    FileUtils::copyFile(source, destination);  // can throw
+    dir.write(".gitattributes", FileUtils::readFile(source));  // can throw
   } catch (Exception& e) {
     qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
   }
-  // TODO: git init
-  // TODO: create initial commit
-  //}
+
+  // save project to filesystem
+  project->save();  // can throw
+  fs->save();       // can throw
 
   // all done, return the new project
   return project.take();

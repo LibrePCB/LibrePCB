@@ -35,7 +35,7 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/aboutdialog.h>
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/library/library.h>
@@ -57,14 +57,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
-                             QSharedPointer<Library> lib)
+LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
+                             bool readOnly)
   : QMainWindow(nullptr),
     mWorkspace(ws),
-    mLibrary(lib),
+    mIsOpenedReadOnly(readOnly),
     mUi(new Ui::LibraryEditor),
     mCurrentEditorWidget(nullptr),
-    mLock(lib->getFilePath()) {
+    mLibrary(nullptr) {
   mUi->setupUi(this);
   connect(mUi->actionClose, &QAction::triggered, this, &LibraryEditor::close);
   connect(mUi->actionNew, &QAction::triggered, this,
@@ -105,14 +105,24 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
 
-  // lock the library directory
-  mLock.tryLock();  // can throw
+  // add overview tab
+  EditorWidgetBase::Context context{mWorkspace, *this, false, readOnly};
+  LibraryOverviewWidget*    overviewWidget =
+      new LibraryOverviewWidget(context, libFp);
+  mLibrary = &overviewWidget->getLibrary();
+  connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
+          &LibraryEditor::updateTabTitles);
+  connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
+          &LibraryEditor::updateTabTitles);
+  connect(overviewWidget, &EditorWidgetBase::elementEdited,
+          &mWorkspace.getLibraryDb(),
+          &workspace::WorkspaceLibraryDb::startLibraryRescan);
 
   // set window title and icon
   const QStringList localeOrder =
       mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
   QString libName = *mLibrary->getNames().value(localeOrder);
-  if (mLibrary->isOpenedReadOnly()) libName.append(tr(" [Read-Only]"));
+  if (readOnly) libName.append(tr(" [Read-Only]"));
   setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
   setWindowIcon(mLibrary->getIconAsPixmap());
 
@@ -132,7 +142,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   // if the library was opened in read-only mode, we guess that it's a remote
   // library and thus show a warning that all modifications are lost after the
   // next update
-  mUi->lblRemoteLibraryWarning->setVisible(mLibrary->isOpenedReadOnly());
+  mUi->lblRemoteLibraryWarning->setVisible(readOnly);
 
   // create the undo stack action group
   mUndoStackActionGroup.reset(new UndoStackActionGroup(
@@ -236,18 +246,6 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
 #endif
 
-  // add overview tab
-  EditorWidgetBase::Context context{mWorkspace, *this, false};
-  LibraryOverviewWidget*    overviewWidget =
-      new LibraryOverviewWidget(context, lib);
-  connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
-          &LibraryEditor::updateTabTitles);
-  connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
-          &LibraryEditor::updateTabTitles);
-  connect(overviewWidget, &EditorWidgetBase::elementEdited,
-          &mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::startLibraryRescan);
-
   // Edit element signals
   connect(overviewWidget,
           &LibraryOverviewWidget::editComponentCategoryTriggered, this,
@@ -284,6 +282,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
 
 LibraryEditor::~LibraryEditor() noexcept {
   setActiveEditorWidget(nullptr);
+  mLibrary = nullptr;
   for (int i = mUi->tabWidget->count() - 1; i >= 0; --i) {
     QWidget* widget = mUi->tabWidget->widget(i);
     mUi->tabWidget->removeTab(i);
@@ -455,7 +454,8 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
       }
     }
 
-    EditorWidgetBase::Context context{mWorkspace, *this, isNewElement};
+    EditorWidgetBase::Context context{mWorkspace, *this, isNewElement,
+                                      mIsOpenedReadOnly};
     EditWidgetType*           widget = new EditWidgetType(context, fp);
     connect(widget, &QWidget::windowTitleChanged, this,
             &LibraryEditor::updateTabTitles);

@@ -24,6 +24,7 @@
 
 #include "../common/symbolchooserdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/widgets/centeredcheckbox.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
@@ -455,8 +456,10 @@ void ComponentSymbolVariantItemListEditorWidget::addItem(
   try {
     ComponentSymbolVariantItemSuffix constrainedSuffix(suffix);  // can throw
     FilePath                         fp =
-        mWorkspace->getLibraryDb().getLatestSymbol(symbol);     // can throw
-    Symbol                                      sym(fp, true);  // can throw
+        mWorkspace->getLibraryDb().getLatestSymbol(symbol);  // can throw
+    Symbol sym(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(fp))));  // can throw
     std::shared_ptr<ComponentSymbolVariantItem> item(
         new ComponentSymbolVariantItem(Uuid::createRandom(), symbol, pos, rot,
                                        required, constrainedSuffix));
@@ -500,7 +503,9 @@ void ComponentSymbolVariantItemListEditorWidget::setSymbolUuid(
   try {
     FilePath fp =
         mWorkspace->getLibraryDb().getLatestSymbol(symbol);  // can throw
-    Symbol sym(fp, true);                                    // can throw
+    Symbol sym(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(fp))));  // can throw
     mItems->find(uuid)->setSymbolUuid(symbol);
     mItems->find(uuid)->getPinSignalMap() =
         ComponentPinSignalMapHelpers::create(sym.getPins().getUuidSet());

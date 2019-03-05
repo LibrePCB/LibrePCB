@@ -25,6 +25,7 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/debug.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardgerberexport.h>
 #include <librepcb/project/erc/ercmsg.h>
@@ -204,7 +205,11 @@ bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
     print(QString(tr("Open project '%1'..."))
               .arg(prettyPath(projectFp, projectFile)));
-    Project project(projectFp, !save, false);  // can throw
+    std::shared_ptr<TransactionalFileSystem> projectFs =
+        TransactionalFileSystem::open(projectFp.getParentDir(), save);
+    Project project(std::unique_ptr<TransactionalDirectory>(
+                        new TransactionalDirectory(projectFs)),
+                    projectFp.getFilename());  // can throw
 
     // ERC
     if (runErc) {
@@ -305,9 +310,8 @@ bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
     // Save project
     if (save) {
       print(tr("Save project..."));
-      // first save to temporary files, then to original files
-      project.save(false);  // can throw
-      project.save(true);   // can throw
+      project.save();     // can throw
+      projectFs->save();  // can throw
     }
 
     return success;

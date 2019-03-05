@@ -28,6 +28,7 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/network/repository.h>
 #include <librepcb/library/library.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -192,6 +193,11 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
   }
 
   try {
+    // create transactional file system
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(directory);
+    TransactionalDirectory dir(fs);
+
     // create the new library
     QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version,
                                             author, ElementName(name), desc,
@@ -203,15 +209,14 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     } catch (const Exception& e) {
       qCritical() << "Could not open the library image:" << e.getMsg();
     }
-    lib->saveTo(directory);  // can throw
+    lib->moveTo(dir);  // can throw
 
     // copy license file
     if (useCc0License) {
       try {
         FilePath source =
             qApp->getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
-        FilePath destination = directory.getPathTo("LICENSE.txt");
-        FileUtils::copyFile(source, destination);  // can throw
+        fs->write("LICENSE.txt", FileUtils::readFile(source));  // can throw
       } catch (Exception& e) {
         qCritical() << "Could not copy the license file:" << e.getMsg();
       }
@@ -221,8 +226,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     try {
       FilePath source =
           qApp->getResourcesDir().getPathTo("library/readme_template");
-      FilePath   destination = directory.getPathTo("README.md");
-      QByteArray content     = FileUtils::readFile(source);  // can throw
+      QByteArray content = FileUtils::readFile(source);  // can throw
       content.replace("{LIBRARY_NAME}", name.toUtf8());
       if (useCc0License) {
         content.replace("{LICENSE_TEXT}",
@@ -231,7 +235,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
       } else {
         content.replace("{LICENSE_TEXT}", "No license set.");
       }
-      FileUtils::writeFile(destination, content);  // can throw
+      fs->write("README.md", content);  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the readme file:" << e.getMsg();
     }
@@ -240,8 +244,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     try {
       FilePath source =
           qApp->getResourcesDir().getPathTo("library/gitignore_template");
-      FilePath destination = directory.getPathTo(".gitignore");
-      FileUtils::copyFile(source, destination);  // can throw
+      fs->write(".gitignore", FileUtils::readFile(source));  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
     }
@@ -250,11 +253,13 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     try {
       FilePath source =
           qApp->getResourcesDir().getPathTo("library/gitattributes_template");
-      FilePath destination = directory.getPathTo(".gitattributes");
-      FileUtils::copyFile(source, destination);  // can throw
+      fs->write(".gitattributes", FileUtils::readFile(source));  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
     }
+
+    // save file system
+    fs->save();  // can throw
 
     // library successfully added! reset input fields and emit signal
     mUi->edtLocalName->clear();
@@ -353,8 +358,8 @@ void AddLibraryWidget::repositoryLibraryListReceived(
     RepositoryLibraryListWidgetItem* widget =
         new RepositoryLibraryListWidgetItem(mWorkspace, libVal.toObject());
     widget->setChecked(mUi->cbxRepoLibsSelectAll->isChecked());
-    connect(mUi->cbxRepoLibsSelectAll, &QCheckBox::clicked,
-            widget, &RepositoryLibraryListWidgetItem::setChecked);
+    connect(mUi->cbxRepoLibsSelectAll, &QCheckBox::clicked, widget,
+            &RepositoryLibraryListWidgetItem::setChecked);
     connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged, this,
             &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
     QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);

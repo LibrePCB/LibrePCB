@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "strokefontpool.h"
 
-#include "../fileio/fileutils.h"
+#include "../fileio/filesystem.h"
 
 #include <QtCore>
 
@@ -35,21 +35,19 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-StrokeFontPool::StrokeFontPool(const FilePath& directory) noexcept {
-  try {
-    foreach (const FilePath& fp,
-             FileUtils::getFilesInDirectory(directory, {"*.bene"})) {
-      try {
-        qDebug() << "Load stroke font:" << fp.getFilename();
-        mFonts.insert(fp.getFilename(),
-                      std::make_shared<StrokeFont>(fp));  // can throw
-      } catch (const Exception& e) {
-        qCritical() << "Failed to load stroke font" << fp.toNative() << ":"
-                    << e.getMsg();
-      }
+StrokeFontPool::StrokeFontPool(const FileSystem& directory) noexcept {
+  foreach (const QString& filename, directory.getFiles()) {
+    FilePath fp = directory.getAbsPath(filename);
+    if (fp.getSuffix() != "bene") continue;
+    try {
+      qDebug() << "Load stroke font:" << filename;
+      mFonts.insert(filename, std::make_shared<StrokeFont>(
+                                  fp,
+                                  directory.read(filename)));  // can throw
+    } catch (const Exception& e) {
+      qCritical() << "Failed to load stroke font" << fp.toNative() << ":"
+                  << e.getMsg();
     }
-  } catch (const Exception& e) {
-    qCritical() << "Failed to load stroke font pool:" << e.getMsg();
   }
 }
 

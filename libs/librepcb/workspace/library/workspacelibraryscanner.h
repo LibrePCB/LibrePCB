@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class SQLiteDatabase;
+class TransactionalFileSystem;
 
 namespace library {
 class Library;
@@ -81,23 +82,29 @@ signals:
   void scanFinished();
 
 private:  // Methods
-  void                 run() noexcept override;
-  void                 scan() noexcept;
-  QHash<FilePath, int> updateLibraries(
-      SQLiteDatabase&                                           db,
-      const QHash<FilePath, std::shared_ptr<library::Library>>& libs);
+  void                run() noexcept override;
+  void                scan() noexcept;
+  QHash<QString, int> updateLibraries(
+      SQLiteDatabase&                                          db,
+      const QHash<QString, std::shared_ptr<library::Library>>& libs);
   void clearAllTables(SQLiteDatabase& db);
   void getLibrariesOfDirectory(
-      const FilePath&                                     dir,
-      QHash<FilePath, std::shared_ptr<library::Library>>& libs) noexcept;
+      std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
+      QHash<QString, std::shared_ptr<library::Library>>& libs) noexcept;
   template <typename ElementType>
-  int addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
+  int addCategoriesToDb(SQLiteDatabase&                          db,
+                        std::shared_ptr<TransactionalFileSystem> fs,
+                        const QString& libPath, const QStringList& dirs,
                         const QString& table, const QString& idColumn,
                         int libId);
   template <typename ElementType>
-  int addElementsToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
+  int addElementsToDb(SQLiteDatabase&                          db,
+                      std::shared_ptr<TransactionalFileSystem> fs,
+                      const QString& libPath, const QStringList& dirs,
                       const QString& table, const QString& idColumn, int libId);
-  int addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
+  int addDevicesToDb(SQLiteDatabase&                          db,
+                     std::shared_ptr<TransactionalFileSystem> fs,
+                     const QString& libPath, const QStringList& dirs,
                      const QString& table, const QString& idColumn, int libId);
   template <typename T>
   static QVariant optionalToVariant(const T& opt) noexcept;
