@@ -85,6 +85,18 @@ NewElementWizard::~NewElementWizard() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void NewElementWizard::setElementToCopy(
+    NewElementWizardContext::ElementType type, const FilePath& fp) noexcept {
+  try {
+    mContext->reset(type);
+    mContext->copyElement(type, fp);  // can throw
+    setStartId(NewElementWizardContext::ID_EnterMetadata);
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Could not copy element"), e.getMsg());
+    setStartId(NewElementWizardContext::ID_ChooseType);
+  }
+}
+
 bool NewElementWizard::validateCurrentPage() noexcept {
   if (currentPage() && (!currentPage()->validatePage())) {
     return false;
