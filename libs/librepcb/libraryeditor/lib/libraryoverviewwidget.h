@@ -81,6 +81,12 @@ signals:
   void editPackageTriggered(const FilePath& fp);
   void editComponentTriggered(const FilePath& fp);
   void editDeviceTriggered(const FilePath& fp);
+  void copyComponentCategoryTriggered(const FilePath& fp);
+  void copyPackageCategoryTriggered(const FilePath& fp);
+  void copySymbolTriggered(const FilePath& fp);
+  void copyPackageTriggered(const FilePath& fp);
+  void copyComponentTriggered(const FilePath& fp);
+  void copyDeviceTriggered(const FilePath& fp);
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
@@ -101,6 +107,7 @@ private:  // Methods
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
   void editItem(QListWidget* list, const FilePath& fp) noexcept;
+  void copyItem(QListWidget* list, const FilePath& fp) noexcept;
   void removeItems(
       const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
 

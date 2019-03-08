@@ -333,6 +333,8 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QMenu    menu;
   QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"), tr("Edit"));
   aEdit->setVisible(!selectedItemPaths.isEmpty());
+  QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
+  aCopy->setVisible(selectedItemPaths.count() == 1);
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   aRemove->setVisible(!selectedItemPaths.isEmpty());
@@ -345,9 +347,33 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   // Show context menu, handle action
   QAction* action = menu.exec(QCursor::pos());
   if (action == aEdit) {
+    Q_ASSERT(selectedItemPaths.count() > 0);
     foreach (const FilePath& fp, selectedItemPaths) { editItem(list, fp); }
+  } else if (action == aCopy) {
+    Q_ASSERT(selectedItemPaths.count() == 1);
+    copyItem(list, selectedItemPaths.values().first());
   } else if (action == aRemove) {
+    Q_ASSERT(selectedItemPaths.count() > 0);
     removeItems(selectedItemPaths);
+  }
+}
+
+void LibraryOverviewWidget::copyItem(QListWidget*    list,
+                                     const FilePath& fp) noexcept {
+  if (list == mUi->lstCmpCat) {
+    emit copyComponentCategoryTriggered(fp);
+  } else if (list == mUi->lstPkgCat) {
+    emit copyPackageCategoryTriggered(fp);
+  } else if (list == mUi->lstSym) {
+    emit copySymbolTriggered(fp);
+  } else if (list == mUi->lstPkg) {
+    emit copyPackageTriggered(fp);
+  } else if (list == mUi->lstCmp) {
+    emit copyComponentTriggered(fp);
+  } else if (list == mUi->lstDev) {
+    emit copyDeviceTriggered(fp);
+  } else if (list) {
+    qCritical() << "Unknown list widget!";
   }
 }
 
