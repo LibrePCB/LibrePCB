@@ -96,9 +96,11 @@ libraryEditorWidget = {libraryEditor}::centralWidget
 
 # Actions
 libraryEditorActionNewElement = {libraryEditor}::actionNew
+libraryEditorActionRemove = {libraryEditor}::actionRemove
 
 # Tab widget
 libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
+libraryEditorTabBar = {libraryEditorTabWidget}::qt_tabwidget_tabbar
 libraryEditorStackedWidget = {libraryEditorTabWidget}::qt_tabwidget_stackedwidget
 
 # Library overview widget
@@ -111,6 +113,15 @@ libraryEditorOverviewAuthorEdit = {libraryEditorOverviewMetadataWidget}::edtAuth
 libraryEditorOverviewVersionEdit = {libraryEditorOverviewMetadataWidget}::edtVersion
 libraryEditorOverviewDeprecatedCheckbox = {libraryEditorOverviewMetadataWidget}::cbxDeprecated
 libraryEditorOverviewUrlEdit = {libraryEditorOverviewMetadataWidget}::edtUrl
+libraryEditorOverviewCmpCatList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_2::lstCmpCat
+libraryEditorOverviewPkgCatList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_3::lstPkgCat
+libraryEditorOverviewSymList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_4::lstSym
+libraryEditorOverviewPkgList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_7::lstPkg
+libraryEditorOverviewCmpList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_5::lstCmp
+libraryEditorOverviewDevList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_6::lstDev
+libraryEditorOverviewMsgBox = {libraryEditorOverviewWidget}::QMessageBox
+libraryEditorOverviewMsgBoxBtnYes = {libraryEditorOverviewMsgBox}::qt_msgbox_buttonbox::QPushButton
+libraryEditorOverviewMsgBoxBtnCancel = {libraryEditorOverviewMsgBox}::qt_msgbox_buttonbox::QPushButton-1
 
 # Component category editor widget
 libraryEditorCmpCatWidget = {libraryEditorStackedWidget}::librepcb__library__editor__ComponentCategoryEditorWidget
