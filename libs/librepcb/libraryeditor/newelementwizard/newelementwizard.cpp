@@ -85,6 +85,12 @@ NewElementWizard::~NewElementWizard() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void NewElementWizard::setNewElementType(
+    NewElementWizardContext::ElementType type) noexcept {
+  mContext->reset(type);
+  setStartId(NewElementWizardContext::ID_EnterMetadata);
+}
+
 void NewElementWizard::setElementToCopy(
     NewElementWizardContext::ElementType type, const FilePath& fp) noexcept {
   try {

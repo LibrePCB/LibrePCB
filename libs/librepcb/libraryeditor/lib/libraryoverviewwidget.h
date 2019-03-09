@@ -76,6 +76,12 @@ public slots:
   bool remove() noexcept override;
 
 signals:
+  void newComponentCategoryTriggered();
+  void newPackageCategoryTriggered();
+  void newSymbolTriggered();
+  void newPackageTriggered();
+  void newComponentTriggered();
+  void newDeviceTriggered();
   void editComponentCategoryTriggered(const FilePath& fp);
   void editPackageCategoryTriggered(const FilePath& fp);
   void editSymbolTriggered(const FilePath& fp);
@@ -109,6 +115,7 @@ private:  // Methods
   QHash<QListWidgetItem*, FilePath> getElementListItemFilePaths(
       const QList<QListWidgetItem*>& items) const noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
+  void newItem(QListWidget* list) noexcept;
   void editItem(QListWidget* list, const FilePath& fp) noexcept;
   void copyItem(QListWidget* list, const FilePath& fp) noexcept;
   void removeItems(

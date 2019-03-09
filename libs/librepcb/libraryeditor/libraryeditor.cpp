@@ -246,6 +246,18 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
 #endif
 
   // Edit element signals
+  connect(overviewWidget, &LibraryOverviewWidget::newComponentCategoryTriggered,
+          this, &LibraryEditor::newComponentCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newPackageCategoryTriggered,
+          this, &LibraryEditor::newPackageCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newSymbolTriggered, this,
+          &LibraryEditor::newSymbolTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newPackageTriggered, this,
+          &LibraryEditor::newPackageTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newComponentTriggered, this,
+          &LibraryEditor::newComponentTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newDeviceTriggered, this,
+          &LibraryEditor::newDeviceTriggered);
   connect(overviewWidget,
           &LibraryOverviewWidget::editComponentCategoryTriggered, this,
           &LibraryEditor::editComponentCategoryTriggered);
@@ -401,6 +413,30 @@ void LibraryEditor::zoomAllTriggered() noexcept {
 
 void LibraryEditor::editGridPropertiesTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->editGridProperties();
+}
+
+void LibraryEditor::newComponentCategoryTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
+}
+
+void LibraryEditor::newPackageCategoryTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
+}
+
+void LibraryEditor::newSymbolTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Symbol);
+}
+
+void LibraryEditor::newPackageTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Package);
+}
+
+void LibraryEditor::newComponentTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Component);
+}
+
+void LibraryEditor::newDeviceTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Device);
 }
 
 void LibraryEditor::editComponentCategoryTriggered(
@@ -582,6 +618,17 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
   mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
   updateTabTitles();  // force updating the "Save" action title
+}
+
+void LibraryEditor::newLibraryElement(
+    NewElementWizardContext::ElementType type) {
+  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  wizard.setNewElementType(type);
+  if (wizard.exec() == QDialog::Accepted) {
+    FilePath fp = wizard.getContext().getOutputDirectory();
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
+    mWorkspace.getLibraryDb().startLibraryRescan();
+  }
 }
 
 void LibraryEditor::copyLibraryElement(

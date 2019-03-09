@@ -141,6 +141,12 @@ private:  // GUI Event Handlers
   void zoomOutTriggered() noexcept;
   void zoomAllTriggered() noexcept;
   void editGridPropertiesTriggered() noexcept;
+  void newComponentCategoryTriggered() noexcept;
+  void newPackageCategoryTriggered() noexcept;
+  void newSymbolTriggered() noexcept;
+  void newPackageTriggered() noexcept;
+  void newComponentTriggered() noexcept;
+  void newDeviceTriggered() noexcept;
   void editComponentCategoryTriggered(const FilePath& fp) noexcept;
   void editPackageCategoryTriggered(const FilePath& fp) noexcept;
   void editSymbolTriggered(const FilePath& fp) noexcept;
@@ -164,6 +170,7 @@ private:  // GUI Event Handlers
 
 private:  // Methods
   void setActiveEditorWidget(EditorWidgetBase* widget);
+  void newLibraryElement(NewElementWizardContext::ElementType type);
   void copyLibraryElement(NewElementWizardContext::ElementType type,
                           const FilePath&                      fp);
   void editNewLibraryElement(NewElementWizardContext::ElementType type,

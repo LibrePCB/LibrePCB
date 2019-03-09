@@ -79,6 +79,7 @@ public:
   }
 
   // General Methods
+  void setNewElementType(NewElementWizardContext::ElementType type) noexcept;
   void setElementToCopy(NewElementWizardContext::ElementType type,
                         const FilePath&                      fp) noexcept;
   bool validateCurrentPage() noexcept override;

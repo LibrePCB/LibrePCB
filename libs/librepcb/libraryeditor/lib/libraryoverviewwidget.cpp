@@ -355,9 +355,13 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   aRemove->setVisible(!selectedItemPaths.isEmpty());
+  QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
+  aNew->setVisible(selectedItemPaths.count() <= 1);
 
   // Set default action
-  if (!selectedItemPaths.isEmpty()) {
+  if (selectedItemPaths.isEmpty()) {
+    menu.setDefaultAction(aNew);
+  } else {
     menu.setDefaultAction(aEdit);
   }
 
@@ -372,6 +376,26 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   } else if (action == aRemove) {
     Q_ASSERT(selectedItemPaths.count() > 0);
     removeItems(selectedItemPaths);
+  } else if (action == aNew) {
+    newItem(list);
+  }
+}
+
+void LibraryOverviewWidget::newItem(QListWidget* list) noexcept {
+  if (list == mUi->lstCmpCat) {
+    emit newComponentCategoryTriggered();
+  } else if (list == mUi->lstPkgCat) {
+    emit newPackageCategoryTriggered();
+  } else if (list == mUi->lstSym) {
+    emit newSymbolTriggered();
+  } else if (list == mUi->lstPkg) {
+    emit newPackageTriggered();
+  } else if (list == mUi->lstCmp) {
+    emit newComponentTriggered();
+  } else if (list == mUi->lstDev) {
+    emit newDeviceTriggered();
+  } else if (list) {
+    qCritical() << "Unknown list widget!";
   }
 }
 
