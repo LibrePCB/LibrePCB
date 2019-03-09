@@ -73,6 +73,7 @@ public:
 
 public slots:
   bool save() noexcept override;
+  bool remove() noexcept override;
 
 signals:
   void editComponentCategoryTriggered(const FilePath& fp);
@@ -105,6 +106,8 @@ private:  // Methods
   void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
+  QHash<QListWidgetItem*, FilePath> getElementListItemFilePaths(
+      const QList<QListWidgetItem*>& items) const noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
   void editItem(QListWidget* list, const FilePath& fp) noexcept;
   void copyItem(QListWidget* list, const FilePath& fp) noexcept;

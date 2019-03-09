@@ -153,6 +153,17 @@ bool LibraryOverviewWidget::save() noexcept {
   }
 }
 
+bool LibraryOverviewWidget::remove() noexcept {
+  if (QListWidget* list = dynamic_cast<QListWidget*>(focusWidget())) {
+    QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+        getElementListItemFilePaths(list->selectedItems());
+    removeItems(selectedItemPaths);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -311,23 +322,29 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
   }
 }
 
+QHash<QListWidgetItem*, FilePath>
+LibraryOverviewWidget::getElementListItemFilePaths(
+    const QList<QListWidgetItem*>& items) const noexcept {
+  QHash<QListWidgetItem*, FilePath> itemPaths;
+  foreach (QListWidgetItem* item, items) {
+    FilePath fp = FilePath(item->data(Qt::UserRole).toString());
+    if (fp.isValid()) {
+      itemPaths.insert(item, fp);
+    } else {
+      qWarning() << "File path for item is not valid";
+    }
+  }
+  return itemPaths;
+}
+
 void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   Q_UNUSED(pos);
 
-  // Get list widget
+  // Get list widget item file paths
   QListWidget* list = dynamic_cast<QListWidget*>(sender());
   Q_ASSERT(list);
-
-  // Get item texts and validated file paths
-  QHash<QListWidgetItem*, FilePath> selectedItemPaths;
-  foreach (QListWidgetItem* item, list->selectedItems()) {
-    FilePath fp = FilePath(item->data(Qt::UserRole).toString());
-    if (fp.isValid()) {
-      selectedItemPaths.insert(item, fp);
-    } else {
-      qWarning() << "File path for selected item is not valid";
-    }
-  }
+  QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+      getElementListItemFilePaths(list->selectedItems());
 
   // Build the context menu
   QMenu    menu;

@@ -557,6 +557,7 @@ void LibraryEditor::cursorPositionChanged(const Point& pos) noexcept {
 
 void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   bool hasGraphicalEditor = false;
+  bool isOverviewTab = dynamic_cast<LibraryOverviewWidget*>(widget) != nullptr;
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->setUndoStackActionGroup(nullptr);
     mCurrentEditorWidget->setToolsActionGroup(nullptr);
@@ -571,6 +572,9 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   }
   foreach (QAction* action, mUi->editToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
+  }
+  if (isOverviewTab) {
+    mUi->actionRemove->setEnabled(true);
   }
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
