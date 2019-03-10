@@ -247,22 +247,42 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   setSelectedElement(FilePath());
   mIsCategoryElement = false;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory:
+    case NewElementWizardContext::ElementType::ComponentCategory: {
       mIsCategoryElement = true;
-    case NewElementWizardContext::ElementType::Symbol:
-    case NewElementWizardContext::ElementType::Component:
-    case NewElementWizardContext::ElementType::Device: {
       setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
-          mContext.getWorkspace().getLibraryDb(),
-          mContext.getLibLocaleOrder()));
+          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
+          workspace::CategoryTreeFilter::ALL));
       break;
     }
-    case NewElementWizardContext::ElementType::PackageCategory:
+    case NewElementWizardContext::ElementType::Symbol: {
+      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
+          workspace::CategoryTreeFilter::SYMBOLS));
+      break;
+    }
+    case NewElementWizardContext::ElementType::Component: {
+      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
+          workspace::CategoryTreeFilter::COMPONENTS));
+      break;
+    }
+    case NewElementWizardContext::ElementType::Device: {
+      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
+          workspace::CategoryTreeFilter::DEVICES));
+      break;
+    }
+    case NewElementWizardContext::ElementType::PackageCategory: {
       mIsCategoryElement = true;
+      setCategoryTreeModel(new workspace::PackageCategoryTreeModel(
+          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
+          workspace::CategoryTreeFilter::ALL));
+      break;
+    }
     case NewElementWizardContext::ElementType::Package: {
       setCategoryTreeModel(new workspace::PackageCategoryTreeModel(
-          mContext.getWorkspace().getLibraryDb(),
-          mContext.getLibLocaleOrder()));
+          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
+          workspace::CategoryTreeFilter::PACKAGES));
       break;
     }
     default: {

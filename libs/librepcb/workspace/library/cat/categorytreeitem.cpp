@@ -39,11 +39,13 @@ namespace workspace {
 template <typename ElementType>
 CategoryTreeItem<ElementType>::CategoryTreeItem(
     const WorkspaceLibraryDb& library, const QStringList localeOrder,
-    CategoryTreeItem* parent, const tl::optional<Uuid>& uuid) noexcept
+    CategoryTreeItem* parent, const tl::optional<Uuid>& uuid,
+    CategoryTreeFilter::Flags filter) noexcept
   : mParent(parent),
     mUuid(uuid),
     mDepth(parent ? parent->getDepth() + 1 : 0),
-    mExceptionMessage() {
+    mExceptionMessage(),
+    mIsVisible(false) {
   try {
     if (mUuid) {
       FilePath fp = getLatestCategory(library);
@@ -56,9 +58,11 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(
     if (mUuid || (!mParent)) {
       QSet<Uuid> childs = getCategoryChilds(library);
       foreach (const Uuid& childUuid, childs) {
-        ChildType child(
-            new CategoryTreeItem(library, localeOrder, this, childUuid));
-        mChilds.append(child);
+        ChildType child(new CategoryTreeItem(library, localeOrder, this,
+                                             childUuid, filter));
+        if (child->isVisible()) {
+          mChilds.append(child);
+        }
       }
 
       // sort childs
@@ -70,12 +74,19 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(
 
     if (!mParent) {
       // add category for elements without category
-      ChildType child(
-          new CategoryTreeItem(library, localeOrder, this, tl::nullopt));
-      mChilds.append(child);
+      ChildType child(new CategoryTreeItem(library, localeOrder, this,
+                                           tl::nullopt, filter));
+      if (child->isVisible()) {
+        mChilds.append(child);
+      }
+    }
+
+    if ((!mChilds.isEmpty()) || matchesFilter(library, filter)) {
+      mIsVisible = true;
     }
   } catch (const Exception& e) {
     mExceptionMessage = e.getMsg();
+    mIsVisible        = true;  // make sure errors are visible
   }
 }
 
@@ -162,6 +173,41 @@ template <>
 QSet<Uuid> CategoryTreeItem<library::PackageCategory>::getCategoryChilds(
     const WorkspaceLibraryDb& lib) const {
   return lib.getPackageCategoryChilds(mUuid);
+}
+
+template <>
+bool CategoryTreeItem<library::ComponentCategory>::matchesFilter(
+    const WorkspaceLibraryDb& lib, CategoryTreeFilter::Flags filter) const {
+  if (filter.testFlag(CategoryTreeFilter::ALL)) {
+    return true;
+  }
+  int categories = 0, symbols = 0, components = 0, devices = 0;
+  lib.getComponentCategoryElementCount(mUuid, &categories, &symbols,
+                                       &components, &devices);
+  if (filter.testFlag(CategoryTreeFilter::SYMBOLS) && (symbols > 0)) {
+    return true;
+  }
+  if (filter.testFlag(CategoryTreeFilter::COMPONENTS) && (components > 0)) {
+    return true;
+  }
+  if (filter.testFlag(CategoryTreeFilter::DEVICES) && (devices > 0)) {
+    return true;
+  }
+  return false;
+}
+
+template <>
+bool CategoryTreeItem<library::PackageCategory>::matchesFilter(
+    const WorkspaceLibraryDb& lib, CategoryTreeFilter::Flags filter) const {
+  if (filter.testFlag(CategoryTreeFilter::ALL)) {
+    return true;
+  }
+  int categories = 0, packages = 0;
+  lib.getPackageCategoryElementCount(mUuid, &categories, &packages);
+  if (filter.testFlag(CategoryTreeFilter::PACKAGES) && (packages > 0)) {
+    return true;
+  }
+  return false;
 }
 
 /*******************************************************************************

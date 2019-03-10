@@ -40,10 +40,11 @@ namespace workspace {
 
 template <typename ElementType>
 CategoryTreeModel<ElementType>::CategoryTreeModel(
-    const WorkspaceLibraryDb& library, const QStringList& localeOrder) noexcept
+    const WorkspaceLibraryDb& library, const QStringList& localeOrder,
+    CategoryTreeFilter::Flags filter) noexcept
   : QAbstractItemModel(nullptr) {
-  mRootItem.reset(new CategoryTreeItem<ElementType>(library, localeOrder,
-                                                    nullptr, tl::nullopt));
+  mRootItem.reset(new CategoryTreeItem<ElementType>(
+      library, localeOrder, nullptr, tl::nullopt, filter));
 }
 
 template <typename ElementType>

@@ -50,8 +50,8 @@ CategoryChooserDialog<ElementType>::CategoryChooserDialog(
           &CategoryChooserDialog<ElementType>::accept);
 
   mModel.reset(new workspace::CategoryTreeModel<ElementType>(
-      ws.getLibraryDb(),
-      ws.getSettings().getLibLocaleOrder().getLocaleOrder()));
+      ws.getLibraryDb(), ws.getSettings().getLibLocaleOrder().getLocaleOrder(),
+      workspace::CategoryTreeFilter::ALL));
   mUi->treeView->setModel(mModel.data());
   mUi->treeView->setRootIndex(QModelIndex());
 }

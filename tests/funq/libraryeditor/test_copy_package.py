@@ -24,7 +24,7 @@ def test(library_editor, helpers):
     # Choose category
     category_tree = le.widget('libraryEditorNewElementWizardCopyFromCategoriesTree')
     helpers.wait_for_model_items_count(category_tree, 2)
-    category = category_tree.model().items().items[1]
+    category = category_tree.model().items().items[0]
     category_tree.select_item(category)
 
     # Choose element
