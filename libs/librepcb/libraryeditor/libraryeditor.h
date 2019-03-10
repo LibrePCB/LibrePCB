@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "newelementwizard/newelementwizard.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/graphics/graphicslayer.h>
@@ -139,14 +141,26 @@ private:  // GUI Event Handlers
   void zoomOutTriggered() noexcept;
   void zoomAllTriggered() noexcept;
   void editGridPropertiesTriggered() noexcept;
+  void newComponentCategoryTriggered() noexcept;
+  void newPackageCategoryTriggered() noexcept;
+  void newSymbolTriggered() noexcept;
+  void newPackageTriggered() noexcept;
+  void newComponentTriggered() noexcept;
+  void newDeviceTriggered() noexcept;
   void editComponentCategoryTriggered(const FilePath& fp) noexcept;
   void editPackageCategoryTriggered(const FilePath& fp) noexcept;
   void editSymbolTriggered(const FilePath& fp) noexcept;
   void editPackageTriggered(const FilePath& fp) noexcept;
   void editComponentTriggered(const FilePath& fp) noexcept;
   void editDeviceTriggered(const FilePath& fp) noexcept;
+  void copyComponentCategoryTriggered(const FilePath& fp) noexcept;
+  void copyPackageCategoryTriggered(const FilePath& fp) noexcept;
+  void copySymbolTriggered(const FilePath& fp) noexcept;
+  void copyPackageTriggered(const FilePath& fp) noexcept;
+  void copyComponentTriggered(const FilePath& fp) noexcept;
+  void copyDeviceTriggered(const FilePath& fp) noexcept;
   void closeTabIfOpen(const FilePath& fp) noexcept;
-  template <typename ElementType, typename EditWidgetType>
+  template <typename EditWidgetType>
   void editLibraryElementTriggered(const FilePath& fp,
                                    bool            isNewElement) noexcept;
   void currentTabChanged(int index) noexcept;
@@ -156,6 +170,11 @@ private:  // GUI Event Handlers
 
 private:  // Methods
   void setActiveEditorWidget(EditorWidgetBase* widget);
+  void newLibraryElement(NewElementWizardContext::ElementType type);
+  void copyLibraryElement(NewElementWizardContext::ElementType type,
+                          const FilePath&                      fp);
+  void editNewLibraryElement(NewElementWizardContext::ElementType type,
+                             const FilePath&                      fp);
   void updateTabTitles() noexcept;
   void closeEvent(QCloseEvent* event) noexcept override;
   void addLayer(const QString& name, bool forceVisible = false) noexcept;

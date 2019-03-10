@@ -98,7 +98,7 @@ private:  // Data
   QScopedPointer<QAbstractItemModel>                mCategoryTreeModel;
   bool                                              mIsCategoryElement;
   tl::optional<Uuid>                                mSelectedCategoryUuid;
-  QScopedPointer<LibraryBaseElement>                mSelectedElement;
+  bool                                              mIsComplete;
 };
 
 /*******************************************************************************
