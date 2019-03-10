@@ -400,6 +400,34 @@ QList<Uuid> WorkspaceLibraryDb::getPackageCategoryParents(
   return getCategoryParents("package_categories", category);
 }
 
+void WorkspaceLibraryDb::getComponentCategoryElementCount(
+    const tl::optional<Uuid>& category, int* categories, int* symbols,
+    int* components, int* devices) const {
+  if (categories) {
+    *categories = getCategoryChildCount("component_categories", category);
+  }
+  if (symbols) {
+    *symbols = getCategoryElementCount("symbols", "symbol_id", category);
+  }
+  if (components) {
+    *components =
+        getCategoryElementCount("components", "component_id", category);
+  }
+  if (devices) {
+    *devices = getCategoryElementCount("devices", "device_id", category);
+  }
+}
+
+void WorkspaceLibraryDb::getPackageCategoryElementCount(
+    const tl::optional<Uuid>& category, int* categories, int* packages) const {
+  if (categories) {
+    *categories = getCategoryChildCount("package_categories", category);
+  }
+  if (packages) {
+    *packages = getCategoryElementCount("packages", "package_id", category);
+  }
+}
+
 QSet<Uuid> WorkspaceLibraryDb::getSymbolsByCategory(
     const tl::optional<Uuid>& category) const {
   return getElementsByCategory("symbols", "symbol_id", category);
@@ -604,6 +632,25 @@ tl::optional<Uuid> WorkspaceLibraryDb::getCategoryParent(
                    "\"%1\" does not exist in the library database."))
             .arg(category.toStr()));
   }
+}
+
+int WorkspaceLibraryDb::getCategoryChildCount(
+    const QString& tablename, const tl::optional<Uuid>& category) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT COUNT(*) FROM " % tablename % " WHERE parent_uuid " %
+      (category ? "= '" % category->toStr() % "'" : QString("IS NULL")));
+  return mDb->count(query);
+}
+
+int WorkspaceLibraryDb::getCategoryElementCount(
+    const QString& tablename, const QString& idrowname,
+    const tl::optional<Uuid>& category) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT COUNT(*) FROM " % tablename % " LEFT JOIN " % tablename % "_cat" %
+      " ON " % tablename % ".id=" % tablename % "_cat." % idrowname %
+      " WHERE category_uuid " %
+      (category ? "= '" % category->toStr() % "'" : QString("IS NULL")));
+  return mDb->count(query);
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(
