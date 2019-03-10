@@ -117,8 +117,7 @@ void NewElementWizardPage_ChooseType::cleanupPage() noexcept {
 
 void NewElementWizardPage_ChooseType::setElementType(
     NewElementWizardContext::ElementType type) noexcept {
-  mContext.reset();
-  mContext.mElementType = type;
+  mContext.reset(type);
   emit completeChanged();
   if (isComplete()) {
     wizard()->next();

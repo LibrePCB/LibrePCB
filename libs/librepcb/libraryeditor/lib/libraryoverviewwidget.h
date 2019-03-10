@@ -73,14 +73,27 @@ public:
 
 public slots:
   bool save() noexcept override;
+  bool remove() noexcept override;
 
 signals:
+  void newComponentCategoryTriggered();
+  void newPackageCategoryTriggered();
+  void newSymbolTriggered();
+  void newPackageTriggered();
+  void newComponentTriggered();
+  void newDeviceTriggered();
   void editComponentCategoryTriggered(const FilePath& fp);
   void editPackageCategoryTriggered(const FilePath& fp);
   void editSymbolTriggered(const FilePath& fp);
   void editPackageTriggered(const FilePath& fp);
   void editComponentTriggered(const FilePath& fp);
   void editDeviceTriggered(const FilePath& fp);
+  void copyComponentCategoryTriggered(const FilePath& fp);
+  void copyPackageCategoryTriggered(const FilePath& fp);
+  void copySymbolTriggered(const FilePath& fp);
+  void copyPackageTriggered(const FilePath& fp);
+  void copyComponentTriggered(const FilePath& fp);
+  void copyDeviceTriggered(const FilePath& fp);
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
@@ -99,18 +112,18 @@ private:  // Methods
   void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
+  QHash<QListWidgetItem*, FilePath> getElementListItemFilePaths(
+      const QList<QListWidgetItem*>& items) const noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
-  bool removeSelectedItem(const QString&  itemName,
-                          const FilePath& itemPath) noexcept;
+  void newItem(QListWidget* list) noexcept;
+  void editItem(QListWidget* list, const FilePath& fp) noexcept;
+  void copyItem(QListWidget* list, const FilePath& fp) noexcept;
+  void removeItems(
+      const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
 
   // Event Handlers
   void btnIconClicked() noexcept;
-  void lstCmpCatDoubleClicked(const QModelIndex& index) noexcept;
-  void lstPkgCatDoubleClicked(const QModelIndex& index) noexcept;
-  void lstSymDoubleClicked(const QModelIndex& index) noexcept;
-  void lstPkgDoubleClicked(const QModelIndex& index) noexcept;
-  void lstCmpDoubleClicked(const QModelIndex& index) noexcept;
-  void lstDevDoubleClicked(const QModelIndex& index) noexcept;
+  void lstDoubleClicked(const QModelIndex& index) noexcept;
 
 private:  // Data
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;

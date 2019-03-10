@@ -110,7 +110,8 @@ public:
   const QStringList& getLibLocaleOrder() const noexcept;
 
   // General Methods
-  void reset() noexcept;
+  void reset(ElementType newType = ElementType::None) noexcept;
+  void copyElement(ElementType type, const FilePath& fp);
   void createLibraryElement();
 
   // Operator Overloadings

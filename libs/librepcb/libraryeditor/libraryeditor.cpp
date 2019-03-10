@@ -27,7 +27,6 @@
 #include "cmpcat/componentcategoryeditorwidget.h"
 #include "dev/deviceeditorwidget.h"
 #include "lib/libraryoverviewwidget.h"
-#include "newelementwizard/newelementwizard.h"
 #include "pkg/packageeditorwidget.h"
 #include "pkgcat/packagecategoryeditorwidget.h"
 #include "sym/symboleditorwidget.h"
@@ -247,6 +246,18 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
 #endif
 
   // Edit element signals
+  connect(overviewWidget, &LibraryOverviewWidget::newComponentCategoryTriggered,
+          this, &LibraryEditor::newComponentCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newPackageCategoryTriggered,
+          this, &LibraryEditor::newPackageCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newSymbolTriggered, this,
+          &LibraryEditor::newSymbolTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newPackageTriggered, this,
+          &LibraryEditor::newPackageTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newComponentTriggered, this,
+          &LibraryEditor::newComponentTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newDeviceTriggered, this,
+          &LibraryEditor::newDeviceTriggered);
   connect(overviewWidget,
           &LibraryOverviewWidget::editComponentCategoryTriggered, this,
           &LibraryEditor::editComponentCategoryTriggered);
@@ -260,6 +271,19 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
           &LibraryEditor::editComponentTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editDeviceTriggered, this,
           &LibraryEditor::editDeviceTriggered);
+  connect(overviewWidget,
+          &LibraryOverviewWidget::copyComponentCategoryTriggered, this,
+          &LibraryEditor::copyComponentCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::copyPackageCategoryTriggered,
+          this, &LibraryEditor::copyPackageCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::copySymbolTriggered, this,
+          &LibraryEditor::copySymbolTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::copyPackageTriggered, this,
+          &LibraryEditor::copyPackageTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::copyComponentTriggered, this,
+          &LibraryEditor::copyComponentTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::copyDeviceTriggered, this,
+          &LibraryEditor::copyDeviceTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::removeElementTriggered, this,
           &LibraryEditor::closeTabIfOpen);
 
@@ -344,30 +368,7 @@ void LibraryEditor::newElementTriggered() noexcept {
   NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
   if (wizard.exec() == QDialog::Accepted) {
     FilePath fp = wizard.getContext().getOutputDirectory();
-    switch (wizard.getContext().mElementType) {
-      case NewElementWizardContext::ElementType::ComponentCategory:
-        editLibraryElementTriggered<ComponentCategory,
-                                    ComponentCategoryEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::PackageCategory:
-        editLibraryElementTriggered<PackageCategory,
-                                    PackageCategoryEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Symbol:
-        editLibraryElementTriggered<Symbol, SymbolEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Package:
-        editLibraryElementTriggered<Package, PackageEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Component:
-        editLibraryElementTriggered<Component, ComponentEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Device:
-        editLibraryElementTriggered<Device, DeviceEditorWidget>(fp, true);
-        break;
-      default:
-        break;
-    }
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
     mWorkspace.getLibraryDb().startLibraryRescan();
   }
 }
@@ -414,34 +415,82 @@ void LibraryEditor::editGridPropertiesTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->editGridProperties();
 }
 
+void LibraryEditor::newComponentCategoryTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
+}
+
+void LibraryEditor::newPackageCategoryTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
+}
+
+void LibraryEditor::newSymbolTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Symbol);
+}
+
+void LibraryEditor::newPackageTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Package);
+}
+
+void LibraryEditor::newComponentTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Component);
+}
+
+void LibraryEditor::newDeviceTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Device);
+}
+
 void LibraryEditor::editComponentCategoryTriggered(
     const FilePath& fp) noexcept {
-  editLibraryElementTriggered<ComponentCategory, ComponentCategoryEditorWidget>(
-      fp, false);
+  editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editPackageCategoryTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<PackageCategory, PackageCategoryEditorWidget>(
-      fp, false);
+  editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editSymbolTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Symbol, SymbolEditorWidget>(fp, false);
+  editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editPackageTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Package, PackageEditorWidget>(fp, false);
+  editLibraryElementTriggered<PackageEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editComponentTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Component, ComponentEditorWidget>(fp, false);
+  editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editDeviceTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Device, DeviceEditorWidget>(fp, false);
+  editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
 }
 
-template <typename ElementType, typename EditWidgetType>
+void LibraryEditor::copyComponentCategoryTriggered(
+    const FilePath& fp) noexcept {
+  copyLibraryElement(NewElementWizardContext::ElementType::ComponentCategory,
+                     fp);
+}
+
+void LibraryEditor::copyPackageCategoryTriggered(const FilePath& fp) noexcept {
+  copyLibraryElement(NewElementWizardContext::ElementType::PackageCategory, fp);
+}
+
+void LibraryEditor::copySymbolTriggered(const FilePath& fp) noexcept {
+  copyLibraryElement(NewElementWizardContext::ElementType::Symbol, fp);
+}
+
+void LibraryEditor::copyPackageTriggered(const FilePath& fp) noexcept {
+  copyLibraryElement(NewElementWizardContext::ElementType::Package, fp);
+}
+
+void LibraryEditor::copyComponentTriggered(const FilePath& fp) noexcept {
+  copyLibraryElement(NewElementWizardContext::ElementType::Component, fp);
+}
+
+void LibraryEditor::copyDeviceTriggered(const FilePath& fp) noexcept {
+  copyLibraryElement(NewElementWizardContext::ElementType::Device, fp);
+}
+
+template <typename EditWidgetType>
 void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
                                                 bool isNewElement) noexcept {
   try {
@@ -544,6 +593,7 @@ void LibraryEditor::cursorPositionChanged(const Point& pos) noexcept {
 
 void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   bool hasGraphicalEditor = false;
+  bool isOverviewTab = dynamic_cast<LibraryOverviewWidget*>(widget) != nullptr;
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->setUndoStackActionGroup(nullptr);
     mCurrentEditorWidget->setToolsActionGroup(nullptr);
@@ -559,12 +609,63 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   foreach (QAction* action, mUi->editToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
+  if (isOverviewTab) {
+    mUi->actionRemove->setEnabled(true);
+  }
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
   mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
   updateTabTitles();  // force updating the "Save" action title
+}
+
+void LibraryEditor::newLibraryElement(
+    NewElementWizardContext::ElementType type) {
+  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  wizard.setNewElementType(type);
+  if (wizard.exec() == QDialog::Accepted) {
+    FilePath fp = wizard.getContext().getOutputDirectory();
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
+    mWorkspace.getLibraryDb().startLibraryRescan();
+  }
+}
+
+void LibraryEditor::copyLibraryElement(
+    NewElementWizardContext::ElementType type, const FilePath& fp) {
+  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  wizard.setElementToCopy(type, fp);
+  if (wizard.exec() == QDialog::Accepted) {
+    FilePath fp = wizard.getContext().getOutputDirectory();
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
+    mWorkspace.getLibraryDb().startLibraryRescan();
+  }
+}
+
+void LibraryEditor::editNewLibraryElement(
+    NewElementWizardContext::ElementType type, const FilePath& fp) {
+  switch (type) {
+    case NewElementWizardContext::ElementType::ComponentCategory:
+      editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::PackageCategory:
+      editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Symbol:
+      editLibraryElementTriggered<SymbolEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Package:
+      editLibraryElementTriggered<PackageEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Component:
+      editLibraryElementTriggered<ComponentEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Device:
+      editLibraryElementTriggered<DeviceEditorWidget>(fp, true);
+      break;
+    default:
+      break;
+  }
 }
 
 void LibraryEditor::updateTabTitles() noexcept {
