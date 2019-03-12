@@ -60,7 +60,8 @@ SymbolChooserDialog::SymbolChooserDialog(
   mUi->graphicsView->setOriginCrossVisible(false);
 
   mCategoryTreeModel.reset(new workspace::ComponentCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder()));
+      mWorkspace.getLibraryDb(), localeOrder(),
+      workspace::CategoryTreeFilter::SYMBOLS));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

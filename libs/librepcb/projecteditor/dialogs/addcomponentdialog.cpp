@@ -105,7 +105,8 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace,
 
   const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
   mCategoryTreeModel             = new workspace::ComponentCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder);
+      mWorkspace.getLibraryDb(), localeOrder,
+      workspace::CategoryTreeFilter::COMPONENTS);
   mUi->treeCategories->setModel(mCategoryTreeModel);
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

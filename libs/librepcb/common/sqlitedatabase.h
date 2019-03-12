@@ -77,6 +77,7 @@ public:
 
   // General Methods
   QSqlQuery prepareQuery(const QString& query) const;
+  int       count(QSqlQuery& query);
   int       insert(QSqlQuery& query);
   void      exec(QSqlQuery& query);
   void      exec(const QString& query);

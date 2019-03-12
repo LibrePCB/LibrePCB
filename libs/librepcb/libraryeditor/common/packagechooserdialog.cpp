@@ -61,7 +61,8 @@ PackageChooserDialog::PackageChooserDialog(
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(new workspace::PackageCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder()));
+      mWorkspace.getLibraryDb(), localeOrder(),
+      workspace::CategoryTreeFilter::PACKAGES));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,
