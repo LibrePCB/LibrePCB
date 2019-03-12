@@ -113,12 +113,17 @@ public:
   QSet<Uuid> getPackageCategoryChilds(const tl::optional<Uuid>& parent) const;
   QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
   QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
-  QSet<Uuid>  getSymbolsByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getPackagesByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getComponentsByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getDevicesByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getDevicesOfComponent(const Uuid& component) const;
-  QSet<Uuid>  getComponentsBySearchKeyword(const QString& keyword) const;
+  void getComponentCategoryElementCount(const tl::optional<Uuid>& category,
+                                        int* categories, int* symbols,
+                                        int* components, int* devices) const;
+  void getPackageCategoryElementCount(const tl::optional<Uuid>& category,
+                                      int* categories, int* packages) const;
+  QSet<Uuid> getSymbolsByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getPackagesByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getComponentsByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getDevicesByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
+  QSet<Uuid> getComponentsBySearchKeyword(const QString& keyword) const;
 
   // General Methods
 
@@ -157,6 +162,11 @@ private:
                                         const Uuid&    category) const;
   tl::optional<Uuid> getCategoryParent(const QString& tablename,
                                        const Uuid&    category) const;
+  int                getCategoryChildCount(const QString&            tablename,
+                                           const tl::optional<Uuid>& category) const;
+  int                getCategoryElementCount(const QString&            tablename,
+                                             const QString&            idrowname,
+                                             const tl::optional<Uuid>& category) const;
   QSet<Uuid>         getElementsByCategory(
               const QString& tablename, const QString& idrowname,
               const tl::optional<Uuid>& categoryUuid) const;

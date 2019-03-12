@@ -160,6 +160,21 @@ QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const {
   return q;
 }
 
+int SQLiteDatabase::count(QSqlQuery& query) {
+  exec(query);  // can throw
+
+  int  count   = 0;
+  bool success = query.next() && query.value(0).isValid();
+  if (success) {
+    count = query.value(0).toInt(&success);
+  }
+  if (success) {
+    return count;
+  } else {
+    throw LogicError(__FILE__, __LINE__);
+  }
+}
+
 int SQLiteDatabase::insert(QSqlQuery& query) {
   exec(query);  // can throw
 
