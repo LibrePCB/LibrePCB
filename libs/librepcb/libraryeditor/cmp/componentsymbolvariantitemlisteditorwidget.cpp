@@ -333,8 +333,13 @@ void ComponentSymbolVariantItemListEditorWidget::setTableRowContent(
   numberItem->setTextAlignment(Qt::AlignCenter);
   mTable->setItem(row, COLUMN_NUMBER, numberItem);
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // symbol
-  int      btnSize = 23;  // TODO: can we determine this value dynamically?
+  int      btnSize            = mTable->rowHeight(row);
   QWidget* symbolColumnWidget = new QWidget(this);
   symbolColumnWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                     QSizePolicy::Fixed);
@@ -445,9 +450,6 @@ void ComponentSymbolVariantItemListEditorWidget::setTableRowContent(
   }
   buttonsColumnLayout->addWidget(btnAddRemove);
   mTable->setCellWidget(row, COLUMN_BUTTONS, buttonsColumnWidget);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void ComponentSymbolVariantItemListEditorWidget::addItem(

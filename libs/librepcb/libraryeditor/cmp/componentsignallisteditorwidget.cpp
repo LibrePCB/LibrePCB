@@ -368,8 +368,13 @@ bool clock,*/ const QString& forcedNetName) noexcept {
   mTable->setItem(row, COLUMN_FORCEDNETNAME,
                   new QTableWidgetItem(forcedNetName));
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // button
-  int          btnSize      = qMax(requiredCheckBox->sizeHint().height(), 17);
+  int          btnSize      = mTable->rowHeight(row);
   QToolButton* btnAddRemove = new QToolButton(this);
   btnAddRemove->setProperty("row", row);
   btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -383,9 +388,6 @@ bool clock,*/ const QString& forcedNetName) noexcept {
     btnAddRemove->setIcon(QIcon(":/img/actions/add.png"));
   }
   mTable->setCellWidget(row, COLUMN_BUTTONS, btnAddRemove);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void ComponentSignalListEditorWidget::addSignal(
