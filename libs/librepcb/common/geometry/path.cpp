@@ -185,7 +185,7 @@ Path& Path::operator=(const Path& rhs) noexcept {
  ******************************************************************************/
 
 Path Path::line(const Point& p1, const Point& p2, const Angle& angle) noexcept {
-  return Path({Vertex(p1), Vertex(p2, angle)});
+  return Path({Vertex(p1, angle), Vertex(p2)});
 }
 
 Path Path::circle(const PositiveLength& diameter) noexcept {
