@@ -67,6 +67,18 @@ Vertex& Vertex::operator=(const Vertex& rhs) noexcept {
 }
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+QDebug operator<<(QDebug stream, const Vertex& vertex) {
+  stream << QString("Vertex(%1mm, %2mm, %3°)")
+                .arg(vertex.getPos().getX().toMmString())
+                .arg(vertex.getPos().getY().toMmString())
+                .arg(vertex.getAngle().toDegString());
+  return stream;
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

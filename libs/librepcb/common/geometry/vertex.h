@@ -78,6 +78,8 @@ private:  // Data
  *  Non-Member Functions
  ******************************************************************************/
 
+QDebug operator<<(QDebug stream, const Vertex& vertex);
+
 inline uint qHash(const Vertex& key, uint seed = 0) noexcept {
   return ::qHash(qMakePair(key.getPos(), key.getAngle()), seed);
 }
