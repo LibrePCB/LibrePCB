@@ -204,11 +204,11 @@ Path Path::obround(const PositiveLength& width,
     p.addVertex(Point(ry - rx, -ry), -Angle::deg180());
     p.addVertex(Point(ry - rx, ry), Angle::deg0());
   } else if (width < height) {
-    p.addVertex(Point(rx - ry, rx), Angle::deg0());
-    p.addVertex(Point(ry - rx, rx), -Angle::deg180());
-    p.addVertex(Point(ry - rx, -rx), Angle::deg0());
-    p.addVertex(Point(rx - ry, -rx), -Angle::deg180());
-    p.addVertex(Point(rx - ry, rx), Angle::deg0());
+    p.addVertex(Point(rx, ry - rx), Angle::deg0());
+    p.addVertex(Point(rx, rx - ry), -Angle::deg180());
+    p.addVertex(Point(-rx, rx - ry), Angle::deg0());
+    p.addVertex(Point(-rx, ry - rx), -Angle::deg180());
+    p.addVertex(Point(rx, ry - rx), Angle::deg0());
   } else {
     Q_ASSERT(width == height);
     p.addVertex(Point(rx, 0), -Angle::deg180());
