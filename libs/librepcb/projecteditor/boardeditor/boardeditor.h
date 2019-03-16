@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 #include <librepcb/common/uuid.h>
+#include <librepcb/project/boards/board.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,7 +43,6 @@ class ExclusiveActionGroup;
 namespace project {
 
 class Project;
-class Board;
 class ComponentInstance;
 
 namespace editor {
@@ -76,11 +76,10 @@ public:
   // Getters
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project&       getProject() const noexcept { return mProject; }
-  int    getActiveBoardIndex() const noexcept { return mActiveBoardIndex; }
-  Board* getActiveBoard() const noexcept;
+  Board*         getActiveBoard() const noexcept { return mActiveBoard.data(); }
 
   // Setters
-  bool setActiveBoardIndex(int index) noexcept;
+  void setActiveBoardIndex(int index) noexcept;
 
   // General Methods
   void abortAllCommands() noexcept;
@@ -112,10 +111,6 @@ private slots:
   void on_lblUnplacedComponentsNote_linkActivated();
   void boardListActionGroupTriggered(QAction* action);
 
-signals:
-
-  void activeBoardChanged(int oldIndex, int newIndex);
-
 private:
   // make some methods inaccessible...
   BoardEditor()                         = delete;
@@ -136,7 +131,7 @@ private:
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
   // Misc
-  int             mActiveBoardIndex;
+  QPointer<Board> mActiveBoard;
   QList<QAction*> mBoardListActions;
   QActionGroup    mBoardListActionGroup;
 
