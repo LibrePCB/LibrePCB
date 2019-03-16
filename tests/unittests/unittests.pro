@@ -70,6 +70,7 @@ SOURCES += \
     common/fileio/transactionaldirectorytest.cpp \
     common/fileio/transactionalfilesystemtest.cpp \
     common/filepathtest.cpp \
+    common/geometry/pathtest.cpp \
     common/networkrequesttest.cpp \
     common/pointtest.cpp \
     common/ratiotest.cpp \
