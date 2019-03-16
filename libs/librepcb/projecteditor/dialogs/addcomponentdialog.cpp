@@ -397,8 +397,11 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp) {
       }
       mUi->cbxSymbVar->addItem(text, symbVar.getUuid().toStr());
     }
-    mUi->cbxSymbVar->setCurrentIndex(cmp->getSymbolVariants().count() > 0 ? 0
-                                                                          : -1);
+    if (!cmp->getSymbolVariants().isEmpty()) {
+      mUi->cbxSymbVar->setCurrentIndex(
+          qMax(0, cmp->getSymbolVariantIndexByNorm(
+                      mProject.getSettings().getNormOrder())));
+    }
   }
 
   mUi->lblSymbVar->setVisible(mUi->cbxSymbVar->count() > 1);

@@ -100,6 +100,19 @@ std::shared_ptr<const ComponentSignal> Component::getSignalOfPin(
   }
 }
 
+int Component::getSymbolVariantIndexByNorm(const QStringList& normOrder) const
+    noexcept {
+  foreach (const QString& norm, normOrder) {
+    for (int i = 0; i < mSymbolVariants.count(); ++i) {
+      std::shared_ptr<const ComponentSymbolVariant> var = mSymbolVariants.at(i);
+      if (cleanNorm(var->getNorm()) == cleanNorm(norm)) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
 std::shared_ptr<ComponentSymbolVariantItem> Component::getSymbVarItem(
     const Uuid& symbVar, const Uuid& item) {
   return mSymbolVariants.get(symbVar)->getSymbolItems().get(item);  // can throw
@@ -131,6 +144,10 @@ void Component::serialize(SExpression& root) const {
   mAttributes.serialize(root);
   mSignals.serialize(root);
   mSymbolVariants.serialize(root);
+}
+
+QString Component::cleanNorm(QString norm) noexcept {
+  return QString(norm.toUpper().remove(QRegularExpression("[^0-9A-Z]")));
 }
 
 /*******************************************************************************
