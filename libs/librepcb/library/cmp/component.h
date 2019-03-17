@@ -126,6 +126,7 @@ public:
   std::shared_ptr<const ComponentSignal> getSignalOfPin(const Uuid& symbVar,
                                                         const Uuid& item,
                                                         const Uuid& pin) const;
+  int getSymbolVariantIndexByNorm(const QStringList& normOrder) const noexcept;
   std::shared_ptr<ComponentSymbolVariantItem> getSymbVarItem(
       const Uuid& symbVar, const Uuid& item);
   std::shared_ptr<const ComponentSymbolVariantItem> getSymbVarItem(
@@ -148,6 +149,8 @@ public:
 private:  // Methods
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
+
+  static QString cleanNorm(QString norm) noexcept;
 
 private:                // Data
   bool mSchematicOnly;  ///< if true, this component is schematic-only (no
