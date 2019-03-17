@@ -270,8 +270,8 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
         QString(tr("OpenProcess() failed with error %1.")).arg(GetLastError()));
   }
   wchar_t buf[MAX_PATH];
-  DWORD length = MAX_PATH;
-  BOOL success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
+  DWORD   length  = MAX_PATH;
+  BOOL    success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
   CloseHandle(hProcess);
   if ((!success) || (!length)) {
     throw RuntimeError(
@@ -280,7 +280,7 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
             .arg(GetLastError()));
   }
   processName = QString::fromWCharArray(buf, length);
-  int i = processName.lastIndexOf(QLatin1Char('\\'));
+  int i       = processName.lastIndexOf(QLatin1Char('\\'));
   if (i >= 0) processName.remove(0, i + 1);
   i = processName.lastIndexOf(QLatin1Char('.'));
   if (i >= 0) processName.truncate(i);
