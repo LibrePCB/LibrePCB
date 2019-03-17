@@ -45,18 +45,18 @@ class ApplicationTest : public ::testing::Test {};
 TEST(ApplicationTest, testAppVersion) {
   // read application version and check validity
   Version v = qApp->getAppVersion();
-  EXPECT_GE(Version::fromString("0.1"), v);
+  EXPECT_GE(v, Version::fromString("0.1"));
 
   // compare with QApplication version
   Version v1 =
       Version::fromString(qApp->applicationVersion().section('-', 0, 0));
-  EXPECT_GE(Version::fromString("0.1"), v1);
+  EXPECT_GE(v1, Version::fromString("0.1"));
   EXPECT_EQ(v, v1);
 }
 
 TEST(ApplicationTest, testFileFormatVersion) {
   // check minimum
-  EXPECT_GE(Version::fromString("0.1"), qApp->getFileFormatVersion());
+  EXPECT_GE(qApp->getFileFormatVersion(), Version::fromString("0.1"));
 
   // it can't be greater then the application version
   EXPECT_LE(qApp->getFileFormatVersion(), qApp->getAppVersion());
