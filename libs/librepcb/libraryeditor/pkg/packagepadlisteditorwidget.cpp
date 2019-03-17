@@ -184,8 +184,13 @@ void PackagePadListEditorWidget::setTableRowContent(
   // name
   mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // button
-  int          btnSize = 23;  // TODO: can we determine this value dynamically?
+  int          btnSize      = mTable->rowHeight(row);
   QToolButton* btnAddRemove = new QToolButton(this);
   btnAddRemove->setProperty("row", row);
   btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -199,9 +204,6 @@ void PackagePadListEditorWidget::setTableRowContent(
     btnAddRemove->setIcon(QIcon(":/img/actions/add.png"));
   }
   mTable->setCellWidget(row, COLUMN_BUTTONS, btnAddRemove);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void PackagePadListEditorWidget::addPad(const QString& name) noexcept {
