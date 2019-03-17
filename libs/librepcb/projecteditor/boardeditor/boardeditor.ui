@@ -539,9 +539,6 @@
    <property name="toolTip">
     <string>Project Settings</string>
    </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
   </action>
   <action name="actionAbout">
    <property name="icon">

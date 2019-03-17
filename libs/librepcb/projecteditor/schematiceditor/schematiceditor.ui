@@ -643,9 +643,6 @@
    <property name="text">
     <string>&amp;Settings</string>
    </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
   </action>
   <action name="actionToolAddNetLabel">
    <property name="icon">
