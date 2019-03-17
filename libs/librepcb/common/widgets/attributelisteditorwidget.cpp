@@ -253,8 +253,13 @@ void AttributeListEditorWidget::setTableRowContent(
           &AttributeListEditorWidget::attributeUnitChanged);
   mTable->setCellWidget(row, COLUMN_UNIT, unitComboBox);
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // buttons
-  int      btnSize = typeComboBox->sizeHint().height();
+  int      btnSize = mTable->rowHeight(row);
   QSize    iconSize(btnSize - 6, btnSize - 6);
   QWidget* buttonsColumnWidget = new QWidget(this);
   buttonsColumnWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -297,9 +302,6 @@ void AttributeListEditorWidget::setTableRowContent(
   }
   buttonsColumnLayout->addWidget(btnAddRemove);
   mTable->setCellWidget(row, COLUMN_BUTTONS, buttonsColumnWidget);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void AttributeListEditorWidget::getTableRowContent(
