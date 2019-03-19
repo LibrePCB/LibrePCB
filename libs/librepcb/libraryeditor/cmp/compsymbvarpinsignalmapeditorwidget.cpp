@@ -55,6 +55,7 @@ CompSymbVarPinSignalMapEditorWidget::CompSymbVarPinSignalMapEditorWidget(
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_SYMBOL,
                                   new QTableWidgetItem(tr("Symbol")));

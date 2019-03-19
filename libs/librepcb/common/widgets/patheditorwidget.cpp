@@ -52,6 +52,7 @@ PathEditorWidget::PathEditorWidget(QWidget* parent) noexcept
   mTable->verticalHeader()->setDefaultSectionSize(20);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setCornerButtonEnabled(false);
   layout->addWidget(mTable);
 }

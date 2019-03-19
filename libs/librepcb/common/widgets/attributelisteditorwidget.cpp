@@ -47,6 +47,7 @@ AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_KEY, new QTableWidgetItem(tr("Key")));
   mTable->setHorizontalHeaderItem(COLUMN_TYPE,
