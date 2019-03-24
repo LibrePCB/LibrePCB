@@ -303,7 +303,8 @@ bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
       bool                 filesOverwritten = false;
       foreach (const Board* board, boardList) {
         print("  " % QString(tr("Board '%1':")).arg(*board->getName()));
-        BoardGerberExport grbExport(*board);
+        BoardGerberExport grbExport(*board,
+                                    board->getFabricationOutputSettings());
         grbExport.exportAllLayers();  // can throw
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
           filesCounter[fp]++;

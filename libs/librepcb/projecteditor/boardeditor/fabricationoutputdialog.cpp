@@ -171,7 +171,7 @@ void FabricationOutputDialog::on_btnGenerate_clicked() {
     }
 
     // generate files
-    BoardGerberExport grbExport(mBoard);
+    BoardGerberExport grbExport(mBoard, mBoard.getFabricationOutputSettings());
     grbExport.exportAllLayers();
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
@@ -179,7 +179,7 @@ void FabricationOutputDialog::on_btnGenerate_clicked() {
 }
 
 void FabricationOutputDialog::on_btnBrowseOutputDir_clicked() {
-  BoardGerberExport grbExport(mBoard);
+  BoardGerberExport grbExport(mBoard, mBoard.getFabricationOutputSettings());
   FilePath          dir = grbExport.getOutputDirectory();
   if (dir.isExistingDir()) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir.toStr()));
