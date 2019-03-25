@@ -112,7 +112,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addPositionalArgument(command, commands[command].first,
                                  commands[command].second);
     parser.addPositionalArgument("project",
-                                 tr("Path to project file (*.lpp)."));
+                                 tr("Path to project file (*.lpp[z])."));
     parser.addOption(ercOption);
     parser.addOption(exportSchematicsOption);
     parser.addOption(exportPcbFabricationDataOption);
@@ -205,11 +205,24 @@ bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
     print(QString(tr("Open project '%1'..."))
               .arg(prettyPath(projectFp, projectFile)));
-    std::shared_ptr<TransactionalFileSystem> projectFs =
-        TransactionalFileSystem::open(projectFp.getParentDir(), save);
+    std::shared_ptr<TransactionalFileSystem> projectFs;
+    QString                                  projectFileName;
+    if (projectFp.getSuffix() == "lppz") {
+      projectFs = TransactionalFileSystem::openRO(projectFp.getParentDir());
+      projectFs->removeDirRecursively();  // 1) get a clean initial state
+      projectFs->loadFromZip(projectFp);  // 2) load files from ZIP
+      foreach (const QString& fn, projectFs->getFiles()) {
+        if (fn.endsWith(".lpp")) {
+          projectFileName = fn;
+        }
+      }
+    } else {
+      projectFs = TransactionalFileSystem::open(projectFp.getParentDir(), save);
+      projectFileName = projectFp.getFilename();
+    }
     Project project(std::unique_ptr<TransactionalDirectory>(
                         new TransactionalDirectory(projectFs)),
-                    projectFp.getFilename());  // can throw
+                    projectFileName);  // can throw
 
     // ERC
     if (runErc) {
@@ -310,8 +323,12 @@ bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
     // Save project
     if (save) {
       print(tr("Save project..."));
-      project.save();     // can throw
-      projectFs->save();  // can throw
+      project.save();  // can throw
+      if (projectFp.getSuffix() == "lppz") {
+        projectFs->exportToZip(projectFp);  // can throw
+      } else {
+        projectFs->save();  // can throw
+      }
     }
 
     return success;

@@ -80,6 +80,7 @@
     <addaction name="actionProjectSave"/>
     <addaction name="actionPrint"/>
     <addaction name="actionExportAsPdf"/>
+    <addaction name="actionExportLppz"/>
     <addaction name="separator"/>
     <addaction name="actionGenerateFabricationData"/>
     <addaction name="separator"/>
@@ -734,6 +735,18 @@
     <string>Update Library</string>
    </property>
   </action>
+  <action name="actionExportLppz">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export project to *.lppz</string>
+   </property>
+   <property name="toolTip">
+    <string>Export project to *.lppz</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -748,6 +761,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../../img/images.qrc"/>
   <include location="../../../../img/images.qrc"/>
  </resources>
  <connections/>

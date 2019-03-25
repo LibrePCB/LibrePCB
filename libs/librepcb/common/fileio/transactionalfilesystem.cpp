@@ -232,6 +232,22 @@ void TransactionalFileSystem::removeDirRecursively(const QString& path) {
  *  General Methods
  ******************************************************************************/
 
+void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
+  QuaZip zip(fp.toStr());
+  if (!zip.open(QuaZip::mdUnzip)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("Failed to open the ZIP file '%1'.")).arg(fp.toNative()));
+  }
+  QuaZipFile file(&zip);
+  for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
+    file.open(QIODevice::ReadOnly);
+    write(file.getActualFileName(), file.readAll());
+    file.close();
+  }
+  zip.close();
+}
+
 void TransactionalFileSystem::exportToZip(const FilePath& fp) const {
   QuaZip zip(fp.toStr());
   if (!zip.open(QuaZip::mdCreate)) {
