@@ -27,6 +27,7 @@
 #include "dialogs/projectsettingsdialog.h"
 #include "schematiceditor/schematiceditor.h"
 
+#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/project.h>
@@ -165,6 +166,23 @@ void ProjectEditor::execProjectSettingsDialog(QWidget* parent) noexcept {
 void ProjectEditor::execNetClassesEditorDialog(QWidget* parent) noexcept {
   EditNetClassesDialog d(mProject.getCircuit(), *mUndoStack, parent);
   d.exec();
+}
+
+void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
+  try {
+    QString filename =
+        FileDialog::getSaveFileName(parent, tr("Export project to *.lppz"),
+                                    mProject.getPath().toStr(), "*.lppz");
+    if (filename.isEmpty()) return;
+    if (!filename.endsWith(".lppz")) filename.append(".lppz");
+    FilePath fp(filename);
+    qDebug() << "Export project to *.lppz:" << fp.toNative();
+    mProject.save();                                           // can throw
+    mProject.getDirectory().getFileSystem()->exportToZip(fp);  // can throw
+    qDebug() << "Project successfully exported.";
+  } catch (const Exception& e) {
+    QMessageBox::critical(parent, tr("Error"), e.getMsg());
+  }
 }
 
 bool ProjectEditor::saveProject() noexcept {

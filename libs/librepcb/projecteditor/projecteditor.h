@@ -154,6 +154,13 @@ public slots:
   void execNetClassesEditorDialog(QWidget* parent = nullptr) noexcept;
 
   /**
+   * @brief Execute the *.lppz export dialog (blocking!)
+   *
+   * @param parent    parent widget of the dialog (optional)
+   */
+  void execLppzExportDialog(QWidget* parent = nullptr) noexcept;
+
+  /**
    * @brief Save the whole project to the harddisc
    *
    * @note The whole save procedere is described in @ref doc_project_save.

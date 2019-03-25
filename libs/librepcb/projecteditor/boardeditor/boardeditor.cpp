@@ -153,6 +153,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           [this]() { mProjectEditor.execNetClassesEditorDialog(this); });
   connect(mUi->actionProjectSettings, &QAction::triggered,
           [this]() { mProjectEditor.execProjectSettingsDialog(this); });
+  connect(mUi->actionExportLppz, &QAction::triggered,
+          [this]() { mProjectEditor.execLppzExportDialog(this); });
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(
