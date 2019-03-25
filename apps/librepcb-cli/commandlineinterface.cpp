@@ -25,8 +25,10 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/debug.h>
+#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardfabricationoutputsettings.h>
 #include <librepcb/project/boards/boardgerberexport.h>
 #include <librepcb/project/erc/ercmsg.h>
 #include <librepcb/project/erc/ercmsglist.h>
@@ -87,6 +89,12 @@ int CommandLineInterface::execute() noexcept {
       tr("Export PCB fabrication data (Gerber/Excellon) according the "
          "fabrication "
          "output settings of boards. Existing files will be overwritten."));
+  QCommandLineOption pcbFabricationSettingsOption(
+      "pcb-fabrication-settings",
+      tr("Override PCB fabrication output settings by providing a *.lp file "
+         "containing custom settings. If not set, the settings from the boards "
+         "will be used instead."),
+      tr("file"));
   QCommandLineOption boardOption("board",
                                  tr("The name of the board(s) to export. Can "
                                     "be given multiple times. If not set, "
@@ -116,6 +124,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(ercOption);
     parser.addOption(exportSchematicsOption);
     parser.addOption(exportPcbFabricationDataOption);
+    parser.addOption(pcbFabricationSettingsOption);
     parser.addOption(boardOption);
     parser.addOption(saveOption);
   } else if (!command.isEmpty()) {
@@ -169,13 +178,13 @@ int CommandLineInterface::execute() noexcept {
       return 1;
     }
     cmdSuccess = openProject(
-        positionalArgs.value(0),                // project filepath
-        parser.isSet(ercOption),                // run ERC
-        parser.values(exportSchematicsOption),  // export schematics
-        parser.isSet(
-            exportPcbFabricationDataOption),  // export PCB fabrication data
-        parser.values(boardOption),           // boards
-        parser.isSet(saveOption)              // save project
+        positionalArgs.value(0),                       // project filepath
+        parser.isSet(ercOption),                       // run ERC
+        parser.values(exportSchematicsOption),         // export schematics
+        parser.isSet(exportPcbFabricationDataOption),  // export PCB fab. data
+        parser.value(pcbFabricationSettingsOption),    // PCB fab. settings
+        parser.values(boardOption),                    // boards
+        parser.isSet(saveOption)                       // save project
     );
   } else {
     printErr(tr("Internal failure."));
@@ -193,11 +202,11 @@ int CommandLineInterface::execute() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
-                                       const QStringList& exportSchematicsFiles,
-                                       bool exportPcbFabricationData,
-                                       const QStringList& boards,
-                                       bool               save) const noexcept {
+bool CommandLineInterface::openProject(
+    const QString& projectFile, bool runErc,
+    const QStringList& exportSchematicsFiles, bool exportPcbFabricationData,
+    const QString& pcbFabricationSettingsPath, const QStringList& boards,
+    bool save) const noexcept {
   try {
     bool success = true;
 
@@ -299,11 +308,28 @@ bool CommandLineInterface::openProject(const QString& projectFile, bool runErc,
           }
         }
       }
+      tl::optional<BoardFabricationOutputSettings> customSettings;
+      if (!pcbFabricationSettingsPath.isEmpty()) {
+        try {
+          qDebug() << "Load custom fabrication output settings:"
+                   << pcbFabricationSettingsPath;
+          FilePath fp(QFileInfo(pcbFabricationSettingsPath).absoluteFilePath());
+          customSettings = BoardFabricationOutputSettings(
+              SExpression::parse(FileUtils::readFile(fp), fp));  // can throw
+        } catch (const Exception& e) {
+          printErr(QString(tr("ERROR: Failed to load custom settings: %1"))
+                       .arg(e.getMsg()));
+          success = false;
+          boardList.clear();  // avoid exporting any boards
+        }
+      }
       QHash<FilePath, int> filesCounter;
       bool                 filesOverwritten = false;
       foreach (const Board* board, boardList) {
         print("  " % QString(tr("Board '%1':")).arg(*board->getName()));
-        BoardGerberExport grbExport(*board);
+        BoardGerberExport grbExport(
+            *board, customSettings ? *customSettings
+                                   : board->getFabricationOutputSettings());
         grbExport.exportAllLayers();  // can throw
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
           filesCounter[fp]++;
