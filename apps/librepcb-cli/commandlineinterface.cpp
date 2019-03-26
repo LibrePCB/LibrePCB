@@ -27,6 +27,7 @@
 #include <librepcb/common/debug.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
+#include <librepcb/library/elements.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardfabricationoutputsettings.h>
 #include <librepcb/project/boards/boardgerberexport.h>
@@ -42,6 +43,7 @@
 namespace librepcb {
 namespace cli {
 
+using namespace librepcb::library;
 using namespace librepcb::project;
 
 /*******************************************************************************
@@ -61,6 +63,9 @@ int CommandLineInterface::execute() noexcept {
       {"open-project",
        {tr("Open a project to execute project-related tasks."),
         tr("open-project [command_options]")}},
+      {"open-library",
+       {tr("Open a library to execute library-related tasks."),
+        tr("open-library [command_options]")}},
   };
 
   // Add global options
@@ -104,6 +109,14 @@ int CommandLineInterface::execute() noexcept {
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
 
+  // Define options for "open-library"
+  QCommandLineOption libAllOption(
+      "all", tr("Perform the selected action(s) on all elements contained in "
+                "the opened library."));
+  QCommandLineOption libSaveOption(
+      "save", tr("Save library (and contained elements if '--all' is given) "
+                 "before closing them (useful to upgrade file format)."));
+
   // First parse to get the supplied command (ignoring errors because the parser
   // does not yet know the command-dependent options).
   parser.parse(mApp.arguments());
@@ -127,6 +140,14 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(pcbFabricationSettingsOption);
     parser.addOption(boardOption);
     parser.addOption(saveOption);
+  } else if (command == "open-library") {
+    parser.clearPositionalArguments();
+    parser.addPositionalArgument(command, commands[command].first,
+                                 commands[command].second);
+    parser.addPositionalArgument("library",
+                                 tr("Path to library directory (*.lplib)."));
+    parser.addOption(libAllOption);
+    parser.addOption(libSaveOption);
   } else if (!command.isEmpty()) {
     printErr(QString(tr("Unknown command '%1'.")).arg(command), 2);
     print(parser.helpText(), 0);
@@ -185,6 +206,16 @@ int CommandLineInterface::execute() noexcept {
         parser.value(pcbFabricationSettingsOption),    // PCB fab. settings
         parser.values(boardOption),                    // boards
         parser.isSet(saveOption)                       // save project
+    );
+  } else if (command == "open-library") {
+    if (positionalArgs.count() != 1) {
+      printErr(tr("Wrong argument count."), 2);
+      print(parser.helpText(), 0);
+      return 1;
+    }
+    cmdSuccess = openLibrary(positionalArgs.value(0),     // library directory
+                             parser.isSet(libAllOption),  // all elements
+                             parser.isSet(libSaveOption)  // save
     );
   } else {
     printErr(tr("Internal failure."));
@@ -364,11 +395,159 @@ bool CommandLineInterface::openProject(
   }
 }
 
+bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
+                                       bool save) const noexcept {
+  try {
+    bool success = true;
+
+    // Open library
+    FilePath libFp(QFileInfo(libDir).absoluteFilePath());
+    print(QString(tr("Open library '%1'...")).arg(prettyPath(libFp, libDir)));
+
+    std::shared_ptr<TransactionalFileSystem> libFs =
+        TransactionalFileSystem::open(libFp, save);  // can throw
+    Library lib(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(libFs)));  // can throw
+
+    // Open all component categories
+    if (all) {
+      QStringList elements = lib.searchForElements<ComponentCategory>();
+      print(QString(tr("Process %1 component categories..."))
+                .arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        ComponentCategory element(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));  // can throw
+        if (save) {
+          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
+          element.save();  // can throw
+          fs->save();      // can throw
+        }
+      }
+    }
+
+    // Open all package categories
+    if (all) {
+      QStringList elements = lib.searchForElements<PackageCategory>();
+      print(QString(tr("Process %1 package categories..."))
+                .arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        PackageCategory element(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));  // can throw
+        if (save) {
+          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
+          element.save();  // can throw
+          fs->save();      // can throw
+        }
+      }
+    }
+
+    // Open all symbols
+    if (all) {
+      QStringList elements = lib.searchForElements<Symbol>();
+      print(QString(tr("Process %1 symbols...")).arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        Symbol element(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));  // can throw
+        if (save) {
+          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
+          element.save();  // can throw
+          fs->save();      // can throw
+        }
+      }
+    }
+
+    // Open all packages
+    if (all) {
+      QStringList elements = lib.searchForElements<Package>();
+      print(QString(tr("Process %1 packages...")).arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        Package element(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));  // can throw
+        if (save) {
+          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
+          element.save();  // can throw
+          fs->save();      // can throw
+        }
+      }
+    }
+
+    // Open all components
+    if (all) {
+      QStringList elements = lib.searchForElements<Component>();
+      print(QString(tr("Process %1 components...")).arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        Component element(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));  // can throw
+        if (save) {
+          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
+          element.save();  // can throw
+          fs->save();      // can throw
+        }
+      }
+    }
+
+    // Open all devices
+    if (all) {
+      QStringList elements = lib.searchForElements<Device>();
+      print(QString(tr("Process %1 devices...")).arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        Device element(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));  // can throw
+        if (save) {
+          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
+          element.save();  // can throw
+          fs->save();      // can throw
+        }
+      }
+    }
+
+    // Save library
+    if (save) {
+      print(QString(tr("Save library '%1'...")).arg(prettyPath(libFp, libDir)));
+      lib.save();     // can throw
+      libFs->save();  // can throw
+    }
+
+    return success;
+  } catch (const Exception& e) {
+    printErr(QString(tr("ERROR: %1")).arg(e.getMsg()));
+    return false;
+  }
+}
+
 QString CommandLineInterface::prettyPath(const FilePath& path,
                                          const QString&  style) noexcept {
-  return QFileInfo(style).isRelative()
-             ? path.toRelative(FilePath(QDir::currentPath()))
-             : path.toStr();
+  if (QFileInfo(style).isAbsolute()) {
+    return path.toStr();  // absolute path
+  } else if (path == FilePath(QDir::currentPath())) {
+    return path.getFilename();  // name of current directory
+  } else {
+    return path.toRelative(FilePath(QDir::currentPath()));  // relative path
+  }
 }
 
 void CommandLineInterface::print(const QString& str, int newlines) noexcept {
