@@ -125,6 +125,24 @@ Length Toolbox::shortestDistanceBetweenPointAndLine(const Point& p,
   return (p - np).getLength();
 }
 
+QString Toolbox::incrementNumberInString(QString string) noexcept {
+  QRegularExpression      regex("([0-9]+)(?!.*[0-9]+)");
+  QRegularExpressionMatch match = regex.match(string);
+  if (match.hasMatch()) {
+    // string contains numbers -> increment last number
+    bool ok     = false;
+    uint number = match.captured().toUInt(&ok);
+    if (ok) {
+      string.replace(match.capturedStart(), match.capturedLength(),
+                     QString::number(number + 1U));
+      return string;
+    }
+  }
+
+  // fallback: just add a "1" at the end
+  return string % "1";
+}
+
 QVariant Toolbox::stringOrNumberToQVariant(const QString& string) noexcept {
   bool isInt;
   int  intval = string.toInt(&isInt, 10);
