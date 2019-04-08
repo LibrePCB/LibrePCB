@@ -133,7 +133,7 @@ Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
   }
   Point scenePos = Point::fromPx(mapToScene(localPosPx));
   if (mapToGrid) {
-    scenePos.mappedToGrid(mGridProperties->getInterval());
+    scenePos.mapToGrid(mGridProperties->getInterval());
   }
   return scenePos;
 }
