@@ -214,7 +214,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     // clang-format off
     // schematic
     h.insert(sSchematicReferences,      {tr("References"),            QColor(0, 0, 0, 50),        QColor(0, 0, 0, 80),        true});
-    h.insert(sSchematicSheetFrames,     {tr("Sheet Frames"),          QColor("#96E0E0E0"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sSchematicSheetFrames,     {tr("Sheet Frames"),          Qt::black,                  Qt::darkGray,               true});
     h.insert(sSchematicNetLines,        {tr("Netlines"),              Qt::darkGreen,              Qt::green,                  true});
     h.insert(sSchematicNetLabels,       {tr("Netlabels"),             Qt::darkGreen,              Qt::green,                  true});
     h.insert(sSchematicNetLabelAnchors, {tr("Netlabel Anchors"),      Qt::darkGray,               Qt::gray,                   true});
@@ -222,7 +222,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sSchematicComments,        {tr("Comments"),              Qt::darkBlue,               Qt::blue,                   true});
     h.insert(sSchematicGuide,           {tr("Guide"),                 Qt::darkYellow,             Qt::yellow,                 true});
     // symbol
-    h.insert(sSymbolOutlines,           {tr("Outlines"),              QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sSymbolOutlines,           {tr("Outlines"),              Qt::darkRed,                Qt::red,                    true});
     h.insert(sSymbolGrabAreas,          {tr("Grab Areas"),            QColor(255, 255, 0, 30),    QColor(255, 255, 0, 50),    true});
     h.insert(sSymbolHiddenGrabAreas,    {tr("Hidden Grab Areas"),     QColor(0, 0, 255, 30),      QColor(0, 0, 255, 50),      false});
     h.insert(sSymbolNames,              {tr("Names"),                 QColor(32, 32, 32, 255),    Qt::darkGray,               true});
@@ -232,8 +232,8 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sSymbolPinNames,           {tr("Pin Names"),             QColor(64, 64, 64, 255),    Qt::gray,                   true});
     h.insert(sSymbolPinNumbers,         {tr("Pin Numbers"),           QColor(64, 64, 64, 255),    Qt::gray,                   true});
     // board asymmetric
-    h.insert(sBoardSheetFrames,         {tr("Sheet Frames"),          Qt::lightGray,              Qt::white,                  true});
-    h.insert(sBoardOutlines,            {tr("Board Outlines"),        QColor(255, 255, 255, 180), QColor(255, 255, 255, 220), true});
+    h.insert(sBoardSheetFrames,         {tr("Sheet Frames"),          QColor("#96E0E0E0"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sBoardOutlines,            {tr("Board Outlines"),        QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
     h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),         QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
     h.insert(sBoardDrillsNpth,          {tr("Drills (NPTH)"),         QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
     h.insert(sBoardPadsTht,             {tr("Pads"),                  QColor("#966DB515"),        QColor("#B488E516"),        true});
