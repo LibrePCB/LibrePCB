@@ -431,15 +431,7 @@ QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const
  ******************************************************************************/
 
 void Schematic::updateIcon() noexcept {
-  QRectF source =
-      mGraphicsScene->itemsBoundingRect().adjusted(-20, -20, 20, 20);
-  QRect target(0, 0, 297, 210);  // DIN A4 format :-)
-
-  QPixmap pixmap(target.size());
-  pixmap.fill(Qt::white);
-  QPainter painter(&pixmap);
-  mGraphicsScene->render(&painter, target, source);
-  mIcon = QIcon(pixmap);
+  mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
 }
 
 void Schematic::serialize(SExpression& root) const {
