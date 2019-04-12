@@ -35,7 +35,7 @@ namespace librepcb {
 namespace library {
 namespace editor {
 
-class CmdMoveSelectedSymbolItems;
+class CmdDragSelectedSymbolItems;
 
 /*******************************************************************************
  *  Class SymbolEditorState_Select
@@ -87,7 +87,8 @@ private:  // Methods
 private:  // Types / Data
   enum class SubState { IDLE, SELECTING, MOVING };
   SubState                                   mState;
-  QScopedPointer<CmdMoveSelectedSymbolItems> mCmdMoveSelectedItems;
+  Point                                      mStartPos;
+  QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
 };
 
 /*******************************************************************************

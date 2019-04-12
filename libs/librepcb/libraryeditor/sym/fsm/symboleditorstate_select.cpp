@@ -24,9 +24,8 @@
 
 #include "../dialogs/symbolpinpropertiesdialog.h"
 #include "../symboleditorwidget.h"
-#include "cmd/cmdmoveselectedsymbolitems.h"
+#include "cmd/cmddragselectedsymbolitems.h"
 #include "cmd/cmdremoveselectedsymbolitems.h"
-#include "cmd/cmdrotateselectedsymbolitems.h"
 
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
@@ -54,11 +53,11 @@ namespace editor {
 
 SymbolEditorState_Select::SymbolEditorState_Select(
     const Context& context) noexcept
-  : SymbolEditorState(context), mState(SubState::IDLE) {
+  : SymbolEditorState(context), mState(SubState::IDLE), mStartPos() {
 }
 
 SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
-  Q_ASSERT(mCmdMoveSelectedItems.isNull());
+  Q_ASSERT(mCmdDragSelectedItems.isNull());
 }
 
 /*******************************************************************************
@@ -67,20 +66,20 @@ SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
 
 bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Point startPos   = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
   Point currentPos = Point::fromPx(e.scenePos());
 
   switch (mState) {
     case SubState::SELECTING: {
-      setSelectionRect(startPos, currentPos);
+      setSelectionRect(mStartPos, currentPos);
       return true;
     }
     case SubState::MOVING: {
-      if (!mCmdMoveSelectedItems) {
-        mCmdMoveSelectedItems.reset(
-            new CmdMoveSelectedSymbolItems(mContext, startPos));
+      if (!mCmdDragSelectedItems) {
+        mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
       }
-      mCmdMoveSelectedItems->setCurrentPosition(currentPos);
+      Point delta = (currentPos - mStartPos).mappedToGrid(getGridInterval());
+      mCmdDragSelectedItems->setDeltaToStartPos(delta);
+      return true;
     }
     default: { return false; }
   }
@@ -88,17 +87,17 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos());
-
   switch (mState) {
     case SubState::IDLE: {
+      // update start position of selection or movement
+      mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
       QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
       QList<QSharedPointer<CircleGraphicsItem>>    circles;
       QList<QSharedPointer<PolygonGraphicsItem>>   polygons;
       QList<QSharedPointer<TextGraphicsItem>>      texts;
       int count = mContext.symbolGraphicsItem.getItemsAtPosition(
-          pos, &pins, &circles, &polygons, &texts);
+          mStartPos, &pins, &circles, &polygons, &texts);
       if (count == 0) {
         // start selecting
         clearSelectionRect(true);
@@ -142,7 +141,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         }
 
         // start moving
-        Q_ASSERT(!mCmdMoveSelectedItems);
+        Q_ASSERT(!mCmdDragSelectedItems);
         mState = SubState::MOVING;
       }
       return true;
@@ -161,9 +160,9 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       return true;
     }
     case SubState::MOVING: {
-      if (mCmdMoveSelectedItems) {
+      if (mCmdDragSelectedItems) {
         try {
-          mContext.undoStack.execCmd(mCmdMoveSelectedItems.take());
+          mContext.undoStack.execCmd(mCmdDragSelectedItems.take());
         } catch (const Exception& e) {
           QMessageBox::critical(&mContext.editorWidget, tr("Error"),
                                 e.getMsg());
@@ -181,7 +180,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 #if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
   // abort moving and handle double click
   if (mState == SubState::MOVING) {
-    mCmdMoveSelectedItems.reset();
+    mCmdDragSelectedItems.reset();
     mState = SubState::IDLE;
   }
 #endif
@@ -311,8 +310,10 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
 bool SymbolEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
   try {
-    mContext.undoStack.execCmd(
-        new CmdRotateSelectedSymbolItems(mContext, angle));
+    QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+        new CmdDragSelectedSymbolItems(mContext));
+    cmd->rotate(angle);
+    mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }

@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdmoveselectedsymbolitems.h"
+#include "cmddragselectedsymbolitems.h"
 
 #include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
@@ -47,17 +47,22 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(
-    const SymbolEditorState::Context& context, const Point& startPos) noexcept
-  : UndoCommandGroup(tr("Move Symbol Elements")),
+CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
+    const SymbolEditorState::Context& context) noexcept
+  : UndoCommandGroup(tr("Drag Symbol Elements")),
     mContext(context),
-    mStartPos(startPos),
-    mDeltaPos(0, 0) {
+    mCenterPos(0, 0),
+    mDeltaPos(0, 0),
+    mDeltaRot(0) {
+  int count = 0;
+
   QList<QSharedPointer<SymbolPinGraphicsItem>> pins =
       context.symbolGraphicsItem.getSelectedPins();
   foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {
     Q_ASSERT(pin);
     mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
+    mCenterPos += pin->getPin().getPosition();
+    ++count;
   }
 
   QList<QSharedPointer<CircleGraphicsItem>> circles =
@@ -65,6 +70,8 @@ CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(
   foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
+    mCenterPos += circle->getCircle().getCenter();
+    ++count;
   }
 
   QList<QSharedPointer<PolygonGraphicsItem>> polygons =
@@ -72,6 +79,11 @@ CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(
   foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
     mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
+    foreach (const Vertex& vertex,
+             polygon->getPolygon().getPath().getVertices()) {
+      mCenterPos += vertex.getPos();
+      ++count;
+    }
   }
 
   QList<QSharedPointer<TextGraphicsItem>> texts =
@@ -79,10 +91,15 @@ CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(
   foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdTextEdit(text->getText()));
+    mCenterPos += text->getText().getPosition();
+    ++count;
   }
+
+  mCenterPos /= qMax(count, 1);
+  mCenterPos.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
 }
 
-CmdMoveSelectedSymbolItems::~CmdMoveSelectedSymbolItems() noexcept {
+CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
   deleteAllCommands();
 }
 
@@ -90,34 +107,52 @@ CmdMoveSelectedSymbolItems::~CmdMoveSelectedSymbolItems() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept {
-  Point delta = pos - mStartPos;
-  delta.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
+void CmdDragSelectedSymbolItems::setDeltaToStartPos(
+    const Point& delta) noexcept {
+  translate(delta - mDeltaPos);
+}
 
-  if (delta != mDeltaPos) {
-    // move selected elements
+void CmdDragSelectedSymbolItems::translate(const Point& deltaPos) noexcept {
+  if (!deltaPos.isOrigin()) {
     foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
-      cmd->translate(delta - mDeltaPos, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
-      cmd->translate(delta - mDeltaPos, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
-      cmd->translate(delta - mDeltaPos, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdTextEdit* cmd, mTextEditCmds) {
-      cmd->translate(delta - mDeltaPos, true);
+      cmd->translate(deltaPos, true);
     }
-    mDeltaPos = delta;
+    mDeltaPos += deltaPos;
+    mCenterPos += deltaPos;
   }
+}
+
+void CmdDragSelectedSymbolItems::rotate(const Angle& angle) noexcept {
+  foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  mDeltaRot += angle;
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdMoveSelectedSymbolItems::performExecute() {
-  if (mDeltaPos.isOrigin()) {
+bool CmdDragSelectedSymbolItems::performExecute() {
+  if (mDeltaPos.isOrigin() && (mDeltaRot == 0)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;
@@ -145,7 +180,7 @@ bool CmdMoveSelectedSymbolItems::performExecute() {
  *  Private Methods
  ******************************************************************************/
 
-void CmdMoveSelectedSymbolItems::deleteAllCommands() noexcept {
+void CmdDragSelectedSymbolItems::deleteAllCommands() noexcept {
   qDeleteAll(mPinEditCmds);
   mPinEditCmds.clear();
   qDeleteAll(mCircleEditCmds);

@@ -78,9 +78,8 @@ SOURCES += \
     pkg/widgets/packagepadcombobox.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/dialogs/symbolpinpropertiesdialog.cpp \
-    sym/fsm/cmd/cmdmoveselectedsymbolitems.cpp \
+    sym/fsm/cmd/cmddragselectedsymbolitems.cpp \
     sym/fsm/cmd/cmdremoveselectedsymbolitems.cpp \
-    sym/fsm/cmd/cmdrotateselectedsymbolitems.cpp \
     sym/fsm/symboleditorfsm.cpp \
     sym/fsm/symboleditorstate.cpp \
     sym/fsm/symboleditorstate_addnames.cpp \
@@ -156,9 +155,8 @@ HEADERS += \
     pkg/widgets/packagepadcombobox.h \
     pkgcat/packagecategoryeditorwidget.h \
     sym/dialogs/symbolpinpropertiesdialog.h \
-    sym/fsm/cmd/cmdmoveselectedsymbolitems.h \
+    sym/fsm/cmd/cmddragselectedsymbolitems.h \
     sym/fsm/cmd/cmdremoveselectedsymbolitems.h \
-    sym/fsm/cmd/cmdrotateselectedsymbolitems.h \
     sym/fsm/symboleditorfsm.h \
     sym/fsm/symboleditorstate.h \
     sym/fsm/symboleditorstate_addnames.h \
