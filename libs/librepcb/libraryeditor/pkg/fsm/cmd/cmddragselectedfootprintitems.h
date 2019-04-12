@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -47,31 +47,30 @@ class CmdFootprintPadEdit;
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdMoveSelectedFootprintItems
+ *  Class CmdDragSelectedFootprintItems
  ******************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedFootprintItems class
- *
- * @author  ubruhin
- * @date    2017-05-28
+ * @brief The CmdDragSelectedFootprintItems class
  */
-class CmdMoveSelectedFootprintItems final : public UndoCommandGroup {
+class CmdDragSelectedFootprintItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdMoveSelectedFootprintItems() = delete;
-  CmdMoveSelectedFootprintItems(const CmdMoveSelectedFootprintItems& other) =
+  CmdDragSelectedFootprintItems() = delete;
+  CmdDragSelectedFootprintItems(const CmdDragSelectedFootprintItems& other) =
       delete;
-  CmdMoveSelectedFootprintItems(const PackageEditorState::Context& context,
-                                const Point& startPos) noexcept;
-  ~CmdMoveSelectedFootprintItems() noexcept;
+  explicit CmdDragSelectedFootprintItems(
+      const PackageEditorState::Context& context) noexcept;
+  ~CmdDragSelectedFootprintItems() noexcept;
 
   // General Methods
-  void setCurrentPosition(const Point& pos) noexcept;
+  void setDeltaToStartPos(const Point& delta) noexcept;
+  void translate(const Point& deltaPos) noexcept;
+  void rotate(const Angle& angle) noexcept;
 
   // Operator Overloadings
-  CmdMoveSelectedFootprintItems& operator       =(
-      const CmdMoveSelectedFootprintItems& rhs) = delete;
+  CmdDragSelectedFootprintItems& operator       =(
+      const CmdDragSelectedFootprintItems& rhs) = delete;
 
 private:
   // Private Methods
@@ -83,8 +82,9 @@ private:
 
   // Private Member Variables
   const PackageEditorState::Context& mContext;
-  Point                              mStartPos;
+  Point                              mCenterPos;
   Point                              mDeltaPos;
+  Angle                              mDeltaRot;
 
   // Move commands
   QList<CmdFootprintPadEdit*> mPadEditCmds;
@@ -102,4 +102,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H

@@ -35,7 +35,7 @@ namespace librepcb {
 namespace library {
 namespace editor {
 
-class CmdMoveSelectedFootprintItems;
+class CmdDragSelectedFootprintItems;
 
 /*******************************************************************************
  *  Class PackageEditorState_Select
@@ -87,7 +87,8 @@ private:  // Methods
 private:  // Types / Data
   enum class SubState { IDLE, SELECTING, MOVING };
   SubState                                      mState;
-  QScopedPointer<CmdMoveSelectedFootprintItems> mCmdMoveSelectedItems;
+  Point                                         mStartPos;
+  QScopedPointer<CmdDragSelectedFootprintItems> mCmdDragSelectedItems;
 };
 
 /*******************************************************************************

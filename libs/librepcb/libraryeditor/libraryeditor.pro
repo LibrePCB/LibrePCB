@@ -54,9 +54,8 @@ SOURCES += \
     newelementwizard/newelementwizardpage_packagepads.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
     pkg/footprintlisteditorwidget.cpp \
-    pkg/fsm/cmd/cmdmoveselectedfootprintitems.cpp \
+    pkg/fsm/cmd/cmddragselectedfootprintitems.cpp \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.cpp \
-    pkg/fsm/cmd/cmdrotateselectedfootprintitems.cpp \
     pkg/fsm/packageeditorfsm.cpp \
     pkg/fsm/packageeditorstate.cpp \
     pkg/fsm/packageeditorstate_addholes.cpp \
@@ -133,9 +132,8 @@ HEADERS += \
     newelementwizard/newelementwizardpage_packagepads.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
     pkg/footprintlisteditorwidget.h \
-    pkg/fsm/cmd/cmdmoveselectedfootprintitems.h \
+    pkg/fsm/cmd/cmddragselectedfootprintitems.h \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.h \
-    pkg/fsm/cmd/cmdrotateselectedfootprintitems.h \
     pkg/fsm/packageeditorfsm.h \
     pkg/fsm/packageeditorstate.h \
     pkg/fsm/packageeditorstate_addholes.h \

@@ -24,9 +24,8 @@
 
 #include "../dialogs/footprintpadpropertiesdialog.h"
 #include "../packageeditorwidget.h"
-#include "cmd/cmdmoveselectedfootprintitems.h"
+#include "cmd/cmddragselectedfootprintitems.h"
 #include "cmd/cmdremoveselectedfootprintitems.h"
-#include "cmd/cmdrotateselectedfootprintitems.h"
 
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
@@ -56,11 +55,11 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState_Select::PackageEditorState_Select(Context& context) noexcept
-  : PackageEditorState(context), mState(SubState::IDLE) {
+  : PackageEditorState(context), mState(SubState::IDLE), mStartPos() {
 }
 
 PackageEditorState_Select::~PackageEditorState_Select() noexcept {
-  Q_ASSERT(mCmdMoveSelectedItems.isNull());
+  Q_ASSERT(mCmdDragSelectedItems.isNull());
 }
 
 /*******************************************************************************
@@ -69,20 +68,21 @@ PackageEditorState_Select::~PackageEditorState_Select() noexcept {
 
 bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Point startPos   = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
   Point currentPos = Point::fromPx(e.scenePos());
 
   switch (mState) {
     case SubState::SELECTING: {
-      setSelectionRect(startPos, currentPos);
+      setSelectionRect(mStartPos, currentPos);
       return true;
     }
     case SubState::MOVING: {
-      if (!mCmdMoveSelectedItems) {
-        mCmdMoveSelectedItems.reset(
-            new CmdMoveSelectedFootprintItems(mContext, startPos));
+      if (!mCmdDragSelectedItems) {
+        mCmdDragSelectedItems.reset(
+            new CmdDragSelectedFootprintItems(mContext));
       }
-      mCmdMoveSelectedItems->setCurrentPosition(currentPos);
+      Point delta = (currentPos - mStartPos).mappedToGrid(getGridInterval());
+      mCmdDragSelectedItems->setDeltaToStartPos(delta);
+      return true;
     }
     default: { return false; }
   }
@@ -90,9 +90,10 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos());
   switch (mState) {
     case SubState::IDLE: {
+      // update start position of selection or movement
+      mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
       QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
       QList<QSharedPointer<CircleGraphicsItem>>       circles;
@@ -100,7 +101,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       QList<QSharedPointer<StrokeTextGraphicsItem>>   texts;
       QList<QSharedPointer<HoleGraphicsItem>>         holes;
       int count = mContext.currentGraphicsItem->getItemsAtPosition(
-          pos, &pads, &circles, &polygons, &texts, &holes);
+          mStartPos, &pads, &circles, &polygons, &texts, &holes);
       if (count == 0) {
         // start selecting
         clearSelectionRect(true);
@@ -146,7 +147,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         }
 
         // start moving
-        Q_ASSERT(!mCmdMoveSelectedItems);
+        Q_ASSERT(!mCmdDragSelectedItems);
         mState = SubState::MOVING;
       }
       return true;
@@ -165,9 +166,9 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       return true;
     }
     case SubState::MOVING: {
-      if (mCmdMoveSelectedItems) {
+      if (mCmdDragSelectedItems) {
         try {
-          mContext.undoStack.execCmd(mCmdMoveSelectedItems.take());
+          mContext.undoStack.execCmd(mCmdDragSelectedItems.take());
         } catch (const Exception& e) {
           QMessageBox::critical(&mContext.editorWidget, tr("Error"),
                                 e.getMsg());
@@ -186,7 +187,7 @@ bool PackageEditorState_Select::
 #if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
   // abort moving and handle double click
   if (mState == SubState::MOVING) {
-    mCmdMoveSelectedItems.reset();
+    mCmdDragSelectedItems.reset();
     mState = SubState::IDLE;
   }
 #endif
@@ -327,8 +328,10 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
 bool PackageEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
   try {
-    mContext.undoStack.execCmd(
-        new CmdRotateSelectedFootprintItems(mContext, angle));
+    QScopedPointer<CmdDragSelectedFootprintItems> cmd(
+        new CmdDragSelectedFootprintItems(mContext));
+    cmd->rotate(angle);
+    mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
