@@ -92,9 +92,8 @@ void CmdPolygonEdit::setPath(const Path& path, bool immediate) noexcept {
   if (immediate) mPolygon.setPath(mNewPath);
 }
 
-void CmdPolygonEdit::setDeltaToStartPos(const Point& deltaPos,
-                                        bool         immediate) noexcept {
-  setPath(mOldPath.translated(deltaPos), immediate);
+void CmdPolygonEdit::translate(const Point& deltaPos, bool immediate) noexcept {
+  setPath(mNewPath.translated(deltaPos), immediate);
 }
 
 void CmdPolygonEdit::rotate(const Angle& angle, const Point& center,

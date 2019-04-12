@@ -53,7 +53,7 @@ public:
 
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;
-  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
   void setShape(BI_Via::Shape shape, bool immediate) noexcept;
   void setSize(const PositiveLength& size, bool immediate) noexcept;
   void setDrillDiameter(const PositiveLength& diameter,

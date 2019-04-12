@@ -97,16 +97,16 @@ void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept {
   if (delta != mDeltaPos) {
     // move selected elements
     foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
-      cmd->setDeltaToStartCenter(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdTextEdit* cmd, mTextEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     mDeltaPos = delta;
   }

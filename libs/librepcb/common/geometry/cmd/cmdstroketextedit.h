@@ -62,7 +62,6 @@ public:
                       bool                     immediate) noexcept;
   void setAlignment(const Alignment& align, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
-  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
   void translate(const Point& delta, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;

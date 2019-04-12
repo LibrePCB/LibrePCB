@@ -124,25 +124,25 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept {
   if (delta != mDeltaPos) {
     // move selected elements
     foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     mDeltaPos = delta;
 

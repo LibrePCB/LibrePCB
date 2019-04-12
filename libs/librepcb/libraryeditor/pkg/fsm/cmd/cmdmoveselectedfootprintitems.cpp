@@ -108,19 +108,19 @@ void CmdMoveSelectedFootprintItems::setCurrentPosition(
   if (delta != mDeltaPos) {
     // move selected elements
     foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
-      cmd->setDeltaToStartCenter(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     mDeltaPos = delta;
   }

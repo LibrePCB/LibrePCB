@@ -50,8 +50,8 @@ public:
   ~CmdSymbolInstanceEdit() noexcept;
 
   // General Methods
-  void setPosition(Point& pos, bool immediate) noexcept;
-  void setDeltaToStartPos(Point& deltaPos, bool immediate) noexcept;
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void setMirrored(bool mirrored, bool immediate) noexcept;

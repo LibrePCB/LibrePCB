@@ -54,7 +54,7 @@ public:
   void setIsFilled(bool filled, bool immediate) noexcept;
   void setIsGrabArea(bool grabArea, bool immediate) noexcept;
   void setPath(const Path& path, bool immediate) noexcept;
-  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirror(const Point& center, Qt::Orientation orientation,
               bool immediate) noexcept;

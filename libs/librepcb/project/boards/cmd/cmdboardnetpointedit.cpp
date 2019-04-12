@@ -60,10 +60,10 @@ void CmdBoardNetPointEdit::setPosition(const Point& pos,
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
-void CmdBoardNetPointEdit::setDeltaToStartPos(const Point& deltaPos,
-                                              bool         immediate) noexcept {
+void CmdBoardNetPointEdit::translate(const Point& deltaPos,
+                                     bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 

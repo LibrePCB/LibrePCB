@@ -120,10 +120,10 @@ void CmdFootprintPadEdit::setPosition(const Point& pos,
   if (immediate) mPad.setPosition(mNewPos);
 }
 
-void CmdFootprintPadEdit::setDeltaToStartPos(const Point& deltaPos,
-                                             bool         immediate) noexcept {
+void CmdFootprintPadEdit::translate(const Point& deltaPos,
+                                    bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mPad.setPosition(mNewPos);
 }
 

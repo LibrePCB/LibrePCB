@@ -51,7 +51,7 @@ public:
 
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;
-  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
 
 private:
   // Private Methods
