@@ -107,6 +107,9 @@ StrokeText::~StrokeText() noexcept {
  ******************************************************************************/
 
 const QVector<Path>& StrokeText::getPaths() const noexcept {
+  if (!mFont) {
+    qWarning() << "Tried to obtain StrokeFont paths, but no font is set!";
+  }
   return needsAutoRotation() ? mPathsRotated : mPaths;
 }
 
