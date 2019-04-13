@@ -50,7 +50,7 @@ UndoCommandGroup::~UndoCommandGroup() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void UndoCommandGroup::appendChild(UndoCommand* cmd) {
+bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
   // make sure "cmd" is deleted when going out of scope (e.g. because of an
   // exception)
   QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -62,6 +62,7 @@ void UndoCommandGroup::appendChild(UndoCommand* cmd) {
   if (wasEverExecuted()) {
     if (cmdScopeGuard->execute()) {  // can throw
       mChilds.append(cmdScopeGuard.take());
+      return true;
     } else {
       cmdScopeGuard
           ->undo();  // just to be sure the command has executed nothing...
@@ -69,6 +70,7 @@ void UndoCommandGroup::appendChild(UndoCommand* cmd) {
   } else {
     mChilds.append(cmdScopeGuard.take());
   }
+  return false;
 }
 
 /*******************************************************************************
