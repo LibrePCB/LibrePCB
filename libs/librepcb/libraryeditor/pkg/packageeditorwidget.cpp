@@ -203,6 +203,18 @@ bool PackageEditorWidget::save() noexcept {
   }
 }
 
+bool PackageEditorWidget::cut() noexcept {
+  return mFsm->processCut();
+}
+
+bool PackageEditorWidget::copy() noexcept {
+  return mFsm->processCopy();
+}
+
+bool PackageEditorWidget::paste() noexcept {
+  return mFsm->processPaste();
+}
+
 bool PackageEditorWidget::rotateCw() noexcept {
   return mFsm->processRotateCw();
 }

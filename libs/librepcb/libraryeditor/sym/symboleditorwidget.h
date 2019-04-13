@@ -85,6 +85,9 @@ public:
 
 public slots:
   bool save() noexcept override;
+  bool cut() noexcept override;
+  bool copy() noexcept override;
+  bool paste() noexcept override;
   bool rotateCw() noexcept override;
   bool rotateCcw() noexcept override;
   bool remove() noexcept override;
