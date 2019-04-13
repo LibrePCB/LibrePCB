@@ -23,8 +23,10 @@
 #include "packageeditorstate_select.h"
 
 #include "../dialogs/footprintpadpropertiesdialog.h"
+#include "../footprintclipboarddata.h"
 #include "../packageeditorwidget.h"
 #include "cmd/cmddragselectedfootprintitems.h"
+#include "cmd/cmdpastefootprintitems.h"
 #include "cmd/cmdremoveselectedfootprintitems.h"
 
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
@@ -33,6 +35,7 @@
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
@@ -75,7 +78,8 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       setSelectionRect(mStartPos, currentPos);
       return true;
     }
-    case SubState::MOVING: {
+    case SubState::MOVING:
+    case SubState::PASTING: {
       if (!mCmdDragSelectedItems) {
         mCmdDragSelectedItems.reset(
             new CmdDragSelectedFootprintItems(mContext));
@@ -152,6 +156,18 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       }
       return true;
     }
+    case SubState::PASTING: {
+      try {
+        Q_ASSERT(mCmdDragSelectedItems);
+        mContext.undoStack.appendToCmdGroup(mCmdDragSelectedItems.take());
+        mContext.undoStack.commitCmdGroup();
+        mState = SubState::IDLE;
+        clearSelectionRect(true);
+      } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+      }
+      return true;
+    }
     default: { return false; }
   }
 }
@@ -201,10 +217,47 @@ bool PackageEditorState_Select::
 
 bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
-  if (mState == SubState::IDLE) {
-    return openContextMenuAtPos(Point::fromPx(e.scenePos()));
-  } else {
-    return false;
+  switch (mState) {
+    case SubState::IDLE: {
+      return openContextMenuAtPos(Point::fromPx(e.scenePos()));
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->rotate(Angle::deg90());
+      return true;
+    }
+    default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processCut() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      if (copySelectedItemsToClipboard()) {
+        return removeSelectedItems();
+      } else {
+        return false;
+      }
+    }
+    default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processCopy() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return copySelectedItemsToClipboard();
+    }
+    default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processPaste() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return pasteFromClipboard();
+    }
+    default: { return false; }
   }
 }
 
@@ -212,6 +265,11 @@ bool PackageEditorState_Select::processRotateCw() noexcept {
   switch (mState) {
     case SubState::IDLE: {
       return rotateSelectedItems(-Angle::deg90());
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->rotate(-Angle::deg90());
+      return true;
     }
     default: { return false; }
   }
@@ -222,6 +280,11 @@ bool PackageEditorState_Select::processRotateCcw() noexcept {
     case SubState::IDLE: {
       return rotateSelectedItems(Angle::deg90());
     }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->rotate(Angle::deg90());
+      return true;
+    }
     default: { return false; }
   }
 }
@@ -230,6 +293,28 @@ bool PackageEditorState_Select::processRemove() noexcept {
   switch (mState) {
     case SubState::IDLE: {
       return removeSelectedItems();
+    }
+    default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processAbortCommand() noexcept {
+  switch (mState) {
+    case SubState::MOVING: {
+      mCmdDragSelectedItems.reset();
+      mState = SubState::IDLE;
+      return true;
+    }
+    case SubState::PASTING: {
+      try {
+        mCmdDragSelectedItems.reset();
+        mContext.undoStack.abortCmdGroup();
+        mState = SubState::IDLE;
+        return true;
+      } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        return false;
+      }
     }
     default: { return false; }
   }
@@ -323,6 +408,99 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
   } else {
     return false;
   }
+}
+
+bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
+  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
+    return false;
+  }
+
+  try {
+    Point cursorPos = mContext.graphicsView.mapGlobalPosToScenePos(
+        QCursor::pos(), true, false);
+    FootprintClipboardData data(mContext.currentFootprint->getUuid(),
+                                mContext.package.getPads(), cursorPos);
+    foreach (const QSharedPointer<FootprintPadGraphicsItem>& pad,
+             mContext.currentGraphicsItem->getSelectedPads()) {
+      Q_ASSERT(pad);
+      data.getFootprintPads().append(
+          std::make_shared<FootprintPad>(pad->getPad()));
+    }
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle,
+             mContext.currentGraphicsItem->getSelectedCircles()) {
+      Q_ASSERT(circle);
+      data.getCircles().append(std::make_shared<Circle>(circle->getCircle()));
+    }
+    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon,
+             mContext.currentGraphicsItem->getSelectedPolygons()) {
+      Q_ASSERT(polygon);
+      data.getPolygons().append(
+          std::make_shared<Polygon>(polygon->getPolygon()));
+    }
+    foreach (const QSharedPointer<StrokeTextGraphicsItem>& text,
+             mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
+      Q_ASSERT(text);
+      data.getStrokeTexts().append(
+          std::make_shared<StrokeText>(text->getText()));
+    }
+    foreach (const QSharedPointer<HoleGraphicsItem>& hole,
+             mContext.currentGraphicsItem->getSelectedHoles()) {
+      Q_ASSERT(hole);
+      data.getHoles().append(std::make_shared<Hole>(hole->getHole()));
+    }
+    if (data.getItemCount() > 0) {
+      qApp->clipboard()->setMimeData(
+          data.toMimeData(mContext.layerProvider).release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;
+}
+
+bool PackageEditorState_Select::pasteFromClipboard() noexcept {
+  try {
+    // abort if no footprint is selected
+    if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
+      return false;
+    }
+
+    // update cursor position
+    mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(),
+                                                             true, false);
+
+    // get footprint items and abort if there are no items
+    std::unique_ptr<FootprintClipboardData> data =
+        FootprintClipboardData::fromMimeData(
+            qApp->clipboard()->mimeData());  // can throw
+    if (!data) {
+      return false;
+    }
+
+    // start undo command group
+    clearSelectionRect(true);
+    mContext.undoStack.beginCmdGroup(tr("Paste Footprint Elements"));
+    mState = SubState::PASTING;
+
+    // paste items from clipboard
+    Point offset =
+        (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
+    QScopedPointer<CmdPasteFootprintItems> cmd(new CmdPasteFootprintItems(
+        mContext.package, *mContext.currentFootprint,
+        *mContext.currentGraphicsItem, std::move(data), offset));
+    if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
+      // start moving the selected items
+      mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(mContext));
+      return true;
+    } else {
+      // no items pasted -> abort
+      mContext.undoStack.abortCmdGroup();  // can throw
+      mState = SubState::IDLE;
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return false;
 }
 
 bool PackageEditorState_Select::rotateSelectedItems(

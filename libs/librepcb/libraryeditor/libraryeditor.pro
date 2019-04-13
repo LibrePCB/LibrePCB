@@ -53,8 +53,10 @@ SOURCES += \
     newelementwizard/newelementwizardpage_entermetadata.cpp \
     newelementwizard/newelementwizardpage_packagepads.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
+    pkg/footprintclipboarddata.cpp \
     pkg/footprintlisteditorwidget.cpp \
     pkg/fsm/cmd/cmddragselectedfootprintitems.cpp \
+    pkg/fsm/cmd/cmdpastefootprintitems.cpp \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.cpp \
     pkg/fsm/packageeditorfsm.cpp \
     pkg/fsm/packageeditorstate.cpp \
@@ -131,8 +133,10 @@ HEADERS += \
     newelementwizard/newelementwizardpage_entermetadata.h \
     newelementwizard/newelementwizardpage_packagepads.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
+    pkg/footprintclipboarddata.h \
     pkg/footprintlisteditorwidget.h \
     pkg/fsm/cmd/cmddragselectedfootprintitems.h \
+    pkg/fsm/cmd/cmdpastefootprintitems.h \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.h \
     pkg/fsm/packageeditorfsm.h \
     pkg/fsm/packageeditorstate.h \
