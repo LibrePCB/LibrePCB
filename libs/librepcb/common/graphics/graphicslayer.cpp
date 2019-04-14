@@ -233,20 +233,20 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sSymbolPinNumbers,         {tr("Pin Numbers"),           QColor(64, 64, 64, 255),    Qt::gray,                   true});
     // board asymmetric
     h.insert(sBoardSheetFrames,         {tr("Sheet Frames"),          QColor("#96E0E0E0"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardOutlines,            {tr("Board Outlines"),        QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),         QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sBoardOutlines,            {tr("Board Outlines"),        QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),         QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
     h.insert(sBoardDrillsNpth,          {tr("Drills (NPTH)"),         QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardPadsTht,             {tr("Pads"),                  QColor("#966DB515"),        QColor("#B488E516"),        true});
-    h.insert(sBoardViasTht,             {tr("Vias"),                  QColor("#966DB515"),        QColor("#B488E516"),        true});
+    h.insert(sBoardPadsTht,             {tr("Pads"),                  QColor("#966DB515"),        QColor("#B44EFC14"),        true});
+    h.insert(sBoardViasTht,             {tr("Vias"),                  QColor("#966DB515"),        QColor("#B44EFC14"),        true});
     h.insert(sBoardAirWires,            {tr("Air Wires"),             Qt::yellow,                 Qt::yellow,                 true});
     h.insert(sBoardMeasures,            {tr("Measures"),              QColor("#FF808000"),        QColor("#FFA3B200"),        true});
-    h.insert(sBoardAlignment,           {tr("Alignment"),             QColor("#B4E59500"),        QColor("#FFA3B200"),        true});
+    h.insert(sBoardAlignment,           {tr("Alignment"),             QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
     h.insert(sBoardDocumentation,       {tr("Documentation"),         QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
     h.insert(sBoardComments,            {tr("Comments"),              QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
     h.insert(sBoardGuide,               {tr("Guide"),                 QColor("#FF808000"),        QColor("#FFA3B200"),        true});
     // board symmetric
-    h.insert(sTopPlacement,             {tr("Top Placement"),         QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBotPlacement,             {tr("Bot Placement"),         QColor("#DDFFFFFF"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sTopPlacement,             {tr("Top Placement"),         QColor("#BBFFFFFF"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sBotPlacement,             {tr("Bot Placement"),         QColor("#BBFFFFFF"),        QColor("#FFFFFFFF"),        true});
     h.insert(sTopDocumentation,         {tr("Top Documentation"),     QColor("#96E0E0E0"),        QColor("#DCE0E0E0"),        true});
     h.insert(sBotDocumentation,         {tr("Bot Documentation"),     QColor("#96E0E0E0"),        QColor("#DCE0E0E0"),        true});
     h.insert(sTopGrabAreas,             {tr("Top Grab Areas"),        QColor("#14FFFFFF"),        QColor("#32FFFFFF"),        false});
@@ -270,37 +270,37 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sTopGlue,                  {tr("Top Glue"),              QColor("#64E0E0E0"),        QColor("#78E0E0E0"),        false});
     h.insert(sBotGlue,                  {tr("Bot Glue"),              QColor("#64E0E0E0"),        QColor("#78E0E0E0"),        false});
     // board copper
-    h.insert(sTopCopper,                {tr("Top Copper"),            QColor("#96CC0802"),        QColor("#B4FF0800"),        true});
-    h.insert(sBotCopper,                {tr("Bot Copper"),            QColor("#964578CC"),        QColor("#B45697FF"),        true});
+    h.insert(sTopCopper,                {tr("Top Copper"),            QColor("#96CC0802"),        QColor("#C0FF0800"),        true});
+    h.insert(sBotCopper,                {tr("Bot Copper"),            QColor("#964578CC"),        QColor("#C00A66FC"),        true});
     // clang-format on
     for (int i = 1; i <= getInnerLayerCount(); ++i) {
-      QString nameTr        = QString(tr("Inner Copper %1")).arg(i);
+      QString nameTr = QString(tr("Inner Copper %1")).arg(i);
       QColor  color;
       QColor  hlColor;
       switch ((i - 1) % 6) {
         case 0:
-          color   = QColor("#96E50063");
-          hlColor = QColor("#B4E50063");
+          color   = QColor("#96CC57FF");
+          hlColor = QColor("#C0DA84FF");
           break;
         case 1:
-          color   = QColor("#96CC57FF");
-          hlColor = QColor("#B4DA84FF");
+          color   = QColor("#96E2A1FF");
+          hlColor = QColor("#C0E9BAFF");
           break;
         case 2:
           color   = QColor("#96EE5C9B");
-          hlColor = QColor("#B4FF4C99");
+          hlColor = QColor("#C0FF4C99");
           break;
         case 3:
-          color   = QColor("#96E2A1FF");
-          hlColor = QColor("#B4E9BAFF");
+          color   = QColor("#96E50063");
+          hlColor = QColor("#C0E50063");
           break;
         case 4:
           color   = QColor("#96A70049");
-          hlColor = QColor("#B4CC0058");
+          hlColor = QColor("#C0CC0058");
           break;
         case 5:
           color   = QColor("#967B20A3");
-          hlColor = QColor("#B49739BF");
+          hlColor = QColor("#C09739BF");
           break;
         default:
           qWarning() << "Invalid remainder!";
