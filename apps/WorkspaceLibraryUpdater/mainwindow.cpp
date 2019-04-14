@@ -132,7 +132,7 @@ void MainWindow::updateElements(std::shared_ptr<TransactionalFileSystem> fs,
     }
     try {
       ElementType element(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(fs)));
+          new TransactionalDirectory(fs, path)));
       element.save();
       fs->save();
       ui->log->addItem(fs->getAbsPath(path).toNative());
