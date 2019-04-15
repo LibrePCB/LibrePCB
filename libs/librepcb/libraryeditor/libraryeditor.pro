@@ -79,6 +79,7 @@ SOURCES += \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/dialogs/symbolpinpropertiesdialog.cpp \
     sym/fsm/cmd/cmddragselectedsymbolitems.cpp \
+    sym/fsm/cmd/cmdpastesymbolitems.cpp \
     sym/fsm/cmd/cmdremoveselectedsymbolitems.cpp \
     sym/fsm/symboleditorfsm.cpp \
     sym/fsm/symboleditorstate.cpp \
@@ -93,6 +94,7 @@ SOURCES += \
     sym/fsm/symboleditorstate_drawtext.cpp \
     sym/fsm/symboleditorstate_drawtextbase.cpp \
     sym/fsm/symboleditorstate_select.cpp \
+    sym/symbolclipboarddata.cpp \
     sym/symboleditorwidget.cpp \
 
 HEADERS += \
@@ -156,6 +158,7 @@ HEADERS += \
     pkgcat/packagecategoryeditorwidget.h \
     sym/dialogs/symbolpinpropertiesdialog.h \
     sym/fsm/cmd/cmddragselectedsymbolitems.h \
+    sym/fsm/cmd/cmdpastesymbolitems.h \
     sym/fsm/cmd/cmdremoveselectedsymbolitems.h \
     sym/fsm/symboleditorfsm.h \
     sym/fsm/symboleditorstate.h \
@@ -170,6 +173,7 @@ HEADERS += \
     sym/fsm/symboleditorstate_drawtext.h \
     sym/fsm/symboleditorstate_drawtextbase.h \
     sym/fsm/symboleditorstate_select.h \
+    sym/symbolclipboarddata.h \
     sym/symboleditorwidget.h \
 
 FORMS += \

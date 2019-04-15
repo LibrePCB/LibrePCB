@@ -57,6 +57,12 @@ public:
   explicit SymbolEditorState_Select(const Context& context) noexcept;
   ~SymbolEditorState_Select() noexcept;
 
+  // General Methods
+  bool exit() noexcept override {
+    processAbortCommand();
+    return true;
+  }
+
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
@@ -68,9 +74,13 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processCut() noexcept override;
+  bool processCopy() noexcept override;
+  bool processPaste() noexcept override;
   bool processRotateCw() noexcept override;
   bool processRotateCcw() noexcept override;
   bool processRemove() noexcept override;
+  bool processAbortCommand() noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_Select& operator=(const SymbolEditorState_Select& rhs) =
@@ -79,13 +89,15 @@ public:
 private:  // Methods
   bool openContextMenuAtPos(const Point& pos) noexcept;
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
+  bool copySelectedItemsToClipboard() noexcept;
+  bool pasteFromClipboard() noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool removeSelectedItems() noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
 
 private:  // Types / Data
-  enum class SubState { IDLE, SELECTING, MOVING };
+  enum class SubState { IDLE, SELECTING, MOVING, PASTING };
   SubState                                   mState;
   Point                                      mStartPos;
   QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;

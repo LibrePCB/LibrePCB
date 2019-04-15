@@ -23,8 +23,10 @@
 #include "symboleditorstate_select.h"
 
 #include "../dialogs/symbolpinpropertiesdialog.h"
+#include "../symbolclipboarddata.h"
 #include "../symboleditorwidget.h"
 #include "cmd/cmddragselectedsymbolitems.h"
+#include "cmd/cmdpastesymbolitems.h"
 #include "cmd/cmdremoveselectedsymbolitems.h"
 
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
@@ -32,9 +34,11 @@
 #include <librepcb/common/dialogs/textpropertiesdialog.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
 
@@ -73,7 +77,8 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       setSelectionRect(mStartPos, currentPos);
       return true;
     }
-    case SubState::MOVING: {
+    case SubState::MOVING:
+    case SubState::PASTING: {
       if (!mCmdDragSelectedItems) {
         mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
       }
@@ -146,6 +151,18 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       }
       return true;
     }
+    case SubState::PASTING: {
+      try {
+        Q_ASSERT(mCmdDragSelectedItems);
+        mContext.undoStack.appendToCmdGroup(mCmdDragSelectedItems.take());
+        mContext.undoStack.commitCmdGroup();
+        mState = SubState::IDLE;
+        clearSelectionRect(true);
+      } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+      }
+      return true;
+    }
     default: { return false; }
   }
 }
@@ -194,10 +211,47 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
-  if (mState == SubState::IDLE) {
-    return openContextMenuAtPos(Point::fromPx(e.scenePos()));
-  } else {
-    return false;
+  switch (mState) {
+    case SubState::IDLE: {
+      return openContextMenuAtPos(Point::fromPx(e.scenePos()));
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->rotate(Angle::deg90());
+      return true;
+    }
+    default: { return false; }
+  }
+}
+
+bool SymbolEditorState_Select::processCut() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      if (copySelectedItemsToClipboard()) {
+        return removeSelectedItems();
+      } else {
+        return false;
+      }
+    }
+    default: { return false; }
+  }
+}
+
+bool SymbolEditorState_Select::processCopy() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return copySelectedItemsToClipboard();
+    }
+    default: { return false; }
+  }
+}
+
+bool SymbolEditorState_Select::processPaste() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return pasteFromClipboard();
+    }
+    default: { return false; }
   }
 }
 
@@ -205,6 +259,11 @@ bool SymbolEditorState_Select::processRotateCw() noexcept {
   switch (mState) {
     case SubState::IDLE: {
       return rotateSelectedItems(-Angle::deg90());
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->rotate(-Angle::deg90());
+      return true;
     }
     default: { return false; }
   }
@@ -215,6 +274,11 @@ bool SymbolEditorState_Select::processRotateCcw() noexcept {
     case SubState::IDLE: {
       return rotateSelectedItems(Angle::deg90());
     }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->rotate(Angle::deg90());
+      return true;
+    }
     default: { return false; }
   }
 }
@@ -223,6 +287,28 @@ bool SymbolEditorState_Select::processRemove() noexcept {
   switch (mState) {
     case SubState::IDLE: {
       return removeSelectedItems();
+    }
+    default: { return false; }
+  }
+}
+
+bool SymbolEditorState_Select::processAbortCommand() noexcept {
+  switch (mState) {
+    case SubState::MOVING: {
+      mCmdDragSelectedItems.reset();
+      mState = SubState::IDLE;
+      return true;
+    }
+    case SubState::PASTING: {
+      try {
+        mCmdDragSelectedItems.reset();
+        mContext.undoStack.abortCmdGroup();
+        mState = SubState::IDLE;
+        return true;
+      } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        return false;
+      }
     }
     default: { return false; }
   }
@@ -305,6 +391,81 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
   } else {
     return false;
   }
+}
+
+bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
+  try {
+    Point cursorPos = mContext.graphicsView.mapGlobalPosToScenePos(
+        QCursor::pos(), true, false);
+    SymbolClipboardData data(mContext.symbol.getUuid(), cursorPos);
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin,
+             mContext.symbolGraphicsItem.getSelectedPins()) {
+      Q_ASSERT(pin);
+      data.getPins().append(std::make_shared<SymbolPin>(pin->getPin()));
+    }
+    foreach (const QSharedPointer<CircleGraphicsItem>& circle,
+             mContext.symbolGraphicsItem.getSelectedCircles()) {
+      Q_ASSERT(circle);
+      data.getCircles().append(std::make_shared<Circle>(circle->getCircle()));
+    }
+    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon,
+             mContext.symbolGraphicsItem.getSelectedPolygons()) {
+      Q_ASSERT(polygon);
+      data.getPolygons().append(
+          std::make_shared<Polygon>(polygon->getPolygon()));
+    }
+    foreach (const QSharedPointer<TextGraphicsItem>& text,
+             mContext.symbolGraphicsItem.getSelectedTexts()) {
+      Q_ASSERT(text);
+      data.getTexts().append(std::make_shared<Text>(text->getText()));
+    }
+    if (data.getItemCount() > 0) {
+      qApp->clipboard()->setMimeData(
+          data.toMimeData(mContext.layerProvider).release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;
+}
+
+bool SymbolEditorState_Select::pasteFromClipboard() noexcept {
+  try {
+    // update cursor position
+    mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(),
+                                                             true, false);
+
+    // get symbol items and abort if there are no items
+    std::unique_ptr<SymbolClipboardData> data =
+        SymbolClipboardData::fromMimeData(
+            qApp->clipboard()->mimeData());  // can throw
+    if (!data) {
+      return false;
+    }
+
+    // start undo command group
+    clearSelectionRect(true);
+    mContext.undoStack.beginCmdGroup(tr("Paste Symbol Elements"));
+    mState = SubState::PASTING;
+
+    // paste items from clipboard
+    Point offset =
+        (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
+    QScopedPointer<CmdPasteSymbolItems> cmd(new CmdPasteSymbolItems(
+        mContext.symbol, mContext.symbolGraphicsItem, std::move(data), offset));
+    if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
+      // start moving the selected items
+      mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
+      return true;
+    } else {
+      // no items pasted -> abort
+      mContext.undoStack.abortCmdGroup();  // can throw
+      mState = SubState::IDLE;
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return false;
 }
 
 bool SymbolEditorState_Select::rotateSelectedItems(
