@@ -66,11 +66,10 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory)
   }
 
   // read properties
-  try {
-    mUrl = mLoadingFileDocument.getValueByPath<QUrl>("url");
-  } catch (const Exception& e) {
-    qWarning() << e.getMsg();
-  }
+  // Note: Don't use SExpression::getValueByPath<QUrl>() because it would throw
+  // an exception if the URL is empty, which is actually legal in this case.
+  mUrl = QUrl(mLoadingFileDocument.getValueByPath<QString>("url"),
+              QUrl::StrictMode);
 
   // read dependency UUIDs
   foreach (const SExpression& node,
