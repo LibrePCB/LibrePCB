@@ -86,14 +86,16 @@ public:
   ComponentChooserDialog& operator=(const ComponentChooserDialog& rhs) = delete;
 
 private:  // Methods
+  void searchEditTextChanged(const QString& text) noexcept;
   void treeCategories_currentItemChanged(const QModelIndex& current,
                                          const QModelIndex& previous) noexcept;
   void listComponents_currentItemChanged(QListWidgetItem* current,
                                          QListWidgetItem* previous) noexcept;
   void listComponents_itemDoubleClicked(QListWidgetItem* item) noexcept;
+  void searchComponents(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
   void setSelectedComponent(const tl::optional<Uuid>& uuid) noexcept;
-  void updatePreview() noexcept;
+  void updatePreview(const FilePath& fp) noexcept;
   void accept() noexcept override;
   const QStringList& localeOrder() const noexcept;
 
@@ -106,7 +108,6 @@ private:  // Data
   tl::optional<Uuid>                         mSelectedComponentUuid;
 
   // preview
-  FilePath                                          mComponentFilePath;
   QScopedPointer<Component>                         mComponent;
   QScopedPointer<GraphicsScene>                     mGraphicsScene;
   QList<std::shared_ptr<Symbol>>                    mSymbols;
