@@ -111,7 +111,8 @@ public:
   void getElementMetadata(const FilePath elemDir, Uuid* uuid = nullptr,
                           Version* version = nullptr) const;
   void getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr) const;
-  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
+  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr,
+                         Uuid* cmpUuid = nullptr) const;
 
   // Getters: Special
   QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;

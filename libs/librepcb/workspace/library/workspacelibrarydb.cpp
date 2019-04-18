@@ -426,9 +426,10 @@ void WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
 }
 
 void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
-                                           Uuid*           pkgUuid) const {
+                                           Uuid* pkgUuid, Uuid* cmpUuid) const {
   QSqlQuery query = mDb->prepareQuery(
-      "SELECT package_uuid FROM devices WHERE filepath = :filepath");
+      "SELECT package_uuid, component_uuid "
+      "FROM devices WHERE filepath = :filepath");
   query.bindValue(":filepath",
                   devDir.toRelative(mWorkspace.getLibrariesPath()));
   mDb->exec(query);
@@ -436,6 +437,8 @@ void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
   if (query.first()) {
     Uuid uuid = Uuid::fromString(query.value(0).toString());  // can throw
     if (pkgUuid) *pkgUuid = uuid;
+    uuid = Uuid::fromString(query.value(1).toString());  // can throw
+    if (cmpUuid) *cmpUuid = uuid;
   } else {
     throw RuntimeError(
         __FILE__, __LINE__,
