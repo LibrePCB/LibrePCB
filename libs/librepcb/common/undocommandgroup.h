@@ -63,6 +63,9 @@ public:
    *
    * @param cmd       The command to add (must not be executed already)
    *
+   * @retval true     If the command was executed and has done some changes
+   * @retval false    If the command was not executed or has done nothing
+   *
    * @note If this command was already executed (#execute() called), this method
    *       will also immediately execute the newly added child command.
    * Otherwise, it will be executed as soon as #execute() is called.
@@ -70,7 +73,7 @@ public:
    * @warning This method must not be called after #undo() was called the first
    * time.
    */
-  void appendChild(UndoCommand* cmd);
+  bool appendChild(UndoCommand* cmd);
 
   // Operator Overloadings
   UndoCommandGroup& operator=(const UndoCommandGroup& rhs) = delete;

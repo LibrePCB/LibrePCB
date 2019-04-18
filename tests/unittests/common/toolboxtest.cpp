@@ -63,6 +63,49 @@ TEST(ToolboxTest, testStringOrNumberToQVariant_mixed) {
 }
 
 /*******************************************************************************
+ *  Parametrized incrementNumberInString() Tests
+ ******************************************************************************/
+
+struct ToolboxIncrementNumberInStringTestData {
+  QString input;
+  QString output;
+};
+
+class ToolboxIncrementNumberInStringTest
+  : public ToolboxTest,
+    public ::testing::WithParamInterface<
+        ToolboxIncrementNumberInStringTestData> {};
+
+TEST_P(ToolboxIncrementNumberInStringTest, test) {
+  const ToolboxIncrementNumberInStringTestData& data = GetParam();
+
+  EXPECT_EQ(data.output, Toolbox::incrementNumberInString(data.input));
+}
+
+// clang-format off
+static ToolboxIncrementNumberInStringTestData
+    sToolboxIncrementNumberInStringTestData[] = {
+// input,                     output
+  {"",                        "1"},
+  {"  ",                      "  1"},
+  {"0",                       "1"},
+  {"1",                       "2"},
+  {" 123 ",                   " 124 "},
+  {"X",                       "X1"},
+  {"X-1",                     "X-2"},
+  {"GND 41",                  "GND 42"},
+  {"FOO1.2",                  "FOO1.3"},
+  {"12 foo 34",               "12 foo 35"},
+  {"12 foo 34 bar 56 ",       "12 foo 34 bar 57 "},
+  {"99A",                     "100A"},
+};
+// clang-format on
+
+INSTANTIATE_TEST_CASE_P(
+    ToolboxIncrementNumberInStringTest, ToolboxIncrementNumberInStringTest,
+    ::testing::ValuesIn(sToolboxIncrementNumberInStringTestData));
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

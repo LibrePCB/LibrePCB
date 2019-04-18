@@ -68,10 +68,10 @@ void CmdBoardViaEdit::setPosition(const Point& pos, bool immediate) noexcept {
   if (immediate) mVia.setPosition(mNewPos);
 }
 
-void CmdBoardViaEdit::setDeltaToStartPos(const Point& deltaPos,
-                                         bool         immediate) noexcept {
+void CmdBoardViaEdit::translate(const Point& deltaPos,
+                                bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mVia.setPosition(mNewPos);
 }
 

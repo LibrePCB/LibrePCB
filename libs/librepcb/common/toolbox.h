@@ -127,6 +127,21 @@ public:
       Point* nearest = nullptr) noexcept;
 
   /**
+   * @brief Copy a string while incrementing its contained number
+   *
+   * - If the string contains one or more numbers, the last one gets incremented
+   * - If it does not contain a number, a "1" is appended instead
+   *
+   * This way, the returned number is guaranteed to be different from the input
+   * string. That's useful for example to generate unique, incrementing pin
+   * numbers like "X1", "X2", "X3" etc.
+   *
+   * @param string  The input string
+   * @return A new string with the incremented number
+   */
+  static QString incrementNumberInString(QString string) noexcept;
+
+  /**
    * @brief Convert a numeric or non-numeric string to the corresponding
    * QVariant
    *

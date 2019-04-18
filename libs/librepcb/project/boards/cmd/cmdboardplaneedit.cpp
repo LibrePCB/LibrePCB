@@ -72,17 +72,17 @@ CmdBoardPlaneEdit::~CmdBoardPlaneEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdBoardPlaneEdit::setDeltaToStartPos(const Point& deltaPos,
-                                           bool         immediate) noexcept {
+void CmdBoardPlaneEdit::translate(const Point& deltaPos,
+                                  bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewOutline = mOldOutline.translated(deltaPos);
+  mNewOutline.translate(deltaPos);
   if (immediate) mPlane.setOutline(mNewOutline);
 }
 
 void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center,
                                bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewOutline = mOldOutline.rotated(angle, center);
+  mNewOutline.rotate(angle, center);
   if (immediate) mPlane.setOutline(mNewOutline);
 }
 

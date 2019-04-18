@@ -74,6 +74,25 @@ void GraphicsScene::setSelectionRect(const Point& p1,
   mSelectionRectItem->setRect(rectPx);
 }
 
+QPixmap GraphicsScene::toPixmap(int dpi, const QColor& background) noexcept {
+  QRectF rect = itemsBoundingRect();
+  return toPixmap(QSize(qCeil(dpi * Length::fromPx(rect.width()).toInch()),
+                        qCeil(dpi * Length::fromPx(rect.height()).toInch())),
+                  background);
+}
+
+QPixmap GraphicsScene::toPixmap(const QSize&  size,
+                                const QColor& background) noexcept {
+  QRectF  rect = itemsBoundingRect();
+  QPixmap pixmap(size);
+  pixmap.fill(background);
+  QPainter painter(&pixmap);
+  painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
+                         QPainter::SmoothPixmapTransform);
+  render(&painter, QRectF(), rect, Qt::KeepAspectRatio);
+  return pixmap;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

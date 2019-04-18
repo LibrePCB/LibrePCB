@@ -17,59 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDPASTEFOOTPRINTITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDPASTEFOOTPRINTITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../symboleditorstate.h"
-
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace library {
+
+class Package;
+class Footprint;
+class FootprintGraphicsItem;
+
 namespace editor {
 
+class FootprintClipboardData;
+
 /*******************************************************************************
- *  Class CmdRotateSelectedSymbolItems
+ *  Class CmdPasteFootprintItems
  ******************************************************************************/
 
 /**
- * @brief The CmdRotateSelectedSymbolItems class
- *
- * @author  ubruhin
- * @date    2016-11-05
+ * @brief The CmdPasteFootprintItems class
  */
-class CmdRotateSelectedSymbolItems final : public UndoCommandGroup {
+class CmdPasteFootprintItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdRotateSelectedSymbolItems() = delete;
-  CmdRotateSelectedSymbolItems(const CmdRotateSelectedSymbolItems& other) =
-      delete;
-  CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
-                               const Angle& angle) noexcept;
-  ~CmdRotateSelectedSymbolItems() noexcept;
+  CmdPasteFootprintItems()                                    = delete;
+  CmdPasteFootprintItems(const CmdPasteFootprintItems& other) = delete;
+  CmdPasteFootprintItems(Package& package, Footprint& footprint,
+                         FootprintGraphicsItem&                  graphicsItem,
+                         std::unique_ptr<FootprintClipboardData> data,
+                         const Point& posOffset) noexcept;
+  ~CmdPasteFootprintItems() noexcept;
 
   // Operator Overloadings
-  CmdRotateSelectedSymbolItems& operator       =(
-      const CmdRotateSelectedSymbolItems& rhs) = delete;
+  CmdPasteFootprintItems& operator=(const CmdPasteFootprintItems& rhs) = delete;
 
-private:
-  // Private Methods
-
+protected:  // Methods
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  // Private Member Variables
-  const SymbolEditorState::Context& mContext;
-  Angle                             mAngle;
+private:  // Data
+  Package&                                mPackage;
+  Footprint&                              mFootprint;
+  FootprintGraphicsItem&                  mGraphicsItem;
+  std::unique_ptr<FootprintClipboardData> mData;
+  Point                                   mPosOffset;
 };
 
 /*******************************************************************************
@@ -80,4 +85,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDPASTEFOOTPRINTITEMS_H

@@ -70,10 +70,10 @@ void CmdDeviceInstanceEdit::setPosition(const Point& pos,
   if (immediate) mDevice.setPosition(mNewPos);
 }
 
-void CmdDeviceInstanceEdit::setDeltaToStartPos(const Point& deltaPos,
-                                               bool immediate) noexcept {
+void CmdDeviceInstanceEdit::translate(const Point& deltaPos,
+                                      bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mDevice.setPosition(mNewPos);
 }
 

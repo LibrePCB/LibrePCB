@@ -59,16 +59,17 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdSymbolInstanceEdit::setPosition(Point& pos, bool immediate) noexcept {
+void CmdSymbolInstanceEdit::setPosition(const Point& pos,
+                                        bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos = pos;
   if (immediate) mSymbol.setPosition(mNewPos);
 }
 
-void CmdSymbolInstanceEdit::setDeltaToStartPos(Point& deltaPos,
-                                               bool   immediate) noexcept {
+void CmdSymbolInstanceEdit::translate(const Point& deltaPos,
+                                      bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mSymbol.setPosition(mNewPos);
 }
 

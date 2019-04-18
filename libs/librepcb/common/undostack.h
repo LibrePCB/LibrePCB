@@ -201,6 +201,9 @@ public:
    * method.
    * @param forceKeepCmd  Only for internal use!
    *
+   * @retval true     If the command has done some changes
+   * @retval false    If the command has done nothing
+   *
    * @throw Exception If the command is not executed successfully, this method
    *                  throws an exception and tries to keep the state of the
    * stack consistend (as the passed command did never exist).
@@ -209,7 +212,7 @@ public:
    * command is active (see #isCommandActive()), this method will throw an
    * exception.
    */
-  void execCmd(UndoCommand* cmd, bool forceKeepCmd = false);
+  bool execCmd(UndoCommand* cmd, bool forceKeepCmd = false);
 
   /**
    * @brief Begin building a new command group that consists of multiple
@@ -233,18 +236,24 @@ public:
    * @param cmd       The command to execute (same conditions as for
    * #execCmd()!)
    *
-   * @throw Exception This method throws an exception if there is no command
-   * group active at the moment (#isCommandGroupActive()) or if an error occurs.
-   */
-  void appendToCmdGroup(UndoCommand* cmd);
-
-  /**
-   * @brief End the currently active command group and keep the changes
+   * @retval true     If the command has done some changes
+   * @retval false    If the command has done nothing
    *
    * @throw Exception This method throws an exception if there is no command
    * group active at the moment (#isCommandGroupActive()) or if an error occurs.
    */
-  void commitCmdGroup();
+  bool appendToCmdGroup(UndoCommand* cmd);
+
+  /**
+   * @brief End the currently active command group and keep the changes
+   *
+   * @retval true     If the command group has done some changes
+   * @retval false    If the command group has done nothing
+   *
+   * @throw Exception This method throws an exception if there is no command
+   * group active at the moment (#isCommandGroupActive()) or if an error occurs.
+   */
+  bool commitCmdGroup();
 
   /**
    * @brief End the currently active command group and revert the changes

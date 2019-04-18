@@ -188,6 +188,18 @@ bool SymbolEditorWidget::save() noexcept {
   }
 }
 
+bool SymbolEditorWidget::cut() noexcept {
+  return mFsm->processCut();
+}
+
+bool SymbolEditorWidget::copy() noexcept {
+  return mFsm->processCopy();
+}
+
+bool SymbolEditorWidget::paste() noexcept {
+  return mFsm->processPaste();
+}
+
 bool SymbolEditorWidget::rotateCw() noexcept {
   return mFsm->processRotateCw();
 }

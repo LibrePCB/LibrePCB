@@ -134,7 +134,7 @@ void UndoStack::setClean() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
+bool UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
   // make sure "cmd" is deleted when going out of scope (e.g. because of an
   // exception)
   QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -178,6 +178,7 @@ void UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
     // the command has done nothing, so we will just discard it
     cmd->undo();  // only to be sure the command has executed nothing...
   }
+  return commandHasDoneSomething;
 }
 
 void UndoStack::beginCmdGroup(const QString& text) {
@@ -197,7 +198,7 @@ void UndoStack::beginCmdGroup(const QString& text) {
   emit canUndoChanged(false);
 }
 
-void UndoStack::appendToCmdGroup(UndoCommand* cmd) {
+bool UndoStack::appendToCmdGroup(UndoCommand* cmd) {
   // make sure "cmd" is deleted when going out of scope (e.g. because of an
   // exception)
   QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
@@ -210,13 +211,15 @@ void UndoStack::appendToCmdGroup(UndoCommand* cmd) {
 
   // append new command as a child of active command group
   // note: this will also execute the new command!
-  mActiveCommandGroup->appendChild(cmdScopeGuard.take());  // can throw
+  bool commandHasDoneSomething =
+      mActiveCommandGroup->appendChild(cmdScopeGuard.take());  // can throw
 
   // emit signals
   emit stateModified();
+  return commandHasDoneSomething;
 }
 
-void UndoStack::commitCmdGroup() {
+bool UndoStack::commitCmdGroup() {
   if (!isCommandGroupActive()) {
     throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
   }
@@ -226,7 +229,7 @@ void UndoStack::commitCmdGroup() {
   if (mActiveCommandGroup->getChildCount() == 0) {
     // the last command is empty --> remove it from the stack!
     abortCmdGroup();
-    return;
+    return false;
   }
 
   // To finish the active command group, we only need to reset the pointer to
@@ -236,6 +239,7 @@ void UndoStack::commitCmdGroup() {
   // emit signals
   emit canUndoChanged(canUndo());
   emit commandGroupEnded();
+  return true;
 }
 
 void UndoStack::abortCmdGroup() {

@@ -60,10 +60,10 @@ void CmdSchematicNetPointEdit::setPosition(const Point& pos,
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
-void CmdSchematicNetPointEdit::setDeltaToStartPos(const Point& deltaPos,
-                                                  bool immediate) noexcept {
+void CmdSchematicNetPointEdit::translate(const Point& deltaPos,
+                                         bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
