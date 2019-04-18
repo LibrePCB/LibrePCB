@@ -211,6 +211,30 @@ bool PackageEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   }
 }
 
+bool PackageEditorFsm::processCut() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processCut();
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processCopy() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processCopy();
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processPaste() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processPaste();
+  } else {
+    return false;
+  }
+}
+
 bool PackageEditorFsm::processRotateCw() noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {

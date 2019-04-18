@@ -148,6 +148,30 @@ bool SymbolEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   }
 }
 
+bool SymbolEditorFsm::processCut() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processCut();
+  } else {
+    return false;
+  }
+}
+
+bool SymbolEditorFsm::processCopy() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processCopy();
+  } else {
+    return false;
+  }
+}
+
+bool SymbolEditorFsm::processPaste() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processPaste();
+  } else {
+    return false;
+  }
+}
+
 bool SymbolEditorFsm::processRotateCw() noexcept {
   if (getCurrentState()) {
     return getCurrentState()->processRotateCw();

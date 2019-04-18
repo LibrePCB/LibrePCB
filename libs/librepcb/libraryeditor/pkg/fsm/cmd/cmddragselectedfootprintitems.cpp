@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdmoveselectedfootprintitems.h"
+#include "cmddragselectedfootprintitems.h"
 
 #include <librepcb/common/geometry/cmd/cmdcircleedit.h>
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
@@ -49,18 +49,24 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
-    const PackageEditorState::Context& context, const Point& startPos) noexcept
-  : UndoCommandGroup(tr("Move Footprint Elements")),
+CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
+    const PackageEditorState::Context& context) noexcept
+  : UndoCommandGroup(tr("Drag Footprint Elements")),
     mContext(context),
-    mStartPos(startPos),
-    mDeltaPos(0, 0) {
+    mCenterPos(0, 0),
+    mDeltaPos(0, 0),
+    mDeltaRot(0) {
   Q_ASSERT(context.currentFootprint && context.currentGraphicsItem);
+
+  int count = 0;
+
   QList<QSharedPointer<FootprintPadGraphicsItem>> pads =
       context.currentGraphicsItem->getSelectedPads();
   foreach (const QSharedPointer<FootprintPadGraphicsItem>& pad, pads) {
     Q_ASSERT(pad);
     mPadEditCmds.append(new CmdFootprintPadEdit(pad->getPad()));
+    mCenterPos += pad->getPad().getPosition();
+    ++count;
   }
 
   QList<QSharedPointer<CircleGraphicsItem>> circles =
@@ -68,6 +74,8 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
   foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
+    mCenterPos += circle->getCircle().getCenter();
+    ++count;
   }
 
   QList<QSharedPointer<PolygonGraphicsItem>> polygons =
@@ -75,6 +83,11 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
   foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
     mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
+    foreach (const Vertex& vertex,
+             polygon->getPolygon().getPath().getVertices()) {
+      mCenterPos += vertex.getPos();
+      ++count;
+    }
   }
 
   QList<QSharedPointer<StrokeTextGraphicsItem>> texts =
@@ -82,6 +95,8 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
   foreach (const QSharedPointer<StrokeTextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdStrokeTextEdit(text->getText()));
+    mCenterPos += text->getText().getPosition();
+    ++count;
   }
 
   QList<QSharedPointer<HoleGraphicsItem>> holes =
@@ -89,10 +104,15 @@ CmdMoveSelectedFootprintItems::CmdMoveSelectedFootprintItems(
   foreach (const QSharedPointer<HoleGraphicsItem>& hole, holes) {
     Q_ASSERT(hole);
     mHoleEditCmds.append(new CmdHoleEdit(hole->getHole()));
+    mCenterPos += hole->getHole().getPosition();
+    ++count;
   }
+
+  mCenterPos /= qMax(count, 1);
+  mCenterPos.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
 }
 
-CmdMoveSelectedFootprintItems::~CmdMoveSelectedFootprintItems() noexcept {
+CmdDragSelectedFootprintItems::~CmdDragSelectedFootprintItems() noexcept {
   deleteAllCommands();
 }
 
@@ -100,38 +120,58 @@ CmdMoveSelectedFootprintItems::~CmdMoveSelectedFootprintItems() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdMoveSelectedFootprintItems::setCurrentPosition(
-    const Point& pos) noexcept {
-  Point delta = pos - mStartPos;
-  delta.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
+void CmdDragSelectedFootprintItems::setDeltaToStartPos(
+    const Point& delta) noexcept {
+  translate(delta - mDeltaPos);
+}
 
-  if (delta != mDeltaPos) {
-    // move selected elements
+void CmdDragSelectedFootprintItems::translate(const Point& deltaPos) noexcept {
+  if (!deltaPos.isOrigin()) {
     foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
-      cmd->setDeltaToStartCenter(delta, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(deltaPos, true);
     }
     foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(deltaPos, true);
     }
-    mDeltaPos = delta;
+    mDeltaPos += deltaPos;
+    mCenterPos += deltaPos;
   }
+}
+
+void CmdDragSelectedFootprintItems::rotate(const Angle& angle) noexcept {
+  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  mDeltaRot += angle;
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdMoveSelectedFootprintItems::performExecute() {
-  if (mDeltaPos.isOrigin()) {
+bool CmdDragSelectedFootprintItems::performExecute() {
+  if (mDeltaPos.isOrigin() && (mDeltaRot == 0)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;
@@ -162,7 +202,7 @@ bool CmdMoveSelectedFootprintItems::performExecute() {
  *  Private Methods
  ******************************************************************************/
 
-void CmdMoveSelectedFootprintItems::deleteAllCommands() noexcept {
+void CmdDragSelectedFootprintItems::deleteAllCommands() noexcept {
   qDeleteAll(mPadEditCmds);
   mPadEditCmds.clear();
   qDeleteAll(mCircleEditCmds);

@@ -94,13 +94,13 @@ void CmdMoveSelectedSchematicItems::setCurrentPosition(
   if (delta != mDeltaPos) {
     // move selected elements
     foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
-      cmd->setDeltaToStartPos(delta, true);
+      cmd->translate(delta - mDeltaPos, true);
     }
     mDeltaPos = delta;
   }

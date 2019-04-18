@@ -93,10 +93,9 @@ void CmdTextEdit::setPosition(const Point& pos, bool immediate) noexcept {
   if (immediate) mText.setPosition(mNewPosition);
 }
 
-void CmdTextEdit::setDeltaToStartPos(const Point& deltaPos,
-                                     bool         immediate) noexcept {
+void CmdTextEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPosition = mOldPosition + deltaPos;
+  mNewPosition += deltaPos;
   if (immediate) mText.setPosition(mNewPosition);
 }
 

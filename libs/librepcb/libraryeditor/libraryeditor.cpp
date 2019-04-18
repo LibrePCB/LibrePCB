@@ -75,6 +75,12 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   connect(mUi->actionUpdateLibraryDb, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
+  connect(mUi->actionCut, &QAction::triggered, this,
+          &LibraryEditor::cutTriggered);
+  connect(mUi->actionCopy, &QAction::triggered, this,
+          &LibraryEditor::copyTriggered);
+  connect(mUi->actionPaste, &QAction::triggered, this,
+          &LibraryEditor::pasteTriggered);
   connect(mUi->actionRotateCw, &QAction::triggered, this,
           &LibraryEditor::rotateCwTriggered);
   connect(mUi->actionRotateCcw, &QAction::triggered, this,
@@ -381,6 +387,18 @@ void LibraryEditor::showElementInFileExplorerTriggered() noexcept {
   if (!mCurrentEditorWidget) return;
   FilePath fp = mCurrentEditorWidget->getFilePath();
   QDesktopServices::openUrl(fp.toQUrl());
+}
+
+void LibraryEditor::cutTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->cut();
+}
+
+void LibraryEditor::copyTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->copy();
+}
+
+void LibraryEditor::pasteTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->paste();
 }
 
 void LibraryEditor::rotateCwTriggered() noexcept {

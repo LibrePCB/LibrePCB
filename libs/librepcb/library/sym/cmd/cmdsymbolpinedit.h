@@ -54,7 +54,7 @@ public:
   void setName(const CircuitIdentifier& name, bool immediate) noexcept;
   void setLength(const UnsignedLength& length, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
-  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 

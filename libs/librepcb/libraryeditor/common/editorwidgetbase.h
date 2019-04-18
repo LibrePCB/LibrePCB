@@ -114,6 +114,9 @@ public:
 
 public slots:
   virtual bool save() noexcept;
+  virtual bool cut() noexcept { return false; }
+  virtual bool copy() noexcept { return false; }
+  virtual bool paste() noexcept { return false; }
   virtual bool rotateCw() noexcept { return false; }
   virtual bool rotateCcw() noexcept { return false; }
   virtual bool remove() noexcept { return false; }

@@ -91,6 +91,9 @@ public:
     Q_UNUSED(e);
     return false;
   }
+  virtual bool processCut() noexcept { return false; }
+  virtual bool processCopy() noexcept { return false; }
+  virtual bool processPaste() noexcept { return false; }
   virtual bool processRotateCw() noexcept { return false; }
   virtual bool processRotateCcw() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }

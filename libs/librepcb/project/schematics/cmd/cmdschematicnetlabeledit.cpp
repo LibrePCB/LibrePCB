@@ -65,10 +65,10 @@ void CmdSchematicNetLabelEdit::setPosition(const Point& position,
   if (immediate) mNetLabel.setPosition(mNewPos);
 }
 
-void CmdSchematicNetLabelEdit::setDeltaToStartPos(const Point& deltaPos,
-                                                  bool immediate) noexcept {
+void CmdSchematicNetLabelEdit::translate(const Point& deltaPos,
+                                         bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mNetLabel.setPosition(mNewPos);
 }
 

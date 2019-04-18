@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -26,7 +26,7 @@
 #include "../packageeditorstate.h"
 
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
 
@@ -34,32 +34,43 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class CmdCircleEdit;
+class CmdStrokeTextEdit;
+class CmdPolygonEdit;
+class CmdHoleEdit;
+
 namespace library {
+
+class CmdFootprintPadEdit;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdRotateSelectedFootprintItems
+ *  Class CmdDragSelectedFootprintItems
  ******************************************************************************/
 
 /**
- * @brief The CmdRotateSelectedFootprintItems class
- *
- * @author  ubruhin
- * @date    2017-05-28
+ * @brief The CmdDragSelectedFootprintItems class
  */
-class CmdRotateSelectedFootprintItems final : public UndoCommandGroup {
+class CmdDragSelectedFootprintItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdRotateSelectedFootprintItems() = delete;
-  CmdRotateSelectedFootprintItems(
-      const CmdRotateSelectedFootprintItems& other) = delete;
-  CmdRotateSelectedFootprintItems(const PackageEditorState::Context& context,
-                                  const Angle& angle) noexcept;
-  ~CmdRotateSelectedFootprintItems() noexcept;
+  CmdDragSelectedFootprintItems() = delete;
+  CmdDragSelectedFootprintItems(const CmdDragSelectedFootprintItems& other) =
+      delete;
+  explicit CmdDragSelectedFootprintItems(
+      const PackageEditorState::Context& context) noexcept;
+  ~CmdDragSelectedFootprintItems() noexcept;
+
+  // General Methods
+  void setDeltaToStartPos(const Point& delta) noexcept;
+  void translate(const Point& deltaPos) noexcept;
+  void rotate(const Angle& angle) noexcept;
 
   // Operator Overloadings
-  CmdRotateSelectedFootprintItems& operator       =(
-      const CmdRotateSelectedFootprintItems& rhs) = delete;
+  CmdDragSelectedFootprintItems& operator       =(
+      const CmdDragSelectedFootprintItems& rhs) = delete;
 
 private:
   // Private Methods
@@ -67,9 +78,20 @@ private:
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
+  void deleteAllCommands() noexcept;
+
   // Private Member Variables
   const PackageEditorState::Context& mContext;
-  Angle                              mAngle;
+  Point                              mCenterPos;
+  Point                              mDeltaPos;
+  Angle                              mDeltaRot;
+
+  // Move commands
+  QList<CmdFootprintPadEdit*> mPadEditCmds;
+  QList<CmdCircleEdit*>       mCircleEditCmds;
+  QList<CmdPolygonEdit*>      mPolygonEditCmds;
+  QList<CmdStrokeTextEdit*>   mTextEditCmds;
+  QList<CmdHoleEdit*>         mHoleEditCmds;
 };
 
 /*******************************************************************************
@@ -80,4 +102,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H

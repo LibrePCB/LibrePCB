@@ -126,13 +126,6 @@ void CmdStrokeTextEdit::setPosition(const Point& pos, bool immediate) noexcept {
   if (immediate) mText.setPosition(mNewPosition);
 }
 
-void CmdStrokeTextEdit::setDeltaToStartPos(const Point& deltaPos,
-                                           bool         immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPosition = mOldPosition + deltaPos;
-  if (immediate) mText.setPosition(mNewPosition);
-}
-
 void CmdStrokeTextEdit::translate(const Point& delta, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPosition += delta;

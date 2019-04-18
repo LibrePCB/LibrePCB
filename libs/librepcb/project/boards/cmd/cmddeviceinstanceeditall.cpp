@@ -63,16 +63,15 @@ CmdDeviceInstanceEditAll::~CmdDeviceInstanceEditAll() noexcept {
 void CmdDeviceInstanceEditAll::setPosition(Point& pos,
                                            bool   immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  setDeltaToStartPos(pos - mDevEditCmd->mOldPos, immediate);
+  translate(pos - mDevEditCmd->mNewPos, immediate);
 }
 
-void CmdDeviceInstanceEditAll::setDeltaToStartPos(const Point& deltaPos,
-                                                  bool immediate) noexcept {
+void CmdDeviceInstanceEditAll::translate(const Point& deltaPos,
+                                         bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  Point posBefore = mDevEditCmd->mNewPos;
-  mDevEditCmd->setDeltaToStartPos(deltaPos, immediate);
+  mDevEditCmd->translate(deltaPos, immediate);
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
-    cmd->translate(mDevEditCmd->mNewPos - posBefore, immediate);
+    cmd->translate(deltaPos, immediate);
   }
 }
 

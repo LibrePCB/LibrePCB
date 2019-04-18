@@ -60,10 +60,16 @@ void CmdHoleEdit::setPosition(const Point& pos, bool immediate) noexcept {
   if (immediate) mHole.setPosition(mNewPosition);
 }
 
-void CmdHoleEdit::setDeltaToStartPos(const Point& deltaPos,
-                                     bool         immediate) noexcept {
+void CmdHoleEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPosition = mOldPosition + deltaPos;
+  mNewPosition += deltaPos;
+  if (immediate) mHole.setPosition(mNewPosition);
+}
+
+void CmdHoleEdit::rotate(const Angle& angle, const Point& center,
+                         bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPosition.rotate(angle, center);
   if (immediate) mHole.setPosition(mNewPosition);
 }
 
