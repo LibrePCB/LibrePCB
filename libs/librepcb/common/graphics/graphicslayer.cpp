@@ -234,14 +234,14 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     // board asymmetric
     h.insert(sBoardSheetFrames,         {tr("Sheet Frames"),          QColor("#96E0E0E0"),        QColor("#FFFFFFFF"),        true});
     h.insert(sBoardOutlines,            {tr("Board Outlines"),        QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),         QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
+    h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),         QColor("#C800DDFF"),        QColor("#FF00FFFF"),        true});
     h.insert(sBoardDrillsNpth,          {tr("Drills (NPTH)"),         QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
     h.insert(sBoardPadsTht,             {tr("Pads"),                  QColor("#966DB515"),        QColor("#B44EFC14"),        true});
     h.insert(sBoardViasTht,             {tr("Vias"),                  QColor("#966DB515"),        QColor("#B44EFC14"),        true});
     h.insert(sBoardAirWires,            {tr("Air Wires"),             Qt::yellow,                 Qt::yellow,                 true});
     h.insert(sBoardMeasures,            {tr("Measures"),              QColor("#FF808000"),        QColor("#FFA3B200"),        true});
     h.insert(sBoardAlignment,           {tr("Alignment"),             QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
-    h.insert(sBoardDocumentation,       {tr("Documentation"),         QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
+    h.insert(sBoardDocumentation,       {tr("Documentation"),         QColor("#96E0E0E0"),        QColor("#DCE0E0E0"),        true});
     h.insert(sBoardComments,            {tr("Comments"),              QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
     h.insert(sBoardGuide,               {tr("Guide"),                 QColor("#FF808000"),        QColor("#FFA3B200"),        true});
     // board symmetric
