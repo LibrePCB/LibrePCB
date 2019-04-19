@@ -95,7 +95,6 @@ public:
   // Getters: Library elements by search keyword
   template <typename ElementType>
   QList<Uuid> getElementsBySearchKeyword(const QString& keyword) const;
-  QSet<Uuid>  getComponentsBySearchKeyword(const QString& keyword) const;
 
   // Getters: Library elements of a specified library
   template <typename ElementType>
@@ -111,7 +110,8 @@ public:
   void getElementMetadata(const FilePath elemDir, Uuid* uuid = nullptr,
                           Version* version = nullptr) const;
   void getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr) const;
-  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
+  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr,
+                         Uuid* cmpUuid = nullptr) const;
 
   // Getters: Special
   QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;
