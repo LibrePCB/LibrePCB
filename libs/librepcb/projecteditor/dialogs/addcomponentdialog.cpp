@@ -262,56 +262,107 @@ void AddComponentDialog::searchComponents(const QString& input) {
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
 
-  if (input.length() >
-      1) {  // avoid freeze on entering first character due to huge result
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    QSet<Uuid>         components =
-        mWorkspace.getLibraryDb().getComponentsBySearchKeyword(input);
-    foreach (const Uuid& cmpUuid, components) {
-      // component
-      FilePath cmpFp = mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);
-      if (!cmpFp.isValid()) continue;
-      QString cmpName;
-      mWorkspace.getLibraryDb().getElementTranslations<library::Component>(
-          cmpFp, localeOrder, &cmpName);
+  // min. 2 chars to avoid freeze on entering first character due to huge result
+  if (input.length() > 1) {
+    SearchResult result = searchComponentsAndDevices(input);
+    QHashIterator<FilePath, SearchResultComponent> cmpIt(result);
+    while (cmpIt.hasNext()) {
+      cmpIt.next();
       QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
-      cmpItem->setText(0, cmpName);
-      cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
-      // devices
-      QSet<Uuid> devices =
-          mWorkspace.getLibraryDb().getDevicesOfComponent(cmpUuid);
-      foreach (const Uuid& devUuid, devices) {
-        try {
-          FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(devUuid);
-          if (!devFp.isValid()) continue;
-          QString devName;
-          mWorkspace.getLibraryDb().getElementTranslations<library::Device>(
-              devFp, localeOrder, &devName);
-          QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
-          devItem->setText(0, devName);
-          devItem->setData(0, Qt::UserRole, devFp.toStr());
-          // package
-          Uuid pkgUuid = Uuid::createRandom();  // only for initialization, will
-                                                // be overwritten
-          mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
-          FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
-          if (pkgFp.isValid()) {
-            QString pkgName;
-            mWorkspace.getLibraryDb().getElementTranslations<library::Package>(
-                pkgFp, localeOrder, &pkgName);
-            devItem->setText(1, pkgName);
-            devItem->setTextAlignment(1, Qt::AlignRight);
-          }
-        } catch (const Exception& e) {
-          // what could we do here?
-        }
+      cmpItem->setText(0, cmpIt.value().name);
+      cmpItem->setData(0, Qt::UserRole, cmpIt.key().toStr());
+      QHashIterator<FilePath, SearchResultDevice> devIt(cmpIt.value().devices);
+      while (devIt.hasNext()) {
+        devIt.next();
+        QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
+        devItem->setText(0, devIt.value().name);
+        devItem->setData(0, Qt::UserRole, devIt.key().toStr());
+        devItem->setText(1, devIt.value().pkgName);
+        devItem->setTextAlignment(1, Qt::AlignRight);
       }
-      cmpItem->setText(1, QString("[%1]").arg(devices.count()));
+      cmpItem->setText(1, QString("[%1]").arg(cmpIt.value().devices.count()));
       cmpItem->setTextAlignment(1, Qt::AlignRight);
+      cmpItem->setExpanded(!cmpIt.value().match);
     }
   }
 
   mUi->treeComponents->sortByColumn(0, Qt::AscendingOrder);
+}
+
+AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
+    const QString& input) {
+  SearchResult       result;
+  const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+
+  // add matching devices and their corresponding components
+  QList<Uuid> devices =
+      mWorkspace.getLibraryDb().getElementsBySearchKeyword<library::Device>(
+          input);  // can throw
+  foreach (const Uuid& devUuid, devices) {
+    FilePath devFp =
+        mWorkspace.getLibraryDb().getLatestDevice(devUuid);  // can throw
+    if (!devFp.isValid()) continue;
+    Uuid cmpUuid = Uuid::createRandom();
+    Uuid pkgUuid = Uuid::createRandom();
+    mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid,
+                                                &cmpUuid);  // can throw
+    FilePath cmpFp =
+        mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);  // can throw
+    if (!cmpFp.isValid()) continue;
+    FilePath pkgFp =
+        mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
+    SearchResultDevice& resDev = result[cmpFp].devices[devFp];
+    resDev.pkgFp               = pkgFp;
+    resDev.match               = true;
+  }
+
+  // add matching components and all their devices
+  QList<Uuid> components =
+      mWorkspace.getLibraryDb().getElementsBySearchKeyword<library::Component>(
+          input);  // can throw
+  foreach (const Uuid& cmpUuid, components) {
+    FilePath cmpFp =
+        mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);  // can throw
+    if (!cmpFp.isValid()) continue;
+    QSet<Uuid> devices =
+        mWorkspace.getLibraryDb().getDevicesOfComponent(cmpUuid);  // can throw
+    SearchResultComponent& resCmp = result[cmpFp];
+    resCmp.match                  = true;
+    foreach (const Uuid& devUuid, devices) {
+      FilePath devFp =
+          mWorkspace.getLibraryDb().getLatestDevice(devUuid);  // can throw
+      if (!devFp.isValid()) continue;
+      if (resCmp.devices.contains(devFp)) continue;
+      Uuid pkgUuid = Uuid::createRandom();
+      mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid,
+                                                  nullptr);  // can throw
+      FilePath pkgFp =
+          mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
+      SearchResultDevice& resDev = resCmp.devices[devFp];
+      resDev.pkgFp               = pkgFp;
+    }
+  }
+
+  // get name of elements
+  QMutableHashIterator<FilePath, SearchResultComponent> resultIt(result);
+  while (resultIt.hasNext()) {
+    resultIt.next();
+    mWorkspace.getLibraryDb().getElementTranslations<library::Component>(
+        resultIt.key(), localeOrder, &resultIt.value().name);
+    QMutableHashIterator<FilePath, SearchResultDevice> devIt(
+        resultIt.value().devices);
+    while (devIt.hasNext()) {
+      devIt.next();
+      mWorkspace.getLibraryDb().getElementTranslations<library::Device>(
+          devIt.key(), localeOrder, &devIt.value().name);
+      if (devIt.value().pkgFp.isValid()) {
+        mWorkspace.getLibraryDb().getElementTranslations<library::Package>(
+            devIt.value().pkgFp, localeOrder, &devIt.value().pkgName);
+      }
+    }
+  }
+
+  return result;
 }
 
 void AddComponentDialog::setSelectedCategory(
