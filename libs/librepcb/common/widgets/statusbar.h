@@ -66,13 +66,8 @@ public:
   void setFields(Fields fields) noexcept;
   void setField(Field field, bool enable) noexcept;
   void setAbsoluteCursorPosition(const Point& pos) noexcept;
-  void setProgressBarVisible(bool visible) noexcept;
   void setProgressBarTextFormat(const QString& format) noexcept;
   void setProgressBarPercent(int percent) noexcept;
-
-  // General Methods
-  void showProgressBar() noexcept { setProgressBarVisible(true); }
-  void hideProgressBar() noexcept { setProgressBarVisible(false); }
 
   // Operator Overloadings
   StatusBar& operator=(const StatusBar& rhs) = delete;

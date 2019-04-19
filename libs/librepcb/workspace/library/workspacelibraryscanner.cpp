@@ -122,6 +122,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     getLibrariesOfDirectory(fs, "remote", libraries);
     QHash<QString, int> libIds = updateLibraries(db, libraries);  // can throw
     emit                scanLibraryListUpdated(libIds.count());
+    emit                scanProgressUpdate(1);
     qDebug() << "Workspace libraries indexed:" << libIds.count()
              << "libraries in" << timer.elapsed() << "ms";
 
@@ -133,7 +134,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
 
     // scan all libraries
     int   count   = 0;
-    qreal percent = 0;
+    qreal percent = 1;
     foreach (const QString& fp, libraries.keys()) {
       Q_ASSERT(libIds.contains(fp));
       int                             libId = libIds[fp];
@@ -143,31 +144,31 @@ void WorkspaceLibraryScanner::scan() noexcept {
       count += addCategoriesToDb<ComponentCategory>(
           db, fs, fp, lib->searchForElements<ComponentCategory>(),
           "component_categories", "cat_id", libId);
-      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addCategoriesToDb<PackageCategory>(
           db, fs, fp, lib->searchForElements<PackageCategory>(),
           "package_categories", "cat_id", libId);
-      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count +=
           addElementsToDb<Symbol>(db, fs, fp, lib->searchForElements<Symbol>(),
                                   "symbols", "symbol_id", libId);
-      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Package>(db, fs, fp,
                                         lib->searchForElements<Package>(),
                                         "packages", "package_id", libId);
-      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Component>(db, fs, fp,
                                           lib->searchForElements<Component>(),
                                           "components", "component_id", libId);
-      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addDevicesToDb(db, fs, fp, lib->searchForElements<Device>(),
                               "devices", "device_id", libId);
-      emit scanProgressUpdate(percent += qreal(100) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
     }
 
     // commit transaction
@@ -184,6 +185,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     qDebug() << "Workspace library scan failed:" << e.getMsg();
     emit scanFailed(e.getMsg());
   }
+  emit scanProgressUpdate(100);
   emit scanFinished();
 }
 

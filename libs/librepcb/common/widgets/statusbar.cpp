@@ -64,8 +64,7 @@ StatusBar::StatusBar(QWidget* parent) noexcept
   // init
   setFields(0);
   setAbsoluteCursorPosition(Point());
-  setProgressBarVisible(false);
-  setProgressBarPercent(0);
+  setProgressBarPercent(100);
 }
 
 StatusBar::~StatusBar() noexcept {
@@ -94,17 +93,19 @@ void StatusBar::setAbsoluteCursorPosition(const Point& pos) noexcept {
   mAbsPosYLabel->setText(QString("Y:%1mm").arg(pos.getY().toMm(), 12, 'f', 6));
 }
 
-void StatusBar::setProgressBarVisible(bool visible) noexcept {
-  mProgressBar->setVisible(visible);
-  mProgressBarPlaceHolder->setVisible(!visible);
-}
-
 void StatusBar::setProgressBarTextFormat(const QString& format) noexcept {
   mProgressBar->setFormat(format);
 }
 
 void StatusBar::setProgressBarPercent(int percent) noexcept {
-  mProgressBar->setValue(percent);
+  if (percent < 100) {
+    mProgressBarPlaceHolder->hide();
+    mProgressBar->setValue(percent);
+    mProgressBar->show();
+  } else {
+    mProgressBar->hide();
+    mProgressBarPlaceHolder->show();
+  }
 }
 
 /*******************************************************************************
