@@ -70,6 +70,8 @@ SymbolChooserDialog::SymbolChooserDialog(
           &SymbolChooserDialog::listSymbols_currentItemChanged);
   connect(mUi->listSymbols, &QListWidget::itemDoubleClicked, this,
           &SymbolChooserDialog::listSymbols_itemDoubleClicked);
+  connect(mUi->edtSearch, &QLineEdit::textChanged, this,
+          &SymbolChooserDialog::searchEditTextChanged);
 
   setSelectedSymbol(FilePath());
 }
@@ -102,6 +104,20 @@ QString SymbolChooserDialog::getSelectedSymbolDescriptionTr() const noexcept {
  *  Private Methods
  ******************************************************************************/
 
+void SymbolChooserDialog::searchEditTextChanged(const QString& text) noexcept {
+  try {
+    QModelIndex catIndex = mUi->treeCategories->currentIndex();
+    if (text.trimmed().isEmpty() && catIndex.isValid()) {
+      setSelectedCategory(
+          Uuid::tryFromString(catIndex.data(Qt::UserRole).toString()));
+    } else {
+      searchSymbols(text.trimmed());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
 void SymbolChooserDialog::treeCategories_currentItemChanged(
     const QModelIndex& current, const QModelIndex& previous) noexcept {
   Q_UNUSED(previous);
@@ -124,6 +140,27 @@ void SymbolChooserDialog::listSymbols_itemDoubleClicked(
   if (item) {
     setSelectedSymbol(FilePath(item->data(Qt::UserRole).toString()));
     accept();
+  }
+}
+
+void SymbolChooserDialog::searchSymbols(const QString& input) {
+  setSelectedCategory(tl::nullopt);
+
+  // min. 2 chars to avoid freeze on entering first character due to huge result
+  if (input.length() > 1) {
+    QList<Uuid> symbols =
+        mWorkspace.getLibraryDb().getElementsBySearchKeyword<Symbol>(input);
+    foreach (const Uuid& uuid, symbols) {
+      FilePath fp =
+          mWorkspace.getLibraryDb().getLatestSymbol(uuid);  // can throw
+      QString name;
+      mWorkspace.getLibraryDb().getElementTranslations<Symbol>(
+          fp, localeOrder(),
+          &name);  // can throw
+      QListWidgetItem* item = new QListWidgetItem(name);
+      item->setData(Qt::UserRole, fp.toStr());
+      mUi->listSymbols->addItem(item);
+    }
   }
 }
 

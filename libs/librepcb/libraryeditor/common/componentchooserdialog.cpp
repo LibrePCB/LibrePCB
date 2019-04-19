@@ -70,6 +70,8 @@ ComponentChooserDialog::ComponentChooserDialog(
           &ComponentChooserDialog::listComponents_currentItemChanged);
   connect(mUi->listComponents, &QListWidget::itemDoubleClicked, this,
           &ComponentChooserDialog::listComponents_itemDoubleClicked);
+  connect(mUi->edtSearch, &QLineEdit::textChanged, this,
+          &ComponentChooserDialog::searchEditTextChanged);
 
   setSelectedComponent(tl::nullopt);
 }
@@ -81,6 +83,21 @@ ComponentChooserDialog::~ComponentChooserDialog() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ComponentChooserDialog::searchEditTextChanged(
+    const QString& text) noexcept {
+  try {
+    QModelIndex catIndex = mUi->treeCategories->currentIndex();
+    if (text.trimmed().isEmpty() && catIndex.isValid()) {
+      setSelectedCategory(
+          Uuid::tryFromString(catIndex.data(Qt::UserRole).toString()));
+    } else {
+      searchComponents(text.trimmed());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
 
 void ComponentChooserDialog::treeCategories_currentItemChanged(
     const QModelIndex& current, const QModelIndex& previous) noexcept {
@@ -106,6 +123,27 @@ void ComponentChooserDialog::listComponents_itemDoubleClicked(
     setSelectedComponent(
         Uuid::tryFromString(item->data(Qt::UserRole).toString()));
     accept();
+  }
+}
+
+void ComponentChooserDialog::searchComponents(const QString& input) {
+  setSelectedCategory(tl::nullopt);
+
+  // min. 2 chars to avoid freeze on entering first character due to huge result
+  if (input.length() > 1) {
+    QList<Uuid> components =
+        mWorkspace.getLibraryDb().getElementsBySearchKeyword<Component>(input);
+    foreach (const Uuid& uuid, components) {
+      FilePath fp =
+          mWorkspace.getLibraryDb().getLatestComponent(uuid);  // can throw
+      QString name;
+      mWorkspace.getLibraryDb().getElementTranslations<Component>(
+          fp, localeOrder(),
+          &name);  // can throw
+      QListWidgetItem* item = new QListWidgetItem(name);
+      item->setData(Qt::UserRole, uuid.toStr());
+      mUi->listComponents->addItem(item);
+    }
   }
 }
 
@@ -142,18 +180,16 @@ void ComponentChooserDialog::setSelectedCategory(
 
 void ComponentChooserDialog::setSelectedComponent(
     const tl::optional<Uuid>& uuid) noexcept {
-  QString uuidStr = "00000000-0000-0000-0000-000000000000";
-  QString name, desc;
+  FilePath fp;
+  QString  name = tr("No component selected");
+  QString  desc;
   mSelectedComponentUuid = uuid;
 
   if (uuid) {
     try {
-      uuidStr = uuid->toStr();
-      mComponentFilePath =
-          mWorkspace.getLibraryDb().getLatestComponent(*uuid);  // can throw
-
+      fp = mWorkspace.getLibraryDb().getLatestComponent(*uuid);  // can throw
       mWorkspace.getLibraryDb().getElementTranslations<Component>(
-          mComponentFilePath, localeOrder(), &name, &desc);  // can throw
+          fp, localeOrder(), &name, &desc);  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Could not load component metadata"),
                             e.getMsg());
@@ -162,19 +198,19 @@ void ComponentChooserDialog::setSelectedComponent(
 
   mUi->lblComponentName->setText(name);
   mUi->lblComponentDescription->setText(desc);
-  updatePreview();
+  updatePreview(fp);
 }
 
-void ComponentChooserDialog::updatePreview() noexcept {
+void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
   mSymbolGraphicsItems.clear();
   mSymbols.clear();
   mComponent.reset();
 
-  if (mComponentFilePath.isValid() && mLayerProvider) {
+  if (fp.isValid() && mLayerProvider) {
     try {
-      mComponent.reset(new Component(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(TransactionalFileSystem::openRO(
-              mComponentFilePath)))));  // can throw
+      mComponent.reset(new Component(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(fp)))));  // can throw
       if (mComponent && mComponent->getSymbolVariants().count() > 0) {
         const ComponentSymbolVariant& symbVar =
             *mComponent->getSymbolVariants().first();

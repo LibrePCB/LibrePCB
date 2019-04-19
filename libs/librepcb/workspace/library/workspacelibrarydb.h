@@ -92,6 +92,11 @@ public:
   FilePath getLatestComponent(const Uuid& uuid) const;
   FilePath getLatestDevice(const Uuid& uuid) const;
 
+  // Getters: Library elements by search keyword
+  template <typename ElementType>
+  QList<Uuid> getElementsBySearchKeyword(const QString& keyword) const;
+  QSet<Uuid>  getComponentsBySearchKeyword(const QString& keyword) const;
+
   // Getters: Library elements of a specified library
   template <typename ElementType>
   QList<FilePath> getLibraryElements(const FilePath& lib) const;
@@ -123,7 +128,6 @@ public:
   QSet<Uuid> getComponentsByCategory(const tl::optional<Uuid>& category) const;
   QSet<Uuid> getDevicesByCategory(const tl::optional<Uuid>& category) const;
   QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
-  QSet<Uuid> getComponentsBySearchKeyword(const QString& keyword) const;
 
   // General Methods
 
@@ -170,6 +174,9 @@ private:
   QSet<Uuid>         getElementsByCategory(
               const QString& tablename, const QString& idrowname,
               const tl::optional<Uuid>& categoryUuid) const;
+  QList<Uuid>     getElementsBySearchKeyword(const QString& tablename,
+                                             const QString& idrowname,
+                                             const QString& keyword) const;
   int             getLibraryId(const FilePath& lib) const;
   QList<FilePath> getLibraryElements(const FilePath& lib,
                                      const QString&  tablename) const;

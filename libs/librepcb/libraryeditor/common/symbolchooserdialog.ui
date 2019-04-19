@@ -21,11 +21,31 @@
   </property>
   <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,0" columnstretch="1,1,1">
    <item row="0" column="0" rowspan="2">
-    <widget class="QTreeView" name="treeCategories">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+     <item>
+      <widget class="QLineEdit" name="edtSearch">
+       <property name="maxLength">
+        <number>100</number>
+       </property>
+       <property name="placeholderText">
+        <string>What are you looking for?</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeView" name="treeCategories">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="0" column="1" rowspan="2">
     <widget class="QListWidget" name="listSymbols">
