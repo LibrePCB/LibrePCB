@@ -237,28 +237,6 @@ QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<Device>(
   return getElementsBySearchKeyword("devices", "device_id", keyword);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getComponentsBySearchKeyword(
-    const QString& keyword) const {
-  QSqlQuery query = mDb->prepareQuery(
-      "SELECT components.uuid FROM components, components_tr, devices, "
-      "devices_tr "
-      "ON components.id=components_tr.component_id "
-      "AND devices.id=devices_tr.device_id "
-      "AND devices.component_uuid=components.uuid "
-      "WHERE components_tr.name LIKE :keyword "
-      "OR components_tr.keywords LIKE :keyword "
-      "OR devices_tr.name LIKE :keyword "
-      "OR devices_tr.keywords LIKE :keyword ");
-  query.bindValue(":keyword", "%" + keyword + "%");
-  mDb->exec(query);
-
-  QSet<Uuid> elements;
-  while (query.next()) {
-    elements.insert(Uuid::fromString(query.value(0).toString()));  // can throw
-  }
-  return elements;
-}
-
 /*******************************************************************************
  *  Getters: Library elements of a specified library
  ******************************************************************************/

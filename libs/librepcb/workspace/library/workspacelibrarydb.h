@@ -95,7 +95,6 @@ public:
   // Getters: Library elements by search keyword
   template <typename ElementType>
   QList<Uuid> getElementsBySearchKeyword(const QString& keyword) const;
-  QSet<Uuid>  getComponentsBySearchKeyword(const QString& keyword) const;
 
   // Getters: Library elements of a specified library
   template <typename ElementType>
