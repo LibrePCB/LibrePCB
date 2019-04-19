@@ -191,12 +191,6 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanStarted, mUi->statusbar,
-          &StatusBar::showProgressBar, Qt::QueuedConnection);
-  connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanFinished, mUi->statusbar,
-          &StatusBar::hideProgressBar, Qt::QueuedConnection);
-  connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
   connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
