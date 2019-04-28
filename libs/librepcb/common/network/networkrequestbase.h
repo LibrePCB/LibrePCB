@@ -191,6 +191,7 @@ private:  // Methods
   void           replyFinishedSlot() noexcept;
   void           finalize(const QString& errorMsg = QString()) noexcept;
   static QString formatFileSize(qint64 bytes) noexcept;
+  static QString getUserAgent() noexcept;
 
 protected:  // Data
   // from constructor

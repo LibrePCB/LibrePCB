@@ -46,8 +46,7 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept
   Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
 
   // set initial HTTP header fields
-  QString userAgent = QString("LibrePCB/%1").arg(qApp->applicationVersion());
-  mRequest.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+  mRequest.setHeader(QNetworkRequest::UserAgentHeader, getUserAgent());
   mRequest.setRawHeader("X-LibrePCB-AppVersion",
                         qApp->applicationVersion().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-GitRevision",
@@ -294,6 +293,23 @@ QString NetworkRequestBase::formatFileSize(qint64 bytes) noexcept {
     num /= 1024;
   }
   return QString::number(num, 'f', 2) % " " % unit;
+}
+
+QString NetworkRequestBase::getUserAgent() noexcept {
+  static QString userAgent;
+  if (userAgent.isEmpty()) {
+    QStringList details;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    details << QSysInfo::prettyProductName();
+    details << QSysInfo::currentCpuArchitecture();
+#endif
+    details << QLocale::system().name();
+    userAgent =
+        QString("LibrePCB/%1 (%2) Qt/%3")
+            .arg(qApp->applicationVersion(),
+                 details.join("; ").remove("(").remove(")"), qVersion());
+  }
+  return userAgent;
 }
 
 /*******************************************************************************
