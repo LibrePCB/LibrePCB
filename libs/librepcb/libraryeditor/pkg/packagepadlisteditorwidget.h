@@ -34,8 +34,13 @@
 namespace librepcb {
 
 class UndoStack;
+class EditableTableWidget;
+class SortFilterProxyModel;
 
 namespace library {
+
+class PackagePadListModel;
+
 namespace editor {
 
 /*******************************************************************************
@@ -47,9 +52,6 @@ namespace editor {
  */
 class PackagePadListEditorWidget final : public QWidget {
   Q_OBJECT
-
-private:  // Types
-  enum Column { COLUMN_NAME = 0, COLUMN_BUTTONS, _COLUMN_COUNT };
 
 public:
   // Constructors / Destructor
@@ -64,45 +66,10 @@ public:
   PackagePadListEditorWidget& operator=(const PackagePadListEditorWidget& rhs) =
       delete;
 
-private:  // Slots
-  void currentCellChanged(int currentRow, int currentColumn, int previousRow,
-                          int previousColumn) noexcept;
-  void tableCellChanged(int row, int column) noexcept;
-  void btnAddRemoveClicked() noexcept;
-
-private:  // Methods
-  void padListEdited(const PackagePadList& list, int index,
-                     const std::shared_ptr<const PackagePad>& pad,
-                     PackagePadList::Event                    event) noexcept;
-  void updateTable(const tl::optional<Uuid>& selected = tl::nullopt) noexcept;
-  void setTableRowContent(int row, const tl::optional<Uuid>& uuid,
-                          const QString& name) noexcept;
-  void addPad(const QString& name) noexcept;
-  void removePad(const Uuid& uuid) noexcept;
-  CircuitIdentifier  setName(const Uuid& uuid, const QString& name) noexcept;
-  int                getRowOfTableCellWidget(QObject* obj) const noexcept;
-  tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
-  CircuitIdentifier  validateNameOrThrow(const QString& name) const;
-  void               executeCommand(UndoCommand* cmd);
-  QString            getNextPadNameProposal() const noexcept;
-
-  // row index <-> signal index conversion methods
-  int  newPadRow() const noexcept { return mPadList->count(); }
-  int  indexToRow(int index) const noexcept { return index; }
-  int  rowToIndex(int row) const noexcept { return row; }
-  bool isExistingPadRow(int row) const noexcept {
-    return row >= 0 && row < mPadList->count();
-  }
-  bool isNewPadRow(int row) const noexcept { return row == newPadRow(); }
-
-private:  // Data
-  QTableWidget*      mTable;
-  PackagePadList*    mPadList;
-  UndoStack*         mUndoStack;
-  tl::optional<Uuid> mSelectedPad;
-
-  // Slots
-  PackagePadList::OnEditedSlot mPadListEditedSlot;
+private:
+  QScopedPointer<PackagePadListModel>  mModel;
+  QScopedPointer<SortFilterProxyModel> mProxy;
+  QScopedPointer<EditableTableWidget>  mView;
 };
 
 /*******************************************************************************
