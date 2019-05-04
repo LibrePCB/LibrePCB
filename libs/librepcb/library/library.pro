@@ -52,6 +52,7 @@ SOURCES += \
     dev/cmd/cmddevicepadsignalmapitemedit.cpp \
     dev/device.cpp \
     dev/devicepadsignalmap.cpp \
+    dev/devicepadsignalmapmodel.cpp \
     library.cpp \
     librarybaseelement.cpp \
     librarybaseelementcheck.cpp \
@@ -130,6 +131,7 @@ HEADERS += \
     dev/cmd/cmddevicepadsignalmapitemedit.h \
     dev/device.h \
     dev/devicepadsignalmap.h \
+    dev/devicepadsignalmapmodel.h \
     elements.h \
     library.h \
     librarybaseelement.h \
