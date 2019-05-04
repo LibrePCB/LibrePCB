@@ -106,6 +106,54 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::ValuesIn(sToolboxIncrementNumberInStringTestData));
 
 /*******************************************************************************
+ *  Parametrized expandRangesInString() Tests
+ ******************************************************************************/
+
+struct ToolboxExpandRangesInStringTestData {
+  QString     input;
+  QStringList output;
+};
+
+class ToolboxExpandRangesInStringTest
+  : public ToolboxTest,
+    public ::testing::WithParamInterface<ToolboxExpandRangesInStringTestData> {
+};
+
+TEST_P(ToolboxExpandRangesInStringTest, test) {
+  const ToolboxExpandRangesInStringTestData& data = GetParam();
+
+  QStringList actual = Toolbox::expandRangesInString(data.input);
+
+  QString msg;
+  QDebug  dbg(&msg);
+  dbg << data.input << "->" << actual << "!=" << data.output;
+  EXPECT_EQ(data.output, actual) << msg.toStdString();
+}
+
+// clang-format off
+static ToolboxExpandRangesInStringTestData
+    sToolboxExpandRangesInStringTestData[] = {
+// input,             output
+  {"",                {""}},
+  {"  ",              {"  "}},
+  {"..",              {".."}},
+  {"1",               {"1"}},
+  {"A..A",            {"A"}},
+  {"1..5",            {"1", "2", "3", "4", "5"}},
+  {"X-2..2",          {"X-2"}},
+  {"X-5..11",         {"X-5", "X-6", "X-7", "X-8", "X-9", "X-10", "X-11"}},
+  {"X3..-1Y",         {"X3..-1Y"}},
+  {"0..1_X..Y",       {"0_X", "0_Y", "1_X", "1_Y"}},
+  {"-1..3_z..y",      {"-1_z", "-1_y", "-2_z", "-2_y", "-3_z", "-3_y"}},
+  {"2..3B..A0..1",    {"2B0", "2B1", "2A0", "2A1", "3B0", "3B1", "3A0", "3A1"}},
+};
+// clang-format on
+
+INSTANTIATE_TEST_CASE_P(
+    ToolboxExpandRangesInStringTest, ToolboxExpandRangesInStringTest,
+    ::testing::ValuesIn(sToolboxExpandRangesInStringTestData));
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 
