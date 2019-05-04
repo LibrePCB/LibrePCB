@@ -94,6 +94,7 @@ SOURCES += \
     graphics/stroketextgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
+    model/sortfilterproxymodel.cpp \
     network/filedownload.cpp \
     network/networkaccessmanager.cpp \
     network/networkrequest.cpp \
@@ -209,6 +210,7 @@ HEADERS += \
     graphics/stroketextgraphicsitem.h \
     graphics/textgraphicsitem.h \
     gridproperties.h \
+    model/sortfilterproxymodel.h \
     network/filedownload.h \
     network/networkaccessmanager.h \
     network/networkrequest.h \
