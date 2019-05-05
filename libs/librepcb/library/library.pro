@@ -68,6 +68,7 @@ SOURCES += \
     pkg/cmd/cmdpackagepadedit.cpp \
     pkg/footprint.cpp \
     pkg/footprintgraphicsitem.cpp \
+    pkg/footprintlistmodel.cpp \
     pkg/footprintpad.cpp \
     pkg/footprintpadgraphicsitem.cpp \
     pkg/footprintpadpreviewgraphicsitem.cpp \
@@ -149,6 +150,7 @@ HEADERS += \
     pkg/cmd/cmdpackagepadedit.h \
     pkg/footprint.h \
     pkg/footprintgraphicsitem.h \
+    pkg/footprintlistmodel.h \
     pkg/footprintpad.h \
     pkg/footprintpadgraphicsitem.h \
     pkg/footprintpadpreviewgraphicsitem.h \

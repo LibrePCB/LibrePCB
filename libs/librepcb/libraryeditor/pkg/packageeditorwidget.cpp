@@ -433,7 +433,9 @@ void PackageEditorWidget::fixMsg(const MsgMissingCategories& msg) {
 template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprint& msg) {
   Q_UNUSED(msg);
-  mUi->footprintEditorWidget->addDefaultFootprint();
+  std::shared_ptr<Footprint> fpt = std::make_shared<Footprint>(
+      Uuid::createRandom(), ElementName("default"), "");
+  mUndoStack->execCmd(new CmdFootprintInsert(mPackage->getFootprints(), fpt));
 }
 
 template <>
