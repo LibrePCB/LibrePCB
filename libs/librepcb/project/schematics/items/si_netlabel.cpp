@@ -81,6 +81,12 @@ NetSignal& SI_NetLabel::getNetSignalOfNetSegment() const noexcept {
   return mNetSegment.getNetSignal();
 }
 
+Length SI_NetLabel::getWidth() noexcept {
+  Length width = Length::fromPx(mGraphicsItem->boundingRect().width());
+
+  return width;
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

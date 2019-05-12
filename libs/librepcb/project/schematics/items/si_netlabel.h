@@ -65,6 +65,7 @@ public:
   const Angle&   getRotation() const noexcept { return mRotation; }
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   NetSignal&     getNetSignalOfNetSegment() const noexcept;
+  Length getWidth() noexcept;
 
   // Setters
   void setPosition(const Point& position) noexcept;

@@ -108,9 +108,12 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
     appendChild(cmd);
   }
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
+    // Since there is no right alignment (yet), coordinates need to be re-adjusted to accomodate left shift
+    // New position = mirrored old position - label width
+    Point newpos = netlabel->getPosition().mirrored(mOrientation, center);
+    newpos.setX(newpos.getX() - netlabel->getWidth());
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
-    cmd->setPosition(netlabel->getPosition().mirrored(mOrientation, center),
-                     false);
+    cmd->setPosition(newpos, false);
     appendChild(cmd);
   }
 
