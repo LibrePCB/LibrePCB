@@ -156,12 +156,12 @@ private:  // GUI Event Handlers
   void editPackageTriggered(const FilePath& fp) noexcept;
   void editComponentTriggered(const FilePath& fp) noexcept;
   void editDeviceTriggered(const FilePath& fp) noexcept;
-  void copyComponentCategoryTriggered(const FilePath& fp) noexcept;
-  void copyPackageCategoryTriggered(const FilePath& fp) noexcept;
-  void copySymbolTriggered(const FilePath& fp) noexcept;
-  void copyPackageTriggered(const FilePath& fp) noexcept;
-  void copyComponentTriggered(const FilePath& fp) noexcept;
-  void copyDeviceTriggered(const FilePath& fp) noexcept;
+  void duplicateComponentCategoryTriggered(const FilePath& fp) noexcept;
+  void duplicatePackageCategoryTriggered(const FilePath& fp) noexcept;
+  void duplicateSymbolTriggered(const FilePath& fp) noexcept;
+  void duplicatePackageTriggered(const FilePath& fp) noexcept;
+  void duplicateComponentTriggered(const FilePath& fp) noexcept;
+  void duplicateDeviceTriggered(const FilePath& fp) noexcept;
   void closeTabIfOpen(const FilePath& fp) noexcept;
   template <typename EditWidgetType>
   void editLibraryElementTriggered(const FilePath& fp,
@@ -174,8 +174,8 @@ private:  // GUI Event Handlers
 private:  // Methods
   void setActiveEditorWidget(EditorWidgetBase* widget);
   void newLibraryElement(NewElementWizardContext::ElementType type);
-  void copyLibraryElement(NewElementWizardContext::ElementType type,
-                          const FilePath&                      fp);
+  void duplicateLibraryElement(NewElementWizardContext::ElementType type,
+                               const FilePath&                      fp);
   void editNewLibraryElement(NewElementWizardContext::ElementType type,
                              const FilePath&                      fp);
   void updateTabTitles() noexcept;

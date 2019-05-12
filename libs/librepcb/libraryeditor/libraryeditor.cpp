@@ -272,18 +272,19 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   connect(overviewWidget, &LibraryOverviewWidget::editDeviceTriggered, this,
           &LibraryEditor::editDeviceTriggered);
   connect(overviewWidget,
-          &LibraryOverviewWidget::copyComponentCategoryTriggered, this,
-          &LibraryEditor::copyComponentCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::copyPackageCategoryTriggered,
-          this, &LibraryEditor::copyPackageCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::copySymbolTriggered, this,
-          &LibraryEditor::copySymbolTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::copyPackageTriggered, this,
-          &LibraryEditor::copyPackageTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::copyComponentTriggered, this,
-          &LibraryEditor::copyComponentTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::copyDeviceTriggered, this,
-          &LibraryEditor::copyDeviceTriggered);
+          &LibraryOverviewWidget::duplicateComponentCategoryTriggered, this,
+          &LibraryEditor::duplicateComponentCategoryTriggered);
+  connect(overviewWidget,
+          &LibraryOverviewWidget::duplicatePackageCategoryTriggered, this,
+          &LibraryEditor::duplicatePackageCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicateSymbolTriggered,
+          this, &LibraryEditor::duplicateSymbolTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicatePackageTriggered,
+          this, &LibraryEditor::duplicatePackageTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicateComponentTriggered,
+          this, &LibraryEditor::duplicateComponentTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicateDeviceTriggered,
+          this, &LibraryEditor::duplicateDeviceTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::removeElementTriggered, this,
           &LibraryEditor::closeTabIfOpen);
 
@@ -476,30 +477,32 @@ void LibraryEditor::editDeviceTriggered(const FilePath& fp) noexcept {
   editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
 }
 
-void LibraryEditor::copyComponentCategoryTriggered(
+void LibraryEditor::duplicateComponentCategoryTriggered(
     const FilePath& fp) noexcept {
-  copyLibraryElement(NewElementWizardContext::ElementType::ComponentCategory,
-                     fp);
+  duplicateLibraryElement(
+      NewElementWizardContext::ElementType::ComponentCategory, fp);
 }
 
-void LibraryEditor::copyPackageCategoryTriggered(const FilePath& fp) noexcept {
-  copyLibraryElement(NewElementWizardContext::ElementType::PackageCategory, fp);
+void LibraryEditor::duplicatePackageCategoryTriggered(
+    const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::PackageCategory,
+                          fp);
 }
 
-void LibraryEditor::copySymbolTriggered(const FilePath& fp) noexcept {
-  copyLibraryElement(NewElementWizardContext::ElementType::Symbol, fp);
+void LibraryEditor::duplicateSymbolTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Symbol, fp);
 }
 
-void LibraryEditor::copyPackageTriggered(const FilePath& fp) noexcept {
-  copyLibraryElement(NewElementWizardContext::ElementType::Package, fp);
+void LibraryEditor::duplicatePackageTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Package, fp);
 }
 
-void LibraryEditor::copyComponentTriggered(const FilePath& fp) noexcept {
-  copyLibraryElement(NewElementWizardContext::ElementType::Component, fp);
+void LibraryEditor::duplicateComponentTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Component, fp);
 }
 
-void LibraryEditor::copyDeviceTriggered(const FilePath& fp) noexcept {
-  copyLibraryElement(NewElementWizardContext::ElementType::Device, fp);
+void LibraryEditor::duplicateDeviceTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Device, fp);
 }
 
 template <typename EditWidgetType>
@@ -643,7 +646,7 @@ void LibraryEditor::newLibraryElement(
   }
 }
 
-void LibraryEditor::copyLibraryElement(
+void LibraryEditor::duplicateLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
   wizard.setElementToCopy(type, fp);

@@ -350,8 +350,9 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QMenu    menu;
   QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"), tr("Edit"));
   aEdit->setVisible(!selectedItemPaths.isEmpty());
-  QAction* aCopy = menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
-  aCopy->setVisible(selectedItemPaths.count() == 1);
+  QAction* aDuplicate =
+      menu.addAction(QIcon(":/img/actions/copy.png"), tr("Duplicate"));
+  aDuplicate->setVisible(selectedItemPaths.count() == 1);
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   aRemove->setVisible(!selectedItemPaths.isEmpty());
@@ -370,9 +371,9 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   if (action == aEdit) {
     Q_ASSERT(selectedItemPaths.count() > 0);
     foreach (const FilePath& fp, selectedItemPaths) { editItem(list, fp); }
-  } else if (action == aCopy) {
+  } else if (action == aDuplicate) {
     Q_ASSERT(selectedItemPaths.count() == 1);
-    copyItem(list, selectedItemPaths.values().first());
+    duplicateItem(list, selectedItemPaths.values().first());
   } else if (action == aRemove) {
     Q_ASSERT(selectedItemPaths.count() > 0);
     removeItems(selectedItemPaths);
@@ -399,20 +400,20 @@ void LibraryOverviewWidget::newItem(QListWidget* list) noexcept {
   }
 }
 
-void LibraryOverviewWidget::copyItem(QListWidget*    list,
-                                     const FilePath& fp) noexcept {
+void LibraryOverviewWidget::duplicateItem(QListWidget*    list,
+                                          const FilePath& fp) noexcept {
   if (list == mUi->lstCmpCat) {
-    emit copyComponentCategoryTriggered(fp);
+    emit duplicateComponentCategoryTriggered(fp);
   } else if (list == mUi->lstPkgCat) {
-    emit copyPackageCategoryTriggered(fp);
+    emit duplicatePackageCategoryTriggered(fp);
   } else if (list == mUi->lstSym) {
-    emit copySymbolTriggered(fp);
+    emit duplicateSymbolTriggered(fp);
   } else if (list == mUi->lstPkg) {
-    emit copyPackageTriggered(fp);
+    emit duplicatePackageTriggered(fp);
   } else if (list == mUi->lstCmp) {
-    emit copyComponentTriggered(fp);
+    emit duplicateComponentTriggered(fp);
   } else if (list == mUi->lstDev) {
-    emit copyDeviceTriggered(fp);
+    emit duplicateDeviceTriggered(fp);
   } else if (list) {
     qCritical() << "Unknown list widget!";
   }
