@@ -82,7 +82,7 @@ NetSignal& SI_NetLabel::getNetSignalOfNetSegment() const noexcept {
 }
 
 Length SI_NetLabel::getWidth() noexcept {
-  Length width = Length::fromPx(mGraphicsItem->boundingRect().width());
+  return Length::fromPx(mGraphicsItem->boundingRect().right());
 
   return width;
 }
