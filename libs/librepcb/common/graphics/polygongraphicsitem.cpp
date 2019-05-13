@@ -39,7 +39,10 @@ namespace librepcb {
 PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
                                          const IF_GraphicsLayerProvider& lp,
                                          QGraphicsItem* parent) noexcept
-  : PrimitivePathGraphicsItem(parent), mPolygon(polygon), mLayerProvider(lp) {
+  : PrimitivePathGraphicsItem(parent),
+    mPolygon(polygon),
+    mLayerProvider(lp),
+    mOnEditedSlot(*this, &PolygonGraphicsItem::polygonEdited) {
   setPath(mPolygon.getPath().toQPainterPathPx());
   setLineWidth(mPolygon.getLineWidth());
   setLineLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
@@ -47,41 +50,38 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // register to the polygon to get attribute updates
-  mPolygon.registerObserver(*this);
+  mPolygon.onEdited.attach(mOnEditedSlot);
 }
 
 PolygonGraphicsItem::~PolygonGraphicsItem() noexcept {
-  mPolygon.unregisterObserver(*this);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void PolygonGraphicsItem::polygonLayerNameChanged(
-    const GraphicsLayerName& newLayerName) noexcept {
-  setLineLayer(mLayerProvider.getLayer(*newLayerName));
-  updateFillLayer();  // required if the area is filled with the line layer
-}
-
-void PolygonGraphicsItem::polygonLineWidthChanged(
-    const UnsignedLength& newLineWidth) noexcept {
-  setLineWidth(newLineWidth);
-}
-
-void PolygonGraphicsItem::polygonIsFilledChanged(bool newIsFilled) noexcept {
-  Q_UNUSED(newIsFilled);
-  updateFillLayer();
-}
-
-void PolygonGraphicsItem::polygonIsGrabAreaChanged(
-    bool newIsGrabArea) noexcept {
-  Q_UNUSED(newIsGrabArea);
-  updateFillLayer();
-}
-
-void PolygonGraphicsItem::polygonPathChanged(const Path& newPath) noexcept {
-  setPath(newPath.toQPainterPathPx());
+void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
+                                        Polygon::Event event) noexcept {
+  switch (event) {
+    case Polygon::Event::LayerNameChanged:
+      setLineLayer(mLayerProvider.getLayer(*polygon.getLayerName()));
+      updateFillLayer();  // required if the area is filled with the line layer
+      break;
+    case Polygon::Event::LineWidthChanged:
+      setLineWidth(polygon.getLineWidth());
+      break;
+    case Polygon::Event::IsFilledChanged:
+    case Polygon::Event::IsGrabAreaChanged:
+      updateFillLayer();
+      break;
+    case Polygon::Event::PathChanged:
+      setPath(polygon.getPath().toQPainterPathPx());
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in "
+                    "PolygonGraphicsItem::polygonEdited()";
+      break;
+  }
 }
 
 void PolygonGraphicsItem::updateFillLayer() noexcept {

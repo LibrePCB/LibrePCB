@@ -48,8 +48,7 @@ namespace editor {
  * @author ubruhin
  * @date 2017-03-27
  */
-class PackagePadListEditorWidget final : public QWidget,
-                                         private PackagePadList::IF_Observer {
+class PackagePadListEditorWidget final : public QWidget {
   Q_OBJECT
 
 private:  // Types
@@ -75,6 +74,9 @@ private:  // Slots
   void btnAddRemoveClicked() noexcept;
 
 private:  // Methods
+  void padListEdited(const PackagePadList& list, int index,
+                     const std::shared_ptr<const PackagePad>& pad,
+                     PackagePadList::Event                    event) noexcept;
   void updateTable(const tl::optional<Uuid>& selected = tl::nullopt) noexcept;
   void setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                           const QString& name) noexcept;
@@ -96,19 +98,14 @@ private:  // Methods
   }
   bool isNewPadRow(int row) const noexcept { return row == newPadRow(); }
 
-  // Observer Methods
-  void listObjectAdded(
-      const PackagePadList& list, int newIndex,
-      const std::shared_ptr<PackagePad>& ptr) noexcept override;
-  void listObjectRemoved(
-      const PackagePadList& list, int oldIndex,
-      const std::shared_ptr<PackagePad>& ptr) noexcept override;
-
 private:  // Data
   QTableWidget*      mTable;
   PackagePadList*    mPadList;
   UndoStack*         mUndoStack;
   tl::optional<Uuid> mSelectedPad;
+
+  // Slots
+  PackagePadList::OnEditedSlot mPadListEditedSlot;
 };
 
 /*******************************************************************************

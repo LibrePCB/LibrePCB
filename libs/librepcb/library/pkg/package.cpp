@@ -49,8 +49,8 @@ Package::Package(const Uuid& uuid, const Version& version,
 Package::Package(std::unique_ptr<TransactionalDirectory> directory)
   : LibraryElement(std::move(directory), getShortElementName(),
                    getLongElementName()) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
+  mPads.loadFromSExpression(mLoadingFileDocument);
+  mFootprints.loadFromSExpression(mLoadingFileDocument);
 
   cleanupAfterLoadingElementFromFile();
 }

@@ -35,7 +35,10 @@ namespace librepcb {
  ******************************************************************************/
 
 OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept
-  : QGraphicsItem(parent), mLayer(nullptr), mSize(0) {
+  : QGraphicsItem(parent),
+    mLayer(nullptr),
+    mSize(0),
+    mOnLayerEditedSlot(*this, &OriginCrossGraphicsItem::layerEdited) {
   mPen.setWidth(0);
   mPenHighlighted.setWidth(0);
   updateBoundingRectAndShape();
@@ -44,8 +47,6 @@ OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept
 }
 
 OriginCrossGraphicsItem::~OriginCrossGraphicsItem() noexcept {
-  // unregister from graphics layer
-  setLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -70,56 +71,17 @@ void OriginCrossGraphicsItem::setSize(const UnsignedLength& size) noexcept {
 
 void OriginCrossGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
   if (mLayer) {
-    mLayer->unregisterObserver(*this);
+    mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mLayer = layer;
   if (mLayer) {
-    mLayer->registerObserver(*this);
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
     mPen.setColor(mLayer->getColor(false));
     mPenHighlighted.setColor(mLayer->getColor(true));
     setVisible(mLayer->isVisible());
   } else {
     setVisible(false);
   }
-}
-
-/*******************************************************************************
- *  Inherited from IF_LayerObserver
- ******************************************************************************/
-
-void OriginCrossGraphicsItem::layerColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_ASSERT(&layer == mLayer);
-  mPen.setColor(newColor);
-  update();
-}
-
-void OriginCrossGraphicsItem::layerHighlightColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_ASSERT(&layer == mLayer);
-  mPenHighlighted.setColor(newColor);
-  update();
-}
-
-void OriginCrossGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer,
-                                                  bool newVisible) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  Q_UNUSED(newVisible);
-  setVisible(layer.isVisible());
-}
-
-void OriginCrossGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer,
-                                                  bool newEnabled) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  layerVisibleChanged(layer, newEnabled);
-}
-
-void OriginCrossGraphicsItem::layerDestroyed(
-    const GraphicsLayer& layer) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  setLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -142,6 +104,31 @@ void OriginCrossGraphicsItem::paint(QPainter*                       painter,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void OriginCrossGraphicsItem::layerEdited(const GraphicsLayer& layer,
+                                          GraphicsLayer::Event event) noexcept {
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      mPen.setColor(layer.getColor(false));
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      mPenHighlighted.setColor(layer.getColor(true));
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      setVisible(layer.isVisible() && layer.isEnabled());
+      break;
+    case GraphicsLayer::Event::Destroyed:
+      setLayer(nullptr);
+      break;
+    default:
+      qWarning()
+          << "Unhandled switch-case in OriginCrossGraphicsItem::layerEdited()";
+      break;
+  }
+}
 
 void OriginCrossGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();

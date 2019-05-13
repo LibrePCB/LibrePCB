@@ -36,7 +36,8 @@ namespace library {
 
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(
     const ComponentPinSignalMapItem& other) noexcept
-  : mPinUuid(other.mPinUuid),
+  : onEdited(*this),
+    mPinUuid(other.mPinUuid),
     mSignalUuid(other.mSignalUuid),
     mDisplayType(other.mDisplayType) {
 }
@@ -44,17 +45,46 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(
     const Uuid& pin, const tl::optional<Uuid>& signal,
     const CmpSigPinDisplayType& displayType) noexcept
-  : mPinUuid(pin), mSignalUuid(signal), mDisplayType(displayType) {
+  : onEdited(*this),
+    mPinUuid(pin),
+    mSignalUuid(signal),
+    mDisplayType(displayType) {
 }
 
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
-  : mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
+  : onEdited(*this),
+    mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("signal")),
     mDisplayType(CmpSigPinDisplayType::fromString(
         node.getValueByPath<QString>("text"))) {
 }
 
 ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept {
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+bool ComponentPinSignalMapItem::setSignalUuid(
+    const tl::optional<Uuid>& uuid) noexcept {
+  if (uuid == mSignalUuid) {
+    return false;
+  }
+
+  mSignalUuid = uuid;
+  onEdited.notify(Event::SignalUuidChanged);
+  return true;
+}
+bool ComponentPinSignalMapItem::setDisplayType(
+    const CmpSigPinDisplayType& type) noexcept {
+  if (type == mDisplayType) {
+    return false;
+  }
+
+  mDisplayType = type;
+  onEdited.notify(Event::DisplayTypeChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -81,9 +111,12 @@ bool ComponentPinSignalMapItem::operator==(
 
 ComponentPinSignalMapItem& ComponentPinSignalMapItem::operator=(
     const ComponentPinSignalMapItem& rhs) noexcept {
-  mPinUuid     = rhs.mPinUuid;
-  mSignalUuid  = rhs.mSignalUuid;
-  mDisplayType = rhs.mDisplayType;
+  if (mPinUuid != rhs.mPinUuid) {
+    mPinUuid = rhs.mPinUuid;
+    onEdited.notify(Event::PinUuidChanged);
+  }
+  setSignalUuid(rhs.mSignalUuid);
+  setDisplayType(rhs.mDisplayType);
   return *this;
 }
 

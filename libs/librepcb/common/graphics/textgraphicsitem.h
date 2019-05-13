@@ -43,13 +43,9 @@ class IF_GraphicsLayerProvider;
 
 /**
  * @brief The TextGraphicsItem class is the graphical representation of a
- * librepcb::Text
- *
- * @author ubruhin
- * @date 2017-05-28
+ *        librepcb::Text
  */
-class TextGraphicsItem final : public PrimitiveTextGraphicsItem,
-                               public IF_TextObserver {
+class TextGraphicsItem final : public PrimitiveTextGraphicsItem {
 public:
   // Constructors / Destructor
   TextGraphicsItem()                              = delete;
@@ -65,18 +61,15 @@ public:
   TextGraphicsItem& operator=(const TextGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void textLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept override;
-  void textTextChanged(const QString& newText) noexcept override;
-  void textPositionChanged(const Point& newPos) noexcept override;
-  void textRotationChanged(const Angle& newRot) noexcept override;
-  void textHeightChanged(const PositiveLength& newHeight) noexcept override;
-  void textAlignChanged(const Alignment& newAlign) noexcept override;
+  void textEdited(const Text& text, Text::Event event) noexcept;
 
 private:  // Data
   Text&                                   mText;
   const IF_GraphicsLayerProvider&         mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+
+  // Slots
+  Text::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

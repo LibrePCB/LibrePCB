@@ -52,6 +52,14 @@ class PackagePad final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(PackagePad)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    NameChanged,
+  };
+  Signal<PackagePad, Event>       onEdited;
+  typedef Slot<PackagePad, Event> OnEditedSlot;
+
   // Constructors / Destructor
   PackagePad() = delete;
   PackagePad(const PackagePad& other) noexcept;
@@ -64,7 +72,7 @@ public:
   CircuitIdentifier getName() const noexcept { return mName; }
 
   // Setters
-  void setName(const CircuitIdentifier& name) noexcept;
+  bool setName(const CircuitIdentifier& name) noexcept;
 
   // General Methods
 
@@ -91,13 +99,17 @@ struct PackagePadListNameProvider {
   static constexpr const char* tagname = "pad";
 };
 using PackagePadList =
-    SerializableObjectList<PackagePad, PackagePadListNameProvider>;
+    SerializableObjectList<PackagePad, PackagePadListNameProvider,
+                           PackagePad::Event>;
 using CmdPackagePadInsert =
-    CmdListElementInsert<PackagePad, PackagePadListNameProvider>;
+    CmdListElementInsert<PackagePad, PackagePadListNameProvider,
+                         PackagePad::Event>;
 using CmdPackagePadRemove =
-    CmdListElementRemove<PackagePad, PackagePadListNameProvider>;
+    CmdListElementRemove<PackagePad, PackagePadListNameProvider,
+                         PackagePad::Event>;
 using CmdPackagePadsSwap =
-    CmdListElementsSwap<PackagePad, PackagePadListNameProvider>;
+    CmdListElementsSwap<PackagePad, PackagePadListNameProvider,
+                        PackagePad::Event>;
 
 /*******************************************************************************
  *  End of File

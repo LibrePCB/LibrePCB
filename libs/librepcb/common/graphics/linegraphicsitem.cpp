@@ -37,7 +37,9 @@ namespace librepcb {
  ******************************************************************************/
 
 LineGraphicsItem::LineGraphicsItem(QGraphicsItem* parent) noexcept
-  : QGraphicsItem(parent), mLayer(nullptr) {
+  : QGraphicsItem(parent),
+    mLayer(nullptr),
+    mOnLayerEditedSlot(*this, &LineGraphicsItem::layerEdited) {
   mPen.setCapStyle(Qt::RoundCap);
   mPenHighlighted.setCapStyle(Qt::RoundCap);
   mPen.setWidth(0);
@@ -47,8 +49,6 @@ LineGraphicsItem::LineGraphicsItem(QGraphicsItem* parent) noexcept
 }
 
 LineGraphicsItem::~LineGraphicsItem() noexcept {
-  // unregister from graphics layer
-  setLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -76,55 +76,17 @@ void LineGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept {
 
 void LineGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
   if (mLayer) {
-    mLayer->unregisterObserver(*this);
+    mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mLayer = layer;
   if (mLayer) {
-    mLayer->registerObserver(*this);
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
     mPen.setColor(mLayer->getColor(false));
     mPenHighlighted.setColor(mLayer->getColor(true));
     setVisible(mLayer->isVisible());
   } else {
     setVisible(false);
   }
-}
-
-/*******************************************************************************
- *  Inherited from IF_LayerObserver
- ******************************************************************************/
-
-void LineGraphicsItem::layerColorChanged(const GraphicsLayer& layer,
-                                         const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_ASSERT(&layer == mLayer);
-  mPen.setColor(newColor);
-  update();
-}
-
-void LineGraphicsItem::layerHighlightColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_ASSERT(&layer == mLayer);
-  mPenHighlighted.setColor(newColor);
-  update();
-}
-
-void LineGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer,
-                                           bool newVisible) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  Q_UNUSED(newVisible);
-  setVisible(layer.isVisible());
-}
-
-void LineGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer,
-                                           bool newEnabled) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  layerVisibleChanged(layer, newEnabled);
-}
-
-void LineGraphicsItem::layerDestroyed(const GraphicsLayer& layer) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  setLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -146,6 +108,30 @@ void LineGraphicsItem::paint(QPainter*                       painter,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void LineGraphicsItem::layerEdited(const GraphicsLayer& layer,
+                                   GraphicsLayer::Event event) noexcept {
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      mPen.setColor(layer.getColor(false));
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      mPenHighlighted.setColor(layer.getColor(true));
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      setVisible(layer.isVisible() && layer.isEnabled());
+      break;
+    case GraphicsLayer::Event::Destroyed:
+      setLayer(nullptr);
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in LineGraphicsItem::layerEdited()";
+      break;
+  }
+}
 
 void LineGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();

@@ -37,14 +37,16 @@ namespace librepcb {
  ******************************************************************************/
 
 Attribute::Attribute(const Attribute& other) noexcept
-  : mKey(other.mKey),
+  : onEdited(*this),
+    mKey(other.mKey),
     mType(other.mType),
     mValue(other.mValue),
     mUnit(other.mUnit) {
 }
 
 Attribute::Attribute(const SExpression& node)
-  : mKey(node.getChildByIndex(0).getValue<QString>(true)),
+  : onEdited(*this),
+    mKey(node.getChildByIndex(0).getValue<QString>(true)),
     mType(&AttributeType::fromString(node.getValueByPath<QString>("type"))),
     mValue(node.getValueByPath<QString>("value")),
     mUnit(mType->getUnitFromString(node.getValueByPath<QString>("unit"))) {
@@ -53,7 +55,7 @@ Attribute::Attribute(const SExpression& node)
 
 Attribute::Attribute(const AttributeKey& key, const AttributeType& type,
                      const QString& value, const AttributeUnit* unit)
-  : mKey(key), mType(&type), mValue(value), mUnit(unit) {
+  : onEdited(*this), mKey(key), mType(&type), mValue(value), mUnit(unit) {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
@@ -72,18 +74,35 @@ QString Attribute::getValueTr(bool showUnit) const noexcept {
  *  Setters
  ******************************************************************************/
 
-void Attribute::setTypeValueUnit(const AttributeType& type,
+bool Attribute::setKey(const AttributeKey& key) noexcept {
+  if (key == mKey) {
+    return false;
+  }
+
+  mKey = key;
+  onEdited.notify(Event::KeyChanged);
+  return true;
+}
+
+bool Attribute::setTypeValueUnit(const AttributeType& type,
                                  const QString&       value,
                                  const AttributeUnit* unit) {
+  if ((&type == mType) && (value == mValue) && (unit == mUnit)) {
+    return false;
+  }
+
   if ((!type.isUnitAvailable(unit)) || (!type.isValueValid(value))) {
     throw LogicError(
         __FILE__, __LINE__,
         QString("%1,%2,%3")
             .arg(type.getName(), value, unit ? unit->getName() : "-"));
   }
+
   mType  = &type;
   mValue = value;
   mUnit  = unit;
+  onEdited.notify(Event::TypeValueUnitChanged);
+  return true;
 }
 
 /*******************************************************************************

@@ -40,15 +40,15 @@ namespace librepcb {
 /**
  * @brief The CmdListElementInsert class
  */
-template <typename T, typename P>
+template <typename T, typename P, typename... OnEditedArgs>
 class CmdListElementInsert final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdListElementInsert()                                  = delete;
   CmdListElementInsert(const CmdListElementInsert& other) = delete;
-  CmdListElementInsert(SerializableObjectList<T, P>& list,
-                       const std::shared_ptr<T>&     element,
-                       int                           index = -1) noexcept
+  CmdListElementInsert(SerializableObjectList<T, P, OnEditedArgs...>& list,
+                       const std::shared_ptr<T>&                      element,
+                       int index = -1) noexcept
     : UndoCommand(QString(tr("Add %1")).arg(P::tagname)),
       mList(list),
       mElement(element),
@@ -73,9 +73,9 @@ private:  // Methods
   void performRedo() override { mIndex = mList.insert(mIndex, mElement); }
 
 private:  // Data
-  SerializableObjectList<T, P>& mList;
-  std::shared_ptr<T>            mElement;
-  int                           mIndex;
+  SerializableObjectList<T, P, OnEditedArgs...>& mList;
+  std::shared_ptr<T>                             mElement;
+  int                                            mIndex;
 };
 
 /*******************************************************************************

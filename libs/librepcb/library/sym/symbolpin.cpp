@@ -37,7 +37,8 @@ namespace library {
  ******************************************************************************/
 
 SymbolPin::SymbolPin(const SymbolPin& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mName(other.mName),
     mPosition(other.mPosition),
     mLength(other.mLength),
@@ -48,7 +49,8 @@ SymbolPin::SymbolPin(const SymbolPin& other) noexcept
 SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
                      const Point& position, const UnsignedLength& length,
                      const Angle& rotation) noexcept
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mName(name),
     mPosition(position),
     mLength(length),
@@ -57,7 +59,8 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
 }
 
 SymbolPin::SymbolPin(const SExpression& node)
-  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mName(node.getValueByPath<CircuitIdentifier>("name", true)),
     mPosition(node.getChildByPath("position")),
     mLength(node.getValueByPath<UnsignedLength>("length")),
@@ -73,24 +76,48 @@ SymbolPin::~SymbolPin() noexcept {
  *  Setters
  ******************************************************************************/
 
-void SymbolPin::setName(const CircuitIdentifier& name) noexcept {
+bool SymbolPin::setName(const CircuitIdentifier& name) noexcept {
+  if (name == mName) {
+    return false;
+  }
+
   mName = name;
   if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setName(mName);
+  onEdited.notify(Event::NameChanged);
+  return true;
 }
 
-void SymbolPin::setPosition(const Point& pos) noexcept {
+bool SymbolPin::setPosition(const Point& pos) noexcept {
+  if (pos == mPosition) {
+    return false;
+  }
+
   mPosition = pos;
   if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
+  onEdited.notify(Event::PositionChanged);
+  return true;
 }
 
-void SymbolPin::setLength(const UnsignedLength& length) noexcept {
+bool SymbolPin::setLength(const UnsignedLength& length) noexcept {
+  if (length == mLength) {
+    return false;
+  }
+
   mLength = length;
   if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLength(mLength);
+  onEdited.notify(Event::LengthChanged);
+  return true;
 }
 
-void SymbolPin::setRotation(const Angle& rotation) noexcept {
+bool SymbolPin::setRotation(const Angle& rotation) noexcept {
+  if (rotation == mRotation) {
+    return false;
+  }
+
   mRotation = rotation;
   if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setRotation(mRotation);
+  onEdited.notify(Event::RotationChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -129,11 +156,14 @@ bool SymbolPin::operator==(const SymbolPin& rhs) const noexcept {
 }
 
 SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept {
-  mUuid     = rhs.mUuid;
-  mName     = rhs.mName;
-  mPosition = rhs.mPosition;
-  mLength   = rhs.mLength;
-  mRotation = rhs.mRotation;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setName(rhs.mName);
+  setPosition(rhs.mPosition);
+  setLength(rhs.mLength);
+  setRotation(rhs.mRotation);
   return *this;
 }
 

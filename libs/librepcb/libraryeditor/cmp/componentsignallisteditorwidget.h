@@ -44,13 +44,8 @@ namespace editor {
 
 /**
  * @brief The ComponentSignalListEditorWidget class
- *
- * @author ubruhin
- * @date 2017-03-12
  */
-class ComponentSignalListEditorWidget final
-  : public QWidget,
-    private ComponentSignalList::IF_Observer {
+class ComponentSignalListEditorWidget final : public QWidget {
   Q_OBJECT
 
 private:  // Types
@@ -89,15 +84,10 @@ private:  // Slots
   // void isClockChanged(bool checked) noexcept;
   void btnAddRemoveClicked() noexcept;
 
-private:  // Observer
-  void listObjectAdded(
-      const ComponentSignalList& list, int newIndex,
-      const std::shared_ptr<ComponentSignal>& ptr) noexcept override;
-  void listObjectRemoved(
-      const ComponentSignalList& list, int oldIndex,
-      const std::shared_ptr<ComponentSignal>& ptr) noexcept override;
-
 private:  // Methods
+  void signalListEdited(const ComponentSignalList& list, int index,
+                        const std::shared_ptr<const ComponentSignal>& signal,
+                        ComponentSignalList::Event event) noexcept;
   void updateTable() noexcept;
   void setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                           const QString&                   name,
@@ -133,6 +123,9 @@ private:  // Data
   UndoStack*           mUndoStack;
   ComponentSignalList* mSignalList;
   tl::optional<Uuid>   mSelectedSignal;
+
+  // Slots
+  ComponentSignalList::OnEditedSlot mSignalListEditedSlot;
 };
 
 /*******************************************************************************
