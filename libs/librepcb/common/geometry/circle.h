@@ -38,35 +38,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Interface IF_CircleObserver
- ******************************************************************************/
-
-/**
- * @brief The IF_CircleObserver class
- *
- * @author ubruhin
- * @date 2017-01-01
- */
-class IF_CircleObserver {
-public:
-  virtual void circleLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept = 0;
-  virtual void circleLineWidthChanged(
-      const UnsignedLength& newLineWidth) noexcept                  = 0;
-  virtual void circleIsFilledChanged(bool newIsFilled) noexcept     = 0;
-  virtual void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
-  virtual void circleCenterChanged(const Point& newCenter) noexcept = 0;
-  virtual void circleDiameterChanged(
-      const PositiveLength& newDiameter) noexcept = 0;
-
-protected:
-  IF_CircleObserver() noexcept {}
-  explicit IF_CircleObserver(const IF_CircleObserver& other) = delete;
-  virtual ~IF_CircleObserver() noexcept {}
-  IF_CircleObserver& operator=(const IF_CircleObserver& rhs) = delete;
-};
-
-/*******************************************************************************
  *  Class Circle
  ******************************************************************************/
 
@@ -77,6 +48,19 @@ class Circle : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Circle)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    LayerNameChanged,
+    LineWidthChanged,
+    IsFilledChanged,
+    IsGrabAreaChanged,
+    CenterChanged,
+    DiameterChanged,
+  };
+  Signal<Circle, Event>       onEdited;
+  typedef Slot<Circle, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Circle() = delete;
   Circle(const Circle& other) noexcept;
@@ -97,19 +81,12 @@ public:
   const PositiveLength&    getDiameter() const noexcept { return mDiameter; }
 
   // Setters
-  void setLayerName(const GraphicsLayerName& name) noexcept;
-  void setLineWidth(const UnsignedLength& width) noexcept;
-  void setIsFilled(bool isFilled) noexcept;
-  void setIsGrabArea(bool isGrabArea) noexcept;
-  void setCenter(const Point& center) noexcept;
-  void setDiameter(const PositiveLength& dia) noexcept;
-
-  // Transformations
-  Circle& translate(const Point& offset) noexcept;
-
-  // General Methods
-  void registerObserver(IF_CircleObserver& object) const noexcept;
-  void unregisterObserver(IF_CircleObserver& object) const noexcept;
+  bool setLayerName(const GraphicsLayerName& name) noexcept;
+  bool setLineWidth(const UnsignedLength& width) noexcept;
+  bool setIsFilled(bool isFilled) noexcept;
+  bool setIsGrabArea(bool isGrabArea) noexcept;
+  bool setCenter(const Point& center) noexcept;
+  bool setDiameter(const PositiveLength& dia) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -127,10 +104,6 @@ private:  // Data
   bool              mIsGrabArea;
   Point             mCenter;
   PositiveLength    mDiameter;
-
-  // Misc
-  mutable QSet<IF_CircleObserver*>
-      mObservers;  ///< A list of all observer objects
 };
 
 /*******************************************************************************
@@ -140,10 +113,14 @@ private:  // Data
 struct CircleListNameProvider {
   static constexpr const char* tagname = "circle";
 };
-using CircleList      = SerializableObjectList<Circle, CircleListNameProvider>;
-using CmdCircleInsert = CmdListElementInsert<Circle, CircleListNameProvider>;
-using CmdCircleRemove = CmdListElementRemove<Circle, CircleListNameProvider>;
-using CmdCirclesSwap  = CmdListElementsSwap<Circle, CircleListNameProvider>;
+using CircleList =
+    SerializableObjectList<Circle, CircleListNameProvider, Circle::Event>;
+using CmdCircleInsert =
+    CmdListElementInsert<Circle, CircleListNameProvider, Circle::Event>;
+using CmdCircleRemove =
+    CmdListElementRemove<Circle, CircleListNameProvider, Circle::Event>;
+using CmdCirclesSwap =
+    CmdListElementsSwap<Circle, CircleListNameProvider, Circle::Event>;
 
 /*******************************************************************************
  *  End of File

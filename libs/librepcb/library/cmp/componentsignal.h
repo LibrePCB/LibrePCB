@@ -46,10 +46,21 @@ namespace library {
 /**
  * @brief The ComponentSignal class represents one signal of a component
  */
-class ComponentSignal final : public QObject, public SerializableObject {
-  Q_OBJECT
-
+class ComponentSignal final : public SerializableObject {
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    NameChanged,
+    RoleChanged,
+    ForcedNetNameChanged,
+    IsRequiredChanged,
+    IsNegatedChanged,
+    IsClockChanged,
+  };
+  Signal<ComponentSignal, Event>       onEdited;
+  typedef Slot<ComponentSignal, Event> OnEditedSlot;
+
   // Constructors / Destructor
   ComponentSignal() = delete;
   ComponentSignal(const ComponentSignal& other) noexcept;
@@ -72,12 +83,12 @@ public:
   }
 
   // Setters
-  void setName(const CircuitIdentifier& name) noexcept;
-  void setRole(const SignalRole& role) noexcept;
-  void setForcedNetName(const QString& name) noexcept;
-  void setIsRequired(bool required) noexcept;
-  void setIsNegated(bool negated) noexcept;
-  void setIsClock(bool clock) noexcept;
+  bool setName(const CircuitIdentifier& name) noexcept;
+  bool setRole(const SignalRole& role) noexcept;
+  bool setForcedNetName(const QString& name) noexcept;
+  bool setIsRequired(bool required) noexcept;
+  bool setIsNegated(bool negated) noexcept;
+  bool setIsClock(bool clock) noexcept;
 
   // General Methods
 
@@ -90,15 +101,6 @@ public:
     return !(*this == rhs);
   }
   ComponentSignal& operator=(const ComponentSignal& rhs) noexcept;
-
-signals:
-  void edited();
-  void nameChanged(const CircuitIdentifier& name);
-  void roleChanged(const SignalRole& role);
-  void forcedNetNameChanged(const QString& name);
-  void isRequiredChanged(bool required);
-  void isNegatedChanged(bool negated);
-  void isClockChanged(bool clock);
 
 private:  // Data
   Uuid              mUuid;
@@ -118,13 +120,17 @@ struct ComponentSignalListNameProvider {
   static constexpr const char* tagname = "signal";
 };
 using ComponentSignalList =
-    SerializableObjectList<ComponentSignal, ComponentSignalListNameProvider>;
+    SerializableObjectList<ComponentSignal, ComponentSignalListNameProvider,
+                           ComponentSignal::Event>;
 using CmdComponentSignalInsert =
-    CmdListElementInsert<ComponentSignal, ComponentSignalListNameProvider>;
+    CmdListElementInsert<ComponentSignal, ComponentSignalListNameProvider,
+                         ComponentSignal::Event>;
 using CmdComponentSignalRemove =
-    CmdListElementRemove<ComponentSignal, ComponentSignalListNameProvider>;
+    CmdListElementRemove<ComponentSignal, ComponentSignalListNameProvider,
+                         ComponentSignal::Event>;
 using CmdComponentSignalsSwap =
-    CmdListElementsSwap<ComponentSignal, ComponentSignalListNameProvider>;
+    CmdListElementsSwap<ComponentSignal, ComponentSignalListNameProvider,
+                        ComponentSignal::Event>;
 
 /*******************************************************************************
  *  End of File

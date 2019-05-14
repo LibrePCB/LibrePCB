@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../signalslot.h"
 #include "graphicslayername.h"
 
 #include <QtCore>
@@ -35,8 +36,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerObserver;
-
 /*******************************************************************************
  *  Class GraphicsLayer
  ******************************************************************************/
@@ -47,9 +46,6 @@ class IF_GraphicsLayerObserver;
  *
  * These layers are used in graphics items (QGraphicsItem) to determine their
  * visibility and colors.
- *
- * @author ubruhin
- * @date 2016-11-04
  */
 class GraphicsLayer : public QObject {
   Q_OBJECT
@@ -140,6 +136,17 @@ public:
 
   // clang-format on
 
+  // Signals
+  enum class Event {
+    ColorChanged,
+    HighlightColorChanged,
+    VisibleChanged,
+    EnabledChanged,
+    Destroyed,
+  };
+  Signal<GraphicsLayer, Event>       onEdited;
+  typedef Slot<GraphicsLayer, Event> OnEditedSlot;
+
   // Constructors / Destructor
   GraphicsLayer() = delete;
   GraphicsLayer(const GraphicsLayer& other) noexcept;
@@ -175,10 +182,6 @@ public:
   void setVisible(bool visible) noexcept;
   void setEnabled(bool enable) noexcept;
 
-  // General Methods
-  void registerObserver(IF_GraphicsLayerObserver& object) const noexcept;
-  void unregisterObserver(IF_GraphicsLayerObserver& object) const noexcept;
-
   // Operator Overloadings
   GraphicsLayer& operator=(const GraphicsLayer& rhs) = delete;
 
@@ -211,32 +214,6 @@ protected:          // Data
                               ///< layer
   bool mIsVisible;            ///< Visibility of graphics items on that layer
   bool mIsEnabled;            ///< Visibility/availability of the layer itself
-  mutable QSet<IF_GraphicsLayerObserver*>
-      mObservers;  ///< A list of all observer objects
-};
-
-/*******************************************************************************
- *  Interface IF_GraphicsLayerObserver
- ******************************************************************************/
-
-/**
- * @brief The IF_GraphicsLayerOblayerHighlightColorChangedserver class defines
- * an interface for classes which can receive updates from graphics layer
- * attributes
- */
-class IF_GraphicsLayerObserver {
-public:
-  virtual ~IF_GraphicsLayerObserver() {}
-
-  virtual void layerColorChanged(const GraphicsLayer& layer,
-                                 const QColor&        newColor) noexcept          = 0;
-  virtual void layerHighlightColorChanged(const GraphicsLayer& layer,
-                                          const QColor& newColor) noexcept = 0;
-  virtual void layerVisibleChanged(const GraphicsLayer& layer,
-                                   bool newVisible) noexcept               = 0;
-  virtual void layerEnabledChanged(const GraphicsLayer& layer,
-                                   bool newEnabled) noexcept               = 0;
-  virtual void layerDestroyed(const GraphicsLayer& layer) noexcept         = 0;
 };
 
 /*******************************************************************************

@@ -43,7 +43,9 @@ FootprintListEditorWidget::FootprintListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mFootprintList(nullptr),
-    mUndoStack(nullptr) {
+    mUndoStack(nullptr),
+    mFootprintListEditedSlot(*this,
+                             &FootprintListEditorWidget::footprintListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -71,7 +73,6 @@ FootprintListEditorWidget::FootprintListEditorWidget(QWidget* parent) noexcept
 }
 
 FootprintListEditorWidget::~FootprintListEditorWidget() noexcept {
-  if (mFootprintList) mFootprintList->unregisterObserver(this);
 }
 
 /*******************************************************************************
@@ -80,10 +81,15 @@ FootprintListEditorWidget::~FootprintListEditorWidget() noexcept {
 
 void FootprintListEditorWidget::setReferences(FootprintList& list,
                                               UndoStack&     stack) noexcept {
+  if (mFootprintList) {
+    mFootprintList->onEdited.detach(mFootprintListEditedSlot);
+  }
   mFootprintList     = &list;
   mUndoStack         = &stack;
   mSelectedFootprint = tl::nullopt;
-  mFootprintList->registerObserver(this);
+  if (mFootprintList) {
+    mFootprintList->onEdited.attach(mFootprintListEditedSlot);
+  }
   updateTable();
 }
 
@@ -164,6 +170,17 @@ void FootprintListEditorWidget::btnAddRemoveClicked() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FootprintListEditorWidget::footprintListEdited(
+    const FootprintList& list, int index,
+    const std::shared_ptr<const Footprint>& footprint,
+    FootprintList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(footprint);
+  Q_UNUSED(event);
+  updateTable(mSelectedFootprint);
+}
 
 void FootprintListEditorWidget::updateTable(
     tl::optional<Uuid> selected) noexcept {
@@ -399,30 +416,6 @@ ElementName FootprintListEditorWidget::validateNameOrThrow(
     }
   }
   return ElementName(name);  // can throw
-}
-
-/*******************************************************************************
- *  Observer Methods
- ******************************************************************************/
-
-void FootprintListEditorWidget::listObjectAdded(
-    const FootprintList& list, int newIndex,
-    const std::shared_ptr<Footprint>& ptr) noexcept {
-  Q_ASSERT(&list == mFootprintList);
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedFootprint);
-}
-
-void FootprintListEditorWidget::listObjectRemoved(
-    const FootprintList& list, int oldIndex,
-    const std::shared_ptr<Footprint>& ptr) noexcept {
-  Q_ASSERT(&list == mFootprintList);
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedFootprint);
 }
 
 /*******************************************************************************

@@ -364,7 +364,7 @@ void AttributeListEditorWidget::moveAttributeUp(int index) noexcept {
 
 void AttributeListEditorWidget::moveAttributeDown(int index) noexcept {
   Q_ASSERT(index >= 0 && index < mAttributeList.count() - 1);
-  mAttributeList.swap(index, index + 1);
+  mAttributeList.swap(index + 1, index);
   updateTable(mSelectedAttribute);
   emit edited(mAttributeList);
 }

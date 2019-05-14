@@ -37,29 +37,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Interface IF_HoleObserver
- ******************************************************************************/
-
-/**
- * @brief The IF_HoleObserver class
- *
- * @author ubruhin
- * @date 2017-05-20
- */
-class IF_HoleObserver {
-public:
-  virtual void holePositionChanged(const Point& newPos) noexcept = 0;
-  virtual void holeDiameterChanged(
-      const PositiveLength& newDiameter) noexcept = 0;
-
-protected:
-  IF_HoleObserver() noexcept {}
-  explicit IF_HoleObserver(const IF_HoleObserver& other) = delete;
-  virtual ~IF_HoleObserver() noexcept {}
-  IF_HoleObserver& operator=(const IF_HoleObserver& rhs) = delete;
-};
-
-/*******************************************************************************
  *  Class Hole
  ******************************************************************************/
 
@@ -70,6 +47,15 @@ class Hole final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Hole)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    PositionChanged,
+    DiameterChanged,
+  };
+  Signal<Hole, Event>       onEdited;
+  typedef Slot<Hole, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Hole() = delete;
   Hole(const Hole& other) noexcept;
@@ -85,12 +71,8 @@ public:
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
 
   // Setters
-  void setPosition(const Point& position) noexcept;
-  void setDiameter(const PositiveLength& diameter) noexcept;
-
-  // General Methods
-  void registerObserver(IF_HoleObserver& object) const noexcept;
-  void unregisterObserver(IF_HoleObserver& object) const noexcept;
+  bool setPosition(const Point& position) noexcept;
+  bool setDiameter(const PositiveLength& diameter) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -104,10 +86,6 @@ private:  // Data
   Uuid           mUuid;
   Point          mPosition;
   PositiveLength mDiameter;
-
-  // Misc
-  mutable QSet<IF_HoleObserver*>
-      mObservers;  ///< A list of all observer objects
 };
 
 /*******************************************************************************
@@ -117,10 +95,14 @@ private:  // Data
 struct HoleListNameProvider {
   static constexpr const char* tagname = "hole";
 };
-using HoleList      = SerializableObjectList<Hole, HoleListNameProvider>;
-using CmdHoleInsert = CmdListElementInsert<Hole, HoleListNameProvider>;
-using CmdHoleRemove = CmdListElementRemove<Hole, HoleListNameProvider>;
-using CmdHolesSwap  = CmdListElementsSwap<Hole, HoleListNameProvider>;
+using HoleList =
+    SerializableObjectList<Hole, HoleListNameProvider, Hole::Event>;
+using CmdHoleInsert =
+    CmdListElementInsert<Hole, HoleListNameProvider, Hole::Event>;
+using CmdHoleRemove =
+    CmdListElementRemove<Hole, HoleListNameProvider, Hole::Event>;
+using CmdHolesSwap =
+    CmdListElementsSwap<Hole, HoleListNameProvider, Hole::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -46,25 +46,31 @@ namespace project {
  ******************************************************************************/
 
 BI_StrokeText::BI_StrokeText(Board& board, const BI_StrokeText& other)
-  : BI_Base(board), mFootprint(nullptr) {
+  : BI_Base(board),
+    mFootprint(nullptr),
+    mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
   mText.reset(new StrokeText(Uuid::createRandom(), *other.mText));
   init();
 }
 
 BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node)
-  : BI_Base(board), mFootprint(nullptr) {
+  : BI_Base(board),
+    mFootprint(nullptr),
+    mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
   mText.reset(new StrokeText(node));
   init();
 }
 
 BI_StrokeText::BI_StrokeText(Board& board, const StrokeText& text)
-  : BI_Base(board), mFootprint(nullptr) {
+  : BI_Base(board),
+    mFootprint(nullptr),
+    mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
   mText.reset(new StrokeText(text));
   init();
 }
 
 void BI_StrokeText::init() {
-  mText->registerObserver(*this);
+  mText->onEdited.attach(mOnStrokeTextEditedSlot);
   mText->setAttributeProvider(&mBoard);
   mText->setFont(&getProject().getStrokeFonts().getFont(
       mBoard.getDefaultFontName()));  // can throw
@@ -80,10 +86,6 @@ void BI_StrokeText::init() {
 }
 
 BI_StrokeText::~BI_StrokeText() noexcept {
-  mAnchorGraphicsItem.reset();
-  mGraphicsItem.reset();
-  mText->unregisterObserver(*this);
-  mText.reset();
 }
 
 /*******************************************************************************
@@ -171,6 +173,23 @@ void BI_StrokeText::setSelected(bool selected) noexcept {
 
 void BI_StrokeText::boardAttributesChanged() {
   mText->updatePaths();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void BI_StrokeText::strokeTextEdited(const StrokeText& text,
+                                     StrokeText::Event event) noexcept {
+  Q_UNUSED(text);
+  switch (event) {
+    case StrokeText::Event::LayerNameChanged:
+    case StrokeText::Event::PositionChanged:
+      updateGraphicsItems();
+      break;
+    default:
+      break;
+  }
 }
 
 /*******************************************************************************

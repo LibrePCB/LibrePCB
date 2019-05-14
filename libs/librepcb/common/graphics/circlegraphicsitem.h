@@ -42,12 +42,8 @@ class IF_GraphicsLayerProvider;
 
 /**
  * @brief The CircleGraphicsItem class
- *
- * @author ubruhin
- * @date 2017-05-28
  */
-class CircleGraphicsItem final : public PrimitiveCircleGraphicsItem,
-                                 public IF_CircleObserver {
+class CircleGraphicsItem final : public PrimitiveCircleGraphicsItem {
 public:
   // Constructors / Destructor
   CircleGraphicsItem()                                = delete;
@@ -63,20 +59,15 @@ public:
   CircleGraphicsItem& operator=(const CircleGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void circleLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept override;
-  void circleLineWidthChanged(
-      const UnsignedLength& newLineWidth) noexcept override;
-  void circleIsFilledChanged(bool newIsFilled) noexcept override;
-  void circleIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
-  void circleCenterChanged(const Point& newCenter) noexcept override;
-  void circleDiameterChanged(
-      const PositiveLength& newDiameter) noexcept override;
+  void circleEdited(const Circle& circle, Circle::Event event) noexcept;
   void updateFillLayer() noexcept;
 
 private:  // Data
   Circle&                         mCircle;
   const IF_GraphicsLayerProvider& mLayerProvider;
+
+  // Slots
+  Circle::OnEditedSlot mEditedSlot;
 };
 
 /*******************************************************************************

@@ -57,6 +57,20 @@ public:
   enum class Shape { ROUND, RECT, OCTAGON };
   enum class BoardSide { TOP, BOTTOM, THT };
 
+  // Signals
+  enum class Event {
+    PackagePadUuidChanged,
+    PositionChanged,
+    RotationChanged,
+    ShapeChanged,
+    WidthChanged,
+    HeightChanged,
+    DrillDiameterChanged,
+    BoardSideChanged,
+  };
+  Signal<FootprintPad, Event>       onEdited;
+  typedef Slot<FootprintPad, Event> OnEditedSlot;
+
   // Constructors / Destructor
   FootprintPad() = delete;
   FootprintPad(const FootprintPad& other) noexcept;
@@ -88,14 +102,14 @@ public:
       noexcept;
 
   // Setters
-  void setPackagePadUuid(const Uuid& pad) noexcept;
-  void setPosition(const Point& pos) noexcept;
-  void setRotation(const Angle& rot) noexcept;
-  void setShape(Shape shape) noexcept;
-  void setWidth(const PositiveLength& width) noexcept;
-  void setHeight(const PositiveLength& height) noexcept;
-  void setDrillDiameter(const UnsignedLength& diameter) noexcept;
-  void setBoardSide(BoardSide side) noexcept;
+  bool setPackagePadUuid(const Uuid& pad) noexcept;
+  bool setPosition(const Point& pos) noexcept;
+  bool setRotation(const Angle& rot) noexcept;
+  bool setShape(Shape shape) noexcept;
+  bool setWidth(const PositiveLength& width) noexcept;
+  bool setHeight(const PositiveLength& height) noexcept;
+  bool setDrillDiameter(const UnsignedLength& diameter) noexcept;
+  bool setBoardSide(BoardSide side) noexcept;
 
   // General Methods
   void registerGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
@@ -131,13 +145,17 @@ struct FootprintPadListNameProvider {
   static constexpr const char* tagname = "pad";
 };
 using FootprintPadList =
-    SerializableObjectList<FootprintPad, FootprintPadListNameProvider>;
+    SerializableObjectList<FootprintPad, FootprintPadListNameProvider,
+                           FootprintPad::Event>;
 using CmdFootprintPadInsert =
-    CmdListElementInsert<FootprintPad, FootprintPadListNameProvider>;
+    CmdListElementInsert<FootprintPad, FootprintPadListNameProvider,
+                         FootprintPad::Event>;
 using CmdFootprintPadRemove =
-    CmdListElementRemove<FootprintPad, FootprintPadListNameProvider>;
+    CmdListElementRemove<FootprintPad, FootprintPadListNameProvider,
+                         FootprintPad::Event>;
 using CmdFootprintPadsSwap =
-    CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider>;
+    CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider,
+                        FootprintPad::Event>;
 
 /*******************************************************************************
  *  Non-Member Functions

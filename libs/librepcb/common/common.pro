@@ -217,6 +217,7 @@ HEADERS += \
     scopeguard.h \
     scopeguardlist.h \
     signalrole.h \
+    signalslot.h \
     sqlitedatabase.h \
     systeminfo.h \
     toolbox.h \

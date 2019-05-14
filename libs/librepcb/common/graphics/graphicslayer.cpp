@@ -36,6 +36,7 @@ namespace librepcb {
 
 GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
   : QObject(nullptr),
+    onEdited(*this),
     mName(other.mName),
     mNameTr(other.mNameTr),
     mColor(other.mColor),
@@ -45,15 +46,12 @@ GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
 }
 
 GraphicsLayer::GraphicsLayer(const QString& name) noexcept
-  : QObject(nullptr), mName(name), mIsEnabled(true) {
+  : QObject(nullptr), onEdited(*this), mName(name), mIsEnabled(true) {
   getDefaultValues(mName, mNameTr, mColor, mColorHighlighted, mIsVisible);
 }
 
 GraphicsLayer::~GraphicsLayer() noexcept {
-  foreach (IF_GraphicsLayerObserver* object, mObservers) {
-    object->layerDestroyed(*this);
-  }
-  Q_ASSERT(mObservers.isEmpty());
+  onEdited.notify(Event::Destroyed);
 }
 
 /*******************************************************************************
@@ -63,9 +61,7 @@ GraphicsLayer::~GraphicsLayer() noexcept {
 void GraphicsLayer::setColor(const QColor& color) noexcept {
   if (color != mColor) {
     mColor = color;
-    foreach (IF_GraphicsLayerObserver* object, mObservers) {
-      object->layerColorChanged(*this, mColor);
-    }
+    onEdited.notify(Event::ColorChanged);
     emit attributesChanged();
   }
 }
@@ -73,9 +69,7 @@ void GraphicsLayer::setColor(const QColor& color) noexcept {
 void GraphicsLayer::setColorHighlighted(const QColor& color) noexcept {
   if (color != mColorHighlighted) {
     mColorHighlighted = color;
-    foreach (IF_GraphicsLayerObserver* object, mObservers) {
-      object->layerHighlightColorChanged(*this, mColorHighlighted);
-    }
+    onEdited.notify(Event::HighlightColorChanged);
     emit attributesChanged();
   }
 }
@@ -83,9 +77,7 @@ void GraphicsLayer::setColorHighlighted(const QColor& color) noexcept {
 void GraphicsLayer::setVisible(bool visible) noexcept {
   if (visible != mIsVisible) {
     mIsVisible = visible;
-    foreach (IF_GraphicsLayerObserver* object, mObservers) {
-      object->layerVisibleChanged(*this, mIsVisible);
-    }
+    onEdited.notify(Event::VisibleChanged);
     emit attributesChanged();
   }
 }
@@ -93,25 +85,9 @@ void GraphicsLayer::setVisible(bool visible) noexcept {
 void GraphicsLayer::setEnabled(bool enable) noexcept {
   if (enable != mIsEnabled) {
     mIsEnabled = enable;
-    foreach (IF_GraphicsLayerObserver* object, mObservers) {
-      object->layerEnabledChanged(*this, mIsEnabled);
-    }
+    onEdited.notify(Event::EnabledChanged);
     emit attributesChanged();
   }
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void GraphicsLayer::registerObserver(IF_GraphicsLayerObserver& object) const
-    noexcept {
-  mObservers.insert(&object);
-}
-
-void GraphicsLayer::unregisterObserver(IF_GraphicsLayerObserver& object) const
-    noexcept {
-  mObservers.remove(&object);
 }
 
 /*******************************************************************************

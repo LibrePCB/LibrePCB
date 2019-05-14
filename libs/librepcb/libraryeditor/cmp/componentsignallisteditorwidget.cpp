@@ -46,7 +46,9 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mUndoStack(nullptr),
-    mSignalList(nullptr) {
+    mSignalList(nullptr),
+    mSignalListEditedSlot(*this,
+                          &ComponentSignalListEditorWidget::signalListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -110,21 +112,13 @@ ComponentSignalListEditorWidget::~ComponentSignalListEditorWidget() noexcept {
 void ComponentSignalListEditorWidget::setReferences(
     UndoStack* undoStack, ComponentSignalList* list) noexcept {
   if (mSignalList) {
-    mSignalList->unregisterObserver(this);
-    for (const ComponentSignal& signal : *mSignalList) {
-      disconnect(&signal, &ComponentSignal::edited, this,
-                 &ComponentSignalListEditorWidget::updateTable);
-    }
+    mSignalList->onEdited.detach(mSignalListEditedSlot);
   }
   mUndoStack      = undoStack;
   mSignalList     = list;
   mSelectedSignal = tl::nullopt;
   if (mSignalList) {
-    mSignalList->registerObserver(this);
-    for (const ComponentSignal& signal : *mSignalList) {
-      connect(&signal, &ComponentSignal::edited, this,
-              &ComponentSignalListEditorWidget::updateTable);
-    }
+    mSignalList->onEdited.attach(mSignalListEditedSlot);
   }
   updateTable();
 }
@@ -238,34 +232,19 @@ void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept {
 }
 
 /*******************************************************************************
- *  Observer
- ******************************************************************************/
-
-void ComponentSignalListEditorWidget::listObjectAdded(
-    const ComponentSignalList& list, int newIndex,
-    const std::shared_ptr<ComponentSignal>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == mSignalList);
-  connect(ptr.get(), &ComponentSignal::edited, this,
-          &ComponentSignalListEditorWidget::updateTable);
-  updateTable();
-}
-
-void ComponentSignalListEditorWidget::listObjectRemoved(
-    const ComponentSignalList& list, int oldIndex,
-    const std::shared_ptr<ComponentSignal>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == mSignalList);
-  disconnect(ptr.get(), &ComponentSignal::edited, this,
-             &ComponentSignalListEditorWidget::updateTable);
-  updateTable();
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ComponentSignalListEditorWidget::signalListEdited(
+    const ComponentSignalList& list, int index,
+    const std::shared_ptr<const ComponentSignal>& signal,
+    ComponentSignalList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(signal);
+  Q_UNUSED(event);
+  updateTable();
+}
 
 void ComponentSignalListEditorWidget::updateTable() noexcept {
   mTable->blockSignals(true);

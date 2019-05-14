@@ -39,7 +39,10 @@ namespace librepcb {
 CircleGraphicsItem::CircleGraphicsItem(Circle&                         circle,
                                        const IF_GraphicsLayerProvider& lp,
                                        QGraphicsItem* parent) noexcept
-  : PrimitiveCircleGraphicsItem(parent), mCircle(circle), mLayerProvider(lp) {
+  : PrimitiveCircleGraphicsItem(parent),
+    mCircle(circle),
+    mLayerProvider(lp),
+    mEditedSlot(*this, &CircleGraphicsItem::circleEdited) {
   setPosition(mCircle.getCenter());
   setDiameter(positiveToUnsigned(mCircle.getDiameter()));
   setLineWidth(mCircle.getLineWidth());
@@ -48,45 +51,41 @@ CircleGraphicsItem::CircleGraphicsItem(Circle&                         circle,
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // register to the circle to get attribute updates
-  mCircle.registerObserver(*this);
+  mCircle.onEdited.attach(mEditedSlot);
 }
 
 CircleGraphicsItem::~CircleGraphicsItem() noexcept {
-  mCircle.unregisterObserver(*this);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void CircleGraphicsItem::circleLayerNameChanged(
-    const GraphicsLayerName& newLayerName) noexcept {
-  setLineLayer(mLayerProvider.getLayer(*newLayerName));
-  updateFillLayer();  // required if the area is filled with the line layer
-}
-
-void CircleGraphicsItem::circleLineWidthChanged(
-    const UnsignedLength& newLineWidth) noexcept {
-  setLineWidth(newLineWidth);
-}
-
-void CircleGraphicsItem::circleIsFilledChanged(bool newIsFilled) noexcept {
-  Q_UNUSED(newIsFilled);
-  updateFillLayer();
-}
-
-void CircleGraphicsItem::circleIsGrabAreaChanged(bool newIsGrabArea) noexcept {
-  Q_UNUSED(newIsGrabArea);
-  updateFillLayer();
-}
-
-void CircleGraphicsItem::circleCenterChanged(const Point& newCenter) noexcept {
-  setPosition(newCenter);
-}
-
-void CircleGraphicsItem::circleDiameterChanged(
-    const PositiveLength& newDiameter) noexcept {
-  setDiameter(positiveToUnsigned(newDiameter));
+void CircleGraphicsItem::circleEdited(const Circle& circle,
+                                      Circle::Event event) noexcept {
+  switch (event) {
+    case Circle::Event::LayerNameChanged:
+      setLineLayer(mLayerProvider.getLayer(*circle.getLayerName()));
+      updateFillLayer();  // required if the area is filled with the line layer
+      break;
+    case Circle::Event::LineWidthChanged:
+      setLineWidth(circle.getLineWidth());
+      break;
+    case Circle::Event::IsFilledChanged:
+    case Circle::Event::IsGrabAreaChanged:
+      updateFillLayer();
+      break;
+    case Circle::Event::CenterChanged:
+      setPosition(circle.getCenter());
+      break;
+    case Circle::Event::DiameterChanged:
+      setDiameter(positiveToUnsigned(circle.getDiameter()));
+      break;
+    default:
+      qWarning()
+          << "Unhandled switch-case in CircleGraphicsItem::circleEdited()";
+      break;
+  }
 }
 
 void CircleGraphicsItem::updateFillLayer() noexcept {
