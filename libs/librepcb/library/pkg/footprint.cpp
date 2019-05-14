@@ -38,43 +38,88 @@ namespace library {
  ******************************************************************************/
 
 Footprint::Footprint(const Footprint& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mNames(other.mNames),
     mDescriptions(other.mDescriptions),
-    mPads(other.mPads, this),
-    mPolygons(other.mPolygons, this),
-    mCircles(other.mCircles, this),
-    mStrokeTexts(other.mStrokeTexts, this),
-    mHoles(other.mHoles, this),
+    mPads(other.mPads),
+    mPolygons(other.mPolygons),
+    mCircles(other.mCircles),
+    mStrokeTexts(other.mStrokeTexts),
+    mHoles(other.mHoles),
     mStrokeFont(nullptr),
-    mRegisteredGraphicsItem(nullptr) {
+    mRegisteredGraphicsItem(nullptr),
+    mNamesEditedSlot(*this, &Footprint::namesEdited),
+    mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
+    mPadsEditedSlot(*this, &Footprint::padsEdited),
+    mPolygonsEditedSlot(*this, &Footprint::polygonsEdited),
+    mCirclesEditedSlot(*this, &Footprint::circlesEdited),
+    mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
+    mHolesEditedSlot(*this, &Footprint::holesEdited) {
+  mNames.onEdited.attach(mNamesEditedSlot);
+  mDescriptions.onEdited.attach(mDescriptionsEditedSlot);
+  mPads.onEdited.attach(mPadsEditedSlot);
+  mPolygons.onEdited.attach(mPolygonsEditedSlot);
+  mCircles.onEdited.attach(mCirclesEditedSlot);
+  mStrokeTexts.onEdited.attach(mStrokeTextsEditedSlot);
+  mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
                      const QString& description_en_US)
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mNames(name_en_US),
     mDescriptions(description_en_US),
-    mPads(this),
-    mPolygons(this),
-    mCircles(this),
-    mStrokeTexts(this),
-    mHoles(this),
+    mPads(),
+    mPolygons(),
+    mCircles(),
+    mStrokeTexts(),
+    mHoles(),
     mStrokeFont(nullptr),
-    mRegisteredGraphicsItem(nullptr) {
+    mRegisteredGraphicsItem(nullptr),
+    mNamesEditedSlot(*this, &Footprint::namesEdited),
+    mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
+    mPadsEditedSlot(*this, &Footprint::padsEdited),
+    mPolygonsEditedSlot(*this, &Footprint::polygonsEdited),
+    mCirclesEditedSlot(*this, &Footprint::circlesEdited),
+    mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
+    mHolesEditedSlot(*this, &Footprint::holesEdited) {
+  mNames.onEdited.attach(mNamesEditedSlot);
+  mDescriptions.onEdited.attach(mDescriptionsEditedSlot);
+  mPads.onEdited.attach(mPadsEditedSlot);
+  mPolygons.onEdited.attach(mPolygonsEditedSlot);
+  mCircles.onEdited.attach(mCirclesEditedSlot);
+  mStrokeTexts.onEdited.attach(mStrokeTextsEditedSlot);
+  mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 Footprint::Footprint(const SExpression& node)
-  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mNames(node),
     mDescriptions(node),
-    mPads(node, this),
-    mPolygons(node, this),
-    mCircles(node, this),
-    mStrokeTexts(node, this),
-    mHoles(node, this),
+    mPads(node),
+    mPolygons(node),
+    mCircles(node),
+    mStrokeTexts(node),
+    mHoles(node),
     mStrokeFont(nullptr),
-    mRegisteredGraphicsItem(nullptr) {
+    mRegisteredGraphicsItem(nullptr),
+    mNamesEditedSlot(*this, &Footprint::namesEdited),
+    mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
+    mPadsEditedSlot(*this, &Footprint::padsEdited),
+    mPolygonsEditedSlot(*this, &Footprint::polygonsEdited),
+    mCirclesEditedSlot(*this, &Footprint::circlesEdited),
+    mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
+    mHolesEditedSlot(*this, &Footprint::holesEdited) {
+  mNames.onEdited.attach(mNamesEditedSlot);
+  mDescriptions.onEdited.attach(mDescriptionsEditedSlot);
+  mPads.onEdited.attach(mPadsEditedSlot);
+  mPolygons.onEdited.attach(mPolygonsEditedSlot);
+  mCircles.onEdited.attach(mCirclesEditedSlot);
+  mStrokeTexts.onEdited.attach(mStrokeTextsEditedSlot);
+  mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 Footprint::~Footprint() noexcept {
@@ -130,7 +175,10 @@ bool Footprint::operator==(const Footprint& rhs) const noexcept {
 }
 
 Footprint& Footprint::operator=(const Footprint& rhs) noexcept {
-  mUuid         = rhs.mUuid;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
   mNames        = rhs.mNames;
   mDescriptions = rhs.mDescriptions;
   mPads         = rhs.mPads;
@@ -145,80 +193,133 @@ Footprint& Footprint::operator=(const Footprint& rhs) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void Footprint::listObjectAdded(
-    const FootprintPadList& list, int newIndex,
-    const std::shared_ptr<FootprintPad>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mPads);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPad(*ptr);
+void Footprint::namesEdited(const LocalizedNameMap& names, const QString& key,
+                            LocalizedNameMap::Event event) noexcept {
+  Q_UNUSED(names);
+  Q_UNUSED(key);
+  Q_UNUSED(event);
+  onEdited.notify(Event::NamesEdited);
 }
 
-void Footprint::listObjectAdded(const PolygonList& list, int newIndex,
-                                const std::shared_ptr<Polygon>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mPolygons);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPolygon(*ptr);
+void Footprint::descriptionsEdited(
+    const LocalizedDescriptionMap& names, const QString& key,
+    LocalizedDescriptionMap::Event event) noexcept {
+  Q_UNUSED(names);
+  Q_UNUSED(key);
+  Q_UNUSED(event);
+  onEdited.notify(Event::DescriptionsEdited);
 }
 
-void Footprint::listObjectAdded(const CircleList& list, int newIndex,
-                                const std::shared_ptr<Circle>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mCircles);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addCircle(*ptr);
+void Footprint::padsEdited(const FootprintPadList& list, int index,
+                           const std::shared_ptr<const FootprintPad>& pad,
+                           FootprintPadList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case FootprintPadList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addPad(const_cast<FootprintPad&>(*pad));
+      }
+      break;
+    case FootprintPadList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removePad(const_cast<FootprintPad&>(*pad));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::PadsEdited);
 }
 
-void Footprint::listObjectAdded(
-    const StrokeTextList& list, int newIndex,
-    const std::shared_ptr<StrokeText>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mStrokeTexts);
-  ptr->setFont(mStrokeFont);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addStrokeText(*ptr);
+void Footprint::polygonsEdited(const PolygonList& list, int index,
+                               const std::shared_ptr<const Polygon>& polygon,
+                               PolygonList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case PolygonList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addPolygon(const_cast<Polygon&>(*polygon));
+      }
+      break;
+    case PolygonList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removePolygon(const_cast<Polygon&>(*polygon));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::PolygonsEdited);
 }
 
-void Footprint::listObjectAdded(const HoleList& list, int newIndex,
-                                const std::shared_ptr<Hole>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mHoles);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addHole(*ptr);
+void Footprint::circlesEdited(const CircleList& list, int index,
+                              const std::shared_ptr<const Circle>& circle,
+                              CircleList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case CircleList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addCircle(const_cast<Circle&>(*circle));
+      }
+      break;
+    case CircleList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removeCircle(const_cast<Circle&>(*circle));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::CirclesEdited);
 }
 
-void Footprint::listObjectRemoved(
-    const FootprintPadList& list, int oldIndex,
-    const std::shared_ptr<FootprintPad>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mPads);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePad(*ptr);
+void Footprint::strokeTextsEdited(const StrokeTextList& list, int index,
+                                  const std::shared_ptr<const StrokeText>& text,
+                                  StrokeTextList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case StrokeTextList::Event::ElementAdded:
+      const_cast<StrokeText&>(*text).setFont(mStrokeFont);
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addStrokeText(const_cast<StrokeText&>(*text));
+      }
+      break;
+    case StrokeTextList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removeStrokeText(
+            const_cast<StrokeText&>(*text));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::StrokeTextsEdited);
 }
 
-void Footprint::listObjectRemoved(
-    const PolygonList& list, int oldIndex,
-    const std::shared_ptr<Polygon>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mPolygons);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePolygon(*ptr);
-}
-
-void Footprint::listObjectRemoved(const CircleList& list, int oldIndex,
-                                  const std::shared_ptr<Circle>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mCircles);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeCircle(*ptr);
-}
-
-void Footprint::listObjectRemoved(
-    const StrokeTextList& list, int oldIndex,
-    const std::shared_ptr<StrokeText>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mStrokeTexts);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeStrokeText(*ptr);
-}
-
-void Footprint::listObjectRemoved(const HoleList& list, int oldIndex,
-                                  const std::shared_ptr<Hole>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mHoles);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeHole(*ptr);
+void Footprint::holesEdited(const HoleList& list, int index,
+                            const std::shared_ptr<const Hole>& hole,
+                            HoleList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case HoleList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addHole(const_cast<Hole&>(*hole));
+      }
+      break;
+    case HoleList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removeHole(const_cast<Hole&>(*hole));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::HolesEdited);
 }
 
 /*******************************************************************************

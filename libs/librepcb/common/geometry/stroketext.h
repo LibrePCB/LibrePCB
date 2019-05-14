@@ -110,40 +110,6 @@ inline StrokeTextSpacing deserializeFromSExpression(const SExpression& sexpr,
 }
 
 /*******************************************************************************
- *  Interface IF_StrokeTextObserver
- ******************************************************************************/
-
-/**
- * @brief The IF_StrokeTextObserver class
- */
-class IF_StrokeTextObserver {
-public:
-  virtual void strokeTextLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept                  = 0;
-  virtual void strokeTextTextChanged(const QString& newText) noexcept  = 0;
-  virtual void strokeTextPositionChanged(const Point& newPos) noexcept = 0;
-  virtual void strokeTextRotationChanged(const Angle& newRot) noexcept = 0;
-  virtual void strokeTextHeightChanged(
-      const PositiveLength& newHeight) noexcept = 0;
-  virtual void strokeTextStrokeWidthChanged(
-      const UnsignedLength& newWidth) noexcept = 0;
-  virtual void strokeTextLetterSpacingChanged(
-      const StrokeTextSpacing& spacing) noexcept = 0;
-  virtual void strokeTextLineSpacingChanged(
-      const StrokeTextSpacing& spacing) noexcept                           = 0;
-  virtual void strokeTextAlignChanged(const Alignment& newAlign) noexcept  = 0;
-  virtual void strokeTextMirroredChanged(bool newMirrored) noexcept        = 0;
-  virtual void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept    = 0;
-  virtual void strokeTextPathsChanged(const QVector<Path>& paths) noexcept = 0;
-
-protected:
-  IF_StrokeTextObserver() noexcept {}
-  explicit IF_StrokeTextObserver(const IF_StrokeTextObserver& other) = delete;
-  virtual ~IF_StrokeTextObserver() noexcept {}
-  IF_StrokeTextObserver& operator=(const IF_StrokeTextObserver& rhs) = delete;
-};
-
-/*******************************************************************************
  *  Class StrokeText
  ******************************************************************************/
 
@@ -154,6 +120,25 @@ class StrokeText final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(StrokeText)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    LayerNameChanged,
+    TextChanged,
+    PositionChanged,
+    RotationChanged,
+    HeightChanged,
+    StrokeWidthChanged,
+    LetterSpacingChanged,
+    LineSpacingChanged,
+    AlignChanged,
+    MirroredChanged,
+    AutoRotateChanged,
+    PathsChanged,
+  };
+  Signal<StrokeText, Event>       onEdited;
+  typedef Slot<StrokeText, Event> OnEditedSlot;
+
   // Constructors / Destructor
   StrokeText() = delete;
   StrokeText(const StrokeText& other) noexcept;
@@ -190,25 +175,23 @@ public:
   Length               calcLineSpacing() const noexcept;
 
   // Setters
-  void setLayerName(const GraphicsLayerName& name) noexcept;
-  void setText(const QString& text) noexcept;
-  void setPosition(const Point& pos) noexcept;
-  void setRotation(const Angle& rotation) noexcept;
-  void setHeight(const PositiveLength& height) noexcept;
-  void setStrokeWidth(const UnsignedLength& strokeWidth) noexcept;
-  void setLetterSpacing(const StrokeTextSpacing& spacing) noexcept;
-  void setLineSpacing(const StrokeTextSpacing& spacing) noexcept;
-  void setAlign(const Alignment& align) noexcept;
-  void setMirrored(bool mirrored) noexcept;
-  void setAutoRotate(bool autoRotate) noexcept;
+  bool setLayerName(const GraphicsLayerName& name) noexcept;
+  bool setText(const QString& text) noexcept;
+  bool setPosition(const Point& pos) noexcept;
+  bool setRotation(const Angle& rotation) noexcept;
+  bool setHeight(const PositiveLength& height) noexcept;
+  bool setStrokeWidth(const UnsignedLength& strokeWidth) noexcept;
+  bool setLetterSpacing(const StrokeTextSpacing& spacing) noexcept;
+  bool setLineSpacing(const StrokeTextSpacing& spacing) noexcept;
+  bool setAlign(const Alignment& align) noexcept;
+  bool setMirrored(bool mirrored) noexcept;
+  bool setAutoRotate(bool autoRotate) noexcept;
 
   // General Methods
   void setAttributeProvider(const AttributeProvider* provider) noexcept;
   void setFont(const StrokeFont* font) noexcept;
   const StrokeFont* getCurrentFont() const noexcept { return mFont; }
   void              updatePaths() noexcept;
-  void registerObserver(IF_StrokeTextObserver& object) const noexcept;
-  void unregisterObserver(IF_StrokeTextObserver& object) const noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -235,8 +218,6 @@ private:  // Data
   bool              mAutoRotate;
 
   // Misc
-  mutable QSet<IF_StrokeTextObserver*>
-      mObservers;  ///< A list of all observer objects
   const AttributeProvider*
                     mAttributeProvider;  ///< for substituting placeholders in text
   const StrokeFont* mFont;               ///< font used for calculating paths
@@ -253,13 +234,17 @@ struct StrokeTextListNameProvider {
   static constexpr const char* tagname = "stroke_text";
 };
 using StrokeTextList =
-    SerializableObjectList<StrokeText, StrokeTextListNameProvider>;
+    SerializableObjectList<StrokeText, StrokeTextListNameProvider,
+                           StrokeText::Event>;
 using CmdStrokeTextInsert =
-    CmdListElementInsert<StrokeText, StrokeTextListNameProvider>;
+    CmdListElementInsert<StrokeText, StrokeTextListNameProvider,
+                         StrokeText::Event>;
 using CmdStrokeTextRemove =
-    CmdListElementRemove<StrokeText, StrokeTextListNameProvider>;
+    CmdListElementRemove<StrokeText, StrokeTextListNameProvider,
+                         StrokeText::Event>;
 using CmdStrokeTextsSwap =
-    CmdListElementsSwap<StrokeText, StrokeTextListNameProvider>;
+    CmdListElementsSwap<StrokeText, StrokeTextListNameProvider,
+                        StrokeText::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -40,33 +40,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Interface IF_PolygonObserver
- ******************************************************************************/
-
-/**
- * @brief The IF_PolygonObserver class
- *
- * @author ubruhin
- * @date 2017-01-05
- */
-class IF_PolygonObserver {
-public:
-  virtual void polygonLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept = 0;
-  virtual void polygonLineWidthChanged(
-      const UnsignedLength& newLineWidth) noexcept                   = 0;
-  virtual void polygonIsFilledChanged(bool newIsFilled) noexcept     = 0;
-  virtual void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept = 0;
-  virtual void polygonPathChanged(const Path& newPath) noexcept      = 0;
-
-protected:
-  IF_PolygonObserver() noexcept {}
-  explicit IF_PolygonObserver(const IF_PolygonObserver& other) = delete;
-  virtual ~IF_PolygonObserver() noexcept {}
-  IF_PolygonObserver& operator=(const IF_PolygonObserver& rhs) = delete;
-};
-
-/*******************************************************************************
  *  Class Polygon
  ******************************************************************************/
 
@@ -77,6 +50,18 @@ class Polygon final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Polygon)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    LayerNameChanged,
+    LineWidthChanged,
+    IsFilledChanged,
+    IsGrabAreaChanged,
+    PathChanged,
+  };
+  Signal<Polygon, Event>       onEdited;
+  typedef Slot<Polygon, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Polygon() = delete;
   Polygon(const Polygon& other) noexcept;
@@ -96,15 +81,11 @@ public:
   const Path&              getPath() const noexcept { return mPath; }
 
   // Setters
-  void setLayerName(const GraphicsLayerName& name) noexcept;
-  void setLineWidth(const UnsignedLength& width) noexcept;
-  void setIsFilled(bool isFilled) noexcept;
-  void setIsGrabArea(bool isGrabArea) noexcept;
-  void setPath(const Path& path) noexcept;
-
-  // General Methods
-  void registerObserver(IF_PolygonObserver& object) const noexcept;
-  void unregisterObserver(IF_PolygonObserver& object) const noexcept;
+  bool setLayerName(const GraphicsLayerName& name) noexcept;
+  bool setLineWidth(const UnsignedLength& width) noexcept;
+  bool setIsFilled(bool isFilled) noexcept;
+  bool setIsGrabArea(bool isGrabArea) noexcept;
+  bool setPath(const Path& path) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -121,10 +102,6 @@ private:  // Data
   bool              mIsFilled;
   bool              mIsGrabArea;
   Path              mPath;
-
-  // Misc
-  mutable QSet<IF_PolygonObserver*>
-      mObservers;  ///< A list of all observer objects
 };
 
 /*******************************************************************************
@@ -134,10 +111,14 @@ private:  // Data
 struct PolygonListNameProvider {
   static constexpr const char* tagname = "polygon";
 };
-using PolygonList = SerializableObjectList<Polygon, PolygonListNameProvider>;
-using CmdPolygonInsert = CmdListElementInsert<Polygon, PolygonListNameProvider>;
-using CmdPolygonRemove = CmdListElementRemove<Polygon, PolygonListNameProvider>;
-using CmdPolygonsSwap  = CmdListElementsSwap<Polygon, PolygonListNameProvider>;
+using PolygonList =
+    SerializableObjectList<Polygon, PolygonListNameProvider, Polygon::Event>;
+using CmdPolygonInsert =
+    CmdListElementInsert<Polygon, PolygonListNameProvider, Polygon::Event>;
+using CmdPolygonRemove =
+    CmdListElementRemove<Polygon, PolygonListNameProvider, Polygon::Event>;
+using CmdPolygonsSwap =
+    CmdListElementsSwap<Polygon, PolygonListNameProvider, Polygon::Event>;
 
 /*******************************************************************************
  *  End of File

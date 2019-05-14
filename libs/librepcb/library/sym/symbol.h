@@ -54,14 +54,20 @@ class SymbolGraphicsItem;
  *  - Pins (neither adding nor removing pins is allowed)
  *    - UUID
  */
-class Symbol final : public LibraryElement,
-                     private SymbolPinList::IF_Observer,
-                     private PolygonList::IF_Observer,
-                     private CircleList::IF_Observer,
-                     private TextList::IF_Observer {
+class Symbol final : public LibraryElement {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PinsEdited,
+    PolygonsEdited,
+    CirclesEdited,
+    TextsEdited,
+  };
+  Signal<Symbol, Event>       onEdited;
+  typedef Slot<Symbol, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Symbol()                    = delete;
   Symbol(const Symbol& other) = delete;
@@ -98,23 +104,18 @@ public:
   }
 
 private:  // Methods
-  void listObjectAdded(const SymbolPinList& list, int newIndex,
-                       const std::shared_ptr<SymbolPin>& ptr) noexcept override;
-  void listObjectAdded(const PolygonList& list, int newIndex,
-                       const std::shared_ptr<Polygon>& ptr) noexcept override;
-  void listObjectAdded(const CircleList& list, int newIndex,
-                       const std::shared_ptr<Circle>& ptr) noexcept override;
-  void listObjectAdded(const TextList& list, int newIndex,
-                       const std::shared_ptr<Text>& ptr) noexcept override;
-  void listObjectRemoved(
-      const SymbolPinList& list, int oldIndex,
-      const std::shared_ptr<SymbolPin>& ptr) noexcept override;
-  void listObjectRemoved(const PolygonList& list, int oldIndex,
-                         const std::shared_ptr<Polygon>& ptr) noexcept override;
-  void listObjectRemoved(const CircleList& list, int oldIndex,
-                         const std::shared_ptr<Circle>& ptr) noexcept override;
-  void listObjectRemoved(const TextList& list, int oldIndex,
-                         const std::shared_ptr<Text>& ptr) noexcept override;
+  void pinsEdited(const SymbolPinList& list, int index,
+                  const std::shared_ptr<const SymbolPin>& pin,
+                  SymbolPinList::Event                    event) noexcept;
+  void polygonsEdited(const PolygonList& list, int index,
+                      const std::shared_ptr<const Polygon>& polygon,
+                      PolygonList::Event                    event) noexcept;
+  void circlesEdited(const CircleList& list, int index,
+                     const std::shared_ptr<const Circle>& circle,
+                     CircleList::Event                    event) noexcept;
+  void textsEdited(const TextList& list, int index,
+                   const std::shared_ptr<const Text>& text,
+                   TextList::Event                    event) noexcept;
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
@@ -125,6 +126,12 @@ private:  // Data
   TextList      mTexts;
 
   SymbolGraphicsItem* mRegisteredGraphicsItem;
+
+  // Slots
+  SymbolPinList::OnEditedSlot mPinsEditedSlot;
+  PolygonList::OnEditedSlot   mPolygonsEditedSlot;
+  CircleList::OnEditedSlot    mCirclesEditedSlot;
+  TextList::OnEditedSlot      mTextsEditedSlot;
 };
 
 /*******************************************************************************

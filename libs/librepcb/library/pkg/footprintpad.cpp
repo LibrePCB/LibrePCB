@@ -39,7 +39,8 @@ namespace library {
  ******************************************************************************/
 
 FootprintPad::FootprintPad(const FootprintPad& other) noexcept
-  : mPackagePadUuid(other.mPackagePadUuid),
+  : onEdited(*this),
+    mPackagePadUuid(other.mPackagePadUuid),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
     mShape(other.mShape),
@@ -56,7 +57,8 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
                            const PositiveLength& height,
                            const UnsignedLength& drillDiameter,
                            BoardSide             side) noexcept
-  : mPackagePadUuid(padUuid),
+  : onEdited(*this),
+    mPackagePadUuid(padUuid),
     mPosition(pos),
     mRotation(rot),
     mShape(shape),
@@ -68,7 +70,8 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
 }
 
 FootprintPad::FootprintPad(const SExpression& node)
-  : mPackagePadUuid(node.getChildByIndex(0).getValue<Uuid>()),
+  : onEdited(*this),
+    mPackagePadUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mPosition(node.getChildByPath("position")),
     mRotation(node.getValueByPath<Angle>("rotation")),
     mShape(node.getValueByPath<Shape>("shape")),
@@ -144,50 +147,98 @@ QPainterPath FootprintPad::toQPainterPathPx(const Length& expansion) const
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
-void FootprintPad::setPosition(const Point& pos) noexcept {
+bool FootprintPad::setPosition(const Point& pos) noexcept {
+  if (pos == mPosition) {
+    return false;
+  }
+
   mPosition = pos;
   if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
+  onEdited.notify(Event::PositionChanged);
+  return true;
 }
 
-void FootprintPad::setPackagePadUuid(const Uuid& pad) noexcept {
+bool FootprintPad::setPackagePadUuid(const Uuid& pad) noexcept {
+  if (pad == mPackagePadUuid) {
+    return false;
+  }
+
   mPackagePadUuid = pad;
+  onEdited.notify(Event::PackagePadUuidChanged);
+  return true;
 }
 
-void FootprintPad::setRotation(const Angle& rot) noexcept {
+bool FootprintPad::setRotation(const Angle& rot) noexcept {
+  if (rot == mRotation) {
+    return false;
+  }
+
   mRotation = rot;
   if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setRotation(mRotation);
+  onEdited.notify(Event::RotationChanged);
+  return true;
 }
 
-void FootprintPad::setShape(Shape shape) noexcept {
+bool FootprintPad::setShape(Shape shape) noexcept {
+  if (shape == mShape) {
+    return false;
+  }
+
   mShape = shape;
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+  onEdited.notify(Event::ShapeChanged);
+  return true;
 }
 
-void FootprintPad::setWidth(const PositiveLength& width) noexcept {
+bool FootprintPad::setWidth(const PositiveLength& width) noexcept {
+  if (width == mWidth) {
+    return false;
+  }
+
   mWidth = width;
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+  onEdited.notify(Event::WidthChanged);
+  return true;
 }
 
-void FootprintPad::setHeight(const PositiveLength& height) noexcept {
+bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
+  if (height == mHeight) {
+    return false;
+  }
+
   mHeight = height;
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+  onEdited.notify(Event::HeightChanged);
+  return true;
 }
 
-void FootprintPad::setDrillDiameter(const UnsignedLength& diameter) noexcept {
+bool FootprintPad::setDrillDiameter(const UnsignedLength& diameter) noexcept {
+  if (diameter == mDrillDiameter) {
+    return false;
+  }
+
   mDrillDiameter = diameter;
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+  onEdited.notify(Event::DrillDiameterChanged);
+  return true;
 }
 
-void FootprintPad::setBoardSide(BoardSide side) noexcept {
+bool FootprintPad::setBoardSide(BoardSide side) noexcept {
+  if (side == mBoardSide) {
+    return false;
+  }
+
   mBoardSide = side;
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setLayerName(getLayerName());
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+  onEdited.notify(Event::BoardSideChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -234,14 +285,14 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
 }
 
 FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
-  mPackagePadUuid = rhs.mPackagePadUuid;
-  mPosition       = rhs.mPosition;
-  mRotation       = rhs.mRotation;
-  mShape          = rhs.mShape;
-  mWidth          = rhs.mWidth;
-  mHeight         = rhs.mHeight;
-  mDrillDiameter  = rhs.mDrillDiameter;
-  mBoardSide      = rhs.mBoardSide;
+  setPackagePadUuid(rhs.mPackagePadUuid);
+  setPosition(rhs.mPosition);
+  setRotation(rhs.mRotation);
+  setShape(rhs.mShape);
+  setWidth(rhs.mWidth);
+  setHeight(rhs.mHeight);
+  setDrillDiameter(rhs.mDrillDiameter);
+  setBoardSide(rhs.mBoardSide);
   return *this;
 }
 

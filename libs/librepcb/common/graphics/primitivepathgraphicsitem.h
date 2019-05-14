@@ -40,12 +40,8 @@ namespace librepcb {
 
 /**
  * @brief The PrimitivePathGraphicsItem class
- *
- * @author ubruhin
- * @date 2017-05-28
  */
-class PrimitivePathGraphicsItem : public QGraphicsItem,
-                                  public IF_GraphicsLayerObserver {
+class PrimitivePathGraphicsItem : public QGraphicsItem {
 public:
   // Constructors / Destructor
   // PrimitivePathGraphicsItem() = delete;
@@ -61,17 +57,6 @@ public:
   void setLineLayer(const GraphicsLayer* layer) noexcept;
   void setFillLayer(const GraphicsLayer* layer) noexcept;
 
-  // Inherited from IF_LayerObserver
-  void layerColorChanged(const GraphicsLayer& layer,
-                         const QColor&        newColor) noexcept override;
-  void layerHighlightColorChanged(const GraphicsLayer& layer,
-                                  const QColor& newColor) noexcept override;
-  void layerVisibleChanged(const GraphicsLayer& layer,
-                           bool                 newVisible) noexcept override;
-  void layerEnabledChanged(const GraphicsLayer& layer,
-                           bool                 newEnabled) noexcept override;
-  void layerDestroyed(const GraphicsLayer& layer) noexcept override;
-
   // Inherited from QGraphicsItem
   QRectF       boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
@@ -83,6 +68,8 @@ public:
       delete;
 
 private:  // Methods
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
   void updateColors() noexcept;
   void updateBoundingRectAndShape() noexcept;
   void updateVisibility() noexcept;
@@ -97,6 +84,9 @@ private:  // Data
   QPainterPath         mPainterPath;
   QRectF               mBoundingRect;
   QPainterPath         mShape;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

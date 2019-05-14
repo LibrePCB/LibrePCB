@@ -40,12 +40,8 @@ namespace librepcb {
 
 /**
  * @brief The LineGraphicsItem class
- *
- * @author ubruhin
- * @date 2016-11-06
  */
-class LineGraphicsItem final : public QGraphicsItem,
-                               public IF_GraphicsLayerObserver {
+class LineGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
   // LineGraphicsItem() = delete;
@@ -60,17 +56,6 @@ public:
   void setLineWidth(const UnsignedLength& width) noexcept;
   void setLayer(const GraphicsLayer* layer) noexcept;
 
-  // Inherited from IF_LayerObserver
-  void layerColorChanged(const GraphicsLayer& layer,
-                         const QColor&        newColor) noexcept override;
-  void layerHighlightColorChanged(const GraphicsLayer& layer,
-                                  const QColor& newColor) noexcept override;
-  void layerVisibleChanged(const GraphicsLayer& layer,
-                           bool                 newVisible) noexcept override;
-  void layerEnabledChanged(const GraphicsLayer& layer,
-                           bool                 newEnabled) noexcept override;
-  void layerDestroyed(const GraphicsLayer& layer) noexcept override;
-
   // Inherited from QGraphicsItem
   QRectF       boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
@@ -81,6 +66,8 @@ public:
   LineGraphicsItem& operator=(const LineGraphicsItem& rhs) = delete;
 
 private:  // Methods
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
   void updateBoundingRectAndShape() noexcept;
 
 private:  // Data
@@ -90,6 +77,9 @@ private:  // Data
   QLineF               mLine;
   QRectF               mBoundingRect;
   QPainterPath         mShape;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

@@ -478,7 +478,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
       Circle e = circle;
       if (footprint.getIsMirrored())
         e.setCenter(e.getCenter().mirrored(Qt::Horizontal));
-      e.translate(footprint.getPosition());
+      e.setCenter(e.getCenter() + footprint.getPosition());
       e.setLineWidth(calcWidthOfLayer(e.getLineWidth(), layer));
       gen.drawCircleOutline(e);
       if (e.isFilled()) {

@@ -40,13 +40,14 @@ namespace librepcb {
 /**
  * @brief The CmdListElementsSwap class
  */
-template <typename T, typename P>
+template <typename T, typename P, typename... OnEditedArgs>
 class CmdListElementsSwap final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdListElementsSwap()                                 = delete;
   CmdListElementsSwap(const CmdListElementsSwap& other) = delete;
-  CmdListElementsSwap(SerializableObjectList<T, P>& list, int i, int j) noexcept
+  CmdListElementsSwap(SerializableObjectList<T, P, OnEditedArgs...>& list,
+                      int i, int j) noexcept
     : UndoCommand(QString(tr("Move %1")).arg(P::tagname)),
       mList(list),
       mI(i),
@@ -70,9 +71,9 @@ private:  // Methods
   void performRedo() override { mList.swap(mI, mJ); }
 
 private:  // Data
-  SerializableObjectList<T, P>& mList;
-  int                           mI;
-  int                           mJ;
+  SerializableObjectList<T, P, OnEditedArgs...>& mList;
+  int                                            mI;
+  int                                            mJ;
 };
 
 /*******************************************************************************
