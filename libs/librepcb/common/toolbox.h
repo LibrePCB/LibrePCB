@@ -139,15 +139,6 @@ public:
   static QString incrementNumberInString(QString string) noexcept;
 
   /**
-   * @brief Convert a numeric or non-numeric string to the corresponding
-   * QVariant
-   *
-   * @param string  The string to be converted
-   * @return A QVariant with either a QVariant::Int or a QVariant::String
-   */
-  static QVariant stringOrNumberToQVariant(const QString& string) noexcept;
-
-  /**
    * @brief Expand ranges like "1..5" in a string to all its values
    *
    * A range is either defined by two integers with ".." in between, or two

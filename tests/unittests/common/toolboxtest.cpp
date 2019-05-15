@@ -38,31 +38,6 @@ namespace tests {
 class ToolboxTest : public ::testing::Test {};
 
 /*******************************************************************************
- *  Test Methods
- ******************************************************************************/
-
-TEST(ToolboxTest, testStringOrNumberToQVariant_numeric) {
-  QString  string  = "1337";
-  QVariant variant = Toolbox::stringOrNumberToQVariant(string);
-  EXPECT_EQ(QVariant::Int, variant.type());
-  EXPECT_EQ(QVariant(1337), variant);
-}
-
-TEST(ToolboxTest, testStringOrNumberToQVariant_nonNumeric) {
-  QString  string  = "leet";
-  QVariant variant = Toolbox::stringOrNumberToQVariant(string);
-  EXPECT_EQ(QVariant::String, variant.type());
-  EXPECT_EQ(QVariant("leet"), variant);
-}
-
-TEST(ToolboxTest, testStringOrNumberToQVariant_mixed) {
-  QString  string  = "l33t";
-  QVariant variant = Toolbox::stringOrNumberToQVariant(string);
-  EXPECT_EQ(QVariant::String, variant.type());
-  EXPECT_EQ(QVariant("l33t"), variant);
-}
-
-/*******************************************************************************
  *  Parametrized incrementNumberInString() Tests
  ******************************************************************************/
 

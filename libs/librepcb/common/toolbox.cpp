@@ -143,15 +143,6 @@ QString Toolbox::incrementNumberInString(QString string) noexcept {
   return string % "1";
 }
 
-QVariant Toolbox::stringOrNumberToQVariant(const QString& string) noexcept {
-  bool isInt;
-  int  intval = string.toInt(&isInt, 10);
-  if (isInt) {
-    return QVariant(intval);
-  }
-  return QVariant(string);
-}
-
 QStringList Toolbox::expandRangesInString(const QString& string) noexcept {
   // Do NOT accept '+' and '-', they are considered as strings, not numbers!
   // For example in the range connector signals range "X-1..10" you expect
