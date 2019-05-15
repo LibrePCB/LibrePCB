@@ -31,6 +31,7 @@ SOURCES += \
     alignment.cpp \
     application.cpp \
     attributes/attribute.cpp \
+    attributes/attributelistmodel.cpp \
     attributes/attributeprovider.cpp \
     attributes/attributesubstitutor.cpp \
     attributes/attributetype.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
     attributes/attrtyperesistance.cpp \
     attributes/attrtypestring.cpp \
     attributes/attrtypevoltage.cpp \
+    attributes/cmd/cmdattributeedit.cpp \
     boarddesignrules.cpp \
     cam/excellongenerator.cpp \
     cam/gerberaperturelist.cpp \
@@ -138,6 +140,7 @@ HEADERS += \
     application.h \
     attributes/attribute.h \
     attributes/attributekey.h \
+    attributes/attributelistmodel.h \
     attributes/attributeprovider.h \
     attributes/attributesubstitutor.h \
     attributes/attributetype.h \
@@ -150,6 +153,7 @@ HEADERS += \
     attributes/attrtyperesistance.h \
     attributes/attrtypestring.h \
     attributes/attrtypevoltage.h \
+    attributes/cmd/cmdattributeedit.h \
     boarddesignrules.h \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \

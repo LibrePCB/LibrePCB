@@ -17,52 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTELISTEDITORWIDGET_H
-#define LIBREPCB_ATTRIBUTELISTEDITORWIDGET_H
+#ifndef LIBREPCB_CMDATTRIBUTEEDIT_H
+#define LIBREPCB_CMDATTRIBUTEEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../attributes/attribute.h"
+#include "../../undocommand.h"
+#include "../attribute.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-class EditableTableWidget;
-class AttributeListModel;
-
 /*******************************************************************************
- *  Class AttributeListEditorWidget
+ *  Class CmdAttributeEdit
  ******************************************************************************/
 
 /**
- * @brief The AttributeListEditorWidget class
+ * @brief The CmdAttributeEdit class
  */
-class AttributeListEditorWidget final : public QWidget {
-  Q_OBJECT
-
+class CmdAttributeEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit AttributeListEditorWidget(QWidget* parent = nullptr) noexcept;
-  AttributeListEditorWidget(const AttributeListEditorWidget& other) = delete;
-  ~AttributeListEditorWidget() noexcept;
+  CmdAttributeEdit()                              = delete;
+  CmdAttributeEdit(const CmdAttributeEdit& other) = delete;
+  explicit CmdAttributeEdit(Attribute& attribute) noexcept;
+  ~CmdAttributeEdit() noexcept;
 
   // Setters
-  void setReferences(UndoStack* undoStack, AttributeList* list) noexcept;
+  void setKey(const AttributeKey& key) noexcept;
+  void setType(const AttributeType& type) noexcept;
+  void setValue(const QString& value) noexcept;
+  void setUnit(const AttributeUnit* unit) noexcept;
 
   // Operator Overloadings
-  AttributeListEditorWidget& operator=(const AttributeListEditorWidget& rhs) =
-      delete;
+  CmdAttributeEdit& operator=(const CmdAttributeEdit& rhs) = delete;
 
-private:  // Data
-  QScopedPointer<AttributeListModel>  mModel;
-  QScopedPointer<EditableTableWidget> mView;
+private:
+  // Private Methods
+
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
+
+  // Private Member Variables
+
+  // Attributes from the constructor
+  Attribute& mAttribute;
+
+  // General Attributes
+  AttributeKey         mOldKey;
+  AttributeKey         mNewKey;
+  const AttributeType* mOldType;
+  const AttributeType* mNewType;
+  QString              mOldValue;
+  QString              mNewValue;
+  const AttributeUnit* mOldUnit;
+  const AttributeUnit* mNewUnit;
 };
 
 /*******************************************************************************
@@ -71,4 +91,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTELISTEDITORWIDGET_H
+#endif  // LIBREPCB_CMDATTRIBUTEEDIT_H

@@ -76,6 +76,10 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
       mUndoStack.data(), &mComponent->getSymbolVariants(), this);
   updateMetadata();
 
+  // Load attribute editor.
+  mUi->attributesEditorWidget->setReferences(mUndoStack.data(),
+                                             &mComponent->getAttributes());
+
   // Show "interface broken" warning when related properties are modified.
   memorizeComponentInterface();
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
@@ -108,11 +112,10 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
           &ComponentEditorWidget::commitMetadata);
   connect(mUi->edtDefaultValue, &PlainTextEdit::editingFinished, this,
           &ComponentEditorWidget::commitMetadata);
-  connect(mUi->attributesEditorWidget, &AttributeListEditorWidget::edited, this,
-          &ComponentEditorWidget::commitMetadata);
 }
 
 ComponentEditorWidget::~ComponentEditorWidget() noexcept {
+  mUi->attributesEditorWidget->setReferences(nullptr, nullptr);
   mUi->signalEditorWidget->setReferences(nullptr, nullptr);
   mUi->symbolVariantsEditorWidget->setReferences(nullptr, nullptr, nullptr);
 }
@@ -158,7 +161,6 @@ void ComponentEditorWidget::updateMetadata() noexcept {
   mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
   mUi->edtPrefix->setText(*mComponent->getPrefixes().getDefaultValue());
   mUi->edtDefaultValue->setPlainText(mComponent->getDefaultValue());
-  mUi->attributesEditorWidget->setAttributeList(mComponent->getAttributes());
 }
 
 QString ComponentEditorWidget::commitMetadata() noexcept {
@@ -186,7 +188,6 @@ QString ComponentEditorWidget::commitMetadata() noexcept {
     } catch (const Exception& e) {
     }
     cmd->setDefaultValue(mUi->edtDefaultValue->toPlainText().trimmed());
-    cmd->setAttributes(mUi->attributesEditorWidget->getAttributeList());
 
     // Commit all changes.
     mUndoStack->execCmd(cmd.take());  // can throw

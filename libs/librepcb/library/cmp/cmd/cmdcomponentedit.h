@@ -54,7 +54,6 @@ public:
   void setDefaultValue(const QString& value) noexcept;
   void setPrefix(const QString& norm, const ComponentPrefix& prefix) noexcept;
   void setPrefixes(const NormDependentPrefixMap& prefixes) noexcept;
-  void setAttributes(const AttributeList& attributes) noexcept;
 
   // Operator Overloadings
   CmdComponentEdit& operator=(const CmdComponentEdit& rhs) = delete;
@@ -78,8 +77,6 @@ private:  // Data
   QString                mNewDefaultValue;
   NormDependentPrefixMap mOldPrefixes;
   NormDependentPrefixMap mNewPrefixes;
-  AttributeList          mOldAttributes;
-  AttributeList          mNewAttributes;
 };
 
 /*******************************************************************************

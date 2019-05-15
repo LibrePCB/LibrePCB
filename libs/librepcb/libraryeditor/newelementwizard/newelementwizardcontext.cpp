@@ -383,7 +383,7 @@ void NewElementWizardContext::createLibraryElement() {
                         *mElementName, mElementDescription, mElementKeywords);
       element.setCategories(categories);
       element.setIsSchematicOnly(mComponentSchematicOnly);
-      element.setAttributes(mComponentAttributes);
+      element.getAttributes() = mComponentAttributes;
       element.setDefaultValue(mComponentDefaultValue);
       element.setPrefixes(mComponentPrefixes);
       element.getSignals()        = mComponentSignals;

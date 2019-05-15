@@ -47,6 +47,7 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(
   : QDialog(parent),
     mMetadata(metadata),
     mUndoStack(undoStack),
+    mAttributes(mMetadata.getAttributes()),
     mUi(new Ui::ProjectPropertiesEditorDialog) {
   mUi->setupUi(this);
 
@@ -57,10 +58,11 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(
       mMetadata.getCreated().toString(Qt::DefaultLocaleLongDate));
   mUi->lblLastModifiedDateTime->setText(
       mMetadata.getLastModified().toString(Qt::DefaultLocaleLongDate));
-  mUi->attributeListEditorWidget->setAttributeList(mMetadata.getAttributes());
+  mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
 }
 
 ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept {
+  mUi->attributeListEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
@@ -93,7 +95,7 @@ bool ProjectPropertiesEditorDialog::applyChanges() noexcept {
     cmd->setName(ElementName(mUi->edtName->text().trimmed()));  // can throw
     cmd->setAuthor(mUi->edtAuthor->text().trimmed());
     cmd->setVersion(mUi->edtVersion->text().trimmed());
-    cmd->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
+    cmd->setAttributes(mAttributes);
     mUndoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {

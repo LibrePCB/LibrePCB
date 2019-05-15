@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdcomponentedit.h"
+#include "cmdattributeedit.h"
 
 #include <QtCore>
 
@@ -28,81 +28,80 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdComponentEdit::CmdComponentEdit(Component& component) noexcept
-  : CmdLibraryElementEdit(component, tr("Edit component metadata")),
-    mComponent(component),
-    mOldSchematicOnly(component.isSchematicOnly()),
-    mNewSchematicOnly(mOldSchematicOnly),
-    mOldDefaultValue(component.getDefaultValue()),
-    mNewDefaultValue(mOldDefaultValue),
-    mOldPrefixes(component.getPrefixes()),
-    mNewPrefixes(mOldPrefixes) {
+CmdAttributeEdit::CmdAttributeEdit(Attribute& attribute) noexcept
+  : UndoCommand(tr("Edit circle")),
+    mAttribute(attribute),
+    mOldKey(attribute.getKey()),
+    mNewKey(mOldKey),
+    mOldType(&attribute.getType()),
+    mNewType(mOldType),
+    mOldValue(attribute.getValue()),
+    mNewValue(mOldValue),
+    mOldUnit(attribute.getUnit()),
+    mNewUnit(mOldUnit) {
 }
 
-CmdComponentEdit::~CmdComponentEdit() noexcept {
+CmdAttributeEdit::~CmdAttributeEdit() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CmdComponentEdit::setIsSchematicOnly(bool schematicOnly) noexcept {
+void CmdAttributeEdit::setKey(const AttributeKey& key) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewSchematicOnly = schematicOnly;
+  mNewKey = key;
 }
 
-void CmdComponentEdit::setDefaultValue(const QString& value) noexcept {
+void CmdAttributeEdit::setType(const AttributeType& type) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewDefaultValue = value;
+  mNewType = &type;
 }
 
-void CmdComponentEdit::setPrefix(const QString&         norm,
-                                 const ComponentPrefix& prefix) noexcept {
+void CmdAttributeEdit::setValue(const QString& value) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPrefixes.insert(norm, prefix);
+  mNewValue = value;
 }
 
-void CmdComponentEdit::setPrefixes(
-    const NormDependentPrefixMap& prefixes) noexcept {
+void CmdAttributeEdit::setUnit(const AttributeUnit* unit) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPrefixes = prefixes;
+  mNewUnit = unit;
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdComponentEdit::performExecute() {
-  if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
-  if (mNewSchematicOnly != mOldSchematicOnly) return true;
-  if (mNewDefaultValue != mOldDefaultValue) return true;
-  if (mNewPrefixes != mOldPrefixes) return true;
-  return false;
+bool CmdAttributeEdit::performExecute() {
+  bool modified = false;
+  // Set type/value/unit before key for exception safety (setTypeValueUnit() can
+  // throw, but setKey() not)!
+  if (mAttribute.setTypeValueUnit(*mNewType, mNewValue, mNewUnit)) {
+    modified = true;
+  }
+  if (mAttribute.setKey(mNewKey)) {
+    modified = true;
+  }
+  return modified;
 }
 
-void CmdComponentEdit::performUndo() {
-  CmdLibraryElementEdit::performUndo();  // can throw
-  mComponent.setIsSchematicOnly(mOldSchematicOnly);
-  mComponent.setDefaultValue(mOldDefaultValue);
-  mComponent.setPrefixes(mOldPrefixes);
+void CmdAttributeEdit::performUndo() {
+  mAttribute.setTypeValueUnit(*mOldType, mOldValue, mOldUnit);
+  mAttribute.setKey(mOldKey);
 }
 
-void CmdComponentEdit::performRedo() {
-  CmdLibraryElementEdit::performRedo();  // can throw
-  mComponent.setIsSchematicOnly(mNewSchematicOnly);
-  mComponent.setDefaultValue(mNewDefaultValue);
-  mComponent.setPrefixes(mNewPrefixes);
+void CmdAttributeEdit::performRedo() {
+  mAttribute.setTypeValueUnit(*mNewType, mNewValue, mNewUnit);
+  mAttribute.setKey(mNewKey);
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
