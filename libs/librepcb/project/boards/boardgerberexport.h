@@ -54,9 +54,6 @@ class BoardFabricationOutputSettings;
 
 /**
  * @brief The BoardGerberExport class
- *
- * @author ubruhin
- * @date 2016-01-10
  */
 class BoardGerberExport final : public QObject, public AttributeProvider {
   Q_OBJECT

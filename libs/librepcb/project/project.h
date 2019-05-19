@@ -75,9 +75,6 @@ class Board;
  *
  * @note !! A detailed description about projects is available here: @ref
  * doc_project !!
- *
- * @author ubruhin
- * @date 2014-06-24
  */
 class Project final : public QObject, public AttributeProvider {
   Q_OBJECT
@@ -272,8 +269,6 @@ public:
    * exists already, it will be overwritten.
    *
    * @throw Exception     On error
-   *
-   * @todo add more parameters (paper size, orientation, pages to print, ...)
    */
   void exportSchematicsAsPdf(const FilePath& filepath);
 

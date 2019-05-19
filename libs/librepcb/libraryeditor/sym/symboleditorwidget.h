@@ -58,9 +58,6 @@ class SymbolEditorWidget;
 
 /**
  * @brief The SymbolEditorWidget class
- *
- * @author ubruhin
- * @date 2016-10-16
  */
 class SymbolEditorWidget final : public EditorWidgetBase,
                                  public IF_GraphicsViewEventHandler {

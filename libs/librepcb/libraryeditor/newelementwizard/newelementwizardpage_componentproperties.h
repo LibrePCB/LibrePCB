@@ -45,9 +45,6 @@ class NewElementWizardPage_ComponentProperties;
 
 /**
  * @brief The NewElementWizardPage_ComponentProperties class
- *
- * @author ubruhin
- * @date 2017-03-26
  */
 class NewElementWizardPage_ComponentProperties final : public QWizardPage {
   Q_OBJECT

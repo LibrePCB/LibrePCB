@@ -54,9 +54,6 @@ class SymbolPinGraphicsItem;
 
 /**
  * @brief The SymbolGraphicsItem class
- *
- * @author ubruhin
- * @date 2016-11-06
  */
 class SymbolGraphicsItem final : public QGraphicsItem {
 public:

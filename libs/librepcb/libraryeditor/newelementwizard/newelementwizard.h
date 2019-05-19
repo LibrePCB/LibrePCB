@@ -57,9 +57,6 @@ class NewElementWizard;
 
 /**
  * @brief The NewElementWizard class
- *
- * @author ubruhin
- * @date 2017-03-21
  */
 class NewElementWizard final : public QWizard {
   Q_OBJECT

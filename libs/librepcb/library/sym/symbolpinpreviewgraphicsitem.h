@@ -47,9 +47,6 @@ class ComponentSignal;
 
 /**
  * @brief The SymbolPinPreviewGraphicsItem class
- *
- * @author ubruhin
- * @date 2015-04-21
  */
 class SymbolPinPreviewGraphicsItem final : public QGraphicsItem {
 public:

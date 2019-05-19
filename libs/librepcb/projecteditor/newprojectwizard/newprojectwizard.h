@@ -59,9 +59,6 @@ class NewProjectWizard;
 
 /**
  * @brief The NewProjectWizard class
- *
- * @author ubruhin
- * @date 2016-08-13
  */
 class NewProjectWizard final : public QWizard {
   Q_OBJECT

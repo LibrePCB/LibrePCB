@@ -53,9 +53,6 @@ class AddLibraryWidget;
 
 /**
  * @brief The AddLibraryWidget class
- *
- * @author ubruhin
- * @date 2016-08-03
  */
 class AddLibraryWidget final : public QWidget {
   Q_OBJECT

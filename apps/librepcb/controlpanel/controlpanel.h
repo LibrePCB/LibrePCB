@@ -73,9 +73,6 @@ class ControlPanel;
 
 /**
  * @brief The ControlPanel class
- *
- * @author ubruhin
- * @date 2014-06-23
  */
 class ControlPanel final : public QMainWindow {
   Q_OBJECT

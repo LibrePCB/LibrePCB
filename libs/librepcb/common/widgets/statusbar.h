@@ -39,9 +39,6 @@ namespace librepcb {
 
 /**
  * @brief The StatusBar class extends QStatusBar for some commonly used fields
- *
- * @author ubruhin
- * @date 2017-09-03
  */
 class StatusBar final : public QStatusBar {
   Q_OBJECT

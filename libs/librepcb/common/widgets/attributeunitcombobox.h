@@ -40,9 +40,6 @@ class AttributeUnit;
 
 /**
  * @brief The AttributeUnitComboBox class
- *
- * @author ubruhin
- * @date 2017-03-10
  */
 class AttributeUnitComboBox final : public QWidget {
   Q_OBJECT

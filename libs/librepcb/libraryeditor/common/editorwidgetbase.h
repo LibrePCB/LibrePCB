@@ -58,9 +58,6 @@ namespace editor {
 
 /**
  * @brief The EditorWidgetBase class
- *
- * @author ubruhin
- * @date 2016-10-17
  */
 class EditorWidgetBase : public QWidget,
                          protected IF_LibraryElementCheckHandler {

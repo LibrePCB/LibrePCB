@@ -58,9 +58,6 @@ class SymbolChooserDialog;
 
 /**
  * @brief The SymbolChooserDialog class
- *
- * @author ubruhin
- * @date 2017-03-19
  */
 class SymbolChooserDialog final : public QDialog {
   Q_OBJECT

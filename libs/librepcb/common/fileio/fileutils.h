@@ -41,9 +41,6 @@ class FilePath;
 /**
  * @brief The FileUtils class provides some static methods to execute file
  * operations.
- *
- * @author ubruhin
- * @date 2016-08-07
  */
 class FileUtils final {
   Q_DECLARE_TR_FUNCTIONS(FileUtils)

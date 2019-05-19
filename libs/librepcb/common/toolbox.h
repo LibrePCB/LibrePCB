@@ -41,9 +41,6 @@ namespace librepcb {
 
 /**
  * @brief The Toolbox class provides some useful general purpose methods
- *
- * @author  ubruhin
- * @date    2016-10-30
  */
 class Toolbox final {
   Q_DECLARE_TR_FUNCTIONS(Toolbox)

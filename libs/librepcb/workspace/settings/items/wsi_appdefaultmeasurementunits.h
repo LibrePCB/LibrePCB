@@ -40,9 +40,6 @@ namespace workspace {
 /**
  * @brief The WSI_AppDefaultMeasurementUnits class represents the application's
  * default measurement units (for example the application's default length unit)
- *
- * @author ubruhin
- * @date 2014-10-04
  */
 class WSI_AppDefaultMeasurementUnits final : public WSI_Base {
   Q_OBJECT

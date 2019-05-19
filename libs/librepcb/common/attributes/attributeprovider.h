@@ -55,9 +55,6 @@ namespace librepcb {
  *
  * @see librepcb::AttributeSubstitutor
  * @see @ref doc_attributes_system
- *
- * @author ubruhin
- * @date 2015-01-10
  */
 class AttributeProvider {
 public:

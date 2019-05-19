@@ -58,9 +58,6 @@ class PackageChooserDialog;
 
 /**
  * @brief The PackageChooserDialog class
- *
- * @author ubruhin
- * @date 2017-03-25
  */
 class PackageChooserDialog final : public QDialog {
   Q_OBJECT

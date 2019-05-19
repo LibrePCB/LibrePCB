@@ -47,9 +47,6 @@ class FabricationOutputDialog;
 
 /**
  * @brief The FabricationOutputDialog class
- *
- * @author ubruhin
- * @date 2016-03-31
  */
 class FabricationOutputDialog final : public QDialog {
   Q_OBJECT

@@ -42,9 +42,6 @@ namespace editor {
 
 /**
  * @brief The CmdRemoveSelectedFootprintItems class
- *
- * @author  ubruhin
- * @date    2016-11-05
  */
 class CmdRemoveSelectedFootprintItems final : public UndoCommandGroup {
 public:

@@ -44,9 +44,6 @@ class GridSettingsDialog;
 /**
  * @brief This class provides a Dialog (GUI) to change the grid settings of a
  * #GraphicsView
- *
- * @author ubruhin
- * @date 2014-10-13
  */
 class GridSettingsDialog final : public QDialog {
   Q_OBJECT

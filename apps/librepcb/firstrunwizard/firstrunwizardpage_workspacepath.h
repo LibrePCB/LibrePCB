@@ -42,9 +42,6 @@ class FirstRunWizardPage_WorkspacePath;
 
 /**
  * @brief The FirstRunWizardPage_WorkspacePath class
- *
- * @author ubruhin
- * @date 2015-09-22
  */
 class FirstRunWizardPage_WorkspacePath final : public QWizardPage {
   Q_OBJECT

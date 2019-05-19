@@ -40,9 +40,6 @@ namespace librepcb {
 
 /**
  * @brief The SQLiteDatabase class
- *
- * @author ubruhin
- * @date 2016-09-03
  */
 class SQLiteDatabase final : public QObject {
   Q_OBJECT

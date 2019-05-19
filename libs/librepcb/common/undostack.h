@@ -53,9 +53,6 @@ class UndoCommandGroup;
  * @li #append() redirects to librepcb::UndoStack::appendToCmdGroup().
  * @li #commit() redirects to librepcb::UndoStack::commitCmdGroup().
  * @li #abort() redirects to librepcb::UndoStack::abortCmdGroup().
- *
- * @author ubruhin
- * @date 2017-02-25
  */
 class UndoStackTransaction final {
 public:
@@ -103,19 +100,9 @@ private:
  *  - <b>Removed support for nested macros (QUndoStack#beginMacro() and
  *    QUndoStack#endMacro())</b>: I think we do need this feature (but we have a
  * similar mechanism, see next line)...
- *  - <b>Added support for exclusive macro command creation:</b> @todo Don't
- * sure if this is a good way, we need some tests first... If the tests are
- * successful, we should complete this documentation (explain how this feature
- * works).
+ *  - <b>Added support for exclusive macro command creation:</b>
  *
  * @see #UndoCommand, #UndoCommandGroup
- *
- * @author ubruhin
- * @date 2014-08-20
- *
- * @todo This class is not yet tested very well. Does it work correctly when
- * destroying an #UndoStack object while the current index is not the index of
- * the last command?
  */
 class UndoStack final : public QObject {
   Q_OBJECT

@@ -54,9 +54,6 @@ class Project;
 
 /**
  * @brief The ProjectLibrary class
- *
- * @todo Adding and removing elements is very provisional. It does not really
- * work together with the automatic backup/restore feature of projects.
  */
 class ProjectLibrary final : public QObject {
   Q_OBJECT

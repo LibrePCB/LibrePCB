@@ -53,8 +53,6 @@ class BI_NetLineAnchor;
 
 /**
  * @brief The BI_NetSegment class
- *
- * @todo Do not allow to create empty netsegments!
  */
 class BI_NetSegment final : public BI_Base, public SerializableObject {
   Q_OBJECT

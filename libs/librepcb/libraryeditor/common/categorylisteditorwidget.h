@@ -51,9 +51,6 @@ class CategoryListEditorWidget;
 
 /**
  * @brief The CategoryListEditorWidgetBase class
- *
- * @author  ubruhin
- * @date    2016-10-29
  */
 class CategoryListEditorWidgetBase : public QWidget {
   Q_OBJECT
@@ -115,9 +112,6 @@ protected:  // Data
 
 /**
  * @brief The CategoryListEditorWidget class
- *
- * @author  ubruhin
- * @date    2016-10-29
  */
 template <typename ElementType>
 class CategoryListEditorWidget final : public CategoryListEditorWidgetBase {

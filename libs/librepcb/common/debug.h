@@ -54,9 +54,6 @@ namespace librepcb {
  * This class can write messages to the stderr output and to a log file. You can
  * set seperate debug levels for both. By default, logging to a file is
  * disabled.
- *
- * @author ubruhin
- * @date 2014-07-28
  */
 class Debug final {
 public:

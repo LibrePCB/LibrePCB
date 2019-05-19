@@ -50,9 +50,6 @@ class LibraryOverviewWidget;
 
 /**
  * @brief The LibraryOverviewWidget class
- *
- * @author ubruhin
- * @date 2016-10-08
  */
 class LibraryOverviewWidget final : public EditorWidgetBase {
   Q_OBJECT

@@ -50,9 +50,6 @@ class LibraryListEditorWidget;
 
 /**
  * @brief The LibraryListEditorWidget class
- *
- * @author  ubruhin
- * @date    2017-02-27
  */
 class LibraryListEditorWidget final : public QWidget {
   Q_OBJECT

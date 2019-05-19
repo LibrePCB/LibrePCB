@@ -57,9 +57,6 @@ class SymbolEditorWidget;
 /**
  * @brief The SymbolEditorFsm class is the finit state machine (FSM) of the
  * symbol editor
- *
- * @author  ubruhin
- * @date    2016-11-01
  */
 class SymbolEditorFsm final : public QObject {
   Q_OBJECT

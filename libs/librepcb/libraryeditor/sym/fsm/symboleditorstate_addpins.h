@@ -46,9 +46,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_AddPins class
- *
- * @author  ubruhin
- * @date    2016-11-27
  */
 class SymbolEditorState_AddPins final : public SymbolEditorState {
   Q_OBJECT

@@ -39,9 +39,6 @@ namespace librepcb {
 /**
  * @brief The UndoCommandGroup class makes it possible to pack multiple undo
  * commands together (it acts as a parent of it's child commands)
- *
- * @author ubruhin
- * @date 2016-03-11
  */
 class UndoCommandGroup : public UndoCommand {
   Q_DECLARE_TR_FUNCTIONS(UndoCommandGroup)

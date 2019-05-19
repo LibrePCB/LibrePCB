@@ -56,9 +56,6 @@ class FootprintPadGraphicsItem;
 
 /**
  * @brief The FootprintGraphicsItem class
- *
- * @author ubruhin
- * @date 2017-05-28
  */
 class FootprintGraphicsItem final : public QGraphicsItem {
 public:

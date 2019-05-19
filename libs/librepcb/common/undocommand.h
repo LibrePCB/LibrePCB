@@ -43,11 +43,6 @@ namespace librepcb {
  * concept.
  *
  * @see librepcb::UndoStack
- *
- * @author ubruhin
- * @date 2014-08-20
- *
- * @todo Write unit tests
  */
 class UndoCommand {
   Q_DECLARE_TR_FUNCTIONS(UndoCommand)

@@ -45,9 +45,6 @@ class NewElementWizardPage_ComponentPinSignalMap;
 
 /**
  * @brief The NewElementWizardPage_ComponentPinSignalMap class
- *
- * @author ubruhin
- * @date 2017-03-26
  */
 class NewElementWizardPage_ComponentPinSignalMap final : public QWizardPage {
   Q_OBJECT

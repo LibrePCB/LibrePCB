@@ -61,9 +61,6 @@ class ComponentChooserDialog;
 
 /**
  * @brief The ComponentChooserDialog class
- *
- * @author ubruhin
- * @date 2017-03-25
  */
 class ComponentChooserDialog final : public QDialog {
   Q_OBJECT

@@ -39,9 +39,6 @@ namespace library {
 
 /**
  * @brief The CmpSigPinDisplayType clas
- *
- * @author ubruhin
- * @date 2016-10-23
  */
 class CmpSigPinDisplayType final {
   Q_DECLARE_TR_FUNCTIONS(CmpSigPinDisplayType)

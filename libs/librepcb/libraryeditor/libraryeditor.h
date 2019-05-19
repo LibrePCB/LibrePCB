@@ -67,9 +67,6 @@ class LibraryEditor;
 
 /**
  * @brief The LibraryEditor class
- *
- * @author ubruhin
- * @date 2015-06-28
  */
 class LibraryEditor final : public QMainWindow,
                             public IF_GraphicsLayerProvider {

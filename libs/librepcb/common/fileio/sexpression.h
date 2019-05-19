@@ -53,9 +53,6 @@ T deserializeFromSExpression(const SExpression& sexpr,
 
 /**
  * @brief The SExpression class
- *
- * @author ubruhin
- * @date 2017-10-17
  */
 class SExpression final {
   Q_DECLARE_TR_FUNCTIONS(SExpression)

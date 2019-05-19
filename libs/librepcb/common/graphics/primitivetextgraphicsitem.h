@@ -42,8 +42,6 @@ namespace librepcb {
 /**
  * @brief The PrimitiveTextGraphicsItem class is the graphical representation of
  * a text
- *
- * @todo Would QStaticText improve the performance?
  */
 class PrimitiveTextGraphicsItem : public QGraphicsItem {
 public:

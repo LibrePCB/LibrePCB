@@ -56,9 +56,6 @@ class LibraryManager;
 
 /**
  * @brief The LibraryManager class
- *
- * @author ubruhin
- * @date 2016-08-03
  */
 class LibraryManager final : public QMainWindow {
   Q_OBJECT

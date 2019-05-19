@@ -42,9 +42,6 @@ namespace librepcb {
  * thread
  *
  * @see librepcb::NetworkRequestBase, librepcb::DownloadManager
- *
- * @author ubruhin
- * @date 2016-09-12
  */
 class FileDownload final : public NetworkRequestBase {
   Q_OBJECT

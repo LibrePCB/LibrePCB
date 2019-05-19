@@ -59,9 +59,6 @@ class PackageEditorWidget;
 /**
  * @brief The PackageEditorFsm class is the finit state machine (FSM) of the
  * package editor
- *
- * @author  ubruhin
- * @date    2017-05-28
  */
 class PackageEditorFsm final : public QObject {
   Q_OBJECT

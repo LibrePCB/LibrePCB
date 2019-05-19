@@ -70,11 +70,6 @@ class AddComponentDialog;
 
 /**
  * @brief The AddComponentDialog class
- *
- * @todo This class is VERY provisional!
- *
- * @author ubruhin
- * @date 2015-02-16
  */
 class AddComponentDialog final : public QDialog {
   Q_OBJECT
