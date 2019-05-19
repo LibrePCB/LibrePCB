@@ -495,7 +495,7 @@ void ComponentSymbolVariantItemListEditorWidget::moveItemUp(
 void ComponentSymbolVariantItemListEditorWidget::moveItemDown(
     int index) noexcept {
   Q_ASSERT(index >= 0 && index < mItems->count() - 1);
-  mItems->swap(index, index + 1);
+  mItems->swap(index + 1, index);
   updateTable(mSelectedItem);
   emit edited();
 }

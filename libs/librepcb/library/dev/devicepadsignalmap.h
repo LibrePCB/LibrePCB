@@ -43,10 +43,16 @@ namespace library {
 /**
  * @brief The DevicePadSignalMapItem class
  */
-class DevicePadSignalMapItem final : public QObject, public SerializableObject {
-  Q_OBJECT
-
+class DevicePadSignalMapItem final : public SerializableObject {
 public:
+  // Signals
+  enum class Event {
+    PadUuidChanged,
+    SignalUuidChanged,
+  };
+  Signal<DevicePadSignalMapItem, Event>       onEdited;
+  typedef Slot<DevicePadSignalMapItem, Event> OnEditedSlot;
+
   // Constructors / Destructor
   DevicePadSignalMapItem() = delete;
   DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
@@ -65,7 +71,7 @@ public:
   }
 
   // Setters
-  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -76,9 +82,6 @@ public:
     return !(*this == rhs);
   }
   DevicePadSignalMapItem& operator=(const DevicePadSignalMapItem& rhs) noexcept;
-
-signals:
-  void signalUuidChanged(const tl::optional<Uuid>& uuid);
 
 private:                           // Data
   Uuid               mPadUuid;     ///< must be valid
@@ -94,15 +97,17 @@ struct DevicePadSignalMapNameProvider {
 };
 using DevicePadSignalMap =
     SerializableObjectList<DevicePadSignalMapItem,
-                           DevicePadSignalMapNameProvider>;
+                           DevicePadSignalMapNameProvider,
+                           DevicePadSignalMapItem::Event>;
 using CmdDevicePadSignalMapItemInsert =
-    CmdListElementInsert<DevicePadSignalMapItem,
-                         DevicePadSignalMapNameProvider>;
+    CmdListElementInsert<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
+                         DevicePadSignalMapItem::Event>;
 using CmdDevicePadSignalMapItemRemove =
-    CmdListElementRemove<DevicePadSignalMapItem,
-                         DevicePadSignalMapNameProvider>;
+    CmdListElementRemove<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
+                         DevicePadSignalMapItem::Event>;
 using CmdDevicePadSignalMapItemsSwap =
-    CmdListElementsSwap<DevicePadSignalMapItem, DevicePadSignalMapNameProvider>;
+    CmdListElementsSwap<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
+                        DevicePadSignalMapItem::Event>;
 
 /*******************************************************************************
  *  Class DevicePadSignalMapHelpers

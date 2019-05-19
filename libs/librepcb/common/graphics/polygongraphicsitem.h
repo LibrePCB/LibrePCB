@@ -42,12 +42,8 @@ class IF_GraphicsLayerProvider;
 
 /**
  * @brief The PolygonGraphicsItem class
- *
- * @author ubruhin
- * @date 2017-05-28
  */
-class PolygonGraphicsItem final : public PrimitivePathGraphicsItem,
-                                  public IF_PolygonObserver {
+class PolygonGraphicsItem final : public PrimitivePathGraphicsItem {
 public:
   // Constructors / Destructor
   PolygonGraphicsItem()                                 = delete;
@@ -63,18 +59,15 @@ public:
   PolygonGraphicsItem& operator=(const PolygonGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void polygonLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept override;
-  void polygonLineWidthChanged(
-      const UnsignedLength& newLineWidth) noexcept override;
-  void polygonIsFilledChanged(bool newIsFilled) noexcept override;
-  void polygonIsGrabAreaChanged(bool newIsGrabArea) noexcept override;
-  void polygonPathChanged(const Path& newPath) noexcept override;
+  void polygonEdited(const Polygon& polygon, Polygon::Event event) noexcept;
   void updateFillLayer() noexcept;
 
 private:  // Data
   Polygon&                        mPolygon;
   const IF_GraphicsLayerProvider& mLayerProvider;
+
+  // Slots
+  Polygon::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

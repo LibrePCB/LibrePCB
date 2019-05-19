@@ -35,7 +35,7 @@ namespace library {
  ******************************************************************************/
 
 ComponentSignal::ComponentSignal(const ComponentSignal& other) noexcept
-  : QObject(nullptr),
+  : onEdited(*this),
     mUuid(other.mUuid),
     mName(other.mName),
     mRole(other.mRole),
@@ -50,7 +50,7 @@ ComponentSignal::ComponentSignal(const Uuid&              uuid,
                                  const SignalRole&        role,
                                  const QString& forcedNetName, bool isRequired,
                                  bool isNegated, bool isClock) noexcept
-  : QObject(nullptr),
+  : onEdited(*this),
     mUuid(uuid),
     mName(name),
     mRole(role),
@@ -61,7 +61,7 @@ ComponentSignal::ComponentSignal(const Uuid&              uuid,
 }
 
 ComponentSignal::ComponentSignal(const SExpression& node)
-  : QObject(nullptr),
+  : onEdited(*this),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mName(node.getValueByPath<CircuitIdentifier>("name", true)),
     mRole(node.getValueByPath<SignalRole>("role")),
@@ -78,46 +78,64 @@ ComponentSignal::~ComponentSignal() noexcept {
  *  Setters
  ******************************************************************************/
 
-void ComponentSignal::setName(const CircuitIdentifier& name) noexcept {
-  if (name == mName) return;
+bool ComponentSignal::setName(const CircuitIdentifier& name) noexcept {
+  if (name == mName) {
+    return false;
+  }
+
   mName = name;
-  emit nameChanged(mName);
-  emit edited();
+  onEdited.notify(Event::NameChanged);
+  return true;
 }
 
-void ComponentSignal::setRole(const SignalRole& role) noexcept {
-  if (role == mRole) return;
+bool ComponentSignal::setRole(const SignalRole& role) noexcept {
+  if (role == mRole) {
+    return false;
+  }
+
   mRole = role;
-  emit roleChanged(mRole);
-  emit edited();
+  onEdited.notify(Event::RoleChanged);
+  return true;
 }
 
-void ComponentSignal::setForcedNetName(const QString& name) noexcept {
-  if (name == mForcedNetName) return;
+bool ComponentSignal::setForcedNetName(const QString& name) noexcept {
+  if (name == mForcedNetName) {
+    return false;
+  }
+
   mForcedNetName = name;
-  emit forcedNetNameChanged(mForcedNetName);
-  emit edited();
+  onEdited.notify(Event::ForcedNetNameChanged);
+  return true;
 }
 
-void ComponentSignal::setIsRequired(bool required) noexcept {
-  if (required == mIsRequired) return;
+bool ComponentSignal::setIsRequired(bool required) noexcept {
+  if (required == mIsRequired) {
+    return false;
+  }
+
   mIsRequired = required;
-  emit isRequiredChanged(mIsRequired);
-  emit edited();
+  onEdited.notify(Event::IsRequiredChanged);
+  return true;
 }
 
-void ComponentSignal::setIsNegated(bool negated) noexcept {
-  if (negated == mIsNegated) return;
+bool ComponentSignal::setIsNegated(bool negated) noexcept {
+  if (negated == mIsNegated) {
+    return false;
+  }
+
   mIsNegated = negated;
-  emit isNegatedChanged(mIsNegated);
-  emit edited();
+  onEdited.notify(Event::IsNegatedChanged);
+  return true;
 }
 
-void ComponentSignal::setIsClock(bool clock) noexcept {
-  if (clock == mIsClock) return;
+bool ComponentSignal::setIsClock(bool clock) noexcept {
+  if (clock == mIsClock) {
+    return false;
+  }
+
   mIsClock = clock;
-  emit isClockChanged(mIsClock);
-  emit edited();
+  onEdited.notify(Event::IsClockChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -153,7 +171,7 @@ ComponentSignal& ComponentSignal::operator=(
     const ComponentSignal& rhs) noexcept {
   if (mUuid != rhs.mUuid) {
     mUuid = rhs.mUuid;
-    emit edited();
+    onEdited.notify(Event::UuidChanged);
   }
   setName(rhs.mName);
   setRole(rhs.mRole);

@@ -53,9 +53,7 @@ class BI_Footprint;
 /**
  * @brief The BI_StrokeText class
  */
-class BI_StrokeText final : public BI_Base,
-                            public SerializableObject,
-                            public IF_StrokeTextObserver {
+class BI_StrokeText final : public BI_Base, public SerializableObject {
   Q_OBJECT
 
 public:
@@ -102,55 +100,17 @@ private slots:
 private:  // Methods
   void init();
   void updatePaths() noexcept;
-  void strokeTextLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept override {
-    Q_UNUSED(newLayerName);
-    updateGraphicsItems();
-  }
-  void strokeTextTextChanged(const QString& newText) noexcept override {
-    Q_UNUSED(newText);
-  }
-  void strokeTextPositionChanged(const Point& newPos) noexcept override {
-    Q_UNUSED(newPos);
-    updateGraphicsItems();
-  }
-  void strokeTextRotationChanged(const Angle& newRot) noexcept override {
-    Q_UNUSED(newRot);
-  }
-  void strokeTextHeightChanged(
-      const PositiveLength& newHeight) noexcept override {
-    Q_UNUSED(newHeight);
-  }
-  void strokeTextStrokeWidthChanged(
-      const UnsignedLength& newStrokeWidth) noexcept override {
-    Q_UNUSED(newStrokeWidth);
-  }
-  void strokeTextLetterSpacingChanged(
-      const StrokeTextSpacing& spacing) noexcept override {
-    Q_UNUSED(spacing);
-  }
-  void strokeTextLineSpacingChanged(
-      const StrokeTextSpacing& spacing) noexcept override {
-    Q_UNUSED(spacing);
-  }
-  void strokeTextAlignChanged(const Alignment& newAlign) noexcept override {
-    Q_UNUSED(newAlign);
-  }
-  void strokeTextMirroredChanged(bool mirrored) noexcept override {
-    Q_UNUSED(mirrored);
-  }
-  void strokeTextAutoRotateChanged(bool newAutoRotate) noexcept override {
-    Q_UNUSED(newAutoRotate);
-  }
-  void strokeTextPathsChanged(const QVector<Path>& paths) noexcept override {
-    Q_UNUSED(paths);
-  }
+  void strokeTextEdited(const StrokeText& text,
+                        StrokeText::Event event) noexcept;
 
 private:  // Data
   BI_Footprint*                          mFootprint;
   QScopedPointer<StrokeText>             mText;
   QScopedPointer<StrokeTextGraphicsItem> mGraphicsItem;
   QScopedPointer<LineGraphicsItem>       mAnchorGraphicsItem;
+
+  // Slots
+  StrokeText::OnEditedSlot mOnStrokeTextEditedSlot;
 };
 
 /*******************************************************************************

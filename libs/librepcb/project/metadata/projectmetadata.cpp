@@ -58,7 +58,7 @@ ProjectMetadata::ProjectMetadata(const SExpression& node)
   mAuthor  = node.getValueByPath<QString>("author");
   mVersion = node.getValueByPath<QString>("version");
   mCreated = node.getValueByPath<QDateTime>("created");
-  mAttributes.loadFromDomElement(node);  // can throw
+  mAttributes.loadFromSExpression(node);  // can throw
 
   mLastModified = QDateTime::currentDateTime();
 

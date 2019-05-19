@@ -44,25 +44,39 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& keywords_en_US)
   : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
                    author, name_en_US, description_en_US, keywords_en_US),
-    mPins(this),
-    mPolygons(this),
-    mCircles(this),
-    mTexts(this),
-    mRegisteredGraphicsItem(nullptr) {
+    onEdited(*this),
+    mPins(),
+    mPolygons(),
+    mCircles(),
+    mTexts(),
+    mRegisteredGraphicsItem(nullptr),
+    mPinsEditedSlot(*this, &Symbol::pinsEdited),
+    mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
+    mCirclesEditedSlot(*this, &Symbol::circlesEdited),
+    mTextsEditedSlot(*this, &Symbol::textsEdited) {
+  mPins.onEdited.attach(mPinsEditedSlot);
+  mPolygons.onEdited.attach(mPolygonsEditedSlot);
+  mCircles.onEdited.attach(mCirclesEditedSlot);
+  mTexts.onEdited.attach(mTextsEditedSlot);
 }
 
 Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory)
   : LibraryElement(std::move(directory), getShortElementName(),
                    getLongElementName()),
-    mPins(this),
-    mPolygons(this),
-    mCircles(this),
-    mTexts(this),
-    mRegisteredGraphicsItem(nullptr) {
-  mPins.loadFromDomElement(mLoadingFileDocument);      // can throw
-  mPolygons.loadFromDomElement(mLoadingFileDocument);  // can throw
-  mCircles.loadFromDomElement(mLoadingFileDocument);   // can throw
-  mTexts.loadFromDomElement(mLoadingFileDocument);     // can throw
+    onEdited(*this),
+    mPins(mLoadingFileDocument),
+    mPolygons(mLoadingFileDocument),
+    mCircles(mLoadingFileDocument),
+    mTexts(mLoadingFileDocument),
+    mRegisteredGraphicsItem(nullptr),
+    mPinsEditedSlot(*this, &Symbol::pinsEdited),
+    mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
+    mCirclesEditedSlot(*this, &Symbol::circlesEdited),
+    mTextsEditedSlot(*this, &Symbol::textsEdited) {
+  mPins.onEdited.attach(mPinsEditedSlot);
+  mPolygons.onEdited.attach(mPolygonsEditedSlot);
+  mCircles.onEdited.attach(mCirclesEditedSlot);
+  mTexts.onEdited.attach(mTextsEditedSlot);
   cleanupAfterLoadingElementFromFile();
 }
 
@@ -93,60 +107,92 @@ void Symbol::unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void Symbol::listObjectAdded(const SymbolPinList& list, int newIndex,
-                             const std::shared_ptr<SymbolPin>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mPins);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPin(*ptr);
+void Symbol::pinsEdited(const SymbolPinList& list, int index,
+                        const std::shared_ptr<const SymbolPin>& pin,
+                        SymbolPinList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case SymbolPinList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addPin(const_cast<SymbolPin&>(*pin));
+      }
+      break;
+    case SymbolPinList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removePin(const_cast<SymbolPin&>(*pin));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::PinsEdited);
 }
 
-void Symbol::listObjectAdded(const PolygonList& list, int newIndex,
-                             const std::shared_ptr<Polygon>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mPolygons);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPolygon(*ptr);
+void Symbol::polygonsEdited(const PolygonList& list, int index,
+                            const std::shared_ptr<const Polygon>& polygon,
+                            PolygonList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case PolygonList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addPolygon(const_cast<Polygon&>(*polygon));
+      }
+      break;
+    case PolygonList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removePolygon(const_cast<Polygon&>(*polygon));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::PolygonsEdited);
 }
 
-void Symbol::listObjectAdded(const CircleList& list, int newIndex,
-                             const std::shared_ptr<Circle>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mCircles);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addCircle(*ptr);
+void Symbol::circlesEdited(const CircleList& list, int index,
+                           const std::shared_ptr<const Circle>& circle,
+                           CircleList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case CircleList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addCircle(const_cast<Circle&>(*circle));
+      }
+      break;
+    case CircleList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removeCircle(const_cast<Circle&>(*circle));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::CirclesEdited);
 }
 
-void Symbol::listObjectAdded(const TextList& list, int newIndex,
-                             const std::shared_ptr<Text>& ptr) noexcept {
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == &mTexts);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addText(*ptr);
-}
-
-void Symbol::listObjectRemoved(const SymbolPinList& list, int oldIndex,
-                               const std::shared_ptr<SymbolPin>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mPins);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePin(*ptr);
-}
-
-void Symbol::listObjectRemoved(const PolygonList& list, int oldIndex,
-                               const std::shared_ptr<Polygon>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mPolygons);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePolygon(*ptr);
-}
-
-void Symbol::listObjectRemoved(const CircleList& list, int oldIndex,
-                               const std::shared_ptr<Circle>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mCircles);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeCircle(*ptr);
-}
-
-void Symbol::listObjectRemoved(const TextList& list, int oldIndex,
-                               const std::shared_ptr<Text>& ptr) noexcept {
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == &mTexts);
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removeText(*ptr);
+void Symbol::textsEdited(const TextList& list, int index,
+                         const std::shared_ptr<const Text>& text,
+                         TextList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  switch (event) {
+    case TextList::Event::ElementAdded:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->addText(const_cast<Text&>(*text));
+      }
+      break;
+    case TextList::Event::ElementRemoved:
+      if (mRegisteredGraphicsItem) {
+        mRegisteredGraphicsItem->removeText(const_cast<Text&>(*text));
+      }
+      break;
+    default:
+      break;
+  }
+  onEdited.notify(Event::TextsEdited);
 }
 
 void Symbol::serialize(SExpression& root) const {

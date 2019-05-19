@@ -43,7 +43,8 @@ PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mPadList(nullptr),
-    mUndoStack(nullptr) {
+    mUndoStack(nullptr),
+    mPadListEditedSlot(*this, &PackagePadListEditorWidget::padListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -71,7 +72,6 @@ PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
 }
 
 PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
-  if (mPadList) mPadList->unregisterObserver(this);
 }
 
 /*******************************************************************************
@@ -80,11 +80,15 @@ PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
 
 void PackagePadListEditorWidget::setReferences(PackagePadList& list,
                                                UndoStack*      stack) noexcept {
-  if (mPadList) mPadList->unregisterObserver(this);
+  if (mPadList) {
+    mPadList->onEdited.detach(mPadListEditedSlot);
+  }
   mPadList     = &list;
   mUndoStack   = stack;
   mSelectedPad = tl::nullopt;
-  mPadList->registerObserver(this);
+  if (mPadList) {
+    mPadList->onEdited.attach(mPadListEditedSlot);
+  }
   updateTable();
 }
 
@@ -134,6 +138,17 @@ void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PackagePadListEditorWidget::padListEdited(
+    const PackagePadList& list, int index,
+    const std::shared_ptr<const PackagePad>& pad,
+    PackagePadList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(pad);
+  Q_UNUSED(event);
+  updateTable(mSelectedPad);
+}
 
 void PackagePadListEditorWidget::updateTable(
     const tl::optional<Uuid>& selected) noexcept {
@@ -292,30 +307,6 @@ QString PackagePadListEditorWidget::getNextPadNameProposal() const noexcept {
     ++i;
   }
   return QString::number(i);
-}
-
-/*******************************************************************************
- *  Observer Methods
- ******************************************************************************/
-
-void PackagePadListEditorWidget::listObjectAdded(
-    const PackagePadList& list, int newIndex,
-    const std::shared_ptr<PackagePad>& ptr) noexcept {
-  Q_ASSERT(&list == mPadList);
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedPad);
-}
-
-void PackagePadListEditorWidget::listObjectRemoved(
-    const PackagePadList& list, int oldIndex,
-    const std::shared_ptr<PackagePad>& ptr) noexcept {
-  Q_ASSERT(&list == mPadList);
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedPad);
 }
 
 /*******************************************************************************

@@ -56,6 +56,15 @@ class ComponentPinSignalMapItem final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(ComponentPinSignalMapItem)
 
 public:
+  // Signals
+  enum class Event {
+    PinUuidChanged,
+    SignalUuidChanged,
+    DisplayTypeChanged,
+  };
+  Signal<ComponentPinSignalMapItem, Event>       onEdited;
+  typedef Slot<ComponentPinSignalMapItem, Event> OnEditedSlot;
+
   // Constructors / Destructor
   ComponentPinSignalMapItem() = delete;
   ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
@@ -77,12 +86,8 @@ public:
   }
 
   // Setters
-  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept {
-    mSignalUuid = uuid;
-  }
-  void setDisplayType(const CmpSigPinDisplayType& type) noexcept {
-    mDisplayType = type;
-  }
+  bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  bool setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -110,16 +115,20 @@ struct ComponentPinSignalMapNameProvider {
 };
 using ComponentPinSignalMap =
     SerializableObjectList<ComponentPinSignalMapItem,
-                           ComponentPinSignalMapNameProvider>;
+                           ComponentPinSignalMapNameProvider,
+                           ComponentPinSignalMapItem::Event>;
 using CmdComponentPinSignalMapItemInsert =
     CmdListElementInsert<ComponentPinSignalMapItem,
-                         ComponentPinSignalMapNameProvider>;
+                         ComponentPinSignalMapNameProvider,
+                         ComponentPinSignalMapItem::Event>;
 using CmdComponentPinSignalMapItemRemove =
     CmdListElementRemove<ComponentPinSignalMapItem,
-                         ComponentPinSignalMapNameProvider>;
+                         ComponentPinSignalMapNameProvider,
+                         ComponentPinSignalMapItem::Event>;
 using CmdComponentPinSignalMapItemsSwap =
     CmdListElementsSwap<ComponentPinSignalMapItem,
-                        ComponentPinSignalMapNameProvider>;
+                        ComponentPinSignalMapNameProvider,
+                        ComponentPinSignalMapItem::Event>;
 
 /*******************************************************************************
  *  Class ComponentPinSignalMapHelpers
