@@ -108,10 +108,17 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
     appendChild(cmd);
   }
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
-    // Since there is no right alignment (yet), coordinates need to be re-adjusted to accomodate left shift
-    // New position = mirrored old position - label width
     Point newpos = netlabel->getPosition().mirrored(mOrientation, center);
-    newpos.setX(newpos.getX() - netlabel->getApproximateWidth());
+
+    // Compensate offset only for horizontal positioning
+    qreal labelRotation = netlabel->getRotation().toDeg();
+    if (qFuzzyCompare(labelRotation, 0) || qFuzzyCompare(labelRotation, 180)) {
+      // Since there is no right alignment (yet), coordinates need to be re-adjusted to accomodate left shift
+      // New position = mirrored old position - label width
+      newpos.setX(newpos.getX() - netlabel->getApproximateWidth());
+      newpos = newpos.mappedToGrid(mSchematic.getGridProperties().getInterval());
+    }
+
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
     cmd->setPosition(newpos, false);
     appendChild(cmd);
