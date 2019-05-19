@@ -155,9 +155,6 @@ namespace librepcb {
  * for RAII)!
  *  };
  * @endcode
- *
- * @author ubruhin
- * @date 2014-07-29
  */
 class DirectoryLock final {
   Q_DECLARE_TR_FUNCTIONS(DirectoryLock)

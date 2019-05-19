@@ -45,9 +45,6 @@ namespace editor {
 /**
  * @brief The SymbolEditorState class is the base class of all symbol editor FSM
  * states
- *
- * @author  ubruhin
- * @date    2016-11-01
  */
 class SymbolEditorState : public QObject {
   Q_OBJECT

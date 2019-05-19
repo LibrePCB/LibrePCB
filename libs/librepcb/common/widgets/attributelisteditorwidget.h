@@ -39,9 +39,6 @@ namespace librepcb {
 
 /**
  * @brief The AttributeListEditorWidget class
- *
- * @author ubruhin
- * @date 2017-03-10
  */
 class AttributeListEditorWidget final : public QWidget {
   Q_OBJECT

@@ -37,9 +37,6 @@ namespace workspace {
 
 /**
  * @brief The WSI_Appearance class
- *
- * @author ubruhin
- * @date 2015-02-08
  */
 class WSI_Appearance final : public WSI_Base {
   Q_OBJECT

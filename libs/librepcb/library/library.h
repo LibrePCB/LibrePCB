@@ -42,9 +42,6 @@ namespace library {
 
 /**
  * @brief   The Library class represents a library directory
- *
- * @author  ubruhin
- * @date    2016-08-03
  */
 class Library final : public LibraryBaseElement {
   Q_OBJECT

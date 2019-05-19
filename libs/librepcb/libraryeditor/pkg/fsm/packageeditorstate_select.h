@@ -43,9 +43,6 @@ class CmdDragSelectedFootprintItems;
 
 /**
  * @brief The PackageEditorState_Select class
- *
- * @author  ubruhin
- * @date    2017-05-28
  */
 class PackageEditorState_Select final : public PackageEditorState {
   Q_OBJECT

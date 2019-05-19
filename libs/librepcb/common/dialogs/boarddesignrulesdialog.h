@@ -43,9 +43,6 @@ class BoardDesignRulesDialog;
 
 /**
  * @brief The BoardDesignRulesDialog class
- *
- * @author ubruhin
- * @date 2016-04-01
  */
 class BoardDesignRulesDialog final : public QDialog {
   Q_OBJECT

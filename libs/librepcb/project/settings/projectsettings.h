@@ -42,9 +42,6 @@ class Project;
 
 /**
  * @brief The ProjectSettings class
- *
- * @author ubruhin
- * @date 2015-03-22
  */
 class ProjectSettings final : public QObject, public SerializableObject {
   Q_OBJECT

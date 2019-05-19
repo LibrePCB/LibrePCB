@@ -38,9 +38,6 @@ namespace librepcb {
 
 /**
  * @brief The Repository class provides access to a LibrePCB API server
- *
- * @author ubruhin
- * @date 2016-08-10
  */
 class Repository final : public QObject, public SerializableObject {
   Q_OBJECT

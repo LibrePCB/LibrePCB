@@ -74,9 +74,6 @@ class Angle;
  * purpose.
  *
  * @see class Length
- *
- * @author ubruhin
- * @date 2014-06-21
  */
 class Point final : public SerializableObject {
 public:

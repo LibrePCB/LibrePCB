@@ -45,9 +45,6 @@ class NewElementWizardPage_ComponentSignals;
 
 /**
  * @brief The NewElementWizardPage_ComponentSignals class
- *
- * @author ubruhin
- * @date 2017-03-26
  */
 class NewElementWizardPage_ComponentSignals final : public QWizardPage {
   Q_OBJECT

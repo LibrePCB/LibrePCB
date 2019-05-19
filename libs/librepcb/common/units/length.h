@@ -78,9 +78,6 @@ typedef qint64 LengthBase_t;
  * unit is always nanometers, but this class provides also some converting
  * methods to other units. Read the documentation of #LengthBase_t for more
  * details.
- *
- * @author ubruhin
- * @date 2014-06-21
  */
 class Length {
   Q_DECLARE_TR_FUNCTIONS(Length)

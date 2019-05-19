@@ -55,9 +55,6 @@ private:
 
 /**
  * @brief The IF_ErcMsgProvider class
- *
- * @author ubruhin
- * @date 2015-02-02
  */
 class IF_ErcMsgProvider {
 public:

@@ -56,9 +56,6 @@ namespace editor {
 
 /**
  * @brief The NewElementWizardContext class
- *
- * @author ubruhin
- * @date 2017-03-22
  */
 class NewElementWizardContext final : public QObject {
   Q_OBJECT

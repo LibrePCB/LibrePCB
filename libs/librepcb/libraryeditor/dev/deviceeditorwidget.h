@@ -60,9 +60,6 @@ class DeviceEditorWidget;
 
 /**
  * @brief The DeviceEditorWidget class
- *
- * @author ubruhin
- * @date 2016-10-16
  */
 class DeviceEditorWidget final : public EditorWidgetBase {
   Q_OBJECT

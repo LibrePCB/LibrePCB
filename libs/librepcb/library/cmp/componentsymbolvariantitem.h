@@ -54,9 +54,6 @@ namespace library {
  *  - UUID
  *  - Symbol UUID
  *  - Pin-signal-mapping
- *
- * @todo Rename class to "ComponentGate" (or similar) and rename related classes
- * if needed
  */
 class ComponentSymbolVariantItem final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariantItem)

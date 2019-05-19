@@ -43,9 +43,6 @@ class CmdDragSelectedSymbolItems;
 
 /**
  * @brief The SymbolEditorState_Select class
- *
- * @author  ubruhin
- * @date    2016-11-02
  */
 class SymbolEditorState_Select final : public SymbolEditorState {
   Q_OBJECT

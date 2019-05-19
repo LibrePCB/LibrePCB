@@ -68,9 +68,6 @@ class ComponentInstance;
  *  - All net classes (project#NetClass objects)
  *  - All net signals (project#NetSignal objects)
  *  - All component instances (project#ComponentInstance objects)
- *
- * @author ubruhin
- * @date 2014-07-03
  */
 class Circuit final : public QObject, public SerializableObject {
   Q_OBJECT

@@ -40,9 +40,6 @@ namespace workspace {
 
 /**
  * @brief The WSI_Repositories class contains a list of used repositories
- *
- * @author ubruhin
- * @date 2016-08-10
  */
 class WSI_Repositories final : public WSI_Base {
   Q_OBJECT

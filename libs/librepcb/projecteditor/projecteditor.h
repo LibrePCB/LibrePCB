@@ -58,9 +58,6 @@ class BoardEditor;
 
 /**
  * @brief The ProjectEditor class
-
- * @author ubruhin
- * @date 2015-06-28
  */
 class ProjectEditor final : public QObject {
   Q_OBJECT

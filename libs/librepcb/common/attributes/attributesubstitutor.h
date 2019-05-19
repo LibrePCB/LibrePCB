@@ -49,9 +49,6 @@ class AttributeProvider;
  * @see librepcb::AttributeProvider
  * @see @ref doc_attributes_system
  *
- * @author ubruhin
- * @date 2017-09-19
- *
  * @todo Fix side-effect of the endless loop detection ("{{FOO}} {{FOO}}" is
  * currently substituted by "{{FOO}} " because of the endless loop detection,
  * even if there is actually no endless loop).

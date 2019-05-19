@@ -40,10 +40,6 @@ class Workspace;
 
 /**
  * @brief The ProjectTreeModel class
- *
- * @author ubruhin
- *
- * @date 2014-06-24
  */
 class ProjectTreeModel : public QFileSystemModel {
 public:

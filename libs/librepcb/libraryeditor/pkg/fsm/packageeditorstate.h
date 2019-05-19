@@ -45,9 +45,6 @@ namespace editor {
 /**
  * @brief The PackageEditorState class is the base class of all package editor
  * FSM states
- *
- * @author  ubruhin
- * @date    2017-05-28
  */
 class PackageEditorState : public QObject {
   Q_OBJECT

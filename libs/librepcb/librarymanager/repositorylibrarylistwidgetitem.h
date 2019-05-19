@@ -55,9 +55,6 @@ class RepositoryLibraryListWidgetItem;
 
 /**
  * @brief The RepositoryLibraryListWidgetItem class
- *
- * @author ubruhin
- * @date 2016-09-25
  */
 class RepositoryLibraryListWidgetItem final : public QWidget {
   Q_OBJECT

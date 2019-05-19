@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The PackagePadComboBox class
- *
- * @author ubruhin
- * @date 2017-08-16
  */
 class PackagePadComboBox final : public QWidget {
   Q_OBJECT

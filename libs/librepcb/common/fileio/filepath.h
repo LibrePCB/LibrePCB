@@ -123,9 +123,6 @@ namespace librepcb {
  * filenames, but not in Windows filenames). Other filepaths, like filepaths to
  * recently used projects (which are stored in the user's profile), do not need
  * to be platform independent.
- *
- * @author ubruhin
- * @date 2014-07-31
  */
 class FilePath final {
 public:  // Types
@@ -366,8 +363,6 @@ public:  // Methods
    * @brief Get the path to the temporary directory (e.g. "/tmp" on Unix/Linux)
    *
    * @return The filepath (in case of an error, the path can be invalid!)
-   *
-   * @todo test this method on windows and mac!
    */
   static FilePath getTempPath() noexcept;
 
@@ -376,8 +371,6 @@ public:  // Methods
    * "/tmp/librepcb")
    *
    * @return The filepath (in case of an error, the path can be invalid!)
-   *
-   * @todo test this method on windows and mac!
    */
   static FilePath getApplicationTempPath() noexcept;
 

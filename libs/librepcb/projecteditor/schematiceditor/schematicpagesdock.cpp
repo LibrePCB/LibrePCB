@@ -78,9 +78,6 @@ SchematicPagesDock::~SchematicPagesDock() {
  *  Inherited from QDockWidget
  ******************************************************************************/
 
-/**
- * @todo The width of the icons is not very accurate
- */
 void SchematicPagesDock::resizeEvent(QResizeEvent* event) {
   int iconSize = event->size().width() - 10;  // this is not good...
   mUi->listWidget->setIconSize(QSize(iconSize, iconSize));

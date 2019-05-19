@@ -74,9 +74,6 @@ namespace librepcb {
  *
  * There are also some static method available to build some often used angles:
  * #deg0(), #deg45(), #deg90() and so on...
- *
- * @author ubruhin
- * @date 2014-06-21
  */
 class Angle {
   Q_DECLARE_TR_FUNCTIONS(Angle)

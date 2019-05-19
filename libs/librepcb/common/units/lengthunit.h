@@ -57,9 +57,6 @@ class Point;
  * conversion is not lossless! Example: If you begin with 1mm and convert via
  * other units back to millimeters, you may get 0,999mm or 1,001mm as result. So
  * be careful on converting lengths and points between different units!
- *
- * @author ubruhin
- * @date 2014-10-07
  */
 class LengthUnit final {
   Q_DECLARE_TR_FUNCTIONS(LengthUnit)

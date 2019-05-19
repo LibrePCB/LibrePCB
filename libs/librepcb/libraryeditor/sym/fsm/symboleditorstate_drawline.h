@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_DrawLine class
- *
- * @author  ubruhin
- * @date    2017-02-23
  */
 class SymbolEditorState_DrawLine final
   : public SymbolEditorState_DrawPolygonBase {

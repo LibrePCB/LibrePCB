@@ -45,9 +45,6 @@ class NewElementWizardPage_ChooseType;
 
 /**
  * @brief The NewElementWizardPage_ChooseType class
- *
- * @author ubruhin
- * @date 2017-03-21
  */
 class NewElementWizardPage_ChooseType final : public QWizardPage {
   Q_OBJECT

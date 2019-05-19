@@ -44,9 +44,6 @@ namespace editor {
 
 /**
  * @brief The PackagePadListEditorWidget class
- *
- * @author ubruhin
- * @date 2017-03-27
  */
 class PackagePadListEditorWidget final : public QWidget {
   Q_OBJECT

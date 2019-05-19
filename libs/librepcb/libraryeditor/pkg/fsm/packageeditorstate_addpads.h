@@ -49,9 +49,6 @@ class PackagePadComboBox;
 
 /**
  * @brief The PackageEditorState_AddPads class
- *
- * @author  ubruhin
- * @date    2017-05-31
  */
 class PackageEditorState_AddPads : public PackageEditorState {
   Q_OBJECT
@@ -114,9 +111,6 @@ private:  // Types / Data
 
 /**
  * @brief The PackageEditorState_AddPadsTht class
- *
- * @author  ubruhin
- * @date    2017-05-31
  */
 class PackageEditorState_AddPadsTht final : public PackageEditorState_AddPads {
   Q_OBJECT
@@ -141,9 +135,6 @@ public:
 
 /**
  * @brief The PackageEditorState_AddPadsSmt class
- *
- * @author  ubruhin
- * @date    2017-05-31
  */
 class PackageEditorState_AddPadsSmt final : public PackageEditorState_AddPads {
   Q_OBJECT

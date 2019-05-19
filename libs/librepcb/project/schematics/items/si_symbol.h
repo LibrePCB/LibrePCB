@@ -53,9 +53,6 @@ class SI_SymbolPin;
 
 /**
  * @brief The SI_Symbol class
- *
- * @author ubruhin
- * @date 2014-08-23
  */
 class SI_Symbol final : public SI_Base,
                         public SerializableObject,

@@ -51,9 +51,6 @@ class CategoryChooserDialog;
 
 /**
  * @brief The CategoryChooserDialog class
- *
- * @author  ubruhin
- * @date    2016-10-25
  */
 template <typename ElementType>
 class CategoryChooserDialog final : public QDialog {

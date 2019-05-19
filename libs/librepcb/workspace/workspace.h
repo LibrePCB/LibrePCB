@@ -58,9 +58,6 @@ class WorkspaceLibraryDb;
  * projects, settings, ...)
  *
  * To access the settings of the workspace, use the method #getSettings().
- *
- * @author ubruhin
- * @date 2014-06-23
  */
 class Workspace final : public QObject {
   Q_OBJECT

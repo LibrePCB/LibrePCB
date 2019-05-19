@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The BoardSideSelectorWidget class
- *
- * @author ubruhin
- * @date 2017-08-17
  */
 class BoardSideSelectorWidget final : public QWidget {
   Q_OBJECT

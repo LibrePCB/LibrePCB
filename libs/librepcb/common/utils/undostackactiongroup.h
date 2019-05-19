@@ -40,9 +40,6 @@ class UndoStack;
 /**
  * @brief The UndoStackActionGroup class groups an undo-QAction and redo-QAction
  * together and optionally connects them with a librepcb::UndoStack
- *
- * @author ubruhin
- * @date 2016-12-04
  */
 class UndoStackActionGroup final : public QObject {
   Q_OBJECT

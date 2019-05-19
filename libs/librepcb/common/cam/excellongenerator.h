@@ -40,9 +40,6 @@ namespace librepcb {
 
 /**
  * @brief The ExcellonGenerator class
- *
- * @author ubruhin
- * @date 2016-03-31
  */
 class ExcellonGenerator final {
   Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)

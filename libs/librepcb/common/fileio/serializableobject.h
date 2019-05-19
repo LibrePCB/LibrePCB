@@ -39,9 +39,6 @@ namespace librepcb {
 /**
  * @brief The SerializableObject class is the base class for all classes which
  * need to be serializable/deserializable from/to librepcb::SExpression nodes
- *
- * @author ubruhin
- * @date 2015-02-06
  */
 class SerializableObject {
 public:

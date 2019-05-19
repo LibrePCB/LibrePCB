@@ -43,9 +43,6 @@ class AlignmentSelector;
 
 /**
  * @brief The AlignmentSelector class
- *
- * @author ubruhin
- * @date 2017-01-29
  */
 class AlignmentSelector final : public QWidget {
   Q_OBJECT

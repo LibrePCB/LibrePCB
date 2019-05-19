@@ -50,9 +50,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_DrawPolygonBase class
- *
- * @author  ubruhin
- * @date    2017-02-23
  */
 class SymbolEditorState_DrawPolygonBase : public SymbolEditorState {
   Q_OBJECT
