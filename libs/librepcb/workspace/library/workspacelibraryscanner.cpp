@@ -166,8 +166,9 @@ void WorkspaceLibraryScanner::scan() noexcept {
                                           "components", "component_id", libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
-      count += addDevicesToDb(db, fs, fp, lib->searchForElements<Device>(),
-                              "devices", "device_id", libId);
+      count +=
+          addElementsToDb<Device>(db, fs, fp, lib->searchForElements<Device>(),
+                                  "devices", "device_id", libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
     }
 
@@ -394,46 +395,7 @@ int WorkspaceLibraryScanner::addElementsToDb(
       std::unique_ptr<TransactionalDirectory> dir(
           new TransactionalDirectory(fs, fullPath));  // can throw
       ElementType element(std::move(dir));            // can throw
-      QSqlQuery   query =
-          db.prepareQuery("INSERT INTO " % table %
-                          " "
-                          "(lib_id, filepath, uuid, version) VALUES "
-                          "(:lib_id, :filepath, :uuid, :version)");
-      query.bindValue(":lib_id", libId);
-      query.bindValue(":filepath", fullPath);
-      query.bindValue(":uuid", element.getUuid().toStr());
-      query.bindValue(":version", element.getVersion().toStr());
-      int id = db.insert(query);
-      foreach (const QString& locale, element.getAllAvailableLocales()) {
-        QSqlQuery query = db.prepareQuery(
-            "INSERT INTO " % table %
-            "_tr "
-            "(" %
-            idColumn %
-            ", locale, name, description, keywords) VALUES "
-            "(:element_id, :locale, :name, :description, :keywords)");
-        query.bindValue(":element_id", id);
-        query.bindValue(":locale", locale);
-        query.bindValue(":name",
-                        optionalToVariant(element.getNames().tryGet(locale)));
-        query.bindValue(
-            ":description",
-            optionalToVariant(element.getDescriptions().tryGet(locale)));
-        query.bindValue(":keywords", optionalToVariant(
-                                         element.getKeywords().tryGet(locale)));
-        db.insert(query);
-      }
-      foreach (const Uuid& categoryUuid, element.getCategories()) {
-        QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
-                                          "_cat "
-                                          "(" %
-                                          idColumn %
-                                          ", category_uuid) VALUES "
-                                          "(:element_id, :category_uuid)");
-        query.bindValue(":element_id", id);
-        query.bindValue(":category_uuid", categoryUuid.toStr());
-        db.insert(query);
-      }
+      addElementToDb(db, table, idColumn, libId, fullPath, element);
       count++;
     } catch (const Exception& e) {
       qWarning() << "Failed to open library element:" << fullPath;
@@ -442,67 +404,80 @@ int WorkspaceLibraryScanner::addElementsToDb(
   return count;
 }
 
-int WorkspaceLibraryScanner::addDevicesToDb(
-    SQLiteDatabase& db, std::shared_ptr<TransactionalFileSystem> fs,
-    const QString& libPath, const QStringList& dirs, const QString& table,
-    const QString& idColumn, int libId) {
-  int count = 0;
-  foreach (const QString& dirpath, dirs) {
-    if (mAbort || (mSemaphore.available() > 0)) break;
-    QString fullPath = libPath % "/" % dirpath;
-    try {
-      std::unique_ptr<TransactionalDirectory> dir(
-          new TransactionalDirectory(fs, fullPath));  // can throw
-      Device    element(std::move(dir));              // can throw
-      QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
-                                        " "
-                                        "(lib_id, filepath, uuid, version, "
-                                        "component_uuid, package_uuid) VALUES "
-                                        "(:lib_id, :filepath, :uuid, :version, "
-                                        ":component_uuid, :package_uuid)");
-      query.bindValue(":lib_id", libId);
-      query.bindValue(":filepath", fullPath);
-      query.bindValue(":uuid", element.getUuid().toStr());
-      query.bindValue(":version", element.getVersion().toStr());
-      query.bindValue(":component_uuid", element.getComponentUuid().toStr());
-      query.bindValue(":package_uuid", element.getPackageUuid().toStr());
-      int id = db.insert(query);
-      foreach (const QString& locale, element.getAllAvailableLocales()) {
-        QSqlQuery query = db.prepareQuery(
-            "INSERT INTO " % table %
-            "_tr "
-            "(" %
-            idColumn %
-            ", locale, name, description, keywords) VALUES "
-            "(:element_id, :locale, :name, :description, :keywords)");
-        query.bindValue(":element_id", id);
-        query.bindValue(":locale", locale);
-        query.bindValue(":name",
-                        optionalToVariant(element.getNames().tryGet(locale)));
-        query.bindValue(
-            ":description",
-            optionalToVariant(element.getDescriptions().tryGet(locale)));
-        query.bindValue(":keywords", optionalToVariant(
-                                         element.getKeywords().tryGet(locale)));
-        db.insert(query);
-      }
-      foreach (const Uuid& categoryUuid, element.getCategories()) {
-        QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
-                                          "_cat "
-                                          "(" %
-                                          idColumn %
-                                          ", category_uuid) VALUES "
-                                          "(:element_id, :category_uuid)");
-        query.bindValue(":element_id", id);
-        query.bindValue(":category_uuid", categoryUuid.toStr());
-        db.insert(query);
-      }
-      count++;
-    } catch (const Exception& e) {
-      qWarning() << "Failed to open library element:" << fullPath;
-    }
+template <typename ElementType>
+void WorkspaceLibraryScanner::addElementToDb(SQLiteDatabase& db,
+                                             const QString&  table,
+                                             const QString& idColumn, int libId,
+                                             const QString&     path,
+                                             const ElementType& element) {
+  QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
+                                    " (lib_id, filepath, uuid, version) VALUES "
+                                    "(:lib_id, :filepath, :uuid, :version)");
+  query.bindValue(":lib_id", libId);
+  query.bindValue(":filepath", path);
+  query.bindValue(":uuid", element.getUuid().toStr());
+  query.bindValue(":version", element.getVersion().toStr());
+  int id = db.insert(query);
+  addElementTranslationsToDb(db, table % "_tr", idColumn, id, element);
+  addElementCategoriesToDb(db, table % "_cat", idColumn, id,
+                           element.getCategories());
+}
+
+template <>
+void WorkspaceLibraryScanner::addElementToDb<Device>(
+    SQLiteDatabase& db, const QString& table, const QString& idColumn,
+    int libId, const QString& path, const Device& element) {
+  QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
+                                    " "
+                                    "(lib_id, filepath, uuid, version, "
+                                    "component_uuid, package_uuid) VALUES "
+                                    "(:lib_id, :filepath, :uuid, :version, "
+                                    ":component_uuid, :package_uuid)");
+  query.bindValue(":lib_id", libId);
+  query.bindValue(":filepath", path);
+  query.bindValue(":uuid", element.getUuid().toStr());
+  query.bindValue(":version", element.getVersion().toStr());
+  query.bindValue(":component_uuid", element.getComponentUuid().toStr());
+  query.bindValue(":package_uuid", element.getPackageUuid().toStr());
+  int id = db.insert(query);
+  addElementTranslationsToDb(db, table % "_tr", idColumn, id, element);
+  addElementCategoriesToDb(db, table % "_cat", idColumn, id,
+                           element.getCategories());
+}
+
+template <typename ElementType>
+void WorkspaceLibraryScanner::addElementTranslationsToDb(
+    SQLiteDatabase& db, const QString& table, const QString& idColumn, int id,
+    const ElementType& element) {
+  foreach (const QString& locale, element.getAllAvailableLocales()) {
+    QSqlQuery query = db.prepareQuery(
+        "INSERT INTO " % table % " (" % idColumn %
+        ", locale, name, description, keywords) VALUES "
+        "(:element_id, :locale, :name, :description, :keywords)");
+    query.bindValue(":element_id", id);
+    query.bindValue(":locale", locale);
+    query.bindValue(":name",
+                    optionalToVariant(element.getNames().tryGet(locale)));
+    query.bindValue(
+        ":description",
+        optionalToVariant(element.getDescriptions().tryGet(locale)));
+    query.bindValue(":keywords",
+                    optionalToVariant(element.getKeywords().tryGet(locale)));
+    db.insert(query);
   }
-  return count;
+}
+
+void WorkspaceLibraryScanner::addElementCategoriesToDb(
+    SQLiteDatabase& db, const QString& table, const QString& idColumn, int id,
+    const QSet<Uuid>& categories) {
+  foreach (const Uuid& categoryUuid, categories) {
+    QSqlQuery query = db.prepareQuery("INSERT INTO " % table % " (" % idColumn %
+                                      ", category_uuid) VALUES "
+                                      "(:element_id, :category_uuid)");
+    query.bindValue(":element_id", id);
+    query.bindValue(":category_uuid", categoryUuid.toStr());
+    db.insert(query);
+  }
 }
 
 /*******************************************************************************

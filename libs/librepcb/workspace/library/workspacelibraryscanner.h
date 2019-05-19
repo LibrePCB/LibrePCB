@@ -35,6 +35,7 @@
 
 namespace librepcb {
 
+class Uuid;
 class SQLiteDatabase;
 class TransactionalFileSystem;
 
@@ -102,10 +103,17 @@ private:  // Methods
                       std::shared_ptr<TransactionalFileSystem> fs,
                       const QString& libPath, const QStringList& dirs,
                       const QString& table, const QString& idColumn, int libId);
-  int addDevicesToDb(SQLiteDatabase&                          db,
-                     std::shared_ptr<TransactionalFileSystem> fs,
-                     const QString& libPath, const QStringList& dirs,
-                     const QString& table, const QString& idColumn, int libId);
+  template <typename ElementType>
+  void addElementToDb(SQLiteDatabase& db, const QString& table,
+                      const QString& idColumn, int libId, const QString& path,
+                      const ElementType& element);
+  template <typename ElementType>
+  void addElementTranslationsToDb(SQLiteDatabase& db, const QString& table,
+                                  const QString& idColumn, int id,
+                                  const ElementType& element);
+  void addElementCategoriesToDb(SQLiteDatabase& db, const QString& table,
+                                const QString& idColumn, int id,
+                                const QSet<Uuid>& categories);
   template <typename T>
   static QVariant optionalToVariant(const T& opt) noexcept;
 
