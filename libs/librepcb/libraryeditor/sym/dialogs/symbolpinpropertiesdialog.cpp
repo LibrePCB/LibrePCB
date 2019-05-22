@@ -55,6 +55,9 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin,
   mUi->spbPosY->setValue(mSymbolPin.getPosition().getY().toMm());
   mUi->spbRotation->setValue(mSymbolPin.getRotation().toDeg());
   mUi->spbLength->setValue(mSymbolPin.getLength()->toMm());
+      
+  // preselect name
+  mUi->edtName->setSelection(0, mUi->edtName->text().size());
 }
 
 SymbolPinPropertiesDialog::~SymbolPinPropertiesDialog() noexcept {
