@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../elementname.h"
+#include "../signalslot.h"
 #include "serializableobject.h"
 
 #include <optional/tl/optional.hpp>
@@ -55,15 +56,25 @@ class SerializableKeyValueMap final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(SerializableKeyValueMap)
 
 public:
+  // Signals
+  enum class Event {
+    ElementAdded,
+    ElementRemoved,
+    ElementValueChanged,
+  };
+  Signal<SerializableKeyValueMap<T>, const QString&, Event>       onEdited;
+  typedef Slot<SerializableKeyValueMap<T>, const QString&, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SerializableKeyValueMap() = delete;
   SerializableKeyValueMap(const SerializableKeyValueMap<T>& other) noexcept
-    : mValues(other.mValues) {}
+    : onEdited(*this), mValues(other.mValues) {}
   explicit SerializableKeyValueMap(
-      const typename T::ValueType& defaultValue) noexcept {
+      const typename T::ValueType& defaultValue) noexcept
+    : onEdited(*this) {
     mValues.insert("", defaultValue);
   }
-  explicit SerializableKeyValueMap(const SExpression& node) {
+  explicit SerializableKeyValueMap(const SExpression& node) : onEdited(*this) {
     foreach (const SExpression& child, node.getChildren(T::tagname)) {
       QString     key;
       SExpression value;
@@ -132,7 +143,14 @@ public:
   }
 
   void insert(const QString& key, const typename T::ValueType& value) noexcept {
-    mValues.insert(key, value);
+    auto it = mValues.find(key);
+    if (it == mValues.end()) {
+      mValues.insert(key, value);
+      onEdited.notify(key, Event::ElementAdded);
+    } else if (it.value() != value) {
+      mValues.insert(key, value);
+      onEdited.notify(key, Event::ElementValueChanged);
+    }
   }
 
   /// @copydoc librepcb::SerializableObject::serialize()
@@ -149,7 +167,16 @@ public:
   // Operator Overloadings
   SerializableKeyValueMap<T>& operator=(
       const SerializableKeyValueMap<T>& rhs) noexcept {
+    foreach (const QString& key, mValues.keys()) {
+      mValues.remove(key);
+      onEdited.notify(key, Event::ElementRemoved);
+    }
     mValues = rhs.mValues;
+    QMapIterator<QString, typename T::ValueType> i(rhs.mValues);
+    while (i.hasNext()) {
+      i.next();
+      insert(i.key(), i.value());
+    }
     return *this;
   }
   bool operator==(const SerializableKeyValueMap<T>& rhs) const noexcept {

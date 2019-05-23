@@ -55,13 +55,19 @@ namespace library {
  *    - Symbol UUID
  *    - Pin-signal-mapping
  */
-class ComponentSymbolVariant final
-  : public QObject,
-    public SerializableObject,
-    private ComponentSymbolVariantItemList::IF_Observer {
-  Q_OBJECT
-
+class ComponentSymbolVariant final : public SerializableObject {
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    NormChanged,
+    NamesChanged,
+    DescriptionsChanged,
+    SymbolItemsEdited,
+  };
+  Signal<ComponentSymbolVariant, Event>       onEdited;
+  typedef Slot<ComponentSymbolVariant, Event> OnEditedSlot;
+
   // Constructors / Destructor
   ComponentSymbolVariant() = delete;
   ComponentSymbolVariant(const ComponentSymbolVariant& other) noexcept;
@@ -80,11 +86,11 @@ public:
   }
 
   // Setters
-  void setNorm(const QString& norm) noexcept;
-  void setName(const QString& locale, const ElementName& name) noexcept;
-  void setDescription(const QString& locale, const QString& desc) noexcept;
-  void setNames(const LocalizedNameMap& names) noexcept;
-  void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
+  bool setNorm(const QString& norm) noexcept;
+  bool setName(const QString& locale, const ElementName& name) noexcept;
+  bool setDescription(const QString& locale, const QString& desc) noexcept;
+  bool setNames(const LocalizedNameMap& names) noexcept;
+  bool setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
 
   // Symbol Item Methods
   ComponentSymbolVariantItemList& getSymbolItems() noexcept {
@@ -110,16 +116,11 @@ public:
   }
   ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) noexcept;
 
-signals:
-  void edited();
-
 private:  // Methods
-  void listObjectAdded(
-      const ComponentSymbolVariantItemList& list, int newIndex,
-      const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept override;
-  void listObjectRemoved(
-      const ComponentSymbolVariantItemList& list, int oldIndex,
-      const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept override;
+  void itemsEdited(
+      const ComponentSymbolVariantItemList& list, int index,
+      const std::shared_ptr<const ComponentSymbolVariantItem>& item,
+      ComponentSymbolVariantItemList::Event                    event) noexcept;
 
 private:  // Data
   Uuid                           mUuid;
@@ -127,6 +128,9 @@ private:  // Data
   LocalizedNameMap               mNames;
   LocalizedDescriptionMap        mDescriptions;
   ComponentSymbolVariantItemList mSymbolItems;
+
+  // Slots
+  ComponentSymbolVariantItemList::OnEditedSlot mOnItemsEditedSlot;
 };
 
 /*******************************************************************************
@@ -138,16 +142,20 @@ struct ComponentSymbolVariantListNameProvider {
 };
 using ComponentSymbolVariantList =
     SerializableObjectList<ComponentSymbolVariant,
-                           ComponentSymbolVariantListNameProvider>;
+                           ComponentSymbolVariantListNameProvider,
+                           ComponentSymbolVariant::Event>;
 using CmdComponentSymbolVariantInsert =
     CmdListElementInsert<ComponentSymbolVariant,
-                         ComponentSymbolVariantListNameProvider>;
+                         ComponentSymbolVariantListNameProvider,
+                         ComponentSymbolVariant::Event>;
 using CmdComponentSymbolVariantRemove =
     CmdListElementRemove<ComponentSymbolVariant,
-                         ComponentSymbolVariantListNameProvider>;
+                         ComponentSymbolVariantListNameProvider,
+                         ComponentSymbolVariant::Event>;
 using CmdComponentSymbolVariantsSwap =
     CmdListElementsSwap<ComponentSymbolVariant,
-                        ComponentSymbolVariantListNameProvider>;
+                        ComponentSymbolVariantListNameProvider,
+                        ComponentSymbolVariant::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -36,16 +36,16 @@ namespace library {
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(
     const DevicePadSignalMapItem& other) noexcept
-  : QObject(nullptr), mPadUuid(other.mPadUuid), mSignalUuid(other.mSignalUuid) {
+  : onEdited(*this), mPadUuid(other.mPadUuid), mSignalUuid(other.mSignalUuid) {
 }
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(
     const Uuid& pad, const tl::optional<Uuid>& signal) noexcept
-  : QObject(nullptr), mPadUuid(pad), mSignalUuid(signal) {
+  : onEdited(*this), mPadUuid(pad), mSignalUuid(signal) {
 }
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node)
-  : QObject(nullptr),
+  : onEdited(*this),
     mPadUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("signal")) {
 }
@@ -57,11 +57,15 @@ DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {
  *  Setters
  ******************************************************************************/
 
-void DevicePadSignalMapItem::setSignalUuid(
+bool DevicePadSignalMapItem::setSignalUuid(
     const tl::optional<Uuid>& uuid) noexcept {
-  if (uuid == mSignalUuid) return;
+  if (uuid == mSignalUuid) {
+    return false;
+  }
+
   mSignalUuid = uuid;
-  emit signalUuidChanged(mSignalUuid);
+  onEdited.notify(Event::SignalUuidChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -86,7 +90,10 @@ bool DevicePadSignalMapItem::operator==(const DevicePadSignalMapItem& rhs) const
 
 DevicePadSignalMapItem& DevicePadSignalMapItem::operator=(
     const DevicePadSignalMapItem& rhs) noexcept {
-  mPadUuid = rhs.mPadUuid;
+  if (rhs.mPadUuid != mPadUuid) {
+    mPadUuid = rhs.mPadUuid;
+    onEdited.notify(Event::PadUuidChanged);
+  }
   setSignalUuid(rhs.mSignalUuid);
   return *this;
 }

@@ -114,7 +114,8 @@ TEST_F(SerializableObjectListTest, testPointerInitializerListConstructor) {
 }
 
 TEST_F(SerializableObjectListTest, testValueInitializerListConstructor) {
-  List l{Mock(Uuid::createRandom(), "foo"), Mock(Uuid::createRandom(), "bar")};
+  List l{std::make_shared<Mock>(Uuid::createRandom(), "foo"),
+         std::make_shared<Mock>(Uuid::createRandom(), "bar")};
   EXPECT_EQ(2, l.count());
   EXPECT_EQ("foo", l[0]->mName);
   EXPECT_EQ("bar", l[1]->mName);
@@ -284,7 +285,9 @@ TEST_F(SerializableObjectListTest, testSerialize) {
 TEST_F(SerializableObjectListTest, testOperatorEqual) {
   EXPECT_TRUE(List() == List());
   EXPECT_TRUE(List({mMocks[0], mMocks[1]}) == List({mMocks[0], mMocks[1]}));
-  EXPECT_TRUE(List({mMocks[0], mMocks[1]}) == List({*mMocks[0], *mMocks[1]}));
+  EXPECT_TRUE(List({mMocks[0], mMocks[1]}) ==
+              List({std::make_shared<Mock>(*mMocks[0]),
+                    std::make_shared<Mock>(*mMocks[1])}));
   EXPECT_FALSE(List({mMocks[0], mMocks[1]}) == List({mMocks[0], mMocks[2]}));
   EXPECT_FALSE(List({mMocks[0]}) == List({mMocks[0], mMocks[1]}));
 }
@@ -292,7 +295,9 @@ TEST_F(SerializableObjectListTest, testOperatorEqual) {
 TEST_F(SerializableObjectListTest, testOperatorUnequal) {
   EXPECT_FALSE(List() != List());
   EXPECT_FALSE(List({mMocks[0], mMocks[1]}) != List({mMocks[0], mMocks[1]}));
-  EXPECT_FALSE(List({mMocks[0], mMocks[1]}) != List({*mMocks[0], *mMocks[1]}));
+  EXPECT_FALSE(List({mMocks[0], mMocks[1]}) !=
+               List({std::make_shared<Mock>(*mMocks[0]),
+                     std::make_shared<Mock>(*mMocks[1])}));
   EXPECT_TRUE(List({mMocks[0], mMocks[1]}) != List({mMocks[0], mMocks[2]}));
   EXPECT_TRUE(List({mMocks[0]}) != List({mMocks[0], mMocks[1]}));
 }

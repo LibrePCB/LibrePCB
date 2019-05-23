@@ -43,13 +43,9 @@ class IF_GraphicsLayerProvider;
 
 /**
  * @brief The HoleGraphicsItem class is the graphical representation of a
- * librepcb::Text
- *
- * @author ubruhin
- * @date 2017-05-30
+ *        librepcb::Hole
  */
-class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem,
-                               public IF_HoleObserver {
+class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem {
 public:
   // Constructors / Destructor
   HoleGraphicsItem()                              = delete;
@@ -68,8 +64,7 @@ public:
   HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void holePositionChanged(const Point& newPos) noexcept override;
-  void holeDiameterChanged(const PositiveLength& newDiameter) noexcept override;
+  void     holeEdited(const Hole& hole, Hole::Event event) noexcept;
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant&    value) noexcept override;
 
@@ -77,6 +72,9 @@ private:  // Data
   Hole&                                   mHole;
   const IF_GraphicsLayerProvider&         mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+
+  // Slots
+  Hole::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

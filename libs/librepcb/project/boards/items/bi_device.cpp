@@ -89,7 +89,7 @@ BI_Device::BI_Device(Board& board, const SExpression& node)
   mIsMirrored = node.getValueByPath<bool>("mirror");
 
   // load attributes
-  mAttributes.loadFromDomElement(node);  // can throw
+  mAttributes.loadFromSExpression(node);  // can throw
 
   // load footprint
   mFootprint.reset(new BI_Footprint(*this, node));

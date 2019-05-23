@@ -38,32 +38,38 @@ namespace library {
 
 ComponentSymbolVariant::ComponentSymbolVariant(
     const ComponentSymbolVariant& other) noexcept
-  : QObject(nullptr),
+  : onEdited(*this),
     mUuid(other.mUuid),
     mNorm(other.mNorm),
     mNames(other.mNames),
     mDescriptions(other.mDescriptions),
-    mSymbolItems(other.mSymbolItems, this) {
+    mSymbolItems(other.mSymbolItems),
+    mOnItemsEditedSlot(*this, &ComponentSymbolVariant::itemsEdited) {
+  mSymbolItems.onEdited.attach(mOnItemsEditedSlot);
 }
 
 ComponentSymbolVariant::ComponentSymbolVariant(
     const Uuid& uuid, const QString& norm, const ElementName& name_en_US,
     const QString& desc_en_US) noexcept
-  : QObject(nullptr),
+  : onEdited(*this),
     mUuid(uuid),
     mNorm(norm),
     mNames(name_en_US),
     mDescriptions(desc_en_US),
-    mSymbolItems(this) {
+    mSymbolItems(),
+    mOnItemsEditedSlot(*this, &ComponentSymbolVariant::itemsEdited) {
+  mSymbolItems.onEdited.attach(mOnItemsEditedSlot);
 }
 
 ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node)
-  : QObject(nullptr),
+  : onEdited(*this),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mNorm(node.getValueByPath<QString>("norm")),
     mNames(node),
     mDescriptions(node),
-    mSymbolItems(node, this) {
+    mSymbolItems(node),
+    mOnItemsEditedSlot(*this, &ComponentSymbolVariant::itemsEdited) {
+  mSymbolItems.onEdited.attach(mOnItemsEditedSlot);
 }
 
 ComponentSymbolVariant::~ComponentSymbolVariant() noexcept {
@@ -73,36 +79,57 @@ ComponentSymbolVariant::~ComponentSymbolVariant() noexcept {
  *  Setters
  ******************************************************************************/
 
-void ComponentSymbolVariant::setNorm(const QString& norm) noexcept {
+bool ComponentSymbolVariant::setNorm(const QString& norm) noexcept {
+  if (norm == mNorm) {
+    return false;
+  }
+
   mNorm = norm;
-  emit edited();
+  onEdited.notify(Event::NormChanged);
+  return true;
 }
 
-void ComponentSymbolVariant::setName(const QString&     locale,
+bool ComponentSymbolVariant::setName(const QString&     locale,
                                      const ElementName& name) noexcept {
-  if (mNames.tryGet(locale) == name) return;
+  if (mNames.tryGet(locale) == name) {
+    return false;
+  }
+
   mNames.insert(locale, name);
-  emit edited();
+  onEdited.notify(Event::NamesChanged);
+  return true;
 }
 
-void ComponentSymbolVariant::setDescription(const QString& locale,
+bool ComponentSymbolVariant::setDescription(const QString& locale,
                                             const QString& desc) noexcept {
-  if (mDescriptions.tryGet(locale) == desc) return;
+  if (mDescriptions.tryGet(locale) == desc) {
+    return false;
+  }
+
   mDescriptions.insert(locale, desc);
-  emit edited();
+  onEdited.notify(Event::DescriptionsChanged);
+  return true;
 }
 
-void ComponentSymbolVariant::setNames(const LocalizedNameMap& names) noexcept {
-  if (names == mNames) return;
+bool ComponentSymbolVariant::setNames(const LocalizedNameMap& names) noexcept {
+  if (names == mNames) {
+    return false;
+  }
+
   mNames = names;
-  emit edited();
+  onEdited.notify(Event::NamesChanged);
+  return true;
 }
 
-void ComponentSymbolVariant::setDescriptions(
+bool ComponentSymbolVariant::setDescriptions(
     const LocalizedDescriptionMap& descriptions) noexcept {
-  if (descriptions == mDescriptions) return;
+  if (descriptions == mDescriptions) {
+    return false;
+  }
+
   mDescriptions = descriptions;
-  emit edited();
+  onEdited.notify(Event::DescriptionsChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -135,15 +162,12 @@ ComponentSymbolVariant& ComponentSymbolVariant::operator=(
     const ComponentSymbolVariant& rhs) noexcept {
   if (mUuid != rhs.mUuid) {
     mUuid = rhs.mUuid;
-    emit edited();
+    onEdited.notify(Event::UuidChanged);
   }
   setNorm(rhs.mNorm);
   setNames(rhs.mNames);
   setDescriptions(rhs.mDescriptions);
-  if (mSymbolItems != rhs.mSymbolItems) {
-    mSymbolItems = rhs.mSymbolItems;
-    emit edited();
-  }
+  mSymbolItems = rhs.mSymbolItems;
   return *this;
 }
 
@@ -151,24 +175,15 @@ ComponentSymbolVariant& ComponentSymbolVariant::operator=(
  *  Private Methods
  ******************************************************************************/
 
-void ComponentSymbolVariant::listObjectAdded(
-    const ComponentSymbolVariantItemList& list, int newIndex,
-    const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept {
+void ComponentSymbolVariant::itemsEdited(
+    const ComponentSymbolVariantItemList& list, int index,
+    const std::shared_ptr<const ComponentSymbolVariantItem>& item,
+    ComponentSymbolVariantItemList::Event                    event) noexcept {
   Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_UNUSED(ptr);
-  Q_ASSERT(&list == &mSymbolItems);
-  emit edited();
-}
-
-void ComponentSymbolVariant::listObjectRemoved(
-    const ComponentSymbolVariantItemList& list, int oldIndex,
-    const std::shared_ptr<ComponentSymbolVariantItem>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_UNUSED(ptr);
-  Q_ASSERT(&list == &mSymbolItems);
-  emit edited();
+  Q_UNUSED(index);
+  Q_UNUSED(item);
+  Q_UNUSED(event);
+  onEdited.notify(Event::SymbolItemsEdited);
 }
 
 /*******************************************************************************

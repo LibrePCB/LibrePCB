@@ -40,12 +40,8 @@ namespace librepcb {
 
 /**
  * @brief The PrimitiveCircleGraphicsItem class
- *
- * @author ubruhin
- * @date 2017-05-28
  */
-class PrimitiveCircleGraphicsItem : public QGraphicsItem,
-                                    public IF_GraphicsLayerObserver {
+class PrimitiveCircleGraphicsItem : public QGraphicsItem {
 public:
   // Constructors / Destructor
   // PrimitiveCircleGraphicsItem() = delete;
@@ -62,17 +58,6 @@ public:
   void setLineLayer(const GraphicsLayer* layer) noexcept;
   void setFillLayer(const GraphicsLayer* layer) noexcept;
 
-  // Inherited from IF_LayerObserver
-  void layerColorChanged(const GraphicsLayer& layer,
-                         const QColor&        newColor) noexcept override;
-  void layerHighlightColorChanged(const GraphicsLayer& layer,
-                                  const QColor& newColor) noexcept override;
-  void layerVisibleChanged(const GraphicsLayer& layer,
-                           bool                 newVisible) noexcept override;
-  void layerEnabledChanged(const GraphicsLayer& layer,
-                           bool                 newEnabled) noexcept override;
-  void layerDestroyed(const GraphicsLayer& layer) noexcept override;
-
   // Inherited from QGraphicsItem
   virtual QRectF boundingRect() const noexcept override {
     return mBoundingRect;
@@ -86,6 +71,8 @@ public:
       const PrimitiveCircleGraphicsItem& rhs) = delete;
 
 private:  // Methods
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
   void updateColors() noexcept;
   void updateBoundingRectAndShape() noexcept;
   void updateVisibility() noexcept;
@@ -100,6 +87,9 @@ private:  // Data
   QRectF               mCircleRect;
   QRectF               mBoundingRect;
   QPainterPath         mShape;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

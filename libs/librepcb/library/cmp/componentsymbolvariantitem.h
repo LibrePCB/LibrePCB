@@ -62,6 +62,19 @@ class ComponentSymbolVariantItem final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariantItem)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    SymbolUuidChanged,
+    SymbolPositionChanged,
+    SymbolRotationChanged,
+    IsRequiredChanged,
+    SuffixChanged,
+    PinSignalMapEdited,
+  };
+  Signal<ComponentSymbolVariantItem, Event>       onEdited;
+  typedef Slot<ComponentSymbolVariantItem, Event> OnEditedSlot;
+
   // Constructors / Destructor
   ComponentSymbolVariantItem() = delete;
   ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) noexcept;
@@ -83,13 +96,11 @@ public:
   }
 
   // Setters: Attributes
-  void setSymbolUuid(const Uuid& uuid) noexcept { mSymbolUuid = uuid; }
-  void setSymbolPosition(const Point& pos) noexcept { mSymbolPos = pos; }
-  void setSymbolRotation(const Angle& rot) noexcept { mSymbolRot = rot; }
-  void setIsRequired(bool required) noexcept { mIsRequired = required; }
-  void setSuffix(const ComponentSymbolVariantItemSuffix& suffix) noexcept {
-    mSuffix = suffix;
-  }
+  bool setSymbolUuid(const Uuid& uuid) noexcept;
+  bool setSymbolPosition(const Point& pos) noexcept;
+  bool setSymbolRotation(const Angle& rot) noexcept;
+  bool setIsRequired(bool required) noexcept;
+  bool setSuffix(const ComponentSymbolVariantItemSuffix& suffix) noexcept;
 
   // Pin-Signal-Map Methods
   ComponentPinSignalMap& getPinSignalMap() noexcept { return mPinSignalMap; }
@@ -108,6 +119,12 @@ public:
   ComponentSymbolVariantItem& operator=(
       const ComponentSymbolVariantItem& rhs) noexcept;
 
+private:  // Methods
+  void pinSignalMapEdited(
+      const ComponentPinSignalMap& map, int index,
+      const std::shared_ptr<const ComponentPinSignalMapItem>& item,
+      ComponentPinSignalMap::Event                            event) noexcept;
+
 private:  // Data
   Uuid                             mUuid;
   Uuid                             mSymbolUuid;
@@ -116,6 +133,9 @@ private:  // Data
   bool                             mIsRequired;
   ComponentSymbolVariantItemSuffix mSuffix;
   ComponentPinSignalMap            mPinSignalMap;
+
+  // Slots
+  ComponentPinSignalMap::OnEditedSlot mOnPinSignalMapEditedSlot;
 };
 
 /*******************************************************************************
@@ -127,16 +147,20 @@ struct ComponentSymbolVariantItemListNameProvider {
 };
 using ComponentSymbolVariantItemList =
     SerializableObjectList<ComponentSymbolVariantItem,
-                           ComponentSymbolVariantItemListNameProvider>;
+                           ComponentSymbolVariantItemListNameProvider,
+                           ComponentSymbolVariantItem::Event>;
 using CmdComponentSymbolVariantItemInsert =
     CmdListElementInsert<ComponentSymbolVariantItem,
-                         ComponentSymbolVariantItemListNameProvider>;
+                         ComponentSymbolVariantItemListNameProvider,
+                         ComponentSymbolVariantItem::Event>;
 using CmdComponentSymbolVariantItemRemove =
     CmdListElementRemove<ComponentSymbolVariantItem,
-                         ComponentSymbolVariantItemListNameProvider>;
+                         ComponentSymbolVariantItemListNameProvider,
+                         ComponentSymbolVariantItem::Event>;
 using CmdComponentSymbolVariantItemsSwap =
     CmdListElementsSwap<ComponentSymbolVariantItem,
-                        ComponentSymbolVariantItemListNameProvider>;
+                        ComponentSymbolVariantItemListNameProvider,
+                        ComponentSymbolVariantItem::Event>;
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemListHelpers
