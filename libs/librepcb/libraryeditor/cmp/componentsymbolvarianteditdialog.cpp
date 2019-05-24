@@ -27,6 +27,7 @@
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/norms.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
 #include <librepcb/library/sym/symbol.h>
@@ -59,6 +60,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
     mUi(new Ui::ComponentSymbolVariantEditDialog),
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
+  mUi->cbxNorm->addItems(getAvailableNorms());
   mUi->graphicsView->setScene(mGraphicsScene.data());
   mUi->graphicsView->setOriginCrossVisible(false);
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
@@ -66,7 +68,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   // load metadata
   mUi->edtName->setText(*mSymbVar.getNames().getDefaultValue());
   mUi->edtDescription->setText(mSymbVar.getDescriptions().getDefaultValue());
-  mUi->edtNorm->setText(mSymbVar.getNorm());
+  mUi->cbxNorm->setCurrentText(mSymbVar.getNorm());
 
   // load symbol items
   mUi->symbolListWidget->setVariant(mWorkspace, *mGraphicsLayerProvider,
@@ -96,7 +98,7 @@ void ComponentSymbolVariantEditDialog::accept() noexcept {
     ElementName name(mUi->edtName->text().trimmed());  // can throw
     mSymbVar.setName("", name);
     mSymbVar.setDescription("", mUi->edtDescription->text().trimmed());
-    mSymbVar.setNorm(mUi->edtNorm->text().trimmed());
+    mSymbVar.setNorm(mUi->cbxNorm->currentText().trimmed());
     mOriginalSymbVar = mSymbVar;
     QDialog::accept();
   } catch (const Exception& e) {
