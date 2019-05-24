@@ -55,11 +55,11 @@ public:
   int execute() noexcept;
 
 private:  // Methods
-  bool           openProject(const QString& projectFile, bool runErc,
-                             const QStringList& exportSchematicsFiles,
-                             bool               exportPcbFabricationData,
-                             const QString&     pcbFabricationSettingsPath,
-                             const QStringList& boards, bool save) const noexcept;
+  bool openProject(const QString& projectFile, bool runErc,
+                   const QStringList& exportSchematicsFiles,
+                   bool               exportPcbFabricationData,
+                   const QString&     pcbFabricationSettingsPath,
+                   const QStringList& boards, bool save) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool save) const noexcept;
   static QString prettyPath(const FilePath& path,
                             const QString&  style) noexcept;

@@ -113,10 +113,11 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
     // Compensate offset only for horizontal positioning
     Angle labelRotation = netlabel->getRotation().mappedTo0_360deg();
     if (labelRotation == Angle::deg0() || labelRotation == Angle::deg180()) {
-      // Since there is no right alignment (yet), coordinates need to be re-adjusted to accomodate left shift
+      // Since there is no right alignment (yet), coordinates need to be
+      // re-adjusted to accomodate left shift.
       // New position = mirrored old position - label width
       newpos.setX(newpos.getX() - netlabel->getApproximateWidth());
-      newpos = newpos.mappedToGrid(mSchematic.getGridProperties().getInterval());
+      newpos.mapToGrid(mSchematic.getGridProperties().getInterval());
     }
 
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
