@@ -214,6 +214,7 @@ HEADERS += \
     network/networkrequest.h \
     network/networkrequestbase.h \
     network/repository.h \
+    norms.h \
     scopeguard.h \
     scopeguardlist.h \
     signalrole.h \
