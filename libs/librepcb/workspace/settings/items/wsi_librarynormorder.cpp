@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "wsi_librarynormorder.h"
 
+#include <librepcb/common/norms.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -53,7 +55,8 @@ WSI_LibraryNormOrder::WSI_LibraryNormOrder(const SExpression& node)
   // create a QComboBox with all available norms
   mComboBox.reset(new QComboBox());
   mComboBox->setEditable(true);
-  mComboBox->addItem("DIN EN 81346");  // TODO: add more norms (dynamically?)
+  mComboBox->addItems(getAvailableNorms());
+  mComboBox->clearEditText();
 
   // create all buttons
   mBtnUp.reset(new QToolButton());
