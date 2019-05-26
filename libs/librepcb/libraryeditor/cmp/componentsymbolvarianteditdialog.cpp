@@ -80,12 +80,8 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
       mUi->symbolListWidget,
       &ComponentSymbolVariantItemListEditorWidget::triggerGraphicsItemsUpdate,
       this, &ComponentSymbolVariantEditDialog::updateGraphicsItems);
-  mUi->pinSignalMapEditorWidget->setVariant(mWorkspace, mComponent.getSignals(),
-                                            mSymbVar);
-  connect(mUi->symbolListWidget,
-          &ComponentSymbolVariantItemListEditorWidget::edited,
-          mUi->pinSignalMapEditorWidget,
-          &CompSymbVarPinSignalMapEditorWidget::updateVariant);
+  mUi->pinSignalMapEditorWidget->setReferences(
+      &mSymbVar, mLibraryElementCache, &mComponent.getSignals(), nullptr);
 
   updateGraphicsItems();
 }

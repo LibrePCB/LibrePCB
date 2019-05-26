@@ -20,78 +20,76 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "newelementwizardpage_componentpinsignalmap.h"
+#include "cmdcomponentpinsignalmapitemedit.h"
 
-#include "ui_newelementwizardpage_componentpinsignalmap.h"
+#include "../componentpinsignalmap.h"
 
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/libraryelementcache.h>
-#include <librepcb/workspace/workspace.h>
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace library {
-namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-NewElementWizardPage_ComponentPinSignalMap::
-    NewElementWizardPage_ComponentPinSignalMap(NewElementWizardContext& context,
-                                               QWidget* parent) noexcept
-  : QWizardPage(parent),
-    mContext(context),
-    mUi(new Ui::NewElementWizardPage_ComponentPinSignalMap) {
-  mUi->setupUi(this);
+CmdComponentPinSignalMapItemEdit::CmdComponentPinSignalMapItemEdit(
+    ComponentPinSignalMapItem& item) noexcept
+  : UndoCommand(tr("Edit component pin-signal-map")),
+    mItem(item),
+    mOldSignalUuid(item.getSignalUuid()),
+    mNewSignalUuid(mOldSignalUuid),
+    mOldDisplayType(item.getDisplayType()),
+    mNewDisplayType(mOldDisplayType) {
 }
 
-NewElementWizardPage_ComponentPinSignalMap::
-    ~NewElementWizardPage_ComponentPinSignalMap() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-bool NewElementWizardPage_ComponentPinSignalMap::validatePage() noexcept {
-  mContext.mComponentSymbolVariants = mSymbolVariantList;
-  return true;
-}
-
-bool NewElementWizardPage_ComponentPinSignalMap::isComplete() const noexcept {
-  return true;
-}
-
-int NewElementWizardPage_ComponentPinSignalMap::nextId() const noexcept {
-  return NewElementWizardContext::ID_None;
+CmdComponentPinSignalMapItemEdit::~CmdComponentPinSignalMapItemEdit() noexcept {
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Setters
  ******************************************************************************/
 
-void NewElementWizardPage_ComponentPinSignalMap::initializePage() noexcept {
-  QWizardPage::initializePage();
-  mSymbolVariantList = mContext.mComponentSymbolVariants;
-  mUi->pinSignalMapEditorWidget->setReferences(
-      mSymbolVariantList.value(0).get(),
-      std::make_shared<LibraryElementCache>(
-          mContext.getWorkspace().getLibraryDb()),
-      &mContext.mComponentSignals, nullptr);
+void CmdComponentPinSignalMapItemEdit::setSignalUuid(
+    const tl::optional<Uuid>& uuid) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewSignalUuid = uuid;
 }
 
-void NewElementWizardPage_ComponentPinSignalMap::cleanupPage() noexcept {
-  QWizardPage::cleanupPage();
-  mContext.mComponentSymbolVariants = mSymbolVariantList;
+void CmdComponentPinSignalMapItemEdit::setDisplayType(
+    const CmpSigPinDisplayType& type) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDisplayType = type;
+}
+
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
+
+bool CmdComponentPinSignalMapItemEdit::performExecute() {
+  performRedo();  // can throw
+
+  if (mNewSignalUuid != mOldSignalUuid) return true;
+  if (mNewDisplayType != mOldDisplayType) return true;
+  return false;
+}
+
+void CmdComponentPinSignalMapItemEdit::performUndo() {
+  mItem.setSignalUuid(mOldSignalUuid);
+  mItem.setDisplayType(mOldDisplayType);
+}
+
+void CmdComponentPinSignalMapItemEdit::performRedo() {
+  mItem.setSignalUuid(mNewSignalUuid);
+  mItem.setDisplayType(mNewDisplayType);
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace library
 }  // namespace librepcb

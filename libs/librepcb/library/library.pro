@@ -28,6 +28,7 @@ SOURCES += \
     cmd/cmdlibraryedit.cpp \
     cmd/cmdlibraryelementedit.cpp \
     cmp/cmd/cmdcomponentedit.cpp \
+    cmp/cmd/cmdcomponentpinsignalmapitemedit.cpp \
     cmp/cmd/cmdcomponentsignaledit.cpp \
     cmp/cmd/cmdcomponentsymbolvariantedit.cpp \
     cmp/cmd/cmdcomponentsymbolvariantitemedit.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
     cmp/component.cpp \
     cmp/componentcheck.cpp \
     cmp/componentpinsignalmap.cpp \
+    cmp/componentpinsignalmapmodel.cpp \
     cmp/componentsignal.cpp \
     cmp/componentsignallistmodel.cpp \
     cmp/componentsymbolvariant.cpp \
@@ -102,6 +104,7 @@ HEADERS += \
     cmd/cmdlibraryedit.h \
     cmd/cmdlibraryelementedit.h \
     cmp/cmd/cmdcomponentedit.h \
+    cmp/cmd/cmdcomponentpinsignalmapitemedit.h \
     cmp/cmd/cmdcomponentsignaledit.h \
     cmp/cmd/cmdcomponentsymbolvariantedit.h \
     cmp/cmd/cmdcomponentsymbolvariantitemedit.h \
@@ -109,6 +112,7 @@ HEADERS += \
     cmp/component.h \
     cmp/componentcheck.h \
     cmp/componentpinsignalmap.h \
+    cmp/componentpinsignalmapmodel.h \
     cmp/componentprefix.h \
     cmp/componentsignal.h \
     cmp/componentsignallistmodel.h \

@@ -17,73 +17,76 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_CMDCOMPONENTPINSIGNALMAPITEMEDIT_H
+#define LIBREPCB_LIBRARY_CMDCOMPONENTPINSIGNALMAPITEMEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/cmp/componentsignal.h>
+#include "../cmpsigpindisplaytype.h"
+
+#include <librepcb/common/undocommand.h>
+#include <librepcb/common/uuid.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class UndoStack;
-class SortFilterProxyModel;
-
 namespace library {
 
-class LibraryElementCache;
-class ComponentSymbolVariant;
-class ComponentPinSignalMapModel;
-
-namespace editor {
+class ComponentPinSignalMapItem;
 
 /*******************************************************************************
- *  Class CompSymbVarPinSignalMapEditorWidget
+ *  Class CmdComponentPinSignalMapItemEdit
  ******************************************************************************/
 
 /**
- * @brief The CompSymbVarPinSignalMapEditorWidget class
+ * @brief The CmdComponentPinSignalMapItemEdit class
  */
-class CompSymbVarPinSignalMapEditorWidget final : public QWidget {
-  Q_OBJECT
-
+class CmdComponentPinSignalMapItemEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit CompSymbVarPinSignalMapEditorWidget(
-      QWidget* parent = nullptr) noexcept;
-  CompSymbVarPinSignalMapEditorWidget(
-      const CompSymbVarPinSignalMapEditorWidget& other) = delete;
-  ~CompSymbVarPinSignalMapEditorWidget() noexcept;
+  CmdComponentPinSignalMapItemEdit() = delete;
+  CmdComponentPinSignalMapItemEdit(
+      const CmdComponentPinSignalMapItemEdit& other) = delete;
+  explicit CmdComponentPinSignalMapItemEdit(
+      ComponentPinSignalMapItem& item) noexcept;
+  ~CmdComponentPinSignalMapItemEdit() noexcept;
 
-  // General Methods
-  void setReferences(
-      ComponentSymbolVariant*                           variant,
-      const std::shared_ptr<const LibraryElementCache>& symbolCache,
-      const ComponentSignalList* sigs, UndoStack* undoStack) noexcept;
+  // Setters
+  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  void setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
   // Operator Overloadings
-  CompSymbVarPinSignalMapEditorWidget& operator       =(
-      const CompSymbVarPinSignalMapEditorWidget& rhs) = delete;
+  CmdComponentPinSignalMapItemEdit& operator       =(
+      const CmdComponentPinSignalMapItemEdit& rhs) = delete;
 
-private:
-  QScopedPointer<ComponentPinSignalMapModel> mModel;
-  QScopedPointer<SortFilterProxyModel>       mProxy;
-  QScopedPointer<QTableView>                 mView;
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
+
+private:  // Data
+  ComponentPinSignalMapItem& mItem;
+
+  tl::optional<Uuid>   mOldSignalUuid;
+  tl::optional<Uuid>   mNewSignalUuid;
+  CmpSigPinDisplayType mOldDisplayType;
+  CmpSigPinDisplayType mNewDisplayType;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_CMDCOMPONENTPINSIGNALMAPITEMEDIT_H
