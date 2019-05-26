@@ -38,6 +38,7 @@ SOURCES += \
     cmp/componentsignallistmodel.cpp \
     cmp/componentsymbolvariant.cpp \
     cmp/componentsymbolvariantitem.cpp \
+    cmp/componentsymbolvariantlistmodel.cpp \
     cmp/msg/msgduplicatesignalname.cpp \
     cmp/msg/msgmissingcomponentdefaultvalue.cpp \
     cmp/msg/msgmissingcomponentprefix.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
     cmp/componentsymbolvariant.h \
     cmp/componentsymbolvariantitem.h \
     cmp/componentsymbolvariantitemsuffix.h \
+    cmp/componentsymbolvariantlistmodel.h \
     cmp/msg/msgduplicatesignalname.h \
     cmp/msg/msgmissingcomponentdefaultvalue.h \
     cmp/msg/msgmissingcomponentprefix.h \

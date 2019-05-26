@@ -295,7 +295,11 @@ void ComponentEditorWidget::fixMsg(const MsgMissingComponentDefaultValue& msg) {
 template <>
 void ComponentEditorWidget::fixMsg(const MsgMissingSymbolVariant& msg) {
   Q_UNUSED(msg);
-  mUi->symbolVariantsEditorWidget->addDefaultSymbolVariant();
+  std::shared_ptr<ComponentSymbolVariant> symbVar =
+      std::make_shared<ComponentSymbolVariant>(Uuid::createRandom(), "",
+                                               ElementName("default"), "");
+  mUndoStack->execCmd(new CmdComponentSymbolVariantInsert(
+      mComponent->getSymbolVariants(), symbVar));
 }
 
 template <typename MessageType>
