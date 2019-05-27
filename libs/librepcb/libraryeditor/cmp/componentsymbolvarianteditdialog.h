@@ -46,6 +46,7 @@ namespace library {
 class Component;
 class Symbol;
 class SymbolGraphicsItem;
+class LibraryElementCache;
 
 namespace editor {
 
@@ -87,9 +88,10 @@ private:  // Data
   const Component&                                     mComponent;
   ComponentSymbolVariant&                              mOriginalSymbVar;
   ComponentSymbolVariant                               mSymbVar;
-  QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
   QScopedPointer<GraphicsScene>                        mGraphicsScene;
   QScopedPointer<DefaultGraphicsLayerProvider>         mGraphicsLayerProvider;
+  std::shared_ptr<LibraryElementCache>                 mLibraryElementCache;
+  QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
 
   QList<std::shared_ptr<Symbol>>             mSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;

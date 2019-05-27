@@ -30,6 +30,7 @@
 #include <librepcb/common/norms.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
+#include <librepcb/library/libraryelementcache.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -57,8 +58,9 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
     mComponent(cmp),
     mOriginalSymbVar(symbVar),
     mSymbVar(symbVar),
-    mUi(new Ui::ComponentSymbolVariantEditDialog),
-    mGraphicsScene(new GraphicsScene()) {
+    mGraphicsScene(new GraphicsScene()),
+    mLibraryElementCache(new LibraryElementCache(ws.getLibraryDb())),
+    mUi(new Ui::ComponentSymbolVariantEditDialog) {
   mUi->setupUi(this);
   mUi->cbxNorm->addItems(getAvailableNorms());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -71,11 +73,13 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   mUi->cbxNorm->setCurrentText(mSymbVar.getNorm());
 
   // load symbol items
-  mUi->symbolListWidget->setVariant(mWorkspace, *mGraphicsLayerProvider,
-                                    mSymbVar.getSymbolItems());
-  connect(mUi->symbolListWidget,
-          &ComponentSymbolVariantItemListEditorWidget::edited, this,
-          &ComponentSymbolVariantEditDialog::updateGraphicsItems);
+  mUi->symbolListWidget->setReferences(mWorkspace, *mGraphicsLayerProvider,
+                                       mSymbVar.getSymbolItems(),
+                                       mLibraryElementCache, nullptr);
+  connect(
+      mUi->symbolListWidget,
+      &ComponentSymbolVariantItemListEditorWidget::triggerGraphicsItemsUpdate,
+      this, &ComponentSymbolVariantEditDialog::updateGraphicsItems);
   mUi->pinSignalMapEditorWidget->setVariant(mWorkspace, mComponent.getSignals(),
                                             mSymbVar);
   connect(mUi->symbolListWidget,

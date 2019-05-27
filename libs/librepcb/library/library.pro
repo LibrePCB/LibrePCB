@@ -30,6 +30,7 @@ SOURCES += \
     cmp/cmd/cmdcomponentedit.cpp \
     cmp/cmd/cmdcomponentsignaledit.cpp \
     cmp/cmd/cmdcomponentsymbolvariantedit.cpp \
+    cmp/cmd/cmdcomponentsymbolvariantitemedit.cpp \
     cmp/cmpsigpindisplaytype.cpp \
     cmp/component.cpp \
     cmp/componentcheck.cpp \
@@ -38,6 +39,7 @@ SOURCES += \
     cmp/componentsignallistmodel.cpp \
     cmp/componentsymbolvariant.cpp \
     cmp/componentsymbolvariantitem.cpp \
+    cmp/componentsymbolvariantitemlistmodel.cpp \
     cmp/componentsymbolvariantlistmodel.cpp \
     cmp/msg/msgduplicatesignalname.cpp \
     cmp/msg/msgmissingcomponentdefaultvalue.cpp \
@@ -52,6 +54,7 @@ SOURCES += \
     librarybaseelement.cpp \
     librarybaseelementcheck.cpp \
     libraryelement.cpp \
+    libraryelementcache.cpp \
     libraryelementcheck.cpp \
     msg/libraryelementcheckmessage.cpp \
     msg/msgmissingauthor.cpp \
@@ -101,6 +104,7 @@ HEADERS += \
     cmp/cmd/cmdcomponentedit.h \
     cmp/cmd/cmdcomponentsignaledit.h \
     cmp/cmd/cmdcomponentsymbolvariantedit.h \
+    cmp/cmd/cmdcomponentsymbolvariantitemedit.h \
     cmp/cmpsigpindisplaytype.h \
     cmp/component.h \
     cmp/componentcheck.h \
@@ -110,6 +114,7 @@ HEADERS += \
     cmp/componentsignallistmodel.h \
     cmp/componentsymbolvariant.h \
     cmp/componentsymbolvariantitem.h \
+    cmp/componentsymbolvariantitemlistmodel.h \
     cmp/componentsymbolvariantitemsuffix.h \
     cmp/componentsymbolvariantlistmodel.h \
     cmp/msg/msgduplicatesignalname.h \
@@ -126,6 +131,7 @@ HEADERS += \
     librarybaseelement.h \
     librarybaseelementcheck.h \
     libraryelement.h \
+    libraryelementcache.h \
     libraryelementcheck.h \
     msg/libraryelementcheckmessage.h \
     msg/msgmissingauthor.h \
