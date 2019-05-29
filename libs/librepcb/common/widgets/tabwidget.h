@@ -38,9 +38,6 @@ namespace librepcb {
 /**
  * @brief A QTabWidget subclass that allows closing closable tabs
  * with the middle mouse button.
- *
- * @author dbrgn
- * @date 2018-12-07
  */
 class TabWidget final : public QTabWidget {
   Q_OBJECT

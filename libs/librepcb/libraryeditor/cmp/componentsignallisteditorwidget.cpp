@@ -46,10 +46,13 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mUndoStack(nullptr),
-    mSignalList(nullptr) {
+    mSignalList(nullptr),
+    mSignalListEditedSlot(*this,
+                          &ComponentSignalListEditorWidget::signalListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_NAME,
                                   new QTableWidgetItem(tr("Name")));
@@ -109,21 +112,13 @@ ComponentSignalListEditorWidget::~ComponentSignalListEditorWidget() noexcept {
 void ComponentSignalListEditorWidget::setReferences(
     UndoStack* undoStack, ComponentSignalList* list) noexcept {
   if (mSignalList) {
-    mSignalList->unregisterObserver(this);
-    for (const ComponentSignal& signal : *mSignalList) {
-      disconnect(&signal, &ComponentSignal::edited, this,
-                 &ComponentSignalListEditorWidget::updateTable);
-    }
+    mSignalList->onEdited.detach(mSignalListEditedSlot);
   }
   mUndoStack      = undoStack;
   mSignalList     = list;
   mSelectedSignal = tl::nullopt;
   if (mSignalList) {
-    mSignalList->registerObserver(this);
-    for (const ComponentSignal& signal : *mSignalList) {
-      connect(&signal, &ComponentSignal::edited, this,
-              &ComponentSignalListEditorWidget::updateTable);
-    }
+    mSignalList->onEdited.attach(mSignalListEditedSlot);
   }
   updateTable();
 }
@@ -237,34 +232,19 @@ void ComponentSignalListEditorWidget::btnAddRemoveClicked() noexcept {
 }
 
 /*******************************************************************************
- *  Observer
- ******************************************************************************/
-
-void ComponentSignalListEditorWidget::listObjectAdded(
-    const ComponentSignalList& list, int newIndex,
-    const std::shared_ptr<ComponentSignal>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == mSignalList);
-  connect(ptr.get(), &ComponentSignal::edited, this,
-          &ComponentSignalListEditorWidget::updateTable);
-  updateTable();
-}
-
-void ComponentSignalListEditorWidget::listObjectRemoved(
-    const ComponentSignalList& list, int oldIndex,
-    const std::shared_ptr<ComponentSignal>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == mSignalList);
-  disconnect(ptr.get(), &ComponentSignal::edited, this,
-             &ComponentSignalListEditorWidget::updateTable);
-  updateTable();
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ComponentSignalListEditorWidget::signalListEdited(
+    const ComponentSignalList& list, int index,
+    const std::shared_ptr<const ComponentSignal>& signal,
+    ComponentSignalList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(signal);
+  Q_UNUSED(event);
+  updateTable();
+}
 
 void ComponentSignalListEditorWidget::updateTable() noexcept {
   mTable->blockSignals(true);
@@ -368,8 +348,13 @@ bool clock,*/ const QString& forcedNetName) noexcept {
   mTable->setItem(row, COLUMN_FORCEDNETNAME,
                   new QTableWidgetItem(forcedNetName));
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // button
-  int          btnSize      = qMax(requiredCheckBox->sizeHint().height(), 17);
+  int          btnSize      = mTable->rowHeight(row);
   QToolButton* btnAddRemove = new QToolButton(this);
   btnAddRemove->setProperty("row", row);
   btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -383,9 +368,6 @@ bool clock,*/ const QString& forcedNetName) noexcept {
     btnAddRemove->setIcon(QIcon(":/img/actions/add.png"));
   }
   mTable->setCellWidget(row, COLUMN_BUTTONS, btnAddRemove);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void ComponentSignalListEditorWidget::addSignal(
@@ -425,7 +407,10 @@ bool ComponentSignalListEditorWidget::setName(const Uuid&    uuid,
                                               const QString& name) noexcept {
   try {
     ComponentSignal* signal = mSignalList->get(uuid).get();  // can throw
-    if (signal->getName() == name) return true;
+    if (signal->getName() == name) {
+      updateTable();
+      return true;
+    }
     CircuitIdentifier constrainedName = validateNameOrThrow(name);  // can throw
     if (mUndoStack) {
       QScopedPointer<CmdComponentSignalEdit> cmd(
@@ -437,6 +422,7 @@ bool ComponentSignalListEditorWidget::setName(const Uuid&    uuid,
     }
     return true;
   } catch (const Exception& e) {
+    updateTable();
     QMessageBox::critical(this, tr("Could not edit signal"), e.getMsg());
     return false;
   }

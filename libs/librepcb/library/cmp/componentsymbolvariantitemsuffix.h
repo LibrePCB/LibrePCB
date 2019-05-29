@@ -118,9 +118,6 @@ template <>
 inline library::ComponentSymbolVariantItemSuffix deserializeFromSExpression(
     const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
-  // backward compatibility - remove this some time!
-  str.remove(QRegularExpression("[^0-9a-zA-Z_]"));
-  str.truncate(16);
   return library::ComponentSymbolVariantItemSuffix(str);  // can throw
 }
 

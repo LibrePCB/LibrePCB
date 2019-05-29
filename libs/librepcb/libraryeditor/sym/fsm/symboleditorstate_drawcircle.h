@@ -48,9 +48,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_DrawCircle class
- *
- * @author  ubruhin
- * @date    2017-01-02
  */
 class SymbolEditorState_DrawCircle final : public SymbolEditorState {
   Q_OBJECT

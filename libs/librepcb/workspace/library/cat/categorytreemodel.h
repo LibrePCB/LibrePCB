@@ -49,7 +49,8 @@ public:
   CategoryTreeModel()                               = delete;
   CategoryTreeModel(const CategoryTreeModel& other) = delete;
   explicit CategoryTreeModel(const WorkspaceLibraryDb& library,
-                             const QStringList&        localeOrder) noexcept;
+                             const QStringList&        localeOrder,
+                             CategoryTreeFilter::Flags filter) noexcept;
   ~CategoryTreeModel() noexcept;
 
   // Getters

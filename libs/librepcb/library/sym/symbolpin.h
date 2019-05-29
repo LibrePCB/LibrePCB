@@ -55,6 +55,17 @@ class SymbolPin final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(SymbolPin)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    NameChanged,
+    PositionChanged,
+    LengthChanged,
+    RotationChanged,
+  };
+  Signal<SymbolPin, Event>       onEdited;
+  typedef Slot<SymbolPin, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SymbolPin() = delete;
   SymbolPin(const SymbolPin& other) noexcept;
@@ -72,10 +83,10 @@ public:
   const Angle&             getRotation() const noexcept { return mRotation; }
 
   // Setters
-  void setPosition(const Point& pos) noexcept;
-  void setLength(const UnsignedLength& length) noexcept;
-  void setRotation(const Angle& rotation) noexcept;
-  void setName(const CircuitIdentifier& name) noexcept;
+  bool setPosition(const Point& pos) noexcept;
+  bool setLength(const UnsignedLength& length) noexcept;
+  bool setRotation(const Angle& rotation) noexcept;
+  bool setName(const CircuitIdentifier& name) noexcept;
 
   // General Methods
   void registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
@@ -109,13 +120,16 @@ struct SymbolPinListNameProvider {
   static constexpr const char* tagname = "pin";
 };
 using SymbolPinList =
-    SerializableObjectList<SymbolPin, SymbolPinListNameProvider>;
+    SerializableObjectList<SymbolPin, SymbolPinListNameProvider,
+                           SymbolPin::Event>;
 using CmdSymbolPinInsert =
-    CmdListElementInsert<SymbolPin, SymbolPinListNameProvider>;
+    CmdListElementInsert<SymbolPin, SymbolPinListNameProvider,
+                         SymbolPin::Event>;
 using CmdSymbolPinRemove =
-    CmdListElementRemove<SymbolPin, SymbolPinListNameProvider>;
+    CmdListElementRemove<SymbolPin, SymbolPinListNameProvider,
+                         SymbolPin::Event>;
 using CmdSymbolPinsSwap =
-    CmdListElementsSwap<SymbolPin, SymbolPinListNameProvider>;
+    CmdListElementsSwap<SymbolPin, SymbolPinListNameProvider, SymbolPin::Event>;
 
 /*******************************************************************************
  *  End of File

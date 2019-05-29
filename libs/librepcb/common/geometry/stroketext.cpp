@@ -37,7 +37,8 @@ namespace librepcb {
  ******************************************************************************/
 
 StrokeText::StrokeText(const StrokeText& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mLayerName(other.mLayerName),
     mText(other.mText),
     mPosition(other.mPosition),
@@ -66,7 +67,8 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
                        const StrokeTextSpacing& lineSpacing,
                        const Alignment& align, bool mirrored,
                        bool autoRotate) noexcept
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mLayerName(layerName),
     mText(text),
     mPosition(pos),
@@ -83,68 +85,21 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 StrokeText::StrokeText(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
-    mText(),
-    mPosition(0, 0),
-    mRotation(0),
+    mText(node.getValueByPath<QString>("value")),
+    mPosition(node.getChildByPath("position")),
+    mRotation(node.getValueByPath<Angle>("rotation")),
     mHeight(node.getValueByPath<PositiveLength>("height")),
-    mStrokeWidth(200000),  // backward compatibility, remove this some time!
-    mLetterSpacing(),      // backward compatibility, remove this some time!
-    mLineSpacing(),        // backward compatibility, remove this some time!
+    mStrokeWidth(node.getValueByPath<UnsignedLength>("stroke_width")),
+    mLetterSpacing(node.getValueByPath<StrokeTextSpacing>("letter_spacing")),
+    mLineSpacing(node.getValueByPath<StrokeTextSpacing>("line_spacing")),
     mAlign(node.getChildByPath("align")),
-    mMirrored(false),   // backward compatibility, remove this some time!
-    mAutoRotate(true),  // backward compatibility, remove this some time!
+    mMirrored(node.getValueByPath<bool>("mirror")),
+    mAutoRotate(node.getValueByPath<bool>("auto_rotate")),
     mAttributeProvider(nullptr),
     mFont(nullptr) {
-  if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mText = node.getValueByPath<QString>("value");
-  } else {
-    // backward compatibility, remove this some time!
-    mText = node.getChildByIndex(0).getValue<QString>();
-  }
-
-  // load geometry attributes
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
-  if (const SExpression* child = node.tryGetChildByPath("stroke_width")) {
-    mStrokeWidth = child->getValueOfFirstChild<UnsignedLength>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("letter_spacing")) {
-    mLetterSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("line_spacing")) {
-    mLineSpacing = child->getValueOfFirstChild<StrokeTextSpacing>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("mirror")) {
-    mMirrored = child->getValueOfFirstChild<bool>();
-  }
-  if (const SExpression* child = node.tryGetChildByPath("auto_rotate")) {
-    mAutoRotate = child->getValueOfFirstChild<bool>();
-  }
-
-  // backward compatibility, remove this some time!
-  if ((node.getName() == "text") &&
-      ((mText == "#NAME") || (mText == "#VALUE"))) {
-    mHeight = PositiveLength(1000000);
-  }
-
-  // backward compatibility - remove this some time!
-  mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-  mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                "{{ \\1 or \\2 }}");
 }
 
 StrokeText::~StrokeText() noexcept {
@@ -155,6 +110,9 @@ StrokeText::~StrokeText() noexcept {
  ******************************************************************************/
 
 const QVector<Path>& StrokeText::getPaths() const noexcept {
+  if (!mFont) {
+    qWarning() << "Tried to obtain StrokeFont paths, but no font is set!";
+  }
   return needsAutoRotation() ? mPathsRotated : mPaths;
 }
 
@@ -194,116 +152,132 @@ Length StrokeText::calcLineSpacing() const noexcept {
  *  Setters
  ******************************************************************************/
 
-void StrokeText::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) return;
+bool StrokeText::setLayerName(const GraphicsLayerName& name) noexcept {
+  if (name == mLayerName) {
+    return false;
+  }
+
   mLayerName = name;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextLayerNameChanged(mLayerName);
-  }
+  onEdited.notify(Event::LayerNameChanged);
+  return true;
 }
 
-void StrokeText::setText(const QString& text) noexcept {
-  if (text == mText) return;
+bool StrokeText::setText(const QString& text) noexcept {
+  if (text == mText) {
+    return false;
+  }
+
   mText = text;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextTextChanged(mText);
-  }
   updatePaths();  // because text has changed
+  onEdited.notify(Event::TextChanged);
+  return true;
 }
 
-void StrokeText::setPosition(const Point& pos) noexcept {
-  if (pos == mPosition) return;
-  mPosition = pos;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextPositionChanged(mPosition);
+bool StrokeText::setPosition(const Point& pos) noexcept {
+  if (pos == mPosition) {
+    return false;
   }
+
+  mPosition = pos;
+  onEdited.notify(Event::PositionChanged);
+  return true;
 }
 
-void StrokeText::setRotation(const Angle& rotation) noexcept {
-  if (rotation == mRotation) return;
+bool StrokeText::setRotation(const Angle& rotation) noexcept {
+  if (rotation == mRotation) {
+    return false;
+  }
+
   bool needsRotation = needsAutoRotation();
   mRotation          = rotation;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextRotationChanged(mRotation);
-  }
+  onEdited.notify(Event::RotationChanged);
   if (needsRotation != needsAutoRotation()) {
-    foreach (IF_StrokeTextObserver* object, mObservers) {
-      object->strokeTextPathsChanged(getPaths());
-    }
+    onEdited.notify(Event::PathsChanged);
   }
+  return true;
 }
 
-void StrokeText::setHeight(const PositiveLength& height) noexcept {
-  if (height == mHeight) return;
+bool StrokeText::setHeight(const PositiveLength& height) noexcept {
+  if (height == mHeight) {
+    return false;
+  }
+
   mHeight = height;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextHeightChanged(mHeight);
-  }
   updatePaths();  // because height has changed
+  onEdited.notify(Event::HeightChanged);
+  return true;
 }
 
-void StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept {
-  if (strokeWidth == mStrokeWidth) return;
+bool StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept {
+  if (strokeWidth == mStrokeWidth) {
+    return false;
+  }
+
   mStrokeWidth = strokeWidth;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextStrokeWidthChanged(mStrokeWidth);
-  }
   updatePaths();  // because stroke width has changed
+  onEdited.notify(Event::StrokeWidthChanged);
+  return true;
 }
 
-void StrokeText::setLetterSpacing(const StrokeTextSpacing& spacing) noexcept {
-  if (spacing == mLetterSpacing) return;
+bool StrokeText::setLetterSpacing(const StrokeTextSpacing& spacing) noexcept {
+  if (spacing == mLetterSpacing) {
+    return false;
+  }
+
   mLetterSpacing = spacing;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextLetterSpacingChanged(mLetterSpacing);
-  }
   updatePaths();  // because letter spacing has changed
+  onEdited.notify(Event::LetterSpacingChanged);
+  return true;
 }
 
-void StrokeText::setLineSpacing(const StrokeTextSpacing& spacing) noexcept {
-  if (spacing == mLineSpacing) return;
+bool StrokeText::setLineSpacing(const StrokeTextSpacing& spacing) noexcept {
+  if (spacing == mLineSpacing) {
+    return false;
+  }
+
   mLineSpacing = spacing;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextLineSpacingChanged(mLineSpacing);
-  }
   updatePaths();  // because line spacing has changed
+  onEdited.notify(Event::LineSpacingChanged);
+  return true;
 }
 
-void StrokeText::setAlign(const Alignment& align) noexcept {
-  if (align == mAlign) return;
-  mAlign = align;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextAlignChanged(mAlign);
+bool StrokeText::setAlign(const Alignment& align) noexcept {
+  if (align == mAlign) {
+    return false;
   }
+
+  mAlign = align;
   updatePaths();  // because alignment has changed
+  onEdited.notify(Event::AlignChanged);
+  return true;
 }
 
-void StrokeText::setMirrored(bool mirrored) noexcept {
-  if (mirrored == mMirrored) return;
+bool StrokeText::setMirrored(bool mirrored) noexcept {
+  if (mirrored == mMirrored) {
+    return false;
+  }
+
   bool needsRotation = needsAutoRotation();
   mMirrored          = mirrored;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextMirroredChanged(mMirrored);
-  }
+  onEdited.notify(Event::MirroredChanged);
   if (needsRotation != needsAutoRotation()) {
-    foreach (IF_StrokeTextObserver* object, mObservers) {
-      object->strokeTextPathsChanged(getPaths());
-    }
+    onEdited.notify(Event::PathsChanged);
   }
+  return true;
 }
 
-void StrokeText::setAutoRotate(bool autoRotate) noexcept {
-  if (autoRotate == mAutoRotate) return;
+bool StrokeText::setAutoRotate(bool autoRotate) noexcept {
+  if (autoRotate == mAutoRotate) {
+    return false;
+  }
+
   bool needsRotation = needsAutoRotation();
   mAutoRotate        = autoRotate;
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextAutoRotateChanged(mAutoRotate);
-  }
+  onEdited.notify(Event::AutoRotateChanged);
   if (needsRotation != needsAutoRotation()) {
-    foreach (IF_StrokeTextObserver* object, mObservers) {
-      object->strokeTextPathsChanged(getPaths());
-    }
+    onEdited.notify(Event::PathsChanged);
   }
+  return true;
 }
 
 /*******************************************************************************
@@ -345,19 +319,7 @@ void StrokeText::updatePaths() noexcept {
     p.rotate(Angle::deg180(), center);
   }
 
-  foreach (IF_StrokeTextObserver* object, mObservers) {
-    object->strokeTextPathsChanged(getPaths());
-  }
-}
-
-void StrokeText::registerObserver(IF_StrokeTextObserver& object) const
-    noexcept {
-  mObservers.insert(&object);
-}
-
-void StrokeText::unregisterObserver(IF_StrokeTextObserver& object) const
-    noexcept {
-  mObservers.remove(&object);
+  onEdited.notify(Event::PathsChanged);
 }
 
 void StrokeText::serialize(SExpression& root) const {
@@ -396,18 +358,21 @@ bool StrokeText::operator==(const StrokeText& rhs) const noexcept {
 }
 
 StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept {
-  mUuid          = rhs.mUuid;
-  mLayerName     = rhs.mLayerName;
-  mText          = rhs.mText;
-  mPosition      = rhs.mPosition;
-  mRotation      = rhs.mRotation;
-  mHeight        = rhs.mHeight;
-  mStrokeWidth   = rhs.mStrokeWidth;
-  mLetterSpacing = rhs.mLetterSpacing;
-  mLineSpacing   = rhs.mLineSpacing;
-  mAlign         = rhs.mAlign;
-  mMirrored      = rhs.mMirrored;
-  mAutoRotate    = rhs.mAutoRotate;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setLayerName(rhs.mLayerName);
+  setText(rhs.mText);
+  setPosition(rhs.mPosition);
+  setRotation(rhs.mRotation);
+  setHeight(rhs.mHeight);
+  setStrokeWidth(rhs.mStrokeWidth);
+  setLetterSpacing(rhs.mLetterSpacing);
+  setLineSpacing(rhs.mLineSpacing);
+  setAlign(rhs.mAlign);
+  setMirrored(rhs.mMirrored);
+  setAutoRotate(rhs.mAutoRotate);
   return *this;
 }
 

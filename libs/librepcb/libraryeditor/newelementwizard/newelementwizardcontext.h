@@ -56,9 +56,6 @@ namespace editor {
 
 /**
  * @brief The NewElementWizardContext class
- *
- * @author ubruhin
- * @date 2017-03-22
  */
 class NewElementWizardContext final : public QObject {
   Q_OBJECT
@@ -92,7 +89,7 @@ public:
   // Constructors / Destructor
   NewElementWizardContext()                                     = delete;
   NewElementWizardContext(const NewElementWizardContext& other) = delete;
-  NewElementWizardContext(const workspace::Workspace& ws, const Library& lib,
+  NewElementWizardContext(const workspace::Workspace& ws, Library& lib,
                           const IF_GraphicsLayerProvider& lp,
                           QObject* parent = nullptr) noexcept;
   ~NewElementWizardContext() noexcept;
@@ -110,7 +107,8 @@ public:
   const QStringList& getLibLocaleOrder() const noexcept;
 
   // General Methods
-  void reset() noexcept;
+  void reset(ElementType newType = ElementType::None) noexcept;
+  void copyElement(ElementType type, const FilePath& fp);
   void createLibraryElement();
 
   // Operator Overloadings
@@ -119,7 +117,7 @@ public:
 
 private:  // Data
   const workspace::Workspace&     mWorkspace;
-  const library::Library&         mLibrary;
+  library::Library&               mLibrary;
   const IF_GraphicsLayerProvider& mLayerProvider;
   FilePath                        mOutputDirectory;
 

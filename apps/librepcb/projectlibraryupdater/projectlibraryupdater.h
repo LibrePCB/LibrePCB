@@ -29,10 +29,14 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class TransactionalFileSystem;
 
 namespace workspace {
 class Workspace;
@@ -74,7 +78,7 @@ private:
   void    log(const QString& msg) noexcept;
   QString prettyPath(const FilePath& fp) const noexcept;
   void    updateElements(
-         const QString& type,
+         std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
          FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const);
 
 private:

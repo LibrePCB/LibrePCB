@@ -47,9 +47,6 @@ class BI_Plane;
 
 /**
  * @brief The BGI_Plane class
- *
- * @author ubruhin
- * @date 2017-11-19
  */
 class BGI_Plane final : public BGI_Base {
 public:

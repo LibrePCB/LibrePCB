@@ -10,26 +10,29 @@ def test(library_editor, helpers):
     """
     Copy symbol with "New Library Element" wizard
     """
+    le = library_editor
 
     # Open "New Library Element" wizard
-    library_editor.action('libraryEditorActionNewElement').trigger(blocking=False)
+    le.action('libraryEditorActionNewElement').trigger(blocking=False)
 
     # Choose "Copy existing element"
-    library_editor.widget('libraryEditorNewElementWizardChooseTypeCopyRadioButton').set_property('checked', True)
+    le.widget('libraryEditorNewElementWizardChooseTypeCopyRadioButton').set_property('checked', True)
 
     # Choose type of element
-    library_editor.widget('libraryEditorNewElementWizardChooseTypeSymbolButton').click()
+    le.widget('libraryEditorNewElementWizardChooseTypeSymbolButton').click()
 
     # Choose category
-    category_tree = library_editor.widget('libraryEditorNewElementWizardCopyFromCategoriesTree')
+    category_tree = le.widget('libraryEditorNewElementWizardCopyFromCategoriesTree')
     helpers.wait_for_model_items_count(category_tree, 1)
-    category_tree.model_items().items[0].select()
+    category = category_tree.model().items().items[0]
+    category_tree.select_item(category)
 
     # Choose element
-    element_list = library_editor.widget('libraryEditorNewElementWizardCopyFromElementsList')
+    element_list = le.widget('libraryEditorNewElementWizardCopyFromElementsList')
     helpers.wait_for_model_items_count(element_list, 1)
-    element_list.model_items().items[0].select()
-    library_editor.widget('libraryEditorNewElementWizardNextButton').click()
+    element = element_list.model().items().items[0]
+    element_list.select_item(element)
+    le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Check metadata
     widget_properties = {
@@ -39,10 +42,21 @@ def test(library_editor, helpers):
         ('VersionEdit', 'text'): '0.1',
     }
     for (widget, property), value in widget_properties.items():
-        props = library_editor.widget('libraryEditorNewElementWizardMetadata' + widget).properties()
+        props = le.widget('libraryEditorNewElementWizardMetadata' + widget).properties()
         assert props[property] == value
 
     # Finish
-    dialog = library_editor.widget('libraryEditorNewElementWizard')
-    library_editor.widget('libraryEditorNewElementWizardFinishButton').click()
+    dialog = le.widget('libraryEditorNewElementWizard')
+    le.widget('libraryEditorNewElementWizardFinishButton').click()
     helpers.wait_until_widget_hidden(dialog)
+
+    # Check if a new tab is opened (indicates that the element was created)
+    tab_props = le.widget('libraryEditorStackedWidget').properties()
+    assert tab_props['count'] == 2
+    assert tab_props['currentIndex'] == 1
+
+    # Check metadata
+    assert le.widget('libraryEditorSymbolNameEdit').properties()['text'] == 'Capacitor Bipolar EU'
+    assert le.widget('libraryEditorSymbolDescriptionEdit').properties()['plainText'] == 'Bipolar Capacitor European (IEC 60617)'
+    assert le.widget('libraryEditorSymbolKeywordsEdit').properties()['text'] == 'capacitor,capacitance,bipolar'
+    assert le.widget('libraryEditorSymbolVersionEdit').properties()['text'] == '0.1'

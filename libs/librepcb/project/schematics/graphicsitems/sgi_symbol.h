@@ -50,9 +50,6 @@ class SI_Symbol;
 
 /**
  * @brief The SGI_Symbol class
- *
- * @author ubruhin
- * @date 2014-08-23
  */
 class SGI_Symbol final : public SGI_Base {
 public:

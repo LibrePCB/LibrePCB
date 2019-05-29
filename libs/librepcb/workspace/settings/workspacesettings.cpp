@@ -26,8 +26,8 @@
 #include "workspacesettingsdialog.h"
 
 #include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 
 #include <QtCore>
 
@@ -49,8 +49,7 @@ WorkspaceSettings::WorkspaceSettings(const Workspace& workspace)
   // load settings if the settings file exists
   SExpression root;
   if (mFilePath.isExistingFile()) {
-    SmartSExprFile file(mFilePath, false, true);
-    root = file.parseFileAndBuildDomTree();
+    root = SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
   } else {
     qInfo("Workspace settings file not found, default settings will be used.");
   }
@@ -116,9 +115,7 @@ void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member,
 
 void WorkspaceSettings::saveToFile() const {
   SExpression doc(serializeToDomElement("librepcb_workspace_settings"));
-
-  QScopedPointer<SmartSExprFile> file(SmartSExprFile::create(mFilePath));
-  file->save(doc, true);  // can throw
+  FileUtils::writeFile(mFilePath, doc.toByteArray());  // can throw
 }
 
 void WorkspaceSettings::serialize(SExpression& root) const {

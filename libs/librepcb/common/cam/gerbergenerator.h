@@ -48,9 +48,6 @@ class GerberApertureList;
  *
  * @todo Remove/Escape illegal characters in #mProjectId and #mProjectRevision!
  * @todo Use file/aperture attributes
- *
- * @author ubruhin
- * @date 2016-01-10
  */
 class GerberGenerator final {
   Q_DECLARE_TR_FUNCTIONS(GerberGenerator)

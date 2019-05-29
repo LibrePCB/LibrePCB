@@ -43,7 +43,10 @@ namespace librepcb {
 StrokeTextGraphicsItem::StrokeTextGraphicsItem(
     StrokeText& text, const IF_GraphicsLayerProvider& lp,
     QGraphicsItem* parent) noexcept
-  : PrimitivePathGraphicsItem(parent), mText(text), mLayerProvider(lp) {
+  : PrimitivePathGraphicsItem(parent),
+    mText(text),
+    mLayerProvider(lp),
+    mOnEditedSlot(*this, &StrokeTextGraphicsItem::strokeTextEdited) {
   // add origin cross
   mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
@@ -58,11 +61,10 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(
   updateTransform();
 
   // register to the text to get attribute updates
-  mText.registerObserver(*this);
+  mText.onEdited.attach(mOnEditedSlot);
 }
 
 StrokeTextGraphicsItem::~StrokeTextGraphicsItem() noexcept {
-  mText.unregisterObserver(*this);
 }
 
 /*******************************************************************************
@@ -77,73 +79,41 @@ QPainterPath StrokeTextGraphicsItem::shape() const noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void StrokeTextGraphicsItem::strokeTextLayerNameChanged(
-    const GraphicsLayerName& newLayerName) noexcept {
-  updateLayer(newLayerName);
-}
-
-void StrokeTextGraphicsItem::strokeTextTextChanged(
-    const QString& newText) noexcept {
-  Q_UNUSED(newText);
-  // do nothing because strokeTextPathsChanged() will be called too
-}
-
-void StrokeTextGraphicsItem::strokeTextPositionChanged(
-    const Point& newPos) noexcept {
-  setPosition(newPos);
-}
-
-void StrokeTextGraphicsItem::strokeTextRotationChanged(
-    const Angle& newRot) noexcept {
-  Q_UNUSED(newRot);
-  updateTransform();
-}
-
-void StrokeTextGraphicsItem::strokeTextHeightChanged(
-    const PositiveLength& newHeight) noexcept {
-  Q_UNUSED(newHeight);
-  // do nothing because strokeTextPathsChanged() will be called too
-}
-
-void StrokeTextGraphicsItem::strokeTextStrokeWidthChanged(
-    const UnsignedLength& newStrokeWidth) noexcept {
-  // only line width must be updated because strokeTextPathsChanged() will be
-  // called too
-  setLineWidth(newStrokeWidth);
-}
-
-void StrokeTextGraphicsItem::strokeTextLetterSpacingChanged(
-    const StrokeTextSpacing& spacing) noexcept {
-  Q_UNUSED(spacing);
-  // do nothing because strokeTextPathsChanged() will be called too
-}
-
-void StrokeTextGraphicsItem::strokeTextLineSpacingChanged(
-    const StrokeTextSpacing& spacing) noexcept {
-  Q_UNUSED(spacing);
-  // do nothing because strokeTextPathsChanged() will be called too
-}
-
-void StrokeTextGraphicsItem::strokeTextAlignChanged(
-    const Alignment& newAlign) noexcept {
-  Q_UNUSED(newAlign);
-  // do nothing because strokeTextPathsChanged() will be called too
-}
-
-void StrokeTextGraphicsItem::strokeTextMirroredChanged(bool mirrored) noexcept {
-  Q_UNUSED(mirrored);
-  updateTransform();
-}
-
-void StrokeTextGraphicsItem::strokeTextAutoRotateChanged(
-    bool newAutoRotate) noexcept {
-  Q_UNUSED(newAutoRotate);
-  // do nothing because strokeTextPathsChanged() will be called too
-}
-
-void StrokeTextGraphicsItem::strokeTextPathsChanged(
-    const QVector<Path>& paths) noexcept {
-  setPath(Path::toQPainterPathPx(paths));
+void StrokeTextGraphicsItem::strokeTextEdited(
+    const StrokeText& text, StrokeText::Event event) noexcept {
+  switch (event) {
+    case StrokeText::Event::LayerNameChanged:
+      updateLayer(text.getLayerName());
+      break;
+    case StrokeText::Event::TextChanged:
+    case StrokeText::Event::HeightChanged:
+    case StrokeText::Event::LetterSpacingChanged:
+    case StrokeText::Event::LineSpacingChanged:
+    case StrokeText::Event::AlignChanged:
+    case StrokeText::Event::AutoRotateChanged:
+      // do nothing because PathsChanged will be emitted too
+      break;
+    case StrokeText::Event::PositionChanged:
+      setPosition(text.getPosition());
+      break;
+    case StrokeText::Event::RotationChanged:
+      updateTransform();
+      break;
+    case StrokeText::Event::StrokeWidthChanged:
+      // update only line width because PathsChanged will be emitted too
+      setLineWidth(text.getStrokeWidth());
+      break;
+    case StrokeText::Event::MirroredChanged:
+      updateTransform();
+      break;
+    case StrokeText::Event::PathsChanged:
+      setPath(Path::toQPainterPathPx(text.getPaths()));
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in "
+                    "StrokeTextGraphicsItem::strokeTextEdited()";
+      break;
+  }
 }
 
 void StrokeTextGraphicsItem::updateLayer(

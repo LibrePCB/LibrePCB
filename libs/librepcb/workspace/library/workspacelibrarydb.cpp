@@ -27,7 +27,6 @@
 
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/sqlitedatabase.h>
 #include <librepcb/library/cat/componentcategory.h>
 #include <librepcb/library/cat/packagecategory.h>
@@ -57,31 +56,38 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws)
   qDebug("Load workspace library database...");
 
   // open SQLite database
-  FilePath dbFilePath = ws.getLibrariesPath().getPathTo("cache.sqlite");
-  mDb.reset(new SQLiteDatabase(dbFilePath));  // can throw
+  mFilePath = ws.getLibrariesPath().getPathTo(
+      QString("cache_v%1.sqlite").arg(sCurrentDbVersion));
+  mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
 
-  // if the db has an old version, just remove the whole db and create a new one
+  // Check database version - actually it must match the version in the
+  // filename, but if not (e.g. due to a mistake by us) we just remove the whole
+  // database and create a new one.
   int dbVersion = getDbVersion();
-  if (dbVersion < sCurrentDbVersion) {
-    qInfo() << "Library database version" << dbVersion
-            << "is outdated -> update triggered";
+  if (dbVersion != sCurrentDbVersion) {
+    qCritical() << "Library database version" << dbVersion << "is wrong!";
     mDb.reset();
-    QFile(dbFilePath.toStr()).remove();
-    mDb.reset(new SQLiteDatabase(dbFilePath));  // can throw
-    createAllTables();                          // can throw
-    setDbVersion(sCurrentDbVersion);            // can throw
+    QFile(mFilePath.toStr()).remove();
+    mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
+    createAllTables();                         // can throw
+    setDbVersion(sCurrentDbVersion);           // can throw
   }
 
   // create library scanner object
-  mLibraryScanner.reset(new WorkspaceLibraryScanner(mWorkspace));
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::started, this,
+  mLibraryScanner.reset(new WorkspaceLibraryScanner(mWorkspace, mFilePath));
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanStarted, this,
           &WorkspaceLibraryDb::scanStarted, Qt::QueuedConnection);
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::progressUpdate,
+  connect(mLibraryScanner.data(),
+          &WorkspaceLibraryScanner::scanLibraryListUpdated, this,
+          &WorkspaceLibraryDb::scanLibraryListUpdated, Qt::QueuedConnection);
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanProgressUpdate,
           this, &WorkspaceLibraryDb::scanProgressUpdate, Qt::QueuedConnection);
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::succeeded, this,
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanSucceeded, this,
           &WorkspaceLibraryDb::scanSucceeded, Qt::QueuedConnection);
-  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::failed, this,
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanFailed, this,
           &WorkspaceLibraryDb::scanFailed, Qt::QueuedConnection);
+  connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanFinished, this,
+          &WorkspaceLibraryDb::scanFinished, Qt::QueuedConnection);
 
   qDebug("Workspace library database successfully loaded!");
 }
@@ -90,8 +96,37 @@ WorkspaceLibraryDb::~WorkspaceLibraryDb() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters: Libraries
+ ******************************************************************************/
+
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getLibraries() const {
+  QSqlQuery query =
+      mDb->prepareQuery("SELECT version, filepath FROM libraries");
+  mDb->exec(query);
+
+  QMultiMap<Version, FilePath> libraries;
+  while (query.next()) {
+    Version version =
+        Version::fromString(query.value(0).toString());  // can throw
+    FilePath filepath(FilePath::fromRelative(mWorkspace.getLibrariesPath(),
+                                             query.value(1).toString()));
+    if (filepath.isValid()) {
+      libraries.insert(version, filepath);
+    } else {
+      throw LogicError(__FILE__, __LINE__);
+    }
+  }
+  return libraries;
+}
+
+/*******************************************************************************
  *  Getters: Library Elements by their UUID
  ******************************************************************************/
+
+QMultiMap<Version, FilePath> WorkspaceLibraryDb::getLibraries(
+    const Uuid& uuid) const {
+  return getElementFilePathsFromDb("libraries", uuid);
+}
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getComponentCategories(
     const Uuid& uuid) const {
@@ -127,6 +162,10 @@ QMultiMap<Version, FilePath> WorkspaceLibraryDb::getDevices(
  *  Getters: Best Match Library Elements by their UUID
  ******************************************************************************/
 
+FilePath WorkspaceLibraryDb::getLatestLibrary(const Uuid& uuid) const {
+  return getLatestVersionFilePath(getLibraries(uuid));
+}
+
 FilePath WorkspaceLibraryDb::getLatestComponentCategory(
     const Uuid& uuid) const {
   return getLatestVersionFilePath(getComponentCategories(uuid));
@@ -150,6 +189,52 @@ FilePath WorkspaceLibraryDb::getLatestComponent(const Uuid& uuid) const {
 
 FilePath WorkspaceLibraryDb::getLatestDevice(const Uuid& uuid) const {
   return getLatestVersionFilePath(getDevices(uuid));
+}
+
+/*******************************************************************************
+ *  Getters: Library elements by search keyword
+ ******************************************************************************/
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<Library>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("libraries", "lib_id", keyword);
+}
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<ComponentCategory>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("component_categories", "cat_id", keyword);
+}
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<PackageCategory>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("package_categories", "cat_id", keyword);
+}
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<Symbol>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("symbols", "symbol_id", keyword);
+}
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<Package>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("packages", "package_id", keyword);
+}
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<Component>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("components", "component_id", keyword);
+}
+
+template <>
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword<Device>(
+    const QString& keyword) const {
+  return getElementsBySearchKeyword("devices", "device_id", keyword);
 }
 
 /*******************************************************************************
@@ -195,6 +280,14 @@ QList<FilePath> WorkspaceLibraryDb::getLibraryElements<Device>(
 /*******************************************************************************
  *  Getters: Element Metadata
  ******************************************************************************/
+
+template <>
+void WorkspaceLibraryDb::getElementTranslations<Library>(
+    const FilePath& elemDir, const QStringList& localeOrder, QString* name,
+    QString* desc, QString* keywords) const {
+  getElementTranslations("libraries", "lib_id", elemDir, localeOrder, name,
+                         desc, keywords);
+}
 
 template <>
 void WorkspaceLibraryDb::getElementTranslations<ComponentCategory>(
@@ -244,10 +337,77 @@ void WorkspaceLibraryDb::getElementTranslations<Device>(
                          desc, keywords);
 }
 
-void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
-                                           Uuid*           pkgUuid) const {
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Library>(const FilePath elemDir,
+                                                     Uuid*          uuid,
+                                                     Version* version) const {
+  return getElementMetadata("libraries", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<ComponentCategory>(
+    const FilePath elemDir, Uuid* uuid, Version* version) const {
+  return getElementMetadata("component_categories", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<PackageCategory>(
+    const FilePath elemDir, Uuid* uuid, Version* version) const {
+  return getElementMetadata("package_categories", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Symbol>(const FilePath elemDir,
+                                                    Uuid*          uuid,
+                                                    Version* version) const {
+  return getElementMetadata("symbols", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Package>(const FilePath elemDir,
+                                                     Uuid*          uuid,
+                                                     Version* version) const {
+  return getElementMetadata("packages", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Component>(const FilePath elemDir,
+                                                       Uuid*          uuid,
+                                                       Version* version) const {
+  return getElementMetadata("components", elemDir, uuid, version);
+}
+
+template <>
+void WorkspaceLibraryDb::getElementMetadata<Device>(const FilePath elemDir,
+                                                    Uuid*          uuid,
+                                                    Version* version) const {
+  return getElementMetadata("devices", elemDir, uuid, version);
+}
+
+void WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
+                                            QPixmap*       icon) const {
   QSqlQuery query = mDb->prepareQuery(
-      "SELECT package_uuid FROM devices WHERE filepath = :filepath");
+      "SELECT icon_png FROM libraries WHERE filepath = :filepath");
+  query.bindValue(":filepath",
+                  libDir.toRelative(mWorkspace.getLibrariesPath()));
+  mDb->exec(query);
+
+  if (query.first()) {
+    QByteArray blob = query.value(0).toByteArray();
+    if (icon) icon->loadFromData(blob, "png");
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("Library not found in workspace library: \"%1\""))
+            .arg(libDir.toNative()));
+  }
+}
+
+void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
+                                           Uuid* pkgUuid, Uuid* cmpUuid) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT package_uuid, component_uuid "
+      "FROM devices WHERE filepath = :filepath");
   query.bindValue(":filepath",
                   devDir.toRelative(mWorkspace.getLibrariesPath()));
   mDb->exec(query);
@@ -255,6 +415,8 @@ void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
   if (query.first()) {
     Uuid uuid = Uuid::fromString(query.value(0).toString());  // can throw
     if (pkgUuid) *pkgUuid = uuid;
+    uuid = Uuid::fromString(query.value(1).toString());  // can throw
+    if (cmpUuid) *cmpUuid = uuid;
   } else {
     throw RuntimeError(
         __FILE__, __LINE__,
@@ -285,6 +447,34 @@ QList<Uuid> WorkspaceLibraryDb::getComponentCategoryParents(
 QList<Uuid> WorkspaceLibraryDb::getPackageCategoryParents(
     const Uuid& category) const {
   return getCategoryParents("package_categories", category);
+}
+
+void WorkspaceLibraryDb::getComponentCategoryElementCount(
+    const tl::optional<Uuid>& category, int* categories, int* symbols,
+    int* components, int* devices) const {
+  if (categories) {
+    *categories = getCategoryChildCount("component_categories", category);
+  }
+  if (symbols) {
+    *symbols = getCategoryElementCount("symbols", "symbol_id", category);
+  }
+  if (components) {
+    *components =
+        getCategoryElementCount("components", "component_id", category);
+  }
+  if (devices) {
+    *devices = getCategoryElementCount("devices", "device_id", category);
+  }
+}
+
+void WorkspaceLibraryDb::getPackageCategoryElementCount(
+    const tl::optional<Uuid>& category, int* categories, int* packages) const {
+  if (categories) {
+    *categories = getCategoryChildCount("package_categories", category);
+  }
+  if (packages) {
+    *packages = getCategoryElementCount("packages", "package_id", category);
+  }
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getSymbolsByCategory(
@@ -321,34 +511,12 @@ QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(
   return elements;
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getComponentsBySearchKeyword(
-    const QString& keyword) const {
-  QSqlQuery query = mDb->prepareQuery(
-      "SELECT components.uuid FROM components, components_tr, devices, "
-      "devices_tr "
-      "ON components.id=components_tr.component_id "
-      "AND devices.id=devices_tr.device_id "
-      "AND devices.component_uuid=components.uuid "
-      "WHERE components_tr.name LIKE :keyword "
-      "OR components_tr.keywords LIKE :keyword "
-      "OR devices_tr.name LIKE :keyword "
-      "OR devices_tr.keywords LIKE :keyword ");
-  query.bindValue(":keyword", "%" + keyword + "%");
-  mDb->exec(query);
-
-  QSet<Uuid> elements;
-  while (query.next()) {
-    elements.insert(Uuid::fromString(query.value(0).toString()));  // can throw
-  }
-  return elements;
-}
-
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
 void WorkspaceLibraryDb::startLibraryRescan() noexcept {
-  mLibraryScanner->start();
+  mLibraryScanner->startScan();
 }
 
 /*******************************************************************************
@@ -380,8 +548,7 @@ void WorkspaceLibraryDb::getElementTranslations(const QString&     table,
     QString locale      = query.value(0).toString();
     QString name        = query.value(1).toString();
     QString description = query.value(2).toString();
-    ;
-    QString keywords = query.value(3).toString();
+    QString keywords    = query.value(3).toString();
     if (!name.isNull()) nameMap.insert(locale, ElementName(name));  // can throw
     if (!description.isNull()) descriptionMap.insert(locale, description);
     if (!keywords.isNull()) keywordsMap.insert(locale, keywords);
@@ -390,6 +557,23 @@ void WorkspaceLibraryDb::getElementTranslations(const QString&     table,
   if (name) *name = *nameMap.value(localeOrder);
   if (desc) *desc = descriptionMap.value(localeOrder);
   if (keywords) *keywords = keywordsMap.value(localeOrder);
+}
+
+void WorkspaceLibraryDb::getElementMetadata(const QString& table,
+                                            const FilePath elemDir, Uuid* uuid,
+                                            Version* version) const {
+  QSqlQuery query = mDb->prepareQuery("SELECT uuid, version FROM " % table %
+                                      " WHERE filepath = :filepath");
+  query.bindValue(":filepath",
+                  elemDir.toRelative(mWorkspace.getLibrariesPath()));
+  mDb->exec(query);
+
+  while (query.next()) {
+    QString uuidStr    = query.value(0).toString();
+    QString versionStr = query.value(1).toString();
+    if (uuid) *uuid = Uuid::fromString(uuidStr);              // can throw
+    if (version) *version = Version::fromString(versionStr);  // can throw
+  }
 }
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getElementFilePathsFromDb(
@@ -477,6 +661,25 @@ tl::optional<Uuid> WorkspaceLibraryDb::getCategoryParent(
   }
 }
 
+int WorkspaceLibraryDb::getCategoryChildCount(
+    const QString& tablename, const tl::optional<Uuid>& category) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT COUNT(*) FROM " % tablename % " WHERE parent_uuid " %
+      (category ? "= '" % category->toStr() % "'" : QString("IS NULL")));
+  return mDb->count(query);
+}
+
+int WorkspaceLibraryDb::getCategoryElementCount(
+    const QString& tablename, const QString& idrowname,
+    const tl::optional<Uuid>& category) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT COUNT(*) FROM " % tablename % " LEFT JOIN " % tablename % "_cat" %
+      " ON " % tablename % ".id=" % tablename % "_cat." % idrowname %
+      " WHERE category_uuid " %
+      (category ? "= '" % category->toStr() % "'" : QString("IS NULL")));
+  return mDb->count(query);
+}
+
 QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(
     const QString& tablename, const QString& idrowname,
     const tl::optional<Uuid>& categoryUuid) const {
@@ -494,6 +697,26 @@ QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(
   QSet<Uuid> elements;
   while (query.next()) {
     elements.insert(Uuid::fromString(query.value(0).toString()));  // can throw
+  }
+  return elements;
+}
+
+QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword(
+    const QString& tablename, const QString& idrowname,
+    const QString& keyword) const {
+  QSqlQuery query = mDb->prepareQuery(QString("SELECT %1.uuid FROM %1, %1_tr "
+                                              "ON %1.id=%1_tr.%2 "
+                                              "WHERE %1_tr.name LIKE :keyword "
+                                              "OR %1_tr.keywords LIKE :keyword "
+                                              "ORDER BY %1_tr.name ASC ")
+                                          .arg(tablename, idrowname));
+  query.bindValue(":keyword", "%" + keyword + "%");
+  mDb->exec(query);
+
+  QList<Uuid> elements;
+  elements.reserve(query.size());
+  while (query.next()) {
+    elements.append(Uuid::fromString(query.value(0).toString()));  // can throw
   }
   return elements;
 }
@@ -562,12 +785,14 @@ void WorkspaceLibraryDb::createAllTables() {
       "`id` INTEGER PRIMARY KEY NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL "
+      "`version` TEXT NOT NULL, "
+      "`icon_png` BLOB "
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS libraries_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER REFERENCES libraries(id) NOT NULL, "
+      "`lib_id` INTEGER "
+      "REFERENCES libraries(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -588,7 +813,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS component_categories_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`cat_id` INTEGER REFERENCES component_categories(id) NOT NULL, "
+      "`cat_id` INTEGER "
+      "REFERENCES component_categories(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -609,7 +835,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS package_categories_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`cat_id` INTEGER REFERENCES package_categories(id) NOT NULL, "
+      "`cat_id` INTEGER "
+      "REFERENCES package_categories(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -629,7 +856,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS symbols_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
+      "`symbol_id` INTEGER "
+      "REFERENCES symbols(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -639,7 +867,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS symbols_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`symbol_id` INTEGER REFERENCES symbols(id) NOT NULL, "
+      "`symbol_id` INTEGER "
+      "REFERENCES symbols(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(symbol_id, category_uuid)"
       ")");
@@ -656,7 +885,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS packages_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
+      "`package_id` INTEGER "
+      "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -666,7 +896,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS packages_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`package_id` INTEGER REFERENCES packages(id) NOT NULL, "
+      "`package_id` INTEGER "
+      "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(package_id, category_uuid)"
       ")");
@@ -683,7 +914,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS components_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
+      "`component_id` INTEGER "
+      "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -693,7 +925,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS components_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`component_id` INTEGER REFERENCES components(id) NOT NULL, "
+      "`component_id` INTEGER "
+      "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(component_id, category_uuid)"
       ")");
@@ -712,7 +945,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS devices_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`device_id` INTEGER REFERENCES devices(id) NOT NULL, "
+      "`device_id` INTEGER "
+      "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
@@ -722,7 +956,8 @@ void WorkspaceLibraryDb::createAllTables() {
   queries << QString(
       "CREATE TABLE IF NOT EXISTS devices_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`device_id` INTEGER REFERENCES devices(id) NOT NULL, "
+      "`device_id` INTEGER "
+      "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(device_id, category_uuid)"
       ")");

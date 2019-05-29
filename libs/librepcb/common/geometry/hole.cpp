@@ -34,7 +34,10 @@ namespace librepcb {
  ******************************************************************************/
 
 Hole::Hole(const Hole& other) noexcept
-  : mUuid(other.mUuid), mPosition(other.mPosition), mDiameter(other.mDiameter) {
+  : onEdited(*this),
+    mUuid(other.mUuid),
+    mPosition(other.mPosition),
+    mDiameter(other.mDiameter) {
 }
 
 Hole::Hole(const Uuid& uuid, const Hole& other) noexcept : Hole(other) {
@@ -43,66 +46,46 @@ Hole::Hole(const Uuid& uuid, const Hole& other) noexcept : Hole(other) {
 
 Hole::Hole(const Uuid& uuid, const Point& position,
            const PositiveLength& diameter) noexcept
-  : mUuid(uuid), mPosition(position), mDiameter(diameter) {
+  : onEdited(*this), mUuid(uuid), mPosition(position), mDiameter(diameter) {
 }
 
 Hole::Hole(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
-    mPosition(0, 0),
-    mDiameter(1) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("diameter")) {
-    mDiameter = node.getValueByPath<PositiveLength>("diameter");
-  } else {
-    // backward compatibility, remove this some time!
-    mDiameter = node.getValueByPath<PositiveLength>("dia");
-  }
-  if (node.getChildByIndex(0).isString()) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-  }
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mPosition(node.getChildByPath("position")),
+    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
 }
 
 Hole::~Hole() noexcept {
-  Q_ASSERT(mObservers.isEmpty());
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void Hole::setPosition(const Point& position) noexcept {
-  if (position == mPosition) return;
-  mPosition = position;
-  foreach (IF_HoleObserver* object, mObservers) {
-    object->holePositionChanged(mPosition);
+bool Hole::setPosition(const Point& position) noexcept {
+  if (position == mPosition) {
+    return false;
   }
+
+  mPosition = position;
+  onEdited.notify(Event::PositionChanged);
+  return true;
 }
 
-void Hole::setDiameter(const PositiveLength& diameter) noexcept {
-  if (diameter == mDiameter) return;
-  mDiameter = diameter;
-  foreach (IF_HoleObserver* object, mObservers) {
-    object->holeDiameterChanged(mDiameter);
+bool Hole::setDiameter(const PositiveLength& diameter) noexcept {
+  if (diameter == mDiameter) {
+    return false;
   }
+
+  mDiameter = diameter;
+  onEdited.notify(Event::DiameterChanged);
+  return true;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void Hole::registerObserver(IF_HoleObserver& object) const noexcept {
-  mObservers.insert(&object);
-}
-
-void Hole::unregisterObserver(IF_HoleObserver& object) const noexcept {
-  mObservers.remove(&object);
-}
 
 void Hole::serialize(SExpression& root) const {
   root.appendChild(mUuid);
@@ -122,9 +105,12 @@ bool Hole::operator==(const Hole& rhs) const noexcept {
 }
 
 Hole& Hole::operator=(const Hole& rhs) noexcept {
-  mUuid     = rhs.mUuid;
-  mPosition = rhs.mPosition;
-  mDiameter = rhs.mDiameter;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setPosition(rhs.mPosition);
+  setDiameter(mDiameter = rhs.mDiameter);
   return *this;
 }
 

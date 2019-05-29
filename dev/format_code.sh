@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
 # Formats files according our coding style with clang-format. And if Python is
 # available, *.pro project files will be sorted with sort_qmake_file_entries.py.
@@ -11,6 +11,8 @@ set -eo pipefail
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, don't use it!
 
+DOCKER=""
+ALL=""
 for i in "$@"
 do
 case $i in
@@ -34,13 +36,11 @@ if [ "$DOCKER" == "--docker" ]; then
 
   if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building clang-format container..."
-    cd "$REPO_ROOT/dev/clang-format"
-    docker build . -t librepcb/clang-format:6
-    cd -
+    docker build "$REPO_ROOT/dev/clang-format" -t librepcb/clang-format:6
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
-  docker run --rm -t -i --user $(id -u):$(id -g) \
+  docker run --rm -t -i --user "$(id -u):$(id -g)" \
     -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
     /bin/bash -c "cd /code && dev/format_code.sh $ALL"
@@ -54,26 +54,28 @@ COUNTER=0
 for dir in apps/ libs/librepcb/ tests/unittests/
 do
   if [ "$ALL" == "--all" ]; then
-    TRACKED=`git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+    TRACKED=$(git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   else
     # Only files which differ from the master branch
-    TRACKED=`git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+    TRACKED=$(git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   fi
-  UNTRACKED=`git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"`
+  UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   for file in $TRACKED $UNTRACKED
   do
-    # Note: Do NOT use in-place edition of clang-format because this causes
-    # "make" to detect the files as changed every time, even if the content was
-    # not modified! So we only overwrite the files if their content has changed.
-    OLD_CONTENT=`cat "$file"`
-    NEW_CONTENT=`clang-format -style=file "$file"`
-    if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
-    then
-        printf "%s\n" "$NEW_CONTENT" > "$file"
-        echo "[M] $file"
-        COUNTER=$((COUNTER+1))
-    else
-        echo "[ ] $file"
+    if [ -f "$file" ]; then
+      # Note: Do NOT use in-place edition of clang-format because this causes
+      # "make" to detect the files as changed every time, even if the content was
+      # not modified! So we only overwrite the files if their content has changed.
+      OLD_CONTENT=$(cat "$file")
+      NEW_CONTENT=$(clang-format -style=file "$file")
+      if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
+      then
+          printf "%s\n" "$NEW_CONTENT" > "$file"
+          echo "[M] $file"
+          COUNTER=$((COUNTER+1))
+      else
+          echo "[ ] $file"
+      fi
     fi
   done
 done

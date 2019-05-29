@@ -42,9 +42,6 @@ namespace editor {
 
 /**
  * @brief The CmdRemoveSelectedSymbolItems class
- *
- * @author  ubruhin
- * @date    2016-11-05
  */
 class CmdRemoveSelectedSymbolItems final : public UndoCommandGroup {
 public:

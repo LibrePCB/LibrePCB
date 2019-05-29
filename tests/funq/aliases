@@ -14,6 +14,7 @@ controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibrarie
 
 # Status bar at bottom
 controlPanelStatusBar = {controlPanel}::statusBar
+controlPanelStatusBarWorkspaceLabel = {controlPanelStatusBar}::QLabel-2
 controlPanelStatusBarProgressBar = {controlPanelStatusBar}::QProgressBar
 
 # Buttons in the top right frame
@@ -74,6 +75,12 @@ libraryManagerCreateLocalLibraryCc0LicenseCheckbox = {libraryManagerCreateLocalL
 libraryManagerCreateLocalLibraryDirectoryEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalDirectory
 libraryManagerCreateLocalLibraryCreateButton = {libraryManagerCreateLocalLibraryTab}::btnLocalCreate
 
+# Download library tab
+libraryManagerDownloadManuallyTab = {libraryManagerAddLibraryStackedWidget}::tabDownloadManually
+libraryManagerDownloadManuallyUrlEdit = {libraryManagerDownloadManuallyTab}::edtDownloadZipUrl
+libraryManagerDownloadManuallyDirectoryEdit = {libraryManagerDownloadManuallyTab}::edtDownloadZipDirectory
+libraryManagerDownloadManuallyDownloadButton = {libraryManagerDownloadManuallyTab}::btnDownloadZip
+
 # Library info widget
 libraryManagerLibraryInfoWidget = {libraryManagerWidget}::librepcb__library__manager__LibraryInfoWidget
 libraryManagerLibraryInfoWidgetOpenEditorButton = {libraryManagerLibraryInfoWidget}::btnOpenLibraryEditor
@@ -89,9 +96,11 @@ libraryEditorWidget = {libraryEditor}::centralWidget
 
 # Actions
 libraryEditorActionNewElement = {libraryEditor}::actionNew
+libraryEditorActionRemove = {libraryEditor}::actionRemove
 
 # Tab widget
 libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
+libraryEditorTabBar = {libraryEditorTabWidget}::qt_tabwidget_tabbar
 libraryEditorStackedWidget = {libraryEditorTabWidget}::qt_tabwidget_stackedwidget
 
 # Library overview widget
@@ -104,6 +113,69 @@ libraryEditorOverviewAuthorEdit = {libraryEditorOverviewMetadataWidget}::edtAuth
 libraryEditorOverviewVersionEdit = {libraryEditorOverviewMetadataWidget}::edtVersion
 libraryEditorOverviewDeprecatedCheckbox = {libraryEditorOverviewMetadataWidget}::cbxDeprecated
 libraryEditorOverviewUrlEdit = {libraryEditorOverviewMetadataWidget}::edtUrl
+libraryEditorOverviewCmpCatList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_2::lstCmpCat
+libraryEditorOverviewPkgCatList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_3::lstPkgCat
+libraryEditorOverviewSymList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_4::lstSym
+libraryEditorOverviewPkgList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_7::lstPkg
+libraryEditorOverviewCmpList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_5::lstCmp
+libraryEditorOverviewDevList = {libraryEditorOverviewWidget}::splitter::gridLayoutWidget::groupBox_6::lstDev
+libraryEditorOverviewMsgBox = {libraryEditorOverviewWidget}::QMessageBox
+libraryEditorOverviewMsgBoxBtnYes = {libraryEditorOverviewMsgBox}::qt_msgbox_buttonbox::QPushButton
+libraryEditorOverviewMsgBoxBtnCancel = {libraryEditorOverviewMsgBox}::qt_msgbox_buttonbox::QPushButton-1
+
+# Component category editor widget
+libraryEditorCmpCatWidget = {libraryEditorStackedWidget}::librepcb__library__editor__ComponentCategoryEditorWidget
+libraryEditorCmpCatNameEdit = {libraryEditorCmpCatWidget}::edtName
+libraryEditorCmpCatDescriptionEdit = {libraryEditorCmpCatWidget}::edtDescription
+libraryEditorCmpCatKeywordsEdit = {libraryEditorCmpCatWidget}::edtKeywords
+libraryEditorCmpCatAuthorEdit = {libraryEditorCmpCatWidget}::edtAuthor
+libraryEditorCmpCatVersionEdit = {libraryEditorCmpCatWidget}::edtVersion
+libraryEditorCmpCatDeprecatedCheckbox = {libraryEditorCmpCatWidget}::cbxDeprecated
+
+# Package category editor widget
+libraryEditorPkgCatWidget = {libraryEditorStackedWidget}::librepcb__library__editor__PackageCategoryEditorWidget
+libraryEditorPkgCatNameEdit = {libraryEditorPkgCatWidget}::edtName
+libraryEditorPkgCatDescriptionEdit = {libraryEditorPkgCatWidget}::edtDescription
+libraryEditorPkgCatKeywordsEdit = {libraryEditorPkgCatWidget}::edtKeywords
+libraryEditorPkgCatAuthorEdit = {libraryEditorPkgCatWidget}::edtAuthor
+libraryEditorPkgCatVersionEdit = {libraryEditorPkgCatWidget}::edtVersion
+libraryEditorPkgCatDeprecatedCheckbox = {libraryEditorPkgCatWidget}::cbxDeprecated
+
+# Symbol editor widget
+libraryEditorSymbolWidget = {libraryEditorStackedWidget}::librepcb__library__editor__SymbolEditorWidget
+libraryEditorSymbolNameEdit = {libraryEditorSymbolWidget}::edtName
+libraryEditorSymbolDescriptionEdit = {libraryEditorSymbolWidget}::edtDescription
+libraryEditorSymbolKeywordsEdit = {libraryEditorSymbolWidget}::edtKeywords
+libraryEditorSymbolAuthorEdit = {libraryEditorSymbolWidget}::edtAuthor
+libraryEditorSymbolVersionEdit = {libraryEditorSymbolWidget}::edtVersion
+libraryEditorSymbolDeprecatedCheckbox = {libraryEditorSymbolWidget}::cbxDeprecated
+
+# Package editor widget
+libraryEditorPackageWidget = {libraryEditorStackedWidget}::librepcb__library__editor__PackageEditorWidget
+libraryEditorPackageNameEdit = {libraryEditorPackageWidget}::edtName
+libraryEditorPackageDescriptionEdit = {libraryEditorPackageWidget}::edtDescription
+libraryEditorPackageKeywordsEdit = {libraryEditorPackageWidget}::edtKeywords
+libraryEditorPackageAuthorEdit = {libraryEditorPackageWidget}::edtAuthor
+libraryEditorPackageVersionEdit = {libraryEditorPackageWidget}::edtVersion
+libraryEditorPackageDeprecatedCheckbox = {libraryEditorPackageWidget}::cbxDeprecated
+
+# Component editor widget
+libraryEditorComponentWidget = {libraryEditorStackedWidget}::librepcb__library__editor__ComponentEditorWidget
+libraryEditorComponentNameEdit = {libraryEditorComponentWidget}::edtName
+libraryEditorComponentDescriptionEdit = {libraryEditorComponentWidget}::edtDescription
+libraryEditorComponentKeywordsEdit = {libraryEditorComponentWidget}::edtKeywords
+libraryEditorComponentAuthorEdit = {libraryEditorComponentWidget}::edtAuthor
+libraryEditorComponentVersionEdit = {libraryEditorComponentWidget}::edtVersion
+libraryEditorComponentDeprecatedCheckbox = {libraryEditorComponentWidget}::cbxDeprecated
+
+# Device editor widget
+libraryEditorDeviceWidget = {libraryEditorStackedWidget}::librepcb__library__editor__DeviceEditorWidget
+libraryEditorDeviceNameEdit = {libraryEditorDeviceWidget}::edtName
+libraryEditorDeviceDescriptionEdit = {libraryEditorDeviceWidget}::edtDescription
+libraryEditorDeviceKeywordsEdit = {libraryEditorDeviceWidget}::edtKeywords
+libraryEditorDeviceAuthorEdit = {libraryEditorDeviceWidget}::edtAuthor
+libraryEditorDeviceVersionEdit = {libraryEditorDeviceWidget}::edtVersion
+libraryEditorDeviceDeprecatedCheckbox = {libraryEditorDeviceWidget}::cbxDeprecated
 
 # New element wizard
 libraryEditorNewElementWizard = librepcb__library__editor__NewElementWizard

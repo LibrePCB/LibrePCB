@@ -26,6 +26,7 @@
 #include "../common/packagechooserdialog.h"
 #include "ui_newelementwizardpage_deviceproperties.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/pkg/package.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/workspace.h>
@@ -123,8 +124,10 @@ void NewElementWizardPage_DeviceProperties::setPackage(
   if (uuid) {
     try {
       FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestPackage(
-          *uuid);                 // can throw
-      Package package(fp, true);  // can throw
+          *uuid);  // can throw
+      Package package(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(fp))));  // can throw
       DevicePadSignalMapHelpers::setPads(mContext.mDevicePadSignalMap,
                                          package.getPads().getUuidSet());
       mUi->lblPackageName->setText(

@@ -74,7 +74,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mProject(project),
     mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr),
-    mActiveBoardIndex(-1),
+    mActiveBoard(nullptr),
     mBoardListActionGroup(this),
     mErcMsgDock(nullptr),
     mUnplacedComponentsDock(nullptr),
@@ -82,11 +82,13 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mFsm(nullptr) {
   mUi->setupUi(this);
   mUi->lblUnplacedComponentsNote->hide();
-  mUi->actionProjectSave->setEnabled(!mProject.isReadOnly());
+  mUi->actionProjectSave->setEnabled(mProject.getDirectory().isWritable());
 
   // set window title
   QString filenameStr = mProject.getFilepath().getFilename();
-  if (mProject.isReadOnly()) filenameStr.append(QStringLiteral(" [Read-Only]"));
+  if (!mProject.getDirectory().isWritable()) {
+    filenameStr.append(QStringLiteral(" [Read-Only]"));
+  }
   setWindowTitle(QString("%1 - LibrePCB Board Editor").arg(filenameStr));
 
   // Add Dock Widgets
@@ -151,6 +153,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           [this]() { mProjectEditor.execNetClassesEditorDialog(this); });
   connect(mUi->actionProjectSettings, &QAction::triggered,
           [this]() { mProjectEditor.execProjectSettingsDialog(this); });
+  connect(mUi->actionExportLppz, &QAction::triggered,
+          [this]() { mProjectEditor.execLppzExportDialog(this); });
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(
@@ -221,12 +225,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanStarted, mUi->statusbar,
-          &StatusBar::showProgressBar, Qt::QueuedConnection);
-  connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, mUi->statusbar,
-          &StatusBar::hideProgressBar, Qt::QueuedConnection);
-  connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
   connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
@@ -273,59 +271,45 @@ BoardEditor::~BoardEditor() {
 }
 
 /*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-Board* BoardEditor::getActiveBoard() const noexcept {
-  return mProject.getBoardByIndex(mActiveBoardIndex);
-}
-
-/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-bool BoardEditor::setActiveBoardIndex(int index) noexcept {
-  if (index == mActiveBoardIndex) return true;
+void BoardEditor::setActiveBoardIndex(int index) noexcept {
+  Board* newBoard = mProject.getBoardByIndex(index);
 
-  Board* board = getActiveBoard();
-  if (board) {
-    // stop airwire rebuild on every project modification (for performance
-    // reasons)
-    disconnect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified, board,
-               &Board::triggerAirWiresRebuild);
-    // save current view scene rect
-    board->saveViewSceneRect(mGraphicsView->getVisibleSceneRect());
-    // uncheck QAction
-    QAction* action = mBoardListActions.value(mActiveBoardIndex);
-    Q_ASSERT(action);
-    if (action) action->setChecked(false);
-  }
-  board = mProject.getBoardByIndex(index);
-  if (board) {
-    // show scene, restore view scene rect, set grid properties
-    board->showInView(*mGraphicsView);
-    mGraphicsView->setVisibleSceneRect(board->restoreViewSceneRect());
-    mGraphicsView->setGridProperties(board->getGridProperties());
-    // force airwire rebuild immediately and on every project modification
-    board->triggerAirWiresRebuild();
-    connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified, board,
-            &Board::triggerAirWiresRebuild);
-    // check QAction
-    QAction* action = mBoardListActions.value(index);
-    Q_ASSERT(action);
-    if (action) action->setChecked(true);
-  } else {
-    mGraphicsView->setScene(nullptr);
+  if (newBoard != mActiveBoard) {
+    if (mActiveBoard) {
+      // stop airwire rebuild on every project modification (for performance
+      // reasons)
+      disconnect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
+                 mActiveBoard.data(), &Board::triggerAirWiresRebuild);
+      // save current view scene rect
+      mActiveBoard->saveViewSceneRect(mGraphicsView->getVisibleSceneRect());
+    }
+    mActiveBoard = newBoard;
+    if (mActiveBoard) {
+      // show scene, restore view scene rect, set grid properties
+      mActiveBoard->showInView(*mGraphicsView);
+      mGraphicsView->setVisibleSceneRect(mActiveBoard->restoreViewSceneRect());
+      mGraphicsView->setGridProperties(mActiveBoard->getGridProperties());
+      // force airwire rebuild immediately and on every project modification
+      mActiveBoard->triggerAirWiresRebuild();
+      connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
+              mActiveBoard.data(), &Board::triggerAirWiresRebuild);
+    } else {
+      mGraphicsView->setScene(nullptr);
+    }
+
+    // update dock widgets
+    mUnplacedComponentsDock->setBoard(mActiveBoard);
+    mBoardLayersDock->setActiveBoard(mActiveBoard);
   }
 
-  // active board has changed!
-  int oldIndex      = mActiveBoardIndex;
-  mActiveBoardIndex = index;
-  mUnplacedComponentsDock->setBoard(board);
-  mBoardLayersDock->setActiveBoard(board);
+  // update GUI
   mUi->tabBar->setCurrentIndex(index);
-  emit activeBoardChanged(oldIndex, index);
-  return true;
+  for (int i = 0; i < mBoardListActions.count(); ++i) {
+    mBoardListActions.at(i)->setChecked(i == index);
+  }
 }
 
 /*******************************************************************************
@@ -360,8 +344,7 @@ void BoardEditor::boardAdded(int newIndex) {
   if (!board) return;
 
   QAction* actionBefore = mBoardListActions.value(newIndex - 1);
-  // if (!actionBefore) actionBefore = TODO
-  QAction* newAction = new QAction(*board->getName(), this);
+  QAction* newAction    = new QAction(*board->getName(), this);
   newAction->setCheckable(true);
   mUi->menuBoard->insertAction(actionBefore, newAction);
   mBoardListActions.insert(newIndex, newAction);
@@ -371,17 +354,12 @@ void BoardEditor::boardAdded(int newIndex) {
 }
 
 void BoardEditor::boardRemoved(int oldIndex) {
-  mUi->tabBar->removeTab(oldIndex);
   QAction* action = mBoardListActions.takeAt(oldIndex);
   Q_ASSERT(action);
   mBoardListActionGroup.removeAction(action);
   delete action;
 
-  if (oldIndex == mActiveBoardIndex) {
-    setActiveBoardIndex(0);
-  } else if (oldIndex < mActiveBoardIndex) {
-    mActiveBoardIndex--;
-  }
+  mUi->tabBar->removeTab(oldIndex);  // calls setActiveBoardIndex() if needed
 }
 
 /*******************************************************************************

@@ -68,7 +68,14 @@ public:
   explicit WorkspaceLibraryDb(Workspace& ws);
   ~WorkspaceLibraryDb() noexcept;
 
+  // Getters: Attributes
+  const FilePath& getFilePath() const noexcept { return mFilePath; }
+
+  // Getters: Libraries
+  QMultiMap<Version, FilePath> getLibraries() const;
+
   // Getters: Library Elements by their UUID
+  QMultiMap<Version, FilePath> getLibraries(const Uuid& uuid) const;
   QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const;
   QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const;
   QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const;
@@ -77,12 +84,17 @@ public:
   QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const;
 
   // Getters: Best Match Library Elements by their UUID
+  FilePath getLatestLibrary(const Uuid& uuid) const;
   FilePath getLatestComponentCategory(const Uuid& uuid) const;
   FilePath getLatestPackageCategory(const Uuid& uuid) const;
   FilePath getLatestSymbol(const Uuid& uuid) const;
   FilePath getLatestPackage(const Uuid& uuid) const;
   FilePath getLatestComponent(const Uuid& uuid) const;
   FilePath getLatestDevice(const Uuid& uuid) const;
+
+  // Getters: Library elements by search keyword
+  template <typename ElementType>
+  QList<Uuid> getElementsBySearchKeyword(const QString& keyword) const;
 
   // Getters: Library elements of a specified library
   template <typename ElementType>
@@ -94,19 +106,28 @@ public:
                               const QStringList& localeOrder,
                               QString* name = nullptr, QString* desc = nullptr,
                               QString* keywords = nullptr) const;
-  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr) const;
+  template <typename ElementType>
+  void getElementMetadata(const FilePath elemDir, Uuid* uuid = nullptr,
+                          Version* version = nullptr) const;
+  void getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr) const;
+  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr,
+                         Uuid* cmpUuid = nullptr) const;
 
   // Getters: Special
   QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;
   QSet<Uuid> getPackageCategoryChilds(const tl::optional<Uuid>& parent) const;
   QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
   QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
-  QSet<Uuid>  getSymbolsByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getPackagesByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getComponentsByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getDevicesByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid>  getDevicesOfComponent(const Uuid& component) const;
-  QSet<Uuid>  getComponentsBySearchKeyword(const QString& keyword) const;
+  void getComponentCategoryElementCount(const tl::optional<Uuid>& category,
+                                        int* categories, int* symbols,
+                                        int* components, int* devices) const;
+  void getPackageCategoryElementCount(const tl::optional<Uuid>& category,
+                                      int* categories, int* packages) const;
+  QSet<Uuid> getSymbolsByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getPackagesByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getComponentsByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getDevicesByCategory(const tl::optional<Uuid>& category) const;
+  QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
 
   // General Methods
 
@@ -121,9 +142,11 @@ public:
 signals:
 
   void scanStarted();
+  void scanLibraryListUpdated(int libraryCount);
   void scanProgressUpdate(int percent);
   void scanSucceeded(int elementCount);
   void scanFailed(QString errorMsg);
+  void scanFinished();
 
 private:
   // Private Methods
@@ -131,6 +154,8 @@ private:
                               const FilePath&    elemDir,
                               const QStringList& localeOrder, QString* name,
                               QString* desc, QString* keywords) const;
+  void getElementMetadata(const QString& table, const FilePath elemDir,
+                          Uuid* uuid, Version* version) const;
   QMultiMap<Version, FilePath> getElementFilePathsFromDb(
       const QString& tablename, const Uuid& uuid) const;
   FilePath getLatestVersionFilePath(
@@ -141,9 +166,17 @@ private:
                                         const Uuid&    category) const;
   tl::optional<Uuid> getCategoryParent(const QString& tablename,
                                        const Uuid&    category) const;
+  int                getCategoryChildCount(const QString&            tablename,
+                                           const tl::optional<Uuid>& category) const;
+  int                getCategoryElementCount(const QString&            tablename,
+                                             const QString&            idrowname,
+                                             const tl::optional<Uuid>& category) const;
   QSet<Uuid>         getElementsByCategory(
               const QString& tablename, const QString& idrowname,
               const tl::optional<Uuid>& categoryUuid) const;
+  QList<Uuid>     getElementsBySearchKeyword(const QString& tablename,
+                                             const QString& idrowname,
+                                             const QString& keyword) const;
   int             getLibraryId(const FilePath& lib) const;
   QList<FilePath> getLibraryElements(const FilePath& lib,
                                      const QString&  tablename) const;
@@ -153,11 +186,12 @@ private:
 
   // Attributes
   Workspace&                     mWorkspace;
-  QScopedPointer<SQLiteDatabase> mDb;  ///< the SQLite database "cache.sqlite"
+  FilePath                       mFilePath;  ///< path to the SQLite database
+  QScopedPointer<SQLiteDatabase> mDb;        ///< the SQLite database
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants
-  static const int sCurrentDbVersion = 1;
+  static const int sCurrentDbVersion = 2;
 };
 
 /*******************************************************************************

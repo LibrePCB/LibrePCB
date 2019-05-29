@@ -45,10 +45,10 @@ PackageCategory::PackageCategory(const Uuid& uuid, const Version& version,
                     author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-PackageCategory::PackageCategory(const FilePath& elementDirectory,
-                                 bool            readOnly)
-  : LibraryCategory(elementDirectory, getShortElementName(),
-                    getLongElementName(), readOnly) {
+PackageCategory::PackageCategory(
+    std::unique_ptr<TransactionalDirectory> directory)
+  : LibraryCategory(std::move(directory), getShortElementName(),
+                    getLongElementName()) {
   cleanupAfterLoadingElementFromFile();
 }
 

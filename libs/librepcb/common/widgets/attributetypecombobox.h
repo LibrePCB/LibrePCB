@@ -39,9 +39,6 @@ class AttributeType;
 
 /**
  * @brief The AttributeTypeComboBox class
- *
- * @author ubruhin
- * @date 2017-03-10
  */
 class AttributeTypeComboBox final : public QWidget {
   Q_OBJECT

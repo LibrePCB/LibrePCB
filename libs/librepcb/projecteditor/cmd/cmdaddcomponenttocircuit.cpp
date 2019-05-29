@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdaddcomponenttocircuit.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/project/circuit/cmd/cmdcomponentinstanceadd.h>
 #include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
@@ -85,7 +86,9 @@ bool CmdAddComponentToCircuit::performExecute() {
                      "workspace library!"))
               .arg(mComponentUuid.toStr()));
     }
-    library::Component* cmp = new library::Component(cmpFp, true);
+    library::Component* cmp = new library::Component(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(cmpFp))));
     CmdProjectLibraryAddElement<library::Component>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<library::Component>(
             mProject.getLibrary(), *cmp);

@@ -40,7 +40,10 @@ namespace librepcb {
 TextGraphicsItem::TextGraphicsItem(Text&                           text,
                                    const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept
-  : PrimitiveTextGraphicsItem(parent), mText(text), mLayerProvider(lp) {
+  : PrimitiveTextGraphicsItem(parent),
+    mText(text),
+    mLayerProvider(lp),
+    mOnEditedSlot(*this, &TextGraphicsItem::textEdited) {
   setFont(TextGraphicsItem::Font::SansSerif);
   setPosition(mText.getPosition());
   setRotation(mText.getRotation());
@@ -58,41 +61,41 @@ TextGraphicsItem::TextGraphicsItem(Text&                           text,
       mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences));  // TODO
 
   // register to the text to get attribute updates
-  mText.registerObserver(*this);
+  mText.onEdited.attach(mOnEditedSlot);
 }
 
 TextGraphicsItem::~TextGraphicsItem() noexcept {
-  mText.unregisterObserver(*this);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void TextGraphicsItem::textLayerNameChanged(
-    const GraphicsLayerName& newLayerName) noexcept {
-  setLayer(mLayerProvider.getLayer(*newLayerName));
-}
-
-void TextGraphicsItem::textTextChanged(const QString& newText) noexcept {
-  setText(newText);
-}
-
-void TextGraphicsItem::textPositionChanged(const Point& newPos) noexcept {
-  setPosition(newPos);
-}
-
-void TextGraphicsItem::textRotationChanged(const Angle& newRot) noexcept {
-  setRotation(newRot);
-}
-
-void TextGraphicsItem::textHeightChanged(
-    const PositiveLength& newHeight) noexcept {
-  setHeight(newHeight);
-}
-
-void TextGraphicsItem::textAlignChanged(const Alignment& newAlign) noexcept {
-  setAlignment(newAlign);
+void TextGraphicsItem::textEdited(const Text& text,
+                                  Text::Event event) noexcept {
+  switch (event) {
+    case Text::Event::LayerNameChanged:
+      setLayer(mLayerProvider.getLayer(*text.getLayerName()));
+      break;
+    case Text::Event::TextChanged:
+      setText(text.getText());
+      break;
+    case Text::Event::PositionChanged:
+      setPosition(text.getPosition());
+      break;
+    case Text::Event::RotationChanged:
+      setRotation(text.getRotation());
+      break;
+    case Text::Event::HeightChanged:
+      setHeight(text.getHeight());
+      break;
+    case Text::Event::AlignChanged:
+      setAlignment(text.getAlign());
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in TextGraphicsItem::textEdited()";
+      break;
+  }
 }
 
 /*******************************************************************************

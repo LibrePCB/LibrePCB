@@ -55,9 +55,9 @@ public:
                  const ElementName& name_en_US,
                  const QString&     description_en_US,
                  const QString&     keywords_en_US);
-  LibraryElement(const FilePath& elementDirectory,
-                 const QString&  shortElementName,
-                 const QString& longElementName, bool readOnly);
+  LibraryElement(std::unique_ptr<TransactionalDirectory> directory,
+                 const QString&                          shortElementName,
+                 const QString&                          longElementName);
   virtual ~LibraryElement() noexcept;
 
   // Getters: Attributes

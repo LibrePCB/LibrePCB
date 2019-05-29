@@ -38,7 +38,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SmartSExprFile;
+class TransactionalDirectory;
 
 namespace library {
 class Component;
@@ -68,9 +68,6 @@ class ComponentInstance;
  *  - All net classes (project#NetClass objects)
  *  - All net signals (project#NetSignal objects)
  *  - All component instances (project#ComponentInstance objects)
- *
- * @author ubruhin
- * @date 2014-07-03
  */
 class Circuit final : public QObject, public SerializableObject {
   Q_OBJECT
@@ -79,7 +76,7 @@ public:
   // Constructors / Destructor
   Circuit()                     = delete;
   Circuit(const Circuit& other) = delete;
-  Circuit(Project& project, bool restore, bool readOnly, bool create);
+  Circuit(Project& project, bool create);
   ~Circuit() noexcept;
 
   // Getters
@@ -125,7 +122,7 @@ public:
                                 const CircuitIdentifier& newName);
 
   // General Methods
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+  void save();
 
   // Operator Overloadings
   Circuit& operator=(const Circuit& rhs) = delete;
@@ -147,10 +144,7 @@ private:
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
-
-  // File "circuit/circuit.lp"
-  FilePath        mFilepath;
-  SmartSExprFile* mFile;
+  QScopedPointer<TransactionalDirectory> mDirectory;
 
   QMap<Uuid, NetClass*>          mNetClasses;
   QMap<Uuid, NetSignal*>         mNetSignals;

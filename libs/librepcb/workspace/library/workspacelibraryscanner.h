@@ -23,9 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -33,7 +35,9 @@
 
 namespace librepcb {
 
+class Uuid;
 class SQLiteDatabase;
+class TransactionalFileSystem;
 
 namespace library {
 class Library;
@@ -53,54 +57,70 @@ class Workspace;
  * @warning Be very careful with dependencies to other objects as the #run()
  * method is executed in a separate thread! Keep the number of dependencies as
  * small as possible and consider thread synchronization and object lifetimes.
- *
- * @todo    Don't really sure that the #run() method is 100% thread save ;)
- *          Maybe it would be better to put the whole library scanning code into
- * this class instead of having references to objects from the library and
- * workspace namespaces. This way it would be easier to guarantee thread safety.
- *
- * @author ubruhin
- * @date 2016-09-06
  */
 class WorkspaceLibraryScanner final : public QThread {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit WorkspaceLibraryScanner(Workspace& ws) noexcept;
+  WorkspaceLibraryScanner(Workspace& ws, const FilePath& dbFilePath) noexcept;
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
   ~WorkspaceLibraryScanner() noexcept;
+
+  // General Methods
+  void startScan() noexcept;
 
   // Operator Overloadings
   WorkspaceLibraryScanner& operator=(const WorkspaceLibraryScanner& rhs) =
       delete;
 
 signals:
-
-  void started();
-  void progressUpdate(int percent);
-  void succeeded(int elementCount);
-  void failed(QString errorMsg);
+  void scanStarted();
+  void scanLibraryListUpdated(int libraryCount);
+  void scanProgressUpdate(int percent);
+  void scanSucceeded(int elementCount);
+  void scanFailed(QString errorMsg);
+  void scanFinished();
 
 private:  // Methods
-  void run() noexcept override;
+  void                run() noexcept override;
+  void                scan() noexcept;
+  QHash<QString, int> updateLibraries(
+      SQLiteDatabase&                                          db,
+      const QHash<QString, std::shared_ptr<library::Library>>& libs);
   void clearAllTables(SQLiteDatabase& db);
-  int  addLibraryToDb(SQLiteDatabase&                         db,
-                      const QSharedPointer<library::Library>& lib);
+  void getLibrariesOfDirectory(
+      std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
+      QHash<QString, std::shared_ptr<library::Library>>& libs) noexcept;
   template <typename ElementType>
-  int addCategoriesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
+  int addCategoriesToDb(SQLiteDatabase&                          db,
+                        std::shared_ptr<TransactionalFileSystem> fs,
+                        const QString& libPath, const QStringList& dirs,
                         const QString& table, const QString& idColumn,
                         int libId);
   template <typename ElementType>
-  int addElementsToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
+  int addElementsToDb(SQLiteDatabase&                          db,
+                      std::shared_ptr<TransactionalFileSystem> fs,
+                      const QString& libPath, const QStringList& dirs,
                       const QString& table, const QString& idColumn, int libId);
-  int addDevicesToDb(SQLiteDatabase& db, const QList<FilePath>& dirs,
-                     const QString& table, const QString& idColumn, int libId);
+  template <typename ElementType>
+  void addElementToDb(SQLiteDatabase& db, const QString& table,
+                      const QString& idColumn, int libId, const QString& path,
+                      const ElementType& element);
+  template <typename ElementType>
+  void addElementTranslationsToDb(SQLiteDatabase& db, const QString& table,
+                                  const QString& idColumn, int id,
+                                  const ElementType& element);
+  void addElementCategoriesToDb(SQLiteDatabase& db, const QString& table,
+                                const QString& idColumn, int id,
+                                const QSet<Uuid>& categories);
   template <typename T>
   static QVariant optionalToVariant(const T& opt) noexcept;
 
 private:  // Data
   Workspace&    mWorkspace;
+  FilePath      mDbFilePath;
+  QSemaphore    mSemaphore;
   volatile bool mAbort;
 };
 

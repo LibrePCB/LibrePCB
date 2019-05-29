@@ -99,11 +99,6 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
             .arg(mLibComponent->getUuid().toStr()));
   }
 
-  // backward compatibility - remove this some time!
-  mValue.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-  mValue.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                 "{{ \\1 or \\2 }}");
-
   init();
 }
 

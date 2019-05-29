@@ -24,6 +24,7 @@
 
 #include "../common/symbolchooserdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/widgets/centeredcheckbox.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
@@ -57,6 +58,7 @@ ComponentSymbolVariantItemListEditorWidget::
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_NUMBER, new QTableWidgetItem(tr("#")));
   mTable->setHorizontalHeaderItem(COLUMN_SYMBOL,
@@ -332,8 +334,13 @@ void ComponentSymbolVariantItemListEditorWidget::setTableRowContent(
   numberItem->setTextAlignment(Qt::AlignCenter);
   mTable->setItem(row, COLUMN_NUMBER, numberItem);
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // symbol
-  int      btnSize = 23;  // TODO: can we determine this value dynamically?
+  int      btnSize            = mTable->rowHeight(row);
   QWidget* symbolColumnWidget = new QWidget(this);
   symbolColumnWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                     QSizePolicy::Fixed);
@@ -444,9 +451,6 @@ void ComponentSymbolVariantItemListEditorWidget::setTableRowContent(
   }
   buttonsColumnLayout->addWidget(btnAddRemove);
   mTable->setCellWidget(row, COLUMN_BUTTONS, buttonsColumnWidget);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void ComponentSymbolVariantItemListEditorWidget::addItem(
@@ -455,8 +459,10 @@ void ComponentSymbolVariantItemListEditorWidget::addItem(
   try {
     ComponentSymbolVariantItemSuffix constrainedSuffix(suffix);  // can throw
     FilePath                         fp =
-        mWorkspace->getLibraryDb().getLatestSymbol(symbol);     // can throw
-    Symbol                                      sym(fp, true);  // can throw
+        mWorkspace->getLibraryDb().getLatestSymbol(symbol);  // can throw
+    Symbol sym(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(fp))));  // can throw
     std::shared_ptr<ComponentSymbolVariantItem> item(
         new ComponentSymbolVariantItem(Uuid::createRandom(), symbol, pos, rot,
                                        required, constrainedSuffix));
@@ -489,7 +495,7 @@ void ComponentSymbolVariantItemListEditorWidget::moveItemUp(
 void ComponentSymbolVariantItemListEditorWidget::moveItemDown(
     int index) noexcept {
   Q_ASSERT(index >= 0 && index < mItems->count() - 1);
-  mItems->swap(index, index + 1);
+  mItems->swap(index + 1, index);
   updateTable(mSelectedItem);
   emit edited();
 }
@@ -500,7 +506,9 @@ void ComponentSymbolVariantItemListEditorWidget::setSymbolUuid(
   try {
     FilePath fp =
         mWorkspace->getLibraryDb().getLatestSymbol(symbol);  // can throw
-    Symbol sym(fp, true);                                    // can throw
+    Symbol sym(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+            TransactionalFileSystem::openRO(fp))));  // can throw
     mItems->find(uuid)->setSymbolUuid(symbol);
     mItems->find(uuid)->getPinSignalMap() =
         ComponentPinSignalMapHelpers::create(sym.getPins().getUuidSet());

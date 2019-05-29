@@ -77,9 +77,18 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="edtNorm">
-        <property name="maxLength">
-         <number>20</number>
+       <widget class="QComboBox" name="cbxNorm">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::NoInsert</enum>
         </property>
        </widget>
       </item>

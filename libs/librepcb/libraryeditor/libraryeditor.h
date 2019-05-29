@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "newelementwizard/newelementwizard.h"
+
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/graphics/graphicslayer.h>
@@ -40,6 +42,7 @@ namespace librepcb {
 
 class UndoStackActionGroup;
 class ExclusiveActionGroup;
+class TransactionalFileSystem;
 
 namespace workspace {
 class Workspace;
@@ -64,9 +67,6 @@ class LibraryEditor;
 
 /**
  * @brief The LibraryEditor class
- *
- * @author ubruhin
- * @date 2015-06-28
  */
 class LibraryEditor final : public QMainWindow,
                             public IF_GraphicsLayerProvider {
@@ -76,7 +76,7 @@ public:
   // Constructors / Destructor
   LibraryEditor()                           = delete;
   LibraryEditor(const LibraryEditor& other) = delete;
-  LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> lib);
+  LibraryEditor(workspace::Workspace& ws, const FilePath& libFp, bool readOnly);
   ~LibraryEditor() noexcept;
 
   /**
@@ -130,6 +130,9 @@ private:  // GUI Event Handlers
   void newElementTriggered() noexcept;
   void saveTriggered() noexcept;
   void showElementInFileExplorerTriggered() noexcept;
+  void cutTriggered() noexcept;
+  void copyTriggered() noexcept;
+  void pasteTriggered() noexcept;
   void rotateCwTriggered() noexcept;
   void rotateCcwTriggered() noexcept;
   void removeTriggered() noexcept;
@@ -138,14 +141,26 @@ private:  // GUI Event Handlers
   void zoomOutTriggered() noexcept;
   void zoomAllTriggered() noexcept;
   void editGridPropertiesTriggered() noexcept;
+  void newComponentCategoryTriggered() noexcept;
+  void newPackageCategoryTriggered() noexcept;
+  void newSymbolTriggered() noexcept;
+  void newPackageTriggered() noexcept;
+  void newComponentTriggered() noexcept;
+  void newDeviceTriggered() noexcept;
   void editComponentCategoryTriggered(const FilePath& fp) noexcept;
   void editPackageCategoryTriggered(const FilePath& fp) noexcept;
   void editSymbolTriggered(const FilePath& fp) noexcept;
   void editPackageTriggered(const FilePath& fp) noexcept;
   void editComponentTriggered(const FilePath& fp) noexcept;
   void editDeviceTriggered(const FilePath& fp) noexcept;
+  void duplicateComponentCategoryTriggered(const FilePath& fp) noexcept;
+  void duplicatePackageCategoryTriggered(const FilePath& fp) noexcept;
+  void duplicateSymbolTriggered(const FilePath& fp) noexcept;
+  void duplicatePackageTriggered(const FilePath& fp) noexcept;
+  void duplicateComponentTriggered(const FilePath& fp) noexcept;
+  void duplicateDeviceTriggered(const FilePath& fp) noexcept;
   void closeTabIfOpen(const FilePath& fp) noexcept;
-  template <typename ElementType, typename EditWidgetType>
+  template <typename EditWidgetType>
   void editLibraryElementTriggered(const FilePath& fp,
                                    bool            isNewElement) noexcept;
   void currentTabChanged(int index) noexcept;
@@ -155,19 +170,24 @@ private:  // GUI Event Handlers
 
 private:  // Methods
   void setActiveEditorWidget(EditorWidgetBase* widget);
+  void newLibraryElement(NewElementWizardContext::ElementType type);
+  void duplicateLibraryElement(NewElementWizardContext::ElementType type,
+                               const FilePath&                      fp);
+  void editNewLibraryElement(NewElementWizardContext::ElementType type,
+                             const FilePath&                      fp);
   void updateTabTitles() noexcept;
   void closeEvent(QCloseEvent* event) noexcept override;
   void addLayer(const QString& name, bool forceVisible = false) noexcept;
 
 private:  // Data
   workspace::Workspace&                mWorkspace;
-  QSharedPointer<Library>              mLibrary;
+  bool                                 mIsOpenedReadOnly;
   QScopedPointer<Ui::LibraryEditor>    mUi;
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
   QList<GraphicsLayer*>                mLayers;
   EditorWidgetBase*                    mCurrentEditorWidget;
-  DirectoryLock                        mLock;
+  Library*                             mLibrary;
 };
 
 /*******************************************************************************

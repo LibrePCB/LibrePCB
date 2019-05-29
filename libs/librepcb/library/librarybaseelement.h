@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include "./msg/libraryelementcheckmessage.h"
 
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
 
@@ -62,20 +62,22 @@ public:
                      const ElementName& name_en_US,
                      const QString&     description_en_US,
                      const QString&     keywords_en_US);
-  LibraryBaseElement(const FilePath& elementDirectory, bool dirnameMustBeUuid,
-                     const QString& shortElementName,
-                     const QString& longElementName, bool readOnly);
+  LibraryBaseElement(std::unique_ptr<TransactionalDirectory> directory,
+                     bool dirnameMustBeUuid, const QString& shortElementName,
+                     const QString& longElementName);
   virtual ~LibraryBaseElement() noexcept;
 
   // Getters: General
-  const FilePath& getFilePath() const noexcept { return mDirectory; }
-  const QString&  getShortElementName() const noexcept {
+  const TransactionalDirectory& getDirectory() const noexcept {
+    return *mDirectory;
+  }
+  TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
+  const QString&          getShortElementName() const noexcept {
     return mShortElementName;
   }
   const QString& getLongElementName() const noexcept {
     return mLongElementName;
   }
-  bool isOpenedReadOnly() const noexcept { return mOpenedReadOnly; }
 
   // Getters: Attributes
   const Uuid&      getUuid() const noexcept { return mUuid; }
@@ -105,10 +107,10 @@ public:
   // General Methods
   virtual LibraryElementCheckMessageList runChecks() const;
   virtual void                           save();
-  virtual void                           saveTo(const FilePath& destination);
-  virtual void saveIntoParentDirectory(const FilePath& parentDir);
-  virtual void moveTo(const FilePath& destination);
-  virtual void moveIntoParentDirectory(const FilePath& parentDir);
+  virtual void                           saveTo(TransactionalDirectory& dest);
+  virtual void                           moveTo(TransactionalDirectory& dest);
+  virtual void saveIntoParentDirectory(TransactionalDirectory& dest);
+  virtual void moveIntoParentDirectory(TransactionalDirectory& dest);
 
   // Operator Overloadings
   LibraryBaseElement& operator=(const LibraryBaseElement& rhs) = delete;
@@ -119,21 +121,24 @@ public:
     return dir.getPathTo(".librepcb-" % ElementType::getShortElementName())
         .isExistingFile();
   }
+  template <typename ElementType>
+  static bool isValidElementDirectory(const TransactionalDirectory& dir,
+                                      const QString& path) noexcept {
+    return dir.fileExists((path.isEmpty() ? path : path % "/") % ".librepcb-" %
+                          ElementType::getShortElementName());
+  }
 
 protected:
   // Protected Methods
   virtual void cleanupAfterLoadingElementFromFile() noexcept;
-  virtual void copyTo(const FilePath& destination, bool removeSource);
 
   /// @copydoc librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
   // General Attributes
-  mutable FilePath mDirectory;
-  mutable bool     mDirectoryIsTemporary;
-  bool             mOpenedReadOnly;
-  bool             mDirectoryNameMustBeUuid;
-  QString          mShortElementName;  ///< e.g. "lib", "cmpcat", "sym"
+  std::unique_ptr<TransactionalDirectory> mDirectory;
+  bool                                    mDirectoryNameMustBeUuid;
+  QString mShortElementName;  ///< e.g. "lib", "cmpcat", "sym"
   QString mLongElementName;  ///< e.g. "library", "component_category", "symbol"
 
   // Members required for loading elements from file

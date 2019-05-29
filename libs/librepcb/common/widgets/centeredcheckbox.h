@@ -37,9 +37,6 @@ namespace librepcb {
 
 /**
  * @brief The CenteredCheckBox class is a centered variant of the QCheckBox
- *
- * @author ubruhin
- * @date 2017-03-13
  */
 class CenteredCheckBox final : public QWidget {
   Q_OBJECT

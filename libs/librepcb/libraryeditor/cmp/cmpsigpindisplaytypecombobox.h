@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The CmpSigPinDisplayTypeComboBox class
- *
- * @author ubruhin
- * @date 2016-10-20
  */
 class CmpSigPinDisplayTypeComboBox final : public QWidget {
   Q_OBJECT

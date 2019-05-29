@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The FootprintPadShapeSelectorWidget class
- *
- * @author ubruhin
- * @date 2017-08-17
  */
 class FootprintPadShapeSelectorWidget final : public QWidget {
   Q_OBJECT

@@ -58,9 +58,6 @@ class PackageChooserDialog;
 
 /**
  * @brief The PackageChooserDialog class
- *
- * @author ubruhin
- * @date 2017-03-25
  */
 class PackageChooserDialog final : public QDialog {
   Q_OBJECT
@@ -83,14 +80,16 @@ public:
   PackageChooserDialog& operator=(const PackageChooserDialog& rhs) = delete;
 
 private:  // Methods
+  void searchEditTextChanged(const QString& text) noexcept;
   void treeCategories_currentItemChanged(const QModelIndex& current,
                                          const QModelIndex& previous) noexcept;
   void listPackages_currentItemChanged(QListWidgetItem* current,
                                        QListWidgetItem* previous) noexcept;
   void listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept;
+  void searchPackages(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
   void setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept;
-  void updatePreview() noexcept;
+  void updatePreview(const FilePath& fp) noexcept;
   void accept() noexcept override;
   const QStringList& localeOrder() const noexcept;
 
@@ -103,7 +102,6 @@ private:  // Data
   tl::optional<Uuid>                       mSelectedPackageUuid;
 
   // preview
-  FilePath                                     mPackageFilePath;
   QScopedPointer<Package>                      mPackage;
   QScopedPointer<GraphicsScene>                mGraphicsScene;
   QScopedPointer<FootprintPreviewGraphicsItem> mGraphicsItem;

@@ -39,9 +39,6 @@ namespace librepcb {
 
 /**
  * @brief The StatusBar class extends QStatusBar for some commonly used fields
- *
- * @author ubruhin
- * @date 2017-09-03
  */
 class StatusBar final : public QStatusBar {
   Q_OBJECT
@@ -66,13 +63,8 @@ public:
   void setFields(Fields fields) noexcept;
   void setField(Field field, bool enable) noexcept;
   void setAbsoluteCursorPosition(const Point& pos) noexcept;
-  void setProgressBarVisible(bool visible) noexcept;
   void setProgressBarTextFormat(const QString& format) noexcept;
   void setProgressBarPercent(int percent) noexcept;
-
-  // General Methods
-  void showProgressBar() noexcept { setProgressBarVisible(true); }
-  void hideProgressBar() noexcept { setProgressBarVisible(false); }
 
   // Operator Overloadings
   StatusBar& operator=(const StatusBar& rhs) = delete;

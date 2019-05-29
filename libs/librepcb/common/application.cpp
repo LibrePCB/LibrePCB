@@ -23,7 +23,7 @@
 #include "application.h"
 
 #include "dialogs/aboutdialog.h"
-#include "exceptions.h"
+#include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
 #include "units/all_length_units.h"
 
@@ -42,7 +42,7 @@
 //    "1.0.0-unstable"
 //  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
 //  - Releases (on release branches):           No suffix, e.g. "1.0.0"
-static const char* APP_VERSION = "0.1.0-unstable";
+static const char* APP_VERSION = "0.1.1-unstable";
 
 // File format version:
 //  - Must be equal to the major version of APP_VERSION!
@@ -157,7 +157,10 @@ Application::Application(int& argc, char** argv) noexcept
   mMonospaceFont.setFamily("Noto Sans Mono");
 
   // load all stroke fonts
-  mStrokeFontPool.reset(new StrokeFontPool(getResourcesFilePath("fontobene")));
+  TransactionalFileSystem strokeFontsDir(
+      getResourcesFilePath("fontobene"), false,
+      TransactionalFileSystem::RestoreMode::NO);
+  mStrokeFontPool.reset(new StrokeFontPool(strokeFontsDir));
   getDefaultStrokeFont();  // ensure that the default font is available (aborts
                            // if not)
 }

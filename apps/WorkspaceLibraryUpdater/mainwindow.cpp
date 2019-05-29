@@ -3,7 +3,7 @@
 #include "ui_mainwindow.h"
 
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 
@@ -90,17 +90,22 @@ void MainWindow::on_updateBtn_clicked() {
     QString dirStr = ui->libDirs->item(i)->text();
 
     try {
-      library::Library lib(FilePath(dirStr), false);
+      std::shared_ptr<TransactionalFileSystem> fs =
+          TransactionalFileSystem::openRW(FilePath(dirStr));
+      library::Library lib(std::unique_ptr<TransactionalDirectory>(
+          new TransactionalDirectory(fs)));
 
-      if (ui->cbx_cmpcat->isChecked()) updateElements<ComponentCategory>(lib);
-      if (ui->cbx_pkgcat->isChecked()) updateElements<PackageCategory>(lib);
-      if (ui->cbx_sym->isChecked()) updateElements<Symbol>(lib);
-      if (ui->cbx_pkg->isChecked()) updateElements<Package>(lib);
-      if (ui->cbx_cmp->isChecked()) updateElements<Component>(lib);
-      if (ui->cbx_dev->isChecked()) updateElements<Device>(lib);
+      if (ui->cbx_cmpcat->isChecked())
+        updateElements<ComponentCategory>(fs, lib);
+      if (ui->cbx_pkgcat->isChecked()) updateElements<PackageCategory>(fs, lib);
+      if (ui->cbx_sym->isChecked()) updateElements<Symbol>(fs, lib);
+      if (ui->cbx_pkg->isChecked()) updateElements<Package>(fs, lib);
+      if (ui->cbx_cmp->isChecked()) updateElements<Component>(fs, lib);
+      if (ui->cbx_dev->isChecked()) updateElements<Device>(fs, lib);
 
       if (ui->cbx_lplib->isChecked()) {
         lib.save();
+        fs->save();
         elementCount++;
       }
     } catch (Exception& e) {
@@ -117,17 +122,20 @@ void MainWindow::on_updateBtn_clicked() {
 }
 
 template <typename ElementType>
-void MainWindow::updateElements(const library::Library& lib) noexcept {
-  foreach (const FilePath& fp, lib.searchForElements<ElementType>()) {
-    if (fp.getBasename() == "00000000-0000-4001-8000-000000000000") {
+void MainWindow::updateElements(std::shared_ptr<TransactionalFileSystem> fs,
+                                const library::Library& lib) noexcept {
+  foreach (const QString& path, lib.searchForElements<ElementType>()) {
+    if (path.contains("00000000-0000-4001-8000-000000000000")) {
       // ignore demo files as they contain documentation which would be removed
       ignoreCount++;
       continue;
     }
     try {
-      ElementType element(fp, false);
+      ElementType element(std::unique_ptr<TransactionalDirectory>(
+          new TransactionalDirectory(fs, path)));
       element.save();
-      ui->log->addItem(fp.toNative());
+      fs->save();
+      ui->log->addItem(fs->getAbsPath(path).toNative());
       elementCount++;
     } catch (const Exception& e) {
       ui->log->addItem("ERROR: " % e.getMsg());

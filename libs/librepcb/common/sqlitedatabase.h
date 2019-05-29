@@ -40,9 +40,6 @@ namespace librepcb {
 
 /**
  * @brief The SQLiteDatabase class
- *
- * @author ubruhin
- * @date 2016-09-03
  */
 class SQLiteDatabase final : public QObject {
   Q_OBJECT
@@ -77,6 +74,7 @@ public:
 
   // General Methods
   QSqlQuery prepareQuery(const QString& query) const;
+  int       count(QSqlQuery& query);
   int       insert(QSqlQuery& query);
   void      exec(QSqlQuery& query);
   void      exec(const QString& query);

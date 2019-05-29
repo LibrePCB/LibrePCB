@@ -70,14 +70,25 @@ class AddComponentDialog;
 
 /**
  * @brief The AddComponentDialog class
- *
- * @todo This class is VERY provisional!
- *
- * @author ubruhin
- * @date 2015-02-16
  */
 class AddComponentDialog final : public QDialog {
   Q_OBJECT
+
+  // Types
+  struct SearchResultDevice {
+    QString  name;
+    FilePath pkgFp;
+    QString  pkgName;
+    bool     match = false;
+  };
+
+  struct SearchResultComponent {
+    QString                             name;
+    QHash<FilePath, SearchResultDevice> devices;
+    bool                                match = false;
+  };
+
+  typedef QHash<FilePath, SearchResultComponent> SearchResult;
 
 public:
   // Constructors / Destructor
@@ -102,9 +113,10 @@ private slots:
 
 private:
   // Private Methods
-  void searchComponents(const QString& input);
-  void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
-  void setSelectedComponent(const library::Component* cmp);
+  void         searchComponents(const QString& input);
+  SearchResult searchComponentsAndDevices(const QString& input);
+  void         setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
+  void         setSelectedComponent(const library::Component* cmp);
   void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
   void setSelectedDevice(const library::Device* dev);
   void accept() noexcept;

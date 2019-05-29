@@ -46,9 +46,6 @@ namespace editor {
 
 /**
  * @brief The SchematicClipboard class
- *
- * @author ubruhin
- * @author 2015-03-07
  */
 class SchematicClipboard final : public QObject {
   Q_OBJECT

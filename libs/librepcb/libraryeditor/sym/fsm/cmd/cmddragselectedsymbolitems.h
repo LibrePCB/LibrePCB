@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -46,29 +46,28 @@ class CmdSymbolPinEdit;
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdMoveSelectedSymbolItems
+ *  Class CmdDragSelectedSymbolItems
  ******************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedSymbolItems class
- *
- * @author  ubruhin
- * @date    2016-11-05
+ * @brief The CmdDragSelectedSymbolItems class
  */
-class CmdMoveSelectedSymbolItems final : public UndoCommandGroup {
+class CmdDragSelectedSymbolItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdMoveSelectedSymbolItems()                                        = delete;
-  CmdMoveSelectedSymbolItems(const CmdMoveSelectedSymbolItems& other) = delete;
-  CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
-                             const Point& startPos) noexcept;
-  ~CmdMoveSelectedSymbolItems() noexcept;
+  CmdDragSelectedSymbolItems()                                        = delete;
+  CmdDragSelectedSymbolItems(const CmdDragSelectedSymbolItems& other) = delete;
+  explicit CmdDragSelectedSymbolItems(
+      const SymbolEditorState::Context& context) noexcept;
+  ~CmdDragSelectedSymbolItems() noexcept;
 
   // General Methods
-  void setCurrentPosition(const Point& pos) noexcept;
+  void setDeltaToStartPos(const Point& delta) noexcept;
+  void translate(const Point& deltaPos) noexcept;
+  void rotate(const Angle& angle) noexcept;
 
   // Operator Overloadings
-  CmdMoveSelectedSymbolItems& operator=(const CmdMoveSelectedSymbolItems& rhs) =
+  CmdDragSelectedSymbolItems& operator=(const CmdDragSelectedSymbolItems& rhs) =
       delete;
 
 private:
@@ -81,8 +80,9 @@ private:
 
   // Private Member Variables
   const SymbolEditorState::Context& mContext;
-  Point                             mStartPos;
+  Point                             mCenterPos;
   Point                             mDeltaPos;
+  Angle                             mDeltaRot;
 
   // Move commands
   QList<CmdSymbolPinEdit*> mPinEditCmds;
@@ -99,4 +99,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H

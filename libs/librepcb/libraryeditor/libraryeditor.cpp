@@ -27,7 +27,6 @@
 #include "cmpcat/componentcategoryeditorwidget.h"
 #include "dev/deviceeditorwidget.h"
 #include "lib/libraryoverviewwidget.h"
-#include "newelementwizard/newelementwizard.h"
 #include "pkg/packageeditorwidget.h"
 #include "pkgcat/packagecategoryeditorwidget.h"
 #include "sym/symboleditorwidget.h"
@@ -35,7 +34,7 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/aboutdialog.h>
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/library/library.h>
@@ -57,14 +56,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
-                             QSharedPointer<Library> lib)
+LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
+                             bool readOnly)
   : QMainWindow(nullptr),
     mWorkspace(ws),
-    mLibrary(lib),
+    mIsOpenedReadOnly(readOnly),
     mUi(new Ui::LibraryEditor),
     mCurrentEditorWidget(nullptr),
-    mLock(lib->getFilePath()) {
+    mLibrary(nullptr) {
   mUi->setupUi(this);
   connect(mUi->actionClose, &QAction::triggered, this, &LibraryEditor::close);
   connect(mUi->actionNew, &QAction::triggered, this,
@@ -76,6 +75,12 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   connect(mUi->actionUpdateLibraryDb, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
+  connect(mUi->actionCut, &QAction::triggered, this,
+          &LibraryEditor::cutTriggered);
+  connect(mUi->actionCopy, &QAction::triggered, this,
+          &LibraryEditor::copyTriggered);
+  connect(mUi->actionPaste, &QAction::triggered, this,
+          &LibraryEditor::pasteTriggered);
   connect(mUi->actionRotateCw, &QAction::triggered, this,
           &LibraryEditor::rotateCwTriggered);
   connect(mUi->actionRotateCcw, &QAction::triggered, this,
@@ -105,14 +110,24 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
 
-  // lock the library directory
-  mLock.tryLock();  // can throw
+  // add overview tab
+  EditorWidgetBase::Context context{mWorkspace, *this, false, readOnly};
+  LibraryOverviewWidget*    overviewWidget =
+      new LibraryOverviewWidget(context, libFp);
+  mLibrary = &overviewWidget->getLibrary();
+  connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
+          &LibraryEditor::updateTabTitles);
+  connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
+          &LibraryEditor::updateTabTitles);
+  connect(overviewWidget, &EditorWidgetBase::elementEdited,
+          &mWorkspace.getLibraryDb(),
+          &workspace::WorkspaceLibraryDb::startLibraryRescan);
 
   // set window title and icon
   const QStringList localeOrder =
       mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
   QString libName = *mLibrary->getNames().value(localeOrder);
-  if (mLibrary->isOpenedReadOnly()) libName.append(tr(" [Read-Only]"));
+  if (readOnly) libName.append(tr(" [Read-Only]"));
   setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
   setWindowIcon(mLibrary->getIconAsPixmap());
 
@@ -120,19 +135,13 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   mUi->statusBar->setFields(StatusBar::ProgressBar);
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanStarted, mUi->statusBar,
-          &StatusBar::showProgressBar, Qt::QueuedConnection);
-  connect(&mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, mUi->statusBar,
-          &StatusBar::hideProgressBar, Qt::QueuedConnection);
-  connect(&mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusBar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
 
   // if the library was opened in read-only mode, we guess that it's a remote
   // library and thus show a warning that all modifications are lost after the
   // next update
-  mUi->lblRemoteLibraryWarning->setVisible(mLibrary->isOpenedReadOnly());
+  mUi->lblRemoteLibraryWarning->setVisible(readOnly);
 
   // create the undo stack action group
   mUndoStackActionGroup.reset(new UndoStackActionGroup(
@@ -236,16 +245,19 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
   addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
 #endif
 
-  // add overview tab
-  EditorWidgetBase::Context context{mWorkspace, *this, false};
-  LibraryOverviewWidget*    overviewWidget =
-      new LibraryOverviewWidget(context, lib);
-  connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
-          &LibraryEditor::updateTabTitles);
-  connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
-          &LibraryEditor::updateTabTitles);
-
   // Edit element signals
+  connect(overviewWidget, &LibraryOverviewWidget::newComponentCategoryTriggered,
+          this, &LibraryEditor::newComponentCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newPackageCategoryTriggered,
+          this, &LibraryEditor::newPackageCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newSymbolTriggered, this,
+          &LibraryEditor::newSymbolTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newPackageTriggered, this,
+          &LibraryEditor::newPackageTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newComponentTriggered, this,
+          &LibraryEditor::newComponentTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::newDeviceTriggered, this,
+          &LibraryEditor::newDeviceTriggered);
   connect(overviewWidget,
           &LibraryOverviewWidget::editComponentCategoryTriggered, this,
           &LibraryEditor::editComponentCategoryTriggered);
@@ -259,6 +271,20 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
           &LibraryEditor::editComponentTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editDeviceTriggered, this,
           &LibraryEditor::editDeviceTriggered);
+  connect(overviewWidget,
+          &LibraryOverviewWidget::duplicateComponentCategoryTriggered, this,
+          &LibraryEditor::duplicateComponentCategoryTriggered);
+  connect(overviewWidget,
+          &LibraryOverviewWidget::duplicatePackageCategoryTriggered, this,
+          &LibraryEditor::duplicatePackageCategoryTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicateSymbolTriggered,
+          this, &LibraryEditor::duplicateSymbolTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicatePackageTriggered,
+          this, &LibraryEditor::duplicatePackageTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicateComponentTriggered,
+          this, &LibraryEditor::duplicateComponentTriggered);
+  connect(overviewWidget, &LibraryOverviewWidget::duplicateDeviceTriggered,
+          this, &LibraryEditor::duplicateDeviceTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::removeElementTriggered, this,
           &LibraryEditor::closeTabIfOpen);
 
@@ -281,6 +307,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace&   ws,
 
 LibraryEditor::~LibraryEditor() noexcept {
   setActiveEditorWidget(nullptr);
+  mLibrary = nullptr;
   for (int i = mUi->tabWidget->count() - 1; i >= 0; --i) {
     QWidget* widget = mUi->tabWidget->widget(i);
     mUi->tabWidget->removeTab(i);
@@ -342,30 +369,7 @@ void LibraryEditor::newElementTriggered() noexcept {
   NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
   if (wizard.exec() == QDialog::Accepted) {
     FilePath fp = wizard.getContext().getOutputDirectory();
-    switch (wizard.getContext().mElementType) {
-      case NewElementWizardContext::ElementType::ComponentCategory:
-        editLibraryElementTriggered<ComponentCategory,
-                                    ComponentCategoryEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::PackageCategory:
-        editLibraryElementTriggered<PackageCategory,
-                                    PackageCategoryEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Symbol:
-        editLibraryElementTriggered<Symbol, SymbolEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Package:
-        editLibraryElementTriggered<Package, PackageEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Component:
-        editLibraryElementTriggered<Component, ComponentEditorWidget>(fp, true);
-        break;
-      case NewElementWizardContext::ElementType::Device:
-        editLibraryElementTriggered<Device, DeviceEditorWidget>(fp, true);
-        break;
-      default:
-        break;
-    }
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
     mWorkspace.getLibraryDb().startLibraryRescan();
   }
 }
@@ -378,6 +382,18 @@ void LibraryEditor::showElementInFileExplorerTriggered() noexcept {
   if (!mCurrentEditorWidget) return;
   FilePath fp = mCurrentEditorWidget->getFilePath();
   QDesktopServices::openUrl(fp.toQUrl());
+}
+
+void LibraryEditor::cutTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->cut();
+}
+
+void LibraryEditor::copyTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->copy();
+}
+
+void LibraryEditor::pasteTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->paste();
 }
 
 void LibraryEditor::rotateCwTriggered() noexcept {
@@ -412,34 +428,84 @@ void LibraryEditor::editGridPropertiesTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->editGridProperties();
 }
 
+void LibraryEditor::newComponentCategoryTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
+}
+
+void LibraryEditor::newPackageCategoryTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
+}
+
+void LibraryEditor::newSymbolTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Symbol);
+}
+
+void LibraryEditor::newPackageTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Package);
+}
+
+void LibraryEditor::newComponentTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Component);
+}
+
+void LibraryEditor::newDeviceTriggered() noexcept {
+  newLibraryElement(NewElementWizardContext::ElementType::Device);
+}
+
 void LibraryEditor::editComponentCategoryTriggered(
     const FilePath& fp) noexcept {
-  editLibraryElementTriggered<ComponentCategory, ComponentCategoryEditorWidget>(
-      fp, false);
+  editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editPackageCategoryTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<PackageCategory, PackageCategoryEditorWidget>(
-      fp, false);
+  editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editSymbolTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Symbol, SymbolEditorWidget>(fp, false);
+  editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editPackageTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Package, PackageEditorWidget>(fp, false);
+  editLibraryElementTriggered<PackageEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editComponentTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Component, ComponentEditorWidget>(fp, false);
+  editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
 }
 
 void LibraryEditor::editDeviceTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<Device, DeviceEditorWidget>(fp, false);
+  editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
 }
 
-template <typename ElementType, typename EditWidgetType>
+void LibraryEditor::duplicateComponentCategoryTriggered(
+    const FilePath& fp) noexcept {
+  duplicateLibraryElement(
+      NewElementWizardContext::ElementType::ComponentCategory, fp);
+}
+
+void LibraryEditor::duplicatePackageCategoryTriggered(
+    const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::PackageCategory,
+                          fp);
+}
+
+void LibraryEditor::duplicateSymbolTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Symbol, fp);
+}
+
+void LibraryEditor::duplicatePackageTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Package, fp);
+}
+
+void LibraryEditor::duplicateComponentTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Component, fp);
+}
+
+void LibraryEditor::duplicateDeviceTriggered(const FilePath& fp) noexcept {
+  duplicateLibraryElement(NewElementWizardContext::ElementType::Device, fp);
+}
+
+template <typename EditWidgetType>
 void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
                                                 bool isNewElement) noexcept {
   try {
@@ -452,7 +518,8 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
       }
     }
 
-    EditorWidgetBase::Context context{mWorkspace, *this, isNewElement};
+    EditorWidgetBase::Context context{mWorkspace, *this, isNewElement,
+                                      mIsOpenedReadOnly};
     EditWidgetType*           widget = new EditWidgetType(context, fp);
     connect(widget, &QWidget::windowTitleChanged, this,
             &LibraryEditor::updateTabTitles);
@@ -541,6 +608,7 @@ void LibraryEditor::cursorPositionChanged(const Point& pos) noexcept {
 
 void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   bool hasGraphicalEditor = false;
+  bool isOverviewTab = dynamic_cast<LibraryOverviewWidget*>(widget) != nullptr;
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->setUndoStackActionGroup(nullptr);
     mCurrentEditorWidget->setToolsActionGroup(nullptr);
@@ -556,11 +624,63 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   foreach (QAction* action, mUi->editToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
+  if (isOverviewTab) {
+    mUi->actionRemove->setEnabled(true);
+  }
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
   mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
+  updateTabTitles();  // force updating the "Save" action title
+}
+
+void LibraryEditor::newLibraryElement(
+    NewElementWizardContext::ElementType type) {
+  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  wizard.setNewElementType(type);
+  if (wizard.exec() == QDialog::Accepted) {
+    FilePath fp = wizard.getContext().getOutputDirectory();
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
+    mWorkspace.getLibraryDb().startLibraryRescan();
+  }
+}
+
+void LibraryEditor::duplicateLibraryElement(
+    NewElementWizardContext::ElementType type, const FilePath& fp) {
+  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  wizard.setElementToCopy(type, fp);
+  if (wizard.exec() == QDialog::Accepted) {
+    FilePath fp = wizard.getContext().getOutputDirectory();
+    editNewLibraryElement(wizard.getContext().mElementType, fp);
+    mWorkspace.getLibraryDb().startLibraryRescan();
+  }
+}
+
+void LibraryEditor::editNewLibraryElement(
+    NewElementWizardContext::ElementType type, const FilePath& fp) {
+  switch (type) {
+    case NewElementWizardContext::ElementType::ComponentCategory:
+      editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::PackageCategory:
+      editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Symbol:
+      editLibraryElementTriggered<SymbolEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Package:
+      editLibraryElementTriggered<PackageEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Component:
+      editLibraryElementTriggered<ComponentEditorWidget>(fp, true);
+      break;
+    case NewElementWizardContext::ElementType::Device:
+      editLibraryElementTriggered<DeviceEditorWidget>(fp, true);
+      break;
+    default:
+      break;
+  }
 }
 
 void LibraryEditor::updateTabTitles() noexcept {
@@ -577,6 +697,14 @@ void LibraryEditor::updateTabTitles() noexcept {
     } else {
       qWarning() << "Tab widget is not a subclass of EditorWidgetBase!";
     }
+  }
+
+  if (mCurrentEditorWidget) {
+    mUi->actionSave->setEnabled(true);
+    mUi->actionSave->setText(
+        QString(tr("&Save '%1'")).arg(mCurrentEditorWidget->windowTitle()));
+  } else {
+    mUi->actionSave->setEnabled(false);
   }
 }
 

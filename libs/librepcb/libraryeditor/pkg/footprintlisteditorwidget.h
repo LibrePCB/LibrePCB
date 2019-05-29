@@ -44,12 +44,8 @@ namespace editor {
 
 /**
  * @brief The FootprintListEditorWidget class
- *
- * @author ubruhin
- * @date 2017-05-27
  */
-class FootprintListEditorWidget final : public QWidget,
-                                        private FootprintList::IF_Observer {
+class FootprintListEditorWidget final : public QWidget {
   Q_OBJECT
 
 private:  // Types
@@ -84,6 +80,9 @@ private:  // Slots
   void btnAddRemoveClicked() noexcept;
 
 private:  // Methods
+  void        footprintListEdited(const FootprintList& list, int index,
+                                  const std::shared_ptr<const Footprint>& footprint,
+                                  FootprintList::Event event) noexcept;
   void        updateTable(tl::optional<Uuid> selected = tl::nullopt) noexcept;
   void        setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                                  const QString& name) noexcept;
@@ -108,18 +107,14 @@ private:  // Methods
     return row == newFootprintRow();
   }
 
-  // Observer Methods
-  void listObjectAdded(const FootprintList& list, int newIndex,
-                       const std::shared_ptr<Footprint>& ptr) noexcept override;
-  void listObjectRemoved(
-      const FootprintList& list, int oldIndex,
-      const std::shared_ptr<Footprint>& ptr) noexcept override;
-
 private:  // Data
   QTableWidget*      mTable;
   FootprintList*     mFootprintList;
   UndoStack*         mUndoStack;
   tl::optional<Uuid> mSelectedFootprint;
+
+  // Slots
+  FootprintList::OnEditedSlot mFootprintListEditedSlot;
 };
 
 /*******************************************************************************

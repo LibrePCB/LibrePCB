@@ -47,6 +47,7 @@ AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_KEY, new QTableWidgetItem(tr("Key")));
   mTable->setHorizontalHeaderItem(COLUMN_TYPE,
@@ -253,8 +254,13 @@ void AttributeListEditorWidget::setTableRowContent(
           &AttributeListEditorWidget::attributeUnitChanged);
   mTable->setCellWidget(row, COLUMN_UNIT, unitComboBox);
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // buttons
-  int      btnSize = typeComboBox->sizeHint().height();
+  int      btnSize = mTable->rowHeight(row);
   QSize    iconSize(btnSize - 6, btnSize - 6);
   QWidget* buttonsColumnWidget = new QWidget(this);
   buttonsColumnWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -297,9 +303,6 @@ void AttributeListEditorWidget::setTableRowContent(
   }
   buttonsColumnLayout->addWidget(btnAddRemove);
   mTable->setCellWidget(row, COLUMN_BUTTONS, buttonsColumnWidget);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void AttributeListEditorWidget::getTableRowContent(
@@ -361,7 +364,7 @@ void AttributeListEditorWidget::moveAttributeUp(int index) noexcept {
 
 void AttributeListEditorWidget::moveAttributeDown(int index) noexcept {
   Q_ASSERT(index >= 0 && index < mAttributeList.count() - 1);
-  mAttributeList.swap(index, index + 1);
+  mAttributeList.swap(index + 1, index);
   updateTable(mSelectedAttribute);
   emit edited(mAttributeList);
 }

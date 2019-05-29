@@ -122,11 +122,7 @@ inline SExpression serializeToSExpression(const ElementName& obj) {
 template <>
 inline ElementName deserializeFromSExpression(const SExpression& sexpr,
                                               bool               throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  // backward compatibility - remove this some time!
-  str = str.trimmed();
-  str.truncate(70);
-  return ElementName(str);  // can throw
+  return ElementName(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const ElementName& obj) {

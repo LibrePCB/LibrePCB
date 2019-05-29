@@ -27,7 +27,6 @@
 #include "boardlayerstack.h"
 
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/utils/graphicslayerstackappearancesettings.h>
 
 #include <QtCore>
@@ -42,41 +41,24 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
+BoardUserSettings::BoardUserSettings(Board& board) noexcept
+  : QObject(&board),
+    mBoard(board),
+    mLayerSettings(
+        new GraphicsLayerStackAppearanceSettings(board.getLayerStack())) {
+}
+
 BoardUserSettings::BoardUserSettings(Board&                   board,
                                      const BoardUserSettings& other) noexcept
-  : BoardUserSettings(board, false, false, true) {
+  : BoardUserSettings(board) {
   *mLayerSettings = *other.mLayerSettings;
 }
 
-BoardUserSettings::BoardUserSettings(Board& board, bool restore, bool readOnly,
-                                     bool create)
-  : QObject(&board), mBoard(board) {
-  mFilepath = mBoard.getFilePath().getParentDir().getPathTo("settings.user.lp");
-
-  if (create || (!mFilepath.isExistingFile())) {
-    mFile.reset(SmartSExprFile::create(mFilepath));
-
-    mLayerSettings.reset(
-        new GraphicsLayerStackAppearanceSettings(mBoard.getLayerStack()));
-  } else {
-    mFile.reset(new SmartSExprFile(mFilepath, restore, readOnly));
-
-    try {
-      SExpression root = mFile->parseFileAndBuildDomTree();
-
-      mLayerSettings.reset(new GraphicsLayerStackAppearanceSettings(
-          mBoard.getLayerStack(), root));
-    } catch (const Exception&) {
-      // Project user settings are normally not put under version control and
-      // thus the likelyhood of parse errors is higher (e.g. when switching to
-      // an older, now incompatible revision). To avoid frustration, we just
-      // ignore these errors and load the default settings instead...
-      qCritical() << "Could not open board user settings, defaults will be "
-                     "used instead!";
-      mLayerSettings.reset(
-          new GraphicsLayerStackAppearanceSettings(mBoard.getLayerStack()));
-    }
-  }
+BoardUserSettings::BoardUserSettings(Board& board, const SExpression& node)
+  : QObject(&board),
+    mBoard(board),
+    mLayerSettings(
+        new GraphicsLayerStackAppearanceSettings(board.getLayerStack(), node)) {
 }
 
 BoardUserSettings::~BoardUserSettings() noexcept {
@@ -84,24 +66,6 @@ BoardUserSettings::~BoardUserSettings() noexcept {
 
 /*******************************************************************************
  *  General Methods
- ******************************************************************************/
-
-bool BoardUserSettings::save(bool toOriginal, QStringList& errors) noexcept {
-  bool success = true;
-
-  try {
-    SExpression doc(serializeToDomElement("librepcb_board_user_settings"));
-    mFile->save(doc, toOriginal);
-  } catch (Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
-  }
-
-  return success;
-}
-
-/*******************************************************************************
- *  Private Methods
  ******************************************************************************/
 
 void BoardUserSettings::serialize(SExpression& root) const {

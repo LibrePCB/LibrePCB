@@ -114,48 +114,21 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
     }
 
     // Load all netpoints
-    QHash<Uuid, QString>
-        netpointLayerMap;  // backward compatibility, remove this some time!
-    QHash<Uuid, BI_NetLineAnchor*>
-        netPointAnchorMap;  // backward compatibility, remove this some time!
-    foreach (const SExpression& child,
-             node.getChildren("netpoint") + node.getChildren("junction")) {
-      if (const SExpression* layerNode = child.tryGetChildByPath("layer")) {
-        Uuid netpointUuid = child.getValueOfFirstChild<Uuid>();
-        netpointLayerMap.insert(netpointUuid,
-                                layerNode->getValueOfFirstChild<QString>());
+    foreach (const SExpression& child, node.getChildren("junction")) {
+      BI_NetPoint* netpoint = new BI_NetPoint(*this, child);
+      if (getNetPointByUuid(netpoint->getUuid())) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+                .arg(netpoint->getUuid().toStr()));
       }
-      if (const SExpression* viaNode = child.tryGetChildByPath("via")) {
-        Uuid    netpointUuid = child.getValueOfFirstChild<Uuid>();
-        Uuid    viaUuid      = viaNode->getValueOfFirstChild<Uuid>();
-        BI_Via* via          = getViaByUuid(viaUuid);
-        Q_ASSERT(via);
-        netPointAnchorMap.insert(netpointUuid, via);
-      } else if (const SExpression* devNode = child.tryGetChildByPath("dev")) {
-        Uuid       netpointUuid = child.getValueOfFirstChild<Uuid>();
-        Uuid       deviceUuid   = devNode->getValueOfFirstChild<Uuid>();
-        Uuid       padUuid      = child.getValueByPath<Uuid>("pad");
-        BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(deviceUuid);
-        Q_ASSERT(device);
-        BI_FootprintPad* pad = device->getFootprint().getPad(padUuid);
-        netPointAnchorMap.insert(netpointUuid, pad);
-      } else {
-        BI_NetPoint* netpoint = new BI_NetPoint(*this, child);
-        if (getNetPointByUuid(netpoint->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-                  .arg(netpoint->getUuid().toStr()));
-        }
-        mNetPoints.append(netpoint);
-      }
+      mNetPoints.append(netpoint);
     }
 
     // Load all netlines
     foreach (const SExpression& node,
              node.getChildren("netline") + node.getChildren("trace")) {
-      BI_NetLine* netline =
-          new BI_NetLine(*this, node, netpointLayerMap, netPointAnchorMap);
+      BI_NetLine* netline = new BI_NetLine(*this, node);
       if (getNetLineByUuid(netline->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,

@@ -45,9 +45,6 @@ class NewElementWizardPage_ComponentSymbols;
 
 /**
  * @brief The NewElementWizardPage_ComponentSymbols class
- *
- * @author ubruhin
- * @date 2017-03-26
  */
 class NewElementWizardPage_ComponentSymbols final : public QWizardPage {
   Q_OBJECT

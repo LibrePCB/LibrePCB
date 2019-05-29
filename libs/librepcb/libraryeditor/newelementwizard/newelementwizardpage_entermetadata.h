@@ -45,9 +45,6 @@ class NewElementWizardPage_EnterMetadata;
 
 /**
  * @brief The NewElementWizardPage_EnterMetadata class
- *
- * @author ubruhin
- * @date 2017-03-21
  */
 class NewElementWizardPage_EnterMetadata final : public QWizardPage {
   Q_OBJECT

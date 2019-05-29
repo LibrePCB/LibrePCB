@@ -42,6 +42,21 @@ namespace workspace {
 class WorkspaceLibraryDb;
 
 /*******************************************************************************
+ *  Class CategoryTreeFilter
+ ******************************************************************************/
+
+struct CategoryTreeFilter {
+  enum Flag {
+    SYMBOLS    = 1 << 0,  ///< Show items containing symbols
+    PACKAGES   = 1 << 1,  ///< Show items containing packages
+    COMPONENTS = 1 << 2,  ///< Show items containing components
+    DEVICES    = 1 << 3,  ///< Show items containing devices
+    ALL        = 1 << 4,  ///< Show all items, even empty ones
+  };
+  Q_DECLARE_FLAGS(Flags, Flag)
+};
+
+/*******************************************************************************
  *  Class CategoryTreeItem
  ******************************************************************************/
 
@@ -56,7 +71,8 @@ public:
   CategoryTreeItem(const CategoryTreeItem& other) = delete;
   CategoryTreeItem(const WorkspaceLibraryDb& library,
                    const QStringList localeOrder, CategoryTreeItem* parent,
-                   const tl::optional<Uuid>& uuid) noexcept;
+                   const tl::optional<Uuid>& uuid,
+                   CategoryTreeFilter::Flags filter) noexcept;
   ~CategoryTreeItem() noexcept;
 
   // Getters
@@ -70,6 +86,7 @@ public:
   int      getChildCount() const noexcept { return mChilds.count(); }
   int      getChildNumber() const noexcept;
   QVariant data(int role) const noexcept;
+  bool     isVisible() const noexcept { return mIsVisible; }
 
   // Operator Overloadings
   CategoryTreeItem& operator=(const CategoryTreeItem& rhs) = delete;
@@ -81,15 +98,18 @@ private:
   // Methods
   FilePath   getLatestCategory(const WorkspaceLibraryDb& lib) const;
   QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
+  bool       matchesFilter(const WorkspaceLibraryDb& lib,
+                           CategoryTreeFilter::Flags filter) const;
 
   // Attributes
-  QStringList                 mLocaleOrder;
-  CategoryTreeItem*           mParent;
-  tl::optional<Uuid>          mUuid;
-  QScopedPointer<ElementType> mCategory;
-  unsigned int mDepth;  ///< this is to avoid endless recursion in the
-                        ///< parent-child relationship
+  CategoryTreeItem*  mParent;
+  tl::optional<Uuid> mUuid;
+  QString            mName;
+  QString            mDescription;
+  unsigned int       mDepth;  ///< this is to avoid endless recursion in the
+                              ///< parent-child relationship
   QString          mExceptionMessage;
+  bool             mIsVisible;
   QList<ChildType> mChilds;
 };
 
@@ -102,5 +122,7 @@ typedef CategoryTreeItem<library::PackageCategory>   PackageCategoryTreeItem;
 
 }  // namespace workspace
 }  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::workspace::CategoryTreeFilter::Flags)
 
 #endif  // LIBREPCB_LIBRARY_CATEGORYTREEITEM_H

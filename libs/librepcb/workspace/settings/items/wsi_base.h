@@ -44,9 +44,6 @@ namespace workspace {
  * Every workspace setting is represented by a seperate object. All of these
  * objects have this class as base class. The name of all Workspace Settings
  * Items begin with the prefix "WSI_" to easily recognize them.
- *
- * @author ubruhin
- * @date 2014-10-04
  */
 class WSI_Base : public QObject, public SerializableObject {
   Q_OBJECT

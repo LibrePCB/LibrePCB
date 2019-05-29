@@ -36,7 +36,8 @@ namespace librepcb {
  ******************************************************************************/
 
 Polygon::Polygon(const Polygon& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mLayerName(other.mLayerName),
     mLineWidth(other.mLineWidth),
     mIsFilled(other.mIsFilled),
@@ -52,7 +53,8 @@ Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept
 Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
                  const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
                  const Path& path) noexcept
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mLayerName(layerName),
     mLineWidth(lineWidth),
     mIsFilled(fill),
@@ -61,35 +63,13 @@ Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 Polygon::Polygon(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(false),
-    mPath() {
-  if (node.getChildByIndex(0).isString()) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-  }
-  if (node.tryGetChildByPath("grab_area")) {
-    mIsGrabArea = node.getValueByPath<bool>("grab_area");
-  } else {
-    // backward compatibility, remove this some time!
-    mIsGrabArea = node.getValueByPath<bool>("grab");
-  }
-
-  // load vertices
-  if ((!node.tryGetChildByPath("pos")) &&
-      (!node.tryGetChildByPath("position"))) {
-    mPath = Path(node);  // can throw
-  } else {
-    // backward compatibility, remove this some time!
-    mPath.addVertex(Point(node.getChildByPath("pos")));
-    foreach (const SExpression& child, node.getChildren("segment")) {
-      mPath.getVertices().last().setAngle(child.getValueByPath<Angle>("angle"));
-      mPath.addVertex(Point(child.getChildByPath("pos")));
-    }
-  }
+    mIsGrabArea(node.getValueByPath<bool>("grab_area")),
+    mPath(node) {
 }
 
 Polygon::~Polygon() noexcept {
@@ -99,57 +79,59 @@ Polygon::~Polygon() noexcept {
  *  Setters
  ******************************************************************************/
 
-void Polygon::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) return;
+bool Polygon::setLayerName(const GraphicsLayerName& name) noexcept {
+  if (name == mLayerName) {
+    return false;
+  }
+
   mLayerName = name;
-  foreach (IF_PolygonObserver* object, mObservers) {
-    object->polygonLayerNameChanged(mLayerName);
-  }
+  onEdited.notify(Event::LayerNameChanged);
+  return true;
 }
 
-void Polygon::setLineWidth(const UnsignedLength& width) noexcept {
-  if (width == mLineWidth) return;
+bool Polygon::setLineWidth(const UnsignedLength& width) noexcept {
+  if (width == mLineWidth) {
+    return false;
+  }
+
   mLineWidth = width;
-  foreach (IF_PolygonObserver* object, mObservers) {
-    object->polygonLineWidthChanged(mLineWidth);
-  }
+  onEdited.notify(Event::LineWidthChanged);
+  return true;
 }
 
-void Polygon::setIsFilled(bool isFilled) noexcept {
-  if (isFilled == mIsFilled) return;
+bool Polygon::setIsFilled(bool isFilled) noexcept {
+  if (isFilled == mIsFilled) {
+    return false;
+  }
+
   mIsFilled = isFilled;
-  foreach (IF_PolygonObserver* object, mObservers) {
-    object->polygonIsFilledChanged(mIsFilled);
-  }
+  onEdited.notify(Event::IsFilledChanged);
+  return true;
 }
 
-void Polygon::setIsGrabArea(bool isGrabArea) noexcept {
-  if (isGrabArea == mIsGrabArea) return;
+bool Polygon::setIsGrabArea(bool isGrabArea) noexcept {
+  if (isGrabArea == mIsGrabArea) {
+    return false;
+  }
+
   mIsGrabArea = isGrabArea;
-  foreach (IF_PolygonObserver* object, mObservers) {
-    object->polygonIsGrabAreaChanged(mIsGrabArea);
-  }
+  onEdited.notify(Event::IsGrabAreaChanged);
+  return true;
 }
 
-void Polygon::setPath(const Path& path) noexcept {
-  if (path == mPath) return;
-  mPath = path;
-  foreach (IF_PolygonObserver* object, mObservers) {
-    object->polygonPathChanged(mPath);
+bool Polygon::setPath(const Path& path) noexcept {
+  if (path == mPath) {
+    return false;
   }
+
+  mPath = path;
+  onEdited.notify(Event::PathChanged);
+  return true;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void Polygon::registerObserver(IF_PolygonObserver& object) const noexcept {
-  mObservers.insert(&object);
-}
-
-void Polygon::unregisterObserver(IF_PolygonObserver& object) const noexcept {
-  mObservers.remove(&object);
-}
 
 void Polygon::serialize(SExpression& root) const {
   root.appendChild(mUuid);
@@ -175,12 +157,15 @@ bool Polygon::operator==(const Polygon& rhs) const noexcept {
 }
 
 Polygon& Polygon::operator=(const Polygon& rhs) noexcept {
-  mUuid       = rhs.mUuid;
-  mLayerName  = rhs.mLayerName;
-  mLineWidth  = rhs.mLineWidth;
-  mIsFilled   = rhs.mIsFilled;
-  mIsGrabArea = rhs.mIsGrabArea;
-  mPath       = rhs.mPath;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setLayerName(rhs.mLayerName);
+  setLineWidth(rhs.mLineWidth);
+  setIsFilled(rhs.mIsFilled);
+  setIsGrabArea(rhs.mIsGrabArea);
+  setPath(rhs.mPath);
   return *this;
 }
 

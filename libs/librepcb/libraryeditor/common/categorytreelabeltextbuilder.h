@@ -48,9 +48,6 @@ namespace editor {
 
 /**
  * @brief The CategoryTreeLabelTextBuilder class
- *
- * @author ubruhin
- * @date 2016-10-28
  */
 template <typename ElementType>
 class CategoryTreeLabelTextBuilder final {

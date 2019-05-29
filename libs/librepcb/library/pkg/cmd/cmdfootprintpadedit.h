@@ -58,7 +58,7 @@ public:
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
-  void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 

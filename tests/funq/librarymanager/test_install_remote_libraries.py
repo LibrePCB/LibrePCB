@@ -57,6 +57,11 @@ def test(librepcb, helpers):
         # Install selected libraries
         app.widget('libraryManagerDownloadFromRepoDownloadButton').click()
 
+        # Check if two libraries were added
+        library_count_after = library_count_before + 2
+        helpers.wait_for_model_items_count(library_list, library_count_after,
+                                           library_count_after)
+
         # Wait until progress bars are at 100% and hidden (i.e. installation finished)
         for i in range(0, remote_library_count):
             props = {'value': 100 if i <= 1 else 0, 'visible': False}
@@ -65,11 +70,8 @@ def test(librepcb, helpers):
         # Check installed status of libraries in remote library list
         for i in range(0, remote_library_count):
             if i <= 1:
-                assert statuslabels[i].properties()['text'].startswith('Installed')
+                # The downloaded libraries are outdated, thus the installed
+                # version number is displayed.
+                assert statuslabels[i].properties()['text'].startswith('v')
             else:
                 assert statuslabels[i].properties()['text'] == 'Recommended'
-
-        # Check if two libraries were added
-        library_count_after = library_count_before + 2
-        helpers.wait_for_model_items_count(library_list, library_count_after,
-                                           library_count_after)

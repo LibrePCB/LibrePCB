@@ -16,11 +16,11 @@ matrix:
       dist: trusty
       compiler: gcc
       env: BUILD_DOXYGEN=true DEPLOY_APPIMAGE=false DEPLOY_INSTALLER=false QT_BASE="trusty"
-    # Ubuntu 14.04 + Clang + Qt from PPA (https://launchpad.net/~beineri) + AppImage deployment
+    # Ubuntu 16.04 + Clang + Qt from PPA (https://launchpad.net/~beineri) + AppImage deployment
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: clang
-      env: BUILD_DOXYGEN=false DEPLOY_APPIMAGE=true DEPLOY_INSTALLER=true TX_UPLOAD=true QT_BASE="qt59" QT_PPA="ppa:beineri/opt-qt591-trusty"
+      env: BUILD_DOXYGEN=false DEPLOY_APPIMAGE=true DEPLOY_INSTALLER=true TX_UPLOAD=true QT_BASE="qt512" QT_PPA="ppa:beineri/opt-qt-5.12.3-xenial"
     # OS X + GCC
     - os: osx
       compiler: gcc

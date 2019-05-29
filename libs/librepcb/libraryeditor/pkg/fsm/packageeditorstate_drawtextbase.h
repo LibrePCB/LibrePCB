@@ -49,9 +49,6 @@ namespace editor {
 
 /**
  * @brief The PackageEditorState_DrawTextBase class
- *
- * @author  ubruhin
- * @date    2017-05-29
  */
 class PackageEditorState_DrawTextBase : public PackageEditorState {
   Q_OBJECT

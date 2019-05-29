@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The IF_ComponentSymbolVariantEditorProvider interface
- *
- * @author ubruhin
- * @date 2017-03-18
  */
 class IF_ComponentSymbolVariantEditorProvider {
 public:

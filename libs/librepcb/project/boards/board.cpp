@@ -48,7 +48,6 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/boarddesignrules.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
@@ -70,20 +69,18 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Board::Board(const Board& other, const FilePath& filepath,
-             const ElementName& name)
+Board::Board(const Board&                            other,
+             std::unique_ptr<TransactionalDirectory> directory,
+             const ElementName&                      name)
   : QObject(&other.getProject()),
     mProject(other.getProject()),
-    mFilePath(filepath),
+    mDirectory(std::move(directory)),
     mIsAddedToProject(false),
     mUuid(Uuid::createRandom()),
     mName(name),
     mDefaultFontFileName(other.mDefaultFontFileName) {
   try {
     mGraphicsScene.reset(new GraphicsScene());
-
-    // copy the other board
-    mFile.reset(SmartSExprFile::create(mFilePath));
 
     // copy layer stack
     mLayerStack.reset(new BoardLayerStack(*this, *other.mLayerStack));
@@ -179,17 +176,17 @@ Board::Board(const Board& other, const FilePath& filepath,
     mDesignRules.reset();
     mGridProperties.reset();
     mLayerStack.reset();
-    mFile.reset();
     mGraphicsScene.reset();
     throw;  // ...and rethrow the exception
   }
 }
 
-Board::Board(Project& project, const FilePath& filepath, bool restore,
-             bool readOnly, bool create, const QString& newName)
+Board::Board(Project&                                project,
+             std::unique_ptr<TransactionalDirectory> directory, bool create,
+             const QString& newName)
   : QObject(&project),
     mProject(project),
-    mFilePath(filepath),
+    mDirectory(std::move(directory)),
     mIsAddedToProject(false),
     mUuid(Uuid::createRandom()),
     mName("New Board") {
@@ -198,8 +195,6 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
 
     // try to open/create the board file
     if (create) {
-      mFile.reset(SmartSExprFile::create(mFilePath));
-
       // set attributes
       mName                = newName;
       mDefaultFontFileName = qApp->getDefaultStrokeFontName();
@@ -220,8 +215,7 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
       mFabricationOutputSettings.reset(new BoardFabricationOutputSettings());
 
       // load default user settings
-      mUserSettings.reset(
-          new BoardUserSettings(*this, restore, readOnly, create));
+      mUserSettings.reset(new BoardUserSettings(*this));
 
       // add 100x80mm board outline (1/2 Eurocard size)
       Polygon polygon(Uuid::createRandom(),
@@ -230,18 +224,13 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
                       Path::rect(Point(0, 0), Point(100000000, 80000000)));
       mPolygons.append(new BI_Polygon(*this, polygon));
     } else {
-      mFile.reset(new SmartSExprFile(mFilePath, restore, readOnly));
-      SExpression root = mFile->parseFileAndBuildDomTree();
+      SExpression root = SExpression::parse(
+          mDirectory->read(getFilePath().getFilename()), getFilePath());
 
       // the board seems to be ready to open, so we will create all needed
       // objects
 
-      if (root.getChildByIndex(0).isString()) {
-        mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      } else {
-        // backward compatibility, remove this some time!
-        mUuid = root.getValueByPath<Uuid>("uuid");
-      }
+      mUuid = root.getChildByIndex(0).getValue<Uuid>();
       mName = root.getValueByPath<ElementName>("name");
       if (const SExpression* child = root.tryGetChildByPath("default_font")) {
         mDefaultFontFileName = child->getValueOfFirstChild<QString>(true);
@@ -261,18 +250,25 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
           new BoardDesignRules(root.getChildByPath("design_rules")));
 
       // load fabrication output settings
-      if (const SExpression* child =
-              root.tryGetChildByPath("fabrication_output_settings")) {
-        mFabricationOutputSettings.reset(
-            new BoardFabricationOutputSettings(*child));
-      } else {
-        // backward compatibility - remove this some time!
-        mFabricationOutputSettings.reset(new BoardFabricationOutputSettings());
-      }
+      mFabricationOutputSettings.reset(new BoardFabricationOutputSettings(
+          root.getChildByPath("fabrication_output_settings")));
 
       // load user settings
-      mUserSettings.reset(
-          new BoardUserSettings(*this, restore, readOnly, create));
+      try {
+        QString     userSettingsFp = "settings.user.lp";
+        SExpression userSettingsRoot =
+            SExpression::parse(mDirectory->read(userSettingsFp),
+                               mDirectory->getAbsPath(userSettingsFp));
+        mUserSettings.reset(new BoardUserSettings(*this, userSettingsRoot));
+      } catch (const Exception&) {
+        // Project user settings are normally not put under version control and
+        // thus the likelyhood of parse errors is higher (e.g. when switching to
+        // an older, now incompatible revision). To avoid frustration, we just
+        // ignore these errors and load the default settings instead...
+        qCritical() << "Could not open board user settings, defaults will be "
+                       "used instead!";
+        mUserSettings.reset(new BoardUserSettings(*this));
+      }
 
       // Load all device instances
       foreach (const SExpression& node, root.getChildren("device")) {
@@ -323,24 +319,6 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
         BI_Hole* hole = new BI_Hole(*this, node);
         mHoles.append(hole);
       }
-
-      //////////////////////////////////////////////////////////////////////////////
-      // TODO: Backward compatibility, remove this some time!
-      int strokeTextCount = mStrokeTexts.count();
-      foreach (const BI_Device* device, mDeviceInstances) {
-        foreach (const BI_StrokeText* text,
-                 device->getFootprint().getStrokeTexts()) {
-          Q_UNUSED(text);
-          ++strokeTextCount;
-        }
-      }
-      if (strokeTextCount == 0) {
-        foreach (const BI_Device* device, mDeviceInstances) {
-          device->getFootprint()
-              .resetStrokeTextsToLibraryFootprint();  // can throw
-        }
-      }
-      //////////////////////////////////////////////////////////////////////////////
     }
 
     rebuildAllPlanes();
@@ -378,7 +356,6 @@ Board::Board(Project& project, const FilePath& filepath, bool restore,
     mDesignRules.reset();
     mGridProperties.reset();
     mLayerStack.reset();
-    mFile.reset();
     mGraphicsScene.reset();
     throw;  // ...and rethrow the exception
   }
@@ -411,13 +388,16 @@ Board::~Board() noexcept {
   mDesignRules.reset();
   mGridProperties.reset();
   mLayerStack.reset();
-  mFile.reset();
   mGraphicsScene.reset();
 }
 
 /*******************************************************************************
  *  Getters: General
  ******************************************************************************/
+
+FilePath Board::getFilePath() const noexcept {
+  return mDirectory->getAbsPath("board.lp");
+}
 
 bool Board::isEmpty() const noexcept {
   return (mDeviceInstances.isEmpty() && mNetSegments.isEmpty() &&
@@ -838,28 +818,20 @@ void Board::removeFromProject() {
   sgl.dismiss();
 }
 
-bool Board::save(bool toOriginal, QStringList& errors) noexcept {
-  bool success = true;
+void Board::save() {
+  if (mIsAddedToProject) {
+    // save board file
+    SExpression brdDoc(serializeToDomElement("librepcb_board"));  // can throw
+    mDirectory->write(getFilePath().getFilename(),
+                      brdDoc.toByteArray());  // can throw
 
-  // save board file
-  try {
-    if (mIsAddedToProject) {
-      SExpression doc(serializeToDomElement("librepcb_board"));
-      mFile->save(doc, toOriginal);
-    } else {
-      mFile->removeFile(toOriginal);
-    }
-  } catch (Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
+    // save user settings
+    SExpression usrDoc(mUserSettings->serializeToDomElement(
+        "librepcb_board_user_settings"));                         // can throw
+    mDirectory->write("settings.user.lp", usrDoc.toByteArray());  // can throw
+  } else {
+    mDirectory->removeDirRecursively();  // can throw
   }
-
-  // save user settings
-  if (!mUserSettings->save(toOriginal, errors)) {
-    success = false;
-  }
-
-  return success;
 }
 
 void Board::showInView(GraphicsView& view) noexcept {
@@ -952,15 +924,7 @@ QVector<const AttributeProvider*> Board::getAttributeProviderParents() const
  ******************************************************************************/
 
 void Board::updateIcon() noexcept {
-  QRectF source =
-      mGraphicsScene->itemsBoundingRect().adjusted(-20, -20, 20, 20);
-  QRect target(0, 0, 297, 210);  // DIN A4 format :-)
-
-  QPixmap pixmap(target.size());
-  pixmap.fill(Qt::white);
-  QPainter painter(&pixmap);
-  mGraphicsScene->render(&painter, target, source);
-  mIcon = QIcon(pixmap);
+  mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
 }
 
 void Board::serialize(SExpression& root) const {
@@ -1026,9 +990,10 @@ void Board::updateErcMessages() noexcept {
  *  Static Methods
  ******************************************************************************/
 
-Board* Board::create(Project& project, const FilePath& filepath,
-                     const ElementName& name) {
-  return new Board(project, filepath, false, false, true, *name);
+Board* Board::create(Project&                                project,
+                     std::unique_ptr<TransactionalDirectory> directory,
+                     const ElementName&                      name) {
+  return new Board(project, std::move(directory), true, *name);
 }
 
 /*******************************************************************************

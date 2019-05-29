@@ -26,6 +26,7 @@
 
 #include <gmock/gmock.h>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/signalslot.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>
@@ -42,11 +43,13 @@ namespace tests {
 
 class MinimalSerializableObjectMock final : public SerializableObject {
 public:
-  QString mValue;
+  QString                               mValue;
+  Signal<MinimalSerializableObjectMock> onEdited;
   MinimalSerializableObjectMock() = delete;
-  MinimalSerializableObjectMock(const QString& value) : mValue(value) {}
+  MinimalSerializableObjectMock(const QString& value)
+    : mValue(value), onEdited(*this) {}
   MinimalSerializableObjectMock(const SExpression& root)
-    : mValue(root.getValueOfFirstChild<QString>()) {}
+    : mValue(root.getValueOfFirstChild<QString>()), onEdited(*this) {}
   MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
   MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) =
       delete;
@@ -68,18 +71,22 @@ public:
 
 class SerializableObjectMock final : public SerializableObject {
 public:
-  Uuid    mUuid;
-  QString mName;
+  Uuid                           mUuid;
+  QString                        mName;
+  Signal<SerializableObjectMock> onEdited;
   SerializableObjectMock() = delete;
   SerializableObjectMock(const SerializableObjectMock& other) noexcept
-    : mUuid(other.mUuid), mName(other.mName) {}
+    : mUuid(other.mUuid), mName(other.mName), onEdited(*this) {}
   SerializableObjectMock(SerializableObjectMock&& other) noexcept
-    : mUuid(std::move(other.mUuid)), mName(std::move(other.mName)) {}
+    : mUuid(std::move(other.mUuid)),
+      mName(std::move(other.mName)),
+      onEdited(*this) {}
   SerializableObjectMock(const Uuid& uuid, const QString& name)
-    : mUuid(uuid), mName(name) {}
+    : mUuid(uuid), mName(name), onEdited(*this) {}
   SerializableObjectMock(const SExpression& root)
     : mUuid(root.getValueOfFirstChild<Uuid>()),
-      mName(root.getValueByPath<QString>("name")) {}
+      mName(root.getValueByPath<QString>("name")),
+      onEdited(*this) {}
   ~SerializableObjectMock() {}
 
   const Uuid&    getUuid() const noexcept { return mUuid; }

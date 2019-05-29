@@ -65,8 +65,6 @@ class UnplacedComponentsDock;
 
 /**
  * @brief The UnplacedComponentsDock class
- *
- * @todo This class is very provisional and may contain dangerous bugs...
  */
 class UnplacedComponentsDock final : public QDockWidget {
   Q_OBJECT

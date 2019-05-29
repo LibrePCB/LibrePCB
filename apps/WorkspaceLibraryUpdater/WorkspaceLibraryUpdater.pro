@@ -20,6 +20,7 @@ LIBS += \
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
     -lsexpresso \
     -lclipper \
+    -lquazip -lz \
 
 INCLUDEPATH += \
     ../../libs \

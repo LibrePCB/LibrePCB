@@ -43,10 +43,12 @@ PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mPadList(nullptr),
-    mUndoStack(nullptr) {
+    mUndoStack(nullptr),
+    mPadListEditedSlot(*this, &PackagePadListEditorWidget::padListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_NAME,
                                   new QTableWidgetItem(tr("Name")));
@@ -70,7 +72,6 @@ PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
 }
 
 PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
-  if (mPadList) mPadList->unregisterObserver(this);
 }
 
 /*******************************************************************************
@@ -79,11 +80,15 @@ PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
 
 void PackagePadListEditorWidget::setReferences(PackagePadList& list,
                                                UndoStack*      stack) noexcept {
-  if (mPadList) mPadList->unregisterObserver(this);
+  if (mPadList) {
+    mPadList->onEdited.detach(mPadListEditedSlot);
+  }
   mPadList     = &list;
   mUndoStack   = stack;
   mSelectedPad = tl::nullopt;
-  mPadList->registerObserver(this);
+  if (mPadList) {
+    mPadList->onEdited.attach(mPadListEditedSlot);
+  }
   updateTable();
 }
 
@@ -133,6 +138,17 @@ void PackagePadListEditorWidget::btnAddRemoveClicked() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PackagePadListEditorWidget::padListEdited(
+    const PackagePadList& list, int index,
+    const std::shared_ptr<const PackagePad>& pad,
+    PackagePadList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(pad);
+  Q_UNUSED(event);
+  updateTable(mSelectedPad);
+}
 
 void PackagePadListEditorWidget::updateTable(
     const tl::optional<Uuid>& selected) noexcept {
@@ -184,8 +200,13 @@ void PackagePadListEditorWidget::setTableRowContent(
   // name
   mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // button
-  int          btnSize = 23;  // TODO: can we determine this value dynamically?
+  int          btnSize      = mTable->rowHeight(row);
   QToolButton* btnAddRemove = new QToolButton(this);
   btnAddRemove->setProperty("row", row);
   btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -199,9 +220,6 @@ void PackagePadListEditorWidget::setTableRowContent(
     btnAddRemove->setIcon(QIcon(":/img/actions/add.png"));
   }
   mTable->setCellWidget(row, COLUMN_BUTTONS, btnAddRemove);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void PackagePadListEditorWidget::addPad(const QString& name) noexcept {
@@ -289,30 +307,6 @@ QString PackagePadListEditorWidget::getNextPadNameProposal() const noexcept {
     ++i;
   }
   return QString::number(i);
-}
-
-/*******************************************************************************
- *  Observer Methods
- ******************************************************************************/
-
-void PackagePadListEditorWidget::listObjectAdded(
-    const PackagePadList& list, int newIndex,
-    const std::shared_ptr<PackagePad>& ptr) noexcept {
-  Q_ASSERT(&list == mPadList);
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedPad);
-}
-
-void PackagePadListEditorWidget::listObjectRemoved(
-    const PackagePadList& list, int oldIndex,
-    const std::shared_ptr<PackagePad>& ptr) noexcept {
-  Q_ASSERT(&list == mPadList);
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedPad);
 }
 
 /*******************************************************************************

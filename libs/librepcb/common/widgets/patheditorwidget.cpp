@@ -52,6 +52,7 @@ PathEditorWidget::PathEditorWidget(QWidget* parent) noexcept
   mTable->verticalHeader()->setDefaultSectionSize(20);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setCornerButtonEnabled(false);
   layout->addWidget(mTable);
 }
@@ -99,8 +100,13 @@ void PathEditorWidget::setRowContent(int row, const QString& x,
   mTable->setItem(row, 1, new QTableWidgetItem(y));
   mTable->setItem(row, 2, new QTableWidgetItem(angle));
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // button
-  int          btnSize = 23;  // TODO: can we determine this value dynamically?
+  int          btnSize      = mTable->rowHeight(row);
   QToolButton* btnAddRemove = new QToolButton(this);
   btnAddRemove->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   btnAddRemove->setFixedSize(btnSize, btnSize);
@@ -113,9 +119,6 @@ void PathEditorWidget::setRowContent(int row, const QString& x,
     btnAddRemove->setIcon(QIcon(":/img/actions/minus.png"));
   }
   mTable->setCellWidget(row, 3, btnAddRemove);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void PathEditorWidget::btnAddRemoveClicked() noexcept {

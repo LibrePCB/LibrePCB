@@ -73,9 +73,6 @@ class ControlPanel;
 
 /**
  * @brief The ControlPanel class
- *
- * @author ubruhin
- * @date 2014-06-23
  */
 class ControlPanel final : public QMainWindow {
   Q_OBJECT
@@ -130,6 +127,7 @@ private:
   // General private methods
   void saveSettings();
   void loadSettings();
+  void updateNoLibrariesWarningVisibility() noexcept;
   void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
 
   // Project Management
@@ -206,7 +204,7 @@ private:
       noexcept;
 
   // Library Management
-  void openLibraryEditor(QSharedPointer<library::Library> lib) noexcept;
+  void openLibraryEditor(const FilePath& libDir) noexcept;
   void libraryEditorDestroyed() noexcept;
 
   /**
@@ -220,12 +218,12 @@ private:
   bool closeAllLibraryEditors(bool askForSave) noexcept;
 
   // Attributes
-  workspace::Workspace&                                     mWorkspace;
-  QScopedPointer<Ui::ControlPanel>                          mUi;
-  QScopedPointer<library::manager::LibraryManager>          mLibraryManager;
-  QHash<QString, project::editor::ProjectEditor*>           mOpenProjectEditors;
-  QHash<library::Library*, library::editor::LibraryEditor*> mOpenLibraryEditors;
-  QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;
+  workspace::Workspace&                            mWorkspace;
+  QScopedPointer<Ui::ControlPanel>                 mUi;
+  QScopedPointer<library::manager::LibraryManager> mLibraryManager;
+  QHash<QString, project::editor::ProjectEditor*>  mOpenProjectEditors;
+  QHash<FilePath, library::editor::LibraryEditor*> mOpenLibraryEditors;
+  QScopedPointer<ProjectLibraryUpdater>            mProjectLibraryUpdater;
 };
 
 /*******************************************************************************

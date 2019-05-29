@@ -174,12 +174,9 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter,
     // set colors
     layer = mLayerProvider.getLayer(*circle.getLayerName());
     if (!layer) continue;
-    if (layer) {
-      pen = QPen(layer->getColor(selected), circle.getLineWidth()->toPx(),
-                 Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-      painter->setPen(pen);
-    } else
-      painter->setPen(Qt::NoPen);
+    pen = QPen(layer->getColor(selected), circle.getLineWidth()->toPx(),
+               Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    painter->setPen(pen);
     if (circle.isFilled())
       layer = mLayerProvider.getLayer(*circle.getLayerName());
     else if (circle.isGrabArea())

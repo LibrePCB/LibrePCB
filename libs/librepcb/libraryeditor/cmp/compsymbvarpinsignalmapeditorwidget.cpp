@@ -24,6 +24,7 @@
 
 #include "cmpsigpindisplaytypecombobox.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -54,6 +55,7 @@ CompSymbVarPinSignalMapEditorWidget::CompSymbVarPinSignalMapEditorWidget(
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_SYMBOL,
                                   new QTableWidgetItem(tr("Symbol")));
@@ -150,7 +152,9 @@ void CompSymbVarPinSignalMapEditorWidget::
     for (ComponentSymbolVariantItem& item : mSymbolVariant->getSymbolItems()) {
       FilePath fp = mWorkspace->getLibraryDb().getLatestSymbol(
           item.getSymbolUuid());  // can throw
-      Symbol symbol(fp, true);    // can throw
+      Symbol symbol(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(fp))));  // can throw
       for (ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
         CircuitIdentifier pinName =
             symbol.getPins().get(map.getPinUuid())->getName();
@@ -190,8 +194,10 @@ void CompSymbVarPinSignalMapEditorWidget::updateTable(
     QScopedPointer<Symbol> symbol;
     try {
       FilePath fp = mWorkspace->getLibraryDb().getLatestSymbol(
-          item.getSymbolUuid());           // can throw
-      symbol.reset(new Symbol(fp, true));  // can throw
+          item.getSymbolUuid());  // can throw
+      symbol.reset(new Symbol(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(fp)))));  // can throw
     } catch (const Exception& e) {
       // what could we do here?
     }

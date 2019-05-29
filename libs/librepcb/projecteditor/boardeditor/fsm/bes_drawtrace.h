@@ -52,8 +52,6 @@ namespace editor {
 
 /**
  * @brief The BES_DrawTrace class
- *
- * @todo This class is incredible ugly and buggy :-D
  */
 class BES_DrawTrace final : public BES_Base {
   Q_OBJECT

@@ -51,9 +51,6 @@ class NewProjectWizardPage_Metadata;
 
 /**
  * @brief The NewProjectWizardPage_Metadata class
- *
- * @author ubruhin
- * @date 2016-08-13
  */
 class NewProjectWizardPage_Metadata final : public QWizardPage {
   Q_OBJECT

@@ -60,7 +60,8 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
           &PackageCategoryEditorWidget::btnResetParentCategoryClicked);
 
   // Load element.
-  mCategory.reset(new PackageCategory(fp, false));  // can throw
+  mCategory.reset(new PackageCategory(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));  // can throw
   updateMetadata();
 
   // Reload metadata on undo stack state changes.
@@ -99,7 +100,8 @@ bool PackageCategoryEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mCategory->save();  // can throw
+    mCategory->save();    // can throw
+    mFileSystem->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Save failed"), e.getMsg());

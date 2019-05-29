@@ -45,9 +45,6 @@ class NewElementWizardPage_PackagePads;
 
 /**
  * @brief The NewElementWizardPage_PackagePads class
- *
- * @author ubruhin
- * @date 2017-03-27
  */
 class NewElementWizardPage_PackagePads final : public QWizardPage {
   Q_OBJECT

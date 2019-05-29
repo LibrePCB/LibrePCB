@@ -41,7 +41,8 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
   : QGraphicsItem(parent),
     mLayer(nullptr),
     mAlignment(HAlign::left(), VAlign::bottom()),
-    mTextFlags(0) {
+    mTextFlags(0),
+    mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
   mFont = qApp->getDefaultSansSerifFont();
   mFont.setPixelSize(1);
 
@@ -50,8 +51,6 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
 }
 
 PrimitiveTextGraphicsItem::~PrimitiveTextGraphicsItem() noexcept {
-  // unregister from graphics layer
-  setLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -103,11 +102,11 @@ void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
 
 void PrimitiveTextGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
   if (mLayer) {
-    mLayer->unregisterObserver(*this);
+    mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mLayer = layer;
   if (mLayer) {
-    mLayer->registerObserver(*this);
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
     mPen.setColor(mLayer->getColor(false));
     mPenHighlighted.setColor(mLayer->getColor(true));
     setVisible(mLayer->isVisible());
@@ -115,45 +114,6 @@ void PrimitiveTextGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
   } else {
     setVisible(false);
   }
-}
-
-/*******************************************************************************
- *  Inherited from IF_LayerObserver
- ******************************************************************************/
-
-void PrimitiveTextGraphicsItem::layerColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_ASSERT(&layer == mLayer);
-  mPen.setColor(newColor);
-  update();
-}
-
-void PrimitiveTextGraphicsItem::layerHighlightColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_ASSERT(&layer == mLayer);
-  mPenHighlighted.setColor(newColor);
-  update();
-}
-
-void PrimitiveTextGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer,
-                                                    bool newVisible) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  Q_UNUSED(newVisible);
-  setVisible(layer.isVisible());
-}
-
-void PrimitiveTextGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer,
-                                                    bool newEnabled) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  layerVisibleChanged(layer, newEnabled);
-}
-
-void PrimitiveTextGraphicsItem::layerDestroyed(
-    const GraphicsLayer& layer) noexcept {
-  Q_ASSERT(&layer == mLayer);
-  setLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -188,6 +148,31 @@ void PrimitiveTextGraphicsItem::paint(QPainter*                       painter,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PrimitiveTextGraphicsItem::layerEdited(
+    const GraphicsLayer& layer, GraphicsLayer::Event event) noexcept {
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      mPen.setColor(layer.getColor(false));
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      mPenHighlighted.setColor(layer.getColor(true));
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      setVisible(layer.isVisible() && layer.isEnabled());
+      break;
+    case GraphicsLayer::Event::Destroyed:
+      setLayer(nullptr);
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in "
+                    "PrimitiveTextGraphicsItem::layerEdited()";
+      break;
+  }
+}
 
 void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();

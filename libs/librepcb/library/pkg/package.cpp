@@ -46,11 +46,11 @@ Package::Package(const Uuid& uuid, const Version& version,
                    author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-Package::Package(const FilePath& elementDirectory, bool readOnly)
-  : LibraryElement(elementDirectory, getShortElementName(),
-                   getLongElementName(), readOnly) {
-  mPads.loadFromDomElement(mLoadingFileDocument);
-  mFootprints.loadFromDomElement(mLoadingFileDocument);
+Package::Package(std::unique_ptr<TransactionalDirectory> directory)
+  : LibraryElement(std::move(directory), getShortElementName(),
+                   getLongElementName()) {
+  mPads.loadFromSExpression(mLoadingFileDocument);
+  mFootprints.loadFromSExpression(mLoadingFileDocument);
 
   cleanupAfterLoadingElementFromFile();
 }

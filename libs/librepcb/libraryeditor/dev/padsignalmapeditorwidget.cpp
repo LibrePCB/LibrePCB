@@ -44,10 +44,12 @@ PadSignalMapEditorWidget::PadSignalMapEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mUndoStack(nullptr),
-    mPadSignalMap(nullptr) {
+    mPadSignalMap(nullptr),
+    mMapEditedSlot(*this, &PadSignalMapEditorWidget::mapEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_PAD,
                                   new QTableWidgetItem(tr("Pad Name")));
@@ -80,20 +82,12 @@ PadSignalMapEditorWidget::~PadSignalMapEditorWidget() noexcept {
 void PadSignalMapEditorWidget::setReferences(UndoStack*          undoStack,
                                              DevicePadSignalMap* map) noexcept {
   if (mPadSignalMap) {
-    mPadSignalMap->unregisterObserver(this);
-    for (const DevicePadSignalMapItem& item : *mPadSignalMap) {
-      disconnect(&item, &DevicePadSignalMapItem::signalUuidChanged, this,
-                 &PadSignalMapEditorWidget::updateTable);
-    }
+    mPadSignalMap->onEdited.detach(mMapEditedSlot);
   }
   mUndoStack    = undoStack;
   mPadSignalMap = map;
   if (mPadSignalMap) {
-    mPadSignalMap->registerObserver(this);
-    for (const DevicePadSignalMapItem& item : *mPadSignalMap) {
-      connect(&item, &DevicePadSignalMapItem::signalUuidChanged, this,
-              &PadSignalMapEditorWidget::updateTable);
-    }
+    mPadSignalMap->onEdited.attach(mMapEditedSlot);
   }
   updateTable();
 }
@@ -135,34 +129,19 @@ void PadSignalMapEditorWidget::componentSignalChanged(int index) noexcept {
 }
 
 /*******************************************************************************
- *  Observer
- ******************************************************************************/
-
-void PadSignalMapEditorWidget::listObjectAdded(
-    const DevicePadSignalMap& list, int newIndex,
-    const std::shared_ptr<DevicePadSignalMapItem>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == mPadSignalMap);
-  connect(ptr.get(), &DevicePadSignalMapItem::signalUuidChanged, this,
-          &PadSignalMapEditorWidget::updateTable);
-  updateTable();
-}
-
-void PadSignalMapEditorWidget::listObjectRemoved(
-    const DevicePadSignalMap& list, int oldIndex,
-    const std::shared_ptr<DevicePadSignalMapItem>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == mPadSignalMap);
-  disconnect(ptr.get(), &DevicePadSignalMapItem::signalUuidChanged, this,
-             &PadSignalMapEditorWidget::updateTable);
-  updateTable();
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PadSignalMapEditorWidget::mapEdited(
+    const DevicePadSignalMap& map, int index,
+    const std::shared_ptr<const DevicePadSignalMapItem>& item,
+    DevicePadSignalMap::Event                            event) noexcept {
+  Q_UNUSED(map);
+  Q_UNUSED(index);
+  Q_UNUSED(item);
+  Q_UNUSED(event);
+  updateTable();
+}
 
 void PadSignalMapEditorWidget::updateTable() noexcept {
   blockSignals(true);
@@ -233,10 +212,16 @@ void PadSignalMapEditorWidget::setTableRowContent(
   signalComboBox->setStyleSheet(
       "padding: 0px 3px 0px 3px;");  // reduce required space
   signalComboBox->setFixedHeight(cbxHeight);
-  signalComboBox->addItem(tr("(not connected)"));
   for (const ComponentSignal& sig : mSignals) {
     signalComboBox->addItem(*sig.getName(), sig.getUuid().toStr());
+    // Set display role to a QVariant to get numbers sorted by value and strings
+    // alphabetically.
+    signalComboBox->setItemData(
+        signalComboBox->count() - 1,
+        Toolbox::stringOrNumberToQVariant(*sig.getName()), Qt::DisplayRole);
   }
+  signalComboBox->model()->sort(0);
+  signalComboBox->insertItem(0, tr("(not connected)"));
   int currentIndex =
       signalUuid ? signalComboBox->findData(signalUuid->toStr(), Qt::UserRole)
                  : -1;

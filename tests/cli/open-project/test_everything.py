@@ -8,23 +8,27 @@ import pytest
 Test command "open-project" with all available options
 """
 
-PROJECT_DIR = 'data/Empty Project/'
-PROJECT_PATH = PROJECT_DIR + 'Empty Project.lpp'
-OUTPUT_DIR = PROJECT_DIR + 'output/v1/gerber'
 
-PROJECT_2_DIR = 'data/Project With Two Boards/'
-PROJECT_2_PATH = PROJECT_2_DIR + 'Project With Two Boards.lpp'
-OUTPUT_2_DIR = PROJECT_2_DIR + 'output/v1/gerber'
-
-
-@pytest.mark.parametrize("project_path,output_dir,gerber_count", [
-    (PROJECT_PATH, OUTPUT_DIR, 8),
-    (PROJECT_2_PATH, OUTPUT_2_DIR, 16),
+@pytest.mark.parametrize("project_name,project_suffix,gerber_count", [
+    ('Empty Project', 'lpp', 8),
+    ('Empty Project', 'lppz', 8),
+    ('Project With Two Boards', 'lpp', 16),
+    ('Project With Two Boards', 'lppz', 16),
 ], ids=[
-    'EmptyProject',
-    'ProjectWithTwoBoards'
+    'EmptyProject.lpp',
+    'EmptyProject.lppz',
+    'ProjectWithTwoBoards.lpp',
+    'ProjectWithTwoBoards.lppz',
 ])
-def test_everything(cli, project_path, output_dir, gerber_count):
+def test_everything(cli, project_name, project_suffix, gerber_count):
+    # determine paths
+    if project_suffix == 'lppz':
+        project_path = 'data/' + project_name + '/' + project_name + '.lpp'
+        output_dir = 'data/' + project_name + '/output/v1/gerber'
+    else:
+        project_path = 'data/' + project_name + '.lppz'
+        output_dir = 'data/output/v1/gerber'
+
     # prepare "--export-schematics"
     schematic = cli.abspath('schematic.pdf')
     assert not os.path.exists(schematic)
@@ -35,10 +39,9 @@ def test_everything(cli, project_path, output_dir, gerber_count):
 
     # prepare "--save"
     path = cli.abspath(project_path)
-    original_filesize = os.path.getsize(path)
     with open(path, 'ab') as f:
-        f.write(b'\n\n')
-    assert os.path.getsize(path) == original_filesize + 2
+        f.write(b'\0\0')
+    original_filesize = os.path.getsize(path)
 
     # run the CLI
     code, stdout, stderr = cli.run('open-project',
@@ -60,4 +63,4 @@ def test_everything(cli, project_path, output_dir, gerber_count):
     assert len(os.listdir(output)) == gerber_count
 
     # check "--save"
-    assert os.path.getsize(path) == original_filesize
+    assert os.path.getsize(path) != original_filesize

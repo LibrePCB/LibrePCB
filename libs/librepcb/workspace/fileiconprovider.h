@@ -40,9 +40,6 @@ namespace workspace {
 
 /**
  * @brief The FileIconProvider class
- *
- * @author ubruhin
- * @date 2017-10-22
  */
 class FileIconProvider final : public QFileIconProvider {
 public:

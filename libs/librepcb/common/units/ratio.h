@@ -40,9 +40,6 @@ namespace librepcb {
 
 /**
  * @brief The Ratio class is used to represent a ratio number (e.g. 13.37%)
- *
- * @author ubruhin
- * @date 2017-07-10
  */
 class Ratio {
   Q_DECLARE_TR_FUNCTIONS(Ratio)

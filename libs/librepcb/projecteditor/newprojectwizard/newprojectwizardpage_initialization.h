@@ -44,9 +44,6 @@ class NewProjectWizardPage_Initialization;
 
 /**
  * @brief The NewProjectWizardPage_Initialization class
- *
- * @author ubruhin
- * @date 2016-08-13
  */
 class NewProjectWizardPage_Initialization final : public QWizardPage {
   Q_OBJECT

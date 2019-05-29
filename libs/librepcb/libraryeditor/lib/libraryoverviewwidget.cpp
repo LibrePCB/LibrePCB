@@ -49,28 +49,26 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
-                                             QSharedPointer<Library> lib,
-                                             QWidget* parent) noexcept
-  : EditorWidgetBase(context, lib->getFilePath(), parent),
-    mLibrary(lib),
-    mUi(new Ui::LibraryOverviewWidget) {
+LibraryOverviewWidget::LibraryOverviewWidget(const Context&  context,
+                                             const FilePath& fp,
+                                             QWidget*        parent) noexcept
+  : EditorWidgetBase(context, fp, parent), mUi(new Ui::LibraryOverviewWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
   connect(mUi->btnIcon, &QPushButton::clicked, this,
           &LibraryOverviewWidget::btnIconClicked);
   connect(mUi->lstCmpCat, &QListWidget::doubleClicked, this,
-          &LibraryOverviewWidget::lstCmpCatDoubleClicked);
+          &LibraryOverviewWidget::lstDoubleClicked);
   connect(mUi->lstPkgCat, &QListWidget::doubleClicked, this,
-          &LibraryOverviewWidget::lstPkgCatDoubleClicked);
+          &LibraryOverviewWidget::lstDoubleClicked);
   connect(mUi->lstSym, &QListWidget::doubleClicked, this,
-          &LibraryOverviewWidget::lstSymDoubleClicked);
+          &LibraryOverviewWidget::lstDoubleClicked);
   connect(mUi->lstPkg, &QListWidget::doubleClicked, this,
-          &LibraryOverviewWidget::lstPkgDoubleClicked);
+          &LibraryOverviewWidget::lstDoubleClicked);
   connect(mUi->lstCmp, &QListWidget::doubleClicked, this,
-          &LibraryOverviewWidget::lstCmpDoubleClicked);
+          &LibraryOverviewWidget::lstDoubleClicked);
   connect(mUi->lstDev, &QListWidget::doubleClicked, this,
-          &LibraryOverviewWidget::lstDevDoubleClicked);
+          &LibraryOverviewWidget::lstDoubleClicked);
 
   // Insert dependencies editor widget.
   mDependenciesEditorWidget.reset(
@@ -81,7 +79,9 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
                              mDependenciesEditorWidget.data());
 
-  // Load metadata.
+  // Load library.
+  mLibrary.reset(new Library(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));
   updateMetadata();
 
   // Reload metadata on undo stack state changes.
@@ -123,7 +123,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&          context,
   // Load all library elements.
   updateElementLists();
   connect(&mContext.workspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
+          &workspace::WorkspaceLibraryDb::scanFinished, this,
           &LibraryOverviewWidget::updateElementLists);
 }
 
@@ -144,10 +144,22 @@ bool LibraryOverviewWidget::save() noexcept {
 
   // Save element.
   try {
-    mLibrary->save();  // can throw
+    mLibrary->save();     // can throw
+    mFileSystem->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Save failed"), e.getMsg());
+    return false;
+  }
+}
+
+bool LibraryOverviewWidget::remove() noexcept {
+  if (QListWidget* list = dynamic_cast<QListWidget*>(focusWidget())) {
+    QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+        getElementListItemFilePaths(list->selectedItems());
+    removeItems(selectedItemPaths);
+    return true;
+  } else {
     return false;
   }
 }
@@ -269,7 +281,7 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
     // get all library element names
     QList<FilePath> elements =
         mContext.workspace.getLibraryDb().getLibraryElements<ElementType>(
-            mLibrary->getFilePath());  // can throw
+            mLibrary->getDirectory().getAbsPath());  // can throw
     foreach (const FilePath& filepath, elements) {
       QString name;
       mContext.workspace.getLibraryDb().getElementTranslations<ElementType>(
@@ -310,69 +322,159 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
   }
 }
 
-void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
-  // Get selected item (may be null)
-  QListWidget* list = dynamic_cast<QListWidget*>(sender());
-  Q_ASSERT(list);
-  QListWidgetItem* selectedItem = list->itemAt(pos);
-
-  // Get item text and validated file path
-  QString itemName = selectedItem ? selectedItem->text() : QString();
-  tl::optional<FilePath> itemPath = tl::nullopt;
-  if (selectedItem) {
-    FilePath fp = FilePath(selectedItem->data(Qt::UserRole).toString());
+QHash<QListWidgetItem*, FilePath>
+LibraryOverviewWidget::getElementListItemFilePaths(
+    const QList<QListWidgetItem*>& items) const noexcept {
+  QHash<QListWidgetItem*, FilePath> itemPaths;
+  foreach (QListWidgetItem* item, items) {
+    FilePath fp = FilePath(item->data(Qt::UserRole).toString());
     if (fp.isValid()) {
-      itemPath = tl::make_optional(fp);
+      itemPaths.insert(item, fp);
     } else {
-      qWarning() << "File path for selected item is not valid";
+      qWarning() << "File path for item is not valid";
     }
   }
+  return itemPaths;
+}
+
+void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
+  Q_UNUSED(pos);
+
+  // Get list widget item file paths
+  QListWidget* list = dynamic_cast<QListWidget*>(sender());
+  Q_ASSERT(list);
+  QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+      getElementListItemFilePaths(list->selectedItems());
 
   // Build the context menu
   QMenu    menu;
+  QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"), tr("Edit"));
+  aEdit->setVisible(!selectedItemPaths.isEmpty());
+  QAction* aDuplicate =
+      menu.addAction(QIcon(":/img/actions/copy.png"), tr("Duplicate"));
+  aDuplicate->setVisible(selectedItemPaths.count() == 1);
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
-  aRemove->setEnabled(selectedItem && itemPath.has_value());
+  aRemove->setVisible(!selectedItemPaths.isEmpty());
+  QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
+  aNew->setVisible(selectedItemPaths.count() <= 1);
+
+  // Set default action
+  if (selectedItemPaths.isEmpty()) {
+    menu.setDefaultAction(aNew);
+  } else {
+    menu.setDefaultAction(aEdit);
+  }
 
   // Show context menu, handle action
   QAction* action = menu.exec(QCursor::pos());
-  if (action == aRemove) {
-    Q_ASSERT(selectedItem);
-    Q_ASSERT(itemPath.has_value());
-    if (removeSelectedItem(itemName, *itemPath)) {
-      delete selectedItem;
-    };
+  if (action == aEdit) {
+    Q_ASSERT(selectedItemPaths.count() > 0);
+    foreach (const FilePath& fp, selectedItemPaths) { editItem(list, fp); }
+  } else if (action == aDuplicate) {
+    Q_ASSERT(selectedItemPaths.count() == 1);
+    duplicateItem(list, selectedItemPaths.values().first());
+  } else if (action == aRemove) {
+    Q_ASSERT(selectedItemPaths.count() > 0);
+    removeItems(selectedItemPaths);
+  } else if (action == aNew) {
+    newItem(list);
   }
 }
 
-bool LibraryOverviewWidget::removeSelectedItem(
-    const QString& itemName, const FilePath& itemPath) noexcept {
+void LibraryOverviewWidget::newItem(QListWidget* list) noexcept {
+  if (list == mUi->lstCmpCat) {
+    emit newComponentCategoryTriggered();
+  } else if (list == mUi->lstPkgCat) {
+    emit newPackageCategoryTriggered();
+  } else if (list == mUi->lstSym) {
+    emit newSymbolTriggered();
+  } else if (list == mUi->lstPkg) {
+    emit newPackageTriggered();
+  } else if (list == mUi->lstCmp) {
+    emit newComponentTriggered();
+  } else if (list == mUi->lstDev) {
+    emit newDeviceTriggered();
+  } else if (list) {
+    qCritical() << "Unknown list widget!";
+  }
+}
+
+void LibraryOverviewWidget::duplicateItem(QListWidget*    list,
+                                          const FilePath& fp) noexcept {
+  if (list == mUi->lstCmpCat) {
+    emit duplicateComponentCategoryTriggered(fp);
+  } else if (list == mUi->lstPkgCat) {
+    emit duplicatePackageCategoryTriggered(fp);
+  } else if (list == mUi->lstSym) {
+    emit duplicateSymbolTriggered(fp);
+  } else if (list == mUi->lstPkg) {
+    emit duplicatePackageTriggered(fp);
+  } else if (list == mUi->lstCmp) {
+    emit duplicateComponentTriggered(fp);
+  } else if (list == mUi->lstDev) {
+    emit duplicateDeviceTriggered(fp);
+  } else if (list) {
+    qCritical() << "Unknown list widget!";
+  }
+}
+
+void LibraryOverviewWidget::editItem(QListWidget*    list,
+                                     const FilePath& fp) noexcept {
+  if (list == mUi->lstCmpCat) {
+    emit editComponentCategoryTriggered(fp);
+  } else if (list == mUi->lstPkgCat) {
+    emit editPackageCategoryTriggered(fp);
+  } else if (list == mUi->lstSym) {
+    emit editSymbolTriggered(fp);
+  } else if (list == mUi->lstPkg) {
+    emit editPackageTriggered(fp);
+  } else if (list == mUi->lstCmp) {
+    emit editComponentTriggered(fp);
+  } else if (list == mUi->lstDev) {
+    emit editDeviceTriggered(fp);
+  } else if (list) {
+    qCritical() << "Unknown list widget!";
+  }
+}
+
+void LibraryOverviewWidget::removeItems(
+    const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept {
+  // Build message (list only the first few elements to avoid a huge message
+  // box)
+  QString msg = tr("WARNING: Library elements must normally NOT be removed "
+                   "because this will break other elements which depend on "
+                   "this one! They should be just marked as deprecated "
+                   "instead.\n\nAre you still sure to delete the following "
+                   "library elements?") %
+                "\n\n";
+  QList<QListWidgetItem*> listedItems = selectedItemPaths.keys().mid(0, 10);
+  foreach (QListWidgetItem* item, listedItems) {
+    msg.append(" - " % item->text() % "\n");
+  }
+  if (selectedItemPaths.count() > listedItems.count()) {
+    msg.append(" - ...\n");
+  }
+  msg.append("\n" % tr("This cannot be undone!"));
+
+  // Show message box
   int ret = QMessageBox::warning(
-      this, tr("Remove %1").arg(itemName),
-      QString(tr("WARNING: Library elements must normally NOT be removed "
-                 "because this will break "
-                 "other elements which depend on this one! They should be just "
-                 "marked as "
-                 "deprecated instead.\n\nAre you still sure to delete the "
-                 "whole library element "
-                 "\"%1\"?\n\nThis cannot be undone!"))
-          .arg(itemName),
+      this, tr("Remove %1 elements").arg(selectedItemPaths.count()), msg,
       QMessageBox::Yes, QMessageBox::Cancel);
   if (ret == QMessageBox::Yes) {
-    try {
-      // Emit signal so that the library editor can close any tabs that have
-      // opened this item
-      emit removeElementTriggered(itemPath);
-      FileUtils::removeDirRecursively(itemPath);
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Error"), e.getMsg());
-      mContext.workspace.getLibraryDb().startLibraryRescan();
-      return false;
+    foreach (QListWidgetItem* item, selectedItemPaths.keys()) {
+      FilePath itemPath = selectedItemPaths.value(item);
+      try {
+        // Emit signal so that the library editor can close any tabs that have
+        // opened this item
+        emit removeElementTriggered(itemPath);
+        FileUtils::removeDirRecursively(itemPath);
+        delete item;  // Remove from list
+      } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+      }
     }
     mContext.workspace.getLibraryDb().startLibraryRescan();
-    return true;
-  } else {
-    return false;
   }
 }
 
@@ -382,7 +484,8 @@ bool LibraryOverviewWidget::removeSelectedItem(
 
 void LibraryOverviewWidget::btnIconClicked() noexcept {
   QString fp = FileDialog::getOpenFileName(
-      this, tr("Choose library icon"), mLibrary->getIconFilePath().toNative(),
+      this, tr("Choose library icon"),
+      mLibrary->getDirectory().getAbsPath().toNative(),
       tr("Portable Network Graphics (*.png)"));
   if (!fp.isEmpty()) {
     try {
@@ -394,63 +497,16 @@ void LibraryOverviewWidget::btnIconClicked() noexcept {
   }
 }
 
-void LibraryOverviewWidget::lstCmpCatDoubleClicked(
+void LibraryOverviewWidget::lstDoubleClicked(
     const QModelIndex& index) noexcept {
-  QListWidgetItem* item = mUi->lstCmpCat->item(index.row());
+  // Get list widget
+  QListWidget* list = dynamic_cast<QListWidget*>(sender());
+  Q_ASSERT(list);
+  QListWidgetItem* item = list->item(index.row());
   FilePath         fp =
       item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
   if (fp.isValid()) {
-    emit editComponentCategoryTriggered(fp);
-  }
-}
-
-void LibraryOverviewWidget::lstPkgCatDoubleClicked(
-    const QModelIndex& index) noexcept {
-  QListWidgetItem* item = mUi->lstPkgCat->item(index.row());
-  FilePath         fp =
-      item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
-  if (fp.isValid()) {
-    emit editPackageCategoryTriggered(fp);
-  }
-}
-
-void LibraryOverviewWidget::lstSymDoubleClicked(
-    const QModelIndex& index) noexcept {
-  QListWidgetItem* item = mUi->lstSym->item(index.row());
-  FilePath         fp =
-      item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
-  if (fp.isValid()) {
-    emit editSymbolTriggered(fp);
-  }
-}
-
-void LibraryOverviewWidget::lstPkgDoubleClicked(
-    const QModelIndex& index) noexcept {
-  QListWidgetItem* item = mUi->lstPkg->item(index.row());
-  FilePath         fp =
-      item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
-  if (fp.isValid()) {
-    emit editPackageTriggered(fp);
-  }
-}
-
-void LibraryOverviewWidget::lstCmpDoubleClicked(
-    const QModelIndex& index) noexcept {
-  QListWidgetItem* item = mUi->lstCmp->item(index.row());
-  FilePath         fp =
-      item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
-  if (fp.isValid()) {
-    emit editComponentTriggered(fp);
-  }
-}
-
-void LibraryOverviewWidget::lstDevDoubleClicked(
-    const QModelIndex& index) noexcept {
-  QListWidgetItem* item = mUi->lstDev->item(index.row());
-  FilePath         fp =
-      item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
-  if (fp.isValid()) {
-    emit editDeviceTriggered(fp);
+    editItem(list, fp);
   }
 }
 

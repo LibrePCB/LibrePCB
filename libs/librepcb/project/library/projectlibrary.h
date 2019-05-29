@@ -24,10 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -52,16 +54,13 @@ class Project;
 
 /**
  * @brief The ProjectLibrary class
- *
- * @todo Adding and removing elements is very provisional. It does not really
- * work together with the automatic backup/restore feature of projects.
  */
 class ProjectLibrary final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit ProjectLibrary(const FilePath& libDir, bool restore, bool readOnly);
+  ProjectLibrary(std::unique_ptr<TransactionalDirectory> directory);
   ~ProjectLibrary() noexcept;
 
   // Getters: Library Elements
@@ -105,7 +104,7 @@ public:
   void removeDevice(library::Device& d);
 
   // General Methods
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+  void save();
 
 private:
   // make some methods inaccessible...
@@ -114,9 +113,8 @@ private:
   ProjectLibrary& operator=(const ProjectLibrary& rhs);
 
   // Private Methods
-  QSet<library::LibraryBaseElement*> getCurrentElements() const noexcept;
   template <typename ElementType>
-  void loadElements(const FilePath& directory, const QString& type,
+  void loadElements(const QString& dirname, const QString& type,
                     QHash<Uuid, ElementType*>& elementList);
   template <typename ElementType>
   void addElement(ElementType& element, QHash<Uuid, ElementType*>& elementList);
@@ -125,9 +123,7 @@ private:
                      QHash<Uuid, ElementType*>& elementList);
 
   // General
-  FilePath mLibraryPath;  ///< the "library" directory of the project
-  FilePath mBackupPath;   ///< same as #mLibraryPath, but with trailing "~"
-  FilePath mTmpDir;       ///< path to a temporary directory
+  std::unique_ptr<TransactionalDirectory> mDirectory;
 
   // The currently added library elements
   QHash<Uuid, library::Symbol*>    mSymbols;
@@ -136,9 +132,7 @@ private:
   QHash<Uuid, library::Device*>    mDevices;
 
   QSet<library::LibraryBaseElement*> mAllElements;
-  QSet<library::LibraryBaseElement*> mLoadedElements;
-  QSet<library::LibraryBaseElement*> mSavedToTemporary;
-  QSet<library::LibraryBaseElement*> mSavedToOriginal;
+  QSet<library::LibraryBaseElement*> mElementsToUpgrade;
 };
 
 /*******************************************************************************

@@ -38,9 +38,6 @@ namespace workspace {
 /**
  * @brief The WSI_AppLocale class represents the application's locale settings
  *        (for translation and localization)
- *
- * @author ubruhin
- * @date 2014-10-04
  */
 class WSI_AppLocale final : public WSI_Base {
   Q_OBJECT

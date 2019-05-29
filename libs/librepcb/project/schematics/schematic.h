@@ -28,6 +28,7 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
@@ -44,7 +45,6 @@ namespace librepcb {
 class GridProperties;
 class GraphicsView;
 class GraphicsScene;
-class SmartSExprFile;
 
 namespace project {
 
@@ -111,14 +111,13 @@ public:
   // Constructors / Destructor
   Schematic()                       = delete;
   Schematic(const Schematic& other) = delete;
-  Schematic(Project& project, const FilePath& filepath, bool restore,
-            bool readOnly)
-    : Schematic(project, filepath, restore, readOnly, false, QString()) {}
+  Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory)
+    : Schematic(project, std::move(directory), false, QString()) {}
   ~Schematic() noexcept;
 
   // Getters: General
   Project&              getProject() const noexcept { return mProject; }
-  const FilePath&       getFilePath() const noexcept { return mFilePath; }
+  FilePath              getFilePath() const noexcept;
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
@@ -152,7 +151,7 @@ public:
   // General Methods
   void addToProject();
   void removeFromProject();
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+  void save();
   void showInView(GraphicsView& view) noexcept;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
@@ -177,8 +176,9 @@ public:
   bool operator!=(const Schematic& rhs) noexcept { return (this != &rhs); }
 
   // Static Methods
-  static Schematic* create(Project& project, const FilePath& filepath,
-                           const ElementName& name);
+  static Schematic* create(Project&                                project,
+                           std::unique_ptr<TransactionalDirectory> directory,
+                           const ElementName&                      name);
 
 signals:
 
@@ -186,8 +186,8 @@ signals:
   void attributesChanged() override;
 
 private:
-  Schematic(Project& project, const FilePath& filepath, bool restore,
-            bool readOnly, bool create, const QString& newName);
+  Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
+            bool create, const QString& newName);
   void updateIcon() noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
@@ -195,10 +195,8 @@ private:
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
-  FilePath
-                                 mFilePath;  ///< the filepath of the schematic *.lp file (from the ctor)
-  QScopedPointer<SmartSExprFile> mFile;
-  bool                           mIsAddedToProject;
+  std::unique_ptr<TransactionalDirectory> mDirectory;
+  bool                                    mIsAddedToProject;
 
   QScopedPointer<GraphicsScene>  mGraphicsScene;
   QScopedPointer<GridProperties> mGridProperties;

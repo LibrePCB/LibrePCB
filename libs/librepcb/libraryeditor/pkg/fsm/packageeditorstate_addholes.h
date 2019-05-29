@@ -47,9 +47,6 @@ namespace editor {
 
 /**
  * @brief The PackageEditorState_AddHoles class
- *
- * @author  ubruhin
- * @date    2017-05-30
  */
 class PackageEditorState_AddHoles final : public PackageEditorState {
   Q_OBJECT
