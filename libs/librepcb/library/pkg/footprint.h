@@ -58,15 +58,24 @@ class FootprintGraphicsItem;
  *  - Footprint pads (neither adding nor removing pads is allowed)
  *    - UUID
  */
-class Footprint final : public SerializableObject,
-                        private FootprintPadList::IF_Observer,
-                        private PolygonList::IF_Observer,
-                        private CircleList::IF_Observer,
-                        private StrokeTextList::IF_Observer,
-                        private HoleList::IF_Observer {
+class Footprint final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Footprint)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    NamesEdited,
+    DescriptionsEdited,
+    PadsEdited,
+    PolygonsEdited,
+    CirclesEdited,
+    StrokeTextsEdited,
+    HolesEdited,
+  };
+  Signal<Footprint, Event>       onEdited;
+  typedef Slot<Footprint, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Footprint() = delete;
   Footprint(const Footprint& other) noexcept;
@@ -114,30 +123,26 @@ public:
   Footprint& operator=(const Footprint& rhs) noexcept;
 
 private:  // Methods
-  void listObjectAdded(
-      const FootprintPadList& list, int newIndex,
-      const std::shared_ptr<FootprintPad>& ptr) noexcept override;
-  void listObjectAdded(const PolygonList& list, int newIndex,
-                       const std::shared_ptr<Polygon>& ptr) noexcept override;
-  void listObjectAdded(const CircleList& list, int newIndex,
-                       const std::shared_ptr<Circle>& ptr) noexcept override;
-  void listObjectAdded(
-      const StrokeTextList& list, int newIndex,
-      const std::shared_ptr<StrokeText>& ptr) noexcept override;
-  void listObjectAdded(const HoleList& list, int newIndex,
-                       const std::shared_ptr<Hole>& ptr) noexcept override;
-  void listObjectRemoved(
-      const FootprintPadList& list, int oldIndex,
-      const std::shared_ptr<FootprintPad>& ptr) noexcept override;
-  void listObjectRemoved(const PolygonList& list, int oldIndex,
-                         const std::shared_ptr<Polygon>& ptr) noexcept override;
-  void listObjectRemoved(const CircleList& list, int oldIndex,
-                         const std::shared_ptr<Circle>& ptr) noexcept override;
-  void listObjectRemoved(
-      const StrokeTextList& list, int oldIndex,
-      const std::shared_ptr<StrokeText>& ptr) noexcept override;
-  void listObjectRemoved(const HoleList& list, int oldIndex,
-                         const std::shared_ptr<Hole>& ptr) noexcept override;
+  void namesEdited(const LocalizedNameMap& names, const QString& key,
+                   LocalizedNameMap::Event event) noexcept;
+  void descriptionsEdited(const LocalizedDescriptionMap& names,
+                          const QString&                 key,
+                          LocalizedDescriptionMap::Event event) noexcept;
+  void padsEdited(const FootprintPadList& list, int index,
+                  const std::shared_ptr<const FootprintPad>& pad,
+                  FootprintPadList::Event                    event) noexcept;
+  void polygonsEdited(const PolygonList& list, int index,
+                      const std::shared_ptr<const Polygon>& polygon,
+                      PolygonList::Event                    event) noexcept;
+  void circlesEdited(const CircleList& list, int index,
+                     const std::shared_ptr<const Circle>& circle,
+                     CircleList::Event                    event) noexcept;
+  void strokeTextsEdited(const StrokeTextList& list, int index,
+                         const std::shared_ptr<const StrokeText>& text,
+                         StrokeTextList::Event event) noexcept;
+  void holesEdited(const HoleList& list, int index,
+                   const std::shared_ptr<const Hole>& hole,
+                   HoleList::Event                    event) noexcept;
 
 private:  // Data
   Uuid                    mUuid;
@@ -151,6 +156,15 @@ private:  // Data
 
   const StrokeFont*      mStrokeFont;
   FootprintGraphicsItem* mRegisteredGraphicsItem;
+
+  // Slots
+  LocalizedNameMap::OnEditedSlot        mNamesEditedSlot;
+  LocalizedDescriptionMap::OnEditedSlot mDescriptionsEditedSlot;
+  FootprintPadList::OnEditedSlot        mPadsEditedSlot;
+  PolygonList::OnEditedSlot             mPolygonsEditedSlot;
+  CircleList::OnEditedSlot              mCirclesEditedSlot;
+  StrokeTextList::OnEditedSlot          mStrokeTextsEditedSlot;
+  HoleList::OnEditedSlot                mHolesEditedSlot;
 };
 
 /*******************************************************************************
@@ -161,13 +175,16 @@ struct FootprintListNameProvider {
   static constexpr const char* tagname = "footprint";
 };
 using FootprintList =
-    SerializableObjectList<Footprint, FootprintListNameProvider>;
+    SerializableObjectList<Footprint, FootprintListNameProvider,
+                           Footprint::Event>;
 using CmdFootprintInsert =
-    CmdListElementInsert<Footprint, FootprintListNameProvider>;
+    CmdListElementInsert<Footprint, FootprintListNameProvider,
+                         Footprint::Event>;
 using CmdFootprintRemove =
-    CmdListElementRemove<Footprint, FootprintListNameProvider>;
+    CmdListElementRemove<Footprint, FootprintListNameProvider,
+                         Footprint::Event>;
 using CmdFootprintsSwap =
-    CmdListElementsSwap<Footprint, FootprintListNameProvider>;
+    CmdListElementsSwap<Footprint, FootprintListNameProvider, Footprint::Event>;
 
 /*******************************************************************************
  *  End of File

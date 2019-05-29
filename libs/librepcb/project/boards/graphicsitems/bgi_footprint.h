@@ -50,9 +50,6 @@ class BI_Footprint;
 
 /**
  * @brief The BGI_Footprint class
- *
- * @author ubruhin
- * @date 2015-05-24
  */
 class BGI_Footprint final : public BGI_Base {
 public:

@@ -51,9 +51,6 @@ namespace editor {
 
 /**
  * @brief The CompSymbVarPinSignalMapEditorWidget class
- *
- * @author ubruhin
- * @date 2017-03-19
  */
 class CompSymbVarPinSignalMapEditorWidget final : public QWidget {
   Q_OBJECT

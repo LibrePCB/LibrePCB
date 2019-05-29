@@ -43,9 +43,6 @@ namespace manager {
 
 /**
  * @brief The LibraryDownload class
- *
- * @author ubruhin
- * @date 2016-10-01
  */
 class LibraryDownload final : public QObject {
   Q_OBJECT

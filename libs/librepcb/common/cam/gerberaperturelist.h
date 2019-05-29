@@ -41,9 +41,6 @@ namespace librepcb {
 
 /**
  * @brief The GerberApertureList class
- *
- * @author ubruhin
- * @date 2016-03-31
  */
 class GerberApertureList final {
   Q_DECLARE_TR_FUNCTIONS(GerberApertureList)

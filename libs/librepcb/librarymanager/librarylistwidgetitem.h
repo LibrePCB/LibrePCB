@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
+#include <librepcb/common/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,9 +38,6 @@ class Workspace;
 }
 
 namespace library {
-
-class Library;
-
 namespace manager {
 
 namespace Ui {
@@ -53,9 +50,6 @@ class LibraryListWidgetItem;
 
 /**
  * @brief The LibraryListWidgetItem class
- *
- * @author ubruhin
- * @date 2016-08-03
  */
 class LibraryListWidgetItem final : public QWidget {
   Q_OBJECT
@@ -64,14 +58,16 @@ public:
   // Constructors / Destructor
   LibraryListWidgetItem() noexcept;
   LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
-  LibraryListWidgetItem(workspace::Workspace&   ws,
-                        QSharedPointer<Library> lib) noexcept;
+  LibraryListWidgetItem(workspace::Workspace& ws, const FilePath& libDir,
+                        const QString& name        = "",
+                        const QString& description = "",
+                        const QPixmap& icon        = QPixmap()) noexcept;
   ~LibraryListWidgetItem() noexcept;
 
   // Getters
-  QSharedPointer<Library> getLibrary() const noexcept { return mLib; }
-  QString                 getName() const noexcept;
-  bool                    isRemoteLibrary() const noexcept;
+  const FilePath& getLibraryFilePath() const noexcept { return mLibDir; }
+  QString         getName() const noexcept;
+  bool            isRemoteLibrary() const noexcept { return mIsRemoteLibrary; }
 
   // Operator Overloadings
   LibraryListWidgetItem& operator=(const LibraryListWidgetItem& rhs) = delete;
@@ -80,12 +76,12 @@ protected:  // Methods
   void mouseDoubleClickEvent(QMouseEvent* e) noexcept override;
 
 signals:
-  void openLibraryEditorTriggered(QSharedPointer<Library> lib);
+  void openLibraryEditorTriggered(const FilePath& libDir);
 
 private:  // Data
   QScopedPointer<Ui::LibraryListWidgetItem> mUi;
-  workspace::Workspace&                     mWorkspace;
-  QSharedPointer<Library>                   mLib;
+  FilePath                                  mLibDir;
+  bool                                      mIsRemoteLibrary;
 };
 
 /*******************************************************************************

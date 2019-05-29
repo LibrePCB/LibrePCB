@@ -44,9 +44,6 @@ class FirstRunWizard;
 
 /**
  * @brief The FirstRunWizard class
- *
- * @author ubruhin
- * @date 2015-09-22
  */
 class FirstRunWizard final : public QWizard {
   Q_OBJECT

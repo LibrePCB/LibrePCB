@@ -53,10 +53,11 @@ SOURCES += \
     newelementwizard/newelementwizardpage_entermetadata.cpp \
     newelementwizard/newelementwizardpage_packagepads.cpp \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
+    pkg/footprintclipboarddata.cpp \
     pkg/footprintlisteditorwidget.cpp \
-    pkg/fsm/cmd/cmdmoveselectedfootprintitems.cpp \
+    pkg/fsm/cmd/cmddragselectedfootprintitems.cpp \
+    pkg/fsm/cmd/cmdpastefootprintitems.cpp \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.cpp \
-    pkg/fsm/cmd/cmdrotateselectedfootprintitems.cpp \
     pkg/fsm/packageeditorfsm.cpp \
     pkg/fsm/packageeditorstate.cpp \
     pkg/fsm/packageeditorstate_addholes.cpp \
@@ -78,9 +79,9 @@ SOURCES += \
     pkg/widgets/packagepadcombobox.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/dialogs/symbolpinpropertiesdialog.cpp \
-    sym/fsm/cmd/cmdmoveselectedsymbolitems.cpp \
+    sym/fsm/cmd/cmddragselectedsymbolitems.cpp \
+    sym/fsm/cmd/cmdpastesymbolitems.cpp \
     sym/fsm/cmd/cmdremoveselectedsymbolitems.cpp \
-    sym/fsm/cmd/cmdrotateselectedsymbolitems.cpp \
     sym/fsm/symboleditorfsm.cpp \
     sym/fsm/symboleditorstate.cpp \
     sym/fsm/symboleditorstate_addnames.cpp \
@@ -94,6 +95,7 @@ SOURCES += \
     sym/fsm/symboleditorstate_drawtext.cpp \
     sym/fsm/symboleditorstate_drawtextbase.cpp \
     sym/fsm/symboleditorstate_select.cpp \
+    sym/symbolclipboarddata.cpp \
     sym/symboleditorwidget.cpp \
 
 HEADERS += \
@@ -131,10 +133,11 @@ HEADERS += \
     newelementwizard/newelementwizardpage_entermetadata.h \
     newelementwizard/newelementwizardpage_packagepads.h \
     pkg/dialogs/footprintpadpropertiesdialog.h \
+    pkg/footprintclipboarddata.h \
     pkg/footprintlisteditorwidget.h \
-    pkg/fsm/cmd/cmdmoveselectedfootprintitems.h \
+    pkg/fsm/cmd/cmddragselectedfootprintitems.h \
+    pkg/fsm/cmd/cmdpastefootprintitems.h \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.h \
-    pkg/fsm/cmd/cmdrotateselectedfootprintitems.h \
     pkg/fsm/packageeditorfsm.h \
     pkg/fsm/packageeditorstate.h \
     pkg/fsm/packageeditorstate_addholes.h \
@@ -156,9 +159,9 @@ HEADERS += \
     pkg/widgets/packagepadcombobox.h \
     pkgcat/packagecategoryeditorwidget.h \
     sym/dialogs/symbolpinpropertiesdialog.h \
-    sym/fsm/cmd/cmdmoveselectedsymbolitems.h \
+    sym/fsm/cmd/cmddragselectedsymbolitems.h \
+    sym/fsm/cmd/cmdpastesymbolitems.h \
     sym/fsm/cmd/cmdremoveselectedsymbolitems.h \
-    sym/fsm/cmd/cmdrotateselectedsymbolitems.h \
     sym/fsm/symboleditorfsm.h \
     sym/fsm/symboleditorstate.h \
     sym/fsm/symboleditorstate_addnames.h \
@@ -172,6 +175,7 @@ HEADERS += \
     sym/fsm/symboleditorstate_drawtext.h \
     sym/fsm/symboleditorstate_drawtextbase.h \
     sym/fsm/symboleditorstate_select.h \
+    sym/symbolclipboarddata.h \
     sym/symboleditorwidget.h \
 
 FORMS += \

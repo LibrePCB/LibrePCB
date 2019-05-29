@@ -189,51 +189,10 @@ void SExpression::removeLineBreaks() noexcept {
   }
 }
 
-QString SExpression::toString(int indent) const {
-  if (mType == Type::List) {
-    if (!isValidListName(mValue)) {
-      throw LogicError(
-          __FILE__, __LINE__,
-          QString(tr("Invalid S-Expression list name: %1")).arg(mValue));
-    }
-    QString str = '(' + mValue;
-    for (int i = 0; i < mChildren.count(); ++i) {
-      const SExpression& child = mChildren.at(i);
-      if ((!str.at(str.length() - 1).isSpace()) && (!child.isLineBreak())) {
-        str += ' ';
-      }
-      bool nextChildIsLineBreak = (i < mChildren.count() - 1)
-                                      ? mChildren.at(i + 1).isLineBreak()
-                                      : true;
-      if (child.isLineBreak() && nextChildIsLineBreak) {
-        if (child.isLineBreak() && (i > 0) &&
-            mChildren.at(i - 1).isLineBreak()) {
-          // too many line breaks ;)
-        } else {
-          str += '\n';
-        }
-      } else {
-        str += child.toString(indent + 1);
-      }
-    }
-    if (isMultiLineList()) {
-      str += '\n' + QString(' ').repeated(indent);
-    }
-    return str + ')';
-  } else if (mType == Type::Token) {
-    if (!isValidToken(mValue)) {
-      throw LogicError(
-          __FILE__, __LINE__,
-          QString(tr("Invalid S-Expression token: %1")).arg(mValue));
-    }
-    return mValue;
-  } else if (mType == Type::String) {
-    return '"' + escapeString(mValue) + '"';
-  } else if (mType == Type::LineBreak) {
-    return '\n' + QString(' ').repeated(indent);
-  } else {
-    throw LogicError(__FILE__, __LINE__);
-  }
+QByteArray SExpression::toByteArray() const {
+  QString str = toString(0);  // can throw
+  str += '\n';                // newline at end of file
+  return str.toUtf8();
 }
 
 /*******************************************************************************
@@ -264,6 +223,52 @@ bool SExpression::isValidToken(const QString& token) const noexcept {
   return QRegExp("[a-zA-Z0-9\\.:_-]+").exactMatch(token);
 }
 
+QString SExpression::toString(int indent) const {
+  if (mType == Type::List) {
+    if (!isValidListName(mValue)) {
+      throw LogicError(
+          __FILE__, __LINE__,
+          QString(tr("Invalid S-Expression list name: %1")).arg(mValue));
+    }
+    QString str = '(' + mValue;
+    for (int i = 0; i < mChildren.count(); ++i) {
+      const SExpression& child = mChildren.at(i);
+      if ((!str.at(str.length() - 1).isSpace()) && (!child.isLineBreak())) {
+        str += ' ';
+      }
+      bool nextChildIsLineBreak = (i < mChildren.count() - 1)
+                                      ? mChildren.at(i + 1).isLineBreak()
+                                      : true;
+      if (child.isLineBreak() && nextChildIsLineBreak) {
+        if ((i > 0) && mChildren.at(i - 1).isLineBreak()) {
+          // too many line breaks ;)
+        } else {
+          str += '\n';
+        }
+      } else {
+        str += child.toString(indent + 1);
+      }
+    }
+    if (isMultiLineList()) {
+      str += '\n' + QString(' ').repeated(indent);
+    }
+    return str + ')';
+  } else if (mType == Type::Token) {
+    if (!isValidToken(mValue)) {
+      throw LogicError(
+          __FILE__, __LINE__,
+          QString(tr("Invalid S-Expression token: %1")).arg(mValue));
+    }
+    return mValue;
+  } else if (mType == Type::String) {
+    return '"' + escapeString(mValue) + '"';
+  } else if (mType == Type::LineBreak) {
+    return '\n' + QString(' ').repeated(indent);
+  } else {
+    throw LogicError(__FILE__, __LINE__);
+  }
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
@@ -284,8 +289,10 @@ SExpression SExpression::createLineBreak() {
   return SExpression(Type::LineBreak, QString());
 }
 
-SExpression SExpression::parse(const QString& str, const FilePath& filePath) {
+SExpression SExpression::parse(const QByteArray& content,
+                               const FilePath&   filePath) {
   std::string     error;
+  QString         str  = QString::fromUtf8(content);
   sexpresso::Sexp tree = sexpresso::parse(str.toStdString(), error);
   if (error.empty()) {
     if (tree.childCount() == 1) {

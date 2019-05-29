@@ -47,11 +47,11 @@ LibraryCategory::LibraryCategory(const QString& shortElementName,
                        author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-LibraryCategory::LibraryCategory(const FilePath& elementDirectory,
-                                 const QString&  shortElementName,
-                                 const QString& longElementName, bool readOnly)
-  : LibraryBaseElement(elementDirectory, true, shortElementName,
-                       longElementName, readOnly),
+LibraryCategory::LibraryCategory(
+    std::unique_ptr<TransactionalDirectory> directory,
+    const QString& shortElementName, const QString& longElementName)
+  : LibraryBaseElement(std::move(directory), true, shortElementName,
+                       longElementName),
     mParentUuid(
         mLoadingFileDocument.getValueByPath<tl::optional<Uuid>>("parent")) {
 }

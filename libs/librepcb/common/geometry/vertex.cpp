@@ -35,12 +35,7 @@ namespace librepcb {
 
 Vertex::Vertex(const SExpression& node) {
   try {
-    if (node.tryGetChildByPath("position")) {
-      mPos = Point(node.getChildByPath("position"));
-    } else {
-      // backward compatibility, remove this some time!
-      mPos = Point(node.getChildByPath("pos"));
-    }
+    mPos   = Point(node.getChildByPath("position"));
     mAngle = node.getValueByPath<Angle>("angle");
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
@@ -69,6 +64,18 @@ Vertex& Vertex::operator=(const Vertex& rhs) noexcept {
   mPos   = rhs.mPos;
   mAngle = rhs.mAngle;
   return *this;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+QDebug operator<<(QDebug stream, const Vertex& vertex) {
+  stream << QString("Vertex(%1mm, %2mm, %3°)")
+                .arg(vertex.getPos().getX().toMmString())
+                .arg(vertex.getPos().getY().toMmString())
+                .arg(vertex.getAngle().toDegString());
+  return stream;
 }
 
 /*******************************************************************************

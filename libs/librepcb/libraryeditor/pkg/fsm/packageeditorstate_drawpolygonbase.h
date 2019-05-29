@@ -50,9 +50,6 @@ namespace editor {
 
 /**
  * @brief The PackageEditorState_DrawPolygonBase class
- *
- * @author  ubruhin
- * @date    2017-05-29
  */
 class PackageEditorState_DrawPolygonBase : public PackageEditorState {
   Q_OBJECT

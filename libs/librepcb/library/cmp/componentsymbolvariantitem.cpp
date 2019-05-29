@@ -40,50 +40,105 @@ namespace library {
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(
     const ComponentSymbolVariantItem& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mSymbolUuid(other.mSymbolUuid),
     mSymbolPos(other.mSymbolPos),
     mSymbolRot(other.mSymbolRot),
     mIsRequired(other.mIsRequired),
     mSuffix(other.mSuffix),
-    mPinSignalMap(other.mPinSignalMap) {
+    mPinSignalMap(other.mPinSignalMap),
+    mOnPinSignalMapEditedSlot(*this,
+                              &ComponentSymbolVariantItem::pinSignalMapEdited) {
+  mPinSignalMap.onEdited.attach(mOnPinSignalMapEditedSlot);
 }
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(
     const Uuid& uuid, const Uuid& symbolUuid, const Point& symbolPos,
     const Angle& symbolRotation, bool isRequired,
     const ComponentSymbolVariantItemSuffix& suffix) noexcept
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mSymbolUuid(symbolUuid),
     mSymbolPos(symbolPos),
     mSymbolRot(symbolRotation),
     mIsRequired(isRequired),
-    mSuffix(suffix) {
+    mSuffix(suffix),
+    mOnPinSignalMapEditedSlot(*this,
+                              &ComponentSymbolVariantItem::pinSignalMapEdited) {
+  mPinSignalMap.onEdited.attach(mOnPinSignalMapEditedSlot);
 }
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
-  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
-    mSymbolPos(0, 0),
-    mSymbolRot(0),
+    mSymbolPos(node.getChildByPath("position")),
+    mSymbolRot(node.getValueByPath<Angle>("rotation")),
     mIsRequired(node.getValueByPath<bool>("required")),
     mSuffix(node.getValueByPath<ComponentSymbolVariantItemSuffix>("suffix")),
-    mPinSignalMap(node) {
-  if (node.tryGetChildByPath("position")) {
-    mSymbolPos = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mSymbolPos = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mSymbolRot = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mSymbolRot = node.getValueByPath<Angle>("rot");
-  }
+    mPinSignalMap(node),
+    mOnPinSignalMapEditedSlot(*this,
+                              &ComponentSymbolVariantItem::pinSignalMapEdited) {
+  mPinSignalMap.onEdited.attach(mOnPinSignalMapEditedSlot);
 }
 
 ComponentSymbolVariantItem::~ComponentSymbolVariantItem() noexcept {
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+bool ComponentSymbolVariantItem::setSymbolUuid(const Uuid& uuid) noexcept {
+  if (uuid == mSymbolUuid) {
+    return false;
+  }
+
+  mSymbolUuid = uuid;
+  onEdited.notify(Event::SymbolUuidChanged);
+  return true;
+}
+
+bool ComponentSymbolVariantItem::setSymbolPosition(const Point& pos) noexcept {
+  if (pos == mSymbolPos) {
+    return false;
+  }
+
+  mSymbolPos = pos;
+  onEdited.notify(Event::SymbolPositionChanged);
+  return true;
+}
+
+bool ComponentSymbolVariantItem::setSymbolRotation(const Angle& rot) noexcept {
+  if (rot == mSymbolRot) {
+    return false;
+  }
+
+  mSymbolRot = rot;
+  onEdited.notify(Event::SymbolRotationChanged);
+  return true;
+}
+
+bool ComponentSymbolVariantItem::setIsRequired(bool required) noexcept {
+  if (required == mIsRequired) {
+    return false;
+  }
+
+  mIsRequired = required;
+  onEdited.notify(Event::IsRequiredChanged);
+  return true;
+}
+
+bool ComponentSymbolVariantItem::setSuffix(
+    const ComponentSymbolVariantItemSuffix& suffix) noexcept {
+  if (suffix == mSuffix) {
+    return false;
+  }
+
+  mSuffix = suffix;
+  onEdited.notify(Event::SuffixChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -118,14 +173,32 @@ bool ComponentSymbolVariantItem::operator==(
 
 ComponentSymbolVariantItem& ComponentSymbolVariantItem::operator=(
     const ComponentSymbolVariantItem& rhs) noexcept {
-  mUuid         = rhs.mUuid;
-  mSymbolUuid   = rhs.mSymbolUuid;
-  mSymbolPos    = rhs.mSymbolPos;
-  mSymbolRot    = rhs.mSymbolRot;
-  mIsRequired   = rhs.mIsRequired;
-  mSuffix       = rhs.mSuffix;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setSymbolUuid(rhs.mSymbolUuid);
+  setSymbolPosition(rhs.mSymbolPos);
+  setSymbolRotation(rhs.mSymbolRot);
+  setIsRequired(rhs.mIsRequired);
+  setSuffix(rhs.mSuffix);
   mPinSignalMap = rhs.mPinSignalMap;
   return *this;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void ComponentSymbolVariantItem::pinSignalMapEdited(
+    const ComponentPinSignalMap& map, int index,
+    const std::shared_ptr<const ComponentPinSignalMapItem>& item,
+    ComponentPinSignalMap::Event                            event) noexcept {
+  Q_UNUSED(map);
+  Q_UNUSED(index);
+  Q_UNUSED(item);
+  Q_UNUSED(event);
+  onEdited.notify(Event::PinSignalMapEdited);
 }
 
 /*******************************************************************************

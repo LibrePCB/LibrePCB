@@ -44,11 +44,6 @@ class NewProjectWizardPage_VersionControl;
 
 /**
  * @brief The NewProjectWizardPage_VersionControl class
- *
- * @author ubruhin
- * @date 2016-08-13
- *
- * @todo Add more functionality (run "git init" and "git commit").
  */
 class NewProjectWizardPage_VersionControl final : public QWizardPage {
   Q_OBJECT

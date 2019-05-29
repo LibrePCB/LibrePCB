@@ -49,9 +49,6 @@ class SI_SymbolPin;
 
 /**
  * @brief The SGI_SymbolPin class
- *
- * @author ubruhin
- * @date 2014-08-23
  */
 class SGI_SymbolPin final : public SGI_Base {
 public:

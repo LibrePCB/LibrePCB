@@ -25,6 +25,7 @@
 #include "ui_librarylisteditorwidget.h"
 
 #include <librepcb/library/library.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -46,21 +47,30 @@ LibraryListEditorWidget::LibraryListEditorWidget(const workspace::Workspace& ws,
                                                  QWidget* parent) noexcept
   : QWidget(parent), mWorkspace(ws), mUi(new Ui::LibraryListEditorWidget) {
   mUi->setupUi(this);
+  mUi->comboBox->addItem(tr("Choose library..."));
   connect(mUi->btnAdd, &QPushButton::clicked, this,
           &LibraryListEditorWidget::btnAddClicked);
   connect(mUi->btnRemove, &QPushButton::clicked, this,
           &LibraryListEditorWidget::btnRemoveClicked);
 
-  const QStringList& localeOrder =
-      mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
-  QList<QSharedPointer<library::Library>> libs;
-  libs.append(mWorkspace.getLocalLibraries().values());
-  libs.append(mWorkspace.getRemoteLibraries().values());
-  mUi->comboBox->addItem(tr("Choose library..."));
-  foreach (const QSharedPointer<library::Library>& lib, libs) {
-    mUi->comboBox->addItem(lib->getIconAsPixmap(),
-                           *lib->getNames().value(localeOrder),
-                           lib->getUuid().toStr());
+  try {
+    QMultiMap<Version, FilePath> libs =
+        mWorkspace.getLibraryDb().getLibraries();  // can throw
+    foreach (const FilePath& fp, libs) {
+      Uuid uuid = Uuid::createRandom();
+      mWorkspace.getLibraryDb().getElementMetadata<Library>(
+          fp, &uuid);  // can throw
+      QString name;
+      mWorkspace.getLibraryDb().getElementTranslations<Library>(
+          fp, mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder(),
+          &name);  // can throw
+      QPixmap icon;
+      mWorkspace.getLibraryDb().getLibraryMetadata(fp, &icon);  // can throw
+      mUi->comboBox->addItem(icon, name, uuid.toStr());
+      mLibNames[uuid] = name;
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Could not load library list.";
   }
 }
 
@@ -116,20 +126,7 @@ void LibraryListEditorWidget::btnRemoveClicked() noexcept {
 }
 
 void LibraryListEditorWidget::addItem(const Uuid& library) noexcept {
-  QString name = library.toStr();
-
-  const QStringList& localeOrder =
-      mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
-  QList<QSharedPointer<library::Library>> libs;
-  libs.append(mWorkspace.getLocalLibraries().values());
-  libs.append(mWorkspace.getRemoteLibraries().values());
-  foreach (const QSharedPointer<library::Library>& lib, libs) {
-    if (lib->getUuid() == library) {
-      name = *lib->getNames().value(localeOrder);
-      break;
-    }
-  }
-
+  QString          name = mLibNames.value(library, library.toStr());
   QListWidgetItem* item = new QListWidgetItem(name, mUi->listWidget);
   item->setData(Qt::UserRole, library.toStr());
 }

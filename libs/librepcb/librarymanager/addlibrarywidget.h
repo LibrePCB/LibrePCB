@@ -53,9 +53,6 @@ class AddLibraryWidget;
 
 /**
  * @brief The AddLibraryWidget class
- *
- * @author ubruhin
- * @date 2016-08-03
  */
 class AddLibraryWidget final : public QWidget {
   Q_OBJECT
@@ -69,14 +66,12 @@ public:
 
   // General Methods
   void updateRepositoryLibraryList() noexcept;
-  void updateInstalledStatusOfRepositoryLibraries() noexcept;
 
   // Operator Overloadings
   AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
 
 signals:
-
-  void libraryAdded(const FilePath& libDir, bool select);
+  void libraryAdded(const FilePath& libDir);
 
 private:  // Methods
   void localLibraryNameLineEditTextChanged(QString name) noexcept;

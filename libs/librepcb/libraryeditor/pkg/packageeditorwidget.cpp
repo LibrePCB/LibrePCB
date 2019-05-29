@@ -85,7 +85,8 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mPackage.reset(new Package(fp, false));  // can throw
+  mPackage.reset(new Package(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));  // can throw
   updateMetadata();
 
   // Setup footprint list editor widget.
@@ -192,13 +193,26 @@ bool PackageEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mPackage->save();  // can throw
+    mPackage->save();     // can throw
+    mFileSystem->save();  // can throw
     memorizePackageInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Save failed"), e.getMsg());
     return false;
   }
+}
+
+bool PackageEditorWidget::cut() noexcept {
+  return mFsm->processCut();
+}
+
+bool PackageEditorWidget::copy() noexcept {
+  return mFsm->processCopy();
+}
+
+bool PackageEditorWidget::paste() noexcept {
+  return mFsm->processPaste();
 }
 
 bool PackageEditorWidget::rotateCw() noexcept {

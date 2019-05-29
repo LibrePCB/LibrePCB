@@ -40,9 +40,6 @@ class IF_GraphicsLayerProvider;
 
 /**
  * @brief The GraphicsLayerStackAppearanceSettings class
- *
- * @author ubruhin
- * @date 2017-07-31
  */
 class GraphicsLayerStackAppearanceSettings final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(GraphicsLayerStackAppearanceSettings)

@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
@@ -33,7 +32,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SmartSExprFile;
 class GraphicsLayerStackAppearanceSettings;
 
 namespace project {
@@ -54,28 +52,22 @@ public:
   // Constructors / Destructor
   BoardUserSettings()                               = delete;
   BoardUserSettings(const BoardUserSettings& other) = delete;
+  explicit BoardUserSettings(Board& board) noexcept;
   BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept;
-  explicit BoardUserSettings(Board& board, bool restore, bool readOnly,
-                             bool create);
+  BoardUserSettings(Board& board, const SExpression& node);
   ~BoardUserSettings() noexcept;
 
   // General Methods
-  bool save(bool toOriginal, QStringList& errors) noexcept;
+
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
   // Operator Overloadings
   BoardUserSettings& operator=(const BoardUserSettings& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // General
-  Board& mBoard;
-
-  // File "boards/<BOARDNAME>/settings.user.lp"
-  FilePath                       mFilepath;
-  QScopedPointer<SmartSExprFile> mFile;
-
+  Board&                                               mBoard;
   QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
 };
 

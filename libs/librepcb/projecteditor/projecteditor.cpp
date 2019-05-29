@@ -27,6 +27,8 @@
 #include "dialogs/projectsettingsdialog.h"
 #include "schematiceditor/schematiceditor.h"
 
+#include <librepcb/common/dialogs/filedialog.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/project.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -72,7 +74,7 @@ ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project)
   // setup the timer for automatic backups, if enabled in the settings
   int intervalSecs =
       mWorkspace.getSettings().getProjectAutosaveInterval().getInterval();
-  if ((intervalSecs > 0) && (!project.isReadOnly())) {
+  if ((intervalSecs > 0) && project.getDirectory().isWritable()) {
     // autosaving is enabled --> start the timer
     connect(&mAutoSaveTimer, &QTimer::timeout, this,
             &ProjectEditor::autosaveProject);
@@ -166,15 +168,28 @@ void ProjectEditor::execNetClassesEditorDialog(QWidget* parent) noexcept {
   d.exec();
 }
 
+void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
+  try {
+    QString filename =
+        FileDialog::getSaveFileName(parent, tr("Export project to *.lppz"),
+                                    mProject.getPath().toStr(), "*.lppz");
+    if (filename.isEmpty()) return;
+    if (!filename.endsWith(".lppz")) filename.append(".lppz");
+    FilePath fp(filename);
+    qDebug() << "Export project to *.lppz:" << fp.toNative();
+    mProject.save();                                           // can throw
+    mProject.getDirectory().getFileSystem()->exportToZip(fp);  // can throw
+    qDebug() << "Project successfully exported.";
+  } catch (const Exception& e) {
+    QMessageBox::critical(parent, tr("Error"), e.getMsg());
+  }
+}
+
 bool ProjectEditor::saveProject() noexcept {
   try {
-    // step 1: save whole project to temporary files
-    qDebug() << "Begin saving the project to temporary files...";
-    mProject.save(false);
-
-    // step 2: save whole project to original files
-    qDebug() << "Begin saving the project to original files...";
-    mProject.save(true);
+    qDebug() << "Save project...";
+    mProject.save();                                  // can throw
+    mProject.getDirectory().getFileSystem()->save();  // can throw
 
     // saving was successful --> clean the undo stack
     mUndoStack->setClean();
@@ -188,7 +203,7 @@ bool ProjectEditor::saveProject() noexcept {
 }
 
 bool ProjectEditor::autosaveProject() noexcept {
-  if ((!mProject.isRestored()) && (mUndoStack->isClean()))
+  if (mUndoStack->isClean())
     return false;  // do not save if there are no changes
 
   if (mUndoStack->isCommandGroupActive()) {
@@ -203,8 +218,9 @@ bool ProjectEditor::autosaveProject() noexcept {
   }
 
   try {
-    qDebug() << "Begin autosaving the project to temporary files...";
-    mProject.save(false);
+    qDebug() << "Autosave project...";
+    mProject.save();                                      // can throw
+    mProject.getDirectory().getFileSystem()->autosave();  // can throw
     qDebug() << "Project successfully autosaved";
     return true;
   } catch (Exception& exc) {
@@ -214,8 +230,8 @@ bool ProjectEditor::autosaveProject() noexcept {
 
 bool ProjectEditor::closeAndDestroy(bool     askForSave,
                                     QWidget* msgBoxParent) noexcept {
-  if (((!mProject.isRestored()) && (mUndoStack->isClean())) ||
-      (mProject.isReadOnly()) || (!askForSave)) {
+  if (mUndoStack->isClean() || (!mProject.getDirectory().isWritable()) ||
+      (!askForSave)) {
     // no unsaved changes or opened in read-only mode or don't save --> close
     // project
     deleteLater();  // this project object will be deleted later in the event
@@ -223,17 +239,10 @@ bool ProjectEditor::closeAndDestroy(bool     askForSave,
     return true;
   }
 
-  QString msg1 =
-      tr("You have unsaved changes in the project.\n"
-         "Do you want to save them before closing the project?");
-  QString msg2 =
-      tr("Attention: The project was restored from a backup, so if you "
-         "don't save the project now the current state of the project (and "
-         "the backup) will be lost forever!");
-
   QMessageBox::StandardButton choice = QMessageBox::question(
       msgBoxParent, tr("Save Project?"),
-      (mProject.isRestored() ? msg1 % QStringLiteral("\n\n") % msg2 : msg1),
+      tr("You have unsaved changes in the project.\n"
+         "Do you want to save them before closing the project?"),
       QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
       QMessageBox::Yes);
 

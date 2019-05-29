@@ -34,7 +34,8 @@ namespace librepcb {
  ******************************************************************************/
 
 Text::Text(const Text& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mLayerName(other.mLayerName),
     mText(other.mText),
     mPosition(other.mPosition),
@@ -50,7 +51,8 @@ Text::Text(const Uuid& uuid, const Text& other) noexcept : Text(other) {
 Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
            const QString& text, const Point& pos, const Angle& rotation,
            const PositiveLength& height, const Alignment& align) noexcept
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mLayerName(layerName),
     mText(text),
     mPosition(pos),
@@ -60,38 +62,14 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 Text::Text(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
-    mText(),
-    mPosition(0, 0),
-    mRotation(0),
+    mText(node.getValueByPath<QString>("value")),
+    mPosition(node.getChildByPath("position")),
+    mRotation(node.getValueByPath<Angle>("rotation")),
     mHeight(node.getValueByPath<PositiveLength>("height")),
     mAlign(node.getChildByPath("align")) {
-  if (Uuid::isValid(node.getChildByIndex(0).getValue<QString>())) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-    mText = node.getValueByPath<QString>("value");
-  } else {
-    // backward compatibility, remove this some time!
-    mText = node.getChildByIndex(0).getValue<QString>();
-  }
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("rotation")) {
-    mRotation = node.getValueByPath<Angle>("rotation");
-  } else {
-    // backward compatibility, remove this some time!
-    mRotation = node.getValueByPath<Angle>("rot");
-  }
-
-  // backward compatibility - remove this some time!
-  mText.replace(QRegularExpression("#([_A-Za-z][_\\|0-9A-Za-z]*)"), "{{\\1}}");
-  mText.replace(QRegularExpression("\\{\\{(\\w+)\\|(\\w+)\\}\\}"),
-                "{{ \\1 or \\2 }}");
 }
 
 Text::~Text() noexcept {
@@ -101,65 +79,69 @@ Text::~Text() noexcept {
  *  Setters
  ******************************************************************************/
 
-void Text::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) return;
+bool Text::setLayerName(const GraphicsLayerName& name) noexcept {
+  if (name == mLayerName) {
+    return false;
+  }
+
   mLayerName = name;
-  foreach (IF_TextObserver* object, mObservers) {
-    object->textLayerNameChanged(mLayerName);
-  }
+  onEdited.notify(Event::LayerNameChanged);
+  return true;
 }
 
-void Text::setText(const QString& text) noexcept {
-  if (text == mText) return;
+bool Text::setText(const QString& text) noexcept {
+  if (text == mText) {
+    return false;
+  }
+
   mText = text;
-  foreach (IF_TextObserver* object, mObservers) {
-    object->textTextChanged(mText);
-  }
+  onEdited.notify(Event::TextChanged);
+  return true;
 }
 
-void Text::setPosition(const Point& pos) noexcept {
-  if (pos == mPosition) return;
+bool Text::setPosition(const Point& pos) noexcept {
+  if (pos == mPosition) {
+    return false;
+  }
+
   mPosition = pos;
-  foreach (IF_TextObserver* object, mObservers) {
-    object->textPositionChanged(mPosition);
-  }
+  onEdited.notify(Event::PositionChanged);
+  return true;
 }
 
-void Text::setRotation(const Angle& rotation) noexcept {
-  if (rotation == mRotation) return;
+bool Text::setRotation(const Angle& rotation) noexcept {
+  if (rotation == mRotation) {
+    return false;
+  }
+
   mRotation = rotation;
-  foreach (IF_TextObserver* object, mObservers) {
-    object->textRotationChanged(mRotation);
-  }
+  onEdited.notify(Event::RotationChanged);
+  return true;
 }
 
-void Text::setHeight(const PositiveLength& height) noexcept {
-  if (height == mHeight) return;
+bool Text::setHeight(const PositiveLength& height) noexcept {
+  if (height == mHeight) {
+    return false;
+  }
+
   mHeight = height;
-  foreach (IF_TextObserver* object, mObservers) {
-    object->textHeightChanged(mHeight);
-  }
+  onEdited.notify(Event::HeightChanged);
+  return true;
 }
 
-void Text::setAlign(const Alignment& align) noexcept {
-  if (align == mAlign) return;
-  mAlign = align;
-  foreach (IF_TextObserver* object, mObservers) {
-    object->textAlignChanged(mAlign);
+bool Text::setAlign(const Alignment& align) noexcept {
+  if (align == mAlign) {
+    return false;
   }
+
+  mAlign = align;
+  onEdited.notify(Event::AlignChanged);
+  return true;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void Text::registerObserver(IF_TextObserver& object) const noexcept {
-  mObservers.insert(&object);
-}
-
-void Text::unregisterObserver(IF_TextObserver& object) const noexcept {
-  mObservers.remove(&object);
-}
 
 void Text::serialize(SExpression& root) const {
   root.appendChild(mUuid);
@@ -187,13 +169,16 @@ bool Text::operator==(const Text& rhs) const noexcept {
 }
 
 Text& Text::operator=(const Text& rhs) noexcept {
-  mUuid      = rhs.mUuid;
-  mLayerName = rhs.mLayerName;
-  mText      = rhs.mText;
-  mPosition  = rhs.mPosition;
-  mRotation  = rhs.mRotation;
-  mHeight    = rhs.mHeight;
-  mAlign     = rhs.mAlign;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setLayerName(rhs.mLayerName);
+  setText(rhs.mText);
+  setPosition(rhs.mPosition);
+  setRotation(rhs.mRotation);
+  setHeight(rhs.mHeight);
+  setAlign(rhs.mAlign);
   return *this;
 }
 

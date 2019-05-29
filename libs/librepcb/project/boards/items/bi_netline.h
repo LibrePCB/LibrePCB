@@ -80,9 +80,7 @@ public:
   BI_NetLine(const BI_NetLine& other) = delete;
   BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
              BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint);
-  BI_NetLine(BI_NetSegment& segment, const SExpression& node,
-             const QHash<Uuid, QString>&           netpointLayerMap,
-             const QHash<Uuid, BI_NetLineAnchor*>& netPointAnchorMap);
+  BI_NetLine(BI_NetSegment& segment, const SExpression& node);
   BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
              BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
              const PositiveLength& width);
@@ -128,10 +126,8 @@ private slots:
 
 private:
   void              init();
-  BI_NetLineAnchor* deserializeAnchor(
-      const SExpression& root, const QString& oldKey, const QString& newKey,
-      const QHash<Uuid, BI_NetLineAnchor*>& netPointAnchorMap,
-      Uuid&                                 oldPointUuid) const;
+  BI_NetLineAnchor* deserializeAnchor(const SExpression& root,
+                                      const QString&     key) const;
   void serializeAnchor(SExpression& root, BI_NetLineAnchor* anchor) const;
 
   // General

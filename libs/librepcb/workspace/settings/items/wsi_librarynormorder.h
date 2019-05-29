@@ -38,9 +38,6 @@ namespace workspace {
 /**
  * @brief The WSI_LibraryNormOrder class contains a list of norms which should
  * be used for all library elements (in the specified order)
- *
- * @author ubruhin
- * @date 2014-11-01
  */
 class WSI_LibraryNormOrder final : public WSI_Base {
   Q_OBJECT

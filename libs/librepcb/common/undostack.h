@@ -53,9 +53,6 @@ class UndoCommandGroup;
  * @li #append() redirects to librepcb::UndoStack::appendToCmdGroup().
  * @li #commit() redirects to librepcb::UndoStack::commitCmdGroup().
  * @li #abort() redirects to librepcb::UndoStack::abortCmdGroup().
- *
- * @author ubruhin
- * @date 2017-02-25
  */
 class UndoStackTransaction final {
 public:
@@ -103,19 +100,9 @@ private:
  *  - <b>Removed support for nested macros (QUndoStack#beginMacro() and
  *    QUndoStack#endMacro())</b>: I think we do need this feature (but we have a
  * similar mechanism, see next line)...
- *  - <b>Added support for exclusive macro command creation:</b> @todo Don't
- * sure if this is a good way, we need some tests first... If the tests are
- * successful, we should complete this documentation (explain how this feature
- * works).
+ *  - <b>Added support for exclusive macro command creation:</b>
  *
  * @see #UndoCommand, #UndoCommandGroup
- *
- * @author ubruhin
- * @date 2014-08-20
- *
- * @todo This class is not yet tested very well. Does it work correctly when
- * destroying an #UndoStack object while the current index is not the index of
- * the last command?
  */
 class UndoStack final : public QObject {
   Q_OBJECT
@@ -201,6 +188,9 @@ public:
    * method.
    * @param forceKeepCmd  Only for internal use!
    *
+   * @retval true     If the command has done some changes
+   * @retval false    If the command has done nothing
+   *
    * @throw Exception If the command is not executed successfully, this method
    *                  throws an exception and tries to keep the state of the
    * stack consistend (as the passed command did never exist).
@@ -209,7 +199,7 @@ public:
    * command is active (see #isCommandActive()), this method will throw an
    * exception.
    */
-  void execCmd(UndoCommand* cmd, bool forceKeepCmd = false);
+  bool execCmd(UndoCommand* cmd, bool forceKeepCmd = false);
 
   /**
    * @brief Begin building a new command group that consists of multiple
@@ -233,18 +223,24 @@ public:
    * @param cmd       The command to execute (same conditions as for
    * #execCmd()!)
    *
-   * @throw Exception This method throws an exception if there is no command
-   * group active at the moment (#isCommandGroupActive()) or if an error occurs.
-   */
-  void appendToCmdGroup(UndoCommand* cmd);
-
-  /**
-   * @brief End the currently active command group and keep the changes
+   * @retval true     If the command has done some changes
+   * @retval false    If the command has done nothing
    *
    * @throw Exception This method throws an exception if there is no command
    * group active at the moment (#isCommandGroupActive()) or if an error occurs.
    */
-  void commitCmdGroup();
+  bool appendToCmdGroup(UndoCommand* cmd);
+
+  /**
+   * @brief End the currently active command group and keep the changes
+   *
+   * @retval true     If the command group has done some changes
+   * @retval false    If the command group has done nothing
+   *
+   * @throw Exception This method throws an exception if there is no command
+   * group active at the moment (#isCommandGroupActive()) or if an error occurs.
+   */
+  bool commitCmdGroup();
 
   /**
    * @brief End the currently active command group and revert the changes

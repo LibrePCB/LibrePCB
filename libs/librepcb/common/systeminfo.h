@@ -46,9 +46,6 @@ namespace librepcb {
  *
  * @note Only static methods are available. You cannot create objects of this
  * class.
- *
- * @author ubruhin
- * @date 2014-07-28
  */
 class SystemInfo final {
   Q_DECLARE_TR_FUNCTIONS(SystemInfo)
@@ -69,8 +66,6 @@ public:
    * Simpson")
    *
    * @return The full user name (can be empty)
-   *
-   * @todo The implementation of this method is very ugly...
    */
   static const QString& getFullUsername() noexcept;
 

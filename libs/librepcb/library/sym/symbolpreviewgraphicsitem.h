@@ -50,9 +50,6 @@ class ComponentSymbolVariantItem;
 
 /**
  * @brief The SymbolPreviewGraphicsItem class
- *
- * @author ubruhin
- * @date 2015-04-21
  */
 class SymbolPreviewGraphicsItem final : public QGraphicsItem,
                                         public AttributeProvider {

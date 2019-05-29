@@ -42,9 +42,6 @@ class FirstRunWizardPage_Welcome;
 
 /**
  * @brief The FirstRunWizardPage_Welcome class
- *
- * @author ubruhin
- * @date 2015-09-22
  */
 class FirstRunWizardPage_Welcome final : public QWizardPage {
   Q_OBJECT

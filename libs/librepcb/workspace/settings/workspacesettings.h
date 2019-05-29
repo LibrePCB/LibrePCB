@@ -62,9 +62,6 @@ class WorkspaceSettingsDialog;
  * This class also provides a graphical dialog to show and edit all these
  * settings. For this purpose, the WorkspaceSettingsDialog class is used. It can
  * be shown by calling the slot #showSettingsDialog().
- *
- * @author ubruhin
- * @date 2014-07-12
  */
 class WorkspaceSettings final : public QObject, public SerializableObject {
   Q_OBJECT

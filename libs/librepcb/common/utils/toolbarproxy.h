@@ -40,9 +40,6 @@ namespace librepcb {
 /**
  * @brief The ToolBarProxy class allows to map a list of QAction's to one
  * QToolBar
- *
- * @author ubruhin
- * @date 2017-08-13
  */
 class ToolBarProxy final : public QObject {
   Q_OBJECT

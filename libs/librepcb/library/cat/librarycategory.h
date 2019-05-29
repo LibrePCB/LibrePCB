@@ -54,9 +54,9 @@ public:
                   const ElementName& name_en_US,
                   const QString&     description_en_US,
                   const QString&     keywords_en_US);
-  LibraryCategory(const FilePath& elementDirectory,
-                  const QString&  shortElementName,
-                  const QString& longElementName, bool readOnly);
+  LibraryCategory(std::unique_ptr<TransactionalDirectory> directory,
+                  const QString&                          shortElementName,
+                  const QString&                          longElementName);
   virtual ~LibraryCategory() noexcept;
 
   // Getters: Attributes

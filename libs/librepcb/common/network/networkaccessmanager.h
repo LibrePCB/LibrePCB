@@ -58,9 +58,6 @@ namespace librepcb {
 
  * @see librepcb::NetworkRequestBase, librepcb::NetworkRequest,
  librepcb::FileDownload
- *
- * @author ubruhin
- * @date 2016-09-15
  */
 class NetworkAccessManager final : public QThread {
   Q_OBJECT

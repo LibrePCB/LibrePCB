@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_AddValues class
- *
- * @author  ubruhin
- * @date    2017-01-03
  */
 class SymbolEditorState_AddValues final
   : public SymbolEditorState_DrawTextBase {

@@ -45,10 +45,13 @@ ComponentSymbolVariantListWidget::ComponentSymbolVariantListWidget(
     mTable(new QTableWidget(this)),
     mUndoStack(nullptr),
     mVariantList(nullptr),
-    mEditorProvider(nullptr) {
+    mEditorProvider(nullptr),
+    mVariantListEditedSlot(
+        *this, &ComponentSymbolVariantListWidget::variantListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_NAME,
                                   new QTableWidgetItem(tr("Name")));
@@ -98,22 +101,14 @@ void ComponentSymbolVariantListWidget::setReferences(
     UndoStack* undoStack, ComponentSymbolVariantList* variants,
     IF_ComponentSymbolVariantEditorProvider* editorProvider) noexcept {
   if (mVariantList) {
-    mVariantList->unregisterObserver(this);
-    for (const ComponentSymbolVariant& variant : *mVariantList) {
-      disconnect(&variant, &ComponentSymbolVariant::edited, this,
-                 &ComponentSymbolVariantListWidget::updateTable);
-    }
+    mVariantList->onEdited.detach(mVariantListEditedSlot);
   }
   mUndoStack       = undoStack;
   mVariantList     = variants;
   mEditorProvider  = editorProvider;
   mSelectedVariant = tl::nullopt;
   if (mVariantList) {
-    mVariantList->registerObserver(this);
-    for (const ComponentSymbolVariant& variant : *mVariantList) {
-      connect(&variant, &ComponentSymbolVariant::edited, this,
-              &ComponentSymbolVariantListWidget::updateTable);
-    }
+    mVariantList->onEdited.attach(mVariantListEditedSlot);
   }
   updateTable();
 }
@@ -197,34 +192,19 @@ void ComponentSymbolVariantListWidget::btnDownClicked() noexcept {
 }
 
 /*******************************************************************************
- *  Observer
- ******************************************************************************/
-
-void ComponentSymbolVariantListWidget::listObjectAdded(
-    const ComponentSymbolVariantList& list, int newIndex,
-    const std::shared_ptr<ComponentSymbolVariant>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_ASSERT(&list == mVariantList);
-  connect(ptr.get(), &ComponentSymbolVariant::edited, this,
-          &ComponentSymbolVariantListWidget::updateTable);
-  updateTable();
-}
-
-void ComponentSymbolVariantListWidget::listObjectRemoved(
-    const ComponentSymbolVariantList& list, int oldIndex,
-    const std::shared_ptr<ComponentSymbolVariant>& ptr) noexcept {
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_ASSERT(&list == mVariantList);
-  disconnect(ptr.get(), &ComponentSymbolVariant::edited, this,
-             &ComponentSymbolVariantListWidget::updateTable);
-  updateTable();
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ComponentSymbolVariantListWidget::variantListEdited(
+    const ComponentSymbolVariantList& list, int index,
+    const std::shared_ptr<const ComponentSymbolVariant>& variant,
+    ComponentSymbolVariantList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(variant);
+  Q_UNUSED(event);
+  updateTable();
+}
 
 void ComponentSymbolVariantListWidget::updateTable() noexcept {
   blockSignals(true);
@@ -316,8 +296,13 @@ void ComponentSymbolVariantListWidget::setTableRowContent(
   }
   mTable->setItem(row, COLUMN_SYMBOLCOUNT, symbolCountItem);
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // buttons
-  int      btnSize = 23;  // TODO: can we determine this value dynamically?
+  int      btnSize = mTable->rowHeight(row);
   QSize    iconSize(btnSize - 6, btnSize - 6);
   QWidget* buttonsColumnWidget = new QWidget(this);
   buttonsColumnWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -371,9 +356,6 @@ void ComponentSymbolVariantListWidget::setTableRowContent(
   }
   buttonsColumnLayout->addWidget(btnAddRemove);
   mTable->setCellWidget(row, COLUMN_BUTTONS, buttonsColumnWidget);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void ComponentSymbolVariantListWidget::addVariant(

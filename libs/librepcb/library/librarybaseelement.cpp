@@ -25,10 +25,8 @@
 #include "librarybaseelementcheck.h"
 
 #include <librepcb/common/application.h>
-#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
-#include <librepcb/common/fileio/smartversionfile.h>
+#include <librepcb/common/fileio/versionfile.h>
 
 #include <QtCore>
 
@@ -48,9 +46,7 @@ LibraryBaseElement::LibraryBaseElement(
     const QString& author, const ElementName& name_en_US,
     const QString& description_en_US, const QString& keywords_en_US)
   : QObject(nullptr),
-    mDirectory(FilePath::getRandomTempPath()),
-    mDirectoryIsTemporary(true),
-    mOpenedReadOnly(false),
+    mDirectory(new TransactionalDirectory()),
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName),
     mLongElementName(longElementName),
@@ -62,18 +58,13 @@ LibraryBaseElement::LibraryBaseElement(
     mNames(name_en_US),
     mDescriptions(description_en_US),
     mKeywords(keywords_en_US) {
-  FileUtils::makePath(mDirectory);  // can throw
 }
 
-LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
-                                       bool            dirnameMustBeUuid,
-                                       const QString&  shortElementName,
-                                       const QString&  longElementName,
-                                       bool            readOnly)
+LibraryBaseElement::LibraryBaseElement(
+    std::unique_ptr<TransactionalDirectory> directory, bool dirnameMustBeUuid,
+    const QString& shortElementName, const QString& longElementName)
   : QObject(nullptr),
-    mDirectory(elementDirectory),
-    mDirectoryIsTemporary(false),
-    mOpenedReadOnly(readOnly),
+    mDirectory(std::move(directory)),
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName),
     mLongElementName(longElementName),
@@ -85,50 +76,46 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
         "unknown")),  // just for initialization, will be overwritten
     mDescriptions(""),
     mKeywords("") {
-  // determine the filepath to the version file
-  FilePath versionFilePath =
-      mDirectory.getPathTo(".librepcb-" % mShortElementName);
+  // determine the filename of the version file
+  QString versionFileName = ".librepcb-" % mShortElementName;
 
   // check if the directory is a library element
-  if (!versionFilePath.isExistingFile()) {
+  if (!mDirectory->fileExists(versionFileName)) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString(tr("Directory is not a library element of type %1: \"%2\""))
-            .arg(mLongElementName, mDirectory.toNative()));
+            .arg(mLongElementName, mDirectory->getAbsPath().toNative()));
   }
 
   // check directory name
-  QString dirUuidStr = mDirectory.getFilename();
+  QString dirUuidStr = mDirectory->getAbsPath().getFilename();
   if (mDirectoryNameMustBeUuid && (!Uuid::isValid(dirUuidStr))) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("Directory name is not a valid UUID: \"%1\""))
-                           .arg(mDirectory.toNative()));
+                           .arg(mDirectory->getAbsPath().toNative()));
   }
 
   // read version number from version file
-  SmartVersionFile versionFile(versionFilePath, false, true);
+  VersionFile versionFile =
+      VersionFile::fromByteArray(mDirectory->read(versionFileName));
   if (versionFile.getVersion() > qApp->getAppVersion()) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString(
             tr("The library element %1 was created with a newer application "
                "version. You need at least LibrePCB version %2 to open it."))
-            .arg(mDirectory.toNative())
+            .arg(mDirectory->getAbsPath().toNative())
             .arg(versionFile.getVersion().toPrettyStr(3)));
   }
 
   // open main file
-  FilePath       sexprFilePath = mDirectory.getPathTo(mLongElementName % ".lp");
-  SmartSExprFile sexprFile(sexprFilePath, false, true);
-  mLoadingFileDocument = sexprFile.parseFileAndBuildDomTree();
+  QString  sexprFileName = mLongElementName % ".lp";
+  FilePath sexprFilePath = mDirectory->getAbsPath(sexprFileName);
+  mLoadingFileDocument =
+      SExpression::parse(mDirectory->read(sexprFileName), sexprFilePath);
 
   // read attributes
-  if (mLoadingFileDocument.getChildByIndex(0).isString()) {
-    mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
-  } else {
-    // backward compatibility, remove this some time!
-    mUuid = mLoadingFileDocument.getValueByPath<Uuid>("uuid");
-  }
+  mUuid         = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
   mVersion      = mLoadingFileDocument.getValueByPath<Version>("version");
   mAuthor       = mLoadingFileDocument.getValueByPath<QString>("author");
   mCreated      = mLoadingFileDocument.getValueByPath<QDateTime>("created");
@@ -151,12 +138,6 @@ LibraryBaseElement::LibraryBaseElement(const FilePath& elementDirectory,
 }
 
 LibraryBaseElement::~LibraryBaseElement() noexcept {
-  if (mDirectoryIsTemporary) {
-    if (!QDir(mDirectory.toStr()).removeRecursively()) {
-      qWarning() << "Could not remove temporary directory:"
-                 << mDirectory.toNative();
-    }
-  }
 }
 
 /*******************************************************************************
@@ -183,45 +164,34 @@ LibraryElementCheckMessageList LibraryBaseElement::runChecks() const {
 }
 
 void LibraryBaseElement::save() {
-  if (mOpenedReadOnly) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Library element was opened in read-only mode: \"%1\""))
-            .arg(mDirectory.toNative()));
-  }
-
   // save S-Expressions file
-  FilePath    sexprFilePath = mDirectory.getPathTo(mLongElementName % ".lp");
-  SExpression root(serializeToDomElement("librepcb_" % mLongElementName));
-  QScopedPointer<SmartSExprFile> sexprFile(
-      SmartSExprFile::create(sexprFilePath));
-  sexprFile->save(root, true);
+  mDirectory->write(
+      mLongElementName % ".lp",
+      serializeToDomElement("librepcb_" % mLongElementName).toByteArray());
 
   // save version number file
-  QScopedPointer<SmartVersionFile> versionFile(SmartVersionFile::create(
-      mDirectory.getPathTo(".librepcb-" % mShortElementName),
-      qApp->getFileFormatVersion()));
-  versionFile->save(true);
+  mDirectory->write(".librepcb-" % mShortElementName,
+                    VersionFile(qApp->getFileFormatVersion()).toByteArray());
 }
 
-void LibraryBaseElement::saveTo(const FilePath& destination) {
-  // copy to new directory and remove source directory if it was temporary
-  copyTo(destination, mDirectoryIsTemporary);
+void LibraryBaseElement::saveTo(TransactionalDirectory& dest) {
+  mDirectory->saveTo(dest);  // can throw
+  save();                    // can throw
 }
 
-void LibraryBaseElement::saveIntoParentDirectory(const FilePath& parentDir) {
-  FilePath elemDir = parentDir.getPathTo(mUuid.toStr());
-  saveTo(elemDir);
+void LibraryBaseElement::moveTo(TransactionalDirectory& dest) {
+  mDirectory->moveTo(dest);  // can throw
+  save();                    // can throw
 }
 
-void LibraryBaseElement::moveTo(const FilePath& destination) {
-  // copy to new directory and remove source directory
-  copyTo(destination, true);
+void LibraryBaseElement::saveIntoParentDirectory(TransactionalDirectory& dest) {
+  TransactionalDirectory dir(dest, mUuid.toStr());
+  saveTo(dir);  // can throw
 }
 
-void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir) {
-  FilePath elemDir = parentDir.getPathTo(mUuid.toStr());
-  moveTo(elemDir);
+void LibraryBaseElement::moveIntoParentDirectory(TransactionalDirectory& dest) {
+  TransactionalDirectory dir(dest, mUuid.toStr());
+  moveTo(dir);  // can throw
 }
 
 /*******************************************************************************
@@ -230,63 +200,6 @@ void LibraryBaseElement::moveIntoParentDirectory(const FilePath& parentDir) {
 
 void LibraryBaseElement::cleanupAfterLoadingElementFromFile() noexcept {
   mLoadingFileDocument = SExpression();  // destroy the whole DOM tree
-}
-
-void LibraryBaseElement::copyTo(const FilePath& destination,
-                                bool            removeSource) {
-  if (destination != mDirectory) {
-    // check destination directory name validity
-    if (mDirectoryNameMustBeUuid &&
-        (destination.getFilename() != mUuid.toStr())) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(
-              tr("Library element directory name is not a valid UUID: \"%1\""))
-              .arg(destination.getFilename()));
-    }
-
-    // Unfortunately empty directories are sometimes not removed properly, for
-    // example some Git operations remove the contained files but not the parent
-    // directories. But if the destination directory exists already,
-    // FileUtils::copyDirRecursively() would throw an exception because it
-    // requires that the destination does not exist yet. To avoid this issue, we
-    // remove the destination first if it's an empty directory. If it's not
-    // empty, we accept that an exception is thrown because this would likely be
-    // a serious error.
-    if (destination.isEmptyDir()) {
-      FileUtils::removeDirRecursively(destination);
-    }
-
-    // check if destination directory exists already
-    if (destination.isExistingDir() || destination.isExistingFile()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("Could not copy "
-                     "library element \"%1\" to \"%2\" because the destination "
-                     "exists already."))
-              .arg(mDirectory.toNative(), destination.toNative()));
-    }
-
-    // copy current directory to destination
-    FileUtils::copyDirRecursively(mDirectory, destination);
-
-    // memorize the current directory
-    FilePath sourceDir = mDirectory;
-
-    // save the library element to the destination directory
-    mDirectory            = destination;
-    mDirectoryIsTemporary = false;
-    mOpenedReadOnly       = false;
-    save();
-
-    // remove source directory if required
-    if (removeSource) {
-      FileUtils::removeDirRecursively(sourceDir);
-    }
-  } else {
-    // no copy action required, just save the element
-    save();
-  }
 }
 
 void LibraryBaseElement::serialize(SExpression& root) const {

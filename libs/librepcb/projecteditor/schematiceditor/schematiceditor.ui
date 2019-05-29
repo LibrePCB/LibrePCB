@@ -48,6 +48,7 @@
     </property>
     <addaction name="actionNew_Schematic_Page"/>
     <addaction name="actionSave_Project"/>
+    <addaction name="actionExportLppz"/>
     <addaction name="actionPDF_Export"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
@@ -313,7 +314,7 @@
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;PDF Export</string>
+    <string>Export schematics to &amp;PDF</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -643,9 +644,6 @@
    <property name="text">
     <string>&amp;Settings</string>
    </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
   </action>
   <action name="actionToolAddNetLabel">
    <property name="icon">
@@ -686,6 +684,18 @@
     <string>Update Library</string>
    </property>
   </action>
+  <action name="actionExportLppz">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export project to *.lppz</string>
+   </property>
+   <property name="toolTip">
+    <string>Export project to *.lppz</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -695,6 +705,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../../img/images.qrc"/>
   <include location="../../../../img/images.qrc"/>
  </resources>
  <connections/>

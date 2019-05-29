@@ -41,9 +41,6 @@ namespace librepcb {
 
 /**
  * @brief The Toolbox class provides some useful general purpose methods
- *
- * @author  ubruhin
- * @date    2016-10-30
  */
 class Toolbox final {
   Q_DECLARE_TR_FUNCTIONS(Toolbox)
@@ -63,6 +60,13 @@ public:
     QList<T> list = set.toList();
     qSort(list);
     return list;
+  }
+
+  template <typename T>
+  static T sorted(const T& container) noexcept {
+    T copy(container);
+    qSort(copy);
+    return copy;
   }
 
   static QRectF boundingRectFromRadius(qreal radius) noexcept {
@@ -118,6 +122,21 @@ public:
   static Length shortestDistanceBetweenPointAndLine(
       const Point& p, const Point& l1, const Point& l2,
       Point* nearest = nullptr) noexcept;
+
+  /**
+   * @brief Copy a string while incrementing its contained number
+   *
+   * - If the string contains one or more numbers, the last one gets incremented
+   * - If it does not contain a number, a "1" is appended instead
+   *
+   * This way, the returned number is guaranteed to be different from the input
+   * string. That's useful for example to generate unique, incrementing pin
+   * numbers like "X1", "X2", "X3" etc.
+   *
+   * @param string  The input string
+   * @return A new string with the incremented number
+   */
+  static QString incrementNumberInString(QString string) noexcept;
 
   /**
    * @brief Convert a numeric or non-numeric string to the corresponding

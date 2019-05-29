@@ -81,10 +81,10 @@ void CmdSymbolPinEdit::setPosition(const Point& pos, bool immediate) noexcept {
   if (immediate) mPin.setPosition(mNewPos);
 }
 
-void CmdSymbolPinEdit::setDeltaToStartPos(const Point& deltaPos,
-                                          bool         immediate) noexcept {
+void CmdSymbolPinEdit::translate(const Point& deltaPos,
+                                 bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPos = mOldPos + deltaPos;
+  mNewPos += deltaPos;
   if (immediate) mPin.setPosition(mNewPos);
 }
 

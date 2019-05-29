@@ -40,7 +40,10 @@ namespace librepcb {
 HoleGraphicsItem::HoleGraphicsItem(Hole&                           hole,
                                    const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept
-  : PrimitiveCircleGraphicsItem(parent), mHole(hole), mLayerProvider(lp) {
+  : PrimitiveCircleGraphicsItem(parent),
+    mHole(hole),
+    mLayerProvider(lp),
+    mOnEditedSlot(*this, &HoleGraphicsItem::holeEdited) {
   setPosition(mHole.getPosition());
   setDiameter(positiveToUnsigned(mHole.getDiameter()));
   setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
@@ -56,11 +59,10 @@ HoleGraphicsItem::HoleGraphicsItem(Hole&                           hole,
       mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
 
   // register to the text to get attribute updates
-  mHole.registerObserver(*this);
+  mHole.onEdited.attach(mOnEditedSlot);
 }
 
 HoleGraphicsItem::~HoleGraphicsItem() noexcept {
-  mHole.unregisterObserver(*this);
 }
 
 /*******************************************************************************
@@ -76,15 +78,21 @@ QPainterPath HoleGraphicsItem::shape() const noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void HoleGraphicsItem::holePositionChanged(const Point& newPos) noexcept {
-  setPosition(newPos);
-}
-
-void HoleGraphicsItem::holeDiameterChanged(
-    const PositiveLength& newDiameter) noexcept {
-  setDiameter(positiveToUnsigned(newDiameter));
-  mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) +
-                                    UnsignedLength(500000));
+void HoleGraphicsItem::holeEdited(const Hole& hole,
+                                  Hole::Event event) noexcept {
+  switch (event) {
+    case Hole::Event::PositionChanged:
+      setPosition(hole.getPosition());
+      break;
+    case Hole::Event::DiameterChanged:
+      setDiameter(positiveToUnsigned(hole.getDiameter()));
+      mOriginCrossGraphicsItem->setSize(positiveToUnsigned(hole.getDiameter()) +
+                                        UnsignedLength(500000));
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in HoleGraphicsItem::holeEdited()";
+      break;
+  }
 }
 
 QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change,

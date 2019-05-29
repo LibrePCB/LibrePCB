@@ -39,33 +39,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Interface IF_TextObserver
- ******************************************************************************/
-
-/**
- * @brief The IF_TextObserver class
- *
- * @author ubruhin
- * @date 2017-01-02
- */
-class IF_TextObserver {
-public:
-  virtual void textLayerNameChanged(
-      const GraphicsLayerName& newLayerName) noexcept                      = 0;
-  virtual void textTextChanged(const QString& newText) noexcept            = 0;
-  virtual void textPositionChanged(const Point& newPos) noexcept           = 0;
-  virtual void textRotationChanged(const Angle& newRot) noexcept           = 0;
-  virtual void textHeightChanged(const PositiveLength& newHeight) noexcept = 0;
-  virtual void textAlignChanged(const Alignment& newAlign) noexcept        = 0;
-
-protected:
-  IF_TextObserver() noexcept {}
-  explicit IF_TextObserver(const IF_TextObserver& other) = delete;
-  virtual ~IF_TextObserver() noexcept {}
-  IF_TextObserver& operator=(const IF_TextObserver& rhs) = delete;
-};
-
-/*******************************************************************************
  *  Class Text
  ******************************************************************************/
 
@@ -76,6 +49,19 @@ class Text final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Text)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    LayerNameChanged,
+    TextChanged,
+    PositionChanged,
+    RotationChanged,
+    HeightChanged,
+    AlignChanged,
+  };
+  Signal<Text, Event>       onEdited;
+  typedef Slot<Text, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Text() = delete;
   Text(const Text& other) noexcept;
@@ -96,16 +82,12 @@ public:
   const QString&           getText() const noexcept { return mText; }
 
   // Setters
-  void setLayerName(const GraphicsLayerName& name) noexcept;
-  void setText(const QString& text) noexcept;
-  void setPosition(const Point& pos) noexcept;
-  void setRotation(const Angle& rotation) noexcept;
-  void setHeight(const PositiveLength& height) noexcept;
-  void setAlign(const Alignment& align) noexcept;
-
-  // General Methods
-  void registerObserver(IF_TextObserver& object) const noexcept;
-  void unregisterObserver(IF_TextObserver& object) const noexcept;
+  bool setLayerName(const GraphicsLayerName& name) noexcept;
+  bool setText(const QString& text) noexcept;
+  bool setPosition(const Point& pos) noexcept;
+  bool setRotation(const Angle& rotation) noexcept;
+  bool setHeight(const PositiveLength& height) noexcept;
+  bool setAlign(const Alignment& align) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -123,10 +105,6 @@ private:  // Data
   Angle             mRotation;
   PositiveLength    mHeight;
   Alignment         mAlign;
-
-  // Misc
-  mutable QSet<IF_TextObserver*>
-      mObservers;  ///< A list of all observer objects
 };
 
 /*******************************************************************************
@@ -136,10 +114,14 @@ private:  // Data
 struct TextListNameProvider {
   static constexpr const char* tagname = "text";
 };
-using TextList      = SerializableObjectList<Text, TextListNameProvider>;
-using CmdTextInsert = CmdListElementInsert<Text, TextListNameProvider>;
-using CmdTextRemove = CmdListElementRemove<Text, TextListNameProvider>;
-using CmdTextsSwap  = CmdListElementsSwap<Text, TextListNameProvider>;
+using TextList =
+    SerializableObjectList<Text, TextListNameProvider, Text::Event>;
+using CmdTextInsert =
+    CmdListElementInsert<Text, TextListNameProvider, Text::Event>;
+using CmdTextRemove =
+    CmdListElementRemove<Text, TextListNameProvider, Text::Event>;
+using CmdTextsSwap =
+    CmdListElementsSwap<Text, TextListNameProvider, Text::Event>;
 
 /*******************************************************************************
  *  End of File

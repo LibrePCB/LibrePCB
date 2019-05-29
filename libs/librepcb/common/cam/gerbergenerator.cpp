@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "gerbergenerator.h"
 
-#include "../fileio/smarttextfile.h"
+#include "../fileio/fileutils.h"
 #include "../geometry/circle.h"
 #include "../geometry/path.h"
 #include "../toolbox.h"
@@ -208,9 +208,7 @@ void GerberGenerator::generate() {
 }
 
 void GerberGenerator::saveToFile(const FilePath& filepath) const {
-  QScopedPointer<SmartTextFile> file(SmartTextFile::create(filepath));
-  file->setContent(mOutput.toLatin1());
-  file->save(true);
+  FileUtils::writeFile(filepath, mOutput.toLatin1());  // can throw
 }
 
 /*******************************************************************************

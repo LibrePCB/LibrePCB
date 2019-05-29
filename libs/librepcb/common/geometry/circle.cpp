@@ -34,7 +34,8 @@ namespace librepcb {
  ******************************************************************************/
 
 Circle::Circle(const Circle& other) noexcept
-  : mUuid(other.mUuid),
+  : onEdited(*this),
+    mUuid(other.mUuid),
     mLayerName(other.mLayerName),
     mLineWidth(other.mLineWidth),
     mIsFilled(other.mIsFilled),
@@ -50,7 +51,8 @@ Circle::Circle(const Uuid& uuid, const Circle& other) noexcept : Circle(other) {
 Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
                const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
                const Point& center, const PositiveLength& diameter) noexcept
-  : mUuid(uuid),
+  : onEdited(*this),
+    mUuid(uuid),
     mLayerName(layerName),
     mLineWidth(lineWidth),
     mIsFilled(fill),
@@ -60,41 +62,14 @@ Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
 }
 
 Circle::Circle(const SExpression& node)
-  : mUuid(Uuid::createRandom()),  // backward compatibility, remove this some
-                                  // time!
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(false),
-    mCenter(0, 0),
-    mDiameter(1) {
-  if (node.getChildByIndex(0).isString()) {
-    mUuid = node.getChildByIndex(0).getValue<Uuid>();
-  }
-  if (node.tryGetChildByPath("grab_area")) {
-    mIsGrabArea = node.getValueByPath<bool>("grab_area");
-  } else {
-    // backward compatibility, remove this some time!
-    mIsGrabArea = node.getValueByPath<bool>("grab");
-  }
-  if (node.tryGetChildByPath("position")) {
-    mCenter = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mCenter = Point(node.getChildByPath("pos"));
-  }
-  if (node.tryGetChildByPath("diameter")) {
-    mDiameter = node.getValueByPath<PositiveLength>("diameter");
-  } else if (node.tryGetChildByPath("dia")) {
-    // backward compatibility, remove this some time!
-    mDiameter = node.getValueByPath<PositiveLength>("dia");
-  } else if (node.tryGetChildByPath("size")) {
-    // backward compatibility, remove this some time!
-    mDiameter = Point(node.getChildByPath("size")).getX();
-  } else {
-    // backward compatibility, remove this some time!
-    mDiameter = node.getValueByPath<Length>("rx") * 2;
-  }
+    mIsGrabArea(node.getValueByPath<bool>("grab_area")),
+    mCenter(node.getChildByPath("position")),
+    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
 }
 
 Circle::~Circle() noexcept {
@@ -104,74 +79,69 @@ Circle::~Circle() noexcept {
  *  Setters
  ******************************************************************************/
 
-void Circle::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) return;
+bool Circle::setLayerName(const GraphicsLayerName& name) noexcept {
+  if (name == mLayerName) {
+    return false;
+  }
+
   mLayerName = name;
-  foreach (IF_CircleObserver* object, mObservers) {
-    object->circleLayerNameChanged(mLayerName);
-  }
+  onEdited.notify(Event::LayerNameChanged);
+  return true;
 }
 
-void Circle::setLineWidth(const UnsignedLength& width) noexcept {
-  if (width == mLineWidth) return;
+bool Circle::setLineWidth(const UnsignedLength& width) noexcept {
+  if (width == mLineWidth) {
+    return false;
+  }
+
   mLineWidth = width;
-  foreach (IF_CircleObserver* object, mObservers) {
-    object->circleLineWidthChanged(mLineWidth);
-  }
+  onEdited.notify(Event::LineWidthChanged);
+  return true;
 }
 
-void Circle::setIsFilled(bool isFilled) noexcept {
-  if (isFilled == mIsFilled) return;
+bool Circle::setIsFilled(bool isFilled) noexcept {
+  if (isFilled == mIsFilled) {
+    return false;
+  }
+
   mIsFilled = isFilled;
-  foreach (IF_CircleObserver* object, mObservers) {
-    object->circleIsFilledChanged(mIsFilled);
-  }
+  onEdited.notify(Event::IsFilledChanged);
+  return true;
 }
 
-void Circle::setIsGrabArea(bool isGrabArea) noexcept {
-  if (isGrabArea == mIsGrabArea) return;
+bool Circle::setIsGrabArea(bool isGrabArea) noexcept {
+  if (isGrabArea == mIsGrabArea) {
+    return false;
+  }
+
   mIsGrabArea = isGrabArea;
-  foreach (IF_CircleObserver* object, mObservers) {
-    object->circleIsGrabAreaChanged(mIsGrabArea);
-  }
+  onEdited.notify(Event::IsGrabAreaChanged);
+  return true;
 }
 
-void Circle::setCenter(const Point& center) noexcept {
-  if (center == mCenter) return;
+bool Circle::setCenter(const Point& center) noexcept {
+  if (center == mCenter) {
+    return false;
+  }
+
   mCenter = center;
-  foreach (IF_CircleObserver* object, mObservers) {
-    object->circleCenterChanged(mCenter);
-  }
+  onEdited.notify(Event::CenterChanged);
+  return true;
 }
 
-void Circle::setDiameter(const PositiveLength& dia) noexcept {
-  if (dia == mDiameter) return;
+bool Circle::setDiameter(const PositiveLength& dia) noexcept {
+  if (dia == mDiameter) {
+    return false;
+  }
+
   mDiameter = dia;
-  foreach (IF_CircleObserver* object, mObservers) {
-    object->circleDiameterChanged(mDiameter);
-  }
-}
-
-/*******************************************************************************
- *  Transformations
- ******************************************************************************/
-
-Circle& Circle::translate(const Point& offset) noexcept {
-  mCenter += offset;
-  return *this;
+  onEdited.notify(Event::DiameterChanged);
+  return true;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void Circle::registerObserver(IF_CircleObserver& object) const noexcept {
-  mObservers.insert(&object);
-}
-
-void Circle::unregisterObserver(IF_CircleObserver& object) const noexcept {
-  mObservers.remove(&object);
-}
 
 void Circle::serialize(SExpression& root) const {
   root.appendChild(mUuid);
@@ -199,13 +169,16 @@ bool Circle::operator==(const Circle& rhs) const noexcept {
 }
 
 Circle& Circle::operator=(const Circle& rhs) noexcept {
-  mUuid       = rhs.mUuid;
-  mLayerName  = rhs.mLayerName;
-  mLineWidth  = rhs.mLineWidth;
-  mIsFilled   = rhs.mIsFilled;
-  mIsGrabArea = rhs.mIsGrabArea;
-  mCenter     = rhs.mCenter;
-  mDiameter   = rhs.mDiameter;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setLayerName(rhs.mLayerName);
+  setLineWidth(rhs.mLineWidth);
+  setIsFilled(rhs.mIsFilled);
+  setIsGrabArea(rhs.mIsGrabArea);
+  setCenter(rhs.mCenter);
+  setDiameter(rhs.mDiameter);
   return *this;
 }
 

@@ -25,8 +25,7 @@
 #include "../controlpanel/controlpanel.h"
 #include "ui_projectlibraryupdater.h"
 
-#include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/dev/device.h>
 #include <librepcb/library/pkg/footprint.h>
@@ -46,6 +45,9 @@
  ******************************************************************************/
 namespace librepcb {
 namespace application {
+
+using project::Project;
+using workspace::WorkspaceLibraryDb;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -95,50 +97,38 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
 
   if (!abort) {
     try {
-      // lock project
-      log(QString(tr("Lock project %1...")).arg(prettyPath(mProjectFilePath)));
-      DirectoryLock lock(mProjectFilePath.getParentDir());
-      lock.tryLock();
-
-      // backup the whole library directory
-      FilePath libDir = mProjectFilePath.getParentDir().getPathTo("library");
-      FilePath libDirBackup =
-          mProjectFilePath.getParentDir().getPathTo("library~");
-      log(tr("Create backup of library directory..."));
-      FileUtils::removeDirRecursively(libDirBackup);
-      FileUtils::copyDirRecursively(libDir, libDirBackup);
+      // open file system
+      log(tr("Open project file system..."));
+      std::shared_ptr<TransactionalFileSystem> fs =
+          TransactionalFileSystem::openRW(
+              mProjectFilePath.getParentDir(),
+              TransactionalFileSystem::RestoreMode::ABORT);
 
       // update all elements
-      updateElements("cmp", &workspace::WorkspaceLibraryDb::getLatestComponent);
-      updateElements("dev", &workspace::WorkspaceLibraryDb::getLatestDevice);
-      updateElements("pkg", &workspace::WorkspaceLibraryDb::getLatestPackage);
-      updateElements("sym", &workspace::WorkspaceLibraryDb::getLatestSymbol);
-
-      // release lock to allow opening the project
-      lock.unlock();
+      updateElements(fs, "cmp", &WorkspaceLibraryDb::getLatestComponent);
+      updateElements(fs, "dev", &WorkspaceLibraryDb::getLatestDevice);
+      updateElements(fs, "pkg", &WorkspaceLibraryDb::getLatestPackage);
+      updateElements(fs, "sym", &WorkspaceLibraryDb::getLatestSymbol);
 
       // check whether project can still be opened of if we broke something
       try {
         log(QString(tr("Open project %1..."))
                 .arg(prettyPath(mProjectFilePath)));
-        project::Project prj(mProjectFilePath, false, false);
+        Project project(std::unique_ptr<TransactionalDirectory>(
+                            new TransactionalDirectory(fs)),
+                        mProjectFilePath.getFilename());
         log(QString(tr("Save project %1..."))
                 .arg(prettyPath(mProjectFilePath)));
-        prj.save(true);  // force updating library elements file format
+        project.save();  // force updating library elements file format
+        fs->save();      // can throw
       } catch (const Exception& e) {
-        // something is broken -> restore backup
-        log(QString(tr("ERROR: %1")).arg(e.getMsg()));
-        log(tr("Restore backup..."));
-        FileUtils::removeDirRecursively(libDir);
-        FileUtils::move(libDirBackup, libDir);
-        log(tr("Successfully restored backup. No changes were made at all."));
+        // something is broken -> discard modifications in file system
+        log(QString(tr("[ERROR] %1")).arg(e.getMsg()));
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Failed to update library elements! Probably "
                               "there were breaking "
                               "changes in some library elements."));
       }
-      log(tr("Remove backup..."));
-      FileUtils::removeDirRecursively(libDirBackup);
       log(tr("[SUCCESS] All library elements updated."));
     } catch (const Exception& e) {
       log(QString(tr("[ERROR] %1")).arg(e.getMsg()));
@@ -173,22 +163,24 @@ QString ProjectLibraryUpdater::prettyPath(const FilePath& fp) const noexcept {
 }
 
 void ProjectLibraryUpdater::updateElements(
-    const QString& type,
+    std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
     FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const) {
-  FilePath dir =
-      mProjectFilePath.getParentDir().getPathTo("library").getPathTo(type);
-  QDir::Filters filters = QDir::Dirs | QDir::NoDotAndDotDot;
-  foreach (const QFileInfo& info, QDir(dir.toStr()).entryInfoList(filters)) {
-    tl::optional<Uuid> uuid = Uuid::tryFromString(info.baseName());
-    FilePath           dst(info.absoluteFilePath());
+  QString dirpath = "library/" % type;
+  foreach (const QString& dirname, fs->getDirs(dirpath)) {
+    tl::optional<Uuid> uuid = Uuid::tryFromString(dirname);
     FilePath           src =
         uuid ? (mWorkspace.getLibraryDb().*getter)(*uuid) : FilePath();
-    if (src.isValid() && !dst.isEmptyDir()) {
-      log(QString(tr("Update %1...")).arg(prettyPath(dst)));
-      FileUtils::removeDirRecursively(dst);
-      FileUtils::copyDirRecursively(src, dst);
+    QString                dst = dirpath % "/" % dirname;
+    TransactionalDirectory dstDir(fs, dst);
+    if (src.isValid() && (!dstDir.getFiles().isEmpty())) {
+      log(QString(tr("Update %1...")).arg(dst));
+      std::shared_ptr<TransactionalFileSystem> srcFs =
+          TransactionalFileSystem::openRO(src);
+      TransactionalDirectory srcDir(srcFs);
+      fs->removeDirRecursively(dst);
+      srcDir.saveTo(dstDir);
     } else {
-      log(QString(tr("Skip %1...")).arg(prettyPath(dst)));
+      log(QString(tr("Skip %1...")).arg(dst));
     }
   }
 }

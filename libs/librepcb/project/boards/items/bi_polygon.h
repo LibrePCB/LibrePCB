@@ -52,9 +52,6 @@ class BGI_Polygon;
 
 /**
  * @brief The BI_Polygon class
- *
- * @author ubruhin
- * @date 2016-01-12
  */
 class BI_Polygon final : public BI_Base, public SerializableObject {
   Q_OBJECT

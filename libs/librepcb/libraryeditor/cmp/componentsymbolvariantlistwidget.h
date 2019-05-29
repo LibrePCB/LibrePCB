@@ -46,13 +46,8 @@ namespace editor {
 
 /**
  * @brief The ComponentSymbolVariantListWidget class
- *
- * @author ubruhin
- * @date 2017-03-18
  */
-class ComponentSymbolVariantListWidget final
-  : public QWidget,
-    private ComponentSymbolVariantList::IF_Observer {
+class ComponentSymbolVariantListWidget final : public QWidget {
   Q_OBJECT
 
 private:  // Types
@@ -93,15 +88,11 @@ private:  // Slots
   void btnUpClicked() noexcept;
   void btnDownClicked() noexcept;
 
-private:  // Observer
-  void listObjectAdded(
-      const ComponentSymbolVariantList& list, int newIndex,
-      const std::shared_ptr<ComponentSymbolVariant>& ptr) noexcept override;
-  void listObjectRemoved(
-      const ComponentSymbolVariantList& list, int oldIndex,
-      const std::shared_ptr<ComponentSymbolVariant>& ptr) noexcept override;
-
 private:  // Methods
+  void variantListEdited(
+      const ComponentSymbolVariantList& list, int index,
+      const std::shared_ptr<const ComponentSymbolVariant>& variant,
+      ComponentSymbolVariantList::Event                    event) noexcept;
   void               updateTable() noexcept;
   void               setTableRowContent(int row, const tl::optional<Uuid>& uuid,
                                         const QString& name, const QString& desc,
@@ -135,6 +126,9 @@ private:  // Data
   ComponentSymbolVariantList*              mVariantList;
   IF_ComponentSymbolVariantEditorProvider* mEditorProvider;
   tl::optional<Uuid>                       mSelectedVariant;
+
+  // Slots
+  ComponentSymbolVariantList::OnEditedSlot mVariantListEditedSlot;
 };
 
 /*******************************************************************************

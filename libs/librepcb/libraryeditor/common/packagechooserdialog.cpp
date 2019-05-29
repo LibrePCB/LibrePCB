@@ -24,6 +24,7 @@
 
 #include "ui_packagechooserdialog.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
 #include <librepcb/library/pkg/package.h>
@@ -60,7 +61,8 @@ PackageChooserDialog::PackageChooserDialog(
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(new workspace::PackageCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder()));
+      mWorkspace.getLibraryDb(), localeOrder(),
+      workspace::CategoryTreeFilter::PACKAGES));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,
@@ -69,6 +71,8 @@ PackageChooserDialog::PackageChooserDialog(
           &PackageChooserDialog::listPackages_currentItemChanged);
   connect(mUi->listPackages, &QListWidget::itemDoubleClicked, this,
           &PackageChooserDialog::listPackages_itemDoubleClicked);
+  connect(mUi->edtSearch, &QLineEdit::textChanged, this,
+          &PackageChooserDialog::searchEditTextChanged);
 
   setSelectedPackage(tl::nullopt);
 }
@@ -80,6 +84,20 @@ PackageChooserDialog::~PackageChooserDialog() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PackageChooserDialog::searchEditTextChanged(const QString& text) noexcept {
+  try {
+    QModelIndex catIndex = mUi->treeCategories->currentIndex();
+    if (text.trimmed().isEmpty() && catIndex.isValid()) {
+      setSelectedCategory(
+          Uuid::tryFromString(catIndex.data(Qt::UserRole).toString()));
+    } else {
+      searchPackages(text.trimmed());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
 
 void PackageChooserDialog::treeCategories_currentItemChanged(
     const QModelIndex& current, const QModelIndex& previous) noexcept {
@@ -105,6 +123,27 @@ void PackageChooserDialog::listPackages_itemDoubleClicked(
     setSelectedPackage(
         Uuid::tryFromString(item->data(Qt::UserRole).toString()));
     accept();
+  }
+}
+
+void PackageChooserDialog::searchPackages(const QString& input) {
+  setSelectedCategory(tl::nullopt);
+
+  // min. 2 chars to avoid freeze on entering first character due to huge result
+  if (input.length() > 1) {
+    QList<Uuid> packages =
+        mWorkspace.getLibraryDb().getElementsBySearchKeyword<Package>(input);
+    foreach (const Uuid& uuid, packages) {
+      FilePath fp =
+          mWorkspace.getLibraryDb().getLatestPackage(uuid);  // can throw
+      QString name;
+      mWorkspace.getLibraryDb().getElementTranslations<Package>(
+          fp, localeOrder(),
+          &name);  // can throw
+      QListWidgetItem* item = new QListWidgetItem(name);
+      item->setData(Qt::UserRole, uuid.toStr());
+      mUi->listPackages->addItem(item);
+    }
   }
 }
 
@@ -142,17 +181,16 @@ void PackageChooserDialog::setSelectedCategory(
 
 void PackageChooserDialog::setSelectedPackage(
     const tl::optional<Uuid>& uuid) noexcept {
-  QString uuidStr = "00000000-0000-0000-0000-000000000000";
-  QString name, desc;
+  FilePath fp;
+  QString  name = tr("No package selected");
+  QString  desc;
   mSelectedPackageUuid = uuid;
 
   if (uuid) {
     try {
-      uuidStr = uuid->toStr();
-      mPackageFilePath =
-          mWorkspace.getLibraryDb().getLatestPackage(*uuid);  // can throw
+      fp = mWorkspace.getLibraryDb().getLatestPackage(*uuid);  // can throw
       mWorkspace.getLibraryDb().getElementTranslations<Package>(
-          mPackageFilePath, localeOrder(), &name, &desc);  // can throw
+          fp, localeOrder(), &name, &desc);  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Could not load package metadata"),
                             e.getMsg());
@@ -161,16 +199,18 @@ void PackageChooserDialog::setSelectedPackage(
 
   mUi->lblPackageName->setText(name);
   mUi->lblPackageDescription->setText(desc);
-  updatePreview();
+  updatePreview(fp);
 }
 
-void PackageChooserDialog::updatePreview() noexcept {
+void PackageChooserDialog::updatePreview(const FilePath& fp) noexcept {
   mGraphicsItem.reset();
   mPackage.reset();
 
-  if (mPackageFilePath.isValid() && mLayerProvider) {
+  if (fp.isValid() && mLayerProvider) {
     try {
-      mPackage.reset(new Package(mPackageFilePath, true));  // can throw
+      mPackage.reset(new Package(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(fp)))));  // can throw
       if (mPackage->getFootprints().count() > 0) {
         mGraphicsItem.reset(new FootprintPreviewGraphicsItem(
             *mLayerProvider, QStringList(), *mPackage->getFootprints().first(),

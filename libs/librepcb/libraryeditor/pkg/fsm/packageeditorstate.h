@@ -45,9 +45,6 @@ namespace editor {
 /**
  * @brief The PackageEditorState class is the base class of all package editor
  * FSM states
- *
- * @author  ubruhin
- * @date    2017-05-28
  */
 class PackageEditorState : public QObject {
   Q_OBJECT
@@ -91,6 +88,9 @@ public:
     Q_UNUSED(e);
     return false;
   }
+  virtual bool processCut() noexcept { return false; }
+  virtual bool processCopy() noexcept { return false; }
+  virtual bool processPaste() noexcept { return false; }
   virtual bool processRotateCw() noexcept { return false; }
   virtual bool processRotateCcw() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }

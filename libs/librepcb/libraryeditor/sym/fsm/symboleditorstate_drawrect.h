@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_DrawRect class
- *
- * @author  ubruhin
- * @date    2017-02-23
  */
 class SymbolEditorState_DrawRect final
   : public SymbolEditorState_DrawPolygonBase {

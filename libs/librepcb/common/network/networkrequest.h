@@ -41,9 +41,6 @@ namespace librepcb {
  * 100MB)
  *
  * @see librepcb::NetworkRequestBase, librepcb::NetworkAccessManager
- *
- * @author ubruhin
- * @date 2016-09-12
  */
 class NetworkRequest final : public NetworkRequestBase {
   Q_OBJECT

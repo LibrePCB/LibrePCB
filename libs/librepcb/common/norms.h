@@ -17,67 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
+#ifndef LIBREPCB_NORMS_H
+#define LIBREPCB_NORMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../packageeditorstate.h"
-
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace editor {
 
 /*******************************************************************************
- *  Class CmdRotateSelectedFootprintItems
+ *  List of norms
  ******************************************************************************/
 
 /**
- * @brief The CmdRotateSelectedFootprintItems class
+ * @brief Get a list of available "built-in" norms
  *
- * @author  ubruhin
- * @date    2017-05-28
+ * These norms are used e.g. in the library editor and workspace/project
+ * settings dialogs.
+ *
+ * @return List of norms
  */
-class CmdRotateSelectedFootprintItems final : public UndoCommandGroup {
-public:
-  // Constructors / Destructor
-  CmdRotateSelectedFootprintItems() = delete;
-  CmdRotateSelectedFootprintItems(
-      const CmdRotateSelectedFootprintItems& other) = delete;
-  CmdRotateSelectedFootprintItems(const PackageEditorState::Context& context,
-                                  const Angle& angle) noexcept;
-  ~CmdRotateSelectedFootprintItems() noexcept;
-
-  // Operator Overloadings
-  CmdRotateSelectedFootprintItems& operator       =(
-      const CmdRotateSelectedFootprintItems& rhs) = delete;
-
-private:
-  // Private Methods
-
-  /// @copydoc UndoCommand::performExecute()
-  bool performExecute() override;
-
-  // Private Member Variables
-  const PackageEditorState::Context& mContext;
-  Angle                              mAngle;
-};
+inline QStringList getAvailableNorms() noexcept {
+  return QStringList{"IEC 60617", "IEEE 315"};
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_NORMS_H

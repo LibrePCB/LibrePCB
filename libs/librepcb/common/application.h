@@ -53,9 +53,6 @@ class StrokeFontPool;
 /**
  * @brief The Application class extends the QApplication with the exception-safe
  * method #notify()
- *
- * @author ubruhin
- * @date 2014-10-23
  */
 class Application final : public QApplication {
   Q_OBJECT

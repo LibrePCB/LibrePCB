@@ -57,9 +57,6 @@ class NewElementWizard;
 
 /**
  * @brief The NewElementWizard class
- *
- * @author ubruhin
- * @date 2017-03-21
  */
 class NewElementWizard final : public QWizard {
   Q_OBJECT
@@ -68,7 +65,7 @@ public:
   // Constructors / Destructor
   NewElementWizard()                              = delete;
   NewElementWizard(const NewElementWizard& other) = delete;
-  NewElementWizard(const workspace::Workspace& ws, const Library& lib,
+  NewElementWizard(const workspace::Workspace& ws, Library& lib,
                    const IF_GraphicsLayerProvider& lp,
                    QWidget*                        parent = 0) noexcept;
   ~NewElementWizard() noexcept;
@@ -79,6 +76,9 @@ public:
   }
 
   // General Methods
+  void setNewElementType(NewElementWizardContext::ElementType type) noexcept;
+  void setElementToCopy(NewElementWizardContext::ElementType type,
+                        const FilePath&                      fp) noexcept;
   bool validateCurrentPage() noexcept override;
 
   // Operator Overloadings

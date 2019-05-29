@@ -38,9 +38,6 @@ namespace librepcb {
 
 /**
  * @brief The HAlign class
- *
- * @author ubruhin
- * @date 2015-02-27
  */
 class HAlign final {
   Q_DECLARE_TR_FUNCTIONS(HAlign)
@@ -112,9 +109,6 @@ inline HAlign deserializeFromSExpression(const SExpression& sexpr,
 
 /**
  * @brief The VAlign class
- *
- * @author ubruhin
- * @date 2015-02-27
  */
 class VAlign final {
   Q_DECLARE_TR_FUNCTIONS(VAlign)
@@ -186,9 +180,6 @@ inline VAlign deserializeFromSExpression(const SExpression& sexpr,
 
 /**
  * @brief The Alignment class
- *
- * @author ubruhin
- * @date 2015-02-27
  */
 class Alignment final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Alignment)

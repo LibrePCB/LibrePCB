@@ -50,6 +50,14 @@ class Attribute final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(Attribute)
 
 public:
+  // Signals
+  enum class Event {
+    KeyChanged,
+    TypeValueUnitChanged,
+  };
+  Signal<Attribute, Event>       onEdited;
+  typedef Slot<Attribute, Event> OnEditedSlot;
+
   // Constructors / Destructor
   Attribute() = delete;
   Attribute(const Attribute& other) noexcept;
@@ -69,8 +77,8 @@ public:
   QString              getValueTr(bool showUnit) const noexcept;
 
   // Setters
-  void setKey(const AttributeKey& key) noexcept { mKey = key; }
-  void setTypeValueUnit(const AttributeType& type, const QString& value,
+  bool setKey(const AttributeKey& key) noexcept;
+  bool setTypeValueUnit(const AttributeType& type, const QString& value,
                         const AttributeUnit* unit);
 
   // General Methods
@@ -103,13 +111,16 @@ struct AttributeListNameProvider {
   static constexpr const char* tagname = "attribute";
 };
 using AttributeList =
-    SerializableObjectList<Attribute, AttributeListNameProvider>;
+    SerializableObjectList<Attribute, AttributeListNameProvider,
+                           Attribute::Event>;
 using CmdAttributeInsert =
-    CmdListElementInsert<Attribute, AttributeListNameProvider>;
+    CmdListElementInsert<Attribute, AttributeListNameProvider,
+                         Attribute::Event>;
 using CmdAttributeRemove =
-    CmdListElementRemove<Attribute, AttributeListNameProvider>;
+    CmdListElementRemove<Attribute, AttributeListNameProvider,
+                         Attribute::Event>;
 using CmdAttributesSwap =
-    CmdListElementsSwap<Attribute, AttributeListNameProvider>;
+    CmdListElementsSwap<Attribute, AttributeListNameProvider, Attribute::Event>;
 
 /*******************************************************************************
  *  End of File

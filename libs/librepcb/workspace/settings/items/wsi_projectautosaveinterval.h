@@ -42,9 +42,6 @@ namespace workspace {
  * This setting is used by the class #project#Project for the autosave
  * mechanism. A value of zero means that the autosave mechanism is disabled! A
  * value greater than zero defines the time interval in seconds.
- *
- * @author ubruhin
- * @date 2014-10-04
  */
 class WSI_ProjectAutosaveInterval final : public WSI_Base {
   Q_OBJECT

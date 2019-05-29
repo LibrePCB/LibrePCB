@@ -38,9 +38,6 @@ namespace librepcb {
 
 /**
  * @brief The SignalRole class provides all supported electrical signal roles
- *
- * @author ubruhin
- * @date 2016-10-20
  */
 class SignalRole final {
   Q_DECLARE_TR_FUNCTIONS(SignalRole)

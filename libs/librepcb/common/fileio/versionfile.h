@@ -17,16 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_VERSIONFILE_H
+#define LIBREPCB_VERSIONFILE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../symboleditorstate.h"
-
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+#include "../version.h"
 
 #include <QtCore>
 
@@ -34,50 +31,89 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace editor {
 
 /*******************************************************************************
- *  Class CmdRotateSelectedSymbolItems
+ *  Class VersionFile
  ******************************************************************************/
 
 /**
- * @brief The CmdRotateSelectedSymbolItems class
+ * @brief Class for reading and writing version files from/to QByteArray
  *
- * @author  ubruhin
- * @date    2016-11-05
+ * See @ref doc_versioning for details what version files are used for and how
+ * they work.
+ *
+ * @see @ref doc_versioning
  */
-class CmdRotateSelectedSymbolItems final : public UndoCommandGroup {
+class VersionFile final {
+  Q_DECLARE_TR_FUNCTIONS(VersionFile)
+
 public:
   // Constructors / Destructor
-  CmdRotateSelectedSymbolItems() = delete;
-  CmdRotateSelectedSymbolItems(const CmdRotateSelectedSymbolItems& other) =
-      delete;
-  CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
-                               const Angle& angle) noexcept;
-  ~CmdRotateSelectedSymbolItems() noexcept;
+  VersionFile()                         = delete;
+  VersionFile(const VersionFile& other) = default;
+
+  /**
+   * @brief The constructor to create a new version file
+   *
+   * @param version   The file version
+   */
+  VersionFile(const Version& version) noexcept;
+
+  /**
+   * Destructor
+   */
+  ~VersionFile() noexcept;
+
+  // Getters
+
+  /**
+   * @brief Get the content of the file
+   *
+   * @return The version contained in the file
+   */
+  const Version& getVersion() const noexcept { return mVersion; }
+
+  // Setters
+
+  /**
+   * @brief Set the version of the file
+   *
+   * @param version   The new version of the file
+   */
+  void setVersion(const Version& version) noexcept { mVersion = version; }
+
+  // General Methods
+
+  /**
+   * @brief Export file content as byte array
+   */
+  QByteArray toByteArray() const noexcept;
+
+  /**
+   * @brief Load version file from byte array
+   *
+   * @param content   The raw file content
+   *
+   * @return A new VersionFile object
+   *
+   * @throw Exception if the content is invalid
+   */
+  static VersionFile fromByteArray(const QByteArray& content);
 
   // Operator Overloadings
-  CmdRotateSelectedSymbolItems& operator       =(
-      const CmdRotateSelectedSymbolItems& rhs) = delete;
+  VersionFile& operator=(const VersionFile& rhs) = delete;
 
-private:
-  // Private Methods
-
-  /// @copydoc UndoCommand::performExecute()
-  bool performExecute() override;
-
-  // Private Member Variables
-  const SymbolEditorState::Context& mContext;
-  Angle                             mAngle;
+private:  // Data
+  /**
+   * @brief The version number of the file
+   */
+  Version mVersion;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+#endif  // LIBREPCB_VERSIONFILE_H

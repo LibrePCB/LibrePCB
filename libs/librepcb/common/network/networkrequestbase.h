@@ -53,9 +53,6 @@ namespace librepcb {
  * librepcb::NetworkAccessManager for more information.
  *
  * @see librepcb::NetworkAccessManager
- *
- * @author ubruhin
- * @date 2016-09-12
  */
 class NetworkRequestBase : public QObject {
   Q_OBJECT
@@ -191,6 +188,7 @@ private:  // Methods
   void           replyFinishedSlot() noexcept;
   void           finalize(const QString& errorMsg = QString()) noexcept;
   static QString formatFileSize(qint64 bytes) noexcept;
+  static QString getUserAgent() noexcept;
 
 protected:  // Data
   // from constructor

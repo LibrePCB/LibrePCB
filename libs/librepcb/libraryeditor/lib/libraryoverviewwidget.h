@@ -50,9 +50,6 @@ class LibraryOverviewWidget;
 
 /**
  * @brief The LibraryOverviewWidget class
- *
- * @author ubruhin
- * @date 2016-10-08
  */
 class LibraryOverviewWidget final : public EditorWidgetBase {
   Q_OBJECT
@@ -61,23 +58,39 @@ public:
   // Constructors / Destructor
   LibraryOverviewWidget()                                   = delete;
   LibraryOverviewWidget(const LibraryOverviewWidget& other) = delete;
-  LibraryOverviewWidget(const Context& context, QSharedPointer<Library> lib,
+  LibraryOverviewWidget(const Context& context, const FilePath& fp,
                         QWidget* parent = nullptr) noexcept;
   ~LibraryOverviewWidget() noexcept;
+
+  // Getters
+  Library& getLibrary() const noexcept { return *mLibrary; }
 
   // Operator Overloadings
   LibraryOverviewWidget& operator=(const LibraryOverviewWidget& rhs) = delete;
 
 public slots:
   bool save() noexcept override;
+  bool remove() noexcept override;
 
 signals:
+  void newComponentCategoryTriggered();
+  void newPackageCategoryTriggered();
+  void newSymbolTriggered();
+  void newPackageTriggered();
+  void newComponentTriggered();
+  void newDeviceTriggered();
   void editComponentCategoryTriggered(const FilePath& fp);
   void editPackageCategoryTriggered(const FilePath& fp);
   void editSymbolTriggered(const FilePath& fp);
   void editPackageTriggered(const FilePath& fp);
   void editComponentTriggered(const FilePath& fp);
   void editDeviceTriggered(const FilePath& fp);
+  void duplicateComponentCategoryTriggered(const FilePath& fp);
+  void duplicatePackageCategoryTriggered(const FilePath& fp);
+  void duplicateSymbolTriggered(const FilePath& fp);
+  void duplicatePackageTriggered(const FilePath& fp);
+  void duplicateComponentTriggered(const FilePath& fp);
+  void duplicateDeviceTriggered(const FilePath& fp);
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
@@ -96,23 +109,23 @@ private:  // Methods
   void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
+  QHash<QListWidgetItem*, FilePath> getElementListItemFilePaths(
+      const QList<QListWidgetItem*>& items) const noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
-  bool removeSelectedItem(const QString&  itemName,
-                          const FilePath& itemPath) noexcept;
+  void newItem(QListWidget* list) noexcept;
+  void editItem(QListWidget* list, const FilePath& fp) noexcept;
+  void duplicateItem(QListWidget* list, const FilePath& fp) noexcept;
+  void removeItems(
+      const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
 
   // Event Handlers
   void btnIconClicked() noexcept;
-  void lstCmpCatDoubleClicked(const QModelIndex& index) noexcept;
-  void lstPkgCatDoubleClicked(const QModelIndex& index) noexcept;
-  void lstSymDoubleClicked(const QModelIndex& index) noexcept;
-  void lstPkgDoubleClicked(const QModelIndex& index) noexcept;
-  void lstCmpDoubleClicked(const QModelIndex& index) noexcept;
-  void lstDevDoubleClicked(const QModelIndex& index) noexcept;
+  void lstDoubleClicked(const QModelIndex& index) noexcept;
 
 private:  // Data
-  QSharedPointer<Library>                   mLibrary;
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
   QScopedPointer<LibraryListEditorWidget>   mDependenciesEditorWidget;
+  QSharedPointer<Library>                   mLibrary;
   QByteArray                                mIcon;
 };
 

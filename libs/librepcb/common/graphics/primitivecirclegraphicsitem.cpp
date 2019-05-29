@@ -38,7 +38,10 @@ namespace librepcb {
 
 PrimitiveCircleGraphicsItem::PrimitiveCircleGraphicsItem(
     QGraphicsItem* parent) noexcept
-  : QGraphicsItem(parent), mLineLayer(nullptr), mFillLayer(nullptr) {
+  : QGraphicsItem(parent),
+    mLineLayer(nullptr),
+    mFillLayer(nullptr),
+    mOnLayerEditedSlot(*this, &PrimitiveCircleGraphicsItem::layerEdited) {
   mPen.setWidthF(0);
   mPenHighlighted.setWidthF(0);
   updateColors();
@@ -47,9 +50,6 @@ PrimitiveCircleGraphicsItem::PrimitiveCircleGraphicsItem(
 }
 
 PrimitiveCircleGraphicsItem::~PrimitiveCircleGraphicsItem() noexcept {
-  // unregister from graphics layers
-  setLineLayer(nullptr);
-  setFillLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -76,11 +76,11 @@ void PrimitiveCircleGraphicsItem::setLineWidth(
 void PrimitiveCircleGraphicsItem::setLineLayer(
     const GraphicsLayer* layer) noexcept {
   if (mLineLayer) {
-    mLineLayer->unregisterObserver(*this);
+    mLineLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mLineLayer = layer;
   if (mLineLayer) {
-    mLineLayer->registerObserver(*this);
+    mLineLayer->onEdited.attach(mOnLayerEditedSlot);
   }
   updateColors();
   updateVisibility();
@@ -90,62 +90,15 @@ void PrimitiveCircleGraphicsItem::setLineLayer(
 void PrimitiveCircleGraphicsItem::setFillLayer(
     const GraphicsLayer* layer) noexcept {
   if (mFillLayer) {
-    mFillLayer->unregisterObserver(*this);
+    mFillLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mFillLayer = layer;
   if (mFillLayer) {
-    mFillLayer->registerObserver(*this);
+    mFillLayer->onEdited.attach(mOnLayerEditedSlot);
   }
   updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
-}
-
-/*******************************************************************************
- *  Inherited from IF_LayerObserver
- ******************************************************************************/
-
-void PrimitiveCircleGraphicsItem::layerColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newColor);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitiveCircleGraphicsItem::layerHighlightColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newColor);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitiveCircleGraphicsItem::layerVisibleChanged(
-    const GraphicsLayer& layer, bool newVisible) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newVisible);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitiveCircleGraphicsItem::layerEnabledChanged(
-    const GraphicsLayer& layer, bool newEnabled) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newEnabled);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitiveCircleGraphicsItem::layerDestroyed(
-    const GraphicsLayer& layer) noexcept {
-  if (&layer == mLineLayer) {
-    setLineLayer(nullptr);
-  } else if (&layer == mFillLayer) {
-    setFillLayer(nullptr);
-  } else {
-    Q_ASSERT(false);
-  }
 }
 
 /*******************************************************************************
@@ -169,6 +122,32 @@ void PrimitiveCircleGraphicsItem::paint(QPainter*                       painter,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PrimitiveCircleGraphicsItem::layerEdited(
+    const GraphicsLayer& layer, GraphicsLayer::Event event) noexcept {
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+    case GraphicsLayer::Event::HighlightColorChanged:
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateColors();
+      updateVisibility();
+      break;
+    case GraphicsLayer::Event::Destroyed:
+      if (&layer == mLineLayer) {
+        setLineLayer(nullptr);
+      } else if (&layer == mFillLayer) {
+        setFillLayer(nullptr);
+      } else {
+        Q_ASSERT(false);
+      }
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in "
+                    "PrimitiveCircleGraphicsItem::layerEdited()";
+      break;
+  }
+}
 
 void PrimitiveCircleGraphicsItem::updateColors() noexcept {
   if (mLineLayer && mLineLayer->isVisible()) {

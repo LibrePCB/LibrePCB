@@ -51,9 +51,6 @@ class Footprint;
 
 /**
  * @brief The FootprintPreviewGraphicsItem class
- *
- * @author ubruhin
- * @date 2015-04-21
  */
 class FootprintPreviewGraphicsItem final : public QGraphicsItem,
                                            public AttributeProvider {

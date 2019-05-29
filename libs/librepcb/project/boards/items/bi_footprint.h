@@ -53,9 +53,6 @@ class BI_FootprintPad;
 
 /**
  * @brief The BI_Footprint class
- *
- * @author ubruhin
- * @date 2015-05-24
  */
 class BI_Footprint final : public BI_Base,
                            public SerializableObject,

@@ -172,33 +172,13 @@ See @ref doc_versioning.
 
 # File format upgrade procedure {#doc_project_upgrade}
 
-*Note: The upgrade procedure is not implemented yet, so this description is
-about how it's **intended** to be implemented*.
-
-When opening a project with an older file format, LibrePCB first upgrades it to
-the latest file format version. Afterwards, it is opened as usual. The exact
-steps are following:
-
-1. If project file format is older than the application's file format version:
-  1. Inform the user that the project will be upgraded and thus older versions of
-     LibrePCB will no longer be able to open that project. If the user doesn't
-     accept, the procedure is aborted and the project will not be opened.
-  2. Create a backup of the whole project into the subdirectory `.backup`.
-  3. Upgrade the project file to the *next* file format version. This is done in
-     a loop until the file format matches the application's file format version.
-  4. If an error occured during the upgrade, abort the procedure, completely
-     restore the backup and display the error message to the user.
-2. Open the project as usual.
-
-Currently the file format upgrade is immediately written to disk, so it's not
-possible to open an old project read-only. Once we have implemented a
-[file system abstraction layer](https://github.com/LibrePCB/LibrePCB/issues/172),
-we can (hopefully) fix this restriction to allow opening old projects read-only
-(i.e. the upgrade can be done completely in RAM).
-
-If the LibrePCB CLI is used to open an old project, it should abort with an
-error to avoid upgrading a project by accident. A flag `--upgrade` could be
-added to explicitly upgrade old projects before processing it.
+When opening a project with an older file format, LibrePCB first upgrades it
+step by step to the latest file format version. Afterwards it is opened as
+usual. Thanks to the transactional file system
+librepcb::TransactionalFileSystem, the whole upgrade procedure is done in RAM.
+So unless the user saves the upgraded project, no files get overwritten at all.
+This allows to open projects with an older file format without actually
+upgrading the files.
 
 
 # Avoid opening a project multiple times (Directory Lock) {#doc_project_lock}
@@ -220,57 +200,70 @@ librepcb::DirectoryLock).
 @see librepcb::DirectoryLock, librepcb::project::Project::Project(), librepcb::project::Project::mLock
 
 
-# Saving Procedere / Automatic Periodically Saving {#doc_project_save}
+# Automatic Periodic Saving (autosave) {#doc_project_autosave}
 
-It's important to keep all files of a project valid and consistent. If the application crashes, the
-project files must not be demaged. Also a crash while saving the project should not demage the project.
+An autosave system is an absolutely must-have to avoid the loose of all
+modifications after saving a project the last time. If the application crashes
+with unsaved chamodificationsnges, it must be possible to restore at least
+some of these modifications when opening that project the next time.
 
-Additionally, an automatic backup/restore system is useful to avoid the loose of all the changes
-made in a project after the last saving. If the application crashes with unsaved changes, it should
-be possible to restore at lease some of these changes while opening that project the next time. To
-detect a crash, the librepcb::DirectoryLock class is used (see @ref doc_project_lock).
+LibrePCB uses following concept to automatically create a backup of projects:
 
-**To reach these goals, we use temporary copies of the project files while a project is open. This means:**
+* Unsaved modifications (only the diff, not a whole snapshot) are periodically
+  saved into the `.autosave` directory inside the project. Basically it
+  contains all modified files and an SExpression file with a list of files and
+  directories which were removed.
+* When gracefully closing a project (or the whole application), the `.autosave`
+  directory will be removed.
+* If the application crashes while a project is opened, the cleanup code is
+  never executed and thus the `.autosave` directory won't be removed. When
+  opening this project the next time, the existence of the `.autosave` directory
+  (resp. its contained file `autosave.lp`) is detected and the user is asked
+  whether to restore the autosave backup or not.
 
-1. The project is automatically saved to temporary files periodically (autosave).
-   Temporary files are indicated by the '~' at the end of the filename. For example the class
-   librepcb::project::Circuit saves its content to `core/circuit.lp~` instead of `core/circuit.lp`.
-2. If the user wants to save the project, all changes will be saved to the temporary files first.
-   Only after *ALL* changes to the whole project were saved *SUCCESSFULLY* to these files, the
-   changes can be written to the original files. The temporary files will still exist. If saving to
-   the temporary files was not successful, you must *NOT* begin saving the changes to the original
-   files. This way, the original files will stay valid even if there is an error in the save algorithm.
-3. On (ordinary) closing a project, all temporary files will be removed from the harddisc.
-4. If the application crashes while unsaved changes are made in a project, the temporary files won't
-   be removed (and also the lock still exist). On opening this project the next time, the user can
-   choose whether to restore the last backup or not. If not, the normal, original files will be
-   loaded (as if there was no crash). But if the backup should be restored, the backup files will be
-   loaded instead. For this purpose, the constructor of classes like librepcb::project::Project,
-   librepcb::project::Circuit and so on needs a parameter `bool restore` (or similar).
+Most of these things are implemented in the librepcb::TransactionalFileSystem
+class which is used by librepcb::project::Project.
 
 
-**Details of #2 of the list above:**
+# Atomic Saving Procedure {#doc_project_save}
 
-To save a project, all related classes need a method with this signature:
+It's important to keep all files of a project valid and consistent. If the
+application crashes, the project files must not be demaged. Even a crash while
+saving the project should not demage the project, i.e. the save procedure must
+be 100% atomic.
 
-    bool save(int version, bool toOriginal, QStringList& errors) noexcept;
+To guarantee consistent project files in every case, following steps are done
+when the user saves a project:
 
-This method will be called to save all the changes of the corresponding object **and all its child
-objects**. So, the class librepcb::project::Project provides such a method to save **the whole
-project with all its content** (circuit, schematics and so on). If the parameter `toOriginal` is
-`false`, all changes will be saved to the temporary files. Otherwise they are saved to the original
-files. Error messages must be appended the `QStringList errors` (after translation). All entries in
-the list will be printed out in a message box. The return value is `true` if the saving proccess was
-successful, and `false` if there was an error. These methods should never throw an exception (`noexcept`).
+1. All modifications since the last save (i.e. only the diff) are written to
+   the `.backup` directory inside the project.
+2. The `.autosave` directory (if existing) is removed because it might contain
+   a backup which is now outdated (it should not be possible to restore
+   outdated autosave backups).
+3. All modifications since the last save (i.e. only the diff) are now also
+   saved to the actual project files.
+4. The `.backup` directory is removed.
 
-If an error occurs while saving the project, you should not abort the saving proccess. "Save all
-what you can" is the name of the game :-) Simply add the error message to the error list and return
-`false` after the job is finished.
+If one of these steps fails (e.g. by throwing an exception), the save procedure
+is aborted and subsequent steps won't be executed.
 
-The class librepcb::project::editor::ProjectEditor provides the public slot `saveProject()`. This
-method will try to save the whole project to the temporary files. **Only if this call has returned
-`true` (project successfully saved to temporary files), it will also save the project to the
-original files.**
+If the application crashes during step 1, there is no valid backup so the
+next time the project will be loaded as usual. Even if the unsaved modifications
+are lost, the project is not broken. Thanks to the autosave, the user might
+even be able to restore most of the apparently lost modifications.
+
+If the application crashes during step 2 or 3, there is a valid backup available
+which will automatically be loaded when opening the project the next time. So
+no changes are lost.
+
+If the application crashes during step 4, either the actual project files or the
+backup will be loaded the next time opening the project, depending on whether
+the `backup.lp` file was removed or not. As both locations contain exactly the
+same state, it doesn't matter from which location the files are loaded. The
+project can be opened successfully anyway, without any lost modifications.
+
+Most of these things are implemented in the librepcb::TransactionalFileSystem
+class which is used by librepcb::project::Project.
 
 
 # The undo/redo system (Command Design Pattern) {#doc_project_undostack}

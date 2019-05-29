@@ -50,9 +50,6 @@ class BI_FootprintPad;
 
 /**
  * @brief The BGI_FootprintPad class
- *
- * @author ubruhin
- * @date 2015-06-07
  */
 class BGI_FootprintPad final : public BGI_Base {
 public:

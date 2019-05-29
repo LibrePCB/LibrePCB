@@ -3,7 +3,7 @@
 QTIFW_VERSION="3.0.4"
 
 QTIFW_URL_BASE="https://download.qt.io/official_releases/qt-installer-framework/$QTIFW_VERSION"
-LINUXDEPLOYQT_URL="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+LINUXDEPLOYQT_URL="https://github.com/probonopd/linuxdeployqt/releases/download/5/linuxdeployqt-5-x86_64.AppImage"
 
 # Install dependencies on Linux
 if [ "${TRAVIS_OS_NAME-}" = "linux" ]

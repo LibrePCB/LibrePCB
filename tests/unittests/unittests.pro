@@ -62,29 +62,32 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libclipper.a \
 
 SOURCES += \
-    common/angletest.cpp \
     common/applicationtest.cpp \
     common/attributes/attributesubstitutortest.cpp \
-    common/directorylocktest.cpp \
-    common/filedownloadtest.cpp \
+    common/fileio/directorylocktest.cpp \
+    common/fileio/filepathtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
-    common/filepathtest.cpp \
-    common/lengthsnaptest.cpp \
-    common/lengthtest.cpp \
-    common/networkrequesttest.cpp \
-    common/pointtest.cpp \
-    common/ratiotest.cpp \
+    common/fileio/transactionaldirectorytest.cpp \
+    common/fileio/transactionalfilesystemtest.cpp \
+    common/geometry/pathtest.cpp \
+    common/network/filedownloadtest.cpp \
+    common/network/networkrequesttest.cpp \
     common/scopeguardtest.cpp \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
     common/toolboxtest.cpp \
+    common/units/angletest.cpp \
+    common/units/lengthsnaptest.cpp \
+    common/units/lengthtest.cpp \
+    common/units/pointtest.cpp \
+    common/units/ratiotest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     eagleimport/deviceconvertertest.cpp \
     eagleimport/devicesetconvertertest.cpp \
     eagleimport/packageconvertertest.cpp \
     eagleimport/symbolconvertertest.cpp \
-    library/componentsymbolvariantitemtest.cpp \
+    library/cmp/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
     main.cpp \
     project/boards/boardplanefragmentsbuildertest.cpp \
@@ -95,7 +98,7 @@ SOURCES += \
 HEADERS += \
     common/attributes/attributeproviderdummy.h \
     common/fileio/serializableobjectmock.h \
-    common/networkrequestbasesignalreceiver.h \
+    common/network/networkrequestbasesignalreceiver.h \
 
 FORMS += \
 

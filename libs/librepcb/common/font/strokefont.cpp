@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "strokefont.h"
 
-#include "../fileio/fileutils.h"
-
 #include <fontobene/font.h>
 #include <fontobene/glyphlistaccessor.h>
 
@@ -41,12 +39,15 @@ namespace fb = fontobene;
  *  Constructors / Destructor
  ******************************************************************************/
 
-StrokeFont::StrokeFont(const FilePath& fontFilePath) noexcept
+StrokeFont::StrokeFont(const FilePath&   fontFilePath,
+                       const QByteArray& content) noexcept
   : QObject(nullptr), mFilePath(fontFilePath) {
   // load the font in another thread because it takes some time to load it
   qDebug() << "Start loading font" << mFilePath.toNative();
-  mFuture = QtConcurrent::run(
-      [fontFilePath]() { return fb::Font(fontFilePath.toStr()); });
+  mFuture = QtConcurrent::run([content]() {
+    QTextStream s(content);
+    return fb::Font(s);
+  });
   connect(&mWatcher, &QFutureWatcher<fb::Font>::finished, this,
           &StrokeFont::fontLoaded);
   mWatcher.setFuture(mFuture);

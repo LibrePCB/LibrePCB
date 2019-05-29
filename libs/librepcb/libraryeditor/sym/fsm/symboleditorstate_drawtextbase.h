@@ -50,9 +50,6 @@ namespace editor {
 
 /**
  * @brief The SymbolEditorState_DrawTextBase class
- *
- * @author  ubruhin
- * @date    2017-01-03
  */
 class SymbolEditorState_DrawTextBase : public SymbolEditorState {
   Q_OBJECT

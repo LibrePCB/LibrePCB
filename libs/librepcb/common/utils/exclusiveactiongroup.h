@@ -46,9 +46,6 @@ namespace librepcb {
  * or the request is rejected can be decided from outside this class (typically
  * by the state machine of an editor window). To change the selected action,
  * #setCurrentAction() needs to be called.
- *
- * @author ubruhin
- * @date 2016-11-29
  */
 class ExclusiveActionGroup final : public QObject {
   Q_OBJECT

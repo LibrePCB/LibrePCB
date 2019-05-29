@@ -41,9 +41,6 @@ namespace librepcb {
 
 /**
  * @brief The BoardDesignRules class
- *
- * @author ubruhin
- * @date 2016-04-01
  */
 class BoardDesignRules final : public SerializableObject {
   Q_DECLARE_TR_FUNCTIONS(BoardDesignRules)

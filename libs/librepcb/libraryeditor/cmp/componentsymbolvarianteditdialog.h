@@ -59,9 +59,6 @@ class ComponentSymbolVariantEditDialog;
 
 /**
  * @brief The ComponentSymbolVariantEditDialog class
- *
- * @author ubruhin
- * @date 2017-03-18
  */
 class ComponentSymbolVariantEditDialog final : public QDialog {
   Q_OBJECT

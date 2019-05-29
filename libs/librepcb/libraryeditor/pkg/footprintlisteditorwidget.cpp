@@ -43,10 +43,13 @@ FootprintListEditorWidget::FootprintListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mTable(new QTableWidget(this)),
     mFootprintList(nullptr),
-    mUndoStack(nullptr) {
+    mUndoStack(nullptr),
+    mFootprintListEditedSlot(*this,
+                             &FootprintListEditorWidget::footprintListEdited) {
   mTable->setCornerButtonEnabled(false);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
   mTable->setSelectionMode(QAbstractItemView::SingleSelection);
+  mTable->setWordWrap(false);  // avoid too high cells due to word wrap
   mTable->setColumnCount(_COLUMN_COUNT);
   mTable->setHorizontalHeaderItem(COLUMN_NAME,
                                   new QTableWidgetItem(tr("Name")));
@@ -70,7 +73,6 @@ FootprintListEditorWidget::FootprintListEditorWidget(QWidget* parent) noexcept
 }
 
 FootprintListEditorWidget::~FootprintListEditorWidget() noexcept {
-  if (mFootprintList) mFootprintList->unregisterObserver(this);
 }
 
 /*******************************************************************************
@@ -79,10 +81,15 @@ FootprintListEditorWidget::~FootprintListEditorWidget() noexcept {
 
 void FootprintListEditorWidget::setReferences(FootprintList& list,
                                               UndoStack&     stack) noexcept {
+  if (mFootprintList) {
+    mFootprintList->onEdited.detach(mFootprintListEditedSlot);
+  }
   mFootprintList     = &list;
   mUndoStack         = &stack;
   mSelectedFootprint = tl::nullopt;
-  mFootprintList->registerObserver(this);
+  if (mFootprintList) {
+    mFootprintList->onEdited.attach(mFootprintListEditedSlot);
+  }
   updateTable();
 }
 
@@ -164,6 +171,17 @@ void FootprintListEditorWidget::btnAddRemoveClicked() noexcept {
  *  Private Methods
  ******************************************************************************/
 
+void FootprintListEditorWidget::footprintListEdited(
+    const FootprintList& list, int index,
+    const std::shared_ptr<const Footprint>& footprint,
+    FootprintList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(footprint);
+  Q_UNUSED(event);
+  updateTable(mSelectedFootprint);
+}
+
 void FootprintListEditorWidget::updateTable(
     tl::optional<Uuid> selected) noexcept {
   mTable->blockSignals(true);
@@ -223,8 +241,13 @@ void FootprintListEditorWidget::setTableRowContent(
   // name
   mTable->setItem(row, COLUMN_NAME, new QTableWidgetItem(name));
 
+  // Adjust the height of the row according to the size of the contained
+  // widgets. This needs to be done *before* adding the button, as the button
+  // would increase the row height!
+  mTable->resizeRowToContents(row);
+
   // buttons
-  int      btnSize = 23;  // TODO: can we determine this value dynamically?
+  int      btnSize = mTable->rowHeight(row);
   QSize    iconSize(btnSize - 6, btnSize - 6);
   QWidget* buttonsColumnWidget = new QWidget(this);
   buttonsColumnWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -278,9 +301,6 @@ void FootprintListEditorWidget::setTableRowContent(
   }
   buttonsColumnLayout->addWidget(btnAddRemove);
   mTable->setCellWidget(row, COLUMN_BUTTONS, buttonsColumnWidget);
-
-  // adjust the height of the row according to the size of the contained widgets
-  mTable->verticalHeader()->resizeSection(row, btnSize);
 }
 
 void FootprintListEditorWidget::addFootprint(const QString& name) noexcept {
@@ -396,30 +416,6 @@ ElementName FootprintListEditorWidget::validateNameOrThrow(
     }
   }
   return ElementName(name);  // can throw
-}
-
-/*******************************************************************************
- *  Observer Methods
- ******************************************************************************/
-
-void FootprintListEditorWidget::listObjectAdded(
-    const FootprintList& list, int newIndex,
-    const std::shared_ptr<Footprint>& ptr) noexcept {
-  Q_ASSERT(&list == mFootprintList);
-  Q_UNUSED(list);
-  Q_UNUSED(newIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedFootprint);
-}
-
-void FootprintListEditorWidget::listObjectRemoved(
-    const FootprintList& list, int oldIndex,
-    const std::shared_ptr<Footprint>& ptr) noexcept {
-  Q_ASSERT(&list == mFootprintList);
-  Q_UNUSED(list);
-  Q_UNUSED(oldIndex);
-  Q_UNUSED(ptr);
-  updateTable(mSelectedFootprint);
 }
 
 /*******************************************************************************

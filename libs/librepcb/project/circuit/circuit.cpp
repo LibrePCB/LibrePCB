@@ -28,9 +28,7 @@
 #include "netclass.h"
 #include "netsignal.h"
 
-#include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
 #include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
@@ -45,23 +43,19 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create)
+Circuit::Circuit(Project& project, bool create)
   : QObject(&project),
     mProject(project),
-    mFilepath(project.getPath().getPathTo("circuit/circuit.lp")),
-    mFile(nullptr) {
+    mDirectory(new TransactionalDirectory(project.getDirectory(), "circuit")) {
   qDebug() << "load circuit...";
-  Q_ASSERT(!(create && (restore || readOnly)));
 
   try {
-    // try to create/open the file "circuit.lp"
     if (create) {
-      mFile              = SmartSExprFile::create(mFilepath);
       NetClass* netclass = new NetClass(*this, ElementName("default"));
       addNetClass(*netclass);  // add a netclass with name "default"
     } else {
-      mFile            = new SmartSExprFile(mFilepath, restore, readOnly);
-      SExpression root = mFile->parseFileAndBuildDomTree();
+      SExpression root = SExpression::parse(
+          mDirectory->read("circuit.lp"), mDirectory->getAbsPath("circuit.lp"));
 
       // OK - file is open --> now load the whole circuit stuff
 
@@ -104,8 +98,6 @@ Circuit::Circuit(Project& project, bool restore, bool readOnly, bool create)
         delete netclass;
       } catch (...) {
       }
-    delete mFile;
-    mFile = nullptr;
     throw;
   }
 
@@ -136,9 +128,6 @@ Circuit::~Circuit() noexcept {
       delete netclass;
     } catch (...) {
     }
-
-  delete mFile;
-  mFile = nullptr;
 }
 
 /*******************************************************************************
@@ -389,19 +378,9 @@ void Circuit::setComponentInstanceName(ComponentInstance&       cmp,
  *  General Methods
  ******************************************************************************/
 
-bool Circuit::save(bool toOriginal, QStringList& errors) noexcept {
-  bool success = true;
-
-  // Save "circuit/circuit.lp"
-  try {
-    SExpression doc(serializeToDomElement("librepcb_circuit"));
-    mFile->save(doc, toOriginal);
-  } catch (Exception& e) {
-    success = false;
-    errors.append(e.getMsg());
-  }
-
-  return success;
+void Circuit::save() {
+  SExpression doc(serializeToDomElement("librepcb_circuit"));  // can throw
+  mDirectory->write("circuit.lp", doc.toByteArray());          // can throw
 }
 
 /*******************************************************************************

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "excellongenerator.h"
 
-#include "../fileio/smarttextfile.h"
+#include "../fileio/fileutils.h"
 
 #include <QtCore>
 
@@ -58,9 +58,7 @@ void ExcellonGenerator::generate() {
 }
 
 void ExcellonGenerator::saveToFile(const FilePath& filepath) const {
-  QScopedPointer<SmartTextFile> file(SmartTextFile::create(filepath));
-  file->setContent(mOutput.toLatin1());
-  file->save(true);
+  FileUtils::writeFile(filepath, mOutput.toLatin1());  // can throw
 }
 
 void ExcellonGenerator::reset() noexcept {

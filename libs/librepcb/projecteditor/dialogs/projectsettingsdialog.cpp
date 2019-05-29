@@ -24,6 +24,7 @@
 
 #include "ui_projectsettingsdialog.h"
 
+#include <librepcb/common/norms.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/cmd/cmdprojectsettingschange.h>
@@ -72,8 +73,8 @@ ProjectSettingsDialog::ProjectSettingsDialog(ProjectSettings& settings,
   mUi->cbxLocales->setCurrentIndex(mUi->cbxLocales->findData(QLocale().name()));
 
   // list norms
-  mUi->cbxNorms->addItem(
-      "DIN EN 81346");  // TODO: add more norms (dynamically?)
+  mUi->cbxNorms->addItems(getAvailableNorms());
+  mUi->cbxNorms->clearEditText();
 
   // update GUI elements
   updateGuiFromSettings();

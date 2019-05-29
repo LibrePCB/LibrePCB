@@ -33,6 +33,12 @@ class CliExecutor(object):
         # Copy test data to temporary directory to avoid modifications in original data
         self.data_dir = os.path.join(self.tmpdir, 'data')
         shutil.copytree(CLI_DATA_DIR, self.data_dir)
+        # Create zipped projects
+        for dirname in os.listdir(self.data_dir):
+            dirpath = os.path.join(self.data_dir, dirname)
+            if dirname + ".lpp" in os.listdir(dirpath):
+                shutil.make_archive(dirpath, 'zip', dirpath)
+                shutil.move(dirpath + '.zip', dirpath + '.lppz')
 
     def __enter__(self):
         return self

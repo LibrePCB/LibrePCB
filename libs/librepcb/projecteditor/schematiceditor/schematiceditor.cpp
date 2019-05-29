@@ -75,11 +75,13 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     mErcMsgDock(nullptr),
     mFsm(nullptr) {
   mUi->setupUi(this);
-  mUi->actionSave_Project->setEnabled(!mProject.isReadOnly());
+  mUi->actionSave_Project->setEnabled(mProject.getDirectory().isWritable());
 
   // set window title
   QString filenameStr = mProject.getFilepath().getFilename();
-  if (mProject.isReadOnly()) filenameStr.append(QStringLiteral(" [Read-Only]"));
+  if (!mProject.getDirectory().isWritable()) {
+    filenameStr.append(QStringLiteral(" [Read-Only]"));
+  }
   setWindowTitle(QString("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
   // Add Dock Widgets
@@ -126,6 +128,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
           [this]() { mProjectEditor.execNetClassesEditorDialog(this); });
   connect(mUi->actionProjectSettings, &QAction::triggered,
           [this]() { mProjectEditor.execProjectSettingsDialog(this); });
+  connect(mUi->actionExportLppz, &QAction::triggered,
+          [this]() { mProjectEditor.execLppzExportDialog(this); });
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(
@@ -186,12 +190,6 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
-  connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanStarted, mUi->statusbar,
-          &StatusBar::showProgressBar, Qt::QueuedConnection);
-  connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, mUi->statusbar,
-          &StatusBar::hideProgressBar, Qt::QueuedConnection);
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);

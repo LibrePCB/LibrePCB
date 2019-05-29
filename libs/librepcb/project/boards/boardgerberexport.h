@@ -46,6 +46,7 @@ class Board;
 class BI_Via;
 class BI_Footprint;
 class BI_FootprintPad;
+class BoardFabricationOutputSettings;
 
 /*******************************************************************************
  *  Class BoardGerberExport
@@ -53,9 +54,6 @@ class BI_FootprintPad;
 
 /**
  * @brief The BoardGerberExport class
- *
- * @author ubruhin
- * @date 2016-01-10
  */
 class BoardGerberExport final : public QObject, public AttributeProvider {
   Q_OBJECT
@@ -64,7 +62,8 @@ public:
   // Constructors / Destructor
   BoardGerberExport()                               = delete;
   BoardGerberExport(const BoardGerberExport& other) = delete;
-  BoardGerberExport(const Board& board) noexcept;
+  BoardGerberExport(const Board&                          board,
+                    const BoardFabricationOutputSettings& settings) noexcept;
   ~BoardGerberExport() noexcept;
 
   // Getters
@@ -131,10 +130,11 @@ private:
   }
 
   // Private Member Variables
-  const Project&            mProject;
-  const Board&              mBoard;
-  mutable int               mCurrentInnerCopperLayer;
-  mutable QVector<FilePath> mWrittenFiles;
+  const Project&                                       mProject;
+  const Board&                                         mBoard;
+  QScopedPointer<const BoardFabricationOutputSettings> mSettings;
+  mutable int                                          mCurrentInnerCopperLayer;
+  mutable QVector<FilePath>                            mWrittenFiles;
 };
 
 /*******************************************************************************

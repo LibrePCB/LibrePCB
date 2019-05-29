@@ -24,11 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -58,9 +58,6 @@ class BoardEditor;
 
 /**
  * @brief The ProjectEditor class
-
- * @author ubruhin
- * @date 2015-06-28
  */
 class ProjectEditor final : public QObject {
   Q_OBJECT
@@ -152,6 +149,13 @@ public slots:
    * @param parent    parent widget of the dialog (optional)
    */
   void execNetClassesEditorDialog(QWidget* parent = nullptr) noexcept;
+
+  /**
+   * @brief Execute the *.lppz export dialog (blocking!)
+   *
+   * @param parent    parent widget of the dialog (optional)
+   */
+  void execLppzExportDialog(QWidget* parent = nullptr) noexcept;
 
   /**
    * @brief Save the whole project to the harddisc

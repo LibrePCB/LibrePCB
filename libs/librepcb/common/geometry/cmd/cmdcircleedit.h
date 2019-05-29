@@ -55,7 +55,7 @@ public:
   void setIsGrabArea(bool grabArea, bool immediate) noexcept;
   void setDiameter(const PositiveLength& dia, bool immediate) noexcept;
   void setCenter(const Point& pos, bool immediate) noexcept;
-  void setDeltaToStartCenter(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
   // Operator Overloadings

@@ -49,9 +49,6 @@ class WorkspaceSettings;
  * WorkspaceSettingsDialog is created in the class WorkspaceSettings. There must
  * not exist more than one instance of this class at the same time in the same
  * application instance!
- *
- * @author ubruhin
- * @date 2014-07-12
  */
 class WorkspaceSettingsDialog final : public QDialog {
   Q_OBJECT

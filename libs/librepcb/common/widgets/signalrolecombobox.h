@@ -39,9 +39,6 @@ namespace librepcb {
 
 /**
  * @brief The SignalRoleComboBox class
- *
- * @author ubruhin
- * @date 2016-10-20
  */
 class SignalRoleComboBox final : public QWidget {
   Q_OBJECT

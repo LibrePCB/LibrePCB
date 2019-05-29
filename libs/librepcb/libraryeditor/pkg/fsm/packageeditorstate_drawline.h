@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The PackageEditorState_DrawLine class
- *
- * @author  ubruhin
- * @date    2017-05-29
  */
 class PackageEditorState_DrawLine final
   : public PackageEditorState_DrawPolygonBase {

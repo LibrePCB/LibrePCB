@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdadddevicetoboard.h"
 
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/dev/device.h>
@@ -90,7 +91,8 @@ bool CmdAddDeviceToBoard::performExecute() {
                      "workspace library!"))
               .arg(mDeviceUuid.toStr()));
     }
-    dev = new library::Device(devFp, true);
+    dev = new library::Device(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(TransactionalFileSystem::openRO(devFp))));
     CmdProjectLibraryAddElement<library::Device>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<library::Device>(
             mBoard.getProject().getLibrary(), *dev);
@@ -111,7 +113,8 @@ bool CmdAddDeviceToBoard::performExecute() {
                      "workspace library!"))
               .arg(pkgUuid.toStr()));
     }
-    pkg = new library::Package(pkgFp, true);
+    pkg = new library::Package(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(TransactionalFileSystem::openRO(pkgFp))));
     CmdProjectLibraryAddElement<library::Package>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<library::Package>(
             mBoard.getProject().getLibrary(), *pkg);

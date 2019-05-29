@@ -35,7 +35,7 @@ namespace librepcb {
 namespace library {
 namespace editor {
 
-class CmdMoveSelectedFootprintItems;
+class CmdDragSelectedFootprintItems;
 
 /*******************************************************************************
  *  Class PackageEditorState_Select
@@ -43,9 +43,6 @@ class CmdMoveSelectedFootprintItems;
 
 /**
  * @brief The PackageEditorState_Select class
- *
- * @author  ubruhin
- * @date    2017-05-28
  */
 class PackageEditorState_Select final : public PackageEditorState {
   Q_OBJECT
@@ -56,6 +53,12 @@ public:
   PackageEditorState_Select(const PackageEditorState_Select& other) = delete;
   explicit PackageEditorState_Select(Context& context) noexcept;
   ~PackageEditorState_Select() noexcept;
+
+  // General Methods
+  bool exit() noexcept override {
+    processAbortCommand();
+    return true;
+  }
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -68,9 +71,13 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processCut() noexcept override;
+  bool processCopy() noexcept override;
+  bool processPaste() noexcept override;
   bool processRotateCw() noexcept override;
   bool processRotateCcw() noexcept override;
   bool processRemove() noexcept override;
+  bool processAbortCommand() noexcept override;
 
   // Operator Overloadings
   PackageEditorState_Select& operator=(const PackageEditorState_Select& rhs) =
@@ -79,15 +86,18 @@ public:
 private:  // Methods
   bool openContextMenuAtPos(const Point& pos) noexcept;
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
+  bool copySelectedItemsToClipboard() noexcept;
+  bool pasteFromClipboard() noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool removeSelectedItems() noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
 
 private:  // Types / Data
-  enum class SubState { IDLE, SELECTING, MOVING };
+  enum class SubState { IDLE, SELECTING, MOVING, PASTING };
   SubState                                      mState;
-  QScopedPointer<CmdMoveSelectedFootprintItems> mCmdMoveSelectedItems;
+  Point                                         mStartPos;
+  QScopedPointer<CmdDragSelectedFootprintItems> mCmdDragSelectedItems;
 };
 
 /*******************************************************************************

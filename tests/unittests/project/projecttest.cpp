@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 
@@ -43,13 +44,19 @@ protected:
   FilePath mProjectFile;
 
   ProjectTest() {
+    // the whitespaces in the path are there to make the test even stronger ;)
     mProjectDir  = FilePath::getRandomTempPath().getPathTo("test project dir");
     mProjectFile = mProjectDir.getPathTo("test project.lpp");
-    // the whitespaces in the path are there to make the test even stronger ;)
   }
 
   virtual ~ProjectTest() {
     QDir(mProjectDir.getParentDir().toStr()).removeRecursively();
+  }
+
+  std::unique_ptr<TransactionalDirectory> createDir(bool writable = true) const
+      noexcept {
+    return std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+        TransactionalFileSystem::open(mProjectDir, writable)));
   }
 };
 
@@ -61,11 +68,10 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   QDateTime datetime = QDateTime::currentDateTime();
 
   // create new project
-  QScopedPointer<Project> project(Project::create(mProjectFile));
+  QScopedPointer<Project> project(
+      Project::create(createDir(), mProjectFile.getFilename()));
   EXPECT_EQ(mProjectFile, project->getFilepath());
   EXPECT_EQ(mProjectDir, project->getPath());
-  EXPECT_FALSE(project->isReadOnly());
-  EXPECT_FALSE(project->isRestored());
   EXPECT_EQ(mProjectFile.getCompleteBasename(),
             project->getMetadata().getName());
   EXPECT_EQ("Unknown", project->getMetadata().getAuthor());
@@ -78,7 +84,8 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_EQ(0, project->getSchematics().count());
   EXPECT_EQ(0, project->getBoards().count());
 
-  // close project
+  // save and close project
+  project->getDirectory().getFileSystem()->save();
   project.reset();
 
   // check existence of files
@@ -92,11 +99,9 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_TRUE(mProjectDir.getPathTo("circuit/erc.lp").isExistingFile());
 
   // open project again
-  project.reset(new Project(mProjectFile, false, false));
+  project.reset(new Project(createDir(), mProjectFile.getFilename()));
   EXPECT_EQ(mProjectFile, project->getFilepath());
   EXPECT_EQ(mProjectDir, project->getPath());
-  EXPECT_FALSE(project->isReadOnly());
-  EXPECT_FALSE(project->isRestored());
   EXPECT_EQ(mProjectFile.getCompleteBasename(),
             project->getMetadata().getName());
   EXPECT_EQ("Unknown", project->getMetadata().getAuthor());
@@ -112,29 +117,31 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
 
 TEST_F(ProjectTest, testSave) {
   // create new project
-  QScopedPointer<Project> project(Project::create(mProjectFile));
+  QScopedPointer<Project> project(
+      Project::create(createDir(), mProjectFile.getFilename()));
 
   // save project
-  project->save(false);
-  project->save(true);
+  project->save();
+  project->getDirectory().getFileSystem()->save();
 
   // close and re-open project
   project.reset();
-  project.reset(new Project(mProjectFile, false, false));
+  project.reset(new Project(createDir(), mProjectFile.getFilename()));
 
   // save project
-  project->save(false);
-  project->save(true);
+  project->save();
+  project->getDirectory().getFileSystem()->save();
 
   // close and re-open project
   project.reset();
-  project.reset(new Project(mProjectFile, false, false));
+  project.reset(new Project(createDir(), mProjectFile.getFilename()));
 }
 
 TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave) {
   // create new project
-  QScopedPointer<Project> project(Project::create(mProjectFile));
-  qint64                  datetimeAfterCreating =
+  QScopedPointer<Project> project(
+      Project::create(createDir(), mProjectFile.getFilename()));
+  qint64 datetimeAfterCreating =
       project->getMetadata().getLastModified().toMSecsSinceEpoch();
 
   // check if datetime has not changed
@@ -144,7 +151,7 @@ TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave) {
 
   // save project and verify that datetime has changed
   QThread::msleep(1000);
-  project->save(true);
+  project->save();
   qint64 datetimeAfterSaving =
       project->getMetadata().getLastModified().toMSecsSinceEpoch();
   EXPECT_NEAR(QDateTime::currentMSecsSinceEpoch(), datetimeAfterSaving,
@@ -154,7 +161,8 @@ TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave) {
 
 TEST_F(ProjectTest, testSettersGetters) {
   // create new project
-  QScopedPointer<Project> project(Project::create(mProjectFile));
+  QScopedPointer<Project> project(
+      Project::create(createDir(), mProjectFile.getFilename()));
 
   // set properties
   ElementName name("test name 1234");
@@ -170,11 +178,12 @@ TEST_F(ProjectTest, testSettersGetters) {
   EXPECT_EQ(version, project->getMetadata().getVersion());
 
   // save project
-  project->save(true);
+  project->save();
+  project->getDirectory().getFileSystem()->save();
 
   // close and re-open project (read-only)
   project.reset();
-  project.reset(new Project(mProjectFile, true, false));
+  project.reset(new Project(createDir(false), mProjectFile.getFilename()));
 
   // get properties
   EXPECT_EQ(name, project->getMetadata().getName());

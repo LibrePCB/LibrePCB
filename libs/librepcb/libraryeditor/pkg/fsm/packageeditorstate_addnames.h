@@ -41,9 +41,6 @@ namespace editor {
 
 /**
  * @brief The PackageEditorState_AddNames class
- *
- * @author  ubruhin
- * @date    2017-05-29
  */
 class PackageEditorState_AddNames final
   : public PackageEditorState_DrawTextBase {

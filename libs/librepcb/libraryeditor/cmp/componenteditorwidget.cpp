@@ -68,7 +68,8 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mComponent.reset(new Component(fp, false));  // can throw
+  mComponent.reset(new Component(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem))));  // can throw
   mUi->signalEditorWidget->setReferences(mUndoStack.data(),
                                          &mComponent->getSignals());
   mUi->symbolVariantsEditorWidget->setReferences(
@@ -130,7 +131,8 @@ bool ComponentEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mComponent->save();  // can throw
+    mComponent->save();   // can throw
+    mFileSystem->save();  // can throw
     memorizeComponentInterface();
     return EditorWidgetBase::save();
   } catch (const Exception& e) {

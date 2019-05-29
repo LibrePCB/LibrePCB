@@ -17,81 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDPASTESYMBOLITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDPASTESYMBOLITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../packageeditorstate.h"
-
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class CmdCircleEdit;
-class CmdStrokeTextEdit;
-class CmdPolygonEdit;
-class CmdHoleEdit;
-
 namespace library {
 
-class CmdFootprintPadEdit;
+class Symbol;
+class SymbolGraphicsItem;
 
 namespace editor {
 
+class SymbolClipboardData;
+
 /*******************************************************************************
- *  Class CmdMoveSelectedFootprintItems
+ *  Class CmdPasteSymbolItems
  ******************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedFootprintItems class
- *
- * @author  ubruhin
- * @date    2017-05-28
+ * @brief The CmdPasteSymbolItems class
  */
-class CmdMoveSelectedFootprintItems final : public UndoCommandGroup {
+class CmdPasteSymbolItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdMoveSelectedFootprintItems() = delete;
-  CmdMoveSelectedFootprintItems(const CmdMoveSelectedFootprintItems& other) =
-      delete;
-  CmdMoveSelectedFootprintItems(const PackageEditorState::Context& context,
-                                const Point& startPos) noexcept;
-  ~CmdMoveSelectedFootprintItems() noexcept;
-
-  // General Methods
-  void setCurrentPosition(const Point& pos) noexcept;
+  CmdPasteSymbolItems()                                 = delete;
+  CmdPasteSymbolItems(const CmdPasteSymbolItems& other) = delete;
+  CmdPasteSymbolItems(Symbol& symbol, SymbolGraphicsItem& graphicsItem,
+                      std::unique_ptr<SymbolClipboardData> data,
+                      const Point&                         posOffset) noexcept;
+  ~CmdPasteSymbolItems() noexcept;
 
   // Operator Overloadings
-  CmdMoveSelectedFootprintItems& operator       =(
-      const CmdMoveSelectedFootprintItems& rhs) = delete;
+  CmdPasteSymbolItems& operator=(const CmdPasteSymbolItems& rhs) = delete;
 
-private:
-  // Private Methods
-
+protected:  // Methods
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  void deleteAllCommands() noexcept;
-
-  // Private Member Variables
-  const PackageEditorState::Context& mContext;
-  Point                              mStartPos;
-  Point                              mDeltaPos;
-
-  // Move commands
-  QList<CmdFootprintPadEdit*> mPadEditCmds;
-  QList<CmdCircleEdit*>       mCircleEditCmds;
-  QList<CmdPolygonEdit*>      mPolygonEditCmds;
-  QList<CmdStrokeTextEdit*>   mTextEditCmds;
-  QList<CmdHoleEdit*>         mHoleEditCmds;
+private:  // Data
+  Symbol&                              mSymbol;
+  SymbolGraphicsItem&                  mGraphicsItem;
+  std::unique_ptr<SymbolClipboardData> mData;
+  Point                                mPosOffset;
 };
 
 /*******************************************************************************
@@ -102,4 +82,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDFOOTPRINTITEMS_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_CMDPASTESYMBOLITEMS_H

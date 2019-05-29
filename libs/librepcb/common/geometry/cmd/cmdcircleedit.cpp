@@ -99,10 +99,9 @@ void CmdCircleEdit::setCenter(const Point& pos, bool immediate) noexcept {
   if (immediate) mCircle.setCenter(mNewCenter);
 }
 
-void CmdCircleEdit::setDeltaToStartCenter(const Point& deltaPos,
-                                          bool         immediate) noexcept {
+void CmdCircleEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewCenter = mOldCenter + deltaPos;
+  mNewCenter += deltaPos;
   if (immediate) mCircle.setCenter(mNewCenter);
 }
 

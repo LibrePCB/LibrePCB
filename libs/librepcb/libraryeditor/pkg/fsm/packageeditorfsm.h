@@ -59,9 +59,6 @@ class PackageEditorWidget;
 /**
  * @brief The PackageEditorFsm class is the finit state machine (FSM) of the
  * package editor
- *
- * @author  ubruhin
- * @date    2017-05-28
  */
 class PackageEditorFsm final : public QObject {
   Q_OBJECT
@@ -117,6 +114,9 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept;
+  bool processCut() noexcept;
+  bool processCopy() noexcept;
+  bool processPaste() noexcept;
   bool processRotateCw() noexcept;
   bool processRotateCcw() noexcept;
   bool processRemove() noexcept;

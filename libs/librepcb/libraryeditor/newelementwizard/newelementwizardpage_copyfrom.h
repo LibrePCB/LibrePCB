@@ -48,12 +48,6 @@ class NewElementWizardPage_CopyFrom;
 
 /**
  * @brief The NewElementWizardPage_CopyFrom class
- *
- * @author ubruhin
- * @date 2017-03-23
- *
- * @todo All names/descriptions/keywords other than en_US are not yet copied.
- * @todo All categories other than the first one are not yet copied.
  */
 class NewElementWizardPage_CopyFrom final : public QWizardPage {
   Q_OBJECT
@@ -98,7 +92,7 @@ private:  // Data
   QScopedPointer<QAbstractItemModel>                mCategoryTreeModel;
   bool                                              mIsCategoryElement;
   tl::optional<Uuid>                                mSelectedCategoryUuid;
-  QScopedPointer<LibraryBaseElement>                mSelectedElement;
+  bool                                              mIsComplete;
 };
 
 /*******************************************************************************

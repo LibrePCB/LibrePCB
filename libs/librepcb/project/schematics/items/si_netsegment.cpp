@@ -63,34 +63,21 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
     }
 
     // Load all netpoints
-    QHash<Uuid, SI_NetLineAnchor*>
-        netPointAnchorMap;  // backward compatibility, remove this some time!
-    foreach (const SExpression& child,
-             node.getChildren("netpoint") + node.getChildren("junction")) {
-      if (const SExpression* symNode = child.tryGetChildByPath("sym")) {
-        Uuid       netpointUuid = child.getValueOfFirstChild<Uuid>();
-        Uuid       symbolUuid   = symNode->getValueOfFirstChild<Uuid>();
-        Uuid       pinUuid      = child.getValueByPath<Uuid>("pin");
-        SI_Symbol* symbol       = mSchematic.getSymbolByUuid(symbolUuid);
-        Q_ASSERT(symbol);
-        SI_SymbolPin* pin = symbol->getPin(pinUuid);
-        netPointAnchorMap.insert(netpointUuid, pin);
-      } else {
-        SI_NetPoint* netpoint = new SI_NetPoint(*this, child);
-        if (getNetPointByUuid(netpoint->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString(tr("There is already a netpoint with the UUID \"%1\"!"))
-                  .arg(netpoint->getUuid().toStr()));
-        }
-        mNetPoints.append(netpoint);
+    foreach (const SExpression& child, node.getChildren("junction")) {
+      SI_NetPoint* netpoint = new SI_NetPoint(*this, child);
+      if (getNetPointByUuid(netpoint->getUuid())) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+                .arg(netpoint->getUuid().toStr()));
       }
+      mNetPoints.append(netpoint);
     }
 
     // Load all netlines
     foreach (const SExpression& child,
              node.getChildren("netline") + node.getChildren("line")) {
-      SI_NetLine* netline = new SI_NetLine(*this, child, netPointAnchorMap);
+      SI_NetLine* netline = new SI_NetLine(*this, child);
       if (getNetLineByUuid(netline->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,

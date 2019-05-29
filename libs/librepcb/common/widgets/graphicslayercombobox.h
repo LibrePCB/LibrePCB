@@ -39,9 +39,6 @@ class GraphicsLayer;
 
 /**
  * @brief The GraphicsLayerComboBox class
- *
- * @author ubruhin
- * @date 2017-08-15
  */
 class GraphicsLayerComboBox final : public QWidget {
   Q_OBJECT

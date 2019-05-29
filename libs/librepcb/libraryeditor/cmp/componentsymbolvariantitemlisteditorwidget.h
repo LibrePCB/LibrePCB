@@ -49,9 +49,6 @@ namespace editor {
 
 /**
  * @brief The ComponentSymbolVariantItemListEditorWidget class
- *
- * @author ubruhin
- * @date 2017-03-19
  */
 class ComponentSymbolVariantItemListEditorWidget final : public QWidget {
   Q_OBJECT

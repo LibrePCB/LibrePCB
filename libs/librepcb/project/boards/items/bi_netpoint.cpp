@@ -50,14 +50,7 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(0, 0) {
-  if (node.tryGetChildByPath("position")) {
-    mPosition = Point(node.getChildByPath("position"));
-  } else {
-    // backward compatibility, remove this some time!
-    mPosition = Point(node.getChildByPath("pos"));
-  }
-
+    mPosition(node.getChildByPath("position")) {
   init();
 }
 

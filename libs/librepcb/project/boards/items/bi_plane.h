@@ -49,9 +49,6 @@ class BGI_Plane;
 
 /**
  * @brief The BI_Plane class
- *
- * @author ubruhin
- * @date 2017-11-19
  */
 class BI_Plane final : public BI_Base, public SerializableObject {
   Q_OBJECT

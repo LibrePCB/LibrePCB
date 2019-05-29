@@ -38,7 +38,10 @@ namespace librepcb {
 
 PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
     QGraphicsItem* parent) noexcept
-  : QGraphicsItem(parent), mLineLayer(nullptr), mFillLayer(nullptr) {
+  : QGraphicsItem(parent),
+    mLineLayer(nullptr),
+    mFillLayer(nullptr),
+    mOnLayerEditedSlot(*this, &PrimitivePathGraphicsItem::layerEdited) {
   mPen.setCapStyle(Qt::RoundCap);
   mPenHighlighted.setCapStyle(Qt::RoundCap);
   mPen.setJoinStyle(Qt::RoundJoin);
@@ -51,9 +54,6 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
 }
 
 PrimitivePathGraphicsItem::~PrimitivePathGraphicsItem() noexcept {
-  // unregister from graphics layers
-  setLineLayer(nullptr);
-  setFillLayer(nullptr);
 }
 
 /*******************************************************************************
@@ -83,11 +83,11 @@ void PrimitivePathGraphicsItem::setLineWidth(
 void PrimitivePathGraphicsItem::setLineLayer(
     const GraphicsLayer* layer) noexcept {
   if (mLineLayer) {
-    mLineLayer->unregisterObserver(*this);
+    mLineLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mLineLayer = layer;
   if (mLineLayer) {
-    mLineLayer->registerObserver(*this);
+    mLineLayer->onEdited.attach(mOnLayerEditedSlot);
   }
   updateColors();
   updateVisibility();
@@ -97,62 +97,15 @@ void PrimitivePathGraphicsItem::setLineLayer(
 void PrimitivePathGraphicsItem::setFillLayer(
     const GraphicsLayer* layer) noexcept {
   if (mFillLayer) {
-    mFillLayer->unregisterObserver(*this);
+    mFillLayer->onEdited.detach(mOnLayerEditedSlot);
   }
   mFillLayer = layer;
   if (mFillLayer) {
-    mFillLayer->registerObserver(*this);
+    mFillLayer->onEdited.attach(mOnLayerEditedSlot);
   }
   updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
-}
-
-/*******************************************************************************
- *  Inherited from IF_LayerObserver
- ******************************************************************************/
-
-void PrimitivePathGraphicsItem::layerColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newColor);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitivePathGraphicsItem::layerHighlightColorChanged(
-    const GraphicsLayer& layer, const QColor& newColor) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newColor);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitivePathGraphicsItem::layerVisibleChanged(const GraphicsLayer& layer,
-                                                    bool newVisible) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newVisible);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitivePathGraphicsItem::layerEnabledChanged(const GraphicsLayer& layer,
-                                                    bool newEnabled) noexcept {
-  Q_UNUSED(layer);
-  Q_UNUSED(newEnabled);
-  updateColors();
-  updateVisibility();
-}
-
-void PrimitivePathGraphicsItem::layerDestroyed(
-    const GraphicsLayer& layer) noexcept {
-  if (&layer == mLineLayer) {
-    setLineLayer(nullptr);
-  } else if (&layer == mFillLayer) {
-    setFillLayer(nullptr);
-  } else {
-    Q_ASSERT(false);
-  }
 }
 
 /*******************************************************************************
@@ -176,6 +129,32 @@ void PrimitivePathGraphicsItem::paint(QPainter*                       painter,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void PrimitivePathGraphicsItem::layerEdited(
+    const GraphicsLayer& layer, GraphicsLayer::Event event) noexcept {
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+    case GraphicsLayer::Event::HighlightColorChanged:
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateColors();
+      updateVisibility();
+      break;
+    case GraphicsLayer::Event::Destroyed:
+      if (&layer == mLineLayer) {
+        setLineLayer(nullptr);
+      } else if (&layer == mFillLayer) {
+        setFillLayer(nullptr);
+      } else {
+        Q_ASSERT(false);
+      }
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in "
+                    "PrimitivePathGraphicsItem::layerEdited()";
+      break;
+  }
+}
 
 void PrimitivePathGraphicsItem::updateColors() noexcept {
   if (mLineLayer && mLineLayer->isVisible()) {

@@ -39,9 +39,6 @@ namespace workspace {
  * @brief The WSI_LibraryLocaleOrder class contains a list of locales which
  * should be used for all (translatable) strings in library elements (in the
  * specified order)
- *
- * @author ubruhin
- * @date 2014-10-05
  */
 class WSI_LibraryLocaleOrder final : public WSI_Base {
   Q_OBJECT

@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "smartversionfile.h"
+#include "versionfile.h"
 
 #include "fileutils.h"
 
@@ -35,52 +35,29 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SmartVersionFile::SmartVersionFile(const FilePath& filepath, bool restore,
-                                   bool readOnly)
-  : SmartFile(filepath, restore, readOnly, false),
-    mVersion(readVersionFromFile(mOpenedFilePath)) {
+VersionFile::VersionFile(const Version& version) noexcept : mVersion(version) {
 }
 
-SmartVersionFile::SmartVersionFile(const FilePath& filepath,
-                                   const Version&  newVersion)
-  : SmartFile(filepath, false, false, true), mVersion(newVersion) {
-}
-
-SmartVersionFile::~SmartVersionFile() noexcept {
+VersionFile::~VersionFile() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void SmartVersionFile::save(bool toOriginal) {
-  const FilePath& filepath = prepareSaveAndReturnFilePath(toOriginal);
-  FileUtils::writeFile(filepath,
-                       QString("%1\n").arg(mVersion.toStr()).toUtf8());
-  updateMembersAfterSaving(toOriginal);
+QByteArray VersionFile::toByteArray() const noexcept {
+  return QString("%1\n").arg(mVersion.toStr()).toUtf8();
 }
 
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
-SmartVersionFile* SmartVersionFile::create(const FilePath& filepath,
-                                           const Version&  version) {
-  return new SmartVersionFile(filepath, version);
-}
-
-Version SmartVersionFile::readVersionFromFile(const FilePath& filepath) {
-  try {
-    QString     content = QString(FileUtils::readFile(filepath));  // can throw
-    QStringList lines   = content.split("\n", QString::KeepEmptyParts);
-    Q_ASSERT(lines.count() >= 1);
-    return Version::fromString(lines.first());  // can throw
-  } catch (const Exception& e) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Could not read version number from \"%1\": %2"))
-            .arg(filepath.toNative(), e.getMsg()));
-  }
+VersionFile VersionFile::fromByteArray(const QByteArray& content) {
+  QList<QByteArray> lines = content.split('\n');
+  Q_ASSERT(lines.count() >= 1);
+  Version version = Version::fromString(lines.first());  // can throw
+  return VersionFile(version);
 }
 
 /*******************************************************************************

@@ -54,9 +54,6 @@ class ComponentEditorWidget;
 
 /**
  * @brief The ComponentEditorWidget class
- *
- * @author ubruhin
- * @date 2016-10-16
  */
 class ComponentEditorWidget final
   : public EditorWidgetBase,

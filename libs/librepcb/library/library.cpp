@@ -29,9 +29,8 @@
 #include "pkg/package.h"
 #include "sym/symbol.h"
 
-#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/smartsexprfile.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/toolbox.h>
 
 #include <QtCore>
@@ -56,22 +55,21 @@ Library::Library(const Uuid& uuid, const Version& version,
                        keywords_en_US) {
 }
 
-Library::Library(const FilePath& libDir, bool readOnly)
-  : LibraryBaseElement(libDir, false, "lib", "library", readOnly) {
+Library::Library(std::unique_ptr<TransactionalDirectory> directory)
+  : LibraryBaseElement(std::move(directory), false, "lib", "library") {
   // check directory suffix
-  if (libDir.getSuffix() != "lplib") {
+  if (mDirectory->getAbsPath().getSuffix() != "lplib") {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("The library directory does not have the "
                                   "suffix '.lplib':\n\n%1"))
-                           .arg(libDir.toNative()));
+                           .arg(mDirectory->getAbsPath().toNative()));
   }
 
   // read properties
-  try {
-    mUrl = mLoadingFileDocument.getValueByPath<QUrl>("url");
-  } catch (const Exception& e) {
-    qWarning() << e.getMsg();
-  }
+  // Note: Don't use SExpression::getValueByPath<QUrl>() because it would throw
+  // an exception if the URL is empty, which is actually legal in this case.
+  mUrl = QUrl(mLoadingFileDocument.getValueByPath<QString>("url"),
+              QUrl::StrictMode);
 
   // read dependency UUIDs
   foreach (const SExpression& node,
@@ -80,8 +78,8 @@ Library::Library(const FilePath& libDir, bool readOnly)
   }
 
   // load image if available
-  if (getIconFilePath().isExistingFile()) {
-    mIcon = FileUtils::readFile(getIconFilePath());  // can throw
+  if (mDirectory->fileExists("library.png")) {
+    mIcon = mDirectory->read("library.png");  // can throw
   }
 
   cleanupAfterLoadingElementFromFile();
@@ -95,23 +93,19 @@ Library::~Library() noexcept {
  ******************************************************************************/
 
 template <typename ElementType>
-FilePath Library::getElementsDirectory() const noexcept {
-  return mDirectory.getPathTo(ElementType::getShortElementName());
+QString Library::getElementsDirectoryName() const noexcept {
+  return ElementType::getShortElementName();
 }
 
 // explicit template instantiations
-template FilePath Library::getElementsDirectory<ComponentCategory>() const
+template QString Library::getElementsDirectoryName<ComponentCategory>() const
     noexcept;
-template FilePath Library::getElementsDirectory<PackageCategory>() const
+template QString Library::getElementsDirectoryName<PackageCategory>() const
     noexcept;
-template FilePath Library::getElementsDirectory<Symbol>() const noexcept;
-template FilePath Library::getElementsDirectory<Package>() const noexcept;
-template FilePath Library::getElementsDirectory<Component>() const noexcept;
-template FilePath Library::getElementsDirectory<Device>() const noexcept;
-
-FilePath Library::getIconFilePath() const noexcept {
-  return mDirectory.getPathTo("library.png");
-}
+template QString Library::getElementsDirectoryName<Symbol>() const noexcept;
+template QString Library::getElementsDirectoryName<Package>() const noexcept;
+template QString Library::getElementsDirectoryName<Component>() const noexcept;
+template QString Library::getElementsDirectoryName<Device>() const noexcept;
 
 QPixmap Library::getIconAsPixmap() const noexcept {
   QPixmap p;
@@ -127,64 +121,55 @@ void Library::save() {
   LibraryBaseElement::save();  // can throw
 
   // Save icon.
-  if (mIcon.isEmpty() && getIconFilePath().isExistingFile()) {
-    FileUtils::removeFile(getIconFilePath());  // can throw
+  if (mIcon.isEmpty() && mDirectory->fileExists("library.png")) {
+    mDirectory->removeFile("library.png");  // can throw
   } else if (!mIcon.isEmpty()) {
-    FileUtils::writeFile(getIconFilePath(), mIcon);  // can throw
+    mDirectory->write("library.png", mIcon);  // can throw
   }
 }
 
+void Library::moveTo(TransactionalDirectory& dest) {
+  // check directory suffix
+  if (dest.getAbsPath().getSuffix() != "lplib") {
+    qDebug() << dest.getAbsPath().toNative();
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("A library directory name must have the suffix '.lplib'.")));
+  }
+
+  // move the element
+  LibraryBaseElement::moveTo(dest);
+}
+
 template <typename ElementType>
-QList<FilePath> Library::searchForElements() const noexcept {
-  QList<FilePath> list;
-  FilePath        subDirFilePath = getElementsDirectory<ElementType>();
-  QDir            subDir(subDirFilePath.toStr());
-  foreach (const QString& dirname,
-           subDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-    FilePath elementFilePath = subDirFilePath.getPathTo(dirname);
-    if (isValidElementDirectory<ElementType>(elementFilePath)) {
-      list.append(elementFilePath);
-    } else if (elementFilePath.isEmptyDir()) {
-      qInfo() << "Empty library element directory will be removed:"
-              << elementFilePath.toNative();
-      // TODO: This is actually a race condition, because the directory may be
-      // created just a moment ago in the main thread, and is thus still empty.
-      // Even if not very critical, this should be made thread-safe some time ;)
-      QDir(elementFilePath.toStr()).removeRecursively();
+QStringList Library::searchForElements() const noexcept {
+  QStringList list;
+  QString     subdir = getElementsDirectoryName<ElementType>();
+  foreach (const QString& dirname, mDirectory->getDirs(subdir)) {
+    QString dirPath = subdir % "/" % dirname;
+    if (isValidElementDirectory<ElementType>(*mDirectory, dirPath)) {
+      list.append(dirPath);
     } else {
       qWarning() << "Directory is not a valid library element:"
-                 << elementFilePath.toNative();
+                 << mDirectory->getAbsPath(dirPath).toNative();
     }
   }
   return list;
 }
 
 // explicit template instantiations
-template QList<FilePath> Library::searchForElements<ComponentCategory>() const
+template QStringList Library::searchForElements<ComponentCategory>() const
     noexcept;
-template QList<FilePath> Library::searchForElements<PackageCategory>() const
+template QStringList Library::searchForElements<PackageCategory>() const
     noexcept;
-template QList<FilePath> Library::searchForElements<Symbol>() const noexcept;
-template QList<FilePath> Library::searchForElements<Package>() const noexcept;
-template QList<FilePath> Library::searchForElements<Component>() const noexcept;
-template QList<FilePath> Library::searchForElements<Device>() const noexcept;
+template QStringList Library::searchForElements<Symbol>() const noexcept;
+template QStringList Library::searchForElements<Package>() const noexcept;
+template QStringList Library::searchForElements<Component>() const noexcept;
+template QStringList Library::searchForElements<Device>() const noexcept;
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void Library::copyTo(const FilePath& destination, bool removeSource) {
-  // check directory suffix
-  if (destination.getSuffix() != "lplib") {
-    qDebug() << destination.toStr();
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("A library directory name must have the suffix '.lplib'.")));
-  }
-
-  // copy the element
-  LibraryBaseElement::copyTo(destination, removeSource);
-}
 
 void Library::serialize(SExpression& root) const {
   LibraryBaseElement::serialize(root);

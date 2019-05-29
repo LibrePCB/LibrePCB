@@ -35,15 +35,16 @@ namespace library {
  ******************************************************************************/
 
 PackagePad::PackagePad(const PackagePad& other) noexcept
-  : mUuid(other.mUuid), mName(other.mName) {
+  : onEdited(*this), mUuid(other.mUuid), mName(other.mName) {
 }
 
 PackagePad::PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept
-  : mUuid(uuid), mName(name) {
+  : onEdited(*this), mUuid(uuid), mName(name) {
 }
 
 PackagePad::PackagePad(const SExpression& node)
-  : mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+  : onEdited(*this),
+    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
     mName(node.getValueByPath<CircuitIdentifier>("name", true)) {
 }
 
@@ -54,8 +55,14 @@ PackagePad::~PackagePad() noexcept {
  *  Setters
  ******************************************************************************/
 
-void PackagePad::setName(const CircuitIdentifier& name) noexcept {
+bool PackagePad::setName(const CircuitIdentifier& name) noexcept {
+  if (name == mName) {
+    return false;
+  }
+
   mName = name;
+  onEdited.notify(Event::NameChanged);
+  return true;
 }
 
 /*******************************************************************************
@@ -78,8 +85,11 @@ bool PackagePad::operator==(const PackagePad& rhs) const noexcept {
 }
 
 PackagePad& PackagePad::operator=(const PackagePad& rhs) noexcept {
-  mUuid = rhs.mUuid;
-  mName = rhs.mName;
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setName(rhs.mName);
   return *this;
 }
 
