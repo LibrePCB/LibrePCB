@@ -12,6 +12,10 @@ elif [ -n "${APPVEYOR-}" ]
 then
   IS_PULL_REQUEST="${APPVEYOR_PULL_REQUEST_NUMBER:-false}"
   BRANCH_NAME="$APPVEYOR_REPO_BRANCH"
+elif [ -n "${AZURE_PIPELINES-}" ]
+then
+  IS_PULL_REQUEST="false"  # script is not executed at all on pull requests
+  BRANCH_NAME="${AZURE_BRANCH_NAME#refs/heads/}"
 fi
 
 # upload build artifacts for all branches of the upstream repository
