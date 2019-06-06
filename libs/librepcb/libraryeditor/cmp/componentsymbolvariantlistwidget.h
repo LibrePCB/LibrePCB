@@ -36,8 +36,12 @@
 namespace librepcb {
 
 class UndoStack;
+class EditableTableWidget;
 
 namespace library {
+
+class ComponentSymbolVariantListModel;
+
 namespace editor {
 
 /*******************************************************************************
@@ -50,16 +54,6 @@ namespace editor {
 class ComponentSymbolVariantListWidget final : public QWidget {
   Q_OBJECT
 
-private:  // Types
-  enum Column {
-    COLUMN_NAME = 0,
-    COLUMN_DESCRIPTION,
-    COLUMN_NORM,
-    COLUMN_SYMBOLCOUNT,
-    COLUMN_BUTTONS,
-    _COLUMN_COUNT
-  };
-
 public:
   // Constructors / Destructor
   explicit ComponentSymbolVariantListWidget(QWidget* parent = nullptr) noexcept;
@@ -69,66 +63,24 @@ public:
 
   // Setters
   void setReferences(
-      UndoStack* undoStack, ComponentSymbolVariantList* variants,
+      UndoStack* undoStack, ComponentSymbolVariantList* list,
       IF_ComponentSymbolVariantEditorProvider* editorProvider) noexcept;
-
-  // General Methods
-  void addDefaultSymbolVariant();
 
   // Operator Overloadings
   ComponentSymbolVariantListWidget& operator       =(
       const ComponentSymbolVariantListWidget& rhs) = delete;
 
-private:  // Slots
-  void currentCellChanged(int currentRow, int currentColumn, int previousRow,
-                          int previousColumn) noexcept;
-  void cellDoubleClicked(int row, int column) noexcept;
-  void btnEditClicked() noexcept;
-  void btnAddRemoveClicked() noexcept;
-  void btnUpClicked() noexcept;
-  void btnDownClicked() noexcept;
-
 private:  // Methods
-  void variantListEdited(
-      const ComponentSymbolVariantList& list, int index,
-      const std::shared_ptr<const ComponentSymbolVariant>& variant,
-      ComponentSymbolVariantList::Event                    event) noexcept;
-  void               updateTable() noexcept;
-  void               setTableRowContent(int row, const tl::optional<Uuid>& uuid,
-                                        const QString& name, const QString& desc,
-                                        const QString& norm, int symbolCount) noexcept;
-  void               addVariant(const QString& name, const QString& desc,
-                                const QString& norm) noexcept;
-  void               removeVariant(const Uuid& uuid) noexcept;
-  void               moveVariantUp(int index) noexcept;
-  void               moveVariantDown(int index) noexcept;
-  void               editVariant(const Uuid& uuid) noexcept;
-  int                getRowOfTableCellWidget(QObject* obj) const noexcept;
-  tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
-  bool               allReferencesValid() const noexcept {
-    return mUndoStack && mVariantList && mEditorProvider;
-  }
-
-  // row index <-> symbol variant index conversion methods
-  int  newVariantRow() const noexcept { return mVariantList->count(); }
-  int  indexToRow(int index) const noexcept { return index; }
-  int  rowToIndex(int row) const noexcept { return row; }
-  bool isExistingVariantRow(int row) const noexcept {
-    return row >= 0 && row < mVariantList->count();
-  }
-  bool isNewVariantRow(int row) const noexcept {
-    return row == newVariantRow();
-  }
+  void btnEditClicked(const QVariant& data) noexcept;
+  void viewDoubleClicked(const QModelIndex& index) noexcept;
+  void editVariant(const Uuid& uuid) noexcept;
 
 private:  // Data
-  QTableWidget*                            mTable;
-  UndoStack*                               mUndoStack;
-  ComponentSymbolVariantList*              mVariantList;
-  IF_ComponentSymbolVariantEditorProvider* mEditorProvider;
-  tl::optional<Uuid>                       mSelectedVariant;
-
-  // Slots
-  ComponentSymbolVariantList::OnEditedSlot mVariantListEditedSlot;
+  QScopedPointer<ComponentSymbolVariantListModel> mModel;
+  QScopedPointer<EditableTableWidget>             mView;
+  ComponentSymbolVariantList*                     mSymbolVariantList;
+  UndoStack*                                      mUndoStack;
+  IF_ComponentSymbolVariantEditorProvider*        mEditorProvider;
 };
 
 /*******************************************************************************

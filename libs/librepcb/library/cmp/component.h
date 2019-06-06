@@ -90,10 +90,8 @@ public:
   }
 
   // Attribute Methods
+  AttributeList&       getAttributes() noexcept { return mAttributes; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
-  void                 setAttributes(const AttributeList& attributes) noexcept {
-    mAttributes = attributes;
-  }
 
   // Default Value Methods
   const QString& getDefaultValue() const noexcept { return mDefaultValue; }

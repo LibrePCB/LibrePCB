@@ -25,6 +25,8 @@
 #include "ui_newelementwizardpage_componentpinsignalmap.h"
 
 #include <librepcb/library/cmp/component.h>
+#include <librepcb/library/libraryelementcache.h>
+#include <librepcb/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
@@ -74,9 +76,11 @@ int NewElementWizardPage_ComponentPinSignalMap::nextId() const noexcept {
 void NewElementWizardPage_ComponentPinSignalMap::initializePage() noexcept {
   QWizardPage::initializePage();
   mSymbolVariantList = mContext.mComponentSymbolVariants;
-  mUi->pinSignalMapEditorWidget->setVariant(mContext.getWorkspace(),
-                                            mContext.mComponentSignals,
-                                            *mSymbolVariantList.value(0));
+  mUi->pinSignalMapEditorWidget->setReferences(
+      mSymbolVariantList.value(0).get(),
+      std::make_shared<LibraryElementCache>(
+          mContext.getWorkspace().getLibraryDb()),
+      &mContext.mComponentSignals, nullptr);
 }
 
 void NewElementWizardPage_ComponentPinSignalMap::cleanupPage() noexcept {

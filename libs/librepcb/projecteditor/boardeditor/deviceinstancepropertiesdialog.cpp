@@ -55,6 +55,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
     mProject(project),
     mDevice(device),
     mUndoStack(undoStack),
+    mAttributes(mDevice.getComponentInstance().getAttributes()),
     mUi(new Ui::DeviceInstancePropertiesDialog) {
   mUi->setupUi(this);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
@@ -66,7 +67,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
   ComponentInstance& cmp = mDevice.getComponentInstance();
   mUi->edtCompInstName->setText(*cmp.getName());
   mUi->edtCompInstValue->setText(cmp.getValue());
-  mUi->attributeListEditorWidget->setAttributeList(cmp.getAttributes());
+  mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
 
   const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
@@ -103,6 +104,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
 }
 
 DeviceInstancePropertiesDialog::~DeviceInstancePropertiesDialog() noexcept {
+  mUi->attributeListEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
@@ -160,7 +162,7 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
     cmdCmp->setName(CircuitIdentifier(
         mUi->edtCompInstName->text().trimmed()));  // can throw
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
-    cmdCmp->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
+    cmdCmp->setAttributes(mAttributes);
     transaction.append(cmdCmp.take());  // can throw
 
     // Device Instance

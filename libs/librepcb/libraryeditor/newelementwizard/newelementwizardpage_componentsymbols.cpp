@@ -25,6 +25,8 @@
 #include "ui_newelementwizardpage_componentsymbols.h"
 
 #include <librepcb/library/cmp/component.h>
+#include <librepcb/library/libraryelementcache.h>
+#include <librepcb/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
@@ -80,9 +82,12 @@ void NewElementWizardPage_ComponentSymbols::initializePage() noexcept {
     mSymbolVariantList.append(std::make_shared<ComponentSymbolVariant>(
         Uuid::createRandom(), "", ElementName("default"), ""));
   }
-  mUi->symbolListEditorWidget->setVariant(
+  mUi->symbolListEditorWidget->setReferences(
       mContext.getWorkspace(), mContext.getLayerProvider(),
-      mSymbolVariantList.value(0)->getSymbolItems());
+      mSymbolVariantList.value(0)->getSymbolItems(),
+      std::make_shared<LibraryElementCache>(
+          mContext.getWorkspace().getLibraryDb()),
+      nullptr);
 }
 
 void NewElementWizardPage_ComponentSymbols::cleanupPage() noexcept {

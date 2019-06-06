@@ -33,7 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CenteredCheckBox;
+class UndoStack;
+class EditableTableWidget;
 class IF_GraphicsLayerProvider;
 
 namespace workspace {
@@ -41,6 +42,10 @@ class Workspace;
 }
 
 namespace library {
+
+class LibraryElementCache;
+class ComponentSymbolVariantItemListModel;
+
 namespace editor {
 
 /*******************************************************************************
@@ -53,19 +58,6 @@ namespace editor {
 class ComponentSymbolVariantItemListEditorWidget final : public QWidget {
   Q_OBJECT
 
-private:  // Types
-  enum Column {
-    COLUMN_NUMBER = 0,
-    COLUMN_SYMBOL,
-    COLUMN_SUFFIX,
-    COLUMN_ISREQUIRED,
-    COLUMN_POS_X,
-    COLUMN_POS_Y,
-    COLUMN_ROTATION,
-    COLUMN_BUTTONS,
-    _COLUMN_COUNT
-  };
-
 public:
   // Constructors / Destructor
   explicit ComponentSymbolVariantItemListEditorWidget(
@@ -75,9 +67,12 @@ public:
   ~ComponentSymbolVariantItemListEditorWidget() noexcept;
 
   // Setters
-  void setVariant(const workspace::Workspace&     ws,
-                  const IF_GraphicsLayerProvider& layerProvider,
-                  ComponentSymbolVariantItemList& items) noexcept;
+  void setReferences(
+      const workspace::Workspace&                       ws,
+      const IF_GraphicsLayerProvider&                   layerProvider,
+      ComponentSymbolVariantItemList&                   items,
+      const std::shared_ptr<const LibraryElementCache>& symbolCache,
+      UndoStack*                                        undoStack) noexcept;
 
   // Operator Overloadings
   ComponentSymbolVariantItemListEditorWidget& operator       =(
@@ -85,54 +80,27 @@ public:
 
 signals:
   void edited();
-
-private:  // Slots
-  void currentCellChanged(int currentRow, int currentColumn, int previousRow,
-                          int previousColumn) noexcept;
-  void tableCellChanged(int row, int column) noexcept;
-  void isRequiredChanged(bool checked) noexcept;
-  void btnChooseSymbolClicked() noexcept;
-  void btnAddRemoveClicked() noexcept;
-  void btnUpClicked() noexcept;
-  void btnDownClicked() noexcept;
+  void triggerGraphicsItemsUpdate();
 
 private:  // Methods
-  void updateTable(tl::optional<Uuid> selected = tl::nullopt) noexcept;
-  void setTableRowContent(int row, int number, const tl::optional<Uuid>& uuid,
-                          const tl::optional<Uuid>& symbol,
-                          const QString& suffix, bool required,
-                          const Point& pos, const Angle& rot) noexcept;
-  void addItem(const Uuid& symbol, const QString& suffix, bool required,
-               const Point& pos, const Angle& rot) noexcept;
-  void removeItem(const Uuid& uuid) noexcept;
-  void moveItemUp(int index) noexcept;
-  void moveItemDown(int index) noexcept;
-  void setSymbolUuid(const Uuid& uuid, const Uuid& symbol) noexcept;
-  void setIsRequired(const Uuid& uuid, bool required) noexcept;
-  void setSuffix(const Uuid& uuid, const QString& suffix) noexcept;
-  void setPosX(const Uuid& uuid, const Length& x) noexcept;
-  void setPosY(const Uuid& uuid, const Length& y) noexcept;
-  void setRotation(const Uuid& uuid, const Angle& rot) noexcept;
-  int  getRowOfTableCellWidget(QObject* obj) const noexcept;
-  tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
-
-  // row index <-> item index conversion methods
-  int  newItemRow() const noexcept { return mItems->count(); }
-  int  indexToRow(int index) const noexcept { return index; }
-  int  rowToIndex(int row) const noexcept { return row; }
-  bool isExistingItemRow(int row) const noexcept {
-    return row >= 0 && row < mItems->count();
-  }
-  bool isNewItemRow(int row) const noexcept { return row == newItemRow(); }
+  void itemListEdited(
+      const ComponentSymbolVariantItemList& list, int index,
+      const std::shared_ptr<const ComponentSymbolVariantItem>& item,
+      ComponentSymbolVariantItemList::Event                    event) noexcept;
+  void itemEdited(const ComponentSymbolVariantItemList& list, int index,
+                  const std::shared_ptr<const ComponentSymbolVariantItem>& item,
+                  ComponentSymbolVariantItem::Event event) noexcept;
+  void btnSymbolBrowseClicked(const QVariant& data) noexcept;
 
 private:  // Data
-  QTableWidget*                   mTable;
-  const workspace::Workspace*     mWorkspace;
-  const IF_GraphicsLayerProvider* mLayerProvider;
-  ComponentSymbolVariantItemList* mItems;
-  tl::optional<Uuid>              mSelectedItem;
-  QLabel*                         mNewSymbolLabel;
-  CenteredCheckBox*               mNewRequiredCheckbox;
+  QScopedPointer<ComponentSymbolVariantItemListModel> mModel;
+  QScopedPointer<EditableTableWidget>                 mView;
+  const workspace::Workspace*                         mWorkspace;
+  const IF_GraphicsLayerProvider*                     mLayerProvider;
+
+  // Slots
+  ComponentSymbolVariantItemList::OnEditedSlot        mOnItemListEditedSlot;
+  ComponentSymbolVariantItemList::OnElementEditedSlot mOnItemEditedSlot;
 };
 
 /*******************************************************************************

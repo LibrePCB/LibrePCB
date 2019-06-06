@@ -59,6 +59,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
     mComponentInstance(cmp),
     mSymbol(symbol),
     mUndoStack(undoStack),
+    mAttributes(mComponentInstance.getAttributes()),
     mUi(new Ui::SymbolInstancePropertiesDialog) {
   mUi->setupUi(this);
   setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
@@ -66,8 +67,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   // Component Instance Attributes
   mUi->edtCompInstName->setText(*mComponentInstance.getName());
   mUi->edtCompInstValue->setText(mComponentInstance.getValue());
-  mUi->attributeListEditorWidget->setAttributeList(
-      mComponentInstance.getAttributes());
+  mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
 
   const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
@@ -115,6 +115,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
 }
 
 SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept {
+  mUi->attributeListEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
@@ -154,7 +155,7 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
     cmdCmp->setName(CircuitIdentifier(
         mUi->edtCompInstName->text().trimmed()));  // can throw
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
-    cmdCmp->setAttributes(mUi->attributeListEditorWidget->getAttributeList());
+    cmdCmp->setAttributes(mAttributes);
     transaction.append(cmdCmp.take());
 
     // Symbol Instance

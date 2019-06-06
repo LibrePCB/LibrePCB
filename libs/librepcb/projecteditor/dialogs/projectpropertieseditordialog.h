@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/attributes/attribute.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -74,6 +76,7 @@ private:  // Methods
 private:  // Data
   ProjectMetadata&                                  mMetadata;
   UndoStack&                                        mUndoStack;
+  AttributeList                                     mAttributes;
   QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;
 };
 

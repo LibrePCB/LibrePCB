@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/attributes/attribute.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -79,6 +81,7 @@ private:  // Data
   Project&                                           mProject;
   BI_Device&                                         mDevice;
   UndoStack&                                         mUndoStack;
+  AttributeList                                      mAttributes;
   QScopedPointer<Ui::DeviceInstancePropertiesDialog> mUi;
 };
 
