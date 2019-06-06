@@ -1,6 +1,6 @@
 # LibrePCB
 
-[![Travis Build Status](https://travis-ci.org/LibrePCB/LibrePCB.svg?branch=master)](https://travis-ci.org/LibrePCB/LibrePCB)
+[![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=master)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=master)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jq41j14jlgs6rxsn/branch/master?svg=true)](https://ci.appveyor.com/project/librepcb/librepcb/branch/master)
 [![Become a Patron](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/librepcb)
 [![Donate with Bitcoin](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](https://blockchain.info/address/1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8)

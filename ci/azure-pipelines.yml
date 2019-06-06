@@ -1,0 +1,9 @@
+variables:
+  AZURE_PIPELINES: true
+  AZURE_BRANCH_NAME: $[ variables['Build.SourceBranch'] ]
+
+jobs:
+- template: azure-jobs-stylecheck.yml
+- template: azure-jobs-doxygen.yml
+- template: azure-jobs-linux.yml
+- template: azure-jobs-macos.yml

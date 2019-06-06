@@ -1,0 +1,16 @@
+jobs:
+- job: Doxygen
+  pool:
+    vmImage: 'ubuntu-16.04'
+  container: librepcb/librepcb-dev:ubuntu-14.04-1
+  steps:
+  - bash: ./ci/build_doxygen.sh
+    displayName: Build Doxygen Documentation
+  - bash: ./ci/upload_artifacts.sh
+    displayName: Upload Artifacts
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    env:
+      UPLOAD_URL: $(ARTIFACTS_UPLOAD_URL)
+      UPLOAD_USER: $(ARTIFACTS_UPLOAD_USER)
+      UPLOAD_PASS: $(ARTIFACTS_UPLOAD_PASS)
+      UPLOAD_SIGN_KEY: $(ARTIFACTS_UPLOAD_SIGN_KEY)
