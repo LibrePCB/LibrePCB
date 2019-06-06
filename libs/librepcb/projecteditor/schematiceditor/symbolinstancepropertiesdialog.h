@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/attributes/attribute.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -80,6 +82,7 @@ private:  // Data
   ComponentInstance&                                 mComponentInstance;
   SI_Symbol&                                         mSymbol;
   UndoStack&                                         mUndoStack;
+  AttributeList                                      mAttributes;
   QScopedPointer<Ui::SymbolInstancePropertiesDialog> mUi;
 };
 

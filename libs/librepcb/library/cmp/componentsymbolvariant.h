@@ -78,8 +78,11 @@ public:
   ~ComponentSymbolVariant() noexcept;
 
   // Getters: Attributes
-  const Uuid&                    getUuid() const noexcept { return mUuid; }
-  const QString&                 getNorm() const noexcept { return mNorm; }
+  const Uuid&        getUuid() const noexcept { return mUuid; }
+  const QString&     getNorm() const noexcept { return mNorm; }
+  const ElementName& getName() const noexcept {
+    return mNames.getDefaultValue();  // Used for SerializableObjectList
+  }
   const LocalizedNameMap&        getNames() const noexcept { return mNames; }
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;

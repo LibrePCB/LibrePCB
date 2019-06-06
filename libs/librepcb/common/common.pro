@@ -31,6 +31,7 @@ SOURCES += \
     alignment.cpp \
     application.cpp \
     attributes/attribute.cpp \
+    attributes/attributelistmodel.cpp \
     attributes/attributeprovider.cpp \
     attributes/attributesubstitutor.cpp \
     attributes/attributetype.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
     attributes/attrtyperesistance.cpp \
     attributes/attrtypestring.cpp \
     attributes/attrtypevoltage.cpp \
+    attributes/cmd/cmdattributeedit.cpp \
     boarddesignrules.cpp \
     cam/excellongenerator.cpp \
     cam/gerberaperturelist.cpp \
@@ -94,6 +96,8 @@ SOURCES += \
     graphics/stroketextgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
+    model/comboboxdelegate.cpp \
+    model/sortfilterproxymodel.cpp \
     network/filedownload.cpp \
     network/networkaccessmanager.cpp \
     network/networkrequest.cpp \
@@ -123,6 +127,7 @@ SOURCES += \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
     widgets/centeredcheckbox.cpp \
+    widgets/editabletablewidget.cpp \
     widgets/graphicslayercombobox.cpp \
     widgets/patheditorwidget.cpp \
     widgets/plaintextedit.cpp \
@@ -135,6 +140,7 @@ HEADERS += \
     application.h \
     attributes/attribute.h \
     attributes/attributekey.h \
+    attributes/attributelistmodel.h \
     attributes/attributeprovider.h \
     attributes/attributesubstitutor.h \
     attributes/attributetype.h \
@@ -147,6 +153,7 @@ HEADERS += \
     attributes/attrtyperesistance.h \
     attributes/attrtypestring.h \
     attributes/attrtypevoltage.h \
+    attributes/cmd/cmdattributeedit.h \
     boarddesignrules.h \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
@@ -209,6 +216,8 @@ HEADERS += \
     graphics/stroketextgraphicsitem.h \
     graphics/textgraphicsitem.h \
     gridproperties.h \
+    model/comboboxdelegate.h \
+    model/sortfilterproxymodel.h \
     network/filedownload.h \
     network/networkaccessmanager.h \
     network/networkrequest.h \
@@ -243,6 +252,7 @@ HEADERS += \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
     widgets/centeredcheckbox.h \
+    widgets/editabletablewidget.h \
     widgets/graphicslayercombobox.h \
     widgets/patheditorwidget.h \
     widgets/plaintextedit.h \

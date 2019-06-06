@@ -139,13 +139,25 @@ public:
   static QString incrementNumberInString(QString string) noexcept;
 
   /**
-   * @brief Convert a numeric or non-numeric string to the corresponding
-   * QVariant
+   * @brief Expand ranges like "1..5" in a string to all its values
    *
-   * @param string  The string to be converted
-   * @return A QVariant with either a QVariant::Int or a QVariant::String
+   * A range is either defined by two integers with ".." in between, or two
+   * ASCII letters with ".." in between. If multiple ranges are contained, all
+   * combinations of them will be created.
+   *
+   * For example the string "X1..10_A..C" expands to the list ["X1_A", "X1_B",
+   * "X1_C", ..., "X10_C"].
+   *
+   * @note  Minus ('-') and plus ('+') characters are not interpreted as the
+   *        sign of a number because in EDA tools they often are considered as
+   *        strings, not as number signs (e.g. the inputs of an OpAmp).
+   *
+   * @param string The input string (may or may not contain ranges).
+   * @return A list with expanded ranges in all combinations. If the input
+   *         string does not contain ranges, a list with one element (equal to
+   *         the input) is returned.
    */
-  static QVariant stringOrNumberToQVariant(const QString& string) noexcept;
+  static QStringList expandRangesInString(const QString& string) noexcept;
 
   /**
    * @brief Clean a user input string
@@ -468,6 +480,14 @@ public:
     }
     return result;
   }
+
+private:
+  /**
+   * @brief Internal helper function for #expandRangesInString(const QString&)
+   */
+  static QStringList expandRangesInString(
+      const QString&                                    input,
+      const QVector<std::tuple<int, int, QStringList>>& replacements) noexcept;
 };
 
 /*******************************************************************************

@@ -143,13 +143,67 @@ QString Toolbox::incrementNumberInString(QString string) noexcept {
   return string % "1";
 }
 
-QVariant Toolbox::stringOrNumberToQVariant(const QString& string) noexcept {
-  bool isInt;
-  int  intval = string.toInt(&isInt, 10);
-  if (isInt) {
-    return QVariant(intval);
+QStringList Toolbox::expandRangesInString(const QString& string) noexcept {
+  // Do NOT accept '+' and '-', they are considered as strings, not numbers!
+  // For example in the range connector signals range "X-1..10" you expect
+  // numbers starting from 1, not -1.
+  QString number    = "\\d+";
+  QString character = "[a-zA-Z]";
+  QString separator = "\\.\\.";
+  QString numberRange =
+      QString("(?<num_start>%1)%2(?<num_end>%1)").arg(number, separator);
+  QString characterRange =
+      QString("(?<char_start>%1)%2(?<char_end>%1)").arg(character, separator);
+  QString pattern =
+      QString("(?<num>%1)|(?<char>%2)").arg(numberRange, characterRange);
+  QRegularExpression                         re(pattern);
+  QRegularExpressionMatchIterator            it = re.globalMatch(string);
+  QVector<std::tuple<int, int, QStringList>> replacements;
+  while (it.hasNext()) {
+    QRegularExpressionMatch match = it.next();
+    QStringList             matchReplacements;
+    if (!match.captured("num").isEmpty()) {
+      bool okStart = false, okEnd = false;
+      int  start = match.captured("num_start").toInt(&okStart);
+      int  end   = match.captured("num_end").toInt(&okEnd);
+      if (okStart && okEnd) {
+        bool invert = start > end;
+        if (invert) std::swap(start, end);
+        for (int i = start; i <= end; ++i) {
+          if (invert) {
+            matchReplacements.prepend(QString::number(i));
+          } else {
+            matchReplacements.append(QString::number(i));
+          }
+        }
+      }
+    } else if (!match.captured("char").isEmpty()) {
+      QString startStr = match.captured("char_start");
+      QString endStr   = match.captured("char_end");
+      if ((startStr.length()) == 1 && (endStr.length() == 1)) {
+        int  start  = startStr[0].unicode();
+        int  end    = endStr[0].unicode();
+        bool invert = start > end;
+        if (invert) std::swap(start, end);
+        if (((start >= 'a') && (end <= 'z')) ||
+            ((start >= 'A') && (end <= 'Z'))) {
+          for (int i = start; i <= end; ++i) {
+            if (invert) {
+              matchReplacements.prepend(QChar::fromLatin1(i));
+            } else {
+              matchReplacements.append(QChar::fromLatin1(i));
+            }
+          }
+        }
+      }
+    }
+    // allow max. 4 replacements to avoid huge results
+    if (!matchReplacements.isEmpty() && (replacements.count() < 4)) {
+      replacements.append(std::make_tuple(
+          match.capturedStart(), match.capturedLength(), matchReplacements));
+    }
   }
-  return QVariant(string);
+  return expandRangesInString(string, replacements);
 }
 
 QString Toolbox::cleanUserInputString(const QString&            input,
@@ -173,6 +227,28 @@ QString Toolbox::cleanUserInputString(const QString&            input,
   // if there are leading or trailing spaces, remove them again ;)
   if (trim) ret = ret.trimmed();
   return ret;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+QStringList Toolbox::expandRangesInString(
+    const QString&                                    input,
+    const QVector<std::tuple<int, int, QStringList>>& replacements) noexcept {
+  if (replacements.isEmpty()) {
+    return QStringList{input};
+  } else {
+    QStringList result;
+    int         pos = std::get<0>(replacements.first());
+    int         len = std::get<1>(replacements.first());
+    foreach (const QString& replacement, std::get<2>(replacements.first())) {
+      foreach (QString str, expandRangesInString(input, replacements.mid(1))) {
+        result.append(str.replace(pos, len, replacement));
+      }
+    }
+    return result;
+  }
 }
 
 /*******************************************************************************

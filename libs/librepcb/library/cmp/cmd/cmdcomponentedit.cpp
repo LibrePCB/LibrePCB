@@ -42,9 +42,7 @@ CmdComponentEdit::CmdComponentEdit(Component& component) noexcept
     mOldDefaultValue(component.getDefaultValue()),
     mNewDefaultValue(mOldDefaultValue),
     mOldPrefixes(component.getPrefixes()),
-    mNewPrefixes(mOldPrefixes),
-    mOldAttributes(component.getAttributes()),
-    mNewAttributes(mOldAttributes) {
+    mNewPrefixes(mOldPrefixes) {
 }
 
 CmdComponentEdit::~CmdComponentEdit() noexcept {
@@ -76,11 +74,6 @@ void CmdComponentEdit::setPrefixes(
   mNewPrefixes = prefixes;
 }
 
-void CmdComponentEdit::setAttributes(const AttributeList& attributes) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewAttributes = attributes;
-}
-
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -90,7 +83,6 @@ bool CmdComponentEdit::performExecute() {
   if (mNewSchematicOnly != mOldSchematicOnly) return true;
   if (mNewDefaultValue != mOldDefaultValue) return true;
   if (mNewPrefixes != mOldPrefixes) return true;
-  if (mNewAttributes != mOldAttributes) return true;
   return false;
 }
 
@@ -99,7 +91,6 @@ void CmdComponentEdit::performUndo() {
   mComponent.setIsSchematicOnly(mOldSchematicOnly);
   mComponent.setDefaultValue(mOldDefaultValue);
   mComponent.setPrefixes(mOldPrefixes);
-  mComponent.setAttributes(mOldAttributes);
 }
 
 void CmdComponentEdit::performRedo() {
@@ -107,7 +98,6 @@ void CmdComponentEdit::performRedo() {
   mComponent.setIsSchematicOnly(mNewSchematicOnly);
   mComponent.setDefaultValue(mNewDefaultValue);
   mComponent.setPrefixes(mNewPrefixes);
-  mComponent.setAttributes(mNewAttributes);
 }
 
 /*******************************************************************************

@@ -34,8 +34,12 @@
 namespace librepcb {
 
 class UndoStack;
+class EditableTableWidget;
 
 namespace library {
+
+class FootprintListModel;
+
 namespace editor {
 
 /*******************************************************************************
@@ -48,9 +52,6 @@ namespace editor {
 class FootprintListEditorWidget final : public QWidget {
   Q_OBJECT
 
-private:  // Types
-  enum Column { COLUMN_NAME = 0, COLUMN_BUTTONS, _COLUMN_COUNT };
-
 public:
   // Constructors / Destructor
   explicit FootprintListEditorWidget(QWidget* parent = nullptr) noexcept;
@@ -60,9 +61,6 @@ public:
   // Setters
   void setReferences(FootprintList& list, UndoStack& stack) noexcept;
 
-  // General Methods
-  void addDefaultFootprint();
-
   // Operator Overloadings
   FootprintListEditorWidget& operator=(const FootprintListEditorWidget& rhs) =
       delete;
@@ -70,51 +68,9 @@ public:
 signals:
   void currentFootprintChanged(int index);
 
-private:  // Slots
-  void currentCellChanged(int currentRow, int currentColumn, int previousRow,
-                          int previousColumn) noexcept;
-  void tableCellChanged(int row, int column) noexcept;
-  void btnUpClicked() noexcept;
-  void btnDownClicked() noexcept;
-  void btnCopyClicked() noexcept;
-  void btnAddRemoveClicked() noexcept;
-
-private:  // Methods
-  void        footprintListEdited(const FootprintList& list, int index,
-                                  const std::shared_ptr<const Footprint>& footprint,
-                                  FootprintList::Event event) noexcept;
-  void        updateTable(tl::optional<Uuid> selected = tl::nullopt) noexcept;
-  void        setTableRowContent(int row, const tl::optional<Uuid>& uuid,
-                                 const QString& name) noexcept;
-  void        addFootprint(const QString& name) noexcept;
-  void        removeFootprint(const Uuid& uuid) noexcept;
-  void        moveFootprintUp(int index) noexcept;
-  void        moveFootprintDown(int index) noexcept;
-  void        copyFootprint(const Uuid& uuid) noexcept;
-  ElementName setName(const Uuid& uuid, const QString& name) noexcept;
-  int         getRowOfTableCellWidget(QObject* obj) const noexcept;
-  tl::optional<Uuid> getUuidOfRow(int row) const noexcept;
-  ElementName        validateNameOrThrow(const QString& name) const;
-
-  // row index <-> signal index conversion methods
-  int  newFootprintRow() const noexcept { return mFootprintList->count(); }
-  int  indexToRow(int index) const noexcept { return index; }
-  int  rowToIndex(int row) const noexcept { return row; }
-  bool isExistingFootprintRow(int row) const noexcept {
-    return row >= 0 && row < mFootprintList->count();
-  }
-  bool isNewFootprintRow(int row) const noexcept {
-    return row == newFootprintRow();
-  }
-
-private:  // Data
-  QTableWidget*      mTable;
-  FootprintList*     mFootprintList;
-  UndoStack*         mUndoStack;
-  tl::optional<Uuid> mSelectedFootprint;
-
-  // Slots
-  FootprintList::OnEditedSlot mFootprintListEditedSlot;
+private:
+  QScopedPointer<FootprintListModel>  mModel;
+  QScopedPointer<EditableTableWidget> mView;
 };
 
 /*******************************************************************************
