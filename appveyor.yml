@@ -7,6 +7,8 @@ deploy: off
 
 environment:
   global:
+    OS: "windows"
+    ARCH: "x86"
     CC: "ccache gcc"
     CXX: "ccache g++"
     MINGW: C:/Qt/Tools/mingw530_32
@@ -27,6 +29,11 @@ install:
 
 build_script:
   - bash -c "./ci/stylecheck.sh"
-  - bash -c "./ci/build.sh"
-  - bash -c "./ci/test.sh"
+  - bash -c "./ci/build_librepcb.sh"
+  - bash -c "./ci/build_windows_archive.sh"
+  - bash -c "./ci/build_installer.sh"
+  - build\output\qztest.exe
+  - build\output\librepcb-unittests.exe
+  - pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" tests/cli
+  - pytest -v --librepcb-executable="build/install/opt/bin/librepcb.exe" tests/funq
   - bash -c "./ci/upload_artifacts.sh"
