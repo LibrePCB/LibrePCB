@@ -545,7 +545,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(
         BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first());
         Q_ASSERT(footprint);
         openDevicePropertiesDialog(footprint->getDeviceInstance());
-        return ForceLeaveState;
+        return ForceStayInState;
       }
       case BI_Base::Type_t::Via: {
         BI_Via* via = dynamic_cast<BI_Via*>(items.first());
