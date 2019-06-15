@@ -12,12 +12,17 @@ set -euo pipefail
 #     parameter. This is intended only for LibrePCB maintainers, don't use it!
 
 DOCKER=""
+DOCKER_CMD="docker"
 ALL=""
 for i in "$@"
 do
 case $i in
     --docker)
     DOCKER="--docker"
+    shift
+    ;;
+    --sudo)
+    DOCKER_CMD="sudo docker"
     shift
     ;;
     --all)
@@ -34,13 +39,13 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 if [ "$DOCKER" == "--docker" ]; then
   DOCKER_IMAGE=librepcb/clang-format:6
 
-  if [ "$(docker images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
+  if [ "$($DOCKER_CMD images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building clang-format container..."
-    docker build "$REPO_ROOT/dev/clang-format" -t librepcb/clang-format:6
+    $DOCKER_CMD build "$REPO_ROOT/dev/clang-format" -t librepcb/clang-format:6
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
-  docker run --rm -t -i --user "$(id -u):$(id -g)" \
+  $DOCKER_CMD run --rm -t -i --user "$(id -u):$(id -g)" \
     -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
     /bin/bash -c "cd /code && dev/format_code.sh $ALL"
