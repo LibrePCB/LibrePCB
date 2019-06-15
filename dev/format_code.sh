@@ -8,6 +8,7 @@ set -euo pipefail
 #   - Make sure the executables "clang-format" and "git" are available in PATH.
 #   - Run the command "./dev/format_code.sh" in the root of the repository.
 #   - To run clang-format in a docker-container, use the "--docker" parameter.
+#   - To run docker with sudo, use the "--sudo" parameter.
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, don't use it!
 
