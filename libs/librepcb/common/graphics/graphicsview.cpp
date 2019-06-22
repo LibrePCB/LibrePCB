@@ -145,9 +145,15 @@ void GraphicsView::handleMouseWheelEvent(
     horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
                                     event->delta());
   } else if (event->modifiers().testFlag(Qt::ControlModifier)) {
-    // vertical scrolling
-    verticalScrollBar()->setValue(verticalScrollBar()->value() -
-                                  event->delta());
+    if (event->orientation() == Qt::Horizontal) {
+      // horizontal scrolling
+      horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
+                                      event->delta());
+    } else {
+      // vertical scrolling
+      verticalScrollBar()->setValue(verticalScrollBar()->value() -
+                                    event->delta());
+    }
   } else {
     // Zoom to mouse
     qreal scaleFactor = qPow(sZoomStepFactor, event->delta() / qreal(120));
