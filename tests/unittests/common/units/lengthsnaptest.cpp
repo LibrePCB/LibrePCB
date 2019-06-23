@@ -59,7 +59,7 @@ TEST_P(LengthSnapTest, testSnapToGrid) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(LengthSnapTest, LengthSnapTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(LengthSnapTest, LengthSnapTest, ::testing::Values(
     LengthSnapTestData({Length(0),   Length(10), Length(0)  }),
     LengthSnapTestData({Length(10),  Length(0),  Length(10) }),
     LengthSnapTestData({Length(-10), Length(0),  Length(-10)}),

@@ -73,7 +73,7 @@ TEST_P(LengthTest, testToMmString) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(LengthTest, LengthTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(LengthTest, LengthTest, ::testing::Values(
     // from/to mm
     LengthTestData({true,  "0",              Length(0),           "0.0"         }),
     LengthTestData({true,  "1",              Length(1000000),     "1.0"         }),

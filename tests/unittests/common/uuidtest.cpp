@@ -229,7 +229,7 @@ TEST(UuidTest, testDeserializeOptionalFromSExpression) {
 //  - https://de.wikipedia.org/wiki/Universally_Unique_Identifier
 //
 // clang-format off
-INSTANTIATE_TEST_CASE_P(UuidTest, UuidTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(UuidTest, UuidTest, ::testing::Values(
     // DCE Version 4 (random, the only accepted UUID type for us)
     UuidTestData({true , "bdf7bea5-b88e-41b2-be85-c1604e8ddfca"  }),
     UuidTestData({true , "587539af-1c39-40ed-9bdd-2ca2e6aeb18d"  }),

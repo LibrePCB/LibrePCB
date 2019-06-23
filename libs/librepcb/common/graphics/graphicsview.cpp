@@ -242,8 +242,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         mPanningActive = false;
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
-      // no break here!
     }
+      // fall through
     case QEvent::GraphicsSceneMouseDoubleClick:
     case QEvent::GraphicsSceneContextMenu: {
       if (mEventHandlerObject) {

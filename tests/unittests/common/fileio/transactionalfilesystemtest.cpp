@@ -650,7 +650,7 @@ static TransactionalFileSystemGetSubDirsTestData sGetSubDirsTestData[] = {
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(TransactionalFileSystemGetSubDirsTest,
+INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemGetSubDirsTest,
                         TransactionalFileSystemGetSubDirsTest,
                         ::testing::ValuesIn(sGetSubDirsTestData));
 
@@ -706,7 +706,7 @@ static TransactionalFileSystemGetFilesInDirTestData sGetFilesInDirTestData[] = {
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(TransactionalFileSystemGetFilesInDirTest,
+INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemGetFilesInDirTest,
                         TransactionalFileSystemGetFilesInDirTest,
                         ::testing::ValuesIn(sGetFilesInDirTestData));
 
@@ -770,7 +770,7 @@ static TransactionalFileSystemFileExistsTestData sFileExistsTestData[] = {
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(TransactionalFileSystemFileExistsTest,
+INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemFileExistsTest,
                         TransactionalFileSystemFileExistsTest,
                         ::testing::ValuesIn(sFileExistsTestData));
 
@@ -807,7 +807,7 @@ static TransactionalFileSystemCleanPathTestData sCleanPathTestData[] = {
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(TransactionalFileSystemCleanPathTest,
+INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemCleanPathTest,
                         TransactionalFileSystemCleanPathTest,
                         ::testing::ValuesIn(sCleanPathTestData));
 

@@ -70,7 +70,7 @@ TEST_P(AttributeSubstitutorTest, testData) {
 using ASTD = AttributeSubstitutorTestData;
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(AttributeSubstitutorTest, AttributeSubstitutorTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(AttributeSubstitutorTest, AttributeSubstitutorTest, ::testing::Values(
     ASTD({"",                                   ""}),
     ASTD({"Hello { World! }} {{",               "Hello { World! }} {{"}),
     ASTD({"{{NONEXISTENT}}",                    ""}),
