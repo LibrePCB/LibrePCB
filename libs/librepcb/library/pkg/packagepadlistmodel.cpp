@@ -88,6 +88,10 @@ void PackagePadListModel::addPad(const QVariant& editData) noexcept {
   try {
     QScopedPointer<UndoCommandGroup> cmd(
         new UndoCommandGroup(tr("Add package pad(s)")));
+    // if no name is set we search for the next free numerical pad name
+    if (mNewName.isEmpty()) {
+      mNewName = getNextPadNameProposal();
+    }
     foreach (const QString& name, Toolbox::expandRangesInString(mNewName)) {
       std::shared_ptr<PackagePad> pad = std::make_shared<PackagePad>(
           Uuid::createRandom(), validateNameOrThrow(name));
@@ -305,6 +309,14 @@ CircuitIdentifier PackagePadListModel::validateNameOrThrow(
         QString(tr("There is already a pad with the name \"%1\".")).arg(name));
   }
   return CircuitIdentifier(name);  // can throw
+}
+
+QString PackagePadListModel::getNextPadNameProposal() const noexcept {
+  int i = 1;
+  while (mPadList->contains(QString::number(i))) {
+    ++i;
+  }
+  return QString::number(i);
 }
 
 /*******************************************************************************
