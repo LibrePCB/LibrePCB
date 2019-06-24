@@ -83,6 +83,7 @@ private:
                                   PackagePadList::Event                    event) noexcept;
   void              execCmd(UndoCommand* cmd);
   CircuitIdentifier validateNameOrThrow(const QString& name) const;
+  QString           getNextPadNameProposal() const noexcept;
 
 private:  // Data
   PackagePadList* mPadList;
