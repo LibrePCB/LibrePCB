@@ -73,6 +73,7 @@ SOURCES += \
     common/network/filedownloadtest.cpp \
     common/network/networkrequesttest.cpp \
     common/scopeguardtest.cpp \
+    common/signalslottest.cpp \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
     common/toolboxtest.cpp \

@@ -89,6 +89,13 @@ public:
   }
 
   /**
+   * @brief Get the count of registered slots
+   *
+   * @return Count of registered slots
+   */
+  int getSlotCount() const noexcept { return mSlots.count(); }
+
+  /**
    * @brief Attach a slot
    *
    * @param slot  Reference to the slot to attach
@@ -175,7 +182,8 @@ public:
    *
    * @warning The function must never throw an exception!!!
    */
-  explicit Slot(std::function<void(const Tsender&, Args...)>& callback) noexcept
+  explicit Slot(
+      const std::function<void(const Tsender&, Args...)>& callback) noexcept
     : mCallback(callback) {}
 
   /**
@@ -198,6 +206,13 @@ public:
    * Automatically disconnects from all signals.
    */
   ~Slot() noexcept { detachAll(); }
+
+  /**
+   * @brief Get the count of registered signals
+   *
+   * @return Count of registered signals
+   */
+  int getSignalCount() const noexcept { return mSignals.count(); }
 
   /**
    * @brief Detach from all signals
