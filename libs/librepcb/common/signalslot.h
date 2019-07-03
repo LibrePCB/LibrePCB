@@ -23,9 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <QtCore>
+
 #include <functional>
-#include <set>
-#include <vector>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -84,9 +84,16 @@ public:
    */
   ~Signal() noexcept {
     for (auto slot : mSlots) {
-      slot->mSignals.erase(this);
+      slot->mSignals.remove(this);
     }
   }
+
+  /**
+   * @brief Get the count of registered slots
+   *
+   * @return Count of registered slots
+   */
+  int getSlotCount() const noexcept { return mSlots.count(); }
 
   /**
    * @brief Attach a slot
@@ -104,8 +111,8 @@ public:
    * @param slot  Reference to the slot to detach
    */
   void detach(Slot<Tsender, Args...>& slot) const noexcept {
-    slot.mSignals.erase(this);
-    mSlots.erase(&slot);
+    slot.mSignals.remove(this);
+    mSlots.remove(&slot);
   }
 
   /**
@@ -114,8 +121,18 @@ public:
    * @param args  Arguments passed to the slots
    */
   void notify(Args... args) noexcept {
-    for (auto slot : mSlots) {
-      slot->mCallback(mSender, args...);
+    // Note: A "foreach" loop with a Qt container first creates an implicitly
+    // shared copy of the container (see
+    // https://doc.qt.io/qt-5/containers.html#foreach). This is very important
+    // since the callback might modify the container while iterating over it!
+    // With std containers this would be much more complicated (or less
+    // efficient).
+    foreach (const auto& slot, mSlots) {
+      // Check existence of the slot again because we must not call it if it
+      // was detached (i.e. removed from the container) in the meantime.
+      if (mSlots.contains(slot)) {
+        slot->mCallback(mSender, args...);
+      }
     }
   }
 
@@ -124,7 +141,7 @@ public:
 
 private:
   const Tsender& mSender;  ///< Reference to the sender object
-  mutable std::set<Slot<Tsender, Args...>*> mSlots;  ///< All attached slots
+  mutable QSet<Slot<Tsender, Args...>*> mSlots;  ///< All attached slots
 };
 
 /*******************************************************************************
@@ -165,7 +182,8 @@ public:
    *
    * @warning The function must never throw an exception!!!
    */
-  explicit Slot(std::function<void(const Tsender&, Args...)>& callback) noexcept
+  explicit Slot(
+      const std::function<void(const Tsender&, Args...)>& callback) noexcept
     : mCallback(callback) {}
 
   /**
@@ -190,11 +208,18 @@ public:
   ~Slot() noexcept { detachAll(); }
 
   /**
+   * @brief Get the count of registered signals
+   *
+   * @return Count of registered signals
+   */
+  int getSignalCount() const noexcept { return mSignals.count(); }
+
+  /**
    * @brief Detach from all signals
    */
   void detachAll() noexcept {
     for (auto signal : mSignals) {
-      signal->mSlots.erase(this);
+      signal->mSlots.remove(this);
     }
     mSignals.clear();
   }
@@ -204,7 +229,7 @@ public:
 
 private:
   /// All signals this slot is attached to
-  std::set<const Signal<Tsender, Args...>*> mSignals;
+  QSet<const Signal<Tsender, Args...>*> mSignals;
 
   /// The registered callback function
   std::function<void(const Tsender&, Args...)> mCallback;
