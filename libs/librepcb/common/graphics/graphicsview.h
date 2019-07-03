@@ -53,6 +53,7 @@ public:
       QWidget*                     parent       = nullptr,
       IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
   ~GraphicsView() noexcept;
+  bool event(QEvent* event);
 
   // Getters
   GraphicsScene*        getScene() const noexcept { return mScene; }

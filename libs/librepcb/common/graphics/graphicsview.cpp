@@ -29,6 +29,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
+#include <QtDebug>
 
 /*******************************************************************************
  *  Namespace
@@ -140,6 +141,7 @@ Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
 
 void GraphicsView::handleMouseWheelEvent(
     QGraphicsSceneWheelEvent* event) noexcept {
+  /*
   if (event->modifiers().testFlag(Qt::ShiftModifier)) {
     // horizontal scrolling
     horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
@@ -160,6 +162,7 @@ void GraphicsView::handleMouseWheelEvent(
     scale(scaleFactor, scaleFactor);
   }
   event->setAccepted(true);
+  */
 }
 
 /*******************************************************************************
@@ -202,6 +205,36 @@ void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept {
 /*******************************************************************************
  *  Inherited from QGraphicsView
  ******************************************************************************/
+
+bool GraphicsView::event(QEvent* event) {
+    if (event->type() == QEvent::NativeGesture) {
+        QNativeGestureEvent* gesture = dynamic_cast<QNativeGestureEvent*>(event);
+        switch (gesture->gestureType()) {
+          case Qt::BeginNativeGesture: {
+            qInfo() << "Gesture began";
+            return true;
+          }
+          case Qt::EndNativeGesture: {
+            qInfo() << "Gesture ended";
+            return true;
+          }
+          case Qt::ZoomNativeGesture: {
+            qInfo() << "Zoom gesture active";
+            QTransform transform;
+            transform.scale(1+gesture->value(), 1+gesture->value());
+            setTransform(transform, true);
+            qInfo() << transform;
+            return true;
+          }
+          default: {
+            qInfo() << "Some other gesture";
+            return false;
+          }
+        }
+    }
+
+    return false;
+}
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
   switch (event->type()) {
