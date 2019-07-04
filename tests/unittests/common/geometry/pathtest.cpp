@@ -138,7 +138,7 @@ static PathObroundWidthHeightTestData sObroundWidthHeightTestData[] = {
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(PathObroundWidthHeightTest, PathObroundWidthHeightTest,
+INSTANTIATE_TEST_SUITE_P(PathObroundWidthHeightTest, PathObroundWidthHeightTest,
                         ::testing::ValuesIn(sObroundWidthHeightTestData));
 
 /*******************************************************************************
@@ -223,7 +223,7 @@ static PathObroundP1P2WidthTestData sObroundP1P2WidthTestData[] = {
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(PathObroundP1P2WidthTest, PathObroundP1P2WidthTest,
+INSTANTIATE_TEST_SUITE_P(PathObroundP1P2WidthTest, PathObroundP1P2WidthTest,
                         ::testing::ValuesIn(sObroundP1P2WidthTestData));
 
 /*******************************************************************************

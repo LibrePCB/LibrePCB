@@ -76,7 +76,7 @@ static ToolboxIncrementNumberInStringTestData
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ToolboxIncrementNumberInStringTest, ToolboxIncrementNumberInStringTest,
     ::testing::ValuesIn(sToolboxIncrementNumberInStringTestData));
 
@@ -124,7 +124,7 @@ static ToolboxExpandRangesInStringTestData
 };
 // clang-format on
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ToolboxExpandRangesInStringTest, ToolboxExpandRangesInStringTest,
     ::testing::ValuesIn(sToolboxExpandRangesInStringTestData));
 
