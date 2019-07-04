@@ -29,7 +29,6 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QtDebug>
 
 /*******************************************************************************
  *  Namespace
@@ -278,7 +277,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
       // no break here!
     }
-    [[clang::fallthrough]]; case QEvent::GraphicsSceneMouseDoubleClick:
+    case QEvent::GraphicsSceneMouseDoubleClick:
     case QEvent::GraphicsSceneContextMenu: {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
