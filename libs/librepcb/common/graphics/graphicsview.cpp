@@ -140,13 +140,12 @@ Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
 }
 
 void GraphicsView::handleMouseWheelEvent(
-    QGraphicsSceneWheelEvent* event) noexcept {
-  /*
-  if (event->modifiers().testFlag(Qt::ShiftModifier)) {
+    QWheelEvent* event) noexcept {
+  if (event->buttons() & Qt::ShiftModifier) {
     // horizontal scrolling
     horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
                                     event->delta());
-  } else if (event->modifiers().testFlag(Qt::ControlModifier)) {
+  } else if (event->buttons() & Qt::ControlModifier) {
     if (event->orientation() == Qt::Horizontal) {
       // horizontal scrolling
       horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
@@ -162,7 +161,6 @@ void GraphicsView::handleMouseWheelEvent(
     scale(scaleFactor, scaleFactor);
   }
   event->setAccepted(true);
-  */
 }
 
 /*******************************************************************************
@@ -210,30 +208,33 @@ bool GraphicsView::event(QEvent* event) {
     if (event->type() == QEvent::NativeGesture) {
         QNativeGestureEvent* gesture = dynamic_cast<QNativeGestureEvent*>(event);
         switch (gesture->gestureType()) {
-          case Qt::BeginNativeGesture: {
-            qInfo() << "Gesture began";
-            return true;
-          }
+          case Qt::BeginNativeGesture:
           case Qt::EndNativeGesture: {
-            qInfo() << "Gesture ended";
             return true;
           }
           case Qt::ZoomNativeGesture: {
-            qInfo() << "Zoom gesture active";
             QTransform transform;
             transform.scale(1+gesture->value(), 1+gesture->value());
             setTransform(transform, true);
-            qInfo() << transform;
             return true;
           }
           default: {
-            qInfo() << "Some other gesture";
+            // Only process zoom gestures
             return false;
           }
         }
     }
 
     return false;
+}
+
+// This function receives the wheel events for the viewport widget.
+void GraphicsView::wheelEvent(QWheelEvent* event) {
+  if (event->source() == Qt::MouseEventSynthesizedBySystem) {
+    QGraphicsView::wheelEvent(event);
+  } else {
+    handleMouseWheelEvent(event);
+  }
 }
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
@@ -277,7 +278,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
       // no break here!
     }
-    case QEvent::GraphicsSceneMouseDoubleClick:
+    [[clang::fallthrough]]; case QEvent::GraphicsSceneMouseDoubleClick:
     case QEvent::GraphicsSceneContextMenu: {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
@@ -286,14 +287,11 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
     }
     case QEvent::GraphicsSceneWheel: {
       if (!underMouse()) break;
+
       if (mEventHandlerObject) {
-        if (!mEventHandlerObject->graphicsViewEventHandler(event)) {
-          handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
-        }
-      } else {
-        handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
+        mEventHandlerObject->graphicsViewEventHandler(event);
       }
-      return true;
+      break;
     }
     default:
       break;

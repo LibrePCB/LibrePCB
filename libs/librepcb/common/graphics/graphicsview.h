@@ -53,7 +53,6 @@ public:
       QWidget*                     parent       = nullptr,
       IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
   ~GraphicsView() noexcept;
-  bool event(QEvent* event);
 
   // Getters
   GraphicsScene*        getScene() const noexcept { return mScene; }
@@ -75,7 +74,7 @@ public:
   // General Methods
   Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
                                bool mapToGrid) const noexcept;
-  void  handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
+  void  handleMouseWheelEvent(QWheelEvent* event) noexcept;
 
 public slots:
 
@@ -103,6 +102,8 @@ private:
   GraphicsView& operator=(const GraphicsView& rhs) = delete;
 
   // Inherited Methods
+  bool event(QEvent* event);
+  void wheelEvent(QWheelEvent* event);
   bool eventFilter(QObject* obj, QEvent* event);
   void drawBackground(QPainter* painter, const QRectF& rect);
   void drawForeground(QPainter* painter, const QRectF& rect);
