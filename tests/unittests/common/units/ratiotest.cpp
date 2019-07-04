@@ -189,7 +189,7 @@ TEST(RatioTest, testOperatorBool) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(RatioTest, RatioTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(RatioTest, RatioTest, ::testing::Values(
     //              {            ratio,        ppm,     percent,  normalized,        string}
     RatioTestData_t({Ratio(         0),          0,         0.0,         0.0,    "0.0"     }),
     RatioTestData_t({Ratio(    500000),     500000,        50.0,         0.5,    "0.5"     }),

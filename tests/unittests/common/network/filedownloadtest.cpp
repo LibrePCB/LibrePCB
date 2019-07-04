@@ -183,7 +183,7 @@ TEST_P(FileDownloadTest, testDownload) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
     FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip"),
                           QString("first_pcb_downloaded.zip"),
                           QString("first_pcb_extracted"),

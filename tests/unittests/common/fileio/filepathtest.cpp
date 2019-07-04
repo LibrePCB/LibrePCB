@@ -172,7 +172,7 @@ TEST(FilePathTest, testCleanFileName) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(FilePathTest, FilePathTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(FilePathTest, FilePathTest, ::testing::Values(
 
     // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      , "isRoot" }
 #ifdef Q_OS_WIN

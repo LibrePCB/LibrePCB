@@ -18,6 +18,10 @@ jobs:
         IMAGE: librepcb/librepcb-dev:ubuntu-18.04-1
         CC: clang
         CXX: clang++
+      Ubuntu_1904_GCC9:
+        IMAGE: librepcb/librepcb-dev:ubuntu-19.04-1
+        CC: gcc-9
+        CXX: g++-9
   container: $[ variables['IMAGE'] ]
   steps:
   - checkout: self

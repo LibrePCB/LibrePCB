@@ -150,7 +150,7 @@ TEST_P(NetworkRequestTest, testDownload) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(NetworkRequestTest, NetworkRequestTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(NetworkRequestTest, NetworkRequestTest, ::testing::Values(
     NetworkRequestTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/NetworkRequestTest/libraries"),
                             QByteArray("application/json"),
                             QByteArray("{"),
