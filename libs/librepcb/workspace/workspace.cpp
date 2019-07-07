@@ -40,6 +40,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -185,7 +187,7 @@ QList<Version> Workspace::getFileFormatVersionsOfWorkspace(
         }
       }
     }
-    qSort(list);
+    std::sort(list.begin(), list.end());
   }
   return list;
 }

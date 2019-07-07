@@ -30,6 +30,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -388,11 +390,11 @@ void ComponentPinSignalMapModel::updateSignalComboBoxItems() noexcept {
   collator.setCaseSensitivity(Qt::CaseInsensitive);
   collator.setIgnorePunctuation(false);
   collator.setNumericMode(true);
-  qSort(mSignalComboBoxItems.begin(), mSignalComboBoxItems.end(),
-        [&collator](const QPair<QString, QVariant>& lhs,
-                    const QPair<QString, QVariant>& rhs) {
-          return collator(lhs.first, rhs.first);
-        });
+  std::sort(mSignalComboBoxItems.begin(), mSignalComboBoxItems.end(),
+            [&collator](const QPair<QString, QVariant>& lhs,
+                        const QPair<QString, QVariant>& rhs) {
+              return collator(lhs.first, rhs.first);
+            });
   mSignalComboBoxItems.insert(
       0, qMakePair(QString("(%1)").arg(tr("unconnected")), QVariant()));
 }

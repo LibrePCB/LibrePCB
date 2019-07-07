@@ -24,6 +24,8 @@
 
 #include "../symbolpin.h"
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -57,7 +59,7 @@ QString MsgOverlappingSymbolPins::buildMessage(
   foreach (const auto& pin, pins) {
     pinNames.append("'" % pin->getName() % "'");
   }
-  qSort(pinNames);
+  std::sort(pinNames.begin(), pinNames.end());
   return QString(tr("Overlapping pins: %1")).arg(pinNames.join(", "));
 }
 

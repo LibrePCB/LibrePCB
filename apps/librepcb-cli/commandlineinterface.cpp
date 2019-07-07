@@ -37,6 +37,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -292,7 +294,8 @@ bool CommandLineInterface::openProject(
       print("  " % QString(tr("Approved messages: %1")).arg(approvedMsgCount));
       print("  " %
             QString(tr("Non-approved messages: %1")).arg(messages.count()));
-      qSort(messages);  // increases readability of console output
+      // sort messages to increases readability of console output
+      std::sort(messages.begin(), messages.end());
       foreach (const QString& msg, messages) { printErr(msg); }
       if (messages.count() > 0) {
         success = false;
