@@ -25,6 +25,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -63,10 +65,10 @@ WSI_LibraryLocaleOrder::WSI_LibraryLocaleOrder(const SExpression& node)
   mComboBox.reset(new QComboBox());
   QList<QLocale> allLocales = QLocale::matchingLocales(
       QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
-  qSort(allLocales.begin(), allLocales.end(),
-        [](const QLocale& l1, const QLocale& l2) {
-          return l1.name() < l2.name();
-        });
+  std::sort(allLocales.begin(), allLocales.end(),
+            [](const QLocale& l1, const QLocale& l2) {
+              return l1.name() < l2.name();
+            });
   foreach (const QLocale& locale, allLocales) {
     QString str = QString("[%1] %2 (%3)")
                       .arg(locale.name(), locale.nativeLanguageName(),

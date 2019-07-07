@@ -29,6 +29,7 @@
 
 #include <QtCore>
 
+#include <algorithm>
 #include <memory>
 
 /*******************************************************************************
@@ -352,19 +353,21 @@ public:
   SerializableObjectList<T, P, OnEditedArgs...> sortedByUuid() const noexcept {
     SerializableObjectList<T, P, OnEditedArgs...> copiedList;
     copiedList.mObjects = mObjects;  // copy only the pointers, not the objects!
-    qSort(copiedList.mObjects.begin(), copiedList.mObjects.end(),
-          [](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2) {
-            return ptr1->getUuid() < ptr2->getUuid();
-          });
+    std::sort(
+        copiedList.mObjects.begin(), copiedList.mObjects.end(),
+        [](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2) {
+          return ptr1->getUuid() < ptr2->getUuid();
+        });
     return copiedList;
   }
   SerializableObjectList<T, P, OnEditedArgs...> sortedByName() const noexcept {
     SerializableObjectList<T, P, OnEditedArgs...> copiedList;
     copiedList.mObjects = mObjects;  // copy only the pointers, not the objects!
-    qSort(copiedList.mObjects.begin(), copiedList.mObjects.end(),
-          [](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2) {
-            return ptr1->getName() < ptr2->getName();
-          });
+    std::sort(
+        copiedList.mObjects.begin(), copiedList.mObjects.end(),
+        [](const std::shared_ptr<T>& ptr1, const std::shared_ptr<T>& ptr2) {
+          return ptr1->getName() < ptr2->getName();
+        });
     return copiedList;
   }
 

@@ -30,6 +30,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -55,11 +57,11 @@ AttributeListModel::AttributeListModel(QObject* parent) noexcept
   }
   QCollator collator;
   collator.setCaseSensitivity(Qt::CaseInsensitive);
-  qSort(mTypeComboBoxItems.begin(), mTypeComboBoxItems.end(),
-        [&collator](const QPair<QString, QVariant>& lhs,
-                    const QPair<QString, QVariant>& rhs) {
-          return collator(lhs.first, rhs.first);
-        });
+  std::sort(mTypeComboBoxItems.begin(), mTypeComboBoxItems.end(),
+            [&collator](const QPair<QString, QVariant>& lhs,
+                        const QPair<QString, QVariant>& rhs) {
+              return collator(lhs.first, rhs.first);
+            });
 }
 
 AttributeListModel::~AttributeListModel() noexcept {
