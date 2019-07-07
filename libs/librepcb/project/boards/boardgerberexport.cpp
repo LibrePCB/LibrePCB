@@ -462,7 +462,9 @@ void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
       path.translate(footprint.getPosition());
       gen.drawPathOutline(path,
                           calcWidthOfLayer(polygon.getLineWidth(), layer));
-      if (polygon.isFilled()) {
+      // Only fill closed paths (for consistency with the appearance in the
+      // board editor, and because Gerber expects area outlines as closed).
+      if (polygon.isFilled() && path.isClosed()) {
         gen.drawPathArea(path);
       }
     }

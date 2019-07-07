@@ -240,7 +240,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
     } else {
       painter->setPen(Qt::NoPen);
     }
-    if (polygon.isFilled())
+    if (polygon.isFilled() && polygon.getPath().isClosed())
       layer = mLayerProvider.getLayer(*polygon.getLayerName());
     else if (polygon.isGrabArea())
       layer = mLayerProvider.getLayer(GraphicsLayer::sSymbolGrabAreas);

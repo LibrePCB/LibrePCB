@@ -205,7 +205,7 @@ void SGI_Symbol::paint(QPainter*                       painter,
                            Qt::RoundCap, Qt::RoundJoin));
     else
       painter->setPen(Qt::NoPen);
-    if (polygon.isFilled())
+    if (polygon.isFilled() && polygon.getPath().isClosed())
       layer = getLayer(*polygon.getLayerName());
     else if (polygon.isGrabArea())
       layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
