@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -123,7 +125,7 @@ private:
   static QList<T*> sortedByUuid(const QList<T*>& list) noexcept {
     // sort a list of objects by their UUID to get reproducable gerber files
     QList<T*> copy = list;
-    qSort(copy.begin(), copy.end(), [](const T* o1, const T* o2) {
+    std::sort(copy.begin(), copy.end(), [](const T* o1, const T* o2) {
       return o1->getUuid() < o2->getUuid();
     });
     return copy;

@@ -25,10 +25,12 @@
  ******************************************************************************/
 #include "units/all_length_units.h"
 
+#include <type_traits>
+
 #include <QtCore>
 #include <QtWidgets>
 
-#include <type_traits>
+#include <algorithm>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -58,14 +60,14 @@ public:
   template <typename T>
   static QList<T> sortedQSet(const QSet<T>& set) noexcept {
     QList<T> list = set.toList();
-    qSort(list);
+    std::sort(list.begin(), list.end());
     return list;
   }
 
   template <typename T>
   static T sorted(const T& container) noexcept {
     T copy(container);
-    qSort(copy);
+    std::sort(copy.begin(), copy.end());
     return copy;
   }
 

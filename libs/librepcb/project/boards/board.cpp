@@ -59,6 +59,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -665,10 +667,10 @@ void Board::removePlane(BI_Plane& plane) {
 
 void Board::rebuildAllPlanes() noexcept {
   QList<BI_Plane*> planes = mPlanes;
-  qSort(planes.begin(), planes.end(),
-        [](const BI_Plane* p1, const BI_Plane* p2) {
-          return !(*p1 < *p2);
-        });  // sort by priority (highest priority first)
+  std::sort(planes.begin(), planes.end(),
+            [](const BI_Plane* p1, const BI_Plane* p2) {
+              return !(*p1 < *p2);
+            });  // sort by priority (highest priority first)
   foreach (BI_Plane* plane, planes) { plane->rebuild(); }
 }
 

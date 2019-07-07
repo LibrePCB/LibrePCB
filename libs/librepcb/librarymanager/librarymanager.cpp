@@ -35,6 +35,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -148,7 +150,7 @@ void LibraryManager::updateLibraryList() noexcept {
   }
 
   // sort all list widget items
-  qSort(widgets.begin(), widgets.end(), widgetsLessThan);
+  std::sort(widgets.begin(), widgets.end(), widgetsLessThan);
 
   // populate the list widget
   int selectedLibraryIndex = 0;

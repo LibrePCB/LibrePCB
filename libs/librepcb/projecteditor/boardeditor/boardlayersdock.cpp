@@ -146,7 +146,7 @@ void BoardLayersDock::updateListWidget() noexcept {
     item->setCheckState(layer->getVisible() ? Qt::Checked : Qt::Unchecked);
     QColor color = layer->getColor(false);
     color.setAlphaF(color.alphaF() * 0.3);
-    item->setBackgroundColor(color);
+    item->setBackground(color);
     // still add, but hide disabled layers because of the condition above:
     // "mUi->listWidget->count() == layerNames.count()"
     item->setHidden(!layer->isEnabled());

@@ -371,7 +371,7 @@ void AddLibraryWidget::repositoryLibraryListReceived(
 void AddLibraryWidget::errorWhileFetchingLibraryList(
     const QString& errorMsg) noexcept {
   QListWidgetItem* item = new QListWidgetItem(errorMsg, mUi->lstRepoLibs);
-  item->setBackgroundColor(Qt::red);
+  item->setBackground(Qt::red);
   item->setForeground(Qt::white);
 }
 

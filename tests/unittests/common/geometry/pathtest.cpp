@@ -139,7 +139,7 @@ static PathObroundWidthHeightTestData sObroundWidthHeightTestData[] = {
 // clang-format on
 
 INSTANTIATE_TEST_SUITE_P(PathObroundWidthHeightTest, PathObroundWidthHeightTest,
-                        ::testing::ValuesIn(sObroundWidthHeightTestData));
+                         ::testing::ValuesIn(sObroundWidthHeightTestData));
 
 /*******************************************************************************
  *  Parametrized obround(p1, p2, width) Tests
@@ -224,7 +224,7 @@ static PathObroundP1P2WidthTestData sObroundP1P2WidthTestData[] = {
 // clang-format on
 
 INSTANTIATE_TEST_SUITE_P(PathObroundP1P2WidthTest, PathObroundP1P2WidthTest,
-                        ::testing::ValuesIn(sObroundP1P2WidthTestData));
+                         ::testing::ValuesIn(sObroundP1P2WidthTestData));
 
 /*******************************************************************************
  *  End of File

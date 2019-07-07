@@ -651,8 +651,8 @@ static TransactionalFileSystemGetSubDirsTestData sGetSubDirsTestData[] = {
 // clang-format on
 
 INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemGetSubDirsTest,
-                        TransactionalFileSystemGetSubDirsTest,
-                        ::testing::ValuesIn(sGetSubDirsTestData));
+                         TransactionalFileSystemGetSubDirsTest,
+                         ::testing::ValuesIn(sGetSubDirsTestData));
 
 /*******************************************************************************
  *  Parametrized getFilesInDir() Tests
@@ -707,8 +707,8 @@ static TransactionalFileSystemGetFilesInDirTestData sGetFilesInDirTestData[] = {
 // clang-format on
 
 INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemGetFilesInDirTest,
-                        TransactionalFileSystemGetFilesInDirTest,
-                        ::testing::ValuesIn(sGetFilesInDirTestData));
+                         TransactionalFileSystemGetFilesInDirTest,
+                         ::testing::ValuesIn(sGetFilesInDirTestData));
 
 /*******************************************************************************
  *  Parametrized fileExists() and read() Tests
@@ -771,8 +771,8 @@ static TransactionalFileSystemFileExistsTestData sFileExistsTestData[] = {
 // clang-format on
 
 INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemFileExistsTest,
-                        TransactionalFileSystemFileExistsTest,
-                        ::testing::ValuesIn(sFileExistsTestData));
+                         TransactionalFileSystemFileExistsTest,
+                         ::testing::ValuesIn(sFileExistsTestData));
 
 /*******************************************************************************
  *  Parametrized cleanPath() Tests
@@ -808,8 +808,8 @@ static TransactionalFileSystemCleanPathTestData sCleanPathTestData[] = {
 // clang-format on
 
 INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemCleanPathTest,
-                        TransactionalFileSystemCleanPathTest,
-                        ::testing::ValuesIn(sCleanPathTestData));
+                         TransactionalFileSystemCleanPathTest,
+                         ::testing::ValuesIn(sCleanPathTestData));
 
 /*******************************************************************************
  *  End of File
