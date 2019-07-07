@@ -45,9 +45,10 @@ def sort_qmake_file(project_root, filepath):
         else:
             if not line.strip():
                 block_end_index = line_index
-                block_lines = sorted(old_lines[block_start_index:block_end_index])
+                block_lines = old_lines[block_start_index:block_end_index]
+                block_lines = sorted([l.strip() for l in block_lines])
                 for i, l in enumerate(block_lines):
-                    adjusted_line = l.replace("\\", "").rstrip() + " \\\n"
+                    adjusted_line = "    " + l.replace("\\", "").strip() + " \\\n"
                     new_lines[block_start_index+i] = adjusted_line
                 block_start_index = None
     relative_path = os.path.relpath(filepath, project_root)
