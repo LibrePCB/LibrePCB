@@ -212,9 +212,7 @@ bool GraphicsView::event(QEvent* event) {
             return true;
           }
           case Qt::ZoomNativeGesture: {
-            QTransform transform;
-            transform.scale(1+gesture->value(), 1+gesture->value());
-            setTransform(transform, true);
+            scale(1+gesture->value(), 1+gesture->value());
             return true;
           }
           default: {
