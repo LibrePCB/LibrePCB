@@ -51,6 +51,16 @@ class AlignmentTest : public ::testing::TestWithParam<AlignmentTestData> {};
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
+TEST_P(AlignmentTest, testMirror) {
+  const AlignmentTestData& data = GetParam();
+
+  if (data.valid) {
+    Alignment alignment = Alignment(data.origHAling, data.origVAling);
+    alignment.mirror();
+    EXPECT_EQ(alignment, Alignment(data.mirrHAling, data.mirrVAling));
+  }
+}
+
 TEST_P(AlignmentTest, testMirrored) {
   const AlignmentTestData& data = GetParam();
 
