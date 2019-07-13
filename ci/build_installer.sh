@@ -14,7 +14,7 @@ then
   EXECUTABLE_EXT="exe"
 fi
 TARGET="$OS-$ARCH"
-./dist/installer/update_metadata.sh "$TARGET" "0.1.1-1"  # TODO: How to determine version number?
+./dist/installer/update_metadata.sh "$TARGET" "0.1.2-1"  # TODO: How to determine version number?
 PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
 mkdir -p $PACKAGES_DIR/librepcb.stable.app/data/stable
 cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
