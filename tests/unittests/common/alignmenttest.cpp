@@ -92,6 +92,17 @@ TEST_P(AlignmentTest, testMirrored) {
   }
 }
 
+TEST_P(AlignmentTest, testMirroredH) {
+  const AlignmentTestData& data = GetParam();
+
+  if (data.valid) {
+    Alignment alignment = Alignment(data.origHAling, data.origVAling);
+    Alignment alignmentMirroredH = alignment.mirroredH();
+    EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
+    EXPECT_EQ(alignmentMirroredH, Alignment(data.mirrHAling, data.origVAling));
+  }
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/
