@@ -240,7 +240,7 @@
            <item>
             <widget class="QLabel" name="textContributeCode">
              <property name="text">
-              <string>TEXT_CONTRIBUTE_CODE</string>
+              <string notr="true">TEXT_CONTRIBUTE_CODE</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
