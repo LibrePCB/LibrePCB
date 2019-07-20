@@ -26,6 +26,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -66,10 +68,10 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(
       }
 
       // sort childs
-      qSort(mChilds.begin(), mChilds.end(),
-            [](const ChildType& a, const ChildType& b) {
-              return a->data(Qt::DisplayRole) < b->data(Qt::DisplayRole);
-            });
+      std::sort(mChilds.begin(), mChilds.end(),
+                [](const ChildType& a, const ChildType& b) {
+                  return a->data(Qt::DisplayRole) < b->data(Qt::DisplayRole);
+                });
     }
 
     if (!mParent) {

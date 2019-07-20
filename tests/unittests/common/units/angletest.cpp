@@ -73,7 +73,7 @@ TEST_P(AngleTest, testToDegString) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(AngleTest, AngleTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(AngleTest, AngleTest, ::testing::Values(
     // from/to deg
     AngleTestData({true,  "0",          Angle(0),         "0.0"       }),
     AngleTestData({true,  "90",         Angle(90000000),  "90.0"      }),

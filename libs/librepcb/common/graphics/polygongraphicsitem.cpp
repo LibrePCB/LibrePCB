@@ -76,6 +76,7 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
       break;
     case Polygon::Event::PathChanged:
       setPath(polygon.getPath().toQPainterPathPx());
+      updateFillLayer();  // path "closed" might have changed
       break;
     default:
       qWarning() << "Unhandled switch-case in "
@@ -85,7 +86,8 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
 }
 
 void PolygonGraphicsItem::updateFillLayer() noexcept {
-  if (mPolygon.isFilled()) {
+  // Don't fill if path is not closed (for consistency with Gerber export)!
+  if (mPolygon.isFilled() && mPolygon.getPath().isClosed()) {
     setFillLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
   } else if (mPolygon.isGrabArea()) {
     setFillLayer(mLayerProvider.getGrabAreaLayer(*mPolygon.getLayerName()));

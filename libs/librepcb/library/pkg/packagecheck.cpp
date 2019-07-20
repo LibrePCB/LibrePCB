@@ -137,7 +137,7 @@ void PackageCheck::checkPadsOverlapWithPlacement(MsgList& msgs) const {
         pen.setWidthF(polygon.getLineWidth()->toPx());
       }
       QBrush brush(Qt::NoBrush);
-      if (polygon.isFilled()) {
+      if (polygon.isFilled() && polygon.getPath().isClosed()) {
         brush.setStyle(Qt::SolidPattern);
       }
       QPainterPath area = Toolbox::shapeFromPath(

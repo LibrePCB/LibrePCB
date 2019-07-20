@@ -74,7 +74,7 @@ TEST_P(PointTest, testRotate) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(PointTest, PointTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(PointTest, PointTest, ::testing::Values(
     //              {pA,                     pB,                     pCenter,                aRot}
     PointTestData_t({Point::fromMm(0, 0),    Point::fromMm(0, 0),    Point::fromMm(0, 0),    Angle::fromDeg(90)}),
     PointTestData_t({Point::fromMm(10, 0),   Point::fromMm(0, 10),   Point::fromMm(0, 0),    Angle::fromDeg(90)}),

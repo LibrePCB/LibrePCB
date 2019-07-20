@@ -147,7 +147,7 @@ void BGI_Footprint::paint(QPainter*                       painter,
       painter->setPen(Qt::NoPen);
 
     // set brush
-    if (!polygon.isFilled()) {
+    if ((!polygon.isFilled()) || (!polygon.getPath().isClosed())) {
       if (polygon.isGrabArea())
         layer = getLayer(GraphicsLayer::sTopGrabAreas);
       else
