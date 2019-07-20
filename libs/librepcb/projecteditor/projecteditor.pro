@@ -16,6 +16,7 @@ CONFIG += staticlib
 
 INCLUDEPATH += \
     ../../ \
+    ../../pns_router/include \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
 

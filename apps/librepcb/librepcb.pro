@@ -44,6 +44,7 @@ LIBS += \
     -llibrepcbproject \
     -llibrepcblibrary \
     -llibrepcbcommon \
+    -lpnsrouter \
     -lsexpresso \
     -lclipper \
     -lquazip -lz
