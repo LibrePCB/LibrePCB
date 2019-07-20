@@ -90,6 +90,7 @@ void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
       setViewport(nullptr);
     mUseOpenGl = useOpenGl;
   }
+  viewport()->grabGesture(Qt::PinchGesture);
 }
 
 void GraphicsView::setGridProperties(
@@ -139,12 +140,12 @@ Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
 }
 
 void GraphicsView::handleMouseWheelEvent(
-    QWheelEvent* event) noexcept {
-  if (event->buttons() & Qt::ShiftModifier) {
+    QGraphicsSceneWheelEvent* event) noexcept {
+  if (event->modifiers().testFlag(Qt::ShiftModifier)) {
     // horizontal scrolling
     horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
                                     event->delta());
-  } else if (event->buttons() & Qt::ControlModifier) {
+  } else if (event->modifiers().testFlag(Qt::ControlModifier)) {
     if (event->orientation() == Qt::Horizontal) {
       // horizontal scrolling
       horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
@@ -203,39 +204,30 @@ void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept {
  *  Inherited from QGraphicsView
  ******************************************************************************/
 
-bool GraphicsView::event(QEvent* event) {
-    if (event->type() == QEvent::NativeGesture) {
-        QNativeGestureEvent* gesture = dynamic_cast<QNativeGestureEvent*>(event);
-        switch (gesture->gestureType()) {
-          case Qt::BeginNativeGesture:
-          case Qt::EndNativeGesture: {
-            return true;
-          }
-          case Qt::ZoomNativeGesture: {
-            scale(1+gesture->value(), 1+gesture->value());
-            return true;
-          }
-          default: {
-            // Only process zoom gestures
-            return false;
-          }
-        }
-    }
-
-    return false;
-}
-
-// This function receives the wheel events for the viewport widget.
+// In Qt<5.5, do not specially handle trackpad events.
+// It is not possible to process the wheel event in the `eventFilter` because
+// `QGraphicsSceneWheelEvent` does not track the source of the wheel event.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 void GraphicsView::wheelEvent(QWheelEvent* event) {
   if (event->source() == Qt::MouseEventSynthesizedBySystem) {
-    QGraphicsView::wheelEvent(event);
+    QAbstractScrollArea::wheelEvent(event);
   } else {
-    handleMouseWheelEvent(event);
+    QGraphicsView::wheelEvent(event);
   }
 }
+#endif
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
   switch (event->type()) {
+    case QEvent::Gesture: {
+      QGestureEvent* ge = dynamic_cast<QGestureEvent*>(event);
+      QPinchGesture* pinch_g = dynamic_cast<QPinchGesture*>(ge->gesture(Qt::PinchGesture));
+      if (pinch_g) {
+        scale(pinch_g->scaleFactor(), pinch_g->scaleFactor());
+        return true;
+      }
+      break;
+    }
     case QEvent::GraphicsSceneMousePress: {
       QGraphicsSceneMouseEvent* e =
           dynamic_cast<QGraphicsSceneMouseEvent*>(event);
@@ -273,8 +265,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         mPanningActive = false;
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
-      // no break here!
     }
+      // fall through
     case QEvent::GraphicsSceneMouseDoubleClick:
     case QEvent::GraphicsSceneContextMenu: {
       if (mEventHandlerObject) {
@@ -284,11 +276,14 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
     }
     case QEvent::GraphicsSceneWheel: {
       if (!underMouse()) break;
-
       if (mEventHandlerObject) {
-        mEventHandlerObject->graphicsViewEventHandler(event);
+        if (!mEventHandlerObject->graphicsViewEventHandler(event)) {
+          handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
+        }
+      } else {
+        handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
       }
-      break;
+      return true;
     }
     default:
       break;

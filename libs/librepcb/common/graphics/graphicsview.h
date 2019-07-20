@@ -74,7 +74,7 @@ public:
   // General Methods
   Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
                                bool mapToGrid) const noexcept;
-  void  handleMouseWheelEvent(QWheelEvent* event) noexcept;
+  void  handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
 public slots:
 
@@ -102,7 +102,6 @@ private:
   GraphicsView& operator=(const GraphicsView& rhs) = delete;
 
   // Inherited Methods
-  bool event(QEvent* event);
   void wheelEvent(QWheelEvent* event);
   bool eventFilter(QObject* obj, QEvent* event);
   void drawBackground(QPainter* painter, const QRectF& rect);
