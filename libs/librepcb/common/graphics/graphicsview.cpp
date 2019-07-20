@@ -215,6 +215,10 @@ void GraphicsView::wheelEvent(QWheelEvent* event) {
     QGraphicsView::wheelEvent(event);
   }
 }
+#else
+void GraphicsView::wheelEvent(QWheelEvent* event) {
+  QGraphicsView::wheelEvent(event);
+}
 #endif
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
