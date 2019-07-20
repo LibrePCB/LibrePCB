@@ -39,6 +39,7 @@ SOURCES += \
     boardeditor/fsm/bes_fsm.cpp \
     boardeditor/fsm/bes_select.cpp \
     boardeditor/fsm/boardeditorevent.cpp \
+    boardeditor/pns_router/pns_librepcb_iface.cpp \
     boardeditor/unplacedcomponentsdock.cpp \
     cmd/cmdaddcomponenttocircuit.cpp \
     cmd/cmdadddevicetoboard.cpp \
@@ -100,6 +101,7 @@ HEADERS += \
     boardeditor/fsm/bes_fsm.h \
     boardeditor/fsm/bes_select.h \
     boardeditor/fsm/boardeditorevent.h \
+    boardeditor/pns_router/pns_librepcb_iface.h \
     boardeditor/unplacedcomponentsdock.h \
     cmd/cmdaddcomponenttocircuit.h \
     cmd/cmdadddevicetoboard.h \
