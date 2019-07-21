@@ -216,11 +216,6 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
 }
 
 SchematicEditor::~SchematicEditor() {
-  // Save Window Geometry
-  QSettings clientSettings;
-  clientSettings.setValue("schematic_editor/window_geometry", saveGeometry());
-  clientSettings.setValue("schematic_editor/window_state", saveState());
-
   delete mFsm;
   mFsm = nullptr;
   delete mErcMsgDock;
@@ -299,8 +294,14 @@ void SchematicEditor::abortAllCommands() noexcept {
 void SchematicEditor::closeEvent(QCloseEvent* event) {
   if (!mProjectEditor.windowIsAboutToClose(*this))
     event->ignore();
-  else
+  else {
+    // Save window geometry
+    QSettings clientSettings;
+    clientSettings.setValue("schematic_editor/window_geometry", saveGeometry());
+    clientSettings.setValue("schematic_editor/window_state", saveState());
+
     QMainWindow::closeEvent(event);
+  }
 }
 
 /*******************************************************************************

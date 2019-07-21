@@ -249,11 +249,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
 }
 
 BoardEditor::~BoardEditor() {
-  // Save Window Geometry
-  QSettings clientSettings;
-  clientSettings.setValue("board_editor/window_geometry", saveGeometry());
-  clientSettings.setValue("board_editor/window_state", saveState());
-
   delete mFsm;
   mFsm = nullptr;
   qDeleteAll(mBoardListActions);
@@ -330,8 +325,14 @@ void BoardEditor::abortAllCommands() noexcept {
 void BoardEditor::closeEvent(QCloseEvent* event) {
   if (!mProjectEditor.windowIsAboutToClose(*this))
     event->ignore();
-  else
+  else {
+    // Save window geometry
+    QSettings clientSettings;
+    clientSettings.setValue("board_editor/window_geometry", saveGeometry());
+    clientSettings.setValue("board_editor/window_state", saveState());
+
     QMainWindow::closeEvent(event);
+  }
 }
 
 /*******************************************************************************
