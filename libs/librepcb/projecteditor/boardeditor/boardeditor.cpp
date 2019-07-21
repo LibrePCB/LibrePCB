@@ -120,6 +120,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // setCentralWidget(mGraphicsView);
   mUi->centralwidget->layout()->addWidget(mGraphicsView);
 
+  // Add actions to toggle visibility of dock widgets
+  mUi->menuView->addSeparator();
+  mUi->menuView->addAction(mUnplacedComponentsDock->toggleViewAction());
+  mUi->menuView->addAction(mBoardLayersDock->toggleViewAction());
+  mUi->menuView->addAction(mErcMsgDock->toggleViewAction());
+
   // add all boards to the menu and connect to project signals
   for (int i = 0; i < mProject.getBoards().count(); i++) boardAdded(i);
   connect(&mProject, &Project::boardAdded, this, &BoardEditor::boardAdded);
