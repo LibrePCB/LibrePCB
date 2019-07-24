@@ -102,6 +102,7 @@ private:
   GraphicsView& operator=(const GraphicsView& rhs) = delete;
 
   // Inherited Methods
+  void wheelEvent(QWheelEvent* event);
   bool eventFilter(QObject* obj, QEvent* event);
   void drawBackground(QPainter* painter, const QRectF& rect);
   void drawForeground(QPainter* painter, const QRectF& rect);

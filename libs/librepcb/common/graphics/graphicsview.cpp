@@ -60,6 +60,8 @@ GraphicsView::GraphicsView(QWidget*                     parent,
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
           &GraphicsView::zoomAnimationValueChanged);
+
+  viewport()->grabGesture(Qt::PinchGesture);
 }
 
 GraphicsView::~GraphicsView() noexcept {
@@ -90,6 +92,7 @@ void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
       setViewport(nullptr);
     mUseOpenGl = useOpenGl;
   }
+  viewport()->grabGesture(Qt::PinchGesture);
 }
 
 void GraphicsView::setGridProperties(
@@ -203,8 +206,34 @@ void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept {
  *  Inherited from QGraphicsView
  ******************************************************************************/
 
+// In Qt<5.5, do not specially handle trackpad events.
+// It is not possible to process the wheel event in the `eventFilter` because
+// `QGraphicsSceneWheelEvent` does not track the source of the wheel event.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+void GraphicsView::wheelEvent(QWheelEvent* event) {
+  if (event->source() == Qt::MouseEventSynthesizedBySystem) {
+    QAbstractScrollArea::wheelEvent(event);
+  } else {
+    QGraphicsView::wheelEvent(event);
+  }
+}
+#else
+void GraphicsView::wheelEvent(QWheelEvent* event) {
+  QGraphicsView::wheelEvent(event);
+}
+#endif
+
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
   switch (event->type()) {
+    case QEvent::Gesture: {
+      QGestureEvent* ge = dynamic_cast<QGestureEvent*>(event);
+      QPinchGesture* pinch_g = dynamic_cast<QPinchGesture*>(ge->gesture(Qt::PinchGesture));
+      if (pinch_g) {
+        scale(pinch_g->scaleFactor(), pinch_g->scaleFactor());
+        return true;
+      }
+      break;
+    }
     case QEvent::GraphicsSceneMousePress: {
       QGraphicsSceneMouseEvent* e =
           dynamic_cast<QGraphicsSceneMouseEvent*>(event);
