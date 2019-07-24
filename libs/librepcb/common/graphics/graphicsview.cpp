@@ -60,6 +60,8 @@ GraphicsView::GraphicsView(QWidget*                     parent,
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
           &GraphicsView::zoomAnimationValueChanged);
+
+  viewport()->grabGesture(Qt::PinchGesture);
 }
 
 GraphicsView::~GraphicsView() noexcept {
