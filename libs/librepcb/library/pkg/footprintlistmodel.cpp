@@ -191,8 +191,7 @@ QVariant FootprintListModel::data(const QModelIndex& index, int role) const {
     case COLUMN_NAME: {
       QString name     = item ? *item->getNames().getDefaultValue() : mNewName;
       bool    showHint = (!item) && mNewName.isEmpty();
-      QString hint =
-          tr("Signal name (may contain ranges like \"%1\")").arg("1..5");
+      QString hint     = tr("Footprint name");
       switch (role) {
         case Qt::DisplayRole:
           return showHint ? hint : name;
