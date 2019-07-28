@@ -102,6 +102,11 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mGraphicsView->setGridProperties(*mGridProperties);
   setCentralWidget(mGraphicsView);
 
+  // Add actions to toggle visibility of dock widgets
+  mUi->menuView->addSeparator();
+  mUi->menuView->addAction(mPagesDock->toggleViewAction());
+  mUi->menuView->addAction(mErcMsgDock->toggleViewAction());
+
   // connect some actions which are created with the Qt Designer
   connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor,
           &ProjectEditor::saveProject);
