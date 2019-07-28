@@ -79,10 +79,12 @@ signals:
 
 private:
   void         installButtons(int row) noexcept;
-  QToolButton* createButton(const QIcon& icon, const QString& text,
-                            const QString& toolTip, int width, int height,
-                            const QVariant& data,
-                            Signal          clickedSignal) noexcept;
+  QToolButton* createButton(const QString& objectName, const QIcon& icon,
+                            const QString& text, const QString& toolTip,
+                            int width, int height, Signal clickedSignal,
+                            const QPersistentModelIndex& index) noexcept;
+  void         buttonClickedHandler(Signal                       clickedSignal,
+                                    const QPersistentModelIndex& index) noexcept;
 
   bool mShowCopyButton;
   bool mShowEditButton;

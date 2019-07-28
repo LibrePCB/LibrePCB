@@ -104,11 +104,10 @@ void EditableTableWidget::installButtons(int row) noexcept {
       layout->setContentsMargins(0, 0, 0, 0);
       layout->setSpacing(0);
       layout->addStretch(1);
-      int      size = rowHeight(row);
-      QVariant data = index.data(Qt::EditRole);
-      layout->addWidget(createButton(QIcon(), "...", tr("Browse"), size, size,
-                                     data,
-                                     &EditableTableWidget::btnBrowseClicked));
+      int size = rowHeight(row);
+      layout->addWidget(
+          createButton("btnBrowse", QIcon(), "...", tr("Browse"), size, size,
+                       &EditableTableWidget::btnBrowseClicked, index));
       setIndexWidget(index, widget);
     }
   }
@@ -121,56 +120,69 @@ void EditableTableWidget::installButtons(int row) noexcept {
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    int      size = rowHeight(row);
-    QVariant data = index.data(Qt::EditRole);
+    int size = rowHeight(row);
     if (row < model()->rowCount() - 1) {
       if (mShowEditButton) {
-        layout->addWidget(createButton(QIcon(":/img/actions/edit.png"), "",
-                                       tr("Edit"), size, size, data,
-                                       &EditableTableWidget::btnEditClicked));
+        layout->addWidget(createButton(
+            "btnEdit", QIcon(":/img/actions/edit.png"), "", tr("Edit"), size,
+            size, &EditableTableWidget::btnEditClicked, index));
       }
       if (mShowCopyButton) {
-        layout->addWidget(createButton(QIcon(":/img/actions/copy.png"), "",
-                                       tr("Copy"), size, size, data,
-                                       &EditableTableWidget::btnCopyClicked));
+        layout->addWidget(createButton(
+            "btnCopy", QIcon(":/img/actions/copy.png"), "", tr("Copy"), size,
+            size, &EditableTableWidget::btnCopyClicked, index));
       }
       if (mShowMoveButtons) {
-        layout->addWidget(createButton(QIcon(":/img/actions/up.png"), "",
-                                       tr("Move up"), size, size, data,
-                                       &EditableTableWidget::btnMoveUpClicked));
         layout->addWidget(createButton(
-            QIcon(":/img/actions/down.png"), "", tr("Move down"), size, size,
-            data, &EditableTableWidget::btnMoveDownClicked));
+            "btnMoveUp", QIcon(":/img/actions/up.png"), "", tr("Move up"), size,
+            size, &EditableTableWidget::btnMoveUpClicked, index));
+        layout->addWidget(createButton(
+            "btnMoveDown", QIcon(":/img/actions/down.png"), "", tr("Move down"),
+            size, size, &EditableTableWidget::btnMoveDownClicked, index));
       }
-      layout->addWidget(createButton(QIcon(":/img/actions/minus.png"), "",
-                                     tr("Remove"), size, size, data,
-                                     &EditableTableWidget::btnRemoveClicked));
+      layout->addWidget(createButton(
+          "btnRemove", QIcon(":/img/actions/minus.png"), "", tr("Remove"), size,
+          size, &EditableTableWidget::btnRemoveClicked, index));
     } else {
       int width = size;
       if (mShowEditButton) width += size;
       if (mShowCopyButton) width += size;
       if (mShowMoveButtons) width += 2 * size;
-      layout->addWidget(createButton(QIcon(":/img/actions/add.png"), "",
-                                     tr("Add"), width, size, data,
-                                     &EditableTableWidget::btnAddClicked));
+      layout->addWidget(createButton(
+          "btnAdd", QIcon(":/img/actions/add.png"), "", tr("Add"), width, size,
+          &EditableTableWidget::btnAddClicked, index));
     }
     setIndexWidget(index, widget);
   }
 }
 
 QToolButton* EditableTableWidget::createButton(
-    const QIcon& icon, const QString& text, const QString& toolTip, int width,
-    int height, const QVariant& data, Signal clickedSignal) noexcept {
+    const QString& objectName, const QIcon& icon, const QString& text,
+    const QString& toolTip, int width, int height, Signal clickedSignal,
+    const QPersistentModelIndex& index) noexcept {
   QToolButton* btn = new QToolButton();
+  btn->setObjectName(objectName);
   btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   btn->setFixedSize(width, height);
   btn->setText(text);
   btn->setIcon(icon);
   btn->setIconSize(QSize(height - 4, height - 4));
   btn->setToolTip(toolTip);
-  connect(btn, &QToolButton::clicked, this,
-          [this, data, clickedSignal]() { (this->*clickedSignal)(data); });
+  connect(btn, &QToolButton::clicked, this, [this, index, clickedSignal]() {
+    buttonClickedHandler(clickedSignal, index);
+  });
   return btn;
+}
+
+void EditableTableWidget::buttonClickedHandler(
+    Signal clickedSignal, const QPersistentModelIndex& index) noexcept {
+  if (clickedSignal && index.isValid()) {
+    QVariant data = index.data(Qt::EditRole);
+    (this->*clickedSignal)(data);
+  } else {
+    qCritical() << "Invalid index received in "
+                   "EditableTableWidget::buttonClickedHandler()";
+  }
 }
 
 /*******************************************************************************
