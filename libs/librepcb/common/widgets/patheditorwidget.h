@@ -33,6 +33,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class EditableTableWidget;
+class PathModel;
+
 /*******************************************************************************
  *  Class PathEditorWidget
  ******************************************************************************/
@@ -50,27 +53,15 @@ public:
   ~PathEditorWidget() noexcept;
 
   // General Methods
-  void setPath(const Path& path) noexcept;
-  Path getPath() const;
+  void        setPath(const Path& path) noexcept;
+  const Path& getPath() const noexcept;
 
   // Operator Overloadings
   PathEditorWidget& operator=(const PathEditorWidget& rhs) = delete;
 
-private:
-  void    setRowContent(int row, const QString& x, const QString& y,
-                        const QString& angle, bool isLastRow) noexcept;
-  void    btnAddRemoveClicked() noexcept;
-  int     getRowOfTableCellWidget(const QWidget* widget) const noexcept;
-  QString cellText(int row, int column,
-                   const QString& fallback = QString()) const noexcept;
-
-signals:
-  void toggled(bool checked);
-  void clicked(bool checked);
-  void stateChanged(int state);
-
-private:                 // Data
-  QTableWidget* mTable;  // ownership by Qt's parent-child-mechanism
+private:  // Data
+  QScopedPointer<PathModel>           mModel;
+  QScopedPointer<EditableTableWidget> mView;
 };
 
 /*******************************************************************************
