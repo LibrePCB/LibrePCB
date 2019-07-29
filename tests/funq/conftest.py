@@ -95,10 +95,13 @@ class LibrePcbFixture(object):
         config_ini = os.path.join(config_dir, 'LibrePCB.ini')
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
-        with open(config_ini, 'w') as f:
-            if self.workspace_path:
-                f.write("[workspaces]\n")
-                f.write("most_recently_used=\"{}\"\n".format(self.workspace_path.replace('\\', '/')))
+        # Only create config file once per test, so tests can check if settings
+        # are stored permanently.
+        if not os.path.exists(config_ini):
+            with open(config_ini, 'w') as f:
+                if self.workspace_path:
+                    f.write("[workspaces]\n")
+                    f.write("most_recently_used=\"{}\"\n".format(self.workspace_path.replace('\\', '/')))
 
     def _args(self):
         args = []
