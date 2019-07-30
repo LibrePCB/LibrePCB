@@ -84,6 +84,20 @@ bool AttributeType::isUnitAvailable(const AttributeUnit* unit) const noexcept {
   }
 }
 
+const AttributeUnit* AttributeType::tryExtractUnitFromValue(
+    QString& value) const noexcept {
+  foreach (const AttributeUnit* unit, mAvailableUnits) {
+    foreach (const QString& suffix, unit->getUserInputSuffixes()) {
+      if (value.endsWith(suffix)) {
+        value.chop(suffix.length());
+        value = value.trimmed();
+        return unit;
+      }
+    }
+  }
+  return nullptr;
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
