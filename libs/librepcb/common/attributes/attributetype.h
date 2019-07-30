@@ -73,7 +73,6 @@ public:
   const AttributeUnit* getUnitFromString(const QString& unit) const;
   const AttributeUnit* getDefaultUnit() const noexcept { return mDefaultUnit; }
   bool            isUnitAvailable(const AttributeUnit* unit) const noexcept;
-  void            throwIfValueInvalid(const QString& value) const;
   virtual bool    isValueValid(const QString& value) const noexcept = 0;
   virtual QString valueFromTr(const QString& value) const noexcept  = 0;
   virtual QString printableValueTr(const QString&       value,

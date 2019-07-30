@@ -84,14 +84,6 @@ bool AttributeType::isUnitAvailable(const AttributeUnit* unit) const noexcept {
   }
 }
 
-void AttributeType::throwIfValueInvalid(const QString& value) const {
-  if (!isValueValid(value)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Invalid %1 value: \"%2\"")).arg(mTypeNameTr, value));
-  }
-}
-
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
