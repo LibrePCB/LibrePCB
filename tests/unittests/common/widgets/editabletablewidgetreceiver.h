@@ -17,57 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PATHEDITORWIDGET_H
-#define LIBREPCB_PATHEDITORWIDGET_H
+#ifndef EDITABLETABLEWIDGETRECEIVER_H
+#define EDITABLETABLEWIDGETRECEIVER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/path.h"
-
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class EditableTableWidget;
-class PathModel;
+namespace tests {
 
 /*******************************************************************************
- *  Class PathEditorWidget
+ *  EditableTableWidgetReceiver Class
  ******************************************************************************/
 
-/**
- * @brief The PathEditorWidget class
- */
-class PathEditorWidget final : public QWidget {
+class EditableTableWidgetReceiver : public QObject {
   Q_OBJECT
 
 public:
-  // Constructors / Destructor
-  explicit PathEditorWidget(QWidget* parent = nullptr) noexcept;
-  PathEditorWidget(const PathEditorWidget& other) = delete;
-  ~PathEditorWidget() noexcept;
+  QVariant mAddData;
+  QVariant mRemoveData;
+  QVariant mCopyData;
+  QVariant mEditData;
+  QVariant mMoveUpData;
+  QVariant mMoveDownData;
+  QVariant mBrowseData;
 
-  // General Methods
-  void        setPath(const Path& path) noexcept;
-  const Path& getPath() const noexcept;
-
-  // Operator Overloadings
-  PathEditorWidget& operator=(const PathEditorWidget& rhs) = delete;
-
-private:  // Data
-  QScopedPointer<PathModel>           mModel;
-  QScopedPointer<EditableTableWidget> mView;
+  void btnAddClicked(const QVariant& data) noexcept { mAddData = data; }
+  void btnRemoveClicked(const QVariant& data) noexcept { mRemoveData = data; }
+  void btnCopyClicked(const QVariant& data) noexcept { mCopyData = data; }
+  void btnEditClicked(const QVariant& data) noexcept { mEditData = data; }
+  void btnMoveUpClicked(const QVariant& data) noexcept { mMoveUpData = data; }
+  void btnMoveDownClicked(const QVariant& data) noexcept {
+    mMoveDownData = data;
+  }
+  void btnBrowseClicked(const QVariant& data) noexcept { mBrowseData = data; }
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PATHEDITORWIDGET_H
+#endif  // EDITABLETABLEWIDGETRECEIVER_H

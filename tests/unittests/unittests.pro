@@ -84,6 +84,7 @@ SOURCES += \
     common/units/ratiotest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
+    common/widgets/editabletablewidgettest.cpp \
     eagleimport/deviceconvertertest.cpp \
     eagleimport/devicesetconvertertest.cpp \
     eagleimport/packageconvertertest.cpp \
@@ -100,6 +101,7 @@ HEADERS += \
     common/attributes/attributeproviderdummy.h \
     common/fileio/serializableobjectmock.h \
     common/network/networkrequestbasesignalreceiver.h \
+    common/widgets/editabletablewidgetreceiver.h \
 
 FORMS += \
 

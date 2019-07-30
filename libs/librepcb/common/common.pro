@@ -77,6 +77,7 @@ SOURCES += \
     geometry/cmd/cmdtextedit.cpp \
     geometry/hole.cpp \
     geometry/path.cpp \
+    geometry/pathmodel.cpp \
     geometry/polygon.cpp \
     geometry/stroketext.cpp \
     geometry/text.cpp \
@@ -195,6 +196,7 @@ HEADERS += \
     geometry/cmd/cmdtextedit.h \
     geometry/hole.h \
     geometry/path.h \
+    geometry/pathmodel.h \
     geometry/polygon.h \
     geometry/stroketext.h \
     geometry/text.h \

@@ -17,51 +17,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PATHEDITORWIDGET_H
-#define LIBREPCB_PATHEDITORWIDGET_H
+#ifndef LIBREPCB_PATHMODEL_H
+#define LIBREPCB_PATHMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/path.h"
+#include "path.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class EditableTableWidget;
-class PathModel;
-
 /*******************************************************************************
- *  Class PathEditorWidget
+ *  Class PathModel
  ******************************************************************************/
 
 /**
- * @brief The PathEditorWidget class
+ * @brief The PathModel class implements QAbstractTableModel for librepcb::Path
  */
-class PathEditorWidget final : public QWidget {
+class PathModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-  // Constructors / Destructor
-  explicit PathEditorWidget(QWidget* parent = nullptr) noexcept;
-  PathEditorWidget(const PathEditorWidget& other) = delete;
-  ~PathEditorWidget() noexcept;
+  enum Column {
+    COLUMN_X,
+    COLUMN_Y,
+    COLUMN_ANGLE,
+    COLUMN_ACTIONS,
+    _COLUMN_COUNT
+  };
 
-  // General Methods
+  // Constructors / Destructor
+  PathModel() = delete;
+  PathModel(const PathModel& other) noexcept;
+  explicit PathModel(QObject* parent = nullptr) noexcept;
+  ~PathModel() noexcept;
+
+  // Setters
   void        setPath(const Path& path) noexcept;
-  const Path& getPath() const noexcept;
+  const Path& getPath() const noexcept { return mPath; }
+
+  // Slots
+  void addItem(const QVariant& editData) noexcept;
+  void copyItem(const QVariant& editData) noexcept;
+  void removeItem(const QVariant& editData) noexcept;
+  void moveItemUp(const QVariant& editData) noexcept;
+  void moveItemDown(const QVariant& editData) noexcept;
+
+  // Inherited from QAbstractItemModel
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  QVariant      data(const QModelIndex& index,
+                     int                role = Qt::DisplayRole) const override;
+  QVariant      headerData(int section, Qt::Orientation orientation,
+                           int role = Qt::DisplayRole) const override;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  bool          setData(const QModelIndex& index, const QVariant& value,
+                        int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  PathEditorWidget& operator=(const PathEditorWidget& rhs) = delete;
+  PathModel& operator=(const PathModel& rhs) noexcept;
 
 private:  // Data
-  QScopedPointer<PathModel>           mModel;
-  QScopedPointer<EditableTableWidget> mView;
+  Path   mPath;
+  Vertex mNewVertex;
 };
 
 /*******************************************************************************
@@ -70,4 +93,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PATHEDITORWIDGET_H
+#endif  // LIBREPCB_PATHMODEL_H
