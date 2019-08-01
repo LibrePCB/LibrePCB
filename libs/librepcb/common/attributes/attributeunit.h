@@ -42,12 +42,16 @@ namespace librepcb {
 class AttributeUnit final {
 public:
   // Constructors / Destructor
-  explicit AttributeUnit(const QString& name, const QString& symbolTr) noexcept;
+  explicit AttributeUnit(const QString& name, const QString& symbolTr,
+                         const QStringList& userInputSuffixes) noexcept;
   ~AttributeUnit() noexcept;
 
   // Getters
-  const QString& getName() const noexcept { return mName; }
-  const QString& getSymbolTr() const noexcept { return mSymbolTr; }
+  const QString&     getName() const noexcept { return mName; }
+  const QString&     getSymbolTr() const noexcept { return mSymbolTr; }
+  const QStringList& getUserInputSuffixes() const noexcept {
+    return mUserInputSuffixes;
+  }
 
 private:
   // make some methods inaccessible...
@@ -56,8 +60,9 @@ private:
   AttributeUnit& operator=(const AttributeUnit& rhs) = delete;
 
   // General Attributes
-  QString mName;      ///< to convert from/to string, e.g. "millivolt"
-  QString mSymbolTr;  ///< e.g. "mV"
+  QString     mName;      ///< to convert from/to string, e.g. "millivolt"
+  QString     mSymbolTr;  ///< e.g. "mV"
+  QStringList mUserInputSuffixes;  ///< user input suffixes, e.g. "k" or "meg"
 };
 
 /*******************************************************************************

@@ -37,15 +37,21 @@ namespace librepcb {
 
 AttrTypeCurrent::AttrTypeCurrent() noexcept
   : AttributeType(Type_t::Current, "current", tr("Current")) {
-  mDefaultUnit = new AttributeUnit("ampere", "A");
+  mDefaultUnit = new AttributeUnit("ampere", "A", {"a", "A"});
 
-  mAvailableUnits.append(new AttributeUnit("picoampere", "pA"));
-  mAvailableUnits.append(new AttributeUnit("nanoampere", "nA"));
-  mAvailableUnits.append(new AttributeUnit("microampere", "μA"));
-  mAvailableUnits.append(new AttributeUnit("milliampere", "mA"));
+  mAvailableUnits.append(
+      new AttributeUnit("picoampere", "pA", {"p", "pa", "pA"}));
+  mAvailableUnits.append(
+      new AttributeUnit("nanoampere", "nA", {"n", "na", "nA"}));
+  mAvailableUnits.append(
+      new AttributeUnit("microampere", "μA", {"u", "ua", "uA"}));
+  mAvailableUnits.append(
+      new AttributeUnit("milliampere", "mA", {"m", "ma", "mA"}));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("kiloampere", "kA"));
-  mAvailableUnits.append(new AttributeUnit("megaampere", "MA"));
+  mAvailableUnits.append(
+      new AttributeUnit("kiloampere", "kA", {"k", "ka", "kA"}));
+  mAvailableUnits.append(
+      new AttributeUnit("megaampere", "MA", {"M", "meg", "MA"}));
 }
 
 AttrTypeCurrent::~AttrTypeCurrent() noexcept {
