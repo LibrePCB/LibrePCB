@@ -360,11 +360,19 @@ bool AttributeListModel::setData(const QModelIndex& index,
         mNewUnit  = unit;
       }
     } else if ((index.column() == COLUMN_VALUE) && role == Qt::EditRole) {
-      QString attrValue = value.toString().trimmed();
+      QString              attrValue = value.toString().trimmed();
+      const AttributeType* type      = item ? &item->getType() : mNewType;
+      const AttributeUnit* unit      = type->tryExtractUnitFromValue(attrValue);
       if (cmd) {
         cmd->setValue(attrValue);
+        if (unit) {
+          cmd->setUnit(unit);
+        }
       } else {
         mNewValue = attrValue;
+        if (unit) {
+          mNewUnit = unit;
+        }
       }
     } else if ((index.column() == COLUMN_UNIT) && role == Qt::EditRole) {
       const AttributeType* type = item ? &item->getType() : mNewType;

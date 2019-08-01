@@ -506,7 +506,16 @@ void SES_AddComponent::attributeChanged() noexcept {
   if (!attribute) return;
   const AttributeType& type  = attribute->getType();
   QString              value = toMultiLine(mAttributeValueEdit->text());
-  const AttributeUnit* unit  = mAttributeUnitComboBox->getCurrentItem();
+  if (const AttributeUnit* unit = type.tryExtractUnitFromValue(value)) {
+    // avoid recursion by blocking signals from combobox
+    const bool wasBlocked = mAttributeUnitComboBox->blockSignals(true);
+    mAttributeUnitComboBox->setCurrentItem(unit);
+    mAttributeUnitComboBox->blockSignals(wasBlocked);
+    mAttributeUnitComboBox->setEnabled(false);
+  } else {
+    mAttributeUnitComboBox->setEnabled(true);
+  }
+  const AttributeUnit* unit = mAttributeUnitComboBox->getCurrentItem();
   if (type.isValueValid(value) && type.isUnitAvailable(unit)) {
     attribute->setTypeValueUnit(attribute->getType(), value, unit);
     mCurrentComponent->setAttributes(attributes);

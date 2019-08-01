@@ -37,15 +37,21 @@ namespace librepcb {
 
 AttrTypePower::AttrTypePower() noexcept
   : AttributeType(Type_t::Power, "power", tr("Power")) {
-  mDefaultUnit = new AttributeUnit("watt", "W");
+  mDefaultUnit = new AttributeUnit("watt", "W", {"w", "W"});
 
-  mAvailableUnits.append(new AttributeUnit("nanowatt", "nW"));
-  mAvailableUnits.append(new AttributeUnit("microwatt", "μW"));
-  mAvailableUnits.append(new AttributeUnit("milliwatt", "mW"));
+  mAvailableUnits.append(
+      new AttributeUnit("nanowatt", "nW", {"n", "nw", "nW"}));
+  mAvailableUnits.append(
+      new AttributeUnit("microwatt", "μW", {"u", "uw", "uW"}));
+  mAvailableUnits.append(
+      new AttributeUnit("milliwatt", "mW", {"m", "mw", "mW"}));
   mAvailableUnits.append(mDefaultUnit);
-  mAvailableUnits.append(new AttributeUnit("kilowatt", "kW"));
-  mAvailableUnits.append(new AttributeUnit("megawatt", "MW"));
-  mAvailableUnits.append(new AttributeUnit("gigawatt", "GW"));
+  mAvailableUnits.append(
+      new AttributeUnit("kilowatt", "kW", {"k", "kw", "kW"}));
+  mAvailableUnits.append(
+      new AttributeUnit("megawatt", "MW", {"M", "meg", "MW"}));
+  mAvailableUnits.append(
+      new AttributeUnit("gigawatt", "GW", {"g", "G", "gw", "GW"}));
 }
 
 AttrTypePower::~AttrTypePower() noexcept {
