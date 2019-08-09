@@ -162,11 +162,12 @@ downloading translations from [Transifex].
    the value of `APP_VERSION` (e.g. "0.1.0-rc1"). Keep in mind that the tag
    must be signed and it's name must always have three numbers (i.e. "0.1.0"
    instead of "0.1")!
-10. Update website/documentation download links and publish blog post
+10. Bump application and installer version on `master`.
+11. Update website/documentation download links and publish blog post
     containing the changelog.
-11. Add tag description to [GitHub Releases], including a link to the blog post.
-12. Notify users through Patreon, Twitter, ...
-13. Start updating distribution packages (Flatpak, Arch, NixOS, ...).
+12. Add tag description to [GitHub Releases], including a link to the blog post.
+13. Notify users through Patreon, Twitter, ...
+14. Start updating distribution packages (Flatpak, Arch, NixOS, ...).
 
 
 [semantic versioning]: https://semver.org/
