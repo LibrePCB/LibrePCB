@@ -50,6 +50,7 @@
     <addaction name="actionSave_Project"/>
     <addaction name="actionExportLppz"/>
     <addaction name="actionPDF_Export"/>
+    <addaction name="actionGenerateBom"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Project"/>
@@ -694,6 +695,15 @@
    </property>
    <property name="toolTip">
     <string>Export project to *.lppz</string>
+   </property>
+  </action>
+  <action name="actionGenerateBom">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate BOM</string>
    </property>
   </action>
  </widget>
