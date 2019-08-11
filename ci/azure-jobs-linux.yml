@@ -12,7 +12,7 @@ jobs:
       Ubuntu_1604_GCC:
         IMAGE: librepcb/librepcb-dev:ubuntu-16.04-1
       Ubuntu_1604_Qt_5_12_3_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.12.3-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.12.3-2
         DEPLOY: true
       Ubuntu_1804_Clang:
         IMAGE: librepcb/librepcb-dev:ubuntu-18.04-1
