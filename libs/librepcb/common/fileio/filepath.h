@@ -432,6 +432,19 @@ public:  // Methods
    */
   bool operator!=(const FilePath& rhs) const noexcept;
 
+  /**
+   * @brief The "<" operator to compare two FilePath objects
+   *
+   * Useful for sorting filepaths, or to store them in a QSet.
+   *
+   * @note This method compares the return values of #toStr() of both objects.
+   *
+   * @param rhs The right hand side object.
+   *
+   * @return true if this filepath is smaller, else false
+   */
+  bool operator<(const FilePath& rhs) const noexcept;
+
 private:
   // Private Methods
 
