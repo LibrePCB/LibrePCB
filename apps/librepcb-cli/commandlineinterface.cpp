@@ -241,7 +241,8 @@ bool CommandLineInterface::openProject(
     const QString& pcbFabricationSettingsPath, const QStringList& boards,
     bool save) const noexcept {
   try {
-    bool success = true;
+    bool                success = true;
+    QMap<FilePath, int> writtenFilesCounter;
 
     // Open project
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
@@ -315,6 +316,7 @@ bool CommandLineInterface::openProject(
         FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
         project.exportSchematicsAsPdf(destPath);  // can throw
         print(QString("  => '%1'").arg(prettyPath(destPath, destPathStr)));
+        writtenFilesCounter[destPath]++;
       } else {
         printErr("  " %
                  QString(tr("ERROR: Unknown extension '%1'.")).arg(suffix));
@@ -357,8 +359,6 @@ bool CommandLineInterface::openProject(
           boardList.clear();  // avoid exporting any boards
         }
       }
-      QHash<FilePath, int> filesCounter;
-      bool                 filesOverwritten = false;
       foreach (const Board* board, boardList) {
         print("  " % QString(tr("Board '%1':")).arg(*board->getName()));
         BoardGerberExport grbExport(
@@ -366,17 +366,9 @@ bool CommandLineInterface::openProject(
                                    : board->getFabricationOutputSettings());
         grbExport.exportAllLayers();  // can throw
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
-          filesCounter[fp]++;
-          if (filesCounter[fp] > 1) filesOverwritten = true;
           print(QString("    => '%1'").arg(prettyPath(fp, projectFile)));
+          writtenFilesCounter[fp]++;
         }
-      }
-      if (filesOverwritten) {
-        printErr("  " % tr("ERROR: Some files were written multiple times! "
-                           "Please make sure that every board uses a different "
-                           "fabrication output path or specify the board to "
-                           "export with the '--board' argument."));
-        success = false;
       }
     }
 
@@ -389,6 +381,27 @@ bool CommandLineInterface::openProject(
       } else {
         projectFs->save();  // can throw
       }
+    }
+
+    // Fail if some files were written multiple times
+    bool                        filesOverwritten = false;
+    QMapIterator<FilePath, int> writtenFilesIterator(writtenFilesCounter);
+    while (writtenFilesIterator.hasNext()) {
+      writtenFilesIterator.next();
+      if (writtenFilesIterator.value() > 1) {
+        filesOverwritten = true;
+        printErr(QString(tr("ERROR: The file %1 was written multiple times!"))
+                     .arg(prettyPath(writtenFilesIterator.key(), projectFile)));
+      }
+    }
+    if (filesOverwritten) {
+      printErr(QString(tr("NOTE: To avoid writing files multiple times, make "
+                          "sure to pass unique filepaths to all export "
+                          "functions. For board output files, you could either "
+                          "add the placeholder '%1' to the path or specify the "
+                          "boards to export with the '%2' argument."))
+                   .arg("'{{BOARD}}'", "--board"));
+      success = false;
     }
 
     return success;
