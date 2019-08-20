@@ -59,6 +59,7 @@ SOURCES += \
     cmd/cmdrotateselectedboarditems.cpp \
     cmd/cmdrotateselectedschematicitems.cpp \
     dialogs/addcomponentdialog.cpp \
+    dialogs/bomgeneratordialog.cpp \
     dialogs/editnetclassesdialog.cpp \
     dialogs/projectpropertieseditordialog.cpp \
     dialogs/projectsettingsdialog.cpp \
@@ -120,6 +121,7 @@ HEADERS += \
     cmd/cmdrotateselectedboarditems.h \
     cmd/cmdrotateselectedschematicitems.h \
     dialogs/addcomponentdialog.h \
+    dialogs/bomgeneratordialog.h \
     dialogs/editnetclassesdialog.h \
     dialogs/projectpropertieseditordialog.h \
     dialogs/projectsettingsdialog.h \
@@ -151,6 +153,7 @@ FORMS += \
     boardeditor/fabricationoutputdialog.ui \
     boardeditor/unplacedcomponentsdock.ui \
     dialogs/addcomponentdialog.ui \
+    dialogs/bomgeneratordialog.ui \
     dialogs/editnetclassesdialog.ui \
     dialogs/projectpropertieseditordialog.ui \
     dialogs/projectsettingsdialog.ui \
