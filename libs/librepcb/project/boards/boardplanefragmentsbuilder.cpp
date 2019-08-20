@@ -100,6 +100,20 @@ void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
       boardAreaClipper.AddPath(path, ClipperLib::ptSubject, true);
     }
   }
+  foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
+    const BI_Footprint& footprint = device->getFootprint();
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
+        Path path = polygon.getPath();
+        path.rotate(footprint.getRotation());
+        if (footprint.getIsMirrored()) path.mirror(Qt::Horizontal);
+        path.translate(footprint.getPosition());
+        ClipperLib::Path clipperPath =
+            ClipperHelpers::convert(path, maxArcTolerance());
+        boardAreaClipper.AddPath(clipperPath, ClipperLib::ptSubject, true);
+      }
+    }
+  }
   boardAreaClipper.Execute(ClipperLib::ctXor, boardArea, ClipperLib::pftEvenOdd,
                            ClipperLib::pftEvenOdd);
 
