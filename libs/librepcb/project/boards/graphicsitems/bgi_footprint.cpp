@@ -139,12 +139,9 @@ void BGI_Footprint::paint(QPainter*                       painter,
     if (!layer->isVisible()) continue;
 
     // set pen
-    if (polygon.getLineWidth() > 0)
-      painter->setPen(QPen(layer->getColor(selected),
-                           polygon.getLineWidth()->toPx(), Qt::SolidLine,
-                           Qt::RoundCap, Qt::RoundJoin));
-    else
-      painter->setPen(Qt::NoPen);
+    painter->setPen(QPen(layer->getColor(selected),
+                         polygon.getLineWidth()->toPx(), Qt::SolidLine,
+                         Qt::RoundCap, Qt::RoundJoin));
 
     // set brush
     if ((!polygon.isFilled()) || (!polygon.getPath().isClosed())) {
@@ -174,12 +171,9 @@ void BGI_Footprint::paint(QPainter*                       painter,
     if (!layer->isVisible()) continue;
 
     // set pen
-    if (circle.getLineWidth() > 0)
-      painter->setPen(QPen(layer->getColor(selected),
-                           circle.getLineWidth()->toPx(), Qt::SolidLine,
-                           Qt::RoundCap, Qt::RoundJoin));
-    else
-      painter->setPen(Qt::NoPen);
+    painter->setPen(QPen(layer->getColor(selected),
+                         circle.getLineWidth()->toPx(), Qt::SolidLine,
+                         Qt::RoundCap, Qt::RoundJoin));
 
     // set brush
     if (!circle.isFilled()) {
