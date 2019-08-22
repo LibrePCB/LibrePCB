@@ -24,6 +24,8 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
+#include <librepcb/common/bom/bom.h>
+#include <librepcb/common/bom/bomcsvwriter.h>
 #include <librepcb/common/debug.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
@@ -31,6 +33,7 @@
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardfabricationoutputsettings.h>
 #include <librepcb/project/boards/boardgerberexport.h>
+#include <librepcb/project/bomgenerator.h>
 #include <librepcb/project/erc/ercmsg.h>
 #include <librepcb/project/erc/ercmsglist.h>
 #include <librepcb/project/project.h>
@@ -91,6 +94,24 @@ int CommandLineInterface::execute() noexcept {
                  "overwritten. Supported file extensions: %1"))
           .arg("pdf"),
       tr("file"));
+  QCommandLineOption exportBomOption(
+      "export-bom",
+      QString(tr("Export generic BOM to given file(s). Existing files will be "
+                 "overwritten. Supported file extensions: %1"))
+          .arg("csv"),
+      tr("file"));
+  QCommandLineOption exportBoardBomOption(
+      "export-board-bom",
+      QString(tr("Export board-specific BOM to given file(s). Existing files "
+                 "will be overwritten. Supported file extensions: %1"))
+          .arg("csv"),
+      tr("file"));
+  QCommandLineOption bomAttributesOption(
+      "bom-attributes",
+      QString(tr("Comma-separated list of additional attributes to be exported "
+                 "to the BOM. Example: \"%1\""))
+          .arg("MANUFACTURER, MPN"),
+      tr("attributes"));
   QCommandLineOption exportPcbFabricationDataOption(
       "export-pcb-fabrication-data",
       tr("Export PCB fabrication data (Gerber/Excellon) according the "
@@ -138,6 +159,9 @@ int CommandLineInterface::execute() noexcept {
                                  tr("Path to project file (*.lpp[z])."));
     parser.addOption(ercOption);
     parser.addOption(exportSchematicsOption);
+    parser.addOption(exportBomOption);
+    parser.addOption(exportBoardBomOption);
+    parser.addOption(bomAttributesOption);
     parser.addOption(exportPcbFabricationDataOption);
     parser.addOption(pcbFabricationSettingsOption);
     parser.addOption(boardOption);
@@ -204,6 +228,9 @@ int CommandLineInterface::execute() noexcept {
         positionalArgs.value(0),                       // project filepath
         parser.isSet(ercOption),                       // run ERC
         parser.values(exportSchematicsOption),         // export schematics
+        parser.values(exportBomOption),                // export generic BOM
+        parser.values(exportBoardBomOption),           // export board BOM
+        parser.value(bomAttributesOption),             // BOM attributes
         parser.isSet(exportPcbFabricationDataOption),  // export PCB fab. data
         parser.value(pcbFabricationSettingsOption),    // PCB fab. settings
         parser.values(boardOption),                    // boards
@@ -237,11 +264,13 @@ int CommandLineInterface::execute() noexcept {
 
 bool CommandLineInterface::openProject(
     const QString& projectFile, bool runErc,
-    const QStringList& exportSchematicsFiles, bool exportPcbFabricationData,
-    const QString& pcbFabricationSettingsPath, const QStringList& boards,
-    bool save) const noexcept {
+    const QStringList& exportSchematicsFiles, const QStringList& exportBomFiles,
+    const QStringList& exportBoardBomFiles, const QString& bomAttributes,
+    bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
+    const QStringList& boards, bool save) const noexcept {
   try {
-    bool success = true;
+    bool                success = true;
+    QMap<FilePath, int> writtenFilesCounter;
 
     // Open project
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
@@ -315,6 +344,7 @@ bool CommandLineInterface::openProject(
         FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
         project.exportSchematicsAsPdf(destPath);  // can throw
         print(QString("  => '%1'").arg(prettyPath(destPath, destPathStr)));
+        writtenFilesCounter[destPath]++;
       } else {
         printErr("  " %
                  QString(tr("ERROR: Unknown extension '%1'.")).arg(suffix));
@@ -322,26 +352,87 @@ bool CommandLineInterface::openProject(
       }
     }
 
-    // Export PCB fabrication data
-    if (exportPcbFabricationData) {
-      print(tr("Export PCB fabrication data..."));
-      QList<Board*> boardList;
-      if (boards.isEmpty()) {
-        // export all boards
-        boardList = project.getBoards();
-      } else {
-        // export specified boards
-        foreach (const QString& boardName, boards) {
-          Board* board = project.getBoardByName(boardName);
+    // Parse list of boards
+    QList<Board*> boardList;
+    if (boards.isEmpty()) {
+      // export all boards
+      boardList = project.getBoards();
+    } else {
+      // export specified boards
+      foreach (const QString& boardName, boards) {
+        Board* board = project.getBoardByName(boardName);
+        if (board) {
+          boardList.append(board);
+        } else {
+          printErr(QString(tr("ERROR: No board with the name '%1' found."))
+                       .arg(boardName));
+          success = false;
+        }
+      }
+    }
+
+    // Export BOM
+    if (exportBomFiles.count() + exportBoardBomFiles.count() > 0) {
+      QList<QPair<QString, bool>> jobs;  // <OutputPath, BoardSpecific>
+      foreach (const QString& fp, exportBomFiles) {
+        jobs.append(qMakePair(fp, false));
+      }
+      foreach (const QString& fp, exportBoardBomFiles) {
+        jobs.append(qMakePair(fp, true));
+      }
+      QStringList attributes;
+      foreach (const QString str,
+               bomAttributes.simplified().split(',', QString::SkipEmptyParts)) {
+        attributes.append(str.trimmed());
+      }
+      foreach (const auto& job, jobs) {
+        const QString& destStr       = job.first;
+        bool           boardSpecific = job.second;
+        if (boardSpecific) {
+          print(
+              QString(tr("Export board-specific BOM to '%1'...")).arg(destStr));
+        } else {
+          print(QString(tr("Export generic BOM to '%1'...")).arg(destStr));
+        }
+        QList<Board*> boards =
+            boardSpecific ? boardList : QList<Board*>{nullptr};
+        foreach (const Board* board, boards) {
+          const AttributeProvider* attrProvider = board;
+          if (!board) {
+            attrProvider = &project;
+          }
+          QString destPathStr = AttributeSubstitutor::substitute(
+              destStr, attrProvider, [&](const QString& str) {
+                return FilePath::cleanFileName(
+                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+              });
+          FilePath     fp(QFileInfo(destPathStr).absoluteFilePath());
+          BomGenerator gen(project);
+          gen.setAdditionalAttributes(attributes);
+          std::shared_ptr<Bom> bom = gen.generate(board);
           if (board) {
-            boardList.append(board);
+            print(QString("  - '%1' => '%2'")
+                      .arg(*board->getName(), prettyPath(fp, destPathStr)));
           } else {
-            printErr(QString(tr("ERROR: No board with the name '%1' found."))
-                         .arg(boardName));
+            print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
+          }
+          QString suffix = destStr.split('.').last().toLower();
+          if (suffix == "csv") {
+            BomCsvWriter writer;
+            writer.writeToFile(*bom, fp);  // can throw
+            writtenFilesCounter[fp]++;
+          } else {
+            printErr("  " %
+                     QString(tr("ERROR: Unknown extension '%1'.")).arg(suffix));
             success = false;
           }
         }
       }
+    }
+
+    // Export PCB fabrication data
+    if (exportPcbFabricationData) {
+      print(tr("Export PCB fabrication data..."));
       tl::optional<BoardFabricationOutputSettings> customSettings;
       if (!pcbFabricationSettingsPath.isEmpty()) {
         try {
@@ -357,8 +448,6 @@ bool CommandLineInterface::openProject(
           boardList.clear();  // avoid exporting any boards
         }
       }
-      QHash<FilePath, int> filesCounter;
-      bool                 filesOverwritten = false;
       foreach (const Board* board, boardList) {
         print("  " % QString(tr("Board '%1':")).arg(*board->getName()));
         BoardGerberExport grbExport(
@@ -366,17 +455,9 @@ bool CommandLineInterface::openProject(
                                    : board->getFabricationOutputSettings());
         grbExport.exportAllLayers();  // can throw
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
-          filesCounter[fp]++;
-          if (filesCounter[fp] > 1) filesOverwritten = true;
           print(QString("    => '%1'").arg(prettyPath(fp, projectFile)));
+          writtenFilesCounter[fp]++;
         }
-      }
-      if (filesOverwritten) {
-        printErr("  " % tr("ERROR: Some files were written multiple times! "
-                           "Please make sure that every board uses a different "
-                           "fabrication output path or specify the board to "
-                           "export with the '--board' argument."));
-        success = false;
       }
     }
 
@@ -389,6 +470,27 @@ bool CommandLineInterface::openProject(
       } else {
         projectFs->save();  // can throw
       }
+    }
+
+    // Fail if some files were written multiple times
+    bool                        filesOverwritten = false;
+    QMapIterator<FilePath, int> writtenFilesIterator(writtenFilesCounter);
+    while (writtenFilesIterator.hasNext()) {
+      writtenFilesIterator.next();
+      if (writtenFilesIterator.value() > 1) {
+        filesOverwritten = true;
+        printErr(QString(tr("ERROR: The file %1 was written multiple times!"))
+                     .arg(prettyPath(writtenFilesIterator.key(), projectFile)));
+      }
+    }
+    if (filesOverwritten) {
+      printErr(QString(tr("NOTE: To avoid writing files multiple times, make "
+                          "sure to pass unique filepaths to all export "
+                          "functions. For board output files, you could either "
+                          "add the placeholder '%1' to the path or specify the "
+                          "boards to export with the '%2' argument."))
+                   .arg("'{{BOARD}}'", "--board"));
+      success = false;
     }
 
     return success;

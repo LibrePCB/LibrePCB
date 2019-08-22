@@ -77,6 +77,7 @@ SOURCES += \
     boards/items/bi_polygon.cpp \
     boards/items/bi_stroketext.cpp \
     boards/items/bi_via.cpp \
+    bomgenerator.cpp \
     circuit/circuit.cpp \
     circuit/cmd/cmdcomponentinstanceadd.cpp \
     circuit/cmd/cmdcomponentinstanceedit.cpp \
@@ -192,6 +193,7 @@ HEADERS += \
     boards/items/bi_polygon.h \
     boards/items/bi_stroketext.h \
     boards/items/bi_via.h \
+    bomgenerator.h \
     circuit/circuit.h \
     circuit/cmd/cmdcomponentinstanceadd.h \
     circuit/cmd/cmdcomponentinstanceedit.h \

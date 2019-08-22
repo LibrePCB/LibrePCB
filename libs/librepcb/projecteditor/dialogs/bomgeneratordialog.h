@@ -17,66 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CLI_COMMANDLINEINTERFACE_H
-#define LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BOMGENERATORDIALOG_H
+#define LIBREPCB_PROJECT_EDITOR_BOMGENERATORDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/attributes/attributeprovider.h>
+#include <librepcb/common/fileio/filepath.h>
+
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Application;
-class FilePath;
+class Bom;
 
-namespace cli {
+namespace project {
+
+class Project;
+class Board;
+
+namespace editor {
+
+namespace Ui {
+class BomGeneratorDialog;
+}
 
 /*******************************************************************************
- *  Class CommandLineInterface
+ *  Class BomGeneratorDialog
  ******************************************************************************/
 
 /**
- * @brief The CommandLineInterface class
+ * @brief The BomGeneratorDialog class
  */
-class CommandLineInterface final {
-  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
+class BomGeneratorDialog final : public QDialog {
+  Q_OBJECT
 
 public:
   // Constructors / Destructor
-  CommandLineInterface() = delete;
-  explicit CommandLineInterface(const Application& app) noexcept;
-  ~CommandLineInterface() noexcept = default;
+  BomGeneratorDialog()                                = delete;
+  BomGeneratorDialog(const BomGeneratorDialog& other) = delete;
+  explicit BomGeneratorDialog(const Project& project,
+                              const Board*   board  = nullptr,
+                              QWidget*       parent = nullptr) noexcept;
+  ~BomGeneratorDialog() noexcept;
 
-  // General Methods
-  int execute() noexcept;
+  // Operator Overloads
+  BomGeneratorDialog& operator=(const BomGeneratorDialog& rhs) = delete;
+
+private:  // GUI Event Handlers
+  void cbxBoardCurrentIndexChanged(int index) noexcept;
+  void btnChooseOutputPathClicked() noexcept;
+  void btnOpenOutputDirectoryClicked() noexcept;
+  void btnGenerateClicked() noexcept;
 
 private:  // Methods
-  bool openProject(const QString& projectFile, bool runErc,
-                   const QStringList& exportSchematicsFiles,
-                   const QStringList& exportBomFiles,
-                   const QStringList& exportBoardBomFiles,
-                   const QString& bomAttributes, bool exportPcbFabricationData,
-                   const QString&     pcbFabricationSettingsPath,
-                   const QStringList& boards, bool save) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool save) const noexcept;
-  static QString prettyPath(const FilePath& path,
-                            const QString&  style) noexcept;
-  static void    print(const QString& str, int newlines = 1) noexcept;
-  static void    printErr(const QString& str, int newlines = 1) noexcept;
+  void     updateBom() noexcept;
+  void     updateTable() noexcept;
+  FilePath getOutputFilePath() const noexcept;
 
 private:  // Data
-  const Application& mApp;
+  const Project&                         mProject;
+  std::shared_ptr<Bom>                   mBom;
+  QScopedPointer<Ui::BomGeneratorDialog> mUi;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace cli
+}  // namespace editor
+}  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#endif  // LIBREPCB_PROJECT_EDITOR_BOMGENERATORDIALOG_H

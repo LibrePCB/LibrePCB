@@ -9,33 +9,42 @@ Test command "open-project" with all available options
 """
 
 
-@pytest.mark.parametrize("project_name,project_suffix,gerber_count", [
-    ('Empty Project', 'lpp', 8),
-    ('Empty Project', 'lppz', 8),
-    ('Project With Two Boards', 'lpp', 16),
-    ('Project With Two Boards', 'lppz', 16),
+@pytest.mark.parametrize("project_name,project_suffix,board_count", [
+    ('Empty Project', 'lpp', 1),
+    ('Empty Project', 'lppz', 1),
+    ('Project With Two Boards', 'lpp', 2),
+    ('Project With Two Boards', 'lppz', 2),
 ], ids=[
     'EmptyProject.lpp',
     'EmptyProject.lppz',
     'ProjectWithTwoBoards.lpp',
     'ProjectWithTwoBoards.lppz',
 ])
-def test_everything(cli, project_name, project_suffix, gerber_count):
+def test_everything(cli, project_name, project_suffix, board_count):
     # determine paths
     if project_suffix == 'lppz':
         project_path = 'data/' + project_name + '/' + project_name + '.lpp'
-        output_dir = 'data/' + project_name + '/output/v1/gerber'
+        output_dir = 'data/' + project_name + '/output/v1'
     else:
         project_path = 'data/' + project_name + '.lppz'
-        output_dir = 'data/output/v1/gerber'
+        output_dir = 'data/output/v1'
 
     # prepare "--export-schematics"
     schematic = cli.abspath('schematic.pdf')
     assert not os.path.exists(schematic)
 
+    # prepare "--export-bom"
+    bom = cli.abspath('bom.csv')
+    assert not os.path.exists(bom)
+
+    # prepare "--export-board-bom"
+    board_bom_dir = cli.abspath(output_dir + '/bom')
+    assert not os.path.exists(board_bom_dir)
+    board_bom = board_bom_dir + r'/{{BOARD}}.csv'
+
     # prepare "--export-pcb-fabrication-data"
-    output = cli.abspath(output_dir)
-    assert not os.path.exists(output)
+    gerber_dir = cli.abspath(output_dir + '/gerber')
+    assert not os.path.exists(gerber_dir)
 
     # prepare "--save"
     path = cli.abspath(project_path)
@@ -47,6 +56,8 @@ def test_everything(cli, project_name, project_suffix, gerber_count):
     code, stdout, stderr = cli.run('open-project',
                                    '--erc',
                                    '--export-schematics={}'.format(schematic),
+                                   '--export-bom={}'.format(bom),
+                                   '--export-board-bom={}'.format(board_bom),
                                    '--export-pcb-fabrication-data',
                                    '--save',
                                    project_path)
@@ -58,9 +69,16 @@ def test_everything(cli, project_name, project_suffix, gerber_count):
     # check "--export-schematics"
     assert os.path.exists(schematic)
 
+    # check "--export-bom"
+    assert os.path.exists(bom)
+
+    # check "--export-board-bom"
+    assert os.path.exists(board_bom_dir)
+    assert len(os.listdir(board_bom_dir)) == board_count
+
     # check "--export-pcb-fabrication-data"
-    assert os.path.exists(output)
-    assert len(os.listdir(output)) == gerber_count
+    assert os.path.exists(gerber_dir)
+    assert len(os.listdir(gerber_dir)) == board_count * 8
 
     # check "--save"
     assert os.path.getsize(path) != original_filesize

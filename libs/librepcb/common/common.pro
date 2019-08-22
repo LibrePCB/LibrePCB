@@ -46,6 +46,8 @@ SOURCES += \
     attributes/attrtypevoltage.cpp \
     attributes/cmd/cmdattributeedit.cpp \
     boarddesignrules.cpp \
+    bom/bom.cpp \
+    bom/bomcsvwriter.cpp \
     cam/excellongenerator.cpp \
     cam/gerberaperturelist.cpp \
     cam/gerbergenerator.cpp \
@@ -156,6 +158,8 @@ HEADERS += \
     attributes/attrtypevoltage.h \
     attributes/cmd/cmdattributeedit.h \
     boarddesignrules.h \
+    bom/bom.h \
+    bom/bomcsvwriter.h \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
     cam/gerbergenerator.h \

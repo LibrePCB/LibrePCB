@@ -20,6 +20,7 @@
         <file>actions/delete.png</file>
         <file>actions/download.png</file>
         <file>actions/edit.png</file>
+        <file>actions/generate_bom.png</file>
         <file>actions/help.png</file>
         <file>actions/home.png</file>
         <file>actions/info.png</file>

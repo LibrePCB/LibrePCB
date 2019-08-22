@@ -17,66 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CLI_COMMANDLINEINTERFACE_H
-#define LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#ifndef LIBREPCB_PROJECT_BOMGENERATOR_H
+#define LIBREPCB_PROJECT_BOMGENERATOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Application;
-class FilePath;
+class Bom;
 
-namespace cli {
+namespace project {
+
+class Board;
+class Project;
 
 /*******************************************************************************
- *  Class CommandLineInterface
+ *  Class BomGenerator
  ******************************************************************************/
 
 /**
- * @brief The CommandLineInterface class
+ * @brief The BomGenerator class
  */
-class CommandLineInterface final {
-  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
+class BomGenerator final {
+  Q_DECLARE_TR_FUNCTIONS(BoardBomGenerator)
 
 public:
   // Constructors / Destructor
-  CommandLineInterface() = delete;
-  explicit CommandLineInterface(const Application& app) noexcept;
-  ~CommandLineInterface() noexcept = default;
+  BomGenerator()                          = delete;
+  BomGenerator(const BomGenerator& other) = delete;
+  explicit BomGenerator(const Project& project) noexcept;
+  ~BomGenerator() noexcept;
+
+  // Setters
+  void setAdditionalAttributes(const QStringList& attributes) noexcept {
+    mAdditionalAttributes = attributes;
+  }
 
   // General Methods
-  int execute() noexcept;
+  std::shared_ptr<Bom> generate(const Board* board = nullptr) noexcept;
 
-private:  // Methods
-  bool openProject(const QString& projectFile, bool runErc,
-                   const QStringList& exportSchematicsFiles,
-                   const QStringList& exportBomFiles,
-                   const QStringList& exportBoardBomFiles,
-                   const QString& bomAttributes, bool exportPcbFabricationData,
-                   const QString&     pcbFabricationSettingsPath,
-                   const QStringList& boards, bool save) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool save) const noexcept;
-  static QString prettyPath(const FilePath& path,
-                            const QString&  style) noexcept;
-  static void    print(const QString& str, int newlines = 1) noexcept;
-  static void    printErr(const QString& str, int newlines = 1) noexcept;
+  // Operator Overloadings
+  BomGenerator& operator=(const BomGenerator& rhs) = delete;
 
-private:  // Data
-  const Application& mApp;
+private:
+  const Project& mProject;
+  QStringList    mAdditionalAttributes;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace cli
+}  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#endif  // LIBREPCB_PROJECT_BOMGENERATOR_H
