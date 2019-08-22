@@ -96,6 +96,7 @@ private slots:
   void on_actionGrid_triggered();
   void on_actionPrint_triggered();
   void on_actionPDF_Export_triggered();
+  void on_actionGenerateBom_triggered();
   void on_actionAddComp_Resistor_triggered();
   void on_actionAddComp_BipolarCapacitor_triggered();
   void on_actionAddComp_UnipolarCapacitor_triggered();

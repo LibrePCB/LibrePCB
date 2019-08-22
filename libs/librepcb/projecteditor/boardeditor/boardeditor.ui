@@ -83,6 +83,7 @@
     <addaction name="actionExportLppz"/>
     <addaction name="separator"/>
     <addaction name="actionGenerateFabricationData"/>
+    <addaction name="actionGenerateBom"/>
     <addaction name="separator"/>
     <addaction name="actionProjectClose"/>
     <addaction name="actionQuit"/>
@@ -745,6 +746,18 @@
    </property>
    <property name="toolTip">
     <string>Export project to *.lppz</string>
+   </property>
+  </action>
+  <action name="actionGenerateBom">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate BOM</string>
+   </property>
+   <property name="toolTip">
+    <string>Generate BOM</string>
    </property>
   </action>
  </widget>

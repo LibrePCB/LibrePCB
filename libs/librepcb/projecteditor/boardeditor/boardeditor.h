@@ -102,6 +102,7 @@ private slots:
   void on_actionGrid_triggered();
   void on_actionExportAsPdf_triggered();
   void on_actionGenerateFabricationData_triggered();
+  void on_actionGenerateBom_triggered();
   void on_actionProjectProperties_triggered();
   void on_actionUpdateLibrary_triggered();
   void on_actionLayerStackSetup_triggered();

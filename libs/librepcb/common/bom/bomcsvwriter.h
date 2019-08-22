@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CLI_COMMANDLINEINTERFACE_H
-#define LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#ifndef LIBREPCB_BOMCSVWRITER_H
+#define LIBREPCB_BOMCSVWRITER_H
 
 /*******************************************************************************
  *  Includes
@@ -30,53 +30,41 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Application;
+class Bom;
 class FilePath;
 
-namespace cli {
-
 /*******************************************************************************
- *  Class CommandLineInterface
+ *  Class BomCsvWriter
  ******************************************************************************/
 
 /**
- * @brief The CommandLineInterface class
+ * @brief The BomCsvWriter class
  */
-class CommandLineInterface final {
-  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
+class BomCsvWriter final {
+  Q_DECLARE_TR_FUNCTIONS(BomCsvWriter)
 
 public:
   // Constructors / Destructor
-  CommandLineInterface() = delete;
-  explicit CommandLineInterface(const Application& app) noexcept;
-  ~CommandLineInterface() noexcept = default;
+  BomCsvWriter() noexcept;
+  BomCsvWriter(const BomCsvWriter& other) = delete;
+  ~BomCsvWriter() noexcept;
 
   // General Methods
-  int execute() noexcept;
+  QList<QStringList> toStringList(const Bom& bom) noexcept;
+  QString            toString(const Bom& bom) noexcept;
+  void               writeToFile(const Bom& bom, const FilePath& csvFp);
 
-private:  // Methods
-  bool openProject(const QString& projectFile, bool runErc,
-                   const QStringList& exportSchematicsFiles,
-                   const QStringList& exportBomFiles,
-                   const QStringList& exportBoardBomFiles,
-                   const QString& bomAttributes, bool exportPcbFabricationData,
-                   const QString&     pcbFabricationSettingsPath,
-                   const QStringList& boards, bool save) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool save) const noexcept;
-  static QString prettyPath(const FilePath& path,
-                            const QString&  style) noexcept;
-  static void    print(const QString& str, int newlines = 1) noexcept;
-  static void    printErr(const QString& str, int newlines = 1) noexcept;
+  // Operator Overloadings
+  BomCsvWriter& operator=(const BomCsvWriter& rhs) = delete;
 
-private:  // Data
-  const Application& mApp;
+private:
+  static QString cleanStr(const QString& str) noexcept;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace cli
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#endif  // LIBREPCB_BOMCSVWRITER_H

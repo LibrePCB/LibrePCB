@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardeditor.h"
 
+#include "../dialogs/bomgeneratordialog.h"
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../docks/ercmsgdock.h"
 #include "../projecteditor.h"
@@ -466,6 +467,11 @@ void BoardEditor::on_actionGenerateFabricationData_triggered() {
   if (!board) return;
 
   FabricationOutputDialog dialog(*board, this);
+  dialog.exec();
+}
+
+void BoardEditor::on_actionGenerateBom_triggered() {
+  BomGeneratorDialog dialog(mProject, getActiveBoard(), this);
   dialog.exec();
 }
 

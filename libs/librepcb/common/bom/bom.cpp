@@ -17,66 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CLI_COMMANDLINEINTERFACE_H
-#define LIBREPCB_CLI_COMMANDLINEINTERFACE_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "bom.h"
+
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Application;
-class FilePath;
-
-namespace cli {
-
 /*******************************************************************************
- *  Class CommandLineInterface
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The CommandLineInterface class
- */
-class CommandLineInterface final {
-  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
+Bom::Bom(const QStringList& columns) noexcept : mColumns(columns), mItems() {
+}
 
-public:
-  // Constructors / Destructor
-  CommandLineInterface() = delete;
-  explicit CommandLineInterface(const Application& app) noexcept;
-  ~CommandLineInterface() noexcept = default;
+Bom::~Bom() noexcept {
+}
 
-  // General Methods
-  int execute() noexcept;
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
-private:  // Methods
-  bool openProject(const QString& projectFile, bool runErc,
-                   const QStringList& exportSchematicsFiles,
-                   const QStringList& exportBomFiles,
-                   const QStringList& exportBoardBomFiles,
-                   const QString& bomAttributes, bool exportPcbFabricationData,
-                   const QString&     pcbFabricationSettingsPath,
-                   const QStringList& boards, bool save) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool save) const noexcept;
-  static QString prettyPath(const FilePath& path,
-                            const QString&  style) noexcept;
-  static void    print(const QString& str, int newlines = 1) noexcept;
-  static void    printErr(const QString& str, int newlines = 1) noexcept;
+void Bom::addItem(const QString&     designator,
+                  const QStringList& attributes) noexcept {
+  Q_ASSERT(attributes.count() == mColumns.count());
 
-private:  // Data
-  const Application& mApp;
-};
+  bool itemAdded = false;
+  for (BomItem& item : mItems) {
+    if (item.getAttributes() == attributes) {
+      item.addDesignator(designator);
+      itemAdded = true;
+    }
+  }
+
+  if (!itemAdded) {
+    mItems.append(BomItem(designator, attributes));
+  }
+
+  // Sort items by designator to improve readability of the BOM
+  QCollator collator;
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  collator.setNumericMode(true);
+  std::sort(mItems.begin(), mItems.end(),
+            [&collator](const BomItem& lhs, const BomItem& rhs) {
+              return collator(lhs.getDesignators().first(),
+                              rhs.getDesignators().first());
+            });
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace cli
 }  // namespace librepcb
-
-#endif  // LIBREPCB_CLI_COMMANDLINEINTERFACE_H

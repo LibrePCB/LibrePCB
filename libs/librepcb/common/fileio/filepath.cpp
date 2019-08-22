@@ -188,6 +188,10 @@ bool FilePath::operator!=(const FilePath& rhs) const noexcept {
   return !(*this == rhs);
 }
 
+bool FilePath::operator<(const FilePath& rhs) const noexcept {
+  return toStr() < rhs.toStr();
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/

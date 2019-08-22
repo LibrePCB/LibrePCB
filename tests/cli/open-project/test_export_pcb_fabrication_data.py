@@ -188,7 +188,8 @@ def test_export_project_with_two_conflicting_boards_fails(cli):
                                    PROJECT_PATH_2_LPP)
     assert code == 1
     assert len(stderr) > 0
-    assert 'Some files were written multiple times' in stderr[0]
+    assert 'was written multiple times' in stderr[0]
+    assert 'NOTE: To avoid writing files multiple times,' in stderr[-1]
     assert len(stdout) > 0
     assert stdout[-1] == 'Finished with errors!'
 

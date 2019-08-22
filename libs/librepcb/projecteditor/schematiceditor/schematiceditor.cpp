@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematiceditor.h"
 
+#include "../dialogs/bomgeneratordialog.h"
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../docks/ercmsgdock.h"
 #include "../projecteditor.h"
@@ -412,6 +413,13 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
+}
+
+void SchematicEditor::on_actionGenerateBom_triggered() {
+  const Board* board =
+      mProject.getBoards().count() == 1 ? mProject.getBoardByIndex(0) : nullptr;
+  BomGeneratorDialog dialog(mProject, board, this);
+  dialog.exec();
 }
 
 void SchematicEditor::on_actionAddComp_Resistor_triggered() {
