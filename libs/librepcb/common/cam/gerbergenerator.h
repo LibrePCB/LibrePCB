@@ -38,6 +38,7 @@ namespace librepcb {
 class Circle;
 class Path;
 class GerberApertureList;
+class Vertex;
 
 /*******************************************************************************
  *  Class GerberGenerator
@@ -111,6 +112,7 @@ private:
   void    linearInterpolateToPosition(const Point& pos) noexcept;
   void    circularInterpolateToPosition(const Point& start, const Point& center,
                                         const Point& end) noexcept;
+  void    interpolateBetween(const Vertex& from, const Vertex& to) noexcept;
   void    flashAtPosition(const Point& pos) noexcept;
   void    printHeader() noexcept;
   void    printApertureList() noexcept;
