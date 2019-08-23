@@ -108,11 +108,10 @@ void GerberGenerator::drawPathOutline(
       linearInterpolateToPosition(v.getPos());
     } else {
       // arc segment
-      if (v0.getAngle().abs() <= Angle::deg90()) {
-        setMultiQuadrantArcModeOff();
-      } else {
-        setMultiQuadrantArcModeOn();
-      }
+      // note: due to buggy clients when using single quadrant mode,
+      // we always use multi quadrant mode.
+      // see https://github.com/LibrePCB/LibrePCB/issues/247
+      setMultiQuadrantArcModeOn();
       if (v0.getAngle() < 0) {
         switchToCircularCwInterpolationModeG02();
       } else {
@@ -142,11 +141,10 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept {
       linearInterpolateToPosition(v.getPos());
     } else {
       // arc segment
-      if (v0.getAngle().abs() <= Angle::deg90()) {
-        setMultiQuadrantArcModeOff();
-      } else {
-        setMultiQuadrantArcModeOn();
-      }
+      // note: due to buggy clients when using single quadrant mode,
+      // we always use multi quadrant mode.
+      // see https://github.com/LibrePCB/LibrePCB/issues/247
+      setMultiQuadrantArcModeOn();
       if (v0.getAngle() < 0) {
         switchToCircularCwInterpolationModeG02();
       } else {
