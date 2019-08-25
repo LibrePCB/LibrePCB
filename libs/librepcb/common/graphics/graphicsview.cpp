@@ -85,11 +85,25 @@ QRectF GraphicsView::getVisibleSceneRect() const noexcept {
 
 void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
   if (useOpenGl != mUseOpenGl) {
-    if (useOpenGl)
+    if (useOpenGl) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+      // Try to make schematics/boards looking good by choosing reasonable
+      // format options (with default options, it looks ugly).
+      QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+      format.setDepthBufferSize(24);
+      format.setSamples(8);
+      format.setStencilBufferSize(8);
+      format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+      QOpenGLWidget* viewport = new QOpenGLWidget();
+      viewport->setFormat(format);
+      setViewport(viewport);
+#else
       setViewport(new QGLWidget(QGLFormat(
           QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
-    else
+#endif
+    } else {
       setViewport(nullptr);
+    }
     mUseOpenGl = useOpenGl;
   }
   viewport()->grabGesture(Qt::PinchGesture);
