@@ -240,7 +240,12 @@ libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogAcceptButton = {
 schematicEditor = librepcb__project__editor__SchematicEditor
 schematicEditorWidget = {schematicEditor}::centralWidget
 
+# Toolbars
+schematicEditorToolbarFile = {schematicEditor}::fileToolbar
+schematicEditorDockErcMsg = {schematicEditor}::librepcb__project__editor__ErcMsgDock
+
 # Actions
+schematicEditorActionCloseProject = {schematicEditor}::actionClose_Project
 schematicEditorActionAddComponent = {schematicEditor}::actionToolAddComponent
 
 # Graphics view
@@ -268,3 +273,10 @@ schematicEditorAddComponentDialogDeviceNameLabel = {schematicEditorAddComponentD
 # Main window
 boardEditor = librepcb__project__editor__BoardEditor
 boardEditorWidget = {boardEditor}::centralWidget
+
+# Toolbars
+boardEditorToolbarFile = {boardEditor}::fileToolbar
+boardEditorDockErcMsg = {boardEditor}::librepcb__project__editor__ErcMsgDock
+
+# Actions
+boardEditorActionCloseProject = {boardEditor}::actionClose_Project
