@@ -33,6 +33,7 @@
 #include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
+#include <librepcb/common/version.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -124,8 +125,9 @@ public:
   Board(const Board& other) = delete;
   Board(const Board& other, std::unique_ptr<TransactionalDirectory> directory,
         const ElementName& name);
-  Board(Project& project, std::unique_ptr<TransactionalDirectory> directory)
-    : Board(project, std::move(directory), false, QString()) {}
+  Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
+        const Version& projectVersion)
+    : Board(project, std::move(directory), projectVersion, false, QString()) {}
   ~Board() noexcept;
 
   // Getters: General
@@ -280,7 +282,7 @@ signals:
 
 private:
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        bool create, const QString& newName);
+        const Version& projectVersion, bool create, const QString& newName);
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 

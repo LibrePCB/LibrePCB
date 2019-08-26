@@ -28,6 +28,7 @@
 #include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
+#include "../version.h"
 
 #include <QtCore>
 
@@ -60,9 +61,9 @@ public:
   Hole() = delete;
   Hole(const Hole& other) noexcept;
   Hole(const Uuid& uuid, const Hole& other) noexcept;
-  Hole(const Uuid& uuid, const Point& position,
-       const PositiveLength& diameter) noexcept;
-  explicit Hole(const SExpression& node);
+  Hole(const Uuid& uuid, const Point& position, const PositiveLength& diameter,
+       const UnsignedLength& length, const Angle& rotation) noexcept;
+  explicit Hole(const SExpression& node, const Version& projectVersion);
   ~Hole() noexcept;
 
   // Getters
@@ -86,6 +87,8 @@ private:  // Data
   Uuid           mUuid;
   Point          mPosition;
   PositiveLength mDiameter;
+  UnsignedLength mLength;
+  Angle          mRotation;
 };
 
 /*******************************************************************************

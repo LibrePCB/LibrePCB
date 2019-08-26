@@ -46,8 +46,10 @@ BI_Hole::BI_Hole(Board& board, const BI_Hole& other) : BI_Base(board) {
   init();
 }
 
-BI_Hole::BI_Hole(Board& board, const SExpression& node) : BI_Base(board) {
-  mHole.reset(new Hole(node));
+BI_Hole::BI_Hole(Board& board, const SExpression& node,
+                 const Version& projectVersion)
+  : BI_Base(board) {
+  mHole.reset(new Hole(node, projectVersion));
   init();
 }
 

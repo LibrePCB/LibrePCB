@@ -67,6 +67,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
                        tr("The suffix of the project file must be \"lpp\"!"));
   }
 
+  std::unique_ptr<Version> projectVersion;
   if (create) {
     // Check if there isn't already a project in the selected directory
     if (mDirectory->fileExists(".librepcb-project") ||
@@ -77,6 +78,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
               tr("The directory \"%1\" already contains a LibrePCB project."))
               .arg(getPath().toNative()));
     }
+
+    projectVersion = std::unique_ptr<Version>(new Version(qApp->getFileFormatVersion()));
   } else {
     // check if the project does exist
     if (!mDirectory->fileExists(".librepcb-project")) {
@@ -92,9 +95,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
                              .arg(getFilepath().toNative()));
     }
     // check the project's file format version
-    Version version =
-        VersionFile::fromByteArray(mDirectory->read(".librepcb-project"))
-            .getVersion();
+    const Version& version = VersionFile::fromByteArray(mDirectory->read(".librepcb-project")).getVersion();
     if (version > qApp->getFileFormatVersion()) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -103,7 +104,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
                  "You need at least LibrePCB %1 to open it.\n\n%2"))
               .arg(version.toPrettyStr(3))
               .arg(getFilepath().toNative()));
-    }
+
+    projectVersion = std::unique_ptr<Version>(new Version(version));
   }
 
   // OK - the project is locked (or read-only) and can be opened!

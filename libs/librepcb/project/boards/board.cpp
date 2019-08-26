@@ -185,8 +185,8 @@ Board::Board(const Board&                            other,
 }
 
 Board::Board(Project&                                project,
-             std::unique_ptr<TransactionalDirectory> directory, bool create,
-             const QString& newName)
+             std::unique_ptr<TransactionalDirectory> directory,
+             const Version& projectVersion, bool create, const QString& newName)
   : QObject(&project),
     mProject(project),
     mDirectory(std::move(directory)),
@@ -319,7 +319,7 @@ Board::Board(Project&                                project,
 
       // Load all holes
       foreach (const SExpression& node, root.getChildren("hole")) {
-        BI_Hole* hole = new BI_Hole(*this, node);
+        BI_Hole* hole = new BI_Hole(*this, node, projectVersion);
         mHoles.append(hole);
       }
     }
