@@ -50,6 +50,8 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
   mUi->edtDiameter->setValue(mHole.getDiameter());
   mUi->edtPosX->setValue(mHole.getPosition().getX());
   mUi->edtPosY->setValue(mHole.getPosition().getY());
+  mUi->edtLength->setValue(mHole.getLength());
+  mUi->edtRotation->setValue(mHole.getRotation());
 }
 
 HolePropertiesDialog::~HolePropertiesDialog() noexcept {
@@ -84,6 +86,8 @@ bool HolePropertiesDialog::applyChanges() noexcept {
     cmd->setDiameter(mUi->edtDiameter->getValue(), false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
+    cmd->setLength(mUi->edtLength->getValue(), false);
+    cmd->setRotation(mUi->edtRotation->getValue(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

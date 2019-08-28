@@ -97,6 +97,26 @@ bool Hole::setDiameter(const PositiveLength& diameter) noexcept {
   return true;
 }
 
+bool Hole::setLength(const UnsignedLength& length) noexcept {
+  if (length == mLength) {
+    return false;
+  }
+
+  mLength = length;
+  onEdited.notify(Event::LengthChanged);
+  return true;
+}
+
+bool Hole::setRotation(const Angle& rotation) noexcept {
+  if (rotation == mRotation) {
+    return false;
+  }
+
+  mRotation = rotation;
+  onEdited.notify(Event::RotationChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

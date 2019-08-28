@@ -57,6 +57,8 @@ public:
   void mirror(Qt::Orientation orientation, const Point& center,
               bool immediate) noexcept;
   void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
+  void setLength(const UnsignedLength& length, bool immediate) noexcept;
+  void setRotation(const Angle& rotation, bool immediate) noexcept;
 
   // Operator Overloadings
   CmdHoleEdit& operator=(const CmdHoleEdit& rhs) = delete;

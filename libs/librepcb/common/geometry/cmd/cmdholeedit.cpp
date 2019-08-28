@@ -87,6 +87,19 @@ void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
   if (immediate) mHole.setDiameter(mNewDiameter);
 }
 
+void CmdHoleEdit::setLength(const UnsignedLength& length,
+                            bool                  immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLength = length;
+  if (immediate) mHole.setLength(mNewLength);
+}
+
+void CmdHoleEdit::setRotation(const Angle& rotation, bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewRotation = rotation;
+  if (immediate) mHole.setRotation(mNewRotation);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

@@ -53,6 +53,8 @@ public:
     UuidChanged,
     PositionChanged,
     DiameterChanged,
+    LengthChanged,
+    RotationChanged,
   };
   Signal<Hole, Event>       onEdited;
   typedef Slot<Hole, Event> OnEditedSlot;
@@ -70,10 +72,14 @@ public:
   const Uuid&           getUuid() const noexcept { return mUuid; }
   const Point&          getPosition() const noexcept { return mPosition; }
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
+  const UnsignedLength& getLength() const noexcept { return mLength; }
+  const Angle&          getRotation() const noexcept { return mRotation; }
 
   // Setters
   bool setPosition(const Point& position) noexcept;
   bool setDiameter(const PositiveLength& diameter) noexcept;
+  bool setLength(const UnsignedLength& length) noexcept;
+  bool setRotation(const Angle& rotation) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;

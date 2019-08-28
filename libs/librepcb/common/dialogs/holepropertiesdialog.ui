@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>91</height>
+    <width>391</width>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,14 +17,17 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="lblDiameter">
        <property name="text">
         <string>Diameter:</string>
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="librepcb::PositiveLengthEdit" name="edtDiameter" native="true"/>
+     </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="lblPos">
        <property name="text">
         <string>Position:</string>
        </property>
@@ -40,8 +43,25 @@
        </item>
       </layout>
      </item>
-     <item row="0" column="1">
-      <widget class="librepcb::PositiveLengthEdit" name="edtDiameter" native="true"/>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblLength">
+       <property name="text">
+        <string>Length:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="librepcb::UnsignedLengthEdit" name="edtLength" native="true"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lblRotation">
+       <property name="text">
+        <string>Rotation:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="librepcb::AngleEdit" name="edtRotation" native="true"/>
      </item>
     </layout>
    </item>
@@ -65,9 +85,21 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>librepcb::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>librepcb::PositiveLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/common/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::AngleEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/angleedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
