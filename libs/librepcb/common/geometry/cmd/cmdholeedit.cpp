@@ -41,7 +41,11 @@ CmdHoleEdit::CmdHoleEdit(Hole& hole) noexcept
     mOldPosition(hole.getPosition()),
     mNewPosition(mOldPosition),
     mOldDiameter(hole.getDiameter()),
-    mNewDiameter(mOldDiameter) {
+    mNewDiameter(mOldDiameter),
+    mOldLength(hole.getLength()),
+    mNewLength(mOldLength),
+    mOldRotation(hole.getRotation()),
+    mNewRotation(mOldRotation) {
 }
 
 CmdHoleEdit::~CmdHoleEdit() noexcept {
@@ -70,7 +74,11 @@ void CmdHoleEdit::rotate(const Angle& angle, const Point& center,
                          bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPosition.rotate(angle, center);
-  if (immediate) mHole.setPosition(mNewPosition);
+  mNewRotation += angle;
+  if (immediate) {
+    mHole.setPosition(mNewPosition);
+    mHole.setRotation(mNewRotation);
+  }
 }
 
 void CmdHoleEdit::mirror(Qt::Orientation orientation, const Point& center,
@@ -109,17 +117,23 @@ bool CmdHoleEdit::performExecute() {
 
   if (mNewPosition != mOldPosition) return true;
   if (mNewDiameter != mOldDiameter) return true;
+  if (mNewLength != mOldLength) return true;
+  if (mNewRotation != mOldRotation) return true;
   return false;
 }
 
 void CmdHoleEdit::performUndo() {
   mHole.setPosition(mOldPosition);
   mHole.setDiameter(mOldDiameter);
+  mHole.setLength(mOldLength);
+  mHole.setRotation(mOldRotation);
 }
 
 void CmdHoleEdit::performRedo() {
   mHole.setPosition(mNewPosition);
   mHole.setDiameter(mNewDiameter);
+  mHole.setLength(mNewLength);
+  mHole.setRotation(mNewRotation);
 }
 
 /*******************************************************************************
