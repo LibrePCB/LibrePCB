@@ -485,6 +485,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
     if (layer == circle.getLayerName()) {
       Circle copy        = circle;
       Point  absolutePos = copy.getCenter();
+      absolutePos.rotate(footprint.getRotation());
       if (footprint.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
       absolutePos += footprint.getPosition();
       copy.setCenter(absolutePos);
