@@ -572,13 +572,16 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator&       gen,
       break;
     }
     case library::FootprintPad::Shape::OCTAGON: {
-      if (width != height) {
-        throw LogicError(
-            __FILE__, __LINE__,
-            tr("Sorry, non-square octagons are not yet supported."));
+      if (width == height) {
+        gen.flashRegularPolygon(pad.getPosition(), uWidth, 8, rot,
+                                UnsignedLength(0));
+      } else {
+        // Calculate edge equal to Path::octagon()!
+        UnsignedLength edge(Length::fromMm(qMin(width / 2, height / 2).toMm() *
+                                           (2 - qSqrt(2))));
+        gen.flashOctagon(pad.getPosition(), uWidth, uHeight, edge, rot,
+                         UnsignedLength(0));
       }
-      gen.flashRegularPolygon(pad.getPosition(), uWidth, 8, rot,
-                              UnsignedLength(0));
       break;
     }
     default: { throw LogicError(__FILE__, __LINE__); }
