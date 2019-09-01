@@ -118,6 +118,18 @@ int GerberApertureList::setRegularPolygon(const UnsignedLength& dia, int n,
   return setCurrentAperture(generateRegularPolygon(dia, n, grbRot, hole));
 }
 
+int GerberApertureList::setOctagon(const UnsignedLength& w,
+                                   const UnsignedLength& h,
+                                   const UnsignedLength& edge, const Angle& rot,
+                                   const UnsignedLength& hole) noexcept {
+  if (hole > 0) {
+    addMacro(generateRotatedOctagonMacroWithHole());
+  } else {
+    addMacro(generateRotatedOctagonMacro());
+  }
+  return setCurrentAperture(generateRotatedOctagon(w, h, edge, rot, hole));
+}
+
 void GerberApertureList::reset() noexcept {
   // mApertureMacros.clear();
   mApertures.clear();
@@ -210,6 +222,39 @@ QString GerberApertureList::generateRotatedObroundMacroWithHole() {
       "4,0*1,0,$6,0,0,0");
 }
 
+QString GerberApertureList::generateRotatedOctagonMacro() {
+  // parameters: width, height, edge, rotation
+  return QString(
+      "ROTATEDOCTAGON*4,1,8,"
+      "-($1/2),($2/2)-$3,"
+      "-($1/2)+$3,($2/2),"
+      "($1/2)-$3,($2/2),"
+      "($1/2),($2/2)-$3,"
+      "($1/2),-($2/2)+$3,"
+      "($1/2)-$3,-($2/2),"
+      "-($1/2)+$3,-($2/2),"
+      "-($1/2),-($2/2)+$3,"
+      "-($1/2),($2/2)-$3,"
+      "$4");
+}
+
+QString GerberApertureList::generateRotatedOctagonMacroWithHole() {
+  // parameters: width, height, edge, rotation, hole
+  return QString(
+      "ROTATEDOCTAGONWITHHOLE*4,1,8,"
+      "-($1/2),($2/2)-$3,"
+      "-($1/2)+$3,($2/2),"
+      "($1/2)-$3,($2/2),"
+      "($1/2),($2/2)-$3,"
+      "($1/2),-($2/2)+$3,"
+      "($1/2)-$3,-($2/2),"
+      "-($1/2)+$3,-($2/2),"
+      "-($1/2),-($2/2)+$3,"
+      "-($1/2),($2/2)-$3,"
+      "$4"
+      "*1,0,$5,0,0,0");
+}
+
 QString GerberApertureList::generateRotatedRect(
     const UnsignedLength& w, const UnsignedLength& h, const Angle& rot,
     const UnsignedLength& hole) noexcept {
@@ -239,6 +284,21 @@ QString GerberApertureList::generateRotatedObround(
         .arg(start.getX().toMmString(), start.getY().toMmString(),
              end.getX().toMmString(), end.getY().toMmString(),
              width->toMmString());
+  }
+}
+
+QString GerberApertureList::generateRotatedOctagon(
+    const UnsignedLength& w, const UnsignedLength& h,
+    const UnsignedLength& edge, const Angle& rot,
+    const UnsignedLength& hole) noexcept {
+  if (hole > 0) {
+    return QString("ROTATEDOCTAGONWITHHOLE,%1X%2X%3X%4X%5")
+        .arg(w->toMmString(), h->toMmString(), edge->toMmString(),
+             rot.toDegString(), hole->toMmString());
+  } else {
+    return QString("ROTATEDOCTAGON,%1X%2X%3X%4")
+        .arg(w->toMmString(), h->toMmString(), edge->toMmString(),
+             rot.toDegString());
   }
 }
 

@@ -152,6 +152,14 @@ void GerberGenerator::flashRegularPolygon(const Point&          pos,
   flashAtPosition(pos);
 }
 
+void GerberGenerator::flashOctagon(const Point& pos, const UnsignedLength& w,
+                                   const UnsignedLength& h,
+                                   const UnsignedLength& edge, const Angle& rot,
+                                   const UnsignedLength& hole) noexcept {
+  setCurrentAperture(mApertureList->setOctagon(w, h, edge, rot, hole));
+  flashAtPosition(pos);
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
