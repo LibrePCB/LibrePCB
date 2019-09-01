@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../geometry/hole.h"
-#include "primitivecirclegraphicsitem.h"
+#include "primitivepathgraphicsitem.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,7 +45,7 @@ class IF_GraphicsLayerProvider;
  * @brief The HoleGraphicsItem class is the graphical representation of a
  *        librepcb::Hole
  */
-class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem {
+class HoleGraphicsItem final : public PrimitivePathGraphicsItem {
 public:
   // Constructors / Destructor
   HoleGraphicsItem()                              = delete;
@@ -64,9 +64,10 @@ public:
   HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void     holeEdited(const Hole& hole, Hole::Event event) noexcept;
-  QVariant itemChange(GraphicsItemChange change,
-                      const QVariant&    value) noexcept override;
+  QPainterPath getPath(const Hole& hole) noexcept;
+  void         holeEdited(const Hole& hole, Hole::Event event) noexcept;
+  QVariant     itemChange(GraphicsItemChange change,
+                          const QVariant&    value) noexcept override;
 
 private:  // Data
   Hole&                                   mHole;
