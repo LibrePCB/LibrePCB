@@ -89,6 +89,9 @@ public:
   void flashRegularPolygon(const Point& pos, const UnsignedLength& dia, int n,
                            const Angle&          rot,
                            const UnsignedLength& hole) noexcept;
+  void flashOctagon(const Point& pos, const UnsignedLength& w,
+                    const UnsignedLength& h, const UnsignedLength& edge,
+                    const Angle& rot, const UnsignedLength& hole) noexcept;
 
   // General Methods
   void reset() noexcept;
