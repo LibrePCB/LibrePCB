@@ -5,15 +5,14 @@
 Test opening projects from within control panel
 """
 
-project = 'data/fixtures/Empty Project/Empty Project.lpp'
-
 
 def test_open_dialog(librepcb, helpers):
     """
     Open project by open dialog in control panel
     """
+    librepcb.add_project('Empty Project')
     with librepcb.open() as app:
-        path = librepcb.abspath(project)
+        path = librepcb.abspath('Empty Project/Empty Project.lpp')
         app.widget('controlPanelOpenProjectButton').click()
         app.widget('controlPanelOpenProjectDialogFileNameEdit').set_property('text', path)
         app.widget('controlPanelOpenProjectDialogOkButton').click()

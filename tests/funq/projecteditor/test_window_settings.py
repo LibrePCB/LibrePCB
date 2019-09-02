@@ -8,8 +8,6 @@ Test if window settings (position, size, toolbar visibility, ...) are saved and
 restored properly.
 """
 
-project = 'data/fixtures/Empty Project/Empty Project.lpp'
-
 
 def close_application(app):
     pass  # nothing to do, it will be closed automatically
@@ -50,7 +48,8 @@ def test(librepcb, close_method):
     new_brd_pos = (70, 80)
     new_brd_size = (820, 620)
 
-    librepcb.set_project(project)
+    librepcb.add_project('Empty Project')
+    librepcb.set_project('Empty Project/Empty Project.lpp')
     with librepcb.open() as app:
         # check default settings (LibrePCB.ini did not exist yet)
         assert app.widget('schematicEditorToolbarFile').properties()['visible'] is True

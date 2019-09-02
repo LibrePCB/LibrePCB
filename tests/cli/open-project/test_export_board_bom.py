@@ -2,35 +2,28 @@
 # -*- coding: utf-8 -*-
 
 import os
+import params
 import pytest
 
 """
 Test command "open-project --export-board-bom"
 """
 
-PROJECT_DIR_1 = 'data/Empty Project'
-PROJECT_PATH_1_LPP = PROJECT_DIR_1 + '/Empty Project.lpp'
-PROJECT_PATH_1_LPPZ = PROJECT_DIR_1 + '.lppz'
-OUTPUT_DIR_1_LPP = PROJECT_DIR_1 + '/output/v1/bom'
-OUTPUT_DIR_1_LPPZ = 'data/output/v1/bom'
 
-PROJECT_DIR_2 = 'data/Project With Two Boards'
-PROJECT_PATH_2_LPP = PROJECT_DIR_2 + '/Project With Two Boards.lpp'
-PROJECT_PATH_2_LPPZ = PROJECT_DIR_2 + '.lppz'
-OUTPUT_DIR_2_LPP = PROJECT_DIR_2 + '/output/v1/bom'
-OUTPUT_DIR_2_LPPZ = 'data/output/v1/bom'
+@pytest.mark.parametrize("project", [params.EMPTY_PROJECT_LPP_PARAM])
+def test_if_project_without_boards_succeeds(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
 
-
-def test_if_project_without_boards_succeeds(cli):
     # remove all boards first
-    with open(cli.abspath(PROJECT_DIR_1 + '/boards/boards.lp'), 'w') as f:
+    with open(cli.abspath(project.dir + '/boards/boards.lp'), 'w') as f:
         f.write('(librepcb_boards)')
-    relpath = OUTPUT_DIR_1_LPP + 'bom.csv'
+
+    relpath = project.output_dir + 'bom/bom.csv'
     abspath = cli.abspath(relpath)
     assert not os.path.exists(abspath)
     code, stdout, stderr = cli.run('open-project',
                                    '--export-board-bom=' + relpath,
-                                   PROJECT_PATH_1_LPP)
+                                   project.path)
     assert code == 0
     assert len(stderr) == 0
     assert len(stdout) > 0
@@ -38,20 +31,18 @@ def test_if_project_without_boards_succeeds(cli):
     assert not os.path.exists(abspath)  # nothing exported
 
 
-@pytest.mark.parametrize("project,output_dir", [
-    (PROJECT_PATH_2_LPP, OUTPUT_DIR_2_LPP),
-    (PROJECT_PATH_2_LPPZ, OUTPUT_DIR_2_LPPZ),
-], ids=[
-    'ProjectWithTwoBoards.lpp',
-    'ProjectWithTwoBoards.lppz',
+@pytest.mark.parametrize("project", [
+    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
-def test_export_project_with_two_boards_implicit(cli, project, output_dir):
-    fp = output_dir + r'/{{BOARD}}.csv'
-    dir = cli.abspath(output_dir)
+def test_export_project_with_two_boards_implicit(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    fp = project.output_dir + '/bom/{{BOARD}}.csv'
+    dir = cli.abspath(project.output_dir + '/bom')
     assert not os.path.exists(dir)
     code, stdout, stderr = cli.run('open-project',
                                    '--export-board-bom=' + fp,
-                                   project)
+                                   project.path)
     assert code == 0
     assert len(stderr) == 0
     assert len(stdout) > 0
@@ -60,21 +51,19 @@ def test_export_project_with_two_boards_implicit(cli, project, output_dir):
     assert len(os.listdir(dir)) == 2
 
 
-@pytest.mark.parametrize("project,output_dir", [
-    (PROJECT_PATH_2_LPP, OUTPUT_DIR_2_LPP),
-    (PROJECT_PATH_2_LPPZ, OUTPUT_DIR_2_LPPZ),
-], ids=[
-    'ProjectWithTwoBoards.lpp',
-    'ProjectWithTwoBoards.lppz',
+@pytest.mark.parametrize("project", [
+    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
-def test_export_project_with_two_boards_explicit_one(cli, project, output_dir):
-    fp = output_dir + r'/{{BOARD}}.csv'
-    dir = cli.abspath(output_dir)
+def test_export_project_with_two_boards_explicit_one(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    fp = project.output_dir + '/bom/{{BOARD}}.csv'
+    dir = cli.abspath(project.output_dir + '/bom')
     assert not os.path.exists(dir)
     code, stdout, stderr = cli.run('open-project',
                                    '--export-board-bom=' + fp,
                                    '--board=copy',
-                                   project)
+                                   project.path)
     assert code == 0
     assert len(stderr) == 0
     assert len(stdout) > 0
@@ -83,13 +72,15 @@ def test_export_project_with_two_boards_explicit_one(cli, project, output_dir):
     assert len(os.listdir(dir)) == 1
 
 
-def test_export_project_with_two_conflicting_boards_fails(cli):
-    fp = OUTPUT_DIR_2_LPP + '/bom.csv'
-    dir = cli.abspath(OUTPUT_DIR_2_LPP)
+@pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP])
+def test_export_project_with_two_conflicting_boards_fails(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    fp = project.output_dir + '/bom.csv'
+    dir = cli.abspath(project.output_dir + '/bom')
     assert not os.path.exists(dir)
     code, stdout, stderr = cli.run('open-project',
                                    '--export-board-bom=' + fp,
-                                   PROJECT_PATH_2_LPP)
+                                   project.path)
     assert code == 1
     assert len(stderr) > 0
     assert 'was written multiple times' in stderr[0]
