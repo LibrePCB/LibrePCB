@@ -211,7 +211,8 @@ Path BI_FootprintPad::getOutline(const Length& expansion) const noexcept {
 }
 
 Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept {
-  return getOutline(expansion).rotated(mRotation).translated(mPosition);
+  Angle rotation = getIsMirrored() ? -mRotation : mRotation;
+  return getOutline(expansion).rotated(rotation).translated(mPosition);
 }
 
 /*******************************************************************************
