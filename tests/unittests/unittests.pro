@@ -62,6 +62,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libclipper.a \
 
 SOURCES += \
+    common/alignmenttest.cpp \
     common/applicationtest.cpp \
     common/attributes/attributesubstitutortest.cpp \
     common/fileio/directorylocktest.cpp \
