@@ -119,14 +119,14 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval) {
  ******************************************************************************/
 
 void Length::setLengthFromFloat(qreal nanometers) {
-  LengthBase_t min   = std::numeric_limits<LengthBase_t>::min();
-  LengthBase_t max   = std::numeric_limits<LengthBase_t>::max();
-  qreal        value = qRound(nanometers);
-  if ((value > max) || (value < min)) {
-    throw RangeError(__FILE__, __LINE__, value, min, max);
+  LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
+  LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
+  if ((nanometers > static_cast<qreal>(max)) ||
+      (nanometers < static_cast<qreal>(min))) {
+    throw RangeError(__FILE__, __LINE__, nanometers, min, max);
   }
 
-  mNanometers = value;
+  mNanometers = qRound64(nanometers);
 }
 
 /*******************************************************************************
