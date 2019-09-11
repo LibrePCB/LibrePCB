@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import params
 import pytest
 
 """
 Test command "open-project"
 """
-
-PROJECT_LPP = 'data/Empty Project/Empty Project.lpp'
-PROJECT_LPPZ = 'data/Empty Project.lppz'
 
 
 def test_help(cli):
@@ -19,11 +17,12 @@ def test_help(cli):
 
 
 @pytest.mark.parametrize("project", [
-    PROJECT_LPP,
-    PROJECT_LPPZ,
+    params.EMPTY_PROJECT_LPP_PARAM,
+    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
 def test_open_project_absolute_path(cli, project):
-    code, stdout, stderr = cli.run('open-project', cli.abspath(project))
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    code, stdout, stderr = cli.run('open-project', cli.abspath(project.path))
     assert code == 0
     assert len(stderr) == 0
     assert len(stdout) > 0
@@ -31,14 +30,12 @@ def test_open_project_absolute_path(cli, project):
 
 
 @pytest.mark.parametrize("project", [
-    PROJECT_LPP,
-    PROJECT_LPPZ,
-], ids=[
-    'lpp',
-    'lppz'
+    params.EMPTY_PROJECT_LPP_PARAM,
+    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
 def test_open_project_relative_path(cli, project):
-    code, stdout, stderr = cli.run('open-project', project)
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    code, stdout, stderr = cli.run('open-project', project.path)
     assert code == 0
     assert len(stderr) == 0
     assert len(stdout) > 0
@@ -46,11 +43,12 @@ def test_open_project_relative_path(cli, project):
 
 
 @pytest.mark.parametrize("project", [
-    PROJECT_LPP,
-    PROJECT_LPPZ,
+    params.EMPTY_PROJECT_LPP_PARAM,
+    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
 def test_open_project_verbose(cli, project):
-    code, stdout, stderr = cli.run('open-project', '--verbose', project)
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    code, stdout, stderr = cli.run('open-project', '--verbose', project.path)
     assert code == 0
     assert len(stderr) > 0  # logging messages are on stderr
     assert len(stdout) > 0

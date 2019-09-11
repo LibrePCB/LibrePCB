@@ -60,7 +60,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       "/unittests/librepcbproject/BoardPlaneFragmentsBuilderTest");
 
   // open project from test data directory
-  FilePath projectFp = testDataDir.getPathTo("test_project/test_project.lpp");
+  FilePath projectFp(TEST_DATA_DIR "/projects/Nested Planes/project.lpp");
   std::shared_ptr<TransactionalFileSystem> projectFs =
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   QScopedPointer<Project> project(

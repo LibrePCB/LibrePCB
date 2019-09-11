@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import params
 import pytest
 
 """
@@ -13,15 +14,13 @@ PROJECT_LPPZ = 'data/Empty Project.lppz'
 
 
 @pytest.mark.parametrize("project", [
-    PROJECT_LPP,
-    PROJECT_LPPZ,
-], ids=[
-    'lpp',
-    'lppz'
+    params.EMPTY_PROJECT_LPP_PARAM,
+    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
 def test_save(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
     # append some zeros to the project file
-    path = cli.abspath(project)
+    path = cli.abspath(project.path)
     with open(path, 'ab') as f:
         f.write(b'\0\0')
     original_filesize = os.path.getsize(path)

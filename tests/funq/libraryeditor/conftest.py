@@ -3,7 +3,7 @@
 
 import pytest
 
-library = 'data/fixtures/Populated Library.lplib'
+library = 'libraries/Populated Library.lplib'
 
 
 @pytest.fixture

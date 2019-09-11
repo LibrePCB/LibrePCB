@@ -93,6 +93,7 @@ SOURCES += \
     library/cmp/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
     main.cpp \
+    project/boards/boardgerberexporttest.cpp \
     project/boards/boardplanefragmentsbuildertest.cpp \
     project/library/projectlibrarytest.cpp \
     project/projecttest.cpp \
