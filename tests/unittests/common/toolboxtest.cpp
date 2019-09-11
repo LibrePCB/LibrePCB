@@ -38,6 +38,44 @@ namespace tests {
 class ToolboxTest : public ::testing::Test {};
 
 /*******************************************************************************
+ *  Parametrized arcCenter() Tests
+ ******************************************************************************/
+
+struct ToolboxArcCenterTestData {
+  Point p1;
+  Point p2;
+  Angle angle;
+  Point center;
+};
+
+class ToolboxArcCenterTest
+  : public ToolboxTest,
+    public ::testing::WithParamInterface<ToolboxArcCenterTestData> {};
+
+TEST_P(ToolboxArcCenterTest, test) {
+  const ToolboxArcCenterTestData& data = GetParam();
+
+  // On Windows, abort here and skip this test because on AppVeyor the result
+  // is slightly different. See discussion here:
+  // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+  GTEST_SKIP();
+#endif
+
+  EXPECT_EQ(data.center, Toolbox::arcCenter(data.p1, data.p2, data.angle));
+}
+
+// clang-format off
+static ToolboxArcCenterTestData sToolboxArcCenterTestData[] = {
+// p1,                         p2,                         angle,              center
+  {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955023, 27411478)}
+};
+// clang-format on
+
+INSTANTIATE_TEST_SUITE_P(ToolboxArcCenterTest, ToolboxArcCenterTest,
+                         ::testing::ValuesIn(sToolboxArcCenterTestData));
+
+/*******************************************************************************
  *  Parametrized incrementNumberInString() Tests
  ******************************************************************************/
 
