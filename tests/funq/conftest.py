@@ -15,8 +15,6 @@ FUNQ_DIR = os.path.dirname(__file__)
 TESTS_DIR = os.path.dirname(FUNQ_DIR)
 REPO_DIR = os.path.dirname(TESTS_DIR)
 DATA_DIR = os.path.join(TESTS_DIR, 'data')
-FUNQ_DATA_DIR = os.path.join(DATA_DIR, 'funq')
-FIXTURES_DATA_DIR = os.path.join(FUNQ_DATA_DIR, 'fixtures')
 
 
 def pytest_addoption(parser):
@@ -56,10 +54,10 @@ class LibrePcbFixture(object):
                             "'--librepcb-executable'.".format(self.executable))
         self.tmpdir = tmpdir
         # Copy test data to temporary directory to avoid modifications in original data
-        self.data_dir = os.path.join(self.tmpdir, 'data')
-        shutil.copytree(FUNQ_DATA_DIR, self.data_dir)
+        shutil.copytree(os.path.join(DATA_DIR, 'workspaces', 'Empty Workspace'),
+                        os.path.join(self.tmpdir, 'Empty Workspace'))
         # Init members to default values
-        self.workspace_path = os.path.join(self.data_dir, 'fixtures', 'Empty Workspace')
+        self.workspace_path = os.path.join(self.tmpdir, 'Empty Workspace')
         self.project_path = None
 
     def abspath(self, relpath):
@@ -69,6 +67,15 @@ class LibrePcbFixture(object):
         if not os.path.isabs(path):
             path = self.abspath(path)
         self.workspace_path = path
+
+    def add_project(self, project, as_lppz=False):
+        src = os.path.join(DATA_DIR, 'projects', project)
+        dst = os.path.join(self.tmpdir, project)
+        if as_lppz:
+            shutil.make_archive(dst, 'zip', src)
+            shutil.move(dst + '.zip', dst + '.lppz')
+        else:
+            shutil.copytree(src, dst)
 
     def set_project(self, path):
         if not os.path.isabs(path):
@@ -80,7 +87,7 @@ class LibrePcbFixture(object):
 
     def add_local_library_to_workspace(self, path):
         if not os.path.isabs(path):
-            path = self.abspath(path)
+            path = os.path.join(DATA_DIR, path)
         dest = self.get_workspace_libraries_path('local')
         dest = os.path.join(dest, os.path.basename(path))
         shutil.copytree(path, dest)
@@ -202,7 +209,7 @@ def librepcb_server():
         def translate_path(self, path):
             path = super(Handler, self).translate_path(path)
             relpath = os.path.relpath(path, os.curdir)
-            return os.path.join(FIXTURES_DATA_DIR, 'server', relpath)
+            return os.path.join(DATA_DIR, 'server', relpath)
 
     # Set SO_REUSEADDR option to avoid "port already in use" errors
     httpd = socketserver.TCPServer(("", 50080), Handler, bind_and_activate=False)

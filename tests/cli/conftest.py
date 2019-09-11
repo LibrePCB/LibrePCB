@@ -12,8 +12,6 @@ CLI_DIR = os.path.dirname(__file__)
 TESTS_DIR = os.path.dirname(CLI_DIR)
 REPO_DIR = os.path.dirname(TESTS_DIR)
 DATA_DIR = os.path.join(TESTS_DIR, 'data')
-CLI_DATA_DIR = os.path.join(DATA_DIR, 'cli')
-FIXTURES_DATA_DIR = os.path.join(CLI_DATA_DIR, 'fixtures')
 
 
 def pytest_addoption(parser):
@@ -30,15 +28,6 @@ class CliExecutor(object):
             raise Exception("Executable '{}' not found. Please pass it with "
                             "'--librepcb-executable'.".format(self.executable))
         self.tmpdir = tmpdir
-        # Copy test data to temporary directory to avoid modifications in original data
-        self.data_dir = os.path.join(self.tmpdir, 'data')
-        shutil.copytree(CLI_DATA_DIR, self.data_dir)
-        # Create zipped projects
-        for dirname in os.listdir(self.data_dir):
-            dirpath = os.path.join(self.data_dir, dirname)
-            if dirname + ".lpp" in os.listdir(dirpath):
-                shutil.make_archive(dirpath, 'zip', dirpath)
-                shutil.move(dirpath + '.zip', dirpath + '.lppz')
 
     def __enter__(self):
         return self
@@ -48,6 +37,15 @@ class CliExecutor(object):
 
     def abspath(self, relpath):
         return os.path.join(self.tmpdir, relpath)
+
+    def add_project(self, project, as_lppz=False):
+        src = os.path.join(DATA_DIR, 'projects', project)
+        dst = os.path.join(self.tmpdir, project)
+        if as_lppz:
+            shutil.make_archive(dst, 'zip', src)
+            shutil.move(dst + '.zip', dst + '.lppz')
+        else:
+            shutil.copytree(src, dst)
 
     def run(self, *args):
         p = subprocess.Popen([self.executable] + list(args), cwd=self.tmpdir,

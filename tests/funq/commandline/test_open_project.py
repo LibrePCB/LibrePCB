@@ -5,14 +5,13 @@
 Test opening projects by command line arguments
 """
 
-project = 'data/fixtures/Empty Project/Empty Project.lpp'
-
 
 def test_open_project(librepcb, helpers):
     """
     Open project by command line argument
     """
-    librepcb.set_project(project)
+    librepcb.add_project('Empty Project')
+    librepcb.set_project('Empty Project/Empty Project.lpp')
     with librepcb.open() as app:
         # Check if both editors were opened
         assert app.widget('schematicEditor').properties()['visible'] is True
