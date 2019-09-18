@@ -152,6 +152,101 @@ There exist two types of categories, while all regular element types use exactly
     - librepcb::library::Package
 
 
+# Field Formats {#doc_library_field_formats}
+
+
+
+- TEXT: strings are always enclosed in double quotes. "TEXT"
+    - Use A through Z,a through z and 0-9.
+    - Use comma,space,dash,underscore and period.
+    - Any field may impose additional restrictions (IE: no spaces).
+    - Special character for LINEFEED not yet defined.
+
+- NUMERIC: numbers  are never enclosed in double quotes.
+    - Use  0-9, dash and period
+
+
+- UUID: Universal unique identifiers are used to track objects:
+    - version 4 (random).
+    - use lower case hexidecimal digits.
+    - use form hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh.
+
+- TIME: Always use international date/time formats in files:
+    - Use the [ISO 8601] format for date/time in all files.
+    - Use UTC time in all files, e.g. `2014-12-20T14:42:30Z`.
+
+
+
+- FIXED: Chose from a set of defined offerings.
+    - true/false.
+
+
+
+# File formats {#doc_library_file_formats}
+
+
+- symbol.lp 
+
+
+      (librepcb_symbol UUID                          LP_SYMBOL_UUID
+      (name "TEXT")                                  LP_SYMBOL_NAME
+      (description "TEXT")                           LP_DESCRIPTION
+      (keywords "TEXT")                              LP_KEYWORDS
+      (author "TEXT")                                LP_AUTHOR
+      (version "TEXT")                               LP_VERSION
+      (created TIME)                                 LP_TIME
+      (deprecated FIXED)                             LP_DEPRECATED
+      (category UUID)                                LP_CATEGORY_UUID
+
+                                                     [
+      (pin UUID                                      LP_SYMBOL_PIN_UUID
+      (name "TEXT")                                  LP_SYMBOL_PIN_NAME
+      (position NUMERIC NUMERIC)                     LP_POSITION_X LP_POSITION_Y 
+      (rotation NUMERIC)                             LP_ROTATION
+      (length NUMERIC)                               LP_LENGTH
+      )                                              ] repeat 0 or more times
+                                   
+                                                     [
+      (polygon UUID                                  LP_GRAPHIC_UUID
+      (layer FIXED)                                  LP_GRAPHIC_LAYER
+      (width NUMERIC)                                LP_GRAPHIC_WIDTH
+      (fill FIXED)                                   LP_GRAPHIC_FILL
+      (grab_area FIXED)                              LP_GRAPHIC_GRAB
+                                                         [
+      (vertex
+      (position NUMERIC NUMERIC)                         LP_POSITION_X LP_POSITION_Y
+      (angle NUMERIC)                                    LP_ANGLE
+      )                                                  ] repeat 2 or more times
+                                  
+      )                                              ] repeat 0 or more times
+                                                
+                                                     [
+      (circle UUID                                   LP_GRAPHIC_UUID
+      (layer FIXED)                                  LP_GRAPHIC_LAYER
+      (width NUMERIC)                                LP_GRAPHIC_WIDTH
+      (fill FIXED)                                   LP_GRAPHIC_FILL
+      (grab_area FIXED)                              LP_GRAPHIC_GRAB
+      (diameter NUMERIC)                             LP_GRAPHIC_DIAMETER
+      (position NUMERIC NUMERIC )                    LP_POSITION_X LP_POSITION_Y
+      )                                              ] repeat 0 or more times
+ 
+
+
+
+                                                     [
+       (text UUID                                    LP_TEXT_UUID
+       (layer sym_names)                             LP_GRAPHIC_LAYER
+       (value "TEXT")                                LP_VALUE          
+       (align FIXED)                                 LP_ALIGN          
+       (height NUMERIC)                              LP_HEIGHT
+       (position NUMERIC NUMERIC)                    LP_POSITION_X,LP_POSITION_Y
+       (rotation NUMERIC)                            LP_ROTATION
+       ) 
+                                                     ] repeat 2 or more times. must have {{NAME}} and {{VALUE}}
+       )
+
+
+
 # Dependencies {#doc_library_dependencies}
 
 A library can have dependencies to other libraries. Therefore, a library needs to provide a list of
