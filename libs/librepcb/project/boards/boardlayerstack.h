@@ -61,7 +61,7 @@ public:
 
   // Getters
   Board& getBoard() const noexcept { return mBoard; }
-  int    getInnerLayerCount() const noexcept { return mInnerLayerCount; }
+  int getInnerLayerCount() const noexcept { return mInnerLayerCount; }
   QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
   /// @copydoc IF_BoardLayerProvider#getAllBoardLayerIds()

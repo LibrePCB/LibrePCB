@@ -369,7 +369,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
       if (GraphicsLayer* linesLayer = netpoint->getLayerOfLines()) {
         layer = linesLayer;
       }
-    } else if (BI_Via* via = findVia(board, pos)) {
+    } else if (BI_Via* via = findVia(board, pos, layer)) {
       mFixedStartAnchor = via;
       netsegment        = &via->getNetSegment();
     } else if (BI_FootprintPad* pad = findPad(board, pos)) {
@@ -485,7 +485,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board, const Point& pos) noexcept {
                            {mPositioningNetPoint1, mPositioningNetPoint2})) {
         otherAnchor     = netpoint;
         otherNetSegment = &netpoint->getNetSegment();
-      } else if (BI_Via* via = findVia(board, pos, netsignal)) {
+      } else if (BI_Via* via = findVia(board, pos, layer, netsignal)) {
         otherAnchor     = via;
         otherNetSegment = &via->getNetSegment();
       } else if (BI_FootprintPad* pad = findPad(board, pos, layer, netsignal)) {
@@ -608,8 +608,9 @@ bool BES_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
 }
 
 BI_Via* BES_DrawTrace::findVia(Board& board, const Point& pos,
+                               GraphicsLayer* layer,
                                NetSignal* netsignal) const noexcept {
-  QList<BI_Via*> items = board.getViasAtScenePos(pos, netsignal);
+  QList<BI_Via*> items = board.getViasAtScenePos(pos, layer, netsignal);
   return items.count() > 0 ? items.first() : nullptr;
 }
 

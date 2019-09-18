@@ -27,6 +27,8 @@
 #include "./bi_netline.h"
 #include "bi_base.h"
 
+#include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
@@ -61,7 +63,11 @@ public:
   BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
   BI_Via(BI_NetSegment& netsegment, const SExpression& node);
   BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
-         const PositiveLength& size, const PositiveLength& drillDiameter);
+         const PositiveLength& size, const PositiveLength& drillDiameter,
+         const QString& startLayerName, const QString& stopLayerName);
+  BI_Via(BI_NetSegment& netsegment, const Point& position, BI_Via::Shape shape,
+         const PositiveLength& size, const PositiveLength& drillDiameter,
+         GraphicsLayer* startLayer, GraphicsLayer* stopLayer);
   ~BI_Via() noexcept;
 
   // Getters
@@ -72,9 +78,25 @@ public:
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
   }
+  GraphicsLayer*        getStartLayer() const noexcept {
+    return mBoard.getLayerStack().getLayer(*mStartLayerName);
+  }
+  GraphicsLayer*        getStopLayer() const noexcept {
+    return mBoard.getLayerStack().getLayer(*mStopLayerName);
+  }
+  const QString&        getStartLayerName() const noexcept {
+    return *mStartLayerName;
+  }
+  const QString&        getStopLayerName() const noexcept {
+    return *mStopLayerName;
+  }
+  int             getStartLayerIndex() const noexcept;
+  int             getStopLayerIndex() const noexcept;
+
   const PositiveLength& getSize() const noexcept { return mSize; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOnLayer(const QString& layerName) const noexcept;
+  bool isOnLayer(GraphicsLayer* layer) const noexcept;
   bool isSelectable() const noexcept override;
   Path getOutline(const Length& expansion = Length(0)) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
@@ -86,6 +108,9 @@ public:
   void setShape(Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  void setLayers(const GraphicsLayerName& startLayer,
+                 const GraphicsLayerName& stopLayer);
+  void setLayers(GraphicsLayer* startLayer, GraphicsLayer* stopLayer);
 
   // General Methods
   void addToBoard() override;
@@ -123,11 +148,13 @@ private:
   QMetaObject::Connection mHighlightChangedConnection;
 
   // Attributes
-  Uuid           mUuid;
-  Point          mPosition;
-  Shape          mShape;
-  PositiveLength mSize;
-  PositiveLength mDrillDiameter;
+  Uuid                  mUuid;
+  Point                 mPosition;
+  Shape                 mShape;
+  PositiveLength        mSize;
+  PositiveLength        mDrillDiameter;
+  GraphicsLayerName     mStartLayerName;
+  GraphicsLayerName     mStopLayerName;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

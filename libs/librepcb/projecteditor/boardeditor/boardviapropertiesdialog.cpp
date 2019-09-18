@@ -27,6 +27,7 @@
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/circuit/netsignal.h>
 
 #include <QtCore>
@@ -74,6 +75,29 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
 
   // netsignal combobox
   mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
+
+  BoardLayerStack* layerStack = &via.getBoard().getLayerStack();
+  QString layerName = GraphicsLayer::sTopCopper;
+  mUi->cbxStartLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                              layerName);
+  for (int i = 1; i <= layerStack->getInnerLayerCount(); ++i){
+    layerName = GraphicsLayer::getInnerLayerName(i);
+    mUi->cbxStartLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                                layerName);
+    mUi->cbxStopLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                               layerName);
+  }
+  layerName = GraphicsLayer::sBotCopper;
+  mUi->cbxStopLayer->addItem(layerStack->getLayer(layerName)->getNameTr(),
+                             layerName);
+  connect(mUi->cbxStartLayer,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+          this, &BoardViaPropertiesDialog::startLayerChanged);
+  connect(mUi->cbxStopLayer,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+          this, &BoardViaPropertiesDialog::stopLayerChanged);
+  mUi->cbxStartLayer->setCurrentIndex(via.getStartLayerIndex());
+  mUi->cbxStopLayer->setCurrentIndex(via.getStopLayerIndex() - 1);
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
@@ -122,12 +146,27 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     cmd->setDrillDiameter(
         PositiveLength(Length::fromMm(mUi->spbxDrillDiameter->value())),
         false);  // can throw
+    cmd->setStartLayerName(mUi->cbxStartLayer->currentData().toString(), false);
+    cmd->setStopLayerName(mUi->cbxStopLayer->currentData().toString(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
+}
+
+void BoardViaPropertiesDialog::startLayerChanged(int index) noexcept{
+  if (mUi->cbxStopLayer->currentIndex() <= index){
+    mUi->cbxStopLayer->setCurrentIndex(index);
+  }
+}
+
+void BoardViaPropertiesDialog::stopLayerChanged(int index) noexcept{
+  if (mUi->cbxStartLayer->currentIndex() >= index){
+    mUi->cbxStartLayer->setCurrentIndex(index);
+  }
+
 }
 
 /*******************************************************************************

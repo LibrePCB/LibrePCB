@@ -120,6 +120,15 @@ QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
 
 void BoardLayerStack::setInnerLayerCount(int count) noexcept {
   if ((count >= 0) && (count != mInnerLayerCount)) {
+
+    int maxInnerLayersCount = GraphicsLayer::getInnerLayerCount();
+    if (count > maxInnerLayersCount){
+      mInnerLayerCount = maxInnerLayersCount;
+    }
+    else{
+      mInnerLayerCount = count;
+    }
+
     mInnerLayerCount = count;
     for (GraphicsLayer* layer : mLayers) {
       if (layer->isInnerLayer() && layer->isCopperLayer()) {
@@ -166,11 +175,13 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBoardPadsTht);
   addLayer(GraphicsLayer::sBoardAirWires);
 
+//  mTopLayerIndex = mLayers.count();
   // copper layers
   addLayer(GraphicsLayer::sTopCopper);
   for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
     addLayer(GraphicsLayer::getInnerLayerName(i));
   }
+//  mBottomLayerIndex = mLayers.count();
   addLayer(GraphicsLayer::sBotCopper);
 
   // symmetric board layers

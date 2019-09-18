@@ -209,7 +209,9 @@ void CmdRemoveBoardItems::createNewSubNetSegment(BI_NetSegment& netsegment,
   foreach (const BI_Via* via, items.vias) {
     BI_Via* newVia =
         cmdAddElements->addVia(via->getPosition(), via->getShape(),
-                               via->getSize(), via->getDrillDiameter());
+                               via->getSize(), via->getDrillDiameter(),
+                               via->getStartLayerName(),
+                               via->getStopLayerName());
     Q_ASSERT(newVia);
     anchorMap.insert(via, newVia);
   }

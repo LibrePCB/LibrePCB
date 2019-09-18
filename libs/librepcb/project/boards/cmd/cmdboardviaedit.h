@@ -58,6 +58,9 @@ public:
   void setSize(const PositiveLength& size, bool immediate) noexcept;
   void setDrillDiameter(const PositiveLength& diameter,
                         bool                  immediate) noexcept;
+  void setStartLayerName(const QString& startLayerName,
+                         bool immediate) noexcept;
+  void setStopLayerName(const QString& stopLayerName, bool immediate) noexcept;
 
 private:
   // Private Methods
@@ -85,6 +88,10 @@ private:
   PositiveLength mNewSize;
   PositiveLength mOldDrillDiameter;
   PositiveLength mNewDrillDiameter;
+  QString        mOldStartLayerName;
+  QString        mNewStartLayerName;
+  QString        mOldStopLayerName;
+  QString        mNewStopLayerName;
 };
 
 /*******************************************************************************
