@@ -133,9 +133,8 @@ QVariant PathModel::data(const QModelIndex& index, int role) const {
           mPath.getVertices().value(index.row(), mNewVertex).getPos().getX();
       switch (role) {
         case Qt::DisplayRole:
-          return val.toMmString() + " mm";
         case Qt::EditRole:
-          return val.toMm();
+          return QVariant::fromValue(val);
         default:
           return QVariant();
       }
@@ -145,9 +144,8 @@ QVariant PathModel::data(const QModelIndex& index, int role) const {
           mPath.getVertices().value(index.row(), mNewVertex).getPos().getY();
       switch (role) {
         case Qt::DisplayRole:
-          return val.toMmString() + " mm";
         case Qt::EditRole:
-          return val.toMm();
+          return QVariant::fromValue(val);
         default:
           return QVariant();
       }
@@ -156,9 +154,8 @@ QVariant PathModel::data(const QModelIndex& index, int role) const {
       Angle val = mPath.getVertices().value(index.row(), mNewVertex).getAngle();
       switch (role) {
         case Qt::DisplayRole:
-          return val.toDegString() + "°";
         case Qt::EditRole:
-          return val.toDeg();
+          return QVariant::fromValue(val);
         default:
           return QVariant();
       }
@@ -237,33 +234,33 @@ bool PathModel::setData(const QModelIndex& index, const QVariant& value,
       vertex = &mPath.getVertices()[index.row()];
     }
     if ((index.column() == COLUMN_X) && role == Qt::EditRole) {
-      QString valueStr = value.toString().trimmed();
+      Length x = value.value<Length>();
       if (vertex) {
         Point pos = vertex->getPos();
-        pos.setX(Length::fromMm(valueStr));
+        pos.setX(x);
         vertex->setPos(pos);
       } else {
         Point pos = mNewVertex.getPos();
-        pos.setX(Length::fromMm(valueStr));
+        pos.setX(x);
         mNewVertex.setPos(pos);
       }
     } else if ((index.column() == COLUMN_Y) && role == Qt::EditRole) {
-      QString valueStr = value.toString().trimmed();
+      Length y = value.value<Length>();
       if (vertex) {
         Point pos = vertex->getPos();
-        pos.setY(Length::fromMm(valueStr));
+        pos.setY(y);
         vertex->setPos(pos);
       } else {
         Point pos = mNewVertex.getPos();
-        pos.setY(Length::fromMm(valueStr));
+        pos.setY(y);
         mNewVertex.setPos(pos);
       }
     } else if ((index.column() == COLUMN_ANGLE) && role == Qt::EditRole) {
-      QString valueStr = value.toString().trimmed();
+      Angle angle = value.value<Angle>();
       if (vertex) {
-        vertex->setAngle(Angle::fromDeg(valueStr));
+        vertex->setAngle(angle);
       } else {
-        mNewVertex.setAngle(Angle::fromDeg(valueStr));
+        mNewVertex.setAngle(angle);
       }
     } else {
       return false;
