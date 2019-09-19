@@ -133,6 +133,7 @@ SOURCES += \
     widgets/doublespinbox.cpp \
     widgets/editabletablewidget.cpp \
     widgets/graphicslayercombobox.cpp \
+    widgets/lengthedit.cpp \
     widgets/numbereditbase.cpp \
     widgets/patheditorwidget.cpp \
     widgets/plaintextedit.cpp \
@@ -263,6 +264,7 @@ HEADERS += \
     widgets/doublespinbox.h \
     widgets/editabletablewidget.h \
     widgets/graphicslayercombobox.h \
+    widgets/lengthedit.h \
     widgets/numbereditbase.h \
     widgets/patheditorwidget.h \
     widgets/plaintextedit.h \
