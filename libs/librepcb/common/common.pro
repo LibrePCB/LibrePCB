@@ -100,6 +100,7 @@ SOURCES += \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
     model/comboboxdelegate.cpp \
+    model/lengthdelegate.cpp \
     model/sortfilterproxymodel.cpp \
     network/filedownload.cpp \
     network/networkaccessmanager.cpp \
@@ -226,6 +227,7 @@ HEADERS += \
     graphics/textgraphicsitem.h \
     gridproperties.h \
     model/comboboxdelegate.h \
+    model/lengthdelegate.h \
     model/sortfilterproxymodel.h \
     network/filedownload.h \
     network/networkaccessmanager.h \
