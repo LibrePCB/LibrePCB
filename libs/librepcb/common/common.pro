@@ -130,6 +130,7 @@ SOURCES += \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
     widgets/centeredcheckbox.cpp \
+    widgets/doublespinbox.cpp \
     widgets/editabletablewidget.cpp \
     widgets/graphicslayercombobox.cpp \
     widgets/numbereditbase.cpp \
@@ -259,6 +260,7 @@ HEADERS += \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
     widgets/centeredcheckbox.h \
+    widgets/doublespinbox.h \
     widgets/editabletablewidget.h \
     widgets/graphicslayercombobox.h \
     widgets/numbereditbase.h \
