@@ -99,6 +99,7 @@ SOURCES += \
     graphics/stroketextgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
+    model/angledelegate.cpp \
     model/comboboxdelegate.cpp \
     model/lengthdelegate.cpp \
     model/sortfilterproxymodel.cpp \
@@ -227,6 +228,7 @@ HEADERS += \
     graphics/stroketextgraphicsitem.h \
     graphics/textgraphicsitem.h \
     gridproperties.h \
+    model/angledelegate.h \
     model/comboboxdelegate.h \
     model/lengthdelegate.h \
     model/sortfilterproxymodel.h \
