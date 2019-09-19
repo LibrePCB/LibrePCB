@@ -261,7 +261,12 @@ public:
     mUnit = rhs.mUnit;
     return *this;
   }
-  bool operator==(const LengthUnit& rhs) noexcept { return mUnit == rhs.mUnit; }
+  bool operator==(const LengthUnit& rhs) const noexcept {
+    return mUnit == rhs.mUnit;
+  }
+  bool operator!=(const LengthUnit& rhs) const noexcept {
+    return mUnit != rhs.mUnit;
+  }
 
 private:
   // Private Methods
