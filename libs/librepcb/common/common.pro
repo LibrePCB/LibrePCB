@@ -127,6 +127,7 @@ SOURCES += \
     uuid.cpp \
     version.cpp \
     widgets/alignmentselector.cpp \
+    widgets/angleedit.cpp \
     widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
@@ -259,6 +260,7 @@ HEADERS += \
     uuid.h \
     version.h \
     widgets/alignmentselector.h \
+    widgets/angleedit.h \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
