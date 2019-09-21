@@ -1,123 +1,123 @@
 <RCC>
     <qresource prefix="/img">
         <file>actions/add.png</file>
+        <file>actions/add_component.png</file>
         <file>actions/add_hole.png</file>
         <file>actions/add_name.png</file>
-        <file>actions/add_value.png</file>
-        <file>actions/add_text.png</file>
-        <file>actions/add_symbol_pin.png</file>
-        <file>actions/add_via.png</file>
+        <file>actions/add_plane.png</file>
         <file>actions/add_smt_pad.png</file>
+        <file>actions/add_symbol_pin.png</file>
+        <file>actions/add_text.png</file>
         <file>actions/add_tht_pad.png</file>
+        <file>actions/add_value.png</file>
+        <file>actions/add_via.png</file>
         <file>actions/apply.png</file>
+        <file>actions/board_editor.png</file>
         <file>actions/bookmark.png</file>
         <file>actions/bookmark_gray.png</file>
+        <file>actions/cam_export.png</file>
         <file>actions/cancel.png</file>
-        <file>actions/add_component.png</file>
-        <file>actions/board_editor.png</file>
+        <file>actions/close.png</file>
         <file>actions/copy.png</file>
         <file>actions/cut.png</file>
         <file>actions/delete.png</file>
+        <file>actions/down.png</file>
         <file>actions/download.png</file>
+        <file>actions/draw_circle.png</file>
+        <file>actions/draw_line.png</file>
+        <file>actions/draw_netlabel.png</file>
+        <file>actions/draw_polygon.png</file>
+        <file>actions/draw_rectangle.png</file>
+        <file>actions/draw_wire.png</file>
         <file>actions/edit.png</file>
+        <file>actions/export_gerber.png</file>
+        <file>actions/export_zip.png</file>
+        <file>actions/flip_horizontal.png</file>
+        <file>actions/flip_vertical.png</file>
         <file>actions/generate_bom.png</file>
+        <file>actions/grid.png</file>
         <file>actions/help.png</file>
         <file>actions/home.png</file>
         <file>actions/info.png</file>
+        <file>actions/layers.png</file>
         <file>actions/minus.png</file>
+        <file>actions/move.png</file>
         <file>actions/new.png</file>
         <file>actions/new_2.png</file>
+        <file>actions/new_file.png</file>
+        <file>actions/new_folder.png</file>
         <file>actions/open.png</file>
         <file>actions/open_browser.png</file>
         <file>actions/paste.png</file>
+        <file>actions/pdf.png</file>
         <file>actions/plus.png</file>
         <file>actions/plus_2.png</file>
         <file>actions/print.png</file>
         <file>actions/print_preview.png</file>
         <file>actions/quit.png</file>
+        <file>actions/rebuild_plane.png</file>
+        <file>actions/recent.png</file>
         <file>actions/redo.png</file>
+        <file>actions/refresh.png</file>
+        <file>actions/rotate_left.png</file>
+        <file>actions/rotate_right.png</file>
         <file>actions/save.png</file>
+        <file>actions/schematic.png</file>
         <file>actions/search.png</file>
+        <file>actions/select.png</file>
         <file>actions/select_rect.png</file>
         <file>actions/settings.png</file>
         <file>actions/stop.png</file>
         <file>actions/undo.png</file>
+        <file>actions/up.png</file>
+        <file>actions/working.png</file>
         <file>actions/zoom_all.png</file>
         <file>actions/zoom_in.png</file>
         <file>actions/zoom_out.png</file>
-        <file>actions/pdf.png</file>
-        <file>actions/working.png</file>
-        <file>actions/move.png</file>
-        <file>actions/refresh.png</file>
-        <file>actions/draw_wire.png</file>
-        <file>actions/draw_line.png</file>
-        <file>actions/export_gerber.png</file>
-        <file>actions/export_zip.png</file>
-        <file>actions/schematic.png</file>
-        <file>actions/recent.png</file>
-        <file>actions/down.png</file>
-        <file>actions/up.png</file>
-        <file>actions/add_plane.png</file>
-        <file>actions/rebuild_plane.png</file>
+        <file>app/librepcb.png</file>
+        <file>command_toolbars/cancel.png</file>
+        <file>command_toolbars/pad_bottom.png</file>
+        <file>command_toolbars/pad_tht.png</file>
+        <file>command_toolbars/pad_top.png</file>
+        <file>command_toolbars/shape_octagon.png</file>
+        <file>command_toolbars/shape_rect.png</file>
+        <file>command_toolbars/shape_round.png</file>
+        <file>command_toolbars/via_octagon.png</file>
         <file>command_toolbars/via_round.png</file>
         <file>command_toolbars/via_square.png</file>
-        <file>command_toolbars/via_octagon.png</file>
-        <file>command_toolbars/shape_round.png</file>
-        <file>command_toolbars/shape_rect.png</file>
-        <file>command_toolbars/shape_octagon.png</file>
         <file>command_toolbars/wire_45_90.png</file>
         <file>command_toolbars/wire_90_45.png</file>
         <file>command_toolbars/wire_h_v.png</file>
         <file>command_toolbars/wire_straight.png</file>
         <file>command_toolbars/wire_v_h.png</file>
-        <file>command_toolbars/cancel.png</file>
-        <file>command_toolbars/pad_top.png</file>
-        <file>command_toolbars/pad_bottom.png</file>
-        <file>command_toolbars/pad_tht.png</file>
+        <file>empty.png</file>
         <file>library/3d_model.png</file>
+        <file>library/bipolar_capacitor_eu.png</file>
+        <file>library/component.png</file>
         <file>library/device.png</file>
         <file>library/footprint.png</file>
-        <file>library/component.png</file>
-        <file>library/package.png</file>
-        <file>library/symbol.png</file>
-        <file>actions/cam_export.png</file>
-        <file>actions/select.png</file>
-        <file>actions/rotate_left.png</file>
-        <file>actions/rotate_right.png</file>
-        <file>actions/flip_horizontal.png</file>
-        <file>actions/flip_vertical.png</file>
-        <file>app/librepcb.png</file>
-        <file>places/folder_gray.png</file>
-        <file>places/folder_open_gray.png</file>
-        <file>places/folder_open.png</file>
-        <file>places/folder.png</file>
-        <file>places/folder_open_green.png</file>
-        <file>places/folder_green.png</file>
-        <file>places/project_folder.png</file>
-        <file>actions/close.png</file>
-        <file>actions/new_file.png</file>
-        <file>actions/new_folder.png</file>
-        <file>places/file.png</file>
-        <file>empty.png</file>
-        <file>actions/draw_circle.png</file>
-        <file>actions/draw_polygon.png</file>
-        <file>actions/draw_rectangle.png</file>
-        <file>actions/draw_netlabel.png</file>
-        <file>actions/grid.png</file>
-        <file>actions/layers.png</file>
-        <file>library/resistor_eu.png</file>
-        <file>library/inductor_eu.png</file>
-        <file>library/bipolar_capacitor_eu.png</file>
-        <file>library/unipolar_capacitor_eu.png</file>
         <file>library/gnd.png</file>
+        <file>library/inductor_eu.png</file>
+        <file>library/package.png</file>
+        <file>library/resistor_eu.png</file>
+        <file>library/symbol.png</file>
+        <file>library/unipolar_capacitor_eu.png</file>
         <file>library/vcc.png</file>
+        <file>logo/32x32.png</file>
+        <file>logo/48x48.png</file>
+        <file>logo/64x64.png</file>
+        <file>places/file.png</file>
+        <file>places/folder.png</file>
+        <file>places/folder_gray.png</file>
+        <file>places/folder_green.png</file>
+        <file>places/folder_open.png</file>
+        <file>places/folder_open_gray.png</file>
+        <file>places/folder_open_green.png</file>
+        <file>places/project_folder.png</file>
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
         <file>status/success.png</file>
-        <file>logo/32x32.png</file>
-        <file>logo/48x48.png</file>
-        <file>logo/64x64.png</file>
         <file>wizards/watermark.jpg</file>
     </qresource>
     <qresource prefix="/"/>
