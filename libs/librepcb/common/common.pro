@@ -141,6 +141,7 @@ SOURCES += \
     widgets/patheditorwidget.cpp \
     widgets/plaintextedit.cpp \
     widgets/positivelengthedit.cpp \
+    widgets/ratioedit.cpp \
     widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
     widgets/tabwidget.cpp \
@@ -277,6 +278,7 @@ HEADERS += \
     widgets/patheditorwidget.h \
     widgets/plaintextedit.h \
     widgets/positivelengthedit.h \
+    widgets/ratioedit.h \
     widgets/signalrolecombobox.h \
     widgets/statusbar.h \
     widgets/tabwidget.h \
