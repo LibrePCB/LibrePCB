@@ -143,6 +143,7 @@ SOURCES += \
     widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
     widgets/tabwidget.cpp \
+    widgets/unsignedlengthedit.cpp \
 
 HEADERS += \
     alignment.h \
@@ -277,6 +278,7 @@ HEADERS += \
     widgets/signalrolecombobox.h \
     widgets/statusbar.h \
     widgets/tabwidget.h \
+    widgets/unsignedlengthedit.h \
 
 FORMS += \
     dialogs/aboutdialog.ui \
