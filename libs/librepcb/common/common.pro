@@ -146,6 +146,7 @@ SOURCES += \
     widgets/statusbar.cpp \
     widgets/tabwidget.cpp \
     widgets/unsignedlengthedit.cpp \
+    widgets/unsignedratioedit.cpp \
 
 HEADERS += \
     alignment.h \
@@ -283,6 +284,7 @@ HEADERS += \
     widgets/statusbar.h \
     widgets/tabwidget.h \
     widgets/unsignedlengthedit.h \
+    widgets/unsignedratioedit.h \
 
 FORMS += \
     dialogs/aboutdialog.ui \
