@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import os 
+import os
 import glob
 from shutil import copyfile
 
 
 """
 This script sorts the entries of HEADERS, SOURCES and FORMS variables in
-all qmake project files (*.pro) in alphabetical order (except those in 
+all qmake project files (*.pro) in alphabetical order (except those in
 submodules). This reduces the risk of conflicts when merging or rebasing
-commits which modify *.pro files and makes those files cleaner and thus 
+commits which modify *.pro files and makes those files cleaner and thus
 easier to read.
 
 This script may be used as a pre-commit hook:
@@ -62,6 +62,36 @@ def sort_qmake_file(project_root, filepath):
         return 0
 
 
+def sort_ressources_file(project_root, filepath):
+    with open(filepath, 'r') as file:
+        old_lines = list(file.readlines())
+        new_lines = list(old_lines)
+    block_start_index = None
+    for line_index, line in enumerate(old_lines):
+        if block_start_index is None:
+            if line.strip().startswith("<file>"):
+                block_start_index = line_index + 1
+        else:
+            if not line.strip().startswith("<file>"):
+                block_end_index = line_index
+                block_lines = old_lines[block_start_index:block_end_index]
+                block_lines = sorted([l.strip() for l in block_lines])
+                for i, l in enumerate(block_lines):
+                    adjusted_line = "        " + l.strip() + "\n"
+                    new_lines[block_start_index+i] = adjusted_line
+                block_start_index = None
+    relative_path = os.path.relpath(filepath, project_root)
+    if new_lines != old_lines:
+        print("[M] {}".format(relative_path))
+        copyfile(filepath, filepath + '~')
+        with open(filepath, 'w') as file:
+            file.writelines(new_lines)
+        return 1
+    else:
+        print("[ ] {}".format(relative_path))
+        return 0
+
+
 def sort_qmake_files_in_dir(project_root, dir):
     modified_files = 0
     dot_git_file = os.path.join(dir, '.git')
@@ -71,6 +101,9 @@ def sort_qmake_files_in_dir(project_root, dir):
             if os.path.isfile(entry):
                 has_qmake_file = True
                 modified_files += sort_qmake_file(project_root, entry)
+        for entry in glob.glob(os.path.join(dir, '*.qrc')):
+            if os.path.isfile(entry):
+                modified_files += sort_ressources_file(project_root, entry)
         if has_qmake_file is True:
             for entry in glob.glob(os.path.join(dir, '*/')):
                 filename = os.path.basename(entry)
@@ -97,4 +130,3 @@ if __name__ == "__main__":
     # exit with code != 0 if files were modified
     # -> aborts the commit when used as pre-commit hook!
     exit(main())
-
