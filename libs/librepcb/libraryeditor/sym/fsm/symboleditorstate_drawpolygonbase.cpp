@@ -111,7 +111,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
     fillCheckBox->setChecked(mLastFill);
     connect(fillCheckBox.get(), &QCheckBox::toggled, this,
             &SymbolEditorState_DrawPolygonBase::fillCheckBoxCheckedChanged);
-    mContext.commandToolBar.addWidget(std::move(fillCheckBox));
+    mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
   }
 
   if (mMode != Mode::LINE) {

@@ -58,7 +58,7 @@ public:
   void     clear() noexcept;
   QAction* addAction(std::unique_ptr<QAction> action) noexcept;
   QAction* addLabel(const QString& text, int indent = 0) noexcept;
-  QAction* addWidget(std::unique_ptr<QWidget> widget) noexcept;
+  QAction* addWidget(std::unique_ptr<QWidget> widget, int indent = 0) noexcept;
   QAction* addSeparator() noexcept;
   void     removeAction(QAction* action) noexcept;
 
