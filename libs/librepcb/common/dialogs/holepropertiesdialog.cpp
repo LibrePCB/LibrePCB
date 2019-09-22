@@ -42,13 +42,14 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
     mUndoStack(undoStack),
     mUi(new Ui::HolePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtDiameter->setSingleStep(0.1);  // [mm]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &HolePropertiesDialog::on_buttonBox_clicked);
 
   // load text attributes
-  mUi->spbDiameter->setValue(mHole.getDiameter()->toMm());
-  mUi->spbPosX->setValue(mHole.getPosition().getX().toMm());
-  mUi->spbPosY->setValue(mHole.getPosition().getY().toMm());
+  mUi->edtDiameter->setValue(mHole.getDiameter());
+  mUi->edtPosX->setValue(mHole.getPosition().getX());
+  mUi->edtPosY->setValue(mHole.getPosition().getY());
 }
 
 HolePropertiesDialog::~HolePropertiesDialog() noexcept {
@@ -80,10 +81,9 @@ void HolePropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 bool HolePropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(mHole));
-    cmd->setDiameter(PositiveLength(Length::fromMm(mUi->spbDiameter->value())),
-                     false);  // can throw
-    cmd->setPosition(
-        Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
+    cmd->setDiameter(mUi->edtDiameter->getValue(), false);
+    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
+                     false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

@@ -45,6 +45,8 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle&               circle,
     mUndoStack(undoStack),
     mUi(new Ui::CirclePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtLineWidth->setSingleStep(0.1);  // [mm]
+  mUi->edtDiameter->setSingleStep(0.1);   // [mm]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
@@ -55,12 +57,12 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle&               circle,
 
   // load circle attributes
   selectLayerNameInCombobox(*mCircle.getLayerName());
-  mUi->spbLineWidth->setValue(mCircle.getLineWidth()->toMm());
+  mUi->edtLineWidth->setValue(mCircle.getLineWidth());
   mUi->cbxFillArea->setChecked(mCircle.isFilled());
   mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
-  mUi->spbDiameter->setValue(mCircle.getDiameter()->toMm());
-  mUi->spbPosX->setValue(mCircle.getCenter().getX().toMm());
-  mUi->spbPosY->setValue(mCircle.getCenter().getY().toMm());
+  mUi->edtDiameter->setValue(mCircle.getDiameter());
+  mUi->edtPosX->setValue(mCircle.getCenter().getX());
+  mUi->edtPosY->setValue(mCircle.getCenter().getY());
 }
 
 CirclePropertiesDialog::~CirclePropertiesDialog() noexcept {
@@ -92,9 +94,6 @@ void CirclePropertiesDialog::buttonBoxClicked(
 
 bool CirclePropertiesDialog::applyChanges() noexcept {
   try {
-    PositiveLength diameter =
-        PositiveLength(Length::fromMm(mUi->spbDiameter->value()));  // can throw
-
     QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
     if (mUi->cbxLayer->currentIndex() >= 0 &&
         mUi->cbxLayer->currentData().isValid()) {
@@ -104,11 +103,9 @@ bool CirclePropertiesDialog::applyChanges() noexcept {
     }
     cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
     cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
-    cmd->setLineWidth(
-        UnsignedLength(Length::fromMm(mUi->spbLineWidth->value())),
-        false);  // can throw
-    cmd->setDiameter(diameter, false);
-    cmd->setCenter(Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()),
+    cmd->setLineWidth(mUi->edtLineWidth->getValue(), false);
+    cmd->setDiameter(mUi->edtDiameter->getValue(), false);
+    cmd->setCenter(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                    false);
     mUndoStack.execCmd(cmd.take());
     return true;

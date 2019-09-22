@@ -45,6 +45,9 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
     mUndoStack(undoStack),
     mUi(new Ui::StrokeTextPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtHeight->setSingleStep(0.5);       // [mm]
+  mUi->edtStrokeWidth->setSingleStep(0.1);  // [mm]
+  mUi->edtRotation->setSingleStep(90.0);    // [°]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
@@ -53,43 +56,41 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &StrokeTextPropertiesDialog::on_buttonBox_clicked);
   connect(mUi->cbxLetterSpacingAuto, &QCheckBox::toggled,
-          mUi->spbxLetterSpacingRatio, &QDoubleSpinBox::setDisabled);
+          mUi->edtLetterSpacingRatio, &RatioEdit::setDisabled);
   connect(mUi->cbxLineSpacingAuto, &QCheckBox::toggled,
-          mUi->spbxLineSpacingRatio, &QDoubleSpinBox::setDisabled);
+          mUi->edtLineSpacingRatio, &RatioEdit::setDisabled);
 
   // load text attributes
   selectLayerNameInCombobox(*mText.getLayerName());
   mUi->edtText->setPlainText(mText.getText());
   mUi->alignmentSelector->setAlignment(mText.getAlign());
-  mUi->spbHeight->setValue(mText.getHeight()->toMm());
-  mUi->spbxStrokeWidth->setValue(mText.getStrokeWidth()->toMm());
+  mUi->edtHeight->setValue(mText.getHeight());
+  mUi->edtStrokeWidth->setValue(mText.getStrokeWidth());
   if (mText.getLetterSpacing().isAuto()) {
     mUi->cbxLetterSpacingAuto->setChecked(true);
-    mUi->spbxLetterSpacingRatio->setEnabled(false);
+    mUi->edtLetterSpacingRatio->setEnabled(false);
     const StrokeFont* font = text.getCurrentFont();
     Ratio ratio = font ? font->getLetterSpacing() : Ratio::percent100();
-    mUi->spbxLetterSpacingRatio->setValue(ratio.toPercent());
+    mUi->edtLetterSpacingRatio->setValue(ratio);
   } else {
     mUi->cbxLetterSpacingAuto->setChecked(false);
-    mUi->spbxLetterSpacingRatio->setEnabled(true);
-    mUi->spbxLetterSpacingRatio->setValue(
-        mText.getLetterSpacing().getRatio().toPercent());
+    mUi->edtLetterSpacingRatio->setEnabled(true);
+    mUi->edtLetterSpacingRatio->setValue(mText.getLetterSpacing().getRatio());
   }
   if (mText.getLineSpacing().isAuto()) {
     mUi->cbxLineSpacingAuto->setChecked(true);
-    mUi->spbxLineSpacingRatio->setEnabled(false);
+    mUi->edtLineSpacingRatio->setEnabled(false);
     const StrokeFont* font = text.getCurrentFont();
     Ratio ratio = font ? font->getLineSpacing() : Ratio::percent100();
-    mUi->spbxLineSpacingRatio->setValue(ratio.toPercent());
+    mUi->edtLineSpacingRatio->setValue(ratio);
   } else {
     mUi->cbxLineSpacingAuto->setChecked(false);
-    mUi->spbxLineSpacingRatio->setEnabled(true);
-    mUi->spbxLineSpacingRatio->setValue(
-        mText.getLineSpacing().getRatio().toPercent());
+    mUi->edtLineSpacingRatio->setEnabled(true);
+    mUi->edtLineSpacingRatio->setValue(mText.getLineSpacing().getRatio());
   }
-  mUi->spbPosX->setValue(mText.getPosition().getX().toMm());
-  mUi->spbPosY->setValue(mText.getPosition().getY().toMm());
-  mUi->spbRotation->setValue(mText.getRotation().toDeg());
+  mUi->edtPosX->setValue(mText.getPosition().getX());
+  mUi->edtPosY->setValue(mText.getPosition().getY());
+  mUi->edtRotation->setValue(mText.getRotation());
   mUi->cbxMirrored->setChecked(mText.getMirrored());
   mUi->cbxAutoRotate->setChecked(mText.getAutoRotate());
 }
@@ -131,28 +132,23 @@ bool StrokeTextPropertiesDialog::applyChanges() noexcept {
     }
     cmd->setText(mUi->edtText->toPlainText(), false);
     cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
-    cmd->setStrokeWidth(
-        UnsignedLength(Length::fromMm(mUi->spbxStrokeWidth->value())),
-        false);  // can throw
+    cmd->setStrokeWidth(mUi->edtStrokeWidth->getValue(), false);
     if (mUi->cbxLetterSpacingAuto->isChecked()) {
       cmd->setLetterSpacing(StrokeTextSpacing(), false);
     } else {
-      cmd->setLetterSpacing(StrokeTextSpacing(Ratio::fromPercent(
-                                mUi->spbxLetterSpacingRatio->value())),
-                            false);
+      cmd->setLetterSpacing(
+          StrokeTextSpacing(mUi->edtLetterSpacingRatio->getValue()), false);
     }
     if (mUi->cbxLineSpacingAuto->isChecked()) {
       cmd->setLineSpacing(StrokeTextSpacing(), false);
     } else {
-      cmd->setLineSpacing(StrokeTextSpacing(Ratio::fromPercent(
-                              mUi->spbxLineSpacingRatio->value())),
-                          false);
+      cmd->setLineSpacing(
+          StrokeTextSpacing(mUi->edtLineSpacingRatio->getValue()), false);
     }
-    cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())),
-                   false);  // can throw
-    cmd->setPosition(
-        Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-    cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
+    cmd->setHeight(mUi->edtHeight->getValue(), false);
+    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
+                     false);
+    cmd->setRotation(mUi->edtRotation->getValue(), false);
     cmd->setMirrored(mUi->cbxMirrored->isChecked(), false);
     cmd->setAutoRotate(mUi->cbxAutoRotate->isChecked(), false);
     mUndoStack.execCmd(cmd.take());

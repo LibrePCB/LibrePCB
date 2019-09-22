@@ -35,6 +35,7 @@
 namespace librepcb {
 
 class CmdHoleEdit;
+class PositiveLengthEdit;
 
 namespace project {
 
@@ -69,7 +70,7 @@ private:
   bool       addHole(Board& board, const Point& pos) noexcept;
   void       updateHolePosition(const Point& pos) noexcept;
   bool       fixHole(const Point& pos) noexcept;
-  void       diameterSpinBoxValueChanged(double value) noexcept;
+  void       diameterEditValueChanged(const PositiveLength& value) noexcept;
   void       makeLayerVisible() noexcept;
 
   // State
@@ -79,8 +80,8 @@ private:
   PositiveLength              mCurrentDiameter;
 
   // Widgets for the command toolbar
-  QScopedPointer<QLabel>         mDiameterLabel;
-  QScopedPointer<QDoubleSpinBox> mDiameterSpinBox;
+  QScopedPointer<QLabel>             mDiameterLabel;
+  QScopedPointer<PositiveLengthEdit> mDiameterEdit;
 };
 
 /*******************************************************************************

@@ -30,7 +30,9 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
+#include <librepcb/common/widgets/angleedit.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/common/widgets/unsignedlengthedit.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 
@@ -87,32 +89,21 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
-  std::unique_ptr<QDoubleSpinBox> lineWidthSpinBox(new QDoubleSpinBox());
-  lineWidthSpinBox->setMinimum(0);
-  lineWidthSpinBox->setMaximum(100);
-  lineWidthSpinBox->setSingleStep(0.1);
-  lineWidthSpinBox->setDecimals(6);
-  lineWidthSpinBox->setValue(mLastLineWidth->toMm());
-  connect(lineWidthSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this,
-          &SymbolEditorState_DrawPolygonBase::lineWidthSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(lineWidthSpinBox));
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->setSingleStep(0.1);  // [mm]
+  edtLineWidth->setValue(mLastLineWidth);
+  connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
+          &SymbolEditorState_DrawPolygonBase::lineWidthEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
   if (mMode != Mode::RECT) {
     mContext.commandToolBar.addLabel(tr("Angle:"), 10);
-    std::unique_ptr<QDoubleSpinBox> angleSpinBox(new QDoubleSpinBox());
-    angleSpinBox->setMinimum(-360);
-    angleSpinBox->setMaximum(360);
-    angleSpinBox->setSingleStep(30);
-    angleSpinBox->setDecimals(6);
-    angleSpinBox->setValue(mLastAngle.toDeg());
-    connect(angleSpinBox.get(),
-            static_cast<void (QDoubleSpinBox::*)(double)>(
-                &QDoubleSpinBox::valueChanged),
-            this, &SymbolEditorState_DrawPolygonBase::angleSpinBoxValueChanged);
-    mContext.commandToolBar.addWidget(std::move(angleSpinBox));
+    std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
+    edtAngle->setSingleStep(90.0);  // [°]
+    edtAngle->setValue(mLastAngle);
+    connect(edtAngle.get(), &AngleEdit::valueChanged, this,
+            &SymbolEditorState_DrawPolygonBase::angleEditValueChanged);
+    mContext.commandToolBar.addWidget(std::move(edtAngle));
   }
 
   if (mMode != Mode::LINE) {
@@ -298,17 +289,17 @@ void SymbolEditorState_DrawPolygonBase::layerComboBoxValueChanged(
   }
 }
 
-void SymbolEditorState_DrawPolygonBase::lineWidthSpinBoxValueChanged(
-    double value) noexcept {
-  mLastLineWidth = Length::fromMm(value);
+void SymbolEditorState_DrawPolygonBase::lineWidthEditValueChanged(
+    const UnsignedLength& value) noexcept {
+  mLastLineWidth = value;
   if (mEditCmd) {
     mEditCmd->setLineWidth(mLastLineWidth, true);
   }
 }
 
-void SymbolEditorState_DrawPolygonBase::angleSpinBoxValueChanged(
-    double value) noexcept {
-  mLastAngle = Angle::fromDeg(value);
+void SymbolEditorState_DrawPolygonBase::angleEditValueChanged(
+    const Angle& value) noexcept {
+  mLastAngle = value;
   if (mCurrentPolygon && mEditCmd) {
     Path path = mCurrentPolygon->getPath();
     if (path.getVertices().count() > 1) {

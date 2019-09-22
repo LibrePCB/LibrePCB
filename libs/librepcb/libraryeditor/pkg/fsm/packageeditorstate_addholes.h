@@ -77,7 +77,7 @@ private:  // Methods
   bool startAddHole(const Point& pos) noexcept;
   bool finishAddHole(const Point& pos) noexcept;
   bool abortAddHole() noexcept;
-  void diameterSpinBoxValueChanged(double value) noexcept;
+  void diameterEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Data
   Point                       mStartPos;

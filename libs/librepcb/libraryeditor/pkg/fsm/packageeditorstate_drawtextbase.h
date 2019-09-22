@@ -90,7 +90,7 @@ private:  // Methods
   void resetToDefaultParameters() noexcept;
 
   void layerComboBoxValueChanged(const QString& layerName) noexcept;
-  void heightSpinBoxValueChanged(double value) noexcept;
+  void heightEditValueChanged(const PositiveLength& value) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
 
 private:  // Types / Data

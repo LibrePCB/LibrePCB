@@ -60,8 +60,8 @@ CmdDeviceInstanceEditAll::~CmdDeviceInstanceEditAll() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdDeviceInstanceEditAll::setPosition(Point& pos,
-                                           bool   immediate) noexcept {
+void CmdDeviceInstanceEditAll::setPosition(const Point& pos,
+                                           bool         immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   translate(pos - mDevEditCmd->mNewPos, immediate);
 }

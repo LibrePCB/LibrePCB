@@ -27,6 +27,7 @@
 
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
@@ -62,9 +63,9 @@ BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mCurrentViaNetSignal(nullptr),
     // command toolbar actions / widgets:
     mSizeLabel(nullptr),
-    mSizeComboBox(nullptr),
+    mSizeEdit(nullptr),
     mDrillLabel(nullptr),
-    mDrillComboBox(nullptr),
+    mDrillEdit(nullptr),
     mNetSignalLabel(nullptr),
     mNetSignalComboBox(nullptr) {
 }
@@ -131,25 +132,12 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   mEditorUi.commandToolbar->addWidget(mSizeLabel);
 
   // add the size combobox to the toolbar
-  mSizeComboBox = new QComboBox();
-  mSizeComboBox->setMinimumContentsLength(6);
-  mSizeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mSizeComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mSizeComboBox->setEditable(true);
-  mSizeComboBox->addItem("0.7");
-  mSizeComboBox->addItem("0.8");
-  mSizeComboBox->addItem("1");
-  mSizeComboBox->addItem("1.2");
-  mSizeComboBox->setCurrentIndex(
-      mSizeComboBox->findText(QString::number(mCurrentViaSize->toMm())));
-  mEditorUi.commandToolbar->addWidget(mSizeComboBox);
-  connect(mSizeComboBox, &QComboBox::currentTextChanged,
-          [this](const QString& value) {
-            try {
-              mCurrentViaSize = Length::fromMm(value);
-            } catch (...) {
-            }
-          });
+  mSizeEdit = new PositiveLengthEdit();
+  mSizeEdit->setValue(mCurrentViaSize);
+  mSizeEdit->setSingleStep(0.1);  // [mm]
+  mEditorUi.commandToolbar->addWidget(mSizeEdit);
+  connect(mSizeEdit, &PositiveLengthEdit::valueChanged, this,
+          &BES_AddVia::sizeEditValueChanged);
 
   // add the "Drill:" label to the toolbar
   mDrillLabel = new QLabel(tr("Drill:"));
@@ -157,25 +145,12 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   mEditorUi.commandToolbar->addWidget(mDrillLabel);
 
   // add the drill combobox to the toolbar
-  mDrillComboBox = new QComboBox();
-  mDrillComboBox->setMinimumContentsLength(6);
-  mDrillComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mDrillComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mDrillComboBox->setEditable(true);
-  mDrillComboBox->addItem("0.3");
-  mDrillComboBox->addItem("0.4");
-  mDrillComboBox->addItem("0.6");
-  mDrillComboBox->addItem("0.8");
-  mDrillComboBox->setCurrentIndex(mDrillComboBox->findText(
-      QString::number(mCurrentViaDrillDiameter->toMm())));
-  mEditorUi.commandToolbar->addWidget(mDrillComboBox);
-  connect(mDrillComboBox, &QComboBox::currentTextChanged,
-          [this](const QString& value) {
-            try {
-              mCurrentViaDrillDiameter = Length::fromMm(value);
-            } catch (...) {
-            }
-          });
+  mDrillEdit = new PositiveLengthEdit();
+  mDrillEdit->setValue(mCurrentViaDrillDiameter);
+  mDrillEdit->setSingleStep(0.1);  // [mm]
+  mEditorUi.commandToolbar->addWidget(mDrillEdit);
+  connect(mDrillEdit, &PositiveLengthEdit::valueChanged, this,
+          &BES_AddVia::drillDiameterEditValueChanged);
 
   // add the "Signal:" label to the toolbar
   mNetSignalLabel = new QLabel(tr("Signal:"));
@@ -222,12 +197,12 @@ bool BES_AddVia::exit(BEE_Base* event) noexcept {
   mNetSignalComboBox = nullptr;
   delete mNetSignalLabel;
   mNetSignalLabel = nullptr;
-  delete mDrillComboBox;
-  mDrillComboBox = nullptr;
+  delete mDrillEdit;
+  mDrillEdit = nullptr;
   delete mDrillLabel;
   mDrillLabel = nullptr;
-  delete mSizeComboBox;
-  mSizeComboBox = nullptr;
+  delete mSizeEdit;
+  mSizeEdit = nullptr;
   delete mSizeLabel;
   mSizeLabel = nullptr;
   qDeleteAll(mShapeActions);
@@ -349,8 +324,6 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
   try {
     mViaEditCmd->setPosition(pos, true);
     mViaEditCmd->setShape(mCurrentViaShape, true);
-    mViaEditCmd->setSize(mCurrentViaSize, true);
-    mViaEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
     board.triggerAirWiresRebuild();
     return true;
   } catch (Exception& e) {
@@ -387,6 +360,21 @@ void BES_AddVia::updateShapeActionsCheckedState() noexcept {
                                            static_cast<int>(mCurrentViaShape));
     mShapeActions.value(key)->setChecked(key ==
                                          static_cast<int>(mCurrentViaShape));
+  }
+}
+
+void BES_AddVia::sizeEditValueChanged(const PositiveLength& value) noexcept {
+  mCurrentViaSize = value;
+  if (mViaEditCmd) {
+    mViaEditCmd->setSize(mCurrentViaSize, true);
+  }
+}
+
+void BES_AddVia::drillDiameterEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mCurrentViaDrillDiameter = value;
+  if (mViaEditCmd) {
+    mViaEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
   }
 }
 

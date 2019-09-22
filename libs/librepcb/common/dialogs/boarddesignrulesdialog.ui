@@ -56,74 +56,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
-    <widget class="QDoubleSpinBox" name="spbxStopMaskMaxViaDia">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Stop Mask Clearance:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QDoubleSpinBox" name="spbxStopMaskClrMin">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QDoubleSpinBox" name="spbxStopMaskClrRatio">
-     <property name="suffix">
-      <string notr="true">%</string>
-     </property>
-     <property name="decimals">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>10.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <widget class="QDoubleSpinBox" name="spbxStopMaskClrMax">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
      </property>
     </widget>
    </item>
@@ -134,54 +70,6 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QDoubleSpinBox" name="spbxCreamMaskClrMin">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QDoubleSpinBox" name="spbxCreamMaskClrRatio">
-     <property name="suffix">
-      <string notr="true">%</string>
-     </property>
-     <property name="decimals">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>10.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="QDoubleSpinBox" name="spbxCreamMaskClrMax">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
    <item row="6" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
@@ -189,106 +77,10 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QDoubleSpinBox" name="spbxRestringPadsMin">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2">
-    <widget class="QDoubleSpinBox" name="spbxRestringPadsRatio">
-     <property name="suffix">
-      <string notr="true">%</string>
-     </property>
-     <property name="decimals">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>10.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="3">
-    <widget class="QDoubleSpinBox" name="spbxRestringPadsMax">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="0">
     <widget class="QLabel" name="label_10">
      <property name="text">
       <string>Restring Vias:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QDoubleSpinBox" name="spbxRestringViasMin">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
-    <widget class="QDoubleSpinBox" name="spbxRestringViasRatio">
-     <property name="suffix">
-      <string notr="true">%</string>
-     </property>
-     <property name="decimals">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>10.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="3">
-    <widget class="QDoubleSpinBox" name="spbxRestringViasMax">
-     <property name="suffix">
-      <string notr="true">mm</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>999.999000000000024</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
      </property>
     </widget>
    </item>
@@ -308,8 +100,61 @@
    <item row="0" column="1" colspan="3">
     <widget class="QLineEdit" name="edtName"/>
    </item>
+   <item row="3" column="3">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtStopMaskMaxViaDia" native="true"/>
+   </item>
+   <item row="4" column="1">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
+   </item>
+   <item row="5" column="1">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
+   </item>
+   <item row="6" column="1">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringPadsMin" native="true"/>
+   </item>
+   <item row="7" column="1">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringViasMin" native="true"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtStopMaskClrMax" native="true"/>
+   </item>
+   <item row="5" column="3">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtCreamMaskClrMax" native="true"/>
+   </item>
+   <item row="6" column="3">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringPadsMax" native="true"/>
+   </item>
+   <item row="7" column="3">
+    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringViasMax" native="true"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="librepcb::UnsignedRatioEdit" name="edtStopMaskClrRatio" native="true"/>
+   </item>
+   <item row="5" column="2">
+    <widget class="librepcb::UnsignedRatioEdit" name="edtCreamMaskClrRatio" native="true"/>
+   </item>
+   <item row="6" column="2">
+    <widget class="librepcb::UnsignedRatioEdit" name="edtRestringPadsRatio" native="true"/>
+   </item>
+   <item row="7" column="2">
+    <widget class="librepcb::UnsignedRatioEdit" name="edtRestringViasRatio" native="true"/>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::UnsignedRatioEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/unsignedratioedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

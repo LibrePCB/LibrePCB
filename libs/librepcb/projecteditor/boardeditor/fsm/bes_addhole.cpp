@@ -29,6 +29,7 @@
 #include <librepcb/common/geometry/hole.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardholeadd.h>
@@ -91,17 +92,12 @@ bool BES_AddHole::entry(BEE_Base* event) noexcept {
   mEditorUi.commandToolbar->addWidget(mDiameterLabel.data());
 
   // add the diameter spinbox to the toolbar
-  mDiameterSpinBox.reset(new QDoubleSpinBox());
-  mDiameterSpinBox->setMinimum(0.0001);
-  mDiameterSpinBox->setMaximum(100);
-  mDiameterSpinBox->setSingleStep(0.2);
-  mDiameterSpinBox->setDecimals(6);
-  mDiameterSpinBox->setValue(mCurrentDiameter->toMm());
-  connect(mDiameterSpinBox.data(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &BES_AddHole::diameterSpinBoxValueChanged);
-  mEditorUi.commandToolbar->addWidget(mDiameterSpinBox.data());
+  mDiameterEdit.reset(new PositiveLengthEdit());
+  mDiameterEdit->setSingleStep(0.1);  // [mm]
+  mDiameterEdit->setValue(mCurrentDiameter);
+  connect(mDiameterEdit.data(), &PositiveLengthEdit::valueChanged, this,
+          &BES_AddHole::diameterEditValueChanged);
+  mEditorUi.commandToolbar->addWidget(mDiameterEdit.data());
 
   // change the cursor
   mEditorGraphicsView.setCursor(Qt::CrossCursor);
@@ -123,7 +119,7 @@ bool BES_AddHole::exit(BEE_Base* event) noexcept {
   }
 
   // Remove actions / widgets from the "command" toolbar
-  mDiameterSpinBox.reset();
+  mDiameterEdit.reset();
   mDiameterLabel.reset();
 
   // change the cursor
@@ -240,8 +236,9 @@ bool BES_AddHole::fixHole(const Point& pos) noexcept {
   }
 }
 
-void BES_AddHole::diameterSpinBoxValueChanged(double value) noexcept {
-  mCurrentDiameter = Length::fromMm(value);
+void BES_AddHole::diameterEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mCurrentDiameter = value;
   if (mEditCmd) {
     mEditCmd->setDiameter(mCurrentDiameter, true);
   }

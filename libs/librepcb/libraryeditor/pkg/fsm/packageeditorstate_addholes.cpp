@@ -30,6 +30,7 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 
@@ -71,17 +72,12 @@ bool PackageEditorState_AddHoles::entry() noexcept {
   // populate command toolbar
   mContext.commandToolBar.addLabel(tr("Diameter:"), 10);
 
-  std::unique_ptr<QDoubleSpinBox> diameterSpinBox(new QDoubleSpinBox());
-  diameterSpinBox->setMinimum(0.0001);
-  diameterSpinBox->setMaximum(100);
-  diameterSpinBox->setSingleStep(0.2);
-  diameterSpinBox->setDecimals(6);
-  diameterSpinBox->setValue(mLastDiameter->toMm());
-  connect(diameterSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &PackageEditorState_AddHoles::diameterSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(diameterSpinBox));
+  std::unique_ptr<PositiveLengthEdit> edtDiameter(new PositiveLengthEdit());
+  edtDiameter->setSingleStep(0.1);  // [mm]
+  edtDiameter->setValue(mLastDiameter);
+  connect(edtDiameter.get(), &PositiveLengthEdit::valueChanged, this,
+          &PackageEditorState_AddHoles::diameterEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtDiameter));
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
@@ -186,9 +182,9 @@ bool PackageEditorState_AddHoles::abortAddHole() noexcept {
   }
 }
 
-void PackageEditorState_AddHoles::diameterSpinBoxValueChanged(
-    double value) noexcept {
-  mLastDiameter = Length::fromMm(value);
+void PackageEditorState_AddHoles::diameterEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mLastDiameter = value;
   if (mEditCmd) {
     mEditCmd->setDiameter(mLastDiameter, true);
   }

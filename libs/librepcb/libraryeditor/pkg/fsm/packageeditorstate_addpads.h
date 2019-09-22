@@ -89,9 +89,9 @@ private:  // Methods
   void boardSideSelectorCurrentSideChanged(
       FootprintPad::BoardSide side) noexcept;
   void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
-  void widthSpinBoxValueChanged(double value) noexcept;
-  void heightSpinBoxValueChanged(double value) noexcept;
-  void drillDiameterSpinBoxValueChanged(double value) noexcept;
+  void widthEditValueChanged(const PositiveLength& value) noexcept;
+  void heightEditValueChanged(const PositiveLength& value) noexcept;
+  void drillDiameterEditValueChanged(const UnsignedLength& value) noexcept;
 
 private:  // Types / Data
   PadType                             mPadType;

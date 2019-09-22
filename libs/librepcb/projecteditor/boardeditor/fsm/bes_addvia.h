@@ -33,6 +33,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class PositiveLengthEdit;
+
 namespace project {
 
 class Board;
@@ -69,7 +72,9 @@ private:
   bool       updateVia(Board& board, const Point& pos) noexcept;
   bool       fixVia(const Point& pos) noexcept;
   void       updateShapeActionsCheckedState() noexcept;
-  void       setNetSignal(NetSignal* netsignal) noexcept;
+  void       sizeEditValueChanged(const PositiveLength& value) noexcept;
+  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
+  void setNetSignal(NetSignal* netsignal) noexcept;
 
   // General Attributes
   bool                            mUndoCmdActive;
@@ -84,9 +89,9 @@ private:
   QHash<int, QAction*> mShapeActions;
   QList<QAction*>      mActionSeparators;
   QLabel*              mSizeLabel;
-  QComboBox*           mSizeComboBox;
+  PositiveLengthEdit*  mSizeEdit;
   QLabel*              mDrillLabel;
-  QComboBox*           mDrillComboBox;
+  PositiveLengthEdit*  mDrillEdit;
   QLabel*              mNetSignalLabel;
   QComboBox*           mNetSignalComboBox;
 };
