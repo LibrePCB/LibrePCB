@@ -79,7 +79,7 @@ bool PackageEditorState_DrawCircle::entry() noexcept {
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(
       mContext.layerProvider.getBoardGeometryElementLayers());
-  layerComboBox->setCurrentLayer(*mLastLayerName);
+  layerComboBox->setCurrentLayer(mLastLayerName);
   connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &PackageEditorState_DrawCircle::layerComboBoxValueChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -226,10 +226,7 @@ bool PackageEditorState_DrawCircle::abortAddCircle() noexcept {
 }
 
 void PackageEditorState_DrawCircle::layerComboBoxValueChanged(
-    const QString& layerName) noexcept {
-  if (layerName.isEmpty()) {
-    return;
-  }
+    const GraphicsLayerName& layerName) noexcept {
   mLastLayerName = layerName;
   if (mEditCmd) {
     mEditCmd->setLayerName(mLastLayerName, true);

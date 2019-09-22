@@ -90,7 +90,7 @@ private:  // Methods
   bool abortAddText() noexcept;
   void resetToDefaultParameters() noexcept;
 
-  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void strokeWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;

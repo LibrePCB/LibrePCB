@@ -88,7 +88,7 @@ private:  // Methods
   bool addNextSegment(const Point& pos) noexcept;
   bool updateCurrentPosition(const Point& pos) noexcept;
 
-  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void angleEditValueChanged(const Angle& value) noexcept;
   void fillCheckBoxCheckedChanged(bool checked) noexcept;

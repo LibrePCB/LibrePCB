@@ -83,7 +83,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(
       mContext.layerProvider.getSchematicGeometryElementLayers());
-  layerComboBox->setCurrentLayer(*mLastLayerName);
+  layerComboBox->setCurrentLayer(mLastLayerName);
   connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &SymbolEditorState_DrawPolygonBase::layerComboBoxValueChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -279,10 +279,7 @@ bool SymbolEditorState_DrawPolygonBase::updateCurrentPosition(
 }
 
 void SymbolEditorState_DrawPolygonBase::layerComboBoxValueChanged(
-    const QString& layerName) noexcept {
-  if (layerName.isEmpty()) {
-    return;
-  }
+    const GraphicsLayerName& layerName) noexcept {
   mLastLayerName = layerName;
   if (mEditCmd) {
     mEditCmd->setLayerName(mLastLayerName, true);

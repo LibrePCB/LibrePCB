@@ -112,7 +112,7 @@ bool BES_AddStrokeText::entry(BEE_Base* event) noexcept {
                                   ->getLayerStack()
                                   .getBoardGeometryElementLayers());
   }
-  mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
+  mLayerComboBox->setCurrentLayer(mCurrentLayerName);
   mEditorUi.commandToolbar->addWidget(mLayerComboBox.data());
   connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &BES_AddStrokeText::layerComboBoxLayerChanged);
@@ -275,7 +275,7 @@ BES_Base::ProcRetVal BES_AddStrokeText::processFlipEvent(
     mEditCmd->mirror(mText->getPosition(), orientation, true);
 
     // update toolbar widgets
-    mLayerComboBox->setCurrentLayer(*mText->getText().getLayerName());
+    mLayerComboBox->setCurrentLayer(mText->getText().getLayerName());
     mMirrorCheckBox->setChecked(mText->getText().getMirrored());
   }
 
@@ -345,7 +345,7 @@ bool BES_AddStrokeText::fixText(const Point& pos) noexcept {
 }
 
 void BES_AddStrokeText::layerComboBoxLayerChanged(
-    const QString& layerName) noexcept {
+    const GraphicsLayerName& layerName) noexcept {
   mCurrentLayerName = layerName;
   if (mEditCmd) {
     mEditCmd->setLayerName(mCurrentLayerName, true);

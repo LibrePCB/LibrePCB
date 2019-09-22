@@ -140,7 +140,7 @@ bool BES_DrawPlane::entry(BEE_Base* event) noexcept {
     }
     mLayerComboBox->setLayers(layers);
   }
-  mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
+  mLayerComboBox->setCurrentLayer(mCurrentLayerName);
   mEditorUi.commandToolbar->addWidget(mLayerComboBox);
   connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged, this,
           &BES_DrawPlane::layerComboBoxLayerChanged);
@@ -363,7 +363,7 @@ void BES_DrawPlane::updateVertexPosition(const Point& cursorPos) noexcept {
 }
 
 void BES_DrawPlane::layerComboBoxLayerChanged(
-    const QString& layerName) noexcept {
+    const GraphicsLayerName& layerName) noexcept {
   mCurrentLayerName = layerName;
   if (mCmdEditCurrentPlane) {
     mCmdEditCurrentPlane->setLayerName(mCurrentLayerName, true);

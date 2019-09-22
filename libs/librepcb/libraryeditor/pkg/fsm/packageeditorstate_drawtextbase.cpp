@@ -86,7 +86,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
         new GraphicsLayerComboBox());
     layerComboBox->setLayers(
         mContext.layerProvider.getBoardGeometryElementLayers());
-    layerComboBox->setCurrentLayer(*mLastLayerName);
+    layerComboBox->setCurrentLayer(mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &PackageEditorState_DrawTextBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -308,10 +308,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
 }
 
 void PackageEditorState_DrawTextBase::layerComboBoxValueChanged(
-    const QString& layerName) noexcept {
-  if (layerName.isEmpty()) {
-    return;
-  }
+    const GraphicsLayerName& layerName) noexcept {
   mLastLayerName = layerName;
   if (mEditCmd) {
     mEditCmd->setLayerName(mLastLayerName, true);
