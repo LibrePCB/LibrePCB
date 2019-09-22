@@ -245,18 +245,18 @@ bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
 void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
-      mLastLayerName = GraphicsLayer::sSymbolNames;
-      mLastHeight    = Length(2540000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolNames);
+      mLastHeight    = PositiveLength(2540000);
       mLastText      = "{{NAME}}";
       break;
     case Mode::VALUE:
-      mLastLayerName = GraphicsLayer::sSymbolValues;
-      mLastHeight    = Length(2540000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolValues);
+      mLastHeight    = PositiveLength(2540000);
       mLastText      = "{{VALUE}}";
       break;
     default:
-      mLastLayerName = GraphicsLayer::sSymbolOutlines;
-      mLastHeight    = Length(2540000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
+      mLastHeight    = PositiveLength(2540000);
       mLastText      = "Text";
       break;
   }

@@ -284,22 +284,22 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
 void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
-      mLastLayerName   = GraphicsLayer::sTopNames;
-      mLastHeight      = Length(1000000);
+      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopNames);
+      mLastHeight      = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::center(), VAlign::bottom());
       mLastText        = "{{NAME}}";
       break;
     case Mode::VALUE:
-      mLastLayerName   = GraphicsLayer::sTopValues;
-      mLastHeight      = Length(1000000);
+      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopValues);
+      mLastHeight      = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::center(), VAlign::top());
       mLastText        = "{{VALUE}}";
       break;
     default:
-      mLastLayerName   = GraphicsLayer::sTopPlacement;
-      mLastHeight      = Length(2000000);
+      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopPlacement);
+      mLastHeight      = PositiveLength(2000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::left(), VAlign::bottom());
       mLastText        = "";
