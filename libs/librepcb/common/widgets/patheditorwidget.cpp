@@ -23,6 +23,8 @@
 #include "patheditorwidget.h"
 
 #include "../geometry/pathmodel.h"
+#include "../model/angledelegate.h"
+#include "../model/lengthdelegate.h"
 #include "editabletablewidget.h"
 
 #include <QtCore>
@@ -44,6 +46,12 @@ PathEditorWidget::PathEditorWidget(QWidget* parent) noexcept
   mView->setShowMoveButtons(true);
   mView->setShowCopyButton(true);
   mView->setModel(mModel.data());
+  mView->setItemDelegateForColumn(PathModel::COLUMN_X,
+                                  new LengthDelegate(this));
+  mView->setItemDelegateForColumn(PathModel::COLUMN_Y,
+                                  new LengthDelegate(this));
+  mView->setItemDelegateForColumn(PathModel::COLUMN_ANGLE,
+                                  new AngleDelegate(this));
   mView->horizontalHeader()->setSectionResizeMode(PathModel::COLUMN_X,
                                                   QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(PathModel::COLUMN_Y,

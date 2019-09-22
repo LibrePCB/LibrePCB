@@ -167,6 +167,46 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(sToolboxExpandRangesInStringTestData));
 
 /*******************************************************************************
+ *  Parametrized floatToString() Tests
+ ******************************************************************************/
+
+struct ToolboxFloatToStringTestData {
+  double  number;
+  int     decimals;
+  QLocale locale;
+  QString output;
+};
+
+class ToolboxFloatToStringTest
+  : public ToolboxTest,
+    public ::testing::WithParamInterface<ToolboxFloatToStringTestData> {};
+
+TEST_P(ToolboxFloatToStringTest, test) {
+  const ToolboxFloatToStringTestData& data = GetParam();
+
+  QString res = Toolbox::floatToString(data.number, data.decimals, data.locale);
+  EXPECT_EQ(data.output.toStdString(), res.toStdString());
+}
+
+// clang-format off
+static ToolboxFloatToStringTestData
+    sToolboxFloatToStringTestData[] = {
+// number,      decimals, locale,                 output
+  {0.0,         0,        QLocale::c(),           "0"},
+  {-2.6,        0,        QLocale::c(),           "-3"},
+  {12345.6789,  0,        QLocale::c(),           "12346"},
+  {0.0,         1,        QLocale::c(),           "0.0"},
+  {-1234.567,   1,        QLocale::c(),           "-1234.6"},
+  {1234.567891, 5,        QLocale::c(),           "1234.56789"},
+  {0.0,         5,        QLocale("de_DE"),       "0,0"},
+  {12345.6789,  5,        QLocale("de_DE"),       "12345,6789"},
+};
+// clang-format on
+
+INSTANTIATE_TEST_SUITE_P(ToolboxFloatToStringTest, ToolboxFloatToStringTest,
+                         ::testing::ValuesIn(sToolboxFloatToStringTestData));
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -133,7 +133,7 @@ QPointF LengthUnit::convertToUnit(const Point& point) const noexcept {
   }
 }
 
-Length LengthUnit::convertFromUnit(qreal length) const noexcept {
+Length LengthUnit::convertFromUnit(qreal length) const {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:
       return Length::fromMm(length);
@@ -152,7 +152,7 @@ Length LengthUnit::convertFromUnit(qreal length) const noexcept {
   }
 }
 
-Point LengthUnit::convertFromUnit(const QPointF& point) const noexcept {
+Point LengthUnit::convertFromUnit(const QPointF& point) const {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:
       return Point::fromMm(point);

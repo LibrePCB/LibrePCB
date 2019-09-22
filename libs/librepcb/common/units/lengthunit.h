@@ -195,7 +195,7 @@ public:
    * @warning As this method always uses floating point numbers, there is a
    * little risk that the conversion is not lossless. So be careful with it.
    */
-  Length convertFromUnit(qreal length) const noexcept;
+  Length convertFromUnit(qreal length) const;
 
   /**
    * @brief Convert floating point numbers with this unit to a Point object
@@ -209,7 +209,7 @@ public:
    * @warning As this method always uses floating point numbers, there is a
    * little risk that the conversion is not lossless. So be careful with it.
    */
-  Point convertFromUnit(const QPointF& point) const noexcept;
+  Point convertFromUnit(const QPointF& point) const;
 
   // Static Methods
 
@@ -261,7 +261,12 @@ public:
     mUnit = rhs.mUnit;
     return *this;
   }
-  bool operator==(const LengthUnit& rhs) noexcept { return mUnit == rhs.mUnit; }
+  bool operator==(const LengthUnit& rhs) const noexcept {
+    return mUnit == rhs.mUnit;
+  }
+  bool operator!=(const LengthUnit& rhs) const noexcept {
+    return mUnit != rhs.mUnit;
+  }
 
 private:
   // Private Methods

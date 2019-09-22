@@ -76,6 +76,8 @@ Application::Application(int& argc, char** argv) noexcept
   // register meta types
   qRegisterMetaType<FilePath>();
   qRegisterMetaType<Point>();
+  qRegisterMetaType<Length>();
+  qRegisterMetaType<Angle>();
 
   // set application version
   QApplication::setApplicationVersion(APP_VERSION);

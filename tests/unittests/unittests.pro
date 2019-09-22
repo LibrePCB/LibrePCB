@@ -70,6 +70,7 @@ SOURCES += \
     common/fileio/serializableobjectlisttest.cpp \
     common/fileio/transactionaldirectorytest.cpp \
     common/fileio/transactionalfilesystemtest.cpp \
+    common/geometry/pathmodeltest.cpp \
     common/geometry/pathtest.cpp \
     common/network/filedownloadtest.cpp \
     common/network/networkrequesttest.cpp \
