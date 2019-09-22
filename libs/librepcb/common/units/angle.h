@@ -420,4 +420,6 @@ inline uint qHash(const Angle& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
+Q_DECLARE_METATYPE(librepcb::Angle)
+
 #endif  // LIBREPCB_ANGLE_H

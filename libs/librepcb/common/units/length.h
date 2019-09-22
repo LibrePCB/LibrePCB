@@ -953,4 +953,6 @@ inline uint qHash(const PositiveLength& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
+Q_DECLARE_METATYPE(librepcb::Length)
+
 #endif  // LIBREPCB_LENGTH_H

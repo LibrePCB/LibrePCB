@@ -182,6 +182,25 @@ public:
                                       int            maxLength = -1) noexcept;
 
   /**
+   * @brief Convert a float or double to a localized string
+   *
+   * Same as QLocale::toString<float/double>(), but with omitted trailing zeros
+   * and without group separators.
+   */
+  template <typename T>
+  static QString floatToString(T value, int decimals,
+                               const QLocale& locale) noexcept {
+    QString s = locale.toString(value, 'f', decimals);
+    for (int i = 1; (i < decimals) && s.endsWith(locale.zeroDigit()); ++i) {
+      s.chop(1);
+    }
+    if (qAbs(value) >= 1000) {
+      s.remove(locale.groupSeparator());
+    }
+    return s;
+  }
+
+  /**
    * @brief Convert a fixed point decimal number from an integer to a QString
    *
    * @param value    Value to convert

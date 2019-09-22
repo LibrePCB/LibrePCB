@@ -99,7 +99,9 @@ SOURCES += \
     graphics/stroketextgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
     gridproperties.cpp \
+    model/angledelegate.cpp \
     model/comboboxdelegate.cpp \
+    model/lengthdelegate.cpp \
     model/sortfilterproxymodel.cpp \
     network/filedownload.cpp \
     network/networkaccessmanager.cpp \
@@ -126,12 +128,16 @@ SOURCES += \
     uuid.cpp \
     version.cpp \
     widgets/alignmentselector.cpp \
+    widgets/angleedit.cpp \
     widgets/attributelisteditorwidget.cpp \
     widgets/attributetypecombobox.cpp \
     widgets/attributeunitcombobox.cpp \
     widgets/centeredcheckbox.cpp \
+    widgets/doublespinbox.cpp \
     widgets/editabletablewidget.cpp \
     widgets/graphicslayercombobox.cpp \
+    widgets/lengthedit.cpp \
+    widgets/numbereditbase.cpp \
     widgets/patheditorwidget.cpp \
     widgets/plaintextedit.cpp \
     widgets/signalrolecombobox.cpp \
@@ -222,7 +228,9 @@ HEADERS += \
     graphics/stroketextgraphicsitem.h \
     graphics/textgraphicsitem.h \
     gridproperties.h \
+    model/angledelegate.h \
     model/comboboxdelegate.h \
+    model/lengthdelegate.h \
     model/sortfilterproxymodel.h \
     network/filedownload.h \
     network/networkaccessmanager.h \
@@ -254,12 +262,16 @@ HEADERS += \
     uuid.h \
     version.h \
     widgets/alignmentselector.h \
+    widgets/angleedit.h \
     widgets/attributelisteditorwidget.h \
     widgets/attributetypecombobox.h \
     widgets/attributeunitcombobox.h \
     widgets/centeredcheckbox.h \
+    widgets/doublespinbox.h \
     widgets/editabletablewidget.h \
     widgets/graphicslayercombobox.h \
+    widgets/lengthedit.h \
+    widgets/numbereditbase.h \
     widgets/patheditorwidget.h \
     widgets/plaintextedit.h \
     widgets/signalrolecombobox.h \
