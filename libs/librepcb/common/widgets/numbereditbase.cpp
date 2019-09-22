@@ -43,7 +43,7 @@ NumberEditBase::NumberEditBase(QWidget* parent) noexcept
   // errors (e.g. when converting between different units), we need some more
   // decimals.
   mSpinBox->setDecimals(10);
-  mSpinBox->setButtonSymbols(QDoubleSpinBox::NoButtons);
+  setSingleStep(tl::nullopt);
   setFocusProxy(mSpinBox.data());
 
   connect(mSpinBox.data(),
@@ -60,6 +60,16 @@ NumberEditBase::~NumberEditBase() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void NumberEditBase::setSingleStep(tl::optional<double> step) noexcept {
+  if (step) {
+    mSpinBox->setSingleStep(*step);
+    mSpinBox->setButtonSymbols(QDoubleSpinBox::UpDownArrows);
+  } else {
+    mSpinBox->setSingleStep(0.0);
+    mSpinBox->setButtonSymbols(QDoubleSpinBox::NoButtons);
+  }
+}
 
 void NumberEditBase::setFrame(bool frame) noexcept {
   mSpinBox->setFrame(frame);
