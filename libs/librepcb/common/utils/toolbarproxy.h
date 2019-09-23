@@ -57,6 +57,7 @@ public:
   // General Methods
   void     clear() noexcept;
   QAction* addAction(std::unique_ptr<QAction> action) noexcept;
+  void     addActionGroup(std::unique_ptr<QActionGroup> group) noexcept;
   QAction* addLabel(const QString& text, int indent = 0) noexcept;
   QAction* addWidget(std::unique_ptr<QWidget> widget, int indent = 0) noexcept;
   QAction* addSeparator() noexcept;
@@ -66,8 +67,9 @@ public:
   ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;
 
 private:  // Data
-  QToolBar*       mToolBar;
-  QList<QAction*> mActions;
+  QToolBar*            mToolBar;
+  QList<QAction*>      mActions;
+  QList<QActionGroup*> mActionGroups;
 };
 
 /*******************************************************************************
