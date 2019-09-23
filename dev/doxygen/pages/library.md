@@ -160,7 +160,11 @@ There exist two types of categories, while all regular element types use exactly
     - Use A through Z,a through z and 0-9.
     - Use comma,space,dash,underscore and period.
     - Any field may impose additional restrictions (IE: no spaces).
-    - Special character for LINEFEED not yet defined.
+
+
+- RICH_TEXT: All characters are allowed
+    - / used as the escape character.
+
 
 - NUMERIC: numbers  are never enclosed in double quotes.
     - Use  0-9, dash and period
@@ -185,12 +189,46 @@ There exist two types of categories, while all regular element types use exactly
 # File formats {#doc_library_file_formats}
 
 
+
+
+- component_category.lp 
+
+      (librepcb_component_category UUID              LP_COMP_CAT_UUID
+      (name "TEXT")                                  LP_COMP_CAT_NAME
+      (description "RICH_TEXT")                      LP_DESCRIPTION
+      (keywords "TEXT")                              LP_KEYWORDS
+      (author "TEXT")                                LP_AUTHOR
+      (version "TEXT")                               LP_VERSION
+      (created TIME)                                 LP_TIME
+      (deprecated FIXED)                             LP_DEPRECATED
+      (parent UUID)                                  LP_COMP_CAT_UUID
+      )
+
+
+
+
+
+- package_category.lp 
+
+      (librepcb_package_category UUID                LP_PACK_CAT_UUID
+      (name "TEXT")                                  LP_COMP_CAT_NAME
+      (description "RICH_TEXT")                      LP_DESCRIPTION
+      (keywords "TEXT")                              LP_KEYWORDS
+      (author "TEXT")                                LP_AUTHOR
+      (version "TEXT")                               LP_VERSION
+      (created TIME)                                 LP_TIME
+      (deprecated FIXED)                             LP_DEPRECATED
+      (parent UUID)                                  LP_PACK_CAT_UUID
+      )
+
+
+
 - symbol.lp 
 
 
       (librepcb_symbol UUID                          LP_SYMBOL_UUID
       (name "TEXT")                                  LP_SYMBOL_NAME
-      (description "TEXT")                           LP_DESCRIPTION
+      (description "RICH_TEXT")                      LP_DESCRIPTION
       (keywords "TEXT")                              LP_KEYWORDS
       (author "TEXT")                                LP_AUTHOR
       (version "TEXT")                               LP_VERSION
@@ -218,7 +256,7 @@ There exist two types of categories, while all regular element types use exactly
       (angle NUMERIC)                                    LP_ANGLE
       )                                                  ] repeat 2 or more times
                                   
-      )                                              ] repeat 0 or more times
+      )                                              ] polygon repeat 0 or more times
                                                 
                                                      [
       (circle UUID                                   LP_GRAPHIC_UUID
@@ -228,11 +266,8 @@ There exist two types of categories, while all regular element types use exactly
       (grab_area FIXED)                              LP_GRAPHIC_GRAB
       (diameter NUMERIC)                             LP_GRAPHIC_DIAMETER
       (position NUMERIC NUMERIC )                    LP_POSITION_X LP_POSITION_Y
-      )                                              ] repeat 0 or more times
+      )                                              ] circle repeat 0 or more times
  
-
-
-
                                                      [
        (text UUID                                    LP_TEXT_UUID
        (layer sym_names)                             LP_GRAPHIC_LAYER
@@ -242,8 +277,144 @@ There exist two types of categories, while all regular element types use exactly
        (position NUMERIC NUMERIC)                    LP_POSITION_X,LP_POSITION_Y
        (rotation NUMERIC)                            LP_ROTATION
        ) 
-                                                     ] repeat 2 or more times. must have {{NAME}} and {{VALUE}}
+                                                     ] text repeat 2 or more times. must have {{NAME}} and {{VALUE}}
        )
+
+
+
+
+
+- component.lp 
+
+      (librepcb_component UUID                       LP_COMPONENT_UUID                   
+      (name "TEXT")                                  LP_COMPONENT_NAME
+      (description "RICH_TEXT")                      LP_DESCRIPTION
+      (keywords "TEXT")                              LP_KEYWORDS
+      (author "TEXT")                                LP_AUTHOR                                      
+      (version "TEXT")                               LP_VERSION
+      (created TIME)                                 LP_TIME     
+      (deprecated FIXED)                             LP_DEPRECATED   
+      (category UUID)                                LP_CATEGORY_UUID
+      (schematic_only FIXED)                         LP_COMPONENT_SCHEMATIC_ONLY
+      (default_value "TEXT")                         LP_COMPONENT_DEFAULT_VALUE
+      (prefix "TEXT")                                LP_COMPONENT_DEFAULT_NAME
+                                                         [  
+          (signal UUID                                   LP_COMPONENT_SIGNAL_UUID
+          (name "TEXT")                                  LP_COMPONENT_SIGNAL_NAME
+          (role FIXED)                                   LP_COMPONENT_SIGNAL_ROLE
+          (required FIXED)                               LP_COMPONENT_SIGNAL_REQUIRED
+          (negated FIXED)                                LP_COMPONENT_SIGNAL_NEGATED
+          (clock FIXED)                                  LP_COMPONENT_SIGNAL_CLOCK
+          (forced_net "TEXT")                            LP_COMPONENT_SIGNAL_FORCED_NET
+          )                                              ] signal repeat 0 or more times
+                                                         [
+          (variant UUID                                  LP_COMPONENT_VARIANT_UUID
+          (norm "TEXT")                                  LP_NORM
+          (name "TEXT")                                  LP_COMPONENT_VARIANT_NAME
+          (description "RICH_TEXT")                      LP_DESCRIPTION
+              (gate UUID                                     LP_COMPONENT_GATE_UUID
+              (symbol UUID)                                  LP_SYMBOL_UUID
+              (position NUMERIC NUMERIC)                     LP_POSITION_X LP_POSITION_Y
+              (rotation NUMERIC)                             LP_ROTATION
+              (required FIXED)                               LP_REQUIRED
+              (suffix "TEST")                                LP_SUFFIX
+                                                                 [
+                  (pin UUID                                      LP_SYMBOL_PIN_UUID
+                  (signal UUID )                                 LP_COMPONENT_SIGNAL_UUID
+                  (text FIXED/"TEXT")                            LP_TEXT
+                  )
+                                                                 ] pin repeat 0 or more times
+								 )
+          )
+                                                          ] gate repeat 1 or more
+      )
+
+- package.lp 
+
+      (librepcb_package UUID                         LP_PACKAGE_UUID                   
+      (name "TEXT")                                  LP_PACKAGE_NAME
+      (description "RICH_TEXT")                      LP_DESCRIPTION
+      (keywords "TEXT")                              LP_KEYWORDS
+      (author "TEXT")                                LP_AUTHOR
+      (version "TEXT")                               LP_VERSION
+      (created TIME)                                 LP_TIME
+      (deprecated FIXED)                             LP_DEPRECATED
+      (category UUID)                                LP_PACKAGE_CATEGORY_UUID
+                                                         [
+          (pad UUID                                      LP_PACKAGE_PAD_UUID
+          (name "TEXT")                                  LP_PACKAGE_PAD_NAME
+          )                                              ] pad repeat 0 or more times
+
+                                                         [
+          (footprint UUID                                LP_FOOTPRINT_UUID
+          (name "TEXT")                                  LP_FOOTPRINT_NAME
+              (description "RICH_TEXT")                      LP_DESCRIPTION
+                                                                 [
+                  (pad UUID                                      LP_PACKAGE_PAD_UUID
+                  (side FIXED)                                   LP_SIDE
+                  (shape FIXED)                                  LP_SHAPE
+                  (position NUMERIC NUMERIC)                     LP_POSITION_X  LP_POSITION_Y
+                  (rotation NUMERIC)                             LP_ROTATION
+                  (size NUMERIC NUMERIC)                         LP_SIZE_X LP_SIZE_Y
+                  (drill NUMERIC)                                LP_DRILL
+                  )                                              ] pad repeat 0 or more times
+              )                                              ] text repeat 0 or more times
+                                                             [ 
+              (polygon UUID                                  LP_GRAPHIC_UUID
+              (layer FIXED)                                  LP_LAYER
+              (width NUMERIC)                                LP_WIDTH
+              (fill FIXED)                                   LP_FILL
+              (grab_area FIXED)                              LP_GRAB
+                                                                 [
+                  (vertex             
+                  (position NUMERIC NUMERIC)                     LP_POSITION_X  LP_POSITION_Y
+                  (angle NUMERIC)                                LP_ANGLE
+                  )                                              ] vertex repeat 0 or more times
+              )                                              ] polygon repeat 0 or more times
+
+                                                             [
+              (stroke_text UUID                              LP_STROKE_UUID
+              (layer NUMERIC)                                LP_LAYER
+              (height NUMERIC)                               LP_HEIGHT
+              (stroke_width NUMERIC)                         LP_STROCK_WIDTH
+              (letter_spacing FIXED)                         LP_LETTER_SPACING
+              (line_spacing FIXED)                           LP_LINE_SPACING
+              (align FIXED)                                  LP_ALIGN
+              (position NUMERIC NUMERIC)                     LP_POSITION_X  LP_POSITION_Y
+              (rotation NUMERIC)                             LP_ROTATION
+              (auto_rotate FIXED)                            LP_AUTO_ROTATE
+              (mirror FIXED)                                 LP_MIRROR
+              (value "TEXT")                                 LP_
+              )                                              ] stroke repeat 2 or more times
+          )                                              ] footprint repeat 0 or more times
+      )
+
+
+
+- device.lp 
+
+
+      (librepcb_device UUID                          LP_DEVICE_UUID                   
+      (name "TEXT")                                  LP_DEVICE_NAME
+      (description "RICH_TEXT")                      LP_DESCRIPTION
+      (keywords "TEXT")                              LP_KEYWORDS
+      (author "TEXT")                                LP_AUTHOR
+      (version "TEXT")                               LP_VERSION
+      (created TIME)                                 LP_TIME
+      (deprecated FIXED)                             LP_DEPRECATED
+      (category UUID)                                LP_CATEGORY_UUID
+      (component UUID)                               LP_COMPONENT_GATE_UUID
+      (package UUID)                                 LP_PACKAGE_UUID
+                                                     [
+          (pad UUID                                  LP_PACKAGE_PAD_UUID
+          (signal UUID)                              LP_COMPONENT_SIGNAL_UUID
+	  )                                          ] pad repeat 0 or more times
+      )
+
+
+
+
+
 
 
 
