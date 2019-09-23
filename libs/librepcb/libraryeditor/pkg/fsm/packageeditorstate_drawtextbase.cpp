@@ -31,7 +31,10 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/common/widgets/halignactiongroup.h>
 #include <librepcb/common/widgets/positivelengthedit.h>
+#include <librepcb/common/widgets/unsignedlengthedit.h>
+#include <librepcb/common/widgets/valignactiongroup.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 
@@ -55,7 +58,10 @@ PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sTopNames),
-    mLastHeight(1) {
+    mLastHeight(1),
+    mLastStrokeWidth(0),
+    mLastAlignment(HAlign::left(), VAlign::bottom()),
+    mLastText() {
   resetToDefaultParameters();
 }
 
@@ -95,7 +101,12 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
     textComboBox->addItem("{{_AUTHOR}}");
     textComboBox->addItem("{{_VERSION}}");
     textComboBox->addItem("{{_MODIFIED_DATE}}");
-    textComboBox->setCurrentIndex(textComboBox->findText(mLastText));
+    int currentTextIndex = textComboBox->findText(mLastText);
+    if (currentTextIndex >= 0) {
+      textComboBox->setCurrentIndex(currentTextIndex);
+    } else {
+      textComboBox->setCurrentText(mLastText);
+    }
     connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
             &PackageEditorState_DrawTextBase::textComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(textComboBox));
@@ -110,6 +121,32 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   connect(edtLineWidth.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_DrawTextBase::heightEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
+
+  // Stroke width
+  mContext.commandToolBar.addLabel(tr("Stroke Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> strokeWidthSpinBox(
+      new UnsignedLengthEdit());
+  strokeWidthSpinBox->setSingleStep(0.1);  // [mm]
+  strokeWidthSpinBox->setValue(mLastStrokeWidth);
+  connect(strokeWidthSpinBox.get(), &UnsignedLengthEdit::valueChanged, this,
+          &PackageEditorState_DrawTextBase::strokeWidthEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(strokeWidthSpinBox));
+
+  // Horizontal alignment
+  mContext.commandToolBar.addSeparator();
+  std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
+  hAlignActionGroup->setValue(mLastAlignment.getH());
+  connect(hAlignActionGroup.get(), &HAlignActionGroup::valueChanged, this,
+          &PackageEditorState_DrawTextBase::hAlignActionGroupValueChanged);
+  mContext.commandToolBar.addActionGroup(std::move(hAlignActionGroup));
+
+  // Vertical alignment
+  mContext.commandToolBar.addSeparator();
+  std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
+  vAlignActionGroup->setValue(mLastAlignment.getV());
+  connect(vAlignActionGroup.get(), &VAlignActionGroup::valueChanged, this,
+          &PackageEditorState_DrawTextBase::vAlignActionGroupValueChanged);
+  mContext.commandToolBar.addActionGroup(std::move(vAlignActionGroup));
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
@@ -191,9 +228,8 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
     mContext.undoStack.beginCmdGroup(tr("Add footprint text"));
     mCurrentText = new StrokeText(
         Uuid::createRandom(), mLastLayerName, mLastText, pos, mLastRotation,
-        mLastHeight, UnsignedLength(200000), StrokeTextSpacing(),
-        StrokeTextSpacing(), Alignment(HAlign::left(), VAlign::bottom()), false,
-        true);
+        mLastHeight, mLastStrokeWidth, StrokeTextSpacing(), StrokeTextSpacing(),
+        mLastAlignment, false, true);
     mContext.undoStack.appendToCmdGroup(
         new CmdStrokeTextInsert(mContext.currentFootprint->getStrokeTexts(),
                                 std::shared_ptr<StrokeText>(mCurrentText)));
@@ -248,19 +284,25 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
 void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
-      mLastLayerName = GraphicsLayer::sTopNames;
-      mLastHeight    = Length(1000000);
-      mLastText      = "{{NAME}}";
+      mLastLayerName   = GraphicsLayer::sTopNames;
+      mLastHeight      = Length(1000000);
+      mLastStrokeWidth = UnsignedLength(200000);
+      mLastAlignment   = Alignment(HAlign::center(), VAlign::bottom());
+      mLastText        = "{{NAME}}";
       break;
     case Mode::VALUE:
-      mLastLayerName = GraphicsLayer::sTopValues;
-      mLastHeight    = Length(1000000);
-      mLastText      = "{{VALUE}}";
+      mLastLayerName   = GraphicsLayer::sTopValues;
+      mLastHeight      = Length(1000000);
+      mLastStrokeWidth = UnsignedLength(200000);
+      mLastAlignment   = Alignment(HAlign::center(), VAlign::top());
+      mLastText        = "{{VALUE}}";
       break;
     default:
-      mLastLayerName = GraphicsLayer::sTopPlacement;
-      mLastHeight    = Length(2000000);
-      mLastText      = "";
+      mLastLayerName   = GraphicsLayer::sTopPlacement;
+      mLastHeight      = Length(2000000);
+      mLastStrokeWidth = UnsignedLength(200000);
+      mLastAlignment   = Alignment(HAlign::left(), VAlign::bottom());
+      mLastText        = "";
       break;
   }
 }
@@ -284,11 +326,35 @@ void PackageEditorState_DrawTextBase::heightEditValueChanged(
   }
 }
 
+void PackageEditorState_DrawTextBase::strokeWidthEditValueChanged(
+    const UnsignedLength& value) noexcept {
+  mLastStrokeWidth = value;
+  if (mEditCmd) {
+    mEditCmd->setStrokeWidth(mLastStrokeWidth, true);
+  }
+}
+
 void PackageEditorState_DrawTextBase::textComboBoxValueChanged(
     const QString& value) noexcept {
   mLastText = value.trimmed();
   if (mEditCmd) {
     mEditCmd->setText(mLastText, true);
+  }
+}
+
+void PackageEditorState_DrawTextBase::hAlignActionGroupValueChanged(
+    const HAlign& value) noexcept {
+  mLastAlignment.setH(value);
+  if (mEditCmd) {
+    mEditCmd->setAlignment(mLastAlignment, true);
+  }
+}
+
+void PackageEditorState_DrawTextBase::vAlignActionGroupValueChanged(
+    const VAlign& value) noexcept {
+  mLastAlignment.setV(value);
+  if (mEditCmd) {
+    mEditCmd->setAlignment(mLastAlignment, true);
   }
 }
 

@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
+#include <librepcb/common/alignment.h>
 #include <librepcb/common/graphics/graphicslayername.h>
 
 #include <QtCore>
@@ -91,7 +92,10 @@ private:  // Methods
 
   void layerComboBoxValueChanged(const QString& layerName) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
+  void strokeWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
+  void hAlignActionGroupValueChanged(const HAlign& value) noexcept;
+  void vAlignActionGroupValueChanged(const VAlign& value) noexcept;
 
 private:  // Types / Data
   Mode                              mMode;
@@ -104,6 +108,8 @@ private:  // Types / Data
   GraphicsLayerName mLastLayerName;
   Angle             mLastRotation;
   PositiveLength    mLastHeight;
+  UnsignedLength    mLastStrokeWidth;
+  Alignment         mLastAlignment;
   QString           mLastText;
 };
 
