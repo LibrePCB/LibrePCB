@@ -148,6 +148,7 @@ SOURCES += \
     widgets/tabwidget.cpp \
     widgets/unsignedlengthedit.cpp \
     widgets/unsignedratioedit.cpp \
+    widgets/valignactiongroup.cpp \
 
 HEADERS += \
     alignment.h \
@@ -287,6 +288,7 @@ HEADERS += \
     widgets/tabwidget.h \
     widgets/unsignedlengthedit.h \
     widgets/unsignedratioedit.h \
+    widgets/valignactiongroup.h \
 
 FORMS += \
     dialogs/aboutdialog.ui \

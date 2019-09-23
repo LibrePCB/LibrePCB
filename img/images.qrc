@@ -78,6 +78,9 @@
         <file>command_toolbars/align_horizontal_center.png</file>
         <file>command_toolbars/align_horizontal_left.png</file>
         <file>command_toolbars/align_horizontal_right.png</file>
+        <file>command_toolbars/align_vertical_bottom.png</file>
+        <file>command_toolbars/align_vertical_center.png</file>
+        <file>command_toolbars/align_vertical_top.png</file>
         <file>command_toolbars/cancel.png</file>
         <file>command_toolbars/pad_bottom.png</file>
         <file>command_toolbars/pad_tht.png</file>
