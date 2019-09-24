@@ -45,6 +45,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon&   polygon,
     mUndoStack(undoStack),
     mUi(new Ui::PolygonPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtLineWidth->setSingleStep(0.1);  // [mm]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
@@ -55,7 +56,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon&   polygon,
 
   // load polygon attributes
   selectLayerNameInCombobox(*mPolygon.getLayerName());
-  mUi->spbLineWidth->setValue(mPolygon.getLineWidth()->toMm());
+  mUi->edtLineWidth->setValue(mPolygon.getLineWidth());
   mUi->cbxFillArea->setChecked(mPolygon.isFilled());
   mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
 
@@ -101,9 +102,7 @@ bool PolygonPropertiesDialog::applyChanges() noexcept {
     }
     cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
     cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
-    cmd->setLineWidth(
-        UnsignedLength(Length::fromMm(mUi->spbLineWidth->value())),
-        false);                                             // can throw
+    cmd->setLineWidth(mUi->edtLineWidth->getValue(), false);
     cmd->setPath(mUi->pathEditorWidget->getPath(), false);  // can throw
     mUndoStack.execCmd(cmd.take());
     return true;

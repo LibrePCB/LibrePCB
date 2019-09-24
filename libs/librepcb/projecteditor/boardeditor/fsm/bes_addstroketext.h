@@ -36,6 +36,7 @@ namespace librepcb {
 
 class GraphicsLayerComboBox;
 class CmdStrokeTextEdit;
+class PositiveLengthEdit;
 
 namespace project {
 
@@ -75,7 +76,7 @@ private:
   bool       fixText(const Point& pos) noexcept;
   void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
   void       textComboBoxValueChanged(const QString& value) noexcept;
-  void       heightSpinBoxValueChanged(double value) noexcept;
+  void       heightEditValueChanged(const PositiveLength& value) noexcept;
   void       mirrorCheckBoxToggled(bool checked) noexcept;
   void       makeSelectedLayerVisible() noexcept;
 
@@ -95,7 +96,7 @@ private:
   QScopedPointer<QLabel>                mTextLabel;
   QScopedPointer<QComboBox>             mTextComboBox;
   QScopedPointer<QLabel>                mHeightLabel;
-  QScopedPointer<QDoubleSpinBox>        mHeightSpinBox;
+  QScopedPointer<PositiveLengthEdit>    mHeightEdit;
   QScopedPointer<QLabel>                mMirrorLabel;
   QScopedPointer<QCheckBox>             mMirrorCheckBox;
 };

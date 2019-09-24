@@ -31,6 +31,7 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/common/widgets/unsignedlengthedit.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 
@@ -84,23 +85,18 @@ bool SymbolEditorState_DrawCircle::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
-  std::unique_ptr<QDoubleSpinBox> lineWidthSpinBox(new QDoubleSpinBox());
-  lineWidthSpinBox->setMinimum(0);
-  lineWidthSpinBox->setMaximum(100);
-  lineWidthSpinBox->setSingleStep(0.1);
-  lineWidthSpinBox->setDecimals(6);
-  lineWidthSpinBox->setValue(mLastLineWidth->toMm());
-  connect(lineWidthSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &SymbolEditorState_DrawCircle::lineWidthSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(lineWidthSpinBox));
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->setSingleStep(0.1);  // [mm]
+  edtLineWidth->setValue(mLastLineWidth);
+  connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
+          &SymbolEditorState_DrawCircle::lineWidthEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
   std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
   fillCheckBox->setChecked(mLastFill);
   connect(fillCheckBox.get(), &QCheckBox::toggled, this,
           &SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged);
-  mContext.commandToolBar.addWidget(std::move(fillCheckBox));
+  mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
 
   std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
   grabAreaCheckBox->setChecked(mLastGrabArea);
@@ -239,9 +235,9 @@ void SymbolEditorState_DrawCircle::layerComboBoxValueChanged(
   }
 }
 
-void SymbolEditorState_DrawCircle::lineWidthSpinBoxValueChanged(
-    double value) noexcept {
-  mLastLineWidth = Length::fromMm(value);
+void SymbolEditorState_DrawCircle::lineWidthEditValueChanged(
+    const UnsignedLength& value) noexcept {
+  mLastLineWidth = value;
   if (mEditCmd) {
     mEditCmd->setLineWidth(mLastLineWidth, true);
   }

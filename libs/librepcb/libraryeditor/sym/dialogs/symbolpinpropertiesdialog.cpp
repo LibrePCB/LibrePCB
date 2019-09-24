@@ -46,15 +46,17 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin,
     mUndoStack(undoStack),
     mUi(new Ui::SymbolPinPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtLength->setSingleStep(2.54);    // [mm]
+  mUi->edtRotation->setSingleStep(90.0);  // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &SymbolPinPropertiesDialog::on_buttonBox_clicked);
 
   // load pin attributes
   mUi->edtName->setText(*mSymbolPin.getName());
-  mUi->spbPosX->setValue(mSymbolPin.getPosition().getX().toMm());
-  mUi->spbPosY->setValue(mSymbolPin.getPosition().getY().toMm());
-  mUi->spbRotation->setValue(mSymbolPin.getRotation().toDeg());
-  mUi->spbLength->setValue(mSymbolPin.getLength()->toMm());
+  mUi->edtPosX->setValue(mSymbolPin.getPosition().getX());
+  mUi->edtPosY->setValue(mSymbolPin.getPosition().getY());
+  mUi->edtRotation->setValue(mSymbolPin.getRotation());
+  mUi->edtLength->setValue(mSymbolPin.getLength());
 
   // preselect name
   mUi->edtName->selectAll();
@@ -91,11 +93,10 @@ bool SymbolPinPropertiesDialog::applyChanges() noexcept {
     CircuitIdentifier name(mUi->edtName->text().trimmed());  // can throw
     QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(mSymbolPin));
     cmd->setName(name, false);
-    cmd->setLength(UnsignedLength(Length::fromMm(mUi->spbLength->value())),
-                   false);  // can throw
-    cmd->setPosition(
-        Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-    cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
+    cmd->setLength(mUi->edtLength->getValue(), false);
+    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
+                     false);
+    cmd->setRotation(mUi->edtRotation->getValue(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

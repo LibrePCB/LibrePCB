@@ -58,6 +58,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
     mAttributes(mDevice.getComponentInstance().getAttributes()),
     mUi(new Ui::DeviceInstancePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtRotation->setSingleStep(90.0);  // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &DeviceInstancePropertiesDialog::buttonBoxClicked);
   setWindowTitle(QString(tr("Properties of %1"))
@@ -93,9 +94,9 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
       mDevice.getLibFootprint().getDescriptions().value(localeOrder));
 
   // Device/Footprint Attributes
-  mUi->spbxPosX->setValue(mDevice.getPosition().getX().toMm());
-  mUi->spbxPosY->setValue(mDevice.getPosition().getY().toMm());
-  mUi->spbxRotation->setValue(mDevice.getRotation().toDeg());
+  mUi->edtPosX->setValue(mDevice.getPosition().getX());
+  mUi->edtPosY->setValue(mDevice.getPosition().getY());
+  mUi->edtRotation->setValue(mDevice.getRotation());
   mUi->cbxMirror->setChecked(mDevice.getIsMirrored());
 
   // set focus to component instance name
@@ -166,13 +167,11 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
     transaction.append(cmdCmp.take());  // can throw
 
     // Device Instance
-    Point pos(Length::fromMm(mUi->spbxPosX->value()),
-              Length::fromMm(mUi->spbxPosY->value()));
-    Angle rotation = Angle::fromDeg(mUi->spbxRotation->value());
     QScopedPointer<CmdDeviceInstanceEditAll> cmdDev(
         new CmdDeviceInstanceEditAll(mDevice));
-    cmdDev->setPosition(pos, false);
-    cmdDev->setRotation(rotation, false);
+    cmdDev->setPosition(
+        Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()), false);
+    cmdDev->setRotation(mUi->edtRotation->getValue(), false);
     cmdDev->setMirrored(mUi->cbxMirror->isChecked(), false);  // can throw
     transaction.append(cmdDev.take());                        // can throw
 

@@ -44,6 +44,8 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
     mUndoStack(undoStack),
     mUi(new Ui::TextPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtHeight->setSingleStep(0.5);     // [mm]
+  mUi->edtRotation->setSingleStep(90.0);  // [°]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
@@ -56,10 +58,10 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
   selectLayerNameInCombobox(*mText.getLayerName());
   mUi->edtText->setPlainText(mText.getText());
   mUi->alignmentSelector->setAlignment(mText.getAlign());
-  mUi->spbHeight->setValue(mText.getHeight()->toMm());
-  mUi->spbPosX->setValue(mText.getPosition().getX().toMm());
-  mUi->spbPosY->setValue(mText.getPosition().getY().toMm());
-  mUi->spbRotation->setValue(mText.getRotation().toDeg());
+  mUi->edtHeight->setValue(mText.getHeight());
+  mUi->edtPosX->setValue(mText.getPosition().getX());
+  mUi->edtPosY->setValue(mText.getPosition().getY());
+  mUi->edtRotation->setValue(mText.getRotation());
 }
 
 TextPropertiesDialog::~TextPropertiesDialog() noexcept {
@@ -99,11 +101,10 @@ bool TextPropertiesDialog::applyChanges() noexcept {
     }
     cmd->setText(mUi->edtText->toPlainText().trimmed(), false);
     cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
-    cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())),
-                   false);  // can throw
-    cmd->setPosition(
-        Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-    cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
+    cmd->setHeight(mUi->edtHeight->getValue(), false);
+    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
+                     false);
+    cmd->setRotation(mUi->edtRotation->getValue(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

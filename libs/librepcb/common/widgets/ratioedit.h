@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TOOLBARPROXY_H
-#define LIBREPCB_TOOLBARPROXY_H
+#ifndef LIBREPCB_RATIOEDIT_H
+#define LIBREPCB_RATIOEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../units/ratio.h"
+#include "numbereditbase.h"
+
 #include <QtCore>
 #include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,40 +35,41 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class ToolBarProxy
+ *  Class RatioEdit
  ******************************************************************************/
 
 /**
- * @brief The ToolBarProxy class allows to map a list of QAction's to one
- * QToolBar
+ * @brief The RatioEdit class is a widget to view/edit ::librepcb::Ratio values
  */
-class ToolBarProxy final : public QObject {
+class RatioEdit final : public NumberEditBase {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ToolBarProxy(QObject* parent = nullptr) noexcept;
-  ToolBarProxy(const ToolBarProxy& other) = delete;
-  ~ToolBarProxy() noexcept;
+  explicit RatioEdit(QWidget* parent = nullptr) noexcept;
+  RatioEdit(const RatioEdit& other) = delete;
+  virtual ~RatioEdit() noexcept;
+
+  // Getters
+  const Ratio& getValue() const noexcept { return mValue; }
 
   // Setters
-  void setToolBar(QToolBar* toolbar) noexcept;
-  void setEnabled(bool enabled) noexcept;
-
-  // General Methods
-  void     clear() noexcept;
-  QAction* addAction(std::unique_ptr<QAction> action) noexcept;
-  QAction* addLabel(const QString& text, int indent = 0) noexcept;
-  QAction* addWidget(std::unique_ptr<QWidget> widget, int indent = 0) noexcept;
-  QAction* addSeparator() noexcept;
-  void     removeAction(QAction* action) noexcept;
+  void setValue(const Ratio& value) noexcept;
 
   // Operator Overloadings
-  ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;
+  RatioEdit& operator=(const RatioEdit& rhs) = delete;
+
+signals:
+  void valueChanged(const Ratio& value);
+
+private:  // Methods
+  void updateSpinBox() noexcept override;
+  void spinBoxValueChanged(double value) noexcept override;
 
 private:  // Data
-  QToolBar*       mToolBar;
-  QList<QAction*> mActions;
+  Ratio mMinValue;
+  Ratio mMaxValue;
+  Ratio mValue;
 };
 
 /*******************************************************************************
@@ -76,4 +78,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TOOLBARPROXY_H
+#endif  // LIBREPCB_RATIOEDIT_H

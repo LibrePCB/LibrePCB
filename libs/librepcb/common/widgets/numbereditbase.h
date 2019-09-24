@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <optional/tl/optional.hpp>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -53,6 +55,7 @@ public:
   virtual ~NumberEditBase() noexcept;
 
   // General Methods
+  void setSingleStep(tl::optional<double> step) noexcept;
   void setFrame(bool frame) noexcept;
   void selectAll() noexcept;
 

@@ -47,6 +47,10 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     mUndoStack(undoStack),
     mUi(new Ui::FootprintPadPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtWidth->setSingleStep(0.1);          // [mm]
+  mUi->edtHeight->setSingleStep(0.1);         // [mm]
+  mUi->edtDrillDiameter->setSingleStep(0.1);  // [mm]
+  mUi->edtRotation->setSingleStep(90.0);      // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 
@@ -91,17 +95,17 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
       Q_ASSERT(false);
       break;
   }
-  mUi->spbWidth->setValue(mPad.getWidth()->toMm());
-  mUi->spbHeight->setValue(mPad.getHeight()->toMm());
-  mUi->spbDrillDiameter->setValue(mPad.getDrillDiameter()->toMm());
-  mUi->spbPosX->setValue(mPad.getPosition().getX().toMm());
-  mUi->spbPosY->setValue(mPad.getPosition().getY().toMm());
-  mUi->spbRotation->setValue(mPad.getRotation().toDeg());
+  mUi->edtWidth->setValue(mPad.getWidth());
+  mUi->edtHeight->setValue(mPad.getHeight());
+  mUi->edtDrillDiameter->setValue(mPad.getDrillDiameter());
+  mUi->edtPosX->setValue(mPad.getPosition().getX());
+  mUi->edtPosY->setValue(mPad.getPosition().getY());
+  mUi->edtRotation->setValue(mPad.getRotation());
 
   // disable drill diameter for SMT pads
-  mUi->spbDrillDiameter->setEnabled(mUi->rbtnBoardSideTht->isChecked());
-  connect(mUi->rbtnBoardSideTht, &QRadioButton::toggled, mUi->spbDrillDiameter,
-          &QDoubleSpinBox::setEnabled);
+  mUi->edtDrillDiameter->setEnabled(mUi->rbtnBoardSideTht->isChecked());
+  connect(mUi->rbtnBoardSideTht, &QRadioButton::toggled, mUi->edtDrillDiameter,
+          &LengthEdit::setEnabled);
 }
 
 FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
@@ -155,16 +159,12 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     } else {
       Q_ASSERT(false);
     }
-    cmd->setWidth(PositiveLength(Length::fromMm(mUi->spbWidth->value())),
-                  false);  // can throw
-    cmd->setHeight(PositiveLength(Length::fromMm(mUi->spbHeight->value())),
-                   false);  // can throw
-    cmd->setDrillDiameter(
-        UnsignedLength(Length::fromMm(mUi->spbDrillDiameter->value())),
-        false);  // can throw
-    cmd->setPosition(
-        Point::fromMm(mUi->spbPosX->value(), mUi->spbPosY->value()), false);
-    cmd->setRotation(Angle::fromDeg(mUi->spbRotation->value()), false);
+    cmd->setWidth(mUi->edtWidth->getValue(), false);
+    cmd->setHeight(mUi->edtHeight->getValue(), false);
+    cmd->setDrillDiameter(mUi->edtDrillDiameter->getValue(), false);
+    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
+                     false);
+    cmd->setRotation(mUi->edtRotation->getValue(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

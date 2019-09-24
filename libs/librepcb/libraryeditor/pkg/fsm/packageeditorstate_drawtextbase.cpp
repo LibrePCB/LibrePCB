@@ -31,6 +31,7 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 
@@ -103,17 +104,12 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   }
 
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
-  std::unique_ptr<QDoubleSpinBox> lineWidthSpinBox(new QDoubleSpinBox());
-  lineWidthSpinBox->setMinimum(0.1);
-  lineWidthSpinBox->setMaximum(100);
-  lineWidthSpinBox->setSingleStep(0.1);
-  lineWidthSpinBox->setDecimals(6);
-  lineWidthSpinBox->setValue(mLastHeight->toMm());
-  connect(lineWidthSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &PackageEditorState_DrawTextBase::heightSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(lineWidthSpinBox));
+  std::unique_ptr<PositiveLengthEdit> edtLineWidth(new PositiveLengthEdit());
+  edtLineWidth->setSingleStep(0.5);  // [mm]
+  edtLineWidth->setValue(mLastHeight);
+  connect(edtLineWidth.get(), &PositiveLengthEdit::valueChanged, this,
+          &PackageEditorState_DrawTextBase::heightEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
@@ -280,9 +276,9 @@ void PackageEditorState_DrawTextBase::layerComboBoxValueChanged(
   }
 }
 
-void PackageEditorState_DrawTextBase::heightSpinBoxValueChanged(
-    double value) noexcept {
-  mLastHeight = Length::fromMm(value);
+void PackageEditorState_DrawTextBase::heightEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mLastHeight = value;
   if (mEditCmd) {
     mEditCmd->setHeight(mLastHeight, true);
   }

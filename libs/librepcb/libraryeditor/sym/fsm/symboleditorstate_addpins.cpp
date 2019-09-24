@@ -26,6 +26,7 @@
 
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/widgets/unsignedlengthedit.h>
 #include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
@@ -79,17 +80,12 @@ bool SymbolEditorState_AddPins::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(nameLineEdit));
 
   mContext.commandToolBar.addLabel(tr("Length:"), 10);
-  std::unique_ptr<QDoubleSpinBox> lengthSpinBox(new QDoubleSpinBox());
-  lengthSpinBox->setMinimum(0);
-  lengthSpinBox->setMaximum(100);
-  lengthSpinBox->setSingleStep(1.27);
-  lengthSpinBox->setDecimals(6);
-  lengthSpinBox->setValue(mLastLength->toMm());
-  connect(lengthSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &SymbolEditorState_AddPins::lengthSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(lengthSpinBox));
+  std::unique_ptr<UnsignedLengthEdit> edtLength(new UnsignedLengthEdit());
+  edtLength->setSingleStep(2.54);  // [mm]
+  edtLength->setValue(mLastLength);
+  connect(edtLength.get(), &UnsignedLengthEdit::valueChanged, this,
+          &SymbolEditorState_AddPins::lengthEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtLength));
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
@@ -204,9 +200,9 @@ void SymbolEditorState_AddPins::nameLineEditTextChanged(
   }
 }
 
-void SymbolEditorState_AddPins::lengthSpinBoxValueChanged(
-    double value) noexcept {
-  mLastLength = Length::fromMm(value);
+void SymbolEditorState_AddPins::lengthEditValueChanged(
+    const UnsignedLength& value) noexcept {
+  mLastLength = value;
   if (mEditCmd) {
     mEditCmd->setLength(mLastLength, true);
   }

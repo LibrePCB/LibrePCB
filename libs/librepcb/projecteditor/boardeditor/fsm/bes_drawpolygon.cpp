@@ -30,6 +30,7 @@
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/common/widgets/unsignedlengthedit.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardpolygonadd.h>
@@ -61,7 +62,7 @@ BES_DrawPolygon::BES_DrawPolygon(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mLayerLabel(nullptr),
     mLayerComboBox(nullptr),
     mWidthLabel(nullptr),
-    mWidthComboBox(nullptr),
+    mWidthEdit(nullptr),
     mFillLabel(nullptr),
     mFillCheckBox(nullptr) {
 }
@@ -115,25 +116,12 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept {
   mEditorUi.commandToolbar->addWidget(mWidthLabel);
 
   // add the widths combobox to the toolbar
-  mWidthComboBox = new QComboBox();
-  mWidthComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mWidthComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mWidthComboBox->setEditable(true);
-  mWidthComboBox->addItem("0");
-  mWidthComboBox->addItem("0.2");
-  mWidthComboBox->addItem("0.3");
-  mWidthComboBox->addItem("0.5");
-  mWidthComboBox->addItem("0.8");
-  mWidthComboBox->addItem("1");
-  mWidthComboBox->addItem("1.5");
-  mWidthComboBox->addItem("2");
-  mWidthComboBox->addItem("2.5");
-  mWidthComboBox->addItem("3");
-  mWidthComboBox->setCurrentIndex(
-      mWidthComboBox->findText(QString::number(mCurrentWidth->toMm())));
-  mEditorUi.commandToolbar->addWidget(mWidthComboBox);
-  connect(mWidthComboBox, &QComboBox::currentTextChanged, this,
-          &BES_DrawPolygon::widthComboBoxTextChanged);
+  mWidthEdit = new UnsignedLengthEdit();
+  mWidthEdit->setValue(mCurrentWidth);
+  mWidthEdit->setSingleStep(0.1);  // [mm]
+  mEditorUi.commandToolbar->addWidget(mWidthEdit);
+  connect(mWidthEdit, &UnsignedLengthEdit::valueChanged, this,
+          &BES_DrawPolygon::widthEditValueChanged);
 
   // add the "Filled:" label to the toolbar
   mFillLabel = new QLabel(tr("Filled:"));
@@ -164,8 +152,8 @@ bool BES_DrawPolygon::exit(BEE_Base* event) noexcept {
   mFillCheckBox = nullptr;
   delete mFillLabel;
   mFillLabel = nullptr;
-  delete mWidthComboBox;
-  mWidthComboBox = nullptr;
+  delete mWidthEdit;
+  mWidthEdit = nullptr;
   delete mWidthLabel;
   mWidthLabel = nullptr;
   delete mLayerComboBox;
@@ -379,12 +367,9 @@ void BES_DrawPolygon::layerComboBoxLayerChanged(
   }
 }
 
-void BES_DrawPolygon::widthComboBoxTextChanged(const QString& width) noexcept {
-  try {
-    mCurrentWidth = Length::fromMm(width);
-  } catch (...) {
-    return;
-  }
+void BES_DrawPolygon::widthEditValueChanged(
+    const UnsignedLength& value) noexcept {
+  mCurrentWidth = value;
   if (mCmdEditCurrentPolygon) {
     mCmdEditCurrentPolygon->setLineWidth(mCurrentWidth, true);
   }

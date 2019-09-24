@@ -46,36 +46,10 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="spbMinWidth">
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="maximum">
-        <double>999.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Min. Clearance:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QDoubleSpinBox" name="spbMinClearance">
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="maximum">
-        <double>999.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
        </property>
       </widget>
      </item>
@@ -119,6 +93,12 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <widget class="librepcb::UnsignedLengthEdit" name="edtMinWidth" native="true"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="librepcb::UnsignedLengthEdit" name="edtMinClearance" native="true"/>
+     </item>
     </layout>
    </item>
    <item>
@@ -148,6 +128,12 @@
    <class>librepcb::PathEditorWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/common/widgets/patheditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -37,6 +37,7 @@ namespace librepcb {
 
 class CmdPolygonEdit;
 class GraphicsLayerComboBox;
+class UnsignedLengthEdit;
 
 namespace project {
 
@@ -76,7 +77,7 @@ private:  // Methods
   bool       abort(bool showErrMsgBox) noexcept;
   void       updateSegmentPosition(const Point& cursorPos) noexcept;
   void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
-  void       widthComboBoxTextChanged(const QString& width) noexcept;
+  void       widthEditValueChanged(const UnsignedLength& value) noexcept;
   void       filledCheckBoxCheckedChanged(bool checked) noexcept;
   void       makeSelectedLayerVisible() noexcept;
 
@@ -102,7 +103,7 @@ private:  // Data
   QLabel*                mLayerLabel;
   GraphicsLayerComboBox* mLayerComboBox;
   QLabel*                mWidthLabel;
-  QComboBox*             mWidthComboBox;
+  UnsignedLengthEdit*    mWidthEdit;
   QLabel*                mFillLabel;
   QCheckBox*             mFillCheckBox;
 };

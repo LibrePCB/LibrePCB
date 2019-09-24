@@ -105,13 +105,17 @@ QAction* ToolBarProxy::addLabel(const QString& text, int indent) noexcept {
   return addWidget(std::move(label));
 }
 
-QAction* ToolBarProxy::addWidget(std::unique_ptr<QWidget> widget) noexcept {
+QAction* ToolBarProxy::addWidget(std::unique_ptr<QWidget> widget,
+                                 int                      indent) noexcept {
   Q_ASSERT(widget);
   Q_ASSERT((widget->parent() == nullptr) || (widget->parent() == this));
 
+  if (indent > 0) {
+    addLabel("", indent);  // A bit ugly, but simple and works :)
+  }
+
   std::unique_ptr<QWidgetAction> action(new QWidgetAction(this));
-  action->setDefaultWidget(
-      widget.release());  // transfer ownership to the action
+  action->setDefaultWidget(widget.release());  // transfer ownership to action
   return addAction(std::move(action));
 }
 

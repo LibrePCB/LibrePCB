@@ -30,20 +30,13 @@
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/widgets/graphicslayercombobox.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardstroketextadd.h>
 #include <librepcb/project/boards/items/bi_stroketext.h>
 
 #include <QtCore>
-//#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-//#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-//#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
-//#include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
-//#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
-//#include <librepcb/project/project.h>
-//#include <librepcb/project/circuit/circuit.h>
-//#include <librepcb/project/circuit/netsignal.h>
 
 /*******************************************************************************
  *  Namespace
@@ -149,17 +142,12 @@ bool BES_AddStrokeText::entry(BEE_Base* event) noexcept {
   mEditorUi.commandToolbar->addWidget(mHeightLabel.data());
 
   // add the height spinbox to the toolbar
-  mHeightSpinBox.reset(new QDoubleSpinBox());
-  mHeightSpinBox->setMinimum(0.1);
-  mHeightSpinBox->setMaximum(100);
-  mHeightSpinBox->setSingleStep(0.1);
-  mHeightSpinBox->setDecimals(6);
-  mHeightSpinBox->setValue(mCurrentHeight->toMm());
-  connect(mHeightSpinBox.data(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &BES_AddStrokeText::heightSpinBoxValueChanged);
-  mEditorUi.commandToolbar->addWidget(mHeightSpinBox.data());
+  mHeightEdit.reset(new PositiveLengthEdit());
+  mHeightEdit->setSingleStep(0.5);  // [mm]
+  mHeightEdit->setValue(mCurrentHeight);
+  connect(mHeightEdit.data(), &PositiveLengthEdit::valueChanged, this,
+          &BES_AddStrokeText::heightEditValueChanged);
+  mEditorUi.commandToolbar->addWidget(mHeightEdit.data());
 
   // add the "Mirror:" label to the toolbar
   mMirrorLabel.reset(new QLabel(tr("Mirror:")));
@@ -195,7 +183,7 @@ bool BES_AddStrokeText::exit(BEE_Base* event) noexcept {
   // Remove actions / widgets from the "command" toolbar
   mMirrorCheckBox.reset();
   mMirrorLabel.reset();
-  mHeightSpinBox.reset();
+  mHeightEdit.reset();
   mHeightLabel.reset();
   mTextComboBox.reset();
   mTextLabel.reset();
@@ -373,8 +361,9 @@ void BES_AddStrokeText::textComboBoxValueChanged(
   }
 }
 
-void BES_AddStrokeText::heightSpinBoxValueChanged(double value) noexcept {
-  mCurrentHeight = Length::fromMm(value);
+void BES_AddStrokeText::heightEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mCurrentHeight = value;
   if (mEditCmd) {
     mEditCmd->setHeight(mCurrentHeight, true);
   }

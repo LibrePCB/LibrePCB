@@ -56,6 +56,8 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project&   project,
     mUi(new Ui::BoardPlanePropertiesDialog),
     mUndoStack(undoStack) {
   mUi->setupUi(this);
+  mUi->edtMinWidth->setSingleStep(0.1);      // [mm]
+  mUi->edtMinClearance->setSingleStep(0.1);  // [mm]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardPlanePropertiesDialog::buttonBoxClicked);
 
@@ -79,8 +81,8 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project&   project,
       mUi->cbxLayer->findData(*mPlane.getLayerName()));
 
   // minimum width / clearance spinbox
-  mUi->spbMinWidth->setValue(mPlane.getMinWidth()->toMm());
-  mUi->spbMinClearance->setValue(mPlane.getMinClearance()->toMm());
+  mUi->edtMinWidth->setValue(mPlane.getMinWidth());
+  mUi->edtMinClearance->setValue(mPlane.getMinClearance());
 
   // connect style combobox
   mUi->cbxConnectStyle->addItem(tr("None"),
@@ -154,10 +156,8 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     }
 
     // min width/clearance
-    cmd->setMinWidth(UnsignedLength(
-        Length::fromMm(mUi->spbMinWidth->value())));  // can throw
-    cmd->setMinClearance(UnsignedLength(
-        Length::fromMm(mUi->spbMinClearance->value())));  // can throw
+    cmd->setMinWidth(mUi->edtMinWidth->getValue());
+    cmd->setMinClearance(mUi->edtMinClearance->getValue());
 
     // connect style
     cmd->setConnectStyle(static_cast<BI_Plane::ConnectStyle>(

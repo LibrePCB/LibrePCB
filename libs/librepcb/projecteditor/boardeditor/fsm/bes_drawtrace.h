@@ -34,6 +34,7 @@
 namespace librepcb {
 
 class GraphicsLayer;
+class PositiveLengthEdit;
 
 namespace project {
 
@@ -116,7 +117,7 @@ private:
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
   void        updateNetpointPositions(const Point& cursorPos) noexcept;
   void        layerComboBoxIndexChanged(int index) noexcept;
-  void        wireWidthComboBoxTextChanged(const QString& width) noexcept;
+  void        wireWidthEditValueChanged(const PositiveLength& value) noexcept;
   void        updateWireModeActionsCheckedState() noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
@@ -139,7 +140,7 @@ private:
   QLabel*                   mLayerLabel;
   QComboBox*                mLayerComboBox;
   QLabel*                   mWidthLabel;
-  QComboBox*                mWidthComboBox;
+  PositiveLengthEdit*       mWidthEdit;
 };
 
 /*******************************************************************************

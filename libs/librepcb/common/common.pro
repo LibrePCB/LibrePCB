@@ -140,9 +140,13 @@ SOURCES += \
     widgets/numbereditbase.cpp \
     widgets/patheditorwidget.cpp \
     widgets/plaintextedit.cpp \
+    widgets/positivelengthedit.cpp \
+    widgets/ratioedit.cpp \
     widgets/signalrolecombobox.cpp \
     widgets/statusbar.cpp \
     widgets/tabwidget.cpp \
+    widgets/unsignedlengthedit.cpp \
+    widgets/unsignedratioedit.cpp \
 
 HEADERS += \
     alignment.h \
@@ -274,9 +278,13 @@ HEADERS += \
     widgets/numbereditbase.h \
     widgets/patheditorwidget.h \
     widgets/plaintextedit.h \
+    widgets/positivelengthedit.h \
+    widgets/ratioedit.h \
     widgets/signalrolecombobox.h \
     widgets/statusbar.h \
     widgets/tabwidget.h \
+    widgets/unsignedlengthedit.h \
+    widgets/unsignedratioedit.h \
 
 FORMS += \
     dialogs/aboutdialog.ui \
