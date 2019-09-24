@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "numbereditbase.h"
+#include "ratioedit.h"
 
 #include "doublespinbox.h"
 
@@ -33,50 +33,55 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NumberEditBase::NumberEditBase(QWidget* parent) noexcept
-  : QWidget(parent), mSpinBox(new DoubleSpinBox(this)) {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->addWidget(mSpinBox.data());
-
-  // Actually for most units we only need 6 decimals, but to avoid rounding
-  // errors (e.g. when converting between different units), we need some more
-  // decimals.
-  mSpinBox->setDecimals(10);
-  setSingleStep(tl::nullopt);
-  setFocusProxy(mSpinBox.data());
-
-  connect(mSpinBox.data(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &NumberEditBase::spinBoxValueChanged);
-  connect(mSpinBox.data(), &DoubleSpinBox::editingFinished, this,
-          &NumberEditBase::editingFinished);
+RatioEdit::RatioEdit(QWidget* parent) noexcept
+  : NumberEditBase(parent),
+    mMinValue(-2000000000L),  // -2'000% should be sufficient for everything
+    mMaxValue(2000000000L),   // 2'000% should be sufficient for everything
+    mValue(0) {
+  mSpinBox->setSuffix("%");
+  updateSpinBox();
 }
 
-NumberEditBase::~NumberEditBase() noexcept {
+RatioEdit::~RatioEdit() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Setters
  ******************************************************************************/
 
-void NumberEditBase::setSingleStep(tl::optional<double> step) noexcept {
-  if (step) {
-    mSpinBox->setSingleStep(*step);
-    mSpinBox->setButtonSymbols(QDoubleSpinBox::UpDownArrows);
-  } else {
-    mSpinBox->setSingleStep(0.0);
-    mSpinBox->setButtonSymbols(QDoubleSpinBox::NoButtons);
+void RatioEdit::setValue(const Ratio& value) noexcept {
+  if (value != mValue) {
+    mValue = value;
+    // Extend allowed range e.g. if a lower/higher value is loaded from file.
+    // Otherwise the edit will clip the value, i.e. the value gets modified
+    // even without user interaction.
+    if (mValue > mMaxValue) mMaxValue = mValue;
+    if (mValue < mMinValue) mMinValue = mValue;
+    updateSpinBox();
   }
 }
 
-void NumberEditBase::setFrame(bool frame) noexcept {
-  mSpinBox->setFrame(frame);
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void RatioEdit::updateSpinBox() noexcept {
+  mSpinBox->setMinimum(mMinValue.toPercent());
+  mSpinBox->setMaximum(mMaxValue.toPercent());
+  mSpinBox->setValue(mValue.toPercent());
 }
 
-void NumberEditBase::selectAll() noexcept {
-  mSpinBox->selectAll();
+void RatioEdit::spinBoxValueChanged(double value) noexcept {
+  try {
+    mValue = Ratio::fromPercent(value);  // can throw
+    // Clip value with integer arithmetic to avoid floating point issues.
+    if (mValue < mMinValue) mValue = mMinValue;
+    if (mValue > mMaxValue) mValue = mMaxValue;
+    emit valueChanged(mValue);
+  } catch (const Exception& e) {
+    // This should actually never happen, thus no user visible message here.
+    qWarning() << "Invalid ratio entered:" << e.getMsg();
+  }
 }
 
 /*******************************************************************************

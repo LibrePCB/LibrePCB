@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>304</width>
-    <height>111</height>
+    <height>91</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,25 +23,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QDoubleSpinBox" name="spbDiameter">
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="minimum">
-        <double>0.000100000000000</double>
-       </property>
-       <property name="maximum">
-        <double>999.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-       <property name="value">
-        <double>0.500000000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
@@ -52,38 +33,15 @@
      <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QDoubleSpinBox" name="spbPosX">
-         <property name="decimals">
-          <number>6</number>
-         </property>
-         <property name="minimum">
-          <double>-9999.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>9999.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>2.540000000000000</double>
-         </property>
-        </widget>
+        <widget class="librepcb::LengthEdit" name="edtPosX" native="true"/>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="spbPosY">
-         <property name="decimals">
-          <number>6</number>
-         </property>
-         <property name="minimum">
-          <double>-9999.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>9999.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>2.540000000000000</double>
-         </property>
-        </widget>
+        <widget class="librepcb::LengthEdit" name="edtPosY" native="true"/>
        </item>
       </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="librepcb::PositiveLengthEdit" name="edtDiameter" native="true"/>
      </item>
     </layout>
    </item>
@@ -99,6 +57,20 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::LengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/lengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

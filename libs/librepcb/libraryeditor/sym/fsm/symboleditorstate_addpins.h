@@ -78,7 +78,7 @@ public:
 private:  // Methods
   bool    addNextPin(const Point& pos, const Angle& rot) noexcept;
   void    nameLineEditTextChanged(const QString& text) noexcept;
-  void    lengthSpinBoxValueChanged(double value) noexcept;
+  void    lengthEditValueChanged(const UnsignedLength& value) noexcept;
   QString determineNextPinName() const noexcept;
   bool    hasPin(const QString& name) const noexcept;
 

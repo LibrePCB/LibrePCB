@@ -89,8 +89,8 @@ private:  // Methods
   bool updateCurrentPosition(const Point& pos) noexcept;
 
   void layerComboBoxValueChanged(const QString& layerName) noexcept;
-  void lineWidthSpinBoxValueChanged(double value) noexcept;
-  void angleSpinBoxValueChanged(double value) noexcept;
+  void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
+  void angleEditValueChanged(const Angle& value) noexcept;
   void fillCheckBoxCheckedChanged(bool checked) noexcept;
   void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
 

@@ -53,6 +53,8 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
     mUi(new Ui::BoardViaPropertiesDialog),
     mUndoStack(undoStack) {
   mUi->setupUi(this);
+  mUi->edtSize->setSingleStep(0.1);           // [mm]
+  mUi->edtDrillDiameter->setSingleStep(0.1);  // [mm]
 
   // shape combobox
   mUi->cbxShape->addItem(tr("Round"), static_cast<int>(BI_Via::Shape::Round));
@@ -63,14 +65,14 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
       mUi->cbxShape->findData(static_cast<int>(mVia.getShape())));
 
   // Position spinboxes
-  mUi->spbxPosX->setValue(mVia.getPosition().getX().toMm());
-  mUi->spbxPosY->setValue(mVia.getPosition().getY().toMm());
+  mUi->edtPosX->setValue(mVia.getPosition().getX());
+  mUi->edtPosY->setValue(mVia.getPosition().getY());
 
   // size spinbox
-  mUi->spbxSize->setValue(mVia.getSize()->toMm());
+  mUi->edtSize->setValue(mVia.getSize());
 
   // drill diameter spinbox
-  mUi->spbxDrillDiameter->setValue(mVia.getDrillDiameter()->toMm());
+  mUi->edtDrillDiameter->setValue(mVia.getDrillDiameter());
 
   // netsignal combobox
   mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
@@ -114,14 +116,10 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     cmd->setShape(
         static_cast<BI_Via::Shape>(mUi->cbxShape->currentData().toInt()),
         false);
-    cmd->setPosition(Point(Length::fromMm(mUi->spbxPosX->value()),
-                           Length::fromMm(mUi->spbxPosY->value())),
+    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
-    cmd->setSize(PositiveLength(Length::fromMm(mUi->spbxSize->value())),
-                 false);  // can throw
-    cmd->setDrillDiameter(
-        PositiveLength(Length::fromMm(mUi->spbxDrillDiameter->value())),
-        false);  // can throw
+    cmd->setSize(mUi->edtSize->getValue(), false);
+    cmd->setDrillDiameter(mUi->edtDrillDiameter->getValue(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

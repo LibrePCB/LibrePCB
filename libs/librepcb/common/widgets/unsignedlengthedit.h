@@ -17,16 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TOOLBARPROXY_H
-#define LIBREPCB_TOOLBARPROXY_H
+#ifndef LIBREPCB_UNSIGNEDLENGTHEDIT_H
+#define LIBREPCB_UNSIGNEDLENGTHEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../units/length.h"
+#include "../units/lengthunit.h"
+#include "numbereditbase.h"
+
 #include <QtCore>
 #include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,40 +36,44 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class ToolBarProxy
+ *  Class UnsignedLengthEdit
  ******************************************************************************/
 
 /**
- * @brief The ToolBarProxy class allows to map a list of QAction's to one
- * QToolBar
+ * @brief The UnsignedLengthEdit class is a widget to view/edit
+ *        ::librepcb::UnsignedLength values
  */
-class ToolBarProxy final : public QObject {
+class UnsignedLengthEdit final : public NumberEditBase {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ToolBarProxy(QObject* parent = nullptr) noexcept;
-  ToolBarProxy(const ToolBarProxy& other) = delete;
-  ~ToolBarProxy() noexcept;
+  explicit UnsignedLengthEdit(QWidget* parent = nullptr) noexcept;
+  UnsignedLengthEdit(const UnsignedLengthEdit& other) = delete;
+  virtual ~UnsignedLengthEdit() noexcept;
+
+  // Getters
+  const UnsignedLength& getValue() const noexcept { return mValue; }
 
   // Setters
-  void setToolBar(QToolBar* toolbar) noexcept;
-  void setEnabled(bool enabled) noexcept;
-
-  // General Methods
-  void     clear() noexcept;
-  QAction* addAction(std::unique_ptr<QAction> action) noexcept;
-  QAction* addLabel(const QString& text, int indent = 0) noexcept;
-  QAction* addWidget(std::unique_ptr<QWidget> widget, int indent = 0) noexcept;
-  QAction* addSeparator() noexcept;
-  void     removeAction(QAction* action) noexcept;
+  void setValue(const UnsignedLength& value) noexcept;
+  void setUnit(const LengthUnit& unit) noexcept;
 
   // Operator Overloadings
-  ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;
+  UnsignedLengthEdit& operator=(const UnsignedLengthEdit& rhs) = delete;
+
+signals:
+  void valueChanged(const UnsignedLength& value);
+
+private:  // Methods
+  void updateSpinBox() noexcept override;
+  void spinBoxValueChanged(double value) noexcept override;
 
 private:  // Data
-  QToolBar*       mToolBar;
-  QList<QAction*> mActions;
+  UnsignedLength mMinValue;
+  UnsignedLength mMaxValue;
+  UnsignedLength mValue;
+  LengthUnit     mUnit;
 };
 
 /*******************************************************************************
@@ -76,4 +82,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TOOLBARPROXY_H
+#endif  // LIBREPCB_UNSIGNEDLENGTHEDIT_H

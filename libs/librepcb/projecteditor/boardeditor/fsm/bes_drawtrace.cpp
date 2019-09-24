@@ -28,6 +28,7 @@
 
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
@@ -69,7 +70,7 @@ BES_DrawTrace::BES_DrawTrace(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mLayerLabel(nullptr),
     mLayerComboBox(nullptr),
     mWidthLabel(nullptr),
-    mWidthComboBox(nullptr) {
+    mWidthEdit(nullptr) {
 }
 
 BES_DrawTrace::~BES_DrawTrace() {
@@ -158,24 +159,12 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
   mEditorUi.commandToolbar->addWidget(mWidthLabel);
 
   // add the widths combobox to the toolbar
-  mWidthComboBox = new QComboBox();
-  mWidthComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mWidthComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mWidthComboBox->setEditable(true);
-  mWidthComboBox->addItem("0.2");
-  mWidthComboBox->addItem("0.3");
-  mWidthComboBox->addItem("0.5");
-  mWidthComboBox->addItem("0.8");
-  mWidthComboBox->addItem("1");
-  mWidthComboBox->addItem("1.5");
-  mWidthComboBox->addItem("2");
-  mWidthComboBox->addItem("2.5");
-  mWidthComboBox->addItem("3");
-  mWidthComboBox->setCurrentIndex(
-      mWidthComboBox->findText(QString::number(mCurrentWidth->toMm())));
-  mEditorUi.commandToolbar->addWidget(mWidthComboBox);
-  connect(mWidthComboBox, &QComboBox::currentTextChanged, this,
-          &BES_DrawTrace::wireWidthComboBoxTextChanged);
+  mWidthEdit = new PositiveLengthEdit();
+  mWidthEdit->setValue(mCurrentWidth);
+  mWidthEdit->setSingleStep(0.1);  // [mm]
+  mEditorUi.commandToolbar->addWidget(mWidthEdit);
+  connect(mWidthEdit, &PositiveLengthEdit::valueChanged, this,
+          &BES_DrawTrace::wireWidthEditValueChanged);
 
   // change the cursor
   mEditorGraphicsView.setCursor(Qt::CrossCursor);
@@ -190,8 +179,8 @@ bool BES_DrawTrace::exit(BEE_Base* event) noexcept {
   if (mSubState != SubState_Idle) abortPositioning(true);
 
   // Remove actions / widgets from the "command" toolbar
-  delete mWidthComboBox;
-  mWidthComboBox = nullptr;
+  delete mWidthEdit;
+  mWidthEdit = nullptr;
   delete mWidthLabel;
   mWidthLabel = nullptr;
   delete mLayerComboBox;
@@ -426,7 +415,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     // update line width
     if (mFixedStartAnchor->getMaxLineWidth() > 0) {
       mCurrentWidth = PositiveLength(*mFixedStartAnchor->getMedianLineWidth());
-      mWidthComboBox->setCurrentText(QString::number(mCurrentWidth->toMm()));
+      mWidthEdit->setValue(mCurrentWidth);
     }
 
     // add more netpoints & netlines
@@ -665,13 +654,9 @@ void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
   // TODO: add a via to change the layer of the current netline?
 }
 
-void BES_DrawTrace::wireWidthComboBoxTextChanged(
-    const QString& width) noexcept {
-  try {
-    mCurrentWidth = Length::fromMm(width);
-  } catch (...) {
-    return;
-  }
+void BES_DrawTrace::wireWidthEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mCurrentWidth = value;
   if (mSubState != SubState::SubState_PositioningNetPoint) return;
   if (mPositioningNetLine1) mPositioningNetLine1->setWidth(mCurrentWidth);
   if (mPositioningNetLine2) mPositioningNetLine2->setWidth(mCurrentWidth);

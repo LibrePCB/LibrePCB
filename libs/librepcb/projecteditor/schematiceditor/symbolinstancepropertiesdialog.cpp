@@ -62,6 +62,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
     mAttributes(mComponentInstance.getAttributes()),
     mUi(new Ui::SymbolInstancePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->edtSymbInstRotation->setSingleStep(90.0);  // [°]
   setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
 
   // Component Instance Attributes
@@ -96,9 +97,9 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
 
   // Symbol Instance Attributes
   mUi->lblSymbInstName->setText(mSymbol.getName());
-  mUi->spbxSymbInstPosX->setValue(mSymbol.getPosition().getX().toMm());
-  mUi->spbxSymbInstPosY->setValue(mSymbol.getPosition().getY().toMm());
-  mUi->spbxSymbInstAngle->setValue(mSymbol.getRotation().toDeg());
+  mUi->edtSymbInstPosX->setValue(mSymbol.getPosition().getX());
+  mUi->edtSymbInstPosY->setValue(mSymbol.getPosition().getY());
+  mUi->edtSymbInstRotation->setValue(mSymbol.getRotation());
   mUi->cbxMirror->setChecked(mSymbol.getMirrored());
 
   // Symbol Library Element Attributes
@@ -159,14 +160,13 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
     transaction.append(cmdCmp.take());
 
     // Symbol Instance
-    Point pos(Length::fromMm(mUi->spbxSymbInstPosX->value()),
-              Length::fromMm(mUi->spbxSymbInstPosY->value()));
-    Angle rotation = Angle::fromDeg(mUi->spbxSymbInstAngle->value());
-    bool  mirrored = mUi->cbxMirror->isChecked();
+    bool mirrored = mUi->cbxMirror->isChecked();
     QScopedPointer<CmdSymbolInstanceEdit> cmdSym(
         new CmdSymbolInstanceEdit(mSymbol));
-    cmdSym->setPosition(pos, false);
-    cmdSym->setRotation(rotation, false);
+    cmdSym->setPosition(Point(mUi->edtSymbInstPosX->getValue(),
+                              mUi->edtSymbInstPosY->getValue()),
+                        false);
+    cmdSym->setRotation(mUi->edtSymbInstRotation->getValue(), false);
     cmdSym->setMirrored(mirrored, false);
     transaction.append(cmdSym.take());
 

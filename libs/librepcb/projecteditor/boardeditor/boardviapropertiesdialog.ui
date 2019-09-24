@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>346</width>
-    <height>197</height>
+    <height>168</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,72 +50,10 @@
      <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QDoubleSpinBox" name="spbxPosX">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="buttonSymbols">
-          <enum>QAbstractSpinBox::UpDownArrows</enum>
-         </property>
-         <property name="suffix">
-          <string notr="true">mm</string>
-         </property>
-         <property name="decimals">
-          <number>6</number>
-         </property>
-         <property name="minimum">
-          <double>-2000.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>2000.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>2.540000000000000</double>
-         </property>
-        </widget>
+        <widget class="librepcb::LengthEdit" name="edtPosX" native="true"/>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="spbxPosY">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="buttonSymbols">
-          <enum>QAbstractSpinBox::UpDownArrows</enum>
-         </property>
-         <property name="suffix">
-          <string notr="true">mm</string>
-         </property>
-         <property name="decimals">
-          <number>6</number>
-         </property>
-         <property name="minimum">
-          <double>-2000.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>2000.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>2.540000000000000</double>
-         </property>
-        </widget>
+        <widget class="librepcb::LengthEdit" name="edtPosY" native="true"/>
        </item>
       </layout>
      </item>
@@ -126,19 +64,6 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QDoubleSpinBox" name="spbxSize">
-       <property name="suffix">
-        <string notr="true">mm</string>
-       </property>
-       <property name="minimum">
-        <double>0.010000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
@@ -146,18 +71,11 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="1">
+      <widget class="librepcb::PositiveLengthEdit" name="edtSize" native="true"/>
+     </item>
      <item row="4" column="1">
-      <widget class="QDoubleSpinBox" name="spbxDrillDiameter">
-       <property name="suffix">
-        <string notr="true">mm</string>
-       </property>
-       <property name="minimum">
-        <double>0.010000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-      </widget>
+      <widget class="librepcb::PositiveLengthEdit" name="edtDrillDiameter" native="true"/>
      </item>
     </layout>
    </item>
@@ -173,6 +91,20 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::LengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/lengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/common/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -29,6 +29,8 @@
 
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/widgets/positivelengthedit.h>
+#include <librepcb/common/widgets/unsignedlengthedit.h>
 #include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
@@ -120,47 +122,32 @@ bool PackageEditorState_AddPads::entry() noexcept {
 
   // width
   mContext.commandToolBar.addLabel(tr("Width:"), 10);
-  std::unique_ptr<QDoubleSpinBox> widthSpinBox(new QDoubleSpinBox());
-  widthSpinBox->setMinimum(0);
-  widthSpinBox->setMaximum(999);
-  widthSpinBox->setSingleStep(0.1);
-  widthSpinBox->setDecimals(6);
-  widthSpinBox->setValue(mLastPad.getWidth()->toMm());
-  connect(widthSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &PackageEditorState_AddPads::widthSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(widthSpinBox));
+  std::unique_ptr<PositiveLengthEdit> edtWidth(new PositiveLengthEdit());
+  edtWidth->setSingleStep(0.1);  // [mm]
+  edtWidth->setValue(mLastPad.getWidth());
+  connect(edtWidth.get(), &PositiveLengthEdit::valueChanged, this,
+          &PackageEditorState_AddPads::widthEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtWidth));
 
   // height
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
-  std::unique_ptr<QDoubleSpinBox> heightSpinBox(new QDoubleSpinBox());
-  heightSpinBox->setMinimum(0);
-  heightSpinBox->setMaximum(999);
-  heightSpinBox->setSingleStep(0.1);
-  heightSpinBox->setDecimals(6);
-  heightSpinBox->setValue(mLastPad.getHeight()->toMm());
-  connect(heightSpinBox.get(),
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &PackageEditorState_AddPads::heightSpinBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(heightSpinBox));
+  std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
+  edtHeight->setSingleStep(0.1);  // [mm]
+  edtHeight->setValue(mLastPad.getHeight());
+  connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
+          &PackageEditorState_AddPads::heightEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtHeight));
 
   // drill diameter
   if (mPadType == PadType::THT) {
     mContext.commandToolBar.addLabel(tr("Drill Diameter:"), 10);
-    std::unique_ptr<QDoubleSpinBox> drillDiameterSpinBox(new QDoubleSpinBox());
-    drillDiameterSpinBox->setMinimum(0);
-    drillDiameterSpinBox->setMaximum(100);
-    drillDiameterSpinBox->setSingleStep(0.2);
-    drillDiameterSpinBox->setDecimals(6);
-    drillDiameterSpinBox->setValue(mLastPad.getDrillDiameter()->toMm());
-    connect(drillDiameterSpinBox.get(),
-            static_cast<void (QDoubleSpinBox::*)(double)>(
-                &QDoubleSpinBox::valueChanged),
-            this,
-            &PackageEditorState_AddPads::drillDiameterSpinBoxValueChanged);
-    mContext.commandToolBar.addWidget(std::move(drillDiameterSpinBox));
+    std::unique_ptr<UnsignedLengthEdit> edtDrillDiameter(
+        new UnsignedLengthEdit());
+    edtDrillDiameter->setSingleStep(0.1);  // [mm]
+    edtDrillDiameter->setValue(mLastPad.getDrillDiameter());
+    connect(edtDrillDiameter.get(), &UnsignedLengthEdit::valueChanged, this,
+            &PackageEditorState_AddPads::drillDiameterEditValueChanged);
+    mContext.commandToolBar.addWidget(std::move(edtDrillDiameter));
   }
 
   Point pos =
@@ -322,31 +309,25 @@ void PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged(
   }
 }
 
-void PackageEditorState_AddPads::widthSpinBoxValueChanged(
-    double value) noexcept {
-  Length width = Length::fromMm(value);
-  if (width <= 0) return;
-  mLastPad.setWidth(PositiveLength(width));
+void PackageEditorState_AddPads::widthEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mLastPad.setWidth(value);
   if (mEditCmd) {
     mEditCmd->setWidth(mLastPad.getWidth(), true);
   }
 }
 
-void PackageEditorState_AddPads::heightSpinBoxValueChanged(
-    double value) noexcept {
-  Length height = Length::fromMm(value);
-  if (height <= 0) return;
-  mLastPad.setHeight(PositiveLength(height));
+void PackageEditorState_AddPads::heightEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mLastPad.setHeight(value);
   if (mEditCmd) {
     mEditCmd->setHeight(mLastPad.getHeight(), true);
   }
 }
 
-void PackageEditorState_AddPads::drillDiameterSpinBoxValueChanged(
-    double value) noexcept {
-  Length diameter = Length::fromMm(value);
-  if (diameter < 0) return;
-  mLastPad.setDrillDiameter(UnsignedLength(diameter));
+void PackageEditorState_AddPads::drillDiameterEditValueChanged(
+    const UnsignedLength& value) noexcept {
+  mLastPad.setDrillDiameter(value);
   if (mEditCmd) {
     mEditCmd->setDrillDiameter(mLastPad.getDrillDiameter(), true);
   }
