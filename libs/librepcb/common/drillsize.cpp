@@ -38,11 +38,31 @@ DrillSize::DrillSize(const SExpression& node) : mWidth(1), mHeight(1) {
   mHeight = node.getChildByIndex(1).getValue<PositiveLength>();
 }
 
-// General Methods
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
 void DrillSize::serialize(SExpression& root) const {
   root.appendChild(mWidth);
   root.appendChild(mHeight);
+}
+
+/*******************************************************************************
+ *  Operator Overloadings
+ ******************************************************************************/
+
+DrillSize& DrillSize::operator=(const DrillSize& rhs) noexcept {
+  mWidth  = rhs.mWidth;
+  mHeight = rhs.mHeight;
+  return *this;
+}
+
+bool DrillSize::operator==(const DrillSize& rhs) const noexcept {
+  return (mWidth == rhs.mWidth) && (mHeight == rhs.mHeight);
+}
+
+bool DrillSize::operator!=(const DrillSize& rhs) const noexcept {
+  return (mWidth != rhs.mWidth) || (mHeight != rhs.mHeight);
 }
 
 /*******************************************************************************

@@ -39,7 +39,11 @@ namespace librepcb {
 
 /**
  * @brief The DrillSize class is used to represent the size of a drilling
- * action, for example (1.2mm; 5.6mm) for a width of 1.2mm and a height of 5.6mm
+ * action, for example (1.2mm; 5.6mm) for a width of 1.2mm and a height
+ * of 5.6mm.
+ *
+ * The diameter used for such a drill is the smaller of the two values (in the
+ * example above, 1.2mm).
  *
  * @see class Length
  *
@@ -52,36 +56,21 @@ public:
 
   /**
    * @brief Default Constructor for passing two PositiveLength objects
-   *
-   * @param width  The width as a PositiveLength object
-   * @param height The height as a PositiveLength object
    */
   explicit DrillSize(const PositiveLength& width,
                      const PositiveLength& height) noexcept
     : mWidth(width), mHeight(height) {}
 
   /**
-   * @brief Constructor for passing two ints
+   * @brief Constructor for a circular drill size (width = height).
    *
-   * @param width  The width as an int
-   * @param height The height as an int
+   * @param diameter  The diameter (width and height) of the hole
    */
-  explicit DrillSize(const int width, const int height)
-    : mWidth(PositiveLength(width)), mHeight(PositiveLength(height)) {}
-
-  /**
-   * @brief Constructor for passing two Length objects
-   *
-   * @param width  The width as a Length object
-   * @param height The height as a Length object
-   */
-  explicit DrillSize(const Length& width, const Length& height)
-    : mWidth(PositiveLength(width)), mHeight(PositiveLength(height)) {}
+  explicit DrillSize(const PositiveLength& diameter) noexcept
+    : mWidth(diameter), mHeight(diameter) {}
 
   /**
    * @brief Copy Constructor
-   *
-   * @param drillSize     Another DrillSize object
    */
   DrillSize(const DrillSize& drillSize) noexcept
     : mWidth(drillSize.mWidth), mHeight(drillSize.mHeight) {}
@@ -94,53 +83,24 @@ public:
   ~DrillSize() noexcept {}
 
   // Setters
-
-  /**
-   * @brief Set the width
-   *
-   * @param width     The new width as a PositiveLength object
-   */
   void setWidth(const PositiveLength& width) noexcept { mWidth = width; }
-
-  /**
-   * @brief Set the height
-   *
-   * @param height     The new height as a PositiveLength object
-   */
   void setHeight(const PositiveLength& height) noexcept { mHeight = height; }
-
-  /**
-   * @brief Get the width
-   *
-   * @return The PositiveLength object of the width
-   */
   const PositiveLength& getWidth() const noexcept { return mWidth; }
-
-  /**
-   * @brief Get the height
-   *
-   * @return The PositiveLength object of the height
-   */
   const PositiveLength& getHeight() const noexcept { return mHeight; }
+
+  // General methods
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  const DrillSize& operator=(const DrillSize& rhs) {
-    mWidth  = rhs.mWidth;
-    mHeight = rhs.mHeight;
-    return *this;
-  }
-  bool operator==(const DrillSize& rhs) const {
-    return (mWidth == rhs.mWidth) && (mHeight == rhs.mHeight);
-  }
-  bool operator!=(const DrillSize& rhs) const {
-    return (mWidth != rhs.mWidth) || (mHeight != rhs.mHeight);
-  }
+  // Operator overloadings
+  DrillSize& operator=(const DrillSize& rhs) noexcept;
+  bool       operator==(const DrillSize& rhs) const noexcept;
+  bool       operator!=(const DrillSize& rhs) const noexcept;
 
 private:
-  PositiveLength mWidth;   ///< the width
-  PositiveLength mHeight;  ///< the height
+  PositiveLength mWidth;
+  PositiveLength mHeight;
 };
 
 /*******************************************************************************
