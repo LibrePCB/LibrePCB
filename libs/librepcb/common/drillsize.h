@@ -93,6 +93,8 @@ public:
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
+  bool isCircular() const noexcept;
+
   // Operator overloadings
   DrillSize& operator=(const DrillSize& rhs) noexcept;
   bool       operator==(const DrillSize& rhs) const noexcept;

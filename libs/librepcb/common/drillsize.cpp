@@ -47,6 +47,10 @@ void DrillSize::serialize(SExpression& root) const {
   root.appendChild(mHeight);
 }
 
+bool DrillSize::isCircular() const noexcept {
+  return mWidth == mHeight;
+}
+
 /*******************************************************************************
  *  Operator Overloadings
  ******************************************************************************/
