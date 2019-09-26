@@ -81,7 +81,7 @@ private:  // Methods
   bool finishAddCircle(const Point& pos) noexcept;
   bool abortAddCircle() noexcept;
 
-  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void fillCheckBoxCheckedChanged(bool checked) noexcept;
   void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;

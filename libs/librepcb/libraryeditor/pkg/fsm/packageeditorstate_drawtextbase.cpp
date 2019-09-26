@@ -86,7 +86,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
         new GraphicsLayerComboBox());
     layerComboBox->setLayers(
         mContext.layerProvider.getBoardGeometryElementLayers());
-    layerComboBox->setCurrentLayer(*mLastLayerName);
+    layerComboBox->setCurrentLayer(mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &PackageEditorState_DrawTextBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -284,22 +284,22 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
 void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
-      mLastLayerName   = GraphicsLayer::sTopNames;
-      mLastHeight      = Length(1000000);
+      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopNames);
+      mLastHeight      = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::center(), VAlign::bottom());
       mLastText        = "{{NAME}}";
       break;
     case Mode::VALUE:
-      mLastLayerName   = GraphicsLayer::sTopValues;
-      mLastHeight      = Length(1000000);
+      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopValues);
+      mLastHeight      = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::center(), VAlign::top());
       mLastText        = "{{VALUE}}";
       break;
     default:
-      mLastLayerName   = GraphicsLayer::sTopPlacement;
-      mLastHeight      = Length(2000000);
+      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopPlacement);
+      mLastHeight      = PositiveLength(2000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::left(), VAlign::bottom());
       mLastText        = "";
@@ -308,10 +308,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
 }
 
 void PackageEditorState_DrawTextBase::layerComboBoxValueChanged(
-    const QString& layerName) noexcept {
-  if (layerName.isEmpty()) {
-    return;
-  }
+    const GraphicsLayerName& layerName) noexcept {
   mLastLayerName = layerName;
   if (mEditCmd) {
     mEditCmd->setLayerName(mLastLayerName, true);

@@ -105,7 +105,7 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept {
     mLayerComboBox->setLayers(
         mEditor.getActiveBoard()->getLayerStack().getAllowedPolygonLayers());
   }
-  mLayerComboBox->setCurrentLayer(*mCurrentLayerName);
+  mLayerComboBox->setCurrentLayer(mCurrentLayerName);
   mEditorUi.commandToolbar->addWidget(mLayerComboBox);
   connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged, this,
           &BES_DrawPolygon::layerComboBoxLayerChanged);
@@ -359,7 +359,7 @@ void BES_DrawPolygon::updateSegmentPosition(const Point& cursorPos) noexcept {
 }
 
 void BES_DrawPolygon::layerComboBoxLayerChanged(
-    const QString& layerName) noexcept {
+    const GraphicsLayerName& layerName) noexcept {
   mCurrentLayerName = layerName;
   if (mCmdEditCurrentPolygon) {
     mCmdEditCurrentPolygon->setLayerName(mCurrentLayerName, true);

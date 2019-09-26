@@ -91,7 +91,7 @@ private:  // Methods
   void      resetToDefaultParameters() noexcept;
   Alignment getAlignment() const noexcept;
 
-  void layerComboBoxValueChanged(const QString& layerName) noexcept;
+  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
 

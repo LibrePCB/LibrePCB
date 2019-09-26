@@ -76,7 +76,7 @@ private:  // Methods
   bool       addSegment(Board& board, const Point& pos) noexcept;
   bool       abort(bool showErrMsgBox) noexcept;
   void       updateVertexPosition(const Point& cursorPos) noexcept;
-  void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
+  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
   // void widthComboBoxTextChanged(const QString& width) noexcept;
   // void filledCheckBoxCheckedChanged(bool checked) noexcept;
   void makeSelectedLayerVisible() noexcept;

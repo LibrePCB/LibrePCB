@@ -23,6 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../graphics/graphicslayername.h"
+
+#include <optional/tl/optional.hpp>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -50,23 +54,23 @@ public:
   ~GraphicsLayerComboBox() noexcept;
 
   // Getters
-  QString getCurrentLayerName() const noexcept;
+  tl::optional<GraphicsLayerName> getCurrentLayerName() const noexcept;
 
   // Setters
   void setLayers(const QList<GraphicsLayer*>& layers) noexcept;
-  void setCurrentLayer(const QString& name) noexcept;
+  void setCurrentLayer(const GraphicsLayerName& name) noexcept;
 
   // Operator Overloadings
   GraphicsLayerComboBox& operator=(const GraphicsLayerComboBox& rhs) = delete;
 
 signals:
-  void currentLayerChanged(const QString& name);
+  void currentLayerChanged(const GraphicsLayerName& name);
 
 private:  // Methods
   void currentIndexChanged(int index) noexcept;
 
 private:  // Data
-  QComboBox* mComboBox;
+  QScopedPointer<QComboBox> mComboBox;
 };
 
 /*******************************************************************************

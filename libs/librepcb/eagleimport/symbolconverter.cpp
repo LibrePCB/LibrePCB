@@ -122,7 +122,7 @@ std::unique_ptr<library::Symbol> SymbolConverter::generate() const {
     }
     PositiveLength height(Length::fromMm(text.getSize()) * 2);  // can throw
     if ((textStr == "{{NAME}}") || (textStr == "{{VALUE}}")) {
-      height = Length::fromMm(2.54);
+      height = PositiveLength(2540000);
     }
     Point     pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
     Angle     rot = Angle::fromDeg(text.getRotation().getAngle());
