@@ -52,7 +52,8 @@ PackageEditorState_AddHoles::PackageEditorState_AddHoles(
   : PackageEditorState(context),
     mCurrentHole(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastDiameter(1000000) {
+    mLastDiameter(1000000)  // Commonly used drill diameter
+{
 }
 
 PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {

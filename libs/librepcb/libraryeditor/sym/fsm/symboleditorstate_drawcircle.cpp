@@ -53,10 +53,11 @@ SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
   : SymbolEditorState(context),
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sSymbolOutlines),
-    mLastLineWidth(254000),
-    mLastFill(false),
-    mLastGrabArea(true) {
+    mLastLayerName(GraphicsLayer::sSymbolOutlines),  // Most important layer
+    mLastLineWidth(200000),  // Typical width according library conventions
+    mLastFill(false),        // Fill is needed very rarely
+    mLastGrabArea(true)      // Most symbol outlines are used as grab areas
+{
 }
 
 SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {

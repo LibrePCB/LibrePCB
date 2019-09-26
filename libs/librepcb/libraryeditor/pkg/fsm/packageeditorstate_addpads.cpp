@@ -57,16 +57,19 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mCurrentPad(nullptr),
     mCurrentGraphicsItem(nullptr),
     mPackagePadComboBox(nullptr),
-    mLastPad(Uuid::createRandom(), Point(0, 0), Angle::deg0(),
-             FootprintPad::Shape::ROUND, PositiveLength(2540000),
-             PositiveLength(1270000), UnsignedLength(800000),
-             FootprintPad::BoardSide::THT) {
+    mLastPad(
+        Uuid::createRandom(), Point(0, 0), Angle::deg0(),
+        FootprintPad::Shape::ROUND,  // Commonly used pad shape
+        PositiveLength(2500000),     // There is no default/recommended pad size
+        PositiveLength(1300000),     // -> choose reasonable multiple of 0.1mm
+        UnsignedLength(800000),      // Commonly used drill diameter
+        FootprintPad::BoardSide::THT) {
   if (mPadType == PadType::SMT) {
-    mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);
-    mLastPad.setShape(FootprintPad::Shape::RECT);
-    mLastPad.setDrillDiameter(UnsignedLength(0));
-    mLastPad.setWidth(PositiveLength(1270000));
-    mLastPad.setHeight(PositiveLength(635000));
+    mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);  // Default side
+    mLastPad.setShape(FootprintPad::Shape::RECT);  // Commonly used SMT shape
+    mLastPad.setDrillDiameter(UnsignedLength(0));  // Disable drill
+    mLastPad.setWidth(PositiveLength(1500000));    // Same as for THT pads ->
+    mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
   }
 }
 
