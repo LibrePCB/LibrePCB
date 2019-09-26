@@ -136,6 +136,7 @@ SOURCES += \
     widgets/doublespinbox.cpp \
     widgets/editabletablewidget.cpp \
     widgets/graphicslayercombobox.cpp \
+    widgets/halignactiongroup.cpp \
     widgets/lengthedit.cpp \
     widgets/numbereditbase.cpp \
     widgets/patheditorwidget.cpp \
@@ -147,6 +148,7 @@ SOURCES += \
     widgets/tabwidget.cpp \
     widgets/unsignedlengthedit.cpp \
     widgets/unsignedratioedit.cpp \
+    widgets/valignactiongroup.cpp \
 
 HEADERS += \
     alignment.h \
@@ -274,6 +276,7 @@ HEADERS += \
     widgets/doublespinbox.h \
     widgets/editabletablewidget.h \
     widgets/graphicslayercombobox.h \
+    widgets/halignactiongroup.h \
     widgets/lengthedit.h \
     widgets/numbereditbase.h \
     widgets/patheditorwidget.h \
@@ -285,6 +288,7 @@ HEADERS += \
     widgets/tabwidget.h \
     widgets/unsignedlengthedit.h \
     widgets/unsignedratioedit.h \
+    widgets/valignactiongroup.h \
 
 FORMS += \
     dialogs/aboutdialog.ui \

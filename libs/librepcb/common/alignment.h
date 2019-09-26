@@ -230,4 +230,7 @@ private:
 
 }  // namespace librepcb
 
+Q_DECLARE_METATYPE(librepcb::HAlign)
+Q_DECLARE_METATYPE(librepcb::VAlign)
+
 #endif  // LIBREPCB_ALIGNMENT_H
