@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TOOLBARPROXY_H
-#define LIBREPCB_TOOLBARPROXY_H
+#ifndef LIBREPCB_HALIGNACTIONGROUP_H
+#define LIBREPCB_HALIGNACTIONGROUP_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../alignment.h"
+
 #include <QtCore>
 #include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,42 +34,42 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class ToolBarProxy
+ *  Class HAlignActionGroup
  ******************************************************************************/
 
 /**
- * @brief The ToolBarProxy class allows to map a list of QAction's to one
- * QToolBar
+ * @brief The HAlignActionGroup class is a helper to add ::librepcb::HAlign
+ *        chooser toolbuttons to a toolbar
+ *
+ * @see ::librepcb::VAlignActionGroup
  */
-class ToolBarProxy final : public QObject {
+class HAlignActionGroup final : public QActionGroup {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ToolBarProxy(QObject* parent = nullptr) noexcept;
-  ToolBarProxy(const ToolBarProxy& other) = delete;
-  ~ToolBarProxy() noexcept;
+  explicit HAlignActionGroup(QWidget* parent = nullptr) noexcept;
+  HAlignActionGroup(const HAlignActionGroup& other) = delete;
+  virtual ~HAlignActionGroup() noexcept;
+
+  // Getters
+  const HAlign& getValue() const noexcept { return mValue; }
 
   // Setters
-  void setToolBar(QToolBar* toolbar) noexcept;
-  void setEnabled(bool enabled) noexcept;
-
-  // General Methods
-  void     clear() noexcept;
-  QAction* addAction(std::unique_ptr<QAction> action) noexcept;
-  void     addActionGroup(std::unique_ptr<QActionGroup> group) noexcept;
-  QAction* addLabel(const QString& text, int indent = 0) noexcept;
-  QAction* addWidget(std::unique_ptr<QWidget> widget, int indent = 0) noexcept;
-  QAction* addSeparator() noexcept;
-  void     removeAction(QAction* action) noexcept;
+  void setValue(const HAlign& value) noexcept;
 
   // Operator Overloadings
-  ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;
+  HAlignActionGroup& operator=(const HAlignActionGroup& rhs) = delete;
+
+signals:
+  void valueChanged(const HAlign& value);
+
+private:  // Methods
+  void updateSelection() noexcept;
+  void actionTriggered(QAction* action) noexcept;
 
 private:  // Data
-  QToolBar*            mToolBar;
-  QList<QAction*>      mActions;
-  QList<QActionGroup*> mActionGroups;
+  HAlign mValue;
 };
 
 /*******************************************************************************
@@ -78,4 +78,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TOOLBARPROXY_H
+#endif  // LIBREPCB_HALIGNACTIONGROUP_H

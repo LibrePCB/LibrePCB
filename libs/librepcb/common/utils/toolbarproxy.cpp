@@ -99,6 +99,19 @@ QAction* ToolBarProxy::addAction(std::unique_ptr<QAction> action) noexcept {
   return action.release();
 }
 
+void ToolBarProxy::addActionGroup(
+    std::unique_ptr<QActionGroup> group) noexcept {
+  Q_ASSERT(group);
+  Q_ASSERT(!mActionGroups.contains(group.get()));
+  Q_ASSERT((group->parent() == nullptr) || (group->parent() == this));
+  group->setParent(this);
+  if (mToolBar) {
+    mToolBar->addActions(group->actions());
+  }
+  mActions.append(group->actions());
+  mActionGroups.append(group.release());
+}
+
 QAction* ToolBarProxy::addLabel(const QString& text, int indent) noexcept {
   std::unique_ptr<QLabel> label(new QLabel(text));
   label->setIndent(indent);
