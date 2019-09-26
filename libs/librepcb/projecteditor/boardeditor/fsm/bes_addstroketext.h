@@ -74,11 +74,11 @@ private:
   bool       addText(Board& board, const Point& pos) noexcept;
   void       updateTextPosition(const Point& pos) noexcept;
   bool       fixText(const Point& pos) noexcept;
-  void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
-  void       textComboBoxValueChanged(const QString& value) noexcept;
-  void       heightEditValueChanged(const PositiveLength& value) noexcept;
-  void       mirrorCheckBoxToggled(bool checked) noexcept;
-  void       makeSelectedLayerVisible() noexcept;
+  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
+  void textComboBoxValueChanged(const QString& value) noexcept;
+  void heightEditValueChanged(const PositiveLength& value) noexcept;
+  void mirrorCheckBoxToggled(bool checked) noexcept;
+  void makeSelectedLayerVisible() noexcept;
 
   // State
   bool                              mUndoCmdActive;

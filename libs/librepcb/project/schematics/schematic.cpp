@@ -67,7 +67,7 @@ Schematic::Schematic(Project&                                project,
     // try to open/create the schematic file
     if (create) {
       // set attributes
-      mName = newName;
+      mName = ElementName(newName);  // can throw
 
       // load default grid properties
       mGridProperties.reset(new GridProperties());

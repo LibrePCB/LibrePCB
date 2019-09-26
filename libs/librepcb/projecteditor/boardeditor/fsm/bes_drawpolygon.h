@@ -76,10 +76,10 @@ private:  // Methods
   bool       addSegment(Board& board, const Point& pos) noexcept;
   bool       abort(bool showErrMsgBox) noexcept;
   void       updateSegmentPosition(const Point& cursorPos) noexcept;
-  void       layerComboBoxLayerChanged(const QString& layerName) noexcept;
-  void       widthEditValueChanged(const UnsignedLength& value) noexcept;
-  void       filledCheckBoxCheckedChanged(bool checked) noexcept;
-  void       makeSelectedLayerVisible() noexcept;
+  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
+  void widthEditValueChanged(const UnsignedLength& value) noexcept;
+  void filledCheckBoxCheckedChanged(bool checked) noexcept;
+  void makeSelectedLayerVisible() noexcept;
 
 private:  // Types
   /// Internal FSM States (substates)

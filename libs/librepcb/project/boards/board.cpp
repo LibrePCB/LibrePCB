@@ -198,7 +198,7 @@ Board::Board(Project&                                project,
     // try to open/create the board file
     if (create) {
       // set attributes
-      mName                = newName;
+      mName                = ElementName(newName);  // can throw
       mDefaultFontFileName = qApp->getDefaultStrokeFontName();
 
       // load default layer stack

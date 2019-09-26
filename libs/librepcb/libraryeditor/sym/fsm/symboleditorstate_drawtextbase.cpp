@@ -80,7 +80,7 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
         new GraphicsLayerComboBox());
     layerComboBox->setLayers(
         mContext.layerProvider.getSchematicGeometryElementLayers());
-    layerComboBox->setCurrentLayer(*mLastLayerName);
+    layerComboBox->setCurrentLayer(mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &SymbolEditorState_DrawTextBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -245,18 +245,18 @@ bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
 void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
-      mLastLayerName = GraphicsLayer::sSymbolNames;
-      mLastHeight    = Length(2540000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolNames);
+      mLastHeight    = PositiveLength(2540000);
       mLastText      = "{{NAME}}";
       break;
     case Mode::VALUE:
-      mLastLayerName = GraphicsLayer::sSymbolValues;
-      mLastHeight    = Length(2540000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolValues);
+      mLastHeight    = PositiveLength(2540000);
       mLastText      = "{{VALUE}}";
       break;
     default:
-      mLastLayerName = GraphicsLayer::sSymbolOutlines;
-      mLastHeight    = Length(2540000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
+      mLastHeight    = PositiveLength(2540000);
       mLastText      = "Text";
       break;
   }
@@ -271,10 +271,7 @@ Alignment SymbolEditorState_DrawTextBase::getAlignment() const noexcept {
 }
 
 void SymbolEditorState_DrawTextBase::layerComboBoxValueChanged(
-    const QString& layerName) noexcept {
-  if (layerName.isEmpty()) {
-    return;
-  }
+    const GraphicsLayerName& layerName) noexcept {
   mLastLayerName = layerName;
   if (mEditCmd) {
     mEditCmd->setLayerName(mLastLayerName, true);
