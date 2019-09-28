@@ -52,7 +52,8 @@ SymbolEditorState_AddPins::SymbolEditorState_AddPins(
     mCurrentPin(nullptr),
     mCurrentGraphicsItem(nullptr),
     mNameLineEdit(nullptr),
-    mLastLength(2540000) {
+    mLastLength(2540000)  // Default length according library conventions
+{
 }
 
 SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {

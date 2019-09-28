@@ -55,11 +55,12 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
     mMode(mode),
     mCurrentPolygon(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sTopPlacement),
-    mLastLineWidth(200000),
+    mLastLayerName(GraphicsLayer::sTopPlacement),  // Most important layer
+    mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
-    mLastFill(false),
-    mLastGrabArea(mode != Mode::LINE) {
+    mLastFill(false),     // Fill is needed very rarely
+    mLastGrabArea(false)  // Avoid creating annoying grab areas "by accident"
+{
 }
 
 PackageEditorState_DrawPolygonBase::

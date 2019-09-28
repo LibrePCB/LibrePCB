@@ -55,11 +55,12 @@ SymbolEditorState_DrawPolygonBase::SymbolEditorState_DrawPolygonBase(
     mMode(mode),
     mCurrentPolygon(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sSymbolOutlines),
-    mLastLineWidth(254000),
+    mLastLayerName(GraphicsLayer::sSymbolOutlines),  // Most important layer
+    mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
-    mLastFill(false),
-    mLastGrabArea(mode != Mode::LINE) {
+    mLastFill(false),                  // Fill is needed very rarely
+    mLastGrabArea(mode != Mode::LINE)  // Most symbol outlines are grab areas
+{
 }
 
 SymbolEditorState_DrawPolygonBase::

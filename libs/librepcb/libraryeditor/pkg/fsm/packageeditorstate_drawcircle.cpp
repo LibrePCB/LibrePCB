@@ -53,10 +53,11 @@ PackageEditorState_DrawCircle::PackageEditorState_DrawCircle(
   : PackageEditorState(context),
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sTopPlacement),
-    mLastLineWidth(254000),
-    mLastFill(false),
-    mLastGrabArea(true) {
+    mLastLayerName(GraphicsLayer::sTopPlacement),  // Most important layer
+    mLastLineWidth(200000),  // typical width according library conventions
+    mLastFill(false),        // Fill is needed very rarely
+    mLastGrabArea(false)     // Avoid creating annoying grab areas "by accident"
+{
 }
 
 PackageEditorState_DrawCircle::~PackageEditorState_DrawCircle() noexcept {
