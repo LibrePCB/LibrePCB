@@ -284,6 +284,7 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
 void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
+      // Set all properties according library conventions
       mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopNames);
       mLastHeight      = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
@@ -291,6 +292,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       mLastText        = "{{NAME}}";
       break;
     case Mode::VALUE:
+      // Set all properties according library conventions
       mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopValues);
       mLastHeight      = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
@@ -298,11 +300,12 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       mLastText        = "{{VALUE}}";
       break;
     default:
+      // Set properties to something reasonable
       mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopPlacement);
       mLastHeight      = PositiveLength(2000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment   = Alignment(HAlign::left(), VAlign::bottom());
-      mLastText        = "";
+      mLastText        = "Text";  // Non-empty to avoid invisible graphics item
       break;
   }
 }
