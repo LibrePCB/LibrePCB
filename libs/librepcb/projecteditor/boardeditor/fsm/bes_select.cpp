@@ -37,10 +37,12 @@
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
+#include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
 #include <librepcb/project/boards/cmd/cmdfootprintstroketextsreset.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
@@ -272,6 +274,11 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
           menu.addAction(QIcon(":/img/actions/delete.png"),
                          QString(tr("Remove %1")).arg(*cmpInst.getName()));
       menu.addSeparator();
+      QAction* aSnapToGrid =
+          menu.addAction(QIcon(":/img/actions/grid.png"), tr("Snap to grid"));
+      aSnapToGrid->setVisible(devInst.getPosition().mappedToGrid(
+                                  board->getGridProperties().getInterval()) !=
+                              devInst.getPosition());  // only show if needed
       QAction* aResetTexts =
           menu.addAction(QIcon(":/img/actions/undo.png"), "Reset all texts");
       menu.addSeparator();
@@ -324,6 +331,17 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
         flipSelectedItems(Qt::Horizontal);
       } else if (action == aRemove) {
         removeSelectedItems();
+      } else if (action == aSnapToGrid) {
+        try {
+          QScopedPointer<CmdDeviceInstanceEditAll> cmd(
+              new CmdDeviceInstanceEditAll(devInst));
+          cmd->setPosition(devInst.getPosition().mappedToGrid(
+                               board->getGridProperties().getInterval()),
+                           false);
+          mUndoStack.execCmd(cmd.take());
+        } catch (const Exception& e) {
+          QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+        }
       } else if (action == aResetTexts) {
         try {
           mUndoStack.execCmd(new CmdFootprintStrokeTextsReset(*footprint));
