@@ -170,9 +170,10 @@ void ProjectEditor::execNetClassesEditorDialog(QWidget* parent) noexcept {
 
 void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   try {
-    QString filename =
-        FileDialog::getSaveFileName(parent, tr("Export project to *.lppz"),
-                                    mProject.getPath().toStr(), "*.lppz");
+    FilePath defaultFp = mProject.getPath().getPathTo(
+        mProject.getFilepath().getBasename() % ".lppz");
+    QString filename = FileDialog::getSaveFileName(
+        parent, tr("Export project to *.lppz"), defaultFp.toStr(), "*.lppz");
     if (filename.isEmpty()) return;
     if (!filename.endsWith(".lppz")) filename.append(".lppz");
     FilePath fp(filename);
