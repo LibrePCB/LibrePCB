@@ -76,6 +76,7 @@ SOURCES += \
     schematiceditor/fsm/ses_drawwire.cpp \
     schematiceditor/fsm/ses_fsm.cpp \
     schematiceditor/fsm/ses_select.cpp \
+    schematiceditor/renamenetsegmentdialog.cpp \
     schematiceditor/schematicclipboard.cpp \
     schematiceditor/schematiceditor.cpp \
     schematiceditor/schematicpagesdock.cpp \
@@ -138,6 +139,7 @@ HEADERS += \
     schematiceditor/fsm/ses_drawwire.h \
     schematiceditor/fsm/ses_fsm.h \
     schematiceditor/fsm/ses_select.h \
+    schematiceditor/renamenetsegmentdialog.h \
     schematiceditor/schematicclipboard.h \
     schematiceditor/schematiceditor.h \
     schematiceditor/schematicpagesdock.h \
@@ -162,6 +164,7 @@ FORMS += \
     newprojectwizard/newprojectwizardpage_initialization.ui \
     newprojectwizard/newprojectwizardpage_metadata.ui \
     newprojectwizard/newprojectwizardpage_versioncontrol.ui \
+    schematiceditor/renamenetsegmentdialog.ui \
     schematiceditor/schematiceditor.ui \
     schematiceditor/schematicpagesdock.ui \
     schematiceditor/symbolinstancepropertiesdialog.ui \

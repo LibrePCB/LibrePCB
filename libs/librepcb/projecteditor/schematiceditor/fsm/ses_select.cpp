@@ -22,22 +22,16 @@
  ******************************************************************************/
 #include "ses_select.h"
 
-#include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
-#include "../../cmd/cmdcombinenetsignals.h"
 #include "../../cmd/cmdmirrorselectedschematicitems.h"
 #include "../../cmd/cmdmoveselectedschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
 #include "../../cmd/cmdrotateselectedschematicitems.h"
+#include "../renamenetsegmentdialog.h"
 #include "../schematiceditor.h"
 #include "../symbolinstancepropertiesdialog.h"
 #include "ui_schematiceditor.h"
 
 #include <librepcb/common/undostack.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
@@ -471,30 +465,8 @@ void SES_Select::openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept {
 }
 
 void SES_Select::openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept {
-  NetSignal& netsignal = netlabel.getNetSignalOfNetSegment();
-  QString    name = QInputDialog::getText(&mEditor, tr("Change net of segment"),
-                                       tr("New net name:"), QLineEdit::Normal,
-                                       *netsignal.getName());
-  if (!name.isNull()) {
-    try {
-      // change netsignal of netsegment
-      CircuitIdentifier newName(name.trimmed());  // can throw
-      mUndoStack.beginCmdGroup(tr("Change netsignal of netsegment"));
-      NetSignal* newSignal = mCircuit.getNetSignalByName(name);
-      if (!newSignal) {
-        CmdNetSignalAdd* cmd = new CmdNetSignalAdd(
-            mProject.getCircuit(), netsignal.getNetClass(), newName);
-        mUndoStack.appendToCmdGroup(cmd);
-        newSignal = cmd->getNetSignal();
-        Q_ASSERT(newSignal);
-      }
-      mUndoStack.appendToCmdGroup(new CmdChangeNetSignalOfSchematicNetSegment(
-          netlabel.getNetSegment(), *newSignal));
-      mUndoStack.commitCmdGroup();
-    } catch (const Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-    }
-  }
+  RenameNetSegmentDialog dialog(mUndoStack, netlabel.getNetSegment(), &mEditor);
+  dialog.exec();  // performs the rename, if needed
 }
 
 /*******************************************************************************
