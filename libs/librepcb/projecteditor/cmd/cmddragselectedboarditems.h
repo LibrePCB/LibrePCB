@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
+#define LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -48,17 +48,17 @@ class CmdBoardPlaneEdit;
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdMoveSelectedBoardItems
+ *  Class CmdDragSelectedBoardItems
  ******************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedBoardItems class
+ * @brief The CmdDragSelectedBoardItems class
  */
-class CmdMoveSelectedBoardItems final : public UndoCommandGroup {
+class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdMoveSelectedBoardItems(Board& board, const Point& startPos) noexcept;
-  ~CmdMoveSelectedBoardItems() noexcept;
+  CmdDragSelectedBoardItems(Board& board, const Point& startPos) noexcept;
+  ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
   void setCurrentPosition(const Point& pos) noexcept;
@@ -92,4 +92,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDMOVESELECTEDBOARDITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H

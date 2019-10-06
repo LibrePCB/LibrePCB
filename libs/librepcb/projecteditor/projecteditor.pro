@@ -46,9 +46,9 @@ SOURCES += \
     cmd/cmdcombineboardnetsegments.cpp \
     cmd/cmdcombinenetsignals.cpp \
     cmd/cmdcombineschematicnetsegments.cpp \
+    cmd/cmddragselectedboarditems.cpp \
     cmd/cmdflipselectedboarditems.cpp \
     cmd/cmdmirrorselectedschematicitems.cpp \
-    cmd/cmdmoveselectedboarditems.cpp \
     cmd/cmdmoveselectedschematicitems.cpp \
     cmd/cmdremoveboarditems.cpp \
     cmd/cmdremoveselectedboarditems.cpp \
@@ -109,9 +109,9 @@ HEADERS += \
     cmd/cmdcombineboardnetsegments.h \
     cmd/cmdcombinenetsignals.h \
     cmd/cmdcombineschematicnetsegments.h \
+    cmd/cmddragselectedboarditems.h \
     cmd/cmdflipselectedboarditems.h \
     cmd/cmdmirrorselectedschematicitems.h \
-    cmd/cmdmoveselectedboarditems.h \
     cmd/cmdmoveselectedschematicitems.h \
     cmd/cmdremoveboarditems.h \
     cmd/cmdremoveselectedboarditems.h \

@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdmoveselectedboarditems.h"
+#include "cmddragselectedboarditems.h"
 
 #include <librepcb/common/geometry/cmd/cmdholeedit.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
@@ -54,9 +54,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(
+CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     Board& board, const Point& startPos) noexcept
-  : UndoCommandGroup(tr("Move Board Elements")),
+  : UndoCommandGroup(tr("Drag Board Elements")),
     mBoard(board),
     mStartPos(startPos),
     mDeltaPos(0, 0) {
@@ -110,14 +110,14 @@ CmdMoveSelectedBoardItems::CmdMoveSelectedBoardItems(
   }
 }
 
-CmdMoveSelectedBoardItems::~CmdMoveSelectedBoardItems() noexcept {
+CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept {
+void CmdDragSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept {
   Point delta = pos - mStartPos;
   delta.mapToGrid(mBoard.getGridProperties().getInterval());
 
@@ -156,7 +156,7 @@ void CmdMoveSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept {
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdMoveSelectedBoardItems::performExecute() {
+bool CmdDragSelectedBoardItems::performExecute() {
   if (mDeltaPos.isOrigin()) {
     // no movement required --> discard all move commands
     qDeleteAll(mDeviceEditCmds);
