@@ -67,6 +67,13 @@ void CmdBoardNetPointEdit::translate(const Point& deltaPos,
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
+void CmdBoardNetPointEdit::rotate(const Angle& angle, const Point& center,
+                                  bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos.rotate(angle, center);
+  if (immediate) mNetPoint.setPosition(mNewPos);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

@@ -59,7 +59,9 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   : UndoCommandGroup(tr("Drag Board Elements")),
     mBoard(board),
     mStartPos(startPos),
-    mDeltaPos(0, 0) {
+    mDeltaPos(0, 0),
+    mCenterPos(0, 0),
+    mDeltaAngle(0) {
   // get all selected items
   std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
   query->addDeviceInstancesOfSelectedFootprints();
@@ -73,40 +75,70 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   query->addSelectedFootprintStrokeTexts();
   query->addSelectedHoles();
 
+  // find the center of all elements and create undo commands
+  int count = 0;
   foreach (BI_Device* device, query->getDeviceInstances()) {
     Q_ASSERT(device);
+    mCenterPos += device->getPosition();
+    ++count;
     CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
     mDeviceEditCmds.append(cmd);
   }
   foreach (BI_Via* via, query->getVias()) {
     Q_ASSERT(via);
+    mCenterPos += via->getPosition();
+    ++count;
     CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
     mViaEditCmds.append(cmd);
   }
   foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
     Q_ASSERT(netpoint);
+    mCenterPos += netpoint->getPosition();
+    ++count;
     CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
   }
   foreach (BI_Plane* plane, query->getPlanes()) {
     Q_ASSERT(plane);
+    for (const Vertex& vertex : plane->getOutline().getVertices()) {
+      mCenterPos += vertex.getPos();
+      ++count;
+    }
     CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
     mPlaneEditCmds.append(cmd);
   }
   foreach (BI_Polygon* polygon, query->getPolygons()) {
     Q_ASSERT(polygon);
+    for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
+      mCenterPos += vertex.getPos();
+      ++count;
+    }
     CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
     mPolygonEditCmds.append(cmd);
   }
   foreach (BI_StrokeText* text, query->getStrokeTexts()) {
     Q_ASSERT(text);
+    // do not count texts of footprints if the footprint is selected too
+    if ((!text->getFootprint()) ||
+        (!query->getDeviceInstances().contains(
+            &text->getFootprint()->getDeviceInstance()))) {
+      mCenterPos += text->getPosition();
+      ++count;
+    }
     CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
     mStrokeTextEditCmds.append(cmd);
   }
   foreach (BI_Hole* hole, query->getHoles()) {
     Q_ASSERT(hole);
+    mCenterPos += hole->getPosition();
+    ++count;
     CmdHoleEdit* cmd = new CmdHoleEdit(hole->getHole());
     mHoleEditCmds.append(cmd);
+  }
+
+  if (count > 0) {
+    mCenterPos /= count;
+    mCenterPos.mapToGrid(mBoard.getGridProperties().getInterval());
   }
 }
 
@@ -152,13 +184,46 @@ void CmdDragSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept {
   }
 }
 
+void CmdDragSelectedBoardItems::rotate(const Angle& angle,
+                                       bool aroundItemsCenter) noexcept {
+  Point center = (aroundItemsCenter ? mCenterPos : mStartPos) + mDeltaPos;
+
+  // rotate selected elements
+  foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  mDeltaAngle += angle;
+
+  // Force updating airwires immediately as they are important while dragging
+  // items.
+  mBoard.triggerAirWiresRebuild();
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
 bool CmdDragSelectedBoardItems::performExecute() {
-  if (mDeltaPos.isOrigin()) {
-    // no movement required --> discard all move commands
+  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0())) {
+    // no movement required --> discard all commands
     qDeleteAll(mDeviceEditCmds);
     mDeviceEditCmds.clear();
     qDeleteAll(mViaEditCmds);

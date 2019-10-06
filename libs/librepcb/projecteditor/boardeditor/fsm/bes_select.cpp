@@ -27,7 +27,6 @@
 #include "../../cmd/cmdflipselectedboarditems.h"
 #include "../../cmd/cmdremoveselectedboarditems.h"
 #include "../../cmd/cmdreplacedevice.h"
-#include "../../cmd/cmdrotateselectedboarditems.h"
 #include "../boardeditor.h"
 #include "../boardplanepropertiesdialog.h"
 #include "../boardviapropertiesdialog.h"
@@ -704,9 +703,10 @@ bool BES_Select::rotateSelectedItems(const Angle& angle) noexcept {
   if (!board) return false;
 
   try {
-    CmdRotateSelectedBoardItems* cmd =
-        new CmdRotateSelectedBoardItems(*board, angle);
-    mUndoStack.execCmd(cmd);
+    QScopedPointer<CmdDragSelectedBoardItems> cmd(
+        new CmdDragSelectedBoardItems(*board));
+    cmd->rotate(angle, true);
+    mUndoStack.execCmd(cmd.take());
     return true;
   } catch (Exception& e) {
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());

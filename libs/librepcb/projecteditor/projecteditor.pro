@@ -56,7 +56,6 @@ SOURCES += \
     cmd/cmdremoveunusedlibraryelements.cpp \
     cmd/cmdremoveunusednetsignals.cpp \
     cmd/cmdreplacedevice.cpp \
-    cmd/cmdrotateselectedboarditems.cpp \
     cmd/cmdrotateselectedschematicitems.cpp \
     dialogs/addcomponentdialog.cpp \
     dialogs/bomgeneratordialog.cpp \
@@ -119,7 +118,6 @@ HEADERS += \
     cmd/cmdremoveunusedlibraryelements.h \
     cmd/cmdremoveunusednetsignals.h \
     cmd/cmdreplacedevice.h \
-    cmd/cmdrotateselectedboarditems.h \
     cmd/cmdrotateselectedschematicitems.h \
     dialogs/addcomponentdialog.h \
     dialogs/bomgeneratordialog.h \

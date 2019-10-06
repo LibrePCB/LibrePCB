@@ -57,11 +57,13 @@ namespace editor {
 class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdDragSelectedBoardItems(Board& board, const Point& startPos) noexcept;
+  explicit CmdDragSelectedBoardItems(Board&       board,
+                                     const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
   void setCurrentPosition(const Point& pos) noexcept;
+  void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
 
 private:
   // Private Methods
@@ -73,6 +75,8 @@ private:
   Board& mBoard;
   Point  mStartPos;
   Point  mDeltaPos;
+  Point  mCenterPos;
+  Angle  mDeltaAngle;
 
   // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
