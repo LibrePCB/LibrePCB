@@ -610,6 +610,12 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(
 BES_Base::ProcRetVal BES_Select::processSubStateMoving(
     BEE_Base* event) noexcept {
   switch (event->getType()) {
+    case BEE_Base::Edit_RotateCW:
+      rotateSelectedItems(-Angle::deg90());
+      return ForceStayInState;
+    case BEE_Base::Edit_RotateCCW:
+      rotateSelectedItems(Angle::deg90());
+      return ForceStayInState;
     case BEE_Base::GraphicsViewEvent:
       return processSubStateMovingSceneEvent(event);
     default:
@@ -641,6 +647,10 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(
         }
         mSelectedItemsDragCommand.reset();
         mSubState = SubState_Idle;
+      } else if ((sceneEvent->button() == Qt::RightButton) &&
+                 (sceneEvent->screenPos() ==
+                  sceneEvent->buttonDownScreenPos(Qt::RightButton))) {
+        rotateSelectedItems(Angle::deg90());
       }
       break;
     }  // case QEvent::GraphicsSceneMouseRelease
@@ -703,10 +713,14 @@ bool BES_Select::rotateSelectedItems(const Angle& angle) noexcept {
   if (!board) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmd(
-        new CmdDragSelectedBoardItems(*board));
-    cmd->rotate(angle, true);
-    mUndoStack.execCmd(cmd.take());
+    if (mSelectedItemsDragCommand) {
+      mSelectedItemsDragCommand->rotate(angle);
+    } else {
+      QScopedPointer<CmdDragSelectedBoardItems> cmd(
+          new CmdDragSelectedBoardItems(*board));
+      cmd->rotate(angle, true);
+      mUndoStack.execCmd(cmd.take());
+    }
     return true;
   } catch (Exception& e) {
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
