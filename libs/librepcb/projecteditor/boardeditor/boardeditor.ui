@@ -112,6 +112,9 @@
     </property>
     <addaction name="actionGrid"/>
     <addaction name="separator"/>
+    <addaction name="actionHideAllPlanes"/>
+    <addaction name="actionShowAllPlanes"/>
+    <addaction name="separator"/>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
     <addaction name="actionZoomAll"/>
@@ -758,6 +761,24 @@
    </property>
    <property name="toolTip">
     <string>Generate BOM</string>
+   </property>
+  </action>
+  <action name="actionShowAllPlanes">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/show_planes.png</normaloff>:/img/actions/show_planes.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show All Planes</string>
+   </property>
+  </action>
+  <action name="actionHideAllPlanes">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/hide_planes.png</normaloff>:/img/actions/hide_planes.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hide All Planes</string>
    </property>
   </action>
  </widget>

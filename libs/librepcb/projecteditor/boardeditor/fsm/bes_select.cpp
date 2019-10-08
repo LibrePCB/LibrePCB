@@ -444,6 +444,10 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
       QAction* aRemove =
           menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Plane");
       menu.addSeparator();
+      QAction* aIsVisible = menu.addAction(tr("Visible"));
+      aIsVisible->setCheckable(true);
+      aIsVisible->setChecked(plane->isVisible());
+      menu.addSeparator();
       QAction* aProperties = menu.addAction(QIcon(":/img/actions/settings.png"),
                                             tr("Plane Properties"));
 
@@ -457,6 +461,9 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
         flipSelectedItems(Qt::Horizontal);
       } else if (action == aRemove) {
         removeSelectedItems();
+      } else if (action == aIsVisible) {
+        // Visibility is not saved, thus no undo command is needed here.
+        plane->setVisible(aIsVisible->isChecked());
       } else if (action == aProperties) {
         openPlanePropertiesDialog(*plane);
       }
@@ -750,7 +757,16 @@ void BES_Select::openViaPropertiesDialog(BI_Via& via) noexcept {
 
 void BES_Select::openPlanePropertiesDialog(BI_Plane& plane) noexcept {
   BoardPlanePropertiesDialog dialog(mProject, plane, mUndoStack, &mEditor);
+
+  // Make sure the plane is visible visible since it's useful to see the actual
+  // plane fragments while the plane properties are modified.
+  bool visible = plane.isVisible();
+  plane.setVisible(true);
+
   dialog.exec();
+
+  // Restore visibility
+  plane.setVisible(visible);
 }
 
 void BES_Select::openPolygonPropertiesDialog(Board&   board,

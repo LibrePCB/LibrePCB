@@ -87,6 +87,7 @@ public:
   const Path&          getOutline() const noexcept { return mOutline; }
   const QVector<Path>& getFragments() const noexcept { return mFragments; }
   bool                 isSelectable() const noexcept override;
+  bool                 isVisible() const noexcept { return mIsVisible; }
 
   // Setters
   void setOutline(const Path& outline) noexcept;
@@ -97,6 +98,7 @@ public:
   void setConnectStyle(ConnectStyle style) noexcept;
   void setPriority(int priority) noexcept;
   void setKeepOrphans(bool keepOrphans) noexcept;
+  void setVisible(bool visible) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -142,6 +144,7 @@ private:  // Data
   // Length mThermalSpokeWidth;
   // style [round square miter] ?
   QScopedPointer<BGI_Plane> mGraphicsItem;
+  bool                      mIsVisible;  // volatile, not saved to file
 
   QVector<Path> mFragments;
 };

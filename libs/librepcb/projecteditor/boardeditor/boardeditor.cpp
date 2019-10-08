@@ -531,6 +531,22 @@ void BoardEditor::on_actionRebuildPlanes_triggered() {
   }
 }
 
+void BoardEditor::on_actionShowAllPlanes_triggered() {
+  if (Board* board = getActiveBoard()) {
+    foreach (BI_Plane* plane, board->getPlanes()) {
+      plane->setVisible(true);  // No undo command needed since it is not saved
+    }
+  }
+}
+
+void BoardEditor::on_actionHideAllPlanes_triggered() {
+  if (Board* board = getActiveBoard()) {
+    foreach (BI_Plane* plane, board->getPlanes()) {
+      plane->setVisible(false);  // No undo command needed since it is not saved
+    }
+  }
+}
+
 void BoardEditor::on_tabBar_currentChanged(int index) {
   setActiveBoardIndex(index);
 }

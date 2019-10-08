@@ -108,6 +108,8 @@ private slots:
   void on_actionLayerStackSetup_triggered();
   void on_actionModifyDesignRules_triggered();
   void on_actionRebuildPlanes_triggered();
+  void on_actionShowAllPlanes_triggered();
+  void on_actionHideAllPlanes_triggered();
   void on_tabBar_currentChanged(int index);
   void on_lblUnplacedComponentsNote_linkActivated();
   void boardListActionGroupTriggered(QAction* action);
