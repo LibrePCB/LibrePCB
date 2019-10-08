@@ -110,10 +110,12 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->setBrush(Qt::NoBrush);
     painter->drawPath(mOutline);
 
-    // draw plane
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mLayer->getColor(selected));
-    foreach (const QPainterPath& area, mAreas) { painter->drawPath(area); }
+    // draw plane only if plane should be visible
+    if (mPlane.isVisible()) {
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mLayer->getColor(selected));
+      foreach (const QPainterPath& area, mAreas) { painter->drawPath(area); }
+    }
   }
 
 #ifdef QT_DEBUG

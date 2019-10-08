@@ -55,6 +55,7 @@ BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
     mConnectStyle(other.mConnectStyle),
     // mThermalGapWidth(other.mThermalGapWidth),
     // mThermalSpokeWidth(other.mThermalSpokeWidth),
+    mIsVisible(true),
     mFragments(other.mFragments)  // also copy fragments to avoid the need for
                                   // a rebuild
 {
@@ -71,10 +72,11 @@ BI_Plane::BI_Plane(Board& board, const SExpression& node)
     mMinClearance(node.getValueByPath<UnsignedLength>("min_clearance")),
     mKeepOrphans(node.getValueByPath<bool>("keep_orphans")),
     mPriority(node.getValueByPath<int>("priority")),
-    mConnectStyle(node.getValueByPath<ConnectStyle>("connect_style"))
-// mThermalGapWidth(node.getValueByPath<Length>("thermal_gap_width", true)),
-// mThermalSpokeWidth(node.getValueByPath<Length>("thermal_spoke_width", true))
-{
+    mConnectStyle(node.getValueByPath<ConnectStyle>("connect_style")),
+    // mThermalGapWidth(node.getValueByPath<Length>("thermal_gap_width", true)),
+    // mThermalSpokeWidth(node.getValueByPath<Length>("thermal_spoke_width",
+    // true))
+    mIsVisible(true) {
   Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
   mNetSignal =
       mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
@@ -101,6 +103,7 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
     mPriority(0),
     mConnectStyle(ConnectStyle::Solid),
     // mThermalGapWidth(100000), mThermalSpokeWidth(100000),
+    mIsVisible(true),
     mFragments() {
   init();
 }
@@ -179,6 +182,13 @@ void BI_Plane::setPriority(int priority) noexcept {
 void BI_Plane::setKeepOrphans(bool keepOrphans) noexcept {
   if (keepOrphans != mKeepOrphans) {
     mKeepOrphans = keepOrphans;
+  }
+}
+
+void BI_Plane::setVisible(bool visible) noexcept {
+  if (visible != mIsVisible) {
+    mIsVisible = visible;
+    mGraphicsItem->update();
   }
 }
 

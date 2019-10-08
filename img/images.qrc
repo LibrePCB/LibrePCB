@@ -37,6 +37,7 @@
         <file>actions/generate_bom.png</file>
         <file>actions/grid.png</file>
         <file>actions/help.png</file>
+        <file>actions/hide_planes.png</file>
         <file>actions/home.png</file>
         <file>actions/info.png</file>
         <file>actions/layers.png</file>
@@ -67,6 +68,7 @@
         <file>actions/select.png</file>
         <file>actions/select_rect.png</file>
         <file>actions/settings.png</file>
+        <file>actions/show_planes.png</file>
         <file>actions/stop.png</file>
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
