@@ -1,0 +1,14 @@
+[#usinggit]
+== Setting up and using GIT With LibrePCB
+:imagesdir: using_git
+
+All of the official LibrePCB libraries are hosted in repositories  on github.com under the username LibrePCB-Libraries
+and are available for download. They are also mirrored on the LibrePCB.org library server. Anyone wanting to donate to
+these libraries must have a github.com account and follow the procedures outlined in this document.
+
+Librarians should always create a separate LibrePCB workspace and only use it for editing libraries. Edits can only  be done
+on local libraries and you cannot have a remote copy of any library that you are working on in the workspace.
+
+include::github.adoc[]
+
+

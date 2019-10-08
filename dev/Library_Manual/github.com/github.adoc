@@ -1,0 +1,42 @@
+[#using_github]
+=== Forking a LibrePCB library
+
+Visit the LibrePCB-Libraries account on github.com and locate the library that you wish to edit.Fork it and set a Watch. This will
+create a cloned repo of the same name under your github.com account.
+
+=== Clone repo into workspace 
+
+Create a library workspace and go to the local library directory:
+
+   ~/LibrePCB-LibWorkspace/v0.1/libraries/local/
+   git clone https://github.com/yourname/LibrePCB_XXX.lplib
+
+Next you change into that repo and configure it to point back to its original LibrePCB-Libraries source:
+
+   ~/LibrePCB-LibWorkspace/v0.1/libraries/local/LibrePCB_XXX.lplib/
+   git remote add upstream https://github.com/LibrePCB-Libraries/LibrePCB_XXX.lplib.git
+
+Now merge any new changes into your local copy and push them back to your github.com account. Do this before
+makeing any pull requests to ensure that you have the latest bits:
+
+    git fetch upstream
+    git checkout master
+    git merge upstream/master
+    git push origin master
+
+=== Editing the library
+
+Never work in the master branch. Create your own branch and use that for all of your changes. When finished add and commit all of your changes:
+
+   ~/LibrePCB-LibWorkspace/v0.3/libraries/local/LibrePCB_XXX.lplib
+   git checkout -b my_branch_name
+   git add .
+   git commit
+   git push origin my_branch_name
+
+You can now go to github.com and issue a pull request to alert the rest of the team that your release candidate is ready for review. Remember that
+the success of LibrePCB will depend on the quality of the libraries so don't be surprised if the expectations seem a little high. That is deliberate. You are always welcome to host your code on github.com but if you want to deliver it via the LibrePCB server then it must meet team standards.
+
+
+
+

@@ -1,0 +1,20 @@
+= LibrePCB Librarians Manual
+:toc: left
+:toclevels: 5
+:sectnums:
+:sectnumlevels: 3
+:sectlinks:
+:icons: font
+:source-highlighter: pygments
+:pygments-style: monokai
+:docinfo: shared
+
+// LibrePCB Variables
+:version: 0.1.2
+:releases_url: https://download.librepcb.org/releases/{version}
+
+include::github.com/index.adoc[]
+
+
+
+
