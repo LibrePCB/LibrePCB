@@ -46,9 +46,9 @@ SOURCES += \
     cmd/cmdcombineboardnetsegments.cpp \
     cmd/cmdcombinenetsignals.cpp \
     cmd/cmdcombineschematicnetsegments.cpp \
+    cmd/cmddragselectedboarditems.cpp \
     cmd/cmdflipselectedboarditems.cpp \
     cmd/cmdmirrorselectedschematicitems.cpp \
-    cmd/cmdmoveselectedboarditems.cpp \
     cmd/cmdmoveselectedschematicitems.cpp \
     cmd/cmdremoveboarditems.cpp \
     cmd/cmdremoveselectedboarditems.cpp \
@@ -56,7 +56,6 @@ SOURCES += \
     cmd/cmdremoveunusedlibraryelements.cpp \
     cmd/cmdremoveunusednetsignals.cpp \
     cmd/cmdreplacedevice.cpp \
-    cmd/cmdrotateselectedboarditems.cpp \
     cmd/cmdrotateselectedschematicitems.cpp \
     dialogs/addcomponentdialog.cpp \
     dialogs/bomgeneratordialog.cpp \
@@ -109,9 +108,9 @@ HEADERS += \
     cmd/cmdcombineboardnetsegments.h \
     cmd/cmdcombinenetsignals.h \
     cmd/cmdcombineschematicnetsegments.h \
+    cmd/cmddragselectedboarditems.h \
     cmd/cmdflipselectedboarditems.h \
     cmd/cmdmirrorselectedschematicitems.h \
-    cmd/cmdmoveselectedboarditems.h \
     cmd/cmdmoveselectedschematicitems.h \
     cmd/cmdremoveboarditems.h \
     cmd/cmdremoveselectedboarditems.h \
@@ -119,7 +118,6 @@ HEADERS += \
     cmd/cmdremoveunusedlibraryelements.h \
     cmd/cmdremoveunusednetsignals.h \
     cmd/cmdreplacedevice.h \
-    cmd/cmdrotateselectedboarditems.h \
     cmd/cmdrotateselectedschematicitems.h \
     dialogs/addcomponentdialog.h \
     dialogs/bomgeneratordialog.h \

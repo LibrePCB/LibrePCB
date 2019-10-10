@@ -45,7 +45,7 @@ class BI_Plane;
 
 namespace editor {
 
-class CmdMoveSelectedBoardItems;
+class CmdDragSelectedBoardItems;
 
 /*******************************************************************************
  *  Class BES_Select
@@ -100,7 +100,7 @@ private:
 
   // Attributes
   SubState mSubState;  ///< the current substate
-  QScopedPointer<CmdMoveSelectedBoardItems> mSelectedItemsMoveCommand;
+  QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
 };
 
 /*******************************************************************************
