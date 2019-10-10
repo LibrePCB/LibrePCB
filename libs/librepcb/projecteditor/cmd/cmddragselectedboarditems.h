@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
+#define LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
 
@@ -32,24 +32,38 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class CmdPolygonEdit;
+class CmdStrokeTextEdit;
+class CmdHoleEdit;
+
 namespace project {
 
 class Board;
+class CmdDeviceInstanceEdit;
+class CmdBoardViaEdit;
+class CmdBoardNetPointEdit;
+class CmdBoardPlaneEdit;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdRotateSelectedBoardItems
+ *  Class CmdDragSelectedBoardItems
  ******************************************************************************/
 
 /**
- * @brief The CmdRotateSelectedBoardItems class
+ * @brief The CmdDragSelectedBoardItems class
  */
-class CmdRotateSelectedBoardItems final : public UndoCommandGroup {
+class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdRotateSelectedBoardItems(Board& board, const Angle& angle) noexcept;
-  ~CmdRotateSelectedBoardItems() noexcept;
+  explicit CmdDragSelectedBoardItems(Board&       board,
+                                     const Point& startPos = Point()) noexcept;
+  ~CmdDragSelectedBoardItems() noexcept;
+
+  // General Methods
+  void setCurrentPosition(const Point& pos) noexcept;
+  void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
 
 private:
   // Private Methods
@@ -58,10 +72,20 @@ private:
   bool performExecute() override;
 
   // Private Member Variables
-
-  // Attributes from the constructor
   Board& mBoard;
-  Angle  mAngle;
+  Point  mStartPos;
+  Point  mDeltaPos;
+  Point  mCenterPos;
+  Angle  mDeltaAngle;
+
+  // Move commands
+  QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
+  QList<CmdBoardViaEdit*>       mViaEditCmds;
+  QList<CmdBoardNetPointEdit*>  mNetPointEditCmds;
+  QList<CmdBoardPlaneEdit*>     mPlaneEditCmds;
+  QList<CmdPolygonEdit*>        mPolygonEditCmds;
+  QList<CmdStrokeTextEdit*>     mStrokeTextEditCmds;
+  QList<CmdHoleEdit*>           mHoleEditCmds;
 };
 
 /*******************************************************************************
@@ -72,4 +96,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDROTATESELECTEDBOARDITEMS_H
+#endif  // LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
