@@ -96,11 +96,6 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
     textComboBox->setEditable(true);
     textComboBox->addItem("{{NAME}}");
     textComboBox->addItem("{{VALUE}}");
-    textComboBox->addItem("{{_BOARD}}");
-    textComboBox->addItem("{{_PROJECT}}");
-    textComboBox->addItem("{{_AUTHOR}}");
-    textComboBox->addItem("{{_VERSION}}");
-    textComboBox->addItem("{{_MODIFIED_DATE}}");
     int currentTextIndex = textComboBox->findText(mLastText);
     if (currentTextIndex >= 0) {
       textComboBox->setCurrentIndex(currentTextIndex);
