@@ -81,6 +81,7 @@ private:
   ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
   void       startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
                                   const tl::optional<Uuid>& symbVar = tl::nullopt,
+                                  const tl::optional<Uuid>& dev = tl::nullopt,
                                   bool                      keepValue = false);
   bool       abortCommand(bool showErrMsgBox) noexcept;
   std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
