@@ -18,18 +18,18 @@ ALL=""
 for i in "$@"
 do
 case $i in
-    --docker)
-    DOCKER="--docker"
-    shift
-    ;;
-    --sudo)
-    DOCKER_CMD="sudo docker"
-    shift
-    ;;
-    --all)
-    ALL="--all"
-    shift
-    ;;
+  --docker)
+  DOCKER="--docker"
+  shift
+  ;;
+  --sudo)
+  DOCKER_CMD="sudo docker"
+  shift
+  ;;
+  --all)
+  ALL="--all"
+  shift
+  ;;
 esac
 done
 
@@ -85,11 +85,11 @@ do
       NEW_CONTENT=$(clang-format -style=file "$file" || format_failed)
       if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
       then
-          printf "%s\n" "$NEW_CONTENT" > "$file"
-          echo "[M] $file"
-          COUNTER=$((COUNTER+1))
+        printf "%s\n" "$NEW_CONTENT" > "$file"
+        echo "[M] $file"
+        COUNTER=$((COUNTER+1))
       else
-          echo "[ ] $file"
+        echo "[ ] $file"
       fi
     fi
   done
