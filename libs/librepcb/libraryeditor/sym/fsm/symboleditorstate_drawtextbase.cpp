@@ -90,12 +90,12 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
     textComboBox->setEditable(true);
     textComboBox->addItem("{{NAME}}");
     textComboBox->addItem("{{VALUE}}");
-    textComboBox->addItem("{{_SHEET}}");
-    textComboBox->addItem("{{_PROJECT}}");
-    textComboBox->addItem("{{_MODIFIED_DATE}}");
-    textComboBox->addItem("{{_AUTHOR}}");
-    textComboBox->addItem("{{_VERSION}}");
-    textComboBox->addItem("{{_PAGE_X_OF_Y}}");
+    textComboBox->addItem("{{SHEET}}");
+    textComboBox->addItem("{{PROJECT}}");
+    textComboBox->addItem("{{MODIFIED_DATE}}");
+    textComboBox->addItem("{{AUTHOR}}");
+    textComboBox->addItem("{{VERSION}}");
+    textComboBox->addItem("{{PAGE_X_OF_Y}}");
     textComboBox->setCurrentIndex(textComboBox->findText(mLastText));
     connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
             &SymbolEditorState_DrawTextBase::textComboBoxValueChanged);
