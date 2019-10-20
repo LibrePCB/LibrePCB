@@ -45,7 +45,7 @@
       <property name="styleSheet">
        <string notr="true">QLabel {
 	background-color: rgb(255, 255, 127);
-	
+
 	color: rgb(170, 0, 0);
 };</string>
       </property>
@@ -75,7 +75,7 @@
       <property name="styleSheet">
        <string notr="true">QLabel {
 	background-color: rgb(255, 255, 127);
-	
+
 	color: rgb(170, 0, 0);
 };</string>
       </property>
@@ -270,17 +270,17 @@
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QListView
-{ 
+{
 	background-color: rgba(0, 0, 0, 0);
 	border: 0px;
 }
-QListView::item:hover 
+QListView::item:hover
 {
     background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 100), stop:1 rgba(0, 170, 255, 0));
 }
-QListView::item 
+QListView::item
 {
-	color: blue; 
+	color: blue;
 }</string>
                  </property>
                  <property name="frameShape">
@@ -343,17 +343,17 @@ QListView::item
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QListView
-{ 
+{
 	background-color: rgba(0, 0, 0, 0);
 	border: 0px;
 }
-QListView::item:hover 
+QListView::item:hover
 {
     background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 100), stop:1 rgba(0, 170, 255, 0));
 }
-QListView::item 
+QListView::item
 {
-	color: blue; 
+	color: blue;
 }</string>
                  </property>
                  <property name="frameShape">
