@@ -27,6 +27,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <iostream>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -131,7 +133,32 @@ void PrimitiveTextGraphicsItem::paint(QPainter*                       painter,
     painter->setPen(mPen);
   }
 
-  if (mapToScene(0, 1).y() < mapToScene(0, 0).y()) {
+  bool shouldRotate = false;
+
+  QPointF map01 = mapToScene(0, 1);
+  QPointF map00 = mapToScene(0, 0);
+  QPointF map10 = mapToScene(1, 0);
+
+  if ((map01.x() >= map00.x() && map01.x() <= map00.x() &&
+       map01.y() < map00.y() && map01.y() <= map00.y() &&
+       map10.x() < map00.x() && map10.x() <= map00.x() &&
+       map10.y() >= map00.y() && map10.y() <= map00.y()) ||
+      (map01.x() < map00.x() && map01.x() <= map00.x() &&
+       map01.y() >= map00.y() && map01.y() <= map00.y() &&
+       map10.x() >= map00.x() && map10.x() <= map00.x() &&
+       map10.y() >= map00.y() && map10.y() > map00.y()) ||
+      (map01.x() >= map00.x() && map01.x() > map00.x() &&
+       map01.y() < map00.y() && map01.y() <= map00.y() &&
+       map10.x() < map00.x() && map10.x() <= map00.x() &&
+       map10.y() < map00.y() && map10.y() <= map00.y()) ||
+      (map01.x() < map00.x() && map01.x() <= map00.x() &&
+       map01.y() >= map00.y() && map01.y() <= map00.y() &&
+       map10.x() >= map00.x() && map10.x() <= map00.x() &&
+       map10.y() >= map00.y() && map10.y() > map00.y())) {
+    shouldRotate = true;
+  }
+
+  if (shouldRotate) {
     // The text needs to be rotated 180°!
     // TODO: Is there a better solution to determine the overall rotation of the
     // item?
