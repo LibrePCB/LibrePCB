@@ -18,20 +18,29 @@ ALL=""
 for i in "$@"
 do
 case $i in
-    --docker)
-    DOCKER="--docker"
-    shift
-    ;;
-    --sudo)
-    DOCKER_CMD="sudo docker"
-    shift
-    ;;
-    --all)
-    ALL="--all"
-    shift
-    ;;
+  --docker)
+  DOCKER="--docker"
+  shift
+  ;;
+  --sudo)
+  DOCKER_CMD="sudo docker"
+  shift
+  ;;
+  --all)
+  ALL="--all"
+  shift
+  ;;
 esac
 done
+
+format_failed() {
+  echo "" >&2
+  echo "ERROR: clang-format failed." >&2
+  echo "  Make sure that clang-format 6 is installed." >&2
+  echo "  You can also run clang-format in a docker container" >&2
+  echo "  by using the '--docker' argument when invoking this script." >&2
+  exit 7
+}
 
 echo "Formatting files with clang-format..."
 
@@ -73,14 +82,14 @@ do
       # "make" to detect the files as changed every time, even if the content was
       # not modified! So we only overwrite the files if their content has changed.
       OLD_CONTENT=$(cat "$file")
-      NEW_CONTENT=$(clang-format -style=file "$file")
+      NEW_CONTENT=$(clang-format -style=file "$file" || format_failed)
       if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
       then
-          printf "%s\n" "$NEW_CONTENT" > "$file"
-          echo "[M] $file"
-          COUNTER=$((COUNTER+1))
+        printf "%s\n" "$NEW_CONTENT" > "$file"
+        echo "[M] $file"
+        COUNTER=$((COUNTER+1))
       else
-          echo "[ ] $file"
+        echo "[ ] $file"
       fi
     fi
   done
