@@ -304,10 +304,13 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(
                   mCurrentComponent->getLibComponent().getUuid();
               Uuid symbVarUuid =
                   mCurrentComponent->getSymbolVariant().getUuid();
+              tl::optional<Uuid> defaultDeviceUuid =
+                  mCurrentComponent->getDefaultDeviceUuid();
               mUndoStack.commitCmdGroup();
               mIsUndoCmdActive = false;
               abortCommand(false);  // reset attributes
-              startAddingComponent(componentUuid, symbVarUuid, true);
+              startAddingComponent(componentUuid, symbVarUuid,
+                                   defaultDeviceUuid, true);
               return ForceStayInState;
             }
           } catch (Exception& e) {
@@ -365,6 +368,7 @@ SES_Base::ProcRetVal SES_AddComponent::processSceneEvent(
 
 void SES_AddComponent::startAddingComponent(const tl::optional<Uuid>& cmp,
                                             const tl::optional<Uuid>& symbVar,
+                                            const tl::optional<Uuid>& dev,
                                             bool keepValue) {
   Schematic* schematic = mEditor.getActiveSchematic();
   Q_ASSERT(schematic);
@@ -378,8 +382,8 @@ void SES_AddComponent::startAddingComponent(const tl::optional<Uuid>& cmp,
 
     if (cmp && symbVar) {
       // add selected component to circuit
-      auto* cmd =
-          new CmdAddComponentToCircuit(mWorkspace, mProject, *cmp, *symbVar);
+      auto* cmd = new CmdAddComponentToCircuit(mWorkspace, mProject, *cmp,
+                                               *symbVar, dev);
       mUndoStack.appendToCmdGroup(cmd);
       mCurrentComponent = cmd->getComponentInstance();
     } else {
