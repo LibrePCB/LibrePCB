@@ -98,6 +98,7 @@ public:
   NetSignal& getNetSignalOfNetSegment() const noexcept;
   bool       isSelectable() const noexcept override;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
+  UnsignedLength getLength() const noexcept;
 
   // Setters
   void setLayer(GraphicsLayer& layer);
