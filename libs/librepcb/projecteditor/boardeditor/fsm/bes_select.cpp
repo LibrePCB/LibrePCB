@@ -247,8 +247,14 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
   QList<BI_Base*> items =
       board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
   if (items.isEmpty()) return PassToParentState;
-  board->clearSelection();
-  items.first()->setSelected(true);
+
+  // If the right-clicked element is part of an active selection, keep it as-is.
+  // However, if it's not part of an active selection, clear the selection and
+  // select the right-clicked element instead.
+  if (!items.first()->isSelected()) {
+    board->clearSelection();
+    items.first()->setSelected(true);
+  }
 
   // build and execute the context menu
   QMenu menu;
