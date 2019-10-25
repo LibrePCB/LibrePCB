@@ -212,12 +212,12 @@ Point SI_NetSegment::calcNearestPoint(const Point& p) const noexcept {
   Point  pos = p;
   Length dist;
   for (int i = 0; i < mNetLines.count(); ++i) {
-    Point  lp;
-    Length ld = Toolbox::shortestDistanceBetweenPointAndLine(
+    Point          lp;
+    UnsignedLength ld = Toolbox::shortestDistanceBetweenPointAndLine(
         p, mNetLines.at(i)->getStartPoint().getPosition(),
         mNetLines.at(i)->getEndPoint().getPosition(), &lp);
     if ((i == 0) || (ld < dist)) {
-      dist = ld;
+      dist = *ld;
       pos  = lp;
     }
   }
