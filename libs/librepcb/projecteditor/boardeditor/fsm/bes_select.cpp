@@ -41,6 +41,7 @@
 #include <librepcb/library/elements.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/project/boards/boardselectionquery.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
 #include <librepcb/project/boards/cmd/cmdfootprintstroketextsreset.h>
 #include <librepcb/project/boards/items/bi_device.h>
@@ -389,6 +390,10 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       menu.addSeparator();
       QAction* aSelectSegment = menu.addAction(
           QIcon(":/img/actions/bookmark.png"), tr("Select Whole Segment"));
+      menu.addSeparator();
+      QAction* aMeasureSelection =
+          menu.addAction(QIcon(":/img/actions/ruler.png"),
+                         tr("Measure Selected Trace Length"));
 
       // execute the context menu
       QAction* action = menu.exec(mouseEvent->screenPos());
@@ -401,6 +406,8 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
         removeSelectedItems();
       } else if (action == aSelectSegment) {
         netline->getNetSegment().setSelected(true);
+      } else if (action == aMeasureSelection) {
+        measureSelectedItems(*netline);
       }
       return ForceStayInState;
     }
@@ -762,6 +769,90 @@ bool BES_Select::removeSelectedItems() noexcept {
   } catch (Exception& e) {
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     return false;
+  }
+}
+
+bool BES_Select::measureSelectedItems(const BI_NetLine& netline) noexcept {
+  Board* board = mEditor.getActiveBoard();
+  Q_ASSERT(board);
+  if (!board) return false;
+
+  Q_ASSERT(netline.isSelected());
+
+  // Store UUIDs of visited netlines
+  QSet<Uuid> visitedNetLines;
+  visitedNetLines.insert(netline.getUuid());
+
+  // Get the netline length. Then traverse the selected netlines first in one
+  // direction, then in the other direction.
+  UnsignedLength totalLength = netline.getLength();
+  try {
+    measureLengthInDirection(false, netline, visitedNetLines,
+                             totalLength);  // can throw
+    measureLengthInDirection(true, netline, visitedNetLines,
+                             totalLength);  // can throw
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+    return false;
+  }
+
+  // Query the total number of selected netlines
+  auto query = board->createSelectionQuery();
+  query->addSelectedNetLines();
+  int totalSelectedNetlines = query->getNetLines().size();
+
+  // Show result
+  QLocale locale;
+  QString title = tr("Measurement Result");
+  QString text =
+      tr("Total length of %1 traces: %2 mm / %3 in")
+          .arg(visitedNetLines.count())
+          .arg(Toolbox::floatToString(totalLength->toMm(), 6, locale))
+          .arg(Toolbox::floatToString(totalLength->toInch(), 6, locale));
+  if (totalSelectedNetlines == visitedNetLines.count()) {
+    QMessageBox::information(&mEditor, title, text);
+  } else {
+    text += "\n\n" + tr("WARNING: There are %1 traces selected, but not all "
+                        "of them are connected!")
+                         .arg(totalSelectedNetlines);
+    QMessageBox::warning(&mEditor, title, text);
+  }
+
+  return true;
+}
+
+void BES_Select::measureLengthInDirection(bool              directionBackwards,
+                                          const BI_NetLine& netline,
+                                          QSet<Uuid>&       visitedNetLines,
+                                          UnsignedLength&   totalLength) {
+  const BI_NetLineAnchor* currentAnchor =
+      directionBackwards ? &netline.getStartPoint() : &netline.getEndPoint();
+
+  for (;;) {
+    const BI_NetLine* nextNetline = nullptr;
+    for (const BI_NetLine* nl : currentAnchor->getNetLines()) {
+      // Don't visit a netline twice
+      if (visitedNetLines.contains(nl->getUuid())) {
+        continue;
+      }
+      // Only visit selected netlines
+      if (nl->isSelected()) {
+        if (nextNetline != nullptr) {
+          // There's already another connected and selected netline
+          throw LogicError(__FILE__, __LINE__,
+                           tr("Selected traces may not branch!"));
+        }
+
+        totalLength += nl->getLength();
+        nextNetline = nl;
+        visitedNetLines.insert(nl->getUuid());
+      }
+    }
+    if (nextNetline != nullptr) {
+      currentAnchor = nextNetline->getOtherPoint(*currentAnchor);
+    } else {
+      break;
+    }
   }
 }
 

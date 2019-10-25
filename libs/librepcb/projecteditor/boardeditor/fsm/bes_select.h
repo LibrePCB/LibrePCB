@@ -84,6 +84,32 @@ private:
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
+  /**
+   * @brief Measure the length of the selected items.
+   *
+   * Note: Currently only non-branching non-intersecting segments can be
+   * measured!
+   *
+   * @param netline A selected netline
+   */
+  bool measureSelectedItems(const BI_NetLine& netline) noexcept;
+  /**
+   * @brief Internal helper method used by #measureSelectedItems
+   *
+   * @param directionBackwards If set to true, the segments are traversed
+   *   "backwards" starting at the start anchor. Otherwise, the segments are
+   *   traversed starting at the end anchor.
+   * @param netline The netline that is used as starting point. The length of
+   *   this netline will not be considered.
+   * @param visitedNetLines A set containing UUIDs of all visited netlines.
+   * @param totalLength A reference to the total length. The length of the
+   *   found segments will be appended to this total length.
+   * @throws LogicError if there are branches or loops.
+   */
+  void measureLengthInDirection(bool              directionBackwards,
+                                const BI_NetLine& netline,
+                                QSet<Uuid>&       visitedNetLines,
+                                UnsignedLength&   totalLength);
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
