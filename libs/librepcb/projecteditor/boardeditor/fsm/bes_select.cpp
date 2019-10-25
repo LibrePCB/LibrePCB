@@ -160,7 +160,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(
       if (!mouseEvent) break;
       switch (mouseEvent->button()) {
         case Qt::LeftButton:
-          return proccessIdleSceneLeftClick(mouseEvent, *board);
+          return processIdleSceneLeftClick(mouseEvent, *board);
         default:
           break;
       }
@@ -178,7 +178,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(
           board->setSelectionRect(Point(), Point(), false);
           return ForceStayInState;
         case Qt::RightButton:
-          return proccessIdleSceneRightMouseButtonReleased(mouseEvent, board);
+          return processIdleSceneRightMouseButtonReleased(mouseEvent, board);
         default:
           break;
       }
@@ -189,7 +189,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
       Q_ASSERT(mouseEvent);
       if (!mouseEvent) break;
-      return proccessIdleSceneDoubleClick(mouseEvent, board);
+      return processIdleSceneDoubleClick(mouseEvent, board);
     }
     case QEvent::GraphicsSceneMouseMove: {
       QGraphicsSceneMouseEvent* mouseEvent =
@@ -212,7 +212,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(
   return PassToParentState;
 }
 
-BES_Base::ProcRetVal BES_Select::proccessIdleSceneLeftClick(
+BES_Base::ProcRetVal BES_Select::processIdleSceneLeftClick(
     QGraphicsSceneMouseEvent* mouseEvent, Board& board) noexcept {
   // handle items selection
   QList<BI_Base*> items =
@@ -241,7 +241,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneLeftClick(
     return PassToParentState;
 }
 
-BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
+BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept {
   // handle item selection
   QList<BI_Base*> items =
@@ -557,7 +557,7 @@ BES_Base::ProcRetVal BES_Select::proccessIdleSceneRightMouseButtonReleased(
   return PassToParentState;
 }
 
-BES_Base::ProcRetVal BES_Select::proccessIdleSceneDoubleClick(
+BES_Base::ProcRetVal BES_Select::processIdleSceneDoubleClick(
     QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept {
   if (mouseEvent->button() == Qt::LeftButton) {
     // check if there is an element under the mouse
@@ -679,7 +679,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(
       // abort moving and handle double click
       mSelectedItemsDragCommand.reset();
       mSubState = SubState_Idle;
-      return proccessIdleSceneDoubleClick(mouseEvent, board);
+      return processIdleSceneDoubleClick(mouseEvent, board);
     }
 #endif
 

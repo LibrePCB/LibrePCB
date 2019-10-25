@@ -139,7 +139,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(
       if (!mouseEvent) break;
       switch (mouseEvent->button()) {
         case Qt::LeftButton:
-          return proccessIdleSceneLeftClick(mouseEvent, *schematic);
+          return processIdleSceneLeftClick(mouseEvent, *schematic);
         default:
           break;
       }
@@ -157,8 +157,8 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(
           schematic->setSelectionRect(Point(), Point(), false);
           return ForceStayInState;
         case Qt::RightButton:
-          return proccessIdleSceneRightMouseButtonReleased(mouseEvent,
-                                                           schematic);
+          return processIdleSceneRightMouseButtonReleased(mouseEvent,
+                                                          schematic);
         default:
           break;
       }
@@ -169,7 +169,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
       Q_ASSERT(mouseEvent);
       if (!mouseEvent) break;
-      return proccessIdleSceneDoubleClick(mouseEvent, schematic);
+      return processIdleSceneDoubleClick(mouseEvent, schematic);
     }
     case QEvent::GraphicsSceneMouseMove: {
       QGraphicsSceneMouseEvent* mouseEvent =
@@ -192,7 +192,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateIdleSceneEvent(
   return PassToParentState;
 }
 
-SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(
+SES_Base::ProcRetVal SES_Select::processIdleSceneLeftClick(
     QGraphicsSceneMouseEvent* mouseEvent, Schematic& schematic) noexcept {
   // handle items selection
   QList<SI_Base*> items =
@@ -222,7 +222,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneLeftClick(
     return PassToParentState;
 }
 
-SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
+SES_Base::ProcRetVal SES_Select::processIdleSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent* mouseEvent, Schematic* schematic) noexcept {
   // handle item selection
   QList<SI_Base*> items =
@@ -292,7 +292,7 @@ SES_Base::ProcRetVal SES_Select::proccessIdleSceneRightMouseButtonReleased(
   return PassToParentState;
 }
 
-SES_Base::ProcRetVal SES_Select::proccessIdleSceneDoubleClick(
+SES_Base::ProcRetVal SES_Select::processIdleSceneDoubleClick(
     QGraphicsSceneMouseEvent* mouseEvent, Schematic* schematic) noexcept {
   if (mouseEvent->button() == Qt::LeftButton) {
     // check if there is an element under the mouse
@@ -382,7 +382,7 @@ SES_Base::ProcRetVal SES_Select::processSubStateMovingSceneEvent(
       // abort moving and handle double click
       mSelectedItemsMoveCommand.reset();
       mSubState = SubState_Idle;
-      return proccessIdleSceneDoubleClick(mouseEvent, schematic);
+      return processIdleSceneDoubleClick(mouseEvent, schematic);
     }
 #endif
 

@@ -74,12 +74,12 @@ private:
   ProcRetVal processSubStateIdleSceneEvent(BEE_Base* event) noexcept;
   ProcRetVal processSubStateMoving(BEE_Base* event) noexcept;
   ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
-  ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                        Board& board) noexcept;
-  ProcRetVal proccessIdleSceneRightMouseButtonReleased(
+  ProcRetVal processIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                       Board& board) noexcept;
+  ProcRetVal processIdleSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept;
-  ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                          Board* board) noexcept;
+  ProcRetVal processIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                         Board* board) noexcept;
   bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;

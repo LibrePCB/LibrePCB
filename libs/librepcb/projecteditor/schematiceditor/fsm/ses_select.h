@@ -70,12 +70,12 @@ private:
   ProcRetVal processSubStateIdleSceneEvent(SEE_Base* event) noexcept;
   ProcRetVal processSubStateMoving(SEE_Base* event) noexcept;
   ProcRetVal processSubStateMovingSceneEvent(SEE_Base* event) noexcept;
-  ProcRetVal proccessIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                        Schematic& schematic) noexcept;
-  ProcRetVal proccessIdleSceneRightMouseButtonReleased(
+  ProcRetVal processIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                       Schematic& schematic) noexcept;
+  ProcRetVal processIdleSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent* mouseEvent, Schematic* schematic) noexcept;
-  ProcRetVal proccessIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                          Schematic* schematic) noexcept;
+  ProcRetVal processIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
+                                         Schematic* schematic) noexcept;
   bool       startMovingSelectedItems(Schematic&   schematic,
                                       const Point& startPos) noexcept;
   bool       rotateSelectedItems(const Angle& angle) noexcept;
