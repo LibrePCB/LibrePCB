@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdremoveunusedlibraryelements.h"
 
+#include <librepcb/library/dev/device.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/circuit/circuit.h>
@@ -67,6 +68,17 @@ bool CmdRemoveUnusedLibraryElements::performExecute() {
            mProject.getCircuit().getComponentInstances()) {
     Q_ASSERT(ci);
     usedComponents.insert(&ci->getLibComponent());
+    // Keep pre-selected devices and their packages to ensure they are
+    // available for placing them on boards.
+    if (tl::optional<Uuid> uuid = ci->getDefaultDeviceUuid()) {
+      if (const library::Device* dev = mProject.getLibrary().getDevice(*uuid)) {
+        usedDevices.insert(dev);
+        if (const library::Package* pkg =
+                mProject.getLibrary().getPackage(dev->getPackageUuid())) {
+          usedPackages.insert(pkg);
+        }
+      }
+    }
   }
   foreach (const Board* brd, mProject.getBoards()) {
     Q_ASSERT(brd);

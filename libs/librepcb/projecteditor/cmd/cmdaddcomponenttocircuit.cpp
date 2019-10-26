@@ -24,6 +24,8 @@
 
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
 #include <librepcb/project/circuit/cmd/cmdcomponentinstanceadd.h>
 #include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcb/project/library/projectlibrary.h>
@@ -93,6 +95,50 @@ bool CmdAddComponentToCircuit::performExecute() {
         new CmdProjectLibraryAddElement<library::Component>(
             mProject.getLibrary(), *cmp);
     appendChild(cmdAddToLibrary);  // can throw
+  }
+
+  // If the pre-selected device or its package are not available yet in the
+  // project's library, copy them from the workspace library to the project's
+  // library too to have them available for adding to boards later.
+  if (mDefaultDeviceUuid) {
+    tl::optional<Uuid> pkgUuid;
+    if (const library::Device* prjDev =
+            mProject.getLibrary().getDevice(*mDefaultDeviceUuid)) {
+      pkgUuid = prjDev->getPackageUuid();
+    } else {
+      FilePath devFp =
+          mWorkspace.getLibraryDb().getLatestDevice(*mDefaultDeviceUuid);
+      if (!devFp.isValid()) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString(tr("The device with the UUID \"%1\" does not exist in the "
+                       "workspace library!"))
+                .arg(mDefaultDeviceUuid->toStr()));
+      }
+      library::Device* dev = new library::Device(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(devFp))));
+      pkgUuid = dev->getPackageUuid();
+      appendChild(new CmdProjectLibraryAddElement<library::Device>(
+          mProject.getLibrary(), *dev));  // can throw
+    }
+
+    Q_ASSERT(pkgUuid);
+    if (!mProject.getLibrary().getPackage(*pkgUuid)) {
+      FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(*pkgUuid);
+      if (!pkgFp.isValid()) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString(tr("The package with the UUID \"%1\" does not exist in the "
+                       "workspace library!"))
+                .arg(pkgUuid->toStr()));
+      }
+      library::Package* pkg = new library::Package(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(pkgFp))));
+      appendChild(new CmdProjectLibraryAddElement<library::Package>(
+          mProject.getLibrary(), *pkg));  // can throw
+    }
   }
 
   // create child command to add a new component instance to the circuit

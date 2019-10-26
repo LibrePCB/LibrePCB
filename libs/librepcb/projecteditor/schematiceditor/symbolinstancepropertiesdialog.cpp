@@ -22,17 +22,21 @@
  ******************************************************************************/
 #include "symbolinstancepropertiesdialog.h"
 
+#include "../cmd/cmdremoveunusedlibraryelements.h"
 #include "ui_symbolinstancepropertiesdialog.h"
 
 #include <librepcb/common/attributes/attributetype.h>
 #include <librepcb/common/attributes/attributeunit.h>
+#include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/project/circuit/cmd/cmdcomponentinstanceedit.h>
 #include <librepcb/project/circuit/componentinstance.h>
+#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
 #include <librepcb/project/library/projectlibrary.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
@@ -197,6 +201,9 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
         QString(tr("Change properties of %1")).arg(mSymbol.getName()));
 
     // Component Instance
+    bool               deviceChanged = false;
+    tl::optional<Uuid> newDeviceUuid = Uuid::tryFromString(
+        mUi->cbxPreselectedDevice->currentData().toString());
     QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
         new CmdComponentInstanceEdit(mProject.getCircuit(),
                                      mComponentInstance));
@@ -205,10 +212,66 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
     cmdCmp->setAttributes(mAttributes);
     if (mUi->cbxPreselectedDevice->isEnabled()) {
-      cmdCmp->setDefaultDeviceUuid(Uuid::tryFromString(
-          mUi->cbxPreselectedDevice->currentData().toString()));
+      if (newDeviceUuid != mComponentInstance.getDefaultDeviceUuid()) {
+        cmdCmp->setDefaultDeviceUuid(newDeviceUuid);
+        deviceChanged = true;
+      }
     }
-    transaction.append(cmdCmp.take());
+    transaction.append(cmdCmp.take());  // can throw
+
+    // If the device has changed, update the project library accordingly
+    if (deviceChanged) {
+      // Add the newly selected device and its package to the project library
+      // to ensure they are available when adding to boards later.
+      if (newDeviceUuid) {
+        tl::optional<Uuid> pkgUuid;
+        if (const library::Device* prjDev =
+                mProject.getLibrary().getDevice(*newDeviceUuid)) {
+          pkgUuid = prjDev->getPackageUuid();
+        } else {
+          FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(
+              *newDeviceUuid);  // can throw
+          if (!devFp.isValid()) {
+            throw RuntimeError(
+                __FILE__, __LINE__,
+                QString(
+                    tr("The device with the UUID \"%1\" does not exist in the "
+                       "workspace library!"))
+                    .arg(newDeviceUuid->toStr()));
+          }
+          library::Device* dev =
+              new library::Device(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(
+                      TransactionalFileSystem::openRO(devFp))));  // can throw
+          pkgUuid = dev->getPackageUuid();
+          transaction.append(new CmdProjectLibraryAddElement<library::Device>(
+              mProject.getLibrary(), *dev));  // can throw
+        }
+
+        Q_ASSERT(pkgUuid);
+        if (!mProject.getLibrary().getPackage(*pkgUuid)) {
+          FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(*pkgUuid);
+          if (!pkgFp.isValid()) {
+            throw RuntimeError(
+                __FILE__, __LINE__,
+                QString(
+                    tr("The package with the UUID \"%1\" does not exist in the "
+                       "workspace library!"))
+                    .arg(pkgUuid->toStr()));
+          }
+          library::Package* pkg =
+              new library::Package(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(
+                      TransactionalFileSystem::openRO(pkgFp))));
+          transaction.append(new CmdProjectLibraryAddElement<library::Package>(
+              mProject.getLibrary(), *pkg));  // can throw
+        }
+      }
+
+      // Remove a no longer needed device/package from the project library.
+      transaction.append(
+          new CmdRemoveUnusedLibraryElements(mProject));  // can throw
+    }
 
     // Symbol Instance
     bool mirrored = mUi->cbxMirror->isChecked();
@@ -219,7 +282,7 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
                         false);
     cmdSym->setRotation(mUi->edtSymbInstRotation->getValue(), false);
     cmdSym->setMirrored(mirrored, false);
-    transaction.append(cmdSym.take());
+    transaction.append(cmdSym.take());  // can throw
 
     transaction.commit();  // can throw
     return true;
