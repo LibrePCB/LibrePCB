@@ -243,6 +243,14 @@ void ComponentInstance::setAttributes(
   }
 }
 
+void ComponentInstance::setDefaultDeviceUuid(
+    const tl::optional<Uuid>& device) noexcept {
+  if (device != mDefaultDeviceUuid) {
+    mDefaultDeviceUuid = device;
+    emit attributesChanged();
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
