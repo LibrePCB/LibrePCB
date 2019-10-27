@@ -564,6 +564,15 @@ bool LibraryEditor::closeTab(int index) noexcept {
     return false;
   }
 
+  // Move focus out of the editor widget to enforce updating the "dirty" state
+  // of the editor before closing it. This is needed to make sure the
+  // "save changes?" message box appears if the user just edited some property
+  // of the library element and the focus is still in the property editor
+  // widget. See https://github.com/LibrePCB/LibrePCB/issues/492.
+  if (QWidget* focus = focusWidget()) {
+    focus->clearFocus();
+  }
+
   // Handle closing
   if (widget == mCurrentEditorWidget) {
     setActiveEditorWidget(nullptr);
