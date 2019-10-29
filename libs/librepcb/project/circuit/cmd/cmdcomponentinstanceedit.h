@@ -61,6 +61,7 @@ public:
   void setName(const CircuitIdentifier& name) noexcept;
   void setValue(const QString& value) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
+  void setDefaultDeviceUuid(const tl::optional<Uuid>& device) noexcept;
 
 private:
   // Private Methods
@@ -81,12 +82,14 @@ private:
   ComponentInstance& mComponentInstance;
 
   // Misc
-  CircuitIdentifier mOldName;
-  CircuitIdentifier mNewName;
-  QString           mOldValue;
-  QString           mNewValue;
-  AttributeList     mOldAttributes;
-  AttributeList     mNewAttributes;
+  CircuitIdentifier  mOldName;
+  CircuitIdentifier  mNewName;
+  QString            mOldValue;
+  QString            mNewValue;
+  AttributeList      mOldAttributes;
+  AttributeList      mNewAttributes;
+  tl::optional<Uuid> mOldDefaultDeviceUuid;
+  tl::optional<Uuid> mNewDefaultDeviceUuid;
 };
 
 /*******************************************************************************

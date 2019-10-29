@@ -136,6 +136,15 @@ public:
 
   void setAttributes(const AttributeList& attributes) noexcept;
 
+  /**
+   * @brief Set the default device of the component
+   *
+   * @param device  The new device UUID
+   *
+   * @undocmd{#librepcb#project#CmdComponentInstanceEdit}
+   */
+  void setDefaultDeviceUuid(const tl::optional<Uuid>& device) noexcept;
+
   // General Methods
   void addToCircuit();
   void removeFromCircuit();

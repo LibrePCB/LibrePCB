@@ -47,7 +47,9 @@ CmdComponentInstanceEdit::CmdComponentInstanceEdit(
     mOldValue(cmp.getValue()),
     mNewValue(mOldValue),
     mOldAttributes(cmp.getAttributes()),
-    mNewAttributes(mOldAttributes) {
+    mNewAttributes(mOldAttributes),
+    mOldDefaultDeviceUuid(cmp.getDefaultDeviceUuid()),
+    mNewDefaultDeviceUuid(mOldDefaultDeviceUuid) {
 }
 
 CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept {
@@ -73,6 +75,12 @@ void CmdComponentInstanceEdit::setAttributes(
   mNewAttributes = attributes;
 }
 
+void CmdComponentInstanceEdit::setDefaultDeviceUuid(
+    const tl::optional<Uuid>& device) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDefaultDeviceUuid = device;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -83,6 +91,7 @@ bool CmdComponentInstanceEdit::performExecute() {
   if (mNewName != mOldName) return true;
   if (mNewValue != mOldValue) return true;
   if (mNewAttributes != mOldAttributes) return true;
+  if (mNewDefaultDeviceUuid != mOldDefaultDeviceUuid) return true;
   return false;
 }
 
@@ -90,12 +99,14 @@ void CmdComponentInstanceEdit::performUndo() {
   mCircuit.setComponentInstanceName(mComponentInstance, mOldName);  // can throw
   mComponentInstance.setValue(mOldValue);
   mComponentInstance.setAttributes(mOldAttributes);
+  mComponentInstance.setDefaultDeviceUuid(mOldDefaultDeviceUuid);
 }
 
 void CmdComponentInstanceEdit::performRedo() {
   mCircuit.setComponentInstanceName(mComponentInstance, mNewName);  // can throw
   mComponentInstance.setValue(mNewValue);
   mComponentInstance.setAttributes(mNewAttributes);
+  mComponentInstance.setDefaultDeviceUuid(mNewDefaultDeviceUuid);
 }
 
 /*******************************************************************************

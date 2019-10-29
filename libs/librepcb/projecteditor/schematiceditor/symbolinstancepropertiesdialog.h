@@ -36,6 +36,10 @@ namespace librepcb {
 class UndoStack;
 class UndoCommand;
 
+namespace workspace {
+class Workspace;
+}
+
 namespace project {
 
 class Project;
@@ -63,9 +67,10 @@ public:
   SymbolInstancePropertiesDialog() = delete;
   SymbolInstancePropertiesDialog(const SymbolInstancePropertiesDialog& other) =
       delete;
-  SymbolInstancePropertiesDialog(Project& project, ComponentInstance& cmp,
-                                 SI_Symbol& symbol, UndoStack& undoStack,
-                                 QWidget* parent) noexcept;
+  SymbolInstancePropertiesDialog(workspace::Workspace& ws, Project& project,
+                                 ComponentInstance& cmp, SI_Symbol& symbol,
+                                 UndoStack& undoStack,
+                                 QWidget*   parent) noexcept;
   ~SymbolInstancePropertiesDialog() noexcept;
 
   // Operator Overloadings
@@ -78,6 +83,7 @@ private:  // Methods
   bool applyChanges() noexcept;
 
 private:  // Data
+  workspace::Workspace&                              mWorkspace;
   Project&                                           mProject;
   ComponentInstance&                                 mComponentInstance;
   SI_Symbol&                                         mSymbol;
