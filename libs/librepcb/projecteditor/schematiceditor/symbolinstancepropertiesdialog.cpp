@@ -29,13 +29,17 @@
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/project/circuit/cmd/cmdcomponentinstanceedit.h>
 #include <librepcb/project/circuit/componentinstance.h>
+#include <librepcb/project/library/projectlibrary.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -52,9 +56,10 @@ namespace editor {
  ******************************************************************************/
 
 SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
-    Project& project, ComponentInstance& cmp, SI_Symbol& symbol,
-    UndoStack& undoStack, QWidget* parent) noexcept
+    workspace::Workspace& ws, Project& project, ComponentInstance& cmp,
+    SI_Symbol& symbol, UndoStack& undoStack, QWidget* parent) noexcept
   : QDialog(parent),
+    mWorkspace(ws),
     mProject(project),
     mComponentInstance(cmp),
     mSymbol(symbol),
@@ -74,13 +79,19 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
 
   // Component Library Element Attributes
   QString htmlLink("<a href=\"%1\">%2<a>");
-  mUi->lblCompLibName->setText(htmlLink.arg(
-      mComponentInstance.getLibComponent()
-          .getDirectory()
-          .getAbsPath()
-          .toQUrl()
-          .toString(),
-      *mComponentInstance.getLibComponent().getNames().value(localeOrder)));
+  mUi->lblCompLibName->setText(
+      htmlLink.arg(
+          mComponentInstance.getLibComponent()
+              .getDirectory()
+              .getAbsPath()
+              .toQUrl()
+              .toString(),
+          *mComponentInstance.getLibComponent().getNames().value(localeOrder)) +
+      " (" +
+      QString(tr("symbol variant \"%1\""))
+          .arg(*mComponentInstance.getSymbolVariant().getNames().value(
+              localeOrder)) +
+      ")");
   mUi->lblCompLibName->setToolTip(
       mComponentInstance.getLibComponent().getDescriptions().value(
           localeOrder) +
@@ -89,11 +100,6 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           .getDirectory()
           .getAbsPath()
           .toNative());
-  mUi->lblSymbVarName->setText(
-      *mComponentInstance.getSymbolVariant().getNames().value(localeOrder));
-  mUi->lblSymbVarName->setToolTip(
-      mComponentInstance.getSymbolVariant().getDescriptions().value(
-          localeOrder));
 
   // Symbol Instance Attributes
   mUi->lblSymbInstName->setText(mSymbol.getName());
@@ -109,6 +115,47 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   mUi->lblSymbLibName->setToolTip(
       mSymbol.getLibSymbol().getDescriptions().value(localeOrder) + "<p>" +
       mSymbol.getLibSymbol().getDirectory().getAbsPath().toNative());
+
+  // List Devices
+  try {
+    tl::optional<Uuid> device = mComponentInstance.getDefaultDeviceUuid();
+    // Add devices from project library first (higher priority)
+    QHash<Uuid, library::Device*> prjLibDevices =
+        mProject.getLibrary().getDevicesOfComponent(
+            mComponentInstance.getLibComponent().getUuid());
+    foreach (const library::Device* device, prjLibDevices) {
+      Q_ASSERT(device);
+      QString name = *device->getNames().value(localeOrder);
+      mUi->cbxPreselectedDevice->addItem(name, device->getUuid().toStr());
+    }
+    // Then add remaining devices from workspace library (lower priority)
+    QSet<Uuid> wsLibDevices = mWorkspace.getLibraryDb().getDevicesOfComponent(
+        mComponentInstance.getLibComponent().getUuid());  // can throw
+    wsLibDevices -= prjLibDevices.keys().toSet();         // avoid duplicates
+    foreach (const Uuid& deviceUuid, wsLibDevices) {
+      FilePath devFp =
+          mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);  // can throw
+      if (devFp.isValid()) {
+        QString name;
+        mWorkspace.getLibraryDb().getElementTranslations<library::Device>(
+            devFp, localeOrder, &name);  // can throw
+        mUi->cbxPreselectedDevice->addItem(name, deviceUuid.toStr());
+      }
+    }
+    // If the selected device was not found, show its UUID instead.
+    if ((device) && (!prjLibDevices.contains(*device)) &&
+        (!wsLibDevices.contains(*device))) {
+      mUi->cbxPreselectedDevice->addItem(device->toStr(), device->toStr());
+    }
+    mUi->cbxPreselectedDevice->model()->sort(0, Qt::AscendingOrder);
+    mUi->cbxPreselectedDevice->insertItem(0, "");
+    mUi->cbxPreselectedDevice->setCurrentIndex(
+        device ? mUi->cbxPreselectedDevice->findData(device->toStr()) : 0);
+  } catch (const Exception& e) {
+    // If something went wrong, disable the combobox to avoid breaking something
+    qCritical() << "Could not list devices:" << e.getMsg();
+    mUi->cbxPreselectedDevice->setEnabled(false);
+  }
 
   // set focus to component instance name
   mUi->edtCompInstName->selectAll();
@@ -157,6 +204,10 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
         mUi->edtCompInstName->text().trimmed()));  // can throw
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
     cmdCmp->setAttributes(mAttributes);
+    if (mUi->cbxPreselectedDevice->isEnabled()) {
+      cmdCmp->setDefaultDeviceUuid(Uuid::tryFromString(
+          mUi->cbxPreselectedDevice->currentData().toString()));
+    }
     transaction.append(cmdCmp.take());
 
     // Symbol Instance

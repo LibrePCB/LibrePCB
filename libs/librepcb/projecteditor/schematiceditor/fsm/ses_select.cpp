@@ -459,8 +459,9 @@ bool SES_Select::removeSelectedItems() noexcept {
 }
 
 void SES_Select::openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept {
-  SymbolInstancePropertiesDialog dialog(mProject, symbol.getComponentInstance(),
-                                        symbol, mUndoStack, &mEditor);
+  SymbolInstancePropertiesDialog dialog(mWorkspace, mProject,
+                                        symbol.getComponentInstance(), symbol,
+                                        mUndoStack, &mEditor);
   dialog.exec();
 }
 
