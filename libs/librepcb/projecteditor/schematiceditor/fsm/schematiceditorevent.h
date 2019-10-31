@@ -69,11 +69,11 @@ public:
     Edit_Remove,       ///< remove the selected elements
     // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a
     // QEvent)
-    GraphicsViewEvent,  ///< event from #GraphicsView @see
-                        ///< #project#SEE_RedirectedQEvent
+    GraphicsViewEvent,  ///< event from #librepcb#GraphicsView @see
+                        ///< #librepcb#project#editor#SEE_RedirectedQEvent
     // Special Events (with some additional parameters)
-    StartAddComponent,      ///< @see #project#SEE_StartAddComponent
-    SwitchToSchematicPage,  ///< @see #project#SEE_SwitchToSchematicPage
+    StartAddComponent,      ///< @see #librepcb#project#editor#SEE_StartAddComponent
+    SwitchToSchematicPage,  ///< @see #librepcb#project#editor#SEE_SwitchToSchematicPage
   };
 
   // Constructors / Destructor
@@ -141,7 +141,7 @@ private:
 /**
  * @brief The SEE_StartAddComponent class
  *
- * @see #project#SES_AddComponent
+ * @see #librepcb#project#editor#SES_AddComponent
  */
 class SEE_StartAddComponent final : public SEE_Base {
 public:
@@ -178,7 +178,7 @@ private:
  * or not (event rejected). If the event was accepted, the schematic editor then
  * will switch to the requested schematic page.
  *
- * @see #project#SchematicEditor#setActiveSchematicIndex()
+ * @see #librepcb#project#editor#SchematicEditor#setActiveSchematicIndex()
  */
 class SEE_SwitchToSchematicPage final : public SEE_Base {
 public:

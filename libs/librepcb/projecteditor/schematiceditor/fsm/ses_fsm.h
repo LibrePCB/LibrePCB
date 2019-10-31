@@ -48,10 +48,10 @@ public:
   /// FSM States
   enum State {
     State_NoState,      ///< no state active
-    State_Select,       ///< @see #project#SES_Select
-    State_DrawWire,     ///< @see #project#SES_DrawWire
-    State_AddNetLabel,  ///< @see #project#SES_AddNetLabel
-    State_AddComponent  ///< @see #project#SES_AddComponent
+    State_Select,       ///< @see #librepcb#project#editor#SES_Select
+    State_DrawWire,     ///< @see #librepcb#project#editor#SES_DrawWire
+    State_AddNetLabel,  ///< @see #librepcb#project#editor#SES_AddNetLabel
+    State_AddComponent  ///< @see #librepcb#project#editor#SES_AddComponent
   };
 
   // Constructors / Destructor

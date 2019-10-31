@@ -125,8 +125,7 @@ signals:
    * This signal shows which actions are executed. Or in other words, it shows
    * the current state of the request processing.
    *
-   * @param action                Short description about the current
-   * action/state
+   * @param state       Short description about the current action/state
    */
   void progressState(QString state);
 

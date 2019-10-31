@@ -109,7 +109,7 @@ public:
    * Qt's event loop.
    *
    * @warning This method can be called both from within this class and from
-   * outside this class (for example from the #ControlPanel). But if you call
+   * outside this class (for example from the #librepcb#application#ControlPanel). But if you call
    * this method from outside this class, you may have to delete the object
    *          yourself afterwards! In special cases, the deleteLater() mechanism
    *          could lead in fatal errors otherwise!

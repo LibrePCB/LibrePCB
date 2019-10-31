@@ -59,7 +59,7 @@ class ComponentInstance;
  * @brief   The Circuit class represents all electrical connections in a project
  * (drawed in the schematics)
  *
- * Each #project#Project object contains exactly one #Circuit object which
+ * Each #librepcb#project#Project object contains exactly one #Circuit object which
  * contains the whole electrical components and connections. They are created
  * with the schematic editor and used by the board editor. The whole circuit is
  * saved in the file "circuit.lp" in the project's "circuit" directory.

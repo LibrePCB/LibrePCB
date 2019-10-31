@@ -42,7 +42,7 @@ class Project;
 
 /**
  * @brief The SchematicLayerProvider class provides and manages all available
- * schematic layers which are used in the #project#SchematicEditor class
+ * schematic layers which are used in the #librepcb#project#editor#SchematicEditor class
  */
 class SchematicLayerProvider final : public IF_GraphicsLayerProvider {
 public:

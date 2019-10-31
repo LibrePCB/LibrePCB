@@ -42,7 +42,7 @@ namespace librepcb {
  *
  * For example, this class is used to get the name of the user which is logged
  * in and the hostname of the computer to create a lock file (see class
- * #DirectoryLock).
+ * #librepcb#DirectoryLock).
  *
  * @note Only static methods are available. You cannot create objects of this
  * class.

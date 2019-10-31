@@ -42,7 +42,7 @@ namespace librepcb {
  * @brief This type is the ONLY base type to store all lengths (always in
  * nanometers)!
  *
- * This is the base type of the class #Length.
+ * This is the base type of the class #librepcb#Length.
  *
  * This type is normally a 64bit signed integer. 32bit integers could handle
  * these values also, but is limited to +/-2.147 meters. Maybe this is not
@@ -53,7 +53,7 @@ namespace librepcb {
  * use 32bit integers instead of 64bit integers for all length units (maybe your
  * platform cannot handle 64bit as efficient as 32bit integers).
  *
- * @see #Length
+ * @see #librepcb#Length
  */
 #ifdef USE_32BIT_LENGTH_UNITS
 typedef qint32 LengthBase_t;

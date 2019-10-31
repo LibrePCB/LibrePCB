@@ -74,6 +74,9 @@ public:
    *
    * @param str       A string which can contain variables ("{{NAME}}"). The
    *                  attributes will be substituted directly in this string.
+   * @param ap        A string which can contain variables ("{{NAME}}"). The
+   * @param filter    A string which can contain variables ("{{NAME}}"). The
+   * XXX
    *
    * @return True if str was modified in some way, false if not
    */

@@ -43,10 +43,10 @@ class Point;
  * @brief The LengthUnit class represents a length unit (millimeters,
  * inches,...) and provides some useful methods to make the life easier
  *
- * With this class, lengths (#Length) and points (#Point) can be converted to
+ * With this class, lengths (#librepcb#Length) and points (#librepcb#Point) can be converted to
  * other units.
  *
- * @note    Please note that the classes #Length and #Point do *not* need a
+ * @note    Please note that the classes #librepcb#Length and #librepcb#Point do *not* need a
  * length unit as they represent the values always in nanometers! The class
  * LengthUnit is only needed to show these values in the unit which the user
  * wants, and provides some useful methods to do this.
@@ -115,8 +115,7 @@ public:
    * #getAllUnits().
    *
    * @warning The index of an unit can change between different application
-   * versions! So you must never save/load such an index to/from files. Use
-   * #toString() and #fromString() instead for this purpose.
+   * versions! So you must never save/load such an index to/from files.
    *
    * @return The index
    *

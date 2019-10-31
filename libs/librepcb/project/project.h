@@ -87,9 +87,9 @@ public:
   /**
    * @brief The constructor to open an existing project with all its content
    *
-   * @param filepath      The filepath to the an existing *.lpp project file
-   * @param readOnly      It true, the project will be opened in read-only mode
-   * @param interactive   If true, message boxes may be shown.
+   * XXX
+   * @param directory     The filepath to the an existing *.lpp project file
+   * @param filename      It true, the project will be opened in read-only mode
    *
    * @throw Exception     If the project could not be opened successfully
    */
@@ -449,11 +449,11 @@ private:
   /**
    * @brief The constructor to create or open a project with all its content
    *
-   * @param filepath      The filepath to the new or existing *.lpp project file
+   * XXX
+   * @param directory     The filepath to the new or existing *.lpp project file
+   * @param filename      If true, the project will be opened in read-only mode
    * @param create        True if the specified project does not exist already
    * and must be created.
-   * @param readOnly      If true, the project will be opened in read-only mode
-   * @param interactive   If true, message boxes may be shown.
    *
    * @throw Exception     If the project could not be created/opened
    * successfully
