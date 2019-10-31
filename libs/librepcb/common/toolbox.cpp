@@ -114,10 +114,8 @@ Point Toolbox::nearestPointOnLine(const Point& p, const Point& l1,
   }
 }
 
-Length Toolbox::shortestDistanceBetweenPointAndLine(const Point& p,
-                                                    const Point& l1,
-                                                    const Point& l2,
-                                                    Point* nearest) noexcept {
+UnsignedLength Toolbox::shortestDistanceBetweenPointAndLine(
+    const Point& p, const Point& l1, const Point& l2, Point* nearest) noexcept {
   Point np = nearestPointOnLine(p, l1, l2);
   if (nearest) {
     *nearest = np;
