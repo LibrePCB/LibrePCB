@@ -77,7 +77,7 @@ namespace librepcb {
  * To reach this goal, you need to convert each filepath which comes from
  * outside the application (user input, read from file, ...) immediately into
  * such a well-formatted filepath (make absolute, convert separators, remove
- * redundant entries and so on). Then the filepath can be proccessed by the
+ * redundant entries and so on). Then the filepath can be processed by the
  * application. If a filepath must be printed to outside the application (print
  * to a message box, write to a file, ...), the filepath can be converted (back)
  * to the needed format (maybe "\" instead of "/", maybe relative instead of

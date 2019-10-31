@@ -208,8 +208,11 @@ public:
    *
    * @return The length of this vector (as a Length object)
    */
-  Length getLength() const noexcept {
-    return Length(qSqrt(mX.toNm() * mX.toNm() + mY.toNm() * mY.toNm()));
+  UnsignedLength getLength() const noexcept {
+    LengthBase_t length = static_cast<LengthBase_t>(
+        qSqrt(mX.toNm() * mX.toNm() + mY.toNm() * mY.toNm()));
+    Q_ASSERT(length >= 0);
+    return UnsignedLength(length);
   }
 
   /**

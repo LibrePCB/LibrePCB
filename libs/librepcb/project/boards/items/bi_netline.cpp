@@ -196,6 +196,10 @@ Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept {
   }
 }
 
+UnsignedLength BI_NetLine::getLength() const noexcept {
+  return (mEndPoint->getPosition() - mStartPoint->getPosition()).getLength();
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

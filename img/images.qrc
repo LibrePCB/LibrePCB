@@ -62,6 +62,7 @@
         <file>actions/refresh.png</file>
         <file>actions/rotate_left.png</file>
         <file>actions/rotate_right.png</file>
+        <file>actions/ruler.png</file>
         <file>actions/save.png</file>
         <file>actions/schematic.png</file>
         <file>actions/search.png</file>

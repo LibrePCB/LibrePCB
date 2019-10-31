@@ -121,7 +121,7 @@ public:
    *
    * @return Shortest distance between the given point and the given line (>=0)
    */
-  static Length shortestDistanceBetweenPointAndLine(
+  static UnsignedLength shortestDistanceBetweenPointAndLine(
       const Point& p, const Point& l1, const Point& l2,
       Point* nearest = nullptr) noexcept;
 

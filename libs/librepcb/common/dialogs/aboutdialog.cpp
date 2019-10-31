@@ -84,6 +84,7 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   formatLabelText(mUi->textVersion, true, false);
   formatLabelText(mUi->textLinks, false, true);
   formatLabelText(mUi->textLicense, false, true);
+  formatLabelText(mUi->textIconLicense, false, true);
   formatLabelText(mUi->textContributeFinancially, false, true);
   formatLabelText(mUi->textContributeCode, false, true);
   formatLabelText(mUi->textContributeShare, false, false);

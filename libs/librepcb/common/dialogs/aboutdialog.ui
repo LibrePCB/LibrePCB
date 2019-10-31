@@ -37,7 +37,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../../../../img/images.qrc">:/img/app/librepcb.png</pixmap>
+        <pixmap>:/img/app/librepcb.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -105,7 +105,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tabGeneral">
         <attribute name="title">
@@ -161,6 +161,16 @@
             <widget class="QLabel" name="textLicense">
              <property name="text">
               <string>LibrePCB is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text &lt;a href=&quot;https://github.com/LibrePCB/LibrePCB/blob/master/LICENSE.txt&quot;&gt;in our source code&lt;/a&gt;.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="textIconLicense">
+             <property name="text">
+              <string>Some of the icons used in LibrePCB are provided by &lt;a href=&quot;https://icons8.com&quot;&gt;icons8.com&lt;/a&gt;, thank you!</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -348,8 +358,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

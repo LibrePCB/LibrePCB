@@ -459,19 +459,19 @@ Length CmdRemoveSelectedSchematicItems::getDistanceBetweenNetLabelAndNetSegment(
   bool   firstRun = true;
   Length nearestDistance;
   foreach (const SI_NetPoint* netpoint, netsegment.netpoints) {
-    Length distance =
+    UnsignedLength distance =
         (netpoint->getPosition() - netlabel.getPosition()).getLength();
     if ((distance < nearestDistance) || firstRun) {
-      nearestDistance = distance;
+      nearestDistance = *distance;
       firstRun        = false;
     }
   }
   foreach (const SI_NetLine* netline, netsegment.netlines) {
-    Length distance = Toolbox::shortestDistanceBetweenPointAndLine(
+    UnsignedLength distance = Toolbox::shortestDistanceBetweenPointAndLine(
         netlabel.getPosition(), netline->getStartPoint().getPosition(),
         netline->getEndPoint().getPosition());
     if ((distance < nearestDistance) || firstRun) {
-      nearestDistance = distance;
+      nearestDistance = *distance;
       firstRun        = false;
     }
   }
