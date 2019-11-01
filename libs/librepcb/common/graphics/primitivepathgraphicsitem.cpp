@@ -24,6 +24,7 @@
 
 #include "../toolbox.h"
 
+#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -116,13 +117,23 @@ void PrimitivePathGraphicsItem::paint(QPainter*                       painter,
                                       const QStyleOptionGraphicsItem* option,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
-  if (option->state.testFlag(QStyle::State_Selected)) {
-    painter->setPen(mPenHighlighted);
-    painter->setBrush(mBrushHighlighted);
-  } else {
-    painter->setPen(mPen);
-    painter->setBrush(mBrush);
+
+  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  const bool deviceIsPrinter =
+      (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
+
+  QPen   pen   = isSelected ? mPenHighlighted : mPen;
+  QBrush brush = isSelected ? mBrushHighlighted : mBrush;
+
+  // When printing, enforce a minimum line width to make sure the line will be
+  // visible (too thin lines will not be visible).
+  qreal minPrintLineWidth = Length(100000).toPx();
+  if (deviceIsPrinter && (pen.widthF() < minPrintLineWidth)) {
+    pen.setWidthF(minPrintLineWidth);
   }
+
+  painter->setPen(pen);
+  painter->setBrush(brush);
   painter->drawPath(mPainterPath);
 }
 

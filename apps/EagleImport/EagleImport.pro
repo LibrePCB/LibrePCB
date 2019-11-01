@@ -10,7 +10,7 @@ TARGET = eagle-import
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets xml network
+QT += core widgets xml network printsupport
 
 LIBS += \
     -L$${DESTDIR} \

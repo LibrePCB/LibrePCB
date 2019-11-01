@@ -15,7 +15,7 @@ DEFINES += BUILD_OUTPUT_DIRECTORY="\\\"$${OUTPUT_DIR_ABS}\\\""
 DEFINES += SHARE_DIRECTORY_SOURCE="\\\"$${SHARE_DIR_ABS}\\\""
 DEFINES += GIT_COMMIT_SHA="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" rev-parse --verify HEAD)\\\""
 
-QT += core widgets xml opengl network sql
+QT += core widgets xml opengl network sql printsupport
 
 CONFIG += staticlib
 
