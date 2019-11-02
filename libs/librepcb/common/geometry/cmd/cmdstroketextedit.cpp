@@ -158,13 +158,39 @@ void CmdStrokeTextEdit::setMirrored(bool mirrored, bool immediate) noexcept {
   if (immediate) mText.setMirrored(mNewMirrored);
 }
 
-void CmdStrokeTextEdit::mirror(Qt::Orientation orientation, const Point& center,
-                               bool immediate) noexcept {
+void CmdStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
+                                       const Point&    center,
+                                       bool            immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPosition.mirror(orientation, center);
+  if (orientation == Qt::Horizontal) {
+    mNewRotation = Angle::deg180() - mNewRotation;
+    mNewAlign.mirrorV();
+  } else {
+    mNewRotation = -mNewRotation;
+    mNewAlign.mirrorH();
+  }
+  if (immediate) {
+    mText.setPosition(mNewPosition);
+    mText.setRotation(mNewRotation);
+    mText.setAlign(mNewAlign);
+  }
+}
+
+void CmdStrokeTextEdit::mirrorLayer(bool immediate) noexcept {
   setLayerName(
       GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
       immediate);
   setMirrored(!mNewMirrored, immediate);
-  setPosition(mNewPosition.mirrored(orientation, center), immediate);
+
+  // Changing the mirror property inverts the rotation and alignment. To keep
+  // rotation and alignment, invert them manually too.
+  mNewRotation = Angle::deg180() - mNewRotation;
+  mNewAlign.mirrorV();
+  if (immediate) {
+    mText.setRotation(mNewRotation);
+    mText.setAlign(mNewAlign);
+  }
 }
 
 void CmdStrokeTextEdit::setAutoRotate(bool autoRotate,

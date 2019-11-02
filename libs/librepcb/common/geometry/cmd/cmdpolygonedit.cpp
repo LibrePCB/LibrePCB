@@ -101,12 +101,16 @@ void CmdPolygonEdit::rotate(const Angle& angle, const Point& center,
   setPath(mNewPath.rotated(angle, center), immediate);
 }
 
-void CmdPolygonEdit::mirror(Qt::Orientation orientation, const Point& center,
-                            bool immediate) noexcept {
+void CmdPolygonEdit::mirrorGeometry(Qt::Orientation orientation,
+                                    const Point&    center,
+                                    bool            immediate) noexcept {
+  setPath(mNewPath.mirrored(orientation, center), immediate);
+}
+
+void CmdPolygonEdit::mirrorLayer(bool immediate) noexcept {
   setLayerName(
       GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
       immediate);
-  setPath(mNewPath.mirrored(orientation, center), immediate);
 }
 
 /*******************************************************************************
