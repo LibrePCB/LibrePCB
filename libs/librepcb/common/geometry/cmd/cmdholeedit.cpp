@@ -73,6 +73,13 @@ void CmdHoleEdit::rotate(const Angle& angle, const Point& center,
   if (immediate) mHole.setPosition(mNewPosition);
 }
 
+void CmdHoleEdit::mirror(Qt::Orientation orientation, const Point& center,
+                         bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPosition.mirror(orientation, center);
+  if (immediate) mHole.setPosition(mNewPosition);
+}
+
 void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
                               bool                  immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

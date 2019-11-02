@@ -116,6 +116,24 @@ void CmdTextEdit::rotate(const Angle& angle, const Point& center,
   }
 }
 
+void CmdTextEdit::mirror(Qt::Orientation orientation, const Point& center,
+                         bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPosition.mirror(orientation, center);
+  if (orientation == Qt::Horizontal) {
+    mNewRotation = Angle::deg180() - mNewRotation;
+    mNewAlign.mirrorV();
+  } else {
+    mNewRotation = -mNewRotation;
+    mNewAlign.mirrorH();
+  }
+  if (immediate) {
+    mText.setPosition(mNewPosition);
+    mText.setRotation(mNewRotation);
+    mText.setAlign(mNewAlign);
+  }
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

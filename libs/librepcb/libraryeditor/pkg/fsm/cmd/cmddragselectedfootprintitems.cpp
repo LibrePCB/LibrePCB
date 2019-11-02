@@ -55,7 +55,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     mContext(context),
     mCenterPos(0, 0),
     mDeltaPos(0, 0),
-    mDeltaRot(0) {
+    mDeltaRot(0),
+    mMirroredGeometry(false),
+    mMirroredLayer(false) {
   Q_ASSERT(context.currentFootprint && context.currentGraphicsItem);
 
   int count = 0;
@@ -166,12 +168,41 @@ void CmdDragSelectedFootprintItems::rotate(const Angle& angle) noexcept {
   mDeltaRot += angle;
 }
 
+void CmdDragSelectedFootprintItems::mirrorGeometry(
+    Qt::Orientation orientation) noexcept {
+  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+    cmd->mirror(orientation, mCenterPos, true);
+  }
+  mMirroredGeometry = !mMirroredGeometry;
+}
+
+void CmdDragSelectedFootprintItems::mirrorLayer() noexcept {
+  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) { cmd->mirrorLayer(true); }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->mirrorLayer(true); }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) { cmd->mirrorLayer(true); }
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) { cmd->mirrorLayer(true); }
+  mMirroredLayer = !mMirroredLayer;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
 bool CmdDragSelectedFootprintItems::performExecute() {
-  if (mDeltaPos.isOrigin() && (mDeltaRot == 0)) {
+  if (mDeltaPos.isOrigin() && (mDeltaRot == 0) && (!mMirroredGeometry) &&
+      (!mMirroredLayer)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;

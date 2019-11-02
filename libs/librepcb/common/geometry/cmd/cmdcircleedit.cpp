@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "cmdcircleedit.h"
 
+#include <librepcb/common/graphics/graphicslayer.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -112,6 +114,22 @@ void CmdCircleEdit::rotate(const Angle& angle, const Point& center,
   if (immediate) {
     mCircle.setCenter(mNewCenter);
   }
+}
+
+void CmdCircleEdit::mirrorGeometry(Qt::Orientation orientation,
+                                   const Point&    center,
+                                   bool            immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewCenter.mirror(orientation, center);
+  if (immediate) {
+    mCircle.setCenter(mNewCenter);
+  }
+}
+
+void CmdCircleEdit::mirrorLayer(bool immediate) noexcept {
+  setLayerName(
+      GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
+      immediate);
 }
 
 /*******************************************************************************

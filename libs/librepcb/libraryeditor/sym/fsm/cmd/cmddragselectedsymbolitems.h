@@ -65,6 +65,7 @@ public:
   void setDeltaToStartPos(const Point& delta) noexcept;
   void translate(const Point& deltaPos) noexcept;
   void rotate(const Angle& angle) noexcept;
+  void mirror(Qt::Orientation orientation) noexcept;
 
   // Operator Overloadings
   CmdDragSelectedSymbolItems& operator=(const CmdDragSelectedSymbolItems& rhs) =
@@ -83,6 +84,7 @@ private:
   Point                             mCenterPos;
   Point                             mDeltaPos;
   Angle                             mDeltaRot;
+  bool                              mMirrored;
 
   // Move commands
   QList<CmdSymbolPinEdit*> mPinEditCmds;
