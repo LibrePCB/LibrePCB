@@ -272,7 +272,7 @@ BES_Base::ProcRetVal BES_AddStrokeText::processFlipEvent(
   if (!board) return PassToParentState;
 
   if (mEditCmd && mText) {
-    mEditCmd->mirror(mText->getPosition(), orientation, true);
+    mEditCmd->mirror(orientation, mText->getPosition(), true);
 
     // update toolbar widgets
     mLayerComboBox->setCurrentLayer(mText->getText().getLayerName());

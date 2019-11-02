@@ -66,7 +66,7 @@ public:
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void setMirrored(bool mirrored, bool immediate) noexcept;
-  void mirror(const Point& center, Qt::Orientation orientation,
+  void mirror(Qt::Orientation orientation, const Point& center,
               bool immediate) noexcept;
   void setAutoRotate(bool autoRotate, bool immediate) noexcept;
 

@@ -103,7 +103,7 @@ void CmdDeviceInstanceEditAll::mirror(const Point&    center,
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->mirror(center, orientation, immediate);  // can throw
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
-    cmd->mirror(center, orientation, immediate);
+    cmd->mirror(orientation, center, immediate);
   }
 }
 

@@ -158,7 +158,7 @@ void CmdStrokeTextEdit::setMirrored(bool mirrored, bool immediate) noexcept {
   if (immediate) mText.setMirrored(mNewMirrored);
 }
 
-void CmdStrokeTextEdit::mirror(const Point& center, Qt::Orientation orientation,
+void CmdStrokeTextEdit::mirror(Qt::Orientation orientation, const Point& center,
                                bool immediate) noexcept {
   setLayerName(
       GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
