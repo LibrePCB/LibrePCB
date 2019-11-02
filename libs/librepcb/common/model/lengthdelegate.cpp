@@ -71,6 +71,14 @@ QWidget* LengthDelegate::createEditor(QWidget*                    parent,
   edt->setUnit(mUnit);
   edt->setValue(index.data(Qt::EditRole).value<Length>());
   edt->selectAll();
+
+  // Manually close the editor if editing is finished, because for some reason
+  // the view does not receive the "focus out" event from our own editor widget.
+  // Queued connection is needed to avoid receiving the "enter pressed" key
+  // event if editing was finished by pressing enter.
+  connect(edt, &LengthEdit::editingFinished, this,
+          &LengthDelegate::editingFinished, Qt::QueuedConnection);
+
   return edt;
 }
 
@@ -91,6 +99,16 @@ void LengthDelegate::updateEditorGeometry(QWidget*                    editor,
                                           const QModelIndex& index) const {
   Q_UNUSED(index);
   editor->setGeometry(option.rect);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void LengthDelegate::editingFinished() noexcept {
+  LengthEdit* edt = static_cast<LengthEdit*>(sender());
+  commitData(edt);
+  closeEditor(edt);
 }
 
 /*******************************************************************************

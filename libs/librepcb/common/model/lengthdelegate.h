@@ -67,6 +67,9 @@ public:
   // Operator Overloadings
   LengthDelegate& operator=(const LengthDelegate& rhs) = delete;
 
+private:  // Methods
+  void editingFinished() noexcept;
+
 private:  // Data
   LengthUnit mUnit;
 };
