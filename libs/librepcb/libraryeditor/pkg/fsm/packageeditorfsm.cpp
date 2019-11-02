@@ -39,6 +39,7 @@
 #include <librepcb/common/graphics/primitivetextgraphicsitem.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -136,7 +137,8 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
         &qApp->getDefaultStrokeFont());
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        *mContext.currentFootprint, mContext.layerProvider));
+        *mContext.currentFootprint, mContext.layerProvider,
+        &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();
     mContext.graphicsView.setEnabled(true);

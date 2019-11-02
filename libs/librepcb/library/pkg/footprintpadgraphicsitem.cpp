@@ -26,10 +26,10 @@
 
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/primitivepathgraphicsitem.h>
+#include <librepcb/common/graphics/primitivetextgraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
-//#include <librepcb/common/graphics/primitivetextgraphicsitem.h>
 
 /*******************************************************************************
  *  Namespace
@@ -43,13 +43,14 @@ namespace library {
 
 FootprintPadGraphicsItem::FootprintPadGraphicsItem(
     FootprintPad& pad, const IF_GraphicsLayerProvider& lp,
-    QGraphicsItem* parent) noexcept
+    const PackagePadList* packagePadList, QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mPad(pad),
     mLayerProvider(lp),
-    mPathGraphicsItem(new PrimitivePathGraphicsItem(this)) /*,
-     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this))*/
-{
+    mPackagePadList(packagePadList),
+    mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
+    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mOnPadsEditedSlot(*this, &FootprintPadGraphicsItem::packagePadListEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, false);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(10);
@@ -57,14 +58,25 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
   // path properties
   mPathGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  // pin properties
+  // text properties
+  mTextGraphicsItem->setHeight(PositiveLength(1000000));
+  mTextGraphicsItem->setAlignment(
+      Alignment(HAlign::center(), VAlign::center()));
+
+  // pad properties
   setPosition(mPad.getPosition());
   setRotation(mPad.getRotation());
   setShape(mPad.toQPainterPathPx());
   setLayerName(mPad.getLayerName());
+  setPackagePadUuid(mPad.getPackagePadUuid());
 
   // register to the pad to get attribute updates
   mPad.registerGraphicsItem(*this);
+
+  // register to the package pad list to get notified about updates
+  if (mPackagePadList) {
+    mPackagePadList->onEdited.attach(mOnPadsEditedSlot);
+  }
 }
 
 FootprintPadGraphicsItem::~FootprintPadGraphicsItem() noexcept {
@@ -85,22 +97,28 @@ void FootprintPadGraphicsItem::setRotation(const Angle& rot) noexcept {
 
 void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
   mPathGraphicsItem->setPath(shape);
-  // mTextGraphicsItem->setHeight(Length::fromPx(shape.boundingRect().height()));
+  updateTextHeight();
 }
 
 void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
   mPathGraphicsItem->setFillLayer(mLayerProvider.getLayer(name));
-  // mTextGraphicsItem->setLayer(mLayerProvider.getLayer(id));
+  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
 }
 
-/*void FootprintPadGraphicsItem::setName(const QString& name) noexcept
-{
-    mTextGraphicsItem->setText(name);
-}*/
+void FootprintPadGraphicsItem::setPackagePadUuid(const Uuid& uuid) noexcept {
+  QString name;
+  if (mPackagePadList) {
+    if (std::shared_ptr<const PackagePad> pad = mPackagePadList->find(uuid)) {
+      name = *pad->getName();
+    }
+  }
+  mTextGraphicsItem->setText(name);
+  updateTextHeight();
+}
 
 void FootprintPadGraphicsItem::setSelected(bool selected) noexcept {
   mPathGraphicsItem->setSelected(selected);
-  // mTextGraphicsItem->setSelected(selected);
+  mTextGraphicsItem->setSelected(selected);
   QGraphicsItem::setSelected(selected);
 }
 
@@ -118,6 +136,30 @@ void FootprintPadGraphicsItem::paint(QPainter*                       painter,
   Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void FootprintPadGraphicsItem::packagePadListEdited(
+    const PackagePadList& list, int index,
+    const std::shared_ptr<const PackagePad>& pad,
+    PackagePadList::Event                    event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(pad);
+  Q_UNUSED(event);
+  setPackagePadUuid(mPad.getPackagePadUuid());
+}
+
+void FootprintPadGraphicsItem::updateTextHeight() noexcept {
+  QRectF padRect     = mPathGraphicsItem->boundingRect();
+  QRectF textRect    = mTextGraphicsItem->boundingRect();
+  qreal  heightRatio = textRect.height() / padRect.height();
+  qreal  widthRatio  = textRect.width() / padRect.width();
+  qreal  ratio       = qMax(heightRatio, widthRatio);
+  mTextGraphicsItem->setScale(1.0 / ratio);
 }
 
 /*******************************************************************************
