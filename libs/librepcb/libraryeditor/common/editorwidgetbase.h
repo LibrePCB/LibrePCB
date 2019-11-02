@@ -100,6 +100,7 @@ public:
   const FilePath& getFilePath() const noexcept { return mFilePath; }
   bool            isDirty() const noexcept { return !mUndoStack->isClean(); }
   virtual bool    hasGraphicalEditor() const noexcept { return false; }
+  virtual bool    supportsFlip() const noexcept { return false; }
 
   // Setters
   virtual void setUndoStackActionGroup(UndoStackActionGroup* group) noexcept;
@@ -116,6 +117,8 @@ public slots:
   virtual bool paste() noexcept { return false; }
   virtual bool rotateCw() noexcept { return false; }
   virtual bool rotateCcw() noexcept { return false; }
+  virtual bool mirror() noexcept { return false; }
+  virtual bool flip() noexcept { return false; }
   virtual bool remove() noexcept { return false; }
   virtual bool zoomIn() noexcept { return false; }
   virtual bool zoomOut() noexcept { return false; }

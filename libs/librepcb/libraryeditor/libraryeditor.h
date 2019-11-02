@@ -135,6 +135,8 @@ private:  // GUI Event Handlers
   void pasteTriggered() noexcept;
   void rotateCwTriggered() noexcept;
   void rotateCcwTriggered() noexcept;
+  void mirrorTriggered() noexcept;
+  void flipTriggered() noexcept;
   void removeTriggered() noexcept;
   void abortCommandTriggered() noexcept;
   void zoomInTriggered() noexcept;
