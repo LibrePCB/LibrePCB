@@ -77,6 +77,15 @@ bool BGI_Via::isSelectable() const noexcept {
 void BGI_Via::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
+  const GraphicsLayer* focusedLayer
+      = mVia.getBoard().getLayerStack().getFocusedLayer();
+  if (focusedLayer && mVia.isOnLayer(focusedLayer->getName())){
+    setZValue(Board::ZValue_FocusedLayer);
+  }
+  else{
+    setZValue(Board::ZValue_Vias);
+  }
+
   setToolTip(*mVia.getNetSignalOfNetSegment().getName());
 
   mViaLayer            = getLayer(GraphicsLayer::sBoardViasTht);
@@ -118,6 +127,74 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->drawPath(mStopMask);
   }
 
+  const GraphicsLayer* focusedLayer
+      = mVia.getBoard().getLayerStack().getFocusedLayer();
+  if (focusedLayer == nullptr){
+    if (mViaLayer && mViaLayer->isVisible()) {
+      // draw via
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mViaLayer->getColor(highlight));
+      painter->drawPath(mCopper);
+
+      // draw netsignal name
+      painter->setFont(mFont);
+      painter->setPen(mViaLayer->getColor(highlight).lighter(150));
+      painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                        *netsignal.getName());
+    }
+  }
+  else if (mVia.isOnLayer(focusedLayer->getName())){
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(focusedLayer->getColor(highlight));
+    painter->drawPath(mCopper);
+
+    // draw netsignal name
+    painter->setFont(mFont);
+    painter->setPen(focusedLayer->getColor(highlight).lighter(150));
+    painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                      *netsignal.getName());
+  }
+  else{
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(GraphicsLayer::sUnfocused);
+    painter->drawPath(mCopper);
+
+    // draw netsignal name
+//    painter->setFont(mFont);
+//    painter->setPen(layer->getColor(highlight).lighter(150));
+//    painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+//                      *netsignal.getName());
+  }
+/*
+  int startIndex = mVia.getStartLayerIndex();
+  int stopIndex = mVia.getStopLayerIndex();
+  for (int i = startIndex; i <= stopIndex; ++i){
+    GraphicsLayer* layer;
+    if (i == 0){
+      layer = mVia.getStartLayer();
+    }
+    else if (i == stopIndex){
+      layer = mVia.getStopLayer();
+    }
+    else{
+      QString innerLayerName = GraphicsLayer::getInnerLayerName(i);
+      layer = mVia.getBoard().getLayerStack().getLayer(innerLayerName);
+    }
+    if (layer && layer->isVisible()) {
+      // draw via
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(layer->getColor(highlight));
+      painter->drawPath(mCopper);
+
+      // draw netsignal name
+      painter->setFont(mFont);
+      painter->setPen(layer->getColor(highlight).lighter(150));
+      painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                        *netsignal.getName());
+      break;
+    }
+  }*/
+/*
   if (mViaLayer && mViaLayer->isVisible()) {
     // draw via
     painter->setPen(Qt::NoPen);
@@ -129,7 +206,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->setPen(mViaLayer->getColor(highlight).lighter(150));
     painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
                       *netsignal.getName());
-  }
+  }*/
 
   if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
     // draw top stop mask

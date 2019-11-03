@@ -76,10 +76,18 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept {
   mShape        = QPainterPath();
 
   // set Z value
-  if (mFootprint.getIsMirrored())
-    setZValue(Board::ZValue_FootprintsBottom);
-  else
-    setZValue(Board::ZValue_FootprintsTop);
+  const GraphicsLayer* focusedLayer
+      = mFootprint.getBoard().getLayerStack().getFocusedLayer();
+  GraphicsLayer* footprintLayer = getLayer(GraphicsLayer::sTopCopper);
+  if (focusedLayer && focusedLayer == footprintLayer){
+    setZValue(Board::ZValue_FocusedLayer);
+  }
+  else{
+    if (mFootprint.getIsMirrored())
+      setZValue(Board::ZValue_FootprintsBottom);
+    else
+      setZValue(Board::ZValue_FootprintsTop);
+  }
 
   // cross rect
   layer = getLayer(GraphicsLayer::sTopReferences);
@@ -131,12 +139,22 @@ void BGI_Footprint::paint(QPainter*                       painter,
   const bool           deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
+  const GraphicsLayer* focusedLayer
+      = mFootprint.getBoard().getLayerStack().getFocusedLayer();
+
   // draw all polygons
   for (const Polygon& polygon : mLibFootprint.getPolygons()) {
     // get layer
     layer = getLayer(*polygon.getLayerName());
     if (!layer) continue;
-    if (!layer->isVisible()) continue;
+    bool skip = false;
+    if (focusedLayer == nullptr){
+      skip = !layer->isVisible();
+    }
+    else{
+      skip = layer->isCopperLayer() != (layer != focusedLayer);
+    }
+    if (skip) continue;
 
     // set pen
     painter->setPen(QPen(layer->getColor(selected),
@@ -168,7 +186,14 @@ void BGI_Footprint::paint(QPainter*                       painter,
     // get layer
     layer = getLayer(*circle.getLayerName());
     if (!layer) continue;
-    if (!layer->isVisible()) continue;
+    bool skip = false;
+    if (focusedLayer == nullptr){
+      skip = !layer->isVisible();
+    }
+    else{
+      skip = layer->isCopperLayer() != (layer != focusedLayer);
+    }
+    if (skip) continue;
 
     // set pen
     painter->setPen(QPen(layer->getColor(selected),

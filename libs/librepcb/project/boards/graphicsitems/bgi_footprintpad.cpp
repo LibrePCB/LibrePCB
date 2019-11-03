@@ -86,11 +86,18 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   // set Z value
-  if ((mLibPad.getBoardSide() == library::FootprintPad::BoardSide::BOTTOM) !=
-      mPad.getIsMirrored()) {
-    setZValue(Board::ZValue_FootprintPadsBottom);
-  } else {
-    setZValue(Board::ZValue_FootprintPadsTop);
+  const GraphicsLayer* focusedLayer
+      = mPad.getBoard().getLayerStack().getFocusedLayer();
+  if (focusedLayer && mPad.isOnLayer(focusedLayer->getName())){
+    setZValue(Board::ZValue_FocusedLayer);
+  }
+  else{
+    if ((mLibPad.getBoardSide() == library::FootprintPad::BoardSide::BOTTOM) !=
+        mPad.getIsMirrored()) {
+      setZValue(Board::ZValue_FootprintPadsBottom);
+    } else {
+      setZValue(Board::ZValue_FootprintPadsTop);
+    }
   }
 
   // set layers
@@ -147,44 +154,71 @@ void BGI_FootprintPad::paint(QPainter*                       painter,
   bool             highlight =
       mPad.isSelected() || (netsignal && netsignal->isHighlighted());
 
-  if (mBottomCreamMaskLayer && mBottomCreamMaskLayer->isVisible()) {
-    // draw bottom cream mask
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mBottomCreamMaskLayer->getColor(highlight));
-    painter->drawPath(mCreamMask);
+  const GraphicsLayer* focusedLayer
+      = mPad.getBoard().getLayerStack().getFocusedLayer();
+  if (mBottomCreamMaskLayer){
+    if ((mBottomCreamMaskLayer->isVisible() && focusedLayer == nullptr)
+        || focusedLayer == mBottomCreamMaskLayer) {
+      // draw bottom cream mask
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mBottomCreamMaskLayer->getColor(highlight));
+      painter->drawPath(mCreamMask);
+    }
   }
 
-  if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
-    // draw bottom stop mask
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
-    painter->drawPath(mStopMask);
+  if (mBottomStopMaskLayer){
+    if ((mBottomStopMaskLayer->isVisible() && focusedLayer == nullptr)
+        || focusedLayer == mBottomStopMaskLayer) {
+      // draw bottom stop mask
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
+      painter->drawPath(mStopMask);
+    }
   }
 
-  if (mPadLayer && mPadLayer->isVisible()) {
-    // draw pad
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mPadLayer->getColor(highlight));
-    painter->drawPath(mCopper);
-    // draw pad text
-    painter->setFont(mFont);
-    painter->setPen(mPadLayer->getColor(highlight).lighter(150));
-    painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
-                      mPad.getDisplayText());
+  if (mPadLayer){
+    if (focusedLayer && focusedLayer != mPadLayer){
+      // draw pad
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(GraphicsLayer::sUnfocused);
+      painter->drawPath(mCopper);
+      // draw pad text
+      painter->setFont(mFont);
+      painter->setPen(GraphicsLayer::sUnfocused.lighter(150));
+      painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                        mPad.getDisplayText());
+    }
+    else if (mPadLayer->isVisible()) {
+      // draw pad
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mPadLayer->getColor(highlight));
+      painter->drawPath(mCopper);
+      // draw pad text
+      painter->setFont(mFont);
+      painter->setPen(mPadLayer->getColor(highlight).lighter(150));
+      painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                        mPad.getDisplayText());
+    }
   }
 
-  if (mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
-    // draw top stop mask
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mTopStopMaskLayer->getColor(highlight));
-    painter->drawPath(mStopMask);
+  if (mTopStopMaskLayer){
+    if ((mTopStopMaskLayer->isVisible() && focusedLayer == nullptr)
+        || focusedLayer == mTopStopMaskLayer) {
+      // draw top stop mask
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mTopStopMaskLayer->getColor(highlight));
+      painter->drawPath(mStopMask);
+    }
   }
 
-  if (mTopCreamMaskLayer && mTopCreamMaskLayer->isVisible()) {
-    // draw top cream mask
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mTopCreamMaskLayer->getColor(highlight));
-    painter->drawPath(mCreamMask);
+  if (mTopCreamMaskLayer){
+    if ((mTopCreamMaskLayer->isVisible() && focusedLayer == nullptr)
+        || focusedLayer == mTopCreamMaskLayer) {
+      // draw top cream mask
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mTopCreamMaskLayer->getColor(highlight));
+      painter->drawPath(mCreamMask);
+    }
   }
 
 #ifdef QT_DEBUG

@@ -115,6 +115,7 @@ public:
     ZValue_TextsTop,  ///< Z value for librepcb::project::BI_StrokeText items
     ZValue_Vias,      ///< Z value for librepcb::project::BI_Via items
     ZValue_Texts,     ///< Z value for librepcb::project::BI_StrokeText items
+    ZValue_FocusedLayer,  ///< Z value for focused layer
     ZValue_AirWires,  ///< Z value for librepcb::project::BI_AirWire items
   };
 

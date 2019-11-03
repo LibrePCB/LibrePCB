@@ -148,6 +148,11 @@ bool BES_DrawPlane::entry(BEE_Base* event) noexcept {
   // change the cursor
   mEditorGraphicsView.setCursor(Qt::CrossCursor);
 
+  // Focus layer
+  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+  GraphicsLayer* focusedLayer = layerStack->getLayer(*mCurrentLayerName);
+  mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(focusedLayer, true);
+
   return true;
 }
 
@@ -369,6 +374,11 @@ void BES_DrawPlane::layerComboBoxLayerChanged(
     mCmdEditCurrentPlane->setLayerName(mCurrentLayerName, true);
     makeSelectedLayerVisible();
   }
+
+  // Focus layer
+  BoardLayerStack* layerStack = &mEditor.getActiveBoard()->getLayerStack();
+  GraphicsLayer* focusedLayer = layerStack->getLayer(*mCurrentLayerName);
+  mEditor.getActiveBoard()->getLayerStack().setFocusedLayer(focusedLayer, true);
 }
 
 void BES_DrawPlane::makeSelectedLayerVisible() noexcept {

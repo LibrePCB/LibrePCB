@@ -67,7 +67,14 @@ bool BGI_Plane::isSelectable() const noexcept {
 void BGI_Plane::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
-  setZValue(getZValueOfCopperLayer(*mPlane.getLayerName()));
+  const GraphicsLayer* focusedLayer
+      = mPlane.getBoard().getLayerStack().getFocusedLayer();
+  if (focusedLayer && focusedLayer == mLayer){
+    setZValue(Board::ZValue_FocusedLayer);
+  }
+  else{
+    setZValue(getZValueOfCopperLayer(*mPlane.getLayerName()));
+  }
 
   mLayer = getLayer(*mPlane.getLayerName());
 
@@ -103,7 +110,20 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
       option->levelOfDetailFromTransform(painter->worldTransform());
   Q_UNUSED(option);
 
-  if (mLayer && mLayer->isVisible()) {
+  const GraphicsLayer* focusedLayer
+      = mPlane.getBoard().getLayerStack().getFocusedLayer();
+  if (focusedLayer && focusedLayer != mLayer){
+    // draw outline
+    painter->setPen(QPen(GraphicsLayer::sUnfocused, 3 / lod, Qt::DashLine, Qt::RoundCap));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPath(mOutline);
+
+    // draw plane
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(GraphicsLayer::sUnfocused);
+    foreach (const QPainterPath& area, mAreas) { painter->drawPath(area); }
+  }
+  else if (mLayer && mLayer->isVisible()) {
     // draw outline
     painter->setPen(
         QPen(mLayer->getColor(selected), 3 / lod, Qt::DashLine, Qt::RoundCap));

@@ -45,7 +45,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
     mPosition(other.mPosition),
     mShape(other.mShape),
     mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter) {
+    mDrillDiameter(other.mDrillDiameter),
+    mStartLayerName(other.mStartLayerName),
+    mStopLayerName(other.mStopLayerName) {
   init();
 }
 
@@ -56,7 +58,15 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
     mPosition(node.getChildByPath("position")),
     mShape(node.getValueByPath<Shape>("shape")),
     mSize(node.getValueByPath<PositiveLength>("size")),
-    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")) {
+    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")),
+    mStartLayerName(GraphicsLayer::sTopCopper),
+    mStopLayerName(GraphicsLayer::sBotCopper) {
+  if (node.tryGetChildByPath("position")) {
+    mPosition = Point(node.getChildByPath("position"));
+  } else {
+    // backward compatibility, remove this some time!
+    mPosition = Point(node.getChildByPath("pos"));
+  }
   init();
 }
 
@@ -68,7 +78,9 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
     mPosition(position),
     mShape(shape),
     mSize(size),
-    mDrillDiameter(drillDiameter) {
+    mDrillDiameter(drillDiameter),
+    mStartLayerName(GraphicsLayer::sTopCopper),
+    mStopLayerName(GraphicsLayer::sBotCopper) {
   init();
 }
 
@@ -127,6 +139,24 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept {
   p.addEllipse(QPointF(0, 0), mDrillDiameter->toPx() / 2,
                mDrillDiameter->toPx() / 2);
   return p;
+}
+
+int BI_Via::getStartLayerIndex() const noexcept {
+  if (getStartLayer()->isTopLayer()){
+    return 0;
+  }
+  else{
+    return getStartLayer()->getInnerLayerNumber();
+  }
+}
+
+int BI_Via::getStopLayerIndex() const noexcept {
+  if (getStopLayer()->isBottomLayer()){
+    return mBoard.getLayerStack().getInnerLayerCount() + 1;
+  }
+  else{
+    return getStopLayer()->getInnerLayerNumber();
+  }
 }
 
 /*******************************************************************************

@@ -79,8 +79,13 @@ public:
     return nullptr;
   }
 
+  const GraphicsLayer* getFocusedLayer() const noexcept {
+    return mFocusedLayer;
+  }
+
   // Setters
   void setInnerLayerCount(int count) noexcept;
+  void setFocusedLayer(GraphicsLayer* layer, bool editorCommand) noexcept;
 
   // General Methods
 
@@ -89,6 +94,10 @@ public:
 
   // Operator Overloadings
   BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
+
+signals:
+  // editorCommand endicates, that change was triggered by tool commands
+  void layerFocusChanged(GraphicsLayer* layer, bool editorCommand);
 
 private slots:
   void layerAttributesChanged() noexcept;
@@ -103,6 +112,7 @@ private:
   Board& mBoard;  ///< A reference to the Board object (from the ctor)
   QList<GraphicsLayer*> mLayers;
   bool                  mLayersChanged;
+  GraphicsLayer*        mFocusedLayer;
 
   // Settings
   int mInnerLayerCount;

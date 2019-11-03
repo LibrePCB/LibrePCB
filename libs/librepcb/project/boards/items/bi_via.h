@@ -27,6 +27,8 @@
 #include "./bi_netline.h"
 #include "bi_base.h"
 
+#include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/uuid.h>
@@ -73,6 +75,21 @@ public:
     return mDrillDiameter;
   }
   const PositiveLength& getSize() const noexcept { return mSize; }
+  GraphicsLayer* getStartLayer() const noexcept {
+    return mBoard.getLayerStack().getLayer(GraphicsLayer::sTopCopper);
+  }
+  GraphicsLayer* getStopLayer() const noexcept {
+    return mBoard.getLayerStack().getLayer(GraphicsLayer::sBotCopper);
+  }
+  const QString&        getStartLayerName() const noexcept {
+    return *mStartLayerName;
+  }
+  const QString&        getStopLayerName() const noexcept {
+    return *mStopLayerName;
+  }
+  int             getStartLayerIndex() const noexcept;
+  int             getStopLayerIndex() const noexcept;
+
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOnLayer(const QString& layerName) const noexcept;
   bool isSelectable() const noexcept override;
@@ -128,6 +145,8 @@ private:
   Shape          mShape;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
+  GraphicsLayerName     mStartLayerName;
+  GraphicsLayerName     mStopLayerName;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

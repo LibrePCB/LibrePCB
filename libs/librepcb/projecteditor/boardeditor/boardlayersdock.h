@@ -68,6 +68,7 @@ public:
 private slots:
 
   void on_listWidget_itemChanged(QListWidgetItem* item);
+  void on_listWidget_itemClicked(QListWidgetItem* item);
   void on_btnTop_clicked();
   void on_btnBottom_clicked();
   void on_btnTopBottom_clicked();
@@ -87,12 +88,19 @@ private:
   QList<QString> getTopLayers() const noexcept;
   QList<QString> getBottomLayers() const noexcept;
   QList<QString> getAllLayers() const noexcept;
+  void layerFocusChanged(GraphicsLayer* layer, bool editorCommand) noexcept;
 
   // General
   QScopedPointer<Ui::BoardLayersDock> mUi;
   BoardEditor&                        mBoardEditor;
   Board*                              mActiveBoard;
   QMetaObject::Connection             mActiveBoardConnection;
+  QListWidgetItem*                    mCurrentSelectedItem;
+  QMetaObject::Connection             mLayerFocusConnection;
+
+  // Private variable
+  mutable bool mItemChanged;
+  mutable bool mEditorCommand;
 };
 
 /*******************************************************************************
