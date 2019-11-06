@@ -97,18 +97,19 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
   Q_UNUSED(widget);
 
   const bool selected = mPlane.isSelected();
-  // const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) !=
-  // 0);
+  const bool deviceIsPrinter =
+      (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
-  Q_UNUSED(option);
 
   if (mLayer && mLayer->isVisible()) {
-    // draw outline
-    painter->setPen(
-        QPen(mLayer->getColor(selected), 3 / lod, Qt::DashLine, Qt::RoundCap));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawPath(mOutline);
+    // draw outline only on screen, not for print or PDF export
+    if (!deviceIsPrinter) {
+      painter->setPen(QPen(mLayer->getColor(selected), 3 / lod, Qt::DashLine,
+                           Qt::RoundCap));
+      painter->setBrush(Qt::NoBrush);
+      painter->drawPath(mOutline);
+    }
 
     // draw plane only if plane should be visible
     if (mPlane.isVisible()) {
