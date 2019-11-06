@@ -10,7 +10,7 @@ TARGET = workspace-library-updater
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets xml sql network
+QT += core widgets xml sql network printsupport
 
 LIBS += \
     -L$${DESTDIR} \

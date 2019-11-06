@@ -38,6 +38,7 @@
 #include <librepcb/common/dialogs/boarddesignrulesdialog.h>
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
+#include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
@@ -49,6 +50,7 @@
 #include <librepcb/project/boards/cmd/cmdboardremove.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -56,6 +58,7 @@
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
+#include <QtPrintSupport>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -448,15 +451,68 @@ void BoardEditor::on_actionGrid_triggered() {
   }
 }
 
+void BoardEditor::on_actionPrint_triggered() {
+  try {
+    Board* board = getActiveBoard();
+    if (!board) {
+      throw Exception(__FILE__, __LINE__, tr("No board selected."));
+    }
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPaperSize(QPrinter::A4);
+    printer.setOrientation(QPrinter::Landscape);
+    printer.setCreator(QString("LibrePCB %1").arg(qApp->applicationVersion()));
+    printer.setDocName(*mProject.getMetadata().getName());
+    QPrintDialog printDialog(&printer, this);
+    printDialog.setOption(QAbstractPrintDialog::PrintSelection, false);
+    printDialog.setMinMax(1, 1);
+    if (printDialog.exec() == QDialog::Accepted) {
+      board->print(printer);  // can throw
+    }
+  } catch (Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
+}
+
 void BoardEditor::on_actionExportAsPdf_triggered() {
   try {
-    QString filename = FileDialog::getSaveFileName(this, tr("PDF Export"),
-                                                   QDir::homePath(), "*.pdf");
+    Board* board = getActiveBoard();
+    if (!board) {
+      throw Exception(__FILE__, __LINE__, tr("No board selected."));
+    }
+    QString projectName =
+        FilePath::cleanFileName(*mProject.getMetadata().getName(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectVersion =
+        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString relativePath =
+        QString("output/%1/%2_Board.pdf").arg(projectVersion, projectName);
+    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
+    QDir().mkpath(defaultFilePath.getParentDir().toStr());
+    QString filename = FileDialog::getSaveFileName(
+        this, tr("PDF Export"), defaultFilePath.toNative(), "*.pdf");
     if (filename.isEmpty()) return;
     if (!filename.endsWith(".pdf")) filename.append(".pdf");
-    // FilePath filepath(filename);
-    // mProject.exportSchematicsAsPdf(filepath); // this method can throw an
-    // exception
+    FilePath filepath(filename);
+
+    // Create output directory first because QPrinter silently fails if it
+    // doesn't exist.
+    FileUtils::makePath(filepath.getParentDir());  // can throw
+
+    // Print (use local block scope to ensure the PDF is fully written & closed
+    // after leaving the block - without this, opening the PDF could fail)
+    {
+      QPrinter printer(QPrinter::HighResolution);
+      printer.setPaperSize(QPrinter::A4);
+      printer.setOrientation(QPrinter::Landscape);
+      printer.setOutputFormat(QPrinter::PdfFormat);
+      printer.setCreator(
+          QString("LibrePCB %1").arg(qApp->applicationVersion()));
+      printer.setOutputFileName(filepath.toStr());
+      board->print(printer);  // can throw
+    }
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
