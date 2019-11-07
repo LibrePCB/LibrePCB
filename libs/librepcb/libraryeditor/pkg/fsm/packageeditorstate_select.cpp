@@ -289,6 +289,35 @@ bool PackageEditorState_Select::processRotateCcw() noexcept {
   }
 }
 
+bool PackageEditorState_Select::processMirror() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return mirrorSelectedItems(Qt::Horizontal, false);
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->mirrorGeometry(Qt::Horizontal);
+      return true;
+    }
+    default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processFlip() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return mirrorSelectedItems(Qt::Horizontal, true);
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->mirrorGeometry(Qt::Horizontal);
+      mCmdDragSelectedItems->mirrorLayer();
+      return true;
+    }
+    default: { return false; }
+  }
+}
+
 bool PackageEditorState_Select::processRemove() noexcept {
   switch (mState) {
     case SubState::IDLE: {
@@ -330,6 +359,9 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   QMenu    menu;
   QAction* aRotateCCW =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+  QAction* aMirrorH =
+      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
+  QAction* aFlipH = menu.addAction(QIcon(":/img/actions/swap.png"), tr("Flip"));
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   menu.addSeparator();
@@ -339,6 +371,10 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   QAction* action = menu.exec(QCursor::pos());
   if (action == aRotateCCW) {
     return rotateSelectedItems(Angle::deg90());
+  } else if (action == aMirrorH) {
+    return mirrorSelectedItems(Qt::Horizontal, false);
+  } else if (action == aFlipH) {
+    return mirrorSelectedItems(Qt::Horizontal, true);
   } else if (action == aRemove) {
     return removeSelectedItems();
   } else if (action == aProperties) {
@@ -509,6 +545,22 @@ bool PackageEditorState_Select::rotateSelectedItems(
     QScopedPointer<CmdDragSelectedFootprintItems> cmd(
         new CmdDragSelectedFootprintItems(mContext));
     cmd->rotate(angle);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;  // TODO: return false if no items were selected
+}
+
+bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
+                                                    bool flipLayers) noexcept {
+  try {
+    QScopedPointer<CmdDragSelectedFootprintItems> cmd(
+        new CmdDragSelectedFootprintItems(mContext));
+    cmd->mirrorGeometry(orientation);
+    if (flipLayers) {
+      cmd->mirrorLayer();
+    }
     mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());

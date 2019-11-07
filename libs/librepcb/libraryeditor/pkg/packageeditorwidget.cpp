@@ -223,6 +223,14 @@ bool PackageEditorWidget::rotateCcw() noexcept {
   return mFsm->processRotateCcw();
 }
 
+bool PackageEditorWidget::mirror() noexcept {
+  return mFsm->processMirror();
+}
+
+bool PackageEditorWidget::flip() noexcept {
+  return mFsm->processFlip();
+}
+
 bool PackageEditorWidget::remove() noexcept {
   return mFsm->processRemove();
 }

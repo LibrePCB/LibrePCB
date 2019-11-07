@@ -119,6 +119,8 @@ public:
   bool processPaste() noexcept;
   bool processRotateCw() noexcept;
   bool processRotateCcw() noexcept;
+  bool processMirror() noexcept;
+  bool processFlip() noexcept;
   bool processRemove() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;

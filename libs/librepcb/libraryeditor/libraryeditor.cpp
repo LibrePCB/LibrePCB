@@ -85,6 +85,10 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
           &LibraryEditor::rotateCwTriggered);
   connect(mUi->actionRotateCcw, &QAction::triggered, this,
           &LibraryEditor::rotateCcwTriggered);
+  connect(mUi->actionMirror, &QAction::triggered, this,
+          &LibraryEditor::mirrorTriggered);
+  connect(mUi->actionFlip, &QAction::triggered, this,
+          &LibraryEditor::flipTriggered);
   connect(mUi->actionRemove, &QAction::triggered, this,
           &LibraryEditor::removeTriggered);
   connect(mUi->actionAbortCommand, &QAction::triggered, this,
@@ -404,6 +408,14 @@ void LibraryEditor::rotateCcwTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->rotateCcw();
 }
 
+void LibraryEditor::mirrorTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->mirror();
+}
+
+void LibraryEditor::flipTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->flip();
+}
+
 void LibraryEditor::removeTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->remove();
 }
@@ -617,6 +629,7 @@ void LibraryEditor::cursorPositionChanged(const Point& pos) noexcept {
 
 void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   bool hasGraphicalEditor = false;
+  bool supportsFlip       = false;
   bool isOverviewTab = dynamic_cast<LibraryOverviewWidget*>(widget) != nullptr;
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->setUndoStackActionGroup(nullptr);
@@ -629,10 +642,12 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mCurrentEditorWidget->setToolsActionGroup(mToolsActionGroup.data());
     mCurrentEditorWidget->setCommandToolBar(mUi->commandToolbar);
     hasGraphicalEditor = mCurrentEditorWidget->hasGraphicalEditor();
+    supportsFlip       = mCurrentEditorWidget->supportsFlip();
   }
   foreach (QAction* action, mUi->editToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
+  mUi->actionFlip->setEnabled(supportsFlip);
   if (isOverviewTab) {
     mUi->actionRemove->setEnabled(true);
   }

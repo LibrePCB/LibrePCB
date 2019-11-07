@@ -221,7 +221,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Polygon* polygon, query->getPolygons()) {
     QScopedPointer<CmdPolygonEdit> cmd(
         new CmdPolygonEdit(polygon->getPolygon()));
-    cmd->mirror(center, mOrientation, false);
+    cmd->mirrorGeometry(mOrientation, center, false);
+    cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -229,7 +230,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_StrokeText* text, query->getStrokeTexts()) {
     QScopedPointer<CmdStrokeTextEdit> cmd(
         new CmdStrokeTextEdit(text->getText()));
-    cmd->mirror(center, mOrientation, false);
+    cmd->mirrorGeometry(mOrientation, center, false);
+    cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw
   }
 

@@ -70,7 +70,8 @@ bool CmdFootprintStrokeTextsReset::performExecute() {
     CmdStrokeTextEdit cmd(newText->getText());
     cmd.rotate(mFootprint.getRotation(), Point(0, 0), true);
     if (mFootprint.getIsMirrored()) {
-      cmd.mirror(Point(0, 0), Qt::Horizontal, true);
+      cmd.mirrorGeometry(Qt::Horizontal, Point(0, 0), true);
+      cmd.mirrorLayer(true);
     }
     cmd.setPosition(newText->getText().getPosition() + mFootprint.getPosition(),
                     true);

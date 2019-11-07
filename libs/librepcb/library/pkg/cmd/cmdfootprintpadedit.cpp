@@ -145,6 +145,38 @@ void CmdFootprintPadEdit::rotate(const Angle& angle, const Point& center,
   }
 }
 
+void CmdFootprintPadEdit::mirrorGeometry(Qt::Orientation orientation,
+                                         const Point&    center,
+                                         bool            immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos.mirror(orientation, center);
+  if (orientation == Qt::Horizontal) {
+    mNewRotation = Angle::deg180() - mNewRotation;
+  } else {
+    mNewRotation = -mNewRotation;
+  }
+  if (immediate) {
+    mPad.setPosition(mNewPos);
+    mPad.setRotation(mNewRotation);
+  }
+}
+
+void CmdFootprintPadEdit::mirrorLayer(bool immediate) noexcept {
+  switch (mNewBoardSide) {
+    case FootprintPad::BoardSide::BOTTOM:
+      mNewBoardSide = FootprintPad::BoardSide::TOP;
+      break;
+    case FootprintPad::BoardSide::TOP:
+      mNewBoardSide = FootprintPad::BoardSide::BOTTOM;
+      break;
+    default:
+      break;
+  }
+  if (immediate) {
+    mPad.setBoardSide(mNewBoardSide);
+  }
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

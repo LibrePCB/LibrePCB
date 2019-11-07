@@ -93,6 +93,8 @@ public:
   virtual bool processPaste() noexcept { return false; }
   virtual bool processRotateCw() noexcept { return false; }
   virtual bool processRotateCcw() noexcept { return false; }
+  virtual bool processMirror() noexcept { return false; }
+  virtual bool processFlip() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
 
