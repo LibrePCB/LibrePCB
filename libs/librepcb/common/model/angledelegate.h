@@ -62,6 +62,9 @@ public:
 
   // Operator Overloadings
   AngleDelegate& operator=(const AngleDelegate& rhs) = delete;
+
+private:  // Methods
+  void editingFinished() noexcept;
 };
 
 /*******************************************************************************

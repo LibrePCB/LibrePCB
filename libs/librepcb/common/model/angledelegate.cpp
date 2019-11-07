@@ -61,6 +61,14 @@ QWidget* AngleDelegate::createEditor(QWidget*                    parent,
   edt->setFrame(false);
   edt->setValue(index.data(Qt::EditRole).value<Angle>());
   edt->selectAll();
+
+  // Manually close the editor if editing is finished, because for some reason
+  // the view does not receive the "focus out" event from our own editor widget.
+  // Queued connection is needed to avoid receiving the "enter pressed" key
+  // event if editing was finished by pressing enter.
+  connect(edt, &AngleEdit::editingFinished, this,
+          &AngleDelegate::editingFinished, Qt::QueuedConnection);
+
   return edt;
 }
 
@@ -81,6 +89,16 @@ void AngleDelegate::updateEditorGeometry(QWidget*                    editor,
                                          const QModelIndex& index) const {
   Q_UNUSED(index);
   editor->setGeometry(option.rect);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void AngleDelegate::editingFinished() noexcept {
+  AngleEdit* edt = static_cast<AngleEdit*>(sender());
+  commitData(edt);
+  closeEditor(edt);
 }
 
 /*******************************************************************************
