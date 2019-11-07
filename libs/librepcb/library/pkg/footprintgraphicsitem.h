@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../pkg/packagepad.h"
+
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
@@ -62,8 +64,8 @@ public:
   // Constructors / Destructor
   FootprintGraphicsItem()                                   = delete;
   FootprintGraphicsItem(const FootprintGraphicsItem& other) = delete;
-  FootprintGraphicsItem(Footprint&                      fpt,
-                        const IF_GraphicsLayerProvider& lp) noexcept;
+  FootprintGraphicsItem(Footprint& fpt, const IF_GraphicsLayerProvider& lp,
+                        const PackagePadList* packagePadList) noexcept;
   ~FootprintGraphicsItem() noexcept;
 
   // Getters
@@ -116,6 +118,7 @@ public:
 private:  // Data
   Footprint&                      mFootprint;
   const IF_GraphicsLayerProvider& mLayerProvider;
+  const PackagePadList*           mPackagePadList;
   QHash<const FootprintPad*, QSharedPointer<FootprintPadGraphicsItem>>
                                                            mPadGraphicsItems;
   QHash<const Circle*, QSharedPointer<CircleGraphicsItem>> mCircleGraphicsItems;

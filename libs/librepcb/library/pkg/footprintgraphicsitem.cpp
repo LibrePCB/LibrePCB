@@ -44,8 +44,12 @@ namespace library {
  ******************************************************************************/
 
 FootprintGraphicsItem::FootprintGraphicsItem(
-    Footprint& fpt, const IF_GraphicsLayerProvider& lp) noexcept
-  : QGraphicsItem(nullptr), mFootprint(fpt), mLayerProvider(lp) {
+    Footprint& fpt, const IF_GraphicsLayerProvider& lp,
+    const PackagePadList* packagePadList) noexcept
+  : QGraphicsItem(nullptr),
+    mFootprint(fpt),
+    mLayerProvider(lp),
+    mPackagePadList(packagePadList) {
   for (FootprintPad& pad : mFootprint.getPads()) {
     addPad(pad);
   }
@@ -232,7 +236,7 @@ void FootprintGraphicsItem::setRotation(const Angle& rot) noexcept {
 void FootprintGraphicsItem::addPad(FootprintPad& pad) noexcept {
   Q_ASSERT(!mPadGraphicsItems.contains(&pad));
   QSharedPointer<FootprintPadGraphicsItem> item(
-      new FootprintPadGraphicsItem(pad, mLayerProvider, this));
+      new FootprintPadGraphicsItem(pad, mLayerProvider, mPackagePadList, this));
   mPadGraphicsItems.insert(&pad, item);
 }
 

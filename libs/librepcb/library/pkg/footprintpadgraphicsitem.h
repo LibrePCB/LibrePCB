@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../pkg/packagepad.h"
+
 #include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
@@ -35,7 +37,7 @@ namespace librepcb {
 
 class IF_GraphicsLayerProvider;
 class PrimitivePathGraphicsItem;
-// class PrimitiveTextGraphicsItem;
+class PrimitiveTextGraphicsItem;
 
 namespace library {
 
@@ -55,6 +57,7 @@ public:
   FootprintPadGraphicsItem(const FootprintPadGraphicsItem& other) = delete;
   FootprintPadGraphicsItem(FootprintPad&                   pad,
                            const IF_GraphicsLayerProvider& lp,
+                           const PackagePadList*           packagePadList,
                            QGraphicsItem* parent = nullptr) noexcept;
   ~FootprintPadGraphicsItem() noexcept;
 
@@ -66,7 +69,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setShape(const QPainterPath& shape) noexcept;
   void setLayerName(const QString& name) noexcept;
-  // void setName(const QString& name) noexcept;
+  void setPackagePadUuid(const Uuid& uuid) noexcept;
   void setSelected(bool selected) noexcept;
 
   // Inherited from QGraphicsItem
@@ -80,13 +83,20 @@ public:
       delete;
 
 private:  // Methods
-  void updateShape() noexcept;
+  void packagePadListEdited(const PackagePadList& list, int index,
+                            const std::shared_ptr<const PackagePad>& pad,
+                            PackagePadList::Event event) noexcept;
+  void updateTextHeight() noexcept;
 
 private:  // Data
   FootprintPad&                             mPad;
   const IF_GraphicsLayerProvider&           mLayerProvider;
+  const PackagePadList*                     mPackagePadList;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
-  // QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+
+  // Slots
+  PackagePadList::OnEditedSlot mOnPadsEditedSlot;
 };
 
 /*******************************************************************************

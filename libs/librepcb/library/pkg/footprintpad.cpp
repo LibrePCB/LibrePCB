@@ -164,6 +164,9 @@ bool FootprintPad::setPackagePadUuid(const Uuid& pad) noexcept {
   }
 
   mPackagePadUuid = pad;
+  if (mRegisteredGraphicsItem) {
+    mRegisteredGraphicsItem->setPackagePadUuid(mPackagePadUuid);
+  }
   onEdited.notify(Event::PackagePadUuidChanged);
   return true;
 }
