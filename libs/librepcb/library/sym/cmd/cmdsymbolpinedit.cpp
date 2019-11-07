@@ -106,6 +106,21 @@ void CmdSymbolPinEdit::rotate(const Angle& angle, const Point& center,
   }
 }
 
+void CmdSymbolPinEdit::mirror(Qt::Orientation orientation, const Point& center,
+                              bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos.mirror(orientation, center);
+  if (orientation == Qt::Horizontal) {
+    mNewRotation = Angle::deg180() - mNewRotation;
+  } else {
+    mNewRotation = -mNewRotation;
+  }
+  if (immediate) {
+    mPin.setPosition(mNewPos);
+    mPin.setRotation(mNewRotation);
+  }
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

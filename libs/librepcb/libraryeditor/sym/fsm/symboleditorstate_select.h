@@ -76,6 +76,7 @@ public:
   bool processPaste() noexcept override;
   bool processRotateCw() noexcept override;
   bool processRotateCcw() noexcept override;
+  bool processMirror() noexcept override;
   bool processRemove() noexcept override;
   bool processAbortCommand() noexcept override;
 
@@ -89,6 +90,7 @@ private:  // Methods
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
+  bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;

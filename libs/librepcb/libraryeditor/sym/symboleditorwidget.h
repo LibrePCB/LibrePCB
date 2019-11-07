@@ -87,6 +87,7 @@ public slots:
   bool paste() noexcept override;
   bool rotateCw() noexcept override;
   bool rotateCcw() noexcept override;
+  bool mirror() noexcept override;
   bool remove() noexcept override;
   bool zoomIn() noexcept override;
   bool zoomOut() noexcept override;

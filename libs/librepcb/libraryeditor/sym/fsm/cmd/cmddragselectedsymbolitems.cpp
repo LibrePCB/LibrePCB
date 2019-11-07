@@ -53,7 +53,8 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     mContext(context),
     mCenterPos(0, 0),
     mDeltaPos(0, 0),
-    mDeltaRot(0) {
+    mDeltaRot(0),
+    mMirrored(false) {
   int count = 0;
 
   QList<QSharedPointer<SymbolPinGraphicsItem>> pins =
@@ -147,12 +148,28 @@ void CmdDragSelectedSymbolItems::rotate(const Angle& angle) noexcept {
   mDeltaRot += angle;
 }
 
+void CmdDragSelectedSymbolItems::mirror(Qt::Orientation orientation) noexcept {
+  foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
+    cmd->mirror(orientation, mCenterPos, true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
+  foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->mirror(orientation, mCenterPos, true);
+  }
+  mMirrored = !mMirrored;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
 bool CmdDragSelectedSymbolItems::performExecute() {
-  if (mDeltaPos.isOrigin() && (mDeltaRot == 0)) {
+  if (mDeltaPos.isOrigin() && (mDeltaRot == 0) && (!mMirrored)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;

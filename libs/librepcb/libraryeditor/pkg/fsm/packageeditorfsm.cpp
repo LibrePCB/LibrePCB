@@ -253,6 +253,24 @@ bool PackageEditorFsm::processRotateCcw() noexcept {
   }
 }
 
+bool PackageEditorFsm::processMirror() noexcept {
+  if (getCurrentState() && mContext.currentFootprint &&
+      mContext.currentGraphicsItem) {
+    return getCurrentState()->processMirror();
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processFlip() noexcept {
+  if (getCurrentState() && mContext.currentFootprint &&
+      mContext.currentGraphicsItem) {
+    return getCurrentState()->processFlip();
+  } else {
+    return false;
+  }
+}
+
 bool PackageEditorFsm::processRemove() noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {

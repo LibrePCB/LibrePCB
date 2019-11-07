@@ -74,6 +74,7 @@ public:
 
   // Getters
   virtual bool hasGraphicalEditor() const noexcept override { return true; }
+  virtual bool supportsFlip() const noexcept override { return true; }
 
   // Setters
   void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
@@ -88,6 +89,8 @@ public slots:
   bool paste() noexcept override;
   bool rotateCw() noexcept override;
   bool rotateCcw() noexcept override;
+  bool mirror() noexcept override;
+  bool flip() noexcept override;
   bool remove() noexcept override;
   bool zoomIn() noexcept override;
   bool zoomOut() noexcept override;

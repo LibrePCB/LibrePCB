@@ -208,6 +208,10 @@ bool SymbolEditorWidget::rotateCcw() noexcept {
   return mFsm->processRotateCcw();
 }
 
+bool SymbolEditorWidget::mirror() noexcept {
+  return mFsm->processMirror();
+}
+
 bool SymbolEditorWidget::remove() noexcept {
   return mFsm->processRemove();
 }

@@ -188,6 +188,14 @@ bool SymbolEditorFsm::processRotateCcw() noexcept {
   }
 }
 
+bool SymbolEditorFsm::processMirror() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processMirror();
+  } else {
+    return false;
+  }
+}
+
 bool SymbolEditorFsm::processRemove() noexcept {
   if (getCurrentState()) {
     return getCurrentState()->processRemove();

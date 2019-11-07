@@ -67,6 +67,8 @@ public:
   void setDeltaToStartPos(const Point& delta) noexcept;
   void translate(const Point& deltaPos) noexcept;
   void rotate(const Angle& angle) noexcept;
+  void mirrorGeometry(Qt::Orientation orientation) noexcept;
+  void mirrorLayer() noexcept;
 
   // Operator Overloadings
   CmdDragSelectedFootprintItems& operator       =(
@@ -85,6 +87,8 @@ private:
   Point                              mCenterPos;
   Point                              mDeltaPos;
   Angle                              mDeltaRot;
+  bool                               mMirroredGeometry;
+  bool                               mMirroredLayer;
 
   // Move commands
   QList<CmdFootprintPadEdit*> mPadEditCmds;

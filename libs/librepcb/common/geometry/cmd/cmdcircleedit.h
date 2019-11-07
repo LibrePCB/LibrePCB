@@ -57,6 +57,9 @@ public:
   void setCenter(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirrorGeometry(Qt::Orientation orientation, const Point& center,
+                      bool immediate) noexcept;
+  void mirrorLayer(bool immediate) noexcept;
 
   // Operator Overloadings
   CmdCircleEdit& operator=(const CmdCircleEdit& rhs) = delete;

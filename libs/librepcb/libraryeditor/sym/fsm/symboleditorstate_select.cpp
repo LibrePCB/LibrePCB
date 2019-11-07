@@ -283,6 +283,20 @@ bool SymbolEditorState_Select::processRotateCcw() noexcept {
   }
 }
 
+bool SymbolEditorState_Select::processMirror() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return mirrorSelectedItems(Qt::Horizontal);
+    }
+    case SubState::PASTING: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->mirror(Qt::Horizontal);
+      return true;
+    }
+    default: { return false; }
+  }
+}
+
 bool SymbolEditorState_Select::processRemove() noexcept {
   switch (mState) {
     case SubState::IDLE: {
@@ -323,6 +337,8 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
   QMenu    menu;
   QAction* aRotateCCW =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+  QAction* aMirrorH =
+      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   menu.addSeparator();
@@ -332,6 +348,8 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
   QAction* action = menu.exec(QCursor::pos());
   if (action == aRotateCCW) {
     return rotateSelectedItems(Angle::deg90());
+  } else if (action == aMirrorH) {
+    return mirrorSelectedItems(Qt::Horizontal);
   } else if (action == aRemove) {
     return removeSelectedItems();
   } else if (action == aProperties) {
@@ -474,6 +492,19 @@ bool SymbolEditorState_Select::rotateSelectedItems(
     QScopedPointer<CmdDragSelectedSymbolItems> cmd(
         new CmdDragSelectedSymbolItems(mContext));
     cmd->rotate(angle);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;  // TODO: return false if no items were selected
+}
+
+bool SymbolEditorState_Select::mirrorSelectedItems(
+    Qt::Orientation orientation) noexcept {
+  try {
+    QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+        new CmdDragSelectedSymbolItems(mContext));
+    cmd->mirror(orientation);
     mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
