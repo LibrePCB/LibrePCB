@@ -114,7 +114,8 @@ QPixmap FootprintClipboardData::generatePixmap(
   GraphicsScene                           scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (FootprintPad& pad : mFootprintPads) {
-    items.append(std::make_shared<FootprintPadGraphicsItem>(pad, lp));
+    items.append(
+        std::make_shared<FootprintPadGraphicsItem>(pad, lp, &mPackagePads));
   }
   for (Polygon& polygon : mPolygons) {
     items.append(std::make_shared<PolygonGraphicsItem>(polygon, lp));
