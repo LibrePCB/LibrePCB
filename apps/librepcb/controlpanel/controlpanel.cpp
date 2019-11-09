@@ -451,7 +451,9 @@ void ControlPanel::projectEditorClosed() noexcept {
   if (!editor) return;
 
   Project* project = &editor->getProject();
-  mOpenProjectEditors.remove(project->getFilepath().toStr());
+  Q_ASSERT(mOpenProjectEditors.contains(
+      project->getFilepath().toUnique().toStr()));
+  mOpenProjectEditors.remove(project->getFilepath().toUnique().toStr());
   delete project;
 }
 
