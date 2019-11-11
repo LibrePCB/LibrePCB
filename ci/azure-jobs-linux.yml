@@ -37,6 +37,9 @@ jobs:
   - bash: ./ci/build_linux_appimage.sh
     displayName: Build AppImage
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
+  - bash: ./ci/build_linux_archive.sh
+    displayName: Build Archive
+    condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
   - bash: ./ci/build_installer.sh
     displayName: Build Installer
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
