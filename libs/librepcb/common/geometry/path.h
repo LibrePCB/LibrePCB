@@ -68,7 +68,8 @@ public:
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
   Path                   toClosedPath() const noexcept;
-  const QPainterPath&    toQPainterPathPx() const noexcept;
+  QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
+  const QPainterPath& toQPainterPathPx() const noexcept;
 
   // Transformations
   Path& translate(const Point& offset) noexcept;
@@ -107,6 +108,8 @@ public:
                       const PositiveLength& height) noexcept;
   static Path obround(const Point& p1, const Point& p2,
                       const PositiveLength& width) noexcept;
+  static Path arcObround(const Point& p1, const Point& p2, const Angle& angle,
+                         const PositiveLength& width) noexcept;
   static Path rect(const Point& p1, const Point& p2) noexcept;
   static Path centeredRect(const PositiveLength& width,
                            const PositiveLength& height) noexcept;
