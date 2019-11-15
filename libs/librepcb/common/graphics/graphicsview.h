@@ -82,6 +82,7 @@ public slots:
   void zoomIn() noexcept;
   void zoomOut() noexcept;
   void zoomAll() noexcept;
+  void zoomToRect(const QRectF& rect) noexcept;
 
 signals:
   /**

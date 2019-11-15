@@ -200,6 +200,10 @@ void GraphicsView::zoomAll() noexcept {
   qreal xMargins = rect.width() / 50;
   qreal yMargins = rect.height() / 50;
   rect.adjust(-xMargins, -yMargins, xMargins, yMargins);
+  zoomToRect(rect);
+}
+
+void GraphicsView::zoomToRect(const QRectF& rect) noexcept {
   mZoomAnimation->setDuration(500);
   mZoomAnimation->setEasingCurve(QEasingCurve::InOutCubic);
   mZoomAnimation->setStartValue(getVisibleSceneRect());
@@ -241,7 +245,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
   switch (event->type()) {
     case QEvent::Gesture: {
       QGestureEvent* ge = dynamic_cast<QGestureEvent*>(event);
-      QPinchGesture* pinch_g = dynamic_cast<QPinchGesture*>(ge->gesture(Qt::PinchGesture));
+      QPinchGesture* pinch_g =
+          dynamic_cast<QPinchGesture*>(ge->gesture(Qt::PinchGesture));
       if (pinch_g) {
         scale(pinch_g->scaleFactor(), pinch_g->scaleFactor());
         return true;
