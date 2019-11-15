@@ -57,13 +57,16 @@ bool Path::isClosed() const noexcept {
   }
 }
 
+Path Path::toClosedPath() const noexcept {
+  Path p(*this);
+  p.close();
+  return p;
+}
+
 const QPainterPath& Path::toQPainterPathPx(bool close) const noexcept {
   if (mPainterPathPx.isEmpty()) {
-    int count = mVertices.count();
-    if (close && (!isClosed()) && (count > 0))
-      ++count;  // add implicit last point
-    for (int i = 0; i < count; ++i) {
-      const Vertex& v = mVertices.at(i % mVertices.count());  // wrap around!
+    for (int i = 0; i < mVertices.count(); ++i) {
+      const Vertex& v = mVertices.at(i);
       if (i == 0) {
         mPainterPathPx.moveTo(v.getPos().toPxQPointF());
         continue;

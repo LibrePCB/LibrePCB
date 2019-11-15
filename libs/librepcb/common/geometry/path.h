@@ -67,7 +67,8 @@ public:
     return mVertices;
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
-  const QPainterPath&    toQPainterPathPx(bool close = false) const noexcept;
+  Path                   toClosedPath() const noexcept;
+  const QPainterPath&    toQPainterPathPx() const noexcept;
 
   // Transformations
   Path& translate(const Point& offset) noexcept;
