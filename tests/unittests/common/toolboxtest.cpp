@@ -38,6 +38,26 @@ namespace tests {
 class ToolboxTest : public ::testing::Test {};
 
 /*******************************************************************************
+ *  shapeFromPath() Tests
+ ******************************************************************************/
+
+TEST_F(ToolboxTest, testNoPenReturnsUnmodifiedPath) {
+  QPainterPath path;
+  path.addRect(10, 20, 30, 40);
+  QPen   pen(QBrush(Qt::SolidPattern), 1, Qt::NoPen);
+  QBrush brush(Qt::SolidPattern);
+  EXPECT_EQ(path, Toolbox::shapeFromPath(path, pen, brush));
+}
+
+TEST_F(ToolboxTest, testNoPenBrushReturnsUnmodifiedPath) {
+  QPainterPath path;
+  path.addRect(10, 20, 30, 40);
+  QPen   pen(QBrush(Qt::NoBrush), 1, Qt::SolidLine);
+  QBrush brush(Qt::SolidPattern);
+  EXPECT_EQ(path, Toolbox::shapeFromPath(path, pen, brush));
+}
+
+/*******************************************************************************
  *  Parametrized arcCenter() Tests
  ******************************************************************************/
 
