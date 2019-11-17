@@ -39,7 +39,8 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath& path, const QPen& pen,
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/graphicsview/qgraphicsitem.cpp
   // Function: qt_graphicsItem_shapeFromPath()
 
-  if (path == QPainterPath() || pen == Qt::NoPen) {
+  if ((path.isEmpty()) || (pen.style() == Qt::NoPen) ||
+      (pen.brush().style() == Qt::NoBrush)) {
     return path;
   } else {
     QPainterPathStroker ps;
@@ -48,7 +49,7 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath& path, const QPen& pen,
     ps.setJoinStyle(pen.joinStyle());
     ps.setMiterLimit(pen.miterLimit());
     QPainterPath p = ps.createStroke(path);
-    if (brush != Qt::NoBrush) {
+    if (brush.style() != Qt::NoBrush) {
       p.addPath(path);
     }
     return p;
