@@ -92,6 +92,11 @@ TEST_F(TransactionalFileSystemTest, testConstructorPopulatedDir) {
   TransactionalFileSystem fs(mPopulatedDir, true);
 }
 
+TEST_F(TransactionalFileSystemTest, testGetPath) {
+  TransactionalFileSystem fs(mPopulatedDir, false);
+  EXPECT_EQ(mPopulatedDir, fs.getPath());
+}
+
 TEST_F(TransactionalFileSystemTest, testIsWritableFalse) {
   TransactionalFileSystem fs(mPopulatedDir, false);
   EXPECT_FALSE(fs.isWritable());

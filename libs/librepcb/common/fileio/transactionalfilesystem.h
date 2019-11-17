@@ -80,7 +80,8 @@ public:
   virtual ~TransactionalFileSystem() noexcept;
 
   // Getters
-  bool isWritable() const noexcept { return mIsWritable; }
+  const FilePath& getPath() const noexcept { return mFilePath; }
+  bool            isWritable() const noexcept { return mIsWritable; }
   bool isRestoredFromAutosave() const noexcept { return mRestoredFromAutosave; }
 
   // Inherited from FileSystem
