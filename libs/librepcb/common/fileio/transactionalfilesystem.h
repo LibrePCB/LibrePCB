@@ -98,6 +98,7 @@ public:
   // General Methods
   void        loadFromZip(const FilePath& fp);
   void        exportToZip(const FilePath& fp) const;
+  void        discardChanges() noexcept;
   QStringList checkForModifications() const;
   void        autosave();
   void        save();
@@ -128,7 +129,6 @@ private:  // Methods
   void saveDiff(const QString& type) const;
   void loadDiff(const FilePath& fp);
   void removeDiff(const QString& type);
-  void discardChanges() noexcept;
 
 private:  // Data
   FilePath      mFilePath;

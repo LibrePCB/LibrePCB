@@ -267,6 +267,12 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp) const {
   }
 }
 
+void TransactionalFileSystem::discardChanges() noexcept {
+  mModifiedFiles.clear();
+  mRemovedFiles.clear();
+  mRemovedDirs.clear();
+}
+
 QStringList TransactionalFileSystem::checkForModifications() const {
   QStringList modifications;
 
@@ -479,12 +485,6 @@ void TransactionalFileSystem::removeDiff(const QString& type) {
 
   // then remove the whole directory
   FileUtils::removeDirRecursively(dir);  // can throw
-}
-
-void TransactionalFileSystem::discardChanges() noexcept {
-  mModifiedFiles.clear();
-  mRemovedFiles.clear();
-  mRemovedDirs.clear();
 }
 
 /*******************************************************************************
