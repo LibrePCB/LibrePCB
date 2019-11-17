@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "angle.h"
+
 #include "../toolbox.h"
 
 #include <QtCore>
