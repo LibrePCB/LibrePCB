@@ -96,10 +96,11 @@ public:
   virtual void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
-  void loadFromZip(const FilePath& fp);
-  void exportToZip(const FilePath& fp) const;
-  void autosave();
-  void save();
+  void        loadFromZip(const FilePath& fp);
+  void        exportToZip(const FilePath& fp) const;
+  QStringList checkForModifications() const;
+  void        autosave();
+  void        save();
 
   // Static Methods
   static std::shared_ptr<TransactionalFileSystem> open(
