@@ -66,10 +66,13 @@ private:  // Methods
                    const QStringList& exportBoardBomFiles,
                    const QString& bomAttributes, bool exportPcbFabricationData,
                    const QString&     pcbFabricationSettingsPath,
-                   const QStringList& boards, bool save) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool save) const noexcept;
+                   const QStringList& boards, bool save, bool strict) const
+      noexcept;
+  bool openLibrary(const QString& libDir, bool all, bool save,
+                   bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
-                             bool save) const;
+                             library::LibraryBaseElement& element, bool save,
+                             bool strict, bool& success) const;
   static QString prettyPath(const FilePath& path,
                             const QString&  style) noexcept;
   static void    print(const QString& str, int newlines = 1) noexcept;
