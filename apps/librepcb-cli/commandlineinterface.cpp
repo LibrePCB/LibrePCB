@@ -512,7 +512,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     std::shared_ptr<TransactionalFileSystem> libFs =
         TransactionalFileSystem::open(libFp, save);  // can throw
     Library lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(libFs)));  // can throw
+        new TransactionalDirectory(libFs)));      // can throw
+    processLibraryElement(libDir, *libFs, save);  // can throw
 
     // Open all component categories
     if (all) {
@@ -525,12 +526,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         ComponentCategory element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+            new TransactionalDirectory(fs)));      // can throw
+        processLibraryElement(libDir, *fs, save);  // can throw
       }
     }
 
@@ -545,12 +542,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         PackageCategory element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+            new TransactionalDirectory(fs)));      // can throw
+        processLibraryElement(libDir, *fs, save);  // can throw
       }
     }
 
@@ -564,12 +557,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Symbol element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+            new TransactionalDirectory(fs)));      // can throw
+        processLibraryElement(libDir, *fs, save);  // can throw
       }
     }
 
@@ -583,12 +572,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Package element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+            new TransactionalDirectory(fs)));      // can throw
+        processLibraryElement(libDir, *fs, save);  // can throw
       }
     }
 
@@ -602,12 +587,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Component element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+            new TransactionalDirectory(fs)));      // can throw
+        processLibraryElement(libDir, *fs, save);  // can throw
       }
     }
 
@@ -621,26 +602,26 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Device element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+            new TransactionalDirectory(fs)));      // can throw
+        processLibraryElement(libDir, *fs, save);  // can throw
       }
-    }
-
-    // Save library
-    if (save) {
-      print(QString(tr("Save library '%1'...")).arg(prettyPath(libFp, libDir)));
-      lib.save();     // can throw
-      libFs->save();  // can throw
     }
 
     return success;
   } catch (const Exception& e) {
     printErr(QString(tr("ERROR: %1")).arg(e.getMsg()));
     return false;
+  }
+}
+
+void CommandLineInterface::processLibraryElement(const QString& libDir,
+                                                 TransactionalFileSystem& fs,
+                                                 bool save) const {
+  // Save element to file system, if needed
+  if (save) {
+    qInfo()
+        << QString(tr("Save '%1'...")).arg(prettyPath(fs.getPath(), libDir));
+    fs.save();  // can throw
   }
 }
 
