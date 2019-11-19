@@ -267,6 +267,44 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp) const {
   }
 }
 
+void TransactionalFileSystem::discardChanges() noexcept {
+  mModifiedFiles.clear();
+  mRemovedFiles.clear();
+  mRemovedDirs.clear();
+}
+
+QStringList TransactionalFileSystem::checkForModifications() const {
+  QStringList modifications;
+
+  // removed directories
+  foreach (const QString& dir, mRemovedDirs) {
+    FilePath fp = mFilePath.getPathTo(dir);
+    if (fp.isExistingDir()) {
+      modifications.append(dir);
+    }
+  }
+
+  // removed files
+  foreach (const QString& filepath, mRemovedFiles) {
+    FilePath fp = mFilePath.getPathTo(filepath);
+    if (fp.isExistingFile()) {
+      modifications.append(filepath);
+    }
+  }
+
+  // new or modified files
+  foreach (const QString& filepath, mModifiedFiles.keys()) {
+    FilePath   fp      = mFilePath.getPathTo(filepath);
+    QByteArray content = mModifiedFiles.value(filepath);
+    if ((!fp.isExistingFile()) ||
+        (FileUtils::readFile(fp) != content)) {  // can throw
+      modifications.append(filepath);
+    }
+  }
+
+  return modifications;
+}
+
 void TransactionalFileSystem::autosave() {
   saveDiff("autosave");  // can throw
 }
@@ -447,12 +485,6 @@ void TransactionalFileSystem::removeDiff(const QString& type) {
 
   // then remove the whole directory
   FileUtils::removeDirRecursively(dir);  // can throw
-}
-
-void TransactionalFileSystem::discardChanges() noexcept {
-  mModifiedFiles.clear();
-  mRemovedFiles.clear();
-  mRemovedDirs.clear();
 }
 
 /*******************************************************************************

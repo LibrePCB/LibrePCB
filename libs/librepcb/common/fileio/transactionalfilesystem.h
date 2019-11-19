@@ -80,7 +80,8 @@ public:
   virtual ~TransactionalFileSystem() noexcept;
 
   // Getters
-  bool isWritable() const noexcept { return mIsWritable; }
+  const FilePath& getPath() const noexcept { return mFilePath; }
+  bool            isWritable() const noexcept { return mIsWritable; }
   bool isRestoredFromAutosave() const noexcept { return mRestoredFromAutosave; }
 
   // Inherited from FileSystem
@@ -95,10 +96,12 @@ public:
   virtual void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
-  void loadFromZip(const FilePath& fp);
-  void exportToZip(const FilePath& fp) const;
-  void autosave();
-  void save();
+  void        loadFromZip(const FilePath& fp);
+  void        exportToZip(const FilePath& fp) const;
+  void        discardChanges() noexcept;
+  QStringList checkForModifications() const;
+  void        autosave();
+  void        save();
 
   // Static Methods
   static std::shared_ptr<TransactionalFileSystem> open(
@@ -126,7 +129,6 @@ private:  // Methods
   void saveDiff(const QString& type) const;
   void loadDiff(const FilePath& fp);
   void removeDiff(const QString& type);
-  void discardChanges() noexcept;
 
 private:  // Data
   FilePath      mFilePath;

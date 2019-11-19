@@ -92,6 +92,11 @@ TEST_F(TransactionalFileSystemTest, testConstructorPopulatedDir) {
   TransactionalFileSystem fs(mPopulatedDir, true);
 }
 
+TEST_F(TransactionalFileSystemTest, testGetPath) {
+  TransactionalFileSystem fs(mPopulatedDir, false);
+  EXPECT_EQ(mPopulatedDir, fs.getPath());
+}
+
 TEST_F(TransactionalFileSystemTest, testIsWritableFalse) {
   TransactionalFileSystem fs(mPopulatedDir, false);
   EXPECT_FALSE(fs.isWritable());
@@ -596,6 +601,103 @@ TEST_F(TransactionalFileSystemTest, testExportToZip) {
   TransactionalFileSystem fs(mPopulatedDir, true);
   fs.exportToZip(zipFp);
   EXPECT_TRUE(zipFp.isExistingFile());
+}
+
+TEST_F(TransactionalFileSystemTest, testDiscardChanges) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+
+  // check initial state
+  ASSERT_FALSE(fs.fileExists("x/y/z"));
+  ASSERT_FALSE(fs.fileExists("z/y/x.txt"));
+  ASSERT_FALSE(fs.fileExists("z/y.txt"));
+  ASSERT_TRUE(fs.fileExists("1.txt"));
+  ASSERT_TRUE(fs.fileExists("a/b/c"));
+  ASSERT_FALSE(fs.fileExists("z/1.txt"));
+  ASSERT_FALSE(fs.fileExists("z/2.txt"));
+
+  // do some file operations
+  fs.write("x/y/z", "z");                 // create new file
+  fs.write("z/y/x.txt", "x");             // create new file
+  fs.write("z/y.txt", "y");               // create new file
+  fs.write("1.txt", "new 1");             // overwrite existing file
+  fs.write(".dot/file.txt", "new file");  // overwrite existing file
+  fs.removeFile("z/y/x.txt");             // remove new file
+  fs.removeFile("1.txt");                 // remove existing file
+  fs.removeDirRecursively("z");           // remove new directory
+  fs.removeDirRecursively("a");           // remove existing directory
+  fs.write("z/1.txt", "1");               // create new file
+  fs.write("z/2.txt", "2");               // create new file
+  fs.removeFile("z/1.txt");               // remove new file
+
+  // discard all changes
+  fs.discardChanges();
+
+  // check state in memory
+  EXPECT_FALSE(fs.fileExists("x/y/z"));
+  EXPECT_FALSE(fs.fileExists("z/y/x.txt"));
+  EXPECT_FALSE(fs.fileExists("z/y.txt"));
+  EXPECT_TRUE(fs.fileExists("1.txt"));
+  EXPECT_TRUE(fs.fileExists("a/b/c"));
+  EXPECT_FALSE(fs.fileExists("z/1.txt"));
+  EXPECT_FALSE(fs.fileExists("z/2.txt"));
+
+  // save to file system
+  fs.save();
+
+  // check state on file system
+  EXPECT_FALSE(fs.getAbsPath("x/y/z").isExistingFile());
+  EXPECT_FALSE(fs.getAbsPath("z/y/x.txt").isExistingFile());
+  EXPECT_FALSE(fs.getAbsPath("z/y.txt").isExistingFile());
+  EXPECT_TRUE(fs.getAbsPath("1.txt").isExistingFile());
+  EXPECT_TRUE(fs.getAbsPath("a/b/c").isExistingFile());
+  EXPECT_FALSE(fs.getAbsPath("z/1.txt").isExistingFile());
+  EXPECT_FALSE(fs.getAbsPath("z/2.txt").isExistingFile());
+  EXPECT_EQ("1", FileUtils::readFile(fs.getAbsPath("1.txt")));
+  EXPECT_EQ("c", FileUtils::readFile(fs.getAbsPath("a/b/c")));
+  EXPECT_EQ("file", FileUtils::readFile(fs.getAbsPath(".dot/file.txt")));
+}
+
+TEST_F(TransactionalFileSystemTest, testCheckForModifications) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+
+  // check initial state
+  ASSERT_FALSE(fs.fileExists("x/y/z"));
+  ASSERT_FALSE(fs.fileExists("z/y/x.txt"));
+  ASSERT_FALSE(fs.fileExists("z/y.txt"));
+  ASSERT_TRUE(fs.fileExists("1.txt"));
+  ASSERT_TRUE(fs.fileExists("a/b/c"));
+  ASSERT_FALSE(fs.fileExists("z/1.txt"));
+  ASSERT_FALSE(fs.fileExists("z/2.txt"));
+
+  // do some file operations
+  fs.write("x/y/z", "z");                 // create new file
+  fs.write("z/y/x.txt", "x");             // create new file
+  fs.write("z/y.txt", "y");               // create new file
+  fs.write("1.txt", "new 1");             // overwrite existing file
+  fs.write(".dot/file.txt", "new file");  // overwrite existing file
+  fs.removeFile("z/y/x.txt");             // remove new file
+  fs.removeFile("1.txt");                 // remove existing file
+  fs.removeDirRecursively("z");           // remove new directory
+  fs.removeDirRecursively("a");           // remove existing directory
+  fs.write("z/1.txt", "1");               // create new file
+  fs.write("z/2.txt", "2");               // create new file
+  fs.removeFile("z/1.txt");               // remove new file
+
+  // check modifications
+  std::list<std::string> modified;
+  foreach (const QString& str, fs.checkForModifications()) {
+    modified.push_back(str.toStdString());
+  }
+  modified.sort();
+  std::list<std::string> expected = {".dot/file.txt", "1.txt", "a/", "x/y/z",
+                                     "z/2.txt"};
+  EXPECT_EQ(expected, modified);
+
+  // save to file system
+  fs.save();
+
+  // check modifications, should be empty now
+  EXPECT_EQ(0, fs.checkForModifications().count());
 }
 
 /*******************************************************************************

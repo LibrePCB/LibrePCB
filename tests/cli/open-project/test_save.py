@@ -9,9 +9,6 @@ import pytest
 Test command "open-project --save"
 """
 
-PROJECT_LPP = 'data/Empty Project/Empty Project.lpp'
-PROJECT_LPPZ = 'data/Empty Project.lppz'
-
 
 @pytest.mark.parametrize("project", [
     params.EMPTY_PROJECT_LPP_PARAM,
