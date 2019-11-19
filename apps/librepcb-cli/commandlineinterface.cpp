@@ -131,6 +131,10 @@ int CommandLineInterface::execute() noexcept {
   QCommandLineOption saveOption(
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
+  QCommandLineOption prjStrictOption(
+      "strict", tr("Fail if the project files are not strictly canonical, i.e. "
+                   "there would be changes when saving the project. Note that "
+                   "this option is not available for *.lppz files."));
 
   // Define options for "open-library"
   QCommandLineOption libAllOption(
@@ -139,6 +143,9 @@ int CommandLineInterface::execute() noexcept {
   QCommandLineOption libSaveOption(
       "save", tr("Save library (and contained elements if '--all' is given) "
                  "before closing them (useful to upgrade file format)."));
+  QCommandLineOption libStrictOption(
+      "strict", tr("Fail if the opened files are not strictly canonical, i.e. "
+                   "there would be changes when saving the library elements."));
 
   // First parse to get the supplied command (ignoring errors because the parser
   // does not yet know the command-dependent options).
@@ -166,6 +173,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(pcbFabricationSettingsOption);
     parser.addOption(boardOption);
     parser.addOption(saveOption);
+    parser.addOption(prjStrictOption);
   } else if (command == "open-library") {
     parser.clearPositionalArguments();
     parser.addPositionalArgument(command, commands[command].first,
@@ -174,6 +182,7 @@ int CommandLineInterface::execute() noexcept {
                                  tr("Path to library directory (*.lplib)."));
     parser.addOption(libAllOption);
     parser.addOption(libSaveOption);
+    parser.addOption(libStrictOption);
   } else if (!command.isEmpty()) {
     printErr(QString(tr("Unknown command '%1'.")).arg(command), 2);
     print(parser.helpText(), 0);
@@ -234,7 +243,8 @@ int CommandLineInterface::execute() noexcept {
         parser.isSet(exportPcbFabricationDataOption),  // export PCB fab. data
         parser.value(pcbFabricationSettingsOption),    // PCB fab. settings
         parser.values(boardOption),                    // boards
-        parser.isSet(saveOption)                       // save project
+        parser.isSet(saveOption),                      // save project
+        parser.isSet(prjStrictOption)                  // strict mode
     );
   } else if (command == "open-library") {
     if (positionalArgs.count() != 1) {
@@ -242,9 +252,10 @@ int CommandLineInterface::execute() noexcept {
       print(parser.helpText(), 0);
       return 1;
     }
-    cmdSuccess = openLibrary(positionalArgs.value(0),     // library directory
-                             parser.isSet(libAllOption),  // all elements
-                             parser.isSet(libSaveOption)  // save
+    cmdSuccess = openLibrary(positionalArgs.value(0),       // library directory
+                             parser.isSet(libAllOption),    // all elements
+                             parser.isSet(libSaveOption),   // save
+                             parser.isSet(libStrictOption)  // strict mode
     );
   } else {
     printErr(tr("Internal failure."));
@@ -267,7 +278,7 @@ bool CommandLineInterface::openProject(
     const QStringList& exportSchematicsFiles, const QStringList& exportBomFiles,
     const QStringList& exportBoardBomFiles, const QString& bomAttributes,
     bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
-    const QStringList& boards, bool save) const noexcept {
+    const QStringList& boards, bool save, bool strict) const noexcept {
   try {
     bool                success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -294,6 +305,31 @@ bool CommandLineInterface::openProject(
     Project project(std::unique_ptr<TransactionalDirectory>(
                         new TransactionalDirectory(projectFs)),
                     projectFileName);  // can throw
+
+    // Check for non-canonical files (strict mode)
+    if (strict) {
+      print(tr("Check for non-canonical files..."));
+      if (projectFp.getSuffix() == "lppz") {
+        printErr("  " % tr("ERROR: The option '--strict' is not available for "
+                           "*.lppz files!"));
+        success = false;
+      } else {
+        project.save();                                          // can throw
+        QStringList paths = projectFs->checkForModifications();  // can throw
+        // ignore user config files
+        paths = paths.filter(QRegularExpression("^((?!\\.user\\.lp).)*$"));
+        // sort file paths to increases readability of console output
+        std::sort(paths.begin(), paths.end());
+        foreach (const QString& path, paths) {
+          printErr(
+              QString("    - Non-canonical file: %1")
+                  .arg(prettyPath(projectFs->getAbsPath(path), projectFile)));
+        }
+        if (paths.count() > 0) {
+          success = false;
+        }
+      }
+    }
 
     // ERC
     if (runErc) {
@@ -501,7 +537,7 @@ bool CommandLineInterface::openProject(
 }
 
 bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
-                                       bool save) const noexcept {
+                                       bool save, bool strict) const noexcept {
   try {
     bool success = true;
 
@@ -513,6 +549,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         TransactionalFileSystem::open(libFp, save);  // can throw
     Library lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(libFs)));  // can throw
+    processLibraryElement(libDir, *libFs, lib, save, strict,
+                          success);  // can throw
 
     // Open all component categories
     if (all) {
@@ -526,11 +564,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         ComponentCategory element(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+        processLibraryElement(libDir, *fs, element, save, strict,
+                              success);  // can throw
       }
     }
 
@@ -546,11 +581,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         PackageCategory element(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+        processLibraryElement(libDir, *fs, element, save, strict,
+                              success);  // can throw
       }
     }
 
@@ -565,11 +597,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         Symbol element(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+        processLibraryElement(libDir, *fs, element, save, strict,
+                              success);  // can throw
       }
     }
 
@@ -584,11 +613,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         Package element(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+        processLibraryElement(libDir, *fs, element, save, strict,
+                              success);  // can throw
       }
     }
 
@@ -603,11 +629,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         Component element(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+        processLibraryElement(libDir, *fs, element, save, strict,
+                              success);  // can throw
       }
     }
 
@@ -622,19 +645,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         Device element(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(fs)));  // can throw
-        if (save) {
-          qInfo() << QString(tr("Save '%1'...")).arg(prettyPath(fp, libDir));
-          element.save();  // can throw
-          fs->save();      // can throw
-        }
+        processLibraryElement(libDir, *fs, element, save, strict,
+                              success);  // can throw
       }
-    }
-
-    // Save library
-    if (save) {
-      print(QString(tr("Save library '%1'...")).arg(prettyPath(libFp, libDir)));
-      lib.save();     // can throw
-      libFs->save();  // can throw
     }
 
     return success;
@@ -642,6 +655,45 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     printErr(QString(tr("ERROR: %1")).arg(e.getMsg()));
     return false;
   }
+}
+
+void CommandLineInterface::processLibraryElement(const QString& libDir,
+                                                 TransactionalFileSystem& fs,
+                                                 LibraryBaseElement& element,
+                                                 bool save, bool strict,
+                                                 bool& success) const {
+  // Save element to transactional file system, if needed
+  if (strict || save) {
+    element.save();  // can throw
+  }
+
+  // Check for non-canonical files (strict mode)
+  if (strict) {
+    qInfo() << QString(tr("Check '%1' for non-canonical files..."))
+                   .arg(prettyPath(fs.getPath(), libDir));
+
+    QStringList paths = fs.checkForModifications();  // can throw
+    // sort file paths to increases readability of console output
+    std::sort(paths.begin(), paths.end());
+    foreach (const QString& path, paths) {
+      printErr(QString("    - Non-canonical file: %1")
+                   .arg(prettyPath(fs.getAbsPath(path), libDir)));
+    }
+    if (paths.count() > 0) {
+      success = false;
+    }
+  }
+
+  // Save element to file system, if needed
+  if (save) {
+    qInfo()
+        << QString(tr("Save '%1'...")).arg(prettyPath(fs.getPath(), libDir));
+    fs.save();  // can throw
+  }
+
+  // Do not propagate changes in the transactional file system to the
+  // following checks
+  fs.discardChanges();
 }
 
 QString CommandLineInterface::prettyPath(const FilePath& path,
