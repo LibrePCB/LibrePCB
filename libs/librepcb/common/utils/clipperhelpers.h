@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -50,6 +52,13 @@ public:
   ~ClipperHelpers() = delete;
 
   // General Methods
+  static void unite(ClipperLib::Paths& paths);
+  static void unite(ClipperLib::Paths& subject, const ClipperLib::Path& clip);
+  static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
+  static std::unique_ptr<ClipperLib::PolyTree> intersect(
+      const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
+  static void subtract(ClipperLib::Paths&       subject,
+                       const ClipperLib::Paths& clip);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
                      const PositiveLength& maxArcTolerance);
   static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
