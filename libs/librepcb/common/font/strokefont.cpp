@@ -259,7 +259,7 @@ Length StrokeFont::convertLength(const PositiveLength& height,
 void StrokeFont::computeBoundingRect(const QVector<Path>& paths,
                                      Point&               bottomLeft,
                                      Point&               topRight) noexcept {
-  QRectF rect = Path::toQPainterPathPx(paths).boundingRect();
+  QRectF rect = Path::toQPainterPathPx(paths, false).boundingRect();
   bottomLeft  = Point::fromPx(rect.bottomLeft());
   topRight    = Point::fromPx(rect.topRight());
 }

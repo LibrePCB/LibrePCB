@@ -114,7 +114,19 @@ public:
                       const PositiveLength& height) noexcept;
   static Path flatArc(const Point& p1, const Point& p2, const Angle& angle,
                       const PositiveLength& maxTolerance) noexcept;
-  static QPainterPath toQPainterPathPx(const QVector<Path>& paths) noexcept;
+
+  /**
+   * @brief Convert multiple ::librepcb::Path objects to a QPainterPath
+   *
+   * The paths are united, so you get the union of all the passed paths.
+   *
+   * @param paths   The paths to convert.
+   * @param area    Whether the passed paths should be interpreted as areas
+   *                (true) or strokes (false).
+   * @return        The QPainterPath with the united paths.
+   */
+  static QPainterPath toQPainterPathPx(const QVector<Path>& paths,
+                                       bool                 area) noexcept;
 
 private:  // Methods
   void invalidatePainterPath() const noexcept {

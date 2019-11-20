@@ -302,9 +302,17 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
   return p;
 }
 
-QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths) noexcept {
+QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths,
+                                    bool                 area) noexcept {
   QPainterPath p;
-  foreach (const Path& path, paths) { p.addPath(path.toQPainterPathPx()); }
+  p.setFillRule(Qt::WindingFill);
+  foreach (const Path& path, paths) {
+    if (area) {
+      p |= path.toQPainterPathPx();
+    } else {
+      p.addPath(path.toQPainterPathPx());
+    }
+  }
   return p;
 }
 
