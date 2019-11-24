@@ -26,6 +26,7 @@
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/drc/boarddesignrulecheck.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,6 +52,7 @@ class ProjectEditor;
 class ErcMsgDock;
 class UnplacedComponentsDock;
 class BoardLayersDock;
+class BoardDesignRuleCheckMessagesDock;
 class BES_FSM;
 
 namespace Ui {
@@ -108,6 +110,7 @@ private slots:
   void on_actionUpdateLibrary_triggered();
   void on_actionLayerStackSetup_triggered();
   void on_actionModifyDesignRules_triggered();
+  void on_actionDesignRuleCheck_triggered();
   void on_actionRebuildPlanes_triggered();
   void on_actionShowAllPlanes_triggered();
   void on_actionHideAllPlanes_triggered();
@@ -125,6 +128,9 @@ private:
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
+  void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
+                           bool                               zoomTo) noexcept;
+  void clearDrcMarker() noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;
@@ -134,15 +140,22 @@ private:
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
+  // DRC
+  BoardDesignRuleCheck::Options mDrcOptions;
+  QHash<Uuid, QList<BoardDesignRuleCheckMessage>>
+                                    mDrcMessages;  ///< Key: Board UUID
+  QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
+
   // Misc
   QPointer<Board> mActiveBoard;
   QList<QAction*> mBoardListActions;
   QActionGroup    mBoardListActionGroup;
 
   // Docks
-  ErcMsgDock*             mErcMsgDock;
-  UnplacedComponentsDock* mUnplacedComponentsDock;
-  BoardLayersDock*        mBoardLayersDock;
+  ErcMsgDock*                                      mErcMsgDock;
+  UnplacedComponentsDock*                          mUnplacedComponentsDock;
+  BoardLayersDock*                                 mBoardLayersDock;
+  QScopedPointer<BoardDesignRuleCheckMessagesDock> mDrcMessagesDock;
 
   // Finite State Machine
   BES_FSM* mFsm;
