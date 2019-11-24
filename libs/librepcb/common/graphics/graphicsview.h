@@ -67,6 +67,17 @@ public:
   void setGridProperties(const GridProperties& properties) noexcept;
   void setScene(GraphicsScene* scene) noexcept;
   void setVisibleSceneRect(const QRectF& rect) noexcept;
+
+  /**
+   * @brief Setup the marker for a specific scene rect
+   *
+   * This is intended to mark a specific area in a scene, with a line starting
+   * from the top left of the view, so the user can easily locate the specified
+   * area, even if it is very small.
+   *
+   * @param rect    The rect to mark. Pass an empty rect to clear the marker.
+   */
+  void setSceneRectMarker(const QRectF& rect) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
   void setEventHandlerObject(
       IF_GraphicsViewEventHandler* eventHandler) noexcept;
@@ -113,6 +124,7 @@ private:
   GraphicsScene*               mScene;
   QVariantAnimation*           mZoomAnimation;
   GridProperties*              mGridProperties;
+  QRectF                       mSceneRectMarker;
   bool                         mOriginCrossVisible;
   bool                         mUseOpenGl;
   volatile bool                mPanningActive;
