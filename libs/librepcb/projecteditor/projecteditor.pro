@@ -21,6 +21,7 @@ INCLUDEPATH += \
 
 SOURCES += \
     boardeditor/boarddesignrulecheckdialog.cpp \
+    boardeditor/boarddesignrulecheckmessagesdock.cpp \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
     boardeditor/boardlayerstacksetupdialog.cpp \
@@ -84,6 +85,7 @@ SOURCES += \
 
 HEADERS += \
     boardeditor/boarddesignrulecheckdialog.h \
+    boardeditor/boarddesignrulecheckmessagesdock.h \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
     boardeditor/boardlayerstacksetupdialog.h \
@@ -147,6 +149,7 @@ HEADERS += \
 
 FORMS += \
     boardeditor/boarddesignrulecheckdialog.ui \
+    boardeditor/boarddesignrulecheckmessagesdock.ui \
     boardeditor/boardeditor.ui \
     boardeditor/boardlayersdock.ui \
     boardeditor/boardlayerstacksetupdialog.ui \
