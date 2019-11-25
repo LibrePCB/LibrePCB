@@ -57,13 +57,32 @@ bool Path::isClosed() const noexcept {
   }
 }
 
-const QPainterPath& Path::toQPainterPathPx(bool close) const noexcept {
+Path Path::toClosedPath() const noexcept {
+  Path p(*this);
+  p.close();
+  return p;
+}
+
+QVector<Path> Path::toOutlineStrokes(const PositiveLength& width) const
+    noexcept {
+  QVector<Path> paths;
+  paths.reserve(mVertices.count());
+  for (int i = 1; i < mVertices.count(); ++i) {  // skip first vertex!
+    const Vertex& v  = mVertices.at(i);
+    const Vertex& v0 = mVertices.at(i - 1);
+    if (v0.getAngle() == 0) {
+      paths.append(obround(v0.getPos(), v.getPos(), width));
+    } else {
+      paths.append(arcObround(v0.getPos(), v.getPos(), v0.getAngle(), width));
+    }
+  }
+  return paths;
+}
+
+const QPainterPath& Path::toQPainterPathPx() const noexcept {
   if (mPainterPathPx.isEmpty()) {
-    int count = mVertices.count();
-    if (close && (!isClosed()) && (count > 0))
-      ++count;  // add implicit last point
-    for (int i = 0; i < count; ++i) {
-      const Vertex& v = mVertices.at(i % mVertices.count());  // wrap around!
+    for (int i = 0; i < mVertices.count(); ++i) {
+      const Vertex& v = mVertices.at(i);
       if (i == 0) {
         mPainterPathPx.moveTo(v.getPos().toPxQPointF());
         continue;
@@ -227,6 +246,37 @@ Path Path::obround(const Point& p1, const Point& p2,
   return p;
 }
 
+Path Path::arcObround(const Point& p1, const Point& p2, const Angle& angle,
+                      const PositiveLength& width) noexcept {
+  if (p1 == p2) {
+    return circle(width).translated(p1);
+  }
+  Length radius      = Toolbox::arcRadius(p1, p2, angle).abs();
+  Length innerRadius = radius - (*width / 2);
+  Length outerRadius = radius + (*width / 2);
+  Point  center      = Toolbox::arcCenter(p1, p2, angle);
+  Point  delta1      = p1 - center;
+  Point  delta2      = p2 - center;
+  qreal  angle1Rad   = qAtan2(delta1.getY().toPx(), delta1.getX().toPx());
+  qreal  angle2Rad   = qAtan2(delta2.getY().toPx(), delta2.getX().toPx());
+  Point  p1Inner =
+      center + Point(innerRadius, 0).rotated(Angle::fromRad(angle1Rad));
+  Point p1Outer =
+      center + Point(outerRadius, 0).rotated(Angle::fromRad(angle1Rad));
+  Point p2Inner =
+      center + Point(innerRadius, 0).rotated(Angle::fromRad(angle2Rad));
+  Point p2Outer =
+      center + Point(outerRadius, 0).rotated(Angle::fromRad(angle2Rad));
+
+  Path p;
+  p.addVertex(p1Inner, angle);
+  p.addVertex(p2Inner, angle < 0 ? Angle::deg180() : -Angle::deg180());
+  p.addVertex(p2Outer, -angle);
+  p.addVertex(p1Outer, angle < 0 ? Angle::deg180() : -Angle::deg180());
+  p.addVertex(p1Inner, Angle::deg0());
+  return p;
+}
+
 Path Path::rect(const Point& p1, const Point& p2) noexcept {
   Path p;
   p.addVertex(Point(p1.getX(), p1.getY()));
@@ -299,9 +349,17 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
   return p;
 }
 
-QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths) noexcept {
+QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths,
+                                    bool                 area) noexcept {
   QPainterPath p;
-  foreach (const Path& path, paths) { p.addPath(path.toQPainterPathPx()); }
+  p.setFillRule(Qt::WindingFill);
+  foreach (const Path& path, paths) {
+    if (area) {
+      p |= path.toQPainterPathPx();
+    } else {
+      p.addPath(path.toQPainterPathPx());
+    }
+  }
   return p;
 }
 

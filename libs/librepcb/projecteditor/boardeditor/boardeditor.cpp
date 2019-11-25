@@ -26,6 +26,8 @@
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../docks/ercmsgdock.h"
 #include "../projecteditor.h"
+#include "boarddesignrulecheckdialog.h"
+#include "boarddesignrulecheckmessagesdock.h"
 #include "boardlayersdock.h"
 #include "boardlayerstacksetupdialog.h"
 #include "fabricationoutputdialog.h"
@@ -40,11 +42,13 @@
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardadd.h>
 #include <librepcb/project/boards/cmd/cmdboarddesignrulesmodify.h>
 #include <librepcb/project/boards/cmd/cmdboardremove.h>
@@ -83,6 +87,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mErcMsgDock(nullptr),
     mUnplacedComponentsDock(nullptr),
     mBoardLayersDock(nullptr),
+    mDrcMessagesDock(),
     mFsm(nullptr) {
   mUi->setupUi(this);
   mUi->lblUnplacedComponentsNote->hide();
@@ -111,6 +116,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mErcMsgDock = new ErcMsgDock(mProject);
   addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
   tabifyDockWidget(mBoardLayersDock, mErcMsgDock);
+  mDrcMessagesDock.reset(new BoardDesignRuleCheckMessagesDock(this));
+  connect(mDrcMessagesDock.data(),
+          &BoardDesignRuleCheckMessagesDock::messageSelected, this,
+          &BoardEditor::highlightDrcMessage);
+  addDockWidget(Qt::RightDockWidgetArea, mDrcMessagesDock.data());
+  tabifyDockWidget(mErcMsgDock, mDrcMessagesDock.data());
   mUnplacedComponentsDock->raise();
 
   // add graphics view as central widget
@@ -129,6 +140,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->menuView->addAction(mUnplacedComponentsDock->toggleViewAction());
   mUi->menuView->addAction(mBoardLayersDock->toggleViewAction());
   mUi->menuView->addAction(mErcMsgDock->toggleViewAction());
+  mUi->menuView->addAction(mDrcMessagesDock->toggleViewAction());
 
   // add all boards to the menu and connect to project signals
   for (int i = 0; i < mProject.getBoards().count(); i++) boardAdded(i);
@@ -274,6 +286,7 @@ BoardEditor::~BoardEditor() {
   mUnplacedComponentsDock = nullptr;
   delete mErcMsgDock;
   mErcMsgDock = nullptr;
+  mDrcMessagesDock.reset();
   delete mGraphicsView;
   mGraphicsView = nullptr;
   delete mUi;
@@ -313,6 +326,9 @@ void BoardEditor::setActiveBoardIndex(int index) noexcept {
     // update dock widgets
     mUnplacedComponentsDock->setBoard(mActiveBoard);
     mBoardLayersDock->setActiveBoard(mActiveBoard);
+    mDrcMessagesDock->setMessages(mActiveBoard
+                                      ? mDrcMessages[mActiveBoard->getUuid()]
+                                      : QList<BoardDesignRuleCheckMessage>());
   }
 
   // update GUI
@@ -579,6 +595,24 @@ void BoardEditor::on_actionModifyDesignRules_triggered() {
   }
 }
 
+void BoardEditor::on_actionDesignRuleCheck_triggered() {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  BoardDesignRuleCheckDialog dialog(*board, mDrcOptions, this);
+  dialog.exec();
+  mDrcOptions = dialog.getOptions();
+  if (dialog.getMessages()) {
+    clearDrcMarker();
+    mDrcMessages.insert(board->getUuid(), *dialog.getMessages());
+    mDrcMessagesDock->setMessages(*dialog.getMessages());
+    if (dialog.getMessages()->count() > 0) {
+      mDrcMessagesDock->show();
+      mDrcMessagesDock->raise();
+    }
+  }
+}
+
 void BoardEditor::on_actionRebuildPlanes_triggered() {
   Board* board = getActiveBoard();
   if (board) {
@@ -621,6 +655,11 @@ void BoardEditor::boardListActionGroupTriggered(QAction* action) {
  ******************************************************************************/
 
 bool BoardEditor::graphicsViewEventHandler(QEvent* event) {
+  // clear DRC location on click
+  if (event->type() == QEvent::GraphicsSceneMousePress) {
+    clearDrcMarker();
+  }
+
   BEE_RedirectedQEvent* e =
       new BEE_RedirectedQEvent(BEE_Base::GraphicsViewEvent, event);
   return mFsm->processEvent(e, true);
@@ -659,6 +698,32 @@ void BoardEditor::toolActionGroupChangeTriggered(
 
 void BoardEditor::unplacedComponentsCountChanged(int count) noexcept {
   mUi->lblUnplacedComponentsNote->setVisible(count > 0);
+}
+
+void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
+                                      bool zoomTo) noexcept {
+  if (QGraphicsScene* scene = mGraphicsView->scene()) {
+    QPainterPath path = Path::toQPainterPathPx(msg.getLocations(), true);
+    mDrcLocationGraphicsItem.reset(new QGraphicsPathItem());
+    mDrcLocationGraphicsItem->setZValue(Board::ZValue_AirWires);
+    mDrcLocationGraphicsItem->setPen(Qt::NoPen);
+    mDrcLocationGraphicsItem->setBrush(QColor::fromRgb(255, 127, 0));
+    mDrcLocationGraphicsItem->setPath(path);
+    scene->addItem(mDrcLocationGraphicsItem.data());
+
+    qreal  margin = Length(1000000).toPx();
+    QRectF rect   = path.boundingRect();
+    rect.adjust(-margin, -margin, margin, margin);
+    mGraphicsView->setSceneRectMarker(rect);
+    if (zoomTo) {
+      mGraphicsView->zoomToRect(rect);
+    }
+  }
+}
+
+void BoardEditor::clearDrcMarker() noexcept {
+  mDrcLocationGraphicsItem.reset();
+  mGraphicsView->setSceneRectMarker(QRectF());
 }
 
 /*******************************************************************************

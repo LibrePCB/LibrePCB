@@ -72,8 +72,7 @@ void BGI_Plane::updateCacheAndRepaint() noexcept {
   mLayer = getLayer(*mPlane.getLayerName());
 
   // set shape and bounding rect
-  mOutline = mPlane.getOutline().toQPainterPathPx(
-      true);  // always return a closed path
+  mOutline = mPlane.getOutline().toClosedPath().toQPainterPathPx();
   mShape = mShape = Toolbox::shapeFromPath(
       mOutline, QPen(Length::fromMm(0.3).toPx()), QBrush());
   mBoundingRect = mShape.boundingRect();

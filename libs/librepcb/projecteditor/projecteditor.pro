@@ -20,6 +20,8 @@ INCLUDEPATH += \
     ../../type_safe/external/debug_assert \
 
 SOURCES += \
+    boardeditor/boarddesignrulecheckdialog.cpp \
+    boardeditor/boarddesignrulecheckmessagesdock.cpp \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
     boardeditor/boardlayerstacksetupdialog.cpp \
@@ -82,6 +84,8 @@ SOURCES += \
     schematiceditor/symbolinstancepropertiesdialog.cpp \
 
 HEADERS += \
+    boardeditor/boarddesignrulecheckdialog.h \
+    boardeditor/boarddesignrulecheckmessagesdock.h \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
     boardeditor/boardlayerstacksetupdialog.h \
@@ -144,6 +148,8 @@ HEADERS += \
     schematiceditor/symbolinstancepropertiesdialog.h \
 
 FORMS += \
+    boardeditor/boarddesignrulecheckdialog.ui \
+    boardeditor/boarddesignrulecheckmessagesdock.ui \
     boardeditor/boardeditor.ui \
     boardeditor/boardlayersdock.ui \
     boardeditor/boardlayerstacksetupdialog.ui \
