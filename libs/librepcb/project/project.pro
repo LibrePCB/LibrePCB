@@ -56,6 +56,9 @@ SOURCES += \
     boards/cmd/cmdfootprintstroketextadd.cpp \
     boards/cmd/cmdfootprintstroketextremove.cpp \
     boards/cmd/cmdfootprintstroketextsreset.cpp \
+    boards/drc/boardclipperpathgenerator.cpp \
+    boards/drc/boarddesignrulecheck.cpp \
+    boards/drc/boarddesignrulecheckmessage.cpp \
     boards/graphicsitems/bgi_airwire.cpp \
     boards/graphicsitems/bgi_base.cpp \
     boards/graphicsitems/bgi_footprint.cpp \
@@ -172,6 +175,9 @@ HEADERS += \
     boards/cmd/cmdfootprintstroketextadd.h \
     boards/cmd/cmdfootprintstroketextremove.h \
     boards/cmd/cmdfootprintstroketextsreset.h \
+    boards/drc/boardclipperpathgenerator.h \
+    boards/drc/boarddesignrulecheck.h \
+    boards/drc/boarddesignrulecheckmessage.h \
     boards/graphicsitems/bgi_airwire.h \
     boards/graphicsitems/bgi_base.h \
     boards/graphicsitems/bgi_footprint.h \

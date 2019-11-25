@@ -217,7 +217,8 @@ public:
   void                   removeHole(BI_Hole& hole);
 
   // AirWire Methods
-  void scheduleAirWiresRebuild(NetSignal* netsignal) noexcept {
+  QList<BI_AirWire*> getAirWires() const noexcept { return mAirWires.values(); }
+  void               scheduleAirWiresRebuild(NetSignal* netsignal) noexcept {
     mScheduledNetSignalsForAirWireRebuild.insert(netsignal);
   }
   void triggerAirWiresRebuild() noexcept;

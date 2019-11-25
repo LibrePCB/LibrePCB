@@ -33,6 +33,79 @@ namespace librepcb {
  *  General Methods
  ******************************************************************************/
 
+void ClipperHelpers::unite(ClipperLib::Paths& paths) {
+  try {
+    ClipperLib::Clipper c;
+    c.AddPaths(paths, ClipperLib::ptSubject, true);
+    c.Execute(ClipperLib::ctUnion, paths, ClipperLib::pftEvenOdd,
+              ClipperLib::pftEvenOdd);
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString(tr("Failed to unite paths: %1")).arg(e.what()));
+  }
+}
+
+void ClipperHelpers::unite(ClipperLib::Paths&      subject,
+                           const ClipperLib::Path& clip) {
+  try {
+    ClipperLib::Clipper c;
+    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPath(clip, ClipperLib::ptClip, true);
+    c.Execute(ClipperLib::ctUnion, subject, ClipperLib::pftEvenOdd,
+              ClipperLib::pftEvenOdd);
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString(tr("Failed to unite paths: %1")).arg(e.what()));
+  }
+}
+
+void ClipperHelpers::unite(ClipperLib::Paths&       subject,
+                           const ClipperLib::Paths& clip) {
+  try {
+    ClipperLib::Clipper c;
+    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPaths(clip, ClipperLib::ptClip, true);
+    c.Execute(ClipperLib::ctUnion, subject, ClipperLib::pftEvenOdd,
+              ClipperLib::pftEvenOdd);
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString(tr("Failed to unite paths: %1")).arg(e.what()));
+  }
+}
+
+std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
+    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip) {
+  try {
+    // Wrap the PolyTree object in a smart pointer since PolyTree cannot
+    // safely be copied (i.e. returned by value), it would lead to a crash!!!
+    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
+    ClipperLib::Clipper                   c;
+    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPaths(clip, ClipperLib::ptClip, true);
+    c.Execute(ClipperLib::ctIntersection, *result, ClipperLib::pftEvenOdd,
+              ClipperLib::pftEvenOdd);
+    return result;
+  } catch (const std::exception& e) {
+    throw LogicError(
+        __FILE__, __LINE__,
+        QString(tr("Failed to intersect paths: %1")).arg(e.what()));
+  }
+}
+
+void ClipperHelpers::subtract(ClipperLib::Paths&       subject,
+                              const ClipperLib::Paths& clip) {
+  try {
+    ClipperLib::Clipper c;
+    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPaths(clip, ClipperLib::ptClip, true);
+    c.Execute(ClipperLib::ctDifference, subject, ClipperLib::pftNonZero,
+              ClipperLib::pftNonZero);
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString(tr("Failed to subtract paths: %1")).arg(e.what()));
+  }
+}
+
 void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
                             const PositiveLength& maxArcTolerance) {
   try {

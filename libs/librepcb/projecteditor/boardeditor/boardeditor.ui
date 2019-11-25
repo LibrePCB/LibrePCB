@@ -157,6 +157,7 @@
     </property>
     <addaction name="actionLayerStackSetup"/>
     <addaction name="actionModifyDesignRules"/>
+    <addaction name="actionDesignRuleCheck"/>
     <addaction name="separator"/>
     <addaction name="actionRebuildPlanes"/>
     <addaction name="separator"/>
@@ -250,6 +251,7 @@
    <addaction name="actionToolAddPlane"/>
    <addaction name="separator"/>
    <addaction name="actionRebuildPlanes"/>
+   <addaction name="actionDesignRuleCheck"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
    <property name="windowTitle">
@@ -769,6 +771,15 @@
    </property>
    <property name="text">
     <string>Hide All Planes</string>
+   </property>
+  </action>
+  <action name="actionDesignRuleCheck">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/drc.png</normaloff>:/img/actions/drc.png</iconset>
+   </property>
+   <property name="text">
+    <string>Design Rule Check</string>
    </property>
   </action>
  </widget>

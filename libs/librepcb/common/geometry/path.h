@@ -67,7 +67,9 @@ public:
     return mVertices;
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
-  const QPainterPath&    toQPainterPathPx(bool close = false) const noexcept;
+  Path                   toClosedPath() const noexcept;
+  QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
+  const QPainterPath& toQPainterPathPx() const noexcept;
 
   // Transformations
   Path& translate(const Point& offset) noexcept;
@@ -106,6 +108,8 @@ public:
                       const PositiveLength& height) noexcept;
   static Path obround(const Point& p1, const Point& p2,
                       const PositiveLength& width) noexcept;
+  static Path arcObround(const Point& p1, const Point& p2, const Angle& angle,
+                         const PositiveLength& width) noexcept;
   static Path rect(const Point& p1, const Point& p2) noexcept;
   static Path centeredRect(const PositiveLength& width,
                            const PositiveLength& height) noexcept;
@@ -113,7 +117,19 @@ public:
                       const PositiveLength& height) noexcept;
   static Path flatArc(const Point& p1, const Point& p2, const Angle& angle,
                       const PositiveLength& maxTolerance) noexcept;
-  static QPainterPath toQPainterPathPx(const QVector<Path>& paths) noexcept;
+
+  /**
+   * @brief Convert multiple ::librepcb::Path objects to a QPainterPath
+   *
+   * The paths are united, so you get the union of all the passed paths.
+   *
+   * @param paths   The paths to convert.
+   * @param area    Whether the passed paths should be interpreted as areas
+   *                (true) or strokes (false).
+   * @return        The QPainterPath with the united paths.
+   */
+  static QPainterPath toQPainterPathPx(const QVector<Path>& paths,
+                                       bool                 area) noexcept;
 
 private:  // Methods
   void invalidatePainterPath() const noexcept {

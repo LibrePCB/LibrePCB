@@ -54,7 +54,7 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(
   // set text properties
   setPosition(mText.getPosition());
   setLineWidth(mText.getStrokeWidth());
-  setPath(Path::toQPainterPathPx(mText.getPaths()));
+  setPath(Path::toQPainterPathPx(mText.getPaths(), false));
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(5);
   updateLayer(mText.getLayerName());
@@ -107,7 +107,7 @@ void StrokeTextGraphicsItem::strokeTextEdited(
       updateTransform();
       break;
     case StrokeText::Event::PathsChanged:
-      setPath(Path::toQPainterPathPx(text.getPaths()));
+      setPath(Path::toQPainterPathPx(text.getPaths(), false));
       break;
     default:
       qWarning() << "Unhandled switch-case in "
