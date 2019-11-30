@@ -42,7 +42,7 @@
 //    "1.0.0-unstable"
 //  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
 //  - Releases (on release branches):           No suffix, e.g. "1.0.0"
-static const char* APP_VERSION = "0.1.3-unstable";
+static const char* APP_VERSION = "0.1.4-unstable";
 
 // File format version:
 //  - Must be equal to the major version of APP_VERSION!
