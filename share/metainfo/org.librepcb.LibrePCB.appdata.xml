@@ -5,28 +5,19 @@
   <project_license>GPL-3.0</project_license>
   <name>LibrePCB</name>
   <summary>Design Schematics and PCBs</summary>
+  <developer_name>The LibrePCB Developers</developer_name>
 
   <description>
-    <p>LibrePCB is a free EDA software to develop printed circuit boards. It’s currently under heavy development to bring out first stable releases as soon as possible.</p>
+    <p>LibrePCB is a free EDA software to develop printed circuit boards.</p>
     <p>Key Features:</p>
     <ul>
       <li>Cross-platform (Unix/Linux, Mac OS X, Windows)</li>
-​      <li>All-in-one (project management, library/schematic/board editors)</li>
+      <li>All-in-one (project management, library/schematic/board editors)</li>
       <li>Intuitive, modern and easy-to-use graphical user interface</li>
       <li>Very powerful library design with some innovative concepts</li>
       <li>Human-readable file formats</li>
       <li>Open Source (GNU GPLv3)</li>
     </ul>
-    <p>Control Panel:</p>
-    <p>The control panel gives you fast access to all of your projects, especially to recently used and favorite projects. It also shows you the description of projects without opening them, if available. Just create a README.md inside your project’s directory!</p>
-    <p>Schematic Editor:</p>
-    <p>The schematic editor is very easy to use and still powerful. Thanks to the innovative library concept, you don’t have to worry about choosing footprints while drawing the schematic. In contrast to other EDA tools, you also don’t have to worry about manually assigning symbol pins to footprint pads later in the board editor.</p>
-    <p>Board Editor:</p>
-    <p>Ever struggled in the middle of layouting if you need to relocate some devices before continue routing the traces? LibrePCB’s board editor just lets you fork your half-done layout to continue with two different layouting strategies! Of course all of the existing boards are always in sync with the schematics.</p>
-    <p>Library Browser:</p>
-    <p>When adding components to the schematic, most EDA tools let you choose them from a simple list of the installed libraries (often named by manufacturer). LibrePCB thinks this is a stupid system and thus lets you choose your components from a tree of categories instead, no matter which library provides them.</p>
-    <p>Library Manager:</p>
-    <p>Managing libraries has never been easier than with LibrePCB’s library manager. It downloads, installs and updates libraries directly from the internet. No more need to do this manually.</p>
   </description>
 
   <screenshots>
@@ -63,6 +54,47 @@
     <binary>librepcb</binary>
     <binary>librepcb-cli</binary>
   </provides>
+
+  <releases>
+    <release version="0.1.3" date="2019-11-30" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Design rule check for boards</li>
+          <li>BOM export to CSV</li>
+          <li>Export boards to PDF</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2019-11-30_release_0.1.3/</url>
+    </release>
+    <release version="0.1.2" date="2019-07-14" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Support latest build environments (GCC 9.x and Qt 5.13)</li>
+          <li>Improved table widgets</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2019-07-14_release_0.1.2/</url>
+    </release>
+    <release version="0.1.1" date="2019-04-21" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Design rule check for library elements</li>
+          <li>More powerful symbol variants</li>
+          <li>Transactional file system</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2019-04-21_release_0.1.1/</url>
+    </release>
+    <release version="0.1.0" date="2018-11-25" type="stable">
+      <description>
+        <p>The first stable release!</p>
+      </description>
+      <url type="details">https://librepcb.org/blog/2018-11-25_release_0.1.0/</url>
+    </release>
+  </releases>
 
   <content_rating type="oars-1.1"/>
 </component>
