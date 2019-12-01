@@ -56,7 +56,44 @@
   </provides>
 
   <releases>
-    <release version="0.1.3" date="2019-11-30"/>
+    <release version="0.1.3" date="2019-11-30" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Design rule check for boards</li>
+          <li>BOM export to CSV</li>
+          <li>Export boards to PDF</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2019-11-30_release_0.1.3/</url>
+    </release>
+    <release version="0.1.2" date="2019-07-14" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Support latest build environments (GCC 9.x and Qt 5.13)</li>
+          <li>Improved table widgets</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2019-07-14_release_0.1.2/</url>
+    </release>
+    <release version="0.1.1" date="2019-04-21" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Design rule check for library elements</li>
+          <li>More powerful symbol variants</li>
+          <li>Transactional file system</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2019-04-21_release_0.1.1/</url>
+    </release>
+    <release version="0.1.0" date="2018-11-25" type="stable">
+      <description>
+        <p>The first stable release!</p>
+      </description>
+      <url type="details">https://librepcb.org/blog/2018-11-25_release_0.1.0/</url>
+    </release>
   </releases>
 
   <content_rating type="oars-1.1"/>
