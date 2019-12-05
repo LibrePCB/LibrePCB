@@ -41,7 +41,7 @@ namespace workspace {
 /**
  * @brief The WSI_Base class is the base class of all workspace settings items
  *
- * Every workspace setting is represented by a seperate object. All of these
+ * Every workspace setting is represented by a separate object. All of these
  * objects have this class as base class. The name of all Workspace Settings
  * Items begin with the prefix "WSI_" to easily recognize them.
  */

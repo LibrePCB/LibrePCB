@@ -67,7 +67,7 @@ class Angle;
  * a coordinate from millimeters (or another unit) to pixels for a QGraphics*
  * object, you have to use the method Point::toPxQPointF(), which will also
  * invert the Y-coordinate. You should never convert an X and/or Y coordinate
- * with seperate Length objects - which would be possible, but then the sign of
+ * with separate Length objects - which would be possible, but then the sign of
  * the Y-coordinate is wrong! It is also not allowed to get the Y-coordinate in
  * pixels with calling Point.getY().toPx(), this way the sign of the value in
  * pixels is also wrong! You should use Point.toPxQPointF().y() instead for this
