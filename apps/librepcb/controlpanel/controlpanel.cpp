@@ -123,7 +123,7 @@ ControlPanel::ControlPanel(Workspace& workspace)
     mUi->projectTreeView->hideColumn(i);
   }
 
-  // load recent and favorite poject models
+  // load recent and favorite project models
   mUi->recentProjectsListView->setModel(&mWorkspace.getRecentProjectsModel());
   mUi->favoriteProjectsListView->setModel(
       &mWorkspace.getFavoriteProjectsModel());

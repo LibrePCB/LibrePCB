@@ -382,7 +382,7 @@ public:
   /**
    * @brief Save the project to the transactional file system
    *
-   * @throw Exception     If an error occured.
+   * @throw Exception     If an error occurred.
    */
   void save();
 

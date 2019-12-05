@@ -220,7 +220,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
 Project::~Project() noexcept {
   // free the allocated memory in the reverse order of their allocation
 
-  // delete all boards and schematics (and catch all throwed exceptions)
+  // delete all boards and schematics (and catch all thrown exceptions)
   foreach (Board* board, mBoards) {
     try {
       removeBoard(*board, true);

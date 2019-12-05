@@ -105,7 +105,7 @@ Circuit::Circuit(Project& project, bool create)
 }
 
 Circuit::~Circuit() noexcept {
-  // delete all component instances (and catch all throwed exceptions)
+  // delete all component instances (and catch all thrown exceptions)
   foreach (ComponentInstance* compInstance, mComponentInstances)
     try {
       removeComponentInstance(*compInstance);
@@ -113,7 +113,7 @@ Circuit::~Circuit() noexcept {
     } catch (...) {
     }
 
-  // delete all netsignals (and catch all throwed exceptions)
+  // delete all netsignals (and catch all thrown exceptions)
   foreach (NetSignal* netsignal, mNetSignals)
     try {
       removeNetSignal(*netsignal);
@@ -121,7 +121,7 @@ Circuit::~Circuit() noexcept {
     } catch (...) {
     }
 
-  // delete all netclasses (and catch all throwed exceptions)
+  // delete all netclasses (and catch all thrown exceptions)
   foreach (NetClass* netclass, mNetClasses)
     try {
       removeNetClass(*netclass);

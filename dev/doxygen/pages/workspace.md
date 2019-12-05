@@ -52,7 +52,7 @@ unit, ...).
 
 ## v<VERSION>/libraries/ {#doc_workspace_libraries_dir}
 
-Here are all libraries located, splitted up into two subdirectories. By the way, all of these
+Here are all libraries located, split up into two subdirectories. By the way, all of these
 libraries together are sometimes referred as *the workspace library*.
 
 ## v<VERSION>/libraries/local/ {#doc_workspace_local_dir}
@@ -123,7 +123,7 @@ continues using the libraries of the older version. For example an application
 of version `v2.x` may still use the libraries in the [version directory] `v1`.
 So the [version directory] `v2` may only contain workspace settings (i.e.
 `settings.lp`). Or if workspace settings are also compatible with the older
-appplication version, the whole [version directory] `v2` is not created at all.
+application version, the whole [version directory] `v2` is not created at all.
 
 
 # Downgrade workspace to older application version {#doc_workspace_downgrade}

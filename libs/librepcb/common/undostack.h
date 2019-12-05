@@ -93,7 +93,7 @@ private:
  * doc_project_undostack
  *
  * Compared with QUndoStack, the biggest differences are the following:
- *  - <b>Support for exceptions:</b> If an exception is throwed in a
+ *  - <b>Support for exceptions:</b> If an exception is thrown in an
  * #UndoCommand object, this undo stack always tries to keep the whole stack
  * consistent (update the index only if the last undo/redo was successful, try
  * to rollback failed changes, ...).

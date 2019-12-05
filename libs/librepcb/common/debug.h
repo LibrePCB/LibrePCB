@@ -52,7 +52,7 @@ namespace librepcb {
  * Debug::DebugLevel::Exception.
  *
  * This class can write messages to the stderr output and to a log file. You can
- * set seperate debug levels for both. By default, logging to a file is
+ * set separate debug levels for both. By default, logging to a file is
  * disabled.
  */
 class Debug final {
@@ -68,7 +68,7 @@ public:
     Fatal =
         10,  ///< fatal errors [qFatal()] --> this will quit the application!
     Critical  = 20,  ///< errors [qCritical()]
-    Exception = 30,  ///< throwed exceptions of (sub)class Exception
+    Exception = 30,  ///< thrown exceptions of (sub)class Exception
     Warning   = 40,  ///< warnings [qWarning()]
     Info      = 50,  ///< info messages [qInfo()]
     DebugMsg =
