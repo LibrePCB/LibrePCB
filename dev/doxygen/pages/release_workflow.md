@@ -97,7 +97,7 @@ Translations are automatically checked into the repository
 [LibrePCB/librepcb-i18n](https://github.com/LibrePCB/librepcb-i18n). The
 `master` branch contains translations of the resource `librepcb.ts`, while
 translations of resources for releases are available on branches for the
-corresponsing releases (e.g. `release/0.1` for `librepcb-0.1.ts`).
+corresponding releases (e.g. `release/0.1` for `librepcb-0.1.ts`).
 
 The `librepcb-i18n` repository is included as a submodule in the main
 repository. On the `master` branch, the submodule points to a commit which does

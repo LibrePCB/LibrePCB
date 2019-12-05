@@ -174,7 +174,7 @@ private:
  * @brief The LogicError class
  *
  * This exception class is used for exceptions related to the internal logic of
- * the program (a throwed LogicError means that there is a bug in the source
+ * the program (a thrown LogicError means that there is a bug in the source
  * code).
  *
  * @see Exception

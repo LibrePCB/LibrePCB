@@ -290,7 +290,7 @@ then cannot be undone. Basically, all changes to the circuit/schematics/boards a
 an undo action. If you are unsure if you should use the project's undo/redo system, try to answer
 the question *do the user wants to undo/redo this action with the undo/redo buttons in the editors?*.
 
-It's possible to use seperate librepcb::UndoStack objects for independent parts of the project. For
+It's possible to use separate librepcb::UndoStack objects for independent parts of the project. For
 example, changing the project settings could be done by using an undo/redo system to provide an undo
 command. But these undo stacks need their own undo/redo buttons. The undo/redo buttons in the
 schematic editor and in the board editor are only connected to the project's undo stack
