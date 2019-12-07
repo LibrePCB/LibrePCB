@@ -24,7 +24,6 @@
 
 #include "firstrunwizardpage_welcome.h"
 #include "firstrunwizardpage_workspacepath.h"
-#include "firstrunwizardpage_workspacesettings.h"
 #include "ui_firstrunwizard.h"
 
 /*******************************************************************************
@@ -44,7 +43,6 @@ FirstRunWizard::FirstRunWizard(QWidget* parent) noexcept
   // add pages
   setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
   setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
-  setPage(Page_WorkspaceSettings, new FirstRunWizardPage_WorkspaceSettings());
 
   // set header logo
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
@@ -68,10 +66,6 @@ FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept {
     return FilePath(field("OpenWorkspacePath").toString());
 }
 
-QString FirstRunWizard::getNewWorkspaceUserName() const noexcept {
-  return field("NewWorkspaceUserName").toString();
-}
-
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -90,9 +84,6 @@ int FirstRunWizard::nextId() const {
       return Page_WorkspacePath;
     }
     case Page_WorkspacePath: {
-      return getCreateNewWorkspace() ? Page_WorkspaceSettings : -1;
-    }
-    case Page_WorkspaceSettings: {
       return -1;
     }
     default: { return -1; }
