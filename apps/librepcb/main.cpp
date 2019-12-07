@@ -213,11 +213,6 @@ static FilePath determineWorkspacePath() noexcept {
         try {
           // create new workspace
           Workspace::createNewWorkspace(wsPath);  // can throw
-
-          // open workspace and apply settings
-          Workspace ws(wsPath);
-          ws.getSettings().userName.set(wizard.getNewWorkspaceUserName());
-          ws.getSettings().saveToFile();  // can throw
         } catch (const Exception& e) {
           QMessageBox::critical(0, Application::translate("Workspace", "Error"),
                                 e.getMsg());

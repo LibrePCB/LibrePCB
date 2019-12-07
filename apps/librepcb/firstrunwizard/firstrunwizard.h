@@ -51,7 +51,6 @@ class FirstRunWizard final : public QWizard {
   enum PageId {
     Page_Welcome,
     Page_WorkspacePath,
-    Page_WorkspaceSettings,
   };
 
 public:
@@ -62,7 +61,6 @@ public:
   // Getters
   bool     getCreateNewWorkspace() const noexcept;
   FilePath getWorkspaceFilePath() const noexcept;
-  QString  getNewWorkspaceUserName() const noexcept;
 
   // Inherited from QWizard
   int nextId() const override;

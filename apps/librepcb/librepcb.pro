@@ -88,7 +88,6 @@ SOURCES += \
     firstrunwizard/firstrunwizard.cpp \
     firstrunwizard/firstrunwizardpage_welcome.cpp \
     firstrunwizard/firstrunwizardpage_workspacepath.cpp \
-    firstrunwizard/firstrunwizardpage_workspacesettings.cpp \
     main.cpp \
     markdown/markdownconverter.cpp \
     projectlibraryupdater/projectlibraryupdater.cpp \
@@ -98,7 +97,6 @@ HEADERS += \
     firstrunwizard/firstrunwizard.h \
     firstrunwizard/firstrunwizardpage_welcome.h \
     firstrunwizard/firstrunwizardpage_workspacepath.h \
-    firstrunwizard/firstrunwizardpage_workspacesettings.h \
     markdown/markdownconverter.h \
     projectlibraryupdater/projectlibraryupdater.h \
 
@@ -107,7 +105,6 @@ FORMS += \
     firstrunwizard/firstrunwizard.ui \
     firstrunwizard/firstrunwizardpage_welcome.ui \
     firstrunwizard/firstrunwizardpage_workspacepath.ui \
-    firstrunwizard/firstrunwizardpage_workspacesettings.ui \
     projectlibraryupdater/projectlibraryupdater.ui \
 
 # Custom compiler "lrelease" for qm generation
