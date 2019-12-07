@@ -183,13 +183,17 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
         QCoreApplication::translate(
             "main",
             "<p><b>ATTENTION: This application version is UNSTABLE!</b></p>"
-            "<p>Everything you do with this application could break your "
-            "workspace, "
-            "libraries or projects! It's highly recommended to create a backup "
-            "before proceeding. If you are unsure, please download an official "
-            "stable release instead.</p>"
+            "<p>Everything you do with this application can break your "
+            "workspace, libraries or projects! Saved files will not be "
+            "readable with stable releases of LibrePCB. It's highly "
+            "recommended to create a backup before proceeding. If you are "
+            "unsure, please download an official stable release instead.</p>"
+            "<p>For details, please take a look at LibrePCB's "
+            "<a href=\"%1\">versioning concept</a>.</p>"
             "<p>Are you really sure to continue with the risk of breaking your "
-            "files?!</p>"),
+            "files?!</p>")
+            .arg("https://developers.librepcb.org/da/dbc/"
+                 "doc_release_workflow.html"),
         QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
     return (btn == QMessageBox::Yes);
   }
