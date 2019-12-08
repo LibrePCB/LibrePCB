@@ -75,6 +75,7 @@ private:  // Methods
                              bool strict, bool& success) const;
   static QString prettyPath(const FilePath& path,
                             const QString&  style) noexcept;
+  static bool    failIfFileFormatUnstable() noexcept;
   static void    print(const QString& str, int newlines = 1) noexcept;
   static void    printErr(const QString& str, int newlines = 1) noexcept;
 
