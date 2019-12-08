@@ -5,4 +5,3 @@ SUBDIRS = \
     librepcb-cli \
     EagleImport \
     UuidGenerator \
-    WorkspaceLibraryUpdater
