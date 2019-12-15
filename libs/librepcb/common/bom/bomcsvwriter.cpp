@@ -50,13 +50,18 @@ QList<QStringList> BomCsvWriter::toStringList(const Bom& bom) noexcept {
   QList<QStringList> lines;
   // Don't translate the CSV header to make BOMs independent of the user's
   // language.
-  lines.append(QStringList{"Quantity", "Designators"} + bom.getColumns());
+  QStringList header = QStringList{"Quantity", "Designators"} + bom.getColumns();
+  QStringList headerCols;
+  foreach (const QString& headerItem, header) {
+    headerCols += '"' + headerItem + '"';
+  }
+  lines.append(headerCols);
   foreach (const BomItem& item, bom.getItems()) {
     QStringList cols;
     cols += QString::number(item.getDesignators().count());
-    cols += cleanStr(item.getDesignators().join(", "));
+    cols += '"' + cleanStr(item.getDesignators().join(", ")) + '"';
     foreach (const QString& attribute, item.getAttributes()) {
-      cols += cleanStr(attribute);
+      cols += '"' + cleanStr(attribute) + '"';
     }
     lines.append(cols);
   }
@@ -66,7 +71,7 @@ QList<QStringList> BomCsvWriter::toStringList(const Bom& bom) noexcept {
 QString BomCsvWriter::toString(const Bom& bom) noexcept {
   QString str;
   foreach (const QStringList& line, toStringList(bom)) {
-    str += line.join(";") + "\n";
+    str += line.join(",") + "\n";
   }
   return str;
 }
