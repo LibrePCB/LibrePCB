@@ -386,6 +386,12 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
           new CmdBoardNetSegmentRemoveElements(*netsegment));
       cmdRemove->removeNetLine(*netline);
       mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+    } else if (BI_NetPoint* netpoint = findNetPointNextTo(board, pos)) {
+      mFixedStartAnchor = netpoint;
+      netsegment        = &netpoint->getNetSegment();
+      if (GraphicsLayer* linesLayer = netpoint->getLayerOfLines()) {
+        layer = linesLayer;
+      }
     } else {
       throw Exception(__FILE__, __LINE__, tr("Nothing here to connect."));
     }
@@ -613,6 +619,13 @@ BI_FootprintPad* BES_DrawTrace::findPad(Board& board, const Point& pos,
     }
   }
   return nullptr;
+}
+
+BI_NetPoint* BES_DrawTrace::findNetPointNextTo(Board& board, const Point& pos,
+                                               GraphicsLayer*            layer,
+                                               NetSignal*                netsignal) const
+    noexcept {
+  return board.getNetPointNextToScenePos(pos, layer, netsignal);
 }
 
 BI_NetPoint* BES_DrawTrace::findNetPoint(Board& board, const Point& pos,

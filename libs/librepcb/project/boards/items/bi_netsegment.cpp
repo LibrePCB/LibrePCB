@@ -194,6 +194,24 @@ int BI_NetSegment::getViasAtScenePos(const Point&    pos,
   return count;
 }
 
+int BI_NetSegment::getNetPointNextToScenePos(const Point&         pos,
+                                             const GraphicsLayer* layer,
+                                             BI_NetPoint** bestMatch,
+                                             UnsignedLength* maxDistance) const
+    noexcept {
+  foreach (BI_NetPoint* netpoint, mNetPoints) {
+    if (netpoint->isSelectable() && ((!layer) || (netpoint->getLayerOfLines() == layer))) {
+      UnsignedLength distance = netpoint->distance(pos);
+      if (! maxDistance || distance < *maxDistance) {
+        *maxDistance = distance;
+        *bestMatch = netpoint;
+      }
+    }
+  }
+  return 0;
+}
+
+
 int BI_NetSegment::getNetPointsAtScenePos(const Point&         pos,
                                           const GraphicsLayer* layer,
                                           QList<BI_NetPoint*>& points) const

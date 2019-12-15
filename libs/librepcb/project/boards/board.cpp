@@ -498,6 +498,21 @@ QList<BI_Via*> Board::getViasAtScenePos(const Point&     pos,
   return list;
 }
 
+BI_NetPoint* Board::getNetPointNextToScenePos(const Point& pos,
+                                              const GraphicsLayer* layer,
+                                              const NetSignal* netsignal) {
+  BI_NetPoint* bestMatch = NULL;
+  UnsignedLength maxDistance = UnsignedLength(10 * 1000 * 1000);
+
+  foreach (BI_NetSegment* segment, mNetSegments) {
+    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+      segment->getNetPointNextToScenePos(pos, layer, &bestMatch, &maxDistance);
+    }
+  }
+
+  return bestMatch;
+}
+
 QList<BI_NetPoint*> Board::getNetPointsAtScenePos(
     const Point& pos, const GraphicsLayer* layer,
     const NetSignal* netsignal) const noexcept {

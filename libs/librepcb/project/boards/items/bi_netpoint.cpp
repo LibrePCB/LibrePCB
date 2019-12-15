@@ -161,6 +161,10 @@ void BI_NetPoint::serialize(SExpression& root) const {
   root.appendChild(mPosition.serializeToDomElement("position"), false);
 }
 
+UnsignedLength BI_NetPoint::distance(Point destination) {
+  return (this->getPosition() - destination).getLength();
+}
+
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/

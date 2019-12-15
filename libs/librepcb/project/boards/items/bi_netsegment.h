@@ -72,6 +72,10 @@ public:
   NetSignal&  getNetSignal() const noexcept { return *mNetSignal; }
   bool        isUsed() const noexcept;
   int getViasAtScenePos(const Point& pos, QList<BI_Via*>& vias) const noexcept;
+  int getNetPointNextToScenePos(const Point&         pos,
+                                const GraphicsLayer* layer,
+                                BI_NetPoint**        bestMatch,
+                                UnsignedLength* maxDistance) const noexcept;
   int getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
                              QList<BI_NetPoint*>& points) const noexcept;
   int getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,

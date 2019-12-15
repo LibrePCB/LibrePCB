@@ -75,6 +75,7 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
+  UnsignedLength distance(Point destination);
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;

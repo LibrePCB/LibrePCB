@@ -156,6 +156,9 @@ public:
                                              const GraphicsLayer* layer,
                                              const NetSignal* netsignal) const
       noexcept;
+  BI_NetPoint*        getNetPointNextToScenePos(const Point&         pos,
+                                                const GraphicsLayer* layer,
+                                                const NetSignal*     netsignal);
   QList<BI_NetLine*> getNetLinesAtScenePos(const Point&         pos,
                                            const GraphicsLayer* layer,
                                            const NetSignal*     netsignal) const

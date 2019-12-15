@@ -106,6 +106,10 @@ private:
   BI_FootprintPad* findPad(Board& board, const Point& pos,
                            GraphicsLayer* layer     = nullptr,
                            NetSignal*     netsignal = nullptr) const noexcept;
+  BI_NetPoint*     findNetPointNextTo(Board& board, const Point& pos,
+                                      GraphicsLayer*            layer     = nullptr,
+                                      NetSignal*                netsignal = nullptr) const
+      noexcept;
   BI_NetPoint*     findNetPoint(Board& board, const Point& pos,
                                 GraphicsLayer*            layer     = nullptr,
                                 NetSignal*                netsignal = nullptr,
