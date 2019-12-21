@@ -34,7 +34,7 @@ projects in an arbitrary, hierarchical system inside that directory. But of cour
 possible to store projects outside this directory.
 
 Each project is represented by a directory, see its
-[file structure documentation](@ref doc_project_file_structure) for details.
+[file structure documentation](@ref doc_project_filestructure) for details.
 
 ## v<VERSION>/ {#doc_workspace_version_dir}
 
