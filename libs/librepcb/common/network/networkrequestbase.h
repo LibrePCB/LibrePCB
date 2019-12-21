@@ -43,9 +43,9 @@ namespace librepcb {
  *
  * This class lets you execute a network request without blocking the main
  * application thread. After creating an object derived from
- * #NetworkRequestBase, you can connect to signals of that class to track the
- * progress of the request. Then you need to call #start() to start the request
- * processing.
+ * ::librepcb::NetworkRequestBase, you can connect to signals of that class to
+ * track the progress of the request. Then you need to call #start() to start
+ * the request processing.
  *
  * @note    You need to ensure that an instance of
  * librepcb::NetworkAccessManager exists while starting a new network request.

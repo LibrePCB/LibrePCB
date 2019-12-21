@@ -285,7 +285,7 @@ public:
    *
    * @return A new Point object with absolute coordinates
    *
-   * @see Length#abs(), Point#makeAbs()
+   * @see ::librepcb::Length::abs(), ::librepcb::Point::makeAbs()
    */
   Point abs() const noexcept;
 
@@ -294,7 +294,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Length#makeAbs(), Point#abs()
+   * @see ::librepcb::Length::makeAbs(), ::librepcb::Point::abs()
    */
   Point& makeAbs() noexcept;
 
@@ -305,7 +305,7 @@ public:
    *
    * @return A new Point object which is mapped to the grid
    *
-   * @see Length#mappedToGrid(), Point#mapToGrid()
+   * @see ::librepcb::Length::mappedToGrid(), ::librepcb::Point::mapToGrid()
    */
   Point mappedToGrid(const PositiveLength& gridInterval) const noexcept;
 
@@ -316,7 +316,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Length#mapToGrid(), Point#mappedToGrid()
+   * @see ::librepcb::Length::mapToGrid(), ::librepcb::Point::mappedToGrid()
    */
   Point& mapToGrid(const PositiveLength& gridInterval) noexcept;
 
@@ -333,7 +333,7 @@ public:
    *
    * @return A new Point object which is rotated
    *
-   * @see Point#rotate()
+   * @see ::librepcb::Point::rotate()
    */
   Point rotated(const Angle& angle, const Point& center = Point(0, 0)) const
       noexcept;
@@ -351,7 +351,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Point#rotated()
+   * @see ::librepcb::Point::rotated()
    */
   Point& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
 
@@ -365,7 +365,7 @@ public:
    *
    * @return A new Point object which is mirrored
    *
-   * @see Point#mirror()
+   * @see ::librepcb::Point::mirror()
    */
   Point mirrored(Qt::Orientation orientation,
                  const Point&    center = Point(0, 0)) const noexcept;
@@ -379,7 +379,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Point#mirrored()
+   * @see ::librepcb::Point::mirrored()
    */
   Point& mirror(Qt::Orientation orientation,
                 const Point&    center = Point(0, 0)) noexcept;

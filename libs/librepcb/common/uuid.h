@@ -69,7 +69,7 @@ public:
   /**
    * @brief Copy constructor
    *
-   * @param other     Another #Uuid object
+   * @param other     Another ::librepcb::Uuid object
    */
   Uuid(const Uuid& other) noexcept : mUuid(other.mUuid) {}
 

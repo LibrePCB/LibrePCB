@@ -117,11 +117,11 @@ public:
    * @warning You have to check if there is no other component with the same
    * name in the whole circuit! This method will not check if the name is
    * unique. The best way to do this is to call
-   * #librepcb#project#Circuit#setComponentInstanceName().
+   * ::librepcb::project::Circuit::setComponentInstanceName().
    *
    * @param name  The new name of this component in the circuit
    *         *
-   * @undocmd{#librepcb#project#CmdComponentInstanceEdit}
+   * @undocmd{::librepcb::project::CmdComponentInstanceEdit}
    */
   void setName(const CircuitIdentifier& name) noexcept;
 
@@ -130,7 +130,7 @@ public:
    *
    * @param value  The new value
    *
-   * @undocmd{#librepcb#project#CmdComponentInstanceEdit}
+   * @undocmd{::librepcb::project::CmdComponentInstanceEdit}
    */
   void setValue(const QString& value) noexcept;
 
@@ -141,7 +141,7 @@ public:
    *
    * @param device  The new device UUID
    *
-   * @undocmd{#librepcb#project#CmdComponentInstanceEdit}
+   * @undocmd{::librepcb::project::CmdComponentInstanceEdit}
    */
   void setDefaultDeviceUuid(const tl::optional<Uuid>& device) noexcept;
 
@@ -218,7 +218,7 @@ private:
    * @brief All registered symbols
    *
    * - Key:   UUID of the symbol variant item
-   * (#librepcb#library#ComponentSymbolVariantItem)
+   * (::librepcb::library::ComponentSymbolVariantItem)
    * - Value: Pointer to the registered symbol
    *
    * @see #registerSymbol(), #unregisterSymbol()

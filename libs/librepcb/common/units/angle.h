@@ -208,7 +208,7 @@ public:
    *
    * @return A new Angle object with absolute value
    *
-   * @see Angle#makeAbs()
+   * @see ::librepcb::Angle::makeAbs()
    */
   Angle abs() const noexcept;
 
@@ -217,7 +217,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Angle#abs()
+   * @see ::librepcb::Angle::abs()
    */
   Angle& makeAbs() noexcept;
 
@@ -226,7 +226,7 @@ public:
    *
    * @return A new Angle object which is mapped to [0..360[ degrees
    *
-   * @see Angle#mapTo0_360deg()
+   * @see ::librepcb::Angle::mapTo0_360deg()
    */
   Angle mappedTo0_360deg() const noexcept;
 
@@ -235,7 +235,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Angle#mappedTo0_360deg()
+   * @see ::librepcb::Angle::mappedTo0_360deg()
    */
   Angle& mapTo0_360deg() noexcept;
 
@@ -244,7 +244,7 @@ public:
    *
    * @return A new Angle object which is mapped to [-180..+180[ degrees
    *
-   * @see Angle#mapTo180deg()
+   * @see ::librepcb::Angle::mapTo180deg()
    */
   Angle mappedTo180deg() const noexcept;
 
@@ -253,7 +253,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Angle#mappedTo180deg()
+   * @see ::librepcb::Angle::mappedTo180deg()
    */
   Angle& mapTo180deg() noexcept;
 

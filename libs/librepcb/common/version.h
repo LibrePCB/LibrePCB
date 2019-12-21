@@ -71,7 +71,7 @@ public:
   /**
    * @brief Copy constructor
    *
-   * @param other     Another #Version object
+   * @param other     Another ::librepcb::Version object
    */
   Version(const Version& other) noexcept : mNumbers(other.mNumbers) {}
 

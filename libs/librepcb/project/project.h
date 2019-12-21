@@ -68,10 +68,11 @@ class Board;
  *  - project settings
  *  - and much more...
  *
- * The constructor of the #Project class needs the filepath to a project file.
- * Then the project will be opened. A new project can be created with the static
- * method #create(). The destructor will close the project (without saving). Use
- * the method #save() to write the whole project to the harddisc.
+ * The constructor of the ::librepcb::project::Project class needs the filepath
+ * to a project file. Then the project will be opened. A new project can be
+ * created with the static method #create(). The destructor will close the
+ * project (without saving). Use the method #save() to write the whole project
+ * to the harddisc.
  *
  * @note !! A detailed description about projects is available here: @ref
  * doc_project !!
@@ -243,7 +244,7 @@ public:
    *
    * @throw Exception     On error
    *
-   * @undocmd{project#CmdSchematicAdd}
+   * @undocmd{::librepcb::project::CmdSchematicAdd}
    */
   void addSchematic(Schematic& schematic, int newIndex = -1);
 
@@ -257,7 +258,7 @@ public:
    *
    * @throw Exception     On error
    *
-   * @undocmd{project#CmdSchematicRemove}
+   * @undocmd{::librepcb::project::CmdSchematicRemove}
    */
   void removeSchematic(Schematic& schematic, bool deleteSchematic = false);
 
@@ -358,7 +359,7 @@ public:
    *
    * @throw Exception     On error
    *
-   * @undocmd{project#CmdBoardAdd}
+   * @undocmd{::librepcb::project::CmdBoardAdd}
    */
   void addBoard(Board& board, int newIndex = -1);
 
@@ -372,7 +373,7 @@ public:
    *
    * @throw Exception     On error
    *
-   * @undocmd{project#CmdBoardRemove}
+   * @undocmd{::librepcb::project::CmdBoardRemove}
    */
   void removeBoard(Board& board, bool deleteBoard = false);
 

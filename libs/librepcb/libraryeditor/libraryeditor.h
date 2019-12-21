@@ -105,14 +105,15 @@ public:
    * whether the changes should be saved or not. If the user clicks on "cancel"
    * or the library could not be saved successfully, this method will return
    * false. If there was no such error, this method will call
-   * QObject#deleteLater() which means that this object will be deleted in the
+   * QObject::deleteLater() which means that this object will be deleted in the
    * Qt's event loop.
    *
    * @warning This method can be called both from within this class and from
-   * outside this class (for example from the #librepcb#application#ControlPanel). But if you call
-   * this method from outside this class, you may have to delete the object
-   *          yourself afterwards! In special cases, the deleteLater() mechanism
-   *          could lead in fatal errors otherwise!
+   * outside this class (for example from the
+   * ::librepcb::application::ControlPanel). But if you call this method from
+   * outside this class, you may have to delete the object yourself afterwards!
+   * In special cases, the deleteLater() mechanism could lead in fatal errors
+   * otherwise!
    *
    * @param askForSave    If true and there are unsaved changes, this method
    * shows a message box to ask whether the library should be saved or not. If

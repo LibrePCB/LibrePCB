@@ -79,11 +79,10 @@ public:
     Edit_Remove,          ///< remove the selected elements
     // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a
     // QEvent)
-    GraphicsViewEvent,  ///< event from #librepcb#GraphicsView @see
-                        ///< #librepcb#project#editor#SEE_RedirectedQEvent
+    GraphicsViewEvent,  ///< event from ::librepcb::GraphicsView @see
+                        ///< ::librepcb::project::editor::SEE_RedirectedQEvent
     // Special Events (with some additional parameters)
-    StartAddDevice,  ///< @see #librepcb#project#editor#BEE_StartAddDevice
-    // SwitchToSchematicPage,  ///< @see #project#SEE_SwitchToSchematicPage
+    StartAddDevice,  ///< @see ::librepcb::project::editor::BEE_StartAddDevice
   };
 
   // Constructors / Destructor
@@ -151,7 +150,7 @@ private:
 /**
  * @brief The BEE_StartAddDevice class
  *
- * @see #librepcb#project#editor#BES_AddDevice
+ * @see ::librepcb::project::editor::BES_AddDevice
  */
 class BEE_StartAddDevice final : public BEE_Base {
 public:

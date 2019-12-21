@@ -68,14 +68,14 @@ class SchematicSelectionQuery;
  * @brief The Schematic class represents one schematic page of a project and is
  * always part of a circuit
  *
- * A schematic can contain following items (see #librepcb#project#SI_Base and
- * #librepcb#project#SGI_Base):
- *  - netsegment:       #librepcb#project#SI_NetSegment
- *      - netpoint:     #librepcb#project#SI_NetPoint    + #librepcb#project#SGI_NetPoint
- *      - netline:      #librepcb#project#SI_NetLine     + #librepcb#project#SGI_NetLine
- *      - netlabel:     #librepcb#project#SI_NetLabel    + #librepcb#project#SGI_NetLabel
- *  - symbol:           #librepcb#project#SI_Symbol      + #librepcb#project#SGI_Symbol
- *      - symbol pin:   #librepcb#project#SI_SymbolPin   + #librepcb#project#SGI_SymbolPin
+ * A schematic can contain following items (see ::librepcb::project::SI_Base and
+ * ::librepcb::project::SGI_Base):
+ *  - netsegment:       ::librepcb::project::SI_NetSegment
+ *      - netpoint:     ::librepcb::project::SI_NetPoint
+ *      - netline:      ::librepcb::project::SI_NetLine
+ *      - netlabel:     ::librepcb::project::SI_NetLabel
+ *  - symbol:           ::librepcb::project::SI_Symbol
+ *      - symbol pin:   ::librepcb::project::SI_SymbolPin
  *  - polygon:          TODO
  *  - circle:           TODO
  *  - text:             TODO
@@ -100,12 +100,13 @@ public:
    */
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
-    ZValue_Symbols,      ///< Z value for #librepcb#project#SI_Symbol items
-    ZValue_NetLabels,    ///< Z value for #librepcb#project#SI_NetLabel items
-    ZValue_NetLines,     ///< Z value for #librepcb#project#SI_NetLine items
-    ZValue_HiddenNetPoints,   ///< Z value for hidden #librepcb#project#SI_NetPoint items
-    ZValue_VisibleNetPoints,  ///< Z value for visible #librepcb#project#SI_NetPoint
-                              ///< items
+    ZValue_Symbols,      ///< Z value for ::librepcb::project::SI_Symbol items
+    ZValue_NetLabels,    ///< Z value for ::librepcb::project::SI_NetLabel items
+    ZValue_NetLines,     ///< Z value for ::librepcb::project::SI_NetLine items
+    ZValue_HiddenNetPoints,   ///< Z value for hidden
+                              ///< ::librepcb::project::SI_NetPoint items
+    ZValue_VisibleNetPoints,  ///< Z value for visible
+                              ///< ::librepcb::project::SI_NetPoint items
   };
 
   // Constructors / Destructor

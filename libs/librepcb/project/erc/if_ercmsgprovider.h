@@ -35,8 +35,8 @@ class ErcMsg;  // all classes which implement IF_ErcMsgProvider will need this
 
 /**
  * @note    The specified class name should be unique only in the namespace
- * #librepcb#project, so we won't use the namespace as a prefix. Simple use the
- * class name.
+ * ::librepcb::project, so we won't use the namespace as a prefix. Simple use
+ * the class name.
  *
  * @warning Do not change the name of an existing class if you don't know what
  * you're doing!

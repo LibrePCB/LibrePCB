@@ -42,7 +42,7 @@ namespace librepcb {
  * @brief This type is the ONLY base type to store all lengths (always in
  * nanometers)!
  *
- * This is the base type of the class #librepcb#Length.
+ * This is the base type of the class ::librepcb::Length.
  *
  * This type is normally a 64bit signed integer. 32bit integers could handle
  * these values also, but is limited to +/-2.147 meters. Maybe this is not
@@ -53,7 +53,7 @@ namespace librepcb {
  * use 32bit integers instead of 64bit integers for all length units (maybe your
  * platform cannot handle 64bit as efficient as 32bit integers).
  *
- * @see #librepcb#Length
+ * @see ::librepcb::Length
  */
 #ifdef USE_32BIT_LENGTH_UNITS
 typedef qint32 LengthBase_t;
@@ -74,10 +74,10 @@ typedef qint64 LengthBase_t;
  * integer or float! It's very important to have a consistent length type over
  * the whole project.
  *
- * All lengths are stored in the integer base type #LengthBase_t. The internal
- * unit is always nanometers, but this class provides also some converting
- * methods to other units. Read the documentation of #LengthBase_t for more
- * details.
+ * All lengths are stored in the integer base type ::librepcb::LengthBase_t. The
+ * internal unit is always nanometers, but this class provides also some
+ * converting methods to other units. Read the documentation of
+ * ::librepcb::LengthBase_t for more details.
  */
 class Length {
   Q_DECLARE_TR_FUNCTIONS(Length)
@@ -279,7 +279,7 @@ public:
    *
    * @return A new Length object with absolute value
    *
-   * @see Length#makeAbs()
+   * @see ::librepcb::Length::makeAbs()
    */
   Length abs() const noexcept;
 
@@ -288,7 +288,7 @@ public:
    *
    * @return A reference to the modified object
    *
-   * @see Length#abs()
+   * @see ::librepcb::Length::abs()
    */
   Length& makeAbs() noexcept;
 

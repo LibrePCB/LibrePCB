@@ -273,8 +273,8 @@ public:
   /**
    * Constructor which produces a message like "42 not in range [13..37]"
    *
-   * @param file                  See Exception#Exception()
-   * @param line                  See Exception#Exception()
+   * @param file                  See ::librepcb::Exception::Exception()
+   * @param line                  See ::librepcb::Exception::Exception()
    * @param value                 The invalid value
    * @param min                   The lower value limit
    * @param max                   The upper value limit
@@ -320,8 +320,8 @@ public:
   /**
    * @brief The constructor which is used to throw an exception
    *
-   * @param file                  See Exception#Exception()
-   * @param line                  See Exception#Exception()
+   * @param file                  See ::librepcb::Exception::Exception()
+   * @param line                  See ::librepcb::Exception::Exception()
    * @param filePath              The path to the parsed file (optional)
    * @param fileLine              The line number of the parse error (-1 if
    * unknown)

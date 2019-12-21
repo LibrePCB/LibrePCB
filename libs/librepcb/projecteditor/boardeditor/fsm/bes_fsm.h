@@ -48,14 +48,14 @@ public:
   /// FSM States
   enum State {
     State_NoState,        ///< no state active
-    State_Select,         ///< @see #librepcb#project#editor#BES_Select
-    State_DrawTrace,      ///< @see #librepcb#project#editor#BES_DrawTrace
-    State_DrawPolygon,    ///< @see #librepcb#project#editor#BES_DrawPolygon
-    State_AddStrokeText,  ///< @see #librepcb#project#editor#BES_AddStrokeText
-    State_AddHole,        ///< @see #librepcb#project#editor#BES_AddHole
-    State_AddVia,         ///< @see #librepcb#project#editor#BES_AddVia
-    State_AddDevice,      ///< @see #librepcb#project#editor#BES_AddDevice
-    State_DrawPlane,      ///< @see #librepcb#project#editor#BES_DrawPlane
+    State_Select,         ///< ::librepcb::project::editor::BES_Select
+    State_DrawTrace,      ///< ::librepcb::project::editor::BES_DrawTrace
+    State_DrawPolygon,    ///< ::librepcb::project::editor::BES_DrawPolygon
+    State_AddStrokeText,  ///< ::librepcb::project::editor::BES_AddStrokeText
+    State_AddHole,        ///< ::librepcb::project::editor::BES_AddHole
+    State_AddVia,         ///< ::librepcb::project::editor::BES_AddVia
+    State_AddDevice,      ///< ::librepcb::project::editor::BES_AddDevice
+    State_DrawPlane,      ///< ::librepcb::project::editor::BES_DrawPlane
   };
 
   // Constructors / Destructor

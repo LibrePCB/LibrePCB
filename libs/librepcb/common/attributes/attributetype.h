@@ -47,14 +47,14 @@ class AttributeType {
 public:
   /// @brief Available Attribute Types
   enum class Type_t {
-    String = 0,   ///< @see class #librepcb#AttrTypeString
-    Resistance,   ///< @see class #librepcb#AttrTypeResistance
-    Capacitance,  ///< @see class #librepcb#AttrTypeCapacitance
-    Inductance,   ///< @see class #librepcb#AttrTypeInductance
-    Voltage,      ///< @see class #librepcb#AttrTypeVoltage
-    Current,      ///< @see class #librepcb#AttrTypeCurrent
-    Power,        ///< @see class #librepcb#AttrTypePower
-    Frequency,    ///< @see class #librepcb#AttrTypeFrequency
+    String = 0,   ///< @see class ::librepcb::AttrTypeString
+    Resistance,   ///< @see class ::librepcb::AttrTypeResistance
+    Capacitance,  ///< @see class ::librepcb::AttrTypeCapacitance
+    Inductance,   ///< @see class ::librepcb::AttrTypeInductance
+    Voltage,      ///< @see class ::librepcb::AttrTypeVoltage
+    Current,      ///< @see class ::librepcb::AttrTypeCurrent
+    Power,        ///< @see class ::librepcb::AttrTypePower
+    Frequency,    ///< @see class ::librepcb::AttrTypeFrequency
     _COUNT
   };
 

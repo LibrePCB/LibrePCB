@@ -59,15 +59,16 @@ class ComponentInstance;
  * @brief   The Circuit class represents all electrical connections in a project
  * (drawed in the schematics)
  *
- * Each #librepcb#project#Project object contains exactly one #Circuit object which
- * contains the whole electrical components and connections. They are created
- * with the schematic editor and used by the board editor. The whole circuit is
- * saved in the file "circuit.lp" in the project's "circuit" directory.
+ * Each ::librepcb::project::Project object contains exactly one
+ * ::librepcb::project::Circuit object which contains the whole electrical
+ * components and connections. They are created with the schematic editor and
+ * used by the board editor. The whole circuit is saved in the file
+ * "circuit.lp" in the project's "circuit" directory.
  *
  * Each #Circuit object contains:
- *  - All net classes (project#NetClass objects)
- *  - All net signals (project#NetSignal objects)
- *  - All component instances (project#ComponentInstance objects)
+ *  - All net classes (::librepcb::project::NetClass objects)
+ *  - All net signals (::librepcb::project::NetSignal objects)
+ *  - All component instances (::librepcb::project::ComponentInstance objects)
  */
 class Circuit final : public QObject, public SerializableObject {
   Q_OBJECT

@@ -43,7 +43,7 @@ class GridSettingsDialog;
 
 /**
  * @brief This class provides a Dialog (GUI) to change the grid settings of a
- * #librepcb#GraphicsView
+ * ::librepcb::GraphicsView
  */
 class GridSettingsDialog final : public QDialog {
   Q_OBJECT
