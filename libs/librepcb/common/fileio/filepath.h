@@ -55,9 +55,10 @@ namespace librepcb {
  * filepath. But that's annoying and can lead into problems if you do not make
  * these checks always solid.
  *
- * The class #FilePath provides a way to avoid such problems and tries to reduce
- * the count of runtime checks you have to perform yourself (the checks will be
- * performed anyway, but the class #FilePath will do this for you).
+ * The class ::librepcb::FilePath provides a way to avoid such problems and
+ * tries to reduce the count of runtime checks you have to perform yourself
+ * (the checks will be performed anyway, but the class #FilePath will do this
+ * for you).
  *
  * For compatibility reasons between different operating systems, we should
  * follow these rules for all paths in the whole project (if not explicitly
@@ -84,13 +85,13 @@ namespace librepcb {
  * absolute, ...).
  *
  *
- * <b>How the class #FilePath works and how to use it</b>
+ * <b>How the class ::librepcb::FilePath works and how to use it</b>
  *
- * The class #FilePath represents a well-formatted filepath to a file or
- * directory and provides methods to convert paths between different formats.
- * Every #FilePath object represents either a well-formatted filepath or an
- * invalid object (see #isValid()). It's not possible to create #FilePath
- * objects with non-well-formatted filepaths.
+ * The class ::librepcb::FilePath represents a well-formatted filepath to a file
+ * or directory and provides methods to convert paths between different formats.
+ * Every ::librepcb::FilePath object represents either a well-formatted filepath
+ * or an invalid object (see #isValid()). It's not possible to create
+ * ::librepcb::FilePath objects with non-well-formatted filepaths.
  *
  * <b>Example:</b>
  * @code
@@ -148,7 +149,7 @@ public:  // Methods
   FilePath() noexcept;
 
   /**
-   * @brief Constructor to create a #FilePath object from a QString
+   * @brief Constructor to create a ::librepcb::FilePath object from a QString
    *
    * @param filepath      See #setPath()
    */
@@ -335,7 +336,8 @@ public:  // Methods
    * @warning This method works only correct if this filepath represents a
    * directory!
    *
-   * @note This method is equal to FilePath#fromRelative(*this, filename);
+   * @note This method is equal to
+   *       `librepcb::FilePath::fromRelative(*this, filename);`
    */
   FilePath getPathTo(const QString& filename) const noexcept;
 
@@ -350,7 +352,7 @@ public:  // Methods
    * paths to a file will produce wrong results!
    * @param relative  The relative path (relative to "base")
    *
-   * @return A #FilePath object with the absolute filepath
+   * @return A ::librepcb::FilePath object with the absolute filepath
    *
    * @note This method is very useful to load relative paths from (text) files.
    *

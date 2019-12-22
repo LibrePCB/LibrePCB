@@ -55,12 +55,12 @@ class SI_Base : public QObject {
 public:
   // Types
   enum class Type_t {
-    NetSegment,  ///< librepcb#project#SI_NetSegment
-    NetPoint,    ///< librepcb#project#SI_NetPoint
-    NetLine,     ///< librepcb#project#SI_NetLine
-    NetLabel,    ///< librepcb#project#SI_NetLabel
-    Symbol,      ///< librepcb#project#SI_Symbol
-    SymbolPin,   ///< librepcb#project#SI_SymbolPin
+    NetSegment,  ///< ::librepcb::project::SI_NetSegment
+    NetPoint,    ///< ::librepcb::project::SI_NetPoint
+    NetLine,     ///< ::librepcb::project::SI_NetLine
+    NetLabel,    ///< ::librepcb::project::SI_NetLabel
+    Symbol,      ///< ::librepcb::project::SI_Symbol
+    SymbolPin,   ///< ::librepcb::project::SI_SymbolPin
   };
 
   // Constructors / Destructor

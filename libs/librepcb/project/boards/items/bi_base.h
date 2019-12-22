@@ -55,18 +55,18 @@ class BI_Base : public QObject {
 public:
   // Types
   enum class Type_t {
-    NetSegment,    ///< librepcb#project#BI_NetSegment
-    NetPoint,      ///< librepcb#project#BI_NetPoint
-    NetLine,       ///< librepcb#project#BI_NetLine
-    Via,           ///< librepcb#project#BI_Via
-    Device,        ///< librepcb#project#BI_Device
-    Footprint,     ///< librepcb#project#BI_Footprint
-    FootprintPad,  ///< librepcb#project#BI_FootprintPad
-    Polygon,       ///< librepcb#project#BI_Polygon
-    StrokeText,    ///< librepcb#project#BI_StrokeText
-    Hole,          ///< librepcb#project#BI_Hole
-    Plane,         ///< librepcb#project#BI_Plane
-    AirWire,       ///< librepcb#project#BI_AirWire
+    NetSegment,    ///< ::librepcb::project::BI_NetSegment
+    NetPoint,      ///< ::librepcb::project::BI_NetPoint
+    NetLine,       ///< ::librepcb::project::BI_NetLine
+    Via,           ///< ::librepcb::project::BI_Via
+    Device,        ///< ::librepcb::project::BI_Device
+    Footprint,     ///< ::librepcb::project::BI_Footprint
+    FootprintPad,  ///< ::librepcb::project::BI_FootprintPad
+    Polygon,       ///< ::librepcb::project::BI_Polygon
+    StrokeText,    ///< ::librepcb::project::BI_StrokeText
+    Hole,          ///< ::librepcb::project::BI_Hole
+    Plane,         ///< ::librepcb::project::BI_Plane
+    AirWire,       ///< ::librepcb::project::BI_AirWire
   };
 
   // Constructors / Destructor

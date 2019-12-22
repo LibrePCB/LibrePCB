@@ -97,12 +97,12 @@ public:
    * The project must be closed and destroyed automatically after the last
    * opened window of the project is closed, because without a window the user
    * is no longer able to close the project himself. So, every project related
-   * window have to "ask" the #ProjectEditor object whether it is allowed to
-   * close or not. If the last opened window wants to close, the editor will
-   * first ask the user if unsaved changes should be written to the harddisc.
-   * Only if the user accepts this question and the project is saved
-   * successfully, the method will return true to allow the last window to
-   * close. Then it will also close the whole project.
+   * window have to "ask" the ::librepcb::project::editor::ProjectEditor object
+   * whether it is allowed to close or not. If the last opened window wants to
+   * close, the editor will first ask the user if unsaved changes should be
+   * written to the harddisc. Only if the user accepts this question and the
+   * project is saved successfully, the method will return true to allow the
+   * last window to close. Then it will also close the whole project.
    *
    * @param window    A reference to the window which is about to close
    *
@@ -182,12 +182,13 @@ public slots:
    * whether the changes should be saved or not. If the user clicks on "cancel"
    * or the project could not be saved successfully, this method will return
    * false. If there was no such error, this method will call
-   * QObject#deleteLater() which means that this object will be deleted in the
+   * QObject::deleteLater() which means that this object will be deleted in the
    * Qt's event loop.
    *
    * @warning This method can be called both from within this class and from
-   * outside this class (for example from the #ControlPanel). But if you call
-   * this method from outside this class, you may have to delete the object
+   *          outside this class (for example from the
+   *          ::librepcb::application::ControlPanel). But if you call this
+   *          method from outside this class, you may have to delete the object
    *          yourself afterwards! In special cases, the deleteLater() mechanism
    *          could lead in fatal errors otherwise!
    *

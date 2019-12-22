@@ -139,7 +139,7 @@ public:
    * extension)
    *
    * @param dir           Filepath to a directory (must exist)
-   * @param filter        Only files matching this filter are returned
+   * @param filters       Only files matching this filters are returned
    *
    * @return A list of filepaths to files in the specified directory
    */

@@ -47,7 +47,9 @@ class Vertex;
 /**
  * @brief The GerberGenerator class
  *
- * @todo Remove/Escape illegal characters in #mProjectId and #mProjectRevision!
+ * @todo Remove/Escape illegal characters in
+ *       ::librepcb::GerberGenerator::mProjectId and
+ *       ::librepcb::GerberGenerator::mProjectRevision!
  * @todo Use file/aperture attributes
  */
 class GerberGenerator final {

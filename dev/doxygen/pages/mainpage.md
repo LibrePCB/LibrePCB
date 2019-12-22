@@ -18,14 +18,6 @@ LibrePCB Developers Documentation {#mainpage}
 - @ref doc_server_api
 
 
-# Related Pages {#doc_main_related_pages}
-
-- @ref todo
-- @ref bug
-- @ref deprecated
-- @ref test
-
-
 # External Links {#doc_main_external}
 
 - Contribution Guidelines: https://github.com/LibrePCB/LibrePCB/blob/master/CONTRIBUTING.md
