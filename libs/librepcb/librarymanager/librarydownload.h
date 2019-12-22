@@ -60,12 +60,12 @@ public:
   // Setters
 
   /**
-   * @copydoc librepcb::NetworkRequestBase::setExpectedReplyContentSize()
+   * @copydoc ::librepcb::NetworkRequestBase::setExpectedReplyContentSize()
    */
   void setExpectedZipFileSize(qint64 bytes) noexcept;
 
   /**
-   * @copydoc librepcb::NetworkRequestBase::setExpectedChecksum()
+   * @copydoc ::librepcb::FileDownload::setExpectedChecksum()
    */
   void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
                            const QByteArray&             checksum) noexcept;
