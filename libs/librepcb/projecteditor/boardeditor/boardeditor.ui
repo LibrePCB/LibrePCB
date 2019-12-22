@@ -82,6 +82,7 @@
     <addaction name="actionExportAsPdf"/>
     <addaction name="actionGenerateBom"/>
     <addaction name="actionGenerateFabricationData"/>
+    <addaction name="actionGeneratePickPlace"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionProjectClose"/>
@@ -780,6 +781,15 @@
    </property>
    <property name="text">
     <string>Design Rule Check</string>
+   </property>
+  </action>
+  <action name="actionGeneratePickPlace">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/export_pick_place_file.png</normaloff>:/img/actions/export_pick_place_file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate Pick&amp;&amp;Place Files</string>
    </property>
   </action>
  </widget>
