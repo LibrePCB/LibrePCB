@@ -48,12 +48,12 @@ namespace librepcb {
  * idea how the @ref doc_attributes_system works in detail.
  *
  * To get the values from the attributes of an object, their class must inherit
- * from #AttributeProvider and override at least one of the methods
+ * from ::librepcb::AttributeProvider and override at least one of the methods
  * #getUserDefinedAttributeValue(), #getBuiltInAttributeValue() and
  * #getAttributeProviderParents(), depending on what kind of attributes it
  * provides.
  *
- * @see librepcb::AttributeSubstitutor
+ * @see ::librepcb::AttributeSubstitutor
  * @see @ref doc_attributes_system
  */
 class AttributeProvider {

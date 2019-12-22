@@ -86,9 +86,9 @@ namespace librepcb {
  * same address over the whole lifetime. To still minimize the risk of memory
  * leaks, `std::shared_ptr` is used instead of raw pointers.
  *
- * @warning Using Qt's `foreach` keyword on a #SerializableObjectList is not
- * recommended because it always creates a deep copy of the list! You should use
- * range based for loops (since C++11) instead.
+ * @warning Using Qt's `foreach` keyword on a ::librepcb::SerializableObjectList
+ * is not recommended because it always creates a deep copy of the list! You
+ * should use range based for loops (since C++11) instead.
  */
 template <typename T, typename P, typename... OnEditedArgs>
 class SerializableObjectList : public SerializableObject {

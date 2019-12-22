@@ -39,9 +39,9 @@ namespace workspace {
  * @brief The WSI_ProjectAutosaveInterval class represents the project autosave
  * interval setting
  *
- * This setting is used by the class #project#Project for the autosave
- * mechanism. A value of zero means that the autosave mechanism is disabled! A
- * value greater than zero defines the time interval in seconds.
+ * This setting is used by the class ::librepcb::project::Project for the
+ * autosave mechanism. A value of zero means that the autosave mechanism is
+ * disabled! A value greater than zero defines the time interval in seconds.
  */
 class WSI_ProjectAutosaveInterval final : public WSI_Base {
   Q_OBJECT

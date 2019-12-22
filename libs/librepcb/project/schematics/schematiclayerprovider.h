@@ -42,7 +42,8 @@ class Project;
 
 /**
  * @brief The SchematicLayerProvider class provides and manages all available
- * schematic layers which are used in the #project#SchematicEditor class
+ * schematic layers which are used in the
+ * ::librepcb::project::editor::SchematicEditor class
  */
 class SchematicLayerProvider final : public IF_GraphicsLayerProvider {
 public:
@@ -55,7 +56,7 @@ public:
   // Getters
   Project& getProject() const noexcept { return mProject; }
 
-  /// @copydoc IF_GraphicsLayerProvider#getLayer()
+  /// @copydoc ::librepcb::IF_GraphicsLayerProvider::getLayer()
   GraphicsLayer* getLayer(const QString& name) const noexcept override {
     foreach (GraphicsLayer* layer, mLayers) {
       if (layer->getName() == name) {

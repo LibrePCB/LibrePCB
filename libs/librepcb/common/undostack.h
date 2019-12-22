@@ -84,8 +84,8 @@ private:
  * commands
  *
  * Instead of the Qt classes QUndoStack and QUndoCommand we use our own undo
- * classes #UndoStack and #UndoCommand because of the better exception handling
- * and more flexibility.
+ * classes ::librepcb::UndoStack and ::librepcb::UndoCommand because of the
+ * better exception handling and more flexibility.
  *
  * @note Our classes work very similar to the equivalent classes of Qt, so
  * please read the documentation of "Qt's Undo Framework" and classes QUndoStack
@@ -94,15 +94,15 @@ private:
  *
  * Compared with QUndoStack, the biggest differences are the following:
  *  - <b>Support for exceptions:</b> If an exception is thrown in an
- * #UndoCommand object, this undo stack always tries to keep the whole stack
- * consistent (update the index only if the last undo/redo was successful, try
- * to rollback failed changes, ...).
+ * ::librepcb::UndoCommand object, this undo stack always tries to keep the
+ * whole stack consistent (update the index only if the last undo/redo was
+ * successful, try to rollback failed changes, ...).
  *  - <b>Removed support for nested macros (QUndoStack#beginMacro() and
  *    QUndoStack#endMacro())</b>: I think we do need this feature (but we have a
  * similar mechanism, see next line)...
  *  - <b>Added support for exclusive macro command creation:</b>
  *
- * @see #UndoCommand, #UndoCommandGroup
+ * @see ::librepcb::UndoCommand, ::librepcb::UndoCommandGroup
  */
 class UndoStack final : public QObject {
   Q_OBJECT
@@ -196,7 +196,7 @@ public:
    * stack consistend (as the passed command did never exist).
    *
    * @note If you try to execute a command with that method while another
-   * command is active (see #isCommandActive()), this method will throw an
+   * command is active (see #isCommandGroupActive()), this method will throw an
    * exception.
    */
   bool execCmd(UndoCommand* cmd, bool forceKeepCmd = false);

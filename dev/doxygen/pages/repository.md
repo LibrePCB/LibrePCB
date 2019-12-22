@@ -13,7 +13,7 @@ A repository is a server which holds a list of available libraries. The librarie
 somewhere as Zip files, for example on the Releases page of a GitHub repository. The library manager
 retrieves the library list from the repositories to display the available libraries. If the user
 wants to install such a library, the library manager just downloads these Zip files and extracts
-them into the [remote libraries directory](@ref doc_workspace_remote_dir) in the @ref workspace.
+them into the [remote libraries directory](@ref doc_workspace_remote_dir) in the @ref doc_workspace.
 After an automatically triggered rescan of the @ref doc_workspace_library_database, the library is
 ready to use.
 

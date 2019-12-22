@@ -74,6 +74,11 @@ public:
    *
    * @param str       A string which can contain variables ("{{NAME}}"). The
    *                  attributes will be substituted directly in this string.
+   * @param ap        The attribute provider for attribute lookup.
+   * @param filter    If a function is passed here, the substituted values will
+   *                  be passed to this function first. This allows for example
+   *                  to remove invalid characters if the resulting string is
+   *                  used for a file path.
    *
    * @return True if str was modified in some way, false if not
    */

@@ -208,7 +208,7 @@ public:
   /**
    * @brief Specify the directory for which you need the lock
    *
-   * @param filepath      The filepath to the directory to lock
+   * @param dir      The filepath to the directory to lock
    *
    * @warning This method must not be called when this object already holds a
    * lock!
