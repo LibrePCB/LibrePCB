@@ -24,6 +24,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
+#include <librepcb/common/toolbox.h>
 
 /*******************************************************************************
  *  Namespace
@@ -720,7 +721,8 @@ TEST_P(TransactionalFileSystemGetSubDirsTest, testGetSubDirs) {
 
   TransactionalFileSystem fs(mTmpDir.getPathTo(data.root), false);
   EXPECT_EQ(data.entries.count(), fs.getDirs(data.relPath).count());
-  EXPECT_EQ(data.entries.toSet(), fs.getDirs(data.relPath).toSet());
+  EXPECT_EQ(Toolbox::toSet(data.entries),
+            Toolbox::toSet(fs.getDirs(data.relPath)));
 }
 
 // clang-format off
@@ -776,7 +778,8 @@ TEST_P(TransactionalFileSystemGetFilesInDirTest, testGetFilesInDir) {
 
   TransactionalFileSystem fs(mTmpDir.getPathTo(data.root), false);
   EXPECT_EQ(data.entries.count(), fs.getFiles(data.relPath).count());
-  EXPECT_EQ(data.entries.toSet(), fs.getFiles(data.relPath).toSet());
+  EXPECT_EQ(Toolbox::toSet(data.entries),
+            Toolbox::toSet(fs.getFiles(data.relPath)));
 }
 
 // clang-format off

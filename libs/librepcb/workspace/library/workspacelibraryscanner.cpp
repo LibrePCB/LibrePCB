@@ -26,6 +26,7 @@
 
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/sqlitedatabase.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/library/elements.h>
 
 #include <QtCore>
@@ -228,7 +229,8 @@ QHash<QString, int> WorkspaceLibraryScanner::updateLibraries(
   }
 
   // update existing libraries in DB
-  foreach (const QString& fp, libs.keys().toSet() & dbLibIds.keys().toSet()) {
+  foreach (const QString& fp,
+           Toolbox::toSet(libs.keys()) & Toolbox::toSet(dbLibIds.keys())) {
     Q_ASSERT(dbLibIds.contains(fp));
     std::shared_ptr<Library> lib = libs[fp];
     Q_ASSERT(lib);
@@ -248,7 +250,8 @@ QHash<QString, int> WorkspaceLibraryScanner::updateLibraries(
   }
 
   // add new libraries to DB
-  foreach (const QString& fp, libs.keys().toSet() - dbLibIds.keys().toSet()) {
+  foreach (const QString& fp,
+           Toolbox::toSet(libs.keys()) - Toolbox::toSet(dbLibIds.keys())) {
     Q_ASSERT(!dbLibIds.contains(fp));
     std::shared_ptr<Library> lib = libs[fp];
     Q_ASSERT(lib);
@@ -264,7 +267,8 @@ QHash<QString, int> WorkspaceLibraryScanner::updateLibraries(
   }
 
   // remove no longer existing libraries from DB
-  foreach (const QString& fp, dbLibIds.keys().toSet() - libs.keys().toSet()) {
+  foreach (const QString& fp,
+           Toolbox::toSet(dbLibIds.keys()) - Toolbox::toSet(libs.keys())) {
     Q_ASSERT(dbLibIds.contains(fp));
     query = db.prepareQuery("DELETE FROM libraries WHERE id = :id");
     query.bindValue(":id", dbLibIds[fp]);
