@@ -145,7 +145,7 @@ QStringList TransactionalFileSystem::getDirs(const QString& path) const
     }
   }
 
-  return dirnames.toList();
+  return dirnames.values();
 }
 
 QStringList TransactionalFileSystem::getFiles(const QString& path) const
@@ -172,7 +172,7 @@ QStringList TransactionalFileSystem::getFiles(const QString& path) const
     }
   }
 
-  return filenames.toList();
+  return filenames.values();
 }
 
 bool TransactionalFileSystem::fileExists(const QString& path) const noexcept {
@@ -438,10 +438,10 @@ void TransactionalFileSystem::saveDiff(const QString& type) const {
     FileUtils::writeFile(filesDir.getPathTo(filepath),
                          mModifiedFiles.value(filepath));  // can throw
   }
-  foreach (const QString& filepath, Toolbox::sorted(mRemovedFiles.toList())) {
+  foreach (const QString& filepath, Toolbox::sorted(mRemovedFiles.values())) {
     root.appendChild("removed_file", filepath, true);
   }
-  foreach (const QString& filepath, Toolbox::sorted(mRemovedDirs.toList())) {
+  foreach (const QString& filepath, Toolbox::sorted(mRemovedDirs.values())) {
     root.appendChild("removed_directory", filepath, true);
   }
 

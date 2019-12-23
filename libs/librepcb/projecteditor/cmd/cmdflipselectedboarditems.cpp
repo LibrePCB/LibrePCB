@@ -28,6 +28,7 @@
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/scopeguard.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
@@ -115,14 +116,14 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
   foreach (BI_Plane* plane, query->getPlanes()) {
     for (const Vertex& vertex :
-         plane->getOutline().getVertices().toList().toSet()) {
+         Toolbox::toSet(plane->getOutline().getVertices().toList())) {
       center += vertex.getPos();
       ++count;
     }
   }
   foreach (BI_Polygon* polygon, query->getPolygons()) {
-    for (const Vertex& vertex :
-         polygon->getPolygon().getPath().getVertices().toList().toSet()) {
+    for (const Vertex& vertex : Toolbox::toSet(
+             polygon->getPolygon().getPath().getVertices().toList())) {
       center += vertex.getPos();
       ++count;
     }

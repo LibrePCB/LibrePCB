@@ -67,9 +67,9 @@ EditNetClassesDialog::EditNetClassesDialog(Circuit&   circuit,
     QTableWidgetItem* uuid = new QTableWidgetItem(netclass->getUuid().toStr());
     QTableWidgetItem* name = new QTableWidgetItem(*netclass->getName());
     uuid->setData(Qt::UserRole,
-                  qVariantFromValue(static_cast<void*>(netclass)));
+                  QVariant::fromValue(static_cast<void*>(netclass)));
     name->setData(Qt::UserRole,
-                  qVariantFromValue(static_cast<void*>(netclass)));
+                  QVariant::fromValue(static_cast<void*>(netclass)));
     mUi->tableWidget->setVerticalHeaderItem(row, uuid);
     mUi->tableWidget->setItem(row, 0, name);
     row++;
@@ -146,7 +146,7 @@ void EditNetClassesDialog::on_btnAdd_clicked() {
         new QTableWidgetItem(*cmd->getNetClass()->getName());
     nameItem->setData(
         Qt::UserRole,
-        qVariantFromValue(static_cast<void*>(cmd->getNetClass())));
+        QVariant::fromValue(static_cast<void*>(cmd->getNetClass())));
     mUi->tableWidget->setVerticalHeaderItem(row, uuidItem);
     mUi->tableWidget->setItem(row, 0, nameItem);
   } catch (Exception& e) {

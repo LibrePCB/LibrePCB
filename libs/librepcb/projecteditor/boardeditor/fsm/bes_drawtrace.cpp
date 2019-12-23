@@ -27,6 +27,7 @@
 #include "ui_boardeditor.h"
 
 #include <librepcb/common/gridproperties.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/widgets/positivelengthedit.h>
 #include <librepcb/project/boards/board.h>
@@ -621,7 +622,7 @@ BI_NetPoint* BES_DrawTrace::findNetPoint(Board& board, const Point& pos,
                                          const QSet<BI_NetPoint*>& except) const
     noexcept {
   QSet<BI_NetPoint*> items =
-      board.getNetPointsAtScenePos(pos, layer, netsignal).toSet();
+      Toolbox::toSet(board.getNetPointsAtScenePos(pos, layer, netsignal));
   items -= except;
   return (items.constBegin() != items.constEnd()) ? *items.constBegin()
                                                   : nullptr;
@@ -633,7 +634,7 @@ BI_NetLine* BES_DrawTrace::findNetLine(Board& board, const Point& pos,
                                        const QSet<BI_NetLine*>& except) const
     noexcept {
   QSet<BI_NetLine*> items =
-      board.getNetLinesAtScenePos(pos, layer, netsignal).toSet();
+      Toolbox::toSet(board.getNetLinesAtScenePos(pos, layer, netsignal));
   items -= except;
   return (items.constBegin() != items.constEnd()) ? *items.constBegin()
                                                   : nullptr;

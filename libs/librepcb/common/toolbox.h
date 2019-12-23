@@ -57,9 +57,31 @@ public:
   Toolbox& operator=(const Toolbox& rhs) = delete;
 
   // Static Methods
+
+  /**
+   * @brief Helper method to convert a QList<T> to a QSet<T>
+   *
+   * Until Qt 5.13, QList::toSet() was the way to do this conversion. But since
+   * Qt 5.14 this is deprecated, and a range constructor was added to QSet
+   * instead. This wrapper chooses the proper method depending on the Qt
+   * version to avoid raising any deprecation warnings.
+   *
+   * @param list  The QList to be converted.
+   *
+   * @return The created QSet.
+   */
+  template <typename T>
+  static QSet<T> toSet(const QList<T>& list) noexcept {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    return QSet<T>(list.begin(), list.end());
+#else
+    return list.toSet();
+#endif
+  }
+
   template <typename T>
   static QList<T> sortedQSet(const QSet<T>& set) noexcept {
-    QList<T> list = set.toList();
+    QList<T> list = set.values();
     std::sort(list.begin(), list.end());
     return list;
   }
