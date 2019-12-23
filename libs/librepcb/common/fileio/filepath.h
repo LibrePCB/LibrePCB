@@ -95,13 +95,12 @@ namespace librepcb {
  *
  * <b>Example:</b>
  * @code
- * FilePath fp("C:\foo\bar.txt"); // a file
- * qDebug(fp.toStr());            // "C:/foo/bar.txt" <-- this is the
- * well-formatted filepath qDebug(fp.toNative());         // "C:\foo\bar.txt" on
- * Windows, otherwise "C:/foo/bar.txt" fp.setPath("/foo/bar/");       // a
- * directory qDebug(fp.toStr());            // "/foo/bar" <-- well-formatted (no
- * slash at the end!) qDebug(fp.toNative());         // "\foo\bar" on Windows,
- * otherwise "/foo/bar"
+ *    FilePath fp("C:\\foo\\bar.txt"); // a file
+ *    qDebug(fp.toStr());      // "C:/foo/bar.txt"
+ *    qDebug(fp.toNative());   // "C:/foo/bar.txt" ("C:\foo\bar.txt" on Windows)
+ *    fp.setPath("/foo/bar/"); // a directory
+ *    qDebug(fp.toStr());      // "/foo/bar" (trailing slash removed!)
+ *    qDebug(fp.toNative());   // "/foo/bar" ("\foo\bar" on Windows)
  * @endcode
  *
  * @note    A filepath represented by a FilePath object do not need to exist on
@@ -232,8 +231,7 @@ public:  // Methods
   QString toStr() const noexcept;
 
   /**
-   * @brief Get the absolute filepath with native directory separators ("/"
-   * resp. "\")
+   * @brief Get the absolute filepath with native directory separators
    *
    * @return  The same as #toStr(), but with native separators (on other
    * platforms than Windows, this method is identical to #toStr())

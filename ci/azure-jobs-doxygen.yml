@@ -2,7 +2,7 @@ jobs:
 - job: Doxygen
   pool:
     vmImage: 'ubuntu-16.04'
-  container: librepcb/librepcb-dev:ubuntu-14.04-1
+  container: librepcb/librepcb-dev:ubuntu-18.04-1
   steps:
   - bash: ./ci/build_doxygen.sh
     displayName: Build Doxygen Documentation

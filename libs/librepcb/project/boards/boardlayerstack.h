@@ -64,12 +64,12 @@ public:
   int    getInnerLayerCount() const noexcept { return mInnerLayerCount; }
   QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
-  /// @copydoc ::librepcb::project::IF_BoardLayerProvider::getAllBoardLayerIds()
+  /// @copydoc ::librepcb::IF_GraphicsLayerProvider::getAllLayers()
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
     return mLayers;
   }
 
-  /// @copydoc ::librepcb::project::IF_BoardLayerProvider::getLayer()
+  /// @copydoc ::librepcb::IF_GraphicsLayerProvider::getLayer()
   GraphicsLayer* getLayer(const QString& name) const noexcept override {
     foreach (GraphicsLayer* layer, mLayers) {
       if (layer->getName() == name) {
