@@ -109,6 +109,8 @@ SOURCES += \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
     network/repository.cpp \
+    pnp/pickplacecsvwriter.cpp \
+    pnp/pickplacedata.cpp \
     signalrole.cpp \
     sqlitedatabase.cpp \
     systeminfo.cpp \
@@ -246,6 +248,8 @@ HEADERS += \
     network/networkrequestbase.h \
     network/repository.h \
     norms.h \
+    pnp/pickplacecsvwriter.h \
+    pnp/pickplacedata.h \
     scopeguard.h \
     scopeguardlist.h \
     signalrole.h \

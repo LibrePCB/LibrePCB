@@ -25,6 +25,7 @@ SOURCES += \
     boards/boardfabricationoutputsettings.cpp \
     boards/boardgerberexport.cpp \
     boards/boardlayerstack.cpp \
+    boards/boardpickplacegenerator.cpp \
     boards/boardplanefragmentsbuilder.cpp \
     boards/boardselectionquery.cpp \
     boards/boardusersettings.cpp \
@@ -144,6 +145,7 @@ HEADERS += \
     boards/boardfabricationoutputsettings.h \
     boards/boardgerberexport.h \
     boards/boardlayerstack.h \
+    boards/boardpickplacegenerator.h \
     boards/boardplanefragmentsbuilder.h \
     boards/boardselectionquery.h \
     boards/boardusersettings.h \
