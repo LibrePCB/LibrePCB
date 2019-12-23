@@ -26,6 +26,7 @@
 
 #include <librepcb/common/attributes/attributetype.h>
 #include <librepcb/common/attributes/attributeunit.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/cmp/component.h>
@@ -130,8 +131,8 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
     }
     // Then add remaining devices from workspace library (lower priority)
     QSet<Uuid> wsLibDevices = mWorkspace.getLibraryDb().getDevicesOfComponent(
-        mComponentInstance.getLibComponent().getUuid());  // can throw
-    wsLibDevices -= prjLibDevices.keys().toSet();         // avoid duplicates
+        mComponentInstance.getLibComponent().getUuid());   // can throw
+    wsLibDevices -= Toolbox::toSet(prjLibDevices.keys());  // avoid duplicates
     foreach (const Uuid& deviceUuid, wsLibDevices) {
       FilePath devFp =
           mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);  // can throw

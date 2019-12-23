@@ -25,6 +25,7 @@
 #include "cmdremoveunusedlibraryelements.h"
 
 #include <librepcb/common/scopeguard.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/cmd/cmdboardholeremove.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
@@ -112,9 +113,10 @@ bool CmdRemoveBoardItems::performExecute() {
   for (auto it = netSegmentItemsToRemove.begin();
        it != netSegmentItemsToRemove.end(); ++it) {
     Q_ASSERT(it.key()->isAddedToBoard());
-    bool removeAllVias = (it.value().vias == it.key()->getVias().toSet());
+    bool removeAllVias =
+        (it.value().vias == Toolbox::toSet(it.key()->getVias()));
     bool removeAllNetLines =
-        (it.value().netlines == it.key()->getNetLines().toSet());
+        (it.value().netlines == Toolbox::toSet(it.key()->getNetLines()));
     if (removeAllVias && removeAllNetLines) {
       // all items of the netsegment are selected --> remove the whole
       // netsegment
@@ -245,9 +247,9 @@ CmdRemoveBoardItems::getNonCohesiveNetSegmentSubSegments(
   Q_ASSERT(segment.isAddedToBoard());
 
   // get all vias and netlines of the segment to keep
-  QSet<BI_Via*>     vias = segment.getVias().toSet() - removedItems.vias;
+  QSet<BI_Via*> vias = Toolbox::toSet(segment.getVias()) - removedItems.vias;
   QSet<BI_NetLine*> netlines =
-      segment.getNetLines().toSet() - removedItems.netlines;
+      Toolbox::toSet(segment.getNetLines()) - removedItems.netlines;
 
   // find all separate segments of the netsegment
   QVector<NetSegmentItems> segments;

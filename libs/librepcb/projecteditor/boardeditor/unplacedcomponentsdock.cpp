@@ -269,7 +269,7 @@ void UnplacedComponentsDock::on_btnAddAll_clicked() {
             mProjectEditor.getWorkspace()
                 .getLibraryDb()
                 .getDevicesOfComponent(component->getLibComponent().getUuid())
-                .toList();
+                .values();
         if (devices.count() > 0)
           addNextDeviceToCmdGroup(*component, devices.first(), tl::nullopt);
       } catch (const Exception& e) {

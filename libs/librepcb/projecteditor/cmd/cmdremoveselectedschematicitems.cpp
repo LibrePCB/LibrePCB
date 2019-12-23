@@ -175,7 +175,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegment(
     ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance();
     Q_ASSERT(cmpSig);
     if (pinsToBeDisconnected.contains(
-            cmpSig->getRegisteredSymbolPins().toSet())) {
+            Toolbox::toSet(cmpSig->getRegisteredSymbolPins()))) {
       cmpSigsToBeDisconnected.insert(cmpSig);
     }
   }
@@ -207,7 +207,7 @@ void CmdRemoveSelectedSchematicItems::splitUpNetSegment(
     ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance();
     Q_ASSERT(cmpSig);
     if (pinsToBeDisconnected.contains(
-            cmpSig->getRegisteredSymbolPins().toSet())) {
+            Toolbox::toSet(cmpSig->getRegisteredSymbolPins()))) {
       cmpSigsToBeDisconnected.insert(cmpSig);
     }
   }
@@ -385,9 +385,9 @@ CmdRemoveSelectedSchematicItems::getNonCohesiveNetSegmentSubSegments(
     SI_NetSegment& segment, const NetSegmentItems& removedItems) noexcept {
   // get all netpoints, netlines and netlabels of the segment
   QSet<SI_NetLine*> netlines =
-      segment.getNetLines().toSet() - removedItems.netlines;
+      Toolbox::toSet(segment.getNetLines()) - removedItems.netlines;
   QSet<SI_NetLabel*> netlabels =
-      segment.getNetLabels().toSet() - removedItems.netlabels;
+      Toolbox::toSet(segment.getNetLabels()) - removedItems.netlabels;
 
   // find all separate segments of the netsegment
   QList<NetSegmentItems> segments;

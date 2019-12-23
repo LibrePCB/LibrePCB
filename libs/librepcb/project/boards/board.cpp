@@ -53,6 +53,7 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/scopeguardlist.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/pkg/footprint.h>
 
@@ -777,8 +778,8 @@ void Board::triggerAirWiresRebuild() noexcept {
 
 void Board::forceAirWiresRebuild() noexcept {
   mScheduledNetSignalsForAirWireRebuild.unite(
-      mProject.getCircuit().getNetSignals().values().toSet());
-  mScheduledNetSignalsForAirWireRebuild.unite(mAirWires.keys().toSet());
+      Toolbox::toSet(mProject.getCircuit().getNetSignals().values()));
+  mScheduledNetSignalsForAirWireRebuild.unite(Toolbox::toSet(mAirWires.keys()));
   triggerAirWiresRebuild();
 }
 
