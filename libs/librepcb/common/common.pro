@@ -62,6 +62,7 @@ SOURCES += \
     dialogs/stroketextpropertiesdialog.cpp \
     dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
+    fileio/csvfile.cpp \
     fileio/directorylock.cpp \
     fileio/filepath.cpp \
     fileio/fileutils.cpp \
@@ -191,6 +192,7 @@ HEADERS += \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
     fileio/cmd/cmdlistelementsswap.h \
+    fileio/csvfile.h \
     fileio/directorylock.h \
     fileio/filepath.h \
     fileio/filesystem.h \

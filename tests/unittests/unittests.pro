@@ -67,6 +67,7 @@ SOURCES += \
     common/attributes/attributekeytest.cpp \
     common/attributes/attributesubstitutortest.cpp \
     common/circuitidentifiertest.cpp \
+    common/fileio/csvfiletest.cpp \
     common/fileio/directorylocktest.cpp \
     common/fileio/filepathtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
