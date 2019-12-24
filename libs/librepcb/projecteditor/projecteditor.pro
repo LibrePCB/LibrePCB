@@ -25,6 +25,7 @@ SOURCES += \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
     boardeditor/boardlayerstacksetupdialog.cpp \
+    boardeditor/boardpickplacegeneratordialog.cpp \
     boardeditor/boardplanepropertiesdialog.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
     boardeditor/deviceinstancepropertiesdialog.cpp \
@@ -89,6 +90,7 @@ HEADERS += \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
     boardeditor/boardlayerstacksetupdialog.h \
+    boardeditor/boardpickplacegeneratordialog.h \
     boardeditor/boardplanepropertiesdialog.h \
     boardeditor/boardviapropertiesdialog.h \
     boardeditor/deviceinstancepropertiesdialog.h \
@@ -153,6 +155,7 @@ FORMS += \
     boardeditor/boardeditor.ui \
     boardeditor/boardlayersdock.ui \
     boardeditor/boardlayerstacksetupdialog.ui \
+    boardeditor/boardpickplacegeneratordialog.ui \
     boardeditor/boardplanepropertiesdialog.ui \
     boardeditor/boardviapropertiesdialog.ui \
     boardeditor/deviceinstancepropertiesdialog.ui \
