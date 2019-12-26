@@ -345,6 +345,7 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   Q_ASSERT(list);
   QHash<QListWidgetItem*, FilePath> selectedItemPaths =
       getElementListItemFilePaths(list->selectedItems());
+  QHash<QAction*, FilePath> aMoveToLibChildren;
 
   // Build the context menu
   QMenu    menu;
@@ -356,6 +357,16 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   aRemove->setVisible(!selectedItemPaths.isEmpty());
+  if (!selectedItemPaths.isEmpty()) {
+    QMenu* menuMoveToLib = menu.addMenu(QIcon(":/img/actions/move_to.png"),
+                                        tr("Move to other library"));
+    foreach (const LibraryMenuItem& item, getLocalLibraries()) {
+      if (item.filepath != mLibrary->getDirectory().getAbsPath()) {
+        QAction* action = menuMoveToLib->addAction(item.pixmap, item.name);
+        aMoveToLibChildren.insert(action, item.filepath);
+      }
+    }
+  }
   QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
   aNew->setVisible(selectedItemPaths.count() <= 1);
 
@@ -379,6 +390,10 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
     removeItems(selectedItemPaths);
   } else if (action == aNew) {
     newItem(list);
+  } else if (aMoveToLibChildren.contains(action)) {
+    Q_ASSERT(selectedItemPaths.count() > 0);
+    moveElementsToOtherLibrary(selectedItemPaths, aMoveToLibChildren[action],
+                               action->text());
   }
 }
 
@@ -476,6 +491,77 @@ void LibraryOverviewWidget::removeItems(
     }
     mContext.workspace.getLibraryDb().startLibraryRescan();
   }
+}
+
+void LibraryOverviewWidget::moveElementsToOtherLibrary(
+    const QHash<QListWidgetItem*, FilePath>& selectedItemPaths,
+    const FilePath& libFp, const QString& libName) noexcept {
+  // Build message (list only the first few elements to avoid a huge message
+  // box)
+  QString msg =
+      tr("Are you sure to move the following elements into the library '%1'?")
+          .arg(libName) %
+      "\n\n";
+  QList<QListWidgetItem*> listedItems = selectedItemPaths.keys().mid(0, 10);
+  foreach (QListWidgetItem* item, listedItems) {
+    msg.append(" - " % item->text() % "\n");
+  }
+  if (selectedItemPaths.count() > listedItems.count()) {
+    msg.append(" - ...\n");
+  }
+  msg.append("\n" % tr("Note: This cannot be easily undone!"));
+
+  // Show message box
+  int ret = QMessageBox::warning(
+      this, tr("Move %1 elements").arg(selectedItemPaths.count()), msg,
+      QMessageBox::Yes, QMessageBox::Cancel);
+  if (ret == QMessageBox::Yes) {
+    foreach (QListWidgetItem* item, selectedItemPaths.keys()) {
+      FilePath itemPath = selectedItemPaths.value(item);
+      QString  relativePath =
+          itemPath.toRelative(itemPath.getParentDir().getParentDir());
+      try {
+        // Emit signal so that the library editor can close any tabs that have
+        // opened this item
+        emit removeElementTriggered(itemPath);
+        FileUtils::move(itemPath, libFp.getPathTo(relativePath));
+        delete item;  // Remove from list
+      } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+      }
+    }
+    mContext.workspace.getLibraryDb().startLibraryRescan();
+  }
+}
+
+QList<LibraryOverviewWidget::LibraryMenuItem>
+LibraryOverviewWidget::getLocalLibraries() const noexcept {
+  QList<LibraryMenuItem> libs;
+  try {
+    QMultiMap<Version, FilePath> libraries =
+        mContext.workspace.getLibraryDb().getLibraries();  // can throw
+    foreach (const FilePath& libDir, libraries) {
+      // Don't list remote libraries since they are read-only!
+      if (libDir.isLocatedInDir(mContext.workspace.getLocalLibrariesPath())) {
+        QString name;
+        mContext.workspace.getLibraryDb().getElementTranslations<Library>(
+            libDir, getLibLocaleOrder(), &name);  // can throw
+        QPixmap icon;
+        mContext.workspace.getLibraryDb().getLibraryMetadata(
+            libDir,
+            &icon);  // can throw
+        libs.append(LibraryMenuItem{name, icon, libDir});
+      }
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Could not list local libraries:" << e.getMsg();
+  }
+  // sort by name
+  std::sort(libs.begin(), libs.end(),
+            [](const LibraryMenuItem& lhs, const LibraryMenuItem& rhs) {
+              return lhs.name < rhs.name;
+            });
+  return libs;
 }
 
 /*******************************************************************************
