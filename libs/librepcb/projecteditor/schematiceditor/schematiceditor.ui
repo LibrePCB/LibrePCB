@@ -14,7 +14,7 @@
    <string>Schematic Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../../img/images.qrc">
+   <iconset>
     <normaloff>:/img/actions/schematic.png</normaloff>:/img/actions/schematic.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -114,9 +114,16 @@
     <addaction name="separator"/>
     <addaction name="actionUpdateLibrary"/>
    </widget>
+   <widget class="QMenu" name="menuSchematic">
+    <property name="title">
+     <string>Schematic</string>
+    </property>
+    <addaction name="actionRenameSheet"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuSchematic"/>
    <addaction name="menuProject"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -252,7 +259,7 @@
   </widget>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
@@ -267,7 +274,7 @@
   </action>
   <action name="actionSave_Project">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
    </property>
    <property name="text">
@@ -279,7 +286,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
@@ -299,7 +306,7 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
    </property>
    <property name="text">
@@ -311,7 +318,7 @@
   </action>
   <action name="actionPDF_Export">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
@@ -323,7 +330,7 @@
   </action>
   <action name="actionShow_Control_Panel">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/home.png</normaloff>:/img/actions/home.png</iconset>
    </property>
    <property name="text">
@@ -332,7 +339,7 @@
   </action>
   <action name="actionShow_Board_Editor">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/board_editor.png</normaloff>:/img/actions/board_editor.png</iconset>
    </property>
    <property name="text">
@@ -341,7 +348,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
    </property>
    <property name="text">
@@ -353,7 +360,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
    </property>
    <property name="text">
@@ -365,7 +372,7 @@
   </action>
   <action name="actionZoom_In">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
    </property>
    <property name="text">
@@ -377,7 +384,7 @@
   </action>
   <action name="actionZoom_Out">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
    </property>
    <property name="text">
@@ -389,7 +396,7 @@
   </action>
   <action name="actionZoom_All">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
    </property>
    <property name="text">
@@ -398,7 +405,7 @@
   </action>
   <action name="actionOnlineDocumentation">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
@@ -410,7 +417,7 @@
   </action>
   <action name="actionOpenWebsite">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
    </property>
    <property name="text">
@@ -419,7 +426,7 @@
   </action>
   <action name="actionRotate_CCW">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
    </property>
    <property name="text">
@@ -431,7 +438,7 @@
   </action>
   <action name="actionRotate_CW">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
    </property>
    <property name="text">
@@ -443,7 +450,7 @@
   </action>
   <action name="actionMirror">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
    </property>
    <property name="text">
@@ -455,7 +462,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
    </property>
    <property name="text">
@@ -470,7 +477,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
    </property>
    <property name="text">
@@ -485,7 +492,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
    </property>
    <property name="text">
@@ -500,7 +507,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
@@ -512,7 +519,7 @@
   </action>
   <action name="actionClose_Project">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
@@ -521,7 +528,7 @@
   </action>
   <action name="actionToolSelect">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
    </property>
    <property name="text">
@@ -530,7 +537,7 @@
   </action>
   <action name="actionToolAddComponent">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/add_component.png</normaloff>:/img/actions/add_component.png</iconset>
    </property>
    <property name="text">
@@ -539,7 +546,7 @@
   </action>
   <action name="actionToolDrawWire">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/draw_wire.png</normaloff>:/img/actions/draw_wire.png</iconset>
    </property>
    <property name="text">
@@ -548,7 +555,7 @@
   </action>
   <action name="actionCommandAbort">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/stop.png</normaloff>:/img/actions/stop.png</iconset>
    </property>
    <property name="text">
@@ -560,7 +567,7 @@
   </action>
   <action name="actionLayers">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/layers.png</normaloff>:/img/actions/layers.png</iconset>
    </property>
    <property name="text">
@@ -572,7 +579,7 @@
   </action>
   <action name="actionGrid">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
    </property>
    <property name="text">
@@ -586,7 +593,7 @@
   </action>
   <action name="actionAddComp_Resistor">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/resistor_eu.png</normaloff>:/img/library/resistor_eu.png</iconset>
    </property>
    <property name="text">
@@ -595,7 +602,7 @@
   </action>
   <action name="actionAddComp_BipolarCapacitor">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/bipolar_capacitor_eu.png</normaloff>:/img/library/bipolar_capacitor_eu.png</iconset>
    </property>
    <property name="text">
@@ -607,7 +614,7 @@
   </action>
   <action name="actionAddComp_Inductor">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/inductor_eu.png</normaloff>:/img/library/inductor_eu.png</iconset>
    </property>
    <property name="text">
@@ -616,7 +623,7 @@
   </action>
   <action name="actionAddComp_gnd">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/gnd.png</normaloff>:/img/library/gnd.png</iconset>
    </property>
    <property name="text">
@@ -625,7 +632,7 @@
   </action>
   <action name="actionAddComp_vcc">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/vcc.png</normaloff>:/img/library/vcc.png</iconset>
    </property>
    <property name="text">
@@ -639,7 +646,7 @@
   </action>
   <action name="actionProjectSettings">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
@@ -648,7 +655,7 @@
   </action>
   <action name="actionToolAddNetLabel">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/draw_netlabel.png</normaloff>:/img/actions/draw_netlabel.png</iconset>
    </property>
    <property name="text">
@@ -657,7 +664,7 @@
   </action>
   <action name="actionAddComp_UnipolarCapacitor">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/unipolar_capacitor_eu.png</normaloff>:/img/library/unipolar_capacitor_eu.png</iconset>
    </property>
    <property name="text">
@@ -666,7 +673,7 @@
   </action>
   <action name="actionNew_Schematic_Page">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
    </property>
    <property name="text">
@@ -678,7 +685,7 @@
   </action>
   <action name="actionUpdateLibrary">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
@@ -687,7 +694,7 @@
   </action>
   <action name="actionExportLppz">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
    </property>
    <property name="text">
@@ -699,11 +706,16 @@
   </action>
   <action name="actionGenerateBom">
    <property name="icon">
-    <iconset resource="../../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
    </property>
    <property name="text">
     <string>Generate BOM</string>
+   </property>
+  </action>
+  <action name="actionRenameSheet">
+   <property name="text">
+    <string>Rename Sheet</string>
    </property>
   </action>
  </widget>
@@ -714,9 +726,6 @@
    <header location="global">librepcb/common/widgets/statusbar.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

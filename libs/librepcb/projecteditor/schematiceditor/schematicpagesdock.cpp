@@ -60,6 +60,8 @@ SchematicPagesDock::SchematicPagesDock(Project& project, QWidget* parent)
           &SchematicPagesDock::schematicAdded);
   connect(&mProject, &Project::schematicRemoved, this,
           &SchematicPagesDock::schematicRemoved);
+  connect(&mProject, &Project::attributesChanged, this,
+          &SchematicPagesDock::updateSchematicNames);
 
   // install event filter on the list widget to implement keyboard shortcuts
   mUi->listWidget->installEventFilter(this);
@@ -95,6 +97,11 @@ bool SchematicPagesDock::eventFilter(QObject* obj, QEvent* event) noexcept {
         event->accept();
         return true;
       }
+      case Qt::Key_F2: {
+        renameSelectedSchematic();
+        event->accept();
+        return true;
+      }
       default:
         break;
     }
@@ -110,6 +117,10 @@ void SchematicPagesDock::removeSelectedSchematic() noexcept {
   emit removeSchematicTriggered(mUi->listWidget->currentRow());
 }
 
+void SchematicPagesDock::renameSelectedSchematic() noexcept {
+  emit renameSchematicTriggered(mUi->listWidget->currentRow());
+}
+
 void SchematicPagesDock::schematicAdded(int newIndex) noexcept {
   Schematic* schematic = mProject.getSchematicByIndex(newIndex);
   Q_ASSERT(schematic);
@@ -123,6 +134,16 @@ void SchematicPagesDock::schematicAdded(int newIndex) noexcept {
 
 void SchematicPagesDock::schematicRemoved(int oldIndex) noexcept {
   delete mUi->listWidget->item(oldIndex);
+}
+
+void SchematicPagesDock::updateSchematicNames() noexcept {
+  for (int i = 0; i < mUi->listWidget->count(); ++i) {
+    QListWidgetItem* item      = mUi->listWidget->item(i);
+    const Schematic* schematic = mProject.getSchematicByIndex(i);
+    if (item && schematic) {
+      item->setText(*schematic->getName());
+    }
+  }
 }
 
 /*******************************************************************************

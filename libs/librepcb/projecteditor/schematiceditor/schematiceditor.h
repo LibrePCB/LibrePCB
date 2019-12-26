@@ -92,6 +92,7 @@ private slots:
 
   // Actions
   void on_actionClose_Project_triggered();
+  void on_actionRenameSheet_triggered();
   void on_actionGrid_triggered();
   void on_actionPrint_triggered();
   void on_actionPDF_Export_triggered();
@@ -119,6 +120,7 @@ private:
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void addSchematic() noexcept;
   void removeSchematic(int index) noexcept;
+  void renameSchematic(int index) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;

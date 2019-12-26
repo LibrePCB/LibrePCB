@@ -67,6 +67,7 @@ signals:
   void selectedSchematicChanged(int index);
   void addSchematicTriggered();
   void removeSchematicTriggered(int index);
+  void renameSchematicTriggered(int index);
 
 protected:
   void resizeEvent(QResizeEvent* event) noexcept override;
@@ -74,8 +75,10 @@ protected:
 
 private:  // Methods
   void removeSelectedSchematic() noexcept;
+  void renameSelectedSchematic() noexcept;
   void schematicAdded(int newIndex) noexcept;
   void schematicRemoved(int oldIndex) noexcept;
+  void updateSchematicNames() noexcept;
 
 private:  // Data
   Project&                               mProject;

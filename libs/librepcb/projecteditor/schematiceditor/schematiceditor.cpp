@@ -43,6 +43,7 @@
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdschematicadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicedit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicremove.h>
 #include <librepcb/project/schematics/schematic.h>
 #include <librepcb/project/settings/projectsettings.h>
@@ -96,6 +97,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
           &SchematicEditor::addSchematic);
   connect(mPagesDock, &SchematicPagesDock::removeSchematicTriggered, this,
           &SchematicEditor::removeSchematic);
+  connect(mPagesDock, &SchematicPagesDock::renameSchematicTriggered, this,
+          &SchematicEditor::renameSchematic);
   addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
   mErcMsgDock = new ErcMsgDock(mProject);
   addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
@@ -328,6 +331,10 @@ void SchematicEditor::on_actionClose_Project_triggered() {
   mProjectEditor.closeAndDestroy(true, this);
 }
 
+void SchematicEditor::on_actionRenameSheet_triggered() {
+  renameSchematic(mActiveSchematicIndex);
+}
+
 void SchematicEditor::on_actionGrid_triggered() {
   GridSettingsDialog dialog(*mGridProperties, this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
@@ -532,6 +539,25 @@ void SchematicEditor::removeSchematic(int index) noexcept {
   try {
     CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
     mProjectEditor.getUndoStack().execCmd(cmd);
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void SchematicEditor::renameSchematic(int index) noexcept {
+  Schematic* schematic = mProject.getSchematicByIndex(index);
+  if (!schematic) return;
+
+  bool    ok = false;
+  QString name =
+      QInputDialog::getText(this, tr("Rename sheet"), tr("Choose new name:"),
+                            QLineEdit::Normal, *schematic->getName(), &ok);
+  if (!ok) return;
+
+  try {
+    QScopedPointer<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
+    cmd->setName(ElementName(cleanElementName(name)));  // can throw
+    mProjectEditor.getUndoStack().execCmd(cmd.take());
   } catch (Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
