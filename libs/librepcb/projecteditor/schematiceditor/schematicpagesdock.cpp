@@ -22,14 +22,9 @@
  ******************************************************************************/
 #include "schematicpagesdock.h"
 
-#include "../projecteditor.h"
-#include "schematiceditor.h"
 #include "ui_schematicpagesdock.h"
 
-#include <librepcb/common/undostack.h>
 #include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicremove.h>
 #include <librepcb/project/schematics/schematic.h>
 
 #include <QtCore>
@@ -46,54 +41,76 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicPagesDock::SchematicPagesDock(Project&         project,
-                                       SchematicEditor& editor)
-  : QDockWidget(0),
-    mProject(project),
-    mEditor(editor),
-    mUi(new Ui::SchematicPagesDock) {
+SchematicPagesDock::SchematicPagesDock(Project& project, QWidget* parent)
+  : QDockWidget(parent), mProject(project), mUi(new Ui::SchematicPagesDock) {
   mUi->setupUi(this);
 
   // add all schematics to list widget
   for (int i = 0; i < mProject.getSchematics().count(); i++) schematicAdded(i);
+  mUi->listWidget->setCurrentRow(-1);
 
   // connect signals/slots
-  connect(&mEditor, &SchematicEditor::activeSchematicChanged, this,
-          &SchematicPagesDock::activeSchematicChanged);
+  connect(mUi->btnNewSchematic, &QToolButton::clicked, this,
+          &SchematicPagesDock::addSchematicTriggered);
+  connect(mUi->btnRemoveSchematic, &QToolButton::clicked, this,
+          &SchematicPagesDock::removeSelectedSchematic);
+  connect(mUi->listWidget, &QListWidget::currentRowChanged, this,
+          &SchematicPagesDock::selectedSchematicChanged);
   connect(&mProject, &Project::schematicAdded, this,
           &SchematicPagesDock::schematicAdded);
   connect(&mProject, &Project::schematicRemoved, this,
           &SchematicPagesDock::schematicRemoved);
 
-  // select the current schematic page
-  mUi->listWidget->setCurrentRow(mEditor.getActiveSchematicIndex());
+  // install event filter on the list widget to implement keyboard shortcuts
+  mUi->listWidget->installEventFilter(this);
 }
 
 SchematicPagesDock::~SchematicPagesDock() {
-  delete mUi;
-  mUi = 0;
 }
 
 /*******************************************************************************
- *  Inherited from QDockWidget
+ *  Public Methods
  ******************************************************************************/
 
-void SchematicPagesDock::resizeEvent(QResizeEvent* event) {
+void SchematicPagesDock::setSelectedSchematic(int index) noexcept {
+  mUi->listWidget->setCurrentRow(index);
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void SchematicPagesDock::resizeEvent(QResizeEvent* event) noexcept {
   int iconSize = event->size().width() - 10;  // this is not good...
   mUi->listWidget->setIconSize(QSize(iconSize, iconSize));
   QDockWidget::resizeEvent(event);
 }
 
-/*******************************************************************************
- *  Public Slots
- ******************************************************************************/
-
-void SchematicPagesDock::activeSchematicChanged(int oldIndex, int newIndex) {
-  Q_UNUSED(oldIndex);
-  mUi->listWidget->setCurrentRow(newIndex);
+bool SchematicPagesDock::eventFilter(QObject* obj, QEvent* event) noexcept {
+  if (event->type() == QEvent::ShortcutOverride) {
+    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+    switch (keyEvent->key()) {
+      case Qt::Key_Delete: {
+        removeSelectedSchematic();
+        event->accept();
+        return true;
+      }
+      default:
+        break;
+    }
+  }
+  return QDockWidget::eventFilter(obj, event);
 }
 
-void SchematicPagesDock::schematicAdded(int newIndex) {
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void SchematicPagesDock::removeSelectedSchematic() noexcept {
+  emit removeSchematicTriggered(mUi->listWidget->currentRow());
+}
+
+void SchematicPagesDock::schematicAdded(int newIndex) noexcept {
   Schematic* schematic = mProject.getSchematicByIndex(newIndex);
   Q_ASSERT(schematic);
   if (!schematic) return;
@@ -104,46 +121,8 @@ void SchematicPagesDock::schematicAdded(int newIndex) {
   mUi->listWidget->insertItem(newIndex, item);
 }
 
-void SchematicPagesDock::schematicRemoved(int oldIndex) {
+void SchematicPagesDock::schematicRemoved(int oldIndex) noexcept {
   delete mUi->listWidget->item(oldIndex);
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void SchematicPagesDock::on_btnNewSchematic_clicked() {
-  bool    ok   = false;
-  QString name = QInputDialog::getText(this, tr("Add schematic page"),
-                                       tr("Choose a name:"), QLineEdit::Normal,
-                                       tr("New Page"), &ok);
-
-  if (!ok) return;
-
-  try {
-    CmdSchematicAdd* cmd =
-        new CmdSchematicAdd(mProject, ElementName(name));  // can throw
-    mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
-  }
-}
-
-void SchematicPagesDock::on_btnRemoveSchematic_clicked() {
-  Schematic* schematic =
-      mProject.getSchematicByIndex(mUi->listWidget->currentRow());
-  if (!schematic) return;
-
-  try {
-    CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
-    mEditor.getProjectEditor().getUndoStack().execCmd(cmd);
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
-  }
-}
-
-void SchematicPagesDock::on_listWidget_currentRowChanged(int currentRow) {
-  mEditor.setActiveSchematicIndex(currentRow);
 }
 
 /*******************************************************************************

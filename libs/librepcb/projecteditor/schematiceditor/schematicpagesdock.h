@@ -36,8 +36,6 @@ class Project;
 
 namespace editor {
 
-class SchematicEditor;
-
 namespace Ui {
 class SchematicPagesDock;
 }
@@ -54,35 +52,34 @@ class SchematicPagesDock final : public QDockWidget {
 
 public:
   // Constructors / Destructor
-  explicit SchematicPagesDock(Project& project, SchematicEditor& editor);
+  SchematicPagesDock()                                = delete;
+  SchematicPagesDock(const SchematicPagesDock& other) = delete;
+  SchematicPagesDock(Project& project, QWidget* parent = nullptr);
   ~SchematicPagesDock();
 
-  // Inherited from QDockWidget
-  void resizeEvent(QResizeEvent* event);
+  // General Methods
+  void setSelectedSchematic(int index) noexcept;
 
-public slots:
+  // Operator Overloadings
+  SchematicPagesDock& operator=(const SchematicPagesDock& rhs) = delete;
 
-  void activeSchematicChanged(int oldIndex, int newIndex);
-  void schematicAdded(int newIndex);
-  void schematicRemoved(int oldIndex);
+signals:
+  void selectedSchematicChanged(int index);
+  void addSchematicTriggered();
+  void removeSchematicTriggered(int index);
 
-private slots:
+protected:
+  void resizeEvent(QResizeEvent* event) noexcept override;
+  bool eventFilter(QObject* obj, QEvent* event) noexcept override;
 
-  // UI
-  void on_btnNewSchematic_clicked();
-  void on_btnRemoveSchematic_clicked();
-  void on_listWidget_currentRowChanged(int currentRow);
+private:  // Methods
+  void removeSelectedSchematic() noexcept;
+  void schematicAdded(int newIndex) noexcept;
+  void schematicRemoved(int oldIndex) noexcept;
 
-private:
-  // make some methods inaccessible...
-  SchematicPagesDock();
-  SchematicPagesDock(const SchematicPagesDock& other);
-  SchematicPagesDock& operator=(const SchematicPagesDock& rhs);
-
-  // General
-  Project&                mProject;
-  SchematicEditor&        mEditor;
-  Ui::SchematicPagesDock* mUi;
+private:  // Data
+  Project&                               mProject;
+  QScopedPointer<Ui::SchematicPagesDock> mUi;
 };
 
 /*******************************************************************************
