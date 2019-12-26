@@ -138,6 +138,9 @@ public:
   const ElementName& getName() const noexcept { return mName; }
   const QIcon&       getIcon() const noexcept { return mIcon; }
 
+  // Setters: Attributes
+  void setName(const ElementName& name) noexcept;
+
   // Symbol Methods
   QList<SI_Symbol*> getSymbols() const noexcept { return mSymbols; }
   SI_Symbol*        getSymbolByUuid(const Uuid& uuid) const noexcept;

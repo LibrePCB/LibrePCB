@@ -226,11 +226,16 @@ QList<SI_SymbolPin*> Schematic::getPinsAtScenePos(const Point& pos) const
 }
 
 /*******************************************************************************
- *  Setters: General
+ *  Setters
  ******************************************************************************/
 
 void Schematic::setGridProperties(const GridProperties& grid) noexcept {
   *mGridProperties = grid;
+}
+
+void Schematic::setName(const ElementName& name) noexcept {
+  mName = name;
+  emit mProject.attributesChanged();
 }
 
 /*******************************************************************************
