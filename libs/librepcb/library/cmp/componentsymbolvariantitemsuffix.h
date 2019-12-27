@@ -55,7 +55,7 @@ struct ComponentSymbolVariantItemSuffixVerifier {
 
 struct ComponentSymbolVariantItemSuffixConstraint {
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("^[0-9a-zA-Z_]{0,16}$")
+    return QRegularExpression("\\A[0-9a-zA-Z_]{0,16}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }

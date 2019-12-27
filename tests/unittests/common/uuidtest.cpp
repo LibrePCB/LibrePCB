@@ -261,6 +261,8 @@ INSTANTIATE_TEST_SUITE_P(UuidTest, UuidTest, ::testing::Values(
     UuidTestData({false, ""                                      }),    // empty
     UuidTestData({false, "                                    "  }),    // empty
     UuidTestData({false, QString()}),                                   // null
+    UuidTestData({false, "\nbdf7bea5-b88e-41b2-be85-c1604e8ddfca"}),    // newline
+    UuidTestData({false, "bdf7bea5-b88e-41b2-be85-c1604e8ddfca\n"}),    // newline
     UuidTestData({false, "74CA6127-E785-4355-8580-1CED4F0A0E9E"  }),    // uppercase
     UuidTestData({false, "568EB40D-CD69-47A5-8932-4F5CC4B2D3FA"  }),    // uppercase
     UuidTestData({false, "29401DCB-6CB6-47A1-8F7D-72DD7F9F4939"  }),    // uppercase
