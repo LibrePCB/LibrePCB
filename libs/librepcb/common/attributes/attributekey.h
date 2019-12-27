@@ -61,7 +61,7 @@ struct AttributeKeyVerifier {
 
 struct AttributeKeyConstraint {
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("^[_0-9A-Z]{1,40}$")
+    return QRegularExpression("\\A[_0-9A-Z]{1,40}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }

@@ -55,7 +55,7 @@ struct ComponentPrefixVerifier {
 
 struct ComponentPrefixConstraint {
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("^[a-zA-Z_]{0,16}$")
+    return QRegularExpression("\\A[a-zA-Z_]{0,16}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }

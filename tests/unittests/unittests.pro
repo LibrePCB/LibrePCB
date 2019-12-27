@@ -64,7 +64,9 @@ PRE_TARGETDEPS += \
 SOURCES += \
     common/alignmenttest.cpp \
     common/applicationtest.cpp \
+    common/attributes/attributekeytest.cpp \
     common/attributes/attributesubstitutortest.cpp \
+    common/circuitidentifiertest.cpp \
     common/fileio/directorylocktest.cpp \
     common/fileio/filepathtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
@@ -72,6 +74,7 @@ SOURCES += \
     common/fileio/transactionalfilesystemtest.cpp \
     common/geometry/pathmodeltest.cpp \
     common/geometry/pathtest.cpp \
+    common/graphics/graphicslayernametest.cpp \
     common/network/filedownloadtest.cpp \
     common/network/networkrequesttest.cpp \
     common/scopeguardtest.cpp \
@@ -91,6 +94,8 @@ SOURCES += \
     eagleimport/devicesetconvertertest.cpp \
     eagleimport/packageconvertertest.cpp \
     eagleimport/symbolconvertertest.cpp \
+    library/cmp/componentprefixtest.cpp \
+    library/cmp/componentsymbolvariantitemsuffixtest.cpp \
     library/cmp/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
     main.cpp \

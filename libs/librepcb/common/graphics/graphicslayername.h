@@ -55,7 +55,7 @@ struct GraphicsLayerNameVerifier {
 
 struct GraphicsLayerNameConstraint {
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("^[a-z][_0-9a-z]{0,39}$")
+    return QRegularExpression("\\A[a-z][_0-9a-z]{0,39}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }

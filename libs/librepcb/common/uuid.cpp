@@ -37,7 +37,7 @@ namespace librepcb {
 bool Uuid::isValid(const QString& str) noexcept {
   // check format of string (only accept EXACT matches!)
   QRegularExpression re(
-      "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+      "\\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\z");
   QRegularExpressionMatch match =
       re.match(str, 0, QRegularExpression::PartialPreferCompleteMatch);
   if (!match.hasMatch()) return false;

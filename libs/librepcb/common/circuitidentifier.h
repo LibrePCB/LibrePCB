@@ -62,7 +62,7 @@ struct CircuitIdentifierVerifier {
 
 struct CircuitIdentifierConstraint {
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("^[-a-zA-Z0-9_+/!?@#$]{1,32}$")
+    return QRegularExpression("\\A[-a-zA-Z0-9_+/!?@#$]{1,32}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }
