@@ -54,6 +54,12 @@ class LibraryOverviewWidget;
 class LibraryOverviewWidget final : public EditorWidgetBase {
   Q_OBJECT
 
+  struct LibraryMenuItem {
+    QString  name;
+    QPixmap  pixmap;
+    FilePath filepath;
+  };
+
 public:
   // Constructors / Destructor
   LibraryOverviewWidget()                                   = delete;
@@ -117,6 +123,10 @@ private:  // Methods
   void duplicateItem(QListWidget* list, const FilePath& fp) noexcept;
   void removeItems(
       const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
+  void moveElementsToOtherLibrary(
+      const QHash<QListWidgetItem*, FilePath>& selectedItemPaths,
+      const FilePath& libFp, const QString& libName) noexcept;
+  QList<LibraryMenuItem> getLocalLibraries() const noexcept;
 
   // Event Handlers
   void btnIconClicked() noexcept;
