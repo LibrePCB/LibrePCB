@@ -30,6 +30,7 @@
 #include "boarddesignrulecheckmessagesdock.h"
 #include "boardlayersdock.h"
 #include "boardlayerstacksetupdialog.h"
+#include "boardpickplacegeneratordialog.h"
 #include "fabricationoutputdialog.h"
 #include "fsm/bes_fsm.h"
 #include "ui_boardeditor.h"
@@ -544,6 +545,14 @@ void BoardEditor::on_actionGenerateFabricationData_triggered() {
 
 void BoardEditor::on_actionGenerateBom_triggered() {
   BomGeneratorDialog dialog(mProject, getActiveBoard(), this);
+  dialog.exec();
+}
+
+void BoardEditor::on_actionGeneratePickPlace_triggered() {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  BoardPickPlaceGeneratorDialog dialog(*board);
   dialog.exec();
 }
 
