@@ -43,6 +43,8 @@
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdschematicadd.h>
+#include <librepcb/project/schematics/cmd/cmdschematicedit.h>
+#include <librepcb/project/schematics/cmd/cmdschematicremove.h>
 #include <librepcb/project/schematics/schematic.h>
 #include <librepcb/project/settings/projectsettings.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -86,7 +88,17 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   setWindowTitle(QString("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
   // Add Dock Widgets
-  mPagesDock = new SchematicPagesDock(mProject, *this);
+  mPagesDock = new SchematicPagesDock(mProject, this);
+  connect(this, &SchematicEditor::activeSchematicChanged, mPagesDock,
+          &SchematicPagesDock::setSelectedSchematic);
+  connect(mPagesDock, &SchematicPagesDock::selectedSchematicChanged, this,
+          &SchematicEditor::setActiveSchematicIndex);
+  connect(mPagesDock, &SchematicPagesDock::addSchematicTriggered, this,
+          &SchematicEditor::addSchematic);
+  connect(mPagesDock, &SchematicPagesDock::removeSchematicTriggered, this,
+          &SchematicEditor::removeSchematic);
+  connect(mPagesDock, &SchematicPagesDock::renameSchematicTriggered, this,
+          &SchematicEditor::renameSchematic);
   addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
   mErcMsgDock = new ErcMsgDock(mProject);
   addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
@@ -109,6 +121,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mUi->menuView->addAction(mErcMsgDock->toggleViewAction());
 
   // connect some actions which are created with the Qt Designer
+  connect(mUi->actionNew_Schematic_Page, &QAction::triggered, this,
+          &SchematicEditor::addSchematic);
   connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor,
           &ProjectEditor::saveProject);
   connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
@@ -282,8 +296,8 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   }
 
   // schematic page has changed!
-  emit activeSchematicChanged(mActiveSchematicIndex, index);
   mActiveSchematicIndex = index;
+  emit activeSchematicChanged(mActiveSchematicIndex);
   return true;
 }
 
@@ -317,20 +331,8 @@ void SchematicEditor::on_actionClose_Project_triggered() {
   mProjectEditor.closeAndDestroy(true, this);
 }
 
-void SchematicEditor::on_actionNew_Schematic_Page_triggered() {
-  bool    ok   = false;
-  QString name = QInputDialog::getText(this, tr("Add schematic page"),
-                                       tr("Choose a name:"), QLineEdit::Normal,
-                                       tr("New Page"), &ok);
-  if (!ok) return;
-
-  try {
-    CmdSchematicAdd* cmd =
-        new CmdSchematicAdd(mProject, ElementName(name));  // can throw
-    mProjectEditor.getUndoStack().execCmd(cmd);
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
-  }
+void SchematicEditor::on_actionRenameSheet_triggered() {
+  renameSchematic(mActiveSchematicIndex);
 }
 
 void SchematicEditor::on_actionGrid_triggered() {
@@ -510,6 +512,54 @@ void SchematicEditor::toolActionGroupChangeTriggered(
       Q_ASSERT(false);
       qCritical() << "Unknown tool triggered!";
       break;
+  }
+}
+
+void SchematicEditor::addSchematic() noexcept {
+  bool    ok   = false;
+  QString name = QInputDialog::getText(this, tr("Add schematic page"),
+                                       tr("Choose a name:"), QLineEdit::Normal,
+                                       tr("New Page"), &ok);
+  if (!ok) return;
+
+  try {
+    CmdSchematicAdd* cmd =
+        new CmdSchematicAdd(mProject, ElementName(name));  // can throw
+    mProjectEditor.getUndoStack().execCmd(cmd);
+    setActiveSchematicIndex(mProject.getSchematics().count() - 1);
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void SchematicEditor::removeSchematic(int index) noexcept {
+  Schematic* schematic = mProject.getSchematicByIndex(index);
+  if (!schematic) return;
+
+  try {
+    CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
+    mProjectEditor.getUndoStack().execCmd(cmd);
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void SchematicEditor::renameSchematic(int index) noexcept {
+  Schematic* schematic = mProject.getSchematicByIndex(index);
+  if (!schematic) return;
+
+  bool    ok = false;
+  QString name =
+      QInputDialog::getText(this, tr("Rename sheet"), tr("Choose new name:"),
+                            QLineEdit::Normal, *schematic->getName(), &ok);
+  if (!ok) return;
+
+  try {
+    QScopedPointer<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
+    cmd->setName(ElementName(cleanElementName(name)));  // can throw
+    mProjectEditor.getUndoStack().execCmd(cmd.take());
+  } catch (Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 }
 

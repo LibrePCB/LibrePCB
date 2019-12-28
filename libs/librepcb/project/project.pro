@@ -106,6 +106,7 @@ SOURCES += \
     metadata/projectmetadata.cpp \
     project.cpp \
     schematics/cmd/cmdschematicadd.cpp \
+    schematics/cmd/cmdschematicedit.cpp \
     schematics/cmd/cmdschematicnetlabeladd.cpp \
     schematics/cmd/cmdschematicnetlabelanchorsupdate.cpp \
     schematics/cmd/cmdschematicnetlabeledit.cpp \
@@ -227,6 +228,7 @@ HEADERS += \
     metadata/projectmetadata.h \
     project.h \
     schematics/cmd/cmdschematicadd.h \
+    schematics/cmd/cmdschematicedit.h \
     schematics/cmd/cmdschematicnetlabeladd.h \
     schematics/cmd/cmdschematicnetlabelanchorsupdate.h \
     schematics/cmd/cmdschematicnetlabeledit.h \

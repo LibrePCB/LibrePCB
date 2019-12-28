@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
-#define LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICEDIT_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/elementname.h>
+#include <librepcb/common/undocommand.h>
+
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -32,65 +34,51 @@
 namespace librepcb {
 namespace project {
 
-class Project;
-
-namespace editor {
-
-namespace Ui {
-class SchematicPagesDock;
-}
+class Schematic;
 
 /*******************************************************************************
- *  Class SchematicPagesDock
+ *  Class CmdSchematicEdit
  ******************************************************************************/
 
 /**
- * @brief The SchematicPagesDock class
+ * @brief The CmdSchematicEdit class
  */
-class SchematicPagesDock final : public QDockWidget {
-  Q_OBJECT
-
+class CmdSchematicEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  SchematicPagesDock()                                = delete;
-  SchematicPagesDock(const SchematicPagesDock& other) = delete;
-  SchematicPagesDock(Project& project, QWidget* parent = nullptr);
-  ~SchematicPagesDock();
+  CmdSchematicEdit()                              = delete;
+  CmdSchematicEdit(const CmdSchematicEdit& other) = delete;
+  explicit CmdSchematicEdit(Schematic& schematic) noexcept;
+  ~CmdSchematicEdit() noexcept;
 
-  // General Methods
-  void setSelectedSchematic(int index) noexcept;
+  // Setters
+  void setName(const ElementName& name) noexcept;
 
   // Operator Overloadings
-  SchematicPagesDock& operator=(const SchematicPagesDock& rhs) = delete;
-
-signals:
-  void selectedSchematicChanged(int index);
-  void addSchematicTriggered();
-  void removeSchematicTriggered(int index);
-  void renameSchematicTriggered(int index);
-
-protected:
-  void resizeEvent(QResizeEvent* event) noexcept override;
-  bool eventFilter(QObject* obj, QEvent* event) noexcept override;
+  CmdSchematicEdit& operator=(const CmdSchematicEdit& rhs) = delete;
 
 private:  // Methods
-  void removeSelectedSchematic() noexcept;
-  void renameSelectedSchematic() noexcept;
-  void schematicAdded(int newIndex) noexcept;
-  void schematicRemoved(int oldIndex) noexcept;
-  void updateSchematicNames() noexcept;
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc UndoCommand::performRedo()
+  void performRedo() override;
 
 private:  // Data
-  Project&                               mProject;
-  QScopedPointer<Ui::SchematicPagesDock> mUi;
+  Schematic& mSchematic;
+
+  ElementName mOldName;
+  ElementName mNewName;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
+#endif  // LIBREPCB_PROJECT_CMDSCHEMATICEDIT_H

@@ -92,7 +92,7 @@ private slots:
 
   // Actions
   void on_actionClose_Project_triggered();
-  void on_actionNew_Schematic_Page_triggered();
+  void on_actionRenameSheet_triggered();
   void on_actionGrid_triggered();
   void on_actionPrint_triggered();
   void on_actionPDF_Export_triggered();
@@ -107,8 +107,7 @@ private slots:
   void on_actionUpdateLibrary_triggered();
 
 signals:
-
-  void activeSchematicChanged(int oldIndex, int newIndex);
+  void activeSchematicChanged(int index);
 
 private:
   // make some methods inaccessible...
@@ -119,6 +118,9 @@ private:
   // Private Methods
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void addSchematic() noexcept;
+  void removeSchematic(int index) noexcept;
+  void renameSchematic(int index) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;
