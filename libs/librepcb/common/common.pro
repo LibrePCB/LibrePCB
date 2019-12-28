@@ -62,6 +62,7 @@ SOURCES += \
     dialogs/stroketextpropertiesdialog.cpp \
     dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
+    fileio/csvfile.cpp \
     fileio/directorylock.cpp \
     fileio/filepath.cpp \
     fileio/fileutils.cpp \
@@ -108,6 +109,8 @@ SOURCES += \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
     network/repository.cpp \
+    pnp/pickplacecsvwriter.cpp \
+    pnp/pickplacedata.cpp \
     signalrole.cpp \
     sqlitedatabase.cpp \
     systeminfo.cpp \
@@ -191,6 +194,7 @@ HEADERS += \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
     fileio/cmd/cmdlistelementsswap.h \
+    fileio/csvfile.h \
     fileio/directorylock.h \
     fileio/filepath.h \
     fileio/filesystem.h \
@@ -244,6 +248,8 @@ HEADERS += \
     network/networkrequestbase.h \
     network/repository.h \
     norms.h \
+    pnp/pickplacecsvwriter.h \
+    pnp/pickplacedata.h \
     scopeguard.h \
     scopeguardlist.h \
     signalrole.h \

@@ -67,6 +67,7 @@ SOURCES += \
     common/attributes/attributekeytest.cpp \
     common/attributes/attributesubstitutortest.cpp \
     common/circuitidentifiertest.cpp \
+    common/fileio/csvfiletest.cpp \
     common/fileio/directorylocktest.cpp \
     common/fileio/filepathtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
@@ -77,6 +78,7 @@ SOURCES += \
     common/graphics/graphicslayernametest.cpp \
     common/network/filedownloadtest.cpp \
     common/network/networkrequesttest.cpp \
+    common/pnp/pickplacecsvwritertest.cpp \
     common/scopeguardtest.cpp \
     common/signalslottest.cpp \
     common/sqlitedatabasetest.cpp \
@@ -100,6 +102,7 @@ SOURCES += \
     library/librarybaseelementtest.cpp \
     main.cpp \
     project/boards/boardgerberexporttest.cpp \
+    project/boards/boardpickplacegeneratortest.cpp \
     project/boards/boardplanefragmentsbuildertest.cpp \
     project/library/projectlibrarytest.cpp \
     project/projecttest.cpp \
