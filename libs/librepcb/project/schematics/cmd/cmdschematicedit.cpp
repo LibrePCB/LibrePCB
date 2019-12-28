@@ -17,80 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
-#define LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "cmdschematicedit.h"
+
+#include "../schematic.h"
+
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace project {
 
-class Project;
+/*******************************************************************************
+ *  Constructors / Destructor
+ ******************************************************************************/
 
-namespace editor {
+CmdSchematicEdit::CmdSchematicEdit(Schematic& schematic) noexcept
+  : UndoCommand(tr("Edit sheet properties")),
+    mSchematic(schematic),
+    mOldName(schematic.getName()),
+    mNewName(mOldName) {
+}
 
-namespace Ui {
-class SchematicPagesDock;
+CmdSchematicEdit::~CmdSchematicEdit() noexcept {
 }
 
 /*******************************************************************************
- *  Class SchematicPagesDock
+ *  Setters
  ******************************************************************************/
 
-/**
- * @brief The SchematicPagesDock class
- */
-class SchematicPagesDock final : public QDockWidget {
-  Q_OBJECT
+void CmdSchematicEdit::setName(const ElementName& name) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = name;
+}
 
-public:
-  // Constructors / Destructor
-  SchematicPagesDock()                                = delete;
-  SchematicPagesDock(const SchematicPagesDock& other) = delete;
-  SchematicPagesDock(Project& project, QWidget* parent = nullptr);
-  ~SchematicPagesDock();
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
 
-  // General Methods
-  void setSelectedSchematic(int index) noexcept;
+bool CmdSchematicEdit::performExecute() {
+  performRedo();  // can throw
 
-  // Operator Overloadings
-  SchematicPagesDock& operator=(const SchematicPagesDock& rhs) = delete;
+  if (mNewName != mOldName) return true;
+  return false;
+}
 
-signals:
-  void selectedSchematicChanged(int index);
-  void addSchematicTriggered();
-  void removeSchematicTriggered(int index);
-  void renameSchematicTriggered(int index);
+void CmdSchematicEdit::performUndo() {
+  mSchematic.setName(mOldName);
+}
 
-protected:
-  void resizeEvent(QResizeEvent* event) noexcept override;
-  bool eventFilter(QObject* obj, QEvent* event) noexcept override;
-
-private:  // Methods
-  void removeSelectedSchematic() noexcept;
-  void renameSelectedSchematic() noexcept;
-  void schematicAdded(int newIndex) noexcept;
-  void schematicRemoved(int oldIndex) noexcept;
-  void updateSchematicNames() noexcept;
-
-private:  // Data
-  Project&                               mProject;
-  QScopedPointer<Ui::SchematicPagesDock> mUi;
-};
+void CmdSchematicEdit::performRedo() {
+  mSchematic.setName(mNewName);
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace project
 }  // namespace librepcb
-
-#endif  // LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
