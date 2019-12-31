@@ -19,6 +19,9 @@ INCLUDEPATH += \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
 
+RESOURCES += \
+    ../../../img/images.qrc \
+
 SOURCES += \
     boards/board.cpp \
     boards/boardairwiresbuilder.cpp \

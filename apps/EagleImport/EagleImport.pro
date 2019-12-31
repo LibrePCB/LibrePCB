@@ -44,6 +44,9 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
 
+RESOURCES += \
+    ../../img/images.qrc \
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp \

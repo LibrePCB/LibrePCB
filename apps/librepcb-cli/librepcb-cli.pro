@@ -67,7 +67,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libclipper.a \
 
 RESOURCES += \
-    ../../img/images.qrc
+    ../../img/images.qrc \
 
 SOURCES += \
     commandlineinterface.cpp \

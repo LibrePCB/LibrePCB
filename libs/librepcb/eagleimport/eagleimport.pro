@@ -20,6 +20,9 @@ INCLUDEPATH += \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
 
+RESOURCES += \
+    ../../../img/images.qrc \
+
 SOURCES += \
     converterdb.cpp \
     deviceconverter.cpp \

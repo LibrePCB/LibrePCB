@@ -27,6 +27,9 @@ DEPENDPATH += \
 PRE_TARGETDEPS += \
     $${DESTDIR}/liblibrepcbcommon.a
 
+RESOURCES += \
+    ../../img/images.qrc \
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
