@@ -36,31 +36,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Repository::Repository(const Repository& other) noexcept
-  : QObject(nullptr), mUrl(other.mUrl) {
-}
-
 Repository::Repository(const QUrl& url) noexcept : QObject(nullptr), mUrl(url) {
 }
 
-Repository::Repository(const SExpression& node) : QObject(nullptr), mUrl() {
-  mUrl = node.getChildByIndex(0).getValue<QUrl>();  // can throw
-}
-
 Repository::~Repository() noexcept {
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-bool Repository::setUrl(const QUrl& url) noexcept {
-  if (url.isValid()) {
-    mUrl = url;
-    return true;
-  } else {
-    return false;
-  }
 }
 
 /*******************************************************************************
@@ -70,10 +49,6 @@ bool Repository::setUrl(const QUrl& url) noexcept {
 void Repository::requestLibraryList() const noexcept {
   QString path = "/api/v1/libraries/v" % qApp->getFileFormatVersion().toStr();
   requestLibraryList(QUrl(mUrl.toString() % path));
-}
-
-void Repository::serialize(SExpression& root) const {
-  root.appendChild(mUrl);
 }
 
 /*******************************************************************************

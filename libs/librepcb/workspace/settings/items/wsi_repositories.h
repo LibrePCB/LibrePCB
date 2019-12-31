@@ -29,9 +29,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Repository;
-
 namespace workspace {
 
 /*******************************************************************************
@@ -52,9 +49,7 @@ public:
   ~WSI_Repositories() noexcept;
 
   // Getters
-  const QList<const Repository*>& getRepositories() const noexcept {
-    return mList;
-  }
+  const QList<QUrl>& getUrls() const noexcept { return mUrls; }
 
   // Getters: Widgets
   QWidget* getWidget() const noexcept { return mWidget.data(); }
@@ -79,13 +74,13 @@ private:  // Methods
 
 private:  // Data
   /**
-   * @brief The list of repositories in the right order
+   * @brief The list of repository URLs in the right order
    *
    * The repository with the highest priority is at index 0 of the list. In case
    * of version conflicts, the repository with the higher priority will be used.
    */
-  QList<const Repository*> mList;
-  QList<const Repository*> mListTmp;
+  QList<QUrl> mUrls;
+  QList<QUrl> mUrlsTmp;
 
   // Widgets
   QScopedPointer<QWidget>     mWidget;

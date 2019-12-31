@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "wsi_repositories.h"
 
-#include <librepcb/common/network/repository.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -40,14 +38,12 @@ namespace workspace {
 WSI_Repositories::WSI_Repositories(const SExpression& node) : WSI_Base() {
   if (const SExpression* child = node.tryGetChildByPath("repositories")) {
     foreach (const SExpression& repo, child->getChildren()) {
-      mList.append(new Repository(repo));  // can throw
+      mUrls.append(repo.getChildByIndex(0).getValue<QUrl>());  // can throw
     }
   } else {
-    mList.append(new Repository(QUrl("https://api.librepcb.org")));
+    mUrls.append(QUrl("https://api.librepcb.org"));
   }
-  foreach (const Repository* repository, mList) {
-    mListTmp.append(new Repository(*repository));
-  }
+  mUrlsTmp = mUrls;
 
   // create the QListWidget
   mListWidget.reset(new QListWidget());
@@ -91,10 +87,6 @@ WSI_Repositories::WSI_Repositories(const SExpression& node) : WSI_Base() {
 }
 
 WSI_Repositories::~WSI_Repositories() noexcept {
-  qDeleteAll(mList);
-  mList.clear();
-  qDeleteAll(mListTmp);
-  mListTmp.clear();
 }
 
 /*******************************************************************************
@@ -102,26 +94,17 @@ WSI_Repositories::~WSI_Repositories() noexcept {
  ******************************************************************************/
 
 void WSI_Repositories::restoreDefault() noexcept {
-  qDeleteAll(mListTmp);
-  mListTmp.clear();
-  mListTmp.append(new Repository(QUrl("https://api.librepcb.org")));
+  mUrlsTmp.clear();
+  mUrlsTmp.append(QUrl("https://api.librepcb.org"));
   updateListWidgetItems();
 }
 
 void WSI_Repositories::apply() noexcept {
-  qDeleteAll(mList);
-  mList.clear();
-  foreach (const Repository* repository, mListTmp) {
-    mList.append(new Repository(*repository));
-  }
+  mUrls = mUrlsTmp;
 }
 
 void WSI_Repositories::revert() noexcept {
-  qDeleteAll(mListTmp);
-  mListTmp.clear();
-  foreach (const Repository* repository, mList) {
-    mListTmp.append(new Repository(*repository));
-  }
+  mUrlsTmp = mUrls;
   updateListWidgetItems();
 }
 
@@ -132,7 +115,7 @@ void WSI_Repositories::revert() noexcept {
 void WSI_Repositories::btnUpClicked() noexcept {
   int row = mListWidget->currentRow();
   if (row > 0) {
-    mListTmp.move(row, row - 1);
+    mUrlsTmp.move(row, row - 1);
     mListWidget->insertItem(row - 1, mListWidget->takeItem(row));
     mListWidget->setCurrentRow(row - 1);
   }
@@ -141,7 +124,7 @@ void WSI_Repositories::btnUpClicked() noexcept {
 void WSI_Repositories::btnDownClicked() noexcept {
   int row = mListWidget->currentRow();
   if ((row >= 0) && (row < mListWidget->count() - 1)) {
-    mListTmp.move(row, row + 1);
+    mUrlsTmp.move(row, row + 1);
     mListWidget->insertItem(row + 1, mListWidget->takeItem(row));
     mListWidget->setCurrentRow(row + 1);
   }
@@ -149,9 +132,8 @@ void WSI_Repositories::btnDownClicked() noexcept {
 
 void WSI_Repositories::btnAddClicked() noexcept {
   QUrl url = QUrl::fromUserInput(mLineEdit->text().trimmed());
-  QScopedPointer<Repository> repository(new Repository(url));
-  if (repository->isValid()) {
-    mListTmp.append(repository.take());
+  if (url.isValid()) {
+    mUrlsTmp.append(url);
     updateListWidgetItems();
     mLineEdit->setText("");
   } else {
@@ -162,23 +144,25 @@ void WSI_Repositories::btnAddClicked() noexcept {
 
 void WSI_Repositories::btnRemoveClicked() noexcept {
   if (mListWidget->currentRow() >= 0) {
-    delete mListTmp.takeAt(mListWidget->currentRow());
+    mUrlsTmp.removeAt(mListWidget->currentRow());
     delete mListWidget->item(mListWidget->currentRow());
   }
 }
 
 void WSI_Repositories::updateListWidgetItems() noexcept {
   mListWidget->clear();
-  foreach (const Repository* repository, mListTmp) {
-    QString          str  = repository->getUrl().toDisplayString();
-    QListWidgetItem* item = new QListWidgetItem(str, mListWidget.data());
-    item->setData(Qt::UserRole, repository);
+  foreach (const QUrl& url, mUrlsTmp) {
+    QListWidgetItem* item =
+        new QListWidgetItem(url.toDisplayString(), mListWidget.data());
+    item->setData(Qt::UserRole, url);
   }
 }
 
 void WSI_Repositories::serialize(SExpression& root) const {
   SExpression& child = root.appendList("repositories", true);
-  serializePointerContainer(child, mList, "repository");
+  foreach (const QUrl& url, mUrls) {
+    child.appendChild("repository", url, true);
+  }
 }
 
 /*******************************************************************************
