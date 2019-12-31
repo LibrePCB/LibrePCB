@@ -84,9 +84,6 @@ private:  // Data
   QString mAppLocale;
   QString mAppLocaleTmp;
 
-  QList<QTranslator*>
-      mInstalledTranslators;  ///< see constructor/destructor code
-
   // Widgets
   QScopedPointer<QWidget>   mWidget;
   QScopedPointer<QComboBox> mComboBox;

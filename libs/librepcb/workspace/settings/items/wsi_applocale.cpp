@@ -44,30 +44,10 @@ WSI_AppLocale::WSI_AppLocale(const SExpression& node)
     mAppLocaleTmp = mAppLocale;
   }
 
-  const QString i18nDir = qApp->getResourcesFilePath("i18n").toStr();
-
-  if (!mAppLocale.isEmpty()) {
-    // use the selected locale as the application's default locale
-    QLocale::setDefault(QLocale(mAppLocale));
-
-    // Install language translations (like "de" for German)
-    QTranslator* newTranslator = new QTranslator();
-    newTranslator->load("librepcb_" % mAppLocale.split("_").at(0), i18nDir);
-    qApp->installTranslator(newTranslator);
-    mInstalledTranslators.append(newTranslator);
-
-    // Install language/country translations (like "de_ch" for
-    // German/Switzerland)
-    newTranslator = new QTranslator();
-    newTranslator->load("librepcb_" % mAppLocale, i18nDir);
-    qApp->installTranslator(newTranslator);
-    mInstalledTranslators.append(newTranslator);
-  }
-
   // create a QComboBox with all available languages
   mComboBox.reset(new QComboBox());
   mComboBox->addItem(tr("System Language"), QString(""));
-  QDir translations(i18nDir);
+  QDir translations(qApp->getResourcesFilePath("i18n").toStr());
   foreach (QString filename, translations.entryList(QDir::Files, QDir::Name)) {
     filename.remove("librepcb_");
     QFileInfo fileInfo(filename);
@@ -100,11 +80,6 @@ WSI_AppLocale::WSI_AppLocale(const SExpression& node)
 }
 
 WSI_AppLocale::~WSI_AppLocale() noexcept {
-  foreach (QTranslator* translator, mInstalledTranslators) {
-    qApp->removeTranslator(translator);
-    delete translator;
-  }
-  mInstalledTranslators.clear();
 }
 
 /*******************************************************************************

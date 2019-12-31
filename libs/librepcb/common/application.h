@@ -30,6 +30,8 @@
 #include <QFont>
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -89,6 +91,9 @@ public:
   QString getDefaultStrokeFontName() const noexcept { return "newstroke.bene"; }
   const StrokeFont& getDefaultStrokeFont() const noexcept;
 
+  // Setters
+  void setTranslationLocale(const QLocale& locale) noexcept;
+
   // Reimplemented from QApplication
   bool notify(QObject* receiver, QEvent* e);
 
@@ -101,6 +106,9 @@ public:
 public slots:
   static void about() noexcept;
 
+private:  // Methods
+  void removeAllTranslators() noexcept;
+
 private:  // Data
   Version   mAppVersion;
   QString   mAppVersionLabel;
@@ -109,10 +117,18 @@ private:  // Data
   Version   mFileFormatVersion;
   bool      mIsFileFormatStable;
   FilePath  mResourcesDir;
-  QScopedPointer<StrokeFontPool>
-        mStrokeFontPool;  ///< all application stroke fonts
+
+  /// Pool containing all application stroke fonts
+  QScopedPointer<StrokeFontPool> mStrokeFontPool;
+
+  /// Default sans serif font
   QFont mSansSerifFont;
+
+  /// Default monospace font
   QFont mMonospaceFont;
+
+  /// All currently installed translators
+  QList<std::shared_ptr<QTranslator>> mTranslators;
 };
 
 /*******************************************************************************
