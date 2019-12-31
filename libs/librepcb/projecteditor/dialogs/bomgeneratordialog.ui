@@ -103,7 +103,7 @@
         <string notr="true"/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../img/images.qrc">
+        <iconset>
          <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
        </property>
       </widget>
@@ -129,10 +129,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

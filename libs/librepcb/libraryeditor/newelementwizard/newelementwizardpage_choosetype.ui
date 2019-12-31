@@ -36,7 +36,7 @@
 (e.g. OpAmps)</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../img/images.qrc">
+      <iconset>
        <normaloff>:/img/places/folder.png</normaloff>:/img/places/folder.png</iconset>
      </property>
      <property name="iconSize">
@@ -66,7 +66,7 @@
 (e.g. DIP)</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../img/images.qrc">
+      <iconset>
        <normaloff>:/img/places/folder_green.png</normaloff>:/img/places/folder_green.png</iconset>
      </property>
      <property name="iconSize">
@@ -96,7 +96,7 @@
 (e.g. OpAmpChannel)</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../img/images.qrc">
+      <iconset>
        <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
      </property>
      <property name="iconSize">
@@ -126,7 +126,7 @@
 (e.g. DIP8)</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../img/images.qrc">
+      <iconset>
        <normaloff>:/img/library/package.png</normaloff>:/img/library/package.png</iconset>
      </property>
      <property name="iconSize">
@@ -156,7 +156,7 @@
 (e.g. SingleOpAmp)</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../img/images.qrc">
+      <iconset>
        <normaloff>:/img/library/component.png</normaloff>:/img/library/component.png</iconset>
      </property>
      <property name="iconSize">
@@ -186,7 +186,7 @@
 (e.g. LM358)</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../img/images.qrc">
+      <iconset>
        <normaloff>:/img/library/device.png</normaloff>:/img/library/device.png</iconset>
      </property>
      <property name="iconSize">
@@ -237,8 +237,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
