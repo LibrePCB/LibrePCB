@@ -81,7 +81,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libclipper.a \
 
 RESOURCES += \
-    ../../img/images.qrc
+    ../../img/images.qrc \
 
 SOURCES += \
     controlpanel/controlpanel.cpp \

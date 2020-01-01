@@ -164,7 +164,7 @@
         <string notr="true"/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../img/images.qrc">
+        <iconset>
          <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
        </property>
       </widget>
@@ -173,8 +173,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

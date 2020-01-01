@@ -81,7 +81,7 @@
        <string>Approve Selected Messages</string>
       </property>
       <property name="icon">
-       <iconset resource="../../../../img/images.qrc">
+       <iconset>
         <normaloff>:/img/actions/apply.png</normaloff>:/img/actions/apply.png</iconset>
       </property>
       <property name="checkable">
@@ -95,8 +95,6 @@
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

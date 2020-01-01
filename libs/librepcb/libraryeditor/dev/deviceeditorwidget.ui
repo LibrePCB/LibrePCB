@@ -125,7 +125,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../../../../img/images.qrc">
+               <iconset>
                 <normaloff>:/img/actions/search.png</normaloff>:/img/actions/search.png</iconset>
               </property>
               <property name="iconSize">
@@ -208,7 +208,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../../../../img/images.qrc">
+               <iconset>
                 <normaloff>:/img/actions/search.png</normaloff>:/img/actions/search.png</iconset>
               </property>
               <property name="iconSize">
@@ -448,9 +448,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

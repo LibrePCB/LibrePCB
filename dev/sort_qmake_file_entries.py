@@ -40,7 +40,8 @@ def sort_qmake_file(project_root, filepath):
             is_headers = line.startswith("HEADERS += \\")
             is_sources = line.startswith("SOURCES += \\")
             is_forms = line.startswith("FORMS += \\")
-            if is_headers or is_sources or is_forms:
+            is_resources = line.startswith("RESOURCES += \\")
+            if is_headers or is_sources or is_forms or is_resources:
                 block_start_index = line_index + 1
         else:
             if not line.strip():

@@ -14,7 +14,7 @@
    <string>LibrePCB ControlPanel</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../img/images.qrc">
+   <iconset>
     <normaloff>:/img/app/librepcb.png</normaloff>:/img/app/librepcb.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -168,7 +168,7 @@
               <string>New Project</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/actions/new.png</normaloff>:/img/actions/new.png</iconset>
              </property>
              <property name="iconSize">
@@ -185,7 +185,7 @@
               <string>Open Project</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
              </property>
              <property name="iconSize">
@@ -202,7 +202,7 @@
               <string>Library Manager</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
              </property>
              <property name="iconSize">
@@ -470,7 +470,7 @@ QListView::item
   <widget class="librepcb::StatusBar" name="statusBar"/>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
@@ -493,7 +493,7 @@ QListView::item
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
@@ -505,7 +505,7 @@ QListView::item
   </action>
   <action name="actionNew_Project">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/new.png</normaloff>:/img/actions/new.png</iconset>
    </property>
    <property name="text">
@@ -514,7 +514,7 @@ QListView::item
   </action>
   <action name="actionOpen_Project">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
    </property>
    <property name="text">
@@ -528,7 +528,7 @@ QListView::item
   </action>
   <action name="actionWorkspace_Settings">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
@@ -540,7 +540,7 @@ QListView::item
   </action>
   <action name="actionOpen_Library_Manager">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
    </property>
    <property name="text">
@@ -552,7 +552,7 @@ QListView::item
   </action>
   <action name="actionClose_all_open_projects">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
@@ -566,7 +566,7 @@ QListView::item
   </action>
   <action name="actionOnlineDocumentation">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
@@ -578,7 +578,7 @@ QListView::item
   </action>
   <action name="actionOpenWebsite">
    <property name="icon">
-    <iconset resource="../../../img/images.qrc">
+    <iconset>
      <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
    </property>
    <property name="text">
@@ -594,9 +594,7 @@ QListView::item
    <header location="global">librepcb/common/widgets/statusbar.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>newProjectButton</sender>

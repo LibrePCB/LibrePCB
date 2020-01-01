@@ -68,7 +68,7 @@
            <item>
             <widget class="QToolButton" name="btnLocaleAdd">
              <property name="icon">
-              <iconset resource="../../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/actions/plus_2.png</normaloff>:/img/actions/plus_2.png</iconset>
              </property>
             </widget>
@@ -76,7 +76,7 @@
            <item>
             <widget class="QToolButton" name="btnLocaleRemove">
              <property name="icon">
-              <iconset resource="../../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
              </property>
             </widget>
@@ -129,7 +129,7 @@
            <item>
             <widget class="QToolButton" name="btnNormAdd">
              <property name="icon">
-              <iconset resource="../../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/actions/plus_2.png</normaloff>:/img/actions/plus_2.png</iconset>
              </property>
             </widget>
@@ -137,7 +137,7 @@
            <item>
             <widget class="QToolButton" name="btnNormRemove">
              <property name="icon">
-              <iconset resource="../../../../img/images.qrc">
+              <iconset>
                <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
              </property>
             </widget>
@@ -176,9 +176,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
