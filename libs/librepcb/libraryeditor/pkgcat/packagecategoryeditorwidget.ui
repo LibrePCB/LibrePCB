@@ -193,7 +193,7 @@
         <string notr="true"/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../img/images.qrc">
+        <iconset>
          <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
        </property>
       </widget>
@@ -235,9 +235,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

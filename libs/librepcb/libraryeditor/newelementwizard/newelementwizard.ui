@@ -17,15 +17,13 @@
    <string>New Library Element</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../img/images.qrc">
+   <iconset>
     <normaloff>:/img/app/librepcb.png</normaloff>:/img/app/librepcb.png</iconset>
   </property>
   <property name="wizardStyle">
    <enum>QWizard::ModernStyle</enum>
   </property>
  </widget>
- <resources>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
