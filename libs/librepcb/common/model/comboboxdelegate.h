@@ -45,7 +45,8 @@ class ComboBoxDelegate final : public QStyledItemDelegate {
 
 public:
   // Constructors / Destructor
-  explicit ComboBoxDelegate(QObject* parent = nullptr) noexcept;
+  explicit ComboBoxDelegate(bool     editable = false,
+                            QObject* parent   = nullptr) noexcept;
   ComboBoxDelegate(const ComboBoxDelegate& other) = delete;
   ~ComboBoxDelegate() noexcept;
 
@@ -62,6 +63,7 @@ public:
   ComboBoxDelegate& operator=(const ComboBoxDelegate& rhs) = delete;
 
 private:  // Data
+  bool mEditable;
 };
 
 /*******************************************************************************

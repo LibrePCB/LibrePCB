@@ -67,9 +67,9 @@ CompSymbVarPinSignalMapEditorWidget::CompSymbVarPinSignalMapEditorWidget(
   mView->horizontalHeader()->setSectionResizeMode(
       ComponentPinSignalMapModel::COLUMN_DISPLAY, QHeaderView::Stretch);
   mView->setItemDelegateForColumn(ComponentPinSignalMapModel::COLUMN_SIGNAL,
-                                  new ComboBoxDelegate(this));
+                                  new ComboBoxDelegate(false, this));
   mView->setItemDelegateForColumn(ComponentPinSignalMapModel::COLUMN_DISPLAY,
-                                  new ComboBoxDelegate(this));
+                                  new ComboBoxDelegate(false, this));
   mView->sortByColumn(ComponentPinSignalMapModel::COLUMN_PIN,
                       Qt::AscendingOrder);
 

@@ -59,9 +59,9 @@ AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
   mView->horizontalHeader()->setSectionResizeMode(
       AttributeListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   mView->setItemDelegateForColumn(AttributeListModel::COLUMN_TYPE,
-                                  new ComboBoxDelegate(this));
+                                  new ComboBoxDelegate(false, this));
   mView->setItemDelegateForColumn(AttributeListModel::COLUMN_UNIT,
-                                  new ComboBoxDelegate(this));
+                                  new ComboBoxDelegate(false, this));
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
           &AttributeListModel::addAttribute);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
