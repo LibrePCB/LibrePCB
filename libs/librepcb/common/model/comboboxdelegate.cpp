@@ -53,9 +53,10 @@ QWidget* ComboBoxDelegate::createEditor(QWidget*                    parent,
   cbx->setFrame(false);
   cbx->setSizePolicy(QSizePolicy::Ignored, cbx->sizePolicy().verticalPolicy());
   cbx->setEditable(mEditable);
-  QVector<QPair<QString, QVariant>> items =
-      index.data(Qt::UserRole).value<QVector<QPair<QString, QVariant>>>();
-  foreach (const auto& item, items) { cbx->addItem(item.first, item.second); }
+  Items items = index.data(Qt::UserRole).value<Items>();
+  foreach (const auto& item, items) {
+    cbx->addItem(item.icon, item.text, item.data);
+  }
   return cbx;
 }
 

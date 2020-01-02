@@ -44,6 +44,24 @@ class ComboBoxDelegate final : public QStyledItemDelegate {
   Q_OBJECT
 
 public:
+  // Types
+  struct Item final {
+    QString  text;
+    QIcon    icon;
+    QVariant data;
+  };
+  struct Items final : public QVector<Item> {
+    void sort() noexcept {
+      QCollator collator;
+      collator.setCaseSensitivity(Qt::CaseInsensitive);
+      collator.setIgnorePunctuation(false);
+      collator.setNumericMode(true);
+      std::sort(begin(), end(), [&collator](const Item& lhs, const Item& rhs) {
+        return collator(lhs.text, rhs.text);
+      });
+    }
+  };
+
   // Constructors / Destructor
   explicit ComboBoxDelegate(bool     editable = false,
                             QObject* parent   = nullptr) noexcept;
@@ -71,5 +89,7 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::ComboBoxDelegate::Items)
 
 #endif  // LIBREPCB_COMBOBOXDELEGATE_H

@@ -268,19 +268,12 @@ void DevicePadSignalMapModel::updateComboBoxItems() noexcept {
   mComboBoxItems.clear();
   for (const ComponentSignal& sig : mSignals) {
     mComboBoxItems.append(
-        qMakePair(*sig.getName(), QVariant(sig.getUuid().toStr())));
+        ComboBoxDelegate::Item{*sig.getName(), QIcon(), sig.getUuid().toStr()});
   }
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(mComboBoxItems.begin(), mComboBoxItems.end(),
-            [&collator](const QPair<QString, QVariant>& lhs,
-                        const QPair<QString, QVariant>& rhs) {
-              return collator(lhs.first, rhs.first);
-            });
+  mComboBoxItems.sort();
   mComboBoxItems.insert(
-      0, qMakePair(QString("(%1)").arg(tr("unconnected")), QVariant()));
+      0, ComboBoxDelegate::Item{QString("(%1)").arg(tr("unconnected")), QIcon(),
+                                QVariant()});
 }
 
 /*******************************************************************************

@@ -27,6 +27,8 @@
 #include "../pkg/packagepad.h"
 #include "devicepadsignalmap.h"
 
+#include <librepcb/common/model/comboboxdelegate.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -87,11 +89,11 @@ private:
   void updateComboBoxItems() noexcept;
 
 private:  // Data
-  DevicePadSignalMap*               mPadSignalMap;
-  UndoStack*                        mUndoStack;
-  ComponentSignalList               mSignals;
-  PackagePadList                    mPads;
-  QVector<QPair<QString, QVariant>> mComboBoxItems;
+  DevicePadSignalMap*     mPadSignalMap;
+  UndoStack*              mUndoStack;
+  ComponentSignalList     mSignals;
+  PackagePadList          mPads;
+  ComboBoxDelegate::Items mComboBoxItems;
 
   // Slots
   DevicePadSignalMap::OnEditedSlot mOnEditedSlot;

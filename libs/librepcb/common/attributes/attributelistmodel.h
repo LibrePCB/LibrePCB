@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../model/comboboxdelegate.h"
 #include "attribute.h"
 
 #include <QtCore>
@@ -90,17 +91,17 @@ private:
                                    AttributeList::Event event) noexcept;
   void         execCmd(UndoCommand* cmd);
   AttributeKey validateKeyOrThrow(const QString& key) const;
-  static QVector<QPair<QString, QVariant>> buildUnitComboBoxData(
+  static ComboBoxDelegate::Items buildUnitComboBoxData(
       const AttributeType& type) noexcept;
 
 private:  // Data
-  AttributeList*                    mAttributeList;
-  UndoStack*                        mUndoStack;
-  QVector<QPair<QString, QVariant>> mTypeComboBoxItems;
-  QString                           mNewKey;
-  const AttributeType*              mNewType;
-  QString                           mNewValue;
-  const AttributeUnit*              mNewUnit;
+  AttributeList*          mAttributeList;
+  UndoStack*              mUndoStack;
+  ComboBoxDelegate::Items mTypeComboBoxItems;
+  QString                 mNewKey;
+  const AttributeType*    mNewType;
+  QString                 mNewValue;
+  const AttributeUnit*    mNewUnit;
 
   // Slots
   AttributeList::OnEditedSlot mOnEditedSlot;
