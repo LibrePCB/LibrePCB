@@ -79,6 +79,7 @@ public:
   bool isFileFormatStable() const noexcept { return mIsFileFormatStable; }
   const FilePath& getResourcesDir() const noexcept { return mResourcesDir; }
   FilePath        getResourcesFilePath(const QString& filepath) const noexcept;
+  QStringList     getAvailableTranslationLocales() const noexcept;
   const QFont&    getDefaultSansSerifFont() const noexcept {
     return mSansSerifFont;
   }

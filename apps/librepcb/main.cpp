@@ -212,8 +212,8 @@ static FilePath determineWorkspacePath() noexcept {
 
           // open workspace and apply settings
           Workspace ws(wsPath);
-          ws.getSettings().getUser().setName(wizard.getNewWorkspaceUserName());
-          ws.getSettings().applyAll();  // can throw
+          ws.getSettings().userName.set(wizard.getNewWorkspaceUserName());
+          ws.getSettings().saveToFile();  // can throw
         } catch (const Exception& e) {
           QMessageBox::critical(0, Application::translate("Workspace", "Error"),
                                 e.getMsg());
@@ -239,8 +239,8 @@ static int openWorkspace(const FilePath& path) noexcept {
 
     // Now since workspace settings are loaded, switch to the locale defined
     // there (until now, the system locale was used).
-    if (!ws.getSettings().getAppLocale().getAppLocaleName().isEmpty()) {
-      QLocale locale(ws.getSettings().getAppLocale().getAppLocaleName());
+    if (!ws.getSettings().applicationLocale.get().isEmpty()) {
+      QLocale locale(ws.getSettings().applicationLocale.get());
       QLocale::setDefault(locale);
       qApp->setTranslationLocale(locale);
     }

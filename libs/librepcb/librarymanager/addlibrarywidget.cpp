@@ -65,7 +65,7 @@ AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept
   // tab "create local library": set placeholder texts
   mUi->edtLocalName->setPlaceholderText("My Library");
   mUi->edtLocalAuthor->setPlaceholderText(
-      mWorkspace.getSettings().getUser().getName());
+      mWorkspace.getSettings().userName.get());
   mUi->edtLocalVersion->setPlaceholderText("0.1");
   mUi->edtLocalUrl->setPlaceholderText(
       tr("e.g. the URL to the Git repository (optional)"));
@@ -94,8 +94,7 @@ AddLibraryWidget::~AddLibraryWidget() noexcept {
 
 void AddLibraryWidget::updateRepositoryLibraryList() noexcept {
   clearRepositoryLibraryList();
-  foreach (const QUrl& url,
-           mWorkspace.getSettings().getRepositories().getUrls()) {
+  foreach (const QUrl& url, mWorkspace.getSettings().repositoryUrls.get()) {
     std::shared_ptr<Repository> repo = std::make_shared<Repository>(url);
     connect(repo.get(), &Repository::libraryListReceived, this,
             &AddLibraryWidget::repositoryLibraryListReceived);

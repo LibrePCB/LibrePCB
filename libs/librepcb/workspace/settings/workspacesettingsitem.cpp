@@ -17,51 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WSI_BASE_H
-#define LIBREPCB_WSI_BASE_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/serializableobject.h>
+#include "workspacesettingsitem.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace workspace {
 
 /*******************************************************************************
- *  Class WSI_Base
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The WSI_Base class is the base class of all workspace settings items
- *
- * Every workspace setting is represented by a separate object. All of these
- * objects have this class as base class. The name of all Workspace Settings
- * Items begin with the prefix "WSI_" to easily recognize them.
- */
-class WSI_Base : public QObject, public SerializableObject {
-  Q_OBJECT
+WorkspaceSettingsItem::WorkspaceSettingsItem(QObject* parent) noexcept
+  : QObject(parent) {
+}
 
-public:
-  // Constructors / Destructor
-  WSI_Base() noexcept;
-  WSI_Base(const WSI_Base& other) = delete;
-  virtual ~WSI_Base() noexcept;
-
-  // General Methods
-  virtual void restoreDefault() noexcept = 0;
-  virtual void apply() noexcept          = 0;
-  virtual void revert() noexcept         = 0;
-
-  // Operator Overloadings
-  WSI_Base& operator=(const WSI_Base& rhs) = delete;
-};
+WorkspaceSettingsItem::~WorkspaceSettingsItem() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
@@ -69,5 +47,3 @@ public:
 
 }  // namespace workspace
 }  // namespace librepcb
-
-#endif  // LIBREPCB_WSI_BASE_H

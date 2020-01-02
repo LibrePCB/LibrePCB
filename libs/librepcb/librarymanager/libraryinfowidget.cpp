@@ -62,8 +62,7 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws,
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
           TransactionalFileSystem::openRO(mLibDir))));  // can throw
 
-  const QStringList& localeOrder =
-      ws.getSettings().getLibLocaleOrder().getLocaleOrder();
+  const QStringList& localeOrder = ws.getSettings().libraryLocaleOrder.get();
 
   // image
   if (!lib.getIconAsPixmap().isNull()) {

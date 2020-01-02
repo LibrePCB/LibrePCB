@@ -129,7 +129,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
 
   // set window title and icon
   const QStringList localeOrder =
-      mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+      mWorkspace.getSettings().libraryLocaleOrder.get();
   QString libName = *mLibrary->getNames().value(localeOrder);
   if (readOnly) libName.append(tr(" [Read-Only]"));
   setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));

@@ -65,7 +65,7 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
   mUi->lstMessages->setHandler(this);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   mUi->graphicsView->setUseOpenGl(
-      mContext.workspace.getSettings().getAppearance().getUseOpenGl());
+      mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setForegroundBrush(Qt::white);

@@ -182,6 +182,17 @@ FilePath Application::getResourcesFilePath(const QString& filepath) const
   return mResourcesDir.getPathTo(filepath);
 }
 
+QStringList Application::getAvailableTranslationLocales() const noexcept {
+  QStringList locales;
+  QDir        dir(getResourcesFilePath("i18n").toStr());
+  foreach (QString filename, dir.entryList({"*.qm"}, QDir::Files, QDir::Name)) {
+    filename.remove("librepcb_");
+    filename.remove(".qm");
+    locales.append(filename);
+  }
+  return locales;
+}
+
 const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
   try {
     return mStrokeFontPool->getFont(getDefaultStrokeFontName());

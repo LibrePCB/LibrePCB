@@ -92,10 +92,8 @@ Project* NewProjectWizard::createProject() const {
 
   // set project settings (copy from workspace settings)
   ProjectSettings& settings = project->getSettings();
-  settings.setLocaleOrder(
-      mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder());
-  settings.setNormOrder(
-      mWorkspace.getSettings().getLibNormOrder().getNormOrder());
+  settings.setLocaleOrder(mWorkspace.getSettings().libraryLocaleOrder.get());
+  settings.setNormOrder(mWorkspace.getSettings().libraryNormOrder.get());
 
   // add schematic
   if (mPageInitialization->getCreateSchematic()) {

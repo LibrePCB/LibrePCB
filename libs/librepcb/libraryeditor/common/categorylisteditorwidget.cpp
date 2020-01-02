@@ -207,7 +207,7 @@ QString CategoryListEditorWidget<ElementType>::getCategoryName(
     const FilePath& fp) const {
   QString name;
   mWorkspace.getLibraryDb().template getElementTranslations<ElementType>(
-      fp, mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder(),
+      fp, mWorkspace.getSettings().libraryLocaleOrder.get(),
       &name);  // can throw
   return name;
 }

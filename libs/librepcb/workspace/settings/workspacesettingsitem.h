@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACESETTINGSDIALOG_H
-#define LIBREPCB_WORKSPACESETTINGSDIALOG_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
+#define LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/model/editablelistmodel.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,50 +33,63 @@
 namespace librepcb {
 namespace workspace {
 
-namespace Ui {
-class WorkspaceSettingsDialog;
-}
-
-class WorkspaceSettings;
-
 /*******************************************************************************
- *  Class WorkspaceSettingsDialog
+ *  Class WorkspaceSettingsItem
  ******************************************************************************/
 
 /**
- * @brief Dialog (GUI) to view and modify workspace settings
+ * @brief Base class for all workspace settings items
+ *
+ * For simple settings, see
+ * ::librepcb::workspace::WorkspaceSettingsItem_GenericValue and
+ * ::librepcb::workspace::WorkspaceSettingsItem_GenericValueList.
+ *
+ * @see ::librepcb::workspace::WorkspaceSettingsItem_GenericValue
+ * @see ::librepcb::workspace::WorkspaceSettingsItem_GenericValueList
  */
-class WorkspaceSettingsDialog final : public QDialog {
+class WorkspaceSettingsItem : public QObject {
   Q_OBJECT
-
-  using LibraryLocaleOrderModel =
-      EditableListModel<QStringList, EditableListModelType::LOCALE>;
-  using LibraryNormOrderModel = EditableListModel<QStringList>;
-  using RepositoryUrlModel    = EditableListModel<QList<QUrl>>;
 
 public:
   // Constructors / Destructor
-  WorkspaceSettingsDialog()                                     = delete;
-  WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
-  explicit WorkspaceSettingsDialog(WorkspaceSettings& settings,
-                                   QWidget*           parent = nullptr);
-  ~WorkspaceSettingsDialog();
+  explicit WorkspaceSettingsItem(QObject* parent = nullptr) noexcept;
+  WorkspaceSettingsItem(const WorkspaceSettingsItem& other) = delete;
+  ~WorkspaceSettingsItem() noexcept;
+
+  /**
+   * @brief Restore default value
+   *
+   * @note Implementation must emit the #edited() signal.
+   */
+  virtual void restoreDefault() noexcept = 0;
+
+  /**
+   * @brief Load value from S-Expression node
+   *
+   * @param root  Root node of the settings file.
+   *
+   * @note Implementation must emit the #edited() signal.
+   *
+   * @note Implementation must be atomic, i.e. either the value must be loaded
+   *       completely from file, or left at the old value (in case of errors).
+   */
+  virtual void load(const SExpression& root) = 0;
+
+  /**
+   * @brief Serialize the value into S-Expression node
+   *
+   * @param root  Root node of the settings file.
+   */
+  virtual void serialize(SExpression& root) const = 0;
 
   // Operator Overloadings
-  WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs) =
-      delete;
+  WorkspaceSettingsItem& operator=(const WorkspaceSettingsItem& rhs) = delete;
 
-private:
-  void buttonBoxClicked(QAbstractButton* button) noexcept;
-  void loadSettings() noexcept;
-  void saveSettings() noexcept;
-
-private:
-  WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
-  QScopedPointer<LibraryLocaleOrderModel>     mLibLocaleOrderModel;
-  QScopedPointer<LibraryNormOrderModel>       mLibNormOrderModel;
-  QScopedPointer<RepositoryUrlModel>          mRepositoryUrlsModel;
-  QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
+signals:
+  /**
+   * @brief Signal to notify about changes of the settings value
+   */
+  void edited();
 };
 
 /*******************************************************************************
@@ -87,4 +99,4 @@ private:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACESETTINGSDIALOG_H
+#endif  // LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H

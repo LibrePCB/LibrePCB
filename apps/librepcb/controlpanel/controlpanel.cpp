@@ -42,6 +42,7 @@
 #include <librepcb/workspace/projecttreemodel.h>
 #include <librepcb/workspace/recentprojectsmodel.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/settings/workspacesettingsdialog.h>
 #include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
@@ -110,8 +111,6 @@ ControlPanel::ControlPanel(Workspace& workspace)
   connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
   connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
-  connect(mUi->actionWorkspace_Settings, &QAction::triggered,
-          &mWorkspace.getSettings(), &WorkspaceSettings::showSettingsDialog);
   connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
           this, &ControlPanel::openLibraryEditor);
 
@@ -451,8 +450,8 @@ void ControlPanel::projectEditorClosed() noexcept {
   if (!editor) return;
 
   Project* project = &editor->getProject();
-  Q_ASSERT(mOpenProjectEditors.contains(
-      project->getFilepath().toUnique().toStr()));
+  Q_ASSERT(
+      mOpenProjectEditors.contains(project->getFilepath().toUnique().toStr()));
   mOpenProjectEditors.remove(project->getFilepath().toUnique().toStr());
   delete project;
 }
@@ -502,6 +501,11 @@ void ControlPanel::on_actionSwitch_Workspace_triggered() {
   QMessageBox::information(this, tr("Workspace changed"),
                            tr("The chosen workspace will be used after "
                               "restarting the application."));
+}
+
+void ControlPanel::on_actionWorkspace_Settings_triggered() {
+  WorkspaceSettingsDialog dialog(mWorkspace.getSettings(), this);
+  dialog.exec();
 }
 
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index) {

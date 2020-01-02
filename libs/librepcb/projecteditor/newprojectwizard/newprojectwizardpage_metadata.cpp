@@ -59,7 +59,7 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
           &NewProjectWizardPage_Metadata::chooseLocationClicked);
 
   // insert values
-  mUi->edtAuthor->setText(ws.getSettings().getUser().getName());
+  mUi->edtAuthor->setText(ws.getSettings().userName.get());
   mUi->cbxLicense->addItem(QString("No License (not recommended)"), QString());
   mUi->cbxLicense->addItem(
       tr("CC0-1.0 (no restrictions, recommended for open hardware projects)"),

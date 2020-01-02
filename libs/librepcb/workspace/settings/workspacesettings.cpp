@@ -22,10 +22,6 @@
  ******************************************************************************/
 #include "workspacesettings.h"
 
-#include "../workspace.h"
-#include "workspacesettingsdialog.h"
-
-#include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/sexpression.h>
 
@@ -41,76 +37,49 @@ namespace workspace {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(const Workspace& workspace)
-  : QObject(nullptr),
-    mFilePath(workspace.getMetadataPath().getPathTo("settings.lp")) {
-  qDebug("Load workspace settings...");
-
+WorkspaceSettings::WorkspaceSettings(const FilePath& fp, QObject* parent)
+  : QObject(parent),
+    mFilePath(fp),
+    // Initialize settings items. Their constructor will register them as
+    // child objects of this object, this way we will access them later.
+    userName("user", "", this),
+    applicationLocale("application_locale", "", this),
+    defaultLengthUnit("default_length_unit", LengthUnit::millimeters(), this),
+    projectAutosaveIntervalSeconds("project_autosave_interval", 600U, this),
+    useOpenGl("use_opengl", false, this),
+    libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
+    libraryNormOrder("library_norm_order", "norm", QStringList(), this),
+    repositoryUrls("repositories", "repository",
+                   QList<QUrl>{QUrl("https://api.librepcb.org")}, this) {
   // load settings if the settings file exists
-  SExpression root;
   if (mFilePath.isExistingFile()) {
-    root = SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
+    qDebug("Load workspace settings...");
+    SExpression root =
+        SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
+    foreach (WorkspaceSettingsItem* item, getAllItems()) {
+      try {
+        item->load(root);  // can throw
+      } catch (const Exception& e) {
+        qCritical() << "Could not load workspace settings item:" << e.getMsg();
+      }
+    }
+    qDebug("Workspace settings loaded.");
   } else {
     qInfo("Workspace settings file not found, default settings will be used.");
   }
-
-  // load all settings
-  loadSettingsItem(mUser, root);
-  loadSettingsItem(mAppLocale, root);
-  loadSettingsItem(mAppDefMeasUnits, root);
-  loadSettingsItem(mProjectAutosaveInterval, root);
-  loadSettingsItem(mAppearance, root);
-  loadSettingsItem(mLibraryLocaleOrder, root);
-  loadSettingsItem(mLibraryNormOrder, root);
-  loadSettingsItem(mRepositories, root);
-  loadSettingsItem(mDebugTools, root);
-
-  // load the settings dialog
-  mDialog.reset(new WorkspaceSettingsDialog(*this));
-
-  qDebug("Workspace settings successfully loaded!");
 }
 
 WorkspaceSettings::~WorkspaceSettings() noexcept {
-  mDialog.reset();  // the dialog must be deleted *before* any settings object!
-  mItems.clear();
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Public Methods
  ******************************************************************************/
 
 void WorkspaceSettings::restoreDefaults() noexcept {
-  foreach (WSI_Base* item, mItems) { item->restoreDefault(); }
-}
-
-void WorkspaceSettings::applyAll() {
-  foreach (WSI_Base* item, mItems) { item->apply(); }
-
-  saveToFile();  // can throw
-}
-
-void WorkspaceSettings::revertAll() noexcept {
-  foreach (WSI_Base* item, mItems) { item->revert(); }
-}
-
-/*******************************************************************************
- *  Public Slots
- ******************************************************************************/
-
-void WorkspaceSettings::showSettingsDialog() noexcept {
-  mDialog->exec();  // this is blocking
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-template <typename T>
-void WorkspaceSettings::loadSettingsItem(QScopedPointer<T>& member,
-                                         SExpression&       root) {
-  member.reset(new T(root));  // can throw
-  mItems.append(member.data());
+  foreach (WorkspaceSettingsItem* item, getAllItems()) {
+    item->restoreDefault();
+  }
 }
 
 void WorkspaceSettings::saveToFile() const {
@@ -118,8 +87,18 @@ void WorkspaceSettings::saveToFile() const {
   FileUtils::writeFile(mFilePath, doc.toByteArray());  // can throw
 }
 
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+QList<WorkspaceSettingsItem*> WorkspaceSettings::getAllItems() const noexcept {
+  return findChildren<WorkspaceSettingsItem*>();
+}
+
 void WorkspaceSettings::serialize(SExpression& root) const {
-  foreach (WSI_Base* item, mItems) { item->serialize(root); }
+  foreach (const WorkspaceSettingsItem* item, getAllItems()) {
+    item->serialize(root);  // can throw
+  }
 }
 
 /*******************************************************************************
