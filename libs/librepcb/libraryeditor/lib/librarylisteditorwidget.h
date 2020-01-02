@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/model/editablelistmodel.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>
@@ -32,6 +33,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class SortFilterProxyModel;
 
 namespace workspace {
 class Workspace;
@@ -54,6 +57,8 @@ class LibraryListEditorWidget;
 class LibraryListEditorWidget final : public QWidget {
   Q_OBJECT
 
+  typedef EditableListModel<QList<Uuid>> Model;
+
 public:
   // Constructors / Destructor
   LibraryListEditorWidget() = delete;
@@ -63,7 +68,7 @@ public:
   ~LibraryListEditorWidget() noexcept;
 
   // Getters
-  const QSet<Uuid>& getUuids() const noexcept { return mUuids; }
+  QSet<Uuid> getUuids() const noexcept;
 
   // Setters
   void setUuids(const QSet<Uuid>& uuids) noexcept;
@@ -72,21 +77,13 @@ public:
   LibraryListEditorWidget& operator=(const LibraryListEditorWidget& rhs) =
       delete;
 
-private:
-  void btnAddClicked() noexcept;
-  void btnRemoveClicked() noexcept;
-  void addItem(const Uuid& library) noexcept;
-
 signals:
   void edited();
-  void libraryAdded(const Uuid& lib);
-  void libraryRemoved(const Uuid& lib);
 
 protected:  // Data
-  const workspace::Workspace&                 mWorkspace;
+  QScopedPointer<Model>                       mModel;
+  QScopedPointer<SortFilterProxyModel>        mProxyModel;
   QScopedPointer<Ui::LibraryListEditorWidget> mUi;
-  QSet<Uuid>                                  mUuids;
-  QHash<Uuid, QString>                        mLibNames;
 };
 
 /*******************************************************************************

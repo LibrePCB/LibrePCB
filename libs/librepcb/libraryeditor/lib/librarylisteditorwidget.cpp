@@ -24,6 +24,9 @@
 
 #include "ui_librarylisteditorwidget.h"
 
+#include <librepcb/common/model/comboboxdelegate.h>
+#include <librepcb/common/model/sortfilterproxymodel.h>
+#include <librepcb/common/toolbox.h>
 #include <librepcb/library/library.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -45,30 +48,49 @@ namespace editor {
 
 LibraryListEditorWidget::LibraryListEditorWidget(const workspace::Workspace& ws,
                                                  QWidget* parent) noexcept
-  : QWidget(parent), mWorkspace(ws), mUi(new Ui::LibraryListEditorWidget) {
+  : QWidget(parent),
+    mModel(new Model(this)),
+    mProxyModel(new SortFilterProxyModel(this)),
+    mUi(new Ui::LibraryListEditorWidget) {
   mUi->setupUi(this);
-  mUi->comboBox->addItem(tr("Choose library..."));
-  connect(mUi->btnAdd, &QPushButton::clicked, this,
-          &LibraryListEditorWidget::btnAddClicked);
-  connect(mUi->btnRemove, &QPushButton::clicked, this,
-          &LibraryListEditorWidget::btnRemoveClicked);
+  mModel->setPlaceholderText(tr("Click here a add a new dependency"));
+  mProxyModel->setKeepLastRowAtBottom(true);
+  mProxyModel->setSourceModel(mModel.data());
+  mUi->tableView->setModel(mProxyModel.data());
+  mUi->tableView->setItemDelegateForColumn(Model::COLUMN_TEXT,
+                                           new ComboBoxDelegate(false, this));
+  mUi->tableView->horizontalHeader()->setSectionResizeMode(
+      Model::COLUMN_TEXT, QHeaderView::Stretch);
+  mUi->tableView->horizontalHeader()->setSectionResizeMode(
+      Model::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
+  mUi->tableView->sortByColumn(Model::COLUMN_TEXT, Qt::AscendingOrder);
+  connect(mUi->tableView, &EditableTableWidget::btnAddClicked, mModel.data(),
+          &Model::addItem);
+  connect(mUi->tableView, &EditableTableWidget::btnRemoveClicked, mModel.data(),
+          &Model::removeItem);
+  connect(mModel.data(), &Model::rowsInserted, this,
+          &LibraryListEditorWidget::edited);
+  connect(mModel.data(), &Model::rowsRemoved, this,
+          &LibraryListEditorWidget::edited);
 
   try {
+    QList<Uuid>                  uuids;
     QMultiMap<Version, FilePath> libs =
-        mWorkspace.getLibraryDb().getLibraries();  // can throw
+        ws.getLibraryDb().getLibraries();  // can throw
     foreach (const FilePath& fp, libs) {
       Uuid uuid = Uuid::createRandom();
-      mWorkspace.getLibraryDb().getElementMetadata<Library>(
-          fp, &uuid);  // can throw
+      ws.getLibraryDb().getElementMetadata<Library>(fp, &uuid);  // can throw
       QString name;
-      mWorkspace.getLibraryDb().getElementTranslations<Library>(
-          fp, mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder(),
+      ws.getLibraryDb().getElementTranslations<Library>(
+          fp, ws.getSettings().libraryLocaleOrder.get(),
           &name);  // can throw
+      mModel->setDisplayText(uuid, name);
       QPixmap icon;
-      mWorkspace.getLibraryDb().getLibraryMetadata(fp, &icon);  // can throw
-      mUi->comboBox->addItem(icon, name, uuid.toStr());
-      mLibNames[uuid] = name;
+      ws.getLibraryDb().getLibraryMetadata(fp, &icon);  // can throw
+      uuids.append(uuid);
+      mModel->setIcon(uuid, icon);
     }
+    mModel->setChoices(uuids);
   } catch (const Exception& e) {
     qCritical() << "Could not load library list.";
   }
@@ -78,57 +100,19 @@ LibraryListEditorWidget::~LibraryListEditorWidget() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QSet<Uuid> LibraryListEditorWidget::getUuids() const noexcept {
+  return Toolbox::toSet(mModel->getValues());
+}
+
+/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
 void LibraryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept {
-  mUuids = uuids;
-  mUi->listWidget->clear();
-  foreach (const Uuid& category, mUuids) { addItem(category); }
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void LibraryListEditorWidget::btnAddClicked() noexcept {
-  tl::optional<Uuid> uuid =
-      Uuid::tryFromString(mUi->comboBox->currentText().trimmed());
-  if (!uuid) {
-    uuid = Uuid::tryFromString(
-        mUi->comboBox->currentData(Qt::UserRole).toString());
-  }
-  if (!uuid) {
-    QMessageBox::warning(this, tr("Error"), tr("Invalid UUID"));
-    return;
-  }
-  if (uuid && !mUuids.contains(*uuid)) {
-    mUuids.insert(*uuid);
-    addItem(*uuid);
-    emit libraryAdded(*uuid);
-    emit edited();
-  }
-}
-
-void LibraryListEditorWidget::btnRemoveClicked() noexcept {
-  QListWidgetItem*   item = mUi->listWidget->currentItem();
-  tl::optional<Uuid> uuid =
-      item ? Uuid::tryFromString(item->data(Qt::UserRole).toString())
-           : tl::nullopt;
-  if (item && uuid) {
-    mUuids.remove(*uuid);
-    delete item;
-    // Emit signals *after* removing the item to avoid critical issues if a
-    // signal handler modifies the UUID list befor removing was finished.
-    emit libraryRemoved(*uuid);
-    emit edited();
-  }
-}
-
-void LibraryListEditorWidget::addItem(const Uuid& library) noexcept {
-  QString          name = mLibNames.value(library, library.toStr());
-  QListWidgetItem* item = new QListWidgetItem(name, mUi->listWidget);
-  item->setData(Qt::UserRole, library.toStr());
+  mModel->setValues(uuids.values());
 }
 
 /*******************************************************************************
