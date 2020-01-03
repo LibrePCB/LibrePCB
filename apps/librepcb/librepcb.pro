@@ -91,6 +91,11 @@ SOURCES += \
     firstrunwizard/firstrunwizard.cpp \
     firstrunwizard/firstrunwizardpage_welcome.cpp \
     firstrunwizard/firstrunwizardpage_workspacepath.cpp \
+    initializeworkspacewizard/initializeworkspacewizard.cpp \
+    initializeworkspacewizard/initializeworkspacewizard_chooseimportversion.cpp \
+    initializeworkspacewizard/initializeworkspacewizard_choosesettings.cpp \
+    initializeworkspacewizard/initializeworkspacewizard_finalizeimport.cpp \
+    initializeworkspacewizard/initializeworkspacewizardcontext.cpp \
     main.cpp \
     markdown/markdownconverter.cpp \
     projectlibraryupdater/projectlibraryupdater.cpp \
@@ -100,6 +105,11 @@ HEADERS += \
     firstrunwizard/firstrunwizard.h \
     firstrunwizard/firstrunwizardpage_welcome.h \
     firstrunwizard/firstrunwizardpage_workspacepath.h \
+    initializeworkspacewizard/initializeworkspacewizard.h \
+    initializeworkspacewizard/initializeworkspacewizard_chooseimportversion.h \
+    initializeworkspacewizard/initializeworkspacewizard_choosesettings.h \
+    initializeworkspacewizard/initializeworkspacewizard_finalizeimport.h \
+    initializeworkspacewizard/initializeworkspacewizardcontext.h \
     markdown/markdownconverter.h \
     projectlibraryupdater/projectlibraryupdater.h \
 
@@ -108,6 +118,10 @@ FORMS += \
     firstrunwizard/firstrunwizard.ui \
     firstrunwizard/firstrunwizardpage_welcome.ui \
     firstrunwizard/firstrunwizardpage_workspacepath.ui \
+    initializeworkspacewizard/initializeworkspacewizard.ui \
+    initializeworkspacewizard/initializeworkspacewizard_chooseimportversion.ui \
+    initializeworkspacewizard/initializeworkspacewizard_choosesettings.ui \
+    initializeworkspacewizard/initializeworkspacewizard_finalizeimport.ui \
     projectlibraryupdater/projectlibraryupdater.ui \
 
 # Custom compiler "lrelease" for qm generation
