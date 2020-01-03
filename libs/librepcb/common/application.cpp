@@ -42,20 +42,19 @@
 //    "1.0.0-unstable"
 //  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
 //  - Releases (on release branches):           No suffix, e.g. "1.0.0"
-static const char* APP_VERSION = "0.1.4-unstable";
+static const char* APP_VERSION = "0.2.0-unstable";
 
 // File format version:
 //  - Must be equal to the major version of APP_VERSION!
 //  - If APP_VERSION < 1.0.0:   Two numbers, e.g. "0.2" for APP_VERSION=="0.2.x"
 //  - If APP_VERSION >= 1.0.0:  Only one number, e.g. "2" for
 //    APP_VERSION=="2.x.y"
-static const char* FILE_FORMAT_VERSION = "0.1";
+static const char* FILE_FORMAT_VERSION = "0.2";
 
 // File format stable flag:
 //  - On all non-release branches: false
-//    TODO: set to "false" after the first release is published!
 //  - On release branches: true
-static const bool FILE_FORMAT_STABLE = true;
+static const bool FILE_FORMAT_STABLE = false;
 
 /*******************************************************************************
  *  Namespace
