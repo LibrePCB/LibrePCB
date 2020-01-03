@@ -4,7 +4,6 @@ This directory contains various resources for developers:
 
 - A [demo workspace](https://github.com/LibrePCB/demo-workspace) for testing LibrePCB
 - Some diagrams about the software architecture (class diagrams, library architecture diagrams, ...)
-- Docker containers
 - [Doxygen documentation](https://doxygen.librepcb.org/)
   ([all branches](https://doxygen.librepcb.org/_branches/))
 - and more...
