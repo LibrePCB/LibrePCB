@@ -108,10 +108,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
 
   // add graphics view as central widget
   mGraphicsView = new GraphicsView(nullptr, this);
-  mGraphicsView->setUseOpenGl(mProjectEditor.getWorkspace()
-                                  .getSettings()
-                                  .getAppearance()
-                                  .getUseOpenGl());
+  mGraphicsView->setUseOpenGl(
+      mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mGraphicsView->setGridProperties(*mGridProperties);
   setCentralWidget(mGraphicsView);
 

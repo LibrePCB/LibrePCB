@@ -178,11 +178,11 @@ void EditorWidgetBase::undoStackStateModified() noexcept {
 }
 
 const QStringList& EditorWidgetBase::getLibLocaleOrder() const noexcept {
-  return mContext.workspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+  return mContext.workspace.getSettings().libraryLocaleOrder.get();
 }
 
 QString EditorWidgetBase::getWorkspaceSettingsUserName() noexcept {
-  QString u = mContext.workspace.getSettings().getUser().getName().trimmed();
+  QString u = mContext.workspace.getSettings().userName.get();
   if (u.isEmpty()) {
     QMessageBox::warning(
         this, tr("User name not set"),

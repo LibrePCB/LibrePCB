@@ -26,6 +26,8 @@
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
 
+#include <librepcb/common/model/comboboxdelegate.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -109,8 +111,8 @@ private:  // Data
   const ComponentSignalList*                 mSignals;
   std::shared_ptr<const LibraryElementCache> mSymbolsCache;
   UndoStack*                                 mUndoStack;
-  QVector<QPair<QString, QVariant>>          mSignalComboBoxItems;
-  QVector<QPair<QString, QVariant>>          mDisplayTypeComboBoxItems;
+  ComboBoxDelegate::Items                    mSignalComboBoxItems;
+  ComboBoxDelegate::Items                    mDisplayTypeComboBoxItems;
 
   // Slots
   ComponentSymbolVariantItemList::OnEditedSlot mOnItemsEditedSlot;

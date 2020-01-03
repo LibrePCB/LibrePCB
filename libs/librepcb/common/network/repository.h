@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobject.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -39,35 +37,26 @@ namespace librepcb {
 /**
  * @brief The Repository class provides access to a LibrePCB API server
  */
-class Repository final : public QObject, public SerializableObject {
+class Repository final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  Repository() = delete;
-  explicit Repository(const Repository& other) noexcept;
+  Repository()                        = delete;
+  Repository(const Repository& other) = delete;
   explicit Repository(const QUrl& url) noexcept;
-  explicit Repository(const SExpression& node);
   ~Repository() noexcept;
 
   // Getters
-  bool        isValid() const noexcept { return mUrl.isValid(); }
   const QUrl& getUrl() const noexcept { return mUrl; }
-
-  // Setters
-  bool setUrl(const QUrl& url) noexcept;
 
   // General Methods
   void requestLibraryList() const noexcept;
-
-  /// @copydoc librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Operators
   Repository& operator=(const Repository& rhs) = delete;
 
 signals:
-
   void libraryListReceived(const QJsonArray& libs);
   void errorWhileFetchingLibraryList(const QString& errorMsg);
 

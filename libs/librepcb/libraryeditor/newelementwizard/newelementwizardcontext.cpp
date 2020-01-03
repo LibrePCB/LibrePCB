@@ -58,7 +58,7 @@ NewElementWizardContext::~NewElementWizardContext() noexcept {
  ******************************************************************************/
 
 const QStringList& NewElementWizardContext::getLibLocaleOrder() const noexcept {
-  return mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+  return mWorkspace.getSettings().libraryLocaleOrder.get();
 }
 
 /*******************************************************************************
@@ -71,7 +71,7 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mElementName = tl::nullopt;
   mElementDescription.clear();
   mElementKeywords.clear();
-  mElementAuthor       = mWorkspace.getSettings().getUser().getName();
+  mElementAuthor       = mWorkspace.getSettings().userName.get();
   mElementVersion      = Version::fromString("0.1");
   mElementCategoryUuid = tl::nullopt;
 

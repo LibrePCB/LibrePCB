@@ -134,8 +134,8 @@ void LibraryManager::updateLibraryList() noexcept {
     foreach (const FilePath& libDir, libraries) {
       QString name, description, keywords;
       mWorkspace.getLibraryDb().getElementTranslations<Library>(
-          libDir, mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder(),
-          &name, &description, &keywords);  // can throw
+          libDir, mWorkspace.getSettings().libraryLocaleOrder.get(), &name,
+          &description, &keywords);  // can throw
       QPixmap icon;
       mWorkspace.getLibraryDb().getLibraryMetadata(libDir, &icon);  // can throw
 

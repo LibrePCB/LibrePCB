@@ -17,81 +17,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
+#define LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/model/editablelistmodel.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class SortFilterProxyModel;
-
 namespace workspace {
-class Workspace;
-}
-
-namespace library {
-namespace editor {
-
-namespace Ui {
-class LibraryListEditorWidget;
-}
 
 /*******************************************************************************
- *  Class LibraryListEditorWidget
+ *  Class WorkspaceSettingsItem
  ******************************************************************************/
 
 /**
- * @brief The LibraryListEditorWidget class
+ * @brief Base class for all workspace settings items
+ *
+ * For simple settings, see
+ * ::librepcb::workspace::WorkspaceSettingsItem_GenericValue and
+ * ::librepcb::workspace::WorkspaceSettingsItem_GenericValueList.
+ *
+ * @see ::librepcb::workspace::WorkspaceSettingsItem_GenericValue
+ * @see ::librepcb::workspace::WorkspaceSettingsItem_GenericValueList
  */
-class LibraryListEditorWidget final : public QWidget {
+class WorkspaceSettingsItem : public QObject {
   Q_OBJECT
-
-  typedef EditableListModel<QList<Uuid>> Model;
 
 public:
   // Constructors / Destructor
-  LibraryListEditorWidget() = delete;
-  explicit LibraryListEditorWidget(const workspace::Workspace& ws,
-                                   QWidget* parent = nullptr) noexcept;
-  LibraryListEditorWidget(const LibraryListEditorWidget& other) = delete;
-  ~LibraryListEditorWidget() noexcept;
+  explicit WorkspaceSettingsItem(QObject* parent = nullptr) noexcept;
+  WorkspaceSettingsItem(const WorkspaceSettingsItem& other) = delete;
+  ~WorkspaceSettingsItem() noexcept;
 
-  // Getters
-  QSet<Uuid> getUuids() const noexcept;
+  /**
+   * @brief Restore default value
+   *
+   * @note Implementation must emit the #edited() signal.
+   */
+  virtual void restoreDefault() noexcept = 0;
 
-  // Setters
-  void setUuids(const QSet<Uuid>& uuids) noexcept;
+  /**
+   * @brief Load value from S-Expression node
+   *
+   * @param root  Root node of the settings file.
+   *
+   * @note Implementation must emit the #edited() signal.
+   *
+   * @note Implementation must be atomic, i.e. either the value must be loaded
+   *       completely from file, or left at the old value (in case of errors).
+   */
+  virtual void load(const SExpression& root) = 0;
+
+  /**
+   * @brief Serialize the value into S-Expression node
+   *
+   * @param root  Root node of the settings file.
+   */
+  virtual void serialize(SExpression& root) const = 0;
 
   // Operator Overloadings
-  LibraryListEditorWidget& operator=(const LibraryListEditorWidget& rhs) =
-      delete;
+  WorkspaceSettingsItem& operator=(const WorkspaceSettingsItem& rhs) = delete;
 
 signals:
+  /**
+   * @brief Signal to notify about changes of the settings value
+   */
   void edited();
-
-protected:  // Data
-  QScopedPointer<Model>                       mModel;
-  QScopedPointer<SortFilterProxyModel>        mProxyModel;
-  QScopedPointer<Ui::LibraryListEditorWidget> mUi;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
-}  // namespace library
+}  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_LIBRARYLISTEDITORWIDGET_H
+#endif  // LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H

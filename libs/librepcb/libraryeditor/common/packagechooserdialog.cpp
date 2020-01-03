@@ -234,7 +234,7 @@ void PackageChooserDialog::accept() noexcept {
 }
 
 const QStringList& PackageChooserDialog::localeOrder() const noexcept {
-  return mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+  return mWorkspace.getSettings().libraryLocaleOrder.get();
 }
 
 /*******************************************************************************

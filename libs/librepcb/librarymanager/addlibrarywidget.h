@@ -29,10 +29,14 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Repository;
 
 namespace workspace {
 class Workspace;
@@ -92,7 +96,7 @@ private:  // Data
   workspace::Workspace&                mWorkspace;
   QScopedPointer<Ui::AddLibraryWidget> mUi;
   QScopedPointer<LibraryDownload>      mManualLibraryDownload;
-  QList<QMetaObject::Connection>       mLibraryDownloadConnections;
+  QList<std::shared_ptr<Repository>>   mRepositories;
 };
 
 /*******************************************************************************

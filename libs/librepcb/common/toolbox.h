@@ -204,6 +204,21 @@ public:
                                       int            maxLength = -1) noexcept;
 
   /**
+   * @brief Pretty print the name of a QLocale
+   *
+   * To show locale names in the UI. Examples:
+   *
+   *  - "en_US" -> "American English (United States)"
+   *  - "de" -> "Deutsch"
+   *  - "eo" -> "Esperanto"
+   *
+   * @param code  The code of the locale to print (e.g. "en_US").
+   *
+   * @return String with the pretty printed locale name.
+   */
+  static QString prettyPrintLocale(const QString& code) noexcept;
+
+  /**
    * @brief Convert a float or double to a localized string
    *
    * Same as QLocale::toString<float/double>(), but with omitted trailing zeros

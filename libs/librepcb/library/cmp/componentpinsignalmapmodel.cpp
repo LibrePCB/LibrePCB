@@ -53,7 +53,7 @@ ComponentPinSignalMapModel::ComponentPinSignalMapModel(QObject* parent) noexcept
   foreach (const CmpSigPinDisplayType& type,
            CmpSigPinDisplayType::getAllTypes()) {
     mDisplayTypeComboBoxItems.append(
-        qMakePair(type.getNameTr(), QVariant(type.toString())));
+        ComboBoxDelegate::Item{type.getNameTr(), QIcon(), type.toString()});
   }
 }
 
@@ -382,21 +382,14 @@ void ComponentPinSignalMapModel::updateSignalComboBoxItems() noexcept {
   mSignalComboBoxItems.clear();
   if (mSignals) {
     for (const ComponentSignal& sig : *mSignals) {
-      mSignalComboBoxItems.append(
-          qMakePair(*sig.getName(), QVariant(sig.getUuid().toStr())));
+      mSignalComboBoxItems.append(ComboBoxDelegate::Item{
+          *sig.getName(), QIcon(), sig.getUuid().toStr()});
     }
   }
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(mSignalComboBoxItems.begin(), mSignalComboBoxItems.end(),
-            [&collator](const QPair<QString, QVariant>& lhs,
-                        const QPair<QString, QVariant>& rhs) {
-              return collator(lhs.first, rhs.first);
-            });
+  mSignalComboBoxItems.sort();
   mSignalComboBoxItems.insert(
-      0, qMakePair(QString("(%1)").arg(tr("unconnected")), QVariant()));
+      0, ComboBoxDelegate::Item{QString("(%1)").arg(tr("unconnected")), QIcon(),
+                                QVariant()});
 }
 
 void ComponentPinSignalMapModel::getRowItem(

@@ -23,21 +23,14 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "workspacesettingsitem_genericvalue.h"
+#include "workspacesettingsitem_genericvaluelist.h"
+
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/units/lengthunit.h>
 
 #include <QtCore>
-
-// All Settings Classes
-#include "items/wsi_appdefaultmeasurementunits.h"
-#include "items/wsi_appearance.h"
-#include "items/wsi_applocale.h"
-#include "items/wsi_debugtools.h"
-#include "items/wsi_librarylocaleorder.h"
-#include "items/wsi_librarynormorder.h"
-#include "items/wsi_projectautosaveinterval.h"
-#include "items/wsi_repositories.h"
-#include "items/wsi_user.h"
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -45,23 +38,22 @@
 namespace librepcb {
 namespace workspace {
 
-class Workspace;
-class WorkspaceSettingsDialog;
-
 /*******************************************************************************
  *  Class WorkspaceSettings
  ******************************************************************************/
 
 /**
- * @brief The WorkspaceSettings class manages all workspace related settings
+ * @brief Container for all workspace related settings
  *
  * The "settings.lp" file in a workspace is used to store workspace related
- * settings. This class is an interface to these settings. A WorkspaceSettings
- * object is created in the constructor of the Workspace object.
+ * settings. This class is an interface to those settings. A
+ * ::librepcb::workspace::WorkspaceSettings object is created in the
+ * constructor of the ::librepcb::workspace::Workspace object.
  *
- * This class also provides a graphical dialog to show and edit all these
- * settings. For this purpose, the WorkspaceSettingsDialog class is used. It can
- * be shown by calling the slot #showSettingsDialog().
+ * Each settings item is represented by an instance of a
+ * ::librepcb::workspace::WorkspaceSettingsItem subclass.
+ *
+ * @see ::librepcb::workspace::WorkspaceSettingsItem
  */
 class WorkspaceSettings final : public QObject, public SerializableObject {
   Q_OBJECT
@@ -70,69 +62,115 @@ public:
   // Constructors / Destructor
   WorkspaceSettings()                               = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
-  explicit WorkspaceSettings(const Workspace& workspace);
+  explicit WorkspaceSettings(const FilePath& fp, QObject* parent = nullptr);
   ~WorkspaceSettings() noexcept;
 
-  // Getters: Settings Items
-  WSI_User&      getUser() const noexcept { return *mUser; }
-  WSI_AppLocale& getAppLocale() const noexcept { return *mAppLocale; }
-  WSI_AppDefaultMeasurementUnits& getAppDefMeasUnits() const noexcept {
-    return *mAppDefMeasUnits;
-  }
-  WSI_ProjectAutosaveInterval& getProjectAutosaveInterval() const noexcept {
-    return *mProjectAutosaveInterval;
-  }
-  WSI_Appearance& getAppearance() const noexcept { return *mAppearance; }
-  WSI_LibraryLocaleOrder& getLibLocaleOrder() const noexcept {
-    return *mLibraryLocaleOrder;
-  }
-  WSI_LibraryNormOrder& getLibNormOrder() const noexcept {
-    return *mLibraryNormOrder;
-  }
-  WSI_Repositories& getRepositories() const noexcept { return *mRepositories; }
-  WSI_DebugTools&   getDebugTools() const noexcept { return *mDebugTools; }
-
-  // General Methods
+  /**
+   * @brief Reset all settings to their default value
+   */
   void restoreDefaults() noexcept;
-  void applyAll();
-  void revertAll() noexcept;
+
+  /**
+   * @brief Save all settings to the file
+   */
+  void saveToFile() const;
 
   // Operator Overloadings
   WorkspaceSettings& operator=(const WorkspaceSettings& rhs) = delete;
 
-public slots:
-
-  /**
-   * @brief Open the workspace settings dialog
-   *
-   * @note The dialog is application modal, so this method is blocking while the
-   * dialog is open. This method will not return before the dialog is closed.
-   */
-  void showSettingsDialog() noexcept;
-
 private:  // Methods
-  template <typename T>
-  void loadSettingsItem(QScopedPointer<T>& member, SExpression& root);
-  void saveToFile() const;
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /**
+   * @brief Get all ::librepcb::workspace::WorkspaceSettingsItem objects
+   *
+   * @return List of ::librepcb::workspace::WorkspaceSettingsItem objects
+   */
+  QList<WorkspaceSettingsItem*> getAllItems() const noexcept;
+
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-private:  // Data
-  // General Attributes
+private:               // Data
   FilePath mFilePath;  ///< path to the "settings.lp" file
-  QScopedPointer<WorkspaceSettingsDialog> mDialog;  ///< the settings dialog
 
-  // Settings Items
-  QList<WSI_Base*>              mItems;  ///< contains all settings items
-  QScopedPointer<WSI_User>      mUser;
-  QScopedPointer<WSI_AppLocale> mAppLocale;
-  QScopedPointer<WSI_AppDefaultMeasurementUnits> mAppDefMeasUnits;
-  QScopedPointer<WSI_ProjectAutosaveInterval>    mProjectAutosaveInterval;
-  QScopedPointer<WSI_Appearance>                 mAppearance;
-  QScopedPointer<WSI_LibraryLocaleOrder>         mLibraryLocaleOrder;
-  QScopedPointer<WSI_LibraryNormOrder>           mLibraryNormOrder;
-  QScopedPointer<WSI_Repositories>               mRepositories;
-  QScopedPointer<WSI_DebugTools>                 mDebugTools;
+public:
+  // All settings item objects below, in the same order as they are safed in
+  // the settings file.
+  //
+  // Note: Generally we don't make member variables public, but in this case
+  //       it would create a lot of boilerplate to wrap all objects with
+  //       both const- and non-const methods, and it's totally safe to access
+  //       them directly.
+
+  /**
+   * @brief User name
+   *
+   * Used when creating new library elements or projects.
+   *
+   * Default: "" (but gets initialized when creating a new workspace)
+   */
+  WorkspaceSettingsItem_GenericValue<QString> userName;
+
+  /**
+   * @brief The application's locale (e.g. "en_US")
+   *
+   * An empty string means that the system locale will be used.
+   *
+   * Default: ""
+   */
+  WorkspaceSettingsItem_GenericValue<QString> applicationLocale;
+
+  /**
+   * @brief The application's default length unit
+   *
+   * Default: millimeters
+   */
+  WorkspaceSettingsItem_GenericValue<LengthUnit> defaultLengthUnit;
+
+  /**
+   * @brief Project autosave interval [seconds] (0 = autosave disabled)
+   *
+   * Default: 600
+   */
+  WorkspaceSettingsItem_GenericValue<uint> projectAutosaveIntervalSeconds;
+
+  /**
+   * @brief Use OpenGL hardware acceleration
+   *
+   * Default: False
+   */
+  WorkspaceSettingsItem_GenericValue<bool> useOpenGl;
+
+  /**
+   * @brief Preferred library locales (like "de_CH") in the right order
+   *
+   * The locale which should be used first is at index 0 of the list. If no
+   * translation strings are found for all locales in this list, the fallback
+   * locale "en_US" will be used automatically, so the list do not have to
+   * contain "en_US". An empty list is also valid, then the fallback locale
+   * "en_US" will be used.
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QStringList> libraryLocaleOrder;
+
+  /**
+   * @brief Preferred library norms (like "DIN EN 81346") in the right order
+   *
+   * The norm which should be used first is at index 0 of the list.
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QStringList> libraryNormOrder;
+
+  /**
+   * @brief The list of API repository URLs in the right order
+   *
+   * The repository with the highest priority is at index 0 of the list. In case
+   * of version conflicts, the repository with the higher priority will be used.
+   *
+   * Default: ["https://api.librepcb.org"]
+   */
+  WorkspaceSettingsItem_GenericValueList<QList<QUrl>> repositoryUrls;
 };
 
 /*******************************************************************************

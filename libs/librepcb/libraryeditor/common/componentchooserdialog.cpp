@@ -254,7 +254,7 @@ void ComponentChooserDialog::accept() noexcept {
 }
 
 const QStringList& ComponentChooserDialog::localeOrder() const noexcept {
-  return mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+  return mWorkspace.getSettings().libraryLocaleOrder.get();
 }
 
 /*******************************************************************************

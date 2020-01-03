@@ -53,15 +53,9 @@ AttributeListModel::AttributeListModel(QObject* parent) noexcept
     mOnEditedSlot(*this, &AttributeListModel::attributeListEdited) {
   foreach (const AttributeType* type, AttributeType::getAllTypes()) {
     mTypeComboBoxItems.append(
-        qMakePair(type->getNameTr(), QVariant(type->getName())));
+        ComboBoxDelegate::Item{type->getNameTr(), QIcon(), type->getName()});
   }
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  std::sort(mTypeComboBoxItems.begin(), mTypeComboBoxItems.end(),
-            [&collator](const QPair<QString, QVariant>& lhs,
-                        const QPair<QString, QVariant>& rhs) {
-              return collator(lhs.first, rhs.first);
-            });
+  mTypeComboBoxItems.sort();
 }
 
 AttributeListModel::~AttributeListModel() noexcept {
@@ -445,11 +439,12 @@ AttributeKey AttributeListModel::validateKeyOrThrow(const QString& key) const {
   return AttributeKey(key);  // can throw
 }
 
-QVector<QPair<QString, QVariant>> AttributeListModel::buildUnitComboBoxData(
+ComboBoxDelegate::Items AttributeListModel::buildUnitComboBoxData(
     const AttributeType& type) noexcept {
-  QVector<QPair<QString, QVariant>> items;
+  ComboBoxDelegate::Items items;
   foreach (const AttributeUnit* unit, type.getAvailableUnits()) {
-    items.append(qMakePair(unit->getSymbolTr(), QVariant(unit->getName())));
+    items.append(
+        ComboBoxDelegate::Item{unit->getSymbolTr(), QIcon(), unit->getName()});
   }
   return items;
 }

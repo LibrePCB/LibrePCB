@@ -163,8 +163,7 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button) {
  ******************************************************************************/
 
 void GridSettingsDialog::updateInternalRepresentation() noexcept {
-  QLocale locale;  // this loads the application's default locale (defined in
-                   // WSI_AppLocale)
+  QLocale locale;  // this loads the application's default locale
   mUi->lblIntervalNm->setText(QString("%1 nm").arg(
       locale.toString(mCurrentGrid.getInterval()->toNm())));
 }

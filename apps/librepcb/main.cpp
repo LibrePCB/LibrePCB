@@ -30,7 +30,6 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
-#include <QTranslator>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -48,9 +47,6 @@ using namespace librepcb::application;
 static void     setApplicationMetadata() noexcept;
 static void     configureApplicationSettings() noexcept;
 static void     writeLogHeader() noexcept;
-static void     installTranslations() noexcept;
-static void     init3rdPartyLibs() noexcept;
-static void     cleanup3rdPartyLibs() noexcept;
 static bool     isFileFormatStableOrAcceptUnstable() noexcept;
 static FilePath determineWorkspacePath() noexcept;
 static int      openWorkspace(const FilePath& path) noexcept;
@@ -63,8 +59,7 @@ static int      appExec() noexcept;
 int main(int argc, char* argv[]) {
   Application app(argc, argv);
 
-  // --------------------------------- INITIALIZATION
-  // ----------------------------------
+  // ------------------------------ INITIALIZATION -----------------------------
 
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
@@ -82,21 +77,17 @@ int main(int argc, char* argv[]) {
   writeLogHeader();
 
   // Install translation files. This must be done before any widget is shown.
-  installTranslations();
+  app.setTranslationLocale(QLocale::system());
 
   // This is to remove the ugly frames around widgets in all status bars...
   // (from http://www.qtcentre.org/threads/1904)
   app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
 
-  // Initialize all 3rd party libraries
-  init3rdPartyLibs();
-
   // Start network access manager thread
   QScopedPointer<NetworkAccessManager> networkAccessManager(
       new NetworkAccessManager());
 
-  // --------------------------------- OPEN WORKSPACE
-  // ----------------------------------
+  // ------------------------------ OPEN WORKSPACE -----------------------------
 
   int retval = 0;
 
@@ -113,14 +104,10 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  // -------------------------------- EXIT APPLICATION
-  // ---------------------------------
+  // ----------------------------- EXIT APPLICATION ----------------------------
 
   // Stop network access manager thread
   networkAccessManager.reset();
-
-  // Cleanup all 3rd party libraries
-  cleanup3rdPartyLibs();
 
   qDebug() << "Exit application with code" << retval;
   return retval;
@@ -183,50 +170,6 @@ static void writeLogHeader() noexcept {
 }
 
 /*******************************************************************************
- *  installTranslations()
- ******************************************************************************/
-
-static void installTranslations() noexcept {
-  // Install Qt translations
-  QTranslator* qtTranslator = new QTranslator(qApp);
-  qtTranslator->load("qt_" % QLocale::system().name(),
-                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-  qApp->installTranslator(qtTranslator);
-
-  // Install system language translations (all system languages defined in the
-  // system settings, in the defined order)
-  const QString dir              = qApp->getResourcesFilePath("i18n").toStr();
-  QTranslator*  systemTranslator = new QTranslator(qApp);
-  systemTranslator->load(QLocale::system(), "librepcb", "_", dir);
-  qApp->installTranslator(systemTranslator);
-
-  // Install language translations (like "de" for German)
-  QTranslator* appTranslator1 = new QTranslator(qApp);
-  appTranslator1->load("librepcb_" % QLocale::system().name().split("_").at(0),
-                       dir);
-  qApp->installTranslator(appTranslator1);
-
-  // Install language/country translations (like "de_ch" for German/Switzerland)
-  QTranslator* appTranslator2 = new QTranslator(qApp);
-  appTranslator2->load("librepcb_" % QLocale::system().name(), dir);
-  qApp->installTranslator(appTranslator2);
-}
-
-/*******************************************************************************
- *  init3rdPartyLibs()
- ******************************************************************************/
-
-static void init3rdPartyLibs() noexcept {
-}
-
-/*******************************************************************************
- *  cleanup3rdPartyLibs()
- ******************************************************************************/
-
-static void cleanup3rdPartyLibs() noexcept {
-}
-
-/*******************************************************************************
  *  isFileFormatStableOrAcceptUnstable()
  ******************************************************************************/
 
@@ -269,8 +212,8 @@ static FilePath determineWorkspacePath() noexcept {
 
           // open workspace and apply settings
           Workspace ws(wsPath);
-          ws.getSettings().getUser().setName(wizard.getNewWorkspaceUserName());
-          ws.getSettings().applyAll();  // can throw
+          ws.getSettings().userName.set(wizard.getNewWorkspaceUserName());
+          ws.getSettings().saveToFile();  // can throw
         } catch (const Exception& e) {
           QMessageBox::critical(0, Application::translate("Workspace", "Error"),
                                 e.getMsg());
@@ -292,7 +235,16 @@ static FilePath determineWorkspacePath() noexcept {
 
 static int openWorkspace(const FilePath& path) noexcept {
   try {
-    Workspace    ws(path);  // The Workspace constructor can throw an exception
+    Workspace ws(path);  // can throw
+
+    // Now since workspace settings are loaded, switch to the locale defined
+    // there (until now, the system locale was used).
+    if (!ws.getSettings().applicationLocale.get().isEmpty()) {
+      QLocale locale(ws.getSettings().applicationLocale.get());
+      QLocale::setDefault(locale);
+      qApp->setTranslationLocale(locale);
+    }
+
     ControlPanel p(ws);
     p.show();
 
