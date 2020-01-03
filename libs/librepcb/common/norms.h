@@ -46,6 +46,11 @@ inline QStringList getAvailableNorms() noexcept {
   return QStringList{"IEC 60617", "IEEE 315"};
 }
 
+inline QIcon getNormIcon(const QString& norm) noexcept {
+  return QIcon(
+      QString(":/img/norm/%1.png").arg(norm.toLower().replace(" ", "_")));
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
