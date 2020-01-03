@@ -168,6 +168,9 @@ Application::Application(int& argc, char** argv) noexcept
 }
 
 Application::~Application() noexcept {
+  // Not sure if needed, but let's unregister translators before destroying
+  // (maybe otherwise QCoreApplication has dangling pointers to translators).
+  removeAllTranslators();
 }
 
 /*******************************************************************************
@@ -179,6 +182,17 @@ FilePath Application::getResourcesFilePath(const QString& filepath) const
   return mResourcesDir.getPathTo(filepath);
 }
 
+QStringList Application::getAvailableTranslationLocales() const noexcept {
+  QStringList locales;
+  QDir        dir(getResourcesFilePath("i18n").toStr());
+  foreach (QString filename, dir.entryList({"*.qm"}, QDir::Files, QDir::Name)) {
+    filename.remove("librepcb_");
+    filename.remove(".qm");
+    locales.append(filename);
+  }
+  return locales;
+}
+
 const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
   try {
     return mStrokeFontPool->getFont(getDefaultStrokeFontName());
@@ -186,6 +200,44 @@ const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
     qFatal("Default stroke font could not be loaded!");  // aborts the
                                                          // application!!!
   }
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void Application::setTranslationLocale(const QLocale& locale) noexcept {
+  // First, remove all currently installed translations to avoid falling back to
+  // wrong languages. The fallback language must always be en_US, i.e.
+  // untranslated strings. See https://github.com/LibrePCB/LibrePCB/issues/611
+  removeAllTranslators();
+
+  // Install Qt translations
+  auto qtTranslator = std::make_shared<QTranslator>(this);
+  qtTranslator->load("qt_" % locale.name(),
+                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  installTranslator(qtTranslator.get());
+  mTranslators.append(qtTranslator);
+
+  // Install system language translations (all system languages defined in the
+  // system settings, in the defined order)
+  const QString dir              = getResourcesFilePath("i18n").toStr();
+  auto          systemTranslator = std::make_shared<QTranslator>(this);
+  systemTranslator->load(locale, "librepcb", "_", dir);
+  installTranslator(systemTranslator.get());
+  mTranslators.append(systemTranslator);
+
+  // Install language translations (like "de" for German)
+  auto appTranslator1 = std::make_shared<QTranslator>(this);
+  appTranslator1->load("librepcb_" % locale.name().split("_").at(0), dir);
+  installTranslator(appTranslator1.get());
+  mTranslators.append(appTranslator1);
+
+  // Install language/country translations (like "de_ch" for German/Switzerland)
+  auto appTranslator2 = std::make_shared<QTranslator>(this);
+  appTranslator2->load("librepcb_" % locale.name(), dir);
+  installTranslator(appTranslator2.get());
+  mTranslators.append(appTranslator2);
 }
 
 /*******************************************************************************
@@ -219,6 +271,19 @@ void Application::about() noexcept {
   QWidget*    parent = QApplication::activeWindow();
   AboutDialog aboutDialog(parent);
   aboutDialog.exec();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void Application::removeAllTranslators() noexcept {
+  foreach (auto& translator, mTranslators) {
+    if (!qApp->removeTranslator(translator.get())) {
+      qWarning() << "Failed to remove translator.";
+    }
+  }
+  mTranslators.clear();
 }
 
 /*******************************************************************************

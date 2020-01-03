@@ -114,7 +114,8 @@ Workspace::Workspace(const FilePath& wsPath)
   // all OK, let's load the workspace stuff!
 
   // load workspace settings
-  mWorkspaceSettings.reset(new WorkspaceSettings(*this));
+  mWorkspaceSettings.reset(
+      new WorkspaceSettings(mMetadataPath.getPathTo("settings.lp"), this));
 
   // load library database
   mLibraryDb.reset(new WorkspaceLibraryDb(*this));  // can throw

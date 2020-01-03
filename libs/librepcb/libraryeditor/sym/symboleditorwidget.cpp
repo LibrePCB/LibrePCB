@@ -70,7 +70,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   mUi->lstMessages->setHandler(this);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   mUi->graphicsView->setUseOpenGl(
-      mContext.workspace.getSettings().getAppearance().getUseOpenGl());
+      mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());
   connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged, this,
           &SymbolEditorWidget::cursorPositionChanged);

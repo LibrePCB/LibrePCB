@@ -61,7 +61,7 @@ PadSignalMapEditorWidget::PadSignalMapEditorWidget(QWidget* parent) noexcept
   mView->horizontalHeader()->setSectionResizeMode(
       DevicePadSignalMapModel::COLUMN_SIGNAL, QHeaderView::Stretch);
   mView->setItemDelegateForColumn(DevicePadSignalMapModel::COLUMN_SIGNAL,
-                                  new ComboBoxDelegate(this));
+                                  new ComboBoxDelegate(false, this));
   mView->sortByColumn(DevicePadSignalMapModel::COLUMN_PAD, Qt::AscendingOrder);
 
   QVBoxLayout* layout = new QVBoxLayout(this);

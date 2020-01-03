@@ -106,6 +106,7 @@ private slots:
   void on_actionOpen_Library_Manager_triggered();
   void on_actionClose_all_open_projects_triggered();
   void on_actionSwitch_Workspace_triggered();
+  void on_actionWorkspace_Settings_triggered();
   void on_projectTreeView_clicked(const QModelIndex& index);
   void on_projectTreeView_doubleClicked(const QModelIndex& index);
   void on_projectTreeView_customContextMenuRequested(const QPoint& pos);

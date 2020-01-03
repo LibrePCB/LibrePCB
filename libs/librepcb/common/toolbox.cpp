@@ -228,6 +228,18 @@ QString Toolbox::cleanUserInputString(const QString&            input,
   return ret;
 }
 
+QString Toolbox::prettyPrintLocale(const QString& code) noexcept {
+  QLocale locale(code);
+  QString str = locale.nativeLanguageName();
+  if (str.isEmpty()) {
+    str = code;  // fallback if language code is not recognized
+  }
+  if (!locale.nativeCountryName().isEmpty()) {
+    str += " (" % locale.nativeCountryName() % ")";
+  }
+  return str;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

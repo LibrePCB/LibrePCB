@@ -233,7 +233,7 @@ void SymbolChooserDialog::accept() noexcept {
 }
 
 const QStringList& SymbolChooserDialog::localeOrder() const noexcept {
-  return mWorkspace.getSettings().getLibLocaleOrder().getLocaleOrder();
+  return mWorkspace.getSettings().libraryLocaleOrder.get();
 }
 
 /*******************************************************************************

@@ -243,6 +243,7 @@ HEADERS += \
     gridproperties.h \
     model/angledelegate.h \
     model/comboboxdelegate.h \
+    model/editablelistmodel.h \
     model/lengthdelegate.h \
     model/sortfilterproxymodel.h \
     network/filedownload.h \

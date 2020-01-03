@@ -31,18 +31,9 @@ SOURCES += \
     library/workspacelibraryscanner.cpp \
     projecttreemodel.cpp \
     recentprojectsmodel.cpp \
-    settings/items/wsi_appdefaultmeasurementunits.cpp \
-    settings/items/wsi_appearance.cpp \
-    settings/items/wsi_applocale.cpp \
-    settings/items/wsi_base.cpp \
-    settings/items/wsi_debugtools.cpp \
-    settings/items/wsi_librarylocaleorder.cpp \
-    settings/items/wsi_librarynormorder.cpp \
-    settings/items/wsi_projectautosaveinterval.cpp \
-    settings/items/wsi_repositories.cpp \
-    settings/items/wsi_user.cpp \
     settings/workspacesettings.cpp \
     settings/workspacesettingsdialog.cpp \
+    settings/workspacesettingsitem.cpp \
     workspace.cpp \
 
 HEADERS += \
@@ -54,18 +45,11 @@ HEADERS += \
     library/workspacelibraryscanner.h \
     projecttreemodel.h \
     recentprojectsmodel.h \
-    settings/items/wsi_appdefaultmeasurementunits.h \
-    settings/items/wsi_appearance.h \
-    settings/items/wsi_applocale.h \
-    settings/items/wsi_base.h \
-    settings/items/wsi_debugtools.h \
-    settings/items/wsi_librarylocaleorder.h \
-    settings/items/wsi_librarynormorder.h \
-    settings/items/wsi_projectautosaveinterval.h \
-    settings/items/wsi_repositories.h \
-    settings/items/wsi_user.h \
     settings/workspacesettings.h \
     settings/workspacesettingsdialog.h \
+    settings/workspacesettingsitem.h \
+    settings/workspacesettingsitem_genericvalue.h \
+    settings/workspacesettingsitem_genericvaluelist.h \
     workspace.h \
 
 FORMS += \

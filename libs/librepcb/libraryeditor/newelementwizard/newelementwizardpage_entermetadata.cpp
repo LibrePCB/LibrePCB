@@ -169,10 +169,7 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
     case NewElementWizardContext::ElementType::Device: {
       ComponentCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),
-          mContext.getWorkspace()
-              .getSettings()
-              .getLibLocaleOrder()
-              .getLocaleOrder(),
+          mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
           *mUi->lblCategoryTree);
       builder.setHighlightLastLine(true);
       builder.setOneLine(true);
@@ -183,10 +180,7 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
     case NewElementWizardContext::ElementType::Package: {
       PackageCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),
-          mContext.getWorkspace()
-              .getSettings()
-              .getLibLocaleOrder()
-              .getLocaleOrder(),
+          mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
           *mUi->lblCategoryTree);
       builder.setHighlightLastLine(true);
       builder.setOneLine(true);

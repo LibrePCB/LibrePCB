@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/model/editablelistmodel.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -43,40 +45,39 @@ class WorkspaceSettings;
  ******************************************************************************/
 
 /**
- * @brief The WorkspaceSettingsDialog class
- *
- * This dialog class implements a GUI for all workspace settings. An instance of
- * WorkspaceSettingsDialog is created in the class WorkspaceSettings. There must
- * not exist more than one instance of this class at the same time in the same
- * application instance!
+ * @brief Dialog (GUI) to view and modify workspace settings
  */
 class WorkspaceSettingsDialog final : public QDialog {
   Q_OBJECT
 
+  using LibraryLocaleOrderModel =
+      EditableListModel<QStringList, EditableListModelType::LOCALE>;
+  using LibraryNormOrderModel = EditableListModel<QStringList>;
+  using RepositoryUrlModel    = EditableListModel<QList<QUrl>>;
+
 public:
   // Constructors / Destructor
-  explicit WorkspaceSettingsDialog(WorkspaceSettings& settings);
+  WorkspaceSettingsDialog()                                     = delete;
+  WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
+  explicit WorkspaceSettingsDialog(WorkspaceSettings& settings,
+                                   QWidget*           parent = nullptr);
   ~WorkspaceSettingsDialog();
 
-protected:
-  // Inherited from QDialog
-  void accept();
-  void reject();
-
-private slots:
-
-  // Private Slots for the GUI elements
-  void on_buttonBox_clicked(QAbstractButton* button);
+  // Operator Overloadings
+  WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs) =
+      delete;
 
 private:
-  // make some methods inaccessible...
-  WorkspaceSettingsDialog();
-  WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other);
-  WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs);
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
+  void loadSettings() noexcept;
+  void saveSettings() noexcept;
 
-  // General Attributes
-  Ui::WorkspaceSettingsDialog* mUi;
-  WorkspaceSettings& mSettings;  ///< a pointer to the WorkspaceSettings object
+private:
+  WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
+  QScopedPointer<LibraryLocaleOrderModel>     mLibLocaleOrderModel;
+  QScopedPointer<LibraryNormOrderModel>       mLibNormOrderModel;
+  QScopedPointer<RepositoryUrlModel>          mRepositoryUrlsModel;
+  QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
 };
 
 /*******************************************************************************

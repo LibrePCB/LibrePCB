@@ -73,7 +73,7 @@ ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project)
 
   // setup the timer for automatic backups, if enabled in the settings
   int intervalSecs =
-      mWorkspace.getSettings().getProjectAutosaveInterval().getInterval();
+      mWorkspace.getSettings().projectAutosaveIntervalSeconds.get();
   if ((intervalSecs > 0) && project.getDirectory().isWritable()) {
     // autosaving is enabled --> start the timer
     connect(&mAutoSaveTimer, &QTimer::timeout, this,

@@ -65,7 +65,7 @@ AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept
   // tab "create local library": set placeholder texts
   mUi->edtLocalName->setPlaceholderText("My Library");
   mUi->edtLocalAuthor->setPlaceholderText(
-      mWorkspace.getSettings().getUser().getName());
+      mWorkspace.getSettings().userName.get());
   mUi->edtLocalVersion->setPlaceholderText("0.1");
   mUi->edtLocalUrl->setPlaceholderText(
       tr("e.g. the URL to the Git repository (optional)"));
@@ -94,17 +94,14 @@ AddLibraryWidget::~AddLibraryWidget() noexcept {
 
 void AddLibraryWidget::updateRepositoryLibraryList() noexcept {
   clearRepositoryLibraryList();
-  QList<const Repository*> repos =
-      mWorkspace.getSettings().getRepositories().getRepositories();
-  foreach (const Repository* repo, repos) {
-    Q_ASSERT(repo);
-    mLibraryDownloadConnections.append(
-        connect(repo, &Repository::libraryListReceived, this,
-                &AddLibraryWidget::repositoryLibraryListReceived));
-    mLibraryDownloadConnections.append(
-        connect(repo, &Repository::errorWhileFetchingLibraryList, this,
-                &AddLibraryWidget::errorWhileFetchingLibraryList));
+  foreach (const QUrl& url, mWorkspace.getSettings().repositoryUrls.get()) {
+    std::shared_ptr<Repository> repo = std::make_shared<Repository>(url);
+    connect(repo.get(), &Repository::libraryListReceived, this,
+            &AddLibraryWidget::repositoryLibraryListReceived);
+    connect(repo.get(), &Repository::errorWhileFetchingLibraryList, this,
+            &AddLibraryWidget::errorWhileFetchingLibraryList);
     repo->requestLibraryList();
+    mRepositories.append(repo);
   }
 }
 
@@ -376,10 +373,7 @@ void AddLibraryWidget::errorWhileFetchingLibraryList(
 }
 
 void AddLibraryWidget::clearRepositoryLibraryList() noexcept {
-  foreach (const QMetaObject::Connection& connection,
-           mLibraryDownloadConnections) {
-    disconnect(connection);
-  }
+  mRepositories.clear();  // disconnects all signal/slot connections
   for (int i = mUi->lstRepoLibs->count() - 1; i >= 0; i--) {
     QListWidgetItem* item = mUi->lstRepoLibs->item(i);
     Q_ASSERT(item);

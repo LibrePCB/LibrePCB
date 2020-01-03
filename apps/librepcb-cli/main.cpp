@@ -25,9 +25,7 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/debug.h>
 
-#include <QTranslator>
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -35,20 +33,10 @@
 using namespace librepcb;
 
 /*******************************************************************************
- *  Function Prototypes
- ******************************************************************************/
-
-static void setApplicationMetadata() noexcept;
-static void installTranslations() noexcept;
-
-/*******************************************************************************
  *  main()
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
-  // --------------------------------- INITIALIZATION
-  // ----------------------------------
-
   // Creates the Debug object which installs the message handler. This must be
   // done as early as possible.
   Debug::instance();
@@ -61,53 +49,14 @@ int main(int argc, char* argv[]) {
 
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
-  setApplicationMetadata();
-
-  // Install translation files. This must be done before any widget is shown.
-  installTranslations();
-
-  // --------------------------------- RUN APPLICATION
-  // ---------------------------------
-  cli::CommandLineInterface cli(app);
-  return cli.execute();
-}
-
-/*******************************************************************************
- *  setApplicationMetadata()
- ******************************************************************************/
-
-static void setApplicationMetadata() noexcept {
   Application::setOrganizationName("LibrePCB");
   Application::setOrganizationDomain("librepcb.org");
   Application::setApplicationName("LibrePCB CLI");
-}
 
-/*******************************************************************************
- *  installTranslations()
- ******************************************************************************/
+  // Install translation files. This must be done before any widget is shown.
+  app.setTranslationLocale(QLocale::system());
 
-static void installTranslations() noexcept {
-  // Install Qt translations
-  QTranslator* qtTranslator = new QTranslator(qApp);
-  qtTranslator->load("qt_" % QLocale::system().name(),
-                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-  qApp->installTranslator(qtTranslator);
-
-  // Install system language translations (all system languages defined in the
-  // system settings, in the defined order)
-  const QString dir              = qApp->getResourcesFilePath("i18n").toStr();
-  QTranslator*  systemTranslator = new QTranslator(qApp);
-  systemTranslator->load(QLocale::system(), "librepcb", "_", dir);
-  qApp->installTranslator(systemTranslator);
-
-  // Install language translations (like "de" for German)
-  QTranslator* appTranslator1 = new QTranslator(qApp);
-  appTranslator1->load("librepcb_" % QLocale::system().name().split("_").at(0),
-                       dir);
-  qApp->installTranslator(appTranslator1);
-
-  // Install language/country translations (like "de_ch" for German/Switzerland)
-  QTranslator* appTranslator2 = new QTranslator(qApp);
-  appTranslator2->load("librepcb_" % QLocale::system().name(), dir);
-  qApp->installTranslator(appTranslator2);
+  // Run application
+  cli::CommandLineInterface cli(app);
+  return cli.execute();
 }
