@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "controlpanel/controlpanel.h"
 #include "firstrunwizard/firstrunwizard.h"
+#include "initializeworkspacewizard/initializeworkspacewizard.h"
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/debug.h>
@@ -234,6 +235,17 @@ static FilePath determineWorkspacePath() noexcept {
 
 static int openWorkspace(const FilePath& path) noexcept {
   try {
+    // Migrate workspace to new major version, if needed. Note that this needs
+    // to be done *before* opening the workspace, otherwise the workspace would
+    // be default-initialized!
+    QList<Version> versions = Workspace::getFileFormatVersionsOfWorkspace(path);
+    if (!versions.contains(qApp->getFileFormatVersion())) {
+      InitializeWorkspaceWizard wizard(path);
+      if (wizard.exec() != QDialog::Accepted) {
+        return 0;  // Workspace not migrated, abort here!
+      }
+    }
+
     Workspace ws(path);  // can throw
 
     // Now since workspace settings are loaded, switch to the locale defined
