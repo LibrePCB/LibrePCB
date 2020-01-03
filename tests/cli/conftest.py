@@ -65,6 +65,9 @@ class CliExecutor(object):
         env['LIBREPCB_CONFIG_DIR'] = os.path.join(self.tmpdir, 'config')
         # Use a neutral username
         env['USERNAME'] = 'testuser'
+        # Disable warning about unstable file format, since tests are run also
+        # on the (unstable) master branch
+        env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
         return env
 
 

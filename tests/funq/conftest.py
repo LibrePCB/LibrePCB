@@ -126,6 +126,9 @@ class LibrePcbFixture(object):
         env['USERNAME'] = 'testuser'
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
         env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
+        # Disable warning about unstable file format, since tests are run also
+        # on the (unstable) master branch
+        env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
         return env
 
 
