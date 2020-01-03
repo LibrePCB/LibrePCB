@@ -159,7 +159,8 @@ void FileUtils::makePath(const FilePath& path) {
 }
 
 QList<FilePath> FileUtils::getFilesInDirectory(const FilePath&    dir,
-                                               const QStringList& filters) {
+                                               const QStringList& filters,
+                                               bool               recursive) {
   if (!dir.isExistingDir()) {
     throw LogicError(__FILE__, __LINE__,
                      QString(tr("The directory \"%1\" does not exist."))
@@ -168,10 +169,16 @@ QList<FilePath> FileUtils::getFilesInDirectory(const FilePath&    dir,
 
   QList<FilePath> files;
   QDir            qDir(dir.toStr());
-  qDir.setFilter(QDir::Files);
+  qDir.setFilter(QDir::Files | QDir::Hidden | QDir::Dirs |
+                 QDir::NoDotAndDotDot);
   if (!filters.isEmpty()) qDir.setNameFilters(filters);
   foreach (const QFileInfo& info, qDir.entryInfoList()) {
-    files.append(FilePath(info.absoluteFilePath()));
+    FilePath fp(info.absoluteFilePath());
+    if (info.isFile()) {
+      files.append(fp);
+    } else if (info.isDir() && recursive) {
+      files += getFilesInDirectory(fp, filters, recursive);
+    }
   }
   return files;
 }
