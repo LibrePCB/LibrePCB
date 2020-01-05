@@ -34,19 +34,59 @@ namespace librepcb {
  *  Static Methods
  ******************************************************************************/
 
+inline bool isLowerHex(const QChar chr) noexcept {
+  return (chr >= QChar('0') && chr <= QChar('9')) || (chr >= QChar('a') && chr <= QChar('f'));
+}
+
 bool Uuid::isValid(const QString& str) noexcept {
-  // check format of string (only accept EXACT matches!)
-  QRegularExpression re(
-      "\\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\z");
-  QRegularExpressionMatch match =
-      re.match(str, 0, QRegularExpression::PartialPreferCompleteMatch);
-  if (!match.hasMatch()) return false;
+  // Note: This used to be done using a RegEx, but when profiling and
+  // optimizing the library rescan code we found that a manually unrolled
+  // comparison loop performs much better than the previous RegEx.
+  // See https://github.com/LibrePCB/LibrePCB/pull/651 for more details.
+  if (str.length() != 36) return false;
+  if (!isLowerHex(str[0])) return false;
+  if (!isLowerHex(str[1])) return false;
+  if (!isLowerHex(str[2])) return false;
+  if (!isLowerHex(str[3])) return false;
+  if (!isLowerHex(str[4])) return false;
+  if (!isLowerHex(str[5])) return false;
+  if (!isLowerHex(str[6])) return false;
+  if (!isLowerHex(str[7])) return false;
+  if (str[8] != QChar('-')) return false;
+  if (!isLowerHex(str[9])) return false;
+  if (!isLowerHex(str[10])) return false;
+  if (!isLowerHex(str[11])) return false;
+  if (!isLowerHex(str[12])) return false;
+  if (str[13] != QChar('-')) return false;
+  if (!isLowerHex(str[14])) return false;
+  if (!isLowerHex(str[15])) return false;
+  if (!isLowerHex(str[16])) return false;
+  if (!isLowerHex(str[17])) return false;
+  if (str[18] != QChar('-')) return false;
+  if (!isLowerHex(str[19])) return false;
+  if (!isLowerHex(str[20])) return false;
+  if (!isLowerHex(str[21])) return false;
+  if (!isLowerHex(str[22])) return false;
+  if (str[23] != QChar('-')) return false;
+  if (!isLowerHex(str[24])) return false;
+  if (!isLowerHex(str[25])) return false;
+  if (!isLowerHex(str[26])) return false;
+  if (!isLowerHex(str[27])) return false;
+  if (!isLowerHex(str[28])) return false;
+  if (!isLowerHex(str[29])) return false;
+  if (!isLowerHex(str[30])) return false;
+  if (!isLowerHex(str[31])) return false;
+  if (!isLowerHex(str[32])) return false;
+  if (!isLowerHex(str[33])) return false;
+  if (!isLowerHex(str[34])) return false;
+  if (!isLowerHex(str[35])) return false;
 
   // check type of uuid
   QUuid quuid(str);
   if (quuid.isNull()) return false;
   if (quuid.variant() != QUuid::DCE) return false;
   if (quuid.version() != QUuid::Random) return false;
+
   return true;
 }
 
