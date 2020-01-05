@@ -144,6 +144,10 @@ Searching for elements is then done with `SELECT` statements in the database, wh
 
 The database is stored in the [`version`](#doc_workspace_version_dir) directory of the workspace.
 
+Here is the current structure of the database:
+
+![Database ERM](database_diagram.png)
+
 
 [UUID]: https://en.wikipedia.org/wiki/Universally_unique_identifier "Universally Unique Identifier"
 [SQLite]: https://sqlite.org/ "SQLite"
