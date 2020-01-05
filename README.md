@@ -19,7 +19,7 @@ about the currently available features, limitations and known bugs.
 
 ### Features
 
-- Cross-platform (Unix/Linux/BSD, Mac OS X, Windows)
+- Cross-platform (Unix/Linux/BSD, macOS, Windows)
 - Multilingual (both application and library elements)
 - All-In-One: project management + library/schematic/board editors
 - Intuitive, modern and easy-to-use graphical user interface
