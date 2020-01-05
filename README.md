@@ -72,9 +72,10 @@ To compile LibrePCB, you need the following software components:
 #### Prepared Docker Image
 
 Instead of installing the dependencies manually on your system (see instructions
-below), you can also use our [Docker](https://www.docker.com/) image with all
-dependencies pre-installed. Just follow
-[these instructions](https://github.com/LibrePCB/LibrePCB/tree/master/dev/docker).
+below), you can also use one of our
+[Docker images](https://hub.docker.com/r/librepcb/librepcb-dev) with all
+dependencies pre-installed (except GUI tools like QtCreator). These images are
+actually used for CI, but are also useful to build LibrePCB locally.
 
 #### Installation on Debian/Ubuntu/Mint
 
