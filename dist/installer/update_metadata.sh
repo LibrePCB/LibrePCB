@@ -25,7 +25,7 @@ then
   DEFAULT_TARGET_DIR="@homeDir@/LibrePCB"
 elif [[ "$TARGET_NAME" == mac* ]]
 then
-  DEFAULT_TARGET_DIR="@homeDir@/Applications/LibrePCB"
+  DEFAULT_TARGET_DIR="/Applications/LibrePCB"
 fi
 
 # copy to destination directory
