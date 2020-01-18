@@ -34,6 +34,7 @@
 #include <librepcb/common/dialogs/aboutdialog.h>
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
+#include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
@@ -51,6 +52,7 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
+#include <QSvgGenerator>
 #include <QtCore>
 #include <QtPrintSupport>
 #include <QtWidgets>
@@ -410,6 +412,51 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
     mProject.exportSchematicsAsPdf(
         filepath);  // this method can throw an exception
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+  } catch (Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
+}
+
+void SchematicEditor::on_actionExportAsSvg_triggered() {
+  try {
+    Schematic* schematic = getActiveSchematic();
+    if (!schematic) return;
+
+    QString projectName =
+        FilePath::cleanFileName(*mProject.getMetadata().getName(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectVersion =
+        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString schematicName = FilePath::cleanFileName(
+        *schematic->getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString relativePath = QString("output/%1/%2_%3.svg")
+                               .arg(projectVersion, projectName, schematicName);
+    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
+    QDir().mkpath(defaultFilePath.getParentDir().toStr());
+    QString filename = FileDialog::getSaveFileName(
+        this, tr("SVG Export"), defaultFilePath.toNative(), "*.svg");
+    if (filename.isEmpty()) return;
+    if (!filename.endsWith(".svg")) filename.append(".svg");
+    FilePath filepath(filename);
+
+    // Export
+    int    dpi    = 254;
+    QRectF rectPx = schematic->getGraphicsScene().itemsBoundingRect();
+    QRectF rectSvg(Length::fromPx(rectPx.left()).toInch() * dpi,
+                   Length::fromPx(rectPx.top()).toInch() * dpi,
+                   Length::fromPx(rectPx.width()).toInch() * dpi,
+                   Length::fromPx(rectPx.height()).toInch() * dpi);
+    rectSvg.moveTo(0, 0);  // seems to be required for the SVG viewbox
+    QSvgGenerator generator;
+    generator.setTitle(filepath.getFilename());
+    generator.setDescription(*mProject.getMetadata().getName());
+    generator.setFileName(filepath.toStr());
+    generator.setSize(rectSvg.toAlignedRect().size());
+    generator.setViewBox(rectSvg);
+    generator.setResolution(dpi);
+    QPainter painter(&generator);
+    schematic->renderToQPainter(painter);
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }

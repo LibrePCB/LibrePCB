@@ -42,6 +42,7 @@
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/dialogs/gridsettingsdialog.h>
 #include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/common/gridproperties.h>
@@ -62,6 +63,7 @@
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
+#include <QSvgGenerator>
 #include <QtCore>
 #include <QtPrintSupport>
 #include <QtWidgets>
@@ -528,6 +530,53 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
     }
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+  } catch (Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditor::on_actionExportAsSvg_triggered() {
+  try {
+    Board* board = getActiveBoard();
+    if (!board) {
+      throw Exception(__FILE__, __LINE__, tr("No board selected."));
+    }
+    QString projectName =
+        FilePath::cleanFileName(*mProject.getMetadata().getName(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectVersion =
+        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString relativePath =
+        QString("output/%1/%2_Board.svg").arg(projectVersion, projectName);
+    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
+    QDir().mkpath(defaultFilePath.getParentDir().toStr());
+    QString filename = FileDialog::getSaveFileName(
+        this, tr("SVG Export"), defaultFilePath.toNative(), "*.svg");
+    if (filename.isEmpty()) return;
+    if (!filename.endsWith(".svg")) filename.append(".svg");
+    FilePath filepath(filename);
+
+    // Create output directory first because QSvgGenerator might not create it.
+    FileUtils::makePath(filepath.getParentDir());  // can throw
+
+    // Export
+    int    dpi    = 254;
+    QRectF rectPx = board->getGraphicsScene().itemsBoundingRect();
+    QRectF rectSvg(Length::fromPx(rectPx.left()).toInch() * dpi,
+                   Length::fromPx(rectPx.top()).toInch() * dpi,
+                   Length::fromPx(rectPx.width()).toInch() * dpi,
+                   Length::fromPx(rectPx.height()).toInch() * dpi);
+    rectSvg.moveTo(0, 0);  // seems to be required for the SVG viewbox
+    QSvgGenerator generator;
+    generator.setTitle(filepath.getFilename());
+    generator.setDescription(*mProject.getMetadata().getName());
+    generator.setFileName(filepath.toStr());
+    generator.setSize(rectSvg.toAlignedRect().size());
+    generator.setViewBox(rectSvg);
+    generator.setResolution(dpi);
+    QPainter painter(&generator);
+    board->renderToQPainter(painter, dpi);
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }

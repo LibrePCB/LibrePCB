@@ -10,7 +10,7 @@ TARGET = librepcb
 # Use common project definitions
 include(../../common.pri)
 
-QT += core widgets opengl network xml printsupport sql
+QT += core widgets opengl network xml printsupport sql svg
 
 win32 {
     # Windows-specific configurations

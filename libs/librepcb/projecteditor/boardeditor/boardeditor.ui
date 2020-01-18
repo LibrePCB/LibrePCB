@@ -80,6 +80,7 @@
     <addaction name="actionProjectSave"/>
     <addaction name="actionExportLppz"/>
     <addaction name="actionExportAsPdf"/>
+    <addaction name="actionExportAsSvg"/>
     <addaction name="actionGenerateBom"/>
     <addaction name="actionGenerateFabricationData"/>
     <addaction name="actionGeneratePickPlace"/>
@@ -790,6 +791,15 @@
    </property>
    <property name="text">
     <string>Generate Pick&amp;&amp;Place Files</string>
+   </property>
+  </action>
+  <action name="actionExportAsSvg">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
+   </property>
+   <property name="text">
+    <string>SVG Export</string>
    </property>
   </action>
  </widget>
