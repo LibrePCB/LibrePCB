@@ -26,6 +26,8 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/filedialog.h>
+#include <librepcb/projecteditor/licenses/license_base.h>
+#include <librepcb/projecteditor/licenses/singlefilelicense.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -38,6 +40,14 @@
 namespace librepcb {
 namespace project {
 namespace editor {
+
+/*******************************************************************************
+ *  Constants
+ ******************************************************************************/
+
+static const QString LICENSE_CC0      = "cc0-1.0";
+static const QString LICENSE_CC_BY    = "cc-by-4.0";
+static const QString LICENSE_CC_BY_SA = "cc-by-sa-4.0";
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -63,12 +73,12 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
   mUi->cbxLicense->addItem(QString("No License (not recommended)"), QString());
   mUi->cbxLicense->addItem(
       tr("CC0-1.0 (no restrictions, recommended for open hardware projects)"),
-      QString("licenses/cc0-1.0.txt"));
+      LICENSE_CC0);
   mUi->cbxLicense->addItem(tr("CC-BY-4.0 (requires attribution)"),
-                           QString("licenses/cc-by-4.0.txt"));
+                           LICENSE_CC_BY);
   mUi->cbxLicense->addItem(
       tr("CC-BY-SA-4.0 (requires attribution + share alike)"),
-      QString("licenses/cc-by-sa-4.0.txt"));
+      LICENSE_CC_BY_SA);
   mUi->cbxLicense->setCurrentIndex(0);  // no license
 }
 
@@ -102,14 +112,21 @@ bool NewProjectWizardPage_Metadata::isLicenseSet() const noexcept {
   return !mUi->cbxLicense->currentData(Qt::UserRole).toString().isEmpty();
 }
 
-FilePath NewProjectWizardPage_Metadata::getProjectLicenseFilePath() const
-    noexcept {
-  QString licenseFileName =
-      mUi->cbxLicense->currentData(Qt::UserRole).toString();
-  if (!licenseFileName.isEmpty()) {
-    return qApp->getResourcesDir().getPathTo(licenseFileName);
+std::unique_ptr<LicenseBase> NewProjectWizardPage_Metadata::getProjectLicense()
+    const noexcept {
+  QString licenseName = mUi->cbxLicense->currentData(Qt::UserRole).toString();
+  if (licenseName == LICENSE_CC0) {
+    return std::unique_ptr<LicenseBase>(
+        new SingleFileLicense("cc0-1.0.txt", "CC0 (No Rights Reserved)"));
+  } else if (licenseName == LICENSE_CC_BY) {
+    return std::unique_ptr<LicenseBase>(new SingleFileLicense(
+        "cc-by-4.0.txt", "Creative Commons Attribution 4.0"));
+  } else if (licenseName == LICENSE_CC_BY_SA) {
+    return std::unique_ptr<LicenseBase>(new SingleFileLicense(
+        "cc-by-sa-4.0.txt", "Creative Commons Attribution ShareAlike 4.0"));
   } else {
-    return FilePath();
+    qWarning() << "Invalid license: " << licenseName;
+    return nullptr;
   }
 }
 

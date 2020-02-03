@@ -32,6 +32,7 @@
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/projecteditor/licenses/license_base.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -109,13 +110,23 @@ Project* NewProjectWizard::createProject() const {
     project->addBoard(*board);
   }
 
-  // copy license file
+  // apply license
   if (mPageMetadata->isLicenseSet()) {
-    try {
-      FilePath source = mPageMetadata->getProjectLicenseFilePath();
-      dir.write("LICENSE.txt", FileUtils::readFile(source));  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the license file:" << e.getMsg();
+    std::unique_ptr<LicenseBase> license = mPageMetadata->getProjectLicense();
+    if (license != nullptr) {
+      // copy all license files
+      const QList<std::pair<QString, QString>>& files = license->getFiles();
+      for (int i = 0; i < files.length(); i++) {
+        FilePath sourcePath =
+            qApp->getResourcesDir().getPathTo("licenses/").getPathTo(files.at(i).first);
+        const QString& destFilename = files.at(i).second;
+        try {
+          dir.write(destFilename,
+                    FileUtils::readFile(sourcePath));  // can throw
+        } catch (Exception& e) {
+          qCritical() << "Could not copy the license file:" << e.getMsg();
+        }
+      }
     }
   }
 
