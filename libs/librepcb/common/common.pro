@@ -65,6 +65,7 @@ SOURCES += \
     dialogs/stroketextpropertiesdialog.cpp \
     dialogs/textpropertiesdialog.cpp \
     exceptions.cpp \
+    fileio/asynccopyoperation.cpp \
     fileio/csvfile.cpp \
     fileio/directorylock.cpp \
     fileio/filepath.cpp \
@@ -194,6 +195,7 @@ HEADERS += \
     dialogs/textpropertiesdialog.h \
     elementname.h \
     exceptions.h \
+    fileio/asynccopyoperation.h \
     fileio/cmd/cmdlistelementinsert.h \
     fileio/cmd/cmdlistelementremove.h \
     fileio/cmd/cmdlistelementsswap.h \

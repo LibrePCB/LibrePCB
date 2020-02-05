@@ -83,7 +83,7 @@ class LibrePcbFixture(object):
         self.project_path = path
 
     def get_workspace_libraries_path(self, subdir=''):
-        return os.path.join(self.workspace_path, 'v0.1', 'libraries', subdir)
+        return os.path.join(self.workspace_path, 'v0.2', 'libraries', subdir)
 
     def add_local_library_to_workspace(self, path):
         if not os.path.isabs(path):
@@ -126,6 +126,9 @@ class LibrePcbFixture(object):
         env['USERNAME'] = 'testuser'
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
         env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
+        # Disable warning about unstable file format, since tests are run also
+        # on the (unstable) master branch
+        env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
         return env
 
 

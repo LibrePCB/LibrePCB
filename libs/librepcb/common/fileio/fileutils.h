@@ -140,11 +140,13 @@ public:
    *
    * @param dir           Filepath to a directory (must exist)
    * @param filters       Only files matching this filters are returned
+   * @param recursive     If true, also subdirectories are searched for files.
    *
    * @return A list of filepaths to files in the specified directory
    */
   static QList<FilePath> getFilesInDirectory(
-      const FilePath& dir, const QStringList& filters = QStringList());
+      const FilePath& dir, const QStringList& filters = QStringList(),
+      bool recursive = false);
 
   // Operator Overloadings
   FileUtils& operator=(const FileUtils& rhs) = delete;

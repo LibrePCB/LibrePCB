@@ -17,44 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NORMS_H
-#define LIBREPCB_NORMS_H
+#ifndef LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_CHOOSESETTINGS_H
+#define LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_CHOOSESETTINGS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "initializeworkspacewizardcontext.h"
+
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace application {
+
+namespace Ui {
+class InitializeWorkspaceWizard_ChooseSettings;
+}
 
 /*******************************************************************************
- *  List of norms
+ *  Class InitializeWorkspaceWizard_ChooseSettings
  ******************************************************************************/
 
 /**
- * @brief Get a list of available "built-in" norms
- *
- * These norms are used e.g. in the library editor and workspace/project
- * settings dialogs.
- *
- * @return List of norms
+ * @brief The InitializeWorkspaceWizard_ChooseSettings class
  */
-inline QStringList getAvailableNorms() noexcept {
-  return QStringList{"IEC 60617", "IEEE 315"};
-}
+class InitializeWorkspaceWizard_ChooseSettings final : public QWizardPage {
+  Q_OBJECT
 
-inline QIcon getNormIcon(const QString& norm) noexcept {
-  return QIcon(
-      QString(":/img/norm/%1.png").arg(norm.toLower().replace(" ", "_")));
-}
+public:
+  // Constructors / Destructor
+  explicit InitializeWorkspaceWizard_ChooseSettings(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_ChooseSettings(
+      const InitializeWorkspaceWizard_ChooseSettings& other) = delete;
+  ~InitializeWorkspaceWizard_ChooseSettings() noexcept;
+
+  // Inherited from QWizardPage
+  bool validatePage() noexcept override;
+  int  nextId() const noexcept override;
+
+  // Operator Overloadings
+  InitializeWorkspaceWizard_ChooseSettings& operator       =(
+      const InitializeWorkspaceWizard_ChooseSettings& rhs) = delete;
+
+private:
+  void cbxVersionCurrentIndexChanged(int index) noexcept;
+
+private:
+  InitializeWorkspaceWizardContext&                            mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_ChooseSettings> mUi;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NORMS_H
+#endif  // LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_CHOOSESETTINGS_H

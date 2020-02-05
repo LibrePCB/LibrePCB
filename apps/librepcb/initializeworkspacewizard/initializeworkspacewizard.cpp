@@ -17,44 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NORMS_H
-#define LIBREPCB_NORMS_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
+#include "initializeworkspacewizard.h"
+
+#include "initializeworkspacewizard_chooseimportversion.h"
+#include "initializeworkspacewizard_choosesettings.h"
+#include "initializeworkspacewizard_finalizeimport.h"
+#include "ui_initializeworkspacewizard.h"
+
+#include <librepcb/workspace/workspace.h>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace application {
+
+using namespace workspace;
 
 /*******************************************************************************
- *  List of norms
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief Get a list of available "built-in" norms
- *
- * These norms are used e.g. in the library editor and workspace/project
- * settings dialogs.
- *
- * @return List of norms
- */
-inline QStringList getAvailableNorms() noexcept {
-  return QStringList{"IEC 60617", "IEEE 315"};
+InitializeWorkspaceWizard::InitializeWorkspaceWizard(
+    const FilePath& workspacePath, QWidget* parent) noexcept
+  : QWizard(parent),
+    mContext(workspacePath),
+    mUi(new Ui::InitializeWorkspaceWizard) {
+  mUi->setupUi(this);
+
+  // add pages
+  if (Workspace::getFileFormatVersionsOfWorkspace(mContext.getWorkspacePath())
+          .count() > 0) {
+    // Only provide import option if there are versions to import
+    setPage(InitializeWorkspaceWizardContext::ID_ChooseImportVersion,
+            new InitializeWorkspaceWizard_ChooseImportVersion(mContext));
+    setPage(InitializeWorkspaceWizardContext::ID_FinalizeImport,
+            new InitializeWorkspaceWizard_FinalizeImport(mContext));
+  }
+  setPage(InitializeWorkspaceWizardContext::ID_ChooseSettings,
+          new InitializeWorkspaceWizard_ChooseSettings(mContext));
+
+  // set header logo
+  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 }
 
-inline QIcon getNormIcon(const QString& norm) noexcept {
-  return QIcon(
-      QString(":/img/norm/%1.png").arg(norm.toLower().replace(" ", "_")));
+InitializeWorkspaceWizard::~InitializeWorkspaceWizard() noexcept {
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace application
 }  // namespace librepcb
-
-#endif  // LIBREPCB_NORMS_H

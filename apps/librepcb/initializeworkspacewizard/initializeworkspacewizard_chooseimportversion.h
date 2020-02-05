@@ -17,49 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
+#define LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "firstrunwizardpage_workspacesettings.h"
+#include "initializeworkspacewizardcontext.h"
 
-#include "ui_firstrunwizardpage_workspacesettings.h"
-
-#include <librepcb/common/systeminfo.h>
-#include <librepcb/workspace/workspace.h>
-
-#include <QFileDialog>
+#include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace application {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-FirstRunWizardPage_WorkspaceSettings::FirstRunWizardPage_WorkspaceSettings(
-    QWidget* parent) noexcept
-  : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_WorkspaceSettings) {
-  mUi->setupUi(this);
-  registerField("NewWorkspaceUserName", mUi->edtUserName);
-
-  // Initialize user name with the system's username.
-  mUi->edtUserName->setText(SystemInfo::getFullUsername());
-}
-
-FirstRunWizardPage_WorkspaceSettings::
-    ~FirstRunWizardPage_WorkspaceSettings() noexcept {
+namespace Ui {
+class InitializeWorkspaceWizard_ChooseImportVersion;
 }
 
 /*******************************************************************************
- *  Inherited Methods
+ *  Class InitializeWorkspaceWizard_ChooseImportVersion
  ******************************************************************************/
 
-bool FirstRunWizardPage_WorkspaceSettings::validatePage() noexcept {
-  return true;  // Any user name is valid
-}
+/**
+ * @brief The InitializeWorkspaceWizard_ChooseImportVersion class
+ */
+class InitializeWorkspaceWizard_ChooseImportVersion final : public QWizardPage {
+  Q_OBJECT
+
+public:
+  // Constructors / Destructor
+  explicit InitializeWorkspaceWizard_ChooseImportVersion(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_ChooseImportVersion(
+      const InitializeWorkspaceWizard_ChooseImportVersion& other) = delete;
+  ~InitializeWorkspaceWizard_ChooseImportVersion() noexcept;
+
+  // Inherited from QWizardPage
+  bool validatePage() noexcept override;
+  int  nextId() const noexcept override;
+
+  // Operator Overloadings
+  InitializeWorkspaceWizard_ChooseImportVersion& operator       =(
+      const InitializeWorkspaceWizard_ChooseImportVersion& rhs) = delete;
+
+private:
+  void cbxVersionCurrentIndexChanged(int index) noexcept;
+
+private:
+  InitializeWorkspaceWizardContext&                                 mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_ChooseImportVersion> mUi;
+};
 
 /*******************************************************************************
  *  End of File
@@ -67,3 +78,5 @@ bool FirstRunWizardPage_WorkspaceSettings::validatePage() noexcept {
 
 }  // namespace application
 }  // namespace librepcb
+
+#endif  // LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
