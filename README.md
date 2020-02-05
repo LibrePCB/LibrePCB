@@ -176,13 +176,6 @@ output\librepcb.exe           # Windows
 
 On a Unix/Linux system, LibrePCB can be installed with `sudo make install`.
 
-### Workspace
-
-At the first startup, LibrePCB asks for a workspace directory where the library
-elements and projects are located. For developers there is a demo workspace
-inclusive some libraries and projects (useful for testing purposes) at
-[LibrePCB/demo-workspace](https://github.com/LibrePCB/demo-workspace).
-
 
 ## Credits
 
