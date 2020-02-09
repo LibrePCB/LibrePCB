@@ -463,6 +463,35 @@ public:
     return (mX != rhs.mX) || (mY != rhs.mY);
   }
 
+  //@{
+  /**
+   * @brief Less/Greater comparison operator overloadings
+   *
+   * This comparison operator doesn't make much sense, but it's useful to to
+   * sort ::librepcb::Point objects, e.g. for using them as a key in a sorted
+   * map. The comparison is first done on the X coordinate, and only if they
+   * are equal, the Y coordinate is also taken into account. So the "smallest"
+   * point is at (-infinity, -infinity) and the "greatest" point at
+   * (infinity, infinity).
+   *
+   * @param rhs   The other object to compare
+   *
+   * @return Result of the comparison
+   */
+  bool operator<(const Point& rhs) const noexcept {
+    return (mX < rhs.mX) || ((mX == rhs.mX) && (mY < rhs.mY));
+  }
+  bool operator<=(const Point& rhs) const noexcept {
+    return (mX < rhs.mX) || ((mX == rhs.mX) && (mY <= rhs.mY));
+  }
+  bool operator>(const Point& rhs) const noexcept {
+    return (mX > rhs.mX) || ((mX == rhs.mX) && (mY > rhs.mY));
+  }
+  bool operator>=(const Point& rhs) const noexcept {
+    return (mX > rhs.mX) || ((mX == rhs.mX) && (mY >= rhs.mY));
+  }
+  //@}
+
 private:
   Length mX;  ///< the X coordinate
   Length mY;  ///< the Y coordinate
