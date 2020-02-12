@@ -196,6 +196,15 @@ public:
   static Version fromString(const QString& str);
 
   /**
+   * @brief Create a Version object from a uint initializer list
+   *
+   * @param numbers  A uint initializer list
+   *
+   * @return A valid Version object
+   */
+  static Version fromNumbers(std::initializer_list<uint> numbers);
+
+  /**
    * @brief Try creating a Version object from a string, returning empty
    * optional if invalid
    *
