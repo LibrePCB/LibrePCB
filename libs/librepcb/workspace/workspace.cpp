@@ -85,7 +85,7 @@ Workspace::Workspace(const FilePath& wsPath)
   FileUtils::makePath(mMetadataPath);   // can throw
   FileUtils::makePath(mLibrariesPath);  // can throw
 
-  // Check if the workspace is locked (already open or application was crashed).
+  // Check if the workspace is locked (already open or application crashed).
   switch (mLock.getStatus())  // can throw
   {
     case DirectoryLock::LockStatus::Unlocked: {
