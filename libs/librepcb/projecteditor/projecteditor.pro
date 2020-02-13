@@ -10,7 +10,7 @@ TARGET = librepcbprojecteditor
 # Use common project definitions
 include(../../../common.pri)
 
-QT += core widgets xml sql printsupport
+QT += core widgets xml sql printsupport svg
 
 CONFIG += staticlib
 

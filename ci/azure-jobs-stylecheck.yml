@@ -2,7 +2,7 @@ jobs:
 - job: Stylecheck
   pool:
     vmImage: 'ubuntu-16.04'
-  container: librepcb/librepcb-dev:ubuntu-18.04-1
+  container: librepcb/librepcb-dev:ubuntu-18.04-2
   steps:
   - bash: ./ci/stylecheck.sh
     displayName: Run Stylecheck

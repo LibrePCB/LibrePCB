@@ -50,6 +50,7 @@
     <addaction name="actionSave_Project"/>
     <addaction name="actionExportLppz"/>
     <addaction name="actionPDF_Export"/>
+    <addaction name="actionExportAsSvg"/>
     <addaction name="actionGenerateBom"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
@@ -716,6 +717,15 @@
   <action name="actionRenameSheet">
    <property name="text">
     <string>Rename Sheet</string>
+   </property>
+  </action>
+  <action name="actionExportAsSvg">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export sheet to SVG</string>
    </property>
   </action>
  </widget>
