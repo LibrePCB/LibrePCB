@@ -80,14 +80,14 @@ actually used for CI, but are also useful to build LibrePCB locally.
 #### Installation on Debian/Ubuntu/Mint
 
 ```bash
-sudo apt-get install git build-essential qt5-default qttools5-dev-tools libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev
+sudo apt-get install git build-essential qt5-default qttools5-dev-tools libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev libqt5svg5-dev
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
 #### Installation on Arch Linux
 
 ```bash
-sudo pacman -S git base-devel qt5-base qt5-tools desktop-file-utils shared-mime-info openssl zlib
+sudo pacman -S git base-devel qt5-base qt5-svg qt5-tools desktop-file-utils shared-mime-info openssl zlib
 sudo pacman -S qt5-doc qtcreator # optional
 ```
 

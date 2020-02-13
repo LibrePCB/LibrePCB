@@ -33,6 +33,7 @@
         <file>actions/edit.png</file>
         <file>actions/export_gerber.png</file>
         <file>actions/export_pick_place_file.png</file>
+        <file>actions/export_svg.png</file>
         <file>actions/export_zip.png</file>
         <file>actions/flip_horizontal.png</file>
         <file>actions/flip_vertical.png</file>
