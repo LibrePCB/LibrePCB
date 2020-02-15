@@ -48,9 +48,9 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
   : QWidget(parent),
     mContext(context),
     mFilePath(fp),
-    mFileSystem(TransactionalFileSystem::open(
-        fp, !context.readOnly,
-        TransactionalFileSystem::RestoreMode::ASK)),  // can throw
+    mFileSystem(
+        TransactionalFileSystem::open(fp, !context.readOnly,
+                                      &askForRestoringBackup)),  // can throw
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
     mIsInterfaceBroken(false) {
@@ -195,6 +195,24 @@ QString EditorWidgetBase::getWorkspaceSettingsUserName() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+bool EditorWidgetBase::askForRestoringBackup(const FilePath& dir) {
+  Q_UNUSED(dir);
+  QMessageBox::StandardButton btn = QMessageBox::question(
+      0, tr("Restore autosave backup?"),
+      tr("It seems that the application crashed the last time you opened this "
+         "library element. Do you want to restore the last autosave backup?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+  switch (btn) {
+    case QMessageBox::Yes:
+      return true;
+    case QMessageBox::No:
+      return false;
+    default:
+      throw UserCanceled(__FILE__, __LINE__);
+  }
+}
 
 void EditorWidgetBase::toolActionGroupChangeTriggered(
     const QVariant& newTool) noexcept {

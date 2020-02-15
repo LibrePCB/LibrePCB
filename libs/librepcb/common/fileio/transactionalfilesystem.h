@@ -43,9 +43,9 @@ namespace librepcb {
  ******************************************************************************/
 
 /**
- * @brief Special FileSystem implementation for libraries and projects
+ * @brief Transactional ::librepcb::FileSystem implementation
  *
- * This is an implementation of the librepcb::FileSystem interface with many
+ * This is an implementation of the ::librepcb::FileSystem interface with many
  * features needed to create, open and save LibrePCB library elements and
  * projects in a very safe way to always guarantee consistency of all files.
  *
@@ -64,18 +64,72 @@ class TransactionalFileSystem final : public FileSystem {
   Q_OBJECT
 
 public:
-  enum class RestoreMode {
-    NO,     ///< Do not restore the backup
-    YES,    ///< Restore backup if available
-    ASK,    ///< Ask (with QMessageBox) whether to restore or not
-    ABORT,  ///< Throw a RuntimeError if a backup exists
+  /**
+   * @brief Callback type used to determine whether a backup should be restored
+   *        or not
+   *
+   * @param dir   The directory to be restored.
+   *
+   * @retval true   Restore backup.
+   * @retval false  Do not restore backup.
+   *
+   * @throw ::librepcb::Exception to abort opening the directory.
+   */
+  typedef std::function<bool(const FilePath& dir)> RestoreCallback;
+
+  /**
+   * @brief Convenience class providing standard implementations for
+   *        ::librepcb::TransactionalFileSystem::RestoreCallback
+   *
+   * @note This is a class just to put some functions into their own scope.
+   */
+  struct RestoreMode {
+    /**
+     * @brief Never restore a backup
+     *
+     * @param dir The directory to be opened.
+     *
+     * @return false
+     */
+    static bool no(const FilePath& dir) {
+      Q_UNUSED(dir);
+      return false;
+    }
+
+    /**
+     * @brief Always restore the backup, if there is any
+     *
+     * @param dir The directory to be opened.
+     *
+     * @return true
+     */
+    static bool yes(const FilePath& dir) {
+      Q_UNUSED(dir);
+      return true;
+    }
+
+    /**
+     * @brief If there exists a backup, abort opening the directory by raising
+     *        an exception
+     *
+     * @param dir The directory to be opened.
+     *
+     * @return Nothing, since an exception is thrown.
+     *
+     * @throw ::librepcb::RuntimeError
+     */
+    static bool abort(const FilePath& dir) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Autosave backup detected in directory '%1'.")
+                             .arg(dir.toNative()));
+    }
   };
 
   // Constructors / Destructor
   TransactionalFileSystem() = delete;
   TransactionalFileSystem(const FilePath& filepath, bool writable = false,
-                          RestoreMode restoreMode = RestoreMode::NO,
-                          QObject*    parent      = nullptr);
+                          RestoreCallback restoreCallback = RestoreCallback(),
+                          QObject*        parent          = nullptr);
   TransactionalFileSystem(const TransactionalFileSystem& other) = delete;
   virtual ~TransactionalFileSystem() noexcept;
 
@@ -106,19 +160,22 @@ public:
   // Static Methods
   static std::shared_ptr<TransactionalFileSystem> open(
       const FilePath& filepath, bool writable,
-      RestoreMode restoreMode = RestoreMode::NO, QObject* parent = nullptr) {
+      RestoreCallback restoreCallback = &RestoreMode::no,
+      QObject*        parent          = nullptr) {
     return std::make_shared<TransactionalFileSystem>(filepath, writable,
-                                                     restoreMode, parent);
+                                                     restoreCallback, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRO(
-      const FilePath& filepath, RestoreMode restoreMode = RestoreMode::NO,
-      QObject* parent = nullptr) {
-    return open(filepath, false, restoreMode, parent);
+      const FilePath& filepath,
+      RestoreCallback restoreCallback = &RestoreMode::no,
+      QObject*        parent          = nullptr) {
+    return open(filepath, false, restoreCallback, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRW(
-      const FilePath& filepath, RestoreMode restoreMode = RestoreMode::NO,
-      QObject* parent = nullptr) {
-    return open(filepath, true, restoreMode, parent);
+      const FilePath& filepath,
+      RestoreCallback restoreCallback = &RestoreMode::no,
+      QObject*        parent          = nullptr) {
+    return open(filepath, true, restoreCallback, parent);
   }
   static QString cleanPath(QString path) noexcept;
 

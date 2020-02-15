@@ -143,6 +143,17 @@ private slots:
   void updateCheckMessages() noexcept;
 
 private:  // Methods
+  /**
+   * @brief Ask the user whether to restore a backup of a library element
+   *
+   * @param dir   The library element directory to be restored.
+   *
+   * @retval true   Restore backup.
+   * @retval false  Do not restore backup.
+   *
+   * @throw Exception to abort opening the library element.
+   */
+  static bool  askForRestoringBackup(const FilePath& dir);
   void         toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void         undoStackCleanChanged(bool clean) noexcept;
   void         scheduleLibraryElementChecks() noexcept;

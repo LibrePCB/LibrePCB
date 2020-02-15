@@ -503,7 +503,7 @@ TEST_F(TransactionalFileSystemTest, testRestoreAutosave) {
 
   // open another file system on the same directory to restore the autosave
   TransactionalFileSystem fs2(mPopulatedDir, true,
-                              TransactionalFileSystem::RestoreMode::YES);
+                              &TransactionalFileSystem::RestoreMode::yes);
   EXPECT_TRUE(fs2.isRestoredFromAutosave());
 
   // check state in memory
