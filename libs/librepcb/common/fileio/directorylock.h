@@ -79,12 +79,12 @@ namespace librepcb {
  *
  * The lock file (and especially its content) is also used to detect application
  * crashes. If the application crashes while a directory was locked, the lock
- * file will still exist after the application was crashed. Now, if the user
+ * file will still exist after the application crashed. Now, if the user
  * tries to open the locked directory again, the content of the lock file will
  * be parsed. If the username and the hostname in the lock file is equal to the
  * current user which tries to get the lock, it's clear that the lock file does
  * NOT exist because the locked directory is already open, but that the
- * application was crashed while the directory was locked. If there exists a
+ * application crashed while the directory was locked. If there exists a
  * backup of the locked directory (e.g. project auto-save), this allows to ask
  * the user whether the backup should be restored or not.
  *
@@ -129,7 +129,7 @@ namespace librepcb {
  *                      throw Exception("Directory is locked!");
  *                      break;
  *                  case StaleLock:
- *                      // The application was crashed while the lock was
+ *                      // The application crashed while the lock was
  * active.
  *                      // Ask the user whether a backup should be restored or
  * not. break; default:
