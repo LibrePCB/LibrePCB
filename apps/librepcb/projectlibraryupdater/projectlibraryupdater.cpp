@@ -102,7 +102,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
       std::shared_ptr<TransactionalFileSystem> fs =
           TransactionalFileSystem::openRW(
               mProjectFilePath.getParentDir(),
-              TransactionalFileSystem::RestoreMode::ABORT);
+              &TransactionalFileSystem::RestoreMode::abort);
 
       // update all elements
       updateElements(fs, "cmp", &WorkspaceLibraryDb::getLatestComponent);
