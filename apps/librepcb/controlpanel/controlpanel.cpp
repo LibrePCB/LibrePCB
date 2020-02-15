@@ -312,9 +312,8 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
     ProjectEditor* editor = getOpenProject(filepath);
     if (!editor) {
       std::shared_ptr<TransactionalFileSystem> fs =
-          TransactionalFileSystem::openRW(
-              filepath.getParentDir(),
-              TransactionalFileSystem::RestoreMode::ASK);
+          TransactionalFileSystem::openRW(filepath.getParentDir(),
+                                          &askForRestoringBackup);
       Project* project = new Project(std::unique_ptr<TransactionalDirectory>(
                                          new TransactionalDirectory(fs)),
                                      filepath.getFilename());
@@ -376,6 +375,24 @@ ProjectEditor* ControlPanel::getOpenProject(const FilePath& filepath) const
     return mOpenProjectEditors.value(filepath.toUnique().toStr());
   else
     return nullptr;
+}
+
+bool ControlPanel::askForRestoringBackup(const FilePath& dir) {
+  Q_UNUSED(dir);
+  QMessageBox::StandardButton btn = QMessageBox::question(
+      0, tr("Restore autosave backup?"),
+      tr("It seems that the application crashed the last time you opened this "
+         "project. Do you want to restore the last autosave backup?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+  switch (btn) {
+    case QMessageBox::Yes:
+      return true;
+    case QMessageBox::No:
+      return false;
+    default:
+      throw UserCanceled(__FILE__, __LINE__);
+  }
 }
 
 /*******************************************************************************

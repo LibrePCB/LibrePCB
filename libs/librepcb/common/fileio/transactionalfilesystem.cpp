@@ -39,10 +39,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-TransactionalFileSystem::TransactionalFileSystem(const FilePath& filepath,
-                                                 bool            writable,
-                                                 RestoreMode     restoreMode,
-                                                 QObject*        parent)
+TransactionalFileSystem::TransactionalFileSystem(
+    const FilePath& filepath, bool writable, RestoreCallback restoreCallback,
+    QObject* parent)
   : FileSystem(parent),
     mFilePath(filepath),
     mIsWritable(writable),
@@ -64,30 +63,7 @@ TransactionalFileSystem::TransactionalFileSystem(const FilePath& filepath,
   // If there is an autosave backup, load it according the restore mode.
   FilePath autosaveFile = mFilePath.getPathTo(".autosave/autosave.lp");
   if (autosaveFile.isExistingFile()) {
-    bool restore = (restoreMode == RestoreMode::YES);
-    if (restoreMode == RestoreMode::ASK) {
-      QMessageBox::StandardButton btn = QMessageBox::question(
-          0, tr("Restore autosave backup?"),
-          tr("It seems that the application crashed the last time you opened "
-             "this project. Do you want to restore the last autosave backup?"),
-          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-          QMessageBox::Cancel);
-      switch (btn) {
-        case QMessageBox::Yes:
-          restore = true;
-          break;
-        case QMessageBox::No:
-          restore = false;
-          break;
-        default:
-          throw UserCanceled(__FILE__, __LINE__);
-      }
-    } else if (restoreMode == RestoreMode::ABORT) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Autosave backup detected in directory '%1'.")
-                             .arg(mFilePath.toNative()));
-    }
-    if (restore) {
+    if (restoreCallback && restoreCallback(mFilePath)) {  // can throw
       qDebug() << "Restoring file system from autosave backup:"
                << autosaveFile.toNative();
       loadDiff(autosaveFile);  // can throw

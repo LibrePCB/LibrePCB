@@ -160,7 +160,7 @@ Application::Application(int& argc, char** argv) noexcept
   // load all stroke fonts
   TransactionalFileSystem strokeFontsDir(
       getResourcesFilePath("fontobene"), false,
-      TransactionalFileSystem::RestoreMode::NO);
+      &TransactionalFileSystem::RestoreMode::no);
   mStrokeFontPool.reset(new StrokeFontPool(strokeFontsDir));
   getDefaultStrokeFont();  // ensure that the default font is available (aborts
                            // if not)
