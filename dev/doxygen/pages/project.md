@@ -192,7 +192,7 @@ To avoid such problems, the constructor of librepcb::project::Project tries to l
 directory with a librepcb::DirectoryLock object (librepcb::project::Project::mLock). If the project
 is already locked by another application instance, the project cannot be opened again (the
 constructor of librepcb::project::Project throws an exception). If the lock file exists because the
-application was crashed while the project was open, the user gets a message box which asks whether
+application crashed while the project was open, the user gets a message box which asks whether
 the last automatic backup should be restored or not (see also @ref doc_project_save). The lock will
 be released automatically when the librepcb::project::Project instance is destroyed (RAII, see
 librepcb::DirectoryLock).

@@ -68,8 +68,8 @@ TransactionalFileSystem::TransactionalFileSystem(const FilePath& filepath,
     if (restoreMode == RestoreMode::ASK) {
       QMessageBox::StandardButton btn = QMessageBox::question(
           0, tr("Restore autosave backup?"),
-          tr("It seems that the application was crashed the last time. "
-             "Do you want to restore the last autosave backup?"),
+          tr("It seems that the application crashed the last time you opened "
+             "this project. Do you want to restore the last autosave backup?"),
           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
           QMessageBox::Cancel);
       switch (btn) {
