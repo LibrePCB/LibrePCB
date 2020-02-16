@@ -41,11 +41,13 @@
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
 #include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdschematicadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicedit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicremove.h>
+#include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/schematic.h>
 #include <librepcb/project/settings/projectsettings.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
@@ -206,6 +208,13 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Remove), true);
   });
 
+  // setup "search" toolbar
+  mUi->searchToolbar->setPlaceholderText(tr("Find symbol..."));
+  mUi->searchToolbar->setCompleterListFunction(
+      std::bind(&SchematicEditor::getSearchToolBarCompleterList, this));
+  connect(mUi->searchToolbar, &SearchToolBar::goToTriggered, this,
+          &SchematicEditor::goToSymbol);
+
   // setup status bar
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
@@ -226,8 +235,12 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   // Load first schematic page
   if (mProject.getSchematics().count() > 0) setActiveSchematicIndex(0);
 
-    // mGraphicsView->zoomAll(); does not work properly here, should be executed
-    // later in the event loop (ugly, but seems to work...)
+  // Set focus to graphics view (avoid having the focus in some arbitrary
+  // widget).
+  mGraphicsView->setFocus();
+
+  // mGraphicsView->zoomAll(); does not work properly here, should be executed
+  // later in the event loop (ugly, but seems to work...)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
   QTimer::singleShot(200, mGraphicsView, &GraphicsView::zoomAll);
 #else
@@ -605,6 +618,35 @@ void SchematicEditor::renameSchematic(int index) noexcept {
     mProjectEditor.getUndoStack().execCmd(cmd.take());
   } catch (Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+QStringList SchematicEditor::getSearchToolBarCompleterList() noexcept {
+  QStringList list;
+  foreach (const Schematic* schematic, mProject.getSchematics()) {
+    foreach (const SI_Symbol* symbol, schematic->getSymbols()) {
+      list.append(symbol->getName());
+    }
+  }
+  return list;
+}
+
+void SchematicEditor::goToSymbol(const QString& name) noexcept {
+  for (int i = 0; i < mProject.getSchematics().count(); ++i) {
+    const Schematic* schematic = mProject.getSchematicByIndex(i);
+    Q_ASSERT(schematic);
+    foreach (SI_Symbol* symbol, schematic->getSymbols()) {
+      if (symbol->getName().toLower() == name.toLower()) {
+        setActiveSchematicIndex(i);
+        schematic->clearSelection();
+        symbol->setSelected(true);
+        QRectF rect   = symbol->getBoundingRect();
+        qreal  margin = Length(1000000).toPx();
+        rect.adjust(-margin, -margin, margin, margin);
+        mGraphicsView->zoomToRect(rect);
+        return;
+      }
+    }
   }
 }
 
