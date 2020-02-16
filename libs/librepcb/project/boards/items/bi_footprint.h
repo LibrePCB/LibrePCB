@@ -79,6 +79,7 @@ public:
   const Angle&                        getRotation() const noexcept;
   bool                                isSelectable() const noexcept override;
   bool                                isUsed() const noexcept;
+  QRectF                              getBoundingRect() const noexcept;
   BGI_Footprint& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   // StrokeText Methods
