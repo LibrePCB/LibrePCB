@@ -85,14 +85,13 @@ void BI_Footprint::init() {
     if (mPads.contains(libPad.getPackagePadUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(
-              tr("The footprint pad UUID \"%1\" is defined multiple times."))
+          QString("The footprint pad UUID \"%1\" is defined multiple times.")
               .arg(libPad.getPackagePadUuid().toStr()));
     }
     if (!libDev.getPadSignalMap().contains(libPad.getPackagePadUuid())) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Footprint pad \"%1\" not found in "
-                                    "pad-signal-map of device \"%2\"."))
+                         QString("Footprint pad \"%1\" not found in "
+                                 "pad-signal-map of device \"%2\".")
                              .arg(libPad.getPackagePadUuid().toStr(),
                                   libDev.getUuid().toStr()));
     }

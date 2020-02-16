@@ -280,8 +280,8 @@ Board::Board(Project&                                project,
                 device->getComponentInstanceUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString(tr("There is already a device of the component instance "
-                         "\"%1\"!"))
+              QString("There is already a device of the component instance "
+                      "\"%1\"!")
                   .arg(device->getComponentInstanceUuid().toStr()));
         }
         mDeviceInstances.insert(device->getComponentInstanceUuid(), device);
@@ -293,7 +293,7 @@ Board::Board(Project&                                project,
         if (getNetSegmentByUuid(netsegment->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString(tr("There is already a netsegment with the UUID \"%1\"!"))
+              QString("There is already a netsegment with the UUID \"%1\"!")
                   .arg(netsegment->getUuid().toStr()));
         }
         mNetSegments.append(netsegment);
@@ -585,8 +585,7 @@ void Board::addDeviceInstance(BI_Device& instance) {
           instance.getComponentInstance().getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(
-            tr("There is already a device with the component instance \"%1\"!"))
+        QString("There is already a device with the component instance \"%1\"!")
             .arg(instance.getComponentInstance().getUuid().toStr()));
   }
   // add to board
@@ -628,7 +627,7 @@ void Board::addNetSegment(BI_NetSegment& netsegment) {
   if (getNetSegmentByUuid(netsegment.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a netsegment with the UUID \"%1\"!"))
+        QString("There is already a netsegment with the UUID \"%1\"!")
             .arg(netsegment.getUuid().toStr()));
   }
   // add to board

@@ -115,15 +115,14 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node)
   mStartPoint = deserializeAnchor(node, "from");
   mEndPoint   = deserializeAnchor(node, "to");
   if ((!mStartPoint) || (!mEndPoint)) {
-    throw RuntimeError(__FILE__, __LINE__, tr("Invalid trace anchor!"));
+    throw RuntimeError(__FILE__, __LINE__, "Invalid trace anchor!");
   }
 
   QString layerName = node.getValueByPath<QString>("layer", true);
   mLayer            = mBoard.getLayerStack().getLayer(layerName);
   if (!mLayer) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Invalid board layer: \"%1\"")).arg(layerName));
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid board layer: \"%1\"").arg(layerName));
   }
 
   init();
@@ -146,17 +145,16 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
 void BI_NetLine::init() {
   // check layer
   if (!mLayer->isCopperLayer()) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("The layer of netpoint \"%1\" is invalid (%2)."))
-            .arg(mUuid.toStr())
-            .arg(mLayer->getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("The layer of netpoint \"%1\" is invalid (%2).")
+                           .arg(mUuid.toStr())
+                           .arg(mLayer->getName()));
   }
 
   // check if both netpoints are different
   if (mStartPoint == mEndPoint) {
     throw LogicError(__FILE__, __LINE__,
-                     tr("BI_NetLine: both endpoints are the same."));
+                     "BI_NetLine: both endpoints are the same.");
   }
 
   mGraphicsItem.reset(new BGI_NetLine(*this));

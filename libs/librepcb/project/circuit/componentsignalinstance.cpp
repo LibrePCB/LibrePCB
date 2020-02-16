@@ -68,7 +68,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit&           circuit,
     mNetSignal = mCircuit.getNetSignalByUuid(*netsignalUuid);
     if (!mNetSignal) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Invalid netsignal UUID: \"%1\""))
+                         QString("Invalid netsignal UUID: \"%1\"")
                              .arg(netsignalUuid->toStr()));
     }
   }
