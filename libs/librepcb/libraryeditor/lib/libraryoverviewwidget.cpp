@@ -52,7 +52,9 @@ namespace editor {
 LibraryOverviewWidget::LibraryOverviewWidget(const Context&  context,
                                              const FilePath& fp,
                                              QWidget*        parent) noexcept
-  : EditorWidgetBase(context, fp, parent), mUi(new Ui::LibraryOverviewWidget) {
+  : EditorWidgetBase(context, fp, parent),
+    mUi(new Ui::LibraryOverviewWidget),
+    mCurrentFilter() {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
   connect(mUi->btnIcon, &QPushButton::clicked, this,
@@ -128,6 +130,20 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&  context,
 }
 
 LibraryOverviewWidget::~LibraryOverviewWidget() noexcept {
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void LibraryOverviewWidget::setFilter(const QString& filter) noexcept {
+  mCurrentFilter = filter.toLower().trimmed();
+  updateElementListFilter(*mUi->lstCmpCat);
+  updateElementListFilter(*mUi->lstPkgCat);
+  updateElementListFilter(*mUi->lstSym);
+  updateElementListFilter(*mUi->lstPkg);
+  updateElementListFilter(*mUi->lstCmp);
+  updateElementListFilter(*mUi->lstDev);
 }
 
 /*******************************************************************************
@@ -320,6 +336,9 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
     item->setData(Qt::UserRole, fp.toStr());
     item->setIcon(icon);
   }
+
+  // apply filter
+  updateElementListFilter(listWidget);
 }
 
 QHash<QListWidgetItem*, FilePath>
@@ -335,6 +354,16 @@ LibraryOverviewWidget::getElementListItemFilePaths(
     }
   }
   return itemPaths;
+}
+
+void LibraryOverviewWidget::updateElementListFilter(
+    QListWidget& listWidget) noexcept {
+  for (int i = 0; i < listWidget.count(); ++i) {
+    QListWidgetItem* item = listWidget.item(i);
+    Q_ASSERT(item);
+    item->setHidden((!mCurrentFilter.isEmpty()) &&
+                    (!item->text().toLower().contains(mCurrentFilter)));
+  }
 }
 
 void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {

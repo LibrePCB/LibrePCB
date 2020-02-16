@@ -68,6 +68,9 @@ public:
                         QWidget* parent = nullptr) noexcept;
   ~LibraryOverviewWidget() noexcept;
 
+  // Setters
+  void setFilter(const QString& filter) noexcept;
+
   // Getters
   Library& getLibrary() const noexcept { return *mLibrary; }
 
@@ -117,6 +120,7 @@ private:  // Methods
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
   QHash<QListWidgetItem*, FilePath> getElementListItemFilePaths(
       const QList<QListWidgetItem*>& items) const noexcept;
+  void updateElementListFilter(QListWidget& listWidget) noexcept;
   void openContextMenuAtPos(const QPoint& pos) noexcept;
   void newItem(QListWidget* list) noexcept;
   void editItem(QListWidget* list, const FilePath& fp) noexcept;
@@ -137,6 +141,7 @@ private:  // Data
   QScopedPointer<LibraryListEditorWidget>   mDependenciesEditorWidget;
   QSharedPointer<Library>                   mLibrary;
   QByteArray                                mIcon;
+  QString                                   mCurrentFilter;
 };
 
 /*******************************************************************************
