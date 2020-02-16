@@ -805,8 +805,8 @@ bool BES_Select::measureSelectedItems(const BI_NetLine& netline) noexcept {
   QLocale locale;
   QString title = tr("Measurement Result");
   QString text =
-      tr("Total length of %1 traces: %2 mm / %3 in")
-          .arg(visitedNetLines.count())
+      tr("Total length of %n trace(s): %2 mm / %3 in", "",
+         visitedNetLines.count())
           .arg(Toolbox::floatToString(totalLength->toMm(), 6, locale))
           .arg(Toolbox::floatToString(totalLength->toInch(), 6, locale));
   if (totalSelectedNetlines == visitedNetLines.count()) {
