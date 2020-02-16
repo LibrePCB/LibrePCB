@@ -87,7 +87,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionShowElementInFileManager"/>
     <addaction name="separator"/>
-    <addaction name="actionUpdateLibraryDb"/>
+    <addaction name="actionRescanLibraries"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -569,13 +569,13 @@
     <string>Draw &amp;Rectangle</string>
    </property>
   </action>
-  <action name="actionUpdateLibraryDb">
+  <action name="actionRescanLibraries">
    <property name="icon">
     <iconset>
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Update Library Database</string>
+    <string>&amp;Rescan Libraries</string>
    </property>
    <property name="shortcut">
     <string>F5</string>

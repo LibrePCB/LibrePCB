@@ -458,7 +458,7 @@ QListView::item
     <property name="title">
      <string>Extras</string>
     </property>
-    <addaction name="actionRescanLibrary"/>
+    <addaction name="actionRescanLibraries"/>
     <addaction name="actionOpen_Library_Manager"/>
     <addaction name="separator"/>
     <addaction name="actionWorkspace_Settings"/>
@@ -559,9 +559,16 @@ QListView::item
     <string>Close all open projects</string>
    </property>
   </action>
-  <action name="actionRescanLibrary">
+  <action name="actionRescanLibraries">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
+   </property>
    <property name="text">
-    <string>Rescan Library</string>
+    <string>Rescan Libraries</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
   <action name="actionOnlineDocumentation">
