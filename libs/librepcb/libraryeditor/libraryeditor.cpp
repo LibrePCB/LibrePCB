@@ -135,6 +135,16 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
   setWindowIcon(mLibrary->getIconAsPixmap());
 
+  // setup "filter" toolbar
+  QLineEdit* filterLineEdit = new QLineEdit();
+  filterLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  filterLineEdit->setMaxLength(30);  // avoid too large widget in toolbar
+  filterLineEdit->setClearButtonEnabled(true);  // to quickly reset the filter
+  filterLineEdit->setPlaceholderText(tr("Filter elements"));
+  connect(filterLineEdit, &QLineEdit::textEdited, overviewWidget,
+          &LibraryOverviewWidget::setFilter);
+  mUi->filterToolbar->addWidget(filterLineEdit);
+
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
@@ -655,6 +665,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     action->setEnabled(hasGraphicalEditor);
   }
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
+  mUi->filterToolbar->setEnabled(isOverviewTab);
   mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
   updateTabTitles();  // force updating the "Save" action title
 }
