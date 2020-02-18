@@ -144,6 +144,10 @@ QString SI_Symbol::getName() const noexcept {
   }
 }
 
+QRectF SI_Symbol::getBoundingRect() const noexcept {
+  return mGraphicsItem->sceneTransform().mapRect(mGraphicsItem->boundingRect());
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
