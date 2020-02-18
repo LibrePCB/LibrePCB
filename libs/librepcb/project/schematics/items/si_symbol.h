@@ -86,6 +86,7 @@ public:
       noexcept {
     return *mSymbVarItem;
   }
+  QRectF getBoundingRect() const noexcept;
 
   // Setters
   void setPosition(const Point& newPos) noexcept;

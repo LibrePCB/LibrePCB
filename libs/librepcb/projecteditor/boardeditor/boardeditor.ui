@@ -234,6 +234,29 @@
    <addaction name="actionPaste"/>
    <addaction name="actionRemove"/>
   </widget>
+  <widget class="QToolBar" name="viewToolbar">
+   <property name="windowTitle">
+    <string>View</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionGrid"/>
+  </widget>
+  <widget class="librepcb::project::editor::SearchToolBar" name="searchToolbar">
+   <property name="windowTitle">
+    <string>Search</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <widget class="QToolBar" name="toolsToolbar">
    <property name="windowTitle">
     <string>Tools</string>
@@ -266,18 +289,6 @@
     <bool>true</bool>
    </attribute>
    <addaction name="actionCommandAbort"/>
-  </widget>
-  <widget class="QToolBar" name="viewToolbar">
-   <property name="windowTitle">
-    <string>View</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionGrid"/>
   </widget>
   <action name="actionProjectSave">
    <property name="icon">
@@ -813,6 +824,11 @@
    <class>QTabBar</class>
    <extends>QWidget</extends>
    <header>qtabbar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::project::editor::SearchToolBar</class>
+   <extends>QToolBar</extends>
+   <header location="global">librepcb/projecteditor/toolbars/searchtoolbar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

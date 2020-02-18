@@ -54,8 +54,11 @@
 #include <librepcb/project/boards/cmd/cmdboardadd.h>
 #include <librepcb/project/boards/cmd/cmdboarddesignrulesmodify.h>
 #include <librepcb/project/boards/cmd/cmdboardremove.h>
+#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/circuit/circuit.h>
+#include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/project/metadata/projectmetadata.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/settings/projectsettings.h>
@@ -243,6 +246,13 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Remove), true);
   });
 
+  // setup "search" toolbar
+  mUi->searchToolbar->setPlaceholderText(tr("Find device..."));
+  mUi->searchToolbar->setCompleterListFunction(
+      std::bind(&BoardEditor::getSearchToolBarCompleterList, this));
+  connect(mUi->searchToolbar, &SearchToolBar::goToTriggered, this,
+          &BoardEditor::goToDevice);
+
   // setup status bar
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
@@ -262,8 +272,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // Load first board
   if (mProject.getBoards().count() > 0) setActiveBoardIndex(0);
 
-    // mGraphicsView->zoomAll(); does not work properly here, should be executed
-    // later in the event loop (ugly, but seems to work...)
+  // Set focus to graphics view (avoid having the focus in some arbitrary
+  // widget).
+  mGraphicsView->setFocus();
+
+  // mGraphicsView->zoomAll(); does not work properly here, should be executed
+  // later in the event loop (ugly, but seems to work...)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
   QTimer::singleShot(200, mGraphicsView, &GraphicsView::zoomAll);
 #else
@@ -780,6 +794,33 @@ void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
 void BoardEditor::clearDrcMarker() noexcept {
   mDrcLocationGraphicsItem.reset();
   mGraphicsView->setSceneRectMarker(QRectF());
+}
+
+QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
+  QStringList list;
+  if (Board* board = getActiveBoard()) {
+    foreach (const BI_Device* device, board->getDeviceInstances()) {
+      list.append(*device->getComponentInstance().getName());
+    }
+  }
+  return list;
+}
+
+void BoardEditor::goToDevice(const QString& name) noexcept {
+  if (Board* board = getActiveBoard()) {
+    foreach (BI_Device* device, board->getDeviceInstances()) {
+      if (device->getComponentInstance().getName()->toLower() ==
+          name.toLower()) {
+        board->clearSelection();
+        device->setSelected(true);
+        QRectF rect   = device->getFootprint().getBoundingRect();
+        qreal  margin = Length(1000000).toPx();
+        rect.adjust(-margin, -margin, margin, margin);
+        mGraphicsView->zoomToRect(rect);
+        return;
+      }
+    }
+  }
 }
 
 /*******************************************************************************

@@ -141,6 +141,10 @@ bool BI_Footprint::isUsed() const noexcept {
   return false;
 }
 
+QRectF BI_Footprint::getBoundingRect() const noexcept {
+  return mGraphicsItem->sceneTransform().mapRect(mGraphicsItem->boundingRect());
+}
+
 /*******************************************************************************
  *  StrokeText Methods
  ******************************************************************************/

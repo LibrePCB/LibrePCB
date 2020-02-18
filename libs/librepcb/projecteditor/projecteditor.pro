@@ -86,6 +86,7 @@ SOURCES += \
     schematiceditor/schematiceditor.cpp \
     schematiceditor/schematicpagesdock.cpp \
     schematiceditor/symbolinstancepropertiesdialog.cpp \
+    toolbars/searchtoolbar.cpp \
 
 HEADERS += \
     boardeditor/boarddesignrulecheckdialog.h \
@@ -151,6 +152,7 @@ HEADERS += \
     schematiceditor/schematiceditor.h \
     schematiceditor/schematicpagesdock.h \
     schematiceditor/symbolinstancepropertiesdialog.h \
+    toolbars/searchtoolbar.h \
 
 FORMS += \
     boardeditor/boarddesignrulecheckdialog.ui \
