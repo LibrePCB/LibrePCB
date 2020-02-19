@@ -279,8 +279,8 @@ bool BES_DrawPolygon::start(Board& board, const Point& pos) noexcept {
     mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
     mSubState = SubState::Positioning;
 
-    // add polygon with three vertices
-    Path path({Vertex(pos), Vertex(pos), Vertex(pos)});
+    // add polygon with two vertices
+    Path path({Vertex(pos), Vertex(pos)});
     mCurrentPolygon =
         new BI_Polygon(board, Uuid::createRandom(), mCurrentLayerName,
                        mCurrentWidth, mCurrentIsFilled, mCurrentIsFilled, path);
@@ -309,19 +309,14 @@ bool BES_DrawPolygon::addSegment(Board& board, const Point& pos) noexcept {
   }
 
   try {
-    // if the polygon has more than 2 vertices, start a new undo command
-    if (mCurrentPolygon->getPolygon().getPath().getVertices().count() > 2) {
-      mUndoStack.appendToCmdGroup(mCmdEditCurrentPolygon);
-      mCmdEditCurrentPolygon = nullptr;
-      mUndoStack.commitCmdGroup();
-      mSubState = SubState::Idle;
-
-      // start a new undo command
-      mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
-      mSubState = SubState::Positioning;
-      mCmdEditCurrentPolygon =
-          new CmdPolygonEdit(mCurrentPolygon->getPolygon());
-    }
+    // start a new undo command to allow reverting segment by segment
+    mUndoStack.appendToCmdGroup(mCmdEditCurrentPolygon);
+    mCmdEditCurrentPolygon = nullptr;
+    mUndoStack.commitCmdGroup();
+    mSubState = SubState::Idle;
+    mUndoStack.beginCmdGroup(tr("Draw Board Polygon"));
+    mSubState              = SubState::Positioning;
+    mCmdEditCurrentPolygon = new CmdPolygonEdit(mCurrentPolygon->getPolygon());
 
     // add new vertex
     Path newPath = mCurrentPolygon->getPolygon().getPath();
