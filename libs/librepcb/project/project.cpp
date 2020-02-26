@@ -288,7 +288,7 @@ void Project::addSchematic(Schematic& schematic, int newIndex) {
   if (getSchematicByUuid(schematic.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a schematic with the UUID \"%1\"!"))
+        QString("There is already a schematic with the UUID \"%1\"!")
             .arg(schematic.getUuid().toStr()));
   }
   if (getSchematicByName(*schematic.getName())) {
@@ -446,10 +446,9 @@ void Project::addBoard(Board& board, int newIndex) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (getBoardByUuid(board.getUuid())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a board with the UUID \"%1\"!"))
-            .arg(board.getUuid().toStr()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a board with the UUID \"%1\"!")
+                           .arg(board.getUuid().toStr()));
   }
   if (getBoardByName(*board.getName())) {
     throw RuntimeError(

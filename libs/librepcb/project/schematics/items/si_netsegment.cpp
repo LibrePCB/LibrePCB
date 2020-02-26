@@ -58,7 +58,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
         mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if (!mNetSignal) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Invalid net signal UUID: \"%1\""))
+                         QString("Invalid net signal UUID: \"%1\"")
                              .arg(netSignalUuid.toStr()));
     }
 
@@ -68,7 +68,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
       if (getNetPointByUuid(netpoint->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
-            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+            QString("There is already a netpoint with the UUID \"%1\"!")
                 .arg(netpoint->getUuid().toStr()));
       }
       mNetPoints.append(netpoint);
@@ -81,7 +81,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
       if (getNetLineByUuid(netline->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
-            QString(tr("There is already a netline with the UUID \"%1\"!"))
+            QString("There is already a netline with the UUID \"%1\"!")
                 .arg(netline->getUuid().toStr()));
       }
       mNetLines.append(netline);
@@ -94,7 +94,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
       if (getNetLabelByUuid(netlabel->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
-            QString(tr("There is already a netlabel with the UUID \"%1\"!"))
+            QString("There is already a netlabel with the UUID \"%1\"!")
                 .arg(netlabel->getUuid().toStr()));
       }
       mNetLabels.append(netlabel);
@@ -103,7 +103,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
     if (!areAllNetPointsConnectedTogether()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
+          QString("The netsegment with the UUID \"%1\" is not cohesive!")
               .arg(mUuid.toStr()));
     }
 
@@ -306,7 +306,7 @@ void SI_NetSegment::addNetPointsAndNetLines(
     if (getNetPointByUuid(netpoint->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+          QString("There is already a netpoint with the UUID \"%1\"!")
               .arg(netpoint->getUuid().toStr()));
     }
     // add to schematic
@@ -325,7 +325,7 @@ void SI_NetSegment::addNetPointsAndNetLines(
     if (getNetLineByUuid(netline->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("There is already a netline with the UUID \"%1\"!"))
+          QString("There is already a netline with the UUID \"%1\"!")
               .arg(netline->getUuid().toStr()));
     }
     // add to schematic
@@ -340,7 +340,7 @@ void SI_NetSegment::addNetPointsAndNetLines(
   if (!areAllNetPointsConnectedTogether()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
+        QString("The netsegment with the UUID \"%1\" is not cohesive!")
             .arg(mUuid.toStr()));
   }
 
@@ -384,7 +384,7 @@ void SI_NetSegment::removeNetPointsAndNetLines(
   if (!areAllNetPointsConnectedTogether()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
+        QString("The netsegment with the UUID \"%1\" is not cohesive!")
             .arg(mUuid.toStr()));
   }
 
@@ -413,7 +413,7 @@ void SI_NetSegment::addNetLabel(SI_NetLabel& netlabel) {
   if (getNetLabelByUuid(netlabel.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a netlabel with the UUID \"%1\"!"))
+        QString("There is already a netlabel with the UUID \"%1\"!")
             .arg(netlabel.getUuid().toStr()));
   }
   // add to schematic

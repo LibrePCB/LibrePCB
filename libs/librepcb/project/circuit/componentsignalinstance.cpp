@@ -68,7 +68,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit&           circuit,
     mNetSignal = mCircuit.getNetSignalByUuid(*netsignalUuid);
     if (!mNetSignal) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Invalid netsignal UUID: \"%1\""))
+                         QString("Invalid netsignal UUID: \"%1\"")
                              .arg(netsignalUuid->toStr()));
     }
   }
@@ -173,9 +173,8 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) {
   if (arePinsOrPadsUsed()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("The net signal of the "
-                   "component signal \"%1:%2\" cannot be changed because it is "
-                   "still in use!"))
+        QString(tr("The net signal of the component signal \"%1:%2\" cannot be "
+                   "changed because it is still in use!"))
             .arg(*mComponentInstance.getName(), *mComponentSignal->getName()));
   }
   ScopeGuardList sgl;

@@ -72,7 +72,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
           &LibraryEditor::saveTriggered);
   connect(mUi->actionShowElementInFileManager, &QAction::triggered, this,
           &LibraryEditor::showElementInFileExplorerTriggered);
-  connect(mUi->actionUpdateLibraryDb, &QAction::triggered,
+  connect(mUi->actionRescanLibraries, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
   connect(mUi->actionCut, &QAction::triggered, this,

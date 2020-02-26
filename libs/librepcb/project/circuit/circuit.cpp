@@ -155,7 +155,7 @@ void Circuit::addNetClass(NetClass& netclass) {
   if (getNetClassByUuid(netclass.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a net class with the UUID \"%1\"!"))
+        QString("There is already a net class with the UUID \"%1\"!")
             .arg(netclass.getUuid().toStr()));
   }
   // check if there is no netclass with the same name in the list
@@ -243,7 +243,7 @@ void Circuit::addNetSignal(NetSignal& netsignal) {
   if (getNetSignalByUuid(netsignal.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a net signal with the UUID \"%1\"!"))
+        QString("There is already a net signal with the UUID \"%1\"!")
             .arg(netsignal.getUuid().toStr()));
   }
   // check if there is no netsignal with the same name in the list
@@ -330,7 +330,7 @@ void Circuit::addComponentInstance(ComponentInstance& cmp) {
   if (getComponentInstanceByUuid(cmp.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a component with the UUID \"%1\"!"))
+        QString("There is already a component with the UUID \"%1\"!")
             .arg(cmp.getUuid().toStr()));
   }
   // check if there is no component with the same name in the list

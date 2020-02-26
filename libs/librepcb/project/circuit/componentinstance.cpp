@@ -83,8 +83,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
     if (mSignals.contains(signal->getCompSignal().getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(
-              tr("The signal with the UUID \"%1\" is defined multiple times."))
+          QString("The signal with the UUID \"%1\" is defined multiple times.")
               .arg(signal->getCompSignal().getUuid().toStr()));
     }
     mSignals.insert(signal->getCompSignal().getUuid(), signal);
@@ -93,8 +92,8 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
     qDebug() << mSignals.count() << "!=" << mLibComponent->getSignals().count();
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("The signal count of the component instance \"%1\" does "
-                   "not match with the signal count of the component \"%2\"."))
+        QString("The signal count of the component instance \"%1\" does "
+                "not match with the signal count of the component \"%2\".")
             .arg(mUuid.toStr())
             .arg(mLibComponent->getUuid().toStr()));
   }
@@ -296,13 +295,13 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol) {
   Uuid itemUuid = symbol.getCompSymbVarItem().getUuid();
   if (!mCompSymbVar->getSymbolItems().find(itemUuid)) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Invalid symbol item in circuit: \"%1\"."))
+                       QString("Invalid symbol item in circuit: \"%1\".")
                            .arg(itemUuid.toStr()));
   }
   if (mRegisteredSymbols.contains(itemUuid)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Symbol item UUID already exists in circuit: \"%1\"."))
+        QString("Symbol item UUID already exists in circuit: \"%1\".")
             .arg(itemUuid.toStr()));
   }
   if (!mRegisteredSymbols.isEmpty()) {

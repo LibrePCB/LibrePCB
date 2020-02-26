@@ -61,7 +61,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node)
   if (!mComponentInstance) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("No component with the UUID \"%1\" found in the circuit!"))
+        QString("No component with the UUID \"%1\" found in the circuit!")
             .arg(gcUuid.toStr()));
   }
   Uuid symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate");
@@ -105,16 +105,16 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) {
     if (mPins.contains(libPin.getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The symbol pin UUID \"%1\" is defined multiple times."))
+          QString("The symbol pin UUID \"%1\" is defined multiple times.")
               .arg(libPin.getUuid().toStr()));
     }
     mPins.insert(libPin.getUuid(), pin);
   }
   if (mPins.count() != mSymbVarItem->getPinSignalMap().count()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The pin count of the symbol instance \"%1\" "
-                                  "does not match with "
-                                  "the pin-signal-map of its component."))
+                       QString("The pin count of the symbol instance \"%1\" "
+                               "does not match with "
+                               "the pin-signal-map of its component.")
                            .arg(mUuid.toStr()));
   }
 

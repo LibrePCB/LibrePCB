@@ -117,7 +117,7 @@ private slots:
   void on_recentProjectsListView_customContextMenuRequested(const QPoint& pos);
   void on_favoriteProjectsListView_customContextMenuRequested(
       const QPoint& pos);
-  void on_actionRescanLibrary_triggered();
+  void on_actionRescanLibraries_triggered();
 
 private:
   // make some methods inaccessible...

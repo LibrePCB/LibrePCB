@@ -87,7 +87,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionShowElementInFileManager"/>
     <addaction name="separator"/>
-    <addaction name="actionUpdateLibraryDb"/>
+    <addaction name="actionRescanLibraries"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -260,6 +260,9 @@
    <property name="text">
     <string>&amp;About LibrePCB</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
    </property>
@@ -267,6 +270,9 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutQtRole</enum>
@@ -280,6 +286,9 @@
    <property name="text">
     <string>&amp;Close Library Editor</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionNew">
    <property name="icon">
@@ -290,7 +299,7 @@
     <string>&amp;New</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string notr="true">Ctrl+N</string>
    </property>
   </action>
   <action name="actionSave">
@@ -302,7 +311,7 @@
     <string notr="true">&amp;Save</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string notr="true">Ctrl+S</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -314,7 +323,7 @@
     <string>&amp;Undo</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Z</string>
+    <string notr="true">Ctrl+Z</string>
    </property>
   </action>
   <action name="actionRedo">
@@ -326,7 +335,7 @@
     <string>&amp;Redo</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Y</string>
+    <string notr="true">Ctrl+Y</string>
    </property>
   </action>
   <action name="actionAbortCommand">
@@ -338,7 +347,7 @@
     <string>Abort Command</string>
    </property>
    <property name="shortcut">
-    <string>Esc</string>
+    <string notr="true">Esc</string>
    </property>
   </action>
   <action name="actionZoomIn">
@@ -350,7 +359,7 @@
     <string>&amp;Zoom In</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl++</string>
+    <string notr="true">Ctrl++</string>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -362,7 +371,7 @@
     <string>Zoom &amp;Out</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+-</string>
+    <string notr="true">Ctrl+-</string>
    </property>
   </action>
   <action name="actionZoomAll">
@@ -372,6 +381,9 @@
    </property>
    <property name="text">
     <string>Zoo&amp;m All</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionRotateCcw">
@@ -383,7 +395,7 @@
     <string>R&amp;otate Counterclockwise</string>
    </property>
    <property name="shortcut">
-    <string>R</string>
+    <string notr="true">R</string>
    </property>
   </action>
   <action name="actionRotateCw">
@@ -395,7 +407,7 @@
     <string>Rotate C&amp;lockwise</string>
    </property>
    <property name="shortcut">
-    <string>Shift+R</string>
+    <string notr="true">Shift+R</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -407,7 +419,7 @@
     <string>&amp;Copy</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C</string>
+    <string notr="true">Ctrl+C</string>
    </property>
   </action>
   <action name="actionCut">
@@ -419,7 +431,7 @@
     <string>Cut</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+X</string>
+    <string notr="true">Ctrl+X</string>
    </property>
   </action>
   <action name="actionPaste">
@@ -431,7 +443,7 @@
     <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+V</string>
+    <string notr="true">Ctrl+V</string>
    </property>
   </action>
   <action name="actionRemove">
@@ -443,7 +455,7 @@
     <string>R&amp;emove</string>
    </property>
    <property name="shortcut">
-    <string>Del</string>
+    <string notr="true">Del</string>
    </property>
   </action>
   <action name="actionToolSelect">
@@ -453,6 +465,9 @@
    </property>
    <property name="text">
     <string>&amp;Select</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionAddSymbolPin">
@@ -464,7 +479,7 @@
     <string>Add S&amp;ymbol Pin</string>
    </property>
    <property name="shortcut">
-    <string>I</string>
+    <string notr="true">I</string>
    </property>
   </action>
   <action name="actionAddThtPad">
@@ -476,7 +491,7 @@
     <string>Add THT Pad</string>
    </property>
    <property name="shortcut">
-    <string>H</string>
+    <string notr="true">H</string>
    </property>
   </action>
   <action name="actionAddSmtPad">
@@ -488,7 +503,7 @@
     <string>Add S&amp;MT Pad</string>
    </property>
    <property name="shortcut">
-    <string>S</string>
+    <string notr="true">S</string>
    </property>
   </action>
   <action name="actionDrawLine">
@@ -498,6 +513,9 @@
    </property>
    <property name="text">
     <string>&amp;Draw Line</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionAddText">
@@ -509,7 +527,7 @@
     <string>&amp;Add Text</string>
    </property>
    <property name="shortcut">
-    <string>T</string>
+    <string notr="true">T</string>
    </property>
   </action>
   <action name="actionDrawPolygon">
@@ -521,7 +539,7 @@
     <string>Draw &amp;Polygon</string>
    </property>
    <property name="shortcut">
-    <string>P</string>
+    <string notr="true">P</string>
    </property>
   </action>
   <action name="actionDrawCircle">
@@ -536,7 +554,7 @@
     <string>Draw Circle</string>
    </property>
    <property name="shortcut">
-    <string>C</string>
+    <string notr="true">C</string>
    </property>
   </action>
   <action name="actionAddHole">
@@ -548,7 +566,7 @@
     <string>Add &amp;Hole (NPTH)</string>
    </property>
    <property name="shortcut">
-    <string>O</string>
+    <string notr="true">O</string>
    </property>
   </action>
   <action name="actionGridProperties">
@@ -559,6 +577,9 @@
    <property name="text">
     <string>&amp;Grid</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionDrawRect">
    <property name="icon">
@@ -568,17 +589,20 @@
    <property name="text">
     <string>Draw &amp;Rectangle</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
-  <action name="actionUpdateLibraryDb">
+  <action name="actionRescanLibraries">
    <property name="icon">
     <iconset>
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Update Library Database</string>
+    <string>&amp;Rescan Libraries</string>
    </property>
    <property name="shortcut">
-    <string>F5</string>
+    <string notr="true">F5</string>
    </property>
   </action>
   <action name="actionRemoveElement">
@@ -589,6 +613,9 @@
    <property name="text">
     <string>&amp;Remove Element</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionAddName">
    <property name="icon">
@@ -597,6 +624,9 @@
    </property>
    <property name="text">
     <string>Add Name</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionAddValue">
@@ -607,6 +637,9 @@
    <property name="text">
     <string>Add Value</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionShowElementInFileManager">
    <property name="icon">
@@ -615,6 +648,9 @@
    </property>
    <property name="text">
     <string>Show element in file manager</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionOnlineDocumentation">
@@ -626,7 +662,7 @@
     <string>Online Documentation</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string notr="true">F1</string>
    </property>
   </action>
   <action name="actionOpenWebsite">
@@ -636,6 +672,9 @@
    </property>
    <property name="text">
     <string>LibrePCB Website</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionMirror">
@@ -647,7 +686,7 @@
     <string>Mirror</string>
    </property>
    <property name="shortcut">
-    <string>M</string>
+    <string notr="true">M</string>
    </property>
   </action>
   <action name="actionFlip">
@@ -659,7 +698,7 @@
     <string>Flip</string>
    </property>
    <property name="shortcut">
-    <string>F</string>
+    <string notr="true">F</string>
    </property>
   </action>
  </widget>
