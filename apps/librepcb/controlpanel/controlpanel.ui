@@ -458,7 +458,7 @@ QListView::item
     <property name="title">
      <string>Extras</string>
     </property>
-    <addaction name="actionRescanLibrary"/>
+    <addaction name="actionRescanLibraries"/>
     <addaction name="actionOpen_Library_Manager"/>
     <addaction name="separator"/>
     <addaction name="actionWorkspace_Settings"/>
@@ -477,7 +477,7 @@ QListView::item
     <string>Quit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string notr="true">Ctrl+Q</string>
    </property>
    <property name="menuRole">
     <enum>QAction::QuitRole</enum>
@@ -486,6 +486,9 @@ QListView::item
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutQtRole</enum>
@@ -499,6 +502,9 @@ QListView::item
    <property name="text">
     <string>&amp;About LibrePCB</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
    </property>
@@ -511,6 +517,9 @@ QListView::item
    <property name="text">
     <string>New Project</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionOpen_Project">
    <property name="icon">
@@ -520,10 +529,16 @@ QListView::item
    <property name="text">
     <string>Open Project</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionSwitch_Workspace">
    <property name="text">
     <string>Switch Workspace</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionWorkspace_Settings">
@@ -533,6 +548,9 @@ QListView::item
    </property>
    <property name="text">
     <string>Workspace Settings</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
    <property name="menuRole">
     <enum>QAction::PreferencesRole</enum>
@@ -549,6 +567,9 @@ QListView::item
    <property name="toolTip">
     <string>Open Library Manager</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
   <action name="actionClose_all_open_projects">
    <property name="icon">
@@ -558,10 +579,20 @@ QListView::item
    <property name="text">
     <string>Close all open projects</string>
    </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
   </action>
-  <action name="actionRescanLibrary">
+  <action name="actionRescanLibraries">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
+   </property>
    <property name="text">
-    <string>Rescan Library</string>
+    <string>Rescan Libraries</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F5</string>
    </property>
   </action>
   <action name="actionOnlineDocumentation">
@@ -573,7 +604,7 @@ QListView::item
     <string>Online Documentation</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string notr="true">F1</string>
    </property>
   </action>
   <action name="actionOpenWebsite">
@@ -583,6 +614,9 @@ QListView::item
    </property>
    <property name="text">
     <string>LibrePCB Website</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
  </widget>

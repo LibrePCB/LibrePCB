@@ -97,7 +97,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
         mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if (!mNetSignal) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Invalid net signal UUID: \"%1\""))
+                         QString("Invalid net signal UUID: \"%1\"")
                              .arg(netSignalUuid.toStr()));
     }
 
@@ -107,7 +107,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
       if (getViaByUuid(via->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
-            QString(tr("There is already a via with the UUID \"%1\"!"))
+            QString("There is already a via with the UUID \"%1\"!")
                 .arg(via->getUuid().toStr()));
       }
       mVias.append(via);
@@ -119,7 +119,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
       if (getNetPointByUuid(netpoint->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
-            QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+            QString("There is already a netpoint with the UUID \"%1\"!")
                 .arg(netpoint->getUuid().toStr()));
       }
       mNetPoints.append(netpoint);
@@ -132,7 +132,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
       if (getNetLineByUuid(netline->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
-            QString(tr("There is already a netline with the UUID \"%1\"!"))
+            QString("There is already a netline with the UUID \"%1\"!")
                 .arg(netline->getUuid().toStr()));
       }
       mNetLines.append(netline);
@@ -141,7 +141,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
     if (!areAllNetPointsConnectedTogether()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
+          QString("The netsegment with the UUID \"%1\" is not cohesive!")
               .arg(mUuid.toStr()));
     }
 
@@ -298,10 +298,9 @@ void BI_NetSegment::addElements(const QList<BI_Via*>&      vias,
     }
     // check if there is no via with the same uuid in the list
     if (getViaByUuid(via->getUuid())) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("There is already a via with the UUID \"%1\"!"))
-              .arg(via->getUuid().toStr()));
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("There is already a via with the UUID \"%1\"!")
+                             .arg(via->getUuid().toStr()));
     }
     // add to board
     via->addToBoard();  // can throw
@@ -320,7 +319,7 @@ void BI_NetSegment::addElements(const QList<BI_Via*>&      vias,
     if (getNetPointByUuid(netpoint->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("There is already a netpoint with the UUID \"%1\"!"))
+          QString("There is already a netpoint with the UUID \"%1\"!")
               .arg(netpoint->getUuid().toStr()));
     }
     // add to board
@@ -339,7 +338,7 @@ void BI_NetSegment::addElements(const QList<BI_Via*>&      vias,
     if (getNetLineByUuid(netline->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("There is already a netline with the UUID \"%1\"!"))
+          QString("There is already a netline with the UUID \"%1\"!")
               .arg(netline->getUuid().toStr()));
     }
     // add to board
@@ -354,7 +353,7 @@ void BI_NetSegment::addElements(const QList<BI_Via*>&      vias,
   if (!areAllNetPointsConnectedTogether()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
+        QString("The netsegment with the UUID \"%1\" is not cohesive!")
             .arg(mUuid.toStr()));
   }
 
@@ -409,7 +408,7 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>&      vias,
   if (!areAllNetPointsConnectedTogether()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("The netsegment with the UUID \"%1\" is not cohesive!"))
+        QString("The netsegment with the UUID \"%1\" is not cohesive!")
             .arg(mUuid.toStr()));
   }
 

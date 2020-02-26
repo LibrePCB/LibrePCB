@@ -163,8 +163,8 @@ void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
     if (elementList.contains(element->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("There are multiple library elements with the same "
-                     "UUID in the directory \"%1\""))
+          QString("There are multiple library elements with the same "
+                  "UUID in the directory \"%1\"")
               .arg(dir->getAbsPath().toNative()));
     }
 
@@ -182,8 +182,8 @@ void ProjectLibrary::addElement(ElementType&               element,
                                 QHash<Uuid, ElementType*>& elementList) {
   if (elementList.contains(element.getUuid())) {
     throw LogicError(__FILE__, __LINE__,
-                     QString(tr("There is already an element with the same "
-                                "UUID in the project's library: %1"))
+                     QString("There is already an element with the same "
+                             "UUID in the project's library: %1")
                          .arg(element.getUuid().toStr()));
   }
   TransactionalDirectory dir(*mDirectory, element.getShortElementName());

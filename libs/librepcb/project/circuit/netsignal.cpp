@@ -58,7 +58,7 @@ NetSignal::NetSignal(Circuit& circuit, const SExpression& node)
   if (!mNetClass) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Invalid netclass UUID: \"%1\"")).arg(netclassUuid.toStr()));
+        QString("Invalid netclass UUID: \"%1\"").arg(netclassUuid.toStr()));
   }
 
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

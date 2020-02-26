@@ -80,8 +80,7 @@ const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(
   }
   throw RuntimeError(
       __FILE__, __LINE__,
-      QString(tr("Invalid component signal pin display type: \"%1\""))
-          .arg(str));
+      QString("Invalid component signal pin display type: \"%1\"").arg(str));
 }
 
 const QList<CmpSigPinDisplayType>&

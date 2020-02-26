@@ -748,7 +748,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(
   }
 }
 
-void ControlPanel::on_actionRescanLibrary_triggered() {
+void ControlPanel::on_actionRescanLibraries_triggered() {
   mWorkspace.getLibraryDb().startLibraryRescan();
 }
 

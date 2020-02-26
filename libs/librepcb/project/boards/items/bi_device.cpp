@@ -75,7 +75,7 @@ BI_Device::BI_Device(Board& board, const SExpression& node)
   if (!mCompInstance) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Could not find the component instance with UUID \"%1\"!"))
+        QString("Could not find the component instance with UUID \"%1\"!")
             .arg(compInstUuid.toStr()));
   }
   // get device and footprint uuid
@@ -135,8 +135,8 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
       mCompInstance->getLibComponent().getUuid()) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("The device \"%1\" does not match with the component"
-                   "instance \"%2\"."))
+        QString("The device \"%1\" does not match with the component"
+                "instance \"%2\".")
             .arg(mLibDevice->getUuid().toStr(),
                  mCompInstance->getUuid().toStr()));
   }
@@ -163,7 +163,7 @@ void BI_Device::init() {
     if ((signalUuid) && (!mCompInstance->getSignalInstance(*signalUuid))) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("Unknown signal \"%1\" found in device \"%2\""))
+          QString("Unknown signal \"%1\" found in device \"%2\"")
               .arg(signalUuid->toStr(), mLibDevice->getUuid().toStr()));
     }
   }

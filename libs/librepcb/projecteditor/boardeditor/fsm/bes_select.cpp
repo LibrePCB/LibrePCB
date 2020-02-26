@@ -383,28 +383,28 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       Q_ASSERT(netline);
 
       // build the context menu
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Trace");
-      QAction* aRemoveSegment = menu.addAction(QIcon(":/img/actions/minus.png"),
-                                               "Remove Whole Segment");
+      QAction* aRemoveSegment = menu.addAction(
+          QIcon(":/img/actions/delete.png"), "Remove Trace Segment");
+      QAction* aRemoveTrace = menu.addAction(QIcon(":/img/actions/minus.png"),
+                                             "Remove Whole Trace");
       menu.addSeparator();
-      QAction* aSelectSegment = menu.addAction(
-          QIcon(":/img/actions/bookmark.png"), tr("Select Whole Segment"));
+      QAction* aSelectTrace = menu.addAction(
+          QIcon(":/img/actions/bookmark.png"), tr("Select Whole Trace"));
       menu.addSeparator();
       QAction* aMeasureSelection =
           menu.addAction(QIcon(":/img/actions/ruler.png"),
-                         tr("Measure Selected Trace Length"));
+                         tr("Measure Selected Segments Length"));
 
       // execute the context menu
       QAction* action = menu.exec(mouseEvent->screenPos());
       if (action == nullptr) {
         // aborted --> nothing to do
-      } else if (action == aRemove) {
-        removeSelectedItems();
       } else if (action == aRemoveSegment) {
+        removeSelectedItems();
+      } else if (action == aRemoveTrace) {
         netline->getNetSegment().setSelected(true);
         removeSelectedItems();
-      } else if (action == aSelectSegment) {
+      } else if (action == aSelectTrace) {
         netline->getNetSegment().setSelected(true);
       } else if (action == aMeasureSelection) {
         measureSelectedItems(*netline);
@@ -419,11 +419,11 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       // build the context menu
       QAction* aRemove =
           menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Via");
-      QAction* aRemoveSegment = menu.addAction(QIcon(":/img/actions/minus.png"),
-                                               "Remove Whole Segment");
+      QAction* aRemoveTrace = menu.addAction(QIcon(":/img/actions/minus.png"),
+                                             "Remove Whole Trace");
       menu.addSeparator();
-      QAction* aSelectSegment = menu.addAction(
-          QIcon(":/img/actions/bookmark.png"), tr("Select Whole Segment"));
+      QAction* aSelectTrace = menu.addAction(
+          QIcon(":/img/actions/bookmark.png"), tr("Select Whole Trace"));
       menu.addSeparator();
       QAction* aProperties = menu.addAction(tr("Properties"));
 
@@ -433,10 +433,10 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
         // aborted --> nothing to do
       } else if (action == aRemove) {
         removeSelectedItems();
-      } else if (action == aRemoveSegment) {
+      } else if (action == aRemoveTrace) {
         via->getNetSegment().setSelected(true);
         removeSelectedItems();
-      } else if (action == aSelectSegment) {
+      } else if (action == aSelectTrace) {
         via->getNetSegment().setSelected(true);
       } else if (action == aProperties) {
         openViaPropertiesDialog(*via);
@@ -805,15 +805,15 @@ bool BES_Select::measureSelectedItems(const BI_NetLine& netline) noexcept {
   QLocale locale;
   QString title = tr("Measurement Result");
   QString text =
-      tr("Total length of %1 traces: %2 mm / %3 in")
-          .arg(visitedNetLines.count())
+      tr("Total length of %n trace segment(s): %2 mm / %3 in", "",
+         visitedNetLines.count())
           .arg(Toolbox::floatToString(totalLength->toMm(), 6, locale))
           .arg(Toolbox::floatToString(totalLength->toInch(), 6, locale));
   if (totalSelectedNetlines == visitedNetLines.count()) {
     QMessageBox::information(&mEditor, title, text);
   } else {
-    text += "\n\n" + tr("WARNING: There are %1 traces selected, but not all "
-                        "of them are connected!")
+    text += "\n\n" + tr("WARNING: There are %1 trace segments selected, but "
+                        "not all of them are connected!")
                          .arg(totalSelectedNetlines);
     QMessageBox::warning(&mEditor, title, text);
   }
@@ -840,7 +840,7 @@ void BES_Select::measureLengthInDirection(bool              directionBackwards,
         if (nextNetline != nullptr) {
           // There's already another connected and selected netline
           throw LogicError(__FILE__, __LINE__,
-                           tr("Selected traces may not branch!"));
+                           tr("Selected trace segments may not branch!"));
         }
 
         totalLength += nl->getLength();

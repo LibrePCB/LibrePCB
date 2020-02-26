@@ -56,7 +56,7 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node)
   mStartPoint = deserializeAnchor(node, "from");
   mEndPoint   = deserializeAnchor(node, "to");
   if ((!mStartPoint) || (!mEndPoint)) {
-    throw RuntimeError(__FILE__, __LINE__, tr("Invalid trace anchor!"));
+    throw RuntimeError(__FILE__, __LINE__, "Invalid trace anchor!");
   }
 
   init();
@@ -78,7 +78,7 @@ void SI_NetLine::init() {
   // check if both netpoints are different
   if (mStartPoint == mEndPoint) {
     throw LogicError(__FILE__, __LINE__,
-                     tr("SI_NetLine: both endpoints are the same."));
+                     "SI_NetLine: both endpoints are the same.");
   }
 
   mGraphicsItem.reset(new SGI_NetLine(*this));

@@ -90,7 +90,7 @@ Schematic::Schematic(Project&                                project,
         if (getSymbolByUuid(symbol->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString(tr("There is already a symbol with the UUID \"%1\"!"))
+              QString("There is already a symbol with the UUID \"%1\"!")
                   .arg(symbol->getUuid().toStr()));
         }
         mSymbols.append(symbol);
@@ -102,7 +102,7 @@ Schematic::Schematic(Project&                                project,
         if (getNetSegmentByUuid(netsegment->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString(tr("There is already a netsegment with the UUID \"%1\"!"))
+              QString("There is already a netsegment with the UUID \"%1\"!")
                   .arg(netsegment->getUuid().toStr()));
         }
         mNetSegments.append(netsegment);
@@ -258,7 +258,7 @@ void Schematic::addSymbol(SI_Symbol& symbol) {
   if (getSymbolByUuid(symbol.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a symbol with the UUID \"%1\"!"))
+        QString("There is already a symbol with the UUID \"%1\"!")
             .arg(symbol.getUuid().toStr()));
   }
   // add to schematic
@@ -295,7 +295,7 @@ void Schematic::addNetSegment(SI_NetSegment& netsegment) {
   if (getNetSegmentByUuid(netsegment.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a netsegment with the UUID \"%1\"!"))
+        QString("There is already a netsegment with the UUID \"%1\"!")
             .arg(netsegment.getUuid().toStr()));
   }
   // add to schematic
