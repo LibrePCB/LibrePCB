@@ -34,16 +34,19 @@ namespace librepcb {
  *  Static Methods
  ******************************************************************************/
 
-inline bool isLowerHex(const QChar chr) noexcept {
-  return (chr >= QChar('0') && chr <= QChar('9')) || (chr >= QChar('a') && chr <= QChar('f'));
-}
-
 bool Uuid::isValid(const QString& str) noexcept {
   // Note: This used to be done using a RegEx, but when profiling and
   // optimizing the library rescan code we found that a manually unrolled
   // comparison loop performs much better than the previous RegEx.
   // See https://github.com/LibrePCB/LibrePCB/pull/651 for more details.
   if (str.length() != 36) return false;
+
+  // Helper function
+  auto isLowerHex = [](const QChar& chr) {
+    return (chr >= QChar('0') && chr <= QChar('9')) ||
+           (chr >= QChar('a') && chr <= QChar('f'));
+  };
+
   if (!isLowerHex(str[0])) return false;
   if (!isLowerHex(str[1])) return false;
   if (!isLowerHex(str[2])) return false;
