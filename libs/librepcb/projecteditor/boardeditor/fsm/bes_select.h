@@ -57,6 +57,12 @@ class CmdDragSelectedBoardItems;
 class BES_Select final : public BES_Base {
   Q_OBJECT
 
+  struct DeviceMenuItem {
+    QString name;
+    QIcon   icon;
+    Uuid    uuid;
+  };
+
 public:
   // Constructors / Destructor
   explicit BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
@@ -116,6 +122,8 @@ private:
   void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
   void openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept;
   void openHolePropertiesDialog(Board& board, Hole& hole) noexcept;
+  QList<DeviceMenuItem> getDeviceMenuItems(
+      const ComponentInstance& cmpInst) const noexcept;
 
   // Types
   /// enum for all possible substates
