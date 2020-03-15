@@ -263,13 +263,8 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
     case BI_Base::Type_t::Footprint: {
       BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first());
       Q_ASSERT(footprint);
-      BI_Device&         devInst     = footprint->getDeviceInstance();
-      ComponentInstance& cmpInst     = devInst.getComponentInstance();
-      const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-
-      // get all available alternative devices and footprints
-      QSet<Uuid> devicesList = mWorkspace.getLibraryDb().getDevicesOfComponent(
-          cmpInst.getLibComponent().getUuid());
+      BI_Device&         devInst = footprint->getDeviceInstance();
+      ComponentInstance& cmpInst = devInst.getComponentInstance();
 
       // build the context menu
       QAction* aRotateCCW =
@@ -288,33 +283,26 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       QAction* aResetTexts =
           menu.addAction(QIcon(":/img/actions/undo.png"), "Reset all texts");
       menu.addSeparator();
-      QMenu* aChangeDeviceMenu = menu.addMenu(tr("Change Device"));
-      aChangeDeviceMenu->setEnabled(devicesList.count() > 0);
-      foreach (const Uuid& deviceUuid, devicesList) {
-        QString  devName, pkgName;
-        FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);
-        mWorkspace.getLibraryDb().getElementTranslations<library::Device>(
-            devFp, localeOrder, &devName);
-        Uuid pkgUuid = Uuid::createRandom();  // only for initialization, will
-                                              // be overwritten
-        mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
-        FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
-        mWorkspace.getLibraryDb().getElementTranslations<library::Package>(
-            pkgFp, localeOrder, &pkgName);
-        QAction* a = aChangeDeviceMenu->addAction(
-            QString("%1 [%2]").arg(devName).arg(pkgName));
-        a->setData(deviceUuid.toStr());
-        if (deviceUuid == devInst.getLibDevice().getUuid()) {
+      QMenu* aChangeDeviceMenu =
+          menu.addMenu(QIcon(":/img/library/device.png"), tr("Change Device"));
+      foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
+        QAction* a = aChangeDeviceMenu->addAction(item.icon, item.name);
+        a->setData(item.uuid.toStr());
+        if (item.uuid == devInst.getLibDevice().getUuid()) {
           a->setCheckable(true);
           a->setChecked(true);
           a->setEnabled(false);
         }
       }
-      QMenu* aChangeFootprintMenu = menu.addMenu(tr("Change Footprint"));
+      aChangeDeviceMenu->setEnabled(!aChangeDeviceMenu->isEmpty());
+      QMenu* aChangeFootprintMenu = menu.addMenu(
+          QIcon(":/img/library/footprint.png"), tr("Change Footprint"));
+      QIcon footprintIcon(":/img/library/footprint.png");
       for (const library::Footprint& footprint :
            devInst.getLibPackage().getFootprints()) {
         QAction* a = aChangeFootprintMenu->addAction(
-            *footprint.getNames().value(localeOrder));
+            footprintIcon, *footprint.getNames().value(
+                               mProject.getSettings().getLocaleOrder()));
         a->setData(footprint.getUuid().toStr());
         if (footprint.getUuid() ==
             devInst.getFootprint().getLibFootprint().getUuid()) {
@@ -898,6 +886,43 @@ void BES_Select::openHolePropertiesDialog(Board& board, Hole& hole) noexcept {
   Q_UNUSED(board);
   HolePropertiesDialog dialog(hole, mUndoStack);
   dialog.exec();
+}
+
+QList<BES_Select::DeviceMenuItem> BES_Select::getDeviceMenuItems(
+    const ComponentInstance& cmpInst) const noexcept {
+  QList<BES_Select::DeviceMenuItem> items;
+  try {
+    QIcon      icon(":/img/library/device.png");
+    QSet<Uuid> devices = mWorkspace.getLibraryDb().getDevicesOfComponent(
+        cmpInst.getLibComponent().getUuid());  // can throw
+    foreach (const Uuid& deviceUuid, devices) {
+      QString  devName, pkgName;
+      FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);
+      mWorkspace.getLibraryDb().getElementTranslations<library::Device>(
+          devFp, mProject.getSettings().getLocaleOrder(), &devName);
+      Uuid pkgUuid = Uuid::createRandom();  // only for initialization...
+      mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
+      FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
+      mWorkspace.getLibraryDb().getElementTranslations<library::Package>(
+          pkgFp, mProject.getSettings().getLocaleOrder(), &pkgName);
+      items.append(DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName),
+                                  icon, deviceUuid});
+    }
+
+    // sort by name
+    QCollator collator;
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+    collator.setIgnorePunctuation(false);
+    collator.setNumericMode(true);
+    std::sort(
+        items.begin(), items.end(),
+        [&collator](const DeviceMenuItem& lhs, const DeviceMenuItem& rhs) {
+          return collator(lhs.name, rhs.name);
+        });
+  } catch (const Exception& e) {
+    qCritical() << "Could not list devices:" << e.getMsg();
+  }
+  return items;
 }
 
 /*******************************************************************************
