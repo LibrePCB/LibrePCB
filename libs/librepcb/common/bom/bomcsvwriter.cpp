@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "bomcsvwriter.h"
 
-#include "../fileio/fileutils.h"
+#include "../fileio/csvfile.h"
 #include "bom.h"
 
 #include <QtCore>
@@ -36,7 +36,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BomCsvWriter::BomCsvWriter() noexcept {
+BomCsvWriter::BomCsvWriter(const Bom& bom) noexcept : mBom(bom) {
 }
 
 BomCsvWriter::~BomCsvWriter() noexcept {
@@ -46,44 +46,24 @@ BomCsvWriter::~BomCsvWriter() noexcept {
  *  General Methods
  ******************************************************************************/
 
-QList<QStringList> BomCsvWriter::toStringList(const Bom& bom) noexcept {
-  QList<QStringList> lines;
-  // Don't translate the CSV header to make BOMs independent of the user's
-  // language.
-  lines.append(QStringList{"Quantity", "Designators"} + bom.getColumns());
-  foreach (const BomItem& item, bom.getItems()) {
-    QStringList cols;
-    cols += QString::number(item.getDesignators().count());
-    cols += cleanStr(item.getDesignators().join(", "));
+std::shared_ptr<CsvFile> BomCsvWriter::generateCsv() const {
+  std::shared_ptr<CsvFile> file(new CsvFile());
+
+  // Don't translate the CSV header to make BOM files independent of the
+  // user's language.
+  file->setHeader(QStringList{"Quantity", "Designators"} + mBom.getColumns());
+
+  foreach (const BomItem& item, mBom.getItems()) {
+    QStringList values;
+    values += QString::number(item.getDesignators().count());
+    values += item.getDesignators().join(", ");
     foreach (const QString& attribute, item.getAttributes()) {
-      cols += cleanStr(attribute);
+      values += attribute;
     }
-    lines.append(cols);
+    file->addValue(values);  // can throw
   }
-  return lines;
-}
 
-QString BomCsvWriter::toString(const Bom& bom) noexcept {
-  QString str;
-  foreach (const QStringList& line, toStringList(bom)) {
-    str += line.join(";") + "\n";
-  }
-  return str;
-}
-
-void BomCsvWriter::writeToFile(const Bom& bom, const FilePath& csvFp) {
-  FileUtils::writeFile(csvFp, toString(bom).toUtf8());
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-QString BomCsvWriter::cleanStr(const QString& str) noexcept {
-  QString cleaned = str;
-  cleaned.replace(";", " ");   // semicolon is reserved for separators
-  cleaned.replace("\n", " ");  // BOM rows shouldn't be multiline
-  return cleaned.trimmed();    // remove leading and trailing whitespaces
+  return file;
 }
 
 /*******************************************************************************

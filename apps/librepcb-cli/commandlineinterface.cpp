@@ -27,6 +27,7 @@
 #include <librepcb/common/bom/bom.h>
 #include <librepcb/common/bom/bomcsvwriter.h>
 #include <librepcb/common/debug.h>
+#include <librepcb/common/fileio/csvfile.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/library/elements.h>
@@ -454,8 +455,9 @@ bool CommandLineInterface::openProject(
           }
           QString suffix = destStr.split('.').last().toLower();
           if (suffix == "csv") {
-            BomCsvWriter writer;
-            writer.writeToFile(*bom, fp);  // can throw
+            BomCsvWriter             writer(*bom);
+            std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+            csv->saveToFile(fp);                                  // can throw
             writtenFilesCounter[fp]++;
           } else {
             printErr("  " %

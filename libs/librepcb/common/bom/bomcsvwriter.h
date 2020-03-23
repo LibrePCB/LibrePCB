@@ -25,13 +25,15 @@
  ******************************************************************************/
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
 class Bom;
-class FilePath;
+class CsvFile;
 
 /*******************************************************************************
  *  Class BomCsvWriter
@@ -45,20 +47,19 @@ class BomCsvWriter final {
 
 public:
   // Constructors / Destructor
-  BomCsvWriter() noexcept;
+  BomCsvWriter()                          = delete;
   BomCsvWriter(const BomCsvWriter& other) = delete;
+  explicit BomCsvWriter(const Bom& bom) noexcept;
   ~BomCsvWriter() noexcept;
 
   // General Methods
-  QList<QStringList> toStringList(const Bom& bom) noexcept;
-  QString            toString(const Bom& bom) noexcept;
-  void               writeToFile(const Bom& bom, const FilePath& csvFp);
+  std::shared_ptr<CsvFile> generateCsv() const;
 
   // Operator Overloadings
   BomCsvWriter& operator=(const BomCsvWriter& rhs) = delete;
 
 private:
-  static QString cleanStr(const QString& str) noexcept;
+  const Bom& mBom;
 };
 
 /*******************************************************************************
