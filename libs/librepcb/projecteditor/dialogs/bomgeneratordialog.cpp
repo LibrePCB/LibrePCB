@@ -28,6 +28,7 @@
 #include <librepcb/common/bom/bom.h>
 #include <librepcb/common/bom/bomcsvwriter.h>
 #include <librepcb/common/dialogs/filedialog.h>
+#include <librepcb/common/fileio/csvfile.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/bomgenerator.h>
 #include <librepcb/project/project.h>
@@ -110,9 +111,9 @@ void BomGeneratorDialog::btnOpenOutputDirectoryClicked() noexcept {
 
 void BomGeneratorDialog::btnGenerateClicked() noexcept {
   try {
-    FilePath     fp = getOutputFilePath();
-    BomCsvWriter writer;
-    writer.writeToFile(*mBom, fp);  // can throw
+    BomCsvWriter             writer(*mBom);
+    std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+    csv->saveToFile(getOutputFilePath());                 // can throw
     mUi->lblSuccess->show();
   } catch (const Exception& e) {
     mUi->lblSuccess->hide();
@@ -143,23 +144,27 @@ void BomGeneratorDialog::updateBom() noexcept {
 void BomGeneratorDialog::updateTable() noexcept {
   mUi->tableWidget->clear();
 
-  BomCsvWriter       writer;
-  QList<QStringList> lines = writer.toStringList(*mBom);
-  Q_ASSERT(lines.count() > 0);
-  mUi->tableWidget->setRowCount(lines.count() - 1);
-  mUi->tableWidget->setColumnCount(lines.first().count());
-  mUi->tableWidget->setHorizontalHeaderLabels(lines.first());
-  for (int column = 0; column < lines.first().count(); ++column) {
-    mUi->tableWidget->horizontalHeader()->setSectionResizeMode(
-        column,
-        column == 0 ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
-    for (int row = 0; row < lines.count() - 1; ++row) {
-      mUi->tableWidget->setItem(row, column,
-                                new QTableWidgetItem(lines[row + 1][column]));
+  try {
+    BomCsvWriter             writer(*mBom);
+    std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+    mUi->tableWidget->setRowCount(csv->getValues().count());
+    mUi->tableWidget->setColumnCount(csv->getHeader().count());
+    mUi->tableWidget->setHorizontalHeaderLabels(csv->getHeader());
+    for (int column = 0; column < csv->getHeader().count(); ++column) {
+      mUi->tableWidget->horizontalHeader()->setSectionResizeMode(
+          column,
+          column == 0 ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
+      for (int row = 0; row < csv->getValues().count() - 1; ++row) {
+        QString text = csv->getValues()[row][column];
+        text.replace("\n", " ");
+        mUi->tableWidget->setItem(row, column, new QTableWidgetItem(text));
+      }
     }
+    mUi->tableWidget->resizeRowsToContents();
+    mUi->lblSuccess->hide();
+  } catch (Exception& e) {
+    qCritical() << e.getMsg();
   }
-  mUi->tableWidget->resizeRowsToContents();
-  mUi->lblSuccess->hide();
 }
 
 FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
