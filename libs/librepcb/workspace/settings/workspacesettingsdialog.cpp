@@ -75,7 +75,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
         QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
     QStringList localesStr;
     foreach (const QLocale& l, locales) { localesStr.append(l.name()); }
-    mLibLocaleOrderModel->setPlaceholderText(tr("Click here a add a locale"));
+    mLibLocaleOrderModel->setPlaceholderText(tr("Click here to add a locale"));
     mLibLocaleOrderModel->setDefaultValue(QString(""));
     mLibLocaleOrderModel->setChoices(localesStr);
     mUi->tblLibLocaleOrder->setShowMoveButtons(true);
@@ -100,7 +100,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
 
   // Initialize library norm order widgets
   {
-    mLibNormOrderModel->setPlaceholderText(tr("Click here a add a norm"));
+    mLibNormOrderModel->setPlaceholderText(tr("Click here to add a norm"));
     mLibNormOrderModel->setDefaultValue(QString(""));
     mLibNormOrderModel->setChoices(getAvailableNorms());
     mUi->tblLibNormOrder->setShowMoveButtons(true);
