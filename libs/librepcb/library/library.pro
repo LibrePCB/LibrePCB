@@ -54,8 +54,10 @@ SOURCES += \
     dev/cmd/cmddeviceedit.cpp \
     dev/cmd/cmddevicepadsignalmapitemedit.cpp \
     dev/device.cpp \
+    dev/devicecheck.cpp \
     dev/devicepadsignalmap.cpp \
     dev/devicepadsignalmapmodel.cpp \
+    dev/msg/msgnopadsindeviceconnected.cpp \
     library.cpp \
     librarybaseelement.cpp \
     librarybaseelementcheck.cpp \
@@ -135,8 +137,10 @@ HEADERS += \
     dev/cmd/cmddeviceedit.h \
     dev/cmd/cmddevicepadsignalmapitemedit.h \
     dev/device.h \
+    dev/devicecheck.h \
     dev/devicepadsignalmap.h \
     dev/devicepadsignalmapmodel.h \
+    dev/msg/msgnopadsindeviceconnected.h \
     elements.h \
     library.h \
     librarybaseelement.h \

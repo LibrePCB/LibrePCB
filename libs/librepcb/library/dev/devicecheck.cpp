@@ -20,11 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "device.h"
-
 #include "devicecheck.h"
 
-#include <librepcb/common/fileio/sexpression.h>
+#include "device.h"
+#include "msg/msgnopadsindeviceconnected.h"
 
 #include <QtCore>
 
@@ -38,66 +37,37 @@ namespace library {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Device::Device(const Uuid& uuid, const Version& version, const QString& author,
-               const ElementName& name_en_US, const QString& description_en_US,
-               const QString& keywords_en_US, const Uuid& component,
-               const Uuid& package)
-  : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US),
-    mComponentUuid(component),
-    mPackageUuid(package),
-    mAttributes(),
-    mPadSignalMap() {
+DeviceCheck::DeviceCheck(const Device& device) noexcept
+  : LibraryElementCheck(device), mDevice(device) {
 }
 
-Device::Device(std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryElement(std::move(directory), getShortElementName(),
-                   getLongElementName()),
-    mComponentUuid(mLoadingFileDocument.getValueByPath<Uuid>("component")),
-    mPackageUuid(mLoadingFileDocument.getValueByPath<Uuid>("package")),
-    mAttributes(mLoadingFileDocument),
-    mPadSignalMap(mLoadingFileDocument) {
-  cleanupAfterLoadingElementFromFile();
-}
-
-Device::~Device() noexcept {
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void Device::setComponentUuid(const Uuid& uuid) noexcept {
-  if (uuid == mComponentUuid) return;
-  mComponentUuid = uuid;
-  emit componentUuidChanged(mComponentUuid);
-}
-
-void Device::setPackageUuid(const Uuid& uuid) noexcept {
-  if (uuid == mPackageUuid) return;
-  mPackageUuid = uuid;
-  emit packageUuidChanged(mPackageUuid);
+DeviceCheck::~DeviceCheck() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Device::runChecks() const {
-  DeviceCheck check(*this);
-  return check.runChecks();  // can throw
+LibraryElementCheckMessageList DeviceCheck::runChecks() const {
+  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+  checkNoPadsConnected(msgs);
+  return msgs;
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
-void Device::serialize(SExpression& root) const {
-  LibraryElement::serialize(root);
-  root.appendChild("component", mComponentUuid, true);
-  root.appendChild("package", mPackageUuid, true);
-  mAttributes.serialize(root);
-  mPadSignalMap.sortedByUuid().serialize(root);
+void DeviceCheck::checkNoPadsConnected(MsgList& msgs) const {
+  for (const DevicePadSignalMapItem& item : mDevice.getPadSignalMap()) {
+    if (item.getSignalUuid()) {
+      return;  // pad is connected, don't show this message
+    }
+  }
+
+  if (!mDevice.getPadSignalMap().isEmpty()) {
+    msgs.append(std::make_shared<MsgNoPadsInDeviceConnected>());
+  }
 }
 
 /*******************************************************************************
