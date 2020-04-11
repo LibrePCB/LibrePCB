@@ -458,6 +458,20 @@ public:
    */
   static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
 
+  /**
+   * @brief Get the smallest possible length value
+   *
+   * @return Smallest possible length
+   */
+  static Length min() noexcept;
+
+  /**
+   * @brief Get the highest possible length value
+   *
+   * @return Highest possible length
+   */
+  static Length max() noexcept;
+
   // Operators
   Length& operator=(const Length& rhs) {
     mNanometers = rhs.mNanometers;
