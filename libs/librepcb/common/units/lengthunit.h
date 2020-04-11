@@ -148,6 +148,17 @@ public:
    */
   QString toShortStringTr() const noexcept;
 
+  /**
+   * @brief Get user input suffixes
+   *
+   * Returns a list of suffixes the user might use to represent this unit. For
+   * example "um" is a typical user input to mean Micrometers since "μm" is
+   * more difficult to write.
+   *
+   * @return A list of user input suffixes
+   */
+  QStringList getUserInputSuffixes() const noexcept;
+
   // General Methods
 
   /**

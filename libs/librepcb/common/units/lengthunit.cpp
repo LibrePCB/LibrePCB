@@ -95,6 +95,25 @@ QString LengthUnit::toShortStringTr() const noexcept {
   }
 }
 
+QStringList LengthUnit::getUserInputSuffixes() const noexcept {
+  switch (mUnit) {
+    case LengthUnit_t::Millimeters:
+      return QStringList{"mm"};
+    case LengthUnit_t::Micrometers:
+      return QStringList{"μm", "um"};
+    case LengthUnit_t::Nanometers:
+      return QStringList{"nm"};
+    case LengthUnit_t::Inches:
+      return QStringList{"″", "\"", "in", "inch", "inches"};
+    case LengthUnit_t::Mils:
+      return QStringList{"mils"};
+    default:
+      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      Q_ASSERT(false);
+      return QStringList();
+  }
+}
+
 qreal LengthUnit::convertToUnit(const Length& length) const noexcept {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:
