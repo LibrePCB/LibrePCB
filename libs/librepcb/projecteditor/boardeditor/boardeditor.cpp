@@ -257,6 +257,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
+  mUi->statusbar->setLengthUnit(
+      mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get());
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
