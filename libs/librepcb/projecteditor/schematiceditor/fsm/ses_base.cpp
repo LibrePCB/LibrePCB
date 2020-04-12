@@ -26,6 +26,8 @@
 
 #include <librepcb/project/project.h>
 #include <librepcb/projecteditor/projecteditor.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 
@@ -53,6 +55,14 @@ SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
 }
 
 SES_Base::~SES_Base() {
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+const LengthUnit& SES_Base::getDefaultLengthUnit() const noexcept {
+  return mWorkspace.getSettings().defaultLengthUnit.get();
 }
 
 /*******************************************************************************
