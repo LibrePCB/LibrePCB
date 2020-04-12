@@ -34,6 +34,7 @@ namespace librepcb {
 class UndoStack;
 class StrokeText;
 class GraphicsLayer;
+class LengthUnit;
 
 namespace Ui {
 class StrokeTextPropertiesDialog;
@@ -55,6 +56,8 @@ public:
   StrokeTextPropertiesDialog(const StrokeTextPropertiesDialog& other) = delete;
   StrokeTextPropertiesDialog(StrokeText& text, UndoStack& undoStack,
                              QList<GraphicsLayer*> layers,
+                             const LengthUnit&     lengthUnit,
+                             const QString&        settingsPrefix,
                              QWidget*              parent = nullptr) noexcept;
   ~StrokeTextPropertiesDialog() noexcept;
 

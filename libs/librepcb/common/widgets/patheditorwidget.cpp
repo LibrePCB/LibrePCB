@@ -42,14 +42,14 @@ namespace librepcb {
 PathEditorWidget::PathEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mModel(new PathModel(this)),
-    mView(new EditableTableWidget(this)) {
+    mView(new EditableTableWidget(this)),
+    mLengthDelegateX(new LengthDelegate(this)),
+    mLengthDelegateY(new LengthDelegate(this)) {
   mView->setShowMoveButtons(true);
   mView->setShowCopyButton(true);
   mView->setModel(mModel.data());
-  mView->setItemDelegateForColumn(PathModel::COLUMN_X,
-                                  new LengthDelegate(this));
-  mView->setItemDelegateForColumn(PathModel::COLUMN_Y,
-                                  new LengthDelegate(this));
+  mView->setItemDelegateForColumn(PathModel::COLUMN_X, mLengthDelegateX);
+  mView->setItemDelegateForColumn(PathModel::COLUMN_Y, mLengthDelegateY);
   mView->setItemDelegateForColumn(PathModel::COLUMN_ANGLE,
                                   new AngleDelegate(this));
   mView->horizontalHeader()->setSectionResizeMode(PathModel::COLUMN_X,
@@ -89,6 +89,11 @@ void PathEditorWidget::setPath(const Path& path) noexcept {
 
 const Path& PathEditorWidget::getPath() const noexcept {
   return mModel->getPath();
+}
+
+void PathEditorWidget::setLengthUnit(const LengthUnit& unit) noexcept {
+  mLengthDelegateX->setUnit(unit);
+  mLengthDelegateY->setUnit(unit);
 }
 
 /*******************************************************************************

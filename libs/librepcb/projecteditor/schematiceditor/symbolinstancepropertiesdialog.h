@@ -69,8 +69,10 @@ public:
       delete;
   SymbolInstancePropertiesDialog(workspace::Workspace& ws, Project& project,
                                  ComponentInstance& cmp, SI_Symbol& symbol,
-                                 UndoStack& undoStack,
-                                 QWidget*   parent) noexcept;
+                                 UndoStack&        undoStack,
+                                 const LengthUnit& lengthUnit,
+                                 const QString&    settingsPrefix,
+                                 QWidget*          parent) noexcept;
   ~SymbolInstancePropertiesDialog() noexcept;
 
   // Operator Overloadings

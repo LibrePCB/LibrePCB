@@ -33,6 +33,7 @@ namespace librepcb {
 
 class UndoStack;
 class Hole;
+class LengthUnit;
 
 namespace Ui {
 class HolePropertiesDialog;
@@ -53,7 +54,9 @@ public:
   HolePropertiesDialog()                                  = delete;
   HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
   HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
-                       QWidget* parent = nullptr) noexcept;
+                       const LengthUnit& lengthUnit,
+                       const QString&    settingsPrefix,
+                       QWidget*          parent = nullptr) noexcept;
   ~HolePropertiesDialog() noexcept;
 
   // Operator Overloadings

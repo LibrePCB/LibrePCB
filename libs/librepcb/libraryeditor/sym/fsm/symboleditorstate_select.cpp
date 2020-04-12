@@ -372,8 +372,9 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
     SymbolPinGraphicsItem* item =
         dynamic_cast<SymbolPinGraphicsItem*>(pins.first().data());
     Q_ASSERT(item);
-    SymbolPinPropertiesDialog dialog(item->getPin(), mContext.undoStack,
-                                     &mContext.editorWidget);
+    SymbolPinPropertiesDialog dialog(
+        item->getPin(), mContext.undoStack, getDefaultLengthUnit(),
+        "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
   } else if (texts.count() > 0) {
@@ -383,6 +384,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
     TextPropertiesDialog dialog(
         item->getText(), mContext.undoStack,
         mContext.layerProvider.getSchematicGeometryElementLayers(),
+        getDefaultLengthUnit(), "symbol_editor/text_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
@@ -393,6 +395,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
     PolygonPropertiesDialog dialog(
         item->getPolygon(), mContext.undoStack,
         mContext.layerProvider.getSchematicGeometryElementLayers(),
+        getDefaultLengthUnit(), "symbol_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
@@ -403,6 +406,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
     CirclePropertiesDialog dialog(
         item->getCircle(), mContext.undoStack,
         mContext.layerProvider.getSchematicGeometryElementLayers(),
+        getDefaultLengthUnit(), "symbol_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;

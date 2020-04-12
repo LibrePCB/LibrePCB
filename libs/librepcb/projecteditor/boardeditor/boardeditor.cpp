@@ -649,7 +649,9 @@ void BoardEditor::on_actionModifyDesignRules_triggered() {
 
   try {
     BoardDesignRules       originalRules = board->getDesignRules();
-    BoardDesignRulesDialog dialog(board->getDesignRules(), this);
+    BoardDesignRulesDialog dialog(board->getDesignRules(),
+                                  mProjectEditor.getDefaultLengthUnit(),
+                                  "board_editor/design_rules_dialog", this);
     connect(&dialog, &BoardDesignRulesDialog::rulesChanged,
             [&](const BoardDesignRules& rules) {
               board->getDesignRules() = rules;
@@ -671,7 +673,9 @@ void BoardEditor::on_actionDesignRuleCheck_triggered() {
   Board* board = getActiveBoard();
   if (!board) return;
 
-  BoardDesignRuleCheckDialog dialog(*board, mDrcOptions, this);
+  BoardDesignRuleCheckDialog dialog(*board, mDrcOptions,
+                                    mProjectEditor.getDefaultLengthUnit(),
+                                    "board_editor/drc_dialog", this);
   dialog.exec();
   mDrcOptions = dialog.getOptions();
   if (dialog.getMessages()) {

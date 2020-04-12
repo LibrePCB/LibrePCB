@@ -38,6 +38,7 @@ class QMainWindow;
 namespace librepcb {
 
 class UndoStack;
+class LengthUnit;
 
 namespace workspace {
 class Workspace;
@@ -81,6 +82,7 @@ public:
 
   workspace::Workspace& getWorkspace() const noexcept { return mWorkspace; }
   Project&              getProject() const noexcept { return mProject; }
+  const LengthUnit&     getDefaultLengthUnit() const noexcept;
 
   /**
    * @brief Get a reference to the undo stack of the project

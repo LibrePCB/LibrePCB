@@ -36,13 +36,42 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
-                                               QWidget*                parent)
+                                               const LengthUnit& lengthUnit,
+                                               const QString&    settingsPrefix,
+                                               QWidget*          parent)
   : QDialog(parent), mUi(new Ui::BoardDesignRulesDialog), mDesignRules(rules) {
   mUi->setupUi(this);
-  mUi->edtStopMaskClrRatio->setSingleStep(5.0);   // [%]
+  mUi->edtStopMaskClrRatio->setSingleStep(5.0);  // [%]
+  mUi->edtStopMaskClrMin->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/stopmask_clearance_min");
+  mUi->edtStopMaskClrMax->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/stopmask_clearance_max");
+  mUi->edtStopMaskMaxViaDia->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/stopmask_max_via_diameter");
   mUi->edtCreamMaskClrRatio->setSingleStep(5.0);  // [%]
+  mUi->edtCreamMaskClrMin->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/creammask_clearance_min");
+  mUi->edtCreamMaskClrMax->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/creammask_clearance_max");
   mUi->edtRestringPadsRatio->setSingleStep(5.0);  // [%]
+  mUi->edtRestringPadsMin->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/restring_pads_min");
+  mUi->edtRestringPadsMax->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/restring_pads_max");
   mUi->edtRestringViasRatio->setSingleStep(5.0);  // [%]
+  mUi->edtRestringViasMin->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/restring_vias_min");
+  mUi->edtRestringViasMax->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/restring_vias_max");
 
   updateWidgets();
 }

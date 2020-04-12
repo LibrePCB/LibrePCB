@@ -42,9 +42,34 @@ namespace editor {
 
 BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     Board& board, const BoardDesignRuleCheck::Options& options,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
     QWidget* parent) noexcept
   : QDialog(parent), mBoard(board), mUi(new Ui::BoardDesignRuleCheckDialog) {
   mUi->setupUi(this);
+  mUi->edtClearanceCopperCopper->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/clearance_copper_copper");
+  mUi->edtClearanceCopperBoard->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/clearance_copper_board");
+  mUi->edtClearanceCopperNpth->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/clearance_copper_npth");
+  mUi->edtMinCopperWidth->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/min_copper_width");
+  mUi->edtMinPthRestring->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/min_pth_restring");
+  mUi->edtMinPthDrillDiameter->configure(
+      lengthUnit, LengthEditBase::Steps::drillDiameter(),
+      settingsPrefix % "/min_pth_drill_diameter");
+  mUi->edtMinNpthDrillDiameter->configure(
+      lengthUnit, LengthEditBase::Steps::drillDiameter(),
+      settingsPrefix % "/min_npth_drill_diameter");
+  mUi->edtCourtyardOffset->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/courtyard_offset");
   connect(mUi->btnRun, &QPushButton::clicked, this,
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
 

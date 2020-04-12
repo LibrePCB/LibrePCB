@@ -57,9 +57,11 @@ public:
   // Constructors / Destructor
   BoardDesignRuleCheckDialog()                                        = delete;
   BoardDesignRuleCheckDialog(const BoardDesignRuleCheckDialog& other) = delete;
-  explicit BoardDesignRuleCheckDialog(
-      Board& board, const BoardDesignRuleCheck::Options& options,
-      QWidget* parent = 0) noexcept;
+  BoardDesignRuleCheckDialog(Board&                               board,
+                             const BoardDesignRuleCheck::Options& options,
+                             const LengthUnit&                    lengthUnit,
+                             const QString& settingsPrefix,
+                             QWidget*       parent = 0) noexcept;
   ~BoardDesignRuleCheckDialog();
 
   // Getters
