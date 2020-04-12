@@ -95,6 +95,25 @@ QString LengthUnit::toShortStringTr() const noexcept {
   }
 }
 
+int LengthUnit::getReasonableNumberOfDecimals() const noexcept {
+  switch (mUnit) {
+    case LengthUnit_t::Millimeters:
+      return 3;
+    case LengthUnit_t::Micrometers:
+      return 1;
+    case LengthUnit_t::Nanometers:
+      return 0;
+    case LengthUnit_t::Inches:
+      return 5;
+    case LengthUnit_t::Mils:
+      return 2;
+    default:
+      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      Q_ASSERT(false);
+      return 3;
+  }
+}
+
 QStringList LengthUnit::getUserInputSuffixes() const noexcept {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:

@@ -149,6 +149,23 @@ public:
   QString toShortStringTr() const noexcept;
 
   /**
+   * @brief Get a reasonable number of decimals to be shown
+   *
+   * When displaying length values to the user, often it makes sense to limit
+   * the displayed number of decimal places. But since this number depends on
+   * the unit, this helper method is provided.
+   *
+   * @note  The returned number of decimals will *NOT* be enough to represent
+   *        all possiblle ::librepcb::Length values without loosing precision!
+   *        So a value with truncated number of decimal places may not be
+   *        converted back to a ::librepcb::Length object since this might lead
+   *        to a different value!
+   *
+   * @return Reasonable number of decimals.
+   */
+  int getReasonableNumberOfDecimals() const noexcept;
+
+  /**
    * @brief Get user input suffixes
    *
    * Returns a list of suffixes the user might use to represent this unit. For
