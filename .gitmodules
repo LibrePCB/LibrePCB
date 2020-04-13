@@ -37,3 +37,6 @@
 [submodule "i18n"]
     path = i18n
     url = https://github.com/LibrePCB/librepcb-i18n.git
+[submodule "libs/muparser"]
+    path = libs/muparser
+    url = https://github.com/LibrePCB/muparser.git

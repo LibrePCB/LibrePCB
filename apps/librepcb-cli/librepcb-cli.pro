@@ -32,6 +32,7 @@ LIBS += \
     -llibrepcbcommon \
     -lsexpresso \
     -lclipper \
+    -lmuparser \
     -lquazip -lz
 
 INCLUDEPATH += \
@@ -52,6 +53,7 @@ DEPENDPATH += \
     ../../libs/quazip \
     ../../libs/sexpresso \
     ../../libs/clipper \
+    ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
@@ -65,6 +67,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libquazip.a \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
+    $${DESTDIR}/libmuparser.a \
 
 RESOURCES += \
     ../../img/images.qrc \

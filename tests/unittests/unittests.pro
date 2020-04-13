@@ -28,6 +28,7 @@ LIBS += \
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
     -lsexpresso \
     -lclipper \
+    -lmuparser \
     -lparseagle -lquazip -lz
 
 INCLUDEPATH += \
@@ -49,6 +50,7 @@ DEPENDPATH += \
     ../../libs/quazip \
     ../../libs/sexpresso \
     ../../libs/clipper \
+    ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
@@ -60,6 +62,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libquazip.a \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
+    $${DESTDIR}/libmuparser.a \
 
 SOURCES += \
     common/algorithm/airwiresbuildertest.cpp \
