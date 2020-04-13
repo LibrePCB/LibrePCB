@@ -103,6 +103,16 @@ void InitializeWorkspaceWizard_FinalizeImport::importFailed(
 void InitializeWorkspaceWizard_FinalizeImport::importSucceeded() noexcept {
   mImportSucceeded = true;
   emit completeChanged();
+
+  // Disable the "cancel" and "back" buttons since they do not make any sense
+  // after the import was completed. The only remaining button is "finish".
+  // In addition, it fixes https://github.com/LibrePCB/LibrePCB/issues/675.
+  if (QAbstractButton* btn = wizard()->button(QWizard::BackButton)) {
+    btn->setEnabled(false);
+  }
+  if (QAbstractButton* btn = wizard()->button(QWizard::CancelButton)) {
+    btn->setEnabled(false);
+  }
 }
 
 /*******************************************************************************
