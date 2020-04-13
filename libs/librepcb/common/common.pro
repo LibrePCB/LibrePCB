@@ -132,6 +132,7 @@ SOURCES += \
     utils/clipperhelpers.cpp \
     utils/exclusiveactiongroup.cpp \
     utils/graphicslayerstackappearancesettings.cpp \
+    utils/mathparser.cpp \
     utils/toolbarproxy.cpp \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
@@ -278,6 +279,7 @@ HEADERS += \
     utils/clipperhelpers.h \
     utils/exclusiveactiongroup.h \
     utils/graphicslayerstackappearancesettings.h \
+    utils/mathparser.h \
     utils/toolbarproxy.h \
     utils/undostackactiongroup.h \
     uuid.h \

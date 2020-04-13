@@ -93,6 +93,7 @@ SOURCES += \
     common/units/lengthtest.cpp \
     common/units/pointtest.cpp \
     common/units/ratiotest.cpp \
+    common/utils/mathparsertest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     common/widgets/editabletablewidgettest.cpp \
