@@ -45,6 +45,10 @@ SchematicPagesDock::SchematicPagesDock(Project& project, QWidget* parent)
   : QDockWidget(parent), mProject(project), mUi(new Ui::SchematicPagesDock) {
   mUi->setupUi(this);
 
+  // disable wrapping to avoid "disappearing" schematic pages, see
+  // https://github.com/LibrePCB/LibrePCB/issues/681
+  mUi->listWidget->setWrapping(false);
+
   // add all schematics to list widget
   for (int i = 0; i < mProject.getSchematics().count(); i++) schematicAdded(i);
   mUi->listWidget->setCurrentRow(-1);
