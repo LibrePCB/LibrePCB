@@ -126,7 +126,8 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
           &PackageEditorWidget::commitMetadata);
 
   // Load finite state machine (FSM).
-  PackageEditorFsm::Context fsmContext{*this,
+  PackageEditorFsm::Context fsmContext{mContext.workspace,
+                                       *this,
                                        *mUndoStack,
                                        *mGraphicsScene,
                                        *mUi->graphicsView,

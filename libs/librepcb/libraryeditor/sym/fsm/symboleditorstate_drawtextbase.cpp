@@ -106,6 +106,9 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
 
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
+  edtHeight->configure(getDefaultLengthUnit(),
+                       LengthEditBase::Steps::textHeight(),
+                       "symbol_editor/draw_text/height");
   edtHeight->setValue(mLastHeight);
   connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
           &SymbolEditorState_DrawTextBase::heightEditValueChanged);

@@ -81,6 +81,7 @@ private:  // Types
 
 public:  // Types
   struct Context {
+    workspace::Workspace&                  workspace;
     PackageEditorWidget&                   editorWidget;
     UndoStack&                             undoStack;
     GraphicsScene&                         graphicsScene;
