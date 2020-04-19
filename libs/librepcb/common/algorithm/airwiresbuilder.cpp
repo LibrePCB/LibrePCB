@@ -60,12 +60,25 @@ AirWiresBuilder::AirWires AirWiresBuilder::buildAirWires() noexcept {
   uint connectedEdges = mEdges.size();
 
   // determine additional edges between found points (candidates for airwires)
-  if (mPoints.size() >= 3) {  // minimum 3 points needed for triangulation
+  if (mPoints.size() == 2) {
+    mEdges.emplace_back(mPoints[0], mPoints[1], -1);
+  } else if (mPoints.size() == 3) {
+    // manually triangulate since it is easy and more stable than the
+    // delaunay-triangulation library
+    mEdges.emplace_back(mPoints[0], mPoints[1], -1);
+    mEdges.emplace_back(mPoints[1], mPoints[2], -1);
+    mEdges.emplace_back(mPoints[2], mPoints[0], -1);
+  } else if (mPoints.size() >= 3) {
+    // since delaunay-triangulation sometimes doesn't work well, add fallback
+    // edges to make sure at least all points are connected somehow
+    for (std::size_t i = 1; i < mPoints.size(); ++i) {
+      mEdges.emplace_back(mPoints[i - 1], mPoints[i], -1);
+    }
+
+    // now run delaunay triangulation to add additional edges
     delaunay::Delaunay<qreal> del;
     del.triangulate(mPoints);
     mEdges.insert(mEdges.end(), del.getEdges().begin(), del.getEdges().end());
-  } else if (mPoints.size() == 2) {
-    mEdges.emplace_back(mPoints[0], mPoints[1], -1);
   }
 
   // determine weights of these new edges
