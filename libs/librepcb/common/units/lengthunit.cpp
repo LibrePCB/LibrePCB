@@ -173,6 +173,17 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const {
 
 // Static Methods
 
+LengthUnit LengthUnit::fromString(const QString& str) {
+  foreach (const LengthUnit& unit, getAllUnits()) {
+    if (unit.toStr() == str) {
+      return unit;
+    }
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
+}
+
 LengthUnit LengthUnit::fromIndex(int index) {
   if (index >= static_cast<int>(LengthUnit_t::_COUNT))
     throw LogicError(__FILE__, __LINE__, QString::number(index));

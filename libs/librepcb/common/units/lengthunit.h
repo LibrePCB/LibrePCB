@@ -214,6 +214,17 @@ public:
   // Static Methods
 
   /**
+   * @brief Get the length unit represented by a string
+   *
+   * @param str   The #toStr() representation of the unit.
+   *
+   * @return The LengthUnit of the string.
+   *
+   * @throw Exception If the string did not contain a valid unit.
+   */
+  static LengthUnit fromString(const QString& str);
+
+  /**
    * @brief Get the length unit of a specific index (to use with #getIndex())
    *
    * @param index         The index of the unit in the list of #getAllUnits().
@@ -227,7 +238,6 @@ public:
    * @see #getIndex(), #getAllUnits()
    */
   static LengthUnit fromIndex(int index);
-  ;
 
   /**
    * @brief Get all available length units
@@ -299,22 +309,8 @@ inline SExpression serializeToSExpression(const LengthUnit& obj) {
 template <>
 inline LengthUnit deserializeFromSExpression(const SExpression& sexpr,
                                              bool               throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  if (str == "millimeters")
-    return LengthUnit::millimeters();
-  else if (str == "micrometers")
-    return LengthUnit::micrometers();
-  else if (str == "nanometers")
-    return LengthUnit::nanometers();
-  else if (str == "inches")
-    return LengthUnit::inches();
-  else if (str == "mils")
-    return LengthUnit::mils();
-  else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
-  }
+  return LengthUnit::fromString(
+      sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {
