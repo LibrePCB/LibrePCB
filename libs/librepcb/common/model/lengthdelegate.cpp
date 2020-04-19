@@ -58,7 +58,9 @@ void LengthDelegate::setUnit(const LengthUnit& unit) noexcept {
 
 QString LengthDelegate::displayText(const QVariant& value,
                                     const QLocale&  locale) const {
-  return Toolbox::floatToString(value.value<Length>().toMm(), 10, locale) %
+  qreal converted = mUnit.convertToUnit(value.value<Length>());
+  return Toolbox::floatToString(converted,
+                                mUnit.getReasonableNumberOfDecimals(), locale) %
          " " % mUnit.toShortStringTr();
 }
 
