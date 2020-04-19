@@ -28,6 +28,7 @@
 #include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
+#include "../version.h"
 
 #include <QtCore>
 
@@ -52,6 +53,8 @@ public:
     UuidChanged,
     PositionChanged,
     DiameterChanged,
+    LengthChanged,
+    RotationChanged,
   };
   Signal<Hole, Event>       onEdited;
   typedef Slot<Hole, Event> OnEditedSlot;
@@ -60,19 +63,23 @@ public:
   Hole() = delete;
   Hole(const Hole& other) noexcept;
   Hole(const Uuid& uuid, const Hole& other) noexcept;
-  Hole(const Uuid& uuid, const Point& position,
-       const PositiveLength& diameter) noexcept;
-  explicit Hole(const SExpression& node);
+  Hole(const Uuid& uuid, const Point& position, const PositiveLength& diameter,
+       const UnsignedLength& length, const Angle& rotation) noexcept;
+  explicit Hole(const SExpression& node, const Version& projectVersion);
   ~Hole() noexcept;
 
   // Getters
   const Uuid&           getUuid() const noexcept { return mUuid; }
   const Point&          getPosition() const noexcept { return mPosition; }
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
+  const UnsignedLength& getLength() const noexcept { return mLength; }
+  const Angle&          getRotation() const noexcept { return mRotation; }
 
   // Setters
   bool setPosition(const Point& position) noexcept;
   bool setDiameter(const PositiveLength& diameter) noexcept;
+  bool setLength(const UnsignedLength& length) noexcept;
+  bool setRotation(const Angle& rotation) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -86,6 +93,8 @@ private:  // Data
   Uuid           mUuid;
   Point          mPosition;
   PositiveLength mDiameter;
+  UnsignedLength mLength;
+  Angle          mRotation;
 };
 
 /*******************************************************************************

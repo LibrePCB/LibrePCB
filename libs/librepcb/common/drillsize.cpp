@@ -20,14 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bi_hole.h"
-
-#include "../../project.h"
-#include "../board.h"
-#include "../boardlayerstack.h"
-
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
+#include "drillsize.h"
 
 #include <QtCore>
 
@@ -35,90 +28,49 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class DrillSize
  ******************************************************************************/
 
-BI_Hole::BI_Hole(Board& board, const BI_Hole& other) : BI_Base(board) {
-  mHole.reset(new Hole(Uuid::createRandom(), *other.mHole));
-  init();
-}
-
-BI_Hole::BI_Hole(Board& board, const SExpression& node,
-                 const Version& projectVersion)
-  : BI_Base(board) {
-  mHole.reset(new Hole(node, projectVersion));
-  init();
-}
-
-BI_Hole::BI_Hole(Board& board, const Hole& hole) : BI_Base(board) {
-  mHole.reset(new Hole(hole));
-  init();
-}
-
-void BI_Hole::init() {
-  mGraphicsItem.reset(new HoleGraphicsItem(*mHole, mBoard.getLayerStack()));
-}
-
-BI_Hole::~BI_Hole() noexcept {
-  mGraphicsItem.reset();
-  mHole.reset();
+DrillSize::DrillSize(const SExpression& node) : mWidth(1), mHeight(1) {
+  mWidth  = node.getChildByIndex(0).getValue<PositiveLength>();
+  mHeight = node.getChildByIndex(1).getValue<PositiveLength>();
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void BI_Hole::addToBoard() {
-  if (isAddedToBoard()) {
-    throw LogicError(__FILE__, __LINE__);
-  }
-  BI_Base::addToBoard(mGraphicsItem.data());
+void DrillSize::serialize(SExpression& root) const {
+  root.appendChild(mWidth);
+  root.appendChild(mHeight);
 }
 
-void BI_Hole::removeFromBoard() {
-  if (!isAddedToBoard()) {
-    throw LogicError(__FILE__, __LINE__);
-  }
-  BI_Base::removeFromBoard(mGraphicsItem.data());
-}
-
-void BI_Hole::serialize(SExpression& root) const {
-  mHole->serialize(root);
+bool DrillSize::isCircular() const noexcept {
+  return mWidth == mHeight;
 }
 
 /*******************************************************************************
- *  Inherited from BI_Base
+ *  Operator Overloadings
  ******************************************************************************/
 
-const Point& BI_Hole::getPosition() const noexcept {
-  return mHole->getPosition();
+DrillSize& DrillSize::operator=(const DrillSize& rhs) noexcept {
+  mWidth  = rhs.mWidth;
+  mHeight = rhs.mHeight;
+  return *this;
 }
 
-QPainterPath BI_Hole::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+bool DrillSize::operator==(const DrillSize& rhs) const noexcept {
+  return (mWidth == rhs.mWidth) && (mHeight == rhs.mHeight);
 }
 
-const Uuid& BI_Hole::getUuid() const noexcept {
-  return mHole->getUuid();
-}
-
-bool BI_Hole::isSelectable() const noexcept {
-  const GraphicsLayer* layer =
-      mBoard.getLayerStack().getLayer(GraphicsLayer::sBoardDrillsNpth);
-  return layer && layer->isVisible();
-}
-
-void BI_Hole::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
+bool DrillSize::operator!=(const DrillSize& rhs) const noexcept {
+  return (mWidth != rhs.mWidth) || (mHeight != rhs.mHeight);
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

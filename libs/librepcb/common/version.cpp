@@ -95,6 +95,10 @@ Version Version::fromString(const QString& str) {
   }
 }
 
+Version Version::fromNumbers(std::initializer_list<uint> numbers) {
+  return Version(QVector<uint>(numbers));
+}
+
 tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
   QVector<uint> numbers;
   // split and convert to integer

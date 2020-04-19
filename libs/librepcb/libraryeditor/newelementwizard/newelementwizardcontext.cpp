@@ -244,7 +244,8 @@ void NewElementWizardContext::copyElement(ElementType     type,
         // copy holes but generate new UUIDs
         for (const Hole& hole : footprint.getHoles()) {
           newFootprint->getHoles().append(std::make_shared<Hole>(
-              Uuid::createRandom(), hole.getPosition(), hole.getDiameter()));
+              Uuid::createRandom(), hole.getPosition(), hole.getDiameter(),
+              hole.getLength(), hole.getRotation()));
         }
         mPackageFootprints.append(newFootprint);
       }

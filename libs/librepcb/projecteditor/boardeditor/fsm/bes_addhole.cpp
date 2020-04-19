@@ -186,8 +186,8 @@ bool BES_AddHole::addHole(Board& board, const Point& pos) noexcept {
   try {
     mUndoStack.beginCmdGroup(tr("Add hole to board"));
     mUndoCmdActive = true;
-    mHole =
-        new BI_Hole(board, Hole(Uuid::createRandom(), pos, mCurrentDiameter));
+    mHole = new BI_Hole(board, Hole(Uuid::createRandom(), pos, mCurrentDiameter,
+                                    UnsignedLength(0), Angle()));
     QScopedPointer<CmdBoardHoleAdd> cmdAdd(new CmdBoardHoleAdd(*mHole));
     mUndoStack.appendToCmdGroup(cmdAdd.take());
     mEditCmd.reset(new CmdHoleEdit(mHole->getHole()));

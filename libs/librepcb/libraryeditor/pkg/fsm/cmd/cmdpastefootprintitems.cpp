@@ -154,7 +154,8 @@ bool CmdPasteFootprintItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<Hole> copy = std::make_shared<Hole>(
-        uuid, hole.getPosition() + mPosOffset, hole.getDiameter());
+        uuid, hole.getPosition() + mPosOffset, hole.getDiameter(),
+        hole.getLength(), hole.getRotation());
     execNewChildCmd(new CmdHoleInsert(mFootprint.getHoles(), copy));
     HoleGraphicsItem* item = mGraphicsItem.getHoleGraphicsItem(*copy);
     Q_ASSERT(item);
