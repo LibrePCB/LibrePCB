@@ -40,18 +40,9 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
   : QDialog(parent), mUi(new Ui::BoardDesignRulesDialog), mDesignRules(rules) {
   mUi->setupUi(this);
   mUi->edtStopMaskClrRatio->setSingleStep(5.0);   // [%]
-  mUi->edtStopMaskClrMin->setSingleStep(0.1);     // [mm]
-  mUi->edtStopMaskClrMax->setSingleStep(0.1);     // [mm]
-  mUi->edtStopMaskMaxViaDia->setSingleStep(0.1);  // [mm]
   mUi->edtCreamMaskClrRatio->setSingleStep(5.0);  // [%]
-  mUi->edtCreamMaskClrMin->setSingleStep(0.1);    // [mm]
-  mUi->edtCreamMaskClrMax->setSingleStep(0.1);    // [mm]
   mUi->edtRestringPadsRatio->setSingleStep(5.0);  // [%]
-  mUi->edtRestringPadsMin->setSingleStep(0.1);    // [mm]
-  mUi->edtRestringPadsMax->setSingleStep(0.1);    // [mm]
   mUi->edtRestringViasRatio->setSingleStep(5.0);  // [%]
-  mUi->edtRestringViasMin->setSingleStep(0.1);    // [mm]
-  mUi->edtRestringViasMax->setSingleStep(0.1);    // [mm]
 
   updateWidgets();
 }

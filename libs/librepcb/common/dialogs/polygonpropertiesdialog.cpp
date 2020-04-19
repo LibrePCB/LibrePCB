@@ -45,7 +45,6 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon&   polygon,
     mUndoStack(undoStack),
     mUi(new Ui::PolygonPropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtLineWidth->setSingleStep(0.1);  // [mm]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());

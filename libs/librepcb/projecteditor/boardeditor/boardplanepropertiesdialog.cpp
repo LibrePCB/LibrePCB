@@ -56,8 +56,6 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project&   project,
     mUi(new Ui::BoardPlanePropertiesDialog),
     mUndoStack(undoStack) {
   mUi->setupUi(this);
-  mUi->edtMinWidth->setSingleStep(0.1);      // [mm]
-  mUi->edtMinClearance->setSingleStep(0.1);  // [mm]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardPlanePropertiesDialog::buttonBoxClicked);
 

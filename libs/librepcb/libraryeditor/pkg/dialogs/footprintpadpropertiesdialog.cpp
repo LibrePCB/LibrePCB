@@ -47,10 +47,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     mUndoStack(undoStack),
     mUi(new Ui::FootprintPadPropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtWidth->setSingleStep(0.1);          // [mm]
-  mUi->edtHeight->setSingleStep(0.1);         // [mm]
-  mUi->edtDrillDiameter->setSingleStep(0.1);  // [mm]
-  mUi->edtRotation->setSingleStep(90.0);      // [°]
+  mUi->edtRotation->setSingleStep(90.0);  // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 

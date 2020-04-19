@@ -92,7 +92,6 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
   std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
   edtLineWidth->setValue(mLastLineWidth);
-  edtLineWidth->setSingleStep(0.1);  // [mm]
   connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
           &PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));

@@ -45,14 +45,6 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     QWidget* parent) noexcept
   : QDialog(parent), mBoard(board), mUi(new Ui::BoardDesignRuleCheckDialog) {
   mUi->setupUi(this);
-  mUi->edtClearanceCopperCopper->setSingleStep(0.1);  // [mm]
-  mUi->edtClearanceCopperBoard->setSingleStep(0.1);   // [mm]
-  mUi->edtClearanceCopperNpth->setSingleStep(0.1);    // [mm]
-  mUi->edtMinCopperWidth->setSingleStep(0.1);         // [mm]
-  mUi->edtMinPthRestring->setSingleStep(0.1);         // [mm]
-  mUi->edtMinPthDrillDiameter->setSingleStep(0.1);    // [mm]
-  mUi->edtMinNpthDrillDiameter->setSingleStep(0.1);   // [mm]
-  mUi->edtCourtyardOffset->setSingleStep(0.1);        // [mm]
   connect(mUi->btnRun, &QPushButton::clicked, this,
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
 

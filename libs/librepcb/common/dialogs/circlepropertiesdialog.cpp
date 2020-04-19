@@ -45,8 +45,6 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle&               circle,
     mUndoStack(undoStack),
     mUi(new Ui::CirclePropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtLineWidth->setSingleStep(0.1);  // [mm]
-  mUi->edtDiameter->setSingleStep(0.1);   // [mm]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());

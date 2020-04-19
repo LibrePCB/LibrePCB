@@ -13,7 +13,7 @@ include(../../common.pri)
 # Set preprocessor defines
 DEFINES += TEST_DATA_DIR=\\\"$${PWD}/../data\\\"
 
-QT += core widgets network printsupport xml opengl sql concurrent
+QT += core widgets network printsupport xml opengl sql concurrent testlib
 
 CONFIG += console
 CONFIG -= app_bundle
@@ -97,6 +97,9 @@ SOURCES += \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     common/widgets/editabletablewidgettest.cpp \
+    common/widgets/lengthedittest.cpp \
+    common/widgets/positivelengthedittest.cpp \
+    common/widgets/unsignedlengthedittest.cpp \
     eagleimport/deviceconvertertest.cpp \
     eagleimport/devicesetconvertertest.cpp \
     eagleimport/packageconvertertest.cpp \

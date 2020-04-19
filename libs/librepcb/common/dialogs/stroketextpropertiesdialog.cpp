@@ -45,9 +45,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
     mUndoStack(undoStack),
     mUi(new Ui::StrokeTextPropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtHeight->setSingleStep(0.5);       // [mm]
-  mUi->edtStrokeWidth->setSingleStep(0.1);  // [mm]
-  mUi->edtRotation->setSingleStep(90.0);    // [°]
+  mUi->edtRotation->setSingleStep(90.0);  // [°]
 
   foreach (const GraphicsLayer* layer, layers) {
     mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());

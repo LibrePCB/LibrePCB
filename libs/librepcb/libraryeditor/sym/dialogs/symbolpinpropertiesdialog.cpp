@@ -46,7 +46,6 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(SymbolPin& pin,
     mUndoStack(undoStack),
     mUi(new Ui::SymbolPinPropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtLength->setSingleStep(2.54);    // [mm]
   mUi->edtRotation->setSingleStep(90.0);  // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &SymbolPinPropertiesDialog::on_buttonBox_clicked);

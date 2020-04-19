@@ -116,7 +116,6 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
 
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtLineWidth(new PositiveLengthEdit());
-  edtLineWidth->setSingleStep(0.5);  // [mm]
   edtLineWidth->setValue(mLastHeight);
   connect(edtLineWidth.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_DrawTextBase::heightEditValueChanged);
@@ -126,7 +125,6 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Stroke Width:"), 10);
   std::unique_ptr<UnsignedLengthEdit> strokeWidthSpinBox(
       new UnsignedLengthEdit());
-  strokeWidthSpinBox->setSingleStep(0.1);  // [mm]
   strokeWidthSpinBox->setValue(mLastStrokeWidth);
   connect(strokeWidthSpinBox.get(), &UnsignedLengthEdit::valueChanged, this,
           &PackageEditorState_DrawTextBase::strokeWidthEditValueChanged);

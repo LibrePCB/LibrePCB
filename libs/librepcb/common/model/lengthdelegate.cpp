@@ -70,7 +70,9 @@ QWidget* LengthDelegate::createEditor(QWidget*                    parent,
   Q_UNUSED(option);
   LengthEdit* edt = new LengthEdit(parent);
   edt->setFrame(false);
-  edt->setUnit(mUnit);
+  edt->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  edt->setChangeUnitActionVisible(false);  // avoid wasting space
+  edt->setDefaultUnit(mUnit);
   edt->setValue(index.data(Qt::EditRole).value<Length>());
   edt->selectAll();
 

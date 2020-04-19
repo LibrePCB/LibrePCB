@@ -53,8 +53,6 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
     mUi(new Ui::BoardViaPropertiesDialog),
     mUndoStack(undoStack) {
   mUi->setupUi(this);
-  mUi->edtSize->setSingleStep(0.1);           // [mm]
-  mUi->edtDrillDiameter->setSingleStep(0.1);  // [mm]
 
   // shape combobox
   mUi->cbxShape->addItem(tr("Round"), static_cast<int>(BI_Via::Shape::Round));

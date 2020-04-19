@@ -44,7 +44,6 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
     mUndoStack(undoStack),
     mUi(new Ui::TextPropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtHeight->setSingleStep(0.5);     // [mm]
   mUi->edtRotation->setSingleStep(90.0);  // [°]
 
   foreach (const GraphicsLayer* layer, layers) {

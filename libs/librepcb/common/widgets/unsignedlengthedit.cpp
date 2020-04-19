@@ -34,15 +34,22 @@ namespace librepcb {
  ******************************************************************************/
 
 UnsignedLengthEdit::UnsignedLengthEdit(QWidget* parent) noexcept
-  : NumberEditBase(parent),
-    mMinValue(0),
-    mMaxValue(2000000000L),  // 2'000mm should be sufficient for everything
-    mValue(0),
-    mUnit(LengthUnit::millimeters()) {
-  updateSpinBox();
+  : LengthEditBase(Length(0), Length::max(), Length(0), parent) {
 }
 
 UnsignedLengthEdit::~UnsignedLengthEdit() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+UnsignedLength UnsignedLengthEdit::getValue() const noexcept {
+  // Since the base class guarantees to hold a value within the specified range,
+  // it should not be possible to ever get an invalid UnsignedLength value. So
+  // we omit the try..catch block here.
+  Q_ASSERT(mValue >= 0);
+  return UnsignedLength(mValue);
 }
 
 /*******************************************************************************
@@ -50,46 +57,15 @@ UnsignedLengthEdit::~UnsignedLengthEdit() noexcept {
  ******************************************************************************/
 
 void UnsignedLengthEdit::setValue(const UnsignedLength& value) noexcept {
-  if (value != mValue) {
-    mValue = value;
-    // Extend allowed range e.g. if a lower/higher value is loaded from file.
-    // Otherwise the edit will clip the value, i.e. the value gets modified
-    // even without user interaction.
-    if (mValue > mMaxValue) mMaxValue = mValue;
-    if (mValue < mMinValue) mMinValue = mValue;
-    updateSpinBox();
-  }
-}
-
-void UnsignedLengthEdit::setUnit(const LengthUnit& unit) noexcept {
-  if (unit != mUnit) {
-    mUnit = unit;
-    updateSpinBox();
-  }
+  setValueImpl(*value);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void UnsignedLengthEdit::updateSpinBox() noexcept {
-  mSpinBox->setMinimum(mUnit.convertToUnit(*mMinValue));
-  mSpinBox->setMaximum(mUnit.convertToUnit(*mMaxValue));
-  mSpinBox->setValue(mUnit.convertToUnit(*mValue));
-  mSpinBox->setSuffix(" " % mUnit.toShortStringTr());
-}
-
-void UnsignedLengthEdit::spinBoxValueChanged(double value) noexcept {
-  try {
-    mValue = UnsignedLength(mUnit.convertFromUnit(value));  // can throw
-    // Clip value with integer arithmetic to avoid floating point issues.
-    if (mValue < mMinValue) mValue = mMinValue;
-    if (mValue > mMaxValue) mValue = mMaxValue;
-    emit valueChanged(mValue);
-  } catch (const Exception& e) {
-    // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid unsigned length entered:" << e.getMsg();
-  }
+void UnsignedLengthEdit::valueChangedImpl() noexcept {
+  emit valueChanged(getValue());
 }
 
 /*******************************************************************************

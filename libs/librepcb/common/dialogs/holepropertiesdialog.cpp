@@ -42,7 +42,6 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
     mUndoStack(undoStack),
     mUi(new Ui::HolePropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtDiameter->setSingleStep(0.1);  // [mm]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &HolePropertiesDialog::on_buttonBox_clicked);
 
