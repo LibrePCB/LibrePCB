@@ -62,6 +62,9 @@ public:
   bool     getCreateNewWorkspace() const noexcept;
   FilePath getWorkspaceFilePath() const noexcept;
 
+  // General Methods
+  void skipWelcomePage() noexcept;
+
   // Inherited from QWizard
   int nextId() const override;
 
