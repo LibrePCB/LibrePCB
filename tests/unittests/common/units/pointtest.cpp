@@ -69,6 +69,62 @@ TEST_P(PointTest, testRotate) {
   EXPECT_EQ(data.pB, p);
 }
 
+TEST_P(PointTest, testOperatorLessThan) {
+  EXPECT_FALSE(Point(Length(0), Length(0)) < Point(Length(0), Length(0)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) < Point(Length(9), Length(19)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) < Point(Length(9), Length(21)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) < Point(Length(10), Length(19)));
+  EXPECT_FALSE(Point(Length(-10), Length(20)) < Point(Length(-11), Length(0)));
+  EXPECT_TRUE(Point(Length(0), Length(0)) < Point(Length(0), Length(1)));
+  EXPECT_TRUE(Point(Length(0), Length(0)) < Point(Length(1), Length(0)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) < Point(Length(11), Length(19)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) < Point(Length(11), Length(21)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) < Point(Length(10), Length(21)));
+  EXPECT_TRUE(Point(Length(-1), Length(-2)) < Point(Length(-1), Length(-1)));
+}
+
+TEST_P(PointTest, testOperatorLessEqual) {
+  EXPECT_FALSE(Point(Length(10), Length(20)) <= Point(Length(9), Length(19)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) <= Point(Length(9), Length(21)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) <= Point(Length(10), Length(19)));
+  EXPECT_FALSE(Point(Length(-10), Length(20)) <= Point(Length(-11), Length(0)));
+  EXPECT_TRUE(Point(Length(0), Length(0)) <= Point(Length(0), Length(0)));
+  EXPECT_TRUE(Point(Length(0), Length(0)) <= Point(Length(0), Length(1)));
+  EXPECT_TRUE(Point(Length(0), Length(0)) <= Point(Length(1), Length(0)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) <= Point(Length(11), Length(19)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) <= Point(Length(11), Length(21)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) <= Point(Length(10), Length(21)));
+  EXPECT_TRUE(Point(Length(-1), Length(-2)) <= Point(Length(-1), Length(-1)));
+}
+
+TEST_P(PointTest, testOperatorGreaterThan) {
+  EXPECT_FALSE(Point(Length(0), Length(0)) > Point(Length(0), Length(0)));
+  EXPECT_FALSE(Point(Length(0), Length(0)) > Point(Length(0), Length(1)));
+  EXPECT_FALSE(Point(Length(0), Length(0)) > Point(Length(1), Length(0)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) > Point(Length(11), Length(19)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) > Point(Length(11), Length(21)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) > Point(Length(10), Length(21)));
+  EXPECT_FALSE(Point(Length(-1), Length(-2)) > Point(Length(-1), Length(-1)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) > Point(Length(9), Length(19)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) > Point(Length(9), Length(21)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) > Point(Length(10), Length(19)));
+  EXPECT_TRUE(Point(Length(-10), Length(20)) > Point(Length(-11), Length(0)));
+}
+
+TEST_P(PointTest, testOperatorGreaterEqual) {
+  EXPECT_FALSE(Point(Length(0), Length(0)) >= Point(Length(0), Length(1)));
+  EXPECT_FALSE(Point(Length(0), Length(0)) >= Point(Length(1), Length(0)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) >= Point(Length(11), Length(19)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) >= Point(Length(11), Length(21)));
+  EXPECT_FALSE(Point(Length(10), Length(20)) >= Point(Length(10), Length(21)));
+  EXPECT_FALSE(Point(Length(-1), Length(-2)) >= Point(Length(-1), Length(-1)));
+  EXPECT_TRUE(Point(Length(0), Length(0)) >= Point(Length(0), Length(0)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) >= Point(Length(9), Length(19)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) >= Point(Length(9), Length(21)));
+  EXPECT_TRUE(Point(Length(10), Length(20)) >= Point(Length(10), Length(19)));
+  EXPECT_TRUE(Point(Length(-10), Length(20)) >= Point(Length(-11), Length(0)));
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/
