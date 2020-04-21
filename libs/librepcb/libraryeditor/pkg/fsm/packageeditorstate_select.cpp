@@ -400,7 +400,9 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
     Q_ASSERT(item);
     FootprintPadPropertiesDialog dialog(
         mContext.package, *mContext.currentFootprint, item->getPad(),
-        mContext.undoStack, &mContext.editorWidget);
+        mContext.undoStack, getDefaultLengthUnit(),
+        "package_editor/footprint_pad_properties_dialog",
+        &mContext.editorWidget);
     dialog.exec();
     return true;
   } else if (texts.count() > 0) {
@@ -410,6 +412,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
     StrokeTextPropertiesDialog dialog(
         item->getText(), mContext.undoStack,
         mContext.layerProvider.getBoardGeometryElementLayers(),
+        getDefaultLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
@@ -420,6 +423,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
     PolygonPropertiesDialog dialog(
         item->getPolygon(), mContext.undoStack,
         mContext.layerProvider.getBoardGeometryElementLayers(),
+        getDefaultLengthUnit(), "package_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
@@ -430,6 +434,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
     CirclePropertiesDialog dialog(
         item->getCircle(), mContext.undoStack,
         mContext.layerProvider.getBoardGeometryElementLayers(),
+        getDefaultLengthUnit(), "package_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
@@ -437,8 +442,9 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
     HoleGraphicsItem* item =
         dynamic_cast<HoleGraphicsItem*>(holes.first().data());
     Q_ASSERT(item);
-    HolePropertiesDialog dialog(item->getHole(), mContext.undoStack,
-                                &mContext.editorWidget);
+    HolePropertiesDialog dialog(
+        item->getHole(), mContext.undoStack, getDefaultLengthUnit(),
+        "package_editor/hole_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
   } else {

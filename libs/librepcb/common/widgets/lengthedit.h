@@ -23,9 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/length.h"
-#include "../units/lengthunit.h"
-#include "numbereditbase.h"
+#include "lengtheditbase.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,7 +41,7 @@ namespace librepcb {
  * @brief The LengthEdit class is a widget to view/edit ::librepcb::Length
  *        values
  */
-class LengthEdit final : public NumberEditBase {
+class LengthEdit final : public LengthEditBase {
   Q_OBJECT
 
 public:
@@ -53,27 +51,20 @@ public:
   virtual ~LengthEdit() noexcept;
 
   // Getters
-  const Length& getValue() const noexcept { return mValue; }
+  Length getValue() const noexcept;
 
   // Setters
   void setValue(const Length& value) noexcept;
-  void setUnit(const LengthUnit& unit) noexcept;
 
   // Operator Overloadings
   LengthEdit& operator=(const LengthEdit& rhs) = delete;
 
 signals:
-  void valueChanged(const Length& value);
+  // Note: Full namespace librepcb::Length is required for the MOC!
+  void valueChanged(const librepcb::Length& value);
 
-private:  // Methods
-  void updateSpinBox() noexcept override;
-  void spinBoxValueChanged(double value) noexcept override;
-
-private:  // Data
-  Length     mMinValue;
-  Length     mMaxValue;
-  Length     mValue;
-  LengthUnit mUnit;
+private:
+  virtual void valueChangedImpl() noexcept override;
 };
 
 /*******************************************************************************

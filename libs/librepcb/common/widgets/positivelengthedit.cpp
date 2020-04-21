@@ -34,15 +34,22 @@ namespace librepcb {
  ******************************************************************************/
 
 PositiveLengthEdit::PositiveLengthEdit(QWidget* parent) noexcept
-  : NumberEditBase(parent),
-    mMinValue(1),
-    mMaxValue(2000000000L),  // 2'000mm should be sufficient for everything
-    mValue(1),
-    mUnit(LengthUnit::millimeters()) {
-  updateSpinBox();
+  : LengthEditBase(Length(1), Length::max(), Length(1), parent) {
 }
 
 PositiveLengthEdit::~PositiveLengthEdit() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+PositiveLength PositiveLengthEdit::getValue() const noexcept {
+  // Since the base class guarantees to hold a value within the specified range,
+  // it should not be possible to ever get an invalid PositiveLength value. So
+  // we omit the try..catch block here.
+  Q_ASSERT(mValue > 0);
+  return PositiveLength(mValue);
 }
 
 /*******************************************************************************
@@ -50,46 +57,15 @@ PositiveLengthEdit::~PositiveLengthEdit() noexcept {
  ******************************************************************************/
 
 void PositiveLengthEdit::setValue(const PositiveLength& value) noexcept {
-  if (value != mValue) {
-    mValue = value;
-    // Extend allowed range e.g. if a lower/higher value is loaded from file.
-    // Otherwise the edit will clip the value, i.e. the value gets modified
-    // even without user interaction.
-    if (mValue > mMaxValue) mMaxValue = mValue;
-    if (mValue < mMinValue) mMinValue = mValue;
-    updateSpinBox();
-  }
-}
-
-void PositiveLengthEdit::setUnit(const LengthUnit& unit) noexcept {
-  if (unit != mUnit) {
-    mUnit = unit;
-    updateSpinBox();
-  }
+  setValueImpl(*value);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void PositiveLengthEdit::updateSpinBox() noexcept {
-  mSpinBox->setMinimum(mUnit.convertToUnit(*mMinValue));
-  mSpinBox->setMaximum(mUnit.convertToUnit(*mMaxValue));
-  mSpinBox->setValue(mUnit.convertToUnit(*mValue));
-  mSpinBox->setSuffix(" " % mUnit.toShortStringTr());
-}
-
-void PositiveLengthEdit::spinBoxValueChanged(double value) noexcept {
-  try {
-    mValue = PositiveLength(mUnit.convertFromUnit(value));  // can throw
-    // Clip value with integer arithmetic to avoid floating point issues.
-    if (mValue < mMinValue) mValue = mMinValue;
-    if (mValue > mMaxValue) mValue = mMaxValue;
-    emit valueChanged(mValue);
-  } catch (const Exception& e) {
-    // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid positive length entered:" << e.getMsg();
-  }
+void PositiveLengthEdit::valueChangedImpl() noexcept {
+  emit valueChanged(getValue());
 }
 
 /*******************************************************************************

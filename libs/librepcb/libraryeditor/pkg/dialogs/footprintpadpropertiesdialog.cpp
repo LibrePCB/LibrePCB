@@ -41,16 +41,25 @@ namespace editor {
 
 FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     const Package& pkg, const Footprint& fpt, FootprintPad& pad,
-    UndoStack& undoStack, QWidget* parent) noexcept
+    UndoStack& undoStack, const LengthUnit& lengthUnit,
+    const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
     mPad(pad),
     mUndoStack(undoStack),
     mUi(new Ui::FootprintPadPropertiesDialog) {
   mUi->setupUi(this);
-  mUi->edtWidth->setSingleStep(0.1);          // [mm]
-  mUi->edtHeight->setSingleStep(0.1);         // [mm]
-  mUi->edtDrillDiameter->setSingleStep(0.1);  // [mm]
-  mUi->edtRotation->setSingleStep(90.0);      // [°]
+  mUi->edtWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                           settingsPrefix % "/width");
+  mUi->edtHeight->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                            settingsPrefix % "/height");
+  mUi->edtDrillDiameter->configure(lengthUnit,
+                                   LengthEditBase::Steps::drillDiameter(),
+                                   settingsPrefix % "/drill_diameter");
+  mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                          settingsPrefix % "/pos_x");
+  mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                          settingsPrefix % "/pos_y");
+  mUi->edtRotation->setSingleStep(90.0);  // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 

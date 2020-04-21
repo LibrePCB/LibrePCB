@@ -17,58 +17,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_MATHPARSER_H
+#define LIBREPCB_MATHPARSER_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ses_base.h"
-
-#include "../schematiceditor.h"
-
-#include <librepcb/project/project.h>
-#include <librepcb/projecteditor/projecteditor.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
-
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
-namespace editor {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class MathParser
  ******************************************************************************/
 
-SES_Base::SES_Base(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                   GraphicsView& editorGraphicsView, UndoStack& undoStack)
-  : QObject(0),
-    mWorkspace(editor.getProjectEditor().getWorkspace()),
-    mProject(editor.getProject()),
-    mCircuit(editor.getProject().getCircuit()),
-    mEditor(editor),
-    mEditorUi(editorUi),
-    mEditorGraphicsView(editorGraphicsView),
-    mUndoStack(undoStack) {
-}
+/**
+ * @brief Mathematical expression parser
+ *
+ * This class interprets mathematical expression strings (e.g. "2+3") and
+ * returns the result of the calculation. It is actually only a wrapper around
+ * the [muparser](https://beltoforion.de/article.php?a=muparser) library, so
+ * take a look at its documentation for details.
+ */
+class MathParser {
+  Q_DECLARE_TR_FUNCTIONS(MathParser)
 
-SES_Base::~SES_Base() {
-}
+public:
+  struct Result {
+    bool    valid;
+    qreal   value;
+    QString error;
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
+    Result() : valid(false), value(0), error() {}
+  };
 
-const LengthUnit& SES_Base::getDefaultLengthUnit() const noexcept {
-  return mWorkspace.getSettings().defaultLengthUnit.get();
-}
+  // Constructors / Destructor
+  MathParser() noexcept;
+  MathParser(const MathParser& other) = delete;
+  virtual ~MathParser() noexcept;
+
+  // General Methods
+
+  /**
+   * @brief Set the locale to be used for parsing numbers
+   *
+   * This sets the thousand separator and decimal point to be used for the
+   * evaluation.
+   *
+   * @param locale  The locale to use.
+   */
+  void setLocale(const QLocale& locale) noexcept;
+
+  /**
+   * @brief Parse expression
+   *
+   * @param expression  The expression to parse.
+   *
+   * @return  The result, either valid with a value, or invalid with an error
+   *          message.
+   */
+  Result parse(const QString& expression) const noexcept;
+
+  // Operator Overloadings
+  MathParser& operator=(const MathParser& rhs) = delete;
+
+private:
+  QLocale mLocale;  ///< The locale used for parsing numbers
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
-}  // namespace project
 }  // namespace librepcb
+
+#endif  // LIBREPCB_MATHPARSER_H

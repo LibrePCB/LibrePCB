@@ -77,6 +77,7 @@ private:  // Types
 
 public:  // Types
   struct Context {
+    workspace::Workspace&           workspace;
     SymbolEditorWidget&             editorWidget;
     UndoStack&                      undoStack;
     const IF_GraphicsLayerProvider& layerProvider;

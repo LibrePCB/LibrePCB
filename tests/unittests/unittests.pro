@@ -13,7 +13,7 @@ include(../../common.pri)
 # Set preprocessor defines
 DEFINES += TEST_DATA_DIR=\\\"$${PWD}/../data\\\"
 
-QT += core widgets network printsupport xml opengl sql concurrent
+QT += core widgets network printsupport xml opengl sql concurrent testlib
 
 CONFIG += console
 CONFIG -= app_bundle
@@ -28,6 +28,7 @@ LIBS += \
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
     -lsexpresso \
     -lclipper \
+    -lmuparser \
     -lparseagle -lquazip -lz
 
 INCLUDEPATH += \
@@ -49,6 +50,7 @@ DEPENDPATH += \
     ../../libs/quazip \
     ../../libs/sexpresso \
     ../../libs/clipper \
+    ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
@@ -60,6 +62,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libquazip.a \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
+    $${DESTDIR}/libmuparser.a \
 
 SOURCES += \
     common/algorithm/airwiresbuildertest.cpp \
@@ -90,9 +93,13 @@ SOURCES += \
     common/units/lengthtest.cpp \
     common/units/pointtest.cpp \
     common/units/ratiotest.cpp \
+    common/utils/mathparsertest.cpp \
     common/uuidtest.cpp \
     common/versiontest.cpp \
     common/widgets/editabletablewidgettest.cpp \
+    common/widgets/lengthedittest.cpp \
+    common/widgets/positivelengthedittest.cpp \
+    common/widgets/unsignedlengthedittest.cpp \
     eagleimport/deviceconvertertest.cpp \
     eagleimport/devicesetconvertertest.cpp \
     eagleimport/packageconvertertest.cpp \

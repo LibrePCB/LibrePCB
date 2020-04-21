@@ -24,6 +24,8 @@
 
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 
@@ -51,6 +53,10 @@ SymbolEditorState::~SymbolEditorState() noexcept {
 
 const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
   return mContext.graphicsView.getGridProperties().getInterval();
+}
+
+const LengthUnit& SymbolEditorState::getDefaultLengthUnit() const noexcept {
+  return mContext.workspace.getSettings().defaultLengthUnit.get();
 }
 
 /*******************************************************************************

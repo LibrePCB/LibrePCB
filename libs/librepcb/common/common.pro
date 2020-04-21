@@ -26,6 +26,7 @@ INCLUDEPATH += \
     ../../sexpresso \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
+    ../../muparser/include \
 
 RESOURCES += \
     ../../../img/images.qrc \
@@ -131,6 +132,7 @@ SOURCES += \
     utils/clipperhelpers.cpp \
     utils/exclusiveactiongroup.cpp \
     utils/graphicslayerstackappearancesettings.cpp \
+    utils/mathparser.cpp \
     utils/toolbarproxy.cpp \
     utils/undostackactiongroup.cpp \
     uuid.cpp \
@@ -146,6 +148,7 @@ SOURCES += \
     widgets/graphicslayercombobox.cpp \
     widgets/halignactiongroup.cpp \
     widgets/lengthedit.cpp \
+    widgets/lengtheditbase.cpp \
     widgets/numbereditbase.cpp \
     widgets/patheditorwidget.cpp \
     widgets/plaintextedit.cpp \
@@ -277,6 +280,7 @@ HEADERS += \
     utils/clipperhelpers.h \
     utils/exclusiveactiongroup.h \
     utils/graphicslayerstackappearancesettings.h \
+    utils/mathparser.h \
     utils/toolbarproxy.h \
     utils/undostackactiongroup.h \
     uuid.h \
@@ -292,6 +296,7 @@ HEADERS += \
     widgets/graphicslayercombobox.h \
     widgets/halignactiongroup.h \
     widgets/lengthedit.h \
+    widgets/lengtheditbase.h \
     widgets/numbereditbase.h \
     widgets/patheditorwidget.h \
     widgets/plaintextedit.h \

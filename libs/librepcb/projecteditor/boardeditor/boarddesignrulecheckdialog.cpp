@@ -42,17 +42,34 @@ namespace editor {
 
 BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     Board& board, const BoardDesignRuleCheck::Options& options,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
     QWidget* parent) noexcept
   : QDialog(parent), mBoard(board), mUi(new Ui::BoardDesignRuleCheckDialog) {
   mUi->setupUi(this);
-  mUi->edtClearanceCopperCopper->setSingleStep(0.1);  // [mm]
-  mUi->edtClearanceCopperBoard->setSingleStep(0.1);   // [mm]
-  mUi->edtClearanceCopperNpth->setSingleStep(0.1);    // [mm]
-  mUi->edtMinCopperWidth->setSingleStep(0.1);         // [mm]
-  mUi->edtMinPthRestring->setSingleStep(0.1);         // [mm]
-  mUi->edtMinPthDrillDiameter->setSingleStep(0.1);    // [mm]
-  mUi->edtMinNpthDrillDiameter->setSingleStep(0.1);   // [mm]
-  mUi->edtCourtyardOffset->setSingleStep(0.1);        // [mm]
+  mUi->edtClearanceCopperCopper->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/clearance_copper_copper");
+  mUi->edtClearanceCopperBoard->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/clearance_copper_board");
+  mUi->edtClearanceCopperNpth->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/clearance_copper_npth");
+  mUi->edtMinCopperWidth->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/min_copper_width");
+  mUi->edtMinPthRestring->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/min_pth_restring");
+  mUi->edtMinPthDrillDiameter->configure(
+      lengthUnit, LengthEditBase::Steps::drillDiameter(),
+      settingsPrefix % "/min_pth_drill_diameter");
+  mUi->edtMinNpthDrillDiameter->configure(
+      lengthUnit, LengthEditBase::Steps::drillDiameter(),
+      settingsPrefix % "/min_npth_drill_diameter");
+  mUi->edtCourtyardOffset->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/courtyard_offset");
   connect(mUi->btnRun, &QPushButton::clicked, this,
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
 

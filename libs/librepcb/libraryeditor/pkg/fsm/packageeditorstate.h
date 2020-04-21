@@ -103,6 +103,7 @@ public:
 
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;
+  const LengthUnit&     getDefaultLengthUnit() const noexcept;
 
 protected:  // Data
   Context& mContext;

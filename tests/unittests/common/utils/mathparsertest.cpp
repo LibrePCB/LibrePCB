@@ -20,56 +20,82 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "unsignedlengthedit.h"
 
-#include "doublespinbox.h"
+#include <gtest/gtest.h>
+#include <librepcb/common/utils/mathparser.h>
+#include <optional/tl/optional.hpp>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace tests {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Test Data Type
  ******************************************************************************/
 
-UnsignedLengthEdit::UnsignedLengthEdit(QWidget* parent) noexcept
-  : LengthEditBase(Length(0), Length::max(), Length(0), parent) {
-}
+typedef struct {
+  QString             locale;
+  QString             input;
+  tl::optional<qreal> output;
+} MathParserTestData;
 
-UnsignedLengthEdit::~UnsignedLengthEdit() noexcept {
+/*******************************************************************************
+ *  Test Class
+ ******************************************************************************/
+
+class MathParserTest : public ::testing::TestWithParam<MathParserTestData> {};
+
+/*******************************************************************************
+ *  Test Methods
+ ******************************************************************************/
+TEST_P(MathParserTest, test) {
+  const MathParserTestData& data = GetParam();
+
+  MathParser parser;
+  parser.setLocale(QLocale(data.locale));
+  MathParser::Result result = parser.parse(data.input);
+  if (data.output) {
+    EXPECT_TRUE(result.valid);
+    EXPECT_EQ("", result.error);
+    EXPECT_EQ(*data.output, result.value);
+  } else {
+    EXPECT_FALSE(result.valid);
+    EXPECT_NE("", result.error);
+    EXPECT_EQ(0, result.value);
+  }
 }
 
 /*******************************************************************************
- *  Getters
+ *  Test Data
  ******************************************************************************/
 
-UnsignedLength UnsignedLengthEdit::getValue() const noexcept {
-  // Since the base class guarantees to hold a value within the specified range,
-  // it should not be possible to ever get an invalid UnsignedLength value. So
-  // we omit the try..catch block here.
-  Q_ASSERT(mValue >= 0);
-  return UnsignedLength(mValue);
-}
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(MathParserTest, MathParserTest, ::testing::Values(
+    // valid cases
+    MathParserTestData({"en_US", "0", 0}),
+    MathParserTestData({"en_US", "0.1234", 0.1234}),
+    MathParserTestData({"en_US", "+0.1234", 0.1234}),
+    MathParserTestData({"en_US", "-0.1234", -0.1234}),
+    MathParserTestData({"en_US", "2+3", 5}),
+    MathParserTestData({"en_US", "(1+2)/2", 1.5}),
+    MathParserTestData({"en_US", " 2 * (1.1 + 2.2) / 3.3 ", 2*(1.1+2.2)/3.3}),
+    MathParserTestData({"en_US", "5,000", 5000}), // thousand separator
+    MathParserTestData({"de_DE", "5,000", 5}), // decimal point
 
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void UnsignedLengthEdit::setValue(const UnsignedLength& value) noexcept {
-  setValueImpl(*value);
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void UnsignedLengthEdit::valueChangedImpl() noexcept {
-  emit valueChanged(getValue());
-}
+    // invalid cases
+    MathParserTestData({"en_US", "", tl::nullopt}),
+    MathParserTestData({"en_US", " ", tl::nullopt}),
+    MathParserTestData({"en_US", ".", tl::nullopt}),
+    MathParserTestData({"en_US", "/", tl::nullopt}),
+    MathParserTestData({"en_US", "(1+2", tl::nullopt})
+));
+// clang-format on
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace librepcb

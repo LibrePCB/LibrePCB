@@ -110,6 +110,14 @@ ProjectEditor::~ProjectEditor() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+const LengthUnit& ProjectEditor::getDefaultLengthUnit() const noexcept {
+  return mWorkspace.getSettings().defaultLengthUnit.get();
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 

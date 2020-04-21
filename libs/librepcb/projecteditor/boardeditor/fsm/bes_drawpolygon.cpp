@@ -118,7 +118,6 @@ bool BES_DrawPolygon::entry(BEE_Base* event) noexcept {
   // add the widths combobox to the toolbar
   mWidthEdit = new UnsignedLengthEdit();
   mWidthEdit->setValue(mCurrentWidth);
-  mWidthEdit->setSingleStep(0.1);  // [mm]
   mEditorUi.commandToolbar->addWidget(mWidthEdit);
   connect(mWidthEdit, &UnsignedLengthEdit::valueChanged, this,
           &BES_DrawPolygon::widthEditValueChanged);

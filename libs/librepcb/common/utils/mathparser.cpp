@@ -20,9 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "unsignedlengthedit.h"
+#include "mathparser.h"
 
-#include "doublespinbox.h"
+#include "muparser/include/muParser.h"
 
 /*******************************************************************************
  *  Namespace
@@ -33,39 +33,46 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-UnsignedLengthEdit::UnsignedLengthEdit(QWidget* parent) noexcept
-  : LengthEditBase(Length(0), Length::max(), Length(0), parent) {
+MathParser::MathParser() noexcept : mLocale() {
 }
 
-UnsignedLengthEdit::~UnsignedLengthEdit() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-UnsignedLength UnsignedLengthEdit::getValue() const noexcept {
-  // Since the base class guarantees to hold a value within the specified range,
-  // it should not be possible to ever get an invalid UnsignedLength value. So
-  // we omit the try..catch block here.
-  Q_ASSERT(mValue >= 0);
-  return UnsignedLength(mValue);
+MathParser::~MathParser() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  Protected Methods
  ******************************************************************************/
 
-void UnsignedLengthEdit::setValue(const UnsignedLength& value) noexcept {
-  setValueImpl(*value);
+void MathParser::setLocale(const QLocale& locale) noexcept {
+  mLocale = locale;
 }
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
+MathParser::Result MathParser::parse(const QString& expression) const noexcept {
+  MathParser::Result result;
 
-void UnsignedLengthEdit::valueChangedImpl() noexcept {
-  emit valueChanged(getValue());
+  try {
+    mu::Parser parser;
+    parser.SetArgSep(';');  // avoid conflict with other separators
+    parser.SetDecSep(mLocale.decimalPoint().toLatin1());
+    parser.SetThousandsSep(mLocale.groupSeparator().toLatin1());
+#if defined(_UNICODE)
+    parser.SetExpr(expression.toStdWString());
+#else
+    parser.SetExpr(expression.toStdString());
+#endif
+    result.value = static_cast<qreal>(parser.Eval());  // can throw
+    result.valid = true;
+  } catch (const mu::Parser::exception_type& e) {
+    result.valid = false;
+    result.error = tr("Failed to parse expression:") % "\n\n";
+#if defined(_UNICODE)
+    result.error += QString::fromStdWString(e.GetMsg());
+#else
+    result.error += QString::fromStdString(e.GetMsg());
+#endif
+  }
+
+  return result;
 }
 
 /*******************************************************************************

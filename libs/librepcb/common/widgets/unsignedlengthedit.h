@@ -23,12 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/length.h"
-#include "../units/lengthunit.h"
-#include "numbereditbase.h"
-
-#include <QtCore>
-#include <QtWidgets>
+#include "lengtheditbase.h"
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -43,7 +38,7 @@ namespace librepcb {
  * @brief The UnsignedLengthEdit class is a widget to view/edit
  *        ::librepcb::UnsignedLength values
  */
-class UnsignedLengthEdit final : public NumberEditBase {
+class UnsignedLengthEdit final : public LengthEditBase {
   Q_OBJECT
 
 public:
@@ -53,27 +48,20 @@ public:
   virtual ~UnsignedLengthEdit() noexcept;
 
   // Getters
-  const UnsignedLength& getValue() const noexcept { return mValue; }
+  UnsignedLength getValue() const noexcept;
 
   // Setters
   void setValue(const UnsignedLength& value) noexcept;
-  void setUnit(const LengthUnit& unit) noexcept;
 
   // Operator Overloadings
   UnsignedLengthEdit& operator=(const UnsignedLengthEdit& rhs) = delete;
 
 signals:
-  void valueChanged(const UnsignedLength& value);
+  // Note: Full namespace librepcb::UnsignedLength is required for the MOC!
+  void valueChanged(const librepcb::UnsignedLength& value);
 
-private:  // Methods
-  void updateSpinBox() noexcept override;
-  void spinBoxValueChanged(double value) noexcept override;
-
-private:  // Data
-  UnsignedLength mMinValue;
-  UnsignedLength mMaxValue;
-  UnsignedLength mValue;
-  LengthUnit     mUnit;
+private:
+  virtual void valueChangedImpl() noexcept override;
 };
 
 /*******************************************************************************

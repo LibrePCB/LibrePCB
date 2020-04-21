@@ -126,7 +126,8 @@ bool PackageEditorState_AddPads::entry() noexcept {
   // width
   mContext.commandToolBar.addLabel(tr("Width:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtWidth(new PositiveLengthEdit());
-  edtWidth->setSingleStep(0.1);  // [mm]
+  edtWidth->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
+                      "package_editor/add_pads/width");
   edtWidth->setValue(mLastPad.getWidth());
   connect(edtWidth.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_AddPads::widthEditValueChanged);
@@ -135,7 +136,8 @@ bool PackageEditorState_AddPads::entry() noexcept {
   // height
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
-  edtHeight->setSingleStep(0.1);  // [mm]
+  edtHeight->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
+                       "package_editor/add_pads/height");
   edtHeight->setValue(mLastPad.getHeight());
   connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_AddPads::heightEditValueChanged);
@@ -146,7 +148,9 @@ bool PackageEditorState_AddPads::entry() noexcept {
     mContext.commandToolBar.addLabel(tr("Drill Diameter:"), 10);
     std::unique_ptr<UnsignedLengthEdit> edtDrillDiameter(
         new UnsignedLengthEdit());
-    edtDrillDiameter->setSingleStep(0.1);  // [mm]
+    edtDrillDiameter->configure(getDefaultLengthUnit(),
+                                LengthEditBase::Steps::drillDiameter(),
+                                "package_editor/add_pads/drill_diameter");
     edtDrillDiameter->setValue(mLastPad.getDrillDiameter());
     connect(edtDrillDiameter.get(), &UnsignedLengthEdit::valueChanged, this,
             &PackageEditorState_AddPads::drillDiameterEditValueChanged);

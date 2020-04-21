@@ -7,18 +7,19 @@ SUBDIRS = \
     hoedown \
     googletest \
     librepcb \
+    muparser \
     optional \
     parseagle \
     quazip \
-    sexpresso
+    sexpresso \
 
 librepcb.depends = \
     clipper \
     delaunay-triangulation \
     fontobene \
+    muparser \
     optional \
     parseagle \
     hoedown \
     quazip \
     sexpresso \
-

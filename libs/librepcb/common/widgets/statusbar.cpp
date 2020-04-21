@@ -35,7 +35,7 @@ namespace librepcb {
  ******************************************************************************/
 
 StatusBar::StatusBar(QWidget* parent) noexcept
-  : QStatusBar(parent), mFields(0) {
+  : QStatusBar(parent), mFields(0), mLengthUnit(), mAbsoluteCursorPosition() {
   // absolute position x
   mAbsPosXLabel.reset(new QLabel());
   mAbsPosXLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -63,7 +63,7 @@ StatusBar::StatusBar(QWidget* parent) noexcept
 
   // init
   setFields(0);
-  setAbsoluteCursorPosition(Point());
+  updateAbsoluteCursorPosition();
   setProgressBarPercent(100);
 }
 
@@ -88,9 +88,14 @@ void StatusBar::setField(Field field, bool enable) noexcept {
   setFields(mFields);
 }
 
+void StatusBar::setLengthUnit(const LengthUnit& unit) noexcept {
+  mLengthUnit = unit;
+  updateAbsoluteCursorPosition();
+}
+
 void StatusBar::setAbsoluteCursorPosition(const Point& pos) noexcept {
-  mAbsPosXLabel->setText(QString("X:%1mm").arg(pos.getX().toMm(), 12, 'f', 6));
-  mAbsPosYLabel->setText(QString("Y:%1mm").arg(pos.getY().toMm(), 12, 'f', 6));
+  mAbsoluteCursorPosition = pos;
+  updateAbsoluteCursorPosition();
 }
 
 void StatusBar::setProgressBarTextFormat(const QString& format) noexcept {
@@ -106,6 +111,23 @@ void StatusBar::setProgressBarPercent(int percent) noexcept {
     mProgressBar->hide();
     mProgressBarPlaceHolder->show();
   }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void StatusBar::updateAbsoluteCursorPosition() noexcept {
+  mAbsPosXLabel->setText(
+      QString("X:%1%2")
+          .arg(mLengthUnit.convertToUnit(mAbsoluteCursorPosition.getX()), 12,
+               'f', 6)
+          .arg(mLengthUnit.toShortStringTr()));
+  mAbsPosYLabel->setText(
+      QString("Y:%1%2")
+          .arg(mLengthUnit.convertToUnit(mAbsoluteCursorPosition.getY()), 12,
+               'f', 6)
+          .arg(mLengthUnit.toShortStringTr()));
 }
 
 /*******************************************************************************
