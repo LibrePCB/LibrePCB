@@ -62,6 +62,7 @@ PRE_TARGETDEPS += \
     $${DESTDIR}/libclipper.a \
 
 SOURCES += \
+    common/algorithm/airwiresbuildertest.cpp \
     common/alignmenttest.cpp \
     common/applicationtest.cpp \
     common/attributes/attributekeytest.cpp \

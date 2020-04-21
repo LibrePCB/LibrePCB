@@ -31,6 +31,7 @@ RESOURCES += \
     ../../../img/images.qrc \
 
 SOURCES += \
+    algorithm/airwiresbuilder.cpp \
     alignment.cpp \
     application.cpp \
     attributes/attribute.cpp \
@@ -158,6 +159,7 @@ SOURCES += \
     widgets/valignactiongroup.cpp \
 
 HEADERS += \
+    algorithm/airwiresbuilder.h \
     alignment.h \
     application.h \
     attributes/attribute.h \
