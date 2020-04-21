@@ -116,6 +116,14 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval) {
   return l.mapToGrid(gridInterval);
 }
 
+Length Length::min() noexcept {
+  return Length(std::numeric_limits<LengthBase_t>::min());
+}
+
+Length Length::max() noexcept {
+  return Length(std::numeric_limits<LengthBase_t>::max());
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

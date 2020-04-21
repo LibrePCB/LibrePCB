@@ -95,6 +95,44 @@ QString LengthUnit::toShortStringTr() const noexcept {
   }
 }
 
+int LengthUnit::getReasonableNumberOfDecimals() const noexcept {
+  switch (mUnit) {
+    case LengthUnit_t::Millimeters:
+      return 3;
+    case LengthUnit_t::Micrometers:
+      return 1;
+    case LengthUnit_t::Nanometers:
+      return 0;
+    case LengthUnit_t::Inches:
+      return 5;
+    case LengthUnit_t::Mils:
+      return 2;
+    default:
+      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      Q_ASSERT(false);
+      return 3;
+  }
+}
+
+QStringList LengthUnit::getUserInputSuffixes() const noexcept {
+  switch (mUnit) {
+    case LengthUnit_t::Millimeters:
+      return QStringList{"mm"};
+    case LengthUnit_t::Micrometers:
+      return QStringList{"μm", "um"};
+    case LengthUnit_t::Nanometers:
+      return QStringList{"nm"};
+    case LengthUnit_t::Inches:
+      return QStringList{"″", "\"", "in", "inch", "inches"};
+    case LengthUnit_t::Mils:
+      return QStringList{"mils"};
+    default:
+      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      Q_ASSERT(false);
+      return QStringList();
+  }
+}
+
 qreal LengthUnit::convertToUnit(const Length& length) const noexcept {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:
@@ -172,6 +210,17 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const {
 }
 
 // Static Methods
+
+LengthUnit LengthUnit::fromString(const QString& str) {
+  foreach (const LengthUnit& unit, getAllUnits()) {
+    if (unit.toStr() == str) {
+      return unit;
+    }
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
+}
 
 LengthUnit LengthUnit::fromIndex(int index) {
   if (index >= static_cast<int>(LengthUnit_t::_COUNT))

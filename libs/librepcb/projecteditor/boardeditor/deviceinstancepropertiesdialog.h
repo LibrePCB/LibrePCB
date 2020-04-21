@@ -63,8 +63,10 @@ public:
   DeviceInstancePropertiesDialog(const DeviceInstancePropertiesDialog& other) =
       delete;
   DeviceInstancePropertiesDialog(Project& project, BI_Device& device,
-                                 UndoStack& undoStack,
-                                 QWidget*   parent) noexcept;
+                                 UndoStack&        undoStack,
+                                 const LengthUnit& lengthUnit,
+                                 const QString&    settingsPrefix,
+                                 QWidget*          parent) noexcept;
   ~DeviceInstancePropertiesDialog() noexcept;
 
   // Operator Overloadings

@@ -845,17 +845,23 @@ void BES_Select::measureLengthInDirection(bool              directionBackwards,
 }
 
 void BES_Select::openDevicePropertiesDialog(BI_Device& device) noexcept {
-  DeviceInstancePropertiesDialog dialog(mProject, device, mUndoStack, &mEditor);
+  DeviceInstancePropertiesDialog dialog(
+      mProject, device, mUndoStack, getDefaultLengthUnit(),
+      "board_editor/device_properties_dialog", &mEditor);
   dialog.exec();
 }
 
 void BES_Select::openViaPropertiesDialog(BI_Via& via) noexcept {
-  BoardViaPropertiesDialog dialog(mProject, via, mUndoStack, &mEditor);
+  BoardViaPropertiesDialog dialog(
+      mProject, via, mUndoStack, getDefaultLengthUnit(),
+      "board_editor/via_properties_dialog", &mEditor);
   dialog.exec();
 }
 
 void BES_Select::openPlanePropertiesDialog(BI_Plane& plane) noexcept {
-  BoardPlanePropertiesDialog dialog(mProject, plane, mUndoStack, &mEditor);
+  BoardPlanePropertiesDialog dialog(
+      mProject, plane, mUndoStack, getDefaultLengthUnit(),
+      "board_editor/plane_properties_dialog", &mEditor);
 
   // Make sure the plane is visible visible since it's useful to see the actual
   // plane fragments while the plane properties are modified.
@@ -871,20 +877,25 @@ void BES_Select::openPlanePropertiesDialog(BI_Plane& plane) noexcept {
 void BES_Select::openPolygonPropertiesDialog(Board&   board,
                                              Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
-      polygon, mUndoStack, board.getLayerStack().getAllowedPolygonLayers());
+      polygon, mUndoStack, board.getLayerStack().getAllowedPolygonLayers(),
+      getDefaultLengthUnit(), "board_editor/polygon_properties_dialog",
+      &mEditor);
   dialog.exec();
 }
 
 void BES_Select::openStrokeTextPropertiesDialog(Board&      board,
                                                 StrokeText& text) noexcept {
   StrokeTextPropertiesDialog dialog(
-      text, mUndoStack, board.getLayerStack().getAllowedPolygonLayers());
+      text, mUndoStack, board.getLayerStack().getAllowedPolygonLayers(),
+      getDefaultLengthUnit(), "board_editor/stroke_text_properties_dialog",
+      &mEditor);
   dialog.exec();
 }
 
 void BES_Select::openHolePropertiesDialog(Board& board, Hole& hole) noexcept {
   Q_UNUSED(board);
-  HolePropertiesDialog dialog(hole, mUndoStack);
+  HolePropertiesDialog dialog(hole, mUndoStack, getDefaultLengthUnit(),
+                              "board_editor/hole_properties_dialog", &mEditor);
   dialog.exec();
 }
 

@@ -26,6 +26,8 @@
 
 #include <librepcb/project/project.h>
 #include <librepcb/projecteditor/projecteditor.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 
@@ -53,6 +55,14 @@ BES_Base::BES_Base(BoardEditor& editor, Ui::BoardEditor& editorUi,
 }
 
 BES_Base::~BES_Base() {
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+const LengthUnit& BES_Base::getDefaultLengthUnit() const noexcept {
+  return mWorkspace.getSettings().defaultLengthUnit.get();
 }
 
 /*******************************************************************************

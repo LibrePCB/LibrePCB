@@ -35,6 +35,7 @@ namespace librepcb {
 
 class EditableTableWidget;
 class PathModel;
+class LengthDelegate;
 
 /*******************************************************************************
  *  Class PathEditorWidget
@@ -55,6 +56,7 @@ public:
   // General Methods
   void        setPath(const Path& path) noexcept;
   const Path& getPath() const noexcept;
+  void        setLengthUnit(const LengthUnit& unit) noexcept;
 
   // Operator Overloadings
   PathEditorWidget& operator=(const PathEditorWidget& rhs) = delete;
@@ -62,6 +64,8 @@ public:
 private:  // Data
   QScopedPointer<PathModel>           mModel;
   QScopedPointer<EditableTableWidget> mView;
+  LengthDelegate*                     mLengthDelegateX;
+  LengthDelegate*                     mLengthDelegateY;
 };
 
 /*******************************************************************************

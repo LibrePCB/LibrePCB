@@ -162,7 +162,6 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
   // add the widths combobox to the toolbar
   mWidthEdit = new PositiveLengthEdit();
   mWidthEdit->setValue(mCurrentWidth);
-  mWidthEdit->setSingleStep(0.1);  // [mm]
   mEditorUi.commandToolbar->addWidget(mWidthEdit);
   connect(mWidthEdit, &PositiveLengthEdit::valueChanged, this,
           &BES_DrawTrace::wireWidthEditValueChanged);

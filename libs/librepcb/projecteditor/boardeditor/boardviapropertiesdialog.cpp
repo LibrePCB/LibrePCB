@@ -43,18 +43,25 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
-                                                   BI_Via&    via,
-                                                   UndoStack& undoStack,
-                                                   QWidget*   parent) noexcept
+BoardViaPropertiesDialog::BoardViaPropertiesDialog(
+    Project& project, BI_Via& via, UndoStack& undoStack,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mProject(project),
     mVia(via),
     mUi(new Ui::BoardViaPropertiesDialog),
     mUndoStack(undoStack) {
   mUi->setupUi(this);
-  mUi->edtSize->setSingleStep(0.1);           // [mm]
-  mUi->edtDrillDiameter->setSingleStep(0.1);  // [mm]
+  mUi->edtSize->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                          settingsPrefix % "/size");
+  mUi->edtDrillDiameter->configure(lengthUnit,
+                                   LengthEditBase::Steps::drillDiameter(),
+                                   settingsPrefix % "/drill_diameter");
+  mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                          settingsPrefix % "/pos_x");
+  mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                          settingsPrefix % "/pos_y");
 
   // shape combobox
   mUi->cbxShape->addItem(tr("Round"), static_cast<int>(BI_Via::Shape::Round));
@@ -81,10 +88,6 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(Project&   project,
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
   mUi.reset();
 }
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
 
 /*******************************************************************************
  *  Private Methods

@@ -46,18 +46,21 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(Project&   project,
-                                                       BI_Plane&  plane,
-                                                       UndoStack& undoStack,
-                                                       QWidget* parent) noexcept
+BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
+    Project& project, BI_Plane& plane, UndoStack& undoStack,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mProject(project),
     mPlane(plane),
     mUi(new Ui::BoardPlanePropertiesDialog),
     mUndoStack(undoStack) {
   mUi->setupUi(this);
-  mUi->edtMinWidth->setSingleStep(0.1);      // [mm]
-  mUi->edtMinClearance->setSingleStep(0.1);  // [mm]
+  mUi->edtMinWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                              settingsPrefix % "/min_width");
+  mUi->edtMinClearance->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                                  settingsPrefix % "/min_clearance");
+  mUi->pathEditorWidget->setLengthUnit(lengthUnit);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardPlanePropertiesDialog::buttonBoxClicked);
 

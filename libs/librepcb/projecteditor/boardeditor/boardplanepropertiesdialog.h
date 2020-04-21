@@ -62,7 +62,9 @@ public:
   BoardPlanePropertiesDialog()                                        = delete;
   BoardPlanePropertiesDialog(const BoardPlanePropertiesDialog& other) = delete;
   BoardPlanePropertiesDialog(Project& project, BI_Plane& plane,
-                             UndoStack& undoStack, QWidget* parent) noexcept;
+                             UndoStack& undoStack, const LengthUnit& lengthUnit,
+                             const QString& settingsPrefix,
+                             QWidget*       parent) noexcept;
   ~BoardPlanePropertiesDialog() noexcept;
 
 private:  // GUI Events

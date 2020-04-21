@@ -93,7 +93,6 @@ bool BES_AddHole::entry(BEE_Base* event) noexcept {
 
   // add the diameter spinbox to the toolbar
   mDiameterEdit.reset(new PositiveLengthEdit());
-  mDiameterEdit->setSingleStep(0.1);  // [mm]
   mDiameterEdit->setValue(mCurrentDiameter);
   connect(mDiameterEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BES_AddHole::diameterEditValueChanged);

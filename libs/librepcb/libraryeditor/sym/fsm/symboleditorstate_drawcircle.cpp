@@ -87,7 +87,9 @@ bool SymbolEditorState_DrawCircle::entry() noexcept {
 
   mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
   std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
-  edtLineWidth->setSingleStep(0.1);  // [mm]
+  edtLineWidth->configure(getDefaultLengthUnit(),
+                          LengthEditBase::Steps::generic(),
+                          "symbol_editor/draw_circle/line_width");
   edtLineWidth->setValue(mLastLineWidth);
   connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
           &SymbolEditorState_DrawCircle::lineWidthEditValueChanged);

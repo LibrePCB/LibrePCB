@@ -143,7 +143,6 @@ bool BES_AddStrokeText::entry(BEE_Base* event) noexcept {
 
   // add the height spinbox to the toolbar
   mHeightEdit.reset(new PositiveLengthEdit());
-  mHeightEdit->setSingleStep(0.5);  // [mm]
   mHeightEdit->setValue(mCurrentHeight);
   connect(mHeightEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BES_AddStrokeText::heightEditValueChanged);

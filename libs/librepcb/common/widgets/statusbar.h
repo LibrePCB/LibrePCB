@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../units/lengthunit.h"
 #include "../units/point.h"
 
 #include <QtCore>
@@ -62,6 +63,7 @@ public:
   // Setters
   void setFields(Fields fields) noexcept;
   void setField(Field field, bool enable) noexcept;
+  void setLengthUnit(const LengthUnit& unit) noexcept;
   void setAbsoluteCursorPosition(const Point& pos) noexcept;
   void setProgressBarTextFormat(const QString& format) noexcept;
   void setProgressBarPercent(int percent) noexcept;
@@ -69,8 +71,13 @@ public:
   // Operator Overloadings
   StatusBar& operator=(const StatusBar& rhs) = delete;
 
+private:  // Methods
+  void updateAbsoluteCursorPosition() noexcept;
+
 private:  // Data
   Fields                       mFields;
+  LengthUnit                   mLengthUnit;
+  Point                        mAbsoluteCursorPosition;
   QScopedPointer<QLabel>       mAbsPosXLabel;
   QScopedPointer<QLabel>       mAbsPosYLabel;
   QScopedPointer<QProgressBar> mProgressBar;

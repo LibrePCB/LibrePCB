@@ -23,12 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/length.h"
-#include "../units/lengthunit.h"
-#include "numbereditbase.h"
-
-#include <QtCore>
-#include <QtWidgets>
+#include "lengtheditbase.h"
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -43,7 +38,7 @@ namespace librepcb {
  * @brief The PositiveLengthEdit class is a widget to view/edit
  *        ::librepcb::PositiveLength values
  */
-class PositiveLengthEdit final : public NumberEditBase {
+class PositiveLengthEdit final : public LengthEditBase {
   Q_OBJECT
 
 public:
@@ -53,27 +48,20 @@ public:
   virtual ~PositiveLengthEdit() noexcept;
 
   // Getters
-  const PositiveLength& getValue() const noexcept { return mValue; }
+  PositiveLength getValue() const noexcept;
 
   // Setters
   void setValue(const PositiveLength& value) noexcept;
-  void setUnit(const LengthUnit& unit) noexcept;
 
   // Operator Overloadings
   PositiveLengthEdit& operator=(const PositiveLengthEdit& rhs) = delete;
 
 signals:
-  void valueChanged(const PositiveLength& value);
+  // Note: Full namespace librepcb::PositiveLength is required for the MOC!
+  void valueChanged(const librepcb::PositiveLength& value);
 
-private:  // Methods
-  void updateSpinBox() noexcept override;
-  void spinBoxValueChanged(double value) noexcept override;
-
-private:  // Data
-  PositiveLength mMinValue;
-  PositiveLength mMaxValue;
-  PositiveLength mValue;
-  LengthUnit     mUnit;
+private:
+  virtual void valueChangedImpl() noexcept override;
 };
 
 /*******************************************************************************

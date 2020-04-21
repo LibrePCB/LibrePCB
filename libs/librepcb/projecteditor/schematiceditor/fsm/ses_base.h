@@ -84,6 +84,9 @@ public:
     return true;
   }
 
+protected:  // Methods
+  const LengthUnit& getDefaultLengthUnit() const noexcept;
+
 protected:
   // General Attributes which are needed by some state objects
   workspace::Workspace& mWorkspace;

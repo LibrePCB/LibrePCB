@@ -34,6 +34,7 @@ namespace librepcb {
 class UndoStack;
 class Text;
 class GraphicsLayer;
+class LengthUnit;
 
 namespace Ui {
 class TextPropertiesDialog;
@@ -55,6 +56,8 @@ public:
   TextPropertiesDialog(const TextPropertiesDialog& other) = delete;
   TextPropertiesDialog(Text& text, UndoStack& undoStack,
                        QList<GraphicsLayer*> layers,
+                       const LengthUnit&     lengthUnit,
+                       const QString&        settingsPrefix,
                        QWidget*              parent = nullptr) noexcept;
   ~TextPropertiesDialog() noexcept;
 

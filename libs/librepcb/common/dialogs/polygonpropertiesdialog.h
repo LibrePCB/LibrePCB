@@ -58,6 +58,8 @@ public:
   PolygonPropertiesDialog(const PolygonPropertiesDialog& other) = delete;
   PolygonPropertiesDialog(Polygon& polygon, UndoStack& undoStack,
                           QList<GraphicsLayer*> layers,
+                          const LengthUnit&     lengthUnit,
+                          const QString&        settingsPrefix,
                           QWidget*              parent = nullptr) noexcept;
   ~PolygonPropertiesDialog() noexcept;
 

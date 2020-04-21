@@ -134,7 +134,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   // add the size combobox to the toolbar
   mSizeEdit = new PositiveLengthEdit();
   mSizeEdit->setValue(mCurrentViaSize);
-  mSizeEdit->setSingleStep(0.1);  // [mm]
   mEditorUi.commandToolbar->addWidget(mSizeEdit);
   connect(mSizeEdit, &PositiveLengthEdit::valueChanged, this,
           &BES_AddVia::sizeEditValueChanged);
@@ -147,7 +146,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   // add the drill combobox to the toolbar
   mDrillEdit = new PositiveLengthEdit();
   mDrillEdit->setValue(mCurrentViaDrillDiameter);
-  mDrillEdit->setSingleStep(0.1);  // [mm]
   mEditorUi.commandToolbar->addWidget(mDrillEdit);
   connect(mDrillEdit, &PositiveLengthEdit::valueChanged, this,
           &BES_AddVia::drillDiameterEditValueChanged);

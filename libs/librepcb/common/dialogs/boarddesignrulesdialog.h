@@ -51,8 +51,9 @@ public:
   // Constructors / Destructor
   BoardDesignRulesDialog()                                    = delete;
   BoardDesignRulesDialog(const BoardDesignRulesDialog& other) = delete;
-  explicit BoardDesignRulesDialog(const BoardDesignRules& rules,
-                                  QWidget*                parent = 0);
+  BoardDesignRulesDialog(const BoardDesignRules& rules,
+                         const LengthUnit&       lengthUnit,
+                         const QString& settingsPrefix, QWidget* parent = 0);
   ~BoardDesignRulesDialog();
 
   // Getters

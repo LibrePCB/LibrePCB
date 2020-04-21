@@ -58,7 +58,9 @@ void LengthDelegate::setUnit(const LengthUnit& unit) noexcept {
 
 QString LengthDelegate::displayText(const QVariant& value,
                                     const QLocale&  locale) const {
-  return Toolbox::floatToString(value.value<Length>().toMm(), 10, locale) %
+  qreal converted = mUnit.convertToUnit(value.value<Length>());
+  return Toolbox::floatToString(converted,
+                                mUnit.getReasonableNumberOfDecimals(), locale) %
          " " % mUnit.toShortStringTr();
 }
 
@@ -68,7 +70,9 @@ QWidget* LengthDelegate::createEditor(QWidget*                    parent,
   Q_UNUSED(option);
   LengthEdit* edt = new LengthEdit(parent);
   edt->setFrame(false);
-  edt->setUnit(mUnit);
+  edt->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  edt->setChangeUnitActionVisible(false);  // avoid wasting space
+  edt->setDefaultUnit(mUnit);
   edt->setValue(index.data(Qt::EditRole).value<Length>());
   edt->selectAll();
 

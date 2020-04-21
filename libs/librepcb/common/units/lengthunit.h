@@ -148,6 +148,34 @@ public:
    */
   QString toShortStringTr() const noexcept;
 
+  /**
+   * @brief Get a reasonable number of decimals to be shown
+   *
+   * When displaying length values to the user, often it makes sense to limit
+   * the displayed number of decimal places. But since this number depends on
+   * the unit, this helper method is provided.
+   *
+   * @note  The returned number of decimals will *NOT* be enough to represent
+   *        all possiblle ::librepcb::Length values without loosing precision!
+   *        So a value with truncated number of decimal places may not be
+   *        converted back to a ::librepcb::Length object since this might lead
+   *        to a different value!
+   *
+   * @return Reasonable number of decimals.
+   */
+  int getReasonableNumberOfDecimals() const noexcept;
+
+  /**
+   * @brief Get user input suffixes
+   *
+   * Returns a list of suffixes the user might use to represent this unit. For
+   * example "um" is a typical user input to mean Micrometers since "μm" is
+   * more difficult to write.
+   *
+   * @return A list of user input suffixes
+   */
+  QStringList getUserInputSuffixes() const noexcept;
+
   // General Methods
 
   /**
@@ -214,6 +242,17 @@ public:
   // Static Methods
 
   /**
+   * @brief Get the length unit represented by a string
+   *
+   * @param str   The #toStr() representation of the unit.
+   *
+   * @return The LengthUnit of the string.
+   *
+   * @throw Exception If the string did not contain a valid unit.
+   */
+  static LengthUnit fromString(const QString& str);
+
+  /**
    * @brief Get the length unit of a specific index (to use with #getIndex())
    *
    * @param index         The index of the unit in the list of #getAllUnits().
@@ -227,7 +266,6 @@ public:
    * @see #getIndex(), #getAllUnits()
    */
   static LengthUnit fromIndex(int index);
-  ;
 
   /**
    * @brief Get all available length units
@@ -299,22 +337,8 @@ inline SExpression serializeToSExpression(const LengthUnit& obj) {
 template <>
 inline LengthUnit deserializeFromSExpression(const SExpression& sexpr,
                                              bool               throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  if (str == "millimeters")
-    return LengthUnit::millimeters();
-  else if (str == "micrometers")
-    return LengthUnit::micrometers();
-  else if (str == "nanometers")
-    return LengthUnit::nanometers();
-  else if (str == "inches")
-    return LengthUnit::inches();
-  else if (str == "mils")
-    return LengthUnit::mils();
-  else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(LengthUnit::tr("Invalid length unit: \"%1\"")).arg(str));
-  }
+  return LengthUnit::fromString(
+      sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {

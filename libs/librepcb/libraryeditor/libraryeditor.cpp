@@ -148,6 +148,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
+  mUi->statusBar->setLengthUnit(
+      mWorkspace.getSettings().defaultLengthUnit.get());
   connect(&mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusBar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);

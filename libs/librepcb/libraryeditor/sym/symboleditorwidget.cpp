@@ -122,10 +122,15 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   mUi->graphicsView->zoomAll();
 
   // Load finite state machine (FSM).
-  SymbolEditorFsm::Context fsmContext{
-      *this,           *mUndoStack,          mContext.layerProvider,
-      *mGraphicsScene, *mUi->graphicsView,   *mSymbol,
-      *mGraphicsItem,  *mCommandToolBarProxy};
+  SymbolEditorFsm::Context fsmContext{mContext.workspace,
+                                      *this,
+                                      *mUndoStack,
+                                      mContext.layerProvider,
+                                      *mGraphicsScene,
+                                      *mUi->graphicsView,
+                                      *mSymbol,
+                                      *mGraphicsItem,
+                                      *mCommandToolBarProxy};
   mFsm.reset(new SymbolEditorFsm(fsmContext));
 
   // Last but not least, connect the graphics scene events with the FSM.
