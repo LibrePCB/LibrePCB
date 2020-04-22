@@ -20,11 +20,14 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "firstrunwizard.h"
+#include "initializeworkspacewizard.h"
 
-#include "firstrunwizardpage_welcome.h"
-#include "firstrunwizardpage_workspacepath.h"
-#include "ui_firstrunwizard.h"
+#include "initializeworkspacewizard_chooseimportversion.h"
+#include "initializeworkspacewizard_choosesettings.h"
+#include "initializeworkspacewizard_finalizeimport.h"
+#include "ui_initializeworkspacewizard.h"
+
+#include <librepcb/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
@@ -32,62 +35,37 @@
 namespace librepcb {
 namespace application {
 
+using namespace workspace;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-FirstRunWizard::FirstRunWizard(QWidget* parent) noexcept
-  : QWizard(parent), mUi(new Ui::FirstRunWizard) {
+InitializeWorkspaceWizard::InitializeWorkspaceWizard(
+    const FilePath& workspacePath, QWidget* parent) noexcept
+  : QWizard(parent),
+    mContext(workspacePath),
+    mUi(new Ui::InitializeWorkspaceWizard) {
   mUi->setupUi(this);
 
   // add pages
-  setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
-  setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
+  if (Workspace::getFileFormatVersionsOfWorkspace(mContext.getWorkspacePath())
+          .count() > 0) {
+    // Only provide import option if there are versions to import
+    setPage(InitializeWorkspaceWizardContext::ID_ChooseImportVersion,
+            new InitializeWorkspaceWizard_ChooseImportVersion(mContext));
+    setPage(InitializeWorkspaceWizardContext::ID_FinalizeImport,
+            new InitializeWorkspaceWizard_FinalizeImport(mContext));
+  }
+  setPage(InitializeWorkspaceWizardContext::ID_ChooseSettings,
+          new InitializeWorkspaceWizard_ChooseSettings(mContext));
 
   // set header logo
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 }
 
-FirstRunWizard::~FirstRunWizard() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-bool FirstRunWizard::getCreateNewWorkspace() const noexcept {
-  return field("CreateWorkspace").toBool();
-}
-
-FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept {
-  if (getCreateNewWorkspace())
-    return FilePath(field("CreateWorkspacePath").toString());
-  else
-    return FilePath(field("OpenWorkspacePath").toString());
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void FirstRunWizard::skipWelcomePage() noexcept {
-  removePage(Page_Welcome);
-}
-
-/*******************************************************************************
- *  Inherited from QWizard
- ******************************************************************************/
-
-int FirstRunWizard::nextId() const {
-  switch (currentId()) {
-    case Page_Welcome: {
-      return Page_WorkspacePath;
-    }
-    case Page_WorkspacePath: {
-      return -1;
-    }
-    default: { return -1; }
-  }
+InitializeWorkspaceWizard::~InitializeWorkspaceWizard() noexcept {
 }
 
 /*******************************************************************************

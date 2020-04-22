@@ -17,55 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
-#define LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
+#ifndef LIBREPCB_ASYNCCOPYOPERATION_H
+#define LIBREPCB_ASYNCCOPYOPERATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "filepath.h"
+
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace application {
-
-namespace Ui {
-class FirstRunWizardPage_WorkspaceSettings;
-}
 
 /*******************************************************************************
- *  Class FirstRunWizardPage_WorkspaceSettings
+ *  Class AsyncCopyOperation
  ******************************************************************************/
 
 /**
- * @brief The FirstRunWizardPage_WorkspaceSettings class
+ * @brief High-level helper class to asynchronously and recursively copy
+ *        directories with progress indicator
  */
-class FirstRunWizardPage_WorkspaceSettings final : public QWizardPage {
+class AsyncCopyOperation final : public QThread {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizardPage_WorkspaceSettings(QWidget* parent = 0) noexcept;
-  ~FirstRunWizardPage_WorkspaceSettings() noexcept;
+  AsyncCopyOperation()                                = delete;
+  AsyncCopyOperation(const AsyncCopyOperation& other) = delete;
+  AsyncCopyOperation(const FilePath& source, const FilePath& destination,
+                     QObject* parent = nullptr) noexcept;
+  ~AsyncCopyOperation() noexcept;
 
-  // Inherited Methods
-  bool validatePage() noexcept override;
+  // Getters
+  const FilePath& getSource() const noexcept { return mSource; }
+  const FilePath& getDestination() const noexcept { return mDestination; }
+
+  // Operator Overloadings
+  AsyncCopyOperation& operator=(const AsyncCopyOperation& rhs) = delete;
+
+signals:
+  void started();
+  void progressStatus(const QString& status);
+  void progressPercent(int percent);
+  void succeeded();
+  void failed(const QString& error);
+  void finished();
 
 private:  // Methods
-  Q_DISABLE_COPY(FirstRunWizardPage_WorkspaceSettings)
+  void run() noexcept override;
 
 private:  // Data
-  QScopedPointer<Ui::FirstRunWizardPage_WorkspaceSettings> mUi;
+  FilePath mSource;
+  FilePath mDestination;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_APPLICATION_FIRSTRUNWIZARDPAGE_WORKSPACESETTINGS_H
+#endif  // LIBREPCB_ASYNCCOPYOPERATION_H

@@ -20,11 +20,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "firstrunwizard.h"
+#include "initializeworkspacewizardcontext.h"
 
-#include "firstrunwizardpage_welcome.h"
-#include "firstrunwizardpage_workspacepath.h"
-#include "ui_firstrunwizard.h"
+#include <librepcb/common/application.h>
+#include <librepcb/common/fileio/asynccopyoperation.h>
+#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
@@ -36,58 +38,38 @@ namespace application {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FirstRunWizard::FirstRunWizard(QWidget* parent) noexcept
-  : QWizard(parent), mUi(new Ui::FirstRunWizard) {
-  mUi->setupUi(this);
-
-  // add pages
-  setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
-  setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
-
-  // set header logo
-  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
+InitializeWorkspaceWizardContext::InitializeWorkspaceWizardContext(
+    const FilePath& ws, QObject* parent) noexcept
+  : QObject(parent), mWorkspacePath(ws), mVersionToImport() {
 }
 
-FirstRunWizard::~FirstRunWizard() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-bool FirstRunWizard::getCreateNewWorkspace() const noexcept {
-  return field("CreateWorkspace").toBool();
-}
-
-FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept {
-  if (getCreateNewWorkspace())
-    return FilePath(field("CreateWorkspacePath").toString());
-  else
-    return FilePath(field("OpenWorkspacePath").toString());
+InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void FirstRunWizard::skipWelcomePage() noexcept {
-  removePage(Page_Welcome);
+std::unique_ptr<AsyncCopyOperation>
+InitializeWorkspaceWizardContext::createImportCopyOperation() const noexcept {
+  if (mVersionToImport) {
+    FilePath src = mWorkspacePath.getPathTo("v" % mVersionToImport->toStr());
+    FilePath dst =
+        mWorkspacePath.getPathTo("v" % qApp->getFileFormatVersion().toStr());
+    return std::unique_ptr<AsyncCopyOperation>(
+        new AsyncCopyOperation(src, dst));
+  } else {
+    return std::unique_ptr<AsyncCopyOperation>(nullptr);
+  }
 }
 
-/*******************************************************************************
- *  Inherited from QWizard
- ******************************************************************************/
-
-int FirstRunWizard::nextId() const {
-  switch (currentId()) {
-    case Page_Welcome: {
-      return Page_WorkspacePath;
-    }
-    case Page_WorkspacePath: {
-      return -1;
-    }
-    default: { return -1; }
-  }
+void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
+  workspace::Workspace ws(mWorkspacePath);  // can throw
+  ws.getSettings().applicationLocale.set(mAppLocale);
+  ws.getSettings().defaultLengthUnit.set(mLengthUnit);
+  ws.getSettings().libraryNormOrder.set(mLibraryNormOrder);
+  ws.getSettings().userName.set(mUserName);
+  ws.getSettings().saveToFile();  // can throw
 }
 
 /*******************************************************************************

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARD_H
-#define LIBREPCB_FIRSTRUNWIZARD_H
+#ifndef LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_FINALIZEIMPORT_H
+#define LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_FINALIZEIMPORT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include "initializeworkspacewizardcontext.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,45 +35,46 @@ namespace librepcb {
 namespace application {
 
 namespace Ui {
-class FirstRunWizard;
+class InitializeWorkspaceWizard_FinalizeImport;
 }
 
 /*******************************************************************************
- *  Class FirstRunWizard
+ *  Class InitializeWorkspaceWizard_FinalizeImport
  ******************************************************************************/
 
 /**
- * @brief The FirstRunWizard class
+ * @brief The InitializeWorkspaceWizard_FinalizeImport class
  */
-class FirstRunWizard final : public QWizard {
+class InitializeWorkspaceWizard_FinalizeImport final : public QWizardPage {
   Q_OBJECT
-
-  enum PageId {
-    Page_Welcome,
-    Page_WorkspacePath,
-  };
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizard(QWidget* parent = 0) noexcept;
-  ~FirstRunWizard() noexcept;
+  explicit InitializeWorkspaceWizard_FinalizeImport(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_FinalizeImport(
+      const InitializeWorkspaceWizard_FinalizeImport& other) = delete;
+  ~InitializeWorkspaceWizard_FinalizeImport() noexcept;
 
-  // Getters
-  bool     getCreateNewWorkspace() const noexcept;
-  FilePath getWorkspaceFilePath() const noexcept;
+  // Inherited from QWizardPage
+  void initializePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int  nextId() const noexcept override;
 
-  // General Methods
-  void skipWelcomePage() noexcept;
-
-  // Inherited from QWizard
-  int nextId() const override;
+  // Operator Overloadings
+  InitializeWorkspaceWizard_FinalizeImport& operator       =(
+      const InitializeWorkspaceWizard_FinalizeImport& rhs) = delete;
 
 private:
-  // Private Methods
-  Q_DISABLE_COPY(FirstRunWizard)
+  void startImport() noexcept;
+  void importFailed(const QString& error) noexcept;
+  void importSucceeded() noexcept;
 
-  // Private Membervariables
-  QScopedPointer<Ui::FirstRunWizard> mUi;
+private:
+  InitializeWorkspaceWizardContext&                            mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_FinalizeImport> mUi;
+  std::unique_ptr<AsyncCopyOperation>                          mCopyOperation;
+  bool                                                         mImportSucceeded;
 };
 
 /*******************************************************************************
@@ -83,4 +84,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FIRSTRUNWIZARD_H
+#endif  // LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_FINALIZEIMPORT_H

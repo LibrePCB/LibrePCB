@@ -20,11 +20,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "firstrunwizard.h"
+#include "initializeworkspacewizard_chooseimportversion.h"
 
-#include "firstrunwizardpage_welcome.h"
-#include "firstrunwizardpage_workspacepath.h"
-#include "ui_firstrunwizard.h"
+#include "librepcb/workspace/workspace.h"
+#include "ui_initializeworkspacewizard_chooseimportversion.h"
+
+#include <librepcb/common/application.h>
 
 /*******************************************************************************
  *  Namespace
@@ -32,61 +33,50 @@
 namespace librepcb {
 namespace application {
 
+using namespace workspace;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-FirstRunWizard::FirstRunWizard(QWidget* parent) noexcept
-  : QWizard(parent), mUi(new Ui::FirstRunWizard) {
+InitializeWorkspaceWizard_ChooseImportVersion::
+    InitializeWorkspaceWizard_ChooseImportVersion(
+        InitializeWorkspaceWizardContext& context, QWidget* parent) noexcept
+  : QWizardPage(parent),
+    mContext(context),
+    mUi(new Ui::InitializeWorkspaceWizard_ChooseImportVersion) {
   mUi->setupUi(this);
 
-  // add pages
-  setPage(Page_Welcome, new FirstRunWizardPage_Welcome());
-  setPage(Page_WorkspacePath, new FirstRunWizardPage_WorkspacePath());
-
-  // set header logo
-  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
-}
-
-FirstRunWizard::~FirstRunWizard() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-bool FirstRunWizard::getCreateNewWorkspace() const noexcept {
-  return field("CreateWorkspace").toBool();
-}
-
-FilePath FirstRunWizard::getWorkspaceFilePath() const noexcept {
-  if (getCreateNewWorkspace())
-    return FilePath(field("CreateWorkspacePath").toString());
-  else
-    return FilePath(field("OpenWorkspacePath").toString());
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void FirstRunWizard::skipWelcomePage() noexcept {
-  removePage(Page_Welcome);
-}
-
-/*******************************************************************************
- *  Inherited from QWizard
- ******************************************************************************/
-
-int FirstRunWizard::nextId() const {
-  switch (currentId()) {
-    case Page_Welcome: {
-      return Page_WorkspacePath;
+  mUi->cbxVersions->addItem(tr("Do not import any data"));
+  foreach (const Version& version, Workspace::getFileFormatVersionsOfWorkspace(
+                                       mContext.getWorkspacePath())) {
+    if (version < qApp->getFileFormatVersion()) {
+      mUi->cbxVersions->addItem("LibrePCB " % version.toStr() % ".x",
+                                version.toStr());
     }
-    case Page_WorkspacePath: {
-      return -1;
-    }
-    default: { return -1; }
+  }
+  mUi->cbxVersions->setCurrentIndex(mUi->cbxVersions->count() - 1);
+}
+
+InitializeWorkspaceWizard_ChooseImportVersion::
+    ~InitializeWorkspaceWizard_ChooseImportVersion() noexcept {
+}
+
+/*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+bool InitializeWorkspaceWizard_ChooseImportVersion::validatePage() noexcept {
+  mContext.setVersionToImport(
+      Version::tryFromString(mUi->cbxVersions->currentData().toString()));
+  return true;
+}
+
+int InitializeWorkspaceWizard_ChooseImportVersion::nextId() const noexcept {
+  if (mContext.getVersionToImport()) {
+    return InitializeWorkspaceWizardContext::ID_FinalizeImport;
+  } else {
+    return InitializeWorkspaceWizardContext::ID_ChooseSettings;
   }
 }
 

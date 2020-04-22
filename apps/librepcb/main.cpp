@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "controlpanel/controlpanel.h"
 #include "firstrunwizard/firstrunwizard.h"
+#include "initializeworkspacewizard/initializeworkspacewizard.h"
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/debug.h>
@@ -183,13 +184,17 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
         QCoreApplication::translate(
             "main",
             "<p><b>ATTENTION: This application version is UNSTABLE!</b></p>"
-            "<p>Everything you do with this application could break your "
-            "workspace, "
-            "libraries or projects! It's highly recommended to create a backup "
-            "before proceeding. If you are unsure, please download an official "
-            "stable release instead.</p>"
+            "<p>Everything you do with this application can break your "
+            "workspace, libraries or projects! Saved files will not be "
+            "readable with stable releases of LibrePCB. It's highly "
+            "recommended to create a backup before proceeding. If you are "
+            "unsure, please download an official stable release instead.</p>"
+            "<p>For details, please take a look at LibrePCB's "
+            "<a href=\"%1\">versioning concept</a>.</p>"
             "<p>Are you really sure to continue with the risk of breaking your "
-            "files?!</p>"),
+            "files?!</p>")
+            .arg("https://developers.librepcb.org/da/dbc/"
+                 "doc_release_workflow.html"),
         QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
     return (btn == QMessageBox::Yes);
   }
@@ -209,11 +214,6 @@ static FilePath determineWorkspacePath() noexcept {
         try {
           // create new workspace
           Workspace::createNewWorkspace(wsPath);  // can throw
-
-          // open workspace and apply settings
-          Workspace ws(wsPath);
-          ws.getSettings().userName.set(wizard.getNewWorkspaceUserName());
-          ws.getSettings().saveToFile();  // can throw
         } catch (const Exception& e) {
           QMessageBox::critical(0, Application::translate("Workspace", "Error"),
                                 e.getMsg());
@@ -235,6 +235,17 @@ static FilePath determineWorkspacePath() noexcept {
 
 static int openWorkspace(const FilePath& path) noexcept {
   try {
+    // Migrate workspace to new major version, if needed. Note that this needs
+    // to be done *before* opening the workspace, otherwise the workspace would
+    // be default-initialized!
+    QList<Version> versions = Workspace::getFileFormatVersionsOfWorkspace(path);
+    if (!versions.contains(qApp->getFileFormatVersion())) {
+      InitializeWorkspaceWizard wizard(path);
+      if (wizard.exec() != QDialog::Accepted) {
+        return 0;  // Workspace not migrated, abort here!
+      }
+    }
+
     Workspace ws(path);  // can throw
 
     // Now since workspace settings are loaded, switch to the locale defined

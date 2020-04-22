@@ -502,11 +502,15 @@ bool CommandLineInterface::openProject(
     // Save project
     if (save) {
       print(tr("Save project..."));
-      project.save();  // can throw
-      if (projectFp.getSuffix() == "lppz") {
-        projectFs->exportToZip(projectFp);  // can throw
+      if (failIfFileFormatUnstable()) {
+        success = false;
       } else {
-        projectFs->save();  // can throw
+        project.save();  // can throw
+        if (projectFp.getSuffix() == "lppz") {
+          projectFs->exportToZip(projectFp);  // can throw
+        } else {
+          projectFs->save();  // can throw
+        }
       }
     }
 
@@ -690,7 +694,11 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
   if (save) {
     qInfo()
         << QString(tr("Save '%1'...")).arg(prettyPath(fs.getPath(), libDir));
-    fs.save();  // can throw
+    if (failIfFileFormatUnstable()) {
+      success = false;
+    } else {
+      fs.save();  // can throw
+    }
   }
 
   // Do not propagate changes in the transactional file system to the
@@ -706,6 +714,22 @@ QString CommandLineInterface::prettyPath(const FilePath& path,
     return path.getFilename();  // name of current directory
   } else {
     return path.toRelative(FilePath(QDir::currentPath()));  // relative path
+  }
+}
+
+bool CommandLineInterface::failIfFileFormatUnstable() noexcept {
+  if ((!qApp->isFileFormatStable()) &&
+      (qgetenv("LIBREPCB_DISABLE_UNSTABLE_WARNING") != "1")) {
+    printErr(
+        tr("This application version is UNSTABLE! Option '%1' is disabled to "
+           "avoid breaking projects or libraries. Please use a stable "
+           "release instead.")
+            .arg("--save"));
+    return true;
+  } else {
+    qInfo() << "Application version is unstable, but warning is disabled with "
+               "environment variable LIBREPCB_DISABLE_UNSTABLE_WARNING.";
+    return false;
   }
 }
 

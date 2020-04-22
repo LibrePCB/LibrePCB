@@ -17,44 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NORMS_H
-#define LIBREPCB_NORMS_H
+#ifndef LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_H
+#define LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "initializeworkspacewizardcontext.h"
+
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace application {
+
+namespace Ui {
+class InitializeWorkspaceWizard;
+}
 
 /*******************************************************************************
- *  List of norms
+ *  Class InitializeWorkspaceWizard
  ******************************************************************************/
 
 /**
- * @brief Get a list of available "built-in" norms
- *
- * These norms are used e.g. in the library editor and workspace/project
- * settings dialogs.
- *
- * @return List of norms
+ * @brief The InitializeWorkspaceWizard class
  */
-inline QStringList getAvailableNorms() noexcept {
-  return QStringList{"IEC 60617", "IEEE 315"};
-}
+class InitializeWorkspaceWizard final : public QWizard {
+  Q_OBJECT
 
-inline QIcon getNormIcon(const QString& norm) noexcept {
-  return QIcon(
-      QString(":/img/norm/%1.png").arg(norm.toLower().replace(" ", "_")));
-}
+public:
+  // Constructors / Destructor
+  explicit InitializeWorkspaceWizard(const FilePath& workspacePath,
+                                     QWidget*        parent = nullptr) noexcept;
+  InitializeWorkspaceWizard(const InitializeWorkspaceWizard& other) = delete;
+  ~InitializeWorkspaceWizard() noexcept;
+
+  // Getters
+  const InitializeWorkspaceWizardContext& getContext() const noexcept {
+    return mContext;
+  }
+
+  // Operator Overloadings
+  InitializeWorkspaceWizard& operator=(const InitializeWorkspaceWizard& rhs) =
+      delete;
+
+private:
+  InitializeWorkspaceWizardContext              mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard> mUi;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NORMS_H
+#endif  // LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_H
