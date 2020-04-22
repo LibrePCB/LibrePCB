@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "controlpanel.h"
 
+#include "../firstrunwizard/firstrunwizard.h"
 #include "../markdown/markdownconverter.h"
 #include "projectlibraryupdater/projectlibraryupdater.h"
 #include "ui_controlpanel.h"
@@ -511,13 +512,24 @@ void ControlPanel::on_actionClose_all_open_projects_triggered() {
 }
 
 void ControlPanel::on_actionSwitch_Workspace_triggered() {
-  FilePath wsPath = Workspace::chooseWorkspacePath();
-  if (!wsPath.isValid()) return;
-
-  Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
-  QMessageBox::information(this, tr("Workspace changed"),
-                           tr("The chosen workspace will be used after "
-                              "restarting the application."));
+  FirstRunWizard wizard;
+  wizard.skipWelcomePage();  // Welcome page not needed here
+  if (wizard.exec() == QDialog::Accepted) {
+    FilePath wsPath = wizard.getWorkspaceFilePath();
+    if (wizard.getCreateNewWorkspace()) {
+      try {
+        // create new workspace
+        Workspace::createNewWorkspace(wsPath);  // can throw
+      } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getMsg());
+        return;
+      }
+    }
+    Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+    QMessageBox::information(this, tr("Workspace changed"),
+                             tr("The chosen workspace will be used after "
+                                "restarting the application."));
+  }
 }
 
 void ControlPanel::on_actionWorkspace_Settings_triggered() {

@@ -64,6 +64,9 @@ public:
   FilePath getWorkspaceFilePath() const noexcept;
   QString  getNewWorkspaceUserName() const noexcept;
 
+  // General Methods
+  void skipWelcomePage() noexcept;
+
   // Inherited from QWizard
   int nextId() const override;
 
