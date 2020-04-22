@@ -221,14 +221,6 @@ public:
   static void setMostRecentlyUsedWorkspacePath(const FilePath& path) noexcept;
 
   /**
-   * @brief Let the user choose a workspace path (with a directory chooser
-   * dialog)
-   *
-   * @return The choosen filepath (is invalid on error or user cancel)
-   */
-  static FilePath chooseWorkspacePath() noexcept;
-
-  /**
    * @brief Current workspace file format version (constant)
    *
    * @warning Don't change this value unless you know exactly what you're doing!

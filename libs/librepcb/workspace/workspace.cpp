@@ -29,7 +29,6 @@
 #include "settings/workspacesettings.h"
 
 #include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/fileutils.h>
@@ -219,32 +218,6 @@ void Workspace::setMostRecentlyUsedWorkspacePath(
     const FilePath& path) noexcept {
   QSettings clientSettings;
   clientSettings.setValue("workspaces/most_recently_used", path.toNative());
-}
-
-FilePath Workspace::chooseWorkspacePath() noexcept {
-  FilePath path(
-      FileDialog::getExistingDirectory(0, tr("Select Workspace Path")));
-
-  if ((path.isValid()) && (!isValidWorkspacePath(path))) {
-    int answer =
-        QMessageBox::question(0, tr("Create new workspace?"),
-                              tr("The specified workspace does not exist. "
-                                 "Do you want to create a new workspace?"));
-
-    if (answer == QMessageBox::Yes) {
-      try {
-        createNewWorkspace(path);  // can throw
-      } catch (const Exception& e) {
-        QMessageBox::critical(0, tr("Error"),
-                              tr("Could not create the workspace!"));
-        return FilePath();
-      }
-    } else {
-      return FilePath();
-    }
-  }
-
-  return path;
 }
 
 /*******************************************************************************
