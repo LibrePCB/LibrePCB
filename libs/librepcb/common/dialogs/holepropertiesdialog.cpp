@@ -58,6 +58,9 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
   mUi->edtDiameter->setValue(mHole.getDiameter());
   mUi->edtPosX->setValue(mHole.getPosition().getX());
   mUi->edtPosY->setValue(mHole.getPosition().getY());
+
+  // set focus to diameter so the user can immediately start typing to change it
+  mUi->edtDiameter->setFocus();
 }
 
 HolePropertiesDialog::~HolePropertiesDialog() noexcept {

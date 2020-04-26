@@ -415,6 +415,35 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>edtBasePath</tabstop>
+  <tabstop>btnDefaultSuffixes</tabstop>
+  <tabstop>btnProtelSuffixes</tabstop>
+  <tabstop>edtSuffixOutlines</tabstop>
+  <tabstop>edtSuffixCopperInner</tabstop>
+  <tabstop>edtSuffixCopperTop</tabstop>
+  <tabstop>edtSuffixCopperBot</tabstop>
+  <tabstop>edtSuffixSoldermaskTop</tabstop>
+  <tabstop>edtSuffixSoldermaskBot</tabstop>
+  <tabstop>edtSuffixSilkscreenTop</tabstop>
+  <tabstop>edtSuffixSilkscreenBot</tabstop>
+  <tabstop>edtSuffixDrillsNpth</tabstop>
+  <tabstop>edtSuffixDrillsPth</tabstop>
+  <tabstop>cbxDrillsMerge</tabstop>
+  <tabstop>edtSuffixDrills</tabstop>
+  <tabstop>cbxSolderPasteTop</tabstop>
+  <tabstop>edtSuffixSolderPasteTop</tabstop>
+  <tabstop>cbxSolderPasteBot</tabstop>
+  <tabstop>edtSuffixSolderPasteBot</tabstop>
+  <tabstop>cbxSilkTopPlacement</tabstop>
+  <tabstop>cbxSilkTopNames</tabstop>
+  <tabstop>cbxSilkTopValues</tabstop>
+  <tabstop>cbxSilkBotPlacement</tabstop>
+  <tabstop>cbxSilkBotNames</tabstop>
+  <tabstop>cbxSilkBotValues</tabstop>
+  <tabstop>btnGenerate</tabstop>
+  <tabstop>btnBrowseOutputDir</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

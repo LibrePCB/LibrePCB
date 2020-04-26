@@ -137,6 +137,16 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbxNetSignal</tabstop>
+  <tabstop>cbxLayer</tabstop>
+  <tabstop>edtMinWidth</tabstop>
+  <tabstop>edtMinClearance</tabstop>
+  <tabstop>spbPriority</tabstop>
+  <tabstop>cbxConnectStyle</tabstop>
+  <tabstop>cbKeepOrphans</tabstop>
+  <tabstop>pathEditorWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

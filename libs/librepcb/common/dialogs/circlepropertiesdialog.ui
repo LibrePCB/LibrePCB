@@ -125,6 +125,15 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbxLayer</tabstop>
+  <tabstop>cbxFillArea</tabstop>
+  <tabstop>cbxIsGrabArea</tabstop>
+  <tabstop>edtLineWidth</tabstop>
+  <tabstop>edtDiameter</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

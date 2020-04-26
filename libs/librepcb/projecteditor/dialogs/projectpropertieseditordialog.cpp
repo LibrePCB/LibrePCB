@@ -59,6 +59,9 @@ ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(
   mUi->lblLastModifiedDateTime->setText(
       mMetadata.getLastModified().toString(Qt::DefaultLocaleLongDate));
   mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
+
+  // set focus to name so the user can immediately start typing to change it
+  mUi->edtName->setFocus();
 }
 
 ProjectPropertiesEditorDialog::~ProjectPropertiesEditorDialog() noexcept {

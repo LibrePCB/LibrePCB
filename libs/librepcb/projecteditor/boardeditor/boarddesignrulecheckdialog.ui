@@ -190,6 +190,17 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>btnRun</tabstop>
+  <tabstop>edtClearanceCopperCopper</tabstop>
+  <tabstop>edtClearanceCopperBoard</tabstop>
+  <tabstop>edtClearanceCopperNpth</tabstop>
+  <tabstop>edtMinCopperWidth</tabstop>
+  <tabstop>edtMinPthRestring</tabstop>
+  <tabstop>edtMinPthDrillDiameter</tabstop>
+  <tabstop>edtMinNpthDrillDiameter</tabstop>
+  <tabstop>edtCourtyardOffset</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

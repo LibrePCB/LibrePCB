@@ -105,6 +105,13 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbxShape</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+  <tabstop>edtSize</tabstop>
+  <tabstop>edtDrillDiameter</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

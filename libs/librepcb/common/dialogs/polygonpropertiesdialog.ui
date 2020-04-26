@@ -102,6 +102,13 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbxLayer</tabstop>
+  <tabstop>cbxFillArea</tabstop>
+  <tabstop>cbxIsGrabArea</tabstop>
+  <tabstop>edtLineWidth</tabstop>
+  <tabstop>pathEditorWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

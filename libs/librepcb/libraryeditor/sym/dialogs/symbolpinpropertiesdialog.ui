@@ -101,6 +101,13 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtName</tabstop>
+  <tabstop>edtLength</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+  <tabstop>edtRotation</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
