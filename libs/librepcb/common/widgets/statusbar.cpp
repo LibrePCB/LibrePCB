@@ -121,12 +121,12 @@ void StatusBar::updateAbsoluteCursorPosition() noexcept {
   mAbsPosXLabel->setText(
       QString("X:%1%2")
           .arg(mLengthUnit.convertToUnit(mAbsoluteCursorPosition.getX()), 12,
-               'f', 6)
+               'f', mLengthUnit.getReasonableNumberOfDecimals())
           .arg(mLengthUnit.toShortStringTr()));
   mAbsPosYLabel->setText(
       QString("Y:%1%2")
           .arg(mLengthUnit.convertToUnit(mAbsoluteCursorPosition.getY()), 12,
-               'f', 6)
+               'f', mLengthUnit.getReasonableNumberOfDecimals())
           .arg(mLengthUnit.toShortStringTr()));
 }
 
