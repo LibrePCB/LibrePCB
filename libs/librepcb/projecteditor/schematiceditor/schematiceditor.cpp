@@ -76,7 +76,6 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     mProject(project),
     mUi(new Ui::SchematicEditor),
     mGraphicsView(nullptr),
-    mGridProperties(nullptr),
     mActiveSchematicIndex(-1),
     mPagesDock(nullptr),
     mErcMsgDock(nullptr),
@@ -107,14 +106,10 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mErcMsgDock = new ErcMsgDock(mProject);
   addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
 
-  // create default grid properties
-  mGridProperties = new GridProperties();
-
   // add graphics view as central widget
   mGraphicsView = new GraphicsView(nullptr, this);
   mGraphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
-  mGraphicsView->setGridProperties(*mGridProperties);
   setCentralWidget(mGraphicsView);
 
   // Add actions to toggle visibility of dock widgets
@@ -219,8 +214,6 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
-  mUi->statusbar->setLengthUnit(
-      mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get());
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
@@ -264,8 +257,6 @@ SchematicEditor::~SchematicEditor() {
   mPagesDock = nullptr;
   delete mGraphicsView;
   mGraphicsView = nullptr;
-  delete mGridProperties;
-  mGridProperties = nullptr;
   delete mUi;
   mUi = nullptr;
 }
@@ -306,9 +297,13 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
     schematic->showInView(*mGraphicsView);
     mGraphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
     mGraphicsView->setGridProperties(schematic->getGridProperties());
+    mUi->statusbar->setLengthUnit(schematic->getGridProperties().getUnit());
   } else {
     mGraphicsView->setScene(nullptr);
   }
+
+  // update toolbars
+  mUi->actionGrid->setEnabled(schematic != nullptr);
 
   // schematic page has changed!
   mActiveSchematicIndex = index;
@@ -351,16 +346,18 @@ void SchematicEditor::on_actionRenameSheet_triggered() {
 }
 
 void SchematicEditor::on_actionGrid_triggered() {
-  GridSettingsDialog dialog(*mGridProperties, this);
-  connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
-          [this](const GridProperties& grid) {
-            *mGridProperties = grid;
-            mGraphicsView->setGridProperties(grid);
-          });
-  if (dialog.exec()) {
-    foreach (Schematic* schematic, mProject.getSchematics())
-      schematic->setGridProperties(*mGridProperties);
-    // mProjectEditor.setModifiedFlag(); TODO
+  if (const Schematic* activeSchematic = getActiveSchematic()) {
+    GridSettingsDialog dialog(activeSchematic->getGridProperties(), this);
+    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
+            [this](const GridProperties& grid) {
+              mGraphicsView->setGridProperties(grid);
+              mUi->statusbar->setLengthUnit(grid.getUnit());
+            });
+    if (dialog.exec()) {
+      foreach (Schematic* schematic, mProject.getSchematics()) {
+        schematic->setGridProperties(dialog.getGrid());
+      }
+    }
   }
 }
 

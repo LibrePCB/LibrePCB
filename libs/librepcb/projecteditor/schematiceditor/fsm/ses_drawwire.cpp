@@ -212,8 +212,9 @@ SES_Base::ProcRetVal SES_DrawWire::processIdleSceneEvent(
     case QEvent::GraphicsSceneMousePress: {
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
 
       switch (sceneEvent->button()) {
         case Qt::LeftButton:
@@ -259,8 +260,9 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(
     case QEvent::GraphicsSceneMousePress: {
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
       switch (sceneEvent->button()) {
         case Qt::LeftButton:
           // fix the current point and add a new point + line
@@ -277,8 +279,9 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(
     case QEvent::GraphicsSceneMouseRelease: {
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
       switch (sceneEvent->button()) {
         case Qt::RightButton:
           if (sceneEvent->screenPos() ==
@@ -302,8 +305,9 @@ SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
       Q_ASSERT(sceneEvent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
       updateNetpointPositions(pos);
       return ForceStayInState;
     }

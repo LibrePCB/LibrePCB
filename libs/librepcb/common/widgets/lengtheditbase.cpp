@@ -44,6 +44,7 @@ LengthEditBase::LengthEditBase(const Length& min, const Length& max,
     mMinimum(min),
     mMaximum(max),
     mValue(value),
+    mStepBehavior(StepBehavior::PredefinedSteps),
     mSteps(Steps::generic()),
     mSingleStepUp(0),
     mSingleStepDown(0),
@@ -101,6 +102,12 @@ void LengthEditBase::setChangeUnitActionVisible(bool visible) noexcept {
   mChangeUnitAction->setVisible(visible);
 }
 
+void LengthEditBase::setStepBehavior(StepBehavior behavior) noexcept {
+  mStepBehavior = behavior;
+  updateSingleStep();
+  update();  // step buttons might need to be repainted
+}
+
 void LengthEditBase::setSteps(const QVector<PositiveLength>& steps) noexcept {
   mSteps = steps;
   updateSingleStep();
@@ -110,6 +117,13 @@ void LengthEditBase::setSteps(const QVector<PositiveLength>& steps) noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void LengthEditBase::resetUnit() noexcept {
+  if (mSelectedUnit) {
+    mSelectedUnit = tl::nullopt;
+    updateText();
+  }
+}
 
 void LengthEditBase::configureClientSettings(
     const QString& uniqueIdentifier) noexcept {
@@ -216,6 +230,23 @@ void LengthEditBase::updateValueFromText(QString text) noexcept {
 }
 
 void LengthEditBase::updateSingleStep() noexcept {
+  switch (mStepBehavior) {
+    case StepBehavior::PredefinedSteps: {
+      updateSingleStepPredefined();
+      break;
+    }
+    case StepBehavior::HalfAndDouble: {
+      updateSingleStepHalfDouble();
+      break;
+    }
+    default:
+      Q_ASSERT(false);
+      qCritical() << "Unknown step behavior in LengthEditBase!";
+      break;
+  }
+}
+
+void LengthEditBase::updateSingleStepPredefined() noexcept {
   if ((mValue == 0) || (mValue == mMinimum)) {
     return;  // keep last step values
   }
@@ -242,6 +273,16 @@ void LengthEditBase::updateSingleStep() noexcept {
 
   mSingleStepUp   = up;
   mSingleStepDown = down;
+}
+
+void LengthEditBase::updateSingleStepHalfDouble() noexcept {
+  if ((mValue % 2) == 0) {
+    mSingleStepDown = mValue.abs() / 2;
+  } else {
+    mSingleStepDown = 0;
+  }
+
+  mSingleStepUp = mValue;
 }
 
 void LengthEditBase::updateText() noexcept {
@@ -290,6 +331,7 @@ void LengthEditBase::setSelectedUnit(const LengthUnit& unit) noexcept {
   if (selectedUnit != mSelectedUnit) {
     mSelectedUnit = selectedUnit;
     saveSelectedUnit();
+    emit displayedUnitChanged(getDisplayedUnit());
   }
 }
 
