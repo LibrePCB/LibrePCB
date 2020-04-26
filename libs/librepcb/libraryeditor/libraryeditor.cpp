@@ -148,8 +148,6 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
-  mUi->statusBar->setLengthUnit(
-      mWorkspace.getSettings().defaultLengthUnit.get());
   connect(&mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusBar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
@@ -547,8 +545,6 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
     EditWidgetType*           widget = new EditWidgetType(context, fp);
     connect(widget, &QWidget::windowTitleChanged, this,
             &LibraryEditor::updateTabTitles);
-    connect(widget, &EditorWidgetBase::cursorPositionChanged, mUi->statusBar,
-            &StatusBar::setAbsoluteCursorPosition);
     connect(widget, &EditorWidgetBase::dirtyChanged, this,
             &LibraryEditor::updateTabTitles);
     connect(widget, &EditorWidgetBase::elementEdited,
@@ -629,12 +625,6 @@ bool LibraryEditor::closeTab(int index) noexcept {
   return true;
 }
 
-void LibraryEditor::cursorPositionChanged(const Point& pos) noexcept {
-  mUi->statusBar->showMessage(QString("(%1mm | %2mm)")
-                                  .arg(pos.toMmQPointF().x())
-                                  .arg(pos.toMmQPointF().y()));
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -647,12 +637,14 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mCurrentEditorWidget->setUndoStackActionGroup(nullptr);
     mCurrentEditorWidget->setToolsActionGroup(nullptr);
     mCurrentEditorWidget->setCommandToolBar(nullptr);
+    mCurrentEditorWidget->setStatusBar(nullptr);
   }
   mCurrentEditorWidget = widget;
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->setUndoStackActionGroup(mUndoStackActionGroup.data());
     mCurrentEditorWidget->setToolsActionGroup(mToolsActionGroup.data());
     mCurrentEditorWidget->setCommandToolBar(mUi->commandToolbar);
+    mCurrentEditorWidget->setStatusBar(mUi->statusBar);
     hasGraphicalEditor = mCurrentEditorWidget->hasGraphicalEditor();
     supportsFlip       = mCurrentEditorWidget->supportsFlip();
   }
@@ -668,7 +660,6 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   }
   mUi->commandToolbar->setEnabled(hasGraphicalEditor);
   mUi->filterToolbar->setEnabled(isOverviewTab);
-  mUi->statusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor);
   updateTabTitles();  // force updating the "Save" action title
 }
 

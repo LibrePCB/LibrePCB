@@ -169,7 +169,6 @@ private:  // GUI Event Handlers
   void currentTabChanged(int index) noexcept;
   void tabCloseRequested(int index) noexcept;
   bool closeTab(int index) noexcept;
-  void cursorPositionChanged(const Point& pos) noexcept;
 
 private:  // Methods
   void setActiveEditorWidget(EditorWidgetBase* widget);

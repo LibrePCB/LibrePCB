@@ -257,8 +257,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
-  mUi->statusbar->setLengthUnit(
-      mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get());
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
@@ -332,6 +330,8 @@ void BoardEditor::setActiveBoardIndex(int index) noexcept {
       mActiveBoard->showInView(*mGraphicsView);
       mGraphicsView->setVisibleSceneRect(mActiveBoard->restoreViewSceneRect());
       mGraphicsView->setGridProperties(mActiveBoard->getGridProperties());
+      mUi->statusbar->setLengthUnit(
+          mActiveBoard->getGridProperties().getUnit());
       // force airwire rebuild immediately and on every project modification
       mActiveBoard->triggerAirWiresRebuild();
       connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
@@ -346,6 +346,9 @@ void BoardEditor::setActiveBoardIndex(int index) noexcept {
     mDrcMessagesDock->setMessages(mActiveBoard
                                       ? mDrcMessages[mActiveBoard->getUuid()]
                                       : QList<BoardDesignRuleCheckMessage>());
+
+    // update toolbars
+    mUi->actionGrid->setEnabled(mActiveBoard != nullptr);
   }
 
   // update GUI
@@ -468,18 +471,17 @@ void BoardEditor::on_actionRemoveBoard_triggered() {
 }
 
 void BoardEditor::on_actionGrid_triggered() {
-  Board* board = getActiveBoard();
-  if (board) {
-    GridSettingsDialog dialog(board->getGridProperties(), this);
+  if (Board* activeBoard = getActiveBoard()) {
+    GridSettingsDialog dialog(activeBoard->getGridProperties(), this);
     connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
             [this](const GridProperties& grid) {
               mGraphicsView->setGridProperties(grid);
+              mUi->statusbar->setLengthUnit(grid.getUnit());
             });
     if (dialog.exec()) {
-      foreach (Board* board, mProject.getBoards())
-        board->setGridProperties(dialog.getGrid());
-      mGraphicsView->setGridProperties(board->getGridProperties());
-      // mProjectEditor.setModifiedFlag(); TODO
+      // In contrast to schematics, apply the grid only on the currently active
+      // board instead of all, so we can use different grids for each board.
+      activeBoard->setGridProperties(dialog.getGrid());
     }
   }
 }

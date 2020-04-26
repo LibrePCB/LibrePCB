@@ -81,6 +81,11 @@ public:
     }
   };
 
+  enum class StepBehavior {
+    PredefinedSteps,
+    HalfAndDouble,
+  };
+
   // Constructors / Destructor
   LengthEditBase() = delete;
   explicit LengthEditBase(const Length& min, const Length& max,
@@ -95,6 +100,7 @@ public:
   // Setters
   void setDefaultUnit(const LengthUnit& unit) noexcept;
   void setChangeUnitActionVisible(bool visible) noexcept;
+  void setStepBehavior(StepBehavior behavior) noexcept;
 
   /**
    * @brief Set the supported up/down step values
@@ -111,6 +117,7 @@ public:
   void setSteps(const QVector<PositiveLength>& steps) noexcept;
 
   // General Methods
+  void resetUnit() noexcept;
   void configureClientSettings(const QString& uniqueIdentifier) noexcept;
   void configure(const LengthUnit&              defaultUnit,
                  const QVector<PositiveLength>& steps,
@@ -123,12 +130,17 @@ public:
   // Operator Overloadings
   LengthEditBase& operator=(const LengthEditBase& rhs) = delete;
 
+signals:
+  void displayedUnitChanged(const LengthUnit& unit);
+
 protected:  // Methods
   virtual QAbstractSpinBox::StepEnabled stepEnabled() const override;
   virtual void                          stepBy(int steps) override;
   void                                  setValueImpl(Length value) noexcept;
   void         updateValueFromText(QString text) noexcept;
   void         updateSingleStep() noexcept;
+  void         updateSingleStepPredefined() noexcept;
+  void         updateSingleStepHalfDouble() noexcept;
   void         updateText() noexcept;
   LengthUnit   extractUnitFromExpression(QString& expression) const noexcept;
   void         changeUnitActionTriggered() noexcept;
@@ -144,6 +156,7 @@ protected:  // Data
   Length                   mMinimum;
   Length                   mMaximum;
   Length                   mValue;
+  StepBehavior             mStepBehavior;
   QVector<PositiveLength>  mSteps;
   Length                   mSingleStepUp;    ///< Zero means "no step available"
   Length                   mSingleStepDown;  ///< Zero means "no step available"

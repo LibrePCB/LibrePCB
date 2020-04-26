@@ -37,7 +37,6 @@
 namespace librepcb {
 
 class GraphicsView;
-class GridProperties;
 class UndoStackActionGroup;
 class ExclusiveActionGroup;
 

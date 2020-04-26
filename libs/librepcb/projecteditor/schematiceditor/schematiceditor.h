@@ -34,7 +34,6 @@
 namespace librepcb {
 
 class GraphicsView;
-class GridProperties;
 class UndoStackActionGroup;
 class ExclusiveActionGroup;
 
@@ -74,10 +73,7 @@ public:
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project&       getProject() const noexcept { return mProject; }
   int getActiveSchematicIndex() const noexcept { return mActiveSchematicIndex; }
-  Schematic*            getActiveSchematic() const noexcept;
-  const GridProperties& getGridProperties() const noexcept {
-    return *mGridProperties;
-  }
+  Schematic* getActiveSchematic() const noexcept;
 
   // Setters
   bool setActiveSchematicIndex(int index) noexcept;
@@ -130,7 +126,6 @@ private:
   Project&                             mProject;
   Ui::SchematicEditor*                 mUi;
   GraphicsView*                        mGraphicsView;
-  GridProperties*                      mGridProperties;
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 

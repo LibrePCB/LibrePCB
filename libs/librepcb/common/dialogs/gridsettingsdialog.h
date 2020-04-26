@@ -50,39 +50,31 @@ class GridSettingsDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  explicit GridSettingsDialog(const GridProperties& grid, QWidget* parent = 0);
-  ~GridSettingsDialog();
+  GridSettingsDialog()                                = delete;
+  GridSettingsDialog(const GridSettingsDialog& other) = delete;
+  explicit GridSettingsDialog(const GridProperties& grid,
+                              QWidget*              parent = nullptr) noexcept;
+  ~GridSettingsDialog() noexcept;
 
   // Getters
   const GridProperties& getGrid() const noexcept { return mCurrentGrid; }
 
-private slots:
-
-  // Private Slots
-  void rbtnGroupClicked(int id);
-  void spbxIntervalChanged(double value);
-  void cbxUnitsChanged(int index);
-  void btnMul2Clicked();
-  void btnDiv2Clicked();
-  void buttonBoxClicked(QAbstractButton* button);
+  // Operator Overloadings
+  GridSettingsDialog& operator=(const GridSettingsDialog& rhs) = delete;
 
 signals:
-
   void gridPropertiesChanged(const GridProperties& grid);
 
-private:
-  // make some methods inaccessible...
-  GridSettingsDialog();
-  GridSettingsDialog(const GridSettingsDialog& other);
-  GridSettingsDialog& operator=(const GridSettingsDialog& rhs);
+private:  // Methods
+  void rbtnGroupClicked(int id) noexcept;
+  void edtIntervalValueChanged(const PositiveLength& value) noexcept;
+  void edtIntervalUnitChanged(const LengthUnit& unit) noexcept;
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
 
-  // Private Methods
-  void updateInternalRepresentation() noexcept;
-
-  // General Attributes
-  Ui::GridSettingsDialog* mUi;
-  GridProperties          mOriginalGrid;
-  GridProperties          mCurrentGrid;
+private:  // Data
+  QScopedPointer<Ui::GridSettingsDialog> mUi;
+  GridProperties                         mOriginalGrid;
+  GridProperties                         mCurrentGrid;
 };
 
 /*******************************************************************************
