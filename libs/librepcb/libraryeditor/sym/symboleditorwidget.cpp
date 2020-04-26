@@ -32,6 +32,7 @@
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
+#include <librepcb/common/widgets/statusbar.h>
 #include <librepcb/library/cmd/cmdlibraryelementedit.h>
 #include <librepcb/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/library/msg/msgmissingauthor.h>
@@ -75,6 +76,13 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged, this,
           &SymbolEditorWidget::cursorPositionChanged);
   setWindowIcon(QIcon(":/img/library/symbol.png"));
+
+  // Apply grid properties unit from workspace settings
+  {
+    GridProperties p = mUi->graphicsView->getGridProperties();
+    p.setUnit(mContext.workspace.getSettings().defaultLengthUnit.get());
+    mUi->graphicsView->setGridProperties(p);
+  }
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
@@ -169,6 +177,14 @@ void SymbolEditorWidget::setToolsActionGroup(
   }
 }
 
+void SymbolEditorWidget::setStatusBar(StatusBar* statusbar) noexcept {
+  EditorWidgetBase::setStatusBar(statusbar);
+
+  if (mStatusBar) {
+    mStatusBar->setLengthUnit(mUi->graphicsView->getGridProperties().getUnit());
+  }
+}
+
 /*******************************************************************************
  *  Public Slots
  ******************************************************************************/
@@ -243,10 +259,13 @@ bool SymbolEditorWidget::abortCommand() noexcept {
 bool SymbolEditorWidget::editGridProperties() noexcept {
   GridSettingsDialog dialog(mUi->graphicsView->getGridProperties(), this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
-          mUi->graphicsView, &GraphicsView::setGridProperties);
-  if (dialog.exec()) {
-    mUi->graphicsView->setGridProperties(dialog.getGrid());
-  }
+          [this](const GridProperties& grid) {
+            mUi->graphicsView->setGridProperties(grid);
+            if (mStatusBar) {
+              mStatusBar->setLengthUnit(grid.getUnit());
+            }
+          });
+  dialog.exec();
   return true;
 }
 

@@ -40,6 +40,7 @@ namespace librepcb {
 class ExclusiveActionGroup;
 class UndoStackActionGroup;
 class ToolBarProxy;
+class StatusBar;
 class IF_GraphicsLayerProvider;
 
 namespace workspace {
@@ -106,6 +107,7 @@ public:
   virtual void setUndoStackActionGroup(UndoStackActionGroup* group) noexcept;
   virtual void setToolsActionGroup(ExclusiveActionGroup* group) noexcept;
   virtual void setCommandToolBar(QToolBar* toolbar) noexcept;
+  virtual void setStatusBar(StatusBar* statusbar) noexcept;
 
   // Operator Overloadings
   EditorWidgetBase& operator=(const EditorWidgetBase& rhs) = delete;
@@ -180,6 +182,7 @@ protected:  // Data
   QScopedPointer<UndoStack>                mUndoStack;
   UndoStackActionGroup*                    mUndoStackActionGroup;
   ExclusiveActionGroup*                    mToolsActionGroup;
+  StatusBar*                               mStatusBar;
   QScopedPointer<ToolBarProxy>             mCommandToolBarProxy;
   bool                                     mIsInterfaceBroken;
 };

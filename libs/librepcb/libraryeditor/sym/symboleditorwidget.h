@@ -76,6 +76,7 @@ public:
 
   // Setters
   void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
+  void setStatusBar(StatusBar* statusbar) noexcept override;
 
   // Operator Overloadings
   SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;

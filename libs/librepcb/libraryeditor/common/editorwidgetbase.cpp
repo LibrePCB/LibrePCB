@@ -26,6 +26,7 @@
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/toolbarproxy.h>
 #include <librepcb/common/utils/undostackactiongroup.h>
+#include <librepcb/common/widgets/statusbar.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -53,6 +54,7 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
                                       &askForRestoringBackup)),  // can throw
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
+    mStatusBar(nullptr),
     mIsInterfaceBroken(false) {
   mUndoStack.reset(new UndoStack());
   connect(mUndoStack.data(), &UndoStack::cleanChanged, this,
@@ -105,6 +107,26 @@ void EditorWidgetBase::setToolsActionGroup(
 
 void EditorWidgetBase::setCommandToolBar(QToolBar* toolbar) noexcept {
   mCommandToolBarProxy->setToolBar(toolbar);
+}
+
+void EditorWidgetBase::setStatusBar(StatusBar* statusbar) noexcept {
+  if (statusbar == mStatusBar) {
+    return;
+  }
+
+  if (mStatusBar) {
+    disconnect(this, &EditorWidgetBase::cursorPositionChanged, mStatusBar,
+               &StatusBar::setAbsoluteCursorPosition);
+    mStatusBar->setField(StatusBar::AbsolutePosition, false);
+  }
+
+  mStatusBar = statusbar;
+
+  if (mStatusBar) {
+    mStatusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor());
+    connect(this, &EditorWidgetBase::cursorPositionChanged, mStatusBar,
+            &StatusBar::setAbsoluteCursorPosition);
+  }
 }
 
 /*******************************************************************************
