@@ -74,6 +74,9 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
                                      settingsPrefix % "/restring_vias_max");
 
   updateWidgets();
+
+  // set focus to name so the user can immediately start typing to change it
+  mUi->edtName->setFocus();
 }
 
 BoardDesignRulesDialog::~BoardDesignRulesDialog() {

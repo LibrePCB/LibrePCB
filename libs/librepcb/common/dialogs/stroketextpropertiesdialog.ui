@@ -17,16 +17,6 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Layer:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="cbxLayer"/>
-     </item>
-     <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -39,8 +29,22 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QPlainTextEdit" name="edtText">
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Layer:</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
-      <widget class="QPlainTextEdit" name="edtText"/>
+      <widget class="QComboBox" name="cbxLayer"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_7">
@@ -59,14 +63,69 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="3" column="1">
+      <widget class="librepcb::PositiveLengthEdit" name="edtHeight" native="true"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Stroke Width:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="librepcb::UnsignedLengthEdit" name="edtStrokeWidth" native="true"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Letter Spacing:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+       <item>
+        <widget class="librepcb::RatioEdit" name="edtLetterSpacingRatio" native="true"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cbxLetterSpacingAuto">
+         <property name="text">
+          <string>Auto</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Line Spacing:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
+       <item>
+        <widget class="librepcb::RatioEdit" name="edtLineSpacingRatio" native="true"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cbxLineSpacingAuto">
+         <property name="text">
+          <string>Auto</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="7" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Position:</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="7" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="librepcb::LengthEdit" name="edtPosX" native="true"/>
@@ -76,28 +135,24 @@
        </item>
       </layout>
      </item>
-     <item row="9" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Rotation:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Stroke Width:</string>
-       </property>
-      </widget>
+     <item row="8" column="1">
+      <widget class="librepcb::AngleEdit" name="edtRotation" native="true"/>
      </item>
-     <item row="10" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_9">
        <property name="text">
         <string>Options:</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="9" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QCheckBox" name="cbxMirrored">
@@ -114,57 +169,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="7" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
-       <item>
-        <widget class="librepcb::RatioEdit" name="edtLineSpacingRatio" native="true"/>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="cbxLineSpacingAuto">
-         <property name="text">
-          <string>Auto</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Line Spacing:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>Letter Spacing:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
-       <item>
-        <widget class="librepcb::RatioEdit" name="edtLetterSpacingRatio" native="true"/>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="cbxLetterSpacingAuto">
-         <property name="text">
-          <string>Auto</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="3" column="1">
-      <widget class="librepcb::PositiveLengthEdit" name="edtHeight" native="true"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="librepcb::UnsignedLengthEdit" name="edtStrokeWidth" native="true"/>
-     </item>
-     <item row="9" column="1">
-      <widget class="librepcb::AngleEdit" name="edtRotation" native="true"/>
      </item>
     </layout>
    </item>
@@ -188,12 +192,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::AlignmentSelector</class>
-   <extends>QWidget</extends>
-   <header>widgets/alignmentselector.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>librepcb::AngleEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/common/widgets/angleedit.h</header>
@@ -212,12 +210,34 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>librepcb::AlignmentSelector</class>
+   <extends>QWidget</extends>
+   <header>widgets/alignmentselector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>librepcb::RatioEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/common/widgets/ratioedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtText</tabstop>
+  <tabstop>cbxLayer</tabstop>
+  <tabstop>alignmentSelector</tabstop>
+  <tabstop>edtHeight</tabstop>
+  <tabstop>edtStrokeWidth</tabstop>
+  <tabstop>edtLetterSpacingRatio</tabstop>
+  <tabstop>cbxLetterSpacingAuto</tabstop>
+  <tabstop>edtLineSpacingRatio</tabstop>
+  <tabstop>cbxLineSpacingAuto</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+  <tabstop>edtRotation</tabstop>
+  <tabstop>cbxMirrored</tabstop>
+  <tabstop>cbxAutoRotate</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

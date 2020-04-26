@@ -91,6 +91,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cbxNetName</tabstop>
+  <tabstop>rbtnRenameNetSegmentOnly</tabstop>
+  <tabstop>rbtnRenameWholeNet</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

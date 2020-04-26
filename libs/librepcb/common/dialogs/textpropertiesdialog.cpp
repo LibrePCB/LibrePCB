@@ -69,6 +69,10 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
   mUi->edtPosX->setValue(mText.getPosition().getX());
   mUi->edtPosY->setValue(mText.getPosition().getY());
   mUi->edtRotation->setValue(mText.getRotation());
+
+  // set focus to text so the user can immediately start typing to change it
+  mUi->edtText->selectAll();
+  mUi->edtText->setFocus();
 }
 
 TextPropertiesDialog::~TextPropertiesDialog() noexcept {
