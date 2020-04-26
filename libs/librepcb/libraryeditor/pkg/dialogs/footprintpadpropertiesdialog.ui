@@ -34,7 +34,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="QWidget" name="boardSideWidget" native="true">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <property name="leftMargin">
          <number>0</number>
@@ -80,7 +80,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QWidget" name="widget_2" native="true">
+      <widget class="QWidget" name="shapeWidget" native="true">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="leftMargin">
          <number>0</number>
@@ -212,6 +212,17 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbxPackagePad</tabstop>
+  <tabstop>boardSideWidget</tabstop>
+  <tabstop>shapeWidget</tabstop>
+  <tabstop>edtDrillDiameter</tabstop>
+  <tabstop>edtWidth</tabstop>
+  <tabstop>edtHeight</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+  <tabstop>edtRotation</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

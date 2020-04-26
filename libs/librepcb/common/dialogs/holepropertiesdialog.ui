@@ -71,6 +71,11 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtDiameter</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -100,6 +100,10 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   mUi->edtRotation->setValue(mText.getRotation());
   mUi->cbxMirrored->setChecked(mText.getMirrored());
   mUi->cbxAutoRotate->setChecked(mText.getAutoRotate());
+
+  // set focus to text so the user can immediately start typing to change it
+  mUi->edtText->selectAll();
+  mUi->edtText->setFocus();
 }
 
 StrokeTextPropertiesDialog::~StrokeTextPropertiesDialog() noexcept {

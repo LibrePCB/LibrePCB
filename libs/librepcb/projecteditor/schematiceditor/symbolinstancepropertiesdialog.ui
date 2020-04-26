@@ -249,6 +249,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="tabChangesFocus">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -306,6 +309,16 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>edtCompInstName</tabstop>
+  <tabstop>edtCompInstValue</tabstop>
+  <tabstop>edtSymbInstPosX</tabstop>
+  <tabstop>edtSymbInstPosY</tabstop>
+  <tabstop>edtSymbInstRotation</tabstop>
+  <tabstop>cbxMirror</tabstop>
+  <tabstop>attributeListEditorWidget</tabstop>
+  <tabstop>cbxPreselectedDevice</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
