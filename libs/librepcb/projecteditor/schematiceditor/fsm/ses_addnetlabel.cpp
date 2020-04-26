@@ -123,8 +123,9 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(
     case QEvent::GraphicsSceneMousePress: {
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
       switch (sceneEvent->button()) {
         case Qt::LeftButton: {
           if (mUndoCmdActive) {
@@ -145,8 +146,9 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(
     case QEvent::GraphicsSceneMouseRelease: {
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
       switch (sceneEvent->button()) {
         case Qt::RightButton: {
           if (mUndoCmdActive &&
@@ -167,8 +169,9 @@ SES_Base::ProcRetVal SES_AddNetLabel::processSceneEvent(
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
       Q_ASSERT(sceneEvent);
-      Point pos = Point::fromPx(sceneEvent->scenePos())
-                      .mappedToGrid(mEditor.getGridProperties().getInterval());
+      Point pos =
+          Point::fromPx(sceneEvent->scenePos())
+              .mappedToGrid(schematic->getGridProperties().getInterval());
       updateLabel(pos);
       return ForceStayInState;
     }
