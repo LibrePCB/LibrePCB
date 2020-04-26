@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-QTIFW_VERSION="3.0.4"
+QTIFW_VERSION="3.2.2"
 QTIFW_URL_BASE="https://download.qt.io/official_releases/qt-installer-framework/$QTIFW_VERSION"
 
 # Install dependencies on Linux
