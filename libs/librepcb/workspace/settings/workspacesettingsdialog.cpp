@@ -139,6 +139,14 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
     connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnMoveDownClicked,
             mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemDown);
   }
+  // Initialize external applications widgets
+  {
+    connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
+            mUi->pdfDefaultCombo, &QComboBox::setDisabled);
+
+    connect(mUi->pdfDefaultRadioBtn, &QRadioButton::toggled,
+            mUi->pdfCustomCmdEdit, &QTextEdit::setDisabled);
+  }
 
   // Now load all current settings
   loadSettings();
