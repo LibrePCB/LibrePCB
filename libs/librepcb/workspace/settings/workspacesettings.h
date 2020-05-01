@@ -173,6 +173,13 @@ public:
   WorkspaceSettingsItem_GenericValueList<QList<QUrl>> repositoryUrls;
 
   /**
+   * @brief Use a PDF Reader other than the system default
+   *
+   * Default: false
+   */
+  WorkspaceSettingsItem_GenericValue<bool> useCustomPdfReader;
+
+  /**
    * @brief Custom command to open a PDF reader
    *
    * Default: ""

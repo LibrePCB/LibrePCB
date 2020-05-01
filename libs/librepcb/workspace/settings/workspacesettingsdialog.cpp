@@ -248,10 +248,13 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
 
   // External PDF Reader
-  if (!mSettings.pdfReaderCommand.get().isEmpty()) {
-    // enable "Custom PDF Viewer" textEdit
-    mUi->pdfCustomRadioBtn->click();
-    mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
+  mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
+
+  // call connected signals
+  if (mSettings.useCustomPdfReader.get()) {
+    mUi->pdfCustomRadioBtn->toggle();
+  } else {
+    mUi->pdfDefaultRadioBtn->toggle();
   }
 }
 
@@ -289,6 +292,7 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     mSettings.repositoryUrls.set(mRepositoryUrlsModel->getValues());
 
     // External PDF Reader
+    mSettings.useCustomPdfReader.set(mUi->pdfCustomRadioBtn->isChecked());
     mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text());
 
     mSettings.saveToFile();  // can throw

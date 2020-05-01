@@ -51,6 +51,7 @@ WorkspaceSettings::WorkspaceSettings(const FilePath& fp, QObject* parent)
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     repositoryUrls("repositories", "repository",
                    QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
+    useCustomPdfReader("use_custom_pdf_reader", false, this),
     pdfReaderCommand("pdf_reader_cmd", "", this) {
   // load settings if the settings file exists
   if (mFilePath.isExistingFile()) {
