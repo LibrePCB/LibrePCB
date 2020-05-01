@@ -11,17 +11,15 @@ jobs:
         IMAGE: librepcb/librepcb-dev:ubuntu-14.04-2
       Ubuntu_1604_GCC:
         IMAGE: librepcb/librepcb-dev:ubuntu-16.04-2
-      Ubuntu_1604_Qt_5_12_3_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.12.3-3
+      Ubuntu_1604_Qt_5_14_2_GCC:
+        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.14.2-1
         DEPLOY: true
       Ubuntu_1804_Clang:
         IMAGE: librepcb/librepcb-dev:ubuntu-18.04-2
         CC: clang
         CXX: clang++
-      Ubuntu_1904_GCC9:
-        IMAGE: librepcb/librepcb-dev:ubuntu-19.04-2
-        CC: gcc-9
-        CXX: g++-9
+      Ubuntu_2004_GCC:
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-1
   container: $[ variables['IMAGE'] ]
   steps:
   - checkout: self
