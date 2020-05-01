@@ -423,7 +423,16 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
     FilePath filepath(filename);
     mProject.exportSchematicsAsPdf(
         filepath);  // this method can throw an exception
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+
+    // open pdf with system / custom reader accordingly
+    QString pdfReaderCommand =
+        mProjectEditor.getWorkspace().getSettings().pdfReaderCommand.get();
+
+    if (mProjectEditor.getWorkspace().getSettings().useCustomPdfReader.get()) {
+      QProcess::execute(pdfReaderCommand.replace("{{FILEPATH}}", filepath.toStr()));
+    } else {
+      QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+    }
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
