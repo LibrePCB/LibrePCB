@@ -50,7 +50,8 @@ WorkspaceSettings::WorkspaceSettings(const FilePath& fp, QObject* parent)
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     repositoryUrls("repositories", "repository",
-                   QList<QUrl>{QUrl("https://api.librepcb.org")}, this) {
+                   QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
+    pdfReaderCommand("pdf_reader_cmd", "", this) {
   // load settings if the settings file exists
   if (mFilePath.isExistingFile()) {
     qDebug("Load workspace settings...");

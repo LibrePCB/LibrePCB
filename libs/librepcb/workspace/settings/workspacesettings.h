@@ -171,6 +171,13 @@ public:
    * Default: ["https://api.librepcb.org"]
    */
   WorkspaceSettingsItem_GenericValueList<QList<QUrl>> repositoryUrls;
+
+  /**
+   * @brief Custom command to open a PDF reader
+   *
+   * Default: ""
+   */
+  WorkspaceSettingsItem_GenericValue<QString> pdfReaderCommand;
 };
 
 /*******************************************************************************

@@ -246,6 +246,13 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // Repository URLs
   mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
+
+  // External PDF Reader
+  if (!mSettings.pdfReaderCommand.get().isEmpty()) {
+    // enable "Custom PDF Viewer" textEdit
+    mUi->pdfCustomRadioBtn->click();
+    mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
+  }
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -280,6 +287,9 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Repository URLs
     mSettings.repositoryUrls.set(mRepositoryUrlsModel->getValues());
+
+    // External PDF Reader
+    mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text());
 
     mSettings.saveToFile();  // can throw
   } catch (const Exception& e) {
