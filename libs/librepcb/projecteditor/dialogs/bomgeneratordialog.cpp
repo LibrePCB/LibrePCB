@@ -153,8 +153,8 @@ void BomGeneratorDialog::updateTable() noexcept {
     for (int column = 0; column < csv->getHeader().count(); ++column) {
       mUi->tableWidget->horizontalHeader()->setSectionResizeMode(
           column,
-          column == 0 ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
-      for (int row = 0; row < csv->getValues().count() - 1; ++row) {
+          column <= 1 ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
+      for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
         text.replace("\n", " ");
         mUi->tableWidget->setItem(row, column, new QTableWidgetItem(text));
