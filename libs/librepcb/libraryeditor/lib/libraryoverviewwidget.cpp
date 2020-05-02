@@ -395,6 +395,8 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
         aMoveToLibChildren.insert(action, item.filepath);
       }
     }
+    // Disable menu item if it doesn't contain children.
+    menuMoveToLib->setEnabled(!aMoveToLibChildren.isEmpty());
   }
   QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
   aNew->setVisible(selectedItemPaths.count() <= 1);
