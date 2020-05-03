@@ -26,7 +26,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -284,61 +284,154 @@
       <attribute name="title">
        <string>External Applications</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
+      <layout class="QFormLayout" name="formLayout_5">
+       <item row="0" column="1">
         <widget class="QGroupBox" name="pdfBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>PDF Reader</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout">
+         <layout class="QFormLayout" name="formLayout_4">
           <item row="0" column="0">
-           <widget class="QRadioButton" name="pdfDefaultRadioBtn">
-            <property name="text">
-             <string>Use default viewer</string>
+           <widget class="QLabel" name="label_13">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="checked">
-             <bool>true</bool>
+            <property name="text">
+             <string>Reader to use:</string>
             </property>
            </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Custom command:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Open PDF after export:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="pdfReaderHLayout">
+            <item>
+             <widget class="QRadioButton" name="pdfDefaultRadioBtn">
+              <property name="text">
+               <string>System default</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">pdfReaderGroup</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="pdfCustomRadioBtn">
+              <property name="text">
+               <string>Run custom command</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">pdfReaderGroup</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="pdfCustomCmdEdit">
             <property name="enabled">
              <bool>true</bool>
             </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="pdfCustomRadioBtn">
-            <property name="text">
-             <string>Run custom command</string>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Monospace</family>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use &lt;span style=&quot; font-family:'monospace';&quot;&gt;{{FILEPATH}}}&lt;/span&gt; as placeholder for the filename.&lt;/p&gt;&lt;p&gt;Notice: If your path contains space you may need to add quotes like this: &lt;span style=&quot; font-family:'monospace';&quot;&gt;&amp;quot;{{FILEPATH}}&amp;quot;&lt;/span&gt; .&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="maxLength">
+             <number>500</number>
+            </property>
+            <property name="placeholderText">
+             <string>example: evince &quot;{{FILEPATH}}&quot;</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="pdfDefaultCombo">
+          <item row="2" column="1">
+           <layout class="QHBoxLayout" name="pdfOpenHLayout">
             <item>
-             <property name="text">
-              <string>Default</string>
-             </property>
+             <widget class="QRadioButton" name="pdfOpenAlwaysRadio">
+              <property name="text">
+               <string>Always</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">pdfOpenGroup</string>
+              </attribute>
+             </widget>
             </item>
-           </widget>
+            <item>
+             <widget class="QRadioButton" name="pdfOpenNeverRadio">
+              <property name="text">
+               <string>Never</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">pdfOpenGroup</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="pdfOpenAskRadio">
+              <property name="text">
+               <string>Ask every time</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">pdfOpenGroup</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -365,4 +458,8 @@
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="pdfOpenGroup"/>
+  <buttongroup name="pdfReaderGroup"/>
+ </buttongroups>
 </ui>

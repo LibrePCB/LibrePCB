@@ -547,14 +547,14 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
       board->print(printer);  // can throw
     }
 
-    // open pdf with system / custom reader accordingly
-    QString pdfReaderCommand =
-        mProjectEditor.getWorkspace().getSettings().pdfReaderCommand.get();
 
+    // open pdf with system / custom reader accordingly
     if (mProjectEditor.getWorkspace().getSettings().useCustomPdfReader.get()) {
-      QProcess::execute(pdfReaderCommand.replace("{{FILEPATH}}", filepath.toStr()));
+      QString pdfCmd=
+          mProjectEditor.getWorkspace().getSettings().pdfReaderCommand.get();
+      QProcess::startDetached(pdfCmd.replace("{{FILEPATH}}", filepath.toStr()));
     } else {
-      QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+      QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
     }
 
   } catch (Exception& e) {

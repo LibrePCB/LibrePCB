@@ -139,13 +139,11 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
     connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnMoveDownClicked,
             mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemDown);
   }
+
   // Initialize external applications widgets
   {
     connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
-            mUi->pdfDefaultCombo, &QComboBox::setDisabled);
-
-    connect(mUi->pdfDefaultRadioBtn, &QRadioButton::toggled,
-            mUi->pdfCustomCmdEdit, &QTextEdit::setDisabled);
+            mUi->pdfCustomCmdEdit, &QTextEdit::setEnabled);
   }
 
   // Now load all current settings
@@ -248,14 +246,12 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
 
   // External PDF Reader
+  mUi->pdfCustomCmdEdit->setEnabled(mSettings.useCustomPdfReader.get());
   mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
+  mUi->pdfCustomRadioBtn->setChecked(mSettings.useCustomPdfReader.get());
 
-  // call connected signals
-  if (mSettings.useCustomPdfReader.get()) {
-    mUi->pdfCustomRadioBtn->toggle();
-  } else {
-    mUi->pdfDefaultRadioBtn->toggle();
-  }
+  // External PDF reader behaviour
+  // TODO
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -293,7 +289,11 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // External PDF Reader
     mSettings.useCustomPdfReader.set(mUi->pdfCustomRadioBtn->isChecked());
-    mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text());
+    mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text().trimmed());
+
+    // External PDF reader behaviour
+    // TODO
+    // mUi->pdfOpenGroup->checkedButton();
 
     mSettings.saveToFile();  // can throw
   } catch (const Exception& e) {

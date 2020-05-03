@@ -425,11 +425,10 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
         filepath);  // this method can throw an exception
 
     // open pdf with system / custom reader accordingly
-    QString pdfReaderCommand =
-        mProjectEditor.getWorkspace().getSettings().pdfReaderCommand.get();
-
     if (mProjectEditor.getWorkspace().getSettings().useCustomPdfReader.get()) {
-      QProcess::execute(pdfReaderCommand.replace("{{FILEPATH}}", filepath.toStr()));
+      QString pdfCmd=
+          mProjectEditor.getWorkspace().getSettings().pdfReaderCommand.get();
+      QProcess::startDetached(pdfCmd.replace("{{FILEPATH}}", filepath.toNative()));
     } else {
       QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
     }
