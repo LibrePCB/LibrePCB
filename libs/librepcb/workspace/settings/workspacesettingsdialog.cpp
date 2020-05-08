@@ -144,6 +144,20 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
   {
     connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
             mUi->pdfCustomCmdEdit, &QTextEdit::setEnabled);
+
+    // PDF Reader
+    // match IDs with enum values
+    mUi->pdfOpenGroup->setId(
+          mUi->pdfOpenAlwaysRadio,
+          static_cast<int>(WorkspaceSettings::PdfOpenBehaviour::ALWAYS));
+
+    mUi->pdfOpenGroup->setId(
+          mUi->pdfOpenNeverRadio,
+          static_cast<int>(WorkspaceSettings::PdfOpenBehaviour::NEVER));
+
+    mUi->pdfOpenGroup->setId(
+          mUi->pdfOpenAskRadio,
+          static_cast<int>(WorkspaceSettings::PdfOpenBehaviour::ASK));
   }
 
   // Now load all current settings
@@ -251,7 +265,8 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mUi->pdfCustomRadioBtn->setChecked(mSettings.useCustomPdfReader.get());
 
   // External PDF reader behaviour
-  // TODO
+  mUi->pdfOpenGroup->button(
+        static_cast<int>(mSettings.pdfOpenBehaviour.get()))->setChecked(true);
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -292,8 +307,9 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text().trimmed());
 
     // External PDF reader behaviour
-    // TODO
-    // mUi->pdfOpenGroup->checkedButton();
+    mSettings.pdfOpenBehaviour.set(
+          static_cast<WorkspaceSettings::PdfOpenBehaviour>(
+            mUi->pdfOpenGroup->checkedId()));
 
     mSettings.saveToFile();  // can throw
   } catch (const Exception& e) {

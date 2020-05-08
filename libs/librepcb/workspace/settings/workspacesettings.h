@@ -59,6 +59,15 @@ class WorkspaceSettings final : public QObject, public SerializableObject {
   Q_OBJECT
 
 public:
+  // Enums for n-state settings
+
+  /// @see ::librepcb::workspace::WorkspaceSettings::pdfOpenBehaviour
+  // The underlying type int is needed to map QButtonGroup IDs
+  // to values in this enum. See for ex. WorkspaceSettingsDialog::loadSettings()
+  enum class PdfOpenBehaviour : int {
+    ALWAYS, NEVER, ASK,
+  };
+
   // Constructors / Destructor
   WorkspaceSettings()                               = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
@@ -185,6 +194,13 @@ public:
    * Default: ""
    */
   WorkspaceSettingsItem_GenericValue<QString> pdfReaderCommand;
+
+  /**
+   * @brief Behaviour after a PDF has been exported
+   *
+   * Default: OpenPdfBehaviour::ALWAYS
+   */
+  WorkspaceSettingsItem_GenericValue<PdfOpenBehaviour> pdfOpenBehaviour;
 };
 
 /*******************************************************************************
@@ -192,6 +208,40 @@ public:
  ******************************************************************************/
 
 }  // namespace workspace
+
+// Serialize settings values
+template<>
+inline SExpression serializeToSExpression(
+    const workspace::WorkspaceSettings::PdfOpenBehaviour& b) {
+  using namespace workspace;
+  switch (b) {
+    case WorkspaceSettings::PdfOpenBehaviour::ALWAYS:
+      return SExpression::createToken("always");
+    case WorkspaceSettings::PdfOpenBehaviour::NEVER:
+      return SExpression::createToken("never");
+    case WorkspaceSettings::PdfOpenBehaviour::ASK:
+      return SExpression::createToken("ask");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  };
+}
+
+template<>
+inline workspace::WorkspaceSettings::PdfOpenBehaviour
+  deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+
+  using namespace workspace;
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == QLatin1String("always"))
+    return WorkspaceSettings::PdfOpenBehaviour::ALWAYS;
+  else if (str == QLatin1String("never"))
+    return WorkspaceSettings::PdfOpenBehaviour::NEVER;
+  else if (str == QLatin1String("ask"))
+    return WorkspaceSettings::PdfOpenBehaviour::ASK;
+  else
+    throw RuntimeError(__FILE__, __LINE__, str);
+}
+
 }  // namespace librepcb
 
 #endif  // LIBREPCB_WORKSPACESETTINGS_H

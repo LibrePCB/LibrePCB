@@ -400,9 +400,6 @@
               <property name="text">
                <string>Always</string>
               </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
               <attribute name="buttonGroup">
                <string notr="true">pdfOpenGroup</string>
               </attribute>
