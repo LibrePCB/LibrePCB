@@ -61,10 +61,10 @@ class WorkspaceSettings final : public QObject, public SerializableObject {
 public:
   // Enums for n-state settings
 
-  /// @see ::librepcb::workspace::WorkspaceSettings::pdfOpenBehaviour
+  /// @see ::librepcb::workspace::WorkspaceSettings::pdfOpenBehavior
   // The underlying type int is needed to map QButtonGroup IDs
   // to values in this enum. See for ex. WorkspaceSettingsDialog::loadSettings()
-  enum class PdfOpenBehaviour : int {
+  enum class PdfOpenBehavior : int {
     ALWAYS, NEVER, ASK,
   };
 
@@ -196,11 +196,11 @@ public:
   WorkspaceSettingsItem_GenericValue<QString> pdfReaderCommand;
 
   /**
-   * @brief Behaviour after a PDF has been exported
+   * @brief Behavior after a PDF has been exported
    *
-   * Default: OpenPdfBehaviour::ALWAYS
+   * Default: PdfOpenBehavior::ALWAYS
    */
-  WorkspaceSettingsItem_GenericValue<PdfOpenBehaviour> pdfOpenBehaviour;
+  WorkspaceSettingsItem_GenericValue<PdfOpenBehavior> pdfOpenBehavior;
 };
 
 /*******************************************************************************
@@ -212,14 +212,14 @@ public:
 // Serialize settings values
 template<>
 inline SExpression serializeToSExpression(
-    const workspace::WorkspaceSettings::PdfOpenBehaviour& b) {
+    const workspace::WorkspaceSettings::PdfOpenBehavior& b) {
   using namespace workspace;
   switch (b) {
-    case WorkspaceSettings::PdfOpenBehaviour::ALWAYS:
+    case WorkspaceSettings::PdfOpenBehavior::ALWAYS:
       return SExpression::createToken("always");
-    case WorkspaceSettings::PdfOpenBehaviour::NEVER:
+    case WorkspaceSettings::PdfOpenBehavior::NEVER:
       return SExpression::createToken("never");
-    case WorkspaceSettings::PdfOpenBehaviour::ASK:
+    case WorkspaceSettings::PdfOpenBehavior::ASK:
       return SExpression::createToken("ask");
     default:
       throw LogicError(__FILE__, __LINE__);
@@ -227,17 +227,17 @@ inline SExpression serializeToSExpression(
 }
 
 template<>
-inline workspace::WorkspaceSettings::PdfOpenBehaviour
+inline workspace::WorkspaceSettings::PdfOpenBehavior
   deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
 
   using namespace workspace;
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == QLatin1String("always"))
-    return WorkspaceSettings::PdfOpenBehaviour::ALWAYS;
+    return WorkspaceSettings::PdfOpenBehavior::ALWAYS;
   else if (str == QLatin1String("never"))
-    return WorkspaceSettings::PdfOpenBehaviour::NEVER;
+    return WorkspaceSettings::PdfOpenBehavior::NEVER;
   else if (str == QLatin1String("ask"))
-    return WorkspaceSettings::PdfOpenBehaviour::ASK;
+    return WorkspaceSettings::PdfOpenBehavior::ASK;
   else
     throw RuntimeError(__FILE__, __LINE__, str);
 }

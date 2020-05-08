@@ -548,15 +548,48 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
     }
 
 
-    // open pdf with system / custom reader accordingly
-    if (mProjectEditor.getWorkspace().getSettings().useCustomPdfReader.get()) {
-      QString pdfCmd=
-          mProjectEditor.getWorkspace().getSettings().pdfReaderCommand.get();
-      QProcess::startDetached(pdfCmd.replace("{{FILEPATH}}", filepath.toStr()));
-    } else {
-      QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
-    }
+    // Open PDF
+    {
+      namespace ws = ::librepcb::workspace;
+      const ws::WorkspaceSettings& workspaceSettings =
+          mProjectEditor.getWorkspace().getSettings();
 
+      ws::WorkspaceSettings::PdfOpenBehavior bhv
+          = workspaceSettings.pdfOpenBehavior.get();
+
+      if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::NEVER) {
+        // do nothing
+      } else {
+        // TODO: refractor into FileUtils::askUserAndOpen or something similar
+        //       to avoid duplicated code in SchematicEditor
+
+        bool doOpenPdf = true;
+        if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::ASK) {
+          int openPdf = QMessageBox::information(
+                          this, tr("PDF Export"),
+                          tr("PDF exported successfully"),
+                          QMessageBox::Ok | QMessageBox::Open);
+
+          if (openPdf == QMessageBox::Ok)
+            doOpenPdf = false;
+        } else if (bhv != ws::WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
+          // this is the last possible state, otherwise there is an error
+          throw LogicError(__FILE__, __LINE__);
+        }
+
+        if (doOpenPdf) {
+          if (workspaceSettings.useCustomPdfReader.get()) {
+            QString pdfCmd = workspaceSettings.pdfReaderCommand.get();
+            // TODO: make it smarter to detect or insert quotes for path
+            //        containing spaces
+            QProcess::startDetached(pdfCmd.replace(
+                                      "{{FILEPATH}}", filepath.toNative()));
+          } else {
+            QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
+          }
+        }
+      }
+    }
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }

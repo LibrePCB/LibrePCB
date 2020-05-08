@@ -149,15 +149,15 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
     // match IDs with enum values
     mUi->pdfOpenGroup->setId(
           mUi->pdfOpenAlwaysRadio,
-          static_cast<int>(WorkspaceSettings::PdfOpenBehaviour::ALWAYS));
+          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ALWAYS));
 
     mUi->pdfOpenGroup->setId(
           mUi->pdfOpenNeverRadio,
-          static_cast<int>(WorkspaceSettings::PdfOpenBehaviour::NEVER));
+          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::NEVER));
 
     mUi->pdfOpenGroup->setId(
           mUi->pdfOpenAskRadio,
-          static_cast<int>(WorkspaceSettings::PdfOpenBehaviour::ASK));
+          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ASK));
   }
 
   // Now load all current settings
@@ -266,7 +266,7 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // External PDF reader behaviour
   mUi->pdfOpenGroup->button(
-        static_cast<int>(mSettings.pdfOpenBehaviour.get()))->setChecked(true);
+        static_cast<int>(mSettings.pdfOpenBehavior.get()))->setChecked(true);
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -307,8 +307,8 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text().trimmed());
 
     // External PDF reader behaviour
-    mSettings.pdfOpenBehaviour.set(
-          static_cast<WorkspaceSettings::PdfOpenBehaviour>(
+    mSettings.pdfOpenBehavior.set(
+          static_cast<WorkspaceSettings::PdfOpenBehavior>(
             mUi->pdfOpenGroup->checkedId()));
 
     mSettings.saveToFile();  // can throw
