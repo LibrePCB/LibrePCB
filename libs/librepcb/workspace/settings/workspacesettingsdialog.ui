@@ -310,32 +310,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Custom command:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Open PDF after export:</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <layout class="QHBoxLayout" name="pdfReaderHLayout">
             <item>
@@ -363,33 +337,29 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="pdfCustomCmdEdit">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_14">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="font">
-             <font>
-              <family>Monospace</family>
-             </font>
+            <property name="text">
+             <string>Custom command:</string>
             </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use &lt;span style=&quot; font-family:'monospace';&quot;&gt;{{FILEPATH}}}&lt;/span&gt; as placeholder for the filename.&lt;/p&gt;&lt;p&gt;Notice: If your path contains space you may need to add quotes like this: &lt;span style=&quot; font-family:'monospace';&quot;&gt;&amp;quot;{{FILEPATH}}&amp;quot;&lt;/span&gt; .&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="maxLength">
-             <number>500</number>
-            </property>
-            <property name="placeholderText">
-             <string>example: evince &quot;{{FILEPATH}}&quot;</string>
-            </property>
-            <property name="clearButtonEnabled">
-             <bool>true</bool>
+            <property name="text">
+             <string>Open PDF after export:</string>
             </property>
            </widget>
           </item>
@@ -427,6 +397,54 @@
             </item>
            </layout>
           </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLineEdit" name="pdfCustomCmdEdit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <family>Monospace</family>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use &lt;span style=&quot; font-family:'monospace';&quot;&gt;{{FILEPATH}}}&lt;/span&gt; as placeholder for the filename.&lt;/p&gt;&lt;p&gt;Notice: If your path contains space you may need to add quotes like this: &lt;span style=&quot; font-family:'monospace';&quot;&gt;&amp;quot;{{FILEPATH}}&amp;quot;&lt;/span&gt; .&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="maxLength">
+               <number>500</number>
+              </property>
+              <property name="placeholderText">
+               <string>example: evince &quot;{{FILEPATH}}&quot;</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="pdfCustomCmdPickBtn">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pick an executable file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Pick</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../../../img/images.qrc">
+                <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
@@ -453,7 +471,20 @@
    <header location="global">librepcb/common/widgets/editabletablewidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+ </resources>
  <connections/>
  <buttongroups>
   <buttongroup name="pdfOpenGroup"/>

@@ -144,6 +144,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
   {
     connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
             mUi->pdfCustomCmdEdit, &QTextEdit::setEnabled);
+    connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
+            mUi->pdfCustomCmdPickBtn, &QToolButton::setEnabled);
 
     // PDF Reader
     // match IDs with enum values
@@ -158,6 +160,21 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
     mUi->pdfOpenGroup->setId(
           mUi->pdfOpenAskRadio,
           static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ASK));
+
+    // File picker
+    connect(mUi->pdfCustomCmdPickBtn, &QToolButton::clicked, [&]() {
+      QFileDialog fileDialog(this);
+
+      fileDialog.setWindowTitle(tr("Select an executable file"));
+      fileDialog.setFileMode(QFileDialog::ExistingFile);
+      fileDialog.setFilter(QDir::Executable);
+      fileDialog.setDirectory(QDir::home());
+
+      if (fileDialog.exec()) {
+        mUi->pdfCustomCmdEdit->setText(fileDialog.selectedFiles().first()
+                                       + " \"{{FILEPATH}}\"");
+      }
+    });
   }
 
   // Now load all current settings
@@ -261,6 +278,8 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // External PDF Reader
   mUi->pdfCustomCmdEdit->setEnabled(mSettings.useCustomPdfReader.get());
+  mUi->pdfCustomCmdPickBtn->setEnabled(mSettings.useCustomPdfReader.get());
+
   mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
   mUi->pdfCustomRadioBtn->setChecked(mSettings.useCustomPdfReader.get());
 
