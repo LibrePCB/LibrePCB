@@ -161,6 +161,16 @@ enable [ccache](https://ccache.dev/) (this will work on Qt 5.9.2 and newer):
 qmake -r ../librepcb.pro CONFIG+=ccache
 ```
 
+By default, all binaries will be linked statically using vendored libraries. If
+you would prefer to unbundle some libraries, set the `UNBUNDLE` variable:
+
+```bash
+qmake -r ../librepcb.pro UNBUNDLE+=quazip
+```
+
+Note: Unbundling is currently only supported on Unix systems with `pkg-config`
+installed.
+
 ### Run LibrePCB
 
 #### From Qt Creator

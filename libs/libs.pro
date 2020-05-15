@@ -10,7 +10,6 @@ SUBDIRS = \
     muparser \
     optional \
     parseagle \
-    quazip \
     sexpresso \
 
 librepcb.depends = \
@@ -21,5 +20,9 @@ librepcb.depends = \
     optional \
     parseagle \
     hoedown \
-    quazip \
     sexpresso \
+
+!contains(UNBUNDLE, quazip) {
+    SUBDIRS += quazip
+    librepcb.depends += quazip
+}

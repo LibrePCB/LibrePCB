@@ -1,7 +1,5 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2015-05-31T12:53:17
-#
+# Lib: Classes & GUI elements to modify LibrePCB project elements
 #-------------------------------------------------
 
 TEMPLATE = lib
@@ -12,7 +10,12 @@ include(../../../common.pri)
 
 QT += core widgets xml sql printsupport svg
 
-CONFIG += staticlib
+isEmpty(UNBUNDLE) {
+    CONFIG += staticlib
+} else {
+    target.path = $${PREFIX}/lib
+    INSTALLS += target
+}
 
 INCLUDEPATH += \
     ../../ \

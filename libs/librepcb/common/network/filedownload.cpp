@@ -25,7 +25,12 @@
 #include "scopeguard.h"
 
 #include <QtCore>
+
+#ifdef SYSTEM_QUAZIP
+#include <quazip5/JlCompress.h>
+#else
 #include <quazip/JlCompress.h>
+#endif
 
 /*******************************************************************************
  *  Namespace
