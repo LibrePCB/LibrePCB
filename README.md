@@ -151,7 +151,14 @@ on the command line:
 ```bash
 mkdir build && cd build
 qmake -r ../librepcb.pro
-make -j 8
+make -j8
+```
+
+To speed up subsequent compilation steps, it's recommended to install and
+enable [ccache](https://ccache.dev/) (this will work on Qt 5.9.2 and newer):
+
+```bash
+qmake -r ../librepcb.pro CONFIG+=ccache
 ```
 
 ### Run LibrePCB
