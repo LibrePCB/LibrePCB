@@ -49,6 +49,11 @@ QMAKE_CXXFLAGS_DEBUG += -Wextra
     unix:CONFIG += link_pkgconfig
 }
 
+# If UNBUNDLE contains "all", unbundle all dependencies
+contains(UNBUNDLE, all) {
+    UNBUNDLE = (all) quazip
+}
+
 # QuaZIP configuration
 contains(UNBUNDLE, quazip) {
     DEFINES += SYSTEM_QUAZIP

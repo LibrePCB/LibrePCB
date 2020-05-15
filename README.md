@@ -168,6 +168,9 @@ you would prefer to unbundle some libraries, set the `UNBUNDLE` variable:
 qmake -r ../librepcb.pro UNBUNDLE+=quazip
 ```
 
+You can either list the libraries one by one, or you can use `UNBUNDLE=all` to
+unbundle all libraries that support dynamic linking.
+
 Note: Unbundling is currently only supported on Unix systems with `pkg-config`
 installed.
 
