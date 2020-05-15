@@ -19,7 +19,11 @@ jobs:
         CC: clang
         CXX: clang++
       Ubuntu_2004_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-2
+      Ubuntu_2004_Unbundled:
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-2
+        UNBUNDLE: quazip
+        LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
   container: $[ variables['IMAGE'] ]
   steps:
   - checkout: self
@@ -30,6 +34,9 @@ jobs:
       # Pass modified PATH to following steps:
       echo "##vso[task.setvariable variable=PATH]$PATH"
     displayName: Install Dependencies
+  - bash: rm -rf libs/quazip
+    displayName: Remove bundled quazip
+    condition: and(succeeded(), contains(variables['UNBUNDLE'], 'quazip'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_linux_appimage.sh
@@ -43,6 +50,7 @@ jobs:
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
   - bash: xvfb-run -a ./build/output/qztest
     displayName: Run QuaZip Unittests
+    condition: and(succeeded(), not(contains(variables['UNBUNDLE'], 'quazip')))
   - bash: xvfb-run -a ./build/output/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli
