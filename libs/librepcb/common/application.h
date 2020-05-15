@@ -73,6 +73,8 @@ public:
   }
   const QString&   getGitRevision() const noexcept { return mGitRevision; }
   const QDateTime& getBuildDate() const noexcept { return mBuildDate; }
+  const QString&   getLinkingType() const noexcept { return mLinkingType; }
+  const QString&   getUnbundledLibs() const noexcept { return mUnbundledLibs; }
   const Version&   getFileFormatVersion() const noexcept {
     return mFileFormatVersion;
   }
@@ -115,6 +117,8 @@ private:  // Data
   QString   mAppVersionLabel;
   QString   mGitRevision;
   QDateTime mBuildDate;
+  QString   mLinkingType;
+  QString   mUnbundledLibs;
   Version   mFileFormatVersion;
   bool      mIsFileFormatStable;
   FilePath  mResourcesDir;

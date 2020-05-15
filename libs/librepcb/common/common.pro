@@ -329,3 +329,12 @@ contains(UNBUNDLE, quazip) {
 } else {
     INCLUDEPATH += ../../quazip
 }
+
+# linking information defines (used by `Application` class)
+isEmpty(UNBUNDLE) {
+    DEFINES += "LINKING_TYPE=\"\\\"static\\\"\""
+    DEFINES += "UNBUNDLE=\"\\\"-\\\"\""
+} else {
+    DEFINES += "LINKING_TYPE=\"\\\"dynamic\\\"\""
+    DEFINES += "UNBUNDLE=\"\\\"$${UNBUNDLE}\\\"\""
+}
