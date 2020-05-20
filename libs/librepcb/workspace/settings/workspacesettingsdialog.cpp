@@ -140,6 +140,43 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
             mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemDown);
   }
 
+  // Initialize external applications widgets
+  {
+    connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
+            mUi->pdfCustomCmdEdit, &QTextEdit::setEnabled);
+    connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
+            mUi->pdfCustomCmdPickBtn, &QToolButton::setEnabled);
+
+    // PDF Reader
+    // match IDs with enum values
+    mUi->pdfOpenGroup->setId(
+          mUi->pdfOpenAlwaysRadio,
+          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ALWAYS));
+
+    mUi->pdfOpenGroup->setId(
+          mUi->pdfOpenNeverRadio,
+          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::NEVER));
+
+    mUi->pdfOpenGroup->setId(
+          mUi->pdfOpenAskRadio,
+          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ASK));
+
+    // File picker
+    connect(mUi->pdfCustomCmdPickBtn, &QToolButton::clicked, [&]() {
+      QFileDialog fileDialog(this);
+
+      fileDialog.setWindowTitle(tr("Select an executable file"));
+      fileDialog.setFileMode(QFileDialog::ExistingFile);
+      fileDialog.setFilter(QDir::Executable);
+      fileDialog.setDirectory(QDir::home());
+
+      if (fileDialog.exec()) {
+        mUi->pdfCustomCmdEdit->setText(fileDialog.selectedFiles().first()
+                                       + " \"{{FILEPATH}}\"");
+      }
+    });
+  }
+
   // Now load all current settings
   loadSettings();
 
@@ -238,6 +275,17 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // Repository URLs
   mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
+
+  // External PDF Reader
+  mUi->pdfCustomCmdEdit->setEnabled(mSettings.useCustomPdfReader.get());
+  mUi->pdfCustomCmdPickBtn->setEnabled(mSettings.useCustomPdfReader.get());
+
+  mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
+  mUi->pdfCustomRadioBtn->setChecked(mSettings.useCustomPdfReader.get());
+
+  // External PDF reader behaviour
+  mUi->pdfOpenGroup->button(
+        static_cast<int>(mSettings.pdfOpenBehavior.get()))->setChecked(true);
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -272,6 +320,15 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Repository URLs
     mSettings.repositoryUrls.set(mRepositoryUrlsModel->getValues());
+
+    // External PDF Reader
+    mSettings.useCustomPdfReader.set(mUi->pdfCustomRadioBtn->isChecked());
+    mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text().trimmed());
+
+    // External PDF reader behaviour
+    mSettings.pdfOpenBehavior.set(
+          static_cast<WorkspaceSettings::PdfOpenBehavior>(
+            mUi->pdfOpenGroup->checkedId()));
 
     mSettings.saveToFile();  // can throw
   } catch (const Exception& e) {

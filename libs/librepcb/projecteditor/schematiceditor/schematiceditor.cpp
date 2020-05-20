@@ -423,7 +423,43 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
     FilePath filepath(filename);
     mProject.exportSchematicsAsPdf(
         filepath);  // this method can throw an exception
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+
+    // Open PDF
+    {
+      namespace ws = ::librepcb::workspace;
+      const ws::WorkspaceSettings& workspaceSettings =
+          mProjectEditor.getWorkspace().getSettings();
+
+      ws::WorkspaceSettings::PdfOpenBehavior bhv
+          = workspaceSettings.pdfOpenBehavior.get();
+
+      if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::NEVER) {
+        // do nothing
+      } else {
+        bool doOpenPdf = true;
+        if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::ASK) {
+          int openPdf = QMessageBox::information(
+                          this, tr("PDF Export"),
+                          tr("PDF exported successfully"),
+                          QMessageBox::Ok | QMessageBox::Open);
+
+          if (openPdf == QMessageBox::Ok)
+            doOpenPdf = false;
+        } else if (bhv != ws::WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
+          throw LogicError(__FILE__, __LINE__);
+        }
+
+        if (doOpenPdf) {
+          if (workspaceSettings.useCustomPdfReader.get()) {
+            QString pdfCmd = workspaceSettings.pdfReaderCommand.get();
+            QProcess::startDetached(pdfCmd.replace(
+                                      "{{FILEPATH}}", filepath.toNative()));
+          } else {
+            QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
+          }
+        }
+      }
+    }
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }

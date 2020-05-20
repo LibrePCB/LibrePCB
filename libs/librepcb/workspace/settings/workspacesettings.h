@@ -59,6 +59,15 @@ class WorkspaceSettings final : public QObject, public SerializableObject {
   Q_OBJECT
 
 public:
+  // Enums for n-state settings
+
+  /// @see ::librepcb::workspace::WorkspaceSettings::pdfOpenBehavior
+  // The underlying type int is needed to map QButtonGroup IDs
+  // to values in this enum. See for ex. WorkspaceSettingsDialog::loadSettings()
+  enum class PdfOpenBehavior : int {
+    ALWAYS, NEVER, ASK,
+  };
+
   // Constructors / Destructor
   WorkspaceSettings()                               = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
@@ -171,6 +180,27 @@ public:
    * Default: ["https://api.librepcb.org"]
    */
   WorkspaceSettingsItem_GenericValueList<QList<QUrl>> repositoryUrls;
+
+  /**
+   * @brief Use a PDF Reader other than the system default
+   *
+   * Default: false
+   */
+  WorkspaceSettingsItem_GenericValue<bool> useCustomPdfReader;
+
+  /**
+   * @brief Custom command to open a PDF reader
+   *
+   * Default: ""
+   */
+  WorkspaceSettingsItem_GenericValue<QString> pdfReaderCommand;
+
+  /**
+   * @brief Behavior after a PDF has been exported
+   *
+   * Default: PdfOpenBehavior::ALWAYS
+   */
+  WorkspaceSettingsItem_GenericValue<PdfOpenBehavior> pdfOpenBehavior;
 };
 
 /*******************************************************************************
@@ -178,6 +208,40 @@ public:
  ******************************************************************************/
 
 }  // namespace workspace
+
+// Serialize settings values
+template<>
+inline SExpression serializeToSExpression(
+    const workspace::WorkspaceSettings::PdfOpenBehavior& b) {
+  using namespace workspace;
+  switch (b) {
+    case WorkspaceSettings::PdfOpenBehavior::ALWAYS:
+      return SExpression::createToken("always");
+    case WorkspaceSettings::PdfOpenBehavior::NEVER:
+      return SExpression::createToken("never");
+    case WorkspaceSettings::PdfOpenBehavior::ASK:
+      return SExpression::createToken("ask");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  };
+}
+
+template<>
+inline workspace::WorkspaceSettings::PdfOpenBehavior
+  deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
+
+  using namespace workspace;
+  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  if (str == QLatin1String("always"))
+    return WorkspaceSettings::PdfOpenBehavior::ALWAYS;
+  else if (str == QLatin1String("never"))
+    return WorkspaceSettings::PdfOpenBehavior::NEVER;
+  else if (str == QLatin1String("ask"))
+    return WorkspaceSettings::PdfOpenBehavior::ASK;
+  else
+    throw RuntimeError(__FILE__, __LINE__, str);
+}
+
 }  // namespace librepcb
 
 #endif  // LIBREPCB_WORKSPACESETTINGS_H
