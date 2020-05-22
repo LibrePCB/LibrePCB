@@ -25,7 +25,7 @@
 #include "ui_newelementwizardpage_componentpinsignalmap.h"
 
 #include <librepcb/library/cmp/component.h>
-#include <librepcb/library/libraryelementcache.h>
+#include <librepcb/libraryeditor/libraryelementcache.h>
 #include <librepcb/workspace/workspace.h>
 
 /*******************************************************************************

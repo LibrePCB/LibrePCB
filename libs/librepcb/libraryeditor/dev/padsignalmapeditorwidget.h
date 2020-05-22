@@ -43,10 +43,9 @@ class Workspace;
 }
 
 namespace library {
+namespace editor {
 
 class DevicePadSignalMapModel;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class PadSignalMapEditorWidget

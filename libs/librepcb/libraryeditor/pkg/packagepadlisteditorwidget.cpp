@@ -24,7 +24,7 @@
 
 #include <librepcb/common/model/sortfilterproxymodel.h>
 #include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/library/pkg/packagepadlistmodel.h>
+#include <librepcb/libraryeditor/pkg/packagepadlistmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>

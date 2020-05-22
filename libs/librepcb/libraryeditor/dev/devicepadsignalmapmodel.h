@@ -17,13 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTLISTMODEL_H
-#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTLISTMODEL_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_DEVICEPADSIGNALMAPMODEL_H
+#define LIBREPCB_LIBRARY_EDITOR_DEVICEPADSIGNALMAPMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "componentsymbolvariant.h"
+#include <librepcb/common/model/comboboxdelegate.h>
+#include <librepcb/library/cmp/componentsignal.h>
+#include <librepcb/library/dev/devicepadsignalmap.h>
+#include <librepcb/library/pkg/packagepad.h>
 
 #include <QtCore>
 
@@ -35,43 +38,32 @@ namespace librepcb {
 class UndoStack;
 
 namespace library {
+namespace editor {
 
 /*******************************************************************************
- *  Class ComponentSymbolVariantListModel
+ *  Class DevicePadSignalMapModel
  ******************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariantListModel class
+ * @brief The DevicePadSignalMapModel class
  */
-class ComponentSymbolVariantListModel final : public QAbstractTableModel {
+class DevicePadSignalMapModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-  enum Column {
-    COLUMN_NAME,
-    COLUMN_DESCRIPTION,
-    COLUMN_NORM,
-    COLUMN_SYMBOLCOUNT,
-    COLUMN_ACTIONS,
-    _COLUMN_COUNT
-  };
+  enum Column { COLUMN_PAD, COLUMN_SIGNAL, _COLUMN_COUNT };
 
   // Constructors / Destructor
-  ComponentSymbolVariantListModel() = delete;
-  ComponentSymbolVariantListModel(
-      const ComponentSymbolVariantListModel& other) noexcept;
-  explicit ComponentSymbolVariantListModel(QObject* parent = nullptr) noexcept;
-  ~ComponentSymbolVariantListModel() noexcept;
+  DevicePadSignalMapModel() = delete;
+  DevicePadSignalMapModel(const DevicePadSignalMapModel& other) noexcept;
+  explicit DevicePadSignalMapModel(QObject* parent = nullptr) noexcept;
+  ~DevicePadSignalMapModel() noexcept;
 
   // Setters
-  void setSymbolVariantList(ComponentSymbolVariantList* list) noexcept;
+  void setPadSignalMap(DevicePadSignalMap* map) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
-
-  // Slots
-  void addSymbolVariant(const QVariant& editData) noexcept;
-  void removeSymbolVariant(const QVariant& editData) noexcept;
-  void moveSymbolVariantUp(const QVariant& editData) noexcept;
-  void moveSymbolVariantDown(const QVariant& editData) noexcept;
+  void setSignalList(const ComponentSignalList& list) noexcept;
+  void setPadList(const PackagePadList& list) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -85,33 +77,34 @@ public:
                         int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  ComponentSymbolVariantListModel& operator=(
-      const ComponentSymbolVariantListModel& rhs) noexcept;
+  DevicePadSignalMapModel& operator=(
+      const DevicePadSignalMapModel& rhs) noexcept;
 
 private:
-  void symbolVariantListEdited(
-      const ComponentSymbolVariantList& list, int index,
-      const std::shared_ptr<const ComponentSymbolVariant>& variant,
-      ComponentSymbolVariantList::Event                    event) noexcept;
-  void        execCmd(UndoCommand* cmd);
-  ElementName validateNameOrThrow(const QString& name) const;
+  void padSignalMapEdited(
+      const DevicePadSignalMap& map, int index,
+      const std::shared_ptr<const DevicePadSignalMapItem>& item,
+      DevicePadSignalMap::Event                            event) noexcept;
+  void execCmd(UndoCommand* cmd);
+  void updateComboBoxItems() noexcept;
 
 private:  // Data
-  ComponentSymbolVariantList* mSymbolVariantList;
-  UndoStack*                  mUndoStack;
-  QString                     mNewName;
-  QString                     mNewDescription;
-  QString                     mNewNorm;
+  DevicePadSignalMap*     mPadSignalMap;
+  UndoStack*              mUndoStack;
+  ComponentSignalList     mSignals;
+  PackagePadList          mPads;
+  ComboBoxDelegate::Items mComboBoxItems;
 
   // Slots
-  ComponentSymbolVariantList::OnEditedSlot mOnEditedSlot;
+  DevicePadSignalMap::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTLISTMODEL_H
+#endif

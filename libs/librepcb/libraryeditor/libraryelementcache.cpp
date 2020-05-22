@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "libraryelementcache.h"
 
-#include "elements.h"
-
 #include <librepcb/common/fileio/transactionalfilesystem.h>
+#include <librepcb/library/elements.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 
 #include <QtCore>
@@ -34,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -114,5 +114,6 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb

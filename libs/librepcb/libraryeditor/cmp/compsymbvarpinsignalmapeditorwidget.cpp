@@ -24,7 +24,7 @@
 
 #include <librepcb/common/model/comboboxdelegate.h>
 #include <librepcb/common/model/sortfilterproxymodel.h>
-#include <librepcb/library/cmp/componentpinsignalmapmodel.h>
+#include <librepcb/libraryeditor/cmp/componentpinsignalmapmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>

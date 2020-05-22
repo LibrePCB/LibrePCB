@@ -20,13 +20,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "packagepadlistmodel.h"
-
-#include "cmd/cmdpackagepadedit.h"
+#include "componentsignallistmodel.h"
 
 #include <librepcb/common/toolbox.h>
 #include <librepcb/common/undocommandgroup.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/library/cmp/cmd/cmdcomponentsignaledit.h>
 
 #include <QtCore>
 
@@ -35,43 +34,47 @@
  ******************************************************************************/
 namespace librepcb {
 namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-PackagePadListModel::PackagePadListModel(QObject* parent) noexcept
+ComponentSignalListModel::ComponentSignalListModel(QObject* parent) noexcept
   : QAbstractTableModel(parent),
-    mPadList(nullptr),
+    mSignalList(nullptr),
     mUndoStack(nullptr),
     mNewName(),
-    mOnEditedSlot(*this, &PackagePadListModel::padListEdited) {
+    mNewIsRequired(false),
+    mNewForcedNetName(),
+    mOnEditedSlot(*this, &ComponentSignalListModel::signalListEdited) {
 }
 
-PackagePadListModel::~PackagePadListModel() noexcept {
+ComponentSignalListModel::~ComponentSignalListModel() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void PackagePadListModel::setPadList(PackagePadList* list) noexcept {
+void ComponentSignalListModel::setSignalList(
+    ComponentSignalList* list) noexcept {
   emit beginResetModel();
 
-  if (mPadList) {
-    mPadList->onEdited.detach(mOnEditedSlot);
+  if (mSignalList) {
+    mSignalList->onEdited.detach(mOnEditedSlot);
   }
 
-  mPadList = list;
+  mSignalList = list;
 
-  if (mPadList) {
-    mPadList->onEdited.attach(mOnEditedSlot);
+  if (mSignalList) {
+    mSignalList->onEdited.attach(mOnEditedSlot);
   }
 
   emit endResetModel();
 }
 
-void PackagePadListModel::setUndoStack(UndoStack* stack) noexcept {
+void ComponentSignalListModel::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
 }
 
@@ -79,40 +82,40 @@ void PackagePadListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void PackagePadListModel::addPad(const QVariant& editData) noexcept {
+void ComponentSignalListModel::addSignal(const QVariant& editData) noexcept {
   Q_UNUSED(editData);
-  if (!mPadList) {
+  if (!mSignalList) {
     return;
   }
 
   try {
     QScopedPointer<UndoCommandGroup> cmd(
-        new UndoCommandGroup(tr("Add package pad(s)")));
-    // if no name is set we search for the next free numerical pad name
-    if (mNewName.isEmpty()) {
-      mNewName = getNextPadNameProposal();
-    }
+        new UndoCommandGroup(tr("Add component signal(s)")));
     foreach (const QString& name, Toolbox::expandRangesInString(mNewName)) {
-      std::shared_ptr<PackagePad> pad = std::make_shared<PackagePad>(
-          Uuid::createRandom(), validateNameOrThrow(name));
-      cmd->appendChild(new CmdPackagePadInsert(*mPadList, pad));
+      std::shared_ptr<ComponentSignal> sig = std::make_shared<ComponentSignal>(
+          Uuid::createRandom(), validateNameOrThrow(name),
+          SignalRole::passive(), mNewForcedNetName, mNewIsRequired, false,
+          false);
+      cmd->appendChild(new CmdComponentSignalInsert(*mSignalList, sig));
     }
     execCmd(cmd.take());
-    mNewName = QString();
+    mNewName          = QString();
+    mNewIsRequired    = false;
+    mNewForcedNetName = QString();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
 }
 
-void PackagePadListModel::removePad(const QVariant& editData) noexcept {
-  if (!mPadList) {
+void ComponentSignalListModel::removeSignal(const QVariant& editData) noexcept {
+  if (!mSignalList) {
     return;
   }
 
   try {
-    Uuid                        uuid = Uuid::fromString(editData.toString());
-    std::shared_ptr<PackagePad> pad  = mPadList->get(uuid);
-    execCmd(new CmdPackagePadRemove(*mPadList, pad.get()));
+    Uuid uuid = Uuid::fromString(editData.toString());
+    std::shared_ptr<ComponentSignal> sig = mSignalList->get(uuid);
+    execCmd(new CmdComponentSignalRemove(*mSignalList, sig.get()));
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
@@ -122,32 +125,33 @@ void PackagePadListModel::removePad(const QVariant& editData) noexcept {
  *  Inherited from QAbstractItemModel
  ******************************************************************************/
 
-int PackagePadListModel::rowCount(const QModelIndex& parent) const {
-  if (!parent.isValid() && mPadList) {
-    return mPadList->count() + 1;
+int ComponentSignalListModel::rowCount(const QModelIndex& parent) const {
+  if (!parent.isValid() && mSignalList) {
+    return mSignalList->count() + 1;
   }
   return 0;
 }
 
-int PackagePadListModel::columnCount(const QModelIndex& parent) const {
+int ComponentSignalListModel::columnCount(const QModelIndex& parent) const {
   if (!parent.isValid()) {
     return _COLUMN_COUNT;
   }
   return 0;
 }
 
-QVariant PackagePadListModel::data(const QModelIndex& index, int role) const {
-  if (!index.isValid() || !mPadList) {
+QVariant ComponentSignalListModel::data(const QModelIndex& index,
+                                        int                role) const {
+  if (!index.isValid() || !mSignalList) {
     return QVariant();
   }
 
-  std::shared_ptr<PackagePad> item = mPadList->value(index.row());
+  std::shared_ptr<ComponentSignal> item = mSignalList->value(index.row());
   switch (index.column()) {
     case COLUMN_NAME: {
       QString name     = item ? *item->getName() : mNewName;
       bool    showHint = (!item) && mNewName.isEmpty();
       QString hint =
-          tr("Pad name (may contain ranges like \"%1\")").arg("1..5");
+          tr("Signal name (may contain ranges like \"%1\")").arg("1..5");
       switch (role) {
         case Qt::DisplayRole:
           return showHint ? hint : name;
@@ -167,6 +171,31 @@ QVariant PackagePadListModel::data(const QModelIndex& index, int role) const {
           return QVariant();
       }
     }
+    case COLUMN_ISREQUIRED: {
+      bool required = item ? item->isRequired() : mNewIsRequired;
+      switch (role) {
+        case Qt::DisplayRole:
+          return required ? tr("Required") : tr("Optional");
+        case Qt::CheckStateRole:
+          return required ? Qt::Checked : Qt::Unchecked;
+        case Qt::ToolTipRole:
+          return required ? tr("Leaving this signal unconnected in schematics "
+                               "produces an ERC error.")
+                          : tr("Leaving this signal unconnected in schematics "
+                               "is allowed.");
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_FORCEDNETNAME: {
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return item ? item->getForcedNetName() : mNewForcedNetName;
+        default:
+          return QVariant();
+      }
+    }
     case COLUMN_ACTIONS: {
       switch (role) {
         case Qt::EditRole:
@@ -182,25 +211,29 @@ QVariant PackagePadListModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
-QVariant PackagePadListModel::headerData(int             section,
-                                         Qt::Orientation orientation,
-                                         int             role) const {
+QVariant ComponentSignalListModel::headerData(int             section,
+                                              Qt::Orientation orientation,
+                                              int             role) const {
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
         case COLUMN_NAME:
           return tr("Name");
+        case COLUMN_ISREQUIRED:
+          return tr("Connection");
+        case COLUMN_FORCEDNETNAME:
+          return tr("Forced Net");
         default:
           return QVariant();
       }
     }
   } else if (orientation == Qt::Vertical) {
-    if (mPadList && (role == Qt::DisplayRole)) {
-      std::shared_ptr<PackagePad> item = mPadList->value(section);
+    if (mSignalList && (role == Qt::DisplayRole)) {
+      std::shared_ptr<ComponentSignal> item = mSignalList->value(section);
       return item ? item->getUuid().toStr().left(8) : tr("New:");
-    } else if (mPadList && (role == Qt::ToolTipRole)) {
-      std::shared_ptr<PackagePad> item = mPadList->value(section);
-      return item ? item->getUuid().toStr() : tr("Add a new pad");
+    } else if (mSignalList && (role == Qt::ToolTipRole)) {
+      std::shared_ptr<ComponentSignal> item = mSignalList->value(section);
+      return item ? item->getUuid().toStr() : tr("Add a new signal");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
     } else if (role == Qt::FontRole) {
@@ -214,25 +247,27 @@ QVariant PackagePadListModel::headerData(int             section,
   return QVariant();
 }
 
-Qt::ItemFlags PackagePadListModel::flags(const QModelIndex& index) const {
+Qt::ItemFlags ComponentSignalListModel::flags(const QModelIndex& index) const {
   Qt::ItemFlags f = QAbstractTableModel::flags(index);
-  if (index.isValid()) {
+  if (index.isValid() && (index.column() == COLUMN_ISREQUIRED)) {
+    f |= Qt::ItemIsUserCheckable;
+  } else if (index.isValid() && (index.column() != COLUMN_ACTIONS)) {
     f |= Qt::ItemIsEditable;
   }
   return f;
 }
 
-bool PackagePadListModel::setData(const QModelIndex& index,
-                                  const QVariant& value, int role) {
-  if (!mPadList) {
+bool ComponentSignalListModel::setData(const QModelIndex& index,
+                                       const QVariant& value, int role) {
+  if (!mSignalList) {
     return false;
   }
 
   try {
-    std::shared_ptr<PackagePad>       item = mPadList->value(index.row());
-    QScopedPointer<CmdPackagePadEdit> cmd;
+    std::shared_ptr<ComponentSignal> item = mSignalList->value(index.row());
+    QScopedPointer<CmdComponentSignalEdit> cmd;
     if (item) {
-      cmd.reset(new CmdPackagePadEdit(*item));
+      cmd.reset(new CmdComponentSignalEdit(*item));
     }
     if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
       QString name        = value.toString().trimmed();
@@ -248,6 +283,22 @@ bool PackagePadListModel::setData(const QModelIndex& index,
         } else {
           mNewName = name;  // contains ranges -> keep them!
         }
+      }
+    } else if ((index.column() == COLUMN_ISREQUIRED) &&
+               role == Qt::CheckStateRole) {
+      bool required = value.toInt() == Qt::Checked;
+      if (cmd) {
+        cmd->setIsRequired(required);
+      } else {
+        mNewIsRequired = required;
+      }
+    } else if ((index.column() == COLUMN_FORCEDNETNAME) &&
+               role == Qt::EditRole) {
+      QString forcedNetName = cleanForcedNetName(value.toString());
+      if (cmd) {
+        cmd->setForcedNetName(forcedNetName);
+      } else {
+        mNewForcedNetName = forcedNetName;
       }
     } else {
       return false;  // do not execute command!
@@ -268,31 +319,32 @@ bool PackagePadListModel::setData(const QModelIndex& index,
  *  Private Methods
  ******************************************************************************/
 
-void PackagePadListModel::padListEdited(
-    const PackagePadList& list, int index,
-    const std::shared_ptr<const PackagePad>& pad,
-    PackagePadList::Event                    event) noexcept {
+void ComponentSignalListModel::signalListEdited(
+    const ComponentSignalList& list, int index,
+    const std::shared_ptr<const ComponentSignal>& signal,
+    ComponentSignalList::Event                    event) noexcept {
   Q_UNUSED(list);
-  Q_UNUSED(pad);
+  Q_UNUSED(signal);
   switch (event) {
-    case PackagePadList::Event::ElementAdded:
+    case ComponentSignalList::Event::ElementAdded:
       beginInsertRows(QModelIndex(), index, index);
       endInsertRows();
       break;
-    case PackagePadList::Event::ElementRemoved:
+    case ComponentSignalList::Event::ElementRemoved:
       beginRemoveRows(QModelIndex(), index, index);
       endRemoveRows();
       break;
-    case PackagePadList::Event::ElementEdited:
+    case ComponentSignalList::Event::ElementEdited:
       dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
       break;
     default:
-      qWarning() << "Unhandled switch-case in PackagePadList::padListEdited()";
+      qWarning() << "Unhandled switch-case in "
+                    "ComponentSignalListModel::signalListEdited()";
       break;
   }
 }
 
-void PackagePadListModel::execCmd(UndoCommand* cmd) {
+void ComponentSignalListModel::execCmd(UndoCommand* cmd) {
   if (mUndoStack) {
     mUndoStack->execCmd(cmd);
   } else {
@@ -301,27 +353,31 @@ void PackagePadListModel::execCmd(UndoCommand* cmd) {
   }
 }
 
-CircuitIdentifier PackagePadListModel::validateNameOrThrow(
+CircuitIdentifier ComponentSignalListModel::validateNameOrThrow(
     const QString& name) const {
-  if (mPadList && mPadList->contains(name)) {
+  if (mSignalList && mSignalList->contains(name)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a pad with the name \"%1\".")).arg(name));
+        QString(tr("There is already a signal with the name \"%1\"."))
+            .arg(name));
   }
   return CircuitIdentifier(name);  // can throw
 }
 
-QString PackagePadListModel::getNextPadNameProposal() const noexcept {
-  int i = 1;
-  while (mPadList->contains(QString::number(i))) {
-    ++i;
-  }
-  return QString::number(i);
+QString ComponentSignalListModel::cleanForcedNetName(
+    const QString& name) noexcept {
+  // Same as cleanCircuitIdentifier(), but allowing '{' and '}' because it's
+  // allowed to have attribute placeholders in a forced net name. Also remove
+  // spaces because they must not be replaced by underscores inside {{ and }}.
+  return Toolbox::cleanUserInputString(
+      name, QRegularExpression("[^-a-zA-Z0-9_+/!?@#$\\{\\}]"), true, false,
+      false, "");
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb

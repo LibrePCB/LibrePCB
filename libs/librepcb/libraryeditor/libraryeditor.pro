@@ -25,9 +25,13 @@ RESOURCES += \
 SOURCES += \
     cmp/cmpsigpindisplaytypecombobox.cpp \
     cmp/componenteditorwidget.cpp \
+    cmp/componentpinsignalmapmodel.cpp \
     cmp/componentsignallisteditorwidget.cpp \
+    cmp/componentsignallistmodel.cpp \
     cmp/componentsymbolvarianteditdialog.cpp \
     cmp/componentsymbolvariantitemlisteditorwidget.cpp \
+    cmp/componentsymbolvariantitemlistmodel.cpp \
+    cmp/componentsymbolvariantlistmodel.cpp \
     cmp/componentsymbolvariantlistwidget.cpp \
     cmp/compsymbvarpinsignalmapeditorwidget.cpp \
     cmpcat/componentcategoryeditorwidget.cpp \
@@ -40,10 +44,12 @@ SOURCES += \
     common/packagechooserdialog.cpp \
     common/symbolchooserdialog.cpp \
     dev/deviceeditorwidget.cpp \
+    dev/devicepadsignalmapmodel.cpp \
     dev/padsignalmapeditorwidget.cpp \
     lib/librarylisteditorwidget.cpp \
     lib/libraryoverviewwidget.cpp \
     libraryeditor.cpp \
+    libraryelementcache.cpp \
     newelementwizard/newelementwizard.cpp \
     newelementwizard/newelementwizardcontext.cpp \
     newelementwizard/newelementwizardpage_choosetype.cpp \
@@ -58,6 +64,7 @@ SOURCES += \
     pkg/dialogs/footprintpadpropertiesdialog.cpp \
     pkg/footprintclipboarddata.cpp \
     pkg/footprintlisteditorwidget.cpp \
+    pkg/footprintlistmodel.cpp \
     pkg/fsm/cmd/cmddragselectedfootprintitems.cpp \
     pkg/fsm/cmd/cmdpastefootprintitems.cpp \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.cpp \
@@ -77,6 +84,7 @@ SOURCES += \
     pkg/fsm/packageeditorstate_select.cpp \
     pkg/packageeditorwidget.cpp \
     pkg/packagepadlisteditorwidget.cpp \
+    pkg/packagepadlistmodel.cpp \
     pkg/widgets/boardsideselectorwidget.cpp \
     pkg/widgets/footprintpadshapeselectorwidget.cpp \
     pkg/widgets/packagepadcombobox.cpp \
@@ -104,9 +112,13 @@ SOURCES += \
 HEADERS += \
     cmp/cmpsigpindisplaytypecombobox.h \
     cmp/componenteditorwidget.h \
+    cmp/componentpinsignalmapmodel.h \
     cmp/componentsignallisteditorwidget.h \
+    cmp/componentsignallistmodel.h \
     cmp/componentsymbolvarianteditdialog.h \
     cmp/componentsymbolvariantitemlisteditorwidget.h \
+    cmp/componentsymbolvariantitemlistmodel.h \
+    cmp/componentsymbolvariantlistmodel.h \
     cmp/componentsymbolvariantlistwidget.h \
     cmp/compsymbvarpinsignalmapeditorwidget.h \
     cmp/if_componentsymbolvarianteditorprovider.h \
@@ -120,10 +132,12 @@ HEADERS += \
     common/packagechooserdialog.h \
     common/symbolchooserdialog.h \
     dev/deviceeditorwidget.h \
+    dev/devicepadsignalmapmodel.h \
     dev/padsignalmapeditorwidget.h \
     lib/librarylisteditorwidget.h \
     lib/libraryoverviewwidget.h \
     libraryeditor.h \
+    libraryelementcache.h \
     newelementwizard/newelementwizard.h \
     newelementwizard/newelementwizardcontext.h \
     newelementwizard/newelementwizardpage_choosetype.h \
@@ -138,6 +152,7 @@ HEADERS += \
     pkg/dialogs/footprintpadpropertiesdialog.h \
     pkg/footprintclipboarddata.h \
     pkg/footprintlisteditorwidget.h \
+    pkg/footprintlistmodel.h \
     pkg/fsm/cmd/cmddragselectedfootprintitems.h \
     pkg/fsm/cmd/cmdpastefootprintitems.h \
     pkg/fsm/cmd/cmdremoveselectedfootprintitems.h \
@@ -157,6 +172,7 @@ HEADERS += \
     pkg/fsm/packageeditorstate_select.h \
     pkg/packageeditorwidget.h \
     pkg/packagepadlisteditorwidget.h \
+    pkg/packagepadlistmodel.h \
     pkg/widgets/boardsideselectorwidget.h \
     pkg/widgets/footprintpadshapeselectorwidget.h \
     pkg/widgets/packagepadcombobox.h \

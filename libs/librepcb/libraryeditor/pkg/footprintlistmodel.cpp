@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "footprintlistmodel.h"
 
-#include "cmd/cmdfootprintedit.h"
-
 #include <librepcb/common/undostack.h>
+#include <librepcb/library/pkg/cmd/cmdfootprintedit.h>
 
 #include <QtCore>
 
@@ -33,6 +32,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -359,5 +359,6 @@ ElementName FootprintListModel::validateNameOrThrow(const QString& name) const {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb

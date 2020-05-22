@@ -25,7 +25,7 @@
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/widgets/editabletablewidget.h>
 #include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantedit.h>
-#include <librepcb/library/cmp/componentsymbolvariantlistmodel.h>
+#include <librepcb/libraryeditor/cmp/componentsymbolvariantlistmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>
