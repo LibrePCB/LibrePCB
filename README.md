@@ -127,74 +127,17 @@ git submodule update --init --recursive
 
 ### Building
 
-#### Using Qt Creator
-
-Building with [Qt Creator](http://doc.qt.io/qtcreator/) is probably the easiest
-way. Simply open the `librepcb.pro` file.
-
-When opening a project in Qt Creator for the first time, you need to configure
-the Desktop kit:
-
-![qtcreator_run](doc/qtcreator_desktopkit.png)
-
-Click on the "Configure Project" button to get started.
-
-Note: To keep build time as low as possible make sure to set the correct make
-flags to use all available CPU cores to build. See this [stackoverflow
-answer](https://stackoverflow.com/questions/8860712/setting-default-make-options-for-qt-creator).
-
-#### Using qmake and make
-
-Since Qt Creator is also using qmake and make to build, it's easy to do the same
-on the command line:
+You can either build LibrePCB using Qt Creator, or you can build on the command
+line using qmake. To build a debug version of LibrePCB with qmake/make:
 
 ```bash
 mkdir build && cd build
-qmake -r ../librepcb.pro
+qmake -r ../librepcb.pro CONFIG+=debug
 make -j8
 ```
 
-To speed up subsequent compilation steps, it's recommended to install and
-enable [ccache](https://ccache.dev/) (this will work on Qt 5.9.2 and newer):
-
-```bash
-qmake -r ../librepcb.pro CONFIG+=ccache
-```
-
-By default, all binaries will be linked statically using vendored libraries. If
-you would prefer to unbundle some libraries, set the `UNBUNDLE` variable:
-
-```bash
-qmake -r ../librepcb.pro UNBUNDLE+=quazip
-```
-
-You can either list the libraries one by one, or you can use `UNBUNDLE=all` to
-unbundle all libraries that support dynamic linking.
-
-Note: Unbundling is currently only supported on Unix systems with `pkg-config`
-installed.
-
-### Run LibrePCB
-
-#### From Qt Creator
-
-Select the run configuration `librepcb` and click on the `Run` button:
-
-![qtcreator_run](doc/qtcreator_run.png)
-
-#### From Command Line
-
-Execute inside the `build` directory:
-
-```bash
-./output/librepcb             # Unix/Linux
-open ./output/librepcb.app    # Mac OS X
-output\librepcb.exe           # Windows
-```
-
-### Installation
-
-On a Unix/Linux system, LibrePCB can be installed with `sudo make install`.
+For more detailed instructions (including how to set up Qt Creator), see
+https://developers.librepcb.org/d5/d96/doc_building.html
 
 
 ## Credits
