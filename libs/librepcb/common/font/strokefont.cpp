@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "strokefont.h"
 
-#include <fontobene/font.h>
-#include <fontobene/glyphlistaccessor.h>
+#include <fontobene-qt5/font.h>
+#include <fontobene-qt5/glyphlistaccessor.h>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore>
