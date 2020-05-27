@@ -46,9 +46,10 @@ namespace library {
 class Component;
 class Symbol;
 class SymbolGraphicsItem;
-class LibraryElementCache;
 
 namespace editor {
+
+class LibraryElementCache;
 
 namespace Ui {
 class ComponentSymbolVariantEditDialog;

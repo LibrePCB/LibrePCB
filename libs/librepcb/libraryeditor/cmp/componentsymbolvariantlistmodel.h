@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTSIGNALLISTMODEL_H
-#define LIBREPCB_LIBRARY_COMPONENTSIGNALLISTMODEL_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTLISTMODEL_H
+#define LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "componentsignal.h"
+#include <librepcb/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 
@@ -35,39 +35,44 @@ namespace librepcb {
 class UndoStack;
 
 namespace library {
+namespace editor {
 
 /*******************************************************************************
- *  Class ComponentSignalListModel
+ *  Class ComponentSymbolVariantListModel
  ******************************************************************************/
 
 /**
- * @brief The ComponentSignalListModel class
+ * @brief The ComponentSymbolVariantListModel class
  */
-class ComponentSignalListModel final : public QAbstractTableModel {
+class ComponentSymbolVariantListModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
   enum Column {
     COLUMN_NAME,
-    COLUMN_ISREQUIRED,
-    COLUMN_FORCEDNETNAME,
+    COLUMN_DESCRIPTION,
+    COLUMN_NORM,
+    COLUMN_SYMBOLCOUNT,
     COLUMN_ACTIONS,
     _COLUMN_COUNT
   };
 
   // Constructors / Destructor
-  ComponentSignalListModel() = delete;
-  ComponentSignalListModel(const ComponentSignalListModel& other) noexcept;
-  explicit ComponentSignalListModel(QObject* parent = nullptr) noexcept;
-  ~ComponentSignalListModel() noexcept;
+  ComponentSymbolVariantListModel() = delete;
+  ComponentSymbolVariantListModel(
+      const ComponentSymbolVariantListModel& other) noexcept;
+  explicit ComponentSymbolVariantListModel(QObject* parent = nullptr) noexcept;
+  ~ComponentSymbolVariantListModel() noexcept;
 
   // Setters
-  void setSignalList(ComponentSignalList* list) noexcept;
+  void setSymbolVariantList(ComponentSymbolVariantList* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
 
   // Slots
-  void addSignal(const QVariant& editData) noexcept;
-  void removeSignal(const QVariant& editData) noexcept;
+  void addSymbolVariant(const QVariant& editData) noexcept;
+  void removeSymbolVariant(const QVariant& editData) noexcept;
+  void moveSymbolVariantUp(const QVariant& editData) noexcept;
+  void moveSymbolVariantDown(const QVariant& editData) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -81,33 +86,34 @@ public:
                         int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  ComponentSignalListModel& operator=(
-      const ComponentSignalListModel& rhs) noexcept;
+  ComponentSymbolVariantListModel& operator=(
+      const ComponentSymbolVariantListModel& rhs) noexcept;
 
 private:
-  void              signalListEdited(const ComponentSignalList& list, int index,
-                                     const std::shared_ptr<const ComponentSignal>& signal,
-                                     ComponentSignalList::Event event) noexcept;
-  void              execCmd(UndoCommand* cmd);
-  CircuitIdentifier validateNameOrThrow(const QString& name) const;
-  static QString    cleanForcedNetName(const QString& name) noexcept;
+  void symbolVariantListEdited(
+      const ComponentSymbolVariantList& list, int index,
+      const std::shared_ptr<const ComponentSymbolVariant>& variant,
+      ComponentSymbolVariantList::Event                    event) noexcept;
+  void        execCmd(UndoCommand* cmd);
+  ElementName validateNameOrThrow(const QString& name) const;
 
 private:  // Data
-  ComponentSignalList* mSignalList;
-  UndoStack*           mUndoStack;
-  QString              mNewName;
-  bool                 mNewIsRequired;
-  QString              mNewForcedNetName;
+  ComponentSymbolVariantList* mSymbolVariantList;
+  UndoStack*                  mUndoStack;
+  QString                     mNewName;
+  QString                     mNewDescription;
+  QString                     mNewNorm;
 
   // Slots
-  ComponentSignalList::OnEditedSlot mOnEditedSlot;
+  ComponentSymbolVariantList::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTSIGNALLISTMODEL_H
+#endif

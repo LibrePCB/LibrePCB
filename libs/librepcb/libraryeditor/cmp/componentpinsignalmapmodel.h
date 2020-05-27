@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_PACKAGEPADLISTMODEL_H
-#define LIBREPCB_LIBRARY_PACKAGEPADLISTMODEL_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
+#define LIBREPCB_LIBRARY_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "packagepad.h"
+#include <librepcb/common/model/comboboxdelegate.h>
+#include <librepcb/library/cmp/componentsignal.h>
+#include <librepcb/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 
@@ -35,33 +37,44 @@ namespace librepcb {
 class UndoStack;
 
 namespace library {
+namespace editor {
+
+class LibraryElementCache;
 
 /*******************************************************************************
- *  Class PackagePadListModel
+ *  Class ComponentPinSignalMapModel
  ******************************************************************************/
 
 /**
- * @brief The PackagePadListModel class
+ * @brief The ComponentPinSignalMapModel class
  */
-class PackagePadListModel final : public QAbstractTableModel {
+class ComponentPinSignalMapModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-  enum Column { COLUMN_NAME, COLUMN_ACTIONS, _COLUMN_COUNT };
+  enum Column {
+    COLUMN_SYMBOL,
+    COLUMN_PIN,
+    COLUMN_SIGNAL,
+    COLUMN_DISPLAY,
+    _COLUMN_COUNT
+  };
 
   // Constructors / Destructor
-  PackagePadListModel() = delete;
-  PackagePadListModel(const PackagePadListModel& other) noexcept;
-  explicit PackagePadListModel(QObject* parent = nullptr) noexcept;
-  ~PackagePadListModel() noexcept;
+  ComponentPinSignalMapModel() = delete;
+  ComponentPinSignalMapModel(const ComponentPinSignalMapModel& other) noexcept;
+  explicit ComponentPinSignalMapModel(QObject* parent = nullptr) noexcept;
+  ~ComponentPinSignalMapModel() noexcept;
 
   // Setters
-  void setPadList(PackagePadList* list) noexcept;
+  void setSymbolVariant(ComponentSymbolVariant* variant) noexcept;
+  void setSignalList(const ComponentSignalList* list) noexcept;
+  void setSymbolsCache(
+      const std::shared_ptr<const LibraryElementCache>& cache) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
 
-  // Slots
-  void addPad(const QVariant& editData) noexcept;
-  void removePad(const QVariant& editData) noexcept;
+  // General Methods
+  void autoAssignSignals() noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -75,30 +88,43 @@ public:
                         int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  PackagePadListModel& operator=(const PackagePadListModel& rhs) noexcept;
+  ComponentPinSignalMapModel& operator=(
+      const ComponentPinSignalMapModel& rhs) noexcept;
 
 private:
-  void              padListEdited(const PackagePadList& list, int index,
-                                  const std::shared_ptr<const PackagePad>& pad,
-                                  PackagePadList::Event                    event) noexcept;
-  void              execCmd(UndoCommand* cmd);
-  CircuitIdentifier validateNameOrThrow(const QString& name) const;
-  QString           getNextPadNameProposal() const noexcept;
+  void symbolItemsEdited(
+      const ComponentSymbolVariantItemList& list, int index,
+      const std::shared_ptr<const ComponentSymbolVariantItem>& item,
+      ComponentSymbolVariantItemList::Event                    event) noexcept;
+  void signalListEdited(const ComponentSignalList& list, int index,
+                        const std::shared_ptr<const ComponentSignal>& signal,
+                        ComponentSignalList::Event event) noexcept;
+  void execCmd(UndoCommand* cmd);
+  void updateSignalComboBoxItems() noexcept;
+  void getRowItem(int row, int& symbolItemIndex,
+                  std::shared_ptr<ComponentSymbolVariantItem>& symbolItem,
+                  std::shared_ptr<ComponentPinSignalMapItem>&  mapItem) const
+      noexcept;
 
 private:  // Data
-  PackagePadList* mPadList;
-  UndoStack*      mUndoStack;
-  QString         mNewName;
+  ComponentSymbolVariant*                    mSymbolVariant;
+  const ComponentSignalList*                 mSignals;
+  std::shared_ptr<const LibraryElementCache> mSymbolsCache;
+  UndoStack*                                 mUndoStack;
+  ComboBoxDelegate::Items                    mSignalComboBoxItems;
+  ComboBoxDelegate::Items                    mDisplayTypeComboBoxItems;
 
   // Slots
-  PackagePadList::OnEditedSlot mOnEditedSlot;
+  ComponentSymbolVariantItemList::OnEditedSlot mOnItemsEditedSlot;
+  ComponentSignalList::OnEditedSlot            mOnSignalsEditedSlot;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_PACKAGEPADLISTMODEL_H
+#endif

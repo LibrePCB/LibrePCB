@@ -38,10 +38,9 @@ class EditableTableWidget;
 class SortFilterProxyModel;
 
 namespace library {
+namespace editor {
 
 class ComponentSignalListModel;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class ComponentSignalListEditorWidget

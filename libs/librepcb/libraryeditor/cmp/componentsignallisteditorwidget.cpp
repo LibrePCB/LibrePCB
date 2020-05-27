@@ -24,7 +24,7 @@
 
 #include <librepcb/common/model/sortfilterproxymodel.h>
 #include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/library/cmp/componentsignallistmodel.h>
+#include <librepcb/libraryeditor/cmp/componentsignallistmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>

@@ -24,7 +24,7 @@
 
 #include <librepcb/common/model/comboboxdelegate.h>
 #include <librepcb/common/model/sortfilterproxymodel.h>
-#include <librepcb/library/dev/devicepadsignalmapmodel.h>
+#include <librepcb/libraryeditor/dev/devicepadsignalmapmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>

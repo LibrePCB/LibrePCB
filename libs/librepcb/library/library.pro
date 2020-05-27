@@ -39,13 +39,9 @@ SOURCES += \
     cmp/component.cpp \
     cmp/componentcheck.cpp \
     cmp/componentpinsignalmap.cpp \
-    cmp/componentpinsignalmapmodel.cpp \
     cmp/componentsignal.cpp \
-    cmp/componentsignallistmodel.cpp \
     cmp/componentsymbolvariant.cpp \
     cmp/componentsymbolvariantitem.cpp \
-    cmp/componentsymbolvariantitemlistmodel.cpp \
-    cmp/componentsymbolvariantlistmodel.cpp \
     cmp/msg/msgduplicatesignalname.cpp \
     cmp/msg/msgmissingcomponentdefaultvalue.cpp \
     cmp/msg/msgmissingcomponentprefix.cpp \
@@ -56,13 +52,11 @@ SOURCES += \
     dev/device.cpp \
     dev/devicecheck.cpp \
     dev/devicepadsignalmap.cpp \
-    dev/devicepadsignalmapmodel.cpp \
     dev/msg/msgnopadsindeviceconnected.cpp \
     library.cpp \
     librarybaseelement.cpp \
     librarybaseelementcheck.cpp \
     libraryelement.cpp \
-    libraryelementcache.cpp \
     libraryelementcheck.cpp \
     msg/libraryelementcheckmessage.cpp \
     msg/msgmissingauthor.cpp \
@@ -73,7 +67,6 @@ SOURCES += \
     pkg/cmd/cmdpackagepadedit.cpp \
     pkg/footprint.cpp \
     pkg/footprintgraphicsitem.cpp \
-    pkg/footprintlistmodel.cpp \
     pkg/footprintpad.cpp \
     pkg/footprintpadgraphicsitem.cpp \
     pkg/footprintpadpreviewgraphicsitem.cpp \
@@ -87,7 +80,6 @@ SOURCES += \
     pkg/package.cpp \
     pkg/packagecheck.cpp \
     pkg/packagepad.cpp \
-    pkg/packagepadlistmodel.cpp \
     sym/cmd/cmdsymbolpinedit.cpp \
     sym/msg/msgduplicatepinname.cpp \
     sym/msg/msgmissingsymbolname.cpp \
@@ -120,15 +112,11 @@ HEADERS += \
     cmp/component.h \
     cmp/componentcheck.h \
     cmp/componentpinsignalmap.h \
-    cmp/componentpinsignalmapmodel.h \
     cmp/componentprefix.h \
     cmp/componentsignal.h \
-    cmp/componentsignallistmodel.h \
     cmp/componentsymbolvariant.h \
     cmp/componentsymbolvariantitem.h \
-    cmp/componentsymbolvariantitemlistmodel.h \
     cmp/componentsymbolvariantitemsuffix.h \
-    cmp/componentsymbolvariantlistmodel.h \
     cmp/msg/msgduplicatesignalname.h \
     cmp/msg/msgmissingcomponentdefaultvalue.h \
     cmp/msg/msgmissingcomponentprefix.h \
@@ -139,14 +127,12 @@ HEADERS += \
     dev/device.h \
     dev/devicecheck.h \
     dev/devicepadsignalmap.h \
-    dev/devicepadsignalmapmodel.h \
     dev/msg/msgnopadsindeviceconnected.h \
     elements.h \
     library.h \
     librarybaseelement.h \
     librarybaseelementcheck.h \
     libraryelement.h \
-    libraryelementcache.h \
     libraryelementcheck.h \
     msg/libraryelementcheckmessage.h \
     msg/msgmissingauthor.h \
@@ -157,7 +143,6 @@ HEADERS += \
     pkg/cmd/cmdpackagepadedit.h \
     pkg/footprint.h \
     pkg/footprintgraphicsitem.h \
-    pkg/footprintlistmodel.h \
     pkg/footprintpad.h \
     pkg/footprintpadgraphicsitem.h \
     pkg/footprintpadpreviewgraphicsitem.h \
@@ -171,7 +156,6 @@ HEADERS += \
     pkg/package.h \
     pkg/packagecheck.h \
     pkg/packagepad.h \
-    pkg/packagepadlistmodel.h \
     sym/cmd/cmdsymbolpinedit.h \
     sym/msg/msgduplicatepinname.h \
     sym/msg/msgmissingsymbolname.h \

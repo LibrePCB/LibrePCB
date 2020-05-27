@@ -37,10 +37,9 @@ class UndoStack;
 class EditableTableWidget;
 
 namespace library {
+namespace editor {
 
 class FootprintListModel;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class FootprintListEditorWidget

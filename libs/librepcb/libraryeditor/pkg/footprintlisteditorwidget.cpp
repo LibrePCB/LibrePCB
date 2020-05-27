@@ -23,7 +23,7 @@
 #include "footprintlisteditorwidget.h"
 
 #include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/library/pkg/footprintlistmodel.h>
+#include <librepcb/libraryeditor/pkg/footprintlistmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>
