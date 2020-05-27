@@ -30,9 +30,9 @@
 #include <librepcb/common/norms.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/cmp/componentsymbolvariant.h>
-#include <librepcb/library/libraryelementcache.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/libraryeditor/libraryelementcache.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/workspace.h>
 

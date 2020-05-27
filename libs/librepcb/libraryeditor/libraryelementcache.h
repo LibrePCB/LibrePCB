@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_LIBRARYELEMENTCACHE_H
-#define LIBREPCB_LIBRARY_LIBRARYELEMENTCACHE_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCACHE_H
+#define LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCACHE_H
 
 /*******************************************************************************
  *  Includes
@@ -47,6 +47,8 @@ class Symbol;
 class Package;
 class Component;
 class Device;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class LibraryElementCache
@@ -101,7 +103,8 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_LIBRARYELEMENTCACHE_H
+#endif

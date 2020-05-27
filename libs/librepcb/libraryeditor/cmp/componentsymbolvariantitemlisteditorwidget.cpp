@@ -25,7 +25,7 @@
 #include "../common/symbolchooserdialog.h"
 
 #include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/library/cmp/componentsymbolvariantitemlistmodel.h>
+#include <librepcb/libraryeditor/cmp/componentsymbolvariantitemlistmodel.h>
 
 #include <QtCore>
 #include <QtWidgets>

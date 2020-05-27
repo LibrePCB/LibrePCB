@@ -42,11 +42,10 @@ class Workspace;
 }
 
 namespace library {
+namespace editor {
 
 class LibraryElementCache;
 class ComponentSymbolVariantItemListModel;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemListEditorWidget

@@ -39,10 +39,9 @@ class UndoStack;
 class EditableTableWidget;
 
 namespace library {
+namespace editor {
 
 class ComponentSymbolVariantListModel;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantListWidget

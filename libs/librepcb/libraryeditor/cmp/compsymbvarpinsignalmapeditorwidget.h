@@ -38,11 +38,12 @@ class SortFilterProxyModel;
 
 namespace library {
 
-class LibraryElementCache;
 class ComponentSymbolVariant;
-class ComponentPinSignalMapModel;
 
 namespace editor {
+
+class LibraryElementCache;
+class ComponentPinSignalMapModel;
 
 /*******************************************************************************
  *  Class CompSymbVarPinSignalMapEditorWidget

@@ -17,17 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_DEVICEPADSIGNALMAPMODEL_H
-#define LIBREPCB_LIBRARY_DEVICEPADSIGNALMAPMODEL_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEPADLISTMODEL_H
+#define LIBREPCB_LIBRARY_EDITOR_PACKAGEPADLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../cmp/componentsignal.h"
-#include "../pkg/packagepad.h"
-#include "devicepadsignalmap.h"
-
-#include <librepcb/common/model/comboboxdelegate.h>
+#include <librepcb/library/pkg/packagepad.h>
 
 #include <QtCore>
 
@@ -39,31 +35,34 @@ namespace librepcb {
 class UndoStack;
 
 namespace library {
+namespace editor {
 
 /*******************************************************************************
- *  Class DevicePadSignalMapModel
+ *  Class PackagePadListModel
  ******************************************************************************/
 
 /**
- * @brief The DevicePadSignalMapModel class
+ * @brief The PackagePadListModel class
  */
-class DevicePadSignalMapModel final : public QAbstractTableModel {
+class PackagePadListModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-  enum Column { COLUMN_PAD, COLUMN_SIGNAL, _COLUMN_COUNT };
+  enum Column { COLUMN_NAME, COLUMN_ACTIONS, _COLUMN_COUNT };
 
   // Constructors / Destructor
-  DevicePadSignalMapModel() = delete;
-  DevicePadSignalMapModel(const DevicePadSignalMapModel& other) noexcept;
-  explicit DevicePadSignalMapModel(QObject* parent = nullptr) noexcept;
-  ~DevicePadSignalMapModel() noexcept;
+  PackagePadListModel() = delete;
+  PackagePadListModel(const PackagePadListModel& other) noexcept;
+  explicit PackagePadListModel(QObject* parent = nullptr) noexcept;
+  ~PackagePadListModel() noexcept;
 
   // Setters
-  void setPadSignalMap(DevicePadSignalMap* map) noexcept;
+  void setPadList(PackagePadList* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
-  void setSignalList(const ComponentSignalList& list) noexcept;
-  void setPadList(const PackagePadList& list) noexcept;
+
+  // Slots
+  void addPad(const QVariant& editData) noexcept;
+  void removePad(const QVariant& editData) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -77,33 +76,31 @@ public:
                         int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  DevicePadSignalMapModel& operator=(
-      const DevicePadSignalMapModel& rhs) noexcept;
+  PackagePadListModel& operator=(const PackagePadListModel& rhs) noexcept;
 
 private:
-  void padSignalMapEdited(
-      const DevicePadSignalMap& map, int index,
-      const std::shared_ptr<const DevicePadSignalMapItem>& item,
-      DevicePadSignalMap::Event                            event) noexcept;
-  void execCmd(UndoCommand* cmd);
-  void updateComboBoxItems() noexcept;
+  void              padListEdited(const PackagePadList& list, int index,
+                                  const std::shared_ptr<const PackagePad>& pad,
+                                  PackagePadList::Event                    event) noexcept;
+  void              execCmd(UndoCommand* cmd);
+  CircuitIdentifier validateNameOrThrow(const QString& name) const;
+  QString           getNextPadNameProposal() const noexcept;
 
 private:  // Data
-  DevicePadSignalMap*     mPadSignalMap;
-  UndoStack*              mUndoStack;
-  ComponentSignalList     mSignals;
-  PackagePadList          mPads;
-  ComboBoxDelegate::Items mComboBoxItems;
+  PackagePadList* mPadList;
+  UndoStack*      mUndoStack;
+  QString         mNewName;
 
   // Slots
-  DevicePadSignalMap::OnEditedSlot mOnEditedSlot;
+  PackagePadList::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_DEVICEPADSIGNALMAPMODEL_H
+#endif

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMLISTMODEL_H
-#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMLISTMODEL_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTITEMLISTMODEL_H
+#define LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTITEMLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "componentsymbolvariant.h"
+#include <librepcb/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 
@@ -35,6 +35,7 @@ namespace librepcb {
 class UndoStack;
 
 namespace library {
+namespace editor {
 
 class LibraryElementCache;
 
@@ -122,7 +123,8 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMLISTMODEL_H
+#endif

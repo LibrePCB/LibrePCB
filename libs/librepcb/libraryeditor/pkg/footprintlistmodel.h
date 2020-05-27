@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTLISTMODEL_H
-#define LIBREPCB_LIBRARY_FOOTPRINTLISTMODEL_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_FOOTPRINTLISTMODEL_H
+#define LIBREPCB_LIBRARY_EDITOR_FOOTPRINTLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "footprint.h"
+#include <librepcb/library/pkg/footprint.h>
 
 #include <QtCore>
 
@@ -35,6 +35,7 @@ namespace librepcb {
 class UndoStack;
 
 namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Class FootprintListModel
@@ -100,7 +101,8 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_FOOTPRINTLISTMODEL_H
+#endif

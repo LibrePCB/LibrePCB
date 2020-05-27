@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "componentsymbolvariantlistmodel.h"
 
-#include "cmd/cmdcomponentsymbolvariantedit.h"
-
 #include <librepcb/common/undostack.h>
+#include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantedit.h>
 
 #include <QtCore>
 
@@ -33,6 +32,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -412,5 +412,6 @@ ElementName ComponentSymbolVariantListModel::validateNameOrThrow(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace library
 }  // namespace librepcb
