@@ -21,7 +21,7 @@ CONFIG += staticlib
 
 INCLUDEPATH += \
     ../../ \
-    ../../fontobene \
+    ../../fontobene-qt5 \
     ../../quazip \
     ../../sexpresso \
     ../../type_safe/include \
