@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/drillsize.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
@@ -30,6 +31,7 @@
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
+#include <librepcb/common/version.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -78,7 +80,13 @@ public:
                Shape shape, const PositiveLength& width,
                const PositiveLength& height,
                const UnsignedLength& drillDiameter, BoardSide side) noexcept;
+  FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
+               Shape shape, const PositiveLength& width,
+               const PositiveLength&          height,
+               const tl::optional<DrillSize>& drillSize,
+               BoardSide                      side) noexcept;
   explicit FootprintPad(const SExpression& node);
+  explicit FootprintPad(const SExpression& node, const Version& version);
   ~FootprintPad() noexcept;
 
   // Getters
@@ -89,10 +97,10 @@ public:
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   Shape        getShape() const noexcept { return mShape; }
-  const PositiveLength& getWidth() const noexcept { return mWidth; }
-  const PositiveLength& getHeight() const noexcept { return mHeight; }
-  const UnsignedLength& getDrillDiameter() const noexcept {
-    return mDrillDiameter;
+  const PositiveLength&          getWidth() const noexcept { return mWidth; }
+  const PositiveLength&          getHeight() const noexcept { return mHeight; }
+  const tl::optional<DrillSize>& getDrillSize() const noexcept {
+    return mDrillSize;
   }
   BoardSide    getBoardSide() const noexcept { return mBoardSide; }
   QString      getLayerName() const noexcept;
@@ -108,7 +116,8 @@ public:
   bool setShape(Shape shape) noexcept;
   bool setWidth(const PositiveLength& width) noexcept;
   bool setHeight(const PositiveLength& height) noexcept;
-  bool setDrillDiameter(const UnsignedLength& diameter) noexcept;
+  bool setDrillSize(const DrillSize& drillSize) noexcept;
+  bool setDrillSize(const tl::optional<DrillSize>& drillSize) noexcept;
   bool setBoardSide(BoardSide side) noexcept;
 
   // General Methods
@@ -132,7 +141,7 @@ protected:  // Data
   Shape                     mShape;
   PositiveLength            mWidth;
   PositiveLength            mHeight;
-  UnsignedLength            mDrillDiameter;  // no effect if BoardSide != THT!
+  tl::optional<DrillSize>   mDrillSize;  // no effect if BoardSide != THT!
   BoardSide                 mBoardSide;
   FootprintPadGraphicsItem* mRegisteredGraphicsItem;
 };

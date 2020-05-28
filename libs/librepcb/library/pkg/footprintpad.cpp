@@ -46,7 +46,7 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mShape(other.mShape),
     mWidth(other.mWidth),
     mHeight(other.mHeight),
-    mDrillDiameter(other.mDrillDiameter),
+    mDrillSize(other.mDrillSize),
     mBoardSide(other.mBoardSide),
     mRegisteredGraphicsItem(nullptr) {
 }
@@ -64,7 +64,25 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
     mShape(shape),
     mWidth(width),
     mHeight(height),
-    mDrillDiameter(drillDiameter),
+    mDrillSize(optionalDrillSize(drillDiameter)),
+    mBoardSide(side),
+    mRegisteredGraphicsItem(nullptr) {
+}
+
+FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
+                           const Angle& rot, Shape shape,
+                           const PositiveLength&          width,
+                           const PositiveLength&          height,
+                           const tl::optional<DrillSize>& drillSize,
+                           BoardSide                      side) noexcept
+  : onEdited(*this),
+    mPackagePadUuid(padUuid),
+    mPosition(pos),
+    mRotation(rot),
+    mShape(shape),
+    mWidth(width),
+    mHeight(height),
+    mDrillSize(drillSize),
     mBoardSide(side),
     mRegisteredGraphicsItem(nullptr) {
 }
@@ -77,7 +95,7 @@ FootprintPad::FootprintPad(const SExpression& node)
     mShape(node.getValueByPath<Shape>("shape")),
     mWidth(Point(node.getChildByPath("size")).getX()),
     mHeight(Point(node.getChildByPath("size")).getY()),
-    mDrillDiameter(node.getValueByPath<UnsignedLength>("drill")),
+    mDrillSize(optionalDrillSize(node.getChildByPath("drill"))),
     mBoardSide(node.getValueByPath<BoardSide>("side")),
     mRegisteredGraphicsItem(nullptr) {
 }
@@ -138,8 +156,8 @@ QPainterPath FootprintPad::toQPainterPathPx(const Length& expansion) const
   QPainterPath p = getOutline(expansion).toQPainterPathPx();
   if (mBoardSide == BoardSide::THT) {
     p.setFillRule(Qt::OddEvenFill);  // important to subtract the hole!
-    p.addEllipse(QPointF(0, 0), mDrillDiameter->toPx() / 2,
-                 mDrillDiameter->toPx() / 2);
+    p.addPath(Path::obround(mDrillSize->getWidth(), mDrillSize->getHeight())
+                  .toQPainterPathPx());
   }
   return p;
 }
@@ -218,12 +236,34 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   return true;
 }
 
-bool FootprintPad::setDrillDiameter(const UnsignedLength& diameter) noexcept {
-  if (diameter == mDrillDiameter) {
-    return false;
+bool FootprintPad::setDrillSize(const DrillSize& drillSize) noexcept {
+  if (mDrillSize) {
+    if (mDrillSize->getWidth() == drillSize.getWidth() &&
+        mDrillSize->getHeight() == drillSize.getHeight()) {
+      return false;
+    } else {
+      mDrillSize->setWidth(drillSize.getWidth());
+      mDrillSize->setHeight(drillSize.getHeight());
+    }
+  } else {
+    mDrillSize = DrillSize(drillSize);
   }
+  if (mRegisteredGraphicsItem)
+    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
+  onEdited.notify(Event::DrillDiameterChanged);
+  return true;
+}
 
-  mDrillDiameter = diameter;
+bool FootprintPad::setDrillSize(
+    const tl::optional<DrillSize>& drillSize) noexcept {
+  if (drillSize) {
+    return setDrillSize(*drillSize);
+  } else {
+    if (mDrillSize)
+      mDrillSize = tl::nullopt;
+    else
+      return false;
+  }
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::DrillDiameterChanged);
@@ -268,7 +308,10 @@ void FootprintPad::serialize(SExpression& root) const {
   root.appendChild("rotation", mRotation, false);
   root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"),
                    false);
-  root.appendChild("drill", mDrillDiameter, false);
+  if (mDrillSize)
+    root.appendChild(mDrillSize->serializeToDomElement("drill"), false);
+  else
+    root.appendChild("drill", Length(0), false);
 }
 
 /*******************************************************************************
@@ -282,7 +325,7 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
   if (mShape != rhs.mShape) return false;
   if (mWidth != rhs.mWidth) return false;
   if (mHeight != rhs.mHeight) return false;
-  if (mDrillDiameter != rhs.mDrillDiameter) return false;
+  if (mDrillSize != rhs.mDrillSize) return false;
   if (mBoardSide != rhs.mBoardSide) return false;
   return true;
 }
@@ -294,7 +337,7 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setShape(rhs.mShape);
   setWidth(rhs.mWidth);
   setHeight(rhs.mHeight);
-  setDrillDiameter(rhs.mDrillDiameter);
+  setDrillSize(rhs.mDrillSize);
   setBoardSide(rhs.mBoardSide);
   return *this;
 }

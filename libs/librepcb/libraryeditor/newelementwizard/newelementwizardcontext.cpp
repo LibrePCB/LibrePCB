@@ -216,7 +216,7 @@ void NewElementWizardContext::copyElement(ElementType     type,
           newFootprint->getPads().append(std::make_shared<FootprintPad>(
               *padUuidMap.find(pad.getUuid()), pad.getPosition(),
               pad.getRotation(), pad.getShape(), pad.getWidth(),
-              pad.getHeight(), pad.getDrillDiameter(), pad.getBoardSide()));
+              pad.getHeight(), pad.getDrillSize(), pad.getBoardSide()));
         }
         // copy polygons but generate new UUIDs
         for (const Polygon& polygon : footprint.getPolygons()) {

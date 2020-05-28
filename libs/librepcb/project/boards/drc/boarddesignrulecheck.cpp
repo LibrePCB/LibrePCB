@@ -405,18 +405,31 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
           library::FootprintPad::BoardSide::THT) {
         continue;  // skip SMT pads
       }
-      PositiveLength size =
-          qMin(pad->getLibPad().getWidth(), pad->getLibPad().getHeight());
-      Length restring = (*size - *pad->getLibPad().getDrillDiameter() + 1) / 2;
-      if (restring < *mOptions.minPthRestring) {
-        QString msg = QString(tr("Min. pad restring ('%1'): %2",
-                                 "Placeholders are pad name + restring width"))
-                          .arg(pad->getDisplayText().simplified(),
-                               formatLength(restring));
-        PositiveLength diameter =
-            PositiveLength(pad->getLibPad().getDrillDiameter() + 1) +
-            mOptions.minPthRestring + mOptions.minPthRestring;
-        Path location = Path::circle(diameter).translated(pad->getPosition());
+      Length width       = *pad->getLibPad().getWidth();
+      Length height      = *pad->getLibPad().getHeight();
+      Length drillWidth  = 0;
+      Length drillHeight = 0;
+      if (pad->getLibPad().getDrillSize()) {
+        drillWidth  = *pad->getLibPad().getDrillSize()->getWidth();
+        drillHeight = *pad->getLibPad().getDrillSize()->getHeight();
+      }
+      Length widthRestring  = (width - drillWidth + 1) / 2;
+      Length heightRestring = (height - drillHeight + 1) / 2;
+      if (widthRestring < *mOptions.minPthRestring or
+          heightRestring < *mOptions.minPthRestring) {
+        QString msg =
+            QString(tr("Min. pad restring ('%1'): %2",
+                       "Placeholders are pad name + restring width"))
+                .arg(pad->getDisplayText().simplified(),
+                     formatLength(qMin(widthRestring, heightRestring)));
+        PositiveLength locWidth = PositiveLength(
+            drillWidth + *mOptions.minPthRestring + *mOptions.minPthRestring);
+        PositiveLength locHeight = PositiveLength(
+            drillHeight + *mOptions.minPthRestring + *mOptions.minPthRestring);
+        Path location =
+            Path::obround(locWidth, locHeight)
+                .translated(pad->getPosition())
+                .rotated(pad->getRotation() + device->getRotation());
         addMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
@@ -453,16 +466,20 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
           library::FootprintPad::BoardSide::THT) {
         continue;  // skip SMT pads
       }
-      if (pad->getLibPad().getDrillDiameter() < *mOptions.minPthDrillDiameter) {
-        QString msg =
-            QString(tr("Min. pad drill diameter ('%1'): %2",
-                       "Placeholders are pad name + drill diameter"))
-                .arg(pad->getDisplayText().simplified(),
-                     formatLength(*pad->getLibPad().getDrillDiameter()));
-        PositiveLength diameter(
-            qMax(*pad->getLibPad().getDrillDiameter(), Length(50000)));
-        Path location = Path::circle(diameter).translated(pad->getPosition());
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+      if (pad->getLibPad().getDrillSize()) {
+        Length minDrillDimension =
+            qMin(*pad->getLibPad().getDrillSize()->getWidth(),
+                 *pad->getLibPad().getDrillSize()->getHeight());
+        if (minDrillDimension < *mOptions.minPthDrillDiameter) {
+          QString msg =
+              QString(tr("Min. pad drill diameter ('%1'): %2",
+                         "Placeholders are pad name + drill diameter"))
+                  .arg(pad->getDisplayText().simplified(),
+                       formatLength(minDrillDimension));
+          PositiveLength diameter(qMax(minDrillDimension, Length(50000)));
+          Path location = Path::circle(diameter).translated(pad->getPosition());
+          addMessage(BoardDesignRuleCheckMessage(msg, location));
+        }
       }
     }
   }

@@ -71,7 +71,10 @@ SOURCES += \
     pkg/footprintpadgraphicsitem.cpp \
     pkg/footprintpadpreviewgraphicsitem.cpp \
     pkg/footprintpreviewgraphicsitem.cpp \
+    pkg/msg/msgdrillinsmdpad.cpp \
     pkg/msg/msgduplicatepadname.cpp \
+    pkg/msg/msgmalformeddrill.cpp \
+    pkg/msg/msgmissingdrill.cpp \
     pkg/msg/msgmissingfootprint.cpp \
     pkg/msg/msgmissingfootprintname.cpp \
     pkg/msg/msgmissingfootprintvalue.cpp \
@@ -147,7 +150,10 @@ HEADERS += \
     pkg/footprintpadgraphicsitem.h \
     pkg/footprintpadpreviewgraphicsitem.h \
     pkg/footprintpreviewgraphicsitem.h \
+    pkg/msg/msgdrillinsmdpad.h \
     pkg/msg/msgduplicatepadname.h \
+    pkg/msg/msgmalformeddrill.h \
+    pkg/msg/msgmissingdrill.h \
     pkg/msg/msgmissingfootprint.h \
     pkg/msg/msgmissingfootprintname.h \
     pkg/msg/msgmissingfootprintvalue.h \

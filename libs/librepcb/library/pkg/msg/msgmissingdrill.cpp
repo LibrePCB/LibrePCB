@@ -17,71 +17,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EXCELLONGENERATOR_H
-#define LIBREPCB_EXCELLONGENERATOR_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-#include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
+#include "msgmissingdrill.h"
 
-#include <QtCore>
+#include "../footprint.h"
+#include "../footprintpad.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace library {
 
 /*******************************************************************************
- *  Class GerberGenerator
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The ExcellonGenerator class
- */
-class ExcellonGenerator final {
-  Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
+MsgMissingDrill::MsgMissingDrill(const FootprintPad& pad) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        QString(tr("Missing Drill in pad: '%1'")).arg(pad.getUuid().toStr()),
+        tr("One of the THT pads of one of the footprints of this package "
+           "does not have a drill configured. This means the pad is virtually "
+           "indistinguishable from a pair of SMD pads on opposite sides "
+           "of the board, i.e. they are not connected (despite all this, "
+           "LibrePCB will treat them as if they were connected.)")) {
+}  // namespace library
 
-public:
-  // Constructors / Destructor
-  // ExcellonGenerator() = delete;
-  ExcellonGenerator(const ExcellonGenerator& other) = delete;
-  ExcellonGenerator() noexcept;
-  ~ExcellonGenerator() noexcept;
-
-  // Getters
-  const QString& toStr() const noexcept { return mOutput; }
-
-  // General Methods
-  void drill(const Point& pos, const PositiveLength& dia) noexcept;
-  void slot(const Point& start, const Point& end,
-            const PositiveLength& width) noexcept;
-  void generate();
-  void saveToFile(const FilePath& filepath) const;
-  void reset() noexcept;
-
-  // Operator Overloadings
-  ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
-
-private:
-  void printHeader() noexcept;
-  void printToolList() noexcept;
-  void printDrills() noexcept;
-  void printFooter() noexcept;
-
-  // Excellon Data
-  QString                                        mOutput;
-  QMultiMap<PositiveLength, Point>               mDrillList;
-  QMultiMap<PositiveLength, QPair<Point, Point>> mSlotList;
-  QList<PositiveLength>                          mToolList;
-};
+MsgMissingDrill::~MsgMissingDrill() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace library
 }  // namespace librepcb
-
-#endif  // LIBREPCB_EXCELLONGENERATOR_H

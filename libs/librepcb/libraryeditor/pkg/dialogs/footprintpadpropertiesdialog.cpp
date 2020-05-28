@@ -52,9 +52,12 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
                            settingsPrefix % "/width");
   mUi->edtHeight->configure(lengthUnit, LengthEditBase::Steps::generic(),
                             settingsPrefix % "/height");
-  mUi->edtDrillDiameter->configure(lengthUnit,
-                                   LengthEditBase::Steps::drillDiameter(),
-                                   settingsPrefix % "/drill_diameter");
+  mUi->edtDrillWidth->configure(lengthUnit,
+                                LengthEditBase::Steps::drillDiameter(),
+                                settingsPrefix % "/drill_width");
+  mUi->edtDrillHeight->configure(lengthUnit,
+                                 LengthEditBase::Steps::drillDiameter(),
+                                 settingsPrefix % "/drill_height");
   mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_x");
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
@@ -106,15 +109,25 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   }
   mUi->edtWidth->setValue(mPad.getWidth());
   mUi->edtHeight->setValue(mPad.getHeight());
-  mUi->edtDrillDiameter->setValue(mPad.getDrillDiameter());
+  mUi->edtDrillWidth->setValue(UnsignedLength(0));
+  mUi->edtDrillHeight->setValue(UnsignedLength(0));
+  if (mPad.getDrillSize()) {
+    mUi->edtDrillWidth->setValue(
+        UnsignedLength(*mPad.getDrillSize()->getWidth()));
+    mUi->edtDrillHeight->setValue(
+        UnsignedLength(*mPad.getDrillSize()->getHeight()));
+  }
   mUi->edtPosX->setValue(mPad.getPosition().getX());
   mUi->edtPosY->setValue(mPad.getPosition().getY());
   mUi->edtRotation->setValue(mPad.getRotation());
 
-  // disable drill diameter for SMT pads
-  mUi->edtDrillDiameter->setEnabled(mUi->rbtnBoardSideTht->isChecked());
-  connect(mUi->rbtnBoardSideTht, &QRadioButton::toggled, mUi->edtDrillDiameter,
-          &LengthEdit::setEnabled);
+  // disable drill size for SMT pads
+  mUi->edtDrillWidth->setEnabled(mUi->rbtnBoardSideTht->isChecked());
+  connect(mUi->rbtnBoardSideTht, &QRadioButton::toggled, mUi->edtDrillWidth,
+          &QDoubleSpinBox::setEnabled);
+  mUi->edtDrillHeight->setEnabled(mUi->rbtnBoardSideTht->isChecked());
+  connect(mUi->rbtnBoardSideTht, &QRadioButton::toggled, mUi->edtDrillHeight,
+          &QDoubleSpinBox::setEnabled);
 }
 
 FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
@@ -152,10 +165,18 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     cmd->setPackagePadUuid(pkgPad, false);
     if (mUi->rbtnBoardSideTop->isChecked()) {
       cmd->setBoardSide(FootprintPad::BoardSide::TOP, false);
+      cmd->setDrillSize(tl::nullopt, false);
     } else if (mUi->rbtnBoardSideBottom->isChecked()) {
       cmd->setBoardSide(FootprintPad::BoardSide::BOTTOM, false);
+      cmd->setDrillSize(tl::nullopt, false);
     } else if (mUi->rbtnBoardSideTht->isChecked()) {
       cmd->setBoardSide(FootprintPad::BoardSide::THT, false);
+      Length drillWidth  = *mUi->edtDrillWidth->getValue();
+      Length drillHeight = *mUi->edtDrillHeight->getValue();
+      if (drillWidth > 0 && drillHeight > 0)
+        cmd->setDrillSize(DrillSize(drillWidth, drillHeight), false);
+      else
+        cmd->setDrillSize(tl::nullopt, false);
     } else {
       Q_ASSERT(false);
     }
@@ -170,7 +191,6 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     }
     cmd->setWidth(mUi->edtWidth->getValue(), false);
     cmd->setHeight(mUi->edtHeight->getValue(), false);
-    cmd->setDrillDiameter(mUi->edtDrillDiameter->getValue(), false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setRotation(mUi->edtRotation->getValue(), false);

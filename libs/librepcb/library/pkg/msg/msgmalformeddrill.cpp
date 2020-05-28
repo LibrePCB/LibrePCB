@@ -17,71 +17,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EXCELLONGENERATOR_H
-#define LIBREPCB_EXCELLONGENERATOR_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-#include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
+#include "msgmalformeddrill.h"
 
-#include <QtCore>
+#include "../footprint.h"
+#include "../footprintpad.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace library {
 
 /*******************************************************************************
- *  Class GerberGenerator
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The ExcellonGenerator class
- */
-class ExcellonGenerator final {
-  Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
+MsgMalformedDrill::MsgMalformedDrill(const FootprintPad& pad,
+                                     errorType           error) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        QString(tr("Malformed pad drill: '%1'")).arg(pad.getUuid().toStr()),
+        QString(
+            tr("The size of a drill may not exceed the pad size. "
+               "When it does, behaviour is undefined and it may not be plated. "
+               "In this case, the %1 of the drill exceeds the %1 of the pad."))
+            .arg((error == WIDER) ? tr("width") : tr("height"))) {
+}
 
-public:
-  // Constructors / Destructor
-  // ExcellonGenerator() = delete;
-  ExcellonGenerator(const ExcellonGenerator& other) = delete;
-  ExcellonGenerator() noexcept;
-  ~ExcellonGenerator() noexcept;
-
-  // Getters
-  const QString& toStr() const noexcept { return mOutput; }
-
-  // General Methods
-  void drill(const Point& pos, const PositiveLength& dia) noexcept;
-  void slot(const Point& start, const Point& end,
-            const PositiveLength& width) noexcept;
-  void generate();
-  void saveToFile(const FilePath& filepath) const;
-  void reset() noexcept;
-
-  // Operator Overloadings
-  ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
-
-private:
-  void printHeader() noexcept;
-  void printToolList() noexcept;
-  void printDrills() noexcept;
-  void printFooter() noexcept;
-
-  // Excellon Data
-  QString                                        mOutput;
-  QMultiMap<PositiveLength, Point>               mDrillList;
-  QMultiMap<PositiveLength, QPair<Point, Point>> mSlotList;
-  QList<PositiveLength>                          mToolList;
-};
+MsgMalformedDrill::~MsgMalformedDrill() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace library
 }  // namespace librepcb
-
-#endif  // LIBREPCB_EXCELLONGENERATOR_H

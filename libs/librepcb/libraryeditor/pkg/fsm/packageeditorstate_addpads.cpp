@@ -67,7 +67,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
   if (mPadType == PadType::SMT) {
     mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);  // Default side
     mLastPad.setShape(FootprintPad::Shape::RECT);  // Commonly used SMT shape
-    mLastPad.setDrillDiameter(UnsignedLength(0));  // Disable drill
+    mLastPad.setDrillSize(tl::nullopt);            // Disable drill
     mLastPad.setWidth(PositiveLength(1500000));    // Same as for THT pads ->
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
   }
@@ -145,16 +145,29 @@ bool PackageEditorState_AddPads::entry() noexcept {
 
   // drill diameter
   if (mPadType == PadType::THT) {
-    mContext.commandToolBar.addLabel(tr("Drill Diameter:"), 10);
-    std::unique_ptr<UnsignedLengthEdit> edtDrillDiameter(
-        new UnsignedLengthEdit());
-    edtDrillDiameter->configure(getDefaultLengthUnit(),
-                                LengthEditBase::Steps::drillDiameter(),
-                                "package_editor/add_pads/drill_diameter");
-    edtDrillDiameter->setValue(mLastPad.getDrillDiameter());
-    connect(edtDrillDiameter.get(), &UnsignedLengthEdit::valueChanged, this,
-            &PackageEditorState_AddPads::drillDiameterEditValueChanged);
-    mContext.commandToolBar.addWidget(std::move(edtDrillDiameter));
+    mContext.commandToolBar.addLabel(tr("Drill Size:"), 10);
+    std::unique_ptr<PositiveLengthEdit> edtDrillWidth(new PositiveLengthEdit());
+    std::unique_ptr<PositiveLengthEdit> edtDrillHeight(
+        new PositiveLengthEdit());
+    edtDrillWidth->configure(getDefaultLengthUnit(),
+                             LengthEditBase::Steps::drillDiameter(),
+                             "package_editor/add_pads/drill_widthr");
+    edtDrillHeight->configure(getDefaultLengthUnit(),
+                              LengthEditBase::Steps::drillDiameter(),
+                              "package_editor/add_pads/drill_height");
+    if (mLastPad.getDrillSize()) {
+      edtDrillWidth->setValue(mLastPad.getDrillSize()->getWidth());
+      edtDrillHeight->setValue(mLastPad.getDrillSize()->getHeight());
+    } else {
+      edtDrillWidth->setValue(PositiveLength(1));
+      edtDrillHeight->setValue(PositiveLength(1));
+    }
+    connect(edtDrillWidth.get(), &PositiveLengthEdit::valueChanged, this,
+            &PackageEditorState_AddPads::drillWidthEditValueChanged);
+    connect(edtDrillHeight.get(), &PositiveLengthEdit::valueChanged, this,
+            &PackageEditorState_AddPads::drillWidthEditValueChanged);
+    mContext.commandToolBar.addWidget(std::move(edtDrillWidth));
+    mContext.commandToolBar.addWidget(std::move(edtDrillHeight));
   }
 
   Point pos =
@@ -236,7 +249,7 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
     mCurrentPad.reset(new FootprintPad(
         mLastPad.getPackagePadUuid(), pos, mLastPad.getRotation(),
         mLastPad.getShape(), mLastPad.getWidth(), mLastPad.getHeight(),
-        mLastPad.getDrillDiameter(), mLastPad.getBoardSide()));
+        mLastPad.getDrillSize(), mLastPad.getBoardSide()));
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
         mContext.currentFootprint->getPads(), mCurrentPad));
     mEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
@@ -332,11 +345,25 @@ void PackageEditorState_AddPads::heightEditValueChanged(
   }
 }
 
-void PackageEditorState_AddPads::drillDiameterEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastPad.setDrillDiameter(value);
+void PackageEditorState_AddPads::drillWidthEditValueChanged(
+    const PositiveLength& value) noexcept {
+  PositiveLength width  = value;
+  PositiveLength height = value;  // circular by default
+  if (mLastPad.getDrillSize()) height = mLastPad.getDrillSize()->getHeight();
+  mLastPad.setDrillSize(DrillSize(width, height));
   if (mEditCmd) {
-    mEditCmd->setDrillDiameter(mLastPad.getDrillDiameter(), true);
+    mEditCmd->setDrillSize(mLastPad.getDrillSize(), true);
+  }
+}
+
+void PackageEditorState_AddPads::drillHeightEditValueChanged(
+    const PositiveLength& value) noexcept {
+  PositiveLength width  = value;  // circular by default
+  PositiveLength height = value;
+  if (mLastPad.getDrillSize()) width = mLastPad.getDrillSize()->getWidth();
+  mLastPad.setDrillSize(DrillSize(width, height));
+  if (mEditCmd) {
+    mEditCmd->setDrillSize(mLastPad.getDrillSize(), true);
   }
 }
 

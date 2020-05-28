@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
+#include <librepcb/common/drillsize.h>
 #include <librepcb/library/pkg/footprintpad.h>
 
 #include <QtCore>
@@ -91,7 +92,8 @@ private:  // Methods
   void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
   void widthEditValueChanged(const PositiveLength& value) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const UnsignedLength& value) noexcept;
+  void drillWidthEditValueChanged(const PositiveLength& value) noexcept;
+  void drillHeightEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Types / Data
   PadType                             mPadType;

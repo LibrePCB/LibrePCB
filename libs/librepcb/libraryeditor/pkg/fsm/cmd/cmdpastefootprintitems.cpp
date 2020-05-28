@@ -89,8 +89,8 @@ bool CmdPasteFootprintItems::performExecute() {
     if (newPad && (!mFootprint.getPads().contains(newPad->getUuid()))) {
       std::shared_ptr<FootprintPad> copy = std::make_shared<FootprintPad>(
           uuid, pad.getPosition() + mPosOffset, pad.getRotation(),
-          pad.getShape(), pad.getWidth(), pad.getHeight(),
-          pad.getDrillDiameter(), pad.getBoardSide());
+          pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getDrillSize(),
+          pad.getBoardSide());
       execNewChildCmd(new CmdFootprintPadInsert(mFootprint.getPads(), copy));
       FootprintPadGraphicsItem* item = mGraphicsItem.getPadGraphicsItem(*copy);
       Q_ASSERT(item);
