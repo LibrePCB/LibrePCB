@@ -24,7 +24,6 @@ isEmpty(UNBUNDLE) {
 
 INCLUDEPATH += \
     ../../ \
-    ../../fontobene-qt5 \
     ../../sexpresso \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
@@ -323,11 +322,17 @@ FORMS += \
     widgets/alignmentselector.ui \
 
 # quazip
-
 contains(UNBUNDLE, quazip) {
     PKGCONFIG += quazip
 } else {
     INCLUDEPATH += ../../quazip
+}
+
+# fontobene-qt5
+contains(UNBUNDLE, fontobene-qt5) {
+    PKGCONFIG += fontobene-qt5
+} else {
+    INCLUDEPATH += ../../fontobene-qt5
 }
 
 # linking information defines (used by `Application` class)

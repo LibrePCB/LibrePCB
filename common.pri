@@ -51,7 +51,7 @@ QMAKE_CXXFLAGS_DEBUG += -Wextra
 
 # If UNBUNDLE contains "all", unbundle all dependencies
 contains(UNBUNDLE, all) {
-    UNBUNDLE = (all) quazip
+    UNBUNDLE = (all) quazip fontobene-qt5
 }
 
 # QuaZIP configuration

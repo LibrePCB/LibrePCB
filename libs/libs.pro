@@ -3,7 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS = \
     clipper \
     delaunay-triangulation \
-    fontobene-qt5 \
     hoedown \
     googletest \
     librepcb \
@@ -15,7 +14,6 @@ SUBDIRS = \
 librepcb.depends = \
     clipper \
     delaunay-triangulation \
-    fontobene-qt5 \
     muparser \
     optional \
     parseagle \
@@ -25,4 +23,9 @@ librepcb.depends = \
 !contains(UNBUNDLE, quazip) {
     SUBDIRS += quazip
     librepcb.depends += quazip
+}
+
+!contains(UNBUNDLE, quazip) {
+    SUBDIRS += fontobene-qt5
+    librepcb.depends += fontobene-qt5
 }
