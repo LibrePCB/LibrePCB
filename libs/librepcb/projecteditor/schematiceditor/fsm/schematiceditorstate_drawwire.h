@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SES_DRAWWIRE_H
-#define LIBREPCB_PROJECT_SES_DRAWWIRE_H
+#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
+#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ses_base.h"
+#include "schematiceditorstate.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,6 +34,7 @@
 namespace librepcb {
 namespace project {
 
+class Circuit;
 class SI_NetPoint;
 class SI_NetLine;
 class SI_SymbolPin;
@@ -42,33 +43,19 @@ class SI_NetLineAnchor;
 namespace editor {
 
 /*******************************************************************************
- *  Class SES_DrawWire
+ *  Class SchematicEditorState_DrawWire
  ******************************************************************************/
 
 /**
- * @brief The SES_DrawWire class
+ * @brief The SchematicEditorState_DrawWire class
  */
-class SES_DrawWire final : public SES_Base {
+class SchematicEditorState_DrawWire final : public SchematicEditorState {
   Q_OBJECT
 
-public:
-  // Constructors / Destructor
-  explicit SES_DrawWire(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                        GraphicsView& editorGraphicsView, UndoStack& undoStack);
-  ~SES_DrawWire();
-
-  // General Methods
-  ProcRetVal process(SEE_Base* event) noexcept override;
-  bool       entry(SEE_Base* event) noexcept override;
-  bool       exit(SEE_Base* event) noexcept override;
-
-private:
-  // Private Types
-
   /// Internal FSM States (substates)
-  enum SubState {
-    SubState_Idle,                ///< idle state [initial state]
-    SubState_PositioningNetPoint  ///< in this state, an undo command is active!
+  enum class SubState {
+    IDLE,                 ///< idle state [initial state]
+    POSITIONING_NETPOINT  ///< in this state, an undo command is active!
   };
 
   /**
@@ -85,15 +72,39 @@ private:
     WireMode_COUNT      ///< count of wire modes
   };
 
-  // Private Methods
-  ProcRetVal processSubStateIdle(SEE_Base* event) noexcept;
-  ProcRetVal processSubStatePositioning(SEE_Base* event) noexcept;
-  ProcRetVal processIdleSceneEvent(SEE_Base* event) noexcept;
-  ProcRetVal processPositioningSceneEvent(SEE_Base* event) noexcept;
-  bool       startPositioning(Schematic& schematic, const Point& pos,
-                              SI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool       addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;
-  bool       abortPositioning(bool showErrMsgBox) noexcept;
+public:
+  // Constructors / Destructor
+  SchematicEditorState_DrawWire() = delete;
+  SchematicEditorState_DrawWire(const SchematicEditorState_DrawWire& other) =
+      delete;
+  explicit SchematicEditorState_DrawWire(const Context& context) noexcept;
+  virtual ~SchematicEditorState_DrawWire() noexcept;
+
+  // General Methods
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
+
+  // Event Handlers
+  virtual bool processAbortCommand() noexcept override;
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processSwitchToSchematicPage(int index) noexcept override;
+
+  // Operator Overloadings
+  SchematicEditorState_DrawWire& operator       =(
+      const SchematicEditorState_DrawWire& rhs) = delete;
+
+private:  //  Methods
+  bool startPositioning(Schematic& schematic, const Point& pos,
+                        SI_NetPoint* fixedPoint = nullptr) noexcept;
+  bool addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;
+  bool abortPositioning(bool showErrMsgBox) noexcept;
   SI_SymbolPin* findSymbolPin(Schematic& schematic, const Point& pos) const
       noexcept;
   SI_NetPoint* findNetPoint(Schematic& schematic, const Point& pos,
@@ -105,7 +116,8 @@ private:
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
 
-  // General Attributes
+private:  // Data
+  Circuit& mCircuit;
   SubState mSubState;  ///< the current substate
   WireMode mWireMode;  ///< the current wire mode
   SI_NetLineAnchor*
@@ -118,8 +130,6 @@ private:
   // Widgets for the command toolbar
   QHash<WireMode, QAction*> mWireModeActions;
   QList<QAction*>           mActionSeparators;
-  QLabel*                   mWidthLabel;
-  QComboBox*                mWidthComboBox;
 };
 
 /*******************************************************************************
@@ -130,4 +140,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SES_DRAWWIRE_H
+#endif

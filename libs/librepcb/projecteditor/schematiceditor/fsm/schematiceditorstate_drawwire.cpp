@@ -20,40 +20,31 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ses_drawwire.h"
+#include "schematiceditorstate_drawwire.h"
 
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../../cmd/cmdcombineschematicnetsegments.h"
-#include "../schematiceditor.h"
 #include "ui_schematiceditor.h"
 
-#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/undostack.h>
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
 #include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
 #include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
 #include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/netclass.h>
 #include <librepcb/project/circuit/netsignal.h>
 #include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
-#include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/schematic.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -66,70 +57,54 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SES_DrawWire::SES_DrawWire(SchematicEditor&     editor,
-                           Ui::SchematicEditor& editorUi,
-                           GraphicsView&        editorGraphicsView,
-                           UndoStack&           undoStack)
-  : SES_Base(editor, editorUi, editorGraphicsView, undoStack),
-    mSubState(SubState_Idle),
+SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
+    const Context& context) noexcept
+  : SchematicEditorState(context),
+    mCircuit(context.project.getCircuit()),
+    mSubState(SubState::IDLE),
     mWireMode(WireMode_HV),
     mFixedStartAnchor(nullptr),
     mPositioningNetLine1(nullptr),
     mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr),
-    mPositioningNetPoint2(nullptr),
-    // command toolbar actions / widgets:
-    mWidthLabel(nullptr),
-    mWidthComboBox(nullptr) {
+    mPositioningNetPoint2(nullptr) {
 }
 
-SES_DrawWire::~SES_DrawWire() {
-  Q_ASSERT(mSubState == SubState_Idle);
+SchematicEditorState_DrawWire::~SchematicEditorState_DrawWire() noexcept {
+  Q_ASSERT(mSubState == SubState::IDLE);
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-SES_Base::ProcRetVal SES_DrawWire::process(SEE_Base* event) noexcept {
-  switch (mSubState) {
-    case SubState_Idle:
-      return processSubStateIdle(event);
-    case SubState_PositioningNetPoint:
-      return processSubStatePositioning(event);
-    default:
-      Q_ASSERT(false);
-      return PassToParentState;
-  }
-}
-
-bool SES_DrawWire::entry(SEE_Base* event) noexcept {
-  Q_UNUSED(event);
-  Q_ASSERT(mSubState == SubState_Idle);
+bool SchematicEditorState_DrawWire::entry() noexcept {
+  Q_ASSERT(mSubState == SubState::IDLE);
 
   // clear schematic selection because selection does not make sense in this
   // state
-  if (mEditor.getActiveSchematic())
-    mEditor.getActiveSchematic()->clearSelection();
+  if (Schematic* schematic = getActiveSchematic()) {
+    schematic->clearSelection();
+  }
 
   // Add wire mode actions to the "command" toolbar
   mWireModeActions.insert(
-      WireMode_HV, mEditorUi.commandToolbar->addAction(
+      WireMode_HV, mContext.editorUi.commandToolbar->addAction(
                        QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
   mWireModeActions.insert(
-      WireMode_VH, mEditorUi.commandToolbar->addAction(
+      WireMode_VH, mContext.editorUi.commandToolbar->addAction(
                        QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
   mWireModeActions.insert(
-      WireMode_9045, mEditorUi.commandToolbar->addAction(
+      WireMode_9045, mContext.editorUi.commandToolbar->addAction(
                          QIcon(":/img/command_toolbars/wire_90_45.png"), ""));
   mWireModeActions.insert(
-      WireMode_4590, mEditorUi.commandToolbar->addAction(
+      WireMode_4590, mContext.editorUi.commandToolbar->addAction(
                          QIcon(":/img/command_toolbars/wire_45_90.png"), ""));
   mWireModeActions.insert(
       WireMode_Straight,
-      mEditorUi.commandToolbar->addAction(
+      mContext.editorUi.commandToolbar->addAction(
           QIcon(":/img/command_toolbars/wire_straight.png"), ""));
-  mActionSeparators.append(mEditorUi.commandToolbar->addSeparator());
+  mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
   updateWireModeActionsCheckedState();
 
   // connect the wire mode actions with the slot
@@ -141,191 +116,120 @@ bool SES_DrawWire::entry(SEE_Base* event) noexcept {
     });
   }
 
-  // add the "Width:" label to the toolbar
-  mWidthLabel = new QLabel(tr("Width:"));
-  mWidthLabel->setIndent(10);
-  mEditorUi.commandToolbar->addWidget(mWidthLabel);
-
-  // add the widths combobox to the toolbar
-  mWidthComboBox = new QComboBox();
-  mWidthComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mWidthComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mWidthComboBox->setEditable(true);
-  mWidthComboBox->addItem("default");
-  mWidthComboBox->setCurrentIndex(0);
-  mWidthComboBox->setEnabled(
-      false);  // this feature is not yet available --> disable
-  mEditorUi.commandToolbar->addWidget(mWidthComboBox);
-
   // change the cursor
-  mEditorGraphicsView.setCursor(Qt::CrossCursor);
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
 
   return true;
 }
 
-bool SES_DrawWire::exit(SEE_Base* event) noexcept {
-  Q_UNUSED(event);
-
+bool SchematicEditorState_DrawWire::exit() noexcept {
   // abort the currently active command
-  if (mSubState != SubState_Idle) abortPositioning(true);
+  if (mSubState != SubState::IDLE) {
+    abortPositioning(true);
+  }
 
   // Remove actions / widgets from the "command" toolbar
-  delete mWidthComboBox;
-  mWidthComboBox = nullptr;
-  delete mWidthLabel;
-  mWidthLabel = nullptr;
   qDeleteAll(mWireModeActions);
   mWireModeActions.clear();
   qDeleteAll(mActionSeparators);
   mActionSeparators.clear();
 
   // change the cursor
-  mEditorGraphicsView.setCursor(Qt::ArrowCursor);
+  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
 
   return true;
+}
+
+/*******************************************************************************
+ *  Event Handlers
+ ******************************************************************************/
+
+bool SchematicEditorState_DrawWire::processAbortCommand() noexcept {
+  if (mSubState == SubState::POSITIONING_NETPOINT) {
+    return abortPositioning(true);
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_DrawWire::processGraphicsSceneMouseMoved(
+    QGraphicsSceneMouseEvent& e) noexcept {
+  if (mSubState == SubState::POSITIONING_NETPOINT) {
+    Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    updateNetpointPositions(pos);
+    return true;
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_DrawWire::processGraphicsSceneLeftMouseButtonPressed(
+    QGraphicsSceneMouseEvent& e) noexcept {
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
+
+  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+
+  if (mSubState == SubState::IDLE) {
+    // start adding netpoints/netlines
+    return startPositioning(*schematic, pos);
+  } else if (mSubState == SubState::POSITIONING_NETPOINT) {
+    // fix the current point and add a new point + line
+    return addNextNetPoint(*schematic, pos);
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_DrawWire::
+    processGraphicsSceneLeftMouseButtonDoubleClicked(
+        QGraphicsSceneMouseEvent& e) noexcept {
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
+
+  if (mSubState == SubState::POSITIONING_NETPOINT) {
+    // fix the current point and add a new point + line
+    Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    return addNextNetPoint(*schematic, pos);
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_DrawWire::
+    processGraphicsSceneRightMouseButtonReleased(
+        QGraphicsSceneMouseEvent& e) noexcept {
+  if ((mSubState == SubState::POSITIONING_NETPOINT) &&
+      (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
+    // switch to next wire mode
+    Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    mWireMode = static_cast<WireMode>(mWireMode + 1);
+    if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
+    updateWireModeActionsCheckedState();
+    updateNetpointPositions(pos);
+    return true;
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_DrawWire::processSwitchToSchematicPage(
+    int index) noexcept {
+  Q_UNUSED(index);
+  return mSubState == SubState::IDLE;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-SES_Base::ProcRetVal SES_DrawWire::processSubStateIdle(
-    SEE_Base* event) noexcept {
-  switch (event->getType()) {
-    case SEE_Base::GraphicsViewEvent:
-      return processIdleSceneEvent(event);
-    default:
-      return PassToParentState;
-  }
-}
-
-SES_Base::ProcRetVal SES_DrawWire::processIdleSceneEvent(
-    SEE_Base* event) noexcept {
-  QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
-  Q_ASSERT(qevent);
-  if (!qevent) return PassToParentState;
-  Schematic* schematic = mEditor.getActiveSchematic();
-  Q_ASSERT(schematic);
-  if (!schematic) return PassToParentState;
-
-  switch (qevent->type()) {
-    case QEvent::GraphicsSceneMousePress: {
-      QGraphicsSceneMouseEvent* sceneEvent =
-          dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos =
-          Point::fromPx(sceneEvent->scenePos())
-              .mappedToGrid(schematic->getGridProperties().getInterval());
-
-      switch (sceneEvent->button()) {
-        case Qt::LeftButton:
-          // start adding netpoints/netlines
-          startPositioning(*schematic, pos);
-          return ForceStayInState;
-        default:
-          break;
-      }
-      break;
-    }
-    default:
-      break;
-  }
-
-  return PassToParentState;
-}
-
-SES_Base::ProcRetVal SES_DrawWire::processSubStatePositioning(
-    SEE_Base* event) noexcept {
-  switch (event->getType()) {
-    case SEE_Base::AbortCommand:
-      abortPositioning(true);
-      return ForceStayInState;
-    case SEE_Base::GraphicsViewEvent:
-      return processPositioningSceneEvent(event);
-    default:
-      return PassToParentState;
-  }
-}
-
-SES_Base::ProcRetVal SES_DrawWire::processPositioningSceneEvent(
-    SEE_Base* event) noexcept {
-  QEvent* qevent = SEE_RedirectedQEvent::getQEventFromSEE(event);
-  Q_ASSERT(qevent);
-  if (!qevent) return PassToParentState;
-  Schematic* schematic = mEditor.getActiveSchematic();
-  Q_ASSERT(schematic);
-  if (!schematic) return PassToParentState;
-
-  switch (qevent->type()) {
-    case QEvent::GraphicsSceneMouseDoubleClick:
-    case QEvent::GraphicsSceneMousePress: {
-      QGraphicsSceneMouseEvent* sceneEvent =
-          dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos =
-          Point::fromPx(sceneEvent->scenePos())
-              .mappedToGrid(schematic->getGridProperties().getInterval());
-      switch (sceneEvent->button()) {
-        case Qt::LeftButton:
-          // fix the current point and add a new point + line
-          addNextNetPoint(*schematic, pos);
-          return ForceStayInState;
-        case Qt::RightButton:
-          return ForceStayInState;
-        default:
-          break;
-      }
-      break;
-    }
-
-    case QEvent::GraphicsSceneMouseRelease: {
-      QGraphicsSceneMouseEvent* sceneEvent =
-          dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos =
-          Point::fromPx(sceneEvent->scenePos())
-              .mappedToGrid(schematic->getGridProperties().getInterval());
-      switch (sceneEvent->button()) {
-        case Qt::RightButton:
-          if (sceneEvent->screenPos() ==
-              sceneEvent->buttonDownScreenPos(Qt::RightButton)) {
-            // switch to next wire mode
-            mWireMode = static_cast<WireMode>(mWireMode + 1);
-            if (mWireMode == WireMode_COUNT)
-              mWireMode = static_cast<WireMode>(0);
-            updateWireModeActionsCheckedState();
-            updateNetpointPositions(pos);
-            return ForceStayInState;
-          }
-          break;
-        default:
-          break;
-      }
-      break;
-    }
-
-    case QEvent::GraphicsSceneMouseMove: {
-      QGraphicsSceneMouseEvent* sceneEvent =
-          dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Q_ASSERT(sceneEvent);
-      Point pos =
-          Point::fromPx(sceneEvent->scenePos())
-              .mappedToGrid(schematic->getGridProperties().getInterval());
-      updateNetpointPositions(pos);
-      return ForceStayInState;
-    }
-
-    default:
-      break;
-  }
-
-  return PassToParentState;
-}
-
-bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
-                                    SI_NetPoint* fixedPoint) noexcept {
+bool SchematicEditorState_DrawWire::startPositioning(
+    Schematic& schematic, const Point& pos, SI_NetPoint* fixedPoint) noexcept {
   try {
     // start a new undo command
-    Q_ASSERT(mSubState == SubState_Idle);
-    mUndoStack.beginCmdGroup(tr("Draw Wire"));
-    mSubState = SubState_PositioningNetPoint;
+    Q_ASSERT(mSubState == SubState::IDLE);
+    mContext.undoStack.beginCmdGroup(tr("Draw Wire"));
+    mSubState = SubState::POSITIONING_NETPOINT;
 
     // determine the fixed anchor (create one if it doesn't exist already)
     NetSignal*                      netsignal  = nullptr;
@@ -349,7 +253,7 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
             forcedNetName = CircuitIdentifier(name);  // can throw
         } catch (const Exception& e) {
           QMessageBox::warning(
-              &mEditor, tr("Invalid net name"),
+              parentWidget(), tr("Invalid net name"),
               QString(tr("Could not apply the forced net name because '%1' is "
                          "not a valid net name."))
                   .arg(name));
@@ -363,11 +267,11 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
       mFixedStartAnchor = cmdAdd->addNetPoint(pos);
       cmdAdd->addNetLine(*mFixedStartAnchor, netline->getStartPoint());
       cmdAdd->addNetLine(*mFixedStartAnchor, netline->getEndPoint());
-      mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
+      mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
       QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
           new CmdSchematicNetSegmentRemoveElements(*netsegment));
       cmdRemove->removeNetLine(*netline);
-      mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+      mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
     }
 
     // find netsignal if name is given
@@ -382,14 +286,14 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
       if (!netclass) {
         CmdNetClassAdd* cmd =
             new CmdNetClassAdd(mCircuit, ElementName("default"));
-        mUndoStack.appendToCmdGroup(cmd);  // can throw
+        mContext.undoStack.appendToCmdGroup(cmd);  // can throw
         netclass = cmd->getNetClass();
         Q_ASSERT(netclass);
       }
       // add new netsignal
       CmdNetSignalAdd* cmd =
           new CmdNetSignalAdd(mCircuit, *netclass, forcedNetName);
-      mUndoStack.appendToCmdGroup(cmd);  // can throw
+      mContext.undoStack.appendToCmdGroup(cmd);  // can throw
       netsignal = cmd->getNetSignal();
       Q_ASSERT(netsignal);
     }
@@ -399,14 +303,14 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
       // connect pin if needed
       if (SI_SymbolPin* pin = dynamic_cast<SI_SymbolPin*>(mFixedStartAnchor)) {
         Q_ASSERT(pin->getComponentSignalInstance());
-        mUndoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
+        mContext.undoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
             *pin->getComponentSignalInstance(), netsignal));
       }
       // add net segment
       Q_ASSERT(netsignal);
       CmdSchematicNetSegmentAdd* cmd =
           new CmdSchematicNetSegmentAdd(schematic, *netsignal);
-      mUndoStack.appendToCmdGroup(cmd);  // can throw
+      mContext.undoStack.appendToCmdGroup(cmd);  // can throw
       netsegment = cmd->getNetSegment();
     }
 
@@ -427,8 +331,8 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
     SI_NetPoint* p3 = cmd->addNetPoint(pos);
     Q_ASSERT(p3);  // third netpoint
     SI_NetLine* l2 = cmd->addNetLine(*p2, *p3);
-    Q_ASSERT(l2);                      // second netline
-    mUndoStack.appendToCmdGroup(cmd);  // can throw
+    Q_ASSERT(l2);                              // second netline
+    mContext.undoStack.appendToCmdGroup(cmd);  // can throw
 
     // update members
     mPositioningNetPoint1 = p2;
@@ -444,17 +348,17 @@ bool SES_DrawWire::startPositioning(Schematic& schematic, const Point& pos,
 
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-    if (mSubState != SubState_Idle) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    if (mSubState != SubState::IDLE) {
       abortPositioning(false);
     }
     return false;
   }
 }
 
-bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
-                                   const Point& pos) noexcept {
-  Q_ASSERT(mSubState == SubState_PositioningNetPoint);
+bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic&   schematic,
+                                                    const Point& pos) noexcept {
+  Q_ASSERT(mSubState == SubState::POSITIONING_NETPOINT);
 
   // abort if p2 == p0 (no line drawn)
   if (pos == mFixedStartAnchor->getPosition()) {
@@ -484,8 +388,8 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
                 mPositioningNetPoint1->getNetSegment()));
         mPositioningNetLine2 =
             cmdAdd->addNetLine(*mFixedStartAnchor, *mPositioningNetPoint2);
-        mUndoStack.appendToCmdGroup(cmdAdd.take());
-        mUndoStack.appendToCmdGroup(cmdRemove.take());
+        mContext.undoStack.appendToCmdGroup(cmdAdd.take());
+        mContext.undoStack.appendToCmdGroup(cmdRemove.take());
       }
 
       // find anchor under cursor
@@ -502,7 +406,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
         // connect pin if needed
         if (!otherNetSegment) {
           Q_ASSERT(pin->getComponentSignalInstance());
-          mUndoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
+          mContext.undoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
               *pin->getComponentSignalInstance(),
               &mPositioningNetPoint2->getNetSignalOfNetSegment()));
           otherForcedNetName =
@@ -517,11 +421,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
         otherAnchor = cmdAdd->addNetPoint(pos);
         cmdAdd->addNetLine(*otherAnchor, netline->getStartPoint());
         cmdAdd->addNetLine(*otherAnchor, netline->getEndPoint());
-        mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
+        mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
         QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
             new CmdSchematicNetSegmentRemoveElements(*otherNetSegment));
         cmdRemove->removeNetLine(*netline);
-        mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+        mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
       }
 
       // if anchor found under the cursor, replace "mPositioningNetPoint2" with
@@ -534,13 +438,13 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
                   mPositioningNetPoint2->getNetSegment()));
           cmdAdd->addNetLine(*otherAnchor,
                              mPositioningNetLine2->getStartPoint());
-          mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
+          mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
           QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
               new CmdSchematicNetSegmentRemoveElements(
                   mPositioningNetPoint2->getNetSegment()));
           cmdRemove->removeNetPoint(*mPositioningNetPoint2);
           cmdRemove->removeNetLine(*mPositioningNetLine2);
-          mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+          mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
         } else {
           // change net signal if needed
           NetSignal* thisSignal =
@@ -569,14 +473,15 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
               netSegmentToChangeSignal =
                   &mPositioningNetPoint2->getNetSegment();
             }
-            mUndoStack.appendToCmdGroup(
+            mContext.undoStack.appendToCmdGroup(
                 new CmdChangeNetSignalOfSchematicNetSegment(
                     *netSegmentToChangeSignal, *resultingNetSignal));
           }
           // combine both net segments
-          mUndoStack.appendToCmdGroup(new CmdCombineSchematicNetSegments(
-              mPositioningNetPoint2->getNetSegment(), *mPositioningNetPoint2,
-              *otherNetSegment, *otherAnchor));
+          mContext.undoStack.appendToCmdGroup(
+              new CmdCombineSchematicNetSegments(
+                  mPositioningNetPoint2->getNetSegment(),
+                  *mPositioningNetPoint2, *otherNetSegment, *otherAnchor));
         }
         if (!otherForcedNetName.isEmpty()) {
           // change net name if connected to a pin with forced net name
@@ -586,7 +491,7 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
             NetSignal* signal =
                 schematic.getProject().getCircuit().getNetSignalByName(*name);
             if (signal) {
-              mUndoStack.appendToCmdGroup(
+              mContext.undoStack.appendToCmdGroup(
                   new CmdChangeNetSignalOfSchematicNetSegment(
                       mPositioningNetPoint2->getNetSegment(), *signal));
             } else {
@@ -594,11 +499,11 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
                   schematic.getProject().getCircuit(),
                   mPositioningNetPoint2->getNetSignalOfNetSegment()));
               cmd->setName(name, false);
-              mUndoStack.appendToCmdGroup(cmd.take());
+              mContext.undoStack.appendToCmdGroup(cmd.take());
             }
           } catch (const Exception& e) {
             QMessageBox::warning(
-                &mEditor, tr("Invalid net name"),
+                parentWidget(), tr("Invalid net name"),
                 QString(
                     tr("Could not apply the forced net name because '%1' is "
                        "not a valid net name."))
@@ -612,26 +517,26 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
     } catch (const UserCanceled& e) {
       return false;
     } catch (const Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       return false;
     }
 
     try {
       // finish the current command
-      mUndoStack.commitCmdGroup();
-      mSubState = SubState_Idle;
+      mContext.undoStack.commitCmdGroup();
+      mSubState = SubState::IDLE;
 
       // abort or start a new command
       if (finishCommand) {
-        mUndoStack.beginCmdGroup(QString());  // this is ugly!
+        mContext.undoStack.beginCmdGroup(QString());  // this is ugly!
         abortPositioning(true);
         return false;
       } else {
         return startPositioning(schematic, pos, mPositioningNetPoint2);
       }
     } catch (const Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-      if (mSubState != SubState_Idle) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+      if (mSubState != SubState::IDLE) {
         abortPositioning(false);
       }
       return false;
@@ -639,25 +544,27 @@ bool SES_DrawWire::addNextNetPoint(Schematic&   schematic,
   }
 }
 
-bool SES_DrawWire::abortPositioning(bool showErrMsgBox) noexcept {
+bool SchematicEditorState_DrawWire::abortPositioning(
+    bool showErrMsgBox) noexcept {
   try {
     mCircuit.setHighlightedNetSignal(nullptr);
-    mSubState             = SubState_Idle;
+    mSubState             = SubState::IDLE;
     mFixedStartAnchor     = nullptr;
     mPositioningNetLine1  = nullptr;
     mPositioningNetLine2  = nullptr;
     mPositioningNetPoint1 = nullptr;
     mPositioningNetPoint2 = nullptr;
-    mUndoStack.abortCmdGroup();  // can throw
+    mContext.undoStack.abortCmdGroup();  // can throw
     return true;
   } catch (const Exception& e) {
-    if (showErrMsgBox) QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+    if (showErrMsgBox)
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
 
-SI_SymbolPin* SES_DrawWire::findSymbolPin(Schematic&   schematic,
-                                          const Point& pos) const noexcept {
+SI_SymbolPin* SchematicEditorState_DrawWire::findSymbolPin(
+    Schematic& schematic, const Point& pos) const noexcept {
   QList<SI_SymbolPin*> items = schematic.getPinsAtScenePos(pos);
   for (int i = items.count() - 1; i >= 0; --i) {
     // only choose pins which are connected to a component signal!
@@ -668,35 +575,42 @@ SI_SymbolPin* SES_DrawWire::findSymbolPin(Schematic&   schematic,
   return (items.count() > 0) ? items.first() : nullptr;
 }
 
-SI_NetPoint* SES_DrawWire::findNetPoint(Schematic& schematic, const Point& pos,
-                                        SI_NetPoint* except) const noexcept {
+SI_NetPoint* SchematicEditorState_DrawWire::findNetPoint(
+    Schematic& schematic, const Point& pos, SI_NetPoint* except) const
+    noexcept {
   QList<SI_NetPoint*> items = schematic.getNetPointsAtScenePos(pos);
   items.removeAll(except);
   return (items.count() > 0) ? items.first() : nullptr;
 }
 
-SI_NetLine* SES_DrawWire::findNetLine(Schematic& schematic, const Point& pos,
-                                      SI_NetLine* except) const noexcept {
+SI_NetLine* SchematicEditorState_DrawWire::findNetLine(Schematic&   schematic,
+                                                       const Point& pos,
+                                                       SI_NetLine* except) const
+    noexcept {
   QList<SI_NetLine*> items = schematic.getNetLinesAtScenePos(pos);
   items.removeAll(except);
   return (items.count() > 0) ? items.first() : nullptr;
 }
 
-void SES_DrawWire::updateNetpointPositions(const Point& cursorPos) noexcept {
+void SchematicEditorState_DrawWire::updateNetpointPositions(
+    const Point& cursorPos) noexcept {
   mPositioningNetPoint1->setPosition(calcMiddlePointPos(
       mFixedStartAnchor->getPosition(), cursorPos, mWireMode));
   mPositioningNetPoint2->setPosition(cursorPos);
 }
 
-void SES_DrawWire::updateWireModeActionsCheckedState() noexcept {
+void SchematicEditorState_DrawWire::
+    updateWireModeActionsCheckedState() noexcept {
   foreach (WireMode key, mWireModeActions.keys()) {
     mWireModeActions.value(key)->setCheckable(key == mWireMode);
     mWireModeActions.value(key)->setChecked(key == mWireMode);
   }
 }
 
-Point SES_DrawWire::calcMiddlePointPos(const Point& p1, const Point p2,
-                                       WireMode mode) const noexcept {
+Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
+                                                        const Point  p2,
+                                                        WireMode     mode) const
+    noexcept {
   Point delta = p2 - p1;
   switch (mode) {
     case WireMode_HV:

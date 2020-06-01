@@ -17,69 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SES_FSM_H
-#define LIBREPCB_PROJECT_SES_FSM_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ses_base.h"
+#include "schematiceditorstate.h"
+
+#include "../schematiceditor.h"
+
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace project {
 namespace editor {
 
 /*******************************************************************************
- *  Class SES_FSM
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The SES_FSM (Schematic Editor Finite State Machine) class
- */
-class SES_FSM final : public SES_Base {
-  Q_OBJECT
+SchematicEditorState::SchematicEditorState(const Context& context,
+                                           QObject*       parent) noexcept
+  : QObject(parent), mContext(context) {
+}
 
-public:
-  /// FSM States
-  enum State {
-    State_NoState,      ///< no state active
-    State_Select,       ///< ::librepcb::project::editor::SES_Select
-    State_DrawWire,     ///< ::librepcb::project::editor::SES_DrawWire
-    State_AddNetLabel,  ///< ::librepcb::project::editor::SES_AddNetLabel
-    State_AddComponent  ///< ::librepcb::project::editor::SES_AddComponent
-  };
+SchematicEditorState::~SchematicEditorState() noexcept {
+}
 
-  // Constructors / Destructor
-  explicit SES_FSM(SchematicEditor& editor, Ui::SchematicEditor& editorUi,
-                   GraphicsView& editorGraphicsView,
-                   UndoStack&    undoStack) noexcept;
-  ~SES_FSM() noexcept;
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
 
-  // Getters
-  State getCurrentState() const noexcept { return mCurrentState; }
+Schematic* SchematicEditorState::getActiveSchematic() noexcept {
+  return mContext.editor.getActiveSchematic();
+}
 
-  // General Methods
-  bool processEvent(SEE_Base* event, bool deleteEvent = false) noexcept;
+PositiveLength SchematicEditorState::getGridInterval() const noexcept {
+  return mContext.editorGraphicsView.getGridProperties().getInterval();
+}
 
-signals:
-  void stateChanged(State newState);
+const LengthUnit& SchematicEditorState::getDefaultLengthUnit() const noexcept {
+  return mContext.workspace.getSettings().defaultLengthUnit.get();
+}
 
-private:
-  // General Methods
-  ProcRetVal process(SEE_Base* event) noexcept;
-  State      processEventFromChild(
-           SEE_Base* event) noexcept;  ///< returns the next state
+bool SchematicEditorState::execCmd(UndoCommand* cmd) {
+  return mContext.undoStack.execCmd(cmd);
+}
 
-  // Attributes
-  State                   mCurrentState;
-  State                   mPreviousState;
-  QHash<State, SES_Base*> mSubStates;
-};
+QWidget* SchematicEditorState::parentWidget() noexcept {
+  return &mContext.editor;
+}
 
 /*******************************************************************************
  *  End of File
@@ -88,5 +82,3 @@ private:
 }  // namespace editor
 }  // namespace project
 }  // namespace librepcb
-
-#endif  // LIBREPCB_PROJECT_SES_FSM_H

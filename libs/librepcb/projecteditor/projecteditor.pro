@@ -77,13 +77,12 @@ SOURCES += \
     newprojectwizard/newprojectwizardpage_metadata.cpp \
     newprojectwizard/newprojectwizardpage_versioncontrol.cpp \
     projecteditor.cpp \
-    schematiceditor/fsm/schematiceditorevent.cpp \
-    schematiceditor/fsm/ses_addcomponent.cpp \
-    schematiceditor/fsm/ses_addnetlabel.cpp \
-    schematiceditor/fsm/ses_base.cpp \
-    schematiceditor/fsm/ses_drawwire.cpp \
-    schematiceditor/fsm/ses_fsm.cpp \
-    schematiceditor/fsm/ses_select.cpp \
+    schematiceditor/fsm/schematiceditorfsm.cpp \
+    schematiceditor/fsm/schematiceditorstate.cpp \
+    schematiceditor/fsm/schematiceditorstate_addcomponent.cpp \
+    schematiceditor/fsm/schematiceditorstate_addnetlabel.cpp \
+    schematiceditor/fsm/schematiceditorstate_drawwire.cpp \
+    schematiceditor/fsm/schematiceditorstate_select.cpp \
     schematiceditor/renamenetsegmentdialog.cpp \
     schematiceditor/schematicclipboard.cpp \
     schematiceditor/schematiceditor.cpp \
@@ -143,13 +142,12 @@ HEADERS += \
     newprojectwizard/newprojectwizardpage_metadata.h \
     newprojectwizard/newprojectwizardpage_versioncontrol.h \
     projecteditor.h \
-    schematiceditor/fsm/schematiceditorevent.h \
-    schematiceditor/fsm/ses_addcomponent.h \
-    schematiceditor/fsm/ses_addnetlabel.h \
-    schematiceditor/fsm/ses_base.h \
-    schematiceditor/fsm/ses_drawwire.h \
-    schematiceditor/fsm/ses_fsm.h \
-    schematiceditor/fsm/ses_select.h \
+    schematiceditor/fsm/schematiceditorfsm.h \
+    schematiceditor/fsm/schematiceditorstate.h \
+    schematiceditor/fsm/schematiceditorstate_addcomponent.h \
+    schematiceditor/fsm/schematiceditorstate_addnetlabel.h \
+    schematiceditor/fsm/schematiceditorstate_drawwire.h \
+    schematiceditor/fsm/schematiceditorstate_select.h \
     schematiceditor/renamenetsegmentdialog.h \
     schematiceditor/schematicclipboard.h \
     schematiceditor/schematiceditor.h \

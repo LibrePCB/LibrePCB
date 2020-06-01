@@ -26,7 +26,7 @@
 #include "../dialogs/projectpropertieseditordialog.h"
 #include "../docks/ercmsgdock.h"
 #include "../projecteditor.h"
-#include "fsm/ses_fsm.h"
+#include "fsm/schematiceditorfsm.h"
 #include "schematicpagesdock.h"
 #include "ui_schematiceditor.h"
 
@@ -155,53 +155,47 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
 
   // build the whole schematic editor finite state machine with all its substate
   // objects
-  mFsm =
-      new SES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
+  SchematicEditorFsm::Context fsmContext{
+      mProjectEditor.getWorkspace(), mProject, *this, *mUi, *mGraphicsView,
+      mProjectEditor.getUndoStack()};
+  mFsm = new SchematicEditorFsm(fsmContext);
 
   // connect the "tools" toolbar with the state machine
   mToolsActionGroup.reset(new ExclusiveActionGroup());
-  mToolsActionGroup->addAction(SES_FSM::State::State_Select,
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::SELECT,
                                mUi->actionToolSelect);
-  mToolsActionGroup->addAction(SES_FSM::State::State_DrawWire,
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_WIRE,
                                mUi->actionToolDrawWire);
-  mToolsActionGroup->addAction(SES_FSM::State::State_AddNetLabel,
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_NETLABEL,
                                mUi->actionToolAddNetLabel);
-  mToolsActionGroup->addAction(SES_FSM::State::State_AddComponent,
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
                                mUi->actionToolAddComponent);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
-  connect(mFsm, &SES_FSM::stateChanged, mToolsActionGroup.data(),
+  connect(mFsm, &SchematicEditorFsm::stateChanged, mToolsActionGroup.data(),
           &ExclusiveActionGroup::setCurrentAction);
   connect(mToolsActionGroup.data(),
           &ExclusiveActionGroup::changeRequestTriggered, this,
           &SchematicEditor::toolActionGroupChangeTriggered);
 
   // connect the "command" toolbar with the state machine
-  connect(mUi->actionCommandAbort, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
-  });
+  connect(mUi->actionCommandAbort, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processAbortCommand);
 
   // connect the "edit" toolbar with the state machine
-  connect(mUi->actionCopy, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Copy), true);
-  });
-  connect(mUi->actionCut, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Cut), true);
-  });
-  connect(mUi->actionPaste, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Paste), true);
-  });
-  connect(mUi->actionRotate_CW, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_RotateCW), true);
-  });
-  connect(mUi->actionRotate_CCW, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_RotateCCW), true);
-  });
-  connect(mUi->actionMirror, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Mirror), true);
-  });
-  connect(mUi->actionRemove, &QAction::triggered, [this]() {
-    mFsm->processEvent(new SEE_Base(SEE_Base::Edit_Remove), true);
-  });
+  connect(mUi->actionCopy, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processCopy);
+  connect(mUi->actionCut, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processCut);
+  connect(mUi->actionPaste, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processPaste);
+  connect(mUi->actionRotate_CW, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processRotateCw);
+  connect(mUi->actionRotate_CCW, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processRotateCcw);
+  connect(mUi->actionMirror, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processMirror);
+  connect(mUi->actionRemove, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processRemove);
 
   // setup "search" toolbar
   mUi->searchToolbar->setPlaceholderText(tr("Find symbol..."));
@@ -279,11 +273,9 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   // "Ask" the FSM if changing the scene is allowed at the moment.
   // If the FSM accepts the event, we can switch to the specified schematic
   // page.
-  SEE_SwitchToSchematicPage* event = new SEE_SwitchToSchematicPage(index);
-  mFsm->processEvent(event);
-  bool accepted = event->isAccepted();
-  delete event;
-  if (!accepted) return false;  // changing the schematic page is not allowed!
+  if (!mFsm->processSwitchToSchematicPage(index)) {
+    return false;  // changing the schematic page is not allowed!
+  }
 
   // event accepted --> change the schematic page
   Schematic* schematic = getActiveSchematic();
@@ -317,9 +309,9 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
 
 void SchematicEditor::abortAllCommands() noexcept {
   // ugly... ;-)
-  mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
-  mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
-  mFsm->processEvent(new SEE_Base(SEE_Base::AbortCommand), true);
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
 }
 
 /*******************************************************************************
@@ -430,8 +422,8 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
       const ws::WorkspaceSettings& workspaceSettings =
           mProjectEditor.getWorkspace().getSettings();
 
-      ws::WorkspaceSettings::PdfOpenBehavior bhv
-          = workspaceSettings.pdfOpenBehavior.get();
+      ws::WorkspaceSettings::PdfOpenBehavior bhv =
+          workspaceSettings.pdfOpenBehavior.get();
 
       if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::NEVER) {
         // do nothing
@@ -439,12 +431,10 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
         bool doOpenPdf = true;
         if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::ASK) {
           int openPdf = QMessageBox::information(
-                          this, tr("PDF Export"),
-                          tr("PDF exported successfully"),
-                          QMessageBox::Ok | QMessageBox::Open);
+              this, tr("PDF Export"), tr("PDF exported successfully"),
+              QMessageBox::Ok | QMessageBox::Open);
 
-          if (openPdf == QMessageBox::Ok)
-            doOpenPdf = false;
+          if (openPdf == QMessageBox::Ok) doOpenPdf = false;
         } else if (bhv != ws::WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
           throw LogicError(__FILE__, __LINE__);
         }
@@ -452,8 +442,8 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
         if (doOpenPdf) {
           if (workspaceSettings.useCustomPdfReader.get()) {
             QString pdfCmd = workspaceSettings.pdfReaderCommand.get();
-            QProcess::startDetached(pdfCmd.replace(
-                                      "{{FILEPATH}}", filepath.toNative()));
+            QProcess::startDetached(
+                pdfCmd.replace("{{FILEPATH}}", filepath.toNative()));
           } else {
             QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
           }
@@ -520,49 +510,37 @@ void SchematicEditor::on_actionGenerateBom_triggered() {
 void SchematicEditor::on_actionAddComp_Resistor_triggered() {
   Uuid componentUuid = Uuid::fromString("ef80cd5e-2689-47ee-8888-31d04fc99174");
   Uuid symbVarUuid   = Uuid::fromString("a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
-  SEE_StartAddComponent* addEvent =
-      new SEE_StartAddComponent(componentUuid, symbVarUuid);
-  mFsm->processEvent(addEvent, true);
+  mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_BipolarCapacitor_triggered() {
   Uuid componentUuid = Uuid::fromString("d167e0e3-6a92-4b76-b013-77b9c230e5f1");
   Uuid symbVarUuid   = Uuid::fromString("8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
-  SEE_StartAddComponent* addEvent =
-      new SEE_StartAddComponent(componentUuid, symbVarUuid);
-  mFsm->processEvent(addEvent, true);
+  mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_UnipolarCapacitor_triggered() {
   Uuid componentUuid = Uuid::fromString("c54375c5-7149-4ded-95c5-7462f7301ee7");
   Uuid symbVarUuid   = Uuid::fromString("5412add2-af9c-44b8-876d-a0fb7c201897");
-  SEE_StartAddComponent* addEvent =
-      new SEE_StartAddComponent(componentUuid, symbVarUuid);
-  mFsm->processEvent(addEvent, true);
+  mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_Inductor_triggered() {
   Uuid componentUuid = Uuid::fromString("506bd124-6062-400e-9078-b38bd7e1aaee");
   Uuid symbVarUuid   = Uuid::fromString("62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
-  SEE_StartAddComponent* addEvent =
-      new SEE_StartAddComponent(componentUuid, symbVarUuid);
-  mFsm->processEvent(addEvent, true);
+  mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_gnd_triggered() {
   Uuid componentUuid = Uuid::fromString("8076f6be-bfab-4fc1-9772-5d54465dd7e1");
   Uuid symbVarUuid   = Uuid::fromString("f09ad258-595b-4ee9-a1fc-910804a203ae");
-  SEE_StartAddComponent* addEvent =
-      new SEE_StartAddComponent(componentUuid, symbVarUuid);
-  mFsm->processEvent(addEvent, true);
+  mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_vcc_triggered() {
   Uuid componentUuid = Uuid::fromString("58c3c6cd-11eb-4557-aa3f-d3e05874afde");
   Uuid symbVarUuid   = Uuid::fromString("afb86b45-68ec-47b6-8d96-153d73567228");
-  SEE_StartAddComponent* addEvent =
-      new SEE_StartAddComponent(componentUuid, symbVarUuid);
-  mFsm->processEvent(addEvent, true);
+  mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionProjectProperties_triggered() {
@@ -581,25 +559,85 @@ void SchematicEditor::on_actionUpdateLibrary_triggered() {
  ******************************************************************************/
 
 bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
-  SEE_RedirectedQEvent* e =
-      new SEE_RedirectedQEvent(SEE_Base::GraphicsViewEvent, event);
-  return mFsm->processEvent(e, true);
+  Q_ASSERT(event);
+  switch (event->type()) {
+    case QEvent::GraphicsSceneMouseMove: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      mFsm->processGraphicsSceneMouseMoved(*e);
+      break;
+    }
+
+    case QEvent::GraphicsSceneMousePress: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      switch (e->button()) {
+        case Qt::LeftButton: {
+          mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
+          break;
+        }
+        default: { break; }
+      }
+      break;
+    }
+
+    case QEvent::GraphicsSceneMouseRelease: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      switch (e->button()) {
+        case Qt::LeftButton: {
+          mFsm->processGraphicsSceneLeftMouseButtonReleased(*e);
+          break;
+        }
+        case Qt::RightButton: {
+          mFsm->processGraphicsSceneRightMouseButtonReleased(*e);
+          break;
+        }
+        default: { break; }
+      }
+      break;
+    }
+
+    case QEvent::GraphicsSceneMouseDoubleClick: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      switch (e->button()) {
+        case Qt::LeftButton: {
+          mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(*e);
+          break;
+        }
+        default: { break; }
+      }
+      break;
+    }
+    default: { break; }
+  }
+
+  // Always accept graphics scene events, even if we do not react on some of
+  // the events! This will give us the full control over the graphics scene.
+  // Otherwise, the graphics scene can react on some events and disturb our
+  // state machine. Only the wheel event is ignored because otherwise the
+  // view will not allow to zoom with the mouse wheel.
+  return (event->type() != QEvent::GraphicsSceneWheel);
 }
 
 void SchematicEditor::toolActionGroupChangeTriggered(
     const QVariant& newTool) noexcept {
-  switch (newTool.toInt()) {
-    case SES_FSM::State::State_Select:
-      mFsm->processEvent(new SEE_Base(SEE_Base::StartSelect), true);
+  // Note: Converting the QVariant to SchematicEditorFsm::State doesn't work
+  // with some Qt versions, thus we convert to int instead. Fixed in:
+  // https://codereview.qt-project.org/c/qt/qtbase/+/159277/
+  switch (newTool.value<int>()) {
+    case SchematicEditorFsm::State::SELECT:
+      mFsm->processSelect();
       break;
-    case SES_FSM::State::State_DrawWire:
-      mFsm->processEvent(new SEE_Base(SEE_Base::StartDrawWire), true);
+    case SchematicEditorFsm::State::DRAW_WIRE:
+      mFsm->processDrawWire();
       break;
-    case SES_FSM::State::State_AddNetLabel:
-      mFsm->processEvent(new SEE_Base(SEE_Base::StartAddNetLabel), true);
+    case SchematicEditorFsm::State::ADD_NETLABEL:
+      mFsm->processAddNetLabel();
       break;
-    case SES_FSM::State::State_AddComponent:
-      mFsm->processEvent(new SEE_StartAddComponent(), true);
+    case SchematicEditorFsm::State::ADD_COMPONENT:
+      mFsm->processAddComponent();
       break;
     default:
       Q_ASSERT(false);
