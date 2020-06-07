@@ -53,24 +53,6 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
 
 FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
                            const Angle& rot, Shape shape,
-                           const PositiveLength& width,
-                           const PositiveLength& height,
-                           const UnsignedLength& drillDiameter,
-                           BoardSide             side) noexcept
-  : onEdited(*this),
-    mPackagePadUuid(padUuid),
-    mPosition(pos),
-    mRotation(rot),
-    mShape(shape),
-    mWidth(width),
-    mHeight(height),
-    mDrillSize(optionalDrillSize(drillDiameter)),
-    mBoardSide(side),
-    mRegisteredGraphicsItem(nullptr) {
-}
-
-FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
-                           const Angle& rot, Shape shape,
                            const PositiveLength&          width,
                            const PositiveLength&          height,
                            const tl::optional<DrillSize>& drillSize,
@@ -236,28 +218,20 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   return true;
 }
 
-bool FootprintPad::setDrillSize(const DrillSize& drillSize) noexcept {
-  if (mDrillSize) {
-    if (mDrillSize->getWidth() == drillSize.getWidth() &&
-        mDrillSize->getHeight() == drillSize.getHeight()) {
-      return false;
-    } else {
-      mDrillSize->setWidth(drillSize.getWidth());
-      mDrillSize->setHeight(drillSize.getHeight());
-    }
-  } else {
-    mDrillSize = DrillSize(drillSize);
-  }
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
-  onEdited.notify(Event::DrillDiameterChanged);
-  return true;
-}
-
 bool FootprintPad::setDrillSize(
     const tl::optional<DrillSize>& drillSize) noexcept {
   if (drillSize) {
-    return setDrillSize(*drillSize);
+    if (mDrillSize) {
+      if (mDrillSize->getWidth() == drillSize->getWidth() &&
+          mDrillSize->getHeight() == drillSize->getHeight()) {
+        return false;
+      } else {
+        mDrillSize->setWidth(drillSize->getWidth());
+        mDrillSize->setHeight(drillSize->getHeight());
+      }
+    } else {
+      mDrillSize = DrillSize(*drillSize);
+    }
   } else {
     if (mDrillSize)
       mDrillSize = tl::nullopt;

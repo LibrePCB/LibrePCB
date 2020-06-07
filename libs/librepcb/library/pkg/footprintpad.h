@@ -78,10 +78,6 @@ public:
   FootprintPad(const FootprintPad& other) noexcept;
   FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
                Shape shape, const PositiveLength& width,
-               const PositiveLength& height,
-               const UnsignedLength& drillDiameter, BoardSide side) noexcept;
-  FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
-               Shape shape, const PositiveLength& width,
                const PositiveLength&          height,
                const tl::optional<DrillSize>& drillSize,
                BoardSide                      side) noexcept;
@@ -116,7 +112,6 @@ public:
   bool setShape(Shape shape) noexcept;
   bool setWidth(const PositiveLength& width) noexcept;
   bool setHeight(const PositiveLength& height) noexcept;
-  bool setDrillSize(const DrillSize& drillSize) noexcept;
   bool setDrillSize(const tl::optional<DrillSize>& drillSize) noexcept;
   bool setBoardSide(BoardSide side) noexcept;
 
