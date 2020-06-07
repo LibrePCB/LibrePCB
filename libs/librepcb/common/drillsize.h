@@ -67,14 +67,6 @@ public:
   DrillSize(const DrillSize& drillSize) noexcept
     : mWidth(drillSize.mWidth), mHeight(drillSize.mHeight) {}
 
-  /**
-   * @brief Return an "optional" DrillSize object
-   *
-   * @param drillDiamater the intended diameter to be drilled
-   */
-  tl::optional<DrillSize> optionalDrillSize(
-      const UnsignedLength& drillDiameter);
-
   explicit DrillSize(const SExpression& node);
 
   /**
