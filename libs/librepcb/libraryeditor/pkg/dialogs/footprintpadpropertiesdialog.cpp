@@ -174,7 +174,9 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
       Length drillWidth  = *mUi->edtDrillWidth->getValue();
       Length drillHeight = *mUi->edtDrillHeight->getValue();
       if (drillWidth > 0 && drillHeight > 0)
-        cmd->setDrillSize(DrillSize(drillWidth, drillHeight), false);
+        cmd->setDrillSize(
+            DrillSize(PositiveLength(drillWidth), PositiveLength(drillHeight)),
+            false);
       else
         cmd->setDrillSize(tl::nullopt, false);
     } else {

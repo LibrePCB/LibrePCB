@@ -28,7 +28,6 @@
 #include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
 #include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 

@@ -44,9 +44,6 @@ namespace librepcb {
  * action, for example (1.2mm; 5.6mm) for a width of 1.2mm and a height of 5.6mm
  *
  * @see class Length
- *
- * @author pinoaffe
- * @date 2019-03-05
  */
 class DrillSize final : public SerializableObject {
 public:
@@ -61,24 +58,6 @@ public:
   explicit DrillSize(const PositiveLength& width,
                      const PositiveLength& height) noexcept
     : mWidth(width), mHeight(height) {}
-
-  /**
-   * @brief Constructor for passing two ints
-   *
-   * @param width  The width as an int
-   * @param height The height as an int
-   */
-  explicit DrillSize(const int width, const int height)
-    : mWidth(PositiveLength(width)), mHeight(PositiveLength(height)) {}
-
-  /**
-   * @brief Constructor for passing two Length objects
-   *
-   * @param width  The width as a Length object
-   * @param height The height as a Length object
-   */
-  explicit DrillSize(const Length& width, const Length& height)
-    : mWidth(PositiveLength(width)), mHeight(PositiveLength(height)) {}
 
   /**
    * @brief Copy Constructor
@@ -136,15 +115,15 @@ public:
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  const DrillSize& operator=(const DrillSize& rhs) {
+  DrillSize& operator=(const DrillSize& rhs) noexcept {
     mWidth  = rhs.mWidth;
     mHeight = rhs.mHeight;
     return *this;
   }
-  bool operator==(const DrillSize& rhs) const {
+  bool operator==(const DrillSize& rhs) const noexcept {
     return (mWidth == rhs.mWidth) && (mHeight == rhs.mHeight);
   }
-  bool operator!=(const DrillSize& rhs) const {
+  bool operator!=(const DrillSize& rhs) const noexcept {
     return (mWidth != rhs.mWidth) || (mHeight != rhs.mHeight);
   }
 

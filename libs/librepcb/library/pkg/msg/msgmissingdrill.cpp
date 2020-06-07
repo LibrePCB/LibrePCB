@@ -44,7 +44,7 @@ MsgMissingDrill::MsgMissingDrill(const FootprintPad& pad) noexcept
            "indistinguishable from a pair of SMD pads on opposite sides "
            "of the board, i.e. they are not connected (despite all this, "
            "LibrePCB will treat them as if they were connected.)")) {
-}  // namespace library
+}
 
 MsgMissingDrill::~MsgMissingDrill() noexcept {
 }

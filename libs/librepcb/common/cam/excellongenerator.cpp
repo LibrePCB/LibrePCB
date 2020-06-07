@@ -58,6 +58,7 @@ void ExcellonGenerator::slot(const Point& start, const Point& end,
 }
 
 void ExcellonGenerator::generate() {
+  std::sort(mToolList.begin(), mToolList.end());
   mOutput.clear();
   printHeader();
   printDrills();
