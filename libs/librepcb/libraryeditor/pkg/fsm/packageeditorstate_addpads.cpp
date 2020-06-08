@@ -62,7 +62,8 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
         FootprintPad::Shape::ROUND,  // Commonly used pad shape
         PositiveLength(2500000),     // There is no default/recommended pad size
         PositiveLength(1300000),     // -> choose reasonable multiple of 0.1mm
-        UnsignedLength(800000),      // Commonly used drill diameter
+        DrillSize(PositiveLength(800000),
+                  PositiveLength(800000)),  // Commonly used drill diameter
         FootprintPad::BoardSide::THT) {
   if (mPadType == PadType::SMT) {
     mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);  // Default side
