@@ -23,6 +23,9 @@ LIBS += \
     -lclipper \
     -lmuparser \
 
+# Solaris based systems need to link against libproc
+solaris:LIBS += -lproc
+
 INCLUDEPATH += \
     ../../libs \
     ../../libs/parseagle \

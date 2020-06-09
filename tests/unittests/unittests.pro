@@ -29,6 +29,9 @@ LIBS += \
     -lmuparser \
     -lparseagle \
 
+# Solaris based systems need to link against libproc
+solaris:LIBS += -lproc
+
 INCLUDEPATH += \
     ../../libs \
     ../../libs/googletest/googletest/include \
