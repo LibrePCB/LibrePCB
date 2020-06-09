@@ -44,5 +44,19 @@ CONFIG += warn_on
 QMAKE_CXXFLAGS += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wextra
 
-# QuaZIP: use as static library
-DEFINES += QUAZIP_STATIC
+# enable pkgconfig on linux when unbundling
+!isEmpty(UNBUNDLE) {
+    unix:CONFIG += link_pkgconfig
+}
+
+# If UNBUNDLE contains "all", unbundle all dependencies
+contains(UNBUNDLE, all) {
+    UNBUNDLE = (all) quazip fontobene-qt5
+}
+
+# QuaZIP configuration
+contains(UNBUNDLE, quazip) {
+    DEFINES += SYSTEM_QUAZIP
+} else {
+    DEFINES += QUAZIP_STATIC
+}

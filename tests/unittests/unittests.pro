@@ -1,7 +1,5 @@
 #-------------------------------------------------
-#
-# Project created 2014-08-02
-#
+# App: LibrePCB unit tests
 #-------------------------------------------------
 
 TEMPLATE = app
@@ -29,14 +27,13 @@ LIBS += \
     -lsexpresso \
     -lclipper \
     -lmuparser \
-    -lparseagle -lquazip -lz
+    -lparseagle \
 
 INCLUDEPATH += \
     ../../libs \
     ../../libs/googletest/googletest/include \
     ../../libs/googletest/googlemock/include \
     ../../libs/parseagle \
-    ../../libs/quazip \
     ../../libs/type_safe/include \
     ../../libs/type_safe/external/debug_assert \
 
@@ -47,22 +44,26 @@ DEPENDPATH += \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
     ../../libs/parseagle \
-    ../../libs/quazip \
     ../../libs/sexpresso \
     ../../libs/clipper \
     ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
-    $${DESTDIR}/liblibrepcbeagleimport.a \
-    $${DESTDIR}/liblibrepcbworkspace.a \
-    $${DESTDIR}/liblibrepcbproject.a \
-    $${DESTDIR}/liblibrepcblibrary.a \
-    $${DESTDIR}/liblibrepcbcommon.a \
-    $${DESTDIR}/libquazip.a \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
     $${DESTDIR}/libmuparser.a \
+
+isEmpty(UNBUNDLE) {
+    # These libraries will only be linked statically when not unbundling
+    PRE_TARGETDEPS += \
+        $${DESTDIR}/liblibrepcbeagleimport.a \
+        $${DESTDIR}/liblibrepcbworkspace.a \
+        $${DESTDIR}/liblibrepcbproject.a \
+        $${DESTDIR}/liblibrepcblibrary.a \
+        $${DESTDIR}/liblibrepcbcommon.a \
+        $${DESTDIR}/libquazip.a \
+}
 
 SOURCES += \
     common/algorithm/airwiresbuildertest.cpp \
@@ -124,3 +125,9 @@ HEADERS += \
 
 FORMS += \
 
+# QuaZIP
+!contains(UNBUNDLE, quazip) {
+    LIBS += -lquazip -lz
+    INCLUDEPATH += ../../libs/quazip
+    DEPENDPATH += ../../libs/quazip
+}

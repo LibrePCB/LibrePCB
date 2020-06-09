@@ -26,9 +26,15 @@
 #include "fileutils.h"
 #include "sexpression.h"
 
+#ifdef SYSTEM_QUAZIP
+#include <quazip5/quazip.h>
+#include <quazip5/quazipdir.h>
+#include <quazip5/quazipfile.h>
+#else
 #include <quazip/quazip.h>
 #include <quazip/quazipdir.h>
 #include <quazip/quazipfile.h>
+#endif
 
 /*******************************************************************************
  *  Namespace
