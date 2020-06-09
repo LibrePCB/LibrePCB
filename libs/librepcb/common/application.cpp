@@ -71,6 +71,8 @@ Application::Application(int& argc, char** argv) noexcept
     mAppVersion(Version::fromString(QString(APP_VERSION).section('-', 0, 0))),
     mAppVersionLabel(QString(APP_VERSION).section('-', 1, 1)),
     mGitRevision(GIT_COMMIT_SHA),
+    mLinkingType(LINKING_TYPE),
+    mUnbundledLibs(UNBUNDLE),
     mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION)),
     mIsFileFormatStable(FILE_FORMAT_STABLE) {
   // register meta types

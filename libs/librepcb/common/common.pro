@@ -1,7 +1,5 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2015-05-31T12:55:49
-#
+# Lib: Commonly used classes in LibrePCB
 #-------------------------------------------------
 
 TEMPLATE = lib
@@ -17,12 +15,15 @@ DEFINES += GIT_COMMIT_SHA="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" rev-parse -
 
 QT += core widgets xml opengl network sql printsupport
 
-CONFIG += staticlib
+isEmpty(UNBUNDLE) {
+    CONFIG += staticlib
+} else {
+    target.path = $${PREFIX}/lib
+    INSTALLS += target
+}
 
 INCLUDEPATH += \
     ../../ \
-    ../../fontobene-qt5 \
-    ../../quazip \
     ../../sexpresso \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
@@ -320,3 +321,25 @@ FORMS += \
     dialogs/textpropertiesdialog.ui \
     widgets/alignmentselector.ui \
 
+# quazip
+contains(UNBUNDLE, quazip) {
+    PKGCONFIG += quazip
+} else {
+    INCLUDEPATH += ../../quazip
+}
+
+# fontobene-qt5
+contains(UNBUNDLE, fontobene-qt5) {
+    PKGCONFIG += fontobene-qt5
+} else {
+    INCLUDEPATH += ../../fontobene-qt5
+}
+
+# linking information defines (used by `Application` class)
+isEmpty(UNBUNDLE) {
+    DEFINES += "LINKING_TYPE=\"\\\"static\\\"\""
+    DEFINES += "UNBUNDLE=\"\\\"-\\\"\""
+} else {
+    DEFINES += "LINKING_TYPE=\"\\\"dynamic\\\"\""
+    DEFINES += "UNBUNDLE=\"\\\"$${UNBUNDLE}\\\"\""
+}
