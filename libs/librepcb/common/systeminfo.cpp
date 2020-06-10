@@ -42,6 +42,9 @@
 #include <pwd.h>
 #include <signal.h>
 #include <unistd.h>
+#if defined(Q_OS_SOLARIS)
+#include <libproc.h>
+#endif
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
 #ifdef WINVER
 #undef WINVER
@@ -284,6 +287,15 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   if (i >= 0) processName.remove(0, i + 1);
   i = processName.lastIndexOf(QLatin1Char('.'));
   if (i >= 0) processName.truncate(i);
+#elif defined(Q_OS_SOLARIS)
+  // https://illumos.org/man/3proc/
+  // NOTE: This will only return the first PRFNSZ (16) bytes of the process name.
+  // If someone finds a way to get the full process name, feel free to improve this.
+  psinfo_t psinfo;
+  if (proc_get_psinfo(pid, &psinfo) != 0) {
+    return QString();  // process not running
+  }
+  processName = QString::fromLocal8Bit(psinfo.pr_fname);
 #else
 #error "Unknown operating system!"
 #endif
