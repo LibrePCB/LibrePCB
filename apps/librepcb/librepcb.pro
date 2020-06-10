@@ -47,6 +47,9 @@ LIBS += \
     -lmuparser \
     -lsexpresso \
 
+# Solaris based systems need to link against libproc
+solaris:LIBS += -lproc
+
 INCLUDEPATH += \
     ../../libs \
     ../../libs/type_safe/include \
