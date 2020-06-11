@@ -323,7 +323,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
         if (libPad.getDrillSize() && libPad.getDrillSize()->getWidth() ==
                                          libPad.getDrillSize()->getHeight()) {
           gen.drill(pad->getPosition(), libPad.getDrillSize()->getWidth());
-        } else {
+        } else if (libPad.getDrillSize()) {
           Point start = pad->getPosition();
           Point end   = start;
 
