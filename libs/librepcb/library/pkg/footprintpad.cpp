@@ -220,24 +220,11 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
 
 bool FootprintPad::setDrillSize(
     const tl::optional<DrillSize>& drillSize) noexcept {
-  if (drillSize) {
-    if (mDrillSize) {
-      if (mDrillSize->getWidth() == drillSize->getWidth() &&
-          mDrillSize->getHeight() == drillSize->getHeight()) {
-        return false;
-      } else {
-        mDrillSize->setWidth(drillSize->getWidth());
-        mDrillSize->setHeight(drillSize->getHeight());
-      }
-    } else {
-      mDrillSize = DrillSize(*drillSize);
-    }
-  } else {
-    if (mDrillSize)
-      mDrillSize = tl::nullopt;
-    else
-      return false;
+  if (drillSize == mDrillSize) {
+    return false;
   }
+
+  mDrillSize = drillSize;
   if (mRegisteredGraphicsItem)
     mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::DrillDiameterChanged);
