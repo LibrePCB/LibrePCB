@@ -127,6 +127,8 @@ void FileUtils::move(const FilePath& source, const FilePath& dest) {
                      QString(tr("The file or directory \"%1\" exists already."))
                          .arg(dest.toNative()));
   }
+  // Note: QDir::rename() fails if the parent directory does not yet exist
+  makePath(dest.getParentDir());
   if (!QDir().rename(source.toStr(), dest.toStr())) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString(tr("Could not move \"%1\" to \"%2\"."))
