@@ -36,6 +36,18 @@ CONFIG(release, debug|release) {
     }
 }
 
+# In Qt 5.15, a lot of things were marked as deprecated, without providing
+# alternatives available in previous Qt versions. It would require a lot of
+# preprocessor conditionals to avoid these deprecation warnings, so let's just
+# disable them for now. We are using CI anyway to ensure LibrePCB compiles with
+# the targeted Qt versions.
+equals(QT_MAJOR_VERSION, 5) {
+    greaterThan(QT_MINOR_VERSION, 14) {
+        QMAKE_CXXFLAGS += -Wno-deprecated-declarations
+        QMAKE_CXXFLAGS_DEBUG += -Wno-deprecated-declarations
+    }
+}
+
 # c++11 is obligatory!
 CONFIG += c++11
 
