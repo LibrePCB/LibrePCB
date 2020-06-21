@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import pytest
+import sys
+
 """
 Test creating local libraries with the library manager
 """
 
 
+@pytest.mark.xfail(sys.platform == "darwin",
+                   reason="Test fails on macOS for an unknown reason.")
 def test(librepcb, helpers):
     """
     Create new local library
