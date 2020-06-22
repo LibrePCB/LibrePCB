@@ -72,6 +72,7 @@ public:
       ComponentSymbolVariantItemList&                   items,
       const std::shared_ptr<const LibraryElementCache>& symbolCache,
       UndoStack*                                        undoStack) noexcept;
+  void resetReferences() noexcept;
 
   // Operator Overloadings
   ComponentSymbolVariantItemListEditorWidget& operator       =(

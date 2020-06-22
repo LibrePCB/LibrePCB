@@ -57,7 +57,6 @@ NewElementWizardPage_ComponentPinSignalMap::
  ******************************************************************************/
 
 bool NewElementWizardPage_ComponentPinSignalMap::validatePage() noexcept {
-  mContext.mComponentSymbolVariants = mSymbolVariantList;
   return true;
 }
 
@@ -75,9 +74,8 @@ int NewElementWizardPage_ComponentPinSignalMap::nextId() const noexcept {
 
 void NewElementWizardPage_ComponentPinSignalMap::initializePage() noexcept {
   QWizardPage::initializePage();
-  mSymbolVariantList = mContext.mComponentSymbolVariants;
   mUi->pinSignalMapEditorWidget->setReferences(
-      mSymbolVariantList.value(0).get(),
+      mContext.mComponentSymbolVariants.value(0).get(),
       std::make_shared<LibraryElementCache>(
           mContext.getWorkspace().getLibraryDb()),
       &mContext.mComponentSignals, nullptr);
@@ -85,7 +83,9 @@ void NewElementWizardPage_ComponentPinSignalMap::initializePage() noexcept {
 
 void NewElementWizardPage_ComponentPinSignalMap::cleanupPage() noexcept {
   QWizardPage::cleanupPage();
-  mContext.mComponentSymbolVariants = mSymbolVariantList;
+
+  // References might become invalid, thus reseting them.
+  mUi->pinSignalMapEditorWidget->resetReferences();
 }
 
 /*******************************************************************************
