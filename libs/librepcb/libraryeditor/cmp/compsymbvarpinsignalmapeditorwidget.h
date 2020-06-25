@@ -68,6 +68,7 @@ public:
       ComponentSymbolVariant*                           variant,
       const std::shared_ptr<const LibraryElementCache>& symbolCache,
       const ComponentSignalList* sigs, UndoStack* undoStack) noexcept;
+  void resetReferences() noexcept;
 
   // Operator Overloadings
   CompSymbVarPinSignalMapEditorWidget& operator       =(
