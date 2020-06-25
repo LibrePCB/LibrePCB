@@ -1,7 +1,5 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2013-08-22T23:02:35
-#
+# App: UUID generator
 #-------------------------------------------------
 
 TEMPLATE = app
@@ -14,7 +12,13 @@ QT += core widgets
 
 LIBS += \
     -L$${DESTDIR} \
-    -llibrepcbcommon
+    -llibrepcbcommon \
+    -lsexpresso \
+    -lclipper \
+    -lmuparser \
+
+# Solaris based systems need to link against libproc
+solaris:LIBS += -lproc
 
 INCLUDEPATH += \
     ../../libs \
@@ -24,8 +28,11 @@ INCLUDEPATH += \
 DEPENDPATH += \
     ../../libs/librepcb/common
 
-PRE_TARGETDEPS += \
-    $${DESTDIR}/liblibrepcbcommon.a
+isEmpty(UNBUNDLE) {
+    # These libraries will only be linked statically when not unbundling
+    PRE_TARGETDEPS += \
+        $${DESTDIR}/liblibrepcbcommon.a
+}
 
 RESOURCES += \
     ../../img/images.qrc \

@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
+# set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
+set -euv -o pipefail
+
 QTIFW_VERSION="3.2.2"
 QTIFW_URL_BASE="https://download.qt.io/official_releases/qt-installer-framework/$QTIFW_VERSION"
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Install dependencies on Linux
 if [ "$OS" = "linux" ]
 then
 
   # python packages
-  pip install --user -r ./tests/cli/requirements.txt
-  pip install --user -r ./tests/funq/requirements.txt
+  pip install --user -r "$DIR/../tests/cli/requirements.txt"
+  pip install --user -r "$DIR/../tests/funq/requirements.txt"
   export PATH="$PATH:`python -m site --user-base`/bin"
 
 # Install dependencies on OS X

@@ -1,7 +1,5 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2013-02-05T16:47:16
-#
+# App: Eagle importer
 #-------------------------------------------------
 
 TEMPLATE = app
@@ -12,15 +10,21 @@ include(../../common.pri)
 
 QT += core widgets xml network printsupport
 
+# Note: The order of the libraries is very important for the linker!
+# Another order could end up in "undefined reference" errors!
+# Note that dependencies need to be listed *after* the dependent libs.
 LIBS += \
     -L$${DESTDIR} \
     -llibrepcbeagleimport \
-    -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
-    -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
+    -llibrepcblibrary \
+    -llibrepcbcommon \
     -lparseagle \
     -lsexpresso \
     -lclipper \
-    -lquazip -lz \
+    -lmuparser \
+
+# Solaris based systems need to link against libproc
+solaris:LIBS += -lproc
 
 INCLUDEPATH += \
     ../../libs \
@@ -36,10 +40,15 @@ DEPENDPATH += \
     ../../libs/sexpresso \
     ../../libs/clipper \
 
+isEmpty(UNBUNDLE) {
+    # These libraries will only be linked statically when not unbundling
+    PRE_TARGETDEPS += \
+      $${DESTDIR}/liblibrepcbeagleimport.a \
+      $${DESTDIR}/liblibrepcblibrary.a \
+      $${DESTDIR}/liblibrepcbcommon.a \
+}
+
 PRE_TARGETDEPS += \
-    $${DESTDIR}/liblibrepcbeagleimport.a \
-    $${DESTDIR}/liblibrepcblibrary.a \
-    $${DESTDIR}/liblibrepcbcommon.a \
     $${DESTDIR}/libparseagle.a \
     $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libclipper.a \
@@ -59,3 +68,9 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
 
+# QuaZIP
+!contains(UNBUNDLE, quazip) {
+    LIBS += -lquazip -lz
+    INCLUDEPATH += ../../libs/quazip
+    DEPENDPATH += ../../libs/quazip
+}

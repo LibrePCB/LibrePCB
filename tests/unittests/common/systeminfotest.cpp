@@ -53,6 +53,15 @@ protected:
 #endif
   }
 
+  QString getOwnProcessExeName() const noexcept {
+#if defined(Q_OS_SOLARIS)
+    // Note: Solaris limits process names to 16 bytes
+    return QString("librepcb-unitte");
+#else
+    return QString("librepcb-unittests");
+#endif
+  }
+
   QString getTestProcessExeName() const noexcept {
     return QString("uuid-generator");
   }
@@ -112,7 +121,7 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
   {
     QString processName =
         SystemInfo::getProcessNameByPid(qApp->applicationPid());
-    EXPECT_EQ("librepcb-unittests", processName) << qPrintable(processName);
+    EXPECT_EQ(getOwnProcessExeName(), processName) << qPrintable(processName);
   }
 
   // check another running process

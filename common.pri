@@ -36,6 +36,18 @@ CONFIG(release, debug|release) {
     }
 }
 
+# In Qt 5.15, a lot of things were marked as deprecated, without providing
+# alternatives available in previous Qt versions. It would require a lot of
+# preprocessor conditionals to avoid these deprecation warnings, so let's just
+# disable them for now. We are using CI anyway to ensure LibrePCB compiles with
+# the targeted Qt versions.
+equals(QT_MAJOR_VERSION, 5) {
+    greaterThan(QT_MINOR_VERSION, 14) {
+        QMAKE_CXXFLAGS += -Wno-deprecated-declarations
+        QMAKE_CXXFLAGS_DEBUG += -Wno-deprecated-declarations
+    }
+}
+
 # c++11 is obligatory!
 CONFIG += c++11
 
@@ -44,5 +56,19 @@ CONFIG += warn_on
 QMAKE_CXXFLAGS += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wextra
 
-# QuaZIP: use as static library
-DEFINES += QUAZIP_STATIC
+# enable pkgconfig on linux when unbundling
+!isEmpty(UNBUNDLE) {
+    unix:CONFIG += link_pkgconfig
+}
+
+# If UNBUNDLE contains "all", unbundle all dependencies
+contains(UNBUNDLE, all) {
+    UNBUNDLE = (all) quazip fontobene-qt5
+}
+
+# QuaZIP configuration
+contains(UNBUNDLE, quazip) {
+    DEFINES += SYSTEM_QUAZIP
+} else {
+    DEFINES += QUAZIP_STATIC
+}

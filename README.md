@@ -19,7 +19,7 @@ about the currently available features, limitations and known bugs.
 
 ### Features
 
-- Cross-platform (Unix/Linux/BSD, macOS, Windows)
+- Cross-platform (Unix/Linux/BSD/Solaris, macOS, Windows)
 - Multilingual (both application and library elements)
 - All-In-One: project management + library/schematic/board editors
 - Intuitive, modern and easy-to-use graphical user interface
@@ -127,54 +127,17 @@ git submodule update --init --recursive
 
 ### Building
 
-#### Using Qt Creator
-
-Building with [Qt Creator](http://doc.qt.io/qtcreator/) is probably the easiest
-way. Simply open the `librepcb.pro` file.
-
-When opening a project in Qt Creator for the first time, you need to configure
-the Desktop kit:
-
-![qtcreator_run](doc/qtcreator_desktopkit.png)
-
-Click on the "Configure Project" button to get started.
-
-Note: To keep build time as low as possible make sure to set the correct make
-flags to use all available CPU cores to build. See this [stackoverflow
-answer](https://stackoverflow.com/questions/8860712/setting-default-make-options-for-qt-creator).
-
-#### Using qmake and make
-
-Since Qt Creator is also using qmake and make to build, it's easy to do the same
-on the command line:
+You can either build LibrePCB using Qt Creator, or you can build on the command
+line using qmake. To build a debug version of LibrePCB with qmake/make:
 
 ```bash
 mkdir build && cd build
-qmake -r ../librepcb.pro
-make -j 8
+qmake -r ../librepcb.pro CONFIG+=debug
+make -j8
 ```
 
-### Run LibrePCB
-
-#### From Qt Creator
-
-Select the run configuration `librepcb` and click on the `Run` button:
-
-![qtcreator_run](doc/qtcreator_run.png)
-
-#### From Command Line
-
-Execute inside the `build` directory:
-
-```bash
-./output/librepcb             # Unix/Linux
-open ./output/librepcb.app    # Mac OS X
-output\librepcb.exe           # Windows
-```
-
-### Installation
-
-On a Unix/Linux system, LibrePCB can be installed with `sudo make install`.
+For more detailed instructions (including how to set up Qt Creator), see
+https://developers.librepcb.org/d5/d96/doc_building.html
 
 
 ## Credits
