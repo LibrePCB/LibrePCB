@@ -59,12 +59,13 @@ NewElementWizardPage_ComponentSymbols::
  ******************************************************************************/
 
 bool NewElementWizardPage_ComponentSymbols::validatePage() noexcept {
-  mContext.mComponentSymbolVariants = mSymbolVariantList;
   return true;
 }
 
 bool NewElementWizardPage_ComponentSymbols::isComplete() const noexcept {
-  return mSymbolVariantList.value(0)->getSymbolItems().count() > 0;
+  return (mContext.mComponentSymbolVariants.count() > 0) &&
+         (mContext.mComponentSymbolVariants.first()->getSymbolItems().count() >
+          0);
 }
 
 int NewElementWizardPage_ComponentSymbols::nextId() const noexcept {
@@ -77,14 +78,14 @@ int NewElementWizardPage_ComponentSymbols::nextId() const noexcept {
 
 void NewElementWizardPage_ComponentSymbols::initializePage() noexcept {
   QWizardPage::initializePage();
-  mSymbolVariantList = mContext.mComponentSymbolVariants;
-  if (mSymbolVariantList.count() < 1) {
-    mSymbolVariantList.append(std::make_shared<ComponentSymbolVariant>(
-        Uuid::createRandom(), "", ElementName("default"), ""));
+  if (mContext.mComponentSymbolVariants.count() < 1) {
+    mContext.mComponentSymbolVariants.append(
+        std::make_shared<ComponentSymbolVariant>(Uuid::createRandom(), "",
+                                                 ElementName("default"), ""));
   }
   mUi->symbolListEditorWidget->setReferences(
       mContext.getWorkspace(), mContext.getLayerProvider(),
-      mSymbolVariantList.value(0)->getSymbolItems(),
+      mContext.mComponentSymbolVariants.value(0)->getSymbolItems(),
       std::make_shared<LibraryElementCache>(
           mContext.getWorkspace().getLibraryDb()),
       nullptr);
@@ -92,7 +93,9 @@ void NewElementWizardPage_ComponentSymbols::initializePage() noexcept {
 
 void NewElementWizardPage_ComponentSymbols::cleanupPage() noexcept {
   QWizardPage::cleanupPage();
-  mContext.mComponentSymbolVariants = mSymbolVariantList;
+
+  // References might become invalid, thus reseting them.
+  mUi->symbolListEditorWidget->resetReferences();
 }
 
 /*******************************************************************************

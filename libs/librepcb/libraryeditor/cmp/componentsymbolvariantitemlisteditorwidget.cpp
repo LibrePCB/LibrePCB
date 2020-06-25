@@ -122,6 +122,17 @@ void ComponentSymbolVariantItemListEditorWidget::setReferences(
   items.onElementEdited.attach(mOnItemEditedSlot);
 }
 
+void ComponentSymbolVariantItemListEditorWidget::resetReferences() noexcept {
+  mOnItemListEditedSlot.detachAll();
+  mOnItemEditedSlot.detachAll();
+
+  mModel->setItemList(nullptr);
+  mModel->setUndoStack(nullptr);
+  mModel->setSymbolsCache(nullptr);
+  mLayerProvider = nullptr;
+  mWorkspace     = nullptr;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

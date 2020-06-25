@@ -74,7 +74,6 @@ private:  // Methods
 private:  // Data
   NewElementWizardContext&                                       mContext;
   QScopedPointer<Ui::NewElementWizardPage_ComponentPinSignalMap> mUi;
-  ComponentSymbolVariantList mSymbolVariantList;
 };
 
 /*******************************************************************************

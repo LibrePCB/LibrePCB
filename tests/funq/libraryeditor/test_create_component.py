@@ -58,8 +58,19 @@ def test(library_editor, helpers):
     # (Do nothing as signals are automatically generated)
     le.widget('libraryEditorNewElementWizardNextButton').click()
 
-    # Define pin-signal-map
-    # (Do nothing as pin-signal-map is automatically generated)
+    # Define pin-signal-map with auto-assign
+    le.widget('libraryEditorNewElementWizardComponentPinSignalMapAutoAssignButton').click()
+
+    # Go back and forth the wizard pages to test if everything is memorized
+    # properly. In the past, the wizard even crashed when doing this.
+    le.widget('libraryEditorNewElementWizardBackButton').click()
+    le.widget('libraryEditorNewElementWizardBackButton').click()
+    le.widget('libraryEditorNewElementWizardBackButton').click()
+    le.widget('libraryEditorNewElementWizardBackButton').click()
+    le.widget('libraryEditorNewElementWizardNextButton').click()
+    le.widget('libraryEditorNewElementWizardNextButton').click()
+    le.widget('libraryEditorNewElementWizardNextButton').click()
+    le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Finish
     dialog = le.widget('libraryEditorNewElementWizard')

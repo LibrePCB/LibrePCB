@@ -102,6 +102,13 @@ void CompSymbVarPinSignalMapEditorWidget::setReferences(
   mModel->setSymbolVariant(variant);
 }
 
+void CompSymbVarPinSignalMapEditorWidget::resetReferences() noexcept {
+  mModel->setSymbolVariant(nullptr);
+  mModel->setSignalList(nullptr);
+  mModel->setUndoStack(nullptr);
+  mModel->setSymbolsCache(nullptr);
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
