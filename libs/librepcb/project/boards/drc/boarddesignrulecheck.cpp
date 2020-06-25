@@ -415,8 +415,8 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
       }
       Length widthRestring  = (width - drillWidth + 1) / 2;
       Length heightRestring = (height - drillHeight + 1) / 2;
-      if (widthRestring < *mOptions.minPthRestring or
-          heightRestring < *mOptions.minPthRestring) {
+      if ((widthRestring < *mOptions.minPthRestring) ||
+          (heightRestring < *mOptions.minPthRestring)) {
         QString msg =
             QString(tr("Min. pad restring ('%1'): %2",
                        "Placeholders are pad name + restring width"))

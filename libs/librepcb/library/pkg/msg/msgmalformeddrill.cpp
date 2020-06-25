@@ -42,7 +42,7 @@ MsgMalformedDrill::MsgMalformedDrill(const FootprintPad& pad,
         QString(tr("Malformed pad drill: '%1'")).arg(pad.getUuid().toStr()),
         QString(
             tr("The size of a drill may not exceed the pad size. "
-               "When it does, behaviour is undefined and it may not be plated. "
+               "When it does, behavior is undefined and it may not be plated. "
                "In this case, the %1 of the drill exceeds the %1 of the pad."))
             .arg((error == WIDER) ? tr("width") : tr("height"))) {
 }

@@ -152,7 +152,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
         new PositiveLengthEdit());
     edtDrillWidth->configure(getDefaultLengthUnit(),
                              LengthEditBase::Steps::drillDiameter(),
-                             "package_editor/add_pads/drill_widthr");
+                             "package_editor/add_pads/drill_width");
     edtDrillHeight->configure(getDefaultLengthUnit(),
                               LengthEditBase::Steps::drillDiameter(),
                               "package_editor/add_pads/drill_height");
@@ -166,7 +166,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
     connect(edtDrillWidth.get(), &PositiveLengthEdit::valueChanged, this,
             &PackageEditorState_AddPads::drillWidthEditValueChanged);
     connect(edtDrillHeight.get(), &PositiveLengthEdit::valueChanged, this,
-            &PackageEditorState_AddPads::drillWidthEditValueChanged);
+            &PackageEditorState_AddPads::drillHeightEditValueChanged);
     mContext.commandToolBar.addWidget(std::move(edtDrillWidth));
     mContext.commandToolBar.addWidget(std::move(edtDrillHeight));
   }

@@ -43,7 +43,7 @@ MsgMissingDrill::MsgMissingDrill(const FootprintPad& pad) noexcept
            "does not have a drill configured. This means the pad is virtually "
            "indistinguishable from a pair of SMD pads on opposite sides "
            "of the board, i.e. they are not connected (despite all this, "
-           "LibrePCB will treat them as if they were connected.)")) {
+           "LibrePCB will treat them as if they were connected).")) {
 }
 
 MsgMissingDrill::~MsgMissingDrill() noexcept {

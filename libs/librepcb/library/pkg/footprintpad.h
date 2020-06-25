@@ -82,7 +82,6 @@ public:
                const tl::optional<DrillSize>& drillSize,
                BoardSide                      side) noexcept;
   explicit FootprintPad(const SExpression& node);
-  explicit FootprintPad(const SExpression& node, const Version& version);
   ~FootprintPad() noexcept;
 
   // Getters
