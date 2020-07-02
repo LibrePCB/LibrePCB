@@ -25,6 +25,8 @@ init:
 
 install:
   - git submodule update --init --recursive
+  # Work around https://github.com/msys2/MSYS2-packages/issues/1962
+  - bash -c "pacman -Sy --noconfirm pacman && pacman -Su --noconfirm"
   - bash -c "./ci/install_dependencies.sh"
 
 build_script:
