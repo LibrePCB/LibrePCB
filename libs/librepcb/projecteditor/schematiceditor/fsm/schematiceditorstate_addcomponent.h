@@ -17,15 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
-#define LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
+#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
+#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ses_base.h"
+#include "schematiceditorstate.h"
+
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/uuid.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
+#include <QtWidgets>
 
 #include <memory>
 
@@ -36,12 +41,6 @@ namespace librepcb {
 
 class Attribute;
 class AttributeUnitComboBox;
-
-namespace library {
-class Component;
-class ComponentSymbolVariant;
-class ComponentSymbolVariantItem;
-}  // namespace library
 
 namespace project {
 
@@ -54,36 +53,53 @@ namespace editor {
 class AddComponentDialog;
 
 /*******************************************************************************
- *  Class SES_AddComponent
+ *  Class SchematicEditorState_AddComponent
  ******************************************************************************/
 
 /**
- * @brief The SES_AddComponent class
+ * @brief The SchematicEditorState_AddComponent class
  */
-class SES_AddComponent final : public SES_Base {
+class SchematicEditorState_AddComponent final : public SchematicEditorState {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit SES_AddComponent(SchematicEditor&     editor,
-                            Ui::SchematicEditor& editorUi,
-                            GraphicsView&        editorGraphicsView,
-                            UndoStack&           undoStack);
-  ~SES_AddComponent();
+  SchematicEditorState_AddComponent() = delete;
+  SchematicEditorState_AddComponent(
+      const SchematicEditorState_AddComponent& other) = delete;
+  explicit SchematicEditorState_AddComponent(const Context& context) noexcept;
+  virtual ~SchematicEditorState_AddComponent() noexcept;
 
   // General Methods
-  ProcRetVal process(SEE_Base* event) noexcept override;
-  bool       entry(SEE_Base* event) noexcept override;
-  bool       exit(SEE_Base* event) noexcept override;
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-private:
-  // Private Methods
-  ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-  void       startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
-                                  const tl::optional<Uuid>& symbVar = tl::nullopt,
-                                  const tl::optional<Uuid>& dev = tl::nullopt,
-                                  bool                      keepValue = false);
-  bool       abortCommand(bool showErrMsgBox) noexcept;
+  // Event Handlers
+  virtual bool processAddComponent() noexcept override;
+  virtual bool processAddComponent(const Uuid& cmp,
+                                   const Uuid& symbVar) noexcept override;
+  virtual bool processRotateCw() noexcept override;
+  virtual bool processRotateCcw() noexcept override;
+  virtual bool processAbortCommand() noexcept override;
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+
+  // Operator Overloadings
+  SchematicEditorState_AddComponent& operator       =(
+      const SchematicEditorState_AddComponent& rhs) = delete;
+
+private:  // Methods
+  void startAddingComponent(const tl::optional<Uuid>& cmp       = tl::nullopt,
+                            const tl::optional<Uuid>& symbVar   = tl::nullopt,
+                            const tl::optional<Uuid>& dev       = tl::nullopt,
+                            bool                      keepValue = false);
+  bool abortCommand(bool showErrMsgBox) noexcept;
   std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
   void                             valueChanged(QString text) noexcept;
   void                             attributeChanged() noexcept;
@@ -93,10 +109,10 @@ private:
   static QString                   toSingleLine(const QString& text) noexcept;
   static QString                   toMultiLine(const QString& text) noexcept;
 
-  // Attributes
-  bool                mIsUndoCmdActive;
-  AddComponentDialog* mAddComponentDialog;
-  Angle               mLastAngle;
+private:  // Data
+  bool                               mIsUndoCmdActive;
+  QScopedPointer<AddComponentDialog> mAddComponentDialog;
+  Angle                              mLastAngle;
 
   // information about the current component/symbol to place
   ComponentInstance*     mCurrentComponent;
@@ -121,4 +137,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SES_ADDCOMPONENT_H
+#endif
