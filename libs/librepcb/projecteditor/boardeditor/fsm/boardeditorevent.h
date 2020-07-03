@@ -56,7 +56,7 @@ class BEE_Base {
 public:
   /// FSM event types
   enum EventType_t {
-    // Triggered Actions (SEE_Base objects, no additional parameters)
+    // Triggered Actions (BEE_Base objects, no additional parameters)
     AbortCommand,  ///< abort the currently active command (esc)
     StartSelect,   ///< start command: select elements
     // StartMove,          ///< start command: move elements
@@ -77,10 +77,10 @@ public:
     Edit_FlipHorizontal,  ///< flip the selected elements horizontal (f)
     Edit_FlipVertical,    ///< flip the selected elements vertical (Shift+f)
     Edit_Remove,          ///< remove the selected elements
-    // Redirected QEvent's (SEE_RedirectedQEvent objects, with pointer to a
+    // Redirected QEvent's (BEE_RedirectedQEvent objects, with pointer to a
     // QEvent)
     GraphicsViewEvent,  ///< event from ::librepcb::GraphicsView @see
-                        ///< ::librepcb::project::editor::SEE_RedirectedQEvent
+                        ///< ::librepcb::project::editor::BEE_RedirectedQEvent
     // Special Events (with some additional parameters)
     StartAddDevice,  ///< @see ::librepcb::project::editor::BEE_StartAddDevice
   };

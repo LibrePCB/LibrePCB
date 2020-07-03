@@ -47,7 +47,7 @@ namespace editor {
 class ProjectEditor;
 class SchematicPagesDock;
 class ErcMsgDock;
-class SES_FSM;
+class SchematicEditorFsm;
 
 namespace Ui {
 class SchematicEditor;
@@ -136,7 +136,7 @@ private:
   ErcMsgDock*         mErcMsgDock;
 
   // Finite State Machine
-  SES_FSM* mFsm;
+  SchematicEditorFsm* mFsm;
 };
 
 /*******************************************************************************

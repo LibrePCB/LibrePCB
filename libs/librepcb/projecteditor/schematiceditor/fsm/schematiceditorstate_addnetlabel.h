@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SES_ADDNETLABEL_H
-#define LIBREPCB_PROJECT_SES_ADDNETLABEL_H
+#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
+#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ses_base.h"
+#include "schematiceditorstate.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -40,36 +41,48 @@ class CmdSchematicNetLabelEdit;
 namespace editor {
 
 /*******************************************************************************
- *  Class SES_AddNetLabel
+ *  Class SchematicEditorState_AddNetLabel
  ******************************************************************************/
 
 /**
- * @brief The SES_AddNetLabel class
+ * @brief The SchematicEditorState_AddNetLabel class
  */
-class SES_AddNetLabel final : public SES_Base {
+class SchematicEditorState_AddNetLabel final : public SchematicEditorState {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit SES_AddNetLabel(SchematicEditor&     editor,
-                           Ui::SchematicEditor& editorUi,
-                           GraphicsView&        editorGraphicsView,
-                           UndoStack&           undoStack);
-  ~SES_AddNetLabel();
+  SchematicEditorState_AddNetLabel() = delete;
+  SchematicEditorState_AddNetLabel(
+      const SchematicEditorState_AddNetLabel& other) = delete;
+  explicit SchematicEditorState_AddNetLabel(const Context& context) noexcept;
+  virtual ~SchematicEditorState_AddNetLabel() noexcept;
 
   // General Methods
-  ProcRetVal process(SEE_Base* event) noexcept override;
-  bool       entry(SEE_Base* event) noexcept override;
-  bool       exit(SEE_Base* event) noexcept override;
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-private:
-  // Private Methods
-  ProcRetVal processSceneEvent(SEE_Base* event) noexcept;
-  bool       addLabel(Schematic& schematic, const Point& pos) noexcept;
-  bool       updateLabel(const Point& pos) noexcept;
-  bool       fixLabel(const Point& pos) noexcept;
+  // Event Handlers
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
-  // General Attributes
+  // Operator Overloadings
+  SchematicEditorState_AddNetLabel& operator       =(
+      const SchematicEditorState_AddNetLabel& rhs) = delete;
+
+private:  // Methods
+  bool addLabel(Schematic& schematic, const Point& pos) noexcept;
+  bool updateLabel(const Point& pos) noexcept;
+  bool fixLabel(const Point& pos) noexcept;
+
+private:  // Data
   bool                      mUndoCmdActive;
   SI_NetLabel*              mCurrentNetLabel;
   CmdSchematicNetLabelEdit* mEditCmd;
@@ -83,4 +96,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SES_ADDNETLABEL_H
+#endif

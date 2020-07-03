@@ -47,10 +47,11 @@ This page describes the code style guide for LibrePCB developers.
 
 # Naming {#doc_code_style_guide_naming}
 
-- File Names: Exactly same naming as classes, but all characters lowercase. Example: `ses_select.cpp`, `ses_select.h`
+- File Names: Exactly same naming as classes, but all characters lowercase. Example: `lengthunit.cpp`, `lengthunit.h`
 - Include guards: Use the namespace as prefix before the class name. Example: `NAMESPACE_CLASSNAME_H`
 - Namespaces: lowercase (with underline as separator if needed)
-- Classes: UpperCamelCase (for common prefixes, use the underline as separator. Example: librepcb::project::editor::SES_Select)
+- Classes: UpperCamelCase (for common prefixes, use the underline as separator.
+  Example: librepcb::project::editor::SchematicEditorState_Select)
 - Interfaces: Like Classes, but with prefix "IF_". Example: librepcb::IF_GraphicsViewEventHandler
 - Functions/Methods: lowerCamelCase
 - Member Variables: lowerCamelCase, beginning with a 'm'. Example: `mSomeMemberVariable`
