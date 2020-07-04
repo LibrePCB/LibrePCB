@@ -490,6 +490,15 @@ void SI_NetSegment::removeFromSchematic() {
   sgl.dismiss();
 }
 
+void SI_NetSegment::selectAll() noexcept {
+  foreach (SI_NetPoint* netpoint, mNetPoints)
+    netpoint->setSelected(true);
+  foreach (SI_NetLine* netline, mNetLines)
+    netline->setSelected(true);
+  foreach (SI_NetLabel* netlabel, mNetLabels)
+    netlabel->setSelected(true);
+}
+
 void SI_NetSegment::setSelectionRect(const QRectF rectPx) noexcept {
   foreach (SI_NetPoint* netpoint, mNetPoints)
     netpoint->setSelected(netpoint->getGrabAreaScenePx().intersects(rectPx));

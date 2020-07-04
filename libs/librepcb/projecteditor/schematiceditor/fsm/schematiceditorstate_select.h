@@ -68,6 +68,7 @@ public:
   virtual bool exit() noexcept override;
 
   // Event Handlers
+  virtual bool processSelectAll() noexcept override;
   virtual bool processRotateCw() noexcept override;
   virtual bool processRotateCcw() noexcept override;
   virtual bool processMirror() noexcept override;

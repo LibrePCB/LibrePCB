@@ -109,6 +109,7 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
+  void selectAll() noexcept;
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 

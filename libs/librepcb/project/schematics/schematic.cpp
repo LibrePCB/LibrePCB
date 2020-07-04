@@ -370,6 +370,11 @@ void Schematic::showInView(GraphicsView& view) noexcept {
   view.setScene(mGraphicsScene.data());
 }
 
+void Schematic::selectAll() noexcept {
+  foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(true); }
+  foreach (SI_NetSegment* segment, mNetSegments) { segment->selectAll(); }
+}
+
 void Schematic::setSelectionRect(const Point& p1, const Point& p2,
                                  bool updateItems) noexcept {
   mGraphicsScene->setSelectionRect(p1, p2);
