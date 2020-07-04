@@ -69,6 +69,7 @@ public:
     StartDrawTrace,  ///< start command: draw trace
     StartAddVia,     ///< start command: add via
     // StartAddNetLabel,   ///< start command: add netlabel
+    Edit_SelectAll,       ///< select all elements (ctrl+a)
     Edit_Copy,            ///< copy the selected elements to clipboard (ctrl+c)
     Edit_Cut,             ///< cut the selected elements (ctrl+x)
     Edit_Paste,           ///< paste the elements from the clipboard (ctrl+v)

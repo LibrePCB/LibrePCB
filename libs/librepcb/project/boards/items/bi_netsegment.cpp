@@ -469,6 +469,15 @@ void BI_NetSegment::removeFromBoard() {
   sgl.dismiss();
 }
 
+void BI_NetSegment::selectAll() noexcept {
+  foreach (BI_Via* via, mVias)
+    via->setSelected(via->isSelectable());
+  foreach (BI_NetPoint* netpoint, mNetPoints)
+    netpoint->setSelected(netpoint->isSelectable());
+  foreach (BI_NetLine* netline, mNetLines)
+    netline->setSelected(netline->isSelectable());
+}
+
 void BI_NetSegment::setSelectionRect(const QRectF rectPx) noexcept {
   foreach (BI_Via* via, mVias)
     via->setSelected(via->isSelectable() &&
