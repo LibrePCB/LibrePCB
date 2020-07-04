@@ -17,82 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
-#define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICCLIPBOARDDATABUILDER_H
+#define LIBREPCB_PROJECT_EDITOR_SCHEMATICCLIPBOARDDATABUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/uuid.h>
+
+#include "schematicclipboarddata.h"
 
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-namespace library {
-class Component;
-}
-
 namespace project {
 
-class Circuit;
-class ComponentInstance;
+class Schematic;
+
+namespace editor {
 
 /*******************************************************************************
- *  Class CmdComponentInstanceAdd
+ *  Class SchematicClipboardDataBuilder
  ******************************************************************************/
 
 /**
- * @brief The CmdComponentInstanceAdd class
+ * @brief The SchematicClipboardDataBuilder class
  */
-class CmdComponentInstanceAdd final : public UndoCommand {
+class SchematicClipboardDataBuilder final {
 public:
   // Constructors / Destructor
-  CmdComponentInstanceAdd(
-      Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
-      const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
-  CmdComponentInstanceAdd(Circuit&           circuit,
-                          ComponentInstance* component) noexcept;
-  ~CmdComponentInstanceAdd() noexcept;
+  SchematicClipboardDataBuilder() = delete;
+  SchematicClipboardDataBuilder(const SchematicClipboardDataBuilder& other) =
+      delete;
+  explicit SchematicClipboardDataBuilder(Schematic& schematic) noexcept;
+  ~SchematicClipboardDataBuilder() noexcept;
 
-  // Getters
-  ComponentInstance* getComponentInstance() const noexcept {
-    return mComponentInstance;
-  }
+  // General Methods
+  std::unique_ptr<SchematicClipboardData> generate(const Point& cursorPos) const
+      noexcept;
 
-private:
-  // Private Methods
+  // Operator Overloadings
+  SchematicClipboardDataBuilder& operator       =(
+      const SchematicClipboardDataBuilder& rhs) = delete;
 
-  /// @copydoc UndoCommand::performExecute()
-  bool performExecute() override;
-
-  /// @copydoc UndoCommand::performUndo()
-  void performUndo() override;
-
-  /// @copydoc UndoCommand::performRedo()
-  void performRedo() override;
-
-  // Private Member Variables
-
-  // Attributes from the constructor
-  Circuit&           mCircuit;
-  Uuid               mComponentUuid;
-  Uuid               mSymbVarUuid;
-  tl::optional<Uuid> mDefaultDeviceUuid;
-
-  /// @brief The created component instance
-  ComponentInstance* mComponentInstance;
+private:  // Data
+  Schematic& mSchematic;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#endif

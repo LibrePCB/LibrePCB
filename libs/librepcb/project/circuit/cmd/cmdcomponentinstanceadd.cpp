@@ -53,6 +53,16 @@ CmdComponentInstanceAdd::CmdComponentInstanceAdd(
     mComponentInstance(nullptr) {
 }
 
+CmdComponentInstanceAdd::CmdComponentInstanceAdd(
+    Circuit& circuit, ComponentInstance* component) noexcept
+  : UndoCommand(tr("Add component")),
+    mCircuit(circuit),
+    mComponentUuid(Uuid::createRandom()),
+    mSymbVarUuid(Uuid::createRandom()),
+    mDefaultDeviceUuid(),
+    mComponentInstance(component) {
+}
+
 CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept {
 }
 
@@ -61,22 +71,24 @@ CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept {
  ******************************************************************************/
 
 bool CmdComponentInstanceAdd::performExecute() {
-  library::Component* cmp =
-      mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
-  if (!cmp) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("The component with the UUID \"%1\" does not exist in the "
-                   "project's library!"))
-            .arg(mComponentUuid.toStr()));
+  if (!mComponentInstance) {
+    library::Component* cmp =
+        mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
+    if (!cmp) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString(tr("The component with the UUID \"%1\" does not exist in the "
+                     "project's library!"))
+              .arg(mComponentUuid.toStr()));
+    }
+    const QStringList& normOrder =
+        mCircuit.getProject().getSettings().getNormOrder();
+    QString name = mCircuit.generateAutoComponentInstanceName(
+        cmp->getPrefixes().value(normOrder));
+    mComponentInstance = new ComponentInstance(
+        mCircuit, *cmp, mSymbVarUuid, CircuitIdentifier(name),
+        mDefaultDeviceUuid);  // can throw
   }
-  const QStringList& normOrder =
-      mCircuit.getProject().getSettings().getNormOrder();
-  QString name = mCircuit.generateAutoComponentInstanceName(
-      cmp->getPrefixes().value(normOrder));
-  mComponentInstance = new ComponentInstance(mCircuit, *cmp, mSymbVarUuid,
-                                             CircuitIdentifier(name),
-                                             mDefaultDeviceUuid);  // can throw
 
   performRedo();  // can throw
 

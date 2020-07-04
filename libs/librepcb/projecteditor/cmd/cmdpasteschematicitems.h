@@ -17,82 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
-#define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#ifndef LIBREPCB_PROJECT_EDITOR_CMDPASTESCHEMATICITEMS_H
+#define LIBREPCB_PROJECT_EDITOR_CMDPASTESCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-namespace library {
-class Component;
-}
-
 namespace project {
 
-class Circuit;
-class ComponentInstance;
+class Project;
+class Schematic;
+
+namespace editor {
+
+class SchematicClipboardData;
 
 /*******************************************************************************
- *  Class CmdComponentInstanceAdd
+ *  Class CmdPasteSchematicItems
  ******************************************************************************/
 
 /**
- * @brief The CmdComponentInstanceAdd class
+ * @brief The CmdPasteSchematicItems class
  */
-class CmdComponentInstanceAdd final : public UndoCommand {
+class CmdPasteSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdComponentInstanceAdd(
-      Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
-      const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
-  CmdComponentInstanceAdd(Circuit&           circuit,
-                          ComponentInstance* component) noexcept;
-  ~CmdComponentInstanceAdd() noexcept;
+  CmdPasteSchematicItems()                                    = delete;
+  CmdPasteSchematicItems(const CmdPasteSchematicItems& other) = delete;
+  CmdPasteSchematicItems(Schematic&                              schematic,
+                         std::unique_ptr<SchematicClipboardData> data,
+                         const Point& posOffset) noexcept;
+  ~CmdPasteSchematicItems() noexcept;
 
-  // Getters
-  ComponentInstance* getComponentInstance() const noexcept {
-    return mComponentInstance;
-  }
+  // Operator Overloadings
+  CmdPasteSchematicItems& operator=(const CmdPasteSchematicItems& rhs) = delete;
 
-private:
-  // Private Methods
-
+private:  // Methods
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
-  void performUndo() override;
-
-  /// @copydoc UndoCommand::performRedo()
-  void performRedo() override;
-
-  // Private Member Variables
-
-  // Attributes from the constructor
-  Circuit&           mCircuit;
-  Uuid               mComponentUuid;
-  Uuid               mSymbVarUuid;
-  tl::optional<Uuid> mDefaultDeviceUuid;
-
-  /// @brief The created component instance
-  ComponentInstance* mComponentInstance;
+private:  // Data
+  Project&                                mProject;
+  Schematic&                              mSchematic;
+  std::unique_ptr<SchematicClipboardData> mData;
+  Point                                   mPosOffset;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#endif
