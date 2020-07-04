@@ -224,6 +224,20 @@ bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   }
 }
 
+bool SymbolEditorState_Select::processSelectAll() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      // Set a selection rect slightly larger than the total items bounding
+      // rect to get all items selected.
+      mContext.symbolGraphicsItem.setSelectionRect(
+          mContext.symbolGraphicsItem.boundingRect().adjusted(-100, -100, 100,
+                                                              100));
+      return true;
+    }
+    default: { return false; }
+  }
+}
+
 bool SymbolEditorState_Select::processCut() noexcept {
   switch (mState) {
     case SubState::IDLE: {
