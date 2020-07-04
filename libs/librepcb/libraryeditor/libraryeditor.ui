@@ -98,6 +98,8 @@
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
+    <addaction name="actionSelectAll"/>
+    <addaction name="separator"/>
     <addaction name="actionRotateCcw"/>
     <addaction name="actionRotateCw"/>
     <addaction name="actionMirror"/>
@@ -699,6 +701,18 @@
    </property>
    <property name="shortcut">
     <string notr="true">F</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/select_all.png</normaloff>:/img/actions/select_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+A</string>
    </property>
   </action>
  </widget>
