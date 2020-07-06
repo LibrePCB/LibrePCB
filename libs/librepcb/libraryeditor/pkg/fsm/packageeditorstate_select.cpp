@@ -230,6 +230,22 @@ bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   }
 }
 
+bool PackageEditorState_Select::processSelectAll() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      if (auto item = mContext.currentGraphicsItem) {
+        // Set a selection rect slightly larger than the total items bounding
+        // rect to get all items selected.
+        item->setSelectionRect(
+            item->boundingRect().adjusted(-100, -100, 100, 100));
+        return true;
+      }
+      return false;
+    }
+    default: { return false; }
+  }
+}
+
 bool PackageEditorState_Select::processCut() noexcept {
   switch (mState) {
     case SubState::IDLE: {

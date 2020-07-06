@@ -104,6 +104,7 @@ public:
   bool processAddNetLabel() noexcept;
   bool processDrawWire() noexcept;
   bool processAbortCommand() noexcept;
+  bool processSelectAll() noexcept;
   bool processCut() noexcept;
   bool processCopy() noexcept;
   bool processPaste() noexcept;

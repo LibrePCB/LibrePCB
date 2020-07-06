@@ -114,6 +114,7 @@ public:
 
 public slots:
   virtual bool save() noexcept;
+  virtual bool selectAll() noexcept { return false; }
   virtual bool cut() noexcept { return false; }
   virtual bool copy() noexcept { return false; }
   virtual bool paste() noexcept { return false; }

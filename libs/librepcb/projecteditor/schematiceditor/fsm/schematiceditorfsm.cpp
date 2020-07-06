@@ -118,6 +118,15 @@ bool SchematicEditorFsm::processAbortCommand() noexcept {
   return setNextState(State::SELECT);
 }
 
+bool SchematicEditorFsm::processSelectAll() noexcept {
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processSelectAll()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool SchematicEditorFsm::processCut() noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processCut()) {

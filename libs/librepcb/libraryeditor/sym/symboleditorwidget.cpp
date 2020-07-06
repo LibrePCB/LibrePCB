@@ -209,6 +209,10 @@ bool SymbolEditorWidget::save() noexcept {
   }
 }
 
+bool SymbolEditorWidget::selectAll() noexcept {
+  return mFsm->processSelectAll();
+}
+
 bool SymbolEditorWidget::cut() noexcept {
   return mFsm->processCut();
 }

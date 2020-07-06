@@ -114,6 +114,12 @@ bool BES_Select::exit(BEE_Base* event) noexcept {
 
 BES_Base::ProcRetVal BES_Select::processSubStateIdle(BEE_Base* event) noexcept {
   switch (event->getType()) {
+    case BEE_Base::Edit_SelectAll:
+      if (Board* board = mEditor.getActiveBoard()) {
+        board->selectAll();
+        return ForceStayInState;
+      }
+      return PassToParentState;
     case BEE_Base::Edit_Cut:
       // cutSelectedItems();
       return ForceStayInState;

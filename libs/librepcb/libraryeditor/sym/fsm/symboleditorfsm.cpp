@@ -148,6 +148,14 @@ bool SymbolEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   }
 }
 
+bool SymbolEditorFsm::processSelectAll() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processSelectAll();
+  } else {
+    return false;
+  }
+}
+
 bool SymbolEditorFsm::processCut() noexcept {
   if (getCurrentState()) {
     return getCurrentState()->processCut();

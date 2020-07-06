@@ -115,6 +115,7 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept;
+  bool processSelectAll() noexcept;
   bool processCut() noexcept;
   bool processCopy() noexcept;
   bool processPaste() noexcept;

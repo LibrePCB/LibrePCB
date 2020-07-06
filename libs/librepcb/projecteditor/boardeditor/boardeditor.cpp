@@ -221,6 +221,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   });
 
   // connect the "edit" toolbar with the state machine
+  connect(mUi->actionSelectAll, &QAction::triggered, [this]() {
+    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_SelectAll), true);
+  });
   connect(mUi->actionCopy, &QAction::triggered, [this]() {
     mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Copy), true);
   });

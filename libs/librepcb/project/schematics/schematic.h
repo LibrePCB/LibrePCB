@@ -159,6 +159,7 @@ public:
   void showInView(GraphicsView& view) noexcept;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
+  void          selectAll() noexcept;
   void          setSelectionRect(const Point& p1, const Point& p2,
                                  bool updateItems) noexcept;
   void          clearSelection() const noexcept;
