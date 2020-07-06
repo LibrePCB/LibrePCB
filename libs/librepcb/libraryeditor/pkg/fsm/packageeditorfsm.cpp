@@ -213,6 +213,14 @@ bool PackageEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   }
 }
 
+bool PackageEditorFsm::processSelectAll() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processSelectAll();
+  } else {
+    return false;
+  }
+}
+
 bool PackageEditorFsm::processCut() noexcept {
   if (getCurrentState()) {
     return getCurrentState()->processCut();

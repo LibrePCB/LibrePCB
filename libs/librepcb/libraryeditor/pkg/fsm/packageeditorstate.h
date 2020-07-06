@@ -88,6 +88,7 @@ public:
     Q_UNUSED(e);
     return false;
   }
+  virtual bool processSelectAll() noexcept { return false; }
   virtual bool processCut() noexcept { return false; }
   virtual bool processCopy() noexcept { return false; }
   virtual bool processPaste() noexcept { return false; }

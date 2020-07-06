@@ -71,6 +71,7 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
+  bool processSelectAll() noexcept override;
   bool processCut() noexcept override;
   bool processCopy() noexcept override;
   bool processPaste() noexcept override;

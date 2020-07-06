@@ -220,6 +220,10 @@ bool PackageEditorWidget::save() noexcept {
   }
 }
 
+bool PackageEditorWidget::selectAll() noexcept {
+  return mFsm->processSelectAll();
+}
+
 bool PackageEditorWidget::cut() noexcept {
   return mFsm->processCut();
 }
