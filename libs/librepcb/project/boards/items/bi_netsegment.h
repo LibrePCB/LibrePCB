@@ -105,6 +105,7 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
+  void selectAll() noexcept;
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 

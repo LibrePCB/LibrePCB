@@ -868,6 +868,23 @@ void Board::showInView(GraphicsView& view) noexcept {
   view.setScene(mGraphicsScene.data());
 }
 
+void Board::selectAll() noexcept {
+  foreach (BI_Device* device, mDeviceInstances) {
+    device->setSelected(device->isSelectable());
+  }
+  foreach (BI_NetSegment* segment, mNetSegments) { segment->selectAll(); }
+  foreach (BI_Plane* plane, mPlanes) {
+    plane->setSelected(plane->isSelectable());
+  }
+  foreach (BI_Polygon* polygon, mPolygons) {
+    polygon->setSelected(polygon->isSelectable());
+  }
+  foreach (BI_StrokeText* text, mStrokeTexts) {
+    text->setSelected(text->isSelectable());
+  }
+  foreach (BI_Hole* hole, mHoles) { hole->setSelected(hole->isSelectable()); }
+}
+
 void Board::setSelectionRect(const Point& p1, const Point& p2,
                              bool updateItems) noexcept {
   mGraphicsScene->setSelectionRect(p1, p2);

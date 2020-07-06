@@ -71,6 +71,7 @@
         <file>actions/schematic.png</file>
         <file>actions/search.png</file>
         <file>actions/select.png</file>
+        <file>actions/select_all.png</file>
         <file>actions/select_rect.png</file>
         <file>actions/settings.png</file>
         <file>actions/show_planes.png</file>

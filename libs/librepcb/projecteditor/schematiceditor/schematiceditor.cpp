@@ -182,6 +182,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
           &SchematicEditorFsm::processAbortCommand);
 
   // connect the "edit" toolbar with the state machine
+  connect(mUi->actionSelectAll, &QAction::triggered, mFsm,
+          &SchematicEditorFsm::processSelectAll);
   connect(mUi->actionCopy, &QAction::triggered, mFsm,
           &SchematicEditorFsm::processCopy);
   connect(mUi->actionCut, &QAction::triggered, mFsm,

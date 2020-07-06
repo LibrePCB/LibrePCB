@@ -74,6 +74,16 @@ bool SchematicEditorState_Select::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
+bool SchematicEditorState_Select::processSelectAll() noexcept {
+  if (mSubState == SubState::IDLE) {
+    if (Schematic* schematic = getActiveSchematic()) {
+      schematic->selectAll();
+      return true;
+    }
+  }
+  return false;
+}
+
 bool SchematicEditorState_Select::processRotateCw() noexcept {
   if (mSubState == SubState::IDLE) {
     rotateSelectedItems(-Angle::deg90());

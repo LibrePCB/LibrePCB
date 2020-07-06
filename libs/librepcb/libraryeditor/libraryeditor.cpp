@@ -75,6 +75,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   connect(mUi->actionRescanLibraries, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
+  connect(mUi->actionSelectAll, &QAction::triggered, this,
+          &LibraryEditor::selectAllTriggered);
   connect(mUi->actionCut, &QAction::triggered, this,
           &LibraryEditor::cutTriggered);
   connect(mUi->actionCopy, &QAction::triggered, this,
@@ -398,6 +400,10 @@ void LibraryEditor::showElementInFileExplorerTriggered() noexcept {
   QDesktopServices::openUrl(fp.toQUrl());
 }
 
+void LibraryEditor::selectAllTriggered() noexcept {
+  if (mCurrentEditorWidget) mCurrentEditorWidget->selectAll();
+}
+
 void LibraryEditor::cutTriggered() noexcept {
   if (mCurrentEditorWidget) mCurrentEditorWidget->cut();
 }
@@ -651,6 +657,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   foreach (QAction* action, mUi->editToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
+  mUi->actionSelectAll->setEnabled(hasGraphicalEditor);
   mUi->actionFlip->setEnabled(supportsFlip);
   if (isOverviewTab) {
     mUi->actionRemove->setEnabled(true);
