@@ -17,77 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_PROJECT_EDITOR_CMDPASTESCHEMATICITEMS_H
+#define LIBREPCB_PROJECT_EDITOR_CMDPASTESCHEMATICITEMS_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "schematicclipboard.h"
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace project {
+
+class Project;
+class Schematic;
+
 namespace editor {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-SchematicClipboard::SchematicClipboard() noexcept
-  : QObject(nullptr), mCutActive(false) {
-}
-
-SchematicClipboard::~SchematicClipboard() noexcept {
-  // clear();
-}
+class SchematicClipboardData;
 
 /*******************************************************************************
- *  General Methods
+ *  Class CmdPasteSchematicItems
  ******************************************************************************/
 
-/*void SchematicClipboard::clear() noexcept
-{
-    qDeleteAll(mSymbolInstances);       mSymbolInstances.clear();
-}
+/**
+ * @brief The CmdPasteSchematicItems class
+ */
+class CmdPasteSchematicItems final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdPasteSchematicItems()                                    = delete;
+  CmdPasteSchematicItems(const CmdPasteSchematicItems& other) = delete;
+  CmdPasteSchematicItems(Schematic&                              schematic,
+                         std::unique_ptr<SchematicClipboardData> data,
+                         const Point& posOffset) noexcept;
+  ~CmdPasteSchematicItems() noexcept;
 
-void SchematicClipboard::cut(const QList<SymbolInstance*>& symbols)
-{
-    mCutActive = true;
-    setElements(symbols);
-}
+  // Operator Overloadings
+  CmdPasteSchematicItems& operator=(const CmdPasteSchematicItems& rhs) = delete;
 
-void SchematicClipboard::copy(const QList<SymbolInstance*>& symbols)
-{
-    mCutActive = false;
-    setElements(symbols);
-}
+private:  // Methods
+  /// @copydoc UndoCommand::performExecute()
+  bool performExecute() override;
 
-void SchematicClipboard::paste(Schematic& schematic, QList<SymbolInstance*>&
-symbols)
-{
-    Q_ASSERT(symbols.isEmpty() == true);
-
-    foreach (DomElement* element, mSymbolInstances)
-    {
-        symbols.append(new SymbolInstance(schematic, *element));
-    }
-
-    mCutActive = false;
-}*/
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-/*void SchematicClipboard::setElements(const QList<SymbolInstance*>& symbols)
-{
-    clear();
-
-    foreach (SymbolInstance* symbol, symbols)
-        mSymbolInstances.append(symbol->serializeToDomElement());
-}*/
+private:  // Data
+  Project&                                mProject;
+  Schematic&                              mSchematic;
+  std::unique_ptr<SchematicClipboardData> mData;
+  Point                                   mPosOffset;
+};
 
 /*******************************************************************************
  *  End of File
@@ -96,3 +81,5 @@ symbols)
 }  // namespace editor
 }  // namespace project
 }  // namespace librepcb
+
+#endif

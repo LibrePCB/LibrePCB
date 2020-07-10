@@ -69,10 +69,14 @@ public:
 
   // Event Handlers
   virtual bool processSelectAll() noexcept override;
+  virtual bool processCut() noexcept override;
+  virtual bool processCopy() noexcept override;
+  virtual bool processPaste() noexcept override;
   virtual bool processRotateCw() noexcept override;
   virtual bool processRotateCcw() noexcept override;
   virtual bool processMirror() noexcept override;
   virtual bool processRemove() noexcept override;
+  virtual bool processAbortCommand() noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
@@ -95,17 +99,22 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
+  bool copySelectedItemsToClipboard() noexcept;
+  bool pasteFromClipboard() noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
 
 private:  // Data
   /// enum for all possible substates
   enum class SubState {
-    IDLE,   ///< left mouse button is not pressed (default state)
-    MOVING  ///< left mouse button is pressed
+    IDLE,       ///< left mouse button is not pressed (default state)
+    SELECTING,  ///< left mouse button pressed to draw selection rect
+    MOVING,     ///< left mouse button pressed to move items
+    PASTING,    ///< move pasted items
   };
 
   SubState mSubState;  ///< the current substate
+  Point    mStartPos;
   QScopedPointer<CmdMoveSelectedSchematicItems> mSelectedItemsMoveCommand;
 };
 

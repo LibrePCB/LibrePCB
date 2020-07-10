@@ -596,12 +596,32 @@ TEST_F(TransactionalFileSystemTest, testRestoredBackupAfterFailedSave) {
   EXPECT_FALSE(backupDir.isExistingDir());
 }
 
-TEST_F(TransactionalFileSystemTest, testExportToZip) {
+TEST_F(TransactionalFileSystemTest, testExportImportZipByFilePath) {
   FilePath zipFp = mPopulatedDir.getPathTo("export to.zip");
   ASSERT_FALSE(zipFp.isExistingFile());
-  TransactionalFileSystem fs(mPopulatedDir, true);
-  fs.exportToZip(zipFp);
-  EXPECT_TRUE(zipFp.isExistingFile());
+  {
+    TransactionalFileSystem fs(mPopulatedDir, true);
+    fs.exportToZip(zipFp);
+    EXPECT_TRUE(zipFp.isExistingFile());
+  }
+  {
+    TransactionalFileSystem fs(mEmptyDir, true);
+    fs.loadFromZip(zipFp);
+    EXPECT_EQ("bar", fs.read("foo dir/bar dir.txt"));
+  }
+}
+
+TEST_F(TransactionalFileSystemTest, testExportImportZipByByteArray) {
+  QByteArray content;
+  {
+    TransactionalFileSystem fs(mPopulatedDir, true);
+    content = fs.exportToZip();
+  }
+  {
+    TransactionalFileSystem fs(mEmptyDir, true);
+    fs.loadFromZip(content);
+    EXPECT_EQ("bar", fs.read("foo dir/bar dir.txt"));
+  }
 }
 
 TEST_F(TransactionalFileSystemTest, testDiscardChanges) {

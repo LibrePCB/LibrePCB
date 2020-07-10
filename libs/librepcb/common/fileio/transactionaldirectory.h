@@ -92,6 +92,7 @@ public:
   virtual void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
+  void copyTo(TransactionalDirectory& dest) const;
   void saveTo(TransactionalDirectory& dest);
   void moveTo(TransactionalDirectory& dest);
 

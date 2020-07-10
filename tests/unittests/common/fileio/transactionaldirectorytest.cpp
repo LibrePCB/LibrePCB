@@ -356,6 +356,75 @@ TEST_F(TransactionalDirectoryTest, testRemoveDirRecursivelyInSubdirPath) {
 }
 
 /*******************************************************************************
+ *  Test copyTo()
+ ******************************************************************************/
+
+TEST_F(TransactionalDirectoryTest, testCopyToFromRootToRoot) {
+  TransactionalDirectory src(mFileSystem, "");
+  TransactionalDirectory dst(mEmptyFileSystem, "");
+  src.copyTo(dst);
+  EXPECT_EQ(mFileSystem, src.getFileSystem());
+  EXPECT_EQ("", src.getPath());
+  EXPECT_EQ(QStringList{"a"}, mFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"a.txt"}, mFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"b"}, mFileSystem->getDirs("a"));
+  EXPECT_EQ(QStringList{"b.txt"}, mFileSystem->getFiles("a"));
+  EXPECT_EQ(QStringList{"a"}, mEmptyFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"a.txt"}, mEmptyFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"b.txt"}, mEmptyFileSystem->getFiles("a"));
+}
+
+TEST_F(TransactionalDirectoryTest, testCopyToFromRootToSubdir) {
+  TransactionalDirectory src(mFileSystem, "");
+  TransactionalDirectory dst(mEmptyFileSystem, "a");
+  src.copyTo(dst);
+  EXPECT_EQ(mFileSystem, src.getFileSystem());
+  EXPECT_EQ("", src.getPath());
+  EXPECT_EQ(QStringList{"a"}, mFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"a.txt"}, mFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"b"}, mFileSystem->getDirs("a"));
+  EXPECT_EQ(QStringList{"b.txt"}, mFileSystem->getFiles("a"));
+  EXPECT_EQ(QStringList{"a"}, mEmptyFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"a"}, mEmptyFileSystem->getDirs("a"));
+  EXPECT_EQ(QStringList{}, mEmptyFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"a.txt"}, mEmptyFileSystem->getFiles("a"));
+  EXPECT_EQ(QStringList{"b.txt"}, mEmptyFileSystem->getFiles("a/a"));
+}
+
+TEST_F(TransactionalDirectoryTest, testCopyToFromSubdirToRoot) {
+  TransactionalDirectory src(mFileSystem, "a");
+  TransactionalDirectory dst(mEmptyFileSystem, "");
+  src.copyTo(dst);
+  EXPECT_EQ(mFileSystem, src.getFileSystem());
+  EXPECT_EQ("a", src.getPath());
+  EXPECT_EQ(QStringList{"a"}, mFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"a.txt"}, mFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"b"}, mFileSystem->getDirs("a"));
+  EXPECT_EQ(QStringList{"b.txt"}, mFileSystem->getFiles("a"));
+  EXPECT_EQ(QStringList{"b"}, mEmptyFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"b.txt"}, mEmptyFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"c.txt"}, mEmptyFileSystem->getFiles("b"));
+}
+
+TEST_F(TransactionalDirectoryTest, testCopyToFromSubdirToSubdir) {
+  TransactionalDirectory src(mFileSystem, "a");
+  TransactionalDirectory dst(mEmptyFileSystem, "a");
+  src.copyTo(dst);
+  EXPECT_EQ(mFileSystem, src.getFileSystem());
+  EXPECT_EQ("a", src.getPath());
+  EXPECT_EQ(QStringList{"a"}, mFileSystem->getDirs());
+  EXPECT_EQ(QStringList{"a.txt"}, mFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"b"}, mFileSystem->getDirs("a"));
+  EXPECT_EQ(QStringList{"b.txt"}, mFileSystem->getFiles("a"));
+  EXPECT_EQ(QStringList{"a"}, mEmptyFileSystem->getDirs());
+  EXPECT_EQ(QStringList{}, mEmptyFileSystem->getFiles());
+  EXPECT_EQ(QStringList{"b"}, mEmptyFileSystem->getDirs("a"));
+  EXPECT_EQ(QStringList{"b.txt"}, mEmptyFileSystem->getFiles("a"));
+  EXPECT_EQ(QStringList{"c"}, mEmptyFileSystem->getDirs("a/b"));
+  EXPECT_EQ(QStringList{"c.txt"}, mEmptyFileSystem->getFiles("a/b"));
+}
+
+/*******************************************************************************
  *  Test saveTo()
  ******************************************************************************/
 
