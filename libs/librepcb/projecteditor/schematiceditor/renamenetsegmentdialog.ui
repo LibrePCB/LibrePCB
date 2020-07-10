@@ -57,7 +57,7 @@
    <item>
     <widget class="QRadioButton" name="rbtnRenameWholeNet">
      <property name="text">
-      <string extracomment="Number of segments (&gt;=1)">Rename whole net (%1 segments)</string>
+      <string extracomment="Number of segments (&gt;=1)">Rename whole net (%n segment(s))</string>
      </property>
     </widget>
    </item>
