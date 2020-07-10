@@ -148,9 +148,10 @@ public:
   void              removeSymbol(SI_Symbol& symbol);
 
   // NetSegment Methods
-  SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
-  void           addNetSegment(SI_NetSegment& netsegment);
-  void           removeNetSegment(SI_NetSegment& netsegment);
+  QList<SI_NetSegment*> getNetSegments() const noexcept { return mNetSegments; }
+  SI_NetSegment*        getNetSegmentByUuid(const Uuid& uuid) const noexcept;
+  void                  addNetSegment(SI_NetSegment& netsegment);
+  void                  removeNetSegment(SI_NetSegment& netsegment);
 
   // General Methods
   void addToProject();

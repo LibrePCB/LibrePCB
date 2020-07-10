@@ -55,6 +55,8 @@ public:
   CmdComponentInstanceAdd(
       Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
+  CmdComponentInstanceAdd(Circuit&           circuit,
+                          ComponentInstance* component) noexcept;
   ~CmdComponentInstanceAdd() noexcept;
 
   // Getters

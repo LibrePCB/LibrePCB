@@ -214,6 +214,21 @@ void TransactionalFileSystem::removeDirRecursively(const QString& path) {
  *  General Methods
  ******************************************************************************/
 
+void TransactionalFileSystem::loadFromZip(QByteArray content) {
+  QBuffer buffer(&content);
+  QuaZip  zip(&buffer);
+  if (!zip.open(QuaZip::mdUnzip)) {
+    throw RuntimeError(__FILE__, __LINE__, tr("Failed to open ZIP file '%1'."));
+  }
+  QuaZipFile file(&zip);
+  for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
+    file.open(QIODevice::ReadOnly);
+    write(file.getActualFileName(), file.readAll());
+    file.close();
+  }
+  zip.close();
+}
+
 void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
   QuaZip zip(fp.toStr());
   if (!zip.open(QuaZip::mdUnzip)) {
@@ -228,6 +243,26 @@ void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
     file.close();
   }
   zip.close();
+}
+
+QByteArray TransactionalFileSystem::exportToZip() const {
+  FilePath fp = FilePath::getRandomTempPath();
+  QBuffer  buffer;
+  QuaZip   zip(&buffer);
+  if (!zip.open(QuaZip::mdCreate)) {
+    throw RuntimeError(__FILE__, __LINE__, tr("Failed to create ZIP file."));
+  }
+  try {
+    QuaZipFile file(&zip);
+    exportDirToZip(file, fp, "");
+    zip.close();
+  } catch (const Exception& e) {
+    // Remove ZIP file because it is not complete
+    QFile(fp.toStr()).remove();
+    zip.close();
+    throw;
+  }
+  return buffer.buffer();
 }
 
 void TransactionalFileSystem::exportToZip(const FilePath& fp) const {

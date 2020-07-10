@@ -150,7 +150,9 @@ public:
   virtual void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
+  void        loadFromZip(QByteArray content);
   void        loadFromZip(const FilePath& fp);
+  QByteArray  exportToZip() const;
   void        exportToZip(const FilePath& fp) const;
   void        discardChanges() noexcept;
   QStringList checkForModifications() const;
