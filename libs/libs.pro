@@ -25,7 +25,7 @@ librepcb.depends = \
     librepcb.depends += quazip
 }
 
-!contains(UNBUNDLE, quazip) {
+!contains(UNBUNDLE, fontobene-qt5) {
     SUBDIRS += fontobene-qt5
     librepcb.depends += fontobene-qt5
 }
