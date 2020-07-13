@@ -99,7 +99,8 @@ private:
   ProcRetVal       processPositioningSceneEvent(BEE_Base* event) noexcept;
   bool             startPositioning(Board& board, const Point& pos,
                                     BI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool             addNextNetPoint(Board& board, const Point& pos) noexcept;
+  bool             addNextNetPoint(Board& board,
+                                   const Point& cursorPos) noexcept;
   bool             abortPositioning(bool showErrMsgBox) noexcept;
   BI_Via*          findVia(Board& board, const Point& pos,
                            NetSignal* netsignal = nullptr) const noexcept;
@@ -118,6 +119,7 @@ private:
   void        updateNetpointPositions(const Point& cursorPos) noexcept;
   void        layerComboBoxIndexChanged(int index) noexcept;
   void        wireWidthEditValueChanged(const PositiveLength& value) noexcept;
+  void        snapCheckBoxCheckedChanged(bool checked) noexcept;
   void        updateWireModeActionsCheckedState() noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
@@ -127,6 +129,7 @@ private:
   WireMode          mCurrentWireMode;   ///< the current wire mode
   QString           mCurrentLayerName;  ///< the current board layer name
   PositiveLength    mCurrentWidth;      ///< the current wire width
+  bool              mCurrentSnapActive; ///< the current active snap to target
   BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
                                         ///< point of the line)
   BI_NetLine*  mPositioningNetLine1;    ///< line between fixed point and p1
@@ -141,6 +144,8 @@ private:
   QComboBox*                mLayerComboBox;
   QLabel*                   mWidthLabel;
   PositiveLengthEdit*       mWidthEdit;
+  QLabel*                   mSnapLabel;
+  QCheckBox*                mSnapCheckBox;
 };
 
 /*******************************************************************************
