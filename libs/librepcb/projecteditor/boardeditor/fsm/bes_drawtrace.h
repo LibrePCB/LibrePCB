@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "bes_base.h"
 
+#include <librepcb/project/boards/items/bi_via.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -39,7 +41,6 @@ class PositiveLengthEdit;
 namespace project {
 
 class NetSignal;
-class BI_Via;
 class BI_FootprintPad;
 class BI_NetPoint;
 class BI_NetLine;
@@ -99,8 +100,7 @@ private:
   ProcRetVal       processPositioningSceneEvent(BEE_Base* event) noexcept;
   bool             startPositioning(Board& board, const Point& pos,
                                     BI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool             addNextNetPoint(Board& board,
-                                   const Point& cursorPos) noexcept;
+  bool             addNextNetPoint(Board& board) noexcept;
   bool             abortPositioning(bool showErrMsgBox) noexcept;
   BI_Via*          findVia(Board& board, const Point& pos,
                            NetSignal* netsignal = nullptr) const noexcept;
@@ -118,6 +118,9 @@ private:
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
   void        updateNetpointPositions(const Point& cursorPos) noexcept;
   void        layerComboBoxIndexChanged(int index) noexcept;
+  void        updateShapeActionsCheckedState() noexcept;
+  void        sizeEditValueChanged(const PositiveLength& value) noexcept;
+  void        drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void        wireWidthEditValueChanged(const PositiveLength& value) noexcept;
   void        snapCheckBoxCheckedChanged(bool checked) noexcept;
   void        updateWireModeActionsCheckedState() noexcept;
@@ -128,6 +131,12 @@ private:
   SubState          mSubState;          ///< the current substate
   WireMode          mCurrentWireMode;   ///< the current wire mode
   QString           mCurrentLayerName;  ///< the current board layer name
+  bool              mAddVia;            ///< whether a via add is requested
+  BI_Via::Shape     mCurrentViaShape;
+  PositiveLength    mCurrentViaSize;
+  PositiveLength    mCurrentViaDrillDiameter;
+  QString           mViaLayerName;      ///< the name of the layer where the via
+                                        ///< was started
   PositiveLength    mCurrentWidth;      ///< the current wire width
   bool              mCurrentSnapActive; ///< the current active snap to target
   BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
@@ -142,6 +151,11 @@ private:
   QList<QAction*>           mActionSeparators;
   QLabel*                   mLayerLabel;
   QComboBox*                mLayerComboBox;
+  QHash<int, QAction*>      mShapeActions;
+  QLabel*                   mSizeLabel;
+  PositiveLengthEdit*       mSizeEdit;
+  QLabel*                   mDrillLabel;
+  PositiveLengthEdit*       mDrillEdit;
   QLabel*                   mWidthLabel;
   PositiveLengthEdit*       mWidthEdit;
   QLabel*                   mSnapLabel;

@@ -35,6 +35,7 @@
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
+#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
@@ -61,6 +62,11 @@ BES_DrawTrace::BES_DrawTrace(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mSubState(SubState_Idle),
     mCurrentWireMode(WireMode_HV),
     mCurrentLayerName(GraphicsLayer::sTopCopper),
+    mAddVia(false),
+    mCurrentViaShape(BI_Via::Shape::Round),
+    mCurrentViaSize(700000),
+    mCurrentViaDrillDiameter(300000),
+    mViaLayerName(""),
     mCurrentWidth(500000),
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
@@ -71,6 +77,10 @@ BES_DrawTrace::BES_DrawTrace(BoardEditor& editor, Ui::BoardEditor& editorUi,
     // command toolbar actions / widgets:
     mLayerLabel(nullptr),
     mLayerComboBox(nullptr),
+    mSizeLabel(nullptr),
+    mSizeEdit(nullptr),
+    mDrillLabel(nullptr),
+    mDrillEdit(nullptr),
     mWidthLabel(nullptr),
     mWidthEdit(nullptr),
     mSnapLabel(nullptr),
@@ -133,6 +143,31 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
     });
   }
 
+  // add the "Width:" label to the toolbar
+  mWidthLabel = new QLabel(tr("Width:"));
+  mWidthLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mWidthLabel);
+
+  // add the widths combobox to the toolbar
+  mWidthEdit = new PositiveLengthEdit();
+  mWidthEdit->setValue(mCurrentWidth);
+  mEditorUi.commandToolbar->addWidget(mWidthEdit);
+  connect(mWidthEdit, &PositiveLengthEdit::valueChanged, this,
+          &BES_DrawTrace::wireWidthEditValueChanged);
+
+  // add the "Snap:" label to the toolbar
+  mSnapLabel = new QLabel(tr("Snap to Target:"));
+  mSnapLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mSnapLabel);
+
+  // add the snap checkbox to the toolbar
+  mSnapCheckBox = new QCheckBox();
+  mSnapCheckBox->setChecked(mCurrentSnapActive);
+  mEditorUi.commandToolbar->addWidget(mSnapCheckBox);
+  connect(mSnapCheckBox, &QCheckBox::toggled, this,
+          &BES_DrawTrace::snapCheckBoxCheckedChanged);
+  mActionSeparators.append(mEditorUi.commandToolbar->addSeparator());
+
   // add the "Layer:" label to the toolbar
   mLayerLabel = new QLabel(tr("Layer:"));
   mLayerLabel->setIndent(10);
@@ -157,29 +192,53 @@ bool BES_DrawTrace::entry(BEE_Base* event) noexcept {
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &BES_DrawTrace::layerComboBoxIndexChanged);
 
-  // add the "Width:" label to the toolbar
-  mWidthLabel = new QLabel(tr("Width:"));
-  mWidthLabel->setIndent(10);
-  mEditorUi.commandToolbar->addWidget(mWidthLabel);
 
-  // add the widths combobox to the toolbar
-  mWidthEdit = new PositiveLengthEdit();
-  mWidthEdit->setValue(mCurrentWidth);
-  mEditorUi.commandToolbar->addWidget(mWidthEdit);
-  connect(mWidthEdit, &PositiveLengthEdit::valueChanged, this,
-          &BES_DrawTrace::wireWidthEditValueChanged);
+  // Add shape actions to the "command" toolbar
+  mShapeActions.insert(static_cast<int>(BI_Via::Shape::Round),
+                       mEditorUi.commandToolbar->addAction(
+                           QIcon(":/img/command_toolbars/via_round.png"), ""));
+  mShapeActions.insert(static_cast<int>(BI_Via::Shape::Square),
+                       mEditorUi.commandToolbar->addAction(
+                           QIcon(":/img/command_toolbars/via_square.png"), ""));
+  mShapeActions.insert(
+      static_cast<int>(BI_Via::Shape::Octagon),
+      mEditorUi.commandToolbar->addAction(
+          QIcon(":/img/command_toolbars/via_octagon.png"), ""));
+  updateShapeActionsCheckedState();
 
-  // add the "Snap:" label to the toolbar
-  mSnapLabel = new QLabel(tr("Snap to Target:"));
-  mSnapLabel->setIndent(10);
-  mEditorUi.commandToolbar->addWidget(mSnapLabel);
+  // connect the shape actions with the slot updateShapeActionsCheckedState()
+  foreach (int shape, mShapeActions.keys()) {
+    connect(mShapeActions.value(shape), &QAction::triggered, [this, shape]() {
+      mCurrentViaShape = static_cast<BI_Via::Shape>(shape);
+      updateShapeActionsCheckedState();
+    });
+  }
 
-  // add the snap checkbox to the toolbar
-  mSnapCheckBox = new QCheckBox();
-  mSnapCheckBox->setChecked(mCurrentSnapActive);
-  mEditorUi.commandToolbar->addWidget(mSnapCheckBox);
-  connect(mSnapCheckBox, &QCheckBox::toggled, this,
-          &BES_DrawTrace::snapCheckBoxCheckedChanged);
+  // add the "Size:" label to the toolbar
+  mSizeLabel = new QLabel(tr("Size:"));
+  mSizeLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mSizeLabel);
+
+  // add the size combobox to the toolbar
+  mSizeEdit = new PositiveLengthEdit();
+  mSizeEdit->setValue(mCurrentViaSize);
+  mEditorUi.commandToolbar->addWidget(mSizeEdit);
+  connect(mSizeEdit, &PositiveLengthEdit::valueChanged, this,
+          &BES_DrawTrace::sizeEditValueChanged);
+
+  // add the "Drill:" label to the toolbar
+  mDrillLabel = new QLabel(tr("Drill:"));
+  mDrillLabel->setIndent(10);
+  mEditorUi.commandToolbar->addWidget(mDrillLabel);
+
+  // add the drill combobox to the toolbar
+  mDrillEdit = new PositiveLengthEdit();
+  mDrillEdit->setValue(mCurrentViaDrillDiameter);
+  mEditorUi.commandToolbar->addWidget(mDrillEdit);
+  connect(mDrillEdit, &PositiveLengthEdit::valueChanged, this,
+          &BES_DrawTrace::drillDiameterEditValueChanged);
+  mActionSeparators.append(mEditorUi.commandToolbar->addSeparator());
+
   // change the cursor
   mEditorGraphicsView.setCursor(Qt::CrossCursor);
 
@@ -201,6 +260,16 @@ bool BES_DrawTrace::exit(BEE_Base* event) noexcept {
   mLayerComboBox = nullptr;
   delete mLayerLabel;
   mLayerLabel = nullptr;
+  delete mDrillEdit;
+  mDrillEdit = nullptr;
+  delete mDrillLabel;
+  mDrillLabel = nullptr;
+  delete mSizeEdit;
+  mSizeEdit = nullptr;
+  delete mSizeLabel;
+  mSizeLabel = nullptr;
+  qDeleteAll(mShapeActions);
+  mShapeActions.clear();
   delete mSnapLabel;
   mSnapLabel = nullptr;
   delete mSnapCheckBox;
@@ -292,7 +361,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(
       switch (sceneEvent->button()) {
         case Qt::LeftButton:
           // fix the current point and add a new point + line
-          addNextNetPoint(*board, Point::fromPx(sceneEvent->scenePos()));
+          addNextNetPoint(*board);
           return ForceStayInState;
         case Qt::RightButton:
           return ForceStayInState;
@@ -348,6 +417,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     Q_ASSERT(mSubState == SubState_Idle);
     mUndoStack.beginCmdGroup(tr("Draw Board Trace"));
     mSubState = SubState_PositioningNetPoint;
+    mAddVia = false;
 
     // get layer
     GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
@@ -417,6 +487,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     }
 
     // add netpoint if none found
+    //TODO(keune): Check if this could be even possible
     Q_ASSERT(netsegment);
     CmdBoardNetSegmentAddElements* cmd =
         new CmdBoardNetSegmentAddElements(*netsegment);
@@ -470,8 +541,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
   }
 }
 
-bool BES_DrawTrace::addNextNetPoint(Board& board,
-                                    const Point& cursorPos) noexcept {
+bool BES_DrawTrace::addNextNetPoint(Board& board) noexcept {
   Q_ASSERT(mSubState == SubState_PositioningNetPoint);
 
   // abort if p2 == p0 (no line drawn)
@@ -498,10 +568,15 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
       } else if (BI_Via* via = findVia(board, posTarget, netsignal)) {
         otherAnchor     = via;
         otherNetSegment = &via->getNetSegment();
+        if (mAddVia) {
+          mCurrentLayerName = mViaLayerName;
+        }
       } else if (BI_FootprintPad* pad = findPad(board, posTarget, layer,
                                                 netsignal)) {
         otherAnchor     = pad;
         otherNetSegment = pad->getNetSegmentOfLines();
+        //TODO(keune): when ending on a THT pad, should we continue if mAddVia
+        // is set?
       } else if (BI_NetLine* netline = findNetLine(
                      board, posTarget, layer, netsignal,
                      {mPositioningNetLine1, mPositioningNetLine2})) {
@@ -519,6 +594,20 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
             new CmdBoardNetSegmentRemoveElements(*otherNetSegment));
         cmdRemove->removeNetLine(*netline);
         mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+      } else if (mAddVia) {
+          CmdBoardNetSegmentAdd* cmdAddSeg =
+                new CmdBoardNetSegmentAdd(board, *netsignal);
+          mUndoStack.appendToCmdGroup(cmdAddSeg);
+          otherNetSegment = cmdAddSeg->getNetSegment();
+          Q_ASSERT(otherNetSegment);
+          CmdBoardNetSegmentAddElements* cmdAddVia =
+                new CmdBoardNetSegmentAddElements(*otherNetSegment);
+          otherAnchor = cmdAddVia->addVia(posTarget, mCurrentViaShape,
+                                          mCurrentViaSize,
+                                          mCurrentViaDrillDiameter);
+          Q_ASSERT(otherAnchor);
+          mUndoStack.appendToCmdGroup(cmdAddVia);
+          mCurrentLayerName = mViaLayerName;
       }
 
       if ((!mCurrentSnapActive) && otherAnchor) {
@@ -576,7 +665,11 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
               mPositioningNetPoint2->getNetSegment(), *mPositioningNetPoint2,
               *otherNetSegment, *otherAnchor));  // can throw
         }
-        finishCommand = true;
+        if (mAddVia) {
+          finishCommand = false;
+        } else {
+          finishCommand = true;
+        }
       } else {
         finishCommand = false;
       }
@@ -596,7 +689,11 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
         abortPositioning(true);
         return false;
       } else {
-        return startPositioning(board, posTarget, mPositioningNetPoint2);
+        if (mAddVia) {
+          return startPositioning(board, posTarget);
+        } else {
+          return startPositioning(board, posTarget, mPositioningNetPoint2);
+        }
       }
     } catch (const Exception& e) {
       QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
@@ -614,6 +711,7 @@ bool BES_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
     mPositioningNetLine2  = nullptr;
     mPositioningNetPoint1 = nullptr;
     mPositioningNetPoint2 = nullptr;
+    mAddVia = false;
     if (mSubState != SubState_Idle) {
       mUndoStack.abortCmdGroup();  // can throw
     }
@@ -706,6 +804,7 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept {
   mPositioningNetPoint1->setPosition(calcMiddlePointPos(
       mFixedStartAnchor->getPosition(), posOnGrid, mCurrentWireMode));
   mPositioningNetPoint2->setPosition(posOnGrid);
+  // TODO(keune): when mAddVia active, display something
 
   // Force updating airwires immediately as they are important for creating
   // traces.
@@ -713,8 +812,35 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept {
 }
 
 void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
-  mCurrentLayerName = mLayerComboBox->itemData(index).toString();
-  // TODO: add a via to change the layer of the current netline?
+  QString newLayerName = mLayerComboBox->itemData(index).toString();
+  if (mSubState == SubState_PositioningNetPoint &&
+      newLayerName != mCurrentLayerName) {
+    mAddVia = true;
+    mViaLayerName = newLayerName;
+  }
+  else
+  {
+    mAddVia = false;
+    mCurrentLayerName = newLayerName;
+  }
+}
+
+void BES_DrawTrace::updateShapeActionsCheckedState() noexcept {
+  foreach (int key, mShapeActions.keys()) {
+    mShapeActions.value(key)->setCheckable(key ==
+                                           static_cast<int>(mCurrentViaShape));
+    mShapeActions.value(key)->setChecked(key ==
+                                         static_cast<int>(mCurrentViaShape));
+  }
+}
+
+void BES_DrawTrace::sizeEditValueChanged(const PositiveLength& value) noexcept {
+  mCurrentViaSize = value;
+}
+
+void BES_DrawTrace::drillDiameterEditValueChanged(
+    const PositiveLength& value) noexcept {
+  mCurrentViaDrillDiameter = value;
 }
 
 void BES_DrawTrace::wireWidthEditValueChanged(
