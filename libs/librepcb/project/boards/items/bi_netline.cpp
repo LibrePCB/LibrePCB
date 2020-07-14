@@ -180,6 +180,16 @@ BI_NetLineAnchor* BI_NetLine::getOtherPoint(
   }
 }
 
+Point BI_NetLine::getClosestPoint(const Point& pos) const noexcept {
+  Point origin = mStartPoint->getPosition();
+  Point direction = mEndPoint->getPosition() - origin;
+  Point lhs = pos - origin;
+  Length dotP = Point::dotProduct(lhs, direction);
+  qreal factor = dotP.toPx() / Point::dotProduct(direction, direction).toPx();
+  Point result = origin + direction * factor;
+  return result;
+}
+
 NetSignal& BI_NetLine::getNetSignalOfNetSegment() const noexcept {
   return getNetSegment().getNetSignal();
 }

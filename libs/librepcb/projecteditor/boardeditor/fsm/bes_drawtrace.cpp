@@ -388,7 +388,13 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
       layer      = &netline->getLayer();
       QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
           new CmdBoardNetSegmentAddElements(*netsegment));
-      mFixedStartAnchor = cmdAdd->addNetPoint(posOnGrid);
+      // get closest point on the netline
+      Point posOnNetline = netline->getClosestPoint(pos);
+      if (findNetLine(board, posOnGrid) == netline) {
+        // Only use the position mapped to the grid, when it lays on the netline
+        posOnNetline = netline->getClosestPoint(posOnGrid);
+      }
+      mFixedStartAnchor = cmdAdd->addNetPoint(posOnNetline);
       cmdAdd->addNetLine(*mFixedStartAnchor, netline->getStartPoint(),
                          netline->getLayer(), netline->getWidth());
       cmdAdd->addNetLine(*mFixedStartAnchor, netline->getEndPoint(),
@@ -468,44 +474,42 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
                                     const Point& cursorPos) noexcept {
   Q_ASSERT(mSubState == SubState_PositioningNetPoint);
 
-  Point posOnGrid = cursorPos.mappedToGrid(
-        board.getGridProperties().getInterval());
-
   // abort if p2 == p0 (no line drawn)
-  if (posOnGrid == mFixedStartAnchor->getPosition()) {
+  if (mPositioningNetLine2->getPosition() == mFixedStartAnchor->getPosition()) {
     abortPositioning(true);
     return false;
   } else {
+    // All the positioning is done by updateNetPoints already
     bool finishCommand = false;
+    Point posTarget = mPositioningNetPoint2->getPosition();
 
     try {
-      // find anchor under cursor for pads and vias use the actual cursorPos,
-      // otherwise posOnGrid
+      // find anchor under cursor use the target position as already determined
       NetSignal* netsignal = &mPositioningNetPoint2->getNetSignalOfNetSegment();
       GraphicsLayer* layer = mPositioningNetPoint2->getLayerOfLines();
       Q_ASSERT(layer);
       BI_NetLineAnchor* otherAnchor     = nullptr;
       BI_NetSegment*    otherNetSegment = nullptr;
       if (BI_NetPoint* netpoint =
-              findNetPoint(board, posOnGrid, layer, netsignal,
+              findNetPoint(board, posTarget, layer, netsignal,
                            {mPositioningNetPoint1, mPositioningNetPoint2})) {
         otherAnchor     = netpoint;
         otherNetSegment = &netpoint->getNetSegment();
-      } else if (BI_Via* via = findVia(board, cursorPos, netsignal)) {
+      } else if (BI_Via* via = findVia(board, posTarget, netsignal)) {
         otherAnchor     = via;
         otherNetSegment = &via->getNetSegment();
-      } else if (BI_FootprintPad* pad = findPad(board, cursorPos, layer,
+      } else if (BI_FootprintPad* pad = findPad(board, posTarget, layer,
                                                 netsignal)) {
         otherAnchor     = pad;
         otherNetSegment = pad->getNetSegmentOfLines();
       } else if (BI_NetLine* netline = findNetLine(
-                     board, posOnGrid, layer, netsignal,
+                     board, posTarget, layer, netsignal,
                      {mPositioningNetLine1, mPositioningNetLine2})) {
         // split netline
         otherNetSegment = &netline->getNetSegment();
         QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
             new CmdBoardNetSegmentAddElements(*otherNetSegment));
-        otherAnchor = cmdAdd->addNetPoint(posOnGrid);
+        otherAnchor = cmdAdd->addNetPoint(posTarget);
         cmdAdd->addNetLine(*otherAnchor, netline->getStartPoint(),
                            netline->getLayer(), netline->getWidth());
         cmdAdd->addNetLine(*otherAnchor, netline->getEndPoint(),
@@ -520,7 +524,8 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
       if ((!mCurrentSnapActive) && otherAnchor) {
         // only snap to otherAnchor, when close to its center
         //TODO(keune): This does not work for anchors which are not aligned
-        if (posOnGrid != otherAnchor->getPosition()) {
+        // with the grid
+        if (posTarget != otherAnchor->getPosition()) {
           otherAnchor = nullptr;
           otherNetSegment = nullptr;
         }
@@ -528,8 +533,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
 
       // remove p1 if p1 == p0 || p1 == p2
       Point middlePos = mPositioningNetPoint1->getPosition();
-      Point endPos    = otherAnchor ? otherAnchor->getPosition()
-                                 : mPositioningNetPoint2->getPosition();
+      Point endPos    = otherAnchor ? otherAnchor->getPosition() : posTarget;
       if ((middlePos == mFixedStartAnchor->getPosition()) ||
           (middlePos == endPos)) {
         QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
@@ -592,7 +596,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board,
         abortPositioning(true);
         return false;
       } else {
-        return startPositioning(board, posOnGrid, mPositioningNetPoint2);
+        return startPositioning(board, posTarget, mPositioningNetPoint2);
       }
     } catch (const Exception& e) {
       QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
@@ -676,7 +680,7 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept {
     GraphicsLayer* layer = mPositioningNetPoint2->getLayerOfLines();
     Q_ASSERT(layer);
     if (BI_NetPoint* netpoint = findNetPoint(
-          board, posOnGrid, layer, netsignal,
+          board, cursorPos, layer, netsignal,
           {mPositioningNetPoint1, mPositioningNetPoint2})) {
       posOnGrid = netpoint->getPosition();
     } else if (BI_Via* via = findVia(board, cursorPos, netsignal)) {
@@ -684,13 +688,19 @@ void BES_DrawTrace::updateNetpointPositions(const Point& cursorPos) noexcept {
     } else if (BI_FootprintPad* pad = findPad(board, cursorPos, layer,
                                               netsignal)) {
       posOnGrid = pad->getPosition();
+    } else if (BI_NetLine* netline = findNetLine(
+                 board, cursorPos, layer, netsignal,
+                 {mPositioningNetLine1, mPositioningNetLine2})) {
+      if (findNetLine(board, posOnGrid, layer, netsignal,
+      {mPositioningNetLine1, mPositioningNetLine2}) == netline)
+      {
+        posOnGrid = netline->getClosestPoint(posOnGrid);
+      } else {
+        posOnGrid = netline->getClosestPoint(cursorPos);
+      }
     }
-    // TODO(keune): find a connecting netline
-    //else if (BI_NetLine* netline = findNetLine(
-      //           board, cursorPos, layer, netsignal,
-      //           {mPositioningNetLine1, mPositioningNetLine2})) {
-      //pos = ???
-    //}
+  } else {
+    //TODO(keune): Do snapping, when close to unaligned pads, vias, ...
   }
 
   mPositioningNetPoint1->setPosition(calcMiddlePointPos(
@@ -729,6 +739,8 @@ void BES_DrawTrace::snapCheckBoxCheckedChanged(bool checked) noexcept {
 Point BES_DrawTrace::calcMiddlePointPos(const Point& p1, const Point p2,
                                         WireMode mode) const noexcept {
   Point delta = p2 - p1;
+  qreal xPositive = delta.getX() >= 0 ? 1 : -1;
+  qreal yPositive = delta.getY() >= 0 ? 1 : -1;
   switch (mode) {
     case WireMode_HV:
       return Point(p2.getX(), p1.getY());
@@ -736,20 +748,14 @@ Point BES_DrawTrace::calcMiddlePointPos(const Point& p1, const Point p2,
       return Point(p1.getX(), p2.getY());
     case WireMode_9045:
       if (delta.getX().abs() >= delta.getY().abs())
-        return Point(
-            p2.getX() - delta.getY().abs() * (delta.getX() >= 0 ? 1 : -1),
-            p1.getY());
+        return Point(p2.getX() - delta.getY().abs() * xPositive, p1.getY());
       else
-        return Point(p1.getX(), p2.getY() - delta.getX().abs() *
-                                                (delta.getY() >= 0 ? 1 : -1));
+        return Point(p1.getX(), p2.getY() - delta.getX().abs() * yPositive);
     case WireMode_4590:
       if (delta.getX().abs() >= delta.getY().abs())
-        return Point(
-            p1.getX() + delta.getY().abs() * (delta.getX() >= 0 ? 1 : -1),
-            p2.getY());
+        return Point(p1.getX() + delta.getY().abs() * xPositive, p2.getY());
       else
-        return Point(p2.getX(), p1.getY() + delta.getX().abs() *
-                                                (delta.getY() >= 0 ? 1 : -1));
+        return Point(p2.getX(), p1.getY() + delta.getX().abs() * yPositive);
     case WireMode_Straight:
       return p1;
     default:

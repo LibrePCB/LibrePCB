@@ -434,12 +434,32 @@ public:
     mY *= rhs;
     return *this;
   }
+  Point& operator*=(int rhs) {
+    mX *= rhs;
+    mY *= rhs;
+    return *this;
+  }
+  Point& operator*=(qreal rhs) {
+    mX *= rhs;
+    mY *= rhs;
+    return *this;
+  }
   Point& operator/=(const Point& rhs) {
     mX /= rhs.mX;
     mY /= rhs.mY;
     return *this;
   }
   Point& operator/=(LengthBase_t rhs) {
+    mX /= rhs;
+    mY /= rhs;
+    return *this;
+  }
+  Point& operator/=(int rhs) {
+    mX /= rhs;
+    mY /= rhs;
+    return *this;
+  }
+  Point& operator/=(qreal rhs) {
     mX /= rhs;
     mY /= rhs;
     return *this;
@@ -453,14 +473,22 @@ public:
   }
   Point operator*(const Length& rhs) const { return Point(mX * rhs, mY * rhs); }
   Point operator*(LengthBase_t rhs) const { return Point(mX * rhs, mY * rhs); }
+  Point operator*(int rhs) const { return Point(mX * rhs, mY * rhs); }
+  Point operator*(qreal rhs) const { return Point(mX * rhs, mY * rhs); }
   Point operator/(const Length& rhs) const { return Point(mX / rhs, mY / rhs); }
   Point operator/(LengthBase_t rhs) const { return Point(mX / rhs, mY / rhs); }
+  Point operator/(int rhs) const { return Point(mX / rhs, mY / rhs); }
+  Point operator/(qreal rhs) const { return Point(mX / rhs, mY / rhs); }
   Point operator%(const Length& rhs) const { return Point(mX % rhs, mY % rhs); }
   bool  operator==(const Point& rhs) const {
     return (mX == rhs.mX) && (mY == rhs.mY);
   }
   bool operator!=(const Point& rhs) const {
     return (mX != rhs.mX) || (mY != rhs.mY);
+  }
+
+  static Length dotProduct(Point& A, Point& B) {
+    return A.getX() * B.getX() + A.getY() * B.getY();
   }
 
   //@{
