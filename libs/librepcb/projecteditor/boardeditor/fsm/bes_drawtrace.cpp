@@ -447,10 +447,8 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
       mFixedStartAnchor = pad;
       netsegment        = pad->getNetSegmentOfLines();
       netsignal         = pad->getCompSigInstNetSignal();
-      GraphicsLayer* padLayer =
-          board.getLayerStack().getLayer(pad->getLayerName());
-      if (padLayer && padLayer->isCopperLayer()) {  // it's not a THT pad
-        layer = padLayer;
+      if (!pad->isTHT()) {
+        layer = board.getLayerStack().getLayer(pad->getLayerName());
       }
     } else if (BI_NetLine* netline = findNetLine(board, pos)) {
       // split netline
@@ -544,6 +542,9 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
 bool BES_DrawTrace::addNextNetPoint(Board& board) noexcept {
   Q_ASSERT(mSubState == SubState_PositioningNetPoint);
 
+  //TODO(keune): Don't abort, when trying to add a via and selecting the start
+  // of the positioning
+
   // abort if p2 == p0 (no line drawn)
   if (mPositioningNetLine2->getPosition() == mFixedStartAnchor->getPosition()) {
     abortPositioning(true);
@@ -575,8 +576,9 @@ bool BES_DrawTrace::addNextNetPoint(Board& board) noexcept {
                                                 netsignal)) {
         otherAnchor     = pad;
         otherNetSegment = pad->getNetSegmentOfLines();
-        //TODO(keune): when ending on a THT pad, should we continue if mAddVia
-        // is set?
+        if (mAddVia && pad->isTHT()) {
+          mCurrentLayerName = mViaLayerName;
+        }
       } else if (BI_NetLine* netline = findNetLine(
                      board, posTarget, layer, netsignal,
                      {mPositioningNetLine1, mPositioningNetLine2})) {
@@ -815,8 +817,19 @@ void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
   QString newLayerName = mLayerComboBox->itemData(index).toString();
   if (mSubState == SubState_PositioningNetPoint &&
       newLayerName != mCurrentLayerName) {
-    mAddVia = true;
-    mViaLayerName = newLayerName;
+    Board& board = mPositioningNetPoint2->getBoard();
+    Point startPos = mFixedStartAnchor->getPosition();
+    NetSignal* netsignal = &mPositioningNetPoint2->getNetSignalOfNetSegment();
+    BI_FootprintPad* padAtStart = findPad(board, startPos, nullptr, netsignal);
+    if (findVia(board, startPos, netsignal) ||
+        (padAtStart && padAtStart->isTHT())) {
+      abortPositioning(false);
+      mCurrentLayerName = newLayerName;
+      startPositioning(board, startPos);
+    } else {
+      mAddVia = true;
+      mViaLayerName = newLayerName;
+    }
   }
   else
   {

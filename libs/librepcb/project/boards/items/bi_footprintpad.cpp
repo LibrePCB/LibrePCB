@@ -27,6 +27,7 @@
 #include "../../circuit/netsignal.h"
 #include "bi_device.h"
 #include "bi_footprint.h"
+#include "../boardlayerstack.h"
 
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/library/dev/device.h>
@@ -116,6 +117,12 @@ bool BI_FootprintPad::isOnLayer(const QString& layerName) const noexcept {
   } else {
     return mFootprintPad->isOnLayer(layerName);
   }
+}
+
+bool BI_FootprintPad::isTHT() const noexcept {
+  GraphicsLayer* padLayer =
+      mBoard.getLayerStack().getLayer(getLayerName());
+  return (padLayer && !padLayer->isCopperLayer());
 }
 
 NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept {
