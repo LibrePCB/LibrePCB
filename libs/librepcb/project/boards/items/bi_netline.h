@@ -95,7 +95,6 @@ public:
   BI_NetLineAnchor&     getEndPoint() const noexcept { return *mEndPoint; }
   BI_NetLineAnchor*     getOtherPoint(const BI_NetLineAnchor& firstPoint) const
       noexcept;
-  Point                 getClosestPoint(const Point& pos) const noexcept;
   NetSignal& getNetSignalOfNetSegment() const noexcept;
   bool       isSelectable() const noexcept override;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;

@@ -103,7 +103,8 @@ private:
   bool             addNextNetPoint(Board& board) noexcept;
   bool             abortPositioning(bool showErrMsgBox) noexcept;
   BI_Via*          findVia(Board& board, const Point& pos,
-                           NetSignal* netsignal = nullptr) const noexcept;
+                           NetSignal* netsignal = nullptr,
+                           const QSet<BI_Via*>& except = {}) const noexcept;
   BI_FootprintPad* findPad(Board& board, const Point& pos,
                            GraphicsLayer* layer     = nullptr,
                            NetSignal*     netsignal = nullptr) const noexcept;
@@ -118,6 +119,7 @@ private:
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
   void        updateNetpointPositions(const Point& cursorPos) noexcept;
   void        layerComboBoxIndexChanged(int index) noexcept;
+  void        showVia(bool isVisible) noexcept;
   void        updateShapeActionsCheckedState() noexcept;
   void        sizeEditValueChanged(const PositiveLength& value) noexcept;
   void        drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
@@ -132,6 +134,7 @@ private:
   WireMode          mCurrentWireMode;   ///< the current wire mode
   QString           mCurrentLayerName;  ///< the current board layer name
   bool              mAddVia;            ///< whether a via add is requested
+  BI_Via*           mTempVia;
   BI_Via::Shape     mCurrentViaShape;
   PositiveLength    mCurrentViaSize;
   PositiveLength    mCurrentViaDrillDiameter;
@@ -158,8 +161,6 @@ private:
   PositiveLengthEdit*       mDrillEdit;
   QLabel*                   mWidthLabel;
   PositiveLengthEdit*       mWidthEdit;
-  QLabel*                   mSnapLabel;
-  QCheckBox*                mSnapCheckBox;
 };
 
 /*******************************************************************************

@@ -493,27 +493,11 @@ public:
     mNanometers *= rhs;
     return *this;
   }
-  Length& operator*=(int rhs) {
-    mNanometers *= rhs;
-    return *this;
-  }
-  Length& operator*=(qreal rhs) {
-    mNanometers *= rhs;
-    return *this;
-  }
   Length& operator/=(const Length& rhs) {
     mNanometers /= rhs.mNanometers;
     return *this;
   }
   Length& operator/=(LengthBase_t rhs) {
-    mNanometers /= rhs;
-    return *this;
-  }
-  Length& operator/=(int rhs) {
-    mNanometers /= rhs;
-    return *this;
-  }
-  Length& operator/=(qreal rhs) {
     mNanometers /= rhs;
     return *this;
   }
@@ -528,14 +512,10 @@ public:
     return Length(mNanometers * rhs.mNanometers);
   }
   Length operator*(LengthBase_t rhs) const { return Length(mNanometers * rhs); }
-  Length operator*(int rhs) const { return Length(mNanometers * rhs); }
-  Length operator*(qreal rhs) const { return Length(mNanometers * rhs); }
   Length operator/(const Length& rhs) const {
     return Length(mNanometers / rhs.mNanometers);
   }
   Length operator/(LengthBase_t rhs) const { return Length(mNanometers / rhs); }
-  Length operator/(int rhs) const { return Length(mNanometers / rhs); }
-  Length operator/(qreal rhs) const { return Length(mNanometers / rhs); }
   Length operator%(const Length& rhs) const {
     return Length(mNanometers % rhs.mNanometers);
   }

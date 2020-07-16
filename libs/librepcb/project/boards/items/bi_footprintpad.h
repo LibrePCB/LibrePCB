@@ -70,7 +70,6 @@ public:
   BI_Footprint& getFootprint() const noexcept { return mFootprint; }
   QString       getLayerName() const noexcept;
   bool          isOnLayer(const QString& layerName) const noexcept;
-  bool          isTHT() const noexcept;
   const library::FootprintPad& getLibPad() const noexcept {
     return *mFootprintPad;
   }

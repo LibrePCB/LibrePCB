@@ -119,12 +119,6 @@ bool BI_FootprintPad::isOnLayer(const QString& layerName) const noexcept {
   }
 }
 
-bool BI_FootprintPad::isTHT() const noexcept {
-  GraphicsLayer* padLayer =
-      mBoard.getLayerStack().getLayer(getLayerName());
-  return (padLayer && !padLayer->isCopperLayer());
-}
-
 NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept {
   if (mComponentSignalInstance) {
     return mComponentSignalInstance->getNetSignal();
