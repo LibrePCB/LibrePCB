@@ -438,7 +438,8 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(
             if (mCurrentWireMode == WireMode_COUNT)
               mCurrentWireMode = static_cast<WireMode>(0);
             updateWireModeActionsCheckedState();
-            updateNetpointPositions(Point::fromPx(sceneEvent->scenePos()));
+            mCursorPos = Point::fromPx(sceneEvent->scenePos());
+            updateNetpointPositions();
             return ForceStayInState;
           }
           break;
@@ -463,6 +464,7 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(
       switch (keyEvent->key()) {
         case Qt::Key_Shift:
           mCurrentSnapActive = false;
+          updateNetpointPositions();
           return ForceStayInState;
         default:
           break;
