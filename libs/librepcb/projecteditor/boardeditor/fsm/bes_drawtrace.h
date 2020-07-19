@@ -148,8 +148,6 @@ private:
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_FootprintPad which are on that
    * layer
-   * @param except A QSet of BI_FootprintPad that should be excluded when
-   * looking at the target position.
    * @return A single BI_FootprintPad, if any. at the target position.
    */
   BI_FootprintPad* findPad(Board& board, const Point& pos,
