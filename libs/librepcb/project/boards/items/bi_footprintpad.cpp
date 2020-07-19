@@ -27,7 +27,6 @@
 #include "../../circuit/netsignal.h"
 #include "bi_device.h"
 #include "bi_footprint.h"
-#include "../boardlayerstack.h"
 
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/library/dev/device.h>

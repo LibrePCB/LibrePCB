@@ -463,10 +463,6 @@ public:
     return (mX != rhs.mX) || (mY != rhs.mY);
   }
 
-  static Length dotProduct(Point& A, Point& B) {
-    return A.getX() * B.getX() + A.getY() * B.getY();
-  }
-
   //@{
   /**
    * @brief Less/Greater comparison operator overloadings

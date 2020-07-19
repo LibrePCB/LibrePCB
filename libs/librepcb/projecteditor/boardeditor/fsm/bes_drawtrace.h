@@ -117,14 +117,14 @@ private:
                           GraphicsLayer*           layer     = nullptr,
                           NetSignal*               netsignal = nullptr,
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
-  void        updateNetpointPositions(const Point& cursorPos) noexcept;
+  void        updateNetpointPositions() noexcept;
   void        layerComboBoxIndexChanged(int index) noexcept;
   void        showVia(bool isVisible) noexcept;
   void        updateShapeActionsCheckedState() noexcept;
   void        sizeEditValueChanged(const PositiveLength& value) noexcept;
   void        drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void        wireWidthEditValueChanged(const PositiveLength& value) noexcept;
-  void        snapCheckBoxCheckedChanged(bool checked) noexcept;
+  void        wireAutoWidthEditToggled(const bool checked) noexcept;
   void        updateWireModeActionsCheckedState() noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
@@ -140,10 +140,15 @@ private:
   PositiveLength    mCurrentViaDrillDiameter;
   QString           mViaLayerName;      ///< the name of the layer where the via
                                         ///< was started
+  Point             mTargetPos;
+  Point             mCursorPos;
   PositiveLength    mCurrentWidth;      ///< the current wire width
+  bool              mCurrentAutoWidth;  ///< automatically adjust wire width
   bool              mCurrentSnapActive; ///< the current active snap to target
   BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
                                         ///< point of the line)
+  BI_NetSegment*    mCurrentNetSegment;
+  NetSignal*        mCurrentNetSignal;
   BI_NetLine*  mPositioningNetLine1;    ///< line between fixed point and p1
   BI_NetPoint* mPositioningNetPoint1;   ///< the first netpoint to place
   BI_NetLine*  mPositioningNetLine2;    ///< line between p1 and p2
@@ -161,6 +166,7 @@ private:
   PositiveLengthEdit*       mDrillEdit;
   QLabel*                   mWidthLabel;
   PositiveLengthEdit*       mWidthEdit;
+  QCheckBox*                mAutoWidthEdit;
 };
 
 /*******************************************************************************

@@ -112,8 +112,12 @@ void BI_NetPoint::setPosition(const Point& position) noexcept {
  ******************************************************************************/
 
 void BI_NetPoint::addToBoard() {
-  if (isAddedToBoard() || isUsed()) {
-    throw LogicError(__FILE__, __LINE__);
+  if (isAddedToBoard()) {
+    throw LogicError(__FILE__, __LINE__,
+                     tr("NetPoint is currently already added to the board."));
+  } else if (isUsed()) {
+    throw LogicError(__FILE__, __LINE__,
+                     tr("NetPoint is currently in use."));
   }
   mHighlightChangedConnection =
       connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
@@ -124,8 +128,12 @@ void BI_NetPoint::addToBoard() {
 }
 
 void BI_NetPoint::removeFromBoard() {
-  if ((!isAddedToBoard()) || isUsed()) {
-    throw LogicError(__FILE__, __LINE__);
+  if (!isAddedToBoard()) {
+    throw LogicError(__FILE__, __LINE__,
+                     tr("NetPoint is currently not added to the board."));
+  } else if (isUsed()) {
+    throw LogicError(__FILE__, __LINE__,
+                     tr("NetPoint is currently in use."));
   }
   disconnect(mHighlightChangedConnection);
   mErcMsgDeadNetPoint->setVisible(false);
