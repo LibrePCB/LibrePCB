@@ -148,6 +148,8 @@ private:
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_FootprintPad which are on that
    * layer
+   * @param netsignal When specified only look for BI_FootprintPad which are
+   * part of that signal
    * @return A single BI_FootprintPad, if any. at the target position.
    */
   BI_FootprintPad* findPad(Board& board, const Point& pos,
