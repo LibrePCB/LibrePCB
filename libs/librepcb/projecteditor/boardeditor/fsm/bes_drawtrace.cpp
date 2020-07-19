@@ -794,7 +794,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board) noexcept {
       // abort or start a new command
       if (finishCommand) {
         abortPositioning(true);
-        return false;
+        return true;
       } else {
         return startPositioning(board, mTargetPos);
       }
@@ -879,6 +879,10 @@ BI_NetLine* BES_DrawTrace::findNetLine(Board& board, const Point& pos,
 }
 
 void BES_DrawTrace::updateNetpointPositions() noexcept {
+  if (mSubState != SubState_PositioningNetPoint) {
+    return;
+  }
+
   Board& board = mPositioningNetPoint1->getBoard();
   mTargetPos = mCursorPos.mappedToGrid(board.getGridProperties().getInterval());
   bool isOnVia = false;
@@ -926,6 +930,10 @@ void BES_DrawTrace::updateNetpointPositions() noexcept {
   if (mAddVia) {
     showVia(!isOnVia);
   }
+
+  // Update the trace width
+  mPositioningNetLine1->setWidth(mCurrentWidth);
+  mPositioningNetLine2->setWidth(mCurrentWidth);
 
   // Force updating airwires immediately as they are important for creating
   // traces.
@@ -1017,23 +1025,25 @@ void BES_DrawTrace::updateShapeActionsCheckedState() noexcept {
     mShapeActions.value(key)->setChecked(key ==
                                          static_cast<int>(mCurrentViaShape));
   }
+  updateNetpointPositions();
 }
 
 void BES_DrawTrace::sizeEditValueChanged(const PositiveLength& value) noexcept {
   mCurrentViaSize = value;
+  updateNetpointPositions();
 }
 
 void BES_DrawTrace::drillDiameterEditValueChanged(
     const PositiveLength& value) noexcept {
   mCurrentViaDrillDiameter = value;
+  updateNetpointPositions();
 }
 
 void BES_DrawTrace::wireWidthEditValueChanged(
     const PositiveLength& value) noexcept {
   mCurrentWidth = value;
   if (mSubState != SubState::SubState_PositioningNetPoint) return;
-  if (mPositioningNetLine1) mPositioningNetLine1->setWidth(mCurrentWidth);
-  if (mPositioningNetLine2) mPositioningNetLine2->setWidth(mCurrentWidth);
+  updateNetpointPositions();
 }
 
 void BES_DrawTrace::updateWireModeActionsCheckedState() noexcept {
@@ -1041,6 +1051,7 @@ void BES_DrawTrace::updateWireModeActionsCheckedState() noexcept {
     mWireModeActions.value(key)->setCheckable(key == mCurrentWireMode);
     mWireModeActions.value(key)->setChecked(key == mCurrentWireMode);
   }
+  updateNetpointPositions();
 }
 
 void BES_DrawTrace::wireAutoWidthEditToggled(const bool checked) noexcept {

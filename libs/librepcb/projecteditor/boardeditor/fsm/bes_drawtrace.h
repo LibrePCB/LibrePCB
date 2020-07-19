@@ -98,34 +98,138 @@ private:
   ProcRetVal       processSubStatePositioning(BEE_Base* event) noexcept;
   ProcRetVal       processIdleSceneEvent(BEE_Base* event) noexcept;
   ProcRetVal       processPositioningSceneEvent(BEE_Base* event) noexcept;
+
+  /**
+  * @brief startPositioning begins the drawing of the next BI_NetLine
+  *
+  * @param board On which board the new traces are drawn.
+  * @param pos The position, where the tracing should begin. If necessary a new
+  * BI_NetPoint is created.
+  * @param fixedPoint the BI_NetPoint used as the start anchor, when beginning a
+  * new trace
+  * @return True, when the tracing is successfully started.
+  */
   bool             startPositioning(Board& board, const Point& pos,
                                     BI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool             addNextNetPoint(Board& board) noexcept;
-  bool             abortPositioning(bool showErrMsgBox) noexcept;
-  BI_Via*          findVia(Board& board, const Point& pos,
-                           NetSignal* netsignal = nullptr,
-                           const QSet<BI_Via*>& except = {}) const noexcept;
+
+  /**
+   * @brief addNextNetPoint Finalize the BI_NetLines and connect them to other
+   * existing traces if necessary.
+   * @param board On which board the drawing is finalized.
+   * @return True, when the trace is succesfully drawn. When the trace is
+   * continued, return the result of startPositioning(). False when canceled or an
+   * error occured
+   */
+  bool addNextNetPoint(Board& board) noexcept;
+
+  /**
+   * @brief abortPositioning Abort or cancel the current drawing of the trace.
+   * @param showErrMsgBox When true, show an error message in a pop-up box.
+   */
+  bool abortPositioning(bool showErrMsgBox) noexcept;
+
+  /**
+   * @brief findVia Find a BI_Via at the given position on the board.
+   * @param board The board on which to look.
+   * @param pos The position at which to look.
+   * @param netsignal When specified only look for BI_Via which are part of that
+   * signal
+   * @param except A QSet of BI_Via that should be excluded when looking at the
+   * target position.
+   * @return A single BI_Via, if any. at the target position.
+   */
+  BI_Via* findVia(Board& board, const Point& pos,
+                  NetSignal* netsignal = nullptr,
+                  const QSet<BI_Via*>& except = {}) const noexcept;
+
+  /**
+   * @brief findPad Find a BI_FootprintPad at the given position on the board.
+   * @param board The board on which to look.
+   * @param pos The position at which to look.
+   * @param layer When specified only look for BI_FootprintPad which are on that
+   * layer
+   * @param except A QSet of BI_FootprintPad that should be excluded when
+   * looking at the target position.
+   * @return A single BI_FootprintPad, if any. at the target position.
+   */
   BI_FootprintPad* findPad(Board& board, const Point& pos,
-                           GraphicsLayer* layer     = nullptr,
-                           NetSignal*     netsignal = nullptr) const noexcept;
-  BI_NetPoint*     findNetPoint(Board& board, const Point& pos,
-                                GraphicsLayer*            layer     = nullptr,
-                                NetSignal*                netsignal = nullptr,
-                                const QSet<BI_NetPoint*>& except    = {}) const
-      noexcept;
+                           GraphicsLayer* layer = nullptr,
+                           NetSignal* netsignal = nullptr) const noexcept;
+
+  /**
+   * @brief findNetPoint Find a BI_NetPoint at the given position on the board.
+   * @param board The board on which to look.
+   * @param pos The position at which to look.
+   * @param layer When specified only look for BI_NetPoint which are on that
+   * layer
+   * @param netsignal When specified only look for BI_NetPoint which are part of
+   * that signal
+   * @param except A QSet of BI_NetPoint that should be excluded when looking at
+   * the target position.
+   * @return A single BI_NetPoint, if any. at the target position.
+   */
+  BI_NetPoint* findNetPoint(Board& board, const Point& pos,
+                            GraphicsLayer* layer = nullptr,
+                            NetSignal* netsignal = nullptr,
+                            const QSet<BI_NetPoint*>& except = {})
+                                    const noexcept;
+
+  /**
+   * @brief findNetLine Find a BI_NetLine at the given position on the board.
+   * @param board The board on which to look.
+   * @param pos The position at which to look.
+   * @param layer When specified only look for BI_NetLine which are on that
+   * layer
+   * @param netsignal When specified only look for BI_NetLine which are part of
+   * that signal
+   * @param except A QSet of BI_NetLine that should be excluded when looking at
+   * the target position.
+   * @return A single BI_NetLine, if any. at the target position.
+   */
   BI_NetLine* findNetLine(Board& board, const Point& pos,
-                          GraphicsLayer*           layer     = nullptr,
-                          NetSignal*               netsignal = nullptr,
+                          GraphicsLayer* layer = nullptr,
+                          NetSignal* netsignal = nullptr,
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
-  void        updateNetpointPositions() noexcept;
-  void        layerComboBoxIndexChanged(int index) noexcept;
-  void        showVia(bool isVisible) noexcept;
-  void        updateShapeActionsCheckedState() noexcept;
-  void        sizeEditValueChanged(const PositiveLength& value) noexcept;
-  void        drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
-  void        wireWidthEditValueChanged(const PositiveLength& value) noexcept;
-  void        wireAutoWidthEditToggled(const bool checked) noexcept;
-  void        updateWireModeActionsCheckedState() noexcept;
+  /**
+   * @brief updateNetpointPositions Update the currently active traces according
+   * to the set parameters.
+   *
+   * Uses the current mCursorPos to where the currently active trace is snapped
+   * to and how its BI_NetLine are palced. Also determines whether a BI_Via
+   * should be added or if the target anchor can provide the desired layer
+   * change.
+   */
+  void updateNetpointPositions() noexcept;
+
+  /**
+   * @brief showVia Sets the BI_Via of the currently active trace.
+   *
+   * When true, adds a BI_Via instead of the current last BI_NetPoint to the
+   * currently active trace. Otherwise removes it if necessary and replaces it
+   * again with a BI_NetPoint.
+   * It also updates the BI_Via according to the currently selected parameters.
+   *
+   * @param isVisible Whether the BI_Via is shown or not
+   */
+  void showVia(bool isVisible) noexcept;
+
+  // Callback Functions for the Gui elements
+  void layerComboBoxIndexChanged(int index) noexcept;
+  void updateShapeActionsCheckedState() noexcept;
+  void sizeEditValueChanged(const PositiveLength& value) noexcept;
+  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
+  void wireWidthEditValueChanged(const PositiveLength& value) noexcept;
+  void wireAutoWidthEditToggled(const bool checked) noexcept;
+  void updateWireModeActionsCheckedState() noexcept;
+
+  /**
+   * @brief calcMiddlePointPos Calculate the 'middle point' of two point,
+   * according to the chosen WireMode.
+   * @param p1 Start point.
+   * @param p2 End point.
+   * @param mode The selected WireMode.
+   * @return Middle Point.
+   */
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
 
@@ -135,20 +239,25 @@ private:
   QString           mCurrentLayerName;  ///< the current board layer name
   bool              mAddVia;            ///< whether a via add is requested
   BI_Via*           mTempVia;
-  BI_Via::Shape     mCurrentViaShape;
-  PositiveLength    mCurrentViaSize;
-  PositiveLength    mCurrentViaDrillDiameter;
+  BI_Via::Shape     mCurrentViaShape;   ///< the current via shape
+  PositiveLength    mCurrentViaSize;    ///< the current via size
+  PositiveLength    mCurrentViaDrillDiameter; ///< the current via drill
+                                        ///< diameter
   QString           mViaLayerName;      ///< the name of the layer where the via
                                         ///< was started
-  Point             mTargetPos;
-  Point             mCursorPos;
+  Point             mTargetPos;         ///< the current target position of the
+                                        ///< active trace
+
+  Point             mCursorPos;         ///< the current cursor position
   PositiveLength    mCurrentWidth;      ///< the current wire width
   bool              mCurrentAutoWidth;  ///< automatically adjust wire width
   bool              mCurrentSnapActive; ///< the current active snap to target
   BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
                                         ///< point of the line)
-  BI_NetSegment*    mCurrentNetSegment;
-  NetSignal*        mCurrentNetSignal;
+  BI_NetSegment* mCurrentNetSegment;    ///< the net segment that is currently
+                                        ///< edited
+  NetSignal*   mCurrentNetSignal;       ///< the net signal that is currently
+                                        ///< edited
   BI_NetLine*  mPositioningNetLine1;    ///< line between fixed point and p1
   BI_NetPoint* mPositioningNetPoint1;   ///< the first netpoint to place
   BI_NetLine*  mPositioningNetLine2;    ///< line between p1 and p2
