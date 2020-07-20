@@ -70,19 +70,31 @@ private:
   ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
   bool       addVia(Board& board) noexcept;
   bool       updateVia(Board& board, const Point& pos) noexcept;
-  bool       fixVia(const Point& pos) noexcept;
+  bool       fixVia(Point& pos) noexcept;
   void       updateShapeActionsCheckedState() noexcept;
   void       sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
+  QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos)
+        const noexcept;
+  BI_Via* findVia(Board& board, const Point pos, NetSignal* netsignal = nullptr,
+                  const QSet<BI_Via*>& except = {}) const noexcept;
+  BI_FootprintPad* findPad(Board& board, const Point pos,
+                  NetSignal* netsignal = nullptr,
+                  const QSet<BI_FootprintPad*>& except = {}) const noexcept;
+  BI_NetPoint* findNetPoint(Board& board, const Point pos,
+                  NetSignal* netsignal = nullptr,
+                  const QSet<BI_NetPoint*>& except = {}) const noexcept;
+  BI_NetLine* findNetLine(Board& board, const Point pos,
+                  NetSignal* netsignal = nullptr) const noexcept;
 
   // General Attributes
-  bool                            mUndoCmdActive;
   BI_Via*                         mCurrentVia;
   BI_Via::Shape                   mCurrentViaShape;
   PositiveLength                  mCurrentViaSize;
   PositiveLength                  mCurrentViaDrillDiameter;
   NetSignal*                      mCurrentViaNetSignal;
+  NetSignal*                      mTempNetSignal;
   QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
   // Widgets for the command toolbar

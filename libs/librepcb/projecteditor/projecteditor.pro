@@ -67,6 +67,7 @@ SOURCES += \
     cmd/cmdremoveunusednetsignals.cpp \
     cmd/cmdreplacedevice.cpp \
     cmd/cmdrotateselectedschematicitems.cpp \
+    cmd/cmdsplitnetline.cpp \
     dialogs/addcomponentdialog.cpp \
     dialogs/bomgeneratordialog.cpp \
     dialogs/editnetclassesdialog.cpp \
@@ -135,6 +136,7 @@ HEADERS += \
     cmd/cmdremoveunusednetsignals.h \
     cmd/cmdreplacedevice.h \
     cmd/cmdrotateselectedschematicitems.h \
+    cmd/cmdsplitnetline.h \
     dialogs/addcomponentdialog.h \
     dialogs/bomgeneratordialog.h \
     dialogs/editnetclassesdialog.h \
