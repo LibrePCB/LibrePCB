@@ -60,7 +60,6 @@ private: // Methods
   bool performExecute() override;
 
   // Private Member Variables
-  CmdBoardNetSegmentAddElements* mCmdAdd;
   BI_NetLine& mOldNetLine;
   Point& mSplitPosition;
   BI_NetPoint* mSplitPoint;

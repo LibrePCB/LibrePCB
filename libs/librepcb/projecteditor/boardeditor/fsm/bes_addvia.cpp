@@ -536,7 +536,9 @@ QSet<NetSignal*> BES_AddVia::getNetSignalsAtScenePos(Board& board,
 NetSignal* BES_AddVia::getClosestNetSignal(Board& board, const Point& pos)
 noexcept {
   //TODO(5n8ke): Get the closest candidate, instead of the most used
-  return mEditor.getProject().getCircuit().getNetSignalWithMostElements();
+  BI_NetLine* atPosition = findNetLine(board, pos);
+  if (atPosition) return &atPosition->getNetSignalOfNetSegment();
+  return board.getProject().getCircuit().getNetSignalWithMostElements();
 }
 
 BI_Via* BES_AddVia::findVia(Board& board, const Point pos, NetSignal* netsignal,
