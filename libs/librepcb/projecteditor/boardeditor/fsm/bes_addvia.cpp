@@ -100,11 +100,6 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   // clear board selection because selection does not make sense in this state
   board->clearSelection();
 
-  // get most used net signal
-  if (!mCurrentViaNetSignal) {
-    mCurrentViaNetSignal = mCircuit.getNetSignalWithMostElements();
-  }
-
   // Add shape actions to the "command" toolbar
   mShapeActions.insert(static_cast<int>(BI_Via::Shape::Round),
                        mEditorUi.commandToolbar->addAction(
@@ -178,12 +173,11 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
             if (value == tr("Auto")) {
               mCurrentViaNetSignal = nullptr;
             } else {
-              setNetSignal(
-                  mEditor.getProject().getCircuit().getNetSignalByName(value));
+              mCurrentViaNetSignal = mEditor.getProject().getCircuit()
+                  .getNetSignalByName(value);
+              setNetSignal(mCurrentViaNetSignal);
             }
           });
-
-  if (!mCurrentViaNetSignal) return false;
 
   // add a new via
   if (!addVia(*board)) return false;
@@ -297,21 +291,25 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept {
 
 bool BES_AddVia::addVia(Board& board) noexcept {
   Q_ASSERT(!mUndoStack.isCommandGroupActive());
-  Q_ASSERT(mCurrentViaNetSignal);
 
   try {
     mUndoStack.beginCmdGroup(tr("Add via to board"));
-    CmdBoardNetSegmentAdd* cmdAddSeg =
-        new CmdBoardNetSegmentAdd(board, *mCurrentViaNetSignal);
+    CmdBoardNetSegmentAdd* cmdAddSeg = nullptr;
+    if (mCurrentViaNetSignal) {
+      cmdAddSeg = new CmdBoardNetSegmentAdd(board, *mCurrentViaNetSignal);
+    } else {
+      cmdAddSeg = new CmdBoardNetSegmentAdd(board,
+                                    *getClosestNetSignal(board, Point(0, 0)));
+    }
     mUndoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);
-    CmdBoardNetSegmentAddElements* cmdAddVia =
-        new CmdBoardNetSegmentAddElements(*netsegment);
+    QScopedPointer<CmdBoardNetSegmentAddElements> cmdAddVia(
+        new CmdBoardNetSegmentAddElements(*netsegment));
     mCurrentVia = cmdAddVia->addVia(Point(0, 0), mCurrentViaShape,
                                     mCurrentViaSize, mCurrentViaDrillDiameter);
     Q_ASSERT(mCurrentVia);
-    mUndoStack.appendToCmdGroup(cmdAddVia);
+    mUndoStack.appendToCmdGroup(cmdAddVia.take());
     mViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentVia));
     return true;
   } catch (Exception& e) {
@@ -333,6 +331,9 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
   try {
     mViaEditCmd->setPosition(pos, true);
     mViaEditCmd->setShape(mCurrentViaShape, true);
+    if (!mCurrentViaNetSignal) {
+      setNetSignal(getClosestNetSignal(board, pos));
+    }
     board.triggerAirWiresRebuild();
     return true;
   } catch (Exception& e) {
@@ -350,19 +351,27 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
     Board* board = &mCurrentVia->getBoard();
     NetSignal* netsignal = mCurrentViaNetSignal;
     if (!netsignal) {
-      QSet<NetSignal*> netsignals = getNetSignalsAtScenePos(*board, pos);
-      if (netsignals.count() != 1) {
+        QSet<NetSignal*> netsignals = getNetSignalsAtScenePos(*board, pos,
+        {mCurrentVia});
+      if (netsignals.count() > 1) {
         throw RuntimeError(__FILE__, __LINE__,
-                           tr("Multiple signals at via position."));
+                           tr("Multiple different signals at via position."));
+      } else if (netsignals.count() == 0) {
+        netsignal = getClosestNetSignal(*board, pos);
+      } else {
+        netsignal = netsignals.values().first();
       }
-      netsignal = netsignals.values().first();
+      Q_ASSERT(netsignal);
+      setNetSignal(netsignal);
     }
     Q_ASSERT(netsignal);
 
-    // TODO(5n8ke): Handle multiple netlines/netpoints at the same location,
-    // to connect both to the new via
     // Find stuff at the via position
-    BI_NetPoint* otherNetPoint = nullptr;
+    QSet<BI_NetPoint*> otherNetAnchors = {};
+    QSet<BI_NetPoint*> otherNetPoints =
+        Toolbox::toSet(board->getNetPointsAtScenePos(pos));
+    QSet<BI_NetLine*> otherNetLines =
+        Toolbox::toSet(board->getNetLinesAtScenePos(pos));
     if (BI_Via* via = findVia(*board, pos, nullptr, {mCurrentVia})) {
       if (&via->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -379,32 +388,41 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         mUndoStack.abortCmdGroup();
         return true;
       }
-    } else if (BI_NetPoint* netpoint = findNetPoint(*board, pos)) {
+    }
+    foreach (BI_NetPoint* netpoint, otherNetPoints) {
       if (&netpoint->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Netpoint of a different signal already present"
              "at target position."));
       } else {
-        otherNetPoint = netpoint;
+        otherNetAnchors.insert(netpoint);
       }
-    } else if (BI_NetLine* netline = findNetLine(*board, pos)) {
+    }
+    foreach (BI_NetLine* netline, otherNetLines) {
       if (&netline->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Netline of a different signal already present"
              "at target position."));
-      } else {
+      } else  if (!otherNetAnchors.contains(
+              dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
+            !otherNetAnchors.contains(
+              dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
+        //TODO(5n8ke) is this the best way to check?
         QScopedPointer<CmdSplitNetLine> cmdSplit(
               new CmdSplitNetLine(*netline, pos));
-        otherNetPoint = cmdSplit->getSplitPoint();
+        otherNetAnchors.insert(cmdSplit->getSplitPoint());
         mUndoStack.appendToCmdGroup(cmdSplit.take());
-        auto test = &cmdSplit;
       }
     }
 
     mUndoStack.appendToCmdGroup(mViaEditCmd.take());
-    mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
-                      otherNetPoint->getNetSegment(), *otherNetPoint,
-                      mCurrentVia->getNetSegment(), *mCurrentVia));
+    //TODO(5n8ke): Handle the case, when netlines of the _same_ netsegment will
+    // be connected
+    foreach (BI_NetPoint* netpoint, otherNetAnchors) {
+        mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
+                          netpoint->getNetSegment(), *netpoint,
+                          mCurrentVia->getNetSegment(), *mCurrentVia));
+    }
     mUndoStack.commitCmdGroup();
     return true;
   } catch (Exception& e) {
@@ -445,14 +463,15 @@ void BES_AddVia::drillDiameterEditValueChanged(
 
 void BES_AddVia::setNetSignal(NetSignal* netsignal) noexcept {
   try {
-    if (!netsignal) throw LogicError(__FILE__, __LINE__);
-    mCurrentViaNetSignal = netsignal;
+    if (!netsignal) {
+      throw LogicError(__FILE__, __LINE__);
+    }
     mUndoStack.appendToCmdGroup(
         new CmdBoardNetSegmentRemove(mCurrentVia->getNetSegment()));
-    CmdBoardNetSegmentEdit* cmdEdit =
-        new CmdBoardNetSegmentEdit(mCurrentVia->getNetSegment());
-    cmdEdit->setNetSignal(*mCurrentViaNetSignal);
-    mUndoStack.appendToCmdGroup(cmdEdit);
+    QScopedPointer<CmdBoardNetSegmentEdit> cmdEdit(
+        new CmdBoardNetSegmentEdit(mCurrentVia->getNetSegment()));
+    cmdEdit->setNetSignal(*netsignal);
+    mUndoStack.appendToCmdGroup(cmdEdit.take());
     mUndoStack.appendToCmdGroup(
         new CmdBoardNetSegmentAdd(mCurrentVia->getNetSegment()));
   } catch (const Exception& e) {
@@ -461,29 +480,39 @@ void BES_AddVia::setNetSignal(NetSignal* netsignal) noexcept {
 }
 
 QSet<NetSignal*> BES_AddVia::getNetSignalsAtScenePos(Board& board,
-                                  const Point& pos) const noexcept {
+                      const Point& pos, QSet<BI_Base*> except) const noexcept {
   QSet<NetSignal*> result = QSet<NetSignal*>();
   foreach(BI_Via* via, board.getViasAtScenePos(pos)) {
+    if (except.contains(via)) continue;
     if (!result.contains(&via->getNetSignalOfNetSegment())) {
       result.insert(&via->getNetSignalOfNetSegment());
     }
   }
   foreach(BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
+    if (except.contains(netpoint)) continue;
     if (!result.contains(&netpoint->getNetSignalOfNetSegment())) {
       result.insert(&netpoint->getNetSignalOfNetSegment());
     }
   }
   foreach(BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
+    if (except.contains(netline)) continue;
     if (!result.contains(&netline->getNetSignalOfNetSegment())) {
       result.insert(&netline->getNetSignalOfNetSegment());
     }
   }
   foreach(BI_FootprintPad* pad, board.getPadsAtScenePos(pos)) {
+    if (except.contains(pad)) continue;
     if (!result.contains(&pad->getNetSegmentOfLines()->getNetSignal())) {
       result.insert(&pad->getNetSegmentOfLines()->getNetSignal());
     }
   }
   return result;
+}
+
+NetSignal* BES_AddVia::getClosestNetSignal(Board& board, const Point& pos)
+noexcept {
+  //TODO(5n8ke): Get the closest candidate, instead of the most used
+  return mEditor.getProject().getCircuit().getNetSignalWithMostElements();
 }
 
 BI_Via* BES_AddVia::findVia(Board& board, const Point pos, NetSignal* netsignal,

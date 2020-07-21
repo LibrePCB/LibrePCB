@@ -75,8 +75,9 @@ private:
   void       sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
-  QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos)
-        const noexcept;
+  NetSignal* getClosestNetSignal(Board& board, const Point& pos) noexcept;
+  QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
+                                    QSet<BI_Base*> except = {}) const noexcept;
   BI_Via* findVia(Board& board, const Point pos, NetSignal* netsignal = nullptr,
                   const QSet<BI_Via*>& except = {}) const noexcept;
   BI_FootprintPad* findPad(Board& board, const Point pos,

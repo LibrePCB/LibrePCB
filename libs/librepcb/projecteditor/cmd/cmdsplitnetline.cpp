@@ -42,8 +42,7 @@ CmdSplitNetLine::CmdSplitNetLine(BI_NetLine& netline, Point& pos)
   noexcept : UndoCommandGroup(tr("Split netline")),
   mOldNetLine(netline),
   mSplitPosition(pos) {
-  mCmdAdd = new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment());
-  mSplitPoint = mCmdAdd->addNetPoint(mSplitPosition);
+  mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), mSplitPosition);
 }
 
 CmdSplitNetLine::~CmdSplitNetLine() noexcept {
@@ -56,16 +55,17 @@ CmdSplitNetLine::~CmdSplitNetLine() noexcept {
 bool CmdSplitNetLine::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
-  mCmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getStartPoint(),
+  QScopedPointer<CmdBoardNetSegmentAddElements>
+      cmdAdd(new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment()));
+  cmdAdd->addNetPoint(*mSplitPoint);
+  cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getStartPoint(),
                      mOldNetLine.getLayer(), mOldNetLine.getWidth());
-  mCmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getEndPoint(),
+  cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getEndPoint(),
                      mOldNetLine.getLayer(), mOldNetLine.getWidth());
   QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
         new CmdBoardNetSegmentRemoveElements(mOldNetLine.getNetSegment()));
   cmdRemove->removeNetLine(mOldNetLine);
-  execNewChildCmd(mCmdAdd); // can throw
-  delete mCmdAdd;
-  mCmdAdd = nullptr;
+  execNewChildCmd(cmdAdd.take()); // can throw
   execNewChildCmd(cmdRemove.take()); // can throw
 
   undoScopeGuard.dismiss();  // no undo required
