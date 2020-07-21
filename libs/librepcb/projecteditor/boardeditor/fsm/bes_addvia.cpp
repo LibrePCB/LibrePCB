@@ -31,6 +31,7 @@
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
@@ -405,7 +406,8 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
               dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
             !otherNetAnchors.contains(
               dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
-        //TODO(5n8ke) is this the best way to check?
+        //TODO(5n8ke) is this the best way to check whtether the NetLine should
+        // be split?
         QScopedPointer<CmdSplitNetLine> cmdSplit(
               new CmdSplitNetLine(*netline, pos));
         otherNetAnchors.insert(cmdSplit->getSplitPoint());
@@ -414,15 +416,37 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
     }
 
     mUndoStack.appendToCmdGroup(mViaEditCmd.take());
-    //TODO(5n8ke): Handle the case, when netlines of the _same_ netsegment will
-    // be connected after CmdCombineBoardNetSegments, the previous netpoints are
-    // no longer valid
+
+    // Combine all NetSegments that are not yet part of the via segment with it
     foreach (BI_NetPoint* netpoint, otherNetAnchors) {
-      if (!netpoint->isAddedToBoard()) continue;
+      if (!netpoint->isAddedToBoard()) {
+        // When multiple netpoints are part of the same NetSegment, only the
+        // first one can be combined and the other ones are no longer part of
+        // the board
+        continue;
+      }
       mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
                         netpoint->getNetSegment(), *netpoint,
                         mCurrentVia->getNetSegment(), *mCurrentVia));
     }
+    // Replace all NetPoints at the given position with the newly added Via
+    foreach (BI_NetPoint* netpoint, board->getNetPointsAtScenePos(pos)) {
+      Q_ASSERT(netpoint->getNetSegment() == mCurrentVia->getNetSegment());
+        QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+              new CmdBoardNetSegmentAddElements(mCurrentVia->getNetSegment()));
+        QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+              new CmdBoardNetSegmentRemoveElements(
+                mCurrentVia->getNetSegment()));
+      foreach (BI_NetLine* netline, netpoint->getNetLines()) {
+        cmdAdd->addNetLine(*mCurrentVia, *netline->getOtherPoint(*netpoint),
+                           netline->getLayer(), netline->getWidth());
+        cmdRemove->removeNetLine(*netline);
+      }
+      cmdRemove->removeNetPoint(*netpoint);
+      mUndoStack.appendToCmdGroup(cmdAdd.take());
+      mUndoStack.appendToCmdGroup(cmdRemove.take());
+    }
+
     mUndoStack.commitCmdGroup();
     return true;
   } catch (Exception& e) {
