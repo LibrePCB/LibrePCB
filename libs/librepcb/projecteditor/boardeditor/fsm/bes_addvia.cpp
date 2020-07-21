@@ -163,6 +163,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   }
   mNetSignalComboBox->model()->sort(0);
   mNetSignalComboBox->setInsertPolicy(QComboBox::InsertAtTop);
+  //TODO(5n8ke): What to do, when a NetSignal "Auto" already exists?
   mNetSignalComboBox->addItem(tr("Auto"));
   mNetSignalComboBox->setCurrentText(mCurrentViaNetSignal
                                      ? *mCurrentViaNetSignal->getName()
@@ -344,6 +345,7 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
 
 bool BES_AddVia::fixVia(Point& pos) noexcept {
   Q_ASSERT(mUndoStack.isCommandGroupActive());
+  //TODO(5n8ke): handle user errors in a more graceful way without popup message
 
   try {
     mViaEditCmd->setPosition(pos, false);
@@ -368,10 +370,6 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
 
     // Find stuff at the via position
     QSet<BI_NetPoint*> otherNetAnchors = {};
-    QSet<BI_NetPoint*> otherNetPoints =
-        Toolbox::toSet(board->getNetPointsAtScenePos(pos));
-    QSet<BI_NetLine*> otherNetLines =
-        Toolbox::toSet(board->getNetLinesAtScenePos(pos));
     if (BI_Via* via = findVia(*board, pos, nullptr, {mCurrentVia})) {
       if (&via->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
@@ -389,7 +387,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         return true;
       }
     }
-    foreach (BI_NetPoint* netpoint, otherNetPoints) {
+    foreach (BI_NetPoint* netpoint, board->getNetPointsAtScenePos(pos)) {
       if (&netpoint->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Netpoint of a different signal already present"
@@ -398,7 +396,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         otherNetAnchors.insert(netpoint);
       }
     }
-    foreach (BI_NetLine* netline, otherNetLines) {
+    foreach (BI_NetLine* netline, board->getNetLinesAtScenePos(pos)) {
       if (&netline->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Netline of a different signal already present"
@@ -417,11 +415,13 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
 
     mUndoStack.appendToCmdGroup(mViaEditCmd.take());
     //TODO(5n8ke): Handle the case, when netlines of the _same_ netsegment will
-    // be connected
+    // be connected after CmdCombineBoardNetSegments, the previous netpoints are
+    // no longer valid
     foreach (BI_NetPoint* netpoint, otherNetAnchors) {
-        mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
-                          netpoint->getNetSegment(), *netpoint,
-                          mCurrentVia->getNetSegment(), *mCurrentVia));
+      if (!netpoint->isAddedToBoard()) continue;
+      mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
+                        netpoint->getNetSegment(), *netpoint,
+                        mCurrentVia->getNetSegment(), *mCurrentVia));
     }
     mUndoStack.commitCmdGroup();
     return true;
@@ -502,8 +502,8 @@ QSet<NetSignal*> BES_AddVia::getNetSignalsAtScenePos(Board& board,
   }
   foreach(BI_FootprintPad* pad, board.getPadsAtScenePos(pos)) {
     if (except.contains(pad)) continue;
-    if (!result.contains(&pad->getNetSegmentOfLines()->getNetSignal())) {
-      result.insert(&pad->getNetSegmentOfLines()->getNetSignal());
+    if (!result.contains(pad->getCompSigInstNetSignal())) {
+      result.insert(pad->getCompSigInstNetSignal());
     }
   }
   return result;
@@ -520,8 +520,7 @@ BI_Via* BES_AddVia::findVia(Board& board, const Point pos, NetSignal* netsignal,
   QSet<BI_Via*> items =
       Toolbox::toSet(board.getViasAtScenePos(pos, netsignal));
   items -= except;
-  return (items.constBegin() != items.constEnd()) ? *items.constBegin()
-                                                  : nullptr;
+  return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
 BI_FootprintPad* BES_AddVia::findPad(Board& board, const Point pos,
@@ -530,8 +529,7 @@ BI_FootprintPad* BES_AddVia::findPad(Board& board, const Point pos,
   QSet<BI_FootprintPad*> items =
       Toolbox::toSet(board.getPadsAtScenePos(pos, nullptr, netsignal));
   items -= except;
-  return (items.constBegin() != items.constEnd()) ? *items.constBegin()
-                                                  : nullptr;
+  return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
 BI_NetPoint* BES_AddVia::findNetPoint(Board& board, const Point pos,
@@ -540,16 +538,14 @@ BI_NetPoint* BES_AddVia::findNetPoint(Board& board, const Point pos,
   QSet<BI_NetPoint*> items =
       Toolbox::toSet(board.getNetPointsAtScenePos(pos, nullptr, netsignal));
   items -= except;
-  return (items.constBegin() != items.constEnd()) ? *items.constBegin()
-                                                  : nullptr;
+  return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
 BI_NetLine* BES_AddVia::findNetLine(Board& board, const Point pos,
                           NetSignal* netsignal) const noexcept {
   QSet<BI_NetLine*> items =
       Toolbox::toSet(board.getNetLinesAtScenePos(pos, nullptr, netsignal));
-  return (items.constBegin() != items.constEnd()) ? *items.constBegin()
-                                                  : nullptr;
+  return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
 /*******************************************************************************
