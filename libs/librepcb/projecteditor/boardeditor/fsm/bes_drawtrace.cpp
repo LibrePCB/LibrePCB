@@ -367,13 +367,14 @@ BES_Base::ProcRetVal BES_DrawTrace::processIdleSceneEvent(
     case QEvent::GraphicsSceneMousePress: {
       QGraphicsSceneMouseEvent* sceneEvent =
           dynamic_cast<QGraphicsSceneMouseEvent*>(qevent);
-      Point pos = Point::fromPx(sceneEvent->scenePos());
-
       switch (sceneEvent->button()) {
-        case Qt::LeftButton:
+        case Qt::LeftButton: {
           // start adding netpoints/netlines
+          Point pos = Point::fromPx(sceneEvent->scenePos());
+          mCursorPos = pos;
           startPositioning(*board, pos);
           return ForceStayInState;
+        }
         default:
           break;
       }
@@ -496,12 +497,13 @@ BES_Base::ProcRetVal BES_DrawTrace::processPositioningSceneEvent(
 bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
                                      BI_NetPoint* fixedPoint) noexcept {
   Point posOnGrid = pos.mappedToGrid(board.getGridProperties().getInterval());
+  mTargetPos = mCursorPos.mappedToGrid(board.getGridProperties().getInterval());
 
   try {
     // start a new undo command
     Q_ASSERT(mSubState == SubState_Idle);
+    mSubState = SubState_Initializing;
     mUndoStack.beginCmdGroup(tr("Draw Board Trace"));
-    mSubState = SubState_PositioningNetPoint;
     mAddVia = false;
     showVia(false);
 
@@ -571,7 +573,8 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     // create new netsegment if none found
     if (!mCurrentNetSegment) {
       Q_ASSERT(mCurrentNetSignal);
-      CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(board, *mCurrentNetSignal);
+      CmdBoardNetSegmentAdd* cmd =
+          new CmdBoardNetSegmentAdd(board, *mCurrentNetSignal);
       mUndoStack.appendToCmdGroup(cmd);  // can throw
       mCurrentNetSegment = cmd->getNetSegment();
     }
@@ -579,8 +582,8 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     // add netpoint if none found
     //TODO(5n8ke): Check if this could be even possible
     Q_ASSERT(mCurrentNetSegment);
-    CmdBoardNetSegmentAddElements* cmd =
-        new CmdBoardNetSegmentAddElements(*mCurrentNetSegment);
+    QScopedPointer<CmdBoardNetSegmentAddElements> cmd(
+        new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
     if (!mFixedStartAnchor) {
       mFixedStartAnchor = cmd->addNetPoint(posOnGrid);
     }
@@ -597,23 +600,22 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
       mWidthEdit->setValue(mCurrentWidth);
     }
 
-    // add more netpoints & netlines
-    BI_NetPoint* p2 = cmd->addNetPoint(posOnGrid);
-    Q_ASSERT(p2);  // second netpoint
-    BI_NetLine* l1 =
-        cmd->addNetLine(*mFixedStartAnchor, *p2, *layer, mCurrentWidth);
-    Q_ASSERT(l1);  // first netline
-    BI_NetPoint* p3 = cmd->addNetPoint(posOnGrid);
-    Q_ASSERT(p3);  // third netpoint
-    BI_NetLine* l2 = cmd->addNetLine(*p2, *p3, *layer, mCurrentWidth);
-    Q_ASSERT(l2);                      // second netline
-    mUndoStack.appendToCmdGroup(cmd);  // can throw
+    // add the new netpoints & netlines
+    mPositioningNetPoint1 = cmd->addNetPoint(mTargetPos);
+    Q_ASSERT(mPositioningNetPoint1);
+    mPositioningNetLine1 =
+        cmd->addNetLine(*mFixedStartAnchor, *mPositioningNetPoint1,
+                        *layer, mCurrentWidth);
+    Q_ASSERT(mPositioningNetLine1);
+    mPositioningNetPoint2 = cmd->addNetPoint(mTargetPos);
+    Q_ASSERT(mPositioningNetPoint2);
+    mPositioningNetLine2 =
+        cmd->addNetLine(*mPositioningNetPoint1, *mPositioningNetPoint2,
+                        *layer, mCurrentWidth);
+    Q_ASSERT(mPositioningNetLine2);
+    mUndoStack.appendToCmdGroup(cmd.take());  // can throw
 
-    // update members
-    mPositioningNetPoint1 = p2;
-    mPositioningNetLine1  = l1;
-    mPositioningNetPoint2 = p3;
-    mPositioningNetLine2  = l2;
+    mSubState = SubState_PositioningNetPoint;
 
     // properly place the new netpoints/netlines according the current wire mode
     updateNetpointPositions();
@@ -625,9 +627,7 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-    if (mSubState != SubState_Idle) {
-      abortPositioning(false);
-    }
+    abortPositioning(false);
     return false;
   }
 }
@@ -796,6 +796,7 @@ bool BES_DrawTrace::addNextNetPoint(Board& board) noexcept {
         abortPositioning(true);
         return true;
       } else {
+        abortPositioning(false);
         return startPositioning(board, mTargetPos);
       }
     } catch (const Exception& e) {
@@ -946,6 +947,7 @@ void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
       .getLayer(newLayerName)->setVisible(true);
   if (mSubState == SubState_PositioningNetPoint &&
       newLayerName != mCurrentLayerName) {
+    Q_ASSERT(mPositioningNetPoint2);
     Board& board = mPositioningNetPoint2->getBoard();
     Point startPos = mFixedStartAnchor->getPosition();
     Point endPos = mPositioningNetPoint2->getPosition();

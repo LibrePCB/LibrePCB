@@ -114,10 +114,10 @@ void BI_NetPoint::setPosition(const Point& position) noexcept {
 void BI_NetPoint::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__,
-                     tr("NetPoint is currently already added to the board."));
+                     "NetPoint is currently already added to the board.");
   } else if (isUsed()) {
     throw LogicError(__FILE__, __LINE__,
-                     tr("NetPoint is currently in use."));
+                     "NetPoint is currently in use.");
   }
   mHighlightChangedConnection =
       connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
@@ -130,10 +130,10 @@ void BI_NetPoint::addToBoard() {
 void BI_NetPoint::removeFromBoard() {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__,
-                     tr("NetPoint is currently not added to the board."));
+                     "NetPoint is currently not added to the board.");
   } else if (isUsed()) {
     throw LogicError(__FILE__, __LINE__,
-                     tr("NetPoint is currently in use."));
+                     "NetPoint is currently in use.");
   }
   disconnect(mHighlightChangedConnection);
   mErcMsgDeadNetPoint->setVisible(false);
@@ -155,8 +155,10 @@ void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
 }
 
 void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
-  if ((!isAddedToBoard()) || (!mRegisteredNetLines.contains(&netline))) {
-    throw LogicError(__FILE__, __LINE__);
+  if (!isAddedToBoard()) {
+    throw LogicError(__FILE__, __LINE__, "NetLine is not part of a board.");
+  } else if ((!mRegisteredNetLines.contains(&netline))) {
+    throw LogicError(__FILE__, __LINE__, "NetLine is not registered.");
   }
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();

@@ -76,11 +76,12 @@ private:
   /// Internal FSM States (substates)
   enum SubState {
     SubState_Idle,                ///< idle state [initial state]
+    SubState_Initializing,        ///< beginning to start
     SubState_PositioningNetPoint  ///< in this state, an undo command is active!
   };
 
   /**
-   * @brief The WireMode enum contains all available wire modes
+   * @brief All available wire modes
    *
    * @note The first item must have the value 0!
    */
@@ -100,7 +101,7 @@ private:
   ProcRetVal       processPositioningSceneEvent(BEE_Base* event) noexcept;
 
   /**
-  * @brief startPositioning begins the drawing of the next BI_NetLine
+  * @brief Begin drawing the next BI_NetLine
   *
   * @param board On which board the new traces are drawn.
   * @param pos The position, where the tracing should begin. If necessary a new
@@ -109,11 +110,11 @@ private:
   * new trace
   * @return True, when the tracing is successfully started.
   */
-  bool             startPositioning(Board& board, const Point& pos,
+  bool startPositioning(Board& board, const Point& pos,
                                     BI_NetPoint* fixedPoint = nullptr) noexcept;
 
   /**
-   * @brief addNextNetPoint Finalize the BI_NetLines and connect them to other
+   * @brief Finalize the BI_NetLines and connect them to other
    * existing traces if necessary.
    * @param board On which board the drawing is finalized.
    * @return True, when the trace is succesfully drawn. When the trace is
@@ -123,13 +124,13 @@ private:
   bool addNextNetPoint(Board& board) noexcept;
 
   /**
-   * @brief abortPositioning Abort or cancel the current drawing of the trace.
+   * @brief Abort or cancel the current drawing of the trace.
    * @param showErrMsgBox When true, show an error message in a pop-up box.
    */
   bool abortPositioning(bool showErrMsgBox) noexcept;
 
   /**
-   * @brief findVia Find a BI_Via at the given position on the board.
+   * @brief Find a BI_Via at the given position on the board.
    * @param board The board on which to look.
    * @param pos The position at which to look.
    * @param netsignal When specified only look for BI_Via which are part of that
@@ -143,7 +144,7 @@ private:
                   const QSet<BI_Via*>& except = {}) const noexcept;
 
   /**
-   * @brief findPad Find a BI_FootprintPad at the given position on the board.
+   * @brief Find a BI_FootprintPad at the given position on the board.
    * @param board The board on which to look.
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_FootprintPad which are on that
@@ -157,7 +158,7 @@ private:
                            NetSignal* netsignal = nullptr) const noexcept;
 
   /**
-   * @brief findNetPoint Find a BI_NetPoint at the given position on the board.
+   * @brief Find a BI_NetPoint at the given position on the board.
    * @param board The board on which to look.
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_NetPoint which are on that
@@ -175,7 +176,7 @@ private:
                                     const noexcept;
 
   /**
-   * @brief findNetLine Find a BI_NetLine at the given position on the board.
+   * @brief Find a BI_NetLine at the given position on the board.
    * @param board The board on which to look.
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_NetLine which are on that
@@ -191,7 +192,7 @@ private:
                           NetSignal* netsignal = nullptr,
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
   /**
-   * @brief updateNetpointPositions Update the currently active traces according
+   * @brief Update the currently active traces according
    * to the set parameters.
    *
    * Uses the current mCursorPos to where the currently active trace is snapped
@@ -202,7 +203,7 @@ private:
   void updateNetpointPositions() noexcept;
 
   /**
-   * @brief showVia Sets the BI_Via of the currently active trace.
+   * @brief Sets the BI_Via of the currently active trace.
    *
    * When true, adds a BI_Via instead of the current last BI_NetPoint to the
    * currently active trace. Otherwise removes it if necessary and replaces it
@@ -223,7 +224,7 @@ private:
   void updateWireModeActionsCheckedState() noexcept;
 
   /**
-   * @brief calcMiddlePointPos Calculate the 'middle point' of two point,
+   * @brief Calculate the 'middle point' of two point,
    * according to the chosen WireMode.
    * @param p1 Start point.
    * @param p2 End point.
