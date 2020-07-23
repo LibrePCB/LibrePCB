@@ -30,6 +30,7 @@
 #include "boardeditorstate_drawpolygon.h"
 #include "boardeditorstate_drawtrace.h"
 #include "boardeditorstate_select.h"
+#include "boardeditorstate_simplify.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -60,6 +61,7 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
                  new BoardEditorState_DrawPolygon(context));
   mStates.insert(State::DRAW_PLANE, new BoardEditorState_DrawPlane(context));
   mStates.insert(State::DRAW_TRACE, new BoardEditorState_DrawTrace(context));
+  mStates.insert(State::SIMPLIFY, new BoardEditorState_Simplify(context));
   enterNextState(State::SELECT);
 }
 
@@ -115,6 +117,10 @@ bool BoardEditorFsm::processDrawPlane() noexcept {
 
 bool BoardEditorFsm::processDrawTrace() noexcept {
   return setNextState(State::DRAW_TRACE);
+}
+
+bool BoardEditorFsm::processSimplify() noexcept {
+  return setNextState(State::SIMPLIFY);
 }
 
 bool BoardEditorFsm::processAbortCommand() noexcept {

@@ -138,6 +138,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
                                mUi->actionToolAddText);
   mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_HOLE,
                                mUi->actionToolAddHole);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::SIMPLIFY,
+                               mUi->actionToolSimplify);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
   connect(mFsm.data(), &BoardEditorFsm::stateChanged, mToolsActionGroup.data(),
           &ExclusiveActionGroup::setCurrentAction);
@@ -873,6 +875,9 @@ void BoardEditor::toolActionGroupChangeTriggered(
       break;
     case BoardEditorFsm::State::ADD_HOLE:
       mFsm->processAddHole();
+      break;
+    case BoardEditorFsm::State::SIMPLIFY:
+      mFsm->processSimplify();
       break;
     default:
       Q_ASSERT(false);

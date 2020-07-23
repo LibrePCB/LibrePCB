@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardeditorstate_drawtrace.h"
 
+#include "../../cmd/cmdboardcombineanchors.h"
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../boardeditor.h"
@@ -636,8 +637,10 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
         otherAnchors.count() ? otherAnchors[0]->getPosition() : mTargetPos;
     if ((middlePos == mFixedStartAnchor->getPosition()) ||
         (middlePos == endPos)) {
-      combiningAnchor =
-          combineAnchors(*mPositioningNetPoint1, *combiningAnchor);
+      QScopedPointer<CmdBoardCombineAnchors> cmdCombine(
+          new CmdBoardCombineAnchors(*mPositioningNetPoint1, *combiningAnchor));
+      combiningAnchor = cmdCombine->getKeepAnchor();
+      mContext.undoStack.appendToCmdGroup(cmdCombine.take());
     }
 
     // for every anchor found under the cursor, replace "mPositioningNetPoint2"
@@ -674,7 +677,10 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
         if (otherNetSegment == mCurrentNetSegment) {
           // If both anchors are of the same NetSegment, they can combined.
           // This takes into consideration if the combiningAnchor is no NetPoint
-          combiningAnchor = combineAnchors(*combiningAnchor, *otherAnchor);
+          QScopedPointer<CmdBoardCombineAnchors> cmdCombine(
+              new CmdBoardCombineAnchors(*combiningAnchor, *otherAnchor));
+          combiningAnchor = cmdCombine->getKeepAnchor();
+          mContext.undoStack.appendToCmdGroup(cmdCombine.take());
         } else {
           // The current or the other anchor might not be a netpoint. Therefore
           // it has to be checked which one can be replaced. If none is a
@@ -705,7 +711,8 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
         foreach (BI_NetPoint* netpoint,
                  Toolbox::toSet(board.getNetPointsAtScenePos(
                      mTargetPos, nullptr, netsignal))) {
-          combineAnchors(*mTempVia, *netpoint);
+          mContext.undoStack.appendToCmdGroup(
+              new CmdBoardCombineAnchors(*mTempVia, *netpoint));
         }
       }
     }
@@ -923,41 +930,6 @@ void BoardEditorState_DrawTrace::showVia(bool isVisible) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
-}
-
-BI_NetLineAnchor* BoardEditorState_DrawTrace::combineAnchors(
-    BI_NetLineAnchor& a, BI_NetLineAnchor& b) {
-  BI_NetPoint*      removePoint = nullptr;
-  BI_NetLineAnchor* otherAnchor = nullptr;
-  if (BI_NetPoint* aPoint = dynamic_cast<BI_NetPoint*>(&a)) {
-    removePoint = aPoint;
-    otherAnchor = &b;
-  } else if (BI_NetPoint* bPoint = dynamic_cast<BI_NetPoint*>(&b)) {
-    removePoint = bPoint;
-    otherAnchor = &a;
-  } else {
-    throw LogicError(__FILE__, __LINE__, "No netpoint to be combined with.");
-  }
-  Q_ASSERT(removePoint);
-  Q_ASSERT(otherAnchor);
-
-  QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-      new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
-  QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
-      new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
-  foreach (BI_NetLine* netline, removePoint->getNetLines()) {
-    BI_NetLineAnchor* anchor = netline->getOtherPoint(*removePoint);
-    if (anchor != otherAnchor) {
-      cmdAdd->addNetLine(*otherAnchor, *anchor, netline->getLayer(),
-                         netline->getWidth());
-    }
-    cmdRemove->removeNetLine(*netline);
-  }
-  cmdRemove->removeNetPoint(*removePoint);
-  mContext.undoStack.appendToCmdGroup(cmdAdd.take());     // can throw
-  mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
-
-  return otherAnchor;
 }
 
 void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {

@@ -233,8 +233,6 @@ private:
    */
   void showVia(bool isVisible) noexcept;
 
-  BI_NetLineAnchor* combineAnchors(BI_NetLineAnchor& a, BI_NetLineAnchor& b);
-
   // Callback Functions for the Gui elements
   void layerComboBoxIndexChanged(int index) noexcept;
   void updateShapeActionsCheckedState() noexcept;

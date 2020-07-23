@@ -140,11 +140,17 @@ void BI_NetPoint::removeFromBoard() {
 }
 
 void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
-  if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline)) ||
-      (&netline.getNetSegment() != &mNetSegment) ||
-      ((mRegisteredNetLines.count() > 0) &&
-       (&netline.getLayer() != getLayerOfLines()))) {
-    throw LogicError(__FILE__, __LINE__);
+  if (!isAddedToBoard()) {
+    throw LogicError(__FILE__, __LINE__, "NetPoint is not added to the board.");
+  } else if (mRegisteredNetLines.contains(&netline)) {
+    throw LogicError(__FILE__, __LINE__,
+                     "NetLine already registered to NetPoint.");
+  } else if (&netline.getNetSegment() != &mNetSegment) {
+    throw LogicError(__FILE__, __LINE__,
+                     "NetLine is part of a different NetSegment.");
+  } else if ((mRegisteredNetLines.count() > 0) &&
+             (&netline.getLayer() != getLayerOfLines())) {
+    throw LogicError(__FILE__, __LINE__, "NetLine is on a different layer.");
   }
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
