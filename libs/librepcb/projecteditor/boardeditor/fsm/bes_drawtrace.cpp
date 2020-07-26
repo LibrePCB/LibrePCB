@@ -947,10 +947,8 @@ void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
       .getLayer(newLayerName)->setVisible(true);
   if (mSubState == SubState_PositioningNetPoint &&
       newLayerName != mCurrentLayerName) {
-    Q_ASSERT(mPositioningNetPoint2);
-    Board& board = mPositioningNetPoint2->getBoard();
+    Board& board = mPositioningNetPoint1->getBoard();
     Point startPos = mFixedStartAnchor->getPosition();
-    Point endPos = mPositioningNetPoint2->getPosition();
     BI_FootprintPad* padAtStart = findPad(board, startPos, nullptr,
                                           mCurrentNetSignal);
     if (findVia(board, startPos, mCurrentNetSignal) ||

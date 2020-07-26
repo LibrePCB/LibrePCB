@@ -210,6 +210,9 @@ private:
    * again with a BI_NetPoint.
    * It also updates the BI_Via according to the currently selected parameters.
    *
+   * @warning mPositioningNetPoint2 and mTempVia are exclusive. If one is set,
+   * the other is nullptr and vice versa.
+   *
    * @param isVisible Whether the BI_Via is shown or not
    */
   void showVia(bool isVisible) noexcept;
