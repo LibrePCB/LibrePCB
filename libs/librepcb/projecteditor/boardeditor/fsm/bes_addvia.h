@@ -66,13 +66,21 @@ public:
   bool       exit(BEE_Base* event) noexcept override;
 
 private:
+  // Private Types
+
+  /// Internal FSM States (substates)
+  enum SubState {
+    SubState_Idle,           ///< idle state [initial state]
+    SubState_PositioningVia  ///< in this state, an undo command is active!
+  };
+
   // Private Methods
   ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-  bool       addVia(Board& board) noexcept;
-  bool       updateVia(Board& board, const Point& pos) noexcept;
-  bool       fixVia(Point& pos) noexcept;
-  void       updateShapeActionsCheckedState() noexcept;
-  void       sizeEditValueChanged(const PositiveLength& value) noexcept;
+  bool addVia(Board& board) noexcept;
+  bool updateVia(Board& board, const Point& pos) noexcept;
+  bool fixVia(Point& pos) noexcept;
+  void updateShapeActionsCheckedState() noexcept;
+  void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
   NetSignal* getClosestNetSignal(Board& board, const Point& pos) noexcept;
@@ -88,8 +96,10 @@ private:
                   const QSet<BI_NetPoint*>& except = {}) const noexcept;
   BI_NetLine* findNetLine(Board& board, const Point pos,
                   NetSignal* netsignal = nullptr) const noexcept;
+  void abortPlacement(const bool showErrorMessage = false) noexcept;
 
   // General Attributes
+  SubState                        mSubState;
   BI_Via*                         mCurrentVia;
   BI_Via::Shape                   mCurrentViaShape;
   PositiveLength                  mCurrentViaSize;

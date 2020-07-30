@@ -62,6 +62,7 @@ namespace editor {
 BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
                        GraphicsView& editorGraphicsView, UndoStack& undoStack)
   : BES_Base(editor, editorUi, editorGraphicsView, undoStack),
+    mSubState(SubState_Idle),
     mCurrentVia(nullptr),
     mCurrentViaShape(BI_Via::Shape::Round),
     mCurrentViaSize(700000),
@@ -97,6 +98,8 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   Q_UNUSED(event);
   Board* board = mEditor.getActiveBoard();
   if (!board) return false;
+  if (mEditor.getProject().getCircuit().getNetSignals().count() == 0)
+    return false;
 
   // clear board selection because selection does not make sense in this state
   board->clearSelection();
@@ -182,21 +185,14 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
           });
 
   // add a new via
-  if (!addVia(*board)) return false;
-
-  return true;
+  return addVia(*board);
 }
 
 bool BES_AddVia::exit(BEE_Base* event) noexcept {
   Q_UNUSED(event);
 
-  if (mUndoStack.isCommandGroupActive()) {
-    try {
-      mUndoStack.abortCmdGroup();
-    } catch (Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-      return false;
-    }
+  if (mSubState != SubState_Idle) {
+    abortPlacement(true);
   }
 
   // Remove actions / widgets from the "command" toolbar
@@ -292,16 +288,22 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept {
 }
 
 bool BES_AddVia::addVia(Board& board) noexcept {
+  Q_ASSERT(mSubState == SubState_Idle);
   Q_ASSERT(!mUndoStack.isCommandGroupActive());
 
   try {
+    mSubState = SubState_PositioningVia;
     mUndoStack.beginCmdGroup(tr("Add via to board"));
     CmdBoardNetSegmentAdd* cmdAddSeg = nullptr;
     if (mCurrentViaNetSignal) {
       cmdAddSeg = new CmdBoardNetSegmentAdd(board, *mCurrentViaNetSignal);
     } else {
-      cmdAddSeg = new CmdBoardNetSegmentAdd(board,
-                                    *getClosestNetSignal(board, Point(0, 0)));
+      NetSignal* closestSignal = getClosestNetSignal(board, Point(0, 0));
+      if (!closestSignal) {
+        abortPlacement();
+        return false;
+      }
+      cmdAddSeg = new CmdBoardNetSegmentAdd(board, *closestSignal);
     }
     mUndoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
@@ -315,20 +317,29 @@ bool BES_AddVia::addVia(Board& board) noexcept {
     mViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentVia));
     return true;
   } catch (Exception& e) {
-    if (mUndoStack.isCommandGroupActive()) {
-      try {
-        mUndoStack.abortCmdGroup();
-      } catch (...) {
-      }
-    }
+    abortPlacement();
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     return false;
   }
 }
 
+void BES_AddVia::abortPlacement(const bool showErrorMessage) noexcept {
+  if (mSubState != SubState_Idle) {
+    Q_ASSERT(mUndoStack.isCommandGroupActive());
+    try {
+      mUndoStack.abortCmdGroup();
+    } catch (Exception& e) {
+      if (showErrorMessage) {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+      }
+    }
+  }
+  Q_ASSERT(!mUndoStack.isCommandGroupActive());
+  mSubState = SubState_Idle;
+}
+
 bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
-  Q_UNUSED(board);
-  Q_ASSERT(mUndoStack.isCommandGroupActive());
+  Q_ASSERT(mSubState == SubState_PositioningVia);
 
   try {
     mViaEditCmd->setPosition(pos, true);
@@ -345,7 +356,7 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
 }
 
 bool BES_AddVia::fixVia(Point& pos) noexcept {
-  Q_ASSERT(mUndoStack.isCommandGroupActive());
+  Q_ASSERT(mSubState == SubState_PositioningVia);
   //TODO(5n8ke): handle user errors in a more graceful way without popup message
 
   try {
@@ -376,7 +387,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Via of a different signal already present at target position."));
       } else {
-        mUndoStack.abortCmdGroup();
+        abortPlacement();
         return true;
       }
     } else if (BI_FootprintPad* pad = findPad(*board, pos)) {
@@ -384,7 +395,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Pad of a different signal already present at target position."));
       } else {
-        mUndoStack.abortCmdGroup();
+        abortPlacement();
         return true;
       }
     }
@@ -448,13 +459,11 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
     }
 
     mUndoStack.commitCmdGroup();
+    mSubState = SubState_Idle;
     return true;
   } catch (Exception& e) {
-    if (mUndoStack.isCommandGroupActive()) {
-      try {
-        mUndoStack.abortCmdGroup();
-      } catch (...) {
-      }
+    if (mSubState != SubState_Idle) {
+      abortPlacement();
     }
     QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     return false;
@@ -477,8 +486,8 @@ void BES_AddVia::sizeEditValueChanged(const PositiveLength& value) noexcept {
   }
 }
 
-void BES_AddVia::drillDiameterEditValueChanged(
-    const PositiveLength& value) noexcept {
+void BES_AddVia::drillDiameterEditValueChanged(const PositiveLength& value)
+      noexcept {
   mCurrentViaDrillDiameter = value;
   if (mViaEditCmd) {
     mViaEditCmd->setDrillDiameter(mCurrentViaDrillDiameter, true);
@@ -486,6 +495,7 @@ void BES_AddVia::drillDiameterEditValueChanged(
 }
 
 void BES_AddVia::setNetSignal(NetSignal* netsignal) noexcept {
+  Q_ASSERT(mSubState == SubState_PositioningVia);
   try {
     if (!netsignal) {
       throw LogicError(__FILE__, __LINE__);
