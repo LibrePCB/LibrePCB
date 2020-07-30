@@ -63,6 +63,7 @@ BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
                        GraphicsView& editorGraphicsView, UndoStack& undoStack)
   : BES_Base(editor, editorUi, editorGraphicsView, undoStack),
     mSubState(SubState_Idle),
+    mAutoText(tr("Auto")),
     mCurrentVia(nullptr),
     mCurrentViaShape(BI_Via::Shape::Round),
     mCurrentViaSize(700000),
@@ -167,15 +168,18 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   }
   mNetSignalComboBox->model()->sort(0);
   mNetSignalComboBox->setInsertPolicy(QComboBox::InsertAtTop);
-  //TODO(5n8ke): What to do, when a NetSignal "Auto" already exists?
-  mNetSignalComboBox->addItem(tr("Auto"));
+  while (mEditor.getProject().getCircuit()
+         .getNetSignalByName(mAutoText)) {
+    mAutoText = "[" + mAutoText + "]";
+  }
+  mNetSignalComboBox->addItem(mAutoText);
   mNetSignalComboBox->setCurrentText(mCurrentViaNetSignal
                                      ? *mCurrentViaNetSignal->getName()
-                                     : tr("Auto"));
+                                     : mAutoText);
   mEditorUi.commandToolbar->addWidget(mNetSignalComboBox);
   connect(mNetSignalComboBox, &QComboBox::currentTextChanged,
           [this](const QString& value) {
-            if (value == tr("Auto")) {
+            if (value == mAutoText) {
               mCurrentViaNetSignal = nullptr;
             } else {
               mCurrentViaNetSignal = mEditor.getProject().getCircuit()

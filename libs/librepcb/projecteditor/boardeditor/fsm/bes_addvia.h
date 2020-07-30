@@ -100,6 +100,7 @@ private:
 
   // General Attributes
   SubState                        mSubState;
+  QString                         mAutoText;
   BI_Via*                         mCurrentVia;
   BI_Via::Shape                   mCurrentViaShape;
   PositiveLength                  mCurrentViaSize;
