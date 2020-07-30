@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdsplitnetline.h"
+#include "cmdboardsplitnetline.h"
 
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
@@ -38,21 +38,21 @@ namespace librepcb {
 namespace project {
 namespace editor {
 
-CmdSplitNetLine::CmdSplitNetLine(BI_NetLine& netline, Point& pos)
+CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine& netline, Point& pos)
   noexcept : UndoCommandGroup(tr("Split netline")),
   mOldNetLine(netline),
   mSplitPosition(pos) {
   mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), mSplitPosition);
 }
 
-CmdSplitNetLine::~CmdSplitNetLine() noexcept {
+CmdBoardSplitNetLine::~CmdBoardSplitNetLine() noexcept {
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdSplitNetLine::performExecute() {
+bool CmdBoardSplitNetLine::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   QScopedPointer<CmdBoardNetSegmentAddElements>

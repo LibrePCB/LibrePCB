@@ -51,6 +51,7 @@ SOURCES += \
     cmd/cmdaddcomponenttocircuit.cpp \
     cmd/cmdadddevicetoboard.cpp \
     cmd/cmdaddsymboltoschematic.cpp \
+    cmd/cmdboardsplitnetline.cpp \
     cmd/cmdchangenetsignalofschematicnetsegment.cpp \
     cmd/cmdcombineboardnetsegments.cpp \
     cmd/cmdcombinenetsignals.cpp \
@@ -67,7 +68,6 @@ SOURCES += \
     cmd/cmdremoveunusednetsignals.cpp \
     cmd/cmdreplacedevice.cpp \
     cmd/cmdrotateselectedschematicitems.cpp \
-    cmd/cmdsplitnetline.cpp \
     dialogs/addcomponentdialog.cpp \
     dialogs/bomgeneratordialog.cpp \
     dialogs/editnetclassesdialog.cpp \
@@ -120,6 +120,7 @@ HEADERS += \
     cmd/cmdaddcomponenttocircuit.h \
     cmd/cmdadddevicetoboard.h \
     cmd/cmdaddsymboltoschematic.h \
+    cmd/cmdboardsplitnetline.h \
     cmd/cmdchangenetsignalofschematicnetsegment.h \
     cmd/cmdcombineboardnetsegments.h \
     cmd/cmdcombinenetsignals.h \
@@ -136,7 +137,6 @@ HEADERS += \
     cmd/cmdremoveunusednetsignals.h \
     cmd/cmdreplacedevice.h \
     cmd/cmdrotateselectedschematicitems.h \
-    cmd/cmdsplitnetline.h \
     dialogs/addcomponentdialog.h \
     dialogs/bomgeneratordialog.h \
     dialogs/editnetclassesdialog.h \

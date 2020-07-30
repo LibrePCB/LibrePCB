@@ -46,11 +46,11 @@ namespace editor {
  *  Class CmdBoardNetLineSplit
  ******************************************************************************/
 
-class CmdSplitNetLine : public UndoCommandGroup {
+class CmdBoardSplitNetLine : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdSplitNetLine(BI_NetLine& netline, Point& pos) noexcept;
-  ~CmdSplitNetLine() noexcept;
+  explicit CmdBoardSplitNetLine(BI_NetLine& netline, Point& pos) noexcept;
+  ~CmdBoardSplitNetLine() noexcept;
 
   BI_NetPoint* getSplitPoint() noexcept { return mSplitPoint; };
 

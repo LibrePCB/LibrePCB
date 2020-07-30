@@ -36,7 +36,7 @@
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
 #include <librepcb/projecteditor/cmd/cmdcombineboardnetsegments.h>
-#include <librepcb/projecteditor/cmd/cmdsplitnetline.h>
+#include <librepcb/projecteditor/cmd/cmdboardsplitnetline.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
@@ -419,8 +419,8 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
               dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
         //TODO(5n8ke) is this the best way to check whtether the NetLine should
         // be split?
-        QScopedPointer<CmdSplitNetLine> cmdSplit(
-              new CmdSplitNetLine(*netline, pos));
+        QScopedPointer<CmdBoardSplitNetLine> cmdSplit(
+              new CmdBoardSplitNetLine(*netline, pos));
         otherNetAnchors.insert(cmdSplit->getSplitPoint());
         mUndoStack.appendToCmdGroup(cmdSplit.take());
       }
