@@ -3,23 +3,16 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
-# detect CI
-if [ -n "${TRAVIS-}" ]
-then
-  IS_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
-  BRANCH_NAME="$TRAVIS_BRANCH"
-elif [ -n "${APPVEYOR-}" ]
-then
-  IS_PULL_REQUEST="${APPVEYOR_PULL_REQUEST_NUMBER:-false}"
-  BRANCH_NAME="$APPVEYOR_REPO_BRANCH"
-elif [ -n "${AZURE_PIPELINES-}" ]
-then
-  IS_PULL_REQUEST="false"  # script is not executed at all on pull requests
-  BRANCH_NAME="${AZURE_BRANCH_NAME#refs/heads/}"
-fi
+# Bash on Windows calls the Windows provided "tar" and "openssl" tool instead
+# of the one from MSYS, which is bullshit since it isn't compatible. As a
+# workaround, we adjust PATH.
+export PATH="/usr/bin:$PATH"
+
+# get branch name from Azure
+BRANCH_NAME="${AZURE_BRANCH_NAME#refs/heads/}"
 
 # upload build artifacts for all branches of the upstream repository
-if [ "${IS_PULL_REQUEST}" = "false" -a -n "${UPLOAD_URL-}" ]
+if [ -n "${UPLOAD_URL-}" ]
 then
   # create tarball of all artifacts
   cd ./artifacts
