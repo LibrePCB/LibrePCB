@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS = \
-    clipper \
+    polyclipping \
     delaunay-triangulation \
     hoedown \
     googletest \
@@ -12,7 +12,7 @@ SUBDIRS = \
     sexpresso \
 
 librepcb.depends = \
-    clipper \
+    polyclipping \
     delaunay-triangulation \
     muparser \
     optional \

@@ -14,7 +14,7 @@ LIBS += \
     -L$${DESTDIR} \
     -llibrepcbcommon \
     -lsexpresso \
-    -lclipper \
+    -lpolyclipping \
     -lmuparser \
 
 # Solaris based systems need to link against libproc

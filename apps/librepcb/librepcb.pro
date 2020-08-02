@@ -42,7 +42,7 @@ LIBS += \
     -llibrepcbproject \
     -llibrepcblibrary \
     -llibrepcbcommon \
-    -lclipper \
+    -lpolyclipping \
     -lhoedown \
     -lmuparser \
     -lsexpresso \
@@ -65,13 +65,13 @@ DEPENDPATH += \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
     ../../libs/sexpresso \
-    ../../libs/clipper \
+    ../../libs/polyclipping \
     ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
     $${DESTDIR}/libsexpresso.a \
-    $${DESTDIR}/libclipper.a \
+    $${DESTDIR}/libpolyclipping.a \
     $${DESTDIR}/libmuparser.a \
 
 isEmpty(UNBUNDLE) {

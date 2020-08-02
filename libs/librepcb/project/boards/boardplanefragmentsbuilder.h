@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <clipper/clipper.hpp>
+#include <polyclipping/clipper.hpp>
 #include <librepcb/common/geometry/path.h>
 
 #include <QtCore>
