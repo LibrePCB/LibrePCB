@@ -31,6 +31,9 @@ about the currently available features, limitations and known bugs.
 
 ## Installation & Usage
 
+**Official stable releases are provided at our
+[download page](https://librepcb.org/download/).**
+
 **Please read our [user manual](https://docs.librepcb.org/) to see how you can
 install and use LibrePCB.**
 The [Getting Started](https://docs.librepcb.org/#gettingstarted) guide
