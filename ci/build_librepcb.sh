@@ -44,7 +44,7 @@ if [ ! -f ./i18n/librepcb.ts ]; then
 fi
 
 # build librepcb
-mkdir build && pushd build
+mkdir -p build && pushd build
 qmake ../librepcb.pro -r ${BUILDSPEC-} \
   "QMAKE_CXX=$CXX" \
   "QMAKE_CC=$CC" \

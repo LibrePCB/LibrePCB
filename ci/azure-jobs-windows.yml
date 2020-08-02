@@ -1,0 +1,52 @@
+jobs:
+  - job: Windows
+    pool:
+      vmImage: 'windows-2019'
+    timeoutInMinutes: 180
+    variables:
+      OS: 'windows'
+      ARCH: 'x86'
+      CC: 'ccache gcc'
+      CXX: 'ccache g++'
+      CCACHE_DIR: $(Pipeline.Workspace)/.ccache
+    strategy:
+      matrix:
+        Qt_5_15_0_MinGW_32bit:
+          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.0-32bit-1
+          DEPLOY: true
+    container: $[ variables['IMAGE'] ]
+    steps:
+    - checkout: self
+      clean: true
+      submodules: recursive
+    - bash: ./ci/install_dependencies.sh
+      displayName: Install Dependencies
+    - task: Cache@2
+      inputs:
+        key: 'ccache | "$(System.JobName)"'
+        path: $(CCACHE_DIR)
+      displayName: Setup ccache
+    - bash: ./ci/build_librepcb.sh
+      displayName: Build LibrePCB
+    - bash: ./ci/build_windows_archive.sh
+      displayName: Build Archive
+      condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
+    - bash: ./ci/build_installer.sh
+      displayName: Build Installer
+      condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
+    - script: build\\output\\qztest.exe
+      displayName: Run QuaZip Unittests
+    - script: build\\output\\librepcb-unittests.exe
+      displayName: Run LibrePCB Unittests
+    - script: pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
+      displayName: Run LibrePCB-CLI Functional Tests
+    - script: pytest -v --librepcb-executable="build/install/opt/bin/librepcb.exe" ./tests/funq
+      displayName: Run LibrePCB Functional Tests
+    - bash: ./ci/upload_artifacts.sh
+      displayName: Upload Artifacts
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      env:
+        UPLOAD_URL: $(ARTIFACTS_UPLOAD_URL)
+        UPLOAD_USER: $(ARTIFACTS_UPLOAD_USER)
+        UPLOAD_PASS: $(ARTIFACTS_UPLOAD_PASS)
+        UPLOAD_SIGN_KEY: $(ARTIFACTS_UPLOAD_SIGN_KEY)
