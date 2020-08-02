@@ -42,7 +42,6 @@ LIBS += \
     -llibrepcbproject \
     -llibrepcblibrary \
     -llibrepcbcommon \
-    -lpolyclipping \
     -lhoedown \
     -lmuparser \
     -lsexpresso \
@@ -65,13 +64,11 @@ DEPENDPATH += \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
     ../../libs/sexpresso \
-    ../../libs/polyclipping \
     ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libhoedown.a \
     $${DESTDIR}/libsexpresso.a \
-    $${DESTDIR}/libpolyclipping.a \
     $${DESTDIR}/libmuparser.a \
 
 isEmpty(UNBUNDLE) {
@@ -85,6 +82,7 @@ isEmpty(UNBUNDLE) {
         $${DESTDIR}/liblibrepcblibrary.a \
         $${DESTDIR}/liblibrepcbcommon.a \
         $${DESTDIR}/libquazip.a \
+        $${DESTDIR}/libpolyclipping.a \
 }
 
 RESOURCES += \
@@ -133,6 +131,12 @@ FORMS += \
     LIBS += -lquazip -lz
     INCLUDEPATH += ../../libs/quazip
     DEPENDPATH += ../../libs/quazip
+}
+
+# polyclipping
+!contains(UNBUNDLE, polyclipping) {
+    LIBS += -lpolyclipping
+    DEPENDPATH += ../../libs/polyclipping
 }
 
 # Custom compiler "lrelease" for qm generation

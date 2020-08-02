@@ -4,7 +4,6 @@ TEMPLATE = subdirs
 include(../common.pri)
 
 SUBDIRS = \
-    polyclipping \
     delaunay-triangulation \
     hoedown \
     googletest \
@@ -15,7 +14,6 @@ SUBDIRS = \
     sexpresso \
 
 librepcb.depends = \
-    polyclipping \
     delaunay-triangulation \
     muparser \
     optional \
@@ -26,6 +24,11 @@ librepcb.depends = \
 !contains(UNBUNDLE, quazip) {
     SUBDIRS += quazip
     librepcb.depends += quazip
+}
+
+!contains(UNBUNDLE, polyclipping) {
+    SUBDIRS += polyclipping
+    librepcb.depends += polyclipping
 }
 
 !contains(UNBUNDLE, fontobene-qt5) {

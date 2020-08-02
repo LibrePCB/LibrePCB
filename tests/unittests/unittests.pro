@@ -25,7 +25,6 @@ LIBS += \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
     -lsexpresso \
-    -lpolyclipping \
     -lmuparser \
     -lparseagle \
 
@@ -48,13 +47,11 @@ DEPENDPATH += \
     ../../libs/librepcb/common \
     ../../libs/parseagle \
     ../../libs/sexpresso \
-    ../../libs/polyclipping \
     ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
     $${DESTDIR}/libsexpresso.a \
-    $${DESTDIR}/libpolyclipping.a \
     $${DESTDIR}/libmuparser.a \
 
 isEmpty(UNBUNDLE) {
@@ -66,6 +63,7 @@ isEmpty(UNBUNDLE) {
         $${DESTDIR}/liblibrepcblibrary.a \
         $${DESTDIR}/liblibrepcbcommon.a \
         $${DESTDIR}/libquazip.a \
+        $${DESTDIR}/libpolyclipping.a \
 }
 
 SOURCES += \
@@ -133,4 +131,10 @@ FORMS += \
     LIBS += -lquazip -lz
     INCLUDEPATH += ../../libs/quazip
     DEPENDPATH += ../../libs/quazip
+}
+
+# polyclipping
+!contains(UNBUNDLE, polyclipping) {
+    LIBS += -lpolyclipping
+    DEPENDPATH += ../../libs/polyclipping
 }

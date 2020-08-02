@@ -32,7 +32,10 @@ fi
 
 # additional qmake arguments
 if [ "${UNBUNDLE-}" != "" ]; then
-  ADDITIONAL_ARGS="UNBUNDLE+=$UNBUNDLE"
+  read -ra arr <<<"$UNBUNDLE"
+  for target in "${arr[@]}"; do
+    ADDITIONAL_ARGS+="UNBUNDLE+=$target "
+  done
 else
   ADDITIONAL_ARGS=""
 fi
@@ -45,6 +48,11 @@ fi
 
 # build librepcb
 mkdir -p build && pushd build
+echo "QMAKE_CXX=$CXX"
+echo "QMAKE_CC=$CC"
+echo "QMAKE_CFLAGS=$CFLAGS"
+echo "QMAKE_CXXFLAGS=$CXXFLAGS"
+echo "ADDITIONAL_ARGS=$ADDITIONAL_ARGS"
 qmake ../librepcb.pro -r ${BUILDSPEC-} \
   "QMAKE_CXX=$CXX" \
   "QMAKE_CC=$CC" \

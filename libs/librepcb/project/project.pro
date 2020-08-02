@@ -270,3 +270,9 @@ HEADERS += \
 
 FORMS += \
 
+# polyclipping
+contains(UNBUNDLE, polyclipping) {
+    PKGCONFIG += polyclipping
+} else {
+    INCLUDEPATH += ../../polyclipping
+}
