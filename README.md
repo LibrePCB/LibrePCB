@@ -39,12 +39,6 @@ install and use LibrePCB.**
 The [Getting Started](https://docs.librepcb.org/#gettingstarted) guide
 gives you a quick introduction to LibrePCB.
 
-In addition to the installation methods described in the user manual, Arch
-Linux users can also install the package
-[librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
-The package clones and builds the latest (unstable!) version of the `master`
-branch from GitHub.
-
 
 ## Contributing
 
@@ -62,6 +56,11 @@ workspace, libraries or projects, so you should not use it productively! For
 productive use, please install an official release as described in the
 [user manual](https://docs.librepcb.org/). For development, please read details
 [here](https://developers.librepcb.org/df/d30/doc_developers.html#doc_developers_unstable_versions).***
+
+Instead of building LibrePCB manually, Arch Linux users could install the
+package [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from
+the AUR. The package clones and builds the latest (unstable!) version of the
+`master` branch from GitHub.
 
 ### Requirements
 
