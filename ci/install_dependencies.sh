@@ -43,11 +43,8 @@ then
 elif [ "$OS" = "windows" ]
 then
 
-  # MSYS2 packages
-  pacman -Sy --noconfirm --needed openssl libopenssl mingw-w64-x86_64-ccache
-  ccache -s
-
   # python packages
+  export FUNQ_MAKE_PATH="mingw32-make"
   pip install future "flake8==3.7.7"
   pip install -r ./tests/cli/requirements.txt
   pip install -r ./tests/funq/requirements.txt
