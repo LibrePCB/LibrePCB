@@ -8,10 +8,11 @@
 
 ## About LibrePCB
 
-LibrePCB is a free [EDA](https://en.wikipedia.org/wiki/Electronic_design_automation)
-software to develop printed circuit boards. It runs on Linux, Windows and Mac.
-The project is still in a quite early development stage (no stable release available).
-See [Project Status](https://docs.librepcb.org/#projectstatus) for more information
+LibrePCB is a free
+[EDA](https://en.wikipedia.org/wiki/Electronic_design_automation) software to
+develop printed circuit boards. It runs on Linux, Windows and Mac. The project
+is still in a rather early development stage. See
+[Project Status](https://docs.librepcb.org/#projectstatus) for more information
 about the currently available features, limitations and known bugs.
 
 ![Screenshot](doc/screenshot.png)
