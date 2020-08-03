@@ -27,9 +27,11 @@
 #include "../erc/ercmsg.h"
 #include "../schematics/items/si_netsegment.h"
 #include "circuit.h"
+#include "componentinstance.h"
 #include "componentsignalinstance.h"
 #include "netclass.h"
 
+#include <librepcb/library/cmp/component.h>
 #include <librepcb/common/exceptions.h>
 
 #include <QtCore>
@@ -263,7 +265,13 @@ void NetSignal::updateErcMessages() noexcept {
     mErcMsgUnusedNetSignal.reset();
   }
 
-  if (mIsAddedToCircuit && (mRegisteredComponentSignals.count() < 2)) {
+  int registeredRealComponentCount = 0;//mRegisteredComponentSignals.count();
+  foreach (ComponentSignalInstance* signal, mRegisteredComponentSignals) {
+    if (!signal->getComponentInstance().getLibComponent().isSchematicOnly()) {
+      registeredRealComponentCount++;
+    }
+  }
+  if (mIsAddedToCircuit && (registeredRealComponentCount < 2)) {
     if (!mErcMsgConnectedToLessThanTwoPins) {
       mErcMsgConnectedToLessThanTwoPins.reset(new ErcMsg(
           mCircuit.getProject(), *this, mUuid.toStr(),
