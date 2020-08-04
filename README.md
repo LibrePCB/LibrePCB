@@ -8,10 +8,11 @@
 
 ## About LibrePCB
 
-LibrePCB is a free [EDA](https://en.wikipedia.org/wiki/Electronic_design_automation)
-software to develop printed circuit boards. It runs on Linux, Windows and Mac.
-The project is still in a quite early development stage (no stable release available).
-See [Project Status](https://docs.librepcb.org/#projectstatus) for more information
+LibrePCB is a free
+[EDA](https://en.wikipedia.org/wiki/Electronic_design_automation) software to
+develop printed circuit boards. It runs on Linux, Windows and Mac. The project
+is still in a rather early development stage. See
+[Project Status](https://docs.librepcb.org/#projectstatus) for more information
 about the currently available features, limitations and known bugs.
 
 ![Screenshot](doc/screenshot.png)
@@ -30,16 +31,13 @@ about the currently available features, limitations and known bugs.
 
 ## Installation & Usage
 
+**Official stable releases are provided at our
+[download page](https://librepcb.org/download/).**
+
 **Please read our [user manual](https://docs.librepcb.org/) to see how you can
 install and use LibrePCB.**
 The [Getting Started](https://docs.librepcb.org/#gettingstarted) guide
 gives you a quick introduction to LibrePCB.
-
-In addition to the installation methods described in the user manual, Arch
-Linux users can also install the package
-[librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
-The package clones and builds the latest (unstable!) version of the `master`
-branch from GitHub.
 
 
 ## Contributing
@@ -58,6 +56,11 @@ workspace, libraries or projects, so you should not use it productively! For
 productive use, please install an official release as described in the
 [user manual](https://docs.librepcb.org/). For development, please read details
 [here](https://developers.librepcb.org/df/d30/doc_developers.html#doc_developers_unstable_versions).***
+
+Instead of building LibrePCB manually, Arch Linux users could install the
+package [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from
+the AUR. The package clones and builds the latest (unstable!) version of the
+`master` branch from GitHub.
 
 ### Requirements
 
