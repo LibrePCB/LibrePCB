@@ -151,6 +151,14 @@ void LengthEditBase::configure(const LengthUnit&              defaultUnit,
   configureClientSettings(uniqueIdentifier);
 }
 
+void LengthEditBase::stepBy(int steps) {
+  if ((mSingleStepUp > 0) && (steps > 0)) {
+    setValueImpl(mValue + mSingleStepUp * steps);
+  } else if ((mSingleStepDown > 0) && (steps < 0)) {
+    setValueImpl(mValue + mSingleStepDown * steps);
+  }
+}
+
 /*******************************************************************************
  *  Reimplemented Methods
  ******************************************************************************/
@@ -176,14 +184,6 @@ QAbstractSpinBox::StepEnabled LengthEditBase::stepEnabled() const {
     enabled |= QAbstractSpinBox::StepDownEnabled;
   }
   return enabled;
-}
-
-void LengthEditBase::stepBy(int steps) {
-  if ((mSingleStepUp > 0) && (steps > 0)) {
-    setValueImpl(mValue + mSingleStepUp * steps);
-  } else if ((mSingleStepDown > 0) && (steps < 0)) {
-    setValueImpl(mValue + mSingleStepDown * steps);
-  }
 }
 
 void LengthEditBase::setValueImpl(Length value) noexcept {

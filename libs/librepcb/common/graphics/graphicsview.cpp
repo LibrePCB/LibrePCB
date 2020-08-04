@@ -267,7 +267,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (e->button() == Qt::MiddleButton) {
         mCursorBeforePanning = cursor();
         setCursor(Qt::ClosedHandCursor);
-      } else if (mEventHandlerObject) {
+      }
+      if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
       return true;
@@ -278,7 +279,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       Q_ASSERT(e);
       if (e->button() == Qt::MiddleButton) {
         setCursor(mCursorBeforePanning);
-      } else if (mEventHandlerObject) {
+      }
+      if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
       return true;
@@ -300,11 +302,14 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
     }
       // fall through
     case QEvent::GraphicsSceneMouseDoubleClick:
-    case QEvent::GraphicsSceneContextMenu: {
-      if (mEventHandlerObject) {
-        mEventHandlerObject->graphicsViewEventHandler(event);
+    case QEvent::GraphicsSceneContextMenu:
+    case QEvent::KeyRelease:
+    case QEvent::KeyPress: {
+      if (mEventHandlerObject
+          && mEventHandlerObject->graphicsViewEventHandler(event)) {
+        return true;
       }
-      return true;
+      break;
     }
     case QEvent::GraphicsSceneWheel: {
       if (!underMouse()) break;

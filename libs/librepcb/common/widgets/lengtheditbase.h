@@ -122,6 +122,7 @@ public:
   void configure(const LengthUnit&              defaultUnit,
                  const QVector<PositiveLength>& steps,
                  const QString&                 uniqueIdentifier) noexcept;
+  virtual void stepBy(int steps) override;
 
   // Reimplemented Methods
   QSize minimumSizeHint() const override;
@@ -135,7 +136,6 @@ signals:
 
 protected:  // Methods
   virtual QAbstractSpinBox::StepEnabled stepEnabled() const override;
-  virtual void                          stepBy(int steps) override;
   void                                  setValueImpl(Length value) noexcept;
   void         updateValueFromText(QString text) noexcept;
   void         updateSingleStep() noexcept;
