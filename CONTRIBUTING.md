@@ -60,6 +60,9 @@ Fixes #62
 - Submit a pull request to the repository in the LibrePCB organization.
 - We will then check the pull request and give you feedback quickly.
 
+Please also take a look at our
+[Pull Request Guidelines](https://developers.librepcb.org/df/d30/doc_developers.html#doc_developers_pullrequests).
+
 ## Other Contributions
 
 This project welcomes non-code contributions, too! The following types of contributions are welcome:
