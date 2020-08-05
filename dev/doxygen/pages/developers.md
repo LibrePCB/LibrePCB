@@ -35,6 +35,34 @@ within QtCreator. But be careful with the disabled warning! :)
 - Write commit messages according this guideline: http://chris.beams.io/posts/git-commit/
 
 
+# Pull Requests {#doc_developers_pullrequests}
+
+To keep our Git history clear, simple and consistent, we use the following
+strategy for working with branches and GitHub Pull Requests:
+
+- If a branch is outdated (i.e. commits were added to `master` in the mean
+  time), the branch should be updated by **rebasing** it. Please do not update
+  branches by merging `master` into it (as the "Update Branch" button on the
+  GitHub UI unfortunately does).
+- When adding fixes or other new changes to a branch, the already pushed
+  commits should be updated accordingly (e.g. modified or amended) and then
+  force-pushed instead of adding new commits.
+
+Generally it's fine to deviate from these rules as long as the branch gets
+updated and cleaned up before it is ready to merge. But keep in mind that
+LibrePCB maintainers might not do a detailed review before it is cleaned up,
+since reviewing a clean Git history is easier.
+
+If you are not familiar enough with Git to do the rebasing operations - no
+problem! LibrePCB maintainers can help you in several ways:
+
+- Explain you how to do the rebase operations, force-pushes etc.
+- Take over your branch and do the rebase on our own, if you agree.
+- For smaller changes, we might simply
+  [squash-merge](https://github.blog/2016-04-01-squash-your-commits/)
+  a Pull Request.
+
+
 # Internationalization (i18n) {#doc_developers_i18n}
 
 - All files (\*.cpp, \*.h, \*.md, \*.lp, \*.ini,...) must be written in english. Only strings which
