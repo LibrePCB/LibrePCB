@@ -258,37 +258,42 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
   // If the right-clicked element is part of an active selection, keep it as-is.
   // However, if it's not part of an active selection, clear the selection and
   // select the right-clicked element instead.
-  if (!items.first()->isSelected()) {
+  BI_Base* selectedItem = items.first();
+  if (!selectedItem->isSelected()) {
     board->clearSelection();
-    items.first()->setSelected(true);
+    selectedItem->setSelected(true);
   }
 
   // build and execute the context menu
   QMenu menu;
-  switch (items.first()->getType()) {
+  QAction* aRemove = nullptr;
+  QAction* aRemoveTrace = nullptr;
+  QAction* aSelectTrace = nullptr;
+  QAction* aRotateCCW = nullptr;
+  QAction* aFlipH = nullptr;
+  QAction* aSnapToGrid = nullptr;
+  QAction* aProperties = nullptr;
+  QAction* action = nullptr;
+  bool menuWasExecuted = false;
+  switch (selectedItem->getType()) {
     case BI_Base::Type_t::Footprint: {
-      BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first());
+      BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(selectedItem);
       Q_ASSERT(footprint);
       BI_Device&         devInst = footprint->getDeviceInstance();
       ComponentInstance& cmpInst = devInst.getComponentInstance();
 
       // build the context menu
-      QAction* aRotateCCW =
-          menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-      QAction* aFlipH = menu.addAction(
-          QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"),
-                         QString(tr("Remove %1")).arg(*cmpInst.getName()));
+      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
+      aFlipH = ACTION_FLIP_DEFAULT(menu);
+      aRemove = ACTION_DELETE(menu, tr("Remove %1").arg(*cmpInst.getName()));
       menu.addSeparator();
-      QAction* aSnapToGrid =
-          menu.addAction(QIcon(":/img/actions/grid.png"), tr("Snap to grid"));
-      aSnapToGrid->setVisible(devInst.getPosition().mappedToGrid(
-                                  board->getGridProperties().getInterval()) !=
-                              devInst.getPosition());  // only show if needed
+      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
+      aSnapToGrid->setVisible(!devInst.getPosition()
+                  .isOnGrid(board->getGridProperties())); // only show if needed
       QAction* aResetTexts =
-          menu.addAction(QIcon(":/img/actions/undo.png"), "Reset all texts");
+        menu.addAction(QIcon(":/img/actions/undo.png"), tr("Reset all texts"));
       menu.addSeparator();
+
       QMenu* aChangeDeviceMenu =
           menu.addMenu(QIcon(":/img/library/device.png"), tr("Change Device"));
       foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
@@ -301,6 +306,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
         }
       }
       aChangeDeviceMenu->setEnabled(!aChangeDeviceMenu->isEmpty());
+
       QMenu* aChangeFootprintMenu = menu.addMenu(
           QIcon(":/img/library/footprint.png"), tr("Change Footprint"));
       QIcon footprintIcon(":/img/library/footprint.png");
@@ -319,30 +325,12 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       }
       aChangeFootprintMenu->setEnabled(!aChangeFootprintMenu->isEmpty());
       menu.addSeparator();
-      QAction* aProperties = menu.addAction(tr("Properties"));
+      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
 
       // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRotateCCW) {
-        rotateSelectedItems(Angle::deg90());
-      } else if (action == aFlipH) {
-        flipSelectedItems(Qt::Horizontal);
-      } else if (action == aRemove) {
-        removeSelectedItems();
-      } else if (action == aSnapToGrid) {
-        try {
-          QScopedPointer<CmdDeviceInstanceEditAll> cmd(
-              new CmdDeviceInstanceEditAll(devInst));
-          cmd->setPosition(devInst.getPosition().mappedToGrid(
-                               board->getGridProperties().getInterval()),
-                           false);
-          mUndoStack.execCmd(cmd.take());
-        } catch (const Exception& e) {
-          QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-        }
-      } else if (action == aResetTexts) {
+      action = menu.exec(mouseEvent->screenPos());
+      menuWasExecuted = true;
+      if (action == aResetTexts) {
         try {
           mUndoStack.execCmd(new CmdFootprintStrokeTextsReset(*footprint));
         } catch (Exception& e) {
@@ -366,202 +354,159 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
         } catch (Exception& e) {
           QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         }
-      } else if (action == aProperties) {
-        openDevicePropertiesDialog(devInst);
       }
-      return ForceStayInState;
+      break;
     }
 
     case BI_Base::Type_t::NetLine: {
-      BI_NetLine* netline = dynamic_cast<BI_NetLine*>(items.first());
+      BI_NetLine* netline = dynamic_cast<BI_NetLine*>(selectedItem);
       Q_ASSERT(netline);
 
       // build the context menu
-      QAction* aRemoveSegment = menu.addAction(
-          QIcon(":/img/actions/delete.png"), "Remove Trace Segment");
-      QAction* aRemoveTrace = menu.addAction(QIcon(":/img/actions/minus.png"),
-                                             "Remove Whole Trace");
+      aRemove = ACTION_DELETE(menu, tr("Remove Trace Segment"));
+      aRemoveTrace = ACTION_DELETE_ALL_DEFAULT(menu);
+      aRemoveTrace->setData(QVariant::fromValue(&netline->getNetSegment()));
       menu.addSeparator();
-      QAction* aSelectTrace = menu.addAction(
-          QIcon(":/img/actions/bookmark.png"), tr("Select Whole Trace"));
+      aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
+      aSelectTrace->setData(QVariant::fromValue(&netline->getNetSegment()));
       menu.addSeparator();
       QAction* aMeasureSelection =
           menu.addAction(QIcon(":/img/actions/ruler.png"),
                          tr("Measure Selected Segments Length"));
 
       // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRemoveSegment) {
-        removeSelectedItems();
-      } else if (action == aRemoveTrace) {
-        netline->getNetSegment().setSelected(true);
-        removeSelectedItems();
-      } else if (action == aSelectTrace) {
-        netline->getNetSegment().setSelected(true);
-      } else if (action == aMeasureSelection) {
+      action = menu.exec(mouseEvent->screenPos());
+      menuWasExecuted = true;
+      if (action == aMeasureSelection) {
         measureSelectedItems(*netline);
       }
-      return ForceStayInState;
+      break;
     }
 
     case BI_Base::Type_t::Via: {
-      BI_Via* via = dynamic_cast<BI_Via*>(items.first());
+      BI_Via* via = dynamic_cast<BI_Via*>(selectedItem);
       Q_ASSERT(via);
 
       // build the context menu
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Via");
-      QAction* aRemoveTrace = menu.addAction(QIcon(":/img/actions/minus.png"),
-                                             "Remove Whole Trace");
+      aRemove = ACTION_DELETE(menu, tr("Remove Via"));
+      aRemoveTrace = ACTION_DELETE_ALL_DEFAULT(menu);
+      aRemoveTrace->setData(QVariant::fromValue(&via->getNetSegment()));
       menu.addSeparator();
-      QAction* aSelectTrace = menu.addAction(
-          QIcon(":/img/actions/bookmark.png"), tr("Select Whole Trace"));
+      aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
+      aSelectTrace->setData(QVariant::fromValue(&via->getNetSegment()));
+      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
+      aSnapToGrid->setVisible(!via->getPosition()
+                  .isOnGrid(board->getGridProperties())); // only show if needed
       menu.addSeparator();
-      QAction* aProperties = menu.addAction(tr("Properties"));
-
-      // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRemove) {
-        removeSelectedItems();
-      } else if (action == aRemoveTrace) {
-        via->getNetSegment().setSelected(true);
-        removeSelectedItems();
-      } else if (action == aSelectTrace) {
-        via->getNetSegment().setSelected(true);
-      } else if (action == aProperties) {
-        openViaPropertiesDialog(*via);
-      }
-      return ForceStayInState;
+      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      break;
     }
 
     case BI_Base::Type_t::Plane: {
-      BI_Plane* plane = dynamic_cast<BI_Plane*>(items.first());
+      BI_Plane* plane = dynamic_cast<BI_Plane*>(selectedItem);
       Q_ASSERT(plane);
 
       // build the context menu
-      QAction* aRotateCCW =
-          menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-      QAction* aFlipH = menu.addAction(
-          QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Plane");
+      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
+      aFlipH = ACTION_FLIP_DEFAULT(menu);
+      aRemove = ACTION_DELETE(menu, tr("Remove Plane"));
       menu.addSeparator();
       QAction* aIsVisible = menu.addAction(tr("Visible"));
       aIsVisible->setCheckable(true);
       aIsVisible->setChecked(plane->isVisible());
       menu.addSeparator();
-      QAction* aProperties = menu.addAction(QIcon(":/img/actions/settings.png"),
-                                            tr("Plane Properties"));
+      aProperties = ACTION_PROPERTIES(menu, tr("Plane Properties"));
 
       // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRotateCCW) {
-        rotateSelectedItems(Angle::deg90());
-      } else if (action == aFlipH) {
-        flipSelectedItems(Qt::Horizontal);
-      } else if (action == aRemove) {
-        removeSelectedItems();
-      } else if (action == aIsVisible) {
+      action = menu.exec(mouseEvent->screenPos());
+      menuWasExecuted = true;
+      if (action == aIsVisible) {
         // Visibility is not saved, thus no undo command is needed here.
         plane->setVisible(aIsVisible->isChecked());
-      } else if (action == aProperties) {
-        openPlanePropertiesDialog(*plane);
       }
-      return ForceStayInState;
+      break;
     }
 
     case BI_Base::Type_t::Polygon: {
-      BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first());
+      BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(selectedItem);
       Q_ASSERT(polygon);
 
       // build the context menu
-      QAction* aRotateCCW =
-          menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-      QAction* aFlipH = menu.addAction(
-          QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Polygon");
+      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
+      aFlipH = ACTION_FLIP_DEFAULT(menu);
+      aRemove = ACTION_DELETE(menu, tr("Remove Polygon"));
       menu.addSeparator();
-      QAction* aProperties = menu.addAction(tr("Properties"));
-
-      // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRotateCCW) {
-        rotateSelectedItems(Angle::deg90());
-      } else if (action == aFlipH) {
-        flipSelectedItems(Qt::Horizontal);
-      } else if (action == aRemove) {
-        removeSelectedItems();
-      } else if (action == aProperties) {
-        openPolygonPropertiesDialog(*board, polygon->getPolygon());
-      }
-      return ForceStayInState;
+      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      break;
     }
 
     case BI_Base::Type_t::StrokeText: {
-      BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first());
+      BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(selectedItem);
       Q_ASSERT(text);
 
       // build the context menu
-      QAction* aRotateCCW =
-          menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-      QAction* aFlipH = menu.addAction(
-          QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Text");
+      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
+      aFlipH = ACTION_FLIP_DEFAULT(menu);
+      aRemove = ACTION_DELETE(menu, tr("Remove Text"));
       menu.addSeparator();
-      QAction* aProperties = menu.addAction(tr("Properties"));
-
-      // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRotateCCW) {
-        rotateSelectedItems(Angle::deg90());
-      } else if (action == aFlipH) {
-        flipSelectedItems(Qt::Horizontal);
-      } else if (action == aRemove) {
-        removeSelectedItems();
-      } else if (action == aProperties) {
-        openStrokeTextPropertiesDialog(*board, text->getText());
-      }
-      return ForceStayInState;
+      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
+      aSnapToGrid->setVisible(!text->getPosition()
+                  .isOnGrid(board->getGridProperties())); // only show if needed
+      menu.addSeparator();
+      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      break;
     }
 
     case BI_Base::Type_t::Hole: {
-      BI_Hole* hole = dynamic_cast<BI_Hole*>(items.first());
+      BI_Hole* hole = dynamic_cast<BI_Hole*>(selectedItem);
       Q_ASSERT(hole);
 
       // build the context menu
-      QAction* aRemove =
-          menu.addAction(QIcon(":/img/actions/delete.png"), "Remove Hole");
+      aRemove = ACTION_DELETE(menu, tr("Remove Hole"));
       menu.addSeparator();
-      QAction* aProperties = menu.addAction(tr("Properties"));
-
-      // execute the context menu
-      QAction* action = menu.exec(mouseEvent->screenPos());
-      if (action == nullptr) {
-        // aborted --> nothing to do
-      } else if (action == aRemove) {
-        removeSelectedItems();
-      } else if (action == aProperties) {
-        openHolePropertiesDialog(*board, hole->getHole());
-      }
-      return ForceStayInState;
+      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
+      aSnapToGrid->setVisible(!hole->getPosition()
+                  .isOnGrid(board->getGridProperties())); // only show if needed
+      menu.addSeparator();
+      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      break;
     }
 
     default:
-      break;
+      return PassToParentState;
   }
-  return PassToParentState;
+  if (!menuWasExecuted) {
+    // execute the context menu
+    Q_ASSERT(action == nullptr);
+    action = menu.exec(mouseEvent->screenPos());
+  }
+  if (action == nullptr) {
+    // aborted --> nothing to do
+  } else if (action == aRemove) {
+    removeSelectedItems();
+  } else if (action == aRemoveTrace) {
+    action->data().value<BI_NetSegment*>()->setSelected(true);
+    removeSelectedItems();
+  } else if (action == aSelectTrace) {
+    action->data().value<BI_NetSegment*>()->setSelected(true);
+  } else if (action == aRotateCCW) {
+    rotateSelectedItems(Angle::deg90());
+  } else if (action == aFlipH) {
+    flipSelectedItems(Qt::Horizontal);
+  } else if (action == aSnapToGrid) {
+    try  {
+      QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
+            new CmdDragSelectedBoardItems(*board, selectedItem->getPosition()));
+      cmdMove->setCurrentPosition(selectedItem->getPosition().mappedToGrid(
+                              board->getGridProperties().getInterval()), false);
+      mUndoStack.execCmd(cmdMove.take());
+    } catch (Exception& e) {
+      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+    }
+  } else if (action == aProperties) {
+    openPropertiesDialog(*board, selectedItem);
+  }
+  return ForceStayInState;
 }
 
 BES_Base::ProcRetVal BES_Select::processIdleSceneDoubleClick(
@@ -571,45 +516,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneDoubleClick(
     QList<BI_Base*> items =
         board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
     if (items.isEmpty()) return PassToParentState;
-    switch (items.first()->getType()) {
-      case BI_Base::Type_t::Footprint: {
-        BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(items.first());
-        Q_ASSERT(footprint);
-        openDevicePropertiesDialog(footprint->getDeviceInstance());
-        return ForceStayInState;
-      }
-      case BI_Base::Type_t::Via: {
-        BI_Via* via = dynamic_cast<BI_Via*>(items.first());
-        Q_ASSERT(via);
-        openViaPropertiesDialog(*via);
-        return ForceStayInState;
-      }
-      case BI_Base::Type_t::Plane: {
-        BI_Plane* plane = dynamic_cast<BI_Plane*>(items.first());
-        Q_ASSERT(plane);
-        openPlanePropertiesDialog(*plane);
-        return ForceStayInState;
-      }
-      case BI_Base::Type_t::Polygon: {
-        BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(items.first());
-        Q_ASSERT(polygon);
-        openPolygonPropertiesDialog(*board, polygon->getPolygon());
-        return ForceStayInState;
-      }
-      case BI_Base::Type_t::StrokeText: {
-        BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(items.first());
-        Q_ASSERT(text);
-        openStrokeTextPropertiesDialog(*board, text->getText());
-        return ForceStayInState;
-      }
-      case BI_Base::Type_t::Hole: {
-        BI_Hole* hole = dynamic_cast<BI_Hole*>(items.first());
-        Q_ASSERT(hole);
-        openHolePropertiesDialog(*board, hole->getHole());
-        return ForceStayInState;
-      }
-      default: { break; }
-    }
+    if (openPropertiesDialog(*board, items.first())) return ForceStayInState;
   }
   return PassToParentState;
 }
@@ -848,6 +755,50 @@ void BES_Select::measureLengthInDirection(bool              directionBackwards,
       break;
     }
   }
+}
+
+bool BES_Select::openPropertiesDialog(Board &board, BI_Base *item) {
+  switch (item->getType()) {
+    case BI_Base::Type_t::Footprint: {
+      BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item);
+      Q_ASSERT(footprint);
+      openDevicePropertiesDialog(footprint->getDeviceInstance());
+      return true;
+    }
+    case BI_Base::Type_t::Via: {
+      BI_Via* via = dynamic_cast<BI_Via*>(item);
+      Q_ASSERT(via);
+      openViaPropertiesDialog(*via);
+      return true;
+    }
+    case BI_Base::Type_t::Plane: {
+      BI_Plane* plane = dynamic_cast<BI_Plane*>(item);
+      Q_ASSERT(plane);
+      openPlanePropertiesDialog(*plane);
+      return true;
+    }
+    case BI_Base::Type_t::Polygon: {
+      BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(item);
+      Q_ASSERT(polygon);
+      openPolygonPropertiesDialog(board, polygon->getPolygon());
+      return true;
+    }
+    case BI_Base::Type_t::StrokeText: {
+      BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(item);
+      Q_ASSERT(text);
+      openStrokeTextPropertiesDialog(board, text->getText());
+      return true;
+    }
+    case BI_Base::Type_t::Hole: {
+      BI_Hole* hole = dynamic_cast<BI_Hole*>(item);
+      Q_ASSERT(hole);
+      openHolePropertiesDialog(board, hole->getHole());
+      return true;
+    }
+    default:
+      break;
+  }
+  return false;
 }
 
 void BES_Select::openDevicePropertiesDialog(BI_Device& device) noexcept {
