@@ -638,172 +638,173 @@ bool BES_DrawTrace::addNextNetPoint(Board& board) noexcept {
   //TODO(5n8ke): Don't abort, when trying to add a via and selecting the start
   // of the positioning
 
-  // abort if p2 == p0 (no line drawn)
-  if (mTargetPos == mFixedStartAnchor->getPosition()) {
+  // abort if no via should be added and p2 == p0 (no line drawn)
+  if (!mTempVia && mTargetPos == mFixedStartAnchor->getPosition()) {
     abortPositioning(true);
     return false;
-  } else {
-    // All the positioning is done by updateNetPoints already
-    bool finishCommand = false;
+  }
+  // All the positioning is done by updateNetPoints already
+  bool finishCommand = false;
 
-    try {
-      // find anchor under cursor use the target position as already determined
-      NetSignal* netsignal = &mPositioningNetPoint1->getNetSignalOfNetSegment();
-      GraphicsLayer* layer = mPositioningNetPoint1->getLayerOfLines();
-      Q_ASSERT(layer);
-      BI_NetLineAnchor* otherAnchor     = nullptr;
-      BI_NetSegment*    otherNetSegment = nullptr;
+  try {
+    // find anchor under cursor use the target position as already determined
+    NetSignal* netsignal = &mPositioningNetPoint1->getNetSignalOfNetSegment();
+    GraphicsLayer* layer = mPositioningNetPoint1->getLayerOfLines();
+    Q_ASSERT(layer);
+    BI_NetLineAnchor* otherAnchor     = nullptr;
+    BI_NetSegment*    otherNetSegment = nullptr;
 
-      if (BI_Via* via = findVia(board, mTargetPos, netsignal, {mTempVia})) {
-        otherAnchor     = via;
-        otherNetSegment = &via->getNetSegment();
-        if (mAddVia) {
-          mCurrentLayerName = mViaLayerName;
-        }
-      } else if (BI_FootprintPad* pad = findPad(board, mTargetPos, layer,
-                                                netsignal)) {
-        otherAnchor     = pad;
-        otherNetSegment = pad->getNetSegmentOfLines();
-        if (mAddVia &&
-            pad->getLibPad().getBoardSide() ==
-            library::FootprintPad::BoardSide::THT) {
-          mCurrentLayerName = mViaLayerName;
-        }
-      } else if (BI_NetPoint* netpoint =
-                 findNetPoint(board, mTargetPos, mAddVia ? nullptr : layer,
-                          netsignal,
-                          {mPositioningNetPoint1, mPositioningNetPoint2})) {
-        otherAnchor     = netpoint;
-        otherNetSegment = &netpoint->getNetSegment();
-      } else if (BI_NetLine* netline = findNetLine(board, mTargetPos,
-                                mAddVia ? nullptr : layer, netsignal,
-                                {mPositioningNetLine1, mPositioningNetLine2})) {
-        // split netline
-        otherNetSegment = &netline->getNetSegment();
-        QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-            new CmdBoardNetSegmentAddElements(*otherNetSegment));
-        otherAnchor = cmdAdd->addNetPoint(mTargetPos);
-        cmdAdd->addNetLine(*otherAnchor, netline->getStartPoint(),
-                           netline->getLayer(), netline->getWidth());
-        cmdAdd->addNetLine(*otherAnchor, netline->getEndPoint(),
-                           netline->getLayer(), netline->getWidth());
-        mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-        QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
-            new CmdBoardNetSegmentRemoveElements(*otherNetSegment));
-        cmdRemove->removeNetLine(*netline);
-        mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
-      }
-
-      if ((!mCurrentSnapActive) && otherAnchor) {
-        // only snap to otherAnchor, when close to its center
-        //TODO(5n8ke): This does not work for anchors which are not aligned
-        // with the grid
-        if (mTargetPos != otherAnchor->getPosition()) {
-          otherAnchor = nullptr;
-          otherNetSegment = nullptr;
-        }
-      }
-
-      // remove p1 if p1 == p0 || p1 == p2
-      Point middlePos = mPositioningNetPoint1->getPosition();
-      Point endPos    = otherAnchor ? otherAnchor->getPosition() : mTargetPos;
-      if ((middlePos == mFixedStartAnchor->getPosition()) ||
-          (middlePos == endPos)) {
-        QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
-            new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
-        cmdRemove->removeNetPoint(*mPositioningNetPoint1);
-        cmdRemove->removeNetLine(*mPositioningNetLine1);
-        cmdRemove->removeNetLine(*mPositioningNetLine2);
-        QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-            new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
-        BI_NetLineAnchor* target = mPositioningNetPoint2 ?
-              mPositioningNetPoint2 : static_cast<BI_NetLineAnchor*>(mTempVia);
-        mPositioningNetLine2 = cmdAdd->addNetLine(
-            *mFixedStartAnchor, *target,
-            mPositioningNetLine2->getLayer(), mPositioningNetLine2->getWidth());
-        mUndoStack.appendToCmdGroup(cmdAdd.take());
-        mUndoStack.appendToCmdGroup(cmdRemove.take());
-      }
-
-      if (mTempVia)
-      {
-        Q_ASSERT(mAddVia);
+    if (BI_Via* via = findVia(board, mTargetPos, netsignal, {mTempVia})) {
+      otherAnchor     = via;
+      otherNetSegment = &via->getNetSegment();
+      if (mAddVia) {
         mCurrentLayerName = mViaLayerName;
       }
+    } else if (BI_FootprintPad* pad = findPad(board, mTargetPos, layer,
+                                              netsignal)) {
+      otherAnchor     = pad;
+      otherNetSegment = pad->getNetSegmentOfLines();
+      if (mAddVia &&
+          pad->getLibPad().getBoardSide() ==
+          library::FootprintPad::BoardSide::THT) {
+        mCurrentLayerName = mViaLayerName;
+      }
+    } else if (BI_NetPoint* netpoint =
+               findNetPoint(board, mTargetPos, mAddVia ? nullptr : layer,
+                        netsignal,
+                        {mPositioningNetPoint1, mPositioningNetPoint2})) {
+      otherAnchor     = netpoint;
+      otherNetSegment = &netpoint->getNetSegment();
+    } else if (BI_NetLine* netline = findNetLine(board, mTargetPos,
+                              mAddVia ? nullptr : layer, netsignal,
+                              {mPositioningNetLine1, mPositioningNetLine2})) {
+      // split netline
+      otherNetSegment = &netline->getNetSegment();
+      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+          new CmdBoardNetSegmentAddElements(*otherNetSegment));
+      otherAnchor = cmdAdd->addNetPoint(mTargetPos);
+      cmdAdd->addNetLine(*otherAnchor, netline->getStartPoint(),
+                         netline->getLayer(), netline->getWidth());
+      cmdAdd->addNetLine(*otherAnchor, netline->getEndPoint(),
+                         netline->getLayer(), netline->getWidth());
+      mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
+      QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+          new CmdBoardNetSegmentRemoveElements(*otherNetSegment));
+      cmdRemove->removeNetLine(*netline);
+      mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+    }
 
-      // if anchor found under the cursor, replace "mPositioningNetPoint2" with
-      // it
-      if (otherAnchor) {
-        if (mAddVia) {
-          finishCommand = false;
-        } else {
-          finishCommand = true;
-        }
-        if (mTempVia && otherNetSegment != mCurrentNetSegment) {
-          mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
-                          *otherNetSegment, *otherAnchor,
-                          *mCurrentNetSegment, *mTempVia));  // can throw
-        } else if (mTempVia) {
-          QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-              new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
-          QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+    if ((!mCurrentSnapActive) && otherAnchor) {
+      // only snap to otherAnchor, when close to its center
+      //TODO(5n8ke): This does not work for anchors which are not aligned
+      // with the grid
+      if (mTargetPos != otherAnchor->getPosition()) {
+        otherAnchor = nullptr;
+        otherNetSegment = nullptr;
+      }
+    }
+
+    // remove p1 if p1 == p0 || p1 == p2
+    Point middlePos = mPositioningNetPoint1->getPosition();
+    Point endPos    = otherAnchor ? otherAnchor->getPosition() : mTargetPos;
+    if ((middlePos == mFixedStartAnchor->getPosition()) ||
+        (middlePos == endPos)) {
+      QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
           new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
-          cmdRemove->removeNetPoint(*dynamic_cast<BI_NetPoint*>(otherAnchor));
-          foreach (BI_NetLine* netLine, otherAnchor->getNetLines()) {
-            BI_NetLineAnchor* anchor = netLine->getOtherPoint(*otherAnchor);
+      cmdRemove->removeNetPoint(*mPositioningNetPoint1);
+      cmdRemove->removeNetLine(*mPositioningNetLine1);
+      cmdRemove->removeNetLine(*mPositioningNetLine2);
+      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+          new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
+      BI_NetLineAnchor* target = mPositioningNetPoint2 ?
+            mPositioningNetPoint2 : static_cast<BI_NetLineAnchor*>(mTempVia);
+      mPositioningNetLine2 = cmdAdd->addNetLine(
+          *mFixedStartAnchor, *target,
+          mPositioningNetLine2->getLayer(), mPositioningNetLine2->getWidth());
+      mUndoStack.appendToCmdGroup(cmdAdd.take());
+      mUndoStack.appendToCmdGroup(cmdRemove.take());
+    }
+
+    if (mTempVia)
+    {
+      Q_ASSERT(mAddVia);
+      mCurrentLayerName = mViaLayerName;
+    }
+
+    // if anchor found under the cursor, replace "mPositioningNetPoint2" with
+    // it
+    if (otherAnchor) {
+      if (mAddVia) {
+        finishCommand = false;
+      } else {
+        finishCommand = true;
+      }
+      if (mTempVia && otherNetSegment != mCurrentNetSegment) {
+        mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
+                        *otherNetSegment, *otherAnchor,
+                        *mCurrentNetSegment, *mTempVia));  // can throw
+      } else if (mTempVia) {
+        QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+            new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
+        QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+        new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
+        cmdRemove->removeNetPoint(*dynamic_cast<BI_NetPoint*>(otherAnchor));
+        foreach (BI_NetLine* netLine, otherAnchor->getNetLines()) {
+          BI_NetLineAnchor* anchor = netLine->getOtherPoint(*otherAnchor);
+          if (anchor != mTempVia) {
             cmdAdd->addNetLine(*anchor, *mTempVia,
                                netLine->getLayer(), netLine->getWidth());
-            cmdRemove->removeNetLine(*netLine);
           }
-          mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-          mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
-        } else if ((!otherNetSegment) ||
-            (otherNetSegment == mCurrentNetSegment)) {
-          QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-              new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
-          cmdAdd->addNetLine(*otherAnchor,
-                             mPositioningNetLine2->getStartPoint(),
-                             mPositioningNetLine2->getLayer(),
-                             mPositioningNetLine2->getWidth());
-          mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-          QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
-              new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
-          cmdRemove->removeNetPoint(*mPositioningNetPoint2);
-          cmdRemove->removeNetLine(*mPositioningNetLine2);
-          mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
-        } else {
-          mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
-              *mCurrentNetSegment, *mPositioningNetPoint2,
-              *otherNetSegment, *otherAnchor));  // can throw
+          cmdRemove->removeNetLine(*netLine);
         }
+        mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
+        mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+      } else if ((!otherNetSegment) ||
+          (otherNetSegment == mCurrentNetSegment)) {
+        QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+            new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
+        cmdAdd->addNetLine(*otherAnchor,
+                           mPositioningNetLine2->getStartPoint(),
+                           mPositioningNetLine2->getLayer(),
+                           mPositioningNetLine2->getWidth());
+        mUndoStack.appendToCmdGroup(cmdAdd.take());  // can throw
+        QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+            new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
+        cmdRemove->removeNetPoint(*mPositioningNetPoint2);
+        cmdRemove->removeNetLine(*mPositioningNetLine2);
+        mUndoStack.appendToCmdGroup(cmdRemove.take());  // can throw
       } else {
-        finishCommand = false;
+        mUndoStack.appendToCmdGroup(new CmdCombineBoardNetSegments(
+            *mCurrentNetSegment, *mPositioningNetPoint2,
+            *otherNetSegment, *otherAnchor));  // can throw
       }
-    } catch (const UserCanceled& e) {
-      return false;
-    } catch (const Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-      return false;
+    } else {
+      finishCommand = false;
     }
-    mTempVia = nullptr;
+  } catch (const UserCanceled& e) {
+    return false;
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+    return false;
+  }
+  mTempVia = nullptr;
 
-    try {
-      // finish the current command
-      mUndoStack.commitCmdGroup();  // can throw
-      mSubState = SubState_Idle;
-      // abort or start a new command
-      if (finishCommand) {
-        abortPositioning(true);
-        return true;
-      } else {
-        abortPositioning(false);
-        return startPositioning(board, mTargetPos);
-      }
-    } catch (const Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+  try {
+    // finish the current command
+    mUndoStack.commitCmdGroup();  // can throw
+    mSubState = SubState_Idle;
+    // abort or start a new command
+    if (finishCommand) {
+      abortPositioning(true);
+      return true;
+    } else {
       abortPositioning(false);
-      return false;
+      return startPositioning(board, mTargetPos);
     }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+    abortPositioning(false);
+    return false;
   }
 }
 
