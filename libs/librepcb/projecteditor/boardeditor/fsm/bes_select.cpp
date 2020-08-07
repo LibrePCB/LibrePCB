@@ -49,6 +49,7 @@
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/boards/items/bi_hole.h>
 #include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_netsegment.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
@@ -76,7 +77,8 @@ namespace editor {
 BES_Select::BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
                        GraphicsView& editorGraphicsView, UndoStack& undoStack)
   : BES_Base(editor, editorUi, editorGraphicsView, undoStack),
-    mSubState(SubState_Idle) {
+    mSubState(SubState_Idle),
+    mCurrentSelectionIndex(0) {
 }
 
 BES_Select::~BES_Select() {
@@ -227,6 +229,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneLeftClick(
   if (items.isEmpty()) {
     // no items under mouse --> start drawing a selection rectangle
     board.clearSelection();
+    mCurrentSelectionIndex = 0;
     return ForceStayInState;
   }
 
@@ -235,6 +238,12 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneLeftClick(
   if ((mouseEvent->modifiers() & Qt::ControlModifier)) {
     // Toggle selection when CTRL is pressed
     items.first()->setSelected(!itemAlreadySelected);
+  } else if ((mouseEvent->modifiers() & Qt::ShiftModifier)) {
+    // Cycle Selection, when holding shift
+    mCurrentSelectionIndex += 1;
+    mCurrentSelectionIndex %= items.count();
+    board.clearSelection();
+    items[mCurrentSelectionIndex]->setSelected(true);
   } else if (!itemAlreadySelected) {
     // Only select the topmost item when clicking an unselected item
     // without CTRL
@@ -258,11 +267,19 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
   // If the right-clicked element is part of an active selection, keep it as-is.
   // However, if it's not part of an active selection, clear the selection and
   // select the right-clicked element instead.
-  BI_Base* selectedItem = items.first();
-  if (!selectedItem->isSelected()) {
+  BI_Base* selectedItem = nullptr;
+  foreach (BI_Base* item, items) {
+    if (item->isSelected()) {
+      selectedItem = item;
+    }
+  }
+  if (!selectedItem) {
+    selectedItem = items.first();
     board->clearSelection();
     selectedItem->setSelected(true);
   }
+  Q_ASSERT(selectedItem);
+  Q_ASSERT(selectedItem->isSelected());
 
   // build and execute the context menu
   QMenu menu;
@@ -272,6 +289,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
   QAction* aRotateCCW = nullptr;
   QAction* aFlipH = nullptr;
   QAction* aSnapToGrid = nullptr;
+  QAction* aMeasureSelection = nullptr;
   QAction* aProperties = nullptr;
   QAction* action = nullptr;
   bool menuWasExecuted = false;
@@ -336,7 +354,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
         } catch (Exception& e) {
           QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
         }
-      } else if (!action->data().toUuid().isNull()) {
+      } else if (action && !action->data().toUuid().isNull()) {
         try {
           Uuid uuid = Uuid::fromString(action->data().toString());  // can throw
           Uuid deviceUuid = devInst.getLibDevice().getUuid();
@@ -370,16 +388,28 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
       aSelectTrace->setData(QVariant::fromValue(&netline->getNetSegment()));
       menu.addSeparator();
-      QAction* aMeasureSelection =
-          menu.addAction(QIcon(":/img/actions/ruler.png"),
-                         tr("Measure Selected Segments Length"));
+      aMeasureSelection = ACTION_MEASURE_DEFAULT(menu);
+      aMeasureSelection->setData(QVariant::fromValue(netline));
+      break;
+    }
 
-      // execute the context menu
-      action = menu.exec(mouseEvent->screenPos());
-      menuWasExecuted = true;
-      if (action == aMeasureSelection) {
-        measureSelectedItems(*netline);
-      }
+    case BI_Base::Type_t::NetPoint: {
+      BI_NetPoint* netpoint = dynamic_cast<BI_NetPoint*>(selectedItem);
+      Q_ASSERT(netpoint);
+
+      aRemoveTrace = ACTION_DELETE_ALL_DEFAULT(menu);
+      aRemoveTrace->setData(QVariant::fromValue(&netpoint->getNetSegment()));
+      menu.addSeparator();
+      aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
+      aSelectTrace->setData(QVariant::fromValue(&netpoint->getNetSegment()));
+      menu.addSeparator();
+      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
+      aSnapToGrid->setVisible(!netpoint->getPosition()
+                  .isOnGrid(board->getGridProperties())); // only show if needed
+      menu.addSeparator();
+      aMeasureSelection = ACTION_MEASURE_DEFAULT(menu);
+      aMeasureSelection->setData(
+            QVariant::fromValue(*netpoint->getNetLines().begin()));
       break;
     }
 
@@ -503,6 +533,10 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
     } catch (Exception& e) {
       QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
     }
+  } else if (action == aMeasureSelection) {
+    BI_NetLine* netline = action->data().value<BI_NetLine*>();
+    netline->setSelected(true);
+    measureSelectedItems(*netline);
   } else if (action == aProperties) {
     openPropertiesDialog(*board, selectedItem);
   }

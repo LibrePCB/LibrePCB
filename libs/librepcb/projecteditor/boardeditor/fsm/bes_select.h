@@ -60,6 +60,10 @@
   menu.addAction(QIcon(":/img/actions/grid.png"), text)
 #define ACTION_SNAP_DEFAULT(menu) ACTION_SNAP(menu, tr("Snap to grid"))
 
+#define ACTION_MEASURE(menu, text) \
+  menu.addAction(QIcon(":/img/actions/ruler.png"), text)
+#define ACTION_MEASURE_DEFAULT(menu) ACTION_MEASURE(menu, tr("Measure Selected Segments Length"))
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -169,6 +173,7 @@ private:
   // Attributes
   SubState mSubState;  ///< the current substate
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************
