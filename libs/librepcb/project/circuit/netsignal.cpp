@@ -265,7 +265,11 @@ void NetSignal::updateErcMessages() noexcept {
     mErcMsgUnusedNetSignal.reset();
   }
 
-  int registeredRealComponentCount = 0;//mRegisteredComponentSignals.count();
+  // Raise a warning if the net signal is connected to less then two component
+  // signals. But do not count component signals of schematic-only components
+  // since these are just "virtual" connections, i.e. not represented by a
+  // real pad (see https://github.com/LibrePCB/LibrePCB/issues/739).
+  int registeredRealComponentCount = 0;
   foreach (ComponentSignalInstance* signal, mRegisteredComponentSignals) {
     if (!signal->getComponentInstance().getLibComponent().isSchematicOnly()) {
       registeredRealComponentCount++;
