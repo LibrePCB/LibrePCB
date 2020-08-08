@@ -78,7 +78,7 @@ private:
   ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
   bool addVia(Board& board) noexcept;
   bool updateVia(Board& board, const Point& pos) noexcept;
-  bool fixVia(Point& pos) noexcept;
+  bool fixVia(Board& board, const Point& pos) noexcept;
   void updateShapeActionsCheckedState() noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
@@ -107,6 +107,8 @@ private:
   PositiveLength                  mCurrentViaDrillDiameter;
   NetSignal*                      mCurrentViaNetSignal;
   NetSignal*                      mTempNetSignal;
+  bool                            mFindClosestNetSignal;
+  NetSignal*                      mLastClosestNetSignal;
   QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
   // Widgets for the command toolbar

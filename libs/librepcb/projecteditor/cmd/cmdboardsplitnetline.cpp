@@ -38,11 +38,10 @@ namespace librepcb {
 namespace project {
 namespace editor {
 
-CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine& netline, Point& pos)
-  noexcept : UndoCommandGroup(tr("Split netline")),
-  mOldNetLine(netline),
-  mSplitPosition(pos) {
-  mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), mSplitPosition);
+CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine& netline, const Point& pos)
+  noexcept : UndoCommandGroup(tr("Split trace")),
+  mOldNetLine(netline) {
+  mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), pos);
 }
 
 CmdBoardSplitNetLine::~CmdBoardSplitNetLine() noexcept {
@@ -53,8 +52,6 @@ CmdBoardSplitNetLine::~CmdBoardSplitNetLine() noexcept {
  ******************************************************************************/
 
 bool CmdBoardSplitNetLine::performExecute() {
-  auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
-
   QScopedPointer<CmdBoardNetSegmentAddElements>
       cmdAdd(new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment()));
   cmdAdd->addNetPoint(*mSplitPoint);
@@ -65,11 +62,9 @@ bool CmdBoardSplitNetLine::performExecute() {
   QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
         new CmdBoardNetSegmentRemoveElements(mOldNetLine.getNetSegment()));
   cmdRemove->removeNetLine(mOldNetLine);
-  execNewChildCmd(cmdAdd.take()); // can throw
-  execNewChildCmd(cmdRemove.take()); // can throw
-
-  undoScopeGuard.dismiss();  // no undo required
-  return true;
+  appendChild(cmdAdd.take());
+  appendChild(cmdRemove.take());
+  return UndoCommandGroup::performExecute();
 }
 
 /*******************************************************************************

@@ -69,6 +69,7 @@ BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mCurrentViaSize(700000),
     mCurrentViaDrillDiameter(300000),
     mCurrentViaNetSignal(nullptr),
+    mFindClosestNetSignal(true),
     // command toolbar actions / widgets:
     mSizeLabel(nullptr),
     mSizeEdit(nullptr),
@@ -79,7 +80,7 @@ BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
 }
 
 BES_AddVia::~BES_AddVia() {
-  Q_ASSERT(!mUndoStack.isCommandGroupActive());
+  Q_ASSERT(mSubState == SubState_Idle);
 }
 
 /*******************************************************************************
@@ -99,8 +100,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   Q_UNUSED(event);
   Board* board = mEditor.getActiveBoard();
   if (!board) return false;
-  if (mEditor.getProject().getCircuit().getNetSignals().count() == 0)
-    return false;
+  if (mCircuit.getNetSignals().isEmpty()) return false;
 
   // clear board selection because selection does not make sense in this state
   board->clearSelection();
@@ -162,14 +162,12 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
   mNetSignalComboBox->setEditable(false);
   foreach (NetSignal* netsignal,
-           mEditor.getProject().getCircuit().getNetSignals()) {
+           mCircuit.getNetSignals()) {
     mNetSignalComboBox->addItem(*netsignal->getName(),
                                 netsignal->getUuid().toStr());
   }
   mNetSignalComboBox->model()->sort(0);
-  mNetSignalComboBox->setInsertPolicy(QComboBox::InsertAtTop);
-  while (mEditor.getProject().getCircuit()
-         .getNetSignalByName(mAutoText)) {
+  while (mCircuit.getNetSignalByName(mAutoText)) {
     mAutoText = "[" + mAutoText + "]";
   }
   mNetSignalComboBox->addItem(mAutoText);
@@ -182,12 +180,12 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
             if (value == mAutoText) {
               mCurrentViaNetSignal = nullptr;
             } else {
-              mCurrentViaNetSignal = mEditor.getProject().getCircuit()
-                  .getNetSignalByName(value);
+              mCurrentViaNetSignal = mCircuit.getNetSignalByName(value);
               setNetSignal(mCurrentViaNetSignal);
             }
           });
 
+  mLastClosestNetSignal = mCircuit.getNetSignalWithMostElements();
   // add a new via
   return addVia(*board);
 }
@@ -240,7 +238,7 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept {
                       .mappedToGrid(board->getGridProperties().getInterval());
       switch (sceneEvent->button()) {
         case Qt::LeftButton: {
-          fixVia(pos);
+          fixVia(*board, pos);
           addVia(*board);
           updateVia(*board, pos);
           return ForceStayInState;
@@ -293,11 +291,11 @@ BES_Base::ProcRetVal BES_AddVia::processSceneEvent(BEE_Base* event) noexcept {
 
 bool BES_AddVia::addVia(Board& board) noexcept {
   Q_ASSERT(mSubState == SubState_Idle);
-  Q_ASSERT(!mUndoStack.isCommandGroupActive());
 
   try {
-    mSubState = SubState_PositioningVia;
     mUndoStack.beginCmdGroup(tr("Add via to board"));
+    Q_ASSERT(mUndoStack.isCommandGroupActive());
+    mSubState = SubState_PositioningVia;
     CmdBoardNetSegmentAdd* cmdAddSeg = nullptr;
     if (mCurrentViaNetSignal) {
       cmdAddSeg = new CmdBoardNetSegmentAdd(board, *mCurrentViaNetSignal);
@@ -329,7 +327,6 @@ bool BES_AddVia::addVia(Board& board) noexcept {
 
 void BES_AddVia::abortPlacement(const bool showErrorMessage) noexcept {
   if (mSubState != SubState_Idle) {
-    Q_ASSERT(mUndoStack.isCommandGroupActive());
     try {
       mUndoStack.abortCmdGroup();
     } catch (Exception& e) {
@@ -338,7 +335,6 @@ void BES_AddVia::abortPlacement(const bool showErrorMessage) noexcept {
       }
     }
   }
-  Q_ASSERT(!mUndoStack.isCommandGroupActive());
   mSubState = SubState_Idle;
 }
 
@@ -359,23 +355,22 @@ bool BES_AddVia::updateVia(Board& board, const Point& pos) noexcept {
   }
 }
 
-bool BES_AddVia::fixVia(Point& pos) noexcept {
+bool BES_AddVia::fixVia(Board& board, const Point& pos) noexcept {
   Q_ASSERT(mSubState == SubState_PositioningVia);
   //TODO(5n8ke): handle user errors in a more graceful way without popup message
 
   try {
     mViaEditCmd->setPosition(pos, false);
 
-    Board* board = &mCurrentVia->getBoard();
     NetSignal* netsignal = mCurrentViaNetSignal;
     if (!netsignal) {
-        QSet<NetSignal*> netsignals = getNetSignalsAtScenePos(*board, pos,
+        QSet<NetSignal*> netsignals = getNetSignalsAtScenePos(board, pos,
         {mCurrentVia});
       if (netsignals.count() > 1) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Multiple different signals at via position."));
       } else if (netsignals.count() == 0) {
-        netsignal = getClosestNetSignal(*board, pos);
+        netsignal = getClosestNetSignal(board, pos);
       } else {
         netsignal = netsignals.values().first();
       }
@@ -386,7 +381,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
 
     // Find stuff at the via position
     QSet<BI_NetPoint*> otherNetAnchors = {};
-    if (BI_Via* via = findVia(*board, pos, nullptr, {mCurrentVia})) {
+    if (BI_Via* via = findVia(board, pos, nullptr, {mCurrentVia})) {
       if (&via->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Via of a different signal already present at target position."));
@@ -394,7 +389,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         abortPlacement();
         return true;
       }
-    } else if (BI_FootprintPad* pad = findPad(*board, pos)) {
+    } else if (BI_FootprintPad* pad = findPad(board, pos)) {
       if (pad->getCompSigInstNetSignal() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Pad of a different signal already present at target position."));
@@ -403,7 +398,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         return true;
       }
     }
-    foreach (BI_NetPoint* netpoint, board->getNetPointsAtScenePos(pos)) {
+    foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
       if (&netpoint->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Netpoint of a different signal already present"
@@ -412,7 +407,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
         otherNetAnchors.insert(netpoint);
       }
     }
-    foreach (BI_NetLine* netline, board->getNetLinesAtScenePos(pos)) {
+    foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
       if (&netline->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
           tr("Netline of a different signal already present"
@@ -445,7 +440,7 @@ bool BES_AddVia::fixVia(Point& pos) noexcept {
                         mCurrentVia->getNetSegment(), *mCurrentVia));
     }
     // Replace all NetPoints at the given position with the newly added Via
-    foreach (BI_NetPoint* netpoint, board->getNetPointsAtScenePos(pos)) {
+    foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
       Q_ASSERT(netpoint->getNetSegment() == mCurrentVia->getNetSegment());
         QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
               new CmdBoardNetSegmentAddElements(mCurrentVia->getNetSegment()));
@@ -550,9 +545,21 @@ QSet<NetSignal*> BES_AddVia::getNetSignalsAtScenePos(Board& board,
 NetSignal* BES_AddVia::getClosestNetSignal(Board& board, const Point& pos)
 noexcept {
   //TODO(5n8ke): Get the closest candidate, instead of the most used
-  BI_NetLine* atPosition = findNetLine(board, pos);
-  if (atPosition) return &atPosition->getNetSignalOfNetSegment();
-  return board.getProject().getCircuit().getNetSignalWithMostElements();
+  // for now a _closest_ NetSignal is only found, when it is at pos.
+  // Otherwise the last candidate is returned.
+  if (mFindClosestNetSignal) {
+    if (BI_NetLine* atPosition = findNetLine(board, pos)) {
+      mLastClosestNetSignal = &atPosition->getNetSignalOfNetSegment();
+    }
+    mFindClosestNetSignal = false;
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this]() {
+      this->mFindClosestNetSignal = true;
+    });
+    timer->setSingleShot(true);
+    timer->start(500);
+  }
+  return mLastClosestNetSignal;
 }
 
 BI_Via* BES_AddVia::findVia(Board& board, const Point pos, NetSignal* netsignal,

@@ -43,13 +43,20 @@ class CmdBoardNetSegmentAddElements;
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdBoardNetLineSplit
+ *  Class CmdBoardSplitNetLine
  ******************************************************************************/
 
+/**
+ * @brief Undo command to split a ::librepcb::project::BI_NetLine
+ *
+ * Splits the BI_NetLine at the given position and creates a new
+ * ::librepcb::project::BI_NetPoint. It is not checked, whether the split
+ * position lies on the BI_NetLine or not.
+ */
 class CmdBoardSplitNetLine : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdBoardSplitNetLine(BI_NetLine& netline, Point& pos) noexcept;
+  explicit CmdBoardSplitNetLine(BI_NetLine& netline, const Point& pos) noexcept;
   ~CmdBoardSplitNetLine() noexcept;
 
   BI_NetPoint* getSplitPoint() noexcept { return mSplitPoint; };
@@ -60,9 +67,8 @@ private: // Methods
   bool performExecute() override;
 
   // Private Member Variables
-  BI_NetLine& mOldNetLine;
-  Point& mSplitPosition;
-  BI_NetPoint* mSplitPoint;
+  BI_NetLine& mOldNetLine;  ///< The BI_NetLine to be split
+  BI_NetPoint* mSplitPoint; ///< The new BI_NetPoint at the split position
 };
 
 /*******************************************************************************
