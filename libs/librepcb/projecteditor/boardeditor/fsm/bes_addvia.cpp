@@ -70,6 +70,7 @@ BES_AddVia::BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mCurrentViaDrillDiameter(300000),
     mCurrentViaNetSignal(nullptr),
     mFindClosestNetSignal(true),
+    mLastClosestNetSignal(nullptr),
     // command toolbar actions / widgets:
     mSizeLabel(nullptr),
     mSizeEdit(nullptr),
@@ -101,6 +102,8 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
   Board* board = mEditor.getActiveBoard();
   if (!board) return false;
   if (mCircuit.getNetSignals().isEmpty()) return false;
+  mLastClosestNetSignal = mCircuit.getNetSignalWithMostElements();
+  if (!addVia(*board)) return false;
 
   // clear board selection because selection does not make sense in this state
   board->clearSelection();
@@ -185,9 +188,7 @@ bool BES_AddVia::entry(BEE_Base* event) noexcept {
             }
           });
 
-  mLastClosestNetSignal = mCircuit.getNetSignalWithMostElements();
-  // add a new via
-  return addVia(*board);
+  return true;
 }
 
 bool BES_AddVia::exit(BEE_Base* event) noexcept {
@@ -401,7 +402,7 @@ bool BES_AddVia::fixVia(Board& board, const Point& pos) noexcept {
     foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
       if (&netpoint->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
-          tr("Netpoint of a different signal already present"
+          tr("Netpoint of a different signal already present "
              "at target position."));
       } else {
         otherNetAnchors.insert(netpoint);
@@ -410,7 +411,7 @@ bool BES_AddVia::fixVia(Board& board, const Point& pos) noexcept {
     foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
       if (&netline->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
-          tr("Netline of a different signal already present"
+          tr("Netline of a different signal already present "
              "at target position."));
       } else  if (!otherNetAnchors.contains(
               dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
@@ -499,6 +500,9 @@ void BES_AddVia::setNetSignal(NetSignal* netsignal) noexcept {
     if (!netsignal) {
       throw LogicError(__FILE__, __LINE__);
     }
+    if (netsignal == &mCurrentVia->getNetSignalOfNetSegment()) {
+      return;
+    }
     mUndoStack.appendToCmdGroup(
         new CmdBoardNetSegmentRemove(mCurrentVia->getNetSegment()));
     QScopedPointer<CmdBoardNetSegmentEdit> cmdEdit(
@@ -553,8 +557,9 @@ noexcept {
     }
     mFindClosestNetSignal = false;
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [this]() {
+    connect(timer, &QTimer::timeout, [this, timer]() {
       this->mFindClosestNetSignal = true;
+      timer->deleteLater();
     });
     timer->setSingleShot(true);
     timer->start(500);

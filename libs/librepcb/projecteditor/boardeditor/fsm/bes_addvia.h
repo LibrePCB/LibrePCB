@@ -106,7 +106,6 @@ private:
   PositiveLength                  mCurrentViaSize;
   PositiveLength                  mCurrentViaDrillDiameter;
   NetSignal*                      mCurrentViaNetSignal;
-  NetSignal*                      mTempNetSignal;
   bool                            mFindClosestNetSignal;
   NetSignal*                      mLastClosestNetSignal;
   QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
