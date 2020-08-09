@@ -23,19 +23,17 @@
 #include "cmdreplacedevice.h"
 
 #include "cmdadddevicetoboard.h"
+#include "cmdremoveboarditems.h"
 
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
+#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_netline.h>
+#include <librepcb/project/boards/items/bi_netsegment.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/project.h>
 
 #include <QtCore>
 
@@ -77,7 +75,26 @@ bool CmdReplaceDevice::performExecute() {
   foreach (BI_FootprintPad* pad, mDeviceInstance.getFootprint().getPads()) {
     BI_NetSegment* netsegment = pad->getNetSegmentOfLines();
     if (netsegment) {
-      execNewChildCmd(new CmdBoardNetSegmentRemove(*netsegment));  // can throw
+      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+            new CmdBoardNetSegmentAddElements(*netsegment));
+      QMap<GraphicsLayer*, BI_NetPoint*> newNetPoints = {};
+      QSet<BI_NetLine*> connectedNetLines = pad->getNetLines();
+      if (connectedNetLines.count() > 1) {
+        foreach (BI_NetLine* netline, connectedNetLines) {
+          auto it = newNetPoints.find(&netline->getLayer());
+          if (it == newNetPoints.end()) {
+            it = newNetPoints.insert(&netline->getLayer(),
+                                     cmdAdd->addNetPoint(pad->getPosition()));
+          }
+          cmdAdd->addNetLine(**it, *netline->getOtherPoint(*pad),
+                             netline->getLayer(), netline->getWidth());
+        }
+      }
+      execNewChildCmd(cmdAdd.take());
+      QScopedPointer<CmdRemoveBoardItems> cmdRemove(
+            new CmdRemoveBoardItems(netsegment->getBoard()));
+      cmdRemove->removeNetLines(pad->getNetLines());
+      execNewChildCmd(cmdRemove.take()); // can throw
     }
   }
 
