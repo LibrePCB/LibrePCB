@@ -191,6 +191,13 @@ private:
                           GraphicsLayer*           layer     = nullptr,
                           NetSignal*               netsignal = nullptr,
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
+
+  BI_NetLineAnchor* findAnchorNextTo(Board& board, const Point& pos,
+                                     const UnsignedLength& maxDistance,
+                                     GraphicsLayer*        layer = nullptr,
+                                     NetSignal* netsignal = nullptr) const
+      noexcept;
+
   /**
    * @brief Update the currently active traces according
    * to the set parameters.

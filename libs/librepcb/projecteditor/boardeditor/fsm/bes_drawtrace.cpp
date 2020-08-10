@@ -557,6 +557,27 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
           new CmdBoardSplitNetLine(*netline, posOnNetline));
       mFixedStartAnchor = cmdSplit->getSplitPoint();
       mUndoStack.appendToCmdGroup(cmdSplit.take());  // can throw
+    } else if (BI_NetLineAnchor* anchor = findAnchorNextTo(
+                   board, pos, UnsignedLength(10 * 1000 * 1000), layer)) {
+      // Only look on the currently selected layer
+      mFixedStartAnchor  = anchor;
+      mCurrentNetSegment = anchor->getNetSegmentOfLines();
+      // NOTE(5n8ke): a via might not have netlines, but still has a netsegment.
+      // The same is true for footprintpads, but they might not even have a
+      // netsegment
+      if (!mCurrentNetSegment) {
+        if (BI_Via* via = dynamic_cast<BI_Via*>(anchor)) {
+          mCurrentNetSegment = &via->getNetSegment();
+        } else if (BI_FootprintPad* pad =
+                       dynamic_cast<BI_FootprintPad*>(anchor)) {
+          mCurrentNetSegment = pad->getNetSegmentOfLines();
+          mCurrentNetSignal  = pad->getCompSigInstNetSignal();
+          if (!mCurrentNetSignal) {
+            throw Exception(__FILE__, __LINE__,
+                            tr("Pad is not connected to any signal."));
+          }
+        }
+      }
     } else {
       throw Exception(__FILE__, __LINE__, tr("Nothing here to connect."));
     }
@@ -868,6 +889,21 @@ BI_NetLine* BES_DrawTrace::findNetLine(Board& board, const Point& pos,
   items -= except;
   return (items.constBegin() != items.constEnd()) ? *items.constBegin()
                                                   : nullptr;
+}
+
+BI_NetLineAnchor* BES_DrawTrace::findAnchorNextTo(
+    Board& board, const Point& pos, const UnsignedLength& maxDistance,
+    GraphicsLayer* layer, NetSignal* netsignal) const noexcept {
+  UnsignedLength currentDistance = maxDistance;
+  BI_NetPoint*   point =
+      board.getNetPointNextToScenePos(pos, currentDistance, layer, netsignal);
+  BI_Via* via = board.getViaNextToScenePos(pos, currentDistance, netsignal);
+  BI_FootprintPad* pad =
+      board.getPadNextToScenePos(pos, currentDistance, layer, netsignal);
+  if (pad) return pad;
+  if (via) return via;
+  if (point) return point;
+  return nullptr;
 }
 
 void BES_DrawTrace::updateNetpointPositions() noexcept {
