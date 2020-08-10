@@ -23,7 +23,6 @@
 #include "point.h"
 
 #include "angle.h"
-#include "gridproperties.h"
 
 #include <QtCore>
 
@@ -72,9 +71,8 @@ Point& Point::mapToGrid(const PositiveLength& gridInterval) noexcept {
   return *this;
 }
 
-bool Point::isOnGrid(const GridProperties &properties) const noexcept {
-  Point p(*this);
-  return (p.mappedToGrid(properties.getInterval()) == p);
+bool Point::isOnGrid(const PositiveLength& gridInterval) const noexcept {
+  return (mappedToGrid(gridInterval) == *this);
 }
 
 Point Point::rotated(const Angle& angle, const Point& center) const noexcept {

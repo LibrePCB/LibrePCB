@@ -187,7 +187,7 @@ BES_Base::ProcRetVal BES_Select::processSubStateIdleSceneEvent(
           board->setSelectionRect(Point(), Point(), false);
           return ForceStayInState;
         case Qt::RightButton:
-          return processIdleSceneRightMouseButtonReleased(mouseEvent, board);
+          return processIdleSceneRightMouseButtonReleased(mouseEvent, *board);
         default:
           break;
       }
@@ -258,10 +258,10 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneLeftClick(
 }
 
 BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept {
+    QGraphicsSceneMouseEvent* mouseEvent, Board& board) noexcept {
   // handle item selection
   QList<BI_Base*> items =
-      board->getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
+      board.getItemsAtScenePos(Point::fromPx(mouseEvent->scenePos()));
   if (items.isEmpty()) return PassToParentState;
 
   // If the right-clicked element is part of an active selection, keep it as-is.
@@ -275,24 +275,14 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
   }
   if (!selectedItem) {
     selectedItem = items.first();
-    board->clearSelection();
+    board.clearSelection();
     selectedItem->setSelected(true);
   }
   Q_ASSERT(selectedItem);
   Q_ASSERT(selectedItem->isSelected());
 
-  // build and execute the context menu
+  // build the context menus
   QMenu menu;
-  QAction* aRemove = nullptr;
-  QAction* aRemoveTrace = nullptr;
-  QAction* aSelectTrace = nullptr;
-  QAction* aRotateCCW = nullptr;
-  QAction* aFlipH = nullptr;
-  QAction* aSnapToGrid = nullptr;
-  QAction* aMeasureSelection = nullptr;
-  QAction* aProperties = nullptr;
-  QAction* action = nullptr;
-  bool menuWasExecuted = false;
   switch (selectedItem->getType()) {
     case BI_Base::Type_t::Footprint: {
       BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(selectedItem);
@@ -301,15 +291,20 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       ComponentInstance& cmpInst = devInst.getComponentInstance();
 
       // build the context menu
-      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
-      aFlipH = ACTION_FLIP_DEFAULT(menu);
-      aRemove = ACTION_DELETE(menu, tr("Remove %1").arg(*cmpInst.getName()));
+      addActionRotate(menu);
+      addActionFlip(menu);
+      addActionDelete(menu, tr("Remove %1").arg(*cmpInst.getName()));
       menu.addSeparator();
-      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
-      aSnapToGrid->setVisible(!devInst.getPosition()
-                  .isOnGrid(board->getGridProperties())); // only show if needed
+      addActionSnap(menu, devInst.getPosition(), board, *selectedItem);
       QAction* aResetTexts =
         menu.addAction(QIcon(":/img/actions/undo.png"), tr("Reset all texts"));
+      connect(aResetTexts, &QAction::triggered, [this, footprint](){
+        try {
+          mUndoStack.execCmd(new CmdFootprintStrokeTextsReset(*footprint));
+        } catch (Exception& e) {
+          QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+        }
+      });
       menu.addSeparator();
 
       QMenu* aChangeDeviceMenu =
@@ -321,6 +316,16 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
           a->setCheckable(true);
           a->setChecked(true);
           a->setEnabled(false);
+        } else {
+          connect(a, &QAction::triggered, [this, &board, &devInst, item](){
+            try {
+              CmdReplaceDevice* cmd = new CmdReplaceDevice(
+                  mWorkspace, board, devInst, item.uuid, tl::optional<Uuid>());
+              mUndoStack.execCmd(cmd);
+            } catch (Exception& e) {
+              QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+            }
+          });
         }
       }
       aChangeDeviceMenu->setEnabled(!aChangeDeviceMenu->isEmpty());
@@ -333,46 +338,27 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
         QAction* a = aChangeFootprintMenu->addAction(
             footprintIcon, *footprint.getNames().value(
                                mProject.getSettings().getLocaleOrder()));
-        a->setData(footprint.getUuid().toStr());
         if (footprint.getUuid() ==
             devInst.getFootprint().getLibFootprint().getUuid()) {
           a->setCheckable(true);
           a->setChecked(true);
           a->setEnabled(false);
+        } else {
+          connect(a, &QAction::triggered, [this, &board, &devInst, &footprint](){
+            try {
+              Uuid deviceUuid = devInst.getLibDevice().getUuid();
+              CmdReplaceDevice* cmd = new CmdReplaceDevice(
+                  mWorkspace, board, devInst, deviceUuid, footprint.getUuid());
+              mUndoStack.execCmd(cmd);
+            } catch (Exception& e) {
+              QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+            }
+          });
         }
       }
       aChangeFootprintMenu->setEnabled(!aChangeFootprintMenu->isEmpty());
       menu.addSeparator();
-      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
-
-      // execute the context menu
-      action = menu.exec(mouseEvent->screenPos());
-      menuWasExecuted = true;
-      if (action == aResetTexts) {
-        try {
-          mUndoStack.execCmd(new CmdFootprintStrokeTextsReset(*footprint));
-        } catch (Exception& e) {
-          QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-        }
-      } else if (action && !action->data().toUuid().isNull()) {
-        try {
-          Uuid uuid = Uuid::fromString(action->data().toString());  // can throw
-          Uuid deviceUuid = devInst.getLibDevice().getUuid();
-          tl::optional<Uuid> footprintUuid;
-          if (devInst.getLibPackage().getFootprints().contains(uuid)) {
-            // change footprint
-            footprintUuid = uuid;
-          } else {
-            // change device
-            deviceUuid = uuid;
-          }
-          CmdReplaceDevice* cmd = new CmdReplaceDevice(
-              mWorkspace, *board, devInst, deviceUuid, footprintUuid);
-          mUndoStack.execCmd(cmd);
-        } catch (Exception& e) {
-          QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-        }
-      }
+      addActionProperties(menu, board, *selectedItem);
       break;
     }
 
@@ -380,16 +366,12 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_NetLine* netline = dynamic_cast<BI_NetLine*>(selectedItem);
       Q_ASSERT(netline);
 
-      // build the context menu
-      aRemove = ACTION_DELETE(menu, tr("Remove Trace Segment"));
-      aRemoveTrace = ACTION_DELETE_ALL_DEFAULT(menu);
-      aRemoveTrace->setData(QVariant::fromValue(&netline->getNetSegment()));
+      addActionDelete(menu, tr("Remove Trace Segment"));
+      addActionDeleteAll(menu, netline->getNetSegment());
       menu.addSeparator();
-      aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
-      aSelectTrace->setData(QVariant::fromValue(&netline->getNetSegment()));
+      addActionSelectAll(menu, netline->getNetSegment());
       menu.addSeparator();
-      aMeasureSelection = ACTION_MEASURE_DEFAULT(menu);
-      aMeasureSelection->setData(QVariant::fromValue(netline));
+      addActionMeasure(menu, *netline);
       break;
     }
 
@@ -397,19 +379,15 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_NetPoint* netpoint = dynamic_cast<BI_NetPoint*>(selectedItem);
       Q_ASSERT(netpoint);
 
-      aRemoveTrace = ACTION_DELETE_ALL_DEFAULT(menu);
-      aRemoveTrace->setData(QVariant::fromValue(&netpoint->getNetSegment()));
+      addActionDeleteAll(menu, netpoint->getNetSegment());
       menu.addSeparator();
-      aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
-      aSelectTrace->setData(QVariant::fromValue(&netpoint->getNetSegment()));
+      addActionSelectAll(menu, netpoint->getNetSegment());
       menu.addSeparator();
-      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
-      aSnapToGrid->setVisible(!netpoint->getPosition()
-                  .isOnGrid(board->getGridProperties())); // only show if needed
-      menu.addSeparator();
-      aMeasureSelection = ACTION_MEASURE_DEFAULT(menu);
-      aMeasureSelection->setData(
-            QVariant::fromValue(*netpoint->getNetLines().begin()));
+      addActionSnap(menu, netpoint->getPosition(), board, *selectedItem);
+      if (!netpoint->getNetLines().isEmpty()) {
+        menu.addSeparator();
+        addActionMeasure(menu, **netpoint->getNetLines().begin());
+      }
       break;
     }
 
@@ -417,18 +395,13 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_Via* via = dynamic_cast<BI_Via*>(selectedItem);
       Q_ASSERT(via);
 
-      // build the context menu
-      aRemove = ACTION_DELETE(menu, tr("Remove Via"));
-      aRemoveTrace = ACTION_DELETE_ALL_DEFAULT(menu);
-      aRemoveTrace->setData(QVariant::fromValue(&via->getNetSegment()));
+      addActionDelete(menu, tr("Remove Via"));
+      addActionDeleteAll(menu, via->getNetSegment());
       menu.addSeparator();
-      aSelectTrace = ACTION_SELECT_ALL_DEFAULT(menu);
-      aSelectTrace->setData(QVariant::fromValue(&via->getNetSegment()));
-      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
-      aSnapToGrid->setVisible(!via->getPosition()
-                  .isOnGrid(board->getGridProperties())); // only show if needed
+      addActionSelectAll(menu, via->getNetSegment());
+      addActionSnap(menu, via->getPosition(), board, *selectedItem);
       menu.addSeparator();
-      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      addActionProperties(menu, board, *selectedItem);
       break;
     }
 
@@ -436,24 +409,19 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_Plane* plane = dynamic_cast<BI_Plane*>(selectedItem);
       Q_ASSERT(plane);
 
-      // build the context menu
-      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
-      aFlipH = ACTION_FLIP_DEFAULT(menu);
-      aRemove = ACTION_DELETE(menu, tr("Remove Plane"));
+      addActionRotate(menu);
+      addActionFlip(menu);
+      addActionDelete(menu, tr("Remove Plane"));
       menu.addSeparator();
       QAction* aIsVisible = menu.addAction(tr("Visible"));
       aIsVisible->setCheckable(true);
       aIsVisible->setChecked(plane->isVisible());
-      menu.addSeparator();
-      aProperties = ACTION_PROPERTIES(menu, tr("Plane Properties"));
-
-      // execute the context menu
-      action = menu.exec(mouseEvent->screenPos());
-      menuWasExecuted = true;
-      if (action == aIsVisible) {
+      connect(aIsVisible, &QAction::triggered, [plane, aIsVisible](){
         // Visibility is not saved, thus no undo command is needed here.
         plane->setVisible(aIsVisible->isChecked());
-      }
+      });
+      menu.addSeparator();
+      addActionProperties(menu, board, *selectedItem, tr("Plane Properties"));
       break;
     }
 
@@ -461,12 +429,11 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(selectedItem);
       Q_ASSERT(polygon);
 
-      // build the context menu
-      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
-      aFlipH = ACTION_FLIP_DEFAULT(menu);
-      aRemove = ACTION_DELETE(menu, tr("Remove Polygon"));
+      addActionRotate(menu);
+      addActionFlip(menu);
+      addActionDelete(menu, tr("Remove Polygon"));
       menu.addSeparator();
-      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      addActionProperties(menu, board, *selectedItem);
       break;
     }
 
@@ -474,16 +441,13 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(selectedItem);
       Q_ASSERT(text);
 
-      // build the context menu
-      aRotateCCW = ACTION_ROTATE_DEFAULT(menu);
-      aFlipH = ACTION_FLIP_DEFAULT(menu);
-      aRemove = ACTION_DELETE(menu, tr("Remove Text"));
+      addActionRotate(menu);
+      addActionFlip(menu);
+      addActionDelete(menu, tr("Remove Text"));
       menu.addSeparator();
-      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
-      aSnapToGrid->setVisible(!text->getPosition()
-                  .isOnGrid(board->getGridProperties())); // only show if needed
+      addActionSnap(menu, text->getPosition(), board, *selectedItem);
       menu.addSeparator();
-      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      addActionProperties(menu, board, *selectedItem);
       break;
     }
 
@@ -491,55 +455,20 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       BI_Hole* hole = dynamic_cast<BI_Hole*>(selectedItem);
       Q_ASSERT(hole);
 
-      // build the context menu
-      aRemove = ACTION_DELETE(menu, tr("Remove Hole"));
+      addActionDelete(menu, tr("Remove Hole"));
       menu.addSeparator();
-      aSnapToGrid = ACTION_SNAP_DEFAULT(menu);
-      aSnapToGrid->setVisible(!hole->getPosition()
-                  .isOnGrid(board->getGridProperties())); // only show if needed
+      addActionSnap(menu, hole->getPosition(), board, *selectedItem);
       menu.addSeparator();
-      aProperties = ACTION_PROPERTIES_DEFAULT(menu);
+      addActionProperties(menu, board, *selectedItem);
       break;
     }
 
     default:
       return PassToParentState;
   }
-  if (!menuWasExecuted) {
-    // execute the context menu
-    Q_ASSERT(action == nullptr);
-    action = menu.exec(mouseEvent->screenPos());
-  }
-  if (action == nullptr) {
-    // aborted --> nothing to do
-  } else if (action == aRemove) {
-    removeSelectedItems();
-  } else if (action == aRemoveTrace) {
-    action->data().value<BI_NetSegment*>()->setSelected(true);
-    removeSelectedItems();
-  } else if (action == aSelectTrace) {
-    action->data().value<BI_NetSegment*>()->setSelected(true);
-  } else if (action == aRotateCCW) {
-    rotateSelectedItems(Angle::deg90());
-  } else if (action == aFlipH) {
-    flipSelectedItems(Qt::Horizontal);
-  } else if (action == aSnapToGrid) {
-    try  {
-      QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-            new CmdDragSelectedBoardItems(*board, selectedItem->getPosition()));
-      cmdMove->setCurrentPosition(selectedItem->getPosition().mappedToGrid(
-                              board->getGridProperties().getInterval()), false);
-      mUndoStack.execCmd(cmdMove.take());
-    } catch (Exception& e) {
-      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-    }
-  } else if (action == aMeasureSelection) {
-    BI_NetLine* netline = action->data().value<BI_NetLine*>();
-    netline->setSelected(true);
-    measureSelectedItems(*netline);
-  } else if (action == aProperties) {
-    openPropertiesDialog(*board, selectedItem);
-  }
+
+  // execute the context menu
+  menu.exec(mouseEvent->screenPos());
   return ForceStayInState;
 }
 
@@ -644,6 +573,79 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(
     }
   }  // switch (qevent->type())
   return PassToParentState;
+}
+
+void BES_Select::addActionRotate(QMenu& menu, const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    rotateSelectedItems(Angle::deg90());
+  });
+}
+
+void BES_Select::addActionFlip(QMenu& menu, const QString& text) noexcept {
+  QAction* action =  menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    flipSelectedItems(Qt::Horizontal);
+  });
+}
+
+void BES_Select::addActionDelete(QMenu& menu, const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
+  connect(action, &QAction::triggered, [this]() {
+    removeSelectedItems();
+  });
+}
+
+void BES_Select::addActionDeleteAll(QMenu& menu, BI_NetSegment& netsegment,
+                                    const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/minus.png"), text);
+  connect(action, &QAction::triggered, [this, &netsegment](){
+    netsegment.setSelected(true);
+    removeSelectedItems();
+  });
+}
+
+void BES_Select::addActionMeasure(QMenu& menu, BI_NetLine& netline,
+                                  const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/ruler.png"), text);
+  connect(action, &QAction::triggered, [this, &netline](){
+    netline.setSelected(true);
+    measureSelectedItems(netline);
+  });
+}
+
+void BES_Select::addActionProperties(QMenu& menu, Board& board, BI_Base& item,
+                                     const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/settings.png"), text);
+  connect(action, &QAction::triggered, [this, &board, &item](){
+    openPropertiesDialog(board, &item);
+  });
+}
+
+void BES_Select::addActionSnap(QMenu& menu, const Point pos, Board& board,
+                               BI_Base& item, const QString& text) noexcept {
+  if (!pos.isOnGrid(board.getGridProperties().getInterval())) {
+    QAction* action = menu.addAction(QIcon(":/img/actions/grid.png"), text);
+    connect(action, &QAction::triggered, [this, &board, &item](){
+      try  {
+        QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
+              new CmdDragSelectedBoardItems(board, item.getPosition()));
+        cmdMove->setCurrentPosition(item.getPosition().mappedToGrid(
+                                board.getGridProperties().getInterval()), false);
+        mUndoStack.execCmd(cmdMove.take());
+      } catch (Exception& e) {
+        QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+      }
+    });
+  }
+}
+
+void BES_Select::addActionSelectAll(QMenu& menu, BI_NetSegment& netsegment,
+                                    const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/bookmark.png"), text);
+  connect(action, &QAction::triggered, [&netsegment](){
+    netsegment.setSelected(true);
+  });
 }
 
 bool BES_Select::startMovingSelectedItems(Board&       board,

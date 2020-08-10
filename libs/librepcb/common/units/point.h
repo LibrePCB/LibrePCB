@@ -34,7 +34,6 @@
 namespace librepcb {
 
 class Angle;
-class GridProperties;
 
 /*******************************************************************************
  *  Class Point
@@ -310,8 +309,6 @@ public:
    */
   Point mappedToGrid(const PositiveLength& gridInterval) const noexcept;
 
-  bool isOnGrid(const GridProperties& properties) const noexcept;
-
   /**
    * @brief Map this Point object to a specific grid interval
    *
@@ -322,6 +319,17 @@ public:
    * @see ::librepcb::Length::mapToGrid(), ::librepcb::Point::mappedToGrid()
    */
   Point& mapToGrid(const PositiveLength& gridInterval) noexcept;
+
+  /**
+   * @brief Check whether the Point lies on the grid
+   *
+   * @param gridInterval  See Length::mappedToGrid()
+   *
+   * @return If the point is on the grid.
+   *
+   * @see ::librepcb::Length::mappedToGrid(), ::librepcb::Point::mapToGrid()
+   */
+  bool isOnGrid(const PositiveLength& gridInterval) const noexcept;
 
   /**
    * @brief Get the point rotated by a specific angle with respect to a specific
