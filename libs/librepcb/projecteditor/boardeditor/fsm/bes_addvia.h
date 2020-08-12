@@ -66,23 +66,48 @@ public:
   bool       exit(BEE_Base* event) noexcept override;
 
 private:
+  // Private Types
+
+  /// Internal FSM States (substates)
+  enum SubState {
+    SubState_Idle,           ///< idle state [initial state]
+    SubState_PositioningVia  ///< in this state, an undo command is active!
+  };
+
   // Private Methods
   ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-  bool       addVia(Board& board) noexcept;
-  bool       updateVia(Board& board, const Point& pos) noexcept;
-  bool       fixVia(const Point& pos) noexcept;
-  void       updateShapeActionsCheckedState() noexcept;
-  void       sizeEditValueChanged(const PositiveLength& value) noexcept;
+  bool addVia(Board& board) noexcept;
+  bool updateVia(Board& board, const Point& pos) noexcept;
+  bool fixVia(Board& board, const Point& pos) noexcept;
+  void updateShapeActionsCheckedState() noexcept;
+  void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
+  NetSignal* getClosestNetSignal(Board& board, const Point& pos) noexcept;
+  QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
+                                    QSet<BI_Base*> except = {}) const noexcept;
+  BI_Via* findVia(Board& board, const Point pos, NetSignal* netsignal = nullptr,
+                  const QSet<BI_Via*>& except = {}) const noexcept;
+  BI_FootprintPad* findPad(Board& board, const Point pos,
+                  NetSignal* netsignal = nullptr,
+                  const QSet<BI_FootprintPad*>& except = {}) const noexcept;
+  BI_NetPoint* findNetPoint(Board& board, const Point pos,
+                  NetSignal* netsignal = nullptr,
+                  const QSet<BI_NetPoint*>& except = {}) const noexcept;
+  BI_NetLine* findNetLine(Board& board, const Point pos,
+                  NetSignal* netsignal = nullptr) const noexcept;
+  void abortPlacement(const bool showErrorMessage = false) noexcept;
 
   // General Attributes
-  bool                            mUndoCmdActive;
+  SubState                        mSubState;
+  QString                         mAutoText;
   BI_Via*                         mCurrentVia;
   BI_Via::Shape                   mCurrentViaShape;
   PositiveLength                  mCurrentViaSize;
   PositiveLength                  mCurrentViaDrillDiameter;
   NetSignal*                      mCurrentViaNetSignal;
+  bool                            mFindClosestNetSignal;
+  NetSignal*                      mLastClosestNetSignal;
   QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
 
   // Widgets for the command toolbar

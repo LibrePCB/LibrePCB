@@ -151,19 +151,20 @@ public:
   bool                isEmpty() const noexcept;
   QList<BI_Base*>     getItemsAtScenePos(const Point& pos) const noexcept;
   QList<BI_Via*>      getViasAtScenePos(const Point&     pos,
-                                        const NetSignal* netsignal) const noexcept;
+                                        const NetSignal* netsignal = nullptr)
+                                        const noexcept;
   QList<BI_NetPoint*> getNetPointsAtScenePos(const Point&         pos,
-                                             const GraphicsLayer* layer,
-                                             const NetSignal* netsignal) const
-      noexcept;
+                                           const GraphicsLayer* layer = nullptr,
+                                           const NetSignal* netsignal = nullptr)
+                                           const noexcept;
   QList<BI_NetLine*> getNetLinesAtScenePos(const Point&         pos,
-                                           const GraphicsLayer* layer,
-                                           const NetSignal*     netsignal) const
-      noexcept;
+                                           const GraphicsLayer* layer = nullptr,
+                                           const NetSignal* netsignal = nullptr)
+                                           const noexcept;
   QList<BI_FootprintPad*> getPadsAtScenePos(const Point&         pos,
-                                            const GraphicsLayer* layer,
-                                            const NetSignal* netsignal) const
-      noexcept;
+                                          const GraphicsLayer* layer = nullptr,
+                                          const NetSignal* netsignal = nullptr)
+                                          const noexcept;
   QList<BI_Base*> getAllItems() const noexcept;
 
   // Setters: General

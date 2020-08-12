@@ -502,8 +502,8 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
   try {
     // start a new undo command
     Q_ASSERT(mSubState == SubState_Idle);
-    mSubState = SubState_Initializing;
     mUndoStack.beginCmdGroup(tr("Draw Board Trace"));
+    mSubState = SubState_Initializing;
     mAddVia = false;
     showVia(false);
 
