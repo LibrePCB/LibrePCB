@@ -20,7 +20,6 @@ LIBS += \
     -llibrepcbcommon \
     -lparseagle \
     -lsexpresso \
-    -lclipper \
     -lmuparser \
 
 # Solaris based systems need to link against libproc
@@ -38,7 +37,6 @@ DEPENDPATH += \
     ../../libs/librepcb/common \
     ../../libs/parseagle \
     ../../libs/sexpresso \
-    ../../libs/clipper \
 
 isEmpty(UNBUNDLE) {
     # These libraries will only be linked statically when not unbundling
@@ -46,12 +44,12 @@ isEmpty(UNBUNDLE) {
       $${DESTDIR}/liblibrepcbeagleimport.a \
       $${DESTDIR}/liblibrepcblibrary.a \
       $${DESTDIR}/liblibrepcbcommon.a \
+      $${DESTDIR}/libpolyclipping.a \
 }
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libparseagle.a \
     $${DESTDIR}/libsexpresso.a \
-    $${DESTDIR}/libclipper.a \
 
 RESOURCES += \
     ../../img/images.qrc \
@@ -73,4 +71,10 @@ FORMS += \
     LIBS += -lquazip -lz
     INCLUDEPATH += ../../libs/quazip
     DEPENDPATH += ../../libs/quazip
+}
+
+# polyclipping
+!contains(UNBUNDLE, polyclipping) {
+    LIBS += -lpolyclipping
+    DEPENDPATH += ../../libs/polyclipping
 }

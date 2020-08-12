@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = clipper
+TARGET = polyclipping
 
 # Use common project definitions
 include(../../common.pri)

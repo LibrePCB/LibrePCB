@@ -14,7 +14,6 @@ LIBS += \
     -L$${DESTDIR} \
     -llibrepcbcommon \
     -lsexpresso \
-    -lclipper \
     -lmuparser \
 
 # Solaris based systems need to link against libproc
@@ -47,3 +46,7 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
 
+# polyclipping
+!contains(UNBUNDLE, polyclipping) {
+    LIBS += -lpolyclipping
+}

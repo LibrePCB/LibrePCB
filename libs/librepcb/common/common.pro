@@ -328,6 +328,13 @@ contains(UNBUNDLE, quazip) {
     INCLUDEPATH += ../../quazip
 }
 
+# polyclipping
+contains(UNBUNDLE, polyclipping) {
+    PKGCONFIG += polyclipping
+} else {
+    INCLUDEPATH += ../../polyclipping
+}
+
 # fontobene-qt5
 contains(UNBUNDLE, fontobene-qt5) {
     PKGCONFIG += fontobene-qt5

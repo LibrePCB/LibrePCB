@@ -93,6 +93,7 @@ unbundle all libraries that support dynamic linking.
 Right now, the following libraries can be unbundled:
 
 * `quazip`
+* `polyclipping`
 * `fontobene-qt5`
 
 Note: Unbundling is currently only supported on Unix systems with `pkg-config`

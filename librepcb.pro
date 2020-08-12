@@ -1,5 +1,8 @@
 TEMPLATE = subdirs
 
+# Use common project definitions
+include(common.pri)
+
 SUBDIRS = \
     apps \
     libs \

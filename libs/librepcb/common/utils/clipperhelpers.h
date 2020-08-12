@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../geometry/path.h"
 
-#include <clipper/clipper.hpp>
+#include <polyclipping/clipper.hpp>
 
 #include <QtCore>
 
