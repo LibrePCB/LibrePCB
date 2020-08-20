@@ -71,6 +71,10 @@ Point& Point::mapToGrid(const PositiveLength& gridInterval) noexcept {
   return *this;
 }
 
+bool Point::isOnGrid(const PositiveLength& gridInterval) const noexcept {
+  return (mappedToGrid(gridInterval) == *this);
+}
+
 Point Point::rotated(const Angle& angle, const Point& center) const noexcept {
   Point p(*this);
   p.rotate(angle, center);

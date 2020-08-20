@@ -149,9 +149,12 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdDragSelectedBoardItems::setCurrentPosition(const Point& pos) noexcept {
+void CmdDragSelectedBoardItems::setCurrentPosition(const Point& pos,
+                                            const bool gridIncrement) noexcept {
   Point delta = pos - mStartPos;
-  delta.mapToGrid(mBoard.getGridProperties().getInterval());
+  if (gridIncrement) {
+    delta.mapToGrid(mBoard.getGridProperties().getInterval());
+  }
 
   if (delta != mDeltaPos) {
     // move selected elements
