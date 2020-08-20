@@ -67,6 +67,7 @@ SOURCES += \
     dialogs/polygonpropertiesdialog.cpp \
     dialogs/stroketextpropertiesdialog.cpp \
     dialogs/textpropertiesdialog.cpp \
+    drillsize.cpp \
     exceptions.cpp \
     fileio/asynccopyoperation.cpp \
     fileio/csvfile.cpp \
@@ -200,6 +201,7 @@ HEADERS += \
     dialogs/stroketextpropertiesdialog.h \
     dialogs/textpropertiesdialog.h \
     elementname.h \
+    drillsize.h \
     exceptions.h \
     fileio/asynccopyoperation.h \
     fileio/cmd/cmdlistelementinsert.h \

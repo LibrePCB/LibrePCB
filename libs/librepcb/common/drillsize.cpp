@@ -17,71 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EXCELLONGENERATOR_H
-#define LIBREPCB_EXCELLONGENERATOR_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-#include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
+#include "drillsize.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
 /*******************************************************************************
- *  Class GerberGenerator
+ *  Class DrillSize
  ******************************************************************************/
 
-/**
- * @brief The ExcellonGenerator class
- */
-class ExcellonGenerator final {
-  Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
+DrillSize::DrillSize(const SExpression& node) : mWidth(1), mHeight(1) {
+  mWidth  = node.getChildByIndex(0).getValue<PositiveLength>();
+  mHeight = node.getChildByIndex(1).getValue<PositiveLength>();
+}
 
-public:
-  // Constructors / Destructor
-  // ExcellonGenerator() = delete;
-  ExcellonGenerator(const ExcellonGenerator& other) = delete;
-  ExcellonGenerator() noexcept;
-  ~ExcellonGenerator() noexcept;
+// General Methods
 
-  // Getters
-  const QString& toStr() const noexcept { return mOutput; }
+void DrillSize::serialize(SExpression& root) const {
+  root.appendChild(mWidth);
+  root.appendChild(mHeight);
+}
 
-  // General Methods
-  void drill(const Point& pos, const PositiveLength& dia) noexcept;
-  void slot(const Point& start, const Point& end,
-            const PositiveLength& width) noexcept;
-  void generate();
-  void saveToFile(const FilePath& filepath) const;
-  void reset() noexcept;
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
 
-  // Operator Overloadings
-  ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
+tl::optional<DrillSize> optionalDrillSize(const UnsignedLength& diameter) {
+  if (diameter == 0) return tl::nullopt;
+  return DrillSize(PositiveLength(*diameter), PositiveLength(*diameter));
+}
 
-private:
-  void printHeader() noexcept;
-  void printToolList() noexcept;
-  void printDrills() noexcept;
-  void printFooter() noexcept;
-
-  // Excellon Data
-  QString                                        mOutput;
-  QMultiMap<PositiveLength, Point>               mDrillList;
-  QMultiMap<PositiveLength, QPair<Point, Point>> mSlotList;
-  QList<PositiveLength>                          mToolList;
-};
+tl::optional<DrillSize> optionalDrillSize(const SExpression& node) {
+  try {
+    const QList<SExpression>& children = node.getChildren();
+    if (children.length() == 2) {
+      return DrillSize(node);
+    } else if (children.length() == 1) {
+      return optionalDrillSize(children[0].getValue<UnsignedLength>());
+    } else {
+      throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
+                           QString(),
+                           "DrillSize has incorrect amount of children");
+    }
+  } catch (const Exception& e) {
+    throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
+                         QString(), e.getMsg());
+  }
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
-
-#endif  // LIBREPCB_EXCELLONGENERATOR_H

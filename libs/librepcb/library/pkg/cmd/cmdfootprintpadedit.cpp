@@ -53,8 +53,8 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mNewPos(mOldPos),
     mOldRotation(pad.getRotation()),
     mNewRotation(mOldRotation),
-    mOldDrillDiameter(pad.getDrillDiameter()),
-    mNewDrillDiameter(mOldDrillDiameter) {
+    mOldDrillSize(pad.getDrillSize()),
+    mNewDrillSize(mOldDrillSize) {
 }
 
 CmdFootprintPadEdit::~CmdFootprintPadEdit() noexcept {
@@ -106,11 +106,11 @@ void CmdFootprintPadEdit::setHeight(const PositiveLength& height,
   if (immediate) mPad.setHeight(mNewHeight);
 }
 
-void CmdFootprintPadEdit::setDrillDiameter(const UnsignedLength& dia,
-                                           bool immediate) noexcept {
+void CmdFootprintPadEdit::setDrillSize(const tl::optional<DrillSize>& drillSize,
+                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewDrillDiameter = dia;
-  if (immediate) mPad.setDrillDiameter(mNewDrillDiameter);
+  mNewDrillSize = drillSize;
+  if (immediate) mPad.setDrillSize(mNewDrillSize);
 }
 
 void CmdFootprintPadEdit::setPosition(const Point& pos,
@@ -191,7 +191,7 @@ bool CmdFootprintPadEdit::performExecute() {
   if (mNewHeight != mOldHeight) return true;
   if (mNewPos != mOldPos) return true;
   if (mNewRotation != mOldRotation) return true;
-  if (mNewDrillDiameter != mOldDrillDiameter) return true;
+  if (mNewDrillSize != mOldDrillSize) return true;
   return false;
 }
 
@@ -203,7 +203,7 @@ void CmdFootprintPadEdit::performUndo() {
   mPad.setHeight(mOldHeight);
   mPad.setPosition(mOldPos);
   mPad.setRotation(mOldRotation);
-  mPad.setDrillDiameter(mOldDrillDiameter);
+  mPad.setDrillSize(mOldDrillSize);
 }
 
 void CmdFootprintPadEdit::performRedo() {
@@ -214,7 +214,7 @@ void CmdFootprintPadEdit::performRedo() {
   mPad.setHeight(mNewHeight);
   mPad.setPosition(mNewPos);
   mPad.setRotation(mNewRotation);
-  mPad.setDrillDiameter(mNewDrillDiameter);
+  mPad.setDrillSize(mNewDrillSize);
 }
 
 /*******************************************************************************

@@ -47,10 +47,18 @@ ExcellonGenerator::~ExcellonGenerator() noexcept {
 
 void ExcellonGenerator::drill(const Point&          pos,
                               const PositiveLength& dia) noexcept {
-  mDrillList.insert(*dia, pos);
+  mDrillList.insert(dia, pos);
+  if (!mToolList.contains(dia)) mToolList.append(dia);
+}
+
+void ExcellonGenerator::slot(const Point& start, const Point& end,
+                             const PositiveLength& width) noexcept {
+  mSlotList.insert(width, qMakePair(start, end));
+  if (!mToolList.contains(width)) mToolList.append(width);
 }
 
 void ExcellonGenerator::generate() {
+  std::sort(mToolList.begin(), mToolList.end());
   mOutput.clear();
   printHeader();
   printDrills();
@@ -64,6 +72,8 @@ void ExcellonGenerator::saveToFile(const FilePath& filepath) const {
 void ExcellonGenerator::reset() noexcept {
   mOutput.clear();
   mDrillList.clear();
+  mSlotList.clear();
+  mToolList.clear();
 }
 
 /*******************************************************************************
@@ -91,20 +101,31 @@ void ExcellonGenerator::printHeader() noexcept {
 }
 
 void ExcellonGenerator::printToolList() noexcept {
-  for (int i = 0; i < mDrillList.uniqueKeys().count(); ++i) {
-    Length dia = mDrillList.uniqueKeys().value(i);
-    mOutput.append(QString("T%1C%2\n").arg(i + 1).arg(dia.toMmString()));
+  for (int i = 0; i < mToolList.count(); ++i) {
+    mOutput.append(
+        QString("T%1C%2\n").arg(i + 1).arg(mToolList[i]->toMmString()));
   }
 }
 
 void ExcellonGenerator::printDrills() noexcept {
-  for (int i = 0; i < mDrillList.uniqueKeys().count(); ++i) {
+  for (int i = 0; i < mToolList.count(); ++i) {
     mOutput.append(QString("T%1\n").arg(i + 1));  // Select Tool
-    Length dia = mDrillList.uniqueKeys().value(i);
-    foreach (const Point& pos, mDrillList.values(dia)) {
+
+    // Circular drills
+    foreach (const Point& pos, mDrillList.values(mToolList[i])) {
       mOutput.append(
           QString("X%1Y%2\n")
               .arg(pos.getX().toMmString(), pos.getY().toMmString()));
+    }
+
+    // Drilled Slots
+    typedef QPair<Point, Point> qpair_point_point;
+    foreach (const qpair_point_point& points, mSlotList.values(mToolList[i])) {
+      mOutput.append(QString("X%1Y%2G85X%3Y%4\n")
+                         .arg(points.first.getX().toMmString(),
+                              points.first.getY().toMmString(),
+                              points.second.getX().toMmString(),
+                              points.second.getY().toMmString()));
     }
   }
 }

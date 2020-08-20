@@ -17,15 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EXCELLONGENERATOR_H
-#define LIBREPCB_EXCELLONGENERATOR_H
+#ifndef LIBREPCB_LIBRARY_MSGMALFORMEDDRILL_H
+#define LIBREPCB_LIBRARY_MSGMALFORMEDDRILL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-#include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -33,55 +31,36 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace library {
+
+class FootprintPad;
 
 /*******************************************************************************
- *  Class GerberGenerator
+ *  Class MsgMalformedDrill
  ******************************************************************************/
 
 /**
- * @brief The ExcellonGenerator class
+ * @brief The MsgMalformedDrill class
  */
-class ExcellonGenerator final {
-  Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
+class MsgMalformedDrill final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMalformedDrill)
 
 public:
+  enum errorType { WIDER, TALLER };
+
   // Constructors / Destructor
-  // ExcellonGenerator() = delete;
-  ExcellonGenerator(const ExcellonGenerator& other) = delete;
-  ExcellonGenerator() noexcept;
-  ~ExcellonGenerator() noexcept;
-
-  // Getters
-  const QString& toStr() const noexcept { return mOutput; }
-
-  // General Methods
-  void drill(const Point& pos, const PositiveLength& dia) noexcept;
-  void slot(const Point& start, const Point& end,
-            const PositiveLength& width) noexcept;
-  void generate();
-  void saveToFile(const FilePath& filepath) const;
-  void reset() noexcept;
-
-  // Operator Overloadings
-  ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
-
-private:
-  void printHeader() noexcept;
-  void printToolList() noexcept;
-  void printDrills() noexcept;
-  void printFooter() noexcept;
-
-  // Excellon Data
-  QString                                        mOutput;
-  QMultiMap<PositiveLength, Point>               mDrillList;
-  QMultiMap<PositiveLength, QPair<Point, Point>> mSlotList;
-  QList<PositiveLength>                          mToolList;
+  MsgMalformedDrill() = delete;
+  explicit MsgMalformedDrill(const FootprintPad& pad, errorType type) noexcept;
+  MsgMalformedDrill(const MsgMalformedDrill& other) noexcept
+    : LibraryElementCheckMessage(other) {}
+  virtual ~MsgMalformedDrill() noexcept;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_EXCELLONGENERATOR_H
+#endif  // LIBREPCB_LIBRARY_MSGMALFORMEDDRILL_H

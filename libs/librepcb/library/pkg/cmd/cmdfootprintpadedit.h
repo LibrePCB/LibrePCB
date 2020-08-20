@@ -25,7 +25,9 @@
  ******************************************************************************/
 #include "../footprintpad.h"
 
+#include <librepcb/common/drillsize.h>
 #include <librepcb/common/undocommand.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
@@ -56,7 +58,8 @@ public:
   void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
-  void setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept;
+  void setDrillSize(const tl::optional<DrillSize>& drillSize,
+                    bool                           immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
@@ -100,8 +103,8 @@ private:
   Point                   mNewPos;
   Angle                   mOldRotation;
   Angle                   mNewRotation;
-  UnsignedLength          mOldDrillDiameter;
-  UnsignedLength          mNewDrillDiameter;
+  tl::optional<DrillSize> mOldDrillSize;
+  tl::optional<DrillSize> mNewDrillSize;
 };
 
 /*******************************************************************************

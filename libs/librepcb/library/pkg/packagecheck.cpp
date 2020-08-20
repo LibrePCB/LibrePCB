@@ -22,7 +22,10 @@
  ******************************************************************************/
 #include "packagecheck.h"
 
+#include "msg/msgdrillinsmdpad.h"
 #include "msg/msgduplicatepadname.h"
+#include "msg/msgmalformeddrill.h"
+#include "msg/msgmissingdrill.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
 #include "msg/msgmissingfootprintvalue.h"
@@ -58,7 +61,10 @@ PackageCheck::~PackageCheck() noexcept {
 
 LibraryElementCheckMessageList PackageCheck::runChecks() const {
   LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+  checkDrillsInSmdPads(msgs);
   checkDuplicatePadNames(msgs);
+  checkMalformedDrills(msgs);
+  checkMissingDrills(msgs);
   checkMissingFootprint(msgs);
   checkMissingTexts(msgs);
   checkWrongTextLayers(msgs);
@@ -70,6 +76,17 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
  *  Protected Methods
  ******************************************************************************/
 
+void PackageCheck::checkDrillsInSmdPads(MsgList& msgs) const {
+  for (const Footprint& footprint : mPackage.getFootprints()) {
+    for (const FootprintPad& pad : footprint.getPads()) {
+      if (pad.getDrillSize() &&
+          pad.getBoardSide() != FootprintPad::BoardSide::THT) {
+        msgs.append(std::make_shared<MsgDrillInSmdPad>(pad));
+      }
+    }
+  }
+}
+
 void PackageCheck::checkDuplicatePadNames(MsgList& msgs) const {
   QSet<CircuitIdentifier> padNames;
   for (const PackagePad& pad : mPackage.getPads()) {
@@ -77,6 +94,34 @@ void PackageCheck::checkDuplicatePadNames(MsgList& msgs) const {
       msgs.append(std::make_shared<MsgDuplicatePadName>(pad));
     } else {
       padNames.insert(pad.getName());
+    }
+  }
+}
+
+void PackageCheck::checkMalformedDrills(MsgList& msgs) const {
+  for (const Footprint& footprint : mPackage.getFootprints()) {
+    for (const FootprintPad& pad : footprint.getPads()) {
+      if (pad.getDrillSize()) {
+        if (pad.getDrillSize()->getWidth() >= pad.getWidth()) {
+          msgs.append(std::make_shared<MsgMalformedDrill>(
+              pad, MsgMalformedDrill::WIDER));
+        }
+        if (pad.getDrillSize()->getHeight() >= pad.getHeight()) {
+          msgs.append(std::make_shared<MsgMalformedDrill>(
+              pad, MsgMalformedDrill::TALLER));
+        }
+      }
+    }
+  }
+}
+
+void PackageCheck::checkMissingDrills(MsgList& msgs) const {
+  for (const Footprint& footprint : mPackage.getFootprints()) {
+    for (const FootprintPad& pad : footprint.getPads()) {
+      if (!pad.getDrillSize() &&
+          pad.getBoardSide() == FootprintPad::BoardSide::THT) {
+        msgs.append(std::make_shared<MsgMissingDrill>(pad));
+      }
     }
   }
 }

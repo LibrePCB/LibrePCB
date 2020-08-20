@@ -57,7 +57,10 @@ public:
   PackageCheck& operator=(const PackageCheck& rhs) = delete;
 
 protected:  // Methods
+  void checkDrillsInSmdPads(MsgList& msgs) const;
   void checkDuplicatePadNames(MsgList& msgs) const;
+  void checkMalformedDrills(MsgList& msgs) const;
+  void checkMissingDrills(MsgList& msgs) const;
   void checkMissingFootprint(MsgList& msgs) const;
   void checkMissingTexts(MsgList& msgs) const;
   void checkWrongTextLayers(MsgList& msgs) const;
