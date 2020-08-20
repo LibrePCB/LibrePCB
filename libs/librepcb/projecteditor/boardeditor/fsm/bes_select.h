@@ -83,13 +83,30 @@ private:
   ProcRetVal processIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
                                        Board& board) noexcept;
   ProcRetVal processIdleSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent* mouseEvent, Board* board) noexcept;
+      QGraphicsSceneMouseEvent* mouseEvent, Board& board) noexcept;
   ProcRetVal processIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
                                          Board* board) noexcept;
+
+  // Menu Helpers
+  void addActionRotate(QMenu& menu, const QString& text = tr("Rotate")) noexcept;
+  void addActionFlip(QMenu& menu, const QString& text = tr("Flip")) noexcept;
+  void addActionDelete(QMenu& menu,const QString& text = tr("Remove")) noexcept;
+  void addActionDeleteAll(QMenu& menu, BI_NetSegment& netsegment,
+                const QString& text = tr("Remove Whole Trace")) noexcept;
+  void addActionMeasure(QMenu& menu, BI_NetLine& netline,
+                const QString& text = tr("Measure Selected Segments Length")) noexcept;
+  void addActionProperties(QMenu& menu, Board& board, BI_Base& item,
+                const QString& text = tr("Properties")) noexcept;
+  void addActionSnap(QMenu& menu, const Point pos, Board& board, BI_Base& item,
+                const QString& text = tr("Snap To Grid")) noexcept;
+  void addActionSelectAll(QMenu& menu, BI_NetSegment& netsegment,
+                const QString& text = tr("Select Whole Trace")) noexcept;
+
   bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
+
   /**
    * @brief Measure the length of the selected items.
    *
@@ -99,6 +116,7 @@ private:
    * @param netline A selected netline
    */
   bool measureSelectedItems(const BI_NetLine& netline) noexcept;
+
   /**
    * @brief Internal helper method used by #measureSelectedItems
    *
@@ -116,6 +134,8 @@ private:
                                 const BI_NetLine& netline,
                                 QSet<Uuid>&       visitedNetLines,
                                 UnsignedLength&   totalLength);
+
+  bool openPropertiesDialog(Board& board, BI_Base* item);
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
@@ -135,6 +155,7 @@ private:
   // Attributes
   SubState mSubState;  ///< the current substate
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************
