@@ -38,6 +38,9 @@
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
+
 //#include "newprojectwizardpage_versioncontrol.h"
 
 /*******************************************************************************
