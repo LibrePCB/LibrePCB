@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -40,6 +42,8 @@ class Workspace;
 
 namespace project {
 namespace editor {
+
+class LicenseBase;
 
 namespace Ui {
 class NewProjectWizardPage_Metadata;
@@ -67,11 +71,11 @@ public:
   void setDefaultLocation(const FilePath& dir) noexcept;
 
   // Getters
-  QString  getProjectName() const noexcept;
-  QString  getProjectAuthor() const noexcept;
-  bool     isLicenseSet() const noexcept;
-  FilePath getProjectLicenseFilePath() const noexcept;
-  FilePath getFullFilePath() const noexcept;
+  QString                      getProjectName() const noexcept;
+  QString                      getProjectAuthor() const noexcept;
+  bool                         isLicenseSet() const noexcept;
+  std::unique_ptr<LicenseBase> getProjectLicense() const noexcept;
+  FilePath                     getFullFilePath() const noexcept;
 
   // Operator Overloadings
   NewProjectWizardPage_Metadata& operator       =(
