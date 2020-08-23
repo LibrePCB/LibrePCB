@@ -87,6 +87,7 @@ public:
 
 private:  // Methods
   bool openContextMenuAtPos(const Point& pos) noexcept;
+  bool openPropertiesDialogOfItem(QGraphicsItem* item) noexcept;
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
@@ -95,12 +96,14 @@ private:  // Methods
   bool removeSelectedItems() noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
+  QList<QGraphicsItem*> findItemsAtPosition(const Point& pos) noexcept;
 
 private:  // Types / Data
   enum class SubState { IDLE, SELECTING, MOVING, PASTING };
   SubState                                   mState;
   Point                                      mStartPos;
   QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************
