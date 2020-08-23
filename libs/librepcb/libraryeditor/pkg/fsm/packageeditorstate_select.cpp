@@ -58,7 +58,10 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState_Select::PackageEditorState_Select(Context& context) noexcept
-  : PackageEditorState(context), mState(SubState::IDLE), mStartPos() {
+  : PackageEditorState(context),
+    mState(SubState::IDLE),
+    mStartPos(),
+    mCurrentSelectionIndex(0) {
 }
 
 PackageEditorState_Select::~PackageEditorState_Select() noexcept {
@@ -99,33 +102,14 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // update start position of selection or movement
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
-      QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
-      QList<QSharedPointer<CircleGraphicsItem>>       circles;
-      QList<QSharedPointer<PolygonGraphicsItem>>      polygons;
-      QList<QSharedPointer<StrokeTextGraphicsItem>>   texts;
-      QList<QSharedPointer<HoleGraphicsItem>>         holes;
-      int count = mContext.currentGraphicsItem->getItemsAtPosition(
-          mStartPos, &pads, &circles, &polygons, &texts, &holes);
-      if (count == 0) {
+      QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
+      if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
         mState = SubState::SELECTING;
       } else {
         // check if the top most item under the cursor is already selected
-        QGraphicsItem* topMostItem = nullptr;
-        if (pads.count() > 0) {
-          topMostItem = pads.first().data();
-        } else if (texts.count() > 0) {
-          topMostItem = texts.first().data();
-        } else if (polygons.count() > 0) {
-          topMostItem = polygons.first().data();
-        } else if (circles.count() > 0) {
-          topMostItem = circles.first().data();
-        } else if (holes.count() > 0) {
-          topMostItem = holes.first().data();
-        } else {
-          Q_ASSERT(false);
-        }
+        QGraphicsItem* topMostItem = items.first();
         bool itemAlreadySelected = topMostItem->isSelected();
 
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
@@ -136,6 +120,19 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
                 ->setSelected(!itemAlreadySelected);
           } else {
             topMostItem->setSelected(!itemAlreadySelected);
+          }
+        } else if (e.modifiers().testFlag(Qt::ShiftModifier)) {
+          // Cycle Selection, when holding shift
+          mCurrentSelectionIndex += 1;
+          mCurrentSelectionIndex %= items.count();
+          clearSelectionRect(true);
+          QGraphicsItem* item = items[mCurrentSelectionIndex];
+          if (dynamic_cast<FootprintPadGraphicsItem*>(item)) {
+            // workaround for selection of a SymbolPinGraphicsItem
+            dynamic_cast<FootprintPadGraphicsItem*>(item)
+                ->setSelected(true);
+          } else {
+            item->setSelected(true);
           }
         } else if (!itemAlreadySelected) {
           // Only select the topmost item when clicking an unselected item
@@ -369,103 +366,126 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool PackageEditorState_Select::openContextMenuAtPos(
-    const Point& pos) noexcept {
+bool PackageEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
+  if (mState != SubState::IDLE) return false;
+
+  // handle item selection
+  QGraphicsItem* selectedItem = nullptr;
+  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  if (items.isEmpty()) return false;
+  foreach (QGraphicsItem* item, items) {
+    if (item->isSelected()) {
+      selectedItem = item;
+    }
+  }
+  if (!selectedItem) {
+    clearSelectionRect(true);
+    selectedItem = items.first();
+    if (dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)) {
+      // workaround for selection of a SymbolPinGraphicsItem
+      dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)
+          ->setSelected(true);
+    } else {
+      selectedItem->setSelected(true);
+    }
+  }
+  Q_ASSERT(selectedItem);
+  Q_ASSERT(selectedItem->isSelected());
+
   // build the context menu
   QMenu    menu;
   QAction* aRotateCCW =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+  connect(aRotateCCW, &QAction::triggered, [this](){
+    rotateSelectedItems(Angle::deg90());
+  });
   QAction* aMirrorH =
       menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
+  connect(aMirrorH, &QAction::triggered, [this](){
+    mirrorSelectedItems(Qt::Horizontal, false);
+  });
   QAction* aFlipH = menu.addAction(QIcon(":/img/actions/swap.png"), tr("Flip"));
+  connect(aFlipH, &QAction::triggered, [this](){
+    mirrorSelectedItems(Qt::Horizontal, true);
+  });
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
+  connect(aRemove, &QAction::triggered, [this](){
+    removeSelectedItems();
+  });
   menu.addSeparator();
-  QAction* aProperties = menu.addAction(tr("Properties"));
+  QAction* aProperties =
+      menu.addAction(QIcon(":/img/actions/settings.png"), tr("Properties"));
+  connect(aProperties, &QAction::triggered, [this, &selectedItem](){
+    openPropertiesDialogOfItem(selectedItem);
+  });
 
   // execute the context menu
-  QAction* action = menu.exec(QCursor::pos());
-  if (action == aRotateCCW) {
-    return rotateSelectedItems(Angle::deg90());
-  } else if (action == aMirrorH) {
-    return mirrorSelectedItems(Qt::Horizontal, false);
-  } else if (action == aFlipH) {
-    return mirrorSelectedItems(Qt::Horizontal, true);
-  } else if (action == aRemove) {
-    return removeSelectedItems();
-  } else if (action == aProperties) {
-    return openPropertiesDialogOfItemAtPos(pos);
-  } else {
-    return false;
-  }
+  menu.exec(QCursor::pos());
+  return true;
 }
 
-bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
-    const Point& pos) noexcept {
-  QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
-  QList<QSharedPointer<CircleGraphicsItem>>       circles;
-  QList<QSharedPointer<PolygonGraphicsItem>>      polygons;
-  QList<QSharedPointer<StrokeTextGraphicsItem>>   texts;
-  QList<QSharedPointer<HoleGraphicsItem>>         holes;
-  mContext.currentGraphicsItem->getItemsAtPosition(pos, &pads, &circles,
-                                                   &polygons, &texts, &holes);
+bool PackageEditorState_Select::openPropertiesDialogOfItem(
+    QGraphicsItem* item) noexcept {
+  if (!item) return false;
 
-  if (pads.count() > 0) {
-    FootprintPadGraphicsItem* item =
-        dynamic_cast<FootprintPadGraphicsItem*>(pads.first().data());
-    Q_ASSERT(item);
+  if (FootprintPadGraphicsItem* pad =
+      dynamic_cast<FootprintPadGraphicsItem*>(item)) {
+    Q_ASSERT(pad);
     FootprintPadPropertiesDialog dialog(
-        mContext.package, *mContext.currentFootprint, item->getPad(),
+        mContext.package, *mContext.currentFootprint, pad->getPad(),
         mContext.undoStack, getDefaultLengthUnit(),
         "package_editor/footprint_pad_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (texts.count() > 0) {
-    StrokeTextGraphicsItem* item =
-        dynamic_cast<StrokeTextGraphicsItem*>(texts.first().data());
-    Q_ASSERT(item);
+  } else if (StrokeTextGraphicsItem* text =
+             dynamic_cast<StrokeTextGraphicsItem*>(item)) {
+    Q_ASSERT(text);
     StrokeTextPropertiesDialog dialog(
-        item->getText(), mContext.undoStack,
+        text->getText(), mContext.undoStack,
         mContext.layerProvider.getBoardGeometryElementLayers(),
         getDefaultLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (polygons.count() > 0) {
-    PolygonGraphicsItem* item =
-        dynamic_cast<PolygonGraphicsItem*>(polygons.first().data());
-    Q_ASSERT(item);
+  } else if (PolygonGraphicsItem* polygon =
+             dynamic_cast<PolygonGraphicsItem*>(item)) {
+    Q_ASSERT(polygon);
     PolygonPropertiesDialog dialog(
-        item->getPolygon(), mContext.undoStack,
+        polygon->getPolygon(), mContext.undoStack,
         mContext.layerProvider.getBoardGeometryElementLayers(),
         getDefaultLengthUnit(), "package_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (circles.count() > 0) {
-    CircleGraphicsItem* item =
-        dynamic_cast<CircleGraphicsItem*>(circles.first().data());
-    Q_ASSERT(item);
+  } else if (CircleGraphicsItem* circle =
+             dynamic_cast<CircleGraphicsItem*>(item)) {
+    Q_ASSERT(circle);
     CirclePropertiesDialog dialog(
-        item->getCircle(), mContext.undoStack,
+        circle->getCircle(), mContext.undoStack,
         mContext.layerProvider.getBoardGeometryElementLayers(),
         getDefaultLengthUnit(), "package_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (holes.count() > 0) {
-    HoleGraphicsItem* item =
-        dynamic_cast<HoleGraphicsItem*>(holes.first().data());
-    Q_ASSERT(item);
+  } else if (HoleGraphicsItem* hole =
+             dynamic_cast<HoleGraphicsItem*>(item)) {
+    Q_ASSERT(hole);
     HolePropertiesDialog dialog(
-        item->getHole(), mContext.undoStack, getDefaultLengthUnit(),
+        hole->getHole(), mContext.undoStack, getDefaultLengthUnit(),
         "package_editor/hole_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else {
-    return false;
   }
+  return false;
+}
+
+bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
+    const Point& pos) noexcept {
+  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  if (items.isEmpty()) return false;
+  return openPropertiesDialogOfItem(items.first());
 }
 
 bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
@@ -612,6 +632,39 @@ void PackageEditorState_Select::clearSelectionRect(
   if (updateItemsSelectionState) {
     mContext.graphicsScene.setSelectionArea(QPainterPath());
   }
+}
+
+QList<QGraphicsItem*> PackageEditorState_Select::findItemsAtPosition(
+    const Point& pos) noexcept {
+  QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
+  QList<QSharedPointer<CircleGraphicsItem>>       circles;
+  QList<QSharedPointer<PolygonGraphicsItem>>      polygons;
+  QList<QSharedPointer<StrokeTextGraphicsItem>>   texts;
+  QList<QSharedPointer<HoleGraphicsItem>>         holes;
+  int count = mContext.currentGraphicsItem->getItemsAtPosition(
+      pos, &pads, &circles, &polygons, &texts, &holes);
+  QList<QGraphicsItem*> result = {};
+  foreach (QSharedPointer<FootprintPadGraphicsItem> pad, pads) {
+    result.append(pad.data());
+  }
+  foreach (QSharedPointer<CircleGraphicsItem> cirlce, circles) {
+    result.append(cirlce.data());
+  }
+  foreach (QSharedPointer<PolygonGraphicsItem> polygon, polygons) {
+    result.append(polygon.data());
+  }
+  foreach (QSharedPointer<StrokeTextGraphicsItem> text, texts) {
+    result.append(text.data());
+  }
+  foreach (QSharedPointer<HoleGraphicsItem> hole, holes) {
+    result.append(hole.data());
+  }
+
+  Q_ASSERT(result.count() == (pads.count() + texts.count()
+                              + polygons.count() + circles.count()
+                              + holes.count()));
+  Q_ASSERT(result.count() == count);
+  return result;
 }
 
 /*******************************************************************************
