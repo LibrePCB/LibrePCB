@@ -52,7 +52,9 @@ namespace editor {
 
 SchematicEditorState_Select::SchematicEditorState_Select(
     const Context& context) noexcept
-  : SchematicEditorState(context), mSubState(SubState::IDLE) {
+  : SchematicEditorState(context),
+    mSubState(SubState::IDLE),
+    mCurrentSelectionIndex(0) {
 }
 
 SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
@@ -194,13 +196,13 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
 }
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    QGraphicsSceneMouseEvent& mouseEvent) noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
   if (mSubState == SubState::IDLE) {
     // handle items selection
-    Point           pos   = Point::fromPx(e.scenePos());
+    Point           pos   = Point::fromPx(mouseEvent.scenePos());
     QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
     if (items.isEmpty()) {
       // no items under mouse --> start drawing a selection rectangle
@@ -212,9 +214,15 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
     bool itemAlreadySelected = items.first()->isSelected();
 
-    if ((e.modifiers() & Qt::ControlModifier)) {
+    if (mouseEvent.modifiers() & Qt::ControlModifier) {
       // Toggle selection when CTRL is pressed
       items.first()->setSelected(!itemAlreadySelected);
+    } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
+        // Cycle Selection, when holding shift
+        mCurrentSelectionIndex += 1;
+        mCurrentSelectionIndex %= items.count();
+        schematic->clearSelection();
+        items[mCurrentSelectionIndex]->setSelected(true);
     } else if (!itemAlreadySelected) {
       // Only select the topmost item when clicking an unselected item
       // without CTRL
@@ -222,13 +230,14 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       items.first()->setSelected(true);
     }
 
-    if (startMovingSelectedItems(*schematic, Point::fromPx(e.scenePos()))) {
+    if (startMovingSelectedItems(*schematic,
+                                 Point::fromPx(mouseEvent.scenePos()))) {
       return true;
     }
   } else if (mSubState == SubState::PASTING) {
     // stop moving items (set position of all selected elements permanent)
     Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
-    Point pos = Point::fromPx(e.scenePos());
+    Point pos = Point::fromPx(mouseEvent.scenePos());
     mSelectedItemsMoveCommand->setCurrentPosition(pos);
     try {
       mContext.undoStack.appendToCmdGroup(
@@ -292,24 +301,7 @@ bool SchematicEditorState_Select::
     if (items.isEmpty()) return false;
 
     // open the properties editor dialog of the top most item
-    switch (items.first()->getType()) {
-      case SI_Base::Type_t::Symbol: {
-        SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first());
-        Q_ASSERT(symbol);
-        openSymbolPropertiesDialog(*symbol);
-        return true;
-      }
-
-      case SI_Base::Type_t::NetLabel: {
-        SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(items.first());
-        Q_ASSERT(netlabel);
-        openNetLabelPropertiesDialog(*netlabel);
-        return true;
-      }
-
-      default:
-        break;
-    }
+    openPropertiesDialog(items.first());
   }
 
   return false;
@@ -319,85 +311,60 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
+  if (mSubState != SubState::IDLE) return false;
 
-  if (mSubState == SubState::IDLE) {
-    // handle item selection
-    QList<SI_Base*> items =
-        schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) return false;
-    schematic->clearSelection();
-    items.first()->setSelected(true);
-
-    // build and execute the context menu
-    QMenu menu;
-    switch (items.first()->getType()) {
-      case SI_Base::Type_t::Symbol: {
-        SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(items.first());
-        Q_ASSERT(symbol);
-
-        // build the context menu
-        QAction* aCut =
-            menu.addAction(QIcon(":/img/actions/cut.png"), tr("Cut"));
-        QAction* aCopy =
-            menu.addAction(QIcon(":/img/actions/copy.png"), tr("Copy"));
-        QAction* aRotateCCW = menu.addAction(
-            QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-        QAction* aMirror = menu.addAction(
-            QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
-        QAction* aRemoveSymbol = menu.addAction(
-            QIcon(":/img/actions/delete.png"), tr("Remove Symbol"));
-        menu.addSeparator();
-        QAction* aProperties = menu.addAction(tr("Properties"));
-
-        // execute the context menu
-        QAction* action = menu.exec(e.screenPos());
-        if (action == aCut) {
-          copySelectedItemsToClipboard();
-          removeSelectedItems();
-        } else if (action == aCopy) {
-          copySelectedItemsToClipboard();
-        } else if (action == aRotateCCW) {
-          rotateSelectedItems(Angle::deg90());
-        } else if (action == aMirror) {
-          mirrorSelectedItems();
-        } else if (action == aRemoveSymbol) {
-          removeSelectedItems();
-        } else if (action == aProperties) {
-          openSymbolPropertiesDialog(*symbol);
-        }
-        return true;
-      }
-
-      case SI_Base::Type_t::NetLabel: {
-        SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(items.first());
-        Q_ASSERT(netlabel);
-
-        // build the context menu
-        QAction* aRotateCCW = menu.addAction(
-            QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-        QAction* aRemove = menu.addAction(QIcon(":/img/actions/delete.png"),
-                                          tr("Remove Net Label"));
-        menu.addSeparator();
-        QAction* aRenameNetSegment = menu.addAction(tr("Rename Net Segment"));
-
-        // execute the context menu
-        QAction* action = menu.exec(e.screenPos());
-        if (action == aRotateCCW) {
-          rotateSelectedItems(Angle::deg90());
-        } else if (action == aRemove) {
-          removeSelectedItems();
-        } else if (action == aRenameNetSegment) {
-          openNetLabelPropertiesDialog(*netlabel);
-        }
-        return true;
-      }
-
-      default:
-        break;
+  // handle item selection
+  QList<SI_Base*> items =
+      schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+  if (items.isEmpty()) return false;
+  SI_Base* selectedItem = nullptr;
+  foreach (SI_Base* item, items) {
+    if (item->isSelected()) {
+      selectedItem = item;
     }
   }
+  if (!selectedItem) {
+    schematic->clearSelection();
+    selectedItem = items.first();
+    selectedItem->setSelected(true);
+  }
+  Q_ASSERT(selectedItem);
+  Q_ASSERT(selectedItem->isSelected());
 
-  return false;
+  // build the context menu
+  QMenu menu;
+  switch (selectedItem->getType()) {
+    case SI_Base::Type_t::Symbol: {
+      SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(selectedItem);
+      Q_ASSERT(symbol);
+
+      addActionCut(menu);
+      addActionCopy(menu);
+      addActionRemove(menu, tr("Remove Symbol"));
+      menu.addSeparator();
+      addActionRotate(menu);
+      addActionMirror(menu);
+      menu.addSeparator();
+      addActionOpenProperties(menu, selectedItem);
+      break;
+    }
+
+    case SI_Base::Type_t::NetLabel: {
+      SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(selectedItem);
+      Q_ASSERT(netlabel);
+
+      addActionRotate(menu);
+      addActionRemove(menu, tr("Remove Net Label"));
+      menu.addSeparator();
+      addActionOpenProperties(menu, selectedItem, tr("Rename Net Segment"));
+      break;
+    }
+
+    default:
+      return false;
+  }
+  // execute the context menu
+  return menu.exec(e.screenPos());
 }
 
 bool SchematicEditorState_Select::processSwitchToSchematicPage(
@@ -536,6 +503,28 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
   return false;
 }
 
+void SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
+  if (!item) return;
+  switch (item->getType()) {
+    case SI_Base::Type_t::Symbol: {
+      SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item);
+      Q_ASSERT(symbol);
+      openSymbolPropertiesDialog(*symbol);
+      break;
+    }
+
+    case SI_Base::Type_t::NetLabel: {
+      SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item);
+      Q_ASSERT(netlabel);
+      openNetLabelPropertiesDialog(*netlabel);
+      break;
+    }
+
+    default:
+      break;
+  }
+}
+
 void SchematicEditorState_Select::openSymbolPropertiesDialog(
     SI_Symbol& symbol) noexcept {
   SymbolInstancePropertiesDialog dialog(
@@ -550,6 +539,61 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
   RenameNetSegmentDialog dialog(mContext.undoStack, netlabel.getNetSegment(),
                                 parentWidget());
   dialog.exec();  // performs the rename, if needed
+}
+
+QAction* SchematicEditorState_Select::addActionCut(
+    QMenu &menu, const QString &text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/cut.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    copySelectedItemsToClipboard();
+    removeSelectedItems();
+  });
+  return action;
+}
+
+QAction* SchematicEditorState_Select::addActionCopy(
+    QMenu &menu, const QString &text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/copy.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    copySelectedItemsToClipboard();
+  });
+  return action;
+}
+
+QAction* SchematicEditorState_Select::addActionRemove(
+    QMenu &menu, const QString &text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    removeSelectedItems();
+  });
+  return action;
+}
+
+QAction* SchematicEditorState_Select::addActionMirror(
+    QMenu &menu, const QString &text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    mirrorSelectedItems();
+  });
+  return action;
+}
+
+QAction* SchematicEditorState_Select::addActionRotate(
+    QMenu &menu, const QString &text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
+  connect(action, &QAction::triggered, [this](){
+    rotateSelectedItems(Angle::deg90());
+  });
+  return action;
+}
+
+QAction* SchematicEditorState_Select::addActionOpenProperties(
+    QMenu &menu, SI_Base* item, const QString &text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/settings.png"), text);
+  connect(action, &QAction::triggered, [this, item](){
+    openPropertiesDialog(item);
+  });
+  return action;
 }
 
 /*******************************************************************************

@@ -14,7 +14,7 @@
    <string>Schematic Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../../../../img/images.qrc">
     <normaloff>:/img/actions/schematic.png</normaloff>:/img/actions/schematic.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -46,11 +46,17 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menu_Export_As">
+     <property name="title">
+      <string>&amp;Export As...</string>
+     </property>
+     <addaction name="actionExportLppz"/>
+     <addaction name="actionPDF_Export"/>
+     <addaction name="actionExportAsSvg"/>
+    </widget>
     <addaction name="actionNew_Schematic_Page"/>
     <addaction name="actionSave_Project"/>
-    <addaction name="actionExportLppz"/>
-    <addaction name="actionPDF_Export"/>
-    <addaction name="actionExportAsSvg"/>
+    <addaction name="menu_Export_As"/>
     <addaction name="actionGenerateBom"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
@@ -92,11 +98,11 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actionGrid"/>
-    <addaction name="separator"/>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionZoom_All"/>
+    <addaction name="separator"/>
+    <addaction name="actionGrid"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -109,7 +115,7 @@
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
-     <string>Pro&amp;ject</string>
+     <string>&amp;Project</string>
     </property>
     <addaction name="actionProjectProperties"/>
     <addaction name="actionProjectSettings"/>
@@ -118,7 +124,7 @@
    </widget>
    <widget class="QMenu" name="menuSchematic">
     <property name="title">
-     <string>Schematic</string>
+     <string>&amp;Schematic</string>
     </property>
     <addaction name="actionRenameSheet"/>
    </widget>
@@ -173,6 +179,7 @@
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_All"/>
+   <addaction name="actionGrid"/>
   </widget>
   <widget class="QToolBar" name="editToolbar">
    <property name="windowTitle">
@@ -193,19 +200,8 @@
    <addaction name="actionCut"/>
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
+   <addaction name="separator"/>
    <addaction name="actionRemove"/>
-  </widget>
-  <widget class="QToolBar" name="viewToolbar">
-   <property name="windowTitle">
-    <string>View</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionGrid"/>
   </widget>
   <widget class="librepcb::project::editor::SearchToolBar" name="searchToolbar">
    <property name="windowTitle">
@@ -271,7 +267,7 @@
   </widget>
   <action name="actionQuit">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
@@ -286,7 +282,7 @@
   </action>
   <action name="actionSave_Project">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
    </property>
    <property name="text">
@@ -298,11 +294,11 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;About LibrePCB</string>
+    <string>About &amp;LibrePCB</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -324,7 +320,7 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
    </property>
    <property name="text">
@@ -336,11 +332,11 @@
   </action>
   <action name="actionPDF_Export">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
-    <string>Export schematics to &amp;PDF</string>
+    <string>&amp;PDF</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -351,7 +347,7 @@
   </action>
   <action name="actionShow_Control_Panel">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/home.png</normaloff>:/img/actions/home.png</iconset>
    </property>
    <property name="text">
@@ -363,7 +359,7 @@
   </action>
   <action name="actionShow_Board_Editor">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/board_editor.png</normaloff>:/img/actions/board_editor.png</iconset>
    </property>
    <property name="text">
@@ -375,7 +371,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
    </property>
    <property name="text">
@@ -387,7 +383,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
    </property>
    <property name="text">
@@ -399,11 +395,11 @@
   </action>
   <action name="actionZoom_In">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Zoom In</string>
+    <string>Zoom &amp;In</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl++</string>
@@ -411,7 +407,7 @@
   </action>
   <action name="actionZoom_Out">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
    </property>
    <property name="text">
@@ -423,23 +419,23 @@
   </action>
   <action name="actionZoom_All">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
    </property>
    <property name="text">
-    <string>Zoo&amp;m All</string>
+    <string>Zoom &amp;All</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string notr="true">Ctrl+0</string>
    </property>
   </action>
   <action name="actionOnlineDocumentation">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
-    <string>Online Documentation</string>
+    <string>&amp;Online Documentation</string>
    </property>
    <property name="shortcut">
     <string notr="true">F1</string>
@@ -447,11 +443,11 @@
   </action>
   <action name="actionOpenWebsite">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
    </property>
    <property name="text">
-    <string>LibrePCB Website</string>
+    <string>LibrePCB &amp;Website</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -459,7 +455,7 @@
   </action>
   <action name="actionRotate_CCW">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
    </property>
    <property name="text">
@@ -471,7 +467,7 @@
   </action>
   <action name="actionRotate_CW">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
    </property>
    <property name="text">
@@ -483,11 +479,11 @@
   </action>
   <action name="actionMirror">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
    </property>
    <property name="text">
-    <string>M&amp;irror</string>
+    <string>&amp;Mirror</string>
    </property>
    <property name="shortcut">
     <string notr="true">M</string>
@@ -495,7 +491,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
    </property>
    <property name="text">
@@ -507,11 +503,11 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
    </property>
    <property name="text">
-    <string>Cut</string>
+    <string>Cu&amp;t</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+X</string>
@@ -519,7 +515,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
    </property>
    <property name="text">
@@ -531,7 +527,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
@@ -543,19 +539,19 @@
   </action>
   <action name="actionClose_Project">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Close Project</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string notr="true">Ctrl+W</string>
    </property>
   </action>
   <action name="actionToolSelect">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
    </property>
    <property name="text">
@@ -567,7 +563,7 @@
   </action>
   <action name="actionToolAddComponent">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/add_component.png</normaloff>:/img/actions/add_component.png</iconset>
    </property>
    <property name="text">
@@ -579,7 +575,7 @@
   </action>
   <action name="actionToolDrawWire">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/draw_wire.png</normaloff>:/img/actions/draw_wire.png</iconset>
    </property>
    <property name="text">
@@ -591,7 +587,7 @@
   </action>
   <action name="actionCommandAbort">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/stop.png</normaloff>:/img/actions/stop.png</iconset>
    </property>
    <property name="text">
@@ -603,7 +599,7 @@
   </action>
   <action name="actionGrid">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
    </property>
    <property name="text">
@@ -623,7 +619,7 @@
   </action>
   <action name="actionAddComp_Resistor">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/library/resistor_eu.png</normaloff>:/img/library/resistor_eu.png</iconset>
    </property>
    <property name="text">
@@ -635,7 +631,7 @@
   </action>
   <action name="actionAddComp_BipolarCapacitor">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/library/bipolar_capacitor_eu.png</normaloff>:/img/library/bipolar_capacitor_eu.png</iconset>
    </property>
    <property name="text">
@@ -650,7 +646,7 @@
   </action>
   <action name="actionAddComp_Inductor">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/library/inductor_eu.png</normaloff>:/img/library/inductor_eu.png</iconset>
    </property>
    <property name="text">
@@ -662,7 +658,7 @@
   </action>
   <action name="actionAddComp_gnd">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/library/gnd.png</normaloff>:/img/library/gnd.png</iconset>
    </property>
    <property name="text">
@@ -674,7 +670,7 @@
   </action>
   <action name="actionAddComp_vcc">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/library/vcc.png</normaloff>:/img/library/vcc.png</iconset>
    </property>
    <property name="text">
@@ -694,7 +690,7 @@
   </action>
   <action name="actionProjectSettings">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
@@ -706,11 +702,11 @@
   </action>
   <action name="actionToolAddNetLabel">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/draw_netlabel.png</normaloff>:/img/actions/draw_netlabel.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Add Netlabel</string>
+    <string>Add &amp;Netlabel</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -718,7 +714,7 @@
   </action>
   <action name="actionAddComp_UnipolarCapacitor">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/library/unipolar_capacitor_eu.png</normaloff>:/img/library/unipolar_capacitor_eu.png</iconset>
    </property>
    <property name="text">
@@ -730,7 +726,7 @@
   </action>
   <action name="actionNew_Schematic_Page">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
    </property>
    <property name="text">
@@ -742,11 +738,11 @@
   </action>
   <action name="actionUpdateLibrary">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
-    <string>Update Library</string>
+    <string>&amp;Update Library</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -754,11 +750,11 @@
   </action>
   <action name="actionExportLppz">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Export project to *.lppz</string>
+    <string>&amp;LPPZ</string>
    </property>
    <property name="toolTip">
     <string>Export project to *.lppz</string>
@@ -769,11 +765,11 @@
   </action>
   <action name="actionGenerateBom">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
    </property>
    <property name="text">
-    <string>Generate BOM</string>
+    <string>&amp;Generate BOM</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -781,7 +777,7 @@
   </action>
   <action name="actionRenameSheet">
    <property name="text">
-    <string>Rename Sheet</string>
+    <string>&amp;Rename Sheet</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -789,11 +785,11 @@
   </action>
   <action name="actionExportAsSvg">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
    </property>
    <property name="text">
-    <string>Export sheet to SVG</string>
+    <string>&amp;SVG</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -801,11 +797,11 @@
   </action>
   <action name="actionSelectAll">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/select_all.png</normaloff>:/img/actions/select_all.png</iconset>
    </property>
    <property name="text">
-    <string>Select All</string>
+    <string>Select &amp;All</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -824,6 +820,15 @@
    <header location="global">librepcb/projecteditor/toolbars/searchtoolbar.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+ </resources>
  <connections/>
 </ui>

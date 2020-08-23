@@ -41,6 +41,7 @@ namespace project {
 
 class Project;
 class Schematic;
+class SI_Symbol;
 
 namespace editor {
 
@@ -130,6 +131,10 @@ private:
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
   int mActiveSchematicIndex;
+
+  // Search Function
+  QString mLastSearch;
+  int mNextSymbolIndex;
 
   // Docks
   SchematicPagesDock* mPagesDock;

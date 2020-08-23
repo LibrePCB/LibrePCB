@@ -88,6 +88,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mProject(project),
     mUi(new Ui::BoardEditor),
     mGraphicsView(nullptr),
+    mLastSearch(""),
+    mNextDeviceIndex(1),
     mActiveBoard(nullptr),
     mBoardListActionGroup(this),
     mErcMsgDock(nullptr),
@@ -104,7 +106,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   if (!mProject.getDirectory().isWritable()) {
     filenameStr.append(QStringLiteral(" [Read-Only]"));
   }
-  setWindowTitle(QString("%1 - LibrePCB Board Editor").arg(filenameStr));
+  setWindowTitle(tr("%1 - LibrePCB Board Editor").arg(filenameStr));
 
   // Add Dock Widgets
   mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
@@ -443,7 +445,7 @@ void BoardEditor::on_actionCopyBoard_triggered() {
   bool    ok   = false;
   QString name = QInputDialog::getText(
       this, tr("Copy Board"), tr("Choose a name:"), QLineEdit::Normal,
-      QString(tr("copy_of_%1")).arg(*board->getName()), &ok);
+      tr("copy_of_%1").arg(*board->getName()), &ok);
   if (!ok) return;
 
   try {
@@ -462,8 +464,7 @@ void BoardEditor::on_actionRemoveBoard_triggered() {
 
   QMessageBox::StandardButton btn = QMessageBox::question(
       this, tr("Remove board"),
-      QString(tr("Are you really sure to remove the board \"%1\"?"))
-          .arg(*board->getName()));
+      tr("Are you really sure to remove the board \"%1\"?").arg(*board->getName()));
   if (btn != QMessageBox::Yes) return;
 
   try {
@@ -861,17 +862,36 @@ QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
 
 void BoardEditor::goToDevice(const QString& name) noexcept {
   if (Board* board = getActiveBoard()) {
+    if (mLastSearch != name) {
+      mLastSearch = name;
+      mNextDeviceIndex = 0;
+    }
+    QList<BI_Device*> deviceCandidates = {};
     foreach (BI_Device* device, board->getDeviceInstances()) {
-      if (device->getComponentInstance().getName()->toLower() ==
-          name.toLower()) {
-        board->clearSelection();
-        device->setSelected(true);
-        QRectF rect   = device->getFootprint().getBoundingRect();
-        qreal  margin = Length(1000000).toPx();
-        rect.adjust(-margin, -margin, margin, margin);
-        mGraphicsView->zoomToRect(rect);
-        return;
+      if (device->getComponentInstance().getName()
+          ->startsWith(name, Qt::CaseInsensitive)) {
+        deviceCandidates.append(device);
       }
+    }
+    std::sort(deviceCandidates.begin(), deviceCandidates.end(),
+              [](BI_Device* A, BI_Device* B){
+      return A->getComponentInstance().getName()
+          < B->getComponentInstance().getName();
+    });
+    if (deviceCandidates.count()) {
+      if (mNextDeviceIndex >= deviceCandidates.count()) {
+        mNextDeviceIndex = 0;
+      }
+      BI_Device* device = deviceCandidates[mNextDeviceIndex++];
+      mNextDeviceIndex = mNextDeviceIndex % deviceCandidates.count();
+      board->clearSelection();
+      device->setSelected(true);
+      QRectF rect = device->getFootprint().getBoundingRect();
+      //Zoom to a rectangle relative to the maximum device dimension. The device
+      // is 1/4th of the screen
+      qreal margin = 1.5f*std::max(rect.size().width(), rect.size().height());
+      rect.adjust(-margin, -margin, margin, margin);
+      mGraphicsView->zoomToRect(rect);
     }
   }
 }

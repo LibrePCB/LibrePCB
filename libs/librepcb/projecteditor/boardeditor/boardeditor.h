@@ -149,6 +149,10 @@ private:
                                     mDrcMessages;  ///< Key: Board UUID
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
 
+  // Search Toolbar
+  QString mLastSearch;
+  int mNextDeviceIndex;
+
   // Misc
   QPointer<Board> mActiveBoard;
   QList<QAction*> mBoardListActions;

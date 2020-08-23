@@ -37,6 +37,7 @@ class Angle;
 
 namespace project {
 
+class SI_Base;
 class SI_Symbol;
 class SI_NetLabel;
 class Schematic;
@@ -90,19 +91,29 @@ public:
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Operator Overloadings
-  SchematicEditorState_Select& operator       =(
+  SchematicEditorState_Select& operator =(
       const SchematicEditorState_Select& rhs) = delete;
 
 private:  // Methods
-  bool startMovingSelectedItems(Schematic&   schematic,
+  bool startMovingSelectedItems(Schematic& schematic,
                                 const Point& startPos) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
+  void openPropertiesDialog(SI_Base* item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
+
+  //Right Click Menu
+  QAction* addActionCut(QMenu& menu, const QString& text = tr("Cut")) noexcept;
+  QAction* addActionCopy(QMenu& menu, const QString& text = tr("Copy")) noexcept;
+  QAction* addActionRemove(QMenu& menu, const QString& text = tr("Remove")) noexcept;
+  QAction* addActionMirror(QMenu& menu, const QString& text = tr("Mirror")) noexcept;
+  QAction* addActionRotate(QMenu& menu, const QString& text = tr("Rotate")) noexcept;
+  QAction* addActionOpenProperties(QMenu& menu, SI_Base* item,
+                                   const QString& text = tr("Properties")) noexcept;
 
 private:  // Data
   /// enum for all possible substates
@@ -116,6 +127,7 @@ private:  // Data
   SubState mSubState;  ///< the current substate
   Point    mStartPos;
   QScopedPointer<CmdMoveSelectedSchematicItems> mSelectedItemsMoveCommand;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************
