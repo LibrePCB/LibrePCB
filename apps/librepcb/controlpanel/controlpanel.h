@@ -131,6 +131,13 @@ private:
   void updateNoLibrariesWarningVisibility() noexcept;
   void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
 
+  // add action to menu methods
+  QAction* addActionOpenProject(QMenu& menu, FilePath& fp) noexcept;
+  QAction* addActionCloseProject(QMenu& menu, FilePath& fp) noexcept;
+  QAction* addActionAddFavorite(QMenu& menu, FilePath& fp) noexcept;
+  QAction* addActionRemoveFavorite(QMenu& menu, FilePath& fp) noexcept;
+  QAction* addActionUpdateLibrary(QMenu& menu, FilePath& fp) noexcept;
+
   // Project Management
 
   project::editor::ProjectEditor* newProject(

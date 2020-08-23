@@ -71,12 +71,12 @@ ControlPanel::ControlPanel(Workspace& workspace)
     mLibraryManager(new LibraryManager(mWorkspace, this)) {
   mUi->setupUi(this);
 
-  setWindowTitle(QString(tr("Control Panel - LibrePCB %1"))
-                     .arg(qApp->applicationVersion()));
+  setWindowTitle(tr("Control Panel - LibrePCB %1")
+                 .arg(qApp->applicationVersion()));
 
   // show workspace path in status bar
   QString wsPath         = mWorkspace.getPath().toNative();
-  QLabel* statusBarLabel = new QLabel(QString(tr("Workspace: %1")).arg(wsPath));
+  QLabel* statusBarLabel = new QLabel(tr("Workspace: %1").arg(wsPath));
   mUi->statusBar->addWidget(statusBarLabel, 1);
 
   // initialize status bar
@@ -309,43 +309,34 @@ ProjectEditor* ControlPanel::openProject(Project& project) noexcept {
 }
 
 ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
-  try {
-    ProjectEditor* editor = getOpenProject(filepath);
-    if (!editor) {
+  ProjectEditor* editor = getOpenProject(filepath);
+  if (!editor) {
+    try {
       std::shared_ptr<TransactionalFileSystem> fs =
           TransactionalFileSystem::openRW(filepath.getParentDir(),
                                           &askForRestoringBackup);
       Project* project = new Project(std::unique_ptr<TransactionalDirectory>(
-                                         new TransactionalDirectory(fs)),
+                                       new TransactionalDirectory(fs)),
                                      filepath.getFilename());
-      editor           = new ProjectEditor(mWorkspace, *project);
-      connect(editor, &ProjectEditor::projectEditorClosed, this,
-              &ControlPanel::projectEditorClosed);
-      connect(editor, &ProjectEditor::showControlPanelClicked, this,
-              &ControlPanel::showControlPanel);
-      connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
-              &ControlPanel::openProjectLibraryUpdater);
-      mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-      mWorkspace.setLastRecentlyUsedProject(filepath);
+      return openProject(*project);
+    } catch (UserCanceled& e) {
+      // do nothing
+      return nullptr;
+    } catch (Exception& e) {
+      QMessageBox::critical(this, tr("Could not open project"), e.getMsg());
+      return nullptr;
     }
-    editor->showAllRequiredEditors();
-    return editor;
-  } catch (UserCanceled& e) {
-    // do nothing
-    return nullptr;
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Could not open project"), e.getMsg());
-    return nullptr;
   }
+  editor->showAllRequiredEditors();
+  return editor;
 }
 
 bool ControlPanel::closeProject(ProjectEditor& editor,
                                 bool           askForSave) noexcept {
   Q_ASSERT(mOpenProjectEditors.contains(
       editor.getProject().getFilepath().toUnique().toStr()));
-  bool success = editor.closeAndDestroy(
-      askForSave,
-      this);  // this will implicitly call the slot "projectEditorClosed()"!
+  // this will implicitly call the slot "projectEditorClosed()"!
+  bool success = editor.closeAndDestroy(askForSave, this);
   if (success) {
     delete &editor;  // delete immediately to avoid locked projects when closing
                      // the app
@@ -571,95 +562,55 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
 
   // build context menu with actions
   QMenu menu;
-  enum Action {
-    OpenProject,
-    CloseProject,
-    AddFavorite,
-    RemoveFavorite,  // on projects
-    UpdateLibrary,   // on projects
-    NewProject,
-    NewFolder,  // on folders
-    Open,
-    Remove
-  };  // on folders+files
   if (isProjectFile) {
-    if (!getOpenProject(fp)) {
-      menu.addAction(QIcon(":/img/actions/open.png"), tr("Open Project"))
-          ->setData(OpenProject);
-      menu.setDefaultAction(menu.actions().last());
+    if (getOpenProject(fp)) {
+      addActionCloseProject(menu, fp);
     } else {
-      menu.addAction(QIcon(":/img/actions/close.png"), tr("Close Project"))
-          ->setData(CloseProject);
+      addActionOpenProject(menu, fp);
+      menu.setDefaultAction(menu.actions().last());
     }
     menu.addSeparator();
     if (mWorkspace.isFavoriteProject(fp)) {
-      menu.addAction(QIcon(":/img/actions/bookmark.png"),
-                     tr("Remove from favorites"))
-          ->setData(RemoveFavorite);
+      addActionRemoveFavorite(menu, fp);
     } else {
-      menu.addAction(QIcon(":/img/actions/bookmark_gray.png"),
-                     tr("Add to favorites"))
-          ->setData(AddFavorite);
+      addActionAddFavorite(menu, fp);
     }
     menu.addSeparator();
-    menu.addAction(QIcon(":/img/actions/refresh.png"),
-                   tr("Update project library"))
-        ->setData(UpdateLibrary);
+    addActionUpdateLibrary(menu, fp);
   } else {
-    menu.addAction(QIcon(":/img/actions/open.png"), tr("Open"))->setData(Open);
     if (fp.isExistingFile()) {
-      menu.setDefaultAction(menu.actions().last());
+      QAction* openAction = menu.addAction(QIcon(":/img/actions/open.png"),
+                                           tr("&Open"));
+      connect(openAction, &QAction::triggered, [&fp](){
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fp.toStr()));
+      });
+      menu.setDefaultAction(openAction);
     }
   }
   menu.addSeparator();
   if (fp.isExistingDir() && (!isProjectDir) && (!isInProjectDir)) {
-    menu.addAction(QIcon(":/img/places/project_folder.png"), tr("New Project"))
-        ->setData(NewProject);
-    menu.addAction(QIcon(":/img/actions/new_folder.png"), tr("New Folder"))
-        ->setData(NewFolder);
+    QAction* newProjectAction = menu.addAction(QIcon(":/img/places/project_folder.png"),
+                                               tr("New &Project"));
+    connect(newProjectAction, &QAction::triggered, [this, &fp](){
+      newProject(fp);
+    });
+    QAction* newFolderAction = menu.addAction(QIcon(":/img/actions/new_folder.png"),
+                                              tr("New &Folder"));
+    connect(newFolderAction, &QAction::triggered, [this, &fp](){
+      QDir(fp.toStr())
+          .mkdir(QInputDialog::getText(this, tr("New Folder"), tr("Name:")));
+    });
   }
   if (fp != mWorkspace.getProjectsPath()) {
     menu.addSeparator();
-    menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"))
-        ->setData(Remove);
-  }
-
-  // show context menu and execute the clicked action
-  QAction* action = menu.exec(QCursor::pos());
-  if (!action) return;
-  switch (action->data().toInt()) {
-    case OpenProject:
-      openProject(fp);
-      break;
-    case CloseProject:
-      closeProject(fp, true);
-      break;
-    case AddFavorite:
-      mWorkspace.addFavoriteProject(fp);
-      break;
-    case RemoveFavorite:
-      mWorkspace.removeFavoriteProject(fp);
-      break;
-    case UpdateLibrary:
-      openProjectLibraryUpdater(fp);
-      break;
-    case NewProject:
-      newProject(fp);
-      break;
-    case NewFolder:
-      QDir(fp.toStr())
-          .mkdir(QInputDialog::getText(this, tr("New Folder"), tr("Name:")));
-      break;
-    case Open:
-      QDesktopServices::openUrl(QUrl::fromLocalFile(fp.toStr()));
-      break;
-    case Remove: {
+    QAction* removeAction = menu.addAction(QIcon(":/img/actions/delete.png"),
+                                           tr("&Remove"));
+    connect(removeAction, &QAction::triggered, [this, &fp](){
       QMessageBox::StandardButton btn = QMessageBox::question(
           this, tr("Remove"),
-          QString(tr("Are you really sure to remove following file or "
-                     "directory?\n\n"
-                     "%1\n\nWarning: This cannot be undone!"))
-              .arg(fp.toNative()));
+          tr("Do you reakky want to remove the following file or "
+             "directory?\n\n%1\n\nWarning: This cannot be undone!")
+                                          .arg(fp.toNative()));
       if (btn == QMessageBox::Yes) {
         try {
           if (fp.isExistingDir()) {
@@ -674,12 +625,11 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
         mWorkspace.getRecentProjectsModel().updateVisibleProjects();
         mWorkspace.getFavoriteProjectsModel().updateVisibleProjects();
       }
-      break;
-    }
-    default:
-      qCritical() << "Unknown action triggered";
-      break;
+    });
   }
+
+  // show context menu and execute the clicked action
+  menu.exec(QCursor::pos());
 }
 
 void ControlPanel::on_recentProjectsListView_entered(const QModelIndex& index) {
@@ -715,27 +665,21 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(
   FilePath fp = FilePath(index.data(Qt::UserRole).toString());
   if (!fp.isValid()) return;
 
-  QMenu    menu;
-  QAction* action;
-  if (isFavorite) {
-    action = menu.addAction(QIcon(":/img/actions/bookmark.png"),
-                            tr("Remove from favorites"));
+  QMenu menu;
+  if (getOpenProject(fp)) {
+    addActionCloseProject(menu, fp);
   } else {
-    action = menu.addAction(QIcon(":/img/actions/bookmark_gray.png"),
-                            tr("Add to favorites"));
+    addActionOpenProject(menu, fp);
+    menu.setDefaultAction(menu.actions().last());
   }
-  QAction* libraryUpdaterAction = menu.addAction(
-      QIcon(":/img/actions/refresh.png"), tr("Update project library"));
+  if (isFavorite) {
+    addActionRemoveFavorite(menu, fp);
+  } else {
+    addActionAddFavorite(menu, fp);
+  }
+  addActionUpdateLibrary(menu, fp);
 
-  QAction* result = menu.exec(QCursor::pos());
-  if (result == action) {
-    if (isFavorite)
-      mWorkspace.removeFavoriteProject(fp);
-    else
-      mWorkspace.addFavoriteProject(fp);
-  } else if (result == libraryUpdaterAction) {
-    openProjectLibraryUpdater(fp);
-  }
+  menu.exec(QCursor::pos());
 }
 
 void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(
@@ -747,21 +691,59 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(
   if (!fp.isValid()) return;
 
   QMenu    menu;
-  QAction* removeAction = menu.addAction(QIcon(":/img/actions/cancel.png"),
-                                         tr("Remove from favorites"));
-  QAction* libraryUpdaterAction = menu.addAction(
-      QIcon(":/img/actions/refresh.png"), tr("Update project library"));
-
-  QAction* result = menu.exec(QCursor::pos());
-  if (result == removeAction) {
-    mWorkspace.removeFavoriteProject(fp);
-  } else if (result == libraryUpdaterAction) {
-    openProjectLibraryUpdater(fp);
+  if (getOpenProject(fp)) {
+    addActionCloseProject(menu, fp);
+  } else {
+    addActionOpenProject(menu, fp);
+    menu.setDefaultAction(menu.actions().last());
   }
+  addActionRemoveFavorite(menu, fp);
+  addActionUpdateLibrary(menu, fp);
+  menu.exec(QCursor::pos());
 }
 
 void ControlPanel::on_actionRescanLibraries_triggered() {
   mWorkspace.getLibraryDb().startLibraryRescan();
+}
+
+QAction* ControlPanel::addActionOpenProject(QMenu &menu, FilePath &fp) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/open.png"), tr("&Open Project"));
+  connect(action, &QAction::triggered, [this, &fp](){
+    openProject(fp);
+  });
+  return action;
+}
+
+QAction* ControlPanel::addActionCloseProject(QMenu &menu, FilePath &fp) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/open.png"), tr("&Open Project"));
+  connect(action, &QAction::triggered, [this, &fp](){
+    closeProject(fp, true);
+  });
+  return action;
+}
+
+QAction* ControlPanel::addActionAddFavorite(QMenu &menu, FilePath &fp) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/bookmark_gray.png"), tr("Add To &Favorites"));
+  connect(action, &QAction::triggered, [this, &fp](){
+    mWorkspace.addFavoriteProject(fp);
+  });
+  return action;
+}
+
+QAction* ControlPanel::addActionRemoveFavorite(QMenu &menu, FilePath &fp) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/bookmark.png"), tr("Remove From &Favorites"));
+  connect(action, &QAction::triggered, [this, &fp](){
+    mWorkspace.removeFavoriteProject(fp);
+  });
+  return action;
+}
+
+QAction* ControlPanel::addActionUpdateLibrary(QMenu &menu, FilePath &fp) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/refresh.png"), tr("&Update Project Library"));
+  connect(action, &QAction::triggered, [this, &fp](){
+    openProjectLibraryUpdater(fp);
+  });
+  return action;
 }
 
 /*******************************************************************************
