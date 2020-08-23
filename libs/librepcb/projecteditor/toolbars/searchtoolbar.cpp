@@ -37,10 +37,18 @@ namespace editor {
  ******************************************************************************/
 
 SearchToolBar::SearchToolBar(QWidget* parent) noexcept
-  : QToolBar(parent), mCompleterListFunction(), mLineEdit(new QLineEdit()) {
+  : QToolBar(parent),
+    mCompleterListFunction(),
+    mLineEdit(new QLineEdit()),
+    mShortcutFocus(nullptr) {
   mLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   mLineEdit->setMaxLength(30);             // avoid too large widget in toolbar
   mLineEdit->setClearButtonEnabled(true);  // to quickly clear the search term
+  mShortcutFocus = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this);
+  connect(mShortcutFocus, &QShortcut::activated, this, [this](){
+    mLineEdit->setFocus();
+  });
+  mLineEdit->setFocus();
   connect(mLineEdit.data(), &QLineEdit::textEdited, this,
           &SearchToolBar::textEdited);
   connect(mLineEdit.data(), &QLineEdit::returnPressed, this,

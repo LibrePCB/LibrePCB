@@ -75,6 +75,7 @@ private:
 private:
   CompleterListFunction     mCompleterListFunction;
   QScopedPointer<QLineEdit> mLineEdit;
+  QShortcut* mShortcutFocus;
 };
 
 /*******************************************************************************
