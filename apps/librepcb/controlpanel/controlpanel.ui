@@ -14,7 +14,7 @@
    <string>LibrePCB ControlPanel</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../../../img/images.qrc">
     <normaloff>:/img/app/librepcb.png</normaloff>:/img/app/librepcb.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -168,7 +168,7 @@
               <string>New Project</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="../../../img/images.qrc">
                <normaloff>:/img/actions/new.png</normaloff>:/img/actions/new.png</iconset>
              </property>
              <property name="iconSize">
@@ -185,7 +185,7 @@
               <string>Open Project</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="../../../img/images.qrc">
                <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
              </property>
              <property name="iconSize">
@@ -202,7 +202,7 @@
               <string>Library Manager</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="../../../img/images.qrc">
                <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
              </property>
              <property name="iconSize">
@@ -435,19 +435,19 @@ QListView::item
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Project"/>
-    <addaction name="actionClose_all_open_projects"/>
     <addaction name="separator"/>
     <addaction name="actionSwitch_Workspace"/>
     <addaction name="separator"/>
+    <addaction name="actionClose_all_open_projects"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionOnlineDocumentation"/>
     <addaction name="actionOpenWebsite"/>
@@ -456,7 +456,7 @@ QListView::item
    </widget>
    <widget class="QMenu" name="menuExtras">
     <property name="title">
-     <string>Extras</string>
+     <string>&amp;Extras</string>
     </property>
     <addaction name="actionRescanLibraries"/>
     <addaction name="actionOpen_Library_Manager"/>
@@ -470,11 +470,11 @@ QListView::item
   <widget class="librepcb::StatusBar" name="statusBar"/>
   <action name="actionQuit">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+Q</string>
@@ -485,7 +485,7 @@ QListView::item
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
-    <string>About Qt</string>
+    <string>About &amp;Qt</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -496,11 +496,11 @@ QListView::item
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;About LibrePCB</string>
+    <string>About &amp;LibrePCB</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -511,43 +511,43 @@ QListView::item
   </action>
   <action name="actionNew_Project">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/new.png</normaloff>:/img/actions/new.png</iconset>
    </property>
    <property name="text">
-    <string>New Project</string>
+    <string>&amp;New Project</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string notr="true">Ctrl+N</string>
    </property>
   </action>
   <action name="actionOpen_Project">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
    </property>
    <property name="text">
-    <string>Open Project</string>
+    <string>&amp;Open Project</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string notr="true">Ctrl+O</string>
    </property>
   </action>
   <action name="actionSwitch_Workspace">
    <property name="text">
-    <string>Switch Workspace</string>
+    <string>&amp;Switch Workspace</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string>Ctrl+Alt+W</string>
    </property>
   </action>
   <action name="actionWorkspace_Settings">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
-    <string>Workspace Settings</string>
+    <string>&amp;Workspace Settings</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -558,38 +558,38 @@ QListView::item
   </action>
   <action name="actionOpen_Library_Manager">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/library/symbol.png</normaloff>:/img/library/symbol.png</iconset>
    </property>
    <property name="text">
-    <string>Open Library Manager</string>
+    <string>&amp;Open Library Manager</string>
    </property>
    <property name="toolTip">
     <string>Open Library Manager</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string notr="true">Ctrl+L</string>
    </property>
   </action>
   <action name="actionClose_all_open_projects">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
-    <string>Close all open projects</string>
+    <string>&amp;Close All Open Projects</string>
    </property>
    <property name="shortcut">
-    <string notr="true"/>
+    <string notr="true">Ctrl+W</string>
    </property>
   </action>
   <action name="actionRescanLibraries">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
-    <string>Rescan Libraries</string>
+    <string>&amp;Rescan Libraries</string>
    </property>
    <property name="shortcut">
     <string notr="true">F5</string>
@@ -597,11 +597,11 @@ QListView::item
   </action>
   <action name="actionOnlineDocumentation">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
-    <string>Online Documentation</string>
+    <string>&amp;Online Documentation</string>
    </property>
    <property name="shortcut">
     <string notr="true">F1</string>
@@ -609,11 +609,11 @@ QListView::item
   </action>
   <action name="actionOpenWebsite">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../img/images.qrc">
      <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
    </property>
    <property name="text">
-    <string>LibrePCB Website</string>
+    <string>LibrePCB &amp;Website</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -628,7 +628,17 @@ QListView::item
    <header location="global">librepcb/common/widgets/statusbar.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+  <include location="../../../img/images.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>newProjectButton</sender>
