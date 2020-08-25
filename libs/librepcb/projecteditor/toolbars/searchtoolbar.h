@@ -65,7 +65,7 @@ public:
   SearchToolBar& operator=(const SearchToolBar& rhs) = delete;
 
 signals:
-  void goToTriggered(const QString& name);
+  void goToTriggered(const QString& name, unsigned int index = 0);
 
 private:
   void updateCompleter() noexcept;
@@ -75,6 +75,7 @@ private:
 private:
   CompleterListFunction     mCompleterListFunction;
   QScopedPointer<QLineEdit> mLineEdit;
+  unsigned int mIndex; ///< Number of searches with the current search term
 };
 
 /*******************************************************************************

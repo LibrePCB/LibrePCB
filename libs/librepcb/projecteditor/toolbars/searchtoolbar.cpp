@@ -37,7 +37,10 @@ namespace editor {
  ******************************************************************************/
 
 SearchToolBar::SearchToolBar(QWidget* parent) noexcept
-  : QToolBar(parent), mCompleterListFunction(), mLineEdit(new QLineEdit()) {
+  : QToolBar(parent),
+    mCompleterListFunction(),
+    mLineEdit(new QLineEdit()),
+    mIndex(0) {
   mLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   mLineEdit->setMaxLength(30);             // avoid too large widget in toolbar
   mLineEdit->setClearButtonEnabled(true);  // to quickly clear the search term
@@ -76,10 +79,11 @@ void SearchToolBar::updateCompleter() noexcept {
 void SearchToolBar::textEdited(const QString& text) noexcept {
   Q_UNUSED(text);
   updateCompleter();
+  mIndex = 0;
 }
 
 void SearchToolBar::enterPressed() noexcept {
-  emit goToTriggered(mLineEdit->text().trimmed());
+  emit goToTriggered(mLineEdit->text().trimmed(), mIndex++);
 }
 
 /*******************************************************************************
