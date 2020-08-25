@@ -88,7 +88,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   if (!mProject.getDirectory().isWritable()) {
     filenameStr.append(QStringLiteral(" [Read-Only]"));
   }
-  setWindowTitle(QString("%1 - LibrePCB Schematic Editor").arg(filenameStr));
+  setWindowTitle(tr("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
   // Add Dock Widgets
   mPagesDock = new SchematicPagesDock(mProject, this);
@@ -662,31 +662,49 @@ void SchematicEditor::renameSchematic(int index) noexcept {
   }
 }
 
+QList<SI_Symbol*> SchematicEditor::getSearchCandidates() noexcept {
+  QList<SI_Symbol*> candidates = {};
+  foreach (const Schematic* schematic, mProject.getSchematics()) {
+    Q_ASSERT(schematic);
+    candidates += schematic->getSymbols();
+  }
+  std::sort(candidates.begin(), candidates.end(),
+            [](SI_Symbol* a, SI_Symbol* b){
+    return a->getName() < b->getName();
+  });
+  return candidates;
+}
+
 QStringList SchematicEditor::getSearchToolBarCompleterList() noexcept {
   QStringList list;
-  foreach (const Schematic* schematic, mProject.getSchematics()) {
-    foreach (const SI_Symbol* symbol, schematic->getSymbols()) {
-      list.append(symbol->getName());
-    }
+  foreach (SI_Symbol* symbol, getSearchCandidates()) {
+    list.append(symbol->getName());
   }
   return list;
 }
 
-void SchematicEditor::goToSymbol(const QString& name) noexcept {
-  for (int i = 0; i < mProject.getSchematics().count(); ++i) {
-    const Schematic* schematic = mProject.getSchematicByIndex(i);
-    Q_ASSERT(schematic);
-    foreach (SI_Symbol* symbol, schematic->getSymbols()) {
-      if (symbol->getName().toLower() == name.toLower()) {
-        setActiveSchematicIndex(i);
-        schematic->clearSelection();
-        symbol->setSelected(true);
-        QRectF rect   = symbol->getBoundingRect();
-        qreal  margin = Length(1000000).toPx();
-        rect.adjust(-margin, -margin, margin, margin);
-        mGraphicsView->zoomToRect(rect);
-        return;
-      }
+void SchematicEditor::goToSymbol(const QString& name,
+                                 unsigned int index) noexcept {
+  QList<SI_Symbol*> symbolCandidates = {};
+  foreach (SI_Symbol* symbol, getSearchCandidates()) {
+    if (symbol->getName().startsWith(name, Qt::CaseInsensitive)) {
+      symbolCandidates.append(symbol);
+    }
+  }
+
+  if (symbolCandidates.count()) {
+    index %= symbolCandidates.count();
+    SI_Symbol* symbol = symbolCandidates[index];
+    Schematic& schematic = symbol->getSchematic();
+    if (setActiveSchematicIndex(mProject.getSchematics().indexOf(&schematic))) {
+      schematic.clearSelection();
+      symbol->setSelected(true);
+      QRectF rect = symbol->getBoundingRect();
+      // Zoom to a rectangle relative to the maximum symbol dimension. The
+      // symbol is 1/4th of the screen.
+      qreal margin = 1.5f*std::max(rect.size().width(), rect.size().height());
+      rect.adjust(-margin, -margin, margin, margin);
+      mGraphicsView->zoomToRect(rect);
     }
   }
 }

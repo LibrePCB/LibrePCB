@@ -41,6 +41,7 @@ namespace project {
 
 class Project;
 class Schematic;
+class SI_Symbol;
 
 namespace editor {
 
@@ -118,8 +119,9 @@ private:
   void        addSchematic() noexcept;
   void        removeSchematic(int index) noexcept;
   void        renameSchematic(int index) noexcept;
+  QList<SI_Symbol*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
-  void        goToSymbol(const QString& name) noexcept;
+  void        goToSymbol(const QString& name, unsigned int index) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;

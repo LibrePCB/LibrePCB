@@ -132,8 +132,9 @@ private:
   void        highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                                   bool                               zoomTo) noexcept;
   void        clearDrcMarker() noexcept;
+  QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
-  void        goToDevice(const QString& name) noexcept;
+  void        goToDevice(const QString& name, unsigned int index) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;
