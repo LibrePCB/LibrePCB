@@ -57,7 +57,10 @@ namespace editor {
 
 SymbolEditorState_Select::SymbolEditorState_Select(
     const Context& context) noexcept
-  : SymbolEditorState(context), mState(SubState::IDLE), mStartPos() {
+  : SymbolEditorState(context),
+    mState(SubState::IDLE),
+    mStartPos(),
+    mCurrentSelectionIndex(0) {
 }
 
 SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
@@ -97,32 +100,16 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // update start position of selection or movement
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
-      QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
-      QList<QSharedPointer<CircleGraphicsItem>>    circles;
-      QList<QSharedPointer<PolygonGraphicsItem>>   polygons;
-      QList<QSharedPointer<TextGraphicsItem>>      texts;
-      int count = mContext.symbolGraphicsItem.getItemsAtPosition(
-          mStartPos, &pins, &circles, &polygons, &texts);
-      if (count == 0) {
+      QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
+      if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
         mState = SubState::SELECTING;
       } else {
         // check if the top most item under the cursor is already selected
-        QGraphicsItem* topMostItem = nullptr;
-        if (pins.count() > 0) {
-          topMostItem = pins.first().data();
-        } else if (texts.count() > 0) {
-          topMostItem = texts.first().data();
-        } else if (polygons.count() > 0) {
-          topMostItem = polygons.first().data();
-        } else if (circles.count() > 0) {
-          topMostItem = circles.first().data();
-        } else {
-          Q_ASSERT(false);
-        }
-        bool itemAlreadySelected = topMostItem->isSelected();
+        QGraphicsItem* topMostItem = items.first();
 
+        bool itemAlreadySelected = topMostItem->isSelected();
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed
           if (dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)) {
@@ -131,6 +118,19 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
                 ->setSelected(!itemAlreadySelected);
           } else {
             topMostItem->setSelected(!itemAlreadySelected);
+          }
+        } else if (e.modifiers().testFlag(Qt::ShiftModifier)) {
+          // Cycle Selection, when holding shift
+          mCurrentSelectionIndex += 1;
+          mCurrentSelectionIndex %= items.count();
+          clearSelectionRect(true);
+          QGraphicsItem* item = items[mCurrentSelectionIndex];
+          if (dynamic_cast<SymbolPinGraphicsItem*>(item)) {
+            // workaround for selection of a SymbolPinGraphicsItem
+            dynamic_cast<SymbolPinGraphicsItem*>(item)
+                ->setSelected(true);
+          } else {
+            item->setSelected(true);
           }
         } else if (!itemAlreadySelected) {
           // Only select the topmost item when clicking an unselected item
@@ -347,86 +347,109 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
+  if (mState != SubState::IDLE) return false;
+
+  // handle item selection
+  QGraphicsItem* selectedItem = nullptr;
+  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  if (items.isEmpty()) return false;
+  foreach (QGraphicsItem* item, items) {
+    if (item->isSelected()) {
+      selectedItem = item;
+    }
+  }
+  if (!selectedItem) {
+    clearSelectionRect(true);
+    selectedItem = items.first();
+    if (dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)) {
+      // workaround for selection of a SymbolPinGraphicsItem
+      dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)
+          ->setSelected(true);
+    } else {
+      selectedItem->setSelected(true);
+    }
+  }
+  Q_ASSERT(selectedItem);
+  Q_ASSERT(selectedItem->isSelected());
+
   // build the context menu
-  QMenu    menu;
+  QMenu menu;
   QAction* aRotateCCW =
-      menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+      menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("&Rotate"));
+  connect(aRotateCCW, &QAction::triggered, [this](){
+    rotateSelectedItems(Angle::deg90());
+  });
   QAction* aMirrorH =
-      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
+      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("&Mirror"));
+  connect(aMirrorH, &QAction::triggered, [this](){
+    mirrorSelectedItems(Qt::Horizontal);
+  });
   QAction* aRemove =
-      menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
+      menu.addAction(QIcon(":/img/actions/delete.png"), tr("R&emove"));
+  connect(aRemove, &QAction::triggered, [this](){
+    removeSelectedItems();
+  });
   menu.addSeparator();
-  QAction* aProperties = menu.addAction(tr("Properties"));
+  QAction* aProperties = menu.addAction(QIcon(":/img/actions/settings.png"),
+                                        tr("&Properties"));
+  connect(aProperties, &QAction::triggered, [this, &selectedItem](){
+    openPropertiesDialogOfItem(selectedItem);
+  });
 
   // execute the context menu
-  QAction* action = menu.exec(QCursor::pos());
-  if (action == aRotateCCW) {
-    return rotateSelectedItems(Angle::deg90());
-  } else if (action == aMirrorH) {
-    return mirrorSelectedItems(Qt::Horizontal);
-  } else if (action == aRemove) {
-    return removeSelectedItems();
-  } else if (action == aProperties) {
-    return openPropertiesDialogOfItemAtPos(pos);
-  } else {
-    return false;
-  }
+  menu.exec(QCursor::pos());
+  return true;
 }
 
-bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
-    const Point& pos) noexcept {
-  QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
-  QList<QSharedPointer<CircleGraphicsItem>>    circles;
-  QList<QSharedPointer<PolygonGraphicsItem>>   polygons;
-  QList<QSharedPointer<TextGraphicsItem>>      texts;
-  mContext.symbolGraphicsItem.getItemsAtPosition(pos, &pins, &circles,
-                                                 &polygons, &texts);
+bool SymbolEditorState_Select::openPropertiesDialogOfItem(
+    QGraphicsItem* item) noexcept {
+  if (!item) return false;
 
-  if (pins.count() > 0) {
-    SymbolPinGraphicsItem* item =
-        dynamic_cast<SymbolPinGraphicsItem*>(pins.first().data());
-    Q_ASSERT(item);
+  if (SymbolPinGraphicsItem* pin = dynamic_cast<SymbolPinGraphicsItem*>(item)) {
+    Q_ASSERT(pin);
     SymbolPinPropertiesDialog dialog(
-        item->getPin(), mContext.undoStack, getDefaultLengthUnit(),
+        pin->getPin(), mContext.undoStack, getDefaultLengthUnit(),
         "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (texts.count() > 0) {
-    TextGraphicsItem* item =
-        dynamic_cast<TextGraphicsItem*>(texts.first().data());
-    Q_ASSERT(item);
+  } else if (TextGraphicsItem* text = dynamic_cast<TextGraphicsItem*>(item)) {
+    Q_ASSERT(text);
     TextPropertiesDialog dialog(
-        item->getText(), mContext.undoStack,
+        text->getText(), mContext.undoStack,
         mContext.layerProvider.getSchematicGeometryElementLayers(),
         getDefaultLengthUnit(), "symbol_editor/text_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (polygons.count() > 0) {
-    PolygonGraphicsItem* item =
-        dynamic_cast<PolygonGraphicsItem*>(polygons.first().data());
-    Q_ASSERT(item);
+  } else if (PolygonGraphicsItem* polygon =
+             dynamic_cast<PolygonGraphicsItem*>(item)) {
+    Q_ASSERT(polygon);
     PolygonPropertiesDialog dialog(
-        item->getPolygon(), mContext.undoStack,
+        polygon->getPolygon(), mContext.undoStack,
         mContext.layerProvider.getSchematicGeometryElementLayers(),
         getDefaultLengthUnit(), "symbol_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (circles.count() > 0) {
-    CircleGraphicsItem* item =
-        dynamic_cast<CircleGraphicsItem*>(circles.first().data());
-    Q_ASSERT(item);
+  } else if (CircleGraphicsItem* circle =
+             dynamic_cast<CircleGraphicsItem*>(item)) {
+    Q_ASSERT(circle);
     CirclePropertiesDialog dialog(
-        item->getCircle(), mContext.undoStack,
+        circle->getCircle(), mContext.undoStack,
         mContext.layerProvider.getSchematicGeometryElementLayers(),
         getDefaultLengthUnit(), "symbol_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else {
-    return false;
   }
+  return false;
+}
+
+bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
+    const Point& pos) noexcept {
+  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  if (items.isEmpty()) return false;
+  return openPropertiesDialogOfItem(items.first());
 }
 
 bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
@@ -552,6 +575,34 @@ void SymbolEditorState_Select::clearSelectionRect(
   if (updateItemsSelectionState) {
     mContext.graphicsScene.setSelectionArea(QPainterPath());
   }
+}
+
+QList<QGraphicsItem*> SymbolEditorState_Select::findItemsAtPosition(
+    const Point& pos) noexcept {
+  QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
+  QList<QSharedPointer<CircleGraphicsItem>>    circles;
+  QList<QSharedPointer<PolygonGraphicsItem>>   polygons;
+  QList<QSharedPointer<TextGraphicsItem>>      texts;
+  int count = mContext.symbolGraphicsItem.getItemsAtPosition(
+      pos, &pins, &circles, &polygons, &texts);
+  QList<QGraphicsItem*> result = {};
+  foreach (QSharedPointer<SymbolPinGraphicsItem> pin, pins) {
+    result.append(pin.data());
+  }
+  foreach (QSharedPointer<CircleGraphicsItem> cirlce, circles) {
+    result.append(cirlce.data());
+  }
+  foreach (QSharedPointer<PolygonGraphicsItem> polygon, polygons) {
+    result.append(polygon.data());
+  }
+  foreach (QSharedPointer<TextGraphicsItem> text, texts) {
+    result.append(text.data());
+  }
+
+  Q_ASSERT(result.count() == (pins.count() + texts.count()
+                             + polygons.count() + circles.count()));
+  Q_ASSERT(result.count() == count);
+  return result;
 }
 
 /*******************************************************************************
