@@ -95,31 +95,31 @@ private:
   };
 
   // Private Methods
-  ProcRetVal       processSubStateIdle(BEE_Base* event) noexcept;
-  ProcRetVal       processSubStatePositioning(BEE_Base* event) noexcept;
-  ProcRetVal       processIdleSceneEvent(BEE_Base* event) noexcept;
-  ProcRetVal       processPositioningSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
+  ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
+  ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
+  ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
 
   /**
-  * @brief Begin drawing the next BI_NetLine
-  *
-  * @param board On which board the new traces are drawn.
-  * @param pos The position, where the tracing should begin. If necessary a new
-  * BI_NetPoint is created.
-  * @param fixedPoint the BI_NetPoint used as the start anchor, when beginning a
-  * new trace
-  * @return True, when the tracing is successfully started.
-  */
+   * @brief Begin drawing the next BI_NetLine
+   *
+   * @param board On which board the new traces are drawn.
+   * @param pos The position, where the tracing should begin. If necessary a new
+   * BI_NetPoint is created.
+   * @param fixedPoint the BI_NetPoint used as the start anchor, when beginning
+   * a new trace
+   * @return True, when the tracing is successfully started.
+   */
   bool startPositioning(Board& board, const Point& pos,
-                                    BI_NetPoint* fixedPoint = nullptr) noexcept;
+                        BI_NetPoint* fixedPoint = nullptr) noexcept;
 
   /**
    * @brief Finalize the BI_NetLines and connect them to other
    * existing traces if necessary.
    * @param board On which board the drawing is finalized.
    * @return True, when the trace is succesfully drawn. When the trace is
-   * continued, return the result of startPositioning(). False when canceled or an
-   * error occured
+   * continued, return the result of startPositioning(). False when canceled or
+   * an error occured
    */
   bool addNextNetPoint(Board& board) noexcept;
 
@@ -140,8 +140,8 @@ private:
    * @return A single BI_Via, if any. at the target position.
    */
   BI_Via* findVia(Board& board, const Point& pos,
-                  NetSignal* netsignal = nullptr,
-                  const QSet<BI_Via*>& except = {}) const noexcept;
+                  NetSignal*           netsignal = nullptr,
+                  const QSet<BI_Via*>& except    = {}) const noexcept;
 
   /**
    * @brief Find a BI_FootprintPad at the given position on the board.
@@ -154,8 +154,8 @@ private:
    * @return A single BI_FootprintPad, if any. at the target position.
    */
   BI_FootprintPad* findPad(Board& board, const Point& pos,
-                           GraphicsLayer* layer = nullptr,
-                           NetSignal* netsignal = nullptr) const noexcept;
+                           GraphicsLayer* layer     = nullptr,
+                           NetSignal*     netsignal = nullptr) const noexcept;
 
   /**
    * @brief Find a BI_NetPoint at the given position on the board.
@@ -170,10 +170,10 @@ private:
    * @return A single BI_NetPoint, if any. at the target position.
    */
   BI_NetPoint* findNetPoint(Board& board, const Point& pos,
-                            GraphicsLayer* layer = nullptr,
-                            NetSignal* netsignal = nullptr,
-                            const QSet<BI_NetPoint*>& except = {})
-                                    const noexcept;
+                            GraphicsLayer*            layer     = nullptr,
+                            NetSignal*                netsignal = nullptr,
+                            const QSet<BI_NetPoint*>& except    = {}) const
+      noexcept;
 
   /**
    * @brief Find a BI_NetLine at the given position on the board.
@@ -188,8 +188,8 @@ private:
    * @return A single BI_NetLine, if any. at the target position.
    */
   BI_NetLine* findNetLine(Board& board, const Point& pos,
-                          GraphicsLayer* layer = nullptr,
-                          NetSignal* netsignal = nullptr,
+                          GraphicsLayer*           layer     = nullptr,
+                          NetSignal*               netsignal = nullptr,
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
   /**
    * @brief Update the currently active traces according
@@ -240,34 +240,34 @@ private:
       noexcept;
 
   // General Attributes
-  SubState          mSubState;          ///< the current substate
-  WireMode          mCurrentWireMode;   ///< the current wire mode
-  QString           mCurrentLayerName;  ///< the current board layer name
-  bool              mAddVia;            ///< whether a via add is requested
-  BI_Via*           mTempVia;
-  BI_Via::Shape     mCurrentViaShape;   ///< the current via shape
-  PositiveLength    mCurrentViaSize;    ///< the current via size
-  PositiveLength    mCurrentViaDrillDiameter; ///< the current via drill
-                                        ///< diameter
-  QString           mViaLayerName;      ///< the name of the layer where the via
-                                        ///< was started
-  Point             mTargetPos;         ///< the current target position of the
-                                        ///< active trace
+  SubState       mSubState;          ///< the current substate
+  WireMode       mCurrentWireMode;   ///< the current wire mode
+  QString        mCurrentLayerName;  ///< the current board layer name
+  bool           mAddVia;            ///< whether a via add is requested
+  BI_Via*        mTempVia;
+  BI_Via::Shape  mCurrentViaShape;          ///< the current via shape
+  PositiveLength mCurrentViaSize;           ///< the current via size
+  PositiveLength mCurrentViaDrillDiameter;  ///< the current via drill
+                                            ///< diameter
+  QString mViaLayerName;  ///< the name of the layer where the via
+                          ///< was started
+  Point mTargetPos;       ///< the current target position of the
+                          ///< active trace
 
-  Point             mCursorPos;         ///< the current cursor position
-  PositiveLength    mCurrentWidth;      ///< the current wire width
-  bool              mCurrentAutoWidth;  ///< automatically adjust wire width
-  bool              mCurrentSnapActive; ///< the current active snap to target
-  BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
-                                        ///< point of the line)
-  BI_NetSegment* mCurrentNetSegment;    ///< the net segment that is currently
-                                        ///< edited
-  NetSignal*   mCurrentNetSignal;       ///< the net signal that is currently
-                                        ///< edited
-  BI_NetLine*  mPositioningNetLine1;    ///< line between fixed point and p1
-  BI_NetPoint* mPositioningNetPoint1;   ///< the first netpoint to place
-  BI_NetLine*  mPositioningNetLine2;    ///< line between p1 and p2
-  BI_NetPoint* mPositioningNetPoint2;   ///< the second netpoint to place
+  Point             mCursorPos;          ///< the current cursor position
+  PositiveLength    mCurrentWidth;       ///< the current wire width
+  bool              mCurrentAutoWidth;   ///< automatically adjust wire width
+  bool              mCurrentSnapActive;  ///< the current active snap to target
+  BI_NetLineAnchor* mFixedStartAnchor;   ///< the fixed netline anchor (start
+                                         ///< point of the line)
+  BI_NetSegment* mCurrentNetSegment;     ///< the net segment that is currently
+                                         ///< edited
+  NetSignal* mCurrentNetSignal;          ///< the net signal that is currently
+                                         ///< edited
+  BI_NetLine*  mPositioningNetLine1;     ///< line between fixed point and p1
+  BI_NetPoint* mPositioningNetPoint1;    ///< the first netpoint to place
+  BI_NetLine*  mPositioningNetLine2;     ///< line between p1 and p2
+  BI_NetPoint* mPositioningNetPoint2;    ///< the second netpoint to place
 
   // Widgets for the command toolbar
   QHash<WireMode, QAction*> mWireModeActions;

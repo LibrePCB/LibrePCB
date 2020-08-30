@@ -76,27 +76,30 @@ private:
 
   // Private Methods
   ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-  bool addVia(Board& board) noexcept;
-  bool updateVia(Board& board, const Point& pos) noexcept;
-  bool fixVia(Board& board, const Point& pos) noexcept;
-  void updateShapeActionsCheckedState() noexcept;
-  void sizeEditValueChanged(const PositiveLength& value) noexcept;
+  bool       addVia(Board& board) noexcept;
+  bool       updateVia(Board& board, const Point& pos) noexcept;
+  bool       fixVia(Board& board, const Point& pos) noexcept;
+  void       updateShapeActionsCheckedState() noexcept;
+  void       sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
-  NetSignal* getClosestNetSignal(Board& board, const Point& pos) noexcept;
+  NetSignal*       getClosestNetSignal(Board& board, const Point& pos) noexcept;
   QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
-                                    QSet<BI_Base*> except = {}) const noexcept;
+                                           QSet<BI_Base*> except = {}) const
+      noexcept;
   BI_Via* findVia(Board& board, const Point pos, NetSignal* netsignal = nullptr,
                   const QSet<BI_Via*>& except = {}) const noexcept;
   BI_FootprintPad* findPad(Board& board, const Point pos,
-                  NetSignal* netsignal = nullptr,
-                  const QSet<BI_FootprintPad*>& except = {}) const noexcept;
+                           NetSignal*                    netsignal = nullptr,
+                           const QSet<BI_FootprintPad*>& except    = {}) const
+      noexcept;
   BI_NetPoint* findNetPoint(Board& board, const Point pos,
-                  NetSignal* netsignal = nullptr,
-                  const QSet<BI_NetPoint*>& except = {}) const noexcept;
+                            NetSignal*                netsignal = nullptr,
+                            const QSet<BI_NetPoint*>& except    = {}) const
+      noexcept;
   BI_NetLine* findNetLine(Board& board, const Point pos,
-                  NetSignal* netsignal = nullptr) const noexcept;
-  void abortPlacement(const bool showErrorMessage = false) noexcept;
+                          NetSignal* netsignal = nullptr) const noexcept;
+  void        abortPlacement(const bool showErrorMessage = false) noexcept;
 
   // General Attributes
   SubState                        mSubState;

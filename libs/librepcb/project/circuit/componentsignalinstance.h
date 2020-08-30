@@ -82,12 +82,12 @@ public:
   const library::ComponentSignal& getCompSignal() const noexcept {
     return *mComponentSignal;
   }
-  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
+  NetSignal*         getNetSignal() const noexcept { return mNetSignal; }
   ComponentInstance& getComponentInstance() const noexcept {
     return mComponentInstance;
   }
-  bool       isNetSignalNameForced() const noexcept;
-  QString    getForcedNetSignalName() const noexcept;
+  bool                        isNetSignalNameForced() const noexcept;
+  QString                     getForcedNetSignalName() const noexcept;
   const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {
     return mRegisteredSymbolPins;
   }

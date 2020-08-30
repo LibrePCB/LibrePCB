@@ -105,7 +105,7 @@ private:  // Types / Data
   SubState                                      mState;
   Point                                         mStartPos;
   QScopedPointer<CmdDragSelectedFootprintItems> mCmdDragSelectedItems;
-  int mCurrentSelectionIndex;
+  int                                           mCurrentSelectionIndex;
 };
 
 /*******************************************************************************

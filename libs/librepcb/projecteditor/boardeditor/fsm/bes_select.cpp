@@ -296,9 +296,9 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       addActionDelete(menu, tr("Remove %1").arg(*cmpInst.getName()));
       menu.addSeparator();
       addActionSnap(menu, devInst.getPosition(), board, *selectedItem);
-      QAction* aResetTexts =
-        menu.addAction(QIcon(":/img/actions/undo.png"), tr("Reset all texts"));
-      connect(aResetTexts, &QAction::triggered, [this, footprint](){
+      QAction* aResetTexts = menu.addAction(QIcon(":/img/actions/undo.png"),
+                                            tr("Reset all texts"));
+      connect(aResetTexts, &QAction::triggered, [this, footprint]() {
         try {
           mUndoStack.execCmd(new CmdFootprintStrokeTextsReset(*footprint));
         } catch (Exception& e) {
@@ -317,7 +317,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
           a->setChecked(true);
           a->setEnabled(false);
         } else {
-          connect(a, &QAction::triggered, [this, &board, &devInst, item](){
+          connect(a, &QAction::triggered, [this, &board, &devInst, item]() {
             try {
               CmdReplaceDevice* cmd = new CmdReplaceDevice(
                   mWorkspace, board, devInst, item.uuid, tl::optional<Uuid>());
@@ -344,16 +344,18 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
           a->setChecked(true);
           a->setEnabled(false);
         } else {
-          connect(a, &QAction::triggered, [this, &board, &devInst, &footprint](){
-            try {
-              Uuid deviceUuid = devInst.getLibDevice().getUuid();
-              CmdReplaceDevice* cmd = new CmdReplaceDevice(
-                  mWorkspace, board, devInst, deviceUuid, footprint.getUuid());
-              mUndoStack.execCmd(cmd);
-            } catch (Exception& e) {
-              QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
-            }
-          });
+          connect(a, &QAction::triggered,
+                  [this, &board, &devInst, &footprint]() {
+                    try {
+                      Uuid deviceUuid = devInst.getLibDevice().getUuid();
+                      CmdReplaceDevice* cmd =
+                          new CmdReplaceDevice(mWorkspace, board, devInst,
+                                               deviceUuid, footprint.getUuid());
+                      mUndoStack.execCmd(cmd);
+                    } catch (Exception& e) {
+                      QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
+                    }
+                  });
         }
       }
       aChangeFootprintMenu->setEnabled(!aChangeFootprintMenu->isEmpty());
@@ -416,7 +418,7 @@ BES_Base::ProcRetVal BES_Select::processIdleSceneRightMouseButtonReleased(
       QAction* aIsVisible = menu.addAction(tr("Visible"));
       aIsVisible->setCheckable(true);
       aIsVisible->setChecked(plane->isVisible());
-      connect(aIsVisible, &QAction::triggered, [plane, aIsVisible](){
+      connect(aIsVisible, &QAction::triggered, [plane, aIsVisible]() {
         // Visibility is not saved, thus no undo command is needed here.
         plane->setVisible(aIsVisible->isChecked());
       });
@@ -576,30 +578,28 @@ BES_Base::ProcRetVal BES_Select::processSubStateMovingSceneEvent(
 }
 
 void BES_Select::addActionRotate(QMenu& menu, const QString& text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
-  connect(action, &QAction::triggered, [this](){
-    rotateSelectedItems(Angle::deg90());
-  });
+  QAction* action =
+      menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
+  connect(action, &QAction::triggered,
+          [this]() { rotateSelectedItems(Angle::deg90()); });
 }
 
 void BES_Select::addActionFlip(QMenu& menu, const QString& text) noexcept {
-  QAction* action =  menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
-  connect(action, &QAction::triggered, [this](){
-    flipSelectedItems(Qt::Horizontal);
-  });
+  QAction* action =
+      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
+  connect(action, &QAction::triggered,
+          [this]() { flipSelectedItems(Qt::Horizontal); });
 }
 
 void BES_Select::addActionDelete(QMenu& menu, const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
-  connect(action, &QAction::triggered, [this]() {
-    removeSelectedItems();
-  });
+  connect(action, &QAction::triggered, [this]() { removeSelectedItems(); });
 }
 
 void BES_Select::addActionDeleteAll(QMenu& menu, BI_NetSegment& netsegment,
                                     const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/minus.png"), text);
-  connect(action, &QAction::triggered, [this, &netsegment](){
+  connect(action, &QAction::triggered, [this, &netsegment]() {
     netsegment.setSelected(true);
     removeSelectedItems();
   });
@@ -608,7 +608,7 @@ void BES_Select::addActionDeleteAll(QMenu& menu, BI_NetSegment& netsegment,
 void BES_Select::addActionMeasure(QMenu& menu, BI_NetLine& netline,
                                   const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/ruler.png"), text);
-  connect(action, &QAction::triggered, [this, &netline](){
+  connect(action, &QAction::triggered, [this, &netline]() {
     netline.setSelected(true);
     measureSelectedItems(netline);
   });
@@ -617,21 +617,22 @@ void BES_Select::addActionMeasure(QMenu& menu, BI_NetLine& netline,
 void BES_Select::addActionProperties(QMenu& menu, Board& board, BI_Base& item,
                                      const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/settings.png"), text);
-  connect(action, &QAction::triggered, [this, &board, &item](){
-    openPropertiesDialog(board, &item);
-  });
+  connect(action, &QAction::triggered,
+          [this, &board, &item]() { openPropertiesDialog(board, &item); });
 }
 
 void BES_Select::addActionSnap(QMenu& menu, const Point pos, Board& board,
                                BI_Base& item, const QString& text) noexcept {
   if (!pos.isOnGrid(board.getGridProperties().getInterval())) {
     QAction* action = menu.addAction(QIcon(":/img/actions/grid.png"), text);
-    connect(action, &QAction::triggered, [this, &board, &item](){
-      try  {
+    connect(action, &QAction::triggered, [this, &board, &item]() {
+      try {
         QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-              new CmdDragSelectedBoardItems(board, item.getPosition()));
-        cmdMove->setCurrentPosition(item.getPosition().mappedToGrid(
-                                board.getGridProperties().getInterval()), false);
+            new CmdDragSelectedBoardItems(board, item.getPosition()));
+        cmdMove->setCurrentPosition(
+            item.getPosition().mappedToGrid(
+                board.getGridProperties().getInterval()),
+            false);
         mUndoStack.execCmd(cmdMove.take());
       } catch (Exception& e) {
         QMessageBox::critical(&mEditor, tr("Error"), e.getMsg());
@@ -643,9 +644,8 @@ void BES_Select::addActionSnap(QMenu& menu, const Point pos, Board& board,
 void BES_Select::addActionSelectAll(QMenu& menu, BI_NetSegment& netsegment,
                                     const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/bookmark.png"), text);
-  connect(action, &QAction::triggered, [&netsegment](){
-    netsegment.setSelected(true);
-  });
+  connect(action, &QAction::triggered,
+          [&netsegment]() { netsegment.setSelected(true); });
 }
 
 bool BES_Select::startMovingSelectedItems(Board&       board,
@@ -793,7 +793,7 @@ void BES_Select::measureLengthInDirection(bool              directionBackwards,
   }
 }
 
-bool BES_Select::openPropertiesDialog(Board &board, BI_Base *item) {
+bool BES_Select::openPropertiesDialog(Board& board, BI_Base* item) {
   switch (item->getType()) {
     case BI_Base::Type_t::Footprint: {
       BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item);

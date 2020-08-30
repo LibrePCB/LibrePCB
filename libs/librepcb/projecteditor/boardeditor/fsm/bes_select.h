@@ -88,19 +88,24 @@ private:
                                          Board* board) noexcept;
 
   // Menu Helpers
-  void addActionRotate(QMenu& menu, const QString& text = tr("Rotate")) noexcept;
+  void addActionRotate(QMenu&         menu,
+                       const QString& text = tr("Rotate")) noexcept;
   void addActionFlip(QMenu& menu, const QString& text = tr("Flip")) noexcept;
-  void addActionDelete(QMenu& menu,const QString& text = tr("Remove")) noexcept;
-  void addActionDeleteAll(QMenu& menu, BI_NetSegment& netsegment,
-                const QString& text = tr("Remove Whole Trace")) noexcept;
-  void addActionMeasure(QMenu& menu, BI_NetLine& netline,
-                const QString& text = tr("Measure Selected Segments Length")) noexcept;
+  void addActionDelete(QMenu&         menu,
+                       const QString& text = tr("Remove")) noexcept;
+  void addActionDeleteAll(
+      QMenu& menu, BI_NetSegment& netsegment,
+      const QString& text = tr("Remove Whole Trace")) noexcept;
+  void addActionMeasure(
+      QMenu& menu, BI_NetLine& netline,
+      const QString& text = tr("Measure Selected Segments Length")) noexcept;
   void addActionProperties(QMenu& menu, Board& board, BI_Base& item,
-                const QString& text = tr("Properties")) noexcept;
+                           const QString& text = tr("Properties")) noexcept;
   void addActionSnap(QMenu& menu, const Point pos, Board& board, BI_Base& item,
-                const QString& text = tr("Snap To Grid")) noexcept;
-  void addActionSelectAll(QMenu& menu, BI_NetSegment& netsegment,
-                const QString& text = tr("Select Whole Trace")) noexcept;
+                     const QString& text = tr("Snap To Grid")) noexcept;
+  void addActionSelectAll(
+      QMenu& menu, BI_NetSegment& netsegment,
+      const QString& text = tr("Select Whole Trace")) noexcept;
 
   bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
@@ -155,7 +160,7 @@ private:
   // Attributes
   SubState mSubState;  ///< the current substate
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
-  int mCurrentSelectionIndex;
+  int                                       mCurrentSelectionIndex;
 };
 
 /*******************************************************************************

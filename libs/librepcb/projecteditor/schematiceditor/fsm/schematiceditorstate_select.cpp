@@ -218,11 +218,11 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // Toggle selection when CTRL is pressed
       items.first()->setSelected(!itemAlreadySelected);
     } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
-        // Cycle Selection, when holding shift
-        mCurrentSelectionIndex += 1;
-        mCurrentSelectionIndex %= items.count();
-        schematic->clearSelection();
-        items[mCurrentSelectionIndex]->setSelected(true);
+      // Cycle Selection, when holding shift
+      mCurrentSelectionIndex += 1;
+      mCurrentSelectionIndex %= items.count();
+      schematic->clearSelection();
+      items[mCurrentSelectionIndex]->setSelected(true);
     } else if (!itemAlreadySelected) {
       // Only select the topmost item when clicking an unselected item
       // without CTRL
@@ -543,9 +543,9 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
 }
 
 QAction* SchematicEditorState_Select::addActionCut(
-    QMenu &menu, const QString &text) noexcept {
+    QMenu& menu, const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/cut.png"), text);
-  connect(action, &QAction::triggered, [this](){
+  connect(action, &QAction::triggered, [this]() {
     copySelectedItemsToClipboard();
     removeSelectedItems();
   });
@@ -553,47 +553,42 @@ QAction* SchematicEditorState_Select::addActionCut(
 }
 
 QAction* SchematicEditorState_Select::addActionCopy(
-    QMenu &menu, const QString &text) noexcept {
+    QMenu& menu, const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/copy.png"), text);
-  connect(action, &QAction::triggered, [this](){
-    copySelectedItemsToClipboard();
-  });
+  connect(action, &QAction::triggered,
+          [this]() { copySelectedItemsToClipboard(); });
   return action;
 }
 
 QAction* SchematicEditorState_Select::addActionRemove(
-    QMenu &menu, const QString &text) noexcept {
+    QMenu& menu, const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
-  connect(action, &QAction::triggered, [this](){
-    removeSelectedItems();
-  });
+  connect(action, &QAction::triggered, [this]() { removeSelectedItems(); });
   return action;
 }
 
 QAction* SchematicEditorState_Select::addActionMirror(
-    QMenu &menu, const QString &text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
-  connect(action, &QAction::triggered, [this](){
-    mirrorSelectedItems();
-  });
+    QMenu& menu, const QString& text) noexcept {
+  QAction* action =
+      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
+  connect(action, &QAction::triggered, [this]() { mirrorSelectedItems(); });
   return action;
 }
 
 QAction* SchematicEditorState_Select::addActionRotate(
-    QMenu &menu, const QString &text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
-  connect(action, &QAction::triggered, [this](){
-    rotateSelectedItems(Angle::deg90());
-  });
+    QMenu& menu, const QString& text) noexcept {
+  QAction* action =
+      menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
+  connect(action, &QAction::triggered,
+          [this]() { rotateSelectedItems(Angle::deg90()); });
   return action;
 }
 
 QAction* SchematicEditorState_Select::addActionOpenProperties(
-    QMenu &menu, SI_Base* item, const QString &text) noexcept {
+    QMenu& menu, SI_Base* item, const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/settings.png"), text);
-  connect(action, &QAction::triggered, [this, item](){
-    openPropertiesDialog(item);
-  });
+  connect(action, &QAction::triggered,
+          [this, item]() { openPropertiesDialog(item); });
   return action;
 }
 

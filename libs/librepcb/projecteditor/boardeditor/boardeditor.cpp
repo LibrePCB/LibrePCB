@@ -462,7 +462,8 @@ void BoardEditor::on_actionRemoveBoard_triggered() {
 
   QMessageBox::StandardButton btn = QMessageBox::question(
       this, tr("Remove board"),
-      tr("Are you really sure to remove the board \"%1\"?").arg(*board->getName()));
+      tr("Are you really sure to remove the board \"%1\"?")
+          .arg(*board->getName()));
   if (btn != QMessageBox::Yes) return;
 
   try {
@@ -549,15 +550,14 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
       board->print(printer);  // can throw
     }
 
-
     // Open PDF
     {
       namespace ws = ::librepcb::workspace;
       const ws::WorkspaceSettings& workspaceSettings =
           mProjectEditor.getWorkspace().getSettings();
 
-      ws::WorkspaceSettings::PdfOpenBehavior bhv
-          = workspaceSettings.pdfOpenBehavior.get();
+      ws::WorkspaceSettings::PdfOpenBehavior bhv =
+          workspaceSettings.pdfOpenBehavior.get();
 
       if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::NEVER) {
         // do nothing
@@ -568,12 +568,10 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
         bool doOpenPdf = true;
         if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::ASK) {
           int openPdf = QMessageBox::information(
-                          this, tr("PDF Export"),
-                          tr("PDF exported successfully"),
-                          QMessageBox::Ok | QMessageBox::Open);
+              this, tr("PDF Export"), tr("PDF exported successfully"),
+              QMessageBox::Ok | QMessageBox::Open);
 
-          if (openPdf == QMessageBox::Ok)
-            doOpenPdf = false;
+          if (openPdf == QMessageBox::Ok) doOpenPdf = false;
         } else if (bhv != ws::WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
           // this is the last possible state, otherwise there is an error
           throw LogicError(__FILE__, __LINE__);
@@ -584,8 +582,8 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
             QString pdfCmd = workspaceSettings.pdfReaderCommand.get();
             // TODO: make it smarter to detect or insert quotes for path
             //        containing spaces
-            QProcess::startDetached(pdfCmd.replace(
-                                      "{{FILEPATH}}", filepath.toNative()));
+            QProcess::startDetached(
+                pdfCmd.replace("{{FILEPATH}}", filepath.toNative()));
           } else {
             QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
           }
@@ -853,10 +851,10 @@ QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
   if (Board* board = getActiveBoard()) {
     candidates += board->getDeviceInstances().values();
     std::sort(candidates.begin(), candidates.end(),
-              [](BI_Device* a, BI_Device* b){
-      return a->getComponentInstance().getName()
-          < b->getComponentInstance().getName();
-    });
+              [](BI_Device* a, BI_Device* b) {
+                return a->getComponentInstance().getName() <
+                       b->getComponentInstance().getName();
+              });
   }
   return candidates;
 }
@@ -872,8 +870,8 @@ QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
 void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
   QList<BI_Device*> deviceCandidates = {};
   foreach (BI_Device* device, getSearchCandidates()) {
-    if (device->getComponentInstance().getName()
-        ->startsWith(name, Qt::CaseInsensitive)) {
+    if (device->getComponentInstance().getName()->startsWith(
+            name, Qt::CaseInsensitive)) {
       deviceCandidates.append(device);
     }
   }
@@ -881,14 +879,14 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
   if (deviceCandidates.count()) {
     index %= deviceCandidates.count();
     BI_Device* device = deviceCandidates[index];
-    Board* board = getActiveBoard();
+    Board*     board  = getActiveBoard();
     Q_ASSERT(board);
     board->clearSelection();
     device->setSelected(true);
     QRectF rect = device->getFootprint().getBoundingRect();
     // Zoom to a rectangle relative to the maximum device dimension. The
     // device is 1/4th of the screen.
-    qreal margin = 1.5f*std::max(rect.size().width(), rect.size().height());
+    qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
     rect.adjust(-margin, -margin, margin, margin);
     mGraphicsView->zoomToRect(rect);
   }

@@ -75,7 +75,7 @@ private:
 private:
   CompleterListFunction     mCompleterListFunction;
   QScopedPointer<QLineEdit> mLineEdit;
-  unsigned int mIndex; ///< Number of searches with the current search term
+  unsigned int mIndex;  ///< Number of searches with the current search term
 };
 
 /*******************************************************************************

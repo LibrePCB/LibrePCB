@@ -287,8 +287,9 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   if (i >= 0) processName.truncate(i);
 #elif defined(Q_OS_SOLARIS)
   // https://illumos.org/man/3proc/
-  // NOTE: This will only return the first PRFNSZ (16) bytes of the process name.
-  // If someone finds a way to get the full process name, feel free to improve this.
+  // NOTE: This will only return the first PRFNSZ (16) bytes of the process
+  // name. If someone finds a way to get the full process name, feel free to
+  // improve this.
   psinfo_t psinfo;
   if (proc_get_psinfo(pid, &psinfo) != 0) {
     return QString();  // process not running
