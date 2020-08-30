@@ -48,6 +48,8 @@ class BI_NetLineAnchor;
 
 namespace editor {
 
+class ViaShapeSelector;
+
 /*******************************************************************************
  *  Class BoardEditorState_DrawTrace
  ******************************************************************************/
@@ -237,11 +239,6 @@ private:
 
   // Callback Functions for the Gui elements
   void layerComboBoxIndexChanged(int index) noexcept;
-  void updateShapeActionsCheckedState() noexcept;
-  void sizeEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
-  void wireWidthEditValueChanged(const PositiveLength& value) noexcept;
-  void wireAutoWidthEditToggled(const bool checked) noexcept;
   void updateWireModeActionsCheckedState() noexcept;
 
   /**
@@ -288,11 +285,7 @@ private:
   QList<QAction*>                    mActionSeparators;
   QScopedPointer<QLabel>             mLayerLabel;
   QScopedPointer<QComboBox>          mLayerComboBox;
-  QHash<int, QAction*>               mShapeActions;
-  QScopedPointer<QLabel>             mSizeLabel;
-  QScopedPointer<PositiveLengthEdit> mSizeEdit;
-  QScopedPointer<QLabel>             mDrillLabel;
-  QScopedPointer<PositiveLengthEdit> mDrillEdit;
+  QScopedPointer<ViaShapeSelector>   mShapeSelector;
   QScopedPointer<QLabel>             mWidthLabel;
   QScopedPointer<PositiveLengthEdit> mWidthEdit;
   QScopedPointer<QCheckBox>          mAutoWidthEdit;

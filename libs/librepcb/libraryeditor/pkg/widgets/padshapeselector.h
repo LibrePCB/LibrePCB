@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_SHAPESELECTOR_H
+#define LIBREPCB_LIBRARY_EDITOR_SHAPESELECTOR_H
 
 /*******************************************************************************
  *  Includes
@@ -32,48 +32,62 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class PositiveLengthEdit;
+
 namespace library {
 namespace editor {
 
 /*******************************************************************************
- *  Class FootprintPadShapeSelectorWidget
+ *  Class PadShapeSelector
  ******************************************************************************/
 
 /**
- * @brief The FootprintPadShapeSelectorWidget class
+ * @brief The PadShapeSelector class provides a panel to control the shape and
+ * size of a footprint pad.
  */
-class FootprintPadShapeSelectorWidget final : public QWidget {
+class PadShapeSelector final : public QToolBar {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit FootprintPadShapeSelectorWidget(QWidget* parent = nullptr) noexcept;
-  FootprintPadShapeSelectorWidget(
-      const FootprintPadShapeSelectorWidget& other) = delete;
-  ~FootprintPadShapeSelectorWidget() noexcept;
-
-  // Getters
-  FootprintPad::Shape getCurrentShape() const noexcept;
+  explicit PadShapeSelector(const LengthUnit defaultUnit,
+                            QWidget*         parent = nullptr) noexcept;
+  PadShapeSelector(const PadShapeSelector& other) = delete;
 
   // Setters
-  void setCurrentShape(FootprintPad::Shape shape) noexcept;
+  /**
+   * @brief Set the pad shape to one available in FootprintPad::Shape
+   * @param shape The new shape.
+   * @note If the shape is not available for selection (e.g
+   * BI_Via::Shape::COUNT), the current shape is kept and nothing happens.
+   */
+  void setShape(const FootprintPad::Shape shape) noexcept;
+
+  /**
+   * @brief Set the pad width
+   * @param width The new pad width.
+   */
+  void setWidth(const PositiveLength& width) noexcept;
+
+  /**
+   * @brief Set the pad height
+   * @param height The new pad height.
+   */
+  void setHeight(const PositiveLength& height) noexcept;
 
   // Operator Overloadings
-  FootprintPadShapeSelectorWidget& operator       =(
-      const FootprintPadShapeSelectorWidget& rhs) = delete;
+  PadShapeSelector& operator=(const PadShapeSelector& rhs) = delete;
 
 signals:
-  void currentShapeChanged(FootprintPad::Shape shape);
-
-private:  // Methods
-  void btnRoundToggled(bool checked) noexcept;
-  void btnRectToggled(bool checked) noexcept;
-  void btnOctagonToggled(bool checked) noexcept;
+  void shapeChanged(const FootprintPad::Shape shape);
+  void widthChanged(const PositiveLength& width);
+  void heightChanged(const PositiveLength& height);
 
 private:  // Data
-  QToolButton* mBtnRound;
-  QToolButton* mBtnRect;
-  QToolButton* mBtnOctagon;
+  QMap<FootprintPad::Shape, QToolButton*> mButtons;
+  PositiveLengthEdit*                     mWidthEdit;
+  PositiveLengthEdit*                     mHeightEdit;
 };
 
 /*******************************************************************************
@@ -84,4 +98,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
+#endif  // LIBREPCB_LIBRARY_EDITOR_SHAPESELECTOR_H

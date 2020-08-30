@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "boardeditorstate_drawtrace.h"
 
-#include "../../cmd/cmdboardsplitnetline.h"
-#include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../boardeditor.h"
 #include "ui_boardeditor.h"
 
@@ -44,6 +42,9 @@
 #include <librepcb/project/boards/items/bi_netsegment.h>
 #include <librepcb/project/circuit/circuit.h>
 #include <librepcb/project/project.h>
+#include <librepcb/projecteditor/cmd/cmdboardsplitnetline.h>
+#include <librepcb/projecteditor/cmd/cmdcombineboardnetsegments.h>
+#include <librepcb/projecteditor/toolbars/viashapeselector.h>
 
 #include <QtCore>
 
@@ -137,15 +138,19 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
   mWidthEdit.reset(new PositiveLengthEdit());
   mWidthEdit->setValue(mCurrentWidth);
   mContext.editorUi.commandToolbar->addWidget(mWidthEdit.data());
-  connect(mWidthEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_DrawTrace::wireWidthEditValueChanged);
+  connect(mWidthEdit.data(), &PositiveLengthEdit::valueChanged,
+          [this](const PositiveLength& width) {
+            mCurrentWidth = width;
+            if (mSubState != SubState::SubState_PositioningNetPoint) return;
+            updateNetpointPositions();
+          });
 
   // Add the auto width checkbox to the toolbar
   mAutoWidthEdit.reset(new QCheckBox(tr("Auto")));
   mAutoWidthEdit->setChecked(mCurrentAutoWidth);
   mContext.editorUi.commandToolbar->addWidget(mAutoWidthEdit.data());
-  connect(mAutoWidthEdit.data(), &QCheckBox::toggled, this,
-          &BoardEditorState_DrawTrace::wireAutoWidthEditToggled);
+  connect(mAutoWidthEdit.data(), &QCheckBox::toggled,
+          [this](const bool checked) { mCurrentAutoWidth = checked; });
   mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
 
   // Add the "Layer:" label to the toolbar
@@ -170,49 +175,27 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
       this, &BoardEditorState_DrawTrace::layerComboBoxIndexChanged);
 
   // Add shape actions to the "command" toolbar
-  mShapeActions.insert(static_cast<int>(BI_Via::Shape::Round),
-                       mContext.editorUi.commandToolbar->addAction(
-                           QIcon(":/img/command_toolbars/via_round.png"), ""));
-  mShapeActions.insert(static_cast<int>(BI_Via::Shape::Square),
-                       mContext.editorUi.commandToolbar->addAction(
-                           QIcon(":/img/command_toolbars/via_square.png"), ""));
-  mShapeActions.insert(
-      static_cast<int>(BI_Via::Shape::Octagon),
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/via_octagon.png"), ""));
-  updateShapeActionsCheckedState();
+  mShapeSelector.reset(new ViaShapeSelector());
+  mShapeSelector->setShape(mCurrentViaShape);
+  mShapeSelector->setSize(mCurrentViaSize);
+  mShapeSelector->setDrill(mCurrentViaDrillDiameter);
+  mContext.editorUi.commandToolbar->addWidget(mShapeSelector.data());
+  connect(mShapeSelector.data(), &ViaShapeSelector::shapeChanged,
+          [this](const BI_Via::Shape shape) {
+            mCurrentViaShape = shape;
+            updateNetpointPositions();
+          });
+  connect(mShapeSelector.data(), &ViaShapeSelector::sizeChanged,
+          [this](const PositiveLength& value) {
+            mCurrentViaSize = value;
+            updateNetpointPositions();
+          });
+  connect(mShapeSelector.data(), &ViaShapeSelector::drillChanged,
+          [this](const PositiveLength& value) {
+            mCurrentViaDrillDiameter = value;
+            updateNetpointPositions();
+          });
 
-  // Connect the shape actions with the slot updateShapeActionsCheckedState()
-  foreach (int shape, mShapeActions.keys()) {
-    connect(mShapeActions.value(shape), &QAction::triggered, [this, shape]() {
-      mCurrentViaShape = static_cast<BI_Via::Shape>(shape);
-      updateShapeActionsCheckedState();
-    });
-  }
-
-  // Add the "Size:" label to the toolbar
-  mSizeLabel.reset(new QLabel(tr("Size:")));
-  mSizeLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mSizeLabel.data());
-
-  // Add the size combobox to the toolbar
-  mSizeEdit.reset(new PositiveLengthEdit());
-  mSizeEdit->setValue(mCurrentViaSize);
-  mContext.editorUi.commandToolbar->addWidget(mSizeEdit.data());
-  connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_DrawTrace::sizeEditValueChanged);
-
-  // Add the "Drill:" label to the toolbar
-  mDrillLabel.reset(new QLabel(tr("Drill:")));
-  mDrillLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mDrillLabel.data());
-
-  // Add the drill combobox to the toolbar
-  mDrillEdit.reset(new PositiveLengthEdit());
-  mDrillEdit->setValue(mCurrentViaDrillDiameter);
-  mContext.editorUi.commandToolbar->addWidget(mDrillEdit.data());
-  connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_DrawTrace::drillDiameterEditValueChanged);
   mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
 
   // Change the cursor
@@ -226,15 +209,12 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   if (!abortPositioning(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mAutoWidthEdit.reset();
   mWidthEdit.reset();
   mWidthLabel.reset();
-  mDrillEdit.reset();
-  mDrillLabel.reset();
-  mSizeEdit.reset();
-  mSizeLabel.reset();
-  qDeleteAll(mShapeActions);
-  mShapeActions.clear();
+  mAutoWidthEdit.reset();
+  mLayerComboBox.reset();
+  mLayerLabel.reset();
+  mShapeSelector.reset();
   mLayerComboBox.reset();
   mLayerLabel.reset();
   qDeleteAll(mActionSeparators);
@@ -289,28 +269,25 @@ bool BoardEditorState_DrawTrace::processKeyPressed(
           mLayerComboBox->count());
       return true;
     case Qt::Key_8:
-      mSizeEdit->stepBy(1);
+      mShapeSelector->stepSize(1);
       return true;
     case Qt::Key_2:
-      mSizeEdit->stepBy(-1);
+      mShapeSelector->stepSize(-1);
       return true;
     case Qt::Key_9:
-      mDrillEdit->stepBy(1);
+      mShapeSelector->stepDrill(1);
       return true;
     case Qt::Key_3:
-      mDrillEdit->stepBy(-1);
+      mShapeSelector->stepDrill(-1);
       return true;
     case Qt::Key_4:
-      mCurrentViaShape = BI_Via::Shape::Round;
-      updateShapeActionsCheckedState();
+      mShapeSelector->setShape(BI_Via::Shape::Round);
       return true;
     case Qt::Key_5:
-      mCurrentViaShape = BI_Via::Shape::Square;
-      updateShapeActionsCheckedState();
+      mShapeSelector->setShape(BI_Via::Shape::Square);
       return true;
     case Qt::Key_6:
-      mCurrentViaShape = BI_Via::Shape::Octagon;
-      updateShapeActionsCheckedState();
+      mShapeSelector->setShape(BI_Via::Shape::Octagon);
       return true;
     default:
       break;
@@ -990,40 +967,6 @@ void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
     showVia(false);
     mCurrentLayerName = newLayerName;
   }
-}
-
-void BoardEditorState_DrawTrace::updateShapeActionsCheckedState() noexcept {
-  foreach (int key, mShapeActions.keys()) {
-    mShapeActions.value(key)->setCheckable(key ==
-                                           static_cast<int>(mCurrentViaShape));
-    mShapeActions.value(key)->setChecked(key ==
-                                         static_cast<int>(mCurrentViaShape));
-  }
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::sizeEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mCurrentViaSize = value;
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::drillDiameterEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mCurrentViaDrillDiameter = value;
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::wireWidthEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mCurrentWidth = value;
-  if (mSubState != SubState::SubState_PositioningNetPoint) return;
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::wireAutoWidthEditToggled(
-    const bool checked) noexcept {
-  mCurrentAutoWidth = checked;
 }
 
 void BoardEditorState_DrawTrace::updateWireModeActionsCheckedState() noexcept {

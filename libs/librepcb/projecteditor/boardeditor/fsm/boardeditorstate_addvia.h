@@ -33,15 +33,14 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class PositiveLengthEdit;
-
 namespace project {
 
 class BI_Via;
 class CmdBoardViaEdit;
 
 namespace editor {
+
+class ViaShapeSelector;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddVia
@@ -77,14 +76,11 @@ public:
       delete;
 
 private:  // Methods
-  bool addVia(Board& board, const Point& pos) noexcept;
-  bool updatePosition(Board& board, const Point& pos) noexcept;
-  void setNetSignal(NetSignal* netsignal) noexcept;
-  bool fixPosition(Board& board, const Point& pos) noexcept;
-  bool abortCommand(bool showErrMsgBox) noexcept;
-  void updateShapeActionsCheckedState() noexcept;
-  void sizeEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
+  bool             addVia(Board& board, const Point& pos) noexcept;
+  bool             updatePosition(Board& board, const Point& pos) noexcept;
+  void             setNetSignal(NetSignal* netsignal) noexcept;
+  bool             fixPosition(Board& board, const Point& pos) noexcept;
+  bool             abortCommand(bool showErrMsgBox) noexcept;
   NetSignal*       getClosestNetSignal(Board& board, const Point& pos) noexcept;
   QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
                                            QSet<BI_Base*> except = {}) const
@@ -115,14 +111,10 @@ private:  // Data
   QScopedPointer<CmdBoardViaEdit> mCurrentViaEditCmd;
 
   // Widgets for the command toolbar
-  QHash<int, QAction*>               mShapeActions;
-  QList<QAction*>                    mActionSeparators;
-  QScopedPointer<QLabel>             mSizeLabel;
-  QScopedPointer<PositiveLengthEdit> mSizeEdit;
-  QScopedPointer<QLabel>             mDrillLabel;
-  QScopedPointer<PositiveLengthEdit> mDrillEdit;
-  QScopedPointer<QLabel>             mNetSignalLabel;
-  QScopedPointer<QComboBox>          mNetSignalComboBox;
+  QScopedPointer<ViaShapeSelector> mShapeSelector;
+  QList<QAction*>                  mActionSeparators;
+  QScopedPointer<QLabel>           mNetSignalLabel;
+  QScopedPointer<QComboBox>        mNetSignalComboBox;
 };
 
 /*******************************************************************************

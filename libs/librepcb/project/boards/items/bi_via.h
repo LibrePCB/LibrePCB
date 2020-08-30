@@ -53,7 +53,7 @@ class BI_Via final : public BI_Base,
 
 public:
   // Public Types
-  enum class Shape { Round, Square, Octagon };
+  enum class Shape { Round, Square, Octagon, Count };
 
   // Constructors / Destructor
   BI_Via()                    = delete;

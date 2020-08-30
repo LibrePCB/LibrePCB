@@ -54,7 +54,7 @@ class FootprintPad final : public SerializableObject {
 
 public:
   // Types
-  enum class Shape { ROUND, RECT, OCTAGON };
+  enum class Shape { ROUND, RECT, OCTAGON, COUNT };
   enum class BoardSide { TOP, BOTTOM, THT };
 
   // Signals
