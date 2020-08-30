@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BES_ADDVIA_H
-#define LIBREPCB_PROJECT_BES_ADDVIA_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_ADDVIA_H
+#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_ADDVIA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bes_base.h"
+#include "boardeditorstate.h"
 
 #include <librepcb/project/boards/items/bi_via.h>
 
@@ -38,51 +38,53 @@ class PositiveLengthEdit;
 
 namespace project {
 
-class Board;
 class BI_Via;
 class CmdBoardViaEdit;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class BES_AddVia
+ *  Class BoardEditorState_AddVia
  ******************************************************************************/
 
 /**
- * @brief The BES_AddVia class
+ * @brief The "add via" state/tool of the board editor
  */
-class BES_AddVia final : public BES_Base {
+class BoardEditorState_AddVia final : public BoardEditorState {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit BES_AddVia(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                      GraphicsView& editorGraphicsView, UndoStack& undoStack);
-  ~BES_AddVia();
+  BoardEditorState_AddVia()                                     = delete;
+  BoardEditorState_AddVia(const BoardEditorState_AddVia& other) = delete;
+  explicit BoardEditorState_AddVia(const Context& context) noexcept;
+  virtual ~BoardEditorState_AddVia() noexcept;
 
   // General Methods
-  ProcRetVal process(BEE_Base* event) noexcept override;
-  bool       entry(BEE_Base* event) noexcept override;
-  bool       exit(BEE_Base* event) noexcept override;
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-private:
-  // Private Types
+  // Event Handlers
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
 
-  /// Internal FSM States (substates)
-  enum SubState {
-    SubState_Idle,           ///< idle state [initial state]
-    SubState_PositioningVia  ///< in this state, an undo command is active!
-  };
+  // Operator Overloadings
+  BoardEditorState_AddVia& operator=(const BoardEditorState_AddVia& rhs) =
+      delete;
 
-  // Private Methods
-  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-  bool       addVia(Board& board) noexcept;
-  bool       updateVia(Board& board, const Point& pos) noexcept;
-  bool       fixVia(Board& board, const Point& pos) noexcept;
-  void       updateShapeActionsCheckedState() noexcept;
-  void       sizeEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
+private:  // Methods
+  bool addVia(Board& board, const Point& pos) noexcept;
+  bool updatePosition(Board& board, const Point& pos) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
+  bool fixPosition(Board& board, const Point& pos) noexcept;
+  bool abortCommand(bool showErrMsgBox) noexcept;
+  void updateShapeActionsCheckedState() noexcept;
+  void sizeEditValueChanged(const PositiveLength& value) noexcept;
+  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   NetSignal*       getClosestNetSignal(Board& board, const Point& pos) noexcept;
   QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
                                            QSet<BI_Base*> except = {}) const
@@ -93,35 +95,34 @@ private:
                            NetSignal*                    netsignal = nullptr,
                            const QSet<BI_FootprintPad*>& except    = {}) const
       noexcept;
-  BI_NetPoint* findNetPoint(Board& board, const Point pos,
-                            NetSignal*                netsignal = nullptr,
-                            const QSet<BI_NetPoint*>& except    = {}) const
-      noexcept;
   BI_NetLine* findNetLine(Board& board, const Point pos,
                           NetSignal* netsignal = nullptr) const noexcept;
-  void        abortPlacement(const bool showErrorMessage = false) noexcept;
 
-  // General Attributes
-  SubState                        mSubState;
-  QString                         mAutoText;
-  BI_Via*                         mCurrentVia;
-  BI_Via::Shape                   mCurrentViaShape;
-  PositiveLength                  mCurrentViaSize;
-  PositiveLength                  mCurrentViaDrillDiameter;
-  NetSignal*                      mCurrentViaNetSignal;
-  bool                            mFindClosestNetSignal;
-  NetSignal*                      mLastClosestNetSignal;
-  QScopedPointer<CmdBoardViaEdit> mViaEditCmd;
+private:  // Data
+  // State
+  bool           mIsUndoCmdActive;
+  QString        mAutoText;
+  bool           mFindClosestNetSignal;
+  NetSignal*     mLastClosestNetSignal;
+  BI_Via::Shape  mLastShape;
+  PositiveLength mLastSize;
+  PositiveLength mLastDrillDiameter;
+  NetSignal*     mLastNetSignal;
+
+  // Information about the current via to place. Only valid if
+  // mIsUndoCmdActive == true.
+  BI_Via*                         mCurrentViaToPlace;
+  QScopedPointer<CmdBoardViaEdit> mCurrentViaEditCmd;
 
   // Widgets for the command toolbar
-  QHash<int, QAction*> mShapeActions;
-  QList<QAction*>      mActionSeparators;
-  QLabel*              mSizeLabel;
-  PositiveLengthEdit*  mSizeEdit;
-  QLabel*              mDrillLabel;
-  PositiveLengthEdit*  mDrillEdit;
-  QLabel*              mNetSignalLabel;
-  QComboBox*           mNetSignalComboBox;
+  QHash<int, QAction*>               mShapeActions;
+  QList<QAction*>                    mActionSeparators;
+  QScopedPointer<QLabel>             mSizeLabel;
+  QScopedPointer<PositiveLengthEdit> mSizeEdit;
+  QScopedPointer<QLabel>             mDrillLabel;
+  QScopedPointer<PositiveLengthEdit> mDrillEdit;
+  QScopedPointer<QLabel>             mNetSignalLabel;
+  QScopedPointer<QComboBox>          mNetSignalComboBox;
 };
 
 /*******************************************************************************
@@ -132,4 +133,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BES_ADDVIA_H
+#endif

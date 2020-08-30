@@ -36,17 +36,16 @@ SOURCES += \
     boardeditor/boardviapropertiesdialog.cpp \
     boardeditor/deviceinstancepropertiesdialog.cpp \
     boardeditor/fabricationoutputdialog.cpp \
-    boardeditor/fsm/bes_adddevice.cpp \
-    boardeditor/fsm/bes_addhole.cpp \
-    boardeditor/fsm/bes_addstroketext.cpp \
-    boardeditor/fsm/bes_addvia.cpp \
-    boardeditor/fsm/bes_base.cpp \
-    boardeditor/fsm/bes_drawplane.cpp \
-    boardeditor/fsm/bes_drawpolygon.cpp \
-    boardeditor/fsm/bes_drawtrace.cpp \
-    boardeditor/fsm/bes_fsm.cpp \
-    boardeditor/fsm/bes_select.cpp \
-    boardeditor/fsm/boardeditorevent.cpp \
+    boardeditor/fsm/boardeditorfsm.cpp \
+    boardeditor/fsm/boardeditorstate.cpp \
+    boardeditor/fsm/boardeditorstate_adddevice.cpp \
+    boardeditor/fsm/boardeditorstate_addhole.cpp \
+    boardeditor/fsm/boardeditorstate_addstroketext.cpp \
+    boardeditor/fsm/boardeditorstate_addvia.cpp \
+    boardeditor/fsm/boardeditorstate_drawplane.cpp \
+    boardeditor/fsm/boardeditorstate_drawpolygon.cpp \
+    boardeditor/fsm/boardeditorstate_drawtrace.cpp \
+    boardeditor/fsm/boardeditorstate_select.cpp \
     boardeditor/unplacedcomponentsdock.cpp \
     cmd/cmdaddcomponenttocircuit.cpp \
     cmd/cmdadddevicetoboard.cpp \
@@ -105,17 +104,16 @@ HEADERS += \
     boardeditor/boardviapropertiesdialog.h \
     boardeditor/deviceinstancepropertiesdialog.h \
     boardeditor/fabricationoutputdialog.h \
-    boardeditor/fsm/bes_adddevice.h \
-    boardeditor/fsm/bes_addhole.h \
-    boardeditor/fsm/bes_addstroketext.h \
-    boardeditor/fsm/bes_addvia.h \
-    boardeditor/fsm/bes_base.h \
-    boardeditor/fsm/bes_drawplane.h \
-    boardeditor/fsm/bes_drawpolygon.h \
-    boardeditor/fsm/bes_drawtrace.h \
-    boardeditor/fsm/bes_fsm.h \
-    boardeditor/fsm/bes_select.h \
-    boardeditor/fsm/boardeditorevent.h \
+    boardeditor/fsm/boardeditorfsm.h \
+    boardeditor/fsm/boardeditorstate.h \
+    boardeditor/fsm/boardeditorstate_adddevice.h \
+    boardeditor/fsm/boardeditorstate_addhole.h \
+    boardeditor/fsm/boardeditorstate_addstroketext.h \
+    boardeditor/fsm/boardeditorstate_addvia.h \
+    boardeditor/fsm/boardeditorstate_drawplane.h \
+    boardeditor/fsm/boardeditorstate_drawpolygon.h \
+    boardeditor/fsm/boardeditorstate_drawtrace.h \
+    boardeditor/fsm/boardeditorstate_select.h \
     boardeditor/unplacedcomponentsdock.h \
     cmd/cmdaddcomponenttocircuit.h \
     cmd/cmdadddevicetoboard.h \
