@@ -38,9 +38,9 @@ namespace librepcb {
 namespace project {
 namespace editor {
 
-CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine& netline, const Point& pos)
-  noexcept : UndoCommandGroup(tr("Split trace")),
-  mOldNetLine(netline) {
+CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine&  netline,
+                                           const Point& pos) noexcept
+  : UndoCommandGroup(tr("Split trace")), mOldNetLine(netline) {
   mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), pos);
 }
 
@@ -52,15 +52,15 @@ CmdBoardSplitNetLine::~CmdBoardSplitNetLine() noexcept {
  ******************************************************************************/
 
 bool CmdBoardSplitNetLine::performExecute() {
-  QScopedPointer<CmdBoardNetSegmentAddElements>
-      cmdAdd(new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment()));
+  QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+      new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment()));
   cmdAdd->addNetPoint(*mSplitPoint);
   cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getStartPoint(),
                      mOldNetLine.getLayer(), mOldNetLine.getWidth());
   cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getEndPoint(),
                      mOldNetLine.getLayer(), mOldNetLine.getWidth());
   QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
-        new CmdBoardNetSegmentRemoveElements(mOldNetLine.getNetSegment()));
+      new CmdBoardNetSegmentRemoveElements(mOldNetLine.getNetSegment()));
   cmdRemove->removeNetLine(mOldNetLine);
   appendChild(cmdAdd.take());
   appendChild(cmdRemove.take());

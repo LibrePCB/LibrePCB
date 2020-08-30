@@ -150,16 +150,16 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
     // PDF Reader
     // match IDs with enum values
     mUi->pdfOpenGroup->setId(
-          mUi->pdfOpenAlwaysRadio,
-          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ALWAYS));
+        mUi->pdfOpenAlwaysRadio,
+        static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ALWAYS));
 
     mUi->pdfOpenGroup->setId(
-          mUi->pdfOpenNeverRadio,
-          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::NEVER));
+        mUi->pdfOpenNeverRadio,
+        static_cast<int>(WorkspaceSettings::PdfOpenBehavior::NEVER));
 
     mUi->pdfOpenGroup->setId(
-          mUi->pdfOpenAskRadio,
-          static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ASK));
+        mUi->pdfOpenAskRadio,
+        static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ASK));
 
     // File picker
     connect(mUi->pdfCustomCmdPickBtn, &QToolButton::clicked, [&]() {
@@ -171,8 +171,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
       fileDialog.setDirectory(QDir::home());
 
       if (fileDialog.exec()) {
-        mUi->pdfCustomCmdEdit->setText(fileDialog.selectedFiles().first()
-                                       + " \"{{FILEPATH}}\"");
+        mUi->pdfCustomCmdEdit->setText(fileDialog.selectedFiles().first() +
+                                       " \"{{FILEPATH}}\"");
       }
     });
   }
@@ -284,8 +284,8 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mUi->pdfCustomRadioBtn->setChecked(mSettings.useCustomPdfReader.get());
 
   // External PDF reader behaviour
-  mUi->pdfOpenGroup->button(
-        static_cast<int>(mSettings.pdfOpenBehavior.get()))->setChecked(true);
+  mUi->pdfOpenGroup->button(static_cast<int>(mSettings.pdfOpenBehavior.get()))
+      ->setChecked(true);
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -327,7 +327,7 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // External PDF reader behaviour
     mSettings.pdfOpenBehavior.set(
-          static_cast<WorkspaceSettings::PdfOpenBehavior>(
+        static_cast<WorkspaceSettings::PdfOpenBehavior>(
             mUi->pdfOpenGroup->checkedId()));
 
     mSettings.saveToFile();  // can throw

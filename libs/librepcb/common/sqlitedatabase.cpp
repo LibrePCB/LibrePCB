@@ -68,16 +68,15 @@ SQLiteDatabase::SQLiteDatabase(const FilePath& filepath)
 
   // check if database is valid
   if (!mDb.isValid()) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Invalid database: \"%1\"")).arg(filepath.toNative()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Invalid database: \"%1\"").arg(filepath.toNative()));
   }
 
   // open the database
   if (!mDb.open()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Could not open database: \"%1\""))
-                           .arg(filepath.toNative()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("Could not open database: \"%1\"").arg(filepath.toNative()));
   }
 
   // set SQLite options
@@ -153,9 +152,8 @@ QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const {
   if (!q.prepare(query)) {
     qDebug() << q.lastError().databaseText();
     qDebug() << q.lastError().driverText();
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Error while preparing SQL query: %1")).arg(query));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Error while preparing SQL query: %1").arg(query));
   }
   return q;
 }
@@ -183,9 +181,9 @@ int SQLiteDatabase::insert(QSqlQuery& query) {
   if (ok) {
     return id;
   } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Error while executing SQL query: %1"))
-                           .arg(query.lastQuery()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("Error while executing SQL query: %1").arg(query.lastQuery()));
   }
 }
 
@@ -193,9 +191,9 @@ void SQLiteDatabase::exec(QSqlQuery& query) {
   if (!query.exec()) {
     qDebug() << query.lastError().databaseText();
     qDebug() << query.lastError().driverText();
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Error while executing SQL query: %1"))
-                           .arg(query.lastQuery()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("Error while executing SQL query: %1").arg(query.lastQuery()));
   }
 }
 
@@ -216,8 +214,7 @@ void SQLiteDatabase::enableSqliteWriteAheadLogging() {
   if ((!success) || (result != "wal")) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("Could not enable SQLite Write-Ahead Logging: \"%1\""))
-            .arg(result));
+        tr("Could not enable SQLite Write-Ahead Logging: \"%1\"").arg(result));
   }
 }
 

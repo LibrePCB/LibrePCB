@@ -34,7 +34,7 @@ namespace library {
 
 MsgNameNotTitleCase::MsgNameNotTitleCase(const ElementName& name) noexcept
   : LibraryElementCheckMessage(
-        Severity::Hint, QString(tr("Name not title case: '%1'")).arg(*name),
+        Severity::Hint, tr("Name not title case: '%1'").arg(*name),
         tr("Generally the library element name should be written in title case "
            "(for consistency). As the current name has words starting with a "
            "lowercase character, it seems that it is not title cases. If this "

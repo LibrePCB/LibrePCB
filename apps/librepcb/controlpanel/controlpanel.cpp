@@ -71,12 +71,12 @@ ControlPanel::ControlPanel(Workspace& workspace)
     mLibraryManager(new LibraryManager(mWorkspace, this)) {
   mUi->setupUi(this);
 
-  setWindowTitle(QString(tr("Control Panel - LibrePCB %1"))
-                     .arg(qApp->applicationVersion()));
+  setWindowTitle(
+      tr("Control Panel - LibrePCB %1").arg(qApp->applicationVersion()));
 
   // show workspace path in status bar
   QString wsPath         = mWorkspace.getPath().toNative();
-  QLabel* statusBarLabel = new QLabel(QString(tr("Workspace: %1")).arg(wsPath));
+  QLabel* statusBarLabel = new QLabel(tr("Workspace: %1").arg(wsPath));
   mUi->statusBar->addWidget(statusBarLabel, 1);
 
   // initialize status bar
@@ -656,9 +656,9 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
     case Remove: {
       QMessageBox::StandardButton btn = QMessageBox::question(
           this, tr("Remove"),
-          QString(tr("Are you really sure to remove following file or "
-                     "directory?\n\n"
-                     "%1\n\nWarning: This cannot be undone!"))
+          tr("Are you really sure to remove following file or "
+             "directory?\n\n"
+             "%1\n\nWarning: This cannot be undone!")
               .arg(fp.toNative()));
       if (btn == QMessageBox::Yes) {
         try {

@@ -36,8 +36,7 @@ namespace library {
 
 MsgDuplicatePinName::MsgDuplicatePinName(const SymbolPin& pin) noexcept
   : LibraryElementCheckMessage(
-        Severity::Error,
-        QString(tr("Duplicate pin name: '%1'")).arg(*pin.getName()),
+        Severity::Error, tr("Duplicate pin name: '%1'").arg(*pin.getName()),
         tr("All symbol pins must have unique names, otherwise they cannot be "
            "distinguished later in the component editor. If your part has "
            "several pins with same functionality (e.g. multiple GND pins), you "

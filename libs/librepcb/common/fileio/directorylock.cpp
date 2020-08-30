@@ -71,9 +71,9 @@ void DirectoryLock::setDirToLock(const FilePath& dir) noexcept {
 DirectoryLock::LockStatus DirectoryLock::getStatus() const {
   // check if the directory to lock does exist
   if (!mDirToLock.isExistingDir()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The directory \"%1\" does not exist."))
-                           .arg(mDirToLock.toNative()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("The directory \"%1\" does not exist.").arg(mDirToLock.toNative()));
   }
 
   // when the directory is valid, the lock filepath must be valid too
@@ -91,7 +91,7 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const {
   // check count of lines
   if (lines.count() < 6) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The lock file \"%1\" has too few lines."))
+                       tr("The lock file \"%1\" has too few lines.")
                            .arg(mLockFilePath.toNative()));
   }
   // read lock metadata
@@ -141,11 +141,10 @@ void DirectoryLock::tryLock(bool* wasStale) {
       lock();  // can throw
       break;
     case LockStatus::Locked:
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("The directory is locked, "
-                     "check if it is already opened elsewhere: %1"))
-              .arg(mDirToLock.toNative()));
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("The directory is locked, "
+                            "check if it is already opened elsewhere: %1")
+                             .arg(mDirToLock.toNative()));
     default:
       Q_ASSERT(false);
       throw LogicError(__FILE__, __LINE__);
@@ -164,9 +163,9 @@ bool DirectoryLock::unlockIfLocked() {
 void DirectoryLock::lock() {
   // check if the directory to lock does exist
   if (!mDirToLock.isExistingDir()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The directory \"%1\" does not exist."))
-                           .arg(mDirToLock.toNative()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("The directory \"%1\" does not exist.").arg(mDirToLock.toNative()));
   }
 
   // when the directory is valid, the lock filepath must be valid too

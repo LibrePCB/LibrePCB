@@ -68,12 +68,12 @@ void BI_NetPoint::init() {
   mGraphicsItem->setPos(mPosition.toPxQPointF());
 
   // create ERC messages
-  mErcMsgDeadNetPoint.reset(
-      new ErcMsg(mBoard.getProject(), *this, mUuid.toStr(), "Dead",
-                 ErcMsg::ErcMsgType_t::BoardError,
-                 QString(tr("Dead net point in board \"%1\": %2"))
-                     .arg(*mBoard.getName())
-                     .arg(mUuid.toStr())));
+  mErcMsgDeadNetPoint.reset(new ErcMsg(mBoard.getProject(), *this,
+                                       mUuid.toStr(), "Dead",
+                                       ErcMsg::ErcMsgType_t::BoardError,
+                                       tr("Dead net point in board \"%1\": %2")
+                                           .arg(*mBoard.getName())
+                                           .arg(mUuid.toStr())));
 }
 
 BI_NetPoint::~BI_NetPoint() noexcept {
@@ -116,8 +116,7 @@ void BI_NetPoint::addToBoard() {
     throw LogicError(__FILE__, __LINE__,
                      "NetPoint is currently already added to the board.");
   } else if (isUsed()) {
-    throw LogicError(__FILE__, __LINE__,
-                     "NetPoint is currently in use.");
+    throw LogicError(__FILE__, __LINE__, "NetPoint is currently in use.");
   }
   mHighlightChangedConnection =
       connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
@@ -132,8 +131,7 @@ void BI_NetPoint::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__,
                      "NetPoint is currently not added to the board.");
   } else if (isUsed()) {
-    throw LogicError(__FILE__, __LINE__,
-                     "NetPoint is currently in use.");
+    throw LogicError(__FILE__, __LINE__, "NetPoint is currently in use.");
   }
   disconnect(mHighlightChangedConnection);
   mErcMsgDeadNetPoint->setVisible(false);

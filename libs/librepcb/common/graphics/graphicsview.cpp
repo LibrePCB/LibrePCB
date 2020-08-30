@@ -305,8 +305,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
     case QEvent::GraphicsSceneContextMenu:
     case QEvent::KeyRelease:
     case QEvent::KeyPress: {
-      if (mEventHandlerObject
-          && mEventHandlerObject->graphicsViewEventHandler(event)) {
+      if (mEventHandlerObject &&
+          mEventHandlerObject->graphicsViewEventHandler(event)) {
         return true;
       }
       break;

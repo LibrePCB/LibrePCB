@@ -66,7 +66,7 @@ Workspace::Workspace(const FilePath& wsPath)
   if (!isValidWorkspacePath(mPath)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Invalid workspace path: \"%1\"")).arg(mPath.toNative()));
+        tr("Invalid workspace path: \"%1\"").arg(mPath.toNative()));
   }
   FilePath    versionFp = mPath.getPathTo(".librepcb-workspace");
   QByteArray  versionRaw(FileUtils::readFile(versionFp));  // can throw
@@ -74,8 +74,8 @@ Workspace::Workspace(const FilePath& wsPath)
       VersionFile::fromByteArray(versionRaw);  // can throw
   if (wsVersionFile.getVersion() != FILE_FORMAT_VERSION()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The workspace version %1 is not compatible "
-                                  "with this application version."))
+                       tr("The workspace version %1 is not compatible "
+                          "with this application version.")
                            .arg(wsVersionFile.getVersion().toStr()));
   }
 

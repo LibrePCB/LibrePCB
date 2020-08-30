@@ -65,7 +65,9 @@ public:
   // The underlying type int is needed to map QButtonGroup IDs
   // to values in this enum. See for ex. WorkspaceSettingsDialog::loadSettings()
   enum class PdfOpenBehavior : int {
-    ALWAYS, NEVER, ASK,
+    ALWAYS,
+    NEVER,
+    ASK,
   };
 
   // Constructors / Destructor
@@ -210,7 +212,7 @@ public:
 }  // namespace workspace
 
 // Serialize settings values
-template<>
+template <>
 inline SExpression serializeToSExpression(
     const workspace::WorkspaceSettings::PdfOpenBehavior& b) {
   using namespace workspace;
@@ -226,10 +228,9 @@ inline SExpression serializeToSExpression(
   };
 }
 
-template<>
-inline workspace::WorkspaceSettings::PdfOpenBehavior
-  deserializeFromSExpression(const SExpression& sexpr, bool throwIfEmpty) {
-
+template <>
+inline workspace::WorkspaceSettings::PdfOpenBehavior deserializeFromSExpression(
+    const SExpression& sexpr, bool throwIfEmpty) {
   using namespace workspace;
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == QLatin1String("always"))

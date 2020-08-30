@@ -702,10 +702,9 @@ QList<SI_Symbol*> SchematicEditor::getSearchCandidates() noexcept {
     Q_ASSERT(schematic);
     candidates += schematic->getSymbols();
   }
-  std::sort(candidates.begin(), candidates.end(),
-            [](SI_Symbol* a, SI_Symbol* b){
-    return a->getName() < b->getName();
-  });
+  std::sort(
+      candidates.begin(), candidates.end(),
+      [](SI_Symbol* a, SI_Symbol* b) { return a->getName() < b->getName(); });
   return candidates;
 }
 
@@ -718,7 +717,7 @@ QStringList SchematicEditor::getSearchToolBarCompleterList() noexcept {
 }
 
 void SchematicEditor::goToSymbol(const QString& name,
-                                 unsigned int index) noexcept {
+                                 unsigned int   index) noexcept {
   QList<SI_Symbol*> symbolCandidates = {};
   foreach (SI_Symbol* symbol, getSearchCandidates()) {
     if (symbol->getName().startsWith(name, Qt::CaseInsensitive)) {
@@ -728,7 +727,7 @@ void SchematicEditor::goToSymbol(const QString& name,
 
   if (symbolCandidates.count()) {
     index %= symbolCandidates.count();
-    SI_Symbol* symbol = symbolCandidates[index];
+    SI_Symbol* symbol    = symbolCandidates[index];
     Schematic& schematic = symbol->getSchematic();
     if (setActiveSchematicIndex(mProject.getSchematics().indexOf(&schematic))) {
       schematic.clearSelection();
@@ -736,7 +735,7 @@ void SchematicEditor::goToSymbol(const QString& name,
       QRectF rect = symbol->getBoundingRect();
       // Zoom to a rectangle relative to the maximum symbol dimension. The
       // symbol is 1/4th of the screen.
-      qreal margin = 1.5f*std::max(rect.size().width(), rect.size().height());
+      qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
       rect.adjust(-margin, -margin, margin, margin);
       mGraphicsView->zoomToRect(rect);
     }

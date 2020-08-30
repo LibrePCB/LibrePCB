@@ -27,13 +27,13 @@
 
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
+#include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
+#include <librepcb/project/boards/items/bi_netsegment.h>
 
 #include <QtCore>
 
@@ -76,9 +76,9 @@ bool CmdReplaceDevice::performExecute() {
     BI_NetSegment* netsegment = pad->getNetSegmentOfLines();
     if (netsegment) {
       QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-            new CmdBoardNetSegmentAddElements(*netsegment));
-      QMap<GraphicsLayer*, BI_NetPoint*> newNetPoints = {};
-      QSet<BI_NetLine*> connectedNetLines = pad->getNetLines();
+          new CmdBoardNetSegmentAddElements(*netsegment));
+      QMap<GraphicsLayer*, BI_NetPoint*> newNetPoints      = {};
+      QSet<BI_NetLine*>                  connectedNetLines = pad->getNetLines();
       if (connectedNetLines.count() > 1) {
         foreach (BI_NetLine* netline, connectedNetLines) {
           auto it = newNetPoints.find(&netline->getLayer());
@@ -92,9 +92,9 @@ bool CmdReplaceDevice::performExecute() {
       }
       execNewChildCmd(cmdAdd.take());
       QScopedPointer<CmdRemoveBoardItems> cmdRemove(
-            new CmdRemoveBoardItems(netsegment->getBoard()));
+          new CmdRemoveBoardItems(netsegment->getBoard()));
       cmdRemove->removeNetLines(pad->getNetLines());
-      execNewChildCmd(cmdRemove.take()); // can throw
+      execNewChildCmd(cmdRemove.take());  // can throw
     }
   }
 

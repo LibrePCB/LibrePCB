@@ -38,7 +38,7 @@ MsgDuplicateSignalName::MsgDuplicateSignalName(
     const ComponentSignal& signal) noexcept
   : LibraryElementCheckMessage(
         Severity::Error,
-        QString(tr("Duplicate signal name: '%1'")).arg(*signal.getName()),
+        tr("Duplicate signal name: '%1'").arg(*signal.getName()),
         tr("All component signals must have unique names, otherwise they "
            "cannot be distinguished later in the device editor. If your part "
            "has several pins which are electrically exactly equal (e.g. "

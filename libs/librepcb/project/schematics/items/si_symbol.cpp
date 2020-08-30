@@ -91,8 +91,8 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) {
       mSymbVarItem->getSymbolUuid());
   if (!mSymbol) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("No symbol with the UUID \"%1\" found in the "
-                                  "project's library."))
+                       tr("No symbol with the UUID \"%1\" found in the "
+                          "project's library.")
                            .arg(mSymbVarItem->getSymbolUuid().toStr()));
   }
 

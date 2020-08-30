@@ -113,9 +113,8 @@ bool BES_AddDevice::entry(BEE_Base* event) noexcept {
     startAddingDevice(e->getComponentInstance(), e->getDeviceUuid(),
                       e->getFootprintUuid());
   } catch (Exception& exc) {
-    QMessageBox::critical(
-        &mEditor, tr("Error"),
-        QString(tr("Could not add device:\n\n%1")).arg(exc.getMsg()));
+    QMessageBox::critical(&mEditor, tr("Error"),
+                          tr("Could not add device:\n\n%1").arg(exc.getMsg()));
     if (mIsUndoCmdActive) abortCommand(false);
     return false;
   }

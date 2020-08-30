@@ -62,8 +62,8 @@ public:
   ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
-  void setCurrentPosition(const Point& pos, const bool gridIncrement = true)
-    noexcept;
+  void setCurrentPosition(const Point& pos,
+                          const bool   gridIncrement = true) noexcept;
   void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
 
 private:

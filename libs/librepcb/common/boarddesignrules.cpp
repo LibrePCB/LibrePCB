@@ -123,7 +123,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
     setRestringViaBounds(mRestringViaMin, mRestringViaMax);
   } catch (const Exception& e) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Invalid design rules: %1")).arg(e.getMsg()));
+                       tr("Invalid design rules: %1").arg(e.getMsg()));
   }
 }
 

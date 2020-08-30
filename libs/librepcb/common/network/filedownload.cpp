@@ -109,7 +109,7 @@ void FileDownload::finalizeRequest() {
   // save to destination file
   if (!mFile->commit()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Error while writing file \"%1\": %2"))
+                       tr("Error while writing file \"%1\": %2")
                            .arg(mDestination.toNative(), mFile->errorString()));
   }
 
@@ -122,7 +122,7 @@ void FileDownload::finalizeRequest() {
     QFile file(mDestination.toStr());
     if (!file.open(QFile::ReadOnly)) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Error while readback file \"%1\": %2"))
+                         tr("Error while readback file \"%1\": %2")
                              .arg(mDestination.toNative(), file.errorString()));
     }
     QCryptographicHash hash(mHashAlgorithm);
@@ -145,10 +145,9 @@ void FileDownload::finalizeRequest() {
     QStringList files =
         JlCompress::extractDir(mDestination.toStr(), mExtractZipToDir.toStr());
     if (files.isEmpty()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("Error while extracting the ZIP file \"%1\"."))
-              .arg(mDestination.toNative()));
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("Error while extracting the ZIP file \"%1\".")
+                             .arg(mDestination.toNative()));
     }
   } else {
     // do NOT remove the downloaded file

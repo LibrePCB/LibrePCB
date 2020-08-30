@@ -60,8 +60,8 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory)
   // check directory suffix
   if (mDirectory->getAbsPath().getSuffix() != "lplib") {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The library directory does not have the "
-                                  "suffix '.lplib':\n\n%1"))
+                       tr("The library directory does not have the "
+                          "suffix '.lplib':\n\n%1")
                            .arg(mDirectory->getAbsPath().toNative()));
   }
 
@@ -134,7 +134,7 @@ void Library::moveTo(TransactionalDirectory& dest) {
     qDebug() << dest.getAbsPath().toNative();
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("A library directory name must have the suffix '.lplib'.")));
+        tr("A library directory name must have the suffix '.lplib'."));
   }
 
   // move the element

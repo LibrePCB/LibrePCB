@@ -87,9 +87,9 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
               .arg(getPath().toNative()));
     }
     if (!mDirectory->fileExists(mFilename)) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("The file \"%1\" does not exist."))
-                             .arg(getFilepath().toNative()));
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("The file \"%1\" does not exist.").arg(getFilepath().toNative()));
     }
     // check the project's file format version
     Version version =
@@ -267,15 +267,14 @@ Schematic* Project::createSchematic(const ElementName& name) {
   QString dirname = FilePath::cleanFileName(
       *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
   if (dirname.isEmpty()) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Invalid schematic name: \"%1\"")).arg(*name));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Invalid schematic name: \"%1\"").arg(*name));
   }
   std::unique_ptr<TransactionalDirectory> dir(
       new TransactionalDirectory(*mDirectory, "schematics/" % dirname));
   if (dir->fileExists("schematic.lp")) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The schematic exists already: \"%1\""))
+                       tr("The schematic exists already: \"%1\"")
                            .arg(dir->getAbsPath().toNative()));
   }
   return Schematic::create(*this, std::move(dir), name);
@@ -292,10 +291,9 @@ void Project::addSchematic(Schematic& schematic, int newIndex) {
             .arg(schematic.getUuid().toStr()));
   }
   if (getSchematicByName(*schematic.getName())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a schematic with the name \"%1\"!"))
-            .arg(*schematic.getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There is already a schematic with the name \"%1\"!")
+                           .arg(*schematic.getName()));
   }
 
   if ((newIndex < 0) || (newIndex > mSchematics.count())) {
@@ -319,10 +317,9 @@ void Project::removeSchematic(Schematic& schematic, bool deleteSchematic) {
     throw LogicError(__FILE__, __LINE__);
   }
   if ((!deleteSchematic) && (!schematic.isEmpty())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There are still elements in the schematic \"%1\"!"))
-            .arg(*schematic.getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There are still elements in the schematic \"%1\"!")
+                           .arg(*schematic.getName()));
   }
 
   int index = getSchematicIndex(schematic);
@@ -370,8 +367,7 @@ void Project::printSchematicPages(QPrinter& printer, QList<int>& pages) {
     if (!schematic) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("No schematic page with the index %1 found."))
-              .arg(pages[i]));
+          tr("No schematic page with the index %1 found.").arg(pages[i]));
     }
     schematic->clearSelection();
     schematic->renderToQPainter(painter);
@@ -412,13 +408,13 @@ Board* Project::createBoard(const ElementName& name) {
       *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
   if (dirname.isEmpty()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Invalid board name: \"%1\"")).arg(*name));
+                       tr("Invalid board name: \"%1\"").arg(*name));
   }
   std::unique_ptr<TransactionalDirectory> dir(
       new TransactionalDirectory(*mDirectory, "boards/" % dirname));
   if (dir->fileExists("board.lp")) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The board exists already: \"%1\""))
+                       tr("The board exists already: \"%1\"")
                            .arg(dir->getAbsPath().toNative()));
   }
   return Board::create(*this, std::move(dir), name);
@@ -429,13 +425,13 @@ Board* Project::createBoard(const Board& other, const ElementName& name) {
       *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
   if (dirname.isEmpty()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Invalid board name: \"%1\"")).arg(*name));
+                       tr("Invalid board name: \"%1\"").arg(*name));
   }
   std::unique_ptr<TransactionalDirectory> dir(
       new TransactionalDirectory(*mDirectory, "boards/" % dirname));
   if (dir->fileExists("board.lp")) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The board exists already: \"%1\""))
+                       tr("The board exists already: \"%1\"")
                            .arg(dir->getAbsPath().toNative()));
   }
   return new Board(other, std::move(dir), name);
@@ -451,10 +447,9 @@ void Project::addBoard(Board& board, int newIndex) {
                            .arg(board.getUuid().toStr()));
   }
   if (getBoardByName(*board.getName())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a board with the name \"%1\"!"))
-            .arg(*board.getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There is already a board with the name \"%1\"!")
+                           .arg(*board.getName()));
   }
 
   if ((newIndex < 0) || (newIndex > mBoards.count())) {

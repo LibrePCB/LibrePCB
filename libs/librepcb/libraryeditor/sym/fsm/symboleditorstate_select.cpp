@@ -127,8 +127,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           QGraphicsItem* item = items[mCurrentSelectionIndex];
           if (dynamic_cast<SymbolPinGraphicsItem*>(item)) {
             // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<SymbolPinGraphicsItem*>(item)
-                ->setSelected(true);
+            dynamic_cast<SymbolPinGraphicsItem*>(item)->setSelected(true);
           } else {
             item->setSelected(true);
           }
@@ -350,8 +349,8 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
   if (mState != SubState::IDLE) return false;
 
   // handle item selection
-  QGraphicsItem* selectedItem = nullptr;
-  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  QGraphicsItem*        selectedItem = nullptr;
+  QList<QGraphicsItem*> items        = findItemsAtPosition(pos);
   if (items.isEmpty()) return false;
   foreach (QGraphicsItem* item, items) {
     if (item->isSelected()) {
@@ -363,8 +362,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     selectedItem = items.first();
     if (dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)) {
       // workaround for selection of a SymbolPinGraphicsItem
-      dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)
-          ->setSelected(true);
+      dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)->setSelected(true);
     } else {
       selectedItem->setSelected(true);
     }
@@ -373,26 +371,22 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
   Q_ASSERT(selectedItem->isSelected());
 
   // build the context menu
-  QMenu menu;
+  QMenu    menu;
   QAction* aRotateCCW =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("&Rotate"));
-  connect(aRotateCCW, &QAction::triggered, [this](){
-    rotateSelectedItems(Angle::deg90());
-  });
+  connect(aRotateCCW, &QAction::triggered,
+          [this]() { rotateSelectedItems(Angle::deg90()); });
   QAction* aMirrorH =
       menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("&Mirror"));
-  connect(aMirrorH, &QAction::triggered, [this](){
-    mirrorSelectedItems(Qt::Horizontal);
-  });
+  connect(aMirrorH, &QAction::triggered,
+          [this]() { mirrorSelectedItems(Qt::Horizontal); });
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("R&emove"));
-  connect(aRemove, &QAction::triggered, [this](){
-    removeSelectedItems();
-  });
+  connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
   menu.addSeparator();
-  QAction* aProperties = menu.addAction(QIcon(":/img/actions/settings.png"),
-                                        tr("&Properties"));
-  connect(aProperties, &QAction::triggered, [this, &selectedItem](){
+  QAction* aProperties =
+      menu.addAction(QIcon(":/img/actions/settings.png"), tr("&Properties"));
+  connect(aProperties, &QAction::triggered, [this, &selectedItem]() {
     openPropertiesDialogOfItem(selectedItem);
   });
 
@@ -422,7 +416,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     dialog.exec();
     return true;
   } else if (PolygonGraphicsItem* polygon =
-             dynamic_cast<PolygonGraphicsItem*>(item)) {
+                 dynamic_cast<PolygonGraphicsItem*>(item)) {
     Q_ASSERT(polygon);
     PolygonPropertiesDialog dialog(
         polygon->getPolygon(), mContext.undoStack,
@@ -432,7 +426,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     dialog.exec();
     return true;
   } else if (CircleGraphicsItem* circle =
-             dynamic_cast<CircleGraphicsItem*>(item)) {
+                 dynamic_cast<CircleGraphicsItem*>(item)) {
     Q_ASSERT(circle);
     CirclePropertiesDialog dialog(
         circle->getCircle(), mContext.undoStack,
@@ -599,8 +593,8 @@ QList<QGraphicsItem*> SymbolEditorState_Select::findItemsAtPosition(
     result.append(text.data());
   }
 
-  Q_ASSERT(result.count() == (pins.count() + texts.count()
-                             + polygons.count() + circles.count()));
+  Q_ASSERT(result.count() ==
+           (pins.count() + texts.count() + polygons.count() + circles.count()));
   Q_ASSERT(result.count() == count);
   return result;
 }

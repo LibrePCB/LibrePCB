@@ -87,8 +87,8 @@ bool CmdAddSymbolToSchematic::performExecute() {
     if (!symFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The symbol with the UUID \"%1\" does not exist in the "
-                     "workspace library!"))
+          tr("The symbol with the UUID \"%1\" does not exist in the "
+             "workspace library!")
               .arg(symbolUuid.toStr()));
     }
     library::Symbol* sym = new library::Symbol(

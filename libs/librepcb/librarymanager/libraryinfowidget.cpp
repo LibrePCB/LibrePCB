@@ -123,10 +123,9 @@ void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept {
 
 void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept {
   QString title = tr("Remove Library");
-  QString text =
-      QString(tr("Attention! This will remove the whole library directory:"
-                 "\n\n%1\n\nAre you really sure to remove \"%2\"?"))
-          .arg(mLibDir.toNative(), mUi->lblName->text());
+  QString text  = tr("Attention! This will remove the whole library directory:"
+                    "\n\n%1\n\nAre you really sure to remove \"%2\"?")
+                     .arg(mLibDir.toNative(), mUi->lblName->text());
 
   int res = QMessageBox::question(this, title, text,
                                   QMessageBox::Yes | QMessageBox::No);

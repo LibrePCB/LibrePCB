@@ -60,13 +60,13 @@ void AsyncCopyOperation::run() noexcept {
   try {
     // if (!mSource.isExistingDir()) {
     //  throw LogicError(__FILE__, __LINE__,
-    //                   QString(tr("The directory \"%1\" does not exist."))
+    //                   tr("The directory \"%1\" does not exist.")
     //                       .arg(mSource.toNative()));
     //}
     // if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
     //  throw LogicError(
     //      __FILE__, __LINE__,
-    //      QString(tr("The file or directory \"%1\" exists already."))
+    //      tr("The file or directory \"%1\" exists already.")
     //          .arg(mDestination.toNative()));
     //}
 

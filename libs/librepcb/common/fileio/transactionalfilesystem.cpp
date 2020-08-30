@@ -176,7 +176,7 @@ QByteArray TransactionalFileSystem::read(const QString& path) const {
     return FileUtils::readFile(mFilePath.getPathTo(cleanedPath));  // can throw
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("File '%1' does not exist."))
+                       tr("File '%1' does not exist.")
                            .arg(mFilePath.getPathTo(cleanedPath).toNative()));
   }
 }
@@ -234,7 +234,7 @@ void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
   if (!zip.open(QuaZip::mdUnzip)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Failed to open the ZIP file '%1'.")).arg(fp.toNative()));
+        tr("Failed to open the ZIP file '%1'.").arg(fp.toNative()));
   }
   QuaZipFile file(&zip);
   for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
@@ -270,7 +270,7 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp) const {
   if (!zip.open(QuaZip::mdCreate)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Failed to create the ZIP file '%1'.")).arg(fp.toNative()));
+        tr("Failed to create the ZIP file '%1'.").arg(fp.toNative()));
   }
   try {
     QuaZipFile file(&zip);
@@ -432,7 +432,7 @@ void TransactionalFileSystem::exportDirToZip(QuaZipFile&     file,
     file.close();
     if (bytesWritten != content.length()) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Failed to write file '%1' to '%2'."))
+                         tr("Failed to write file '%1' to '%2'.")
                              .arg(filepath, zipFp.toNative()));
     }
   }

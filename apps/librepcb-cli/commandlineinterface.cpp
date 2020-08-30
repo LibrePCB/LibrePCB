@@ -91,26 +91,26 @@ int CommandLineInterface::execute() noexcept {
          "report failure (exit code = 1) if there are non-approved messages."));
   QCommandLineOption exportSchematicsOption(
       "export-schematics",
-      QString(tr("Export schematics to given file(s). Existing files will be "
-                 "overwritten. Supported file extensions: %1"))
+      tr("Export schematics to given file(s). Existing files will be "
+         "overwritten. Supported file extensions: %1")
           .arg("pdf"),
       tr("file"));
   QCommandLineOption exportBomOption(
       "export-bom",
-      QString(tr("Export generic BOM to given file(s). Existing files will be "
-                 "overwritten. Supported file extensions: %1"))
+      tr("Export generic BOM to given file(s). Existing files will be "
+         "overwritten. Supported file extensions: %1")
           .arg("csv"),
       tr("file"));
   QCommandLineOption exportBoardBomOption(
       "export-board-bom",
-      QString(tr("Export board-specific BOM to given file(s). Existing files "
-                 "will be overwritten. Supported file extensions: %1"))
+      tr("Export board-specific BOM to given file(s). Existing files "
+         "will be overwritten. Supported file extensions: %1")
           .arg("csv"),
       tr("file"));
   QCommandLineOption bomAttributesOption(
       "bom-attributes",
-      QString(tr("Comma-separated list of additional attributes to be exported "
-                 "to the BOM. Example: \"%1\""))
+      tr("Comma-separated list of additional attributes to be exported "
+         "to the BOM. Example: \"%1\"")
           .arg("MANUFACTURER, MPN"),
       tr("attributes"));
   QCommandLineOption exportPcbFabricationDataOption(
@@ -185,7 +185,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(libSaveOption);
     parser.addOption(libStrictOption);
   } else if (!command.isEmpty()) {
-    printErr(QString(tr("Unknown command '%1'.")).arg(command), 2);
+    printErr(tr("Unknown command '%1'.").arg(command), 2);
     print(parser.helpText(), 0);
     return 1;
   }
@@ -199,13 +199,11 @@ int CommandLineInterface::execute() noexcept {
 
   // --version
   if (parser.isSet(versionOption)) {
-    print(
-        QString(tr("LibrePCB CLI Version %1")).arg(mApp.applicationVersion()));
-    print(QString(tr("Git Revision %1")).arg(mApp.getGitRevision()));
-    print(QString(tr("Qt Version %1 (compiled against %2)"))
+    print(tr("LibrePCB CLI Version %1").arg(mApp.applicationVersion()));
+    print(tr("Git Revision %1").arg(mApp.getGitRevision()));
+    print(tr("Qt Version %1 (compiled against %2)")
               .arg(qVersion(), QT_VERSION_STR));
-    print(QString(tr("Built at %1"))
-              .arg(mApp.getBuildDate().toString(Qt::LocalDate)));
+    print(tr("Built at %1").arg(mApp.getBuildDate().toString(Qt::LocalDate)));
     return 0;
   }
 
@@ -286,8 +284,7 @@ bool CommandLineInterface::openProject(
 
     // Open project
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
-    print(QString(tr("Open project '%1'..."))
-              .arg(prettyPath(projectFp, projectFile)));
+    print(tr("Open project '%1'...").arg(prettyPath(projectFp, projectFile)));
     std::shared_ptr<TransactionalFileSystem> projectFs;
     QString                                  projectFileName;
     if (projectFp.getSuffix() == "lppz") {
@@ -357,9 +354,8 @@ bool CommandLineInterface::openProject(
               QString("    - [%1] %2").arg(severity, msg->getMsg()));
         }
       }
-      print("  " % QString(tr("Approved messages: %1")).arg(approvedMsgCount));
-      print("  " %
-            QString(tr("Non-approved messages: %1")).arg(messages.count()));
+      print("  " % tr("Approved messages: %1").arg(approvedMsgCount));
+      print("  " % tr("Non-approved messages: %1").arg(messages.count()));
       // sort messages to increases readability of console output
       std::sort(messages.begin(), messages.end());
       foreach (const QString& msg, messages) { printErr(msg); }
@@ -370,7 +366,7 @@ bool CommandLineInterface::openProject(
 
     // Export schematics
     foreach (const QString& destStr, exportSchematicsFiles) {
-      print(QString(tr("Export schematics to '%1'...")).arg(destStr));
+      print(tr("Export schematics to '%1'...").arg(destStr));
       QString suffix = destStr.split('.').last().toLower();
       if (suffix == "pdf") {
         QString destPathStr = AttributeSubstitutor::substitute(
@@ -383,8 +379,7 @@ bool CommandLineInterface::openProject(
         print(QString("  => '%1'").arg(prettyPath(destPath, destPathStr)));
         writtenFilesCounter[destPath]++;
       } else {
-        printErr("  " %
-                 QString(tr("ERROR: Unknown extension '%1'.")).arg(suffix));
+        printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
         success = false;
       }
     }
@@ -401,8 +396,8 @@ bool CommandLineInterface::openProject(
         if (board) {
           boardList.append(board);
         } else {
-          printErr(QString(tr("ERROR: No board with the name '%1' found."))
-                       .arg(boardName));
+          printErr(
+              tr("ERROR: No board with the name '%1' found.").arg(boardName));
           success = false;
         }
       }
@@ -426,10 +421,9 @@ bool CommandLineInterface::openProject(
         const QString& destStr       = job.first;
         bool           boardSpecific = job.second;
         if (boardSpecific) {
-          print(
-              QString(tr("Export board-specific BOM to '%1'...")).arg(destStr));
+          print(tr("Export board-specific BOM to '%1'...").arg(destStr));
         } else {
-          print(QString(tr("Export generic BOM to '%1'...")).arg(destStr));
+          print(tr("Export generic BOM to '%1'...").arg(destStr));
         }
         QList<Board*> boards =
             boardSpecific ? boardList : QList<Board*>{nullptr};
@@ -460,8 +454,7 @@ bool CommandLineInterface::openProject(
             csv->saveToFile(fp);                                  // can throw
             writtenFilesCounter[fp]++;
           } else {
-            printErr("  " %
-                     QString(tr("ERROR: Unknown extension '%1'.")).arg(suffix));
+            printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
             success = false;
           }
         }
@@ -480,14 +473,14 @@ bool CommandLineInterface::openProject(
           customSettings = BoardFabricationOutputSettings(
               SExpression::parse(FileUtils::readFile(fp), fp));  // can throw
         } catch (const Exception& e) {
-          printErr(QString(tr("ERROR: Failed to load custom settings: %1"))
-                       .arg(e.getMsg()));
+          printErr(
+              tr("ERROR: Failed to load custom settings: %1").arg(e.getMsg()));
           success = false;
           boardList.clear();  // avoid exporting any boards
         }
       }
       foreach (const Board* board, boardList) {
-        print("  " % QString(tr("Board '%1':")).arg(*board->getName()));
+        print("  " % tr("Board '%1':").arg(*board->getName()));
         BoardGerberExport grbExport(
             *board, customSettings ? *customSettings
                                    : board->getFabricationOutputSettings());
@@ -521,23 +514,23 @@ bool CommandLineInterface::openProject(
       writtenFilesIterator.next();
       if (writtenFilesIterator.value() > 1) {
         filesOverwritten = true;
-        printErr(QString(tr("ERROR: The file %1 was written multiple times!"))
+        printErr(tr("ERROR: The file %1 was written multiple times!")
                      .arg(prettyPath(writtenFilesIterator.key(), projectFile)));
       }
     }
     if (filesOverwritten) {
-      printErr(QString(tr("NOTE: To avoid writing files multiple times, make "
-                          "sure to pass unique filepaths to all export "
-                          "functions. For board output files, you could either "
-                          "add the placeholder '%1' to the path or specify the "
-                          "boards to export with the '%2' argument."))
+      printErr(tr("NOTE: To avoid writing files multiple times, make "
+                  "sure to pass unique filepaths to all export "
+                  "functions. For board output files, you could either "
+                  "add the placeholder '%1' to the path or specify the "
+                  "boards to export with the '%2' argument.")
                    .arg("'{{BOARD}}'", "--board"));
       success = false;
     }
 
     return success;
   } catch (const Exception& e) {
-    printErr(QString(tr("ERROR: %1")).arg(e.getMsg()));
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
     return false;
   }
 }
@@ -549,7 +542,7 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
 
     // Open library
     FilePath libFp(QFileInfo(libDir).absoluteFilePath());
-    print(QString(tr("Open library '%1'...")).arg(prettyPath(libFp, libDir)));
+    print(tr("Open library '%1'...").arg(prettyPath(libFp, libDir)));
 
     std::shared_ptr<TransactionalFileSystem> libFs =
         TransactionalFileSystem::open(libFp, save);  // can throw
@@ -561,11 +554,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all component categories
     if (all) {
       QStringList elements = lib.searchForElements<ComponentCategory>();
-      print(QString(tr("Process %1 component categories..."))
-                .arg(elements.count()));
+      print(tr("Process %1 component categories...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         ComponentCategory element(std::unique_ptr<TransactionalDirectory>(
@@ -578,11 +570,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all package categories
     if (all) {
       QStringList elements = lib.searchForElements<PackageCategory>();
-      print(QString(tr("Process %1 package categories..."))
-                .arg(elements.count()));
+      print(tr("Process %1 package categories...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         PackageCategory element(std::unique_ptr<TransactionalDirectory>(
@@ -595,10 +586,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all symbols
     if (all) {
       QStringList elements = lib.searchForElements<Symbol>();
-      print(QString(tr("Process %1 symbols...")).arg(elements.count()));
+      print(tr("Process %1 symbols...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Symbol element(std::unique_ptr<TransactionalDirectory>(
@@ -611,10 +602,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all packages
     if (all) {
       QStringList elements = lib.searchForElements<Package>();
-      print(QString(tr("Process %1 packages...")).arg(elements.count()));
+      print(tr("Process %1 packages...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Package element(std::unique_ptr<TransactionalDirectory>(
@@ -627,10 +618,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all components
     if (all) {
       QStringList elements = lib.searchForElements<Component>();
-      print(QString(tr("Process %1 components...")).arg(elements.count()));
+      print(tr("Process %1 components...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Component element(std::unique_ptr<TransactionalDirectory>(
@@ -643,10 +634,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all devices
     if (all) {
       QStringList elements = lib.searchForElements<Device>();
-      print(QString(tr("Process %1 devices...")).arg(elements.count()));
+      print(tr("Process %1 devices...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << QString(tr("Open '%1'...")).arg(prettyPath(fp, libDir));
+        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         Device element(std::unique_ptr<TransactionalDirectory>(
@@ -658,7 +649,7 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
 
     return success;
   } catch (const Exception& e) {
-    printErr(QString(tr("ERROR: %1")).arg(e.getMsg()));
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
     return false;
   }
 }
@@ -675,7 +666,7 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
 
   // Check for non-canonical files (strict mode)
   if (strict) {
-    qInfo() << QString(tr("Check '%1' for non-canonical files..."))
+    qInfo() << tr("Check '%1' for non-canonical files...")
                    .arg(prettyPath(fs.getPath(), libDir));
 
     QStringList paths = fs.checkForModifications();  // can throw
@@ -692,8 +683,7 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
 
   // Save element to file system, if needed
   if (save) {
-    qInfo()
-        << QString(tr("Save '%1'...")).arg(prettyPath(fs.getPath(), libDir));
+    qInfo() << tr("Save '%1'...").arg(prettyPath(fs.getPath(), libDir));
     if (failIfFileFormatUnstable()) {
       success = false;
     } else {

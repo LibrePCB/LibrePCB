@@ -126,15 +126,15 @@ private:
   BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
   // Private Methods
-  bool        graphicsViewEventHandler(QEvent* event);
-  void        toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
-  void        unplacedComponentsCountChanged(int count) noexcept;
-  void        highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
-                                  bool                               zoomTo) noexcept;
-  void        clearDrcMarker() noexcept;
+  bool graphicsViewEventHandler(QEvent* event);
+  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void unplacedComponentsCountChanged(int count) noexcept;
+  void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
+                           bool                               zoomTo) noexcept;
+  void clearDrcMarker() noexcept;
   QList<BI_Device*> getSearchCandidates() noexcept;
-  QStringList getSearchToolBarCompleterList() noexcept;
-  void        goToDevice(const QString& name, unsigned int index) noexcept;
+  QStringList       getSearchToolBarCompleterList() noexcept;
+  void goToDevice(const QString& name, unsigned int index) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;

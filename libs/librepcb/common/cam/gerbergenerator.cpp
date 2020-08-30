@@ -250,25 +250,27 @@ void GerberGenerator::circularInterpolateToPosition(const Point& start,
                            diff.getX().toNmString(), diff.getY().toNmString()));
 }
 
-void GerberGenerator::interpolateBetween(const Vertex& from, const Vertex& to) noexcept {
-    if (from.getAngle() == 0) {
-      // linear segment
-      linearInterpolateToPosition(to.getPos());
+void GerberGenerator::interpolateBetween(const Vertex& from,
+                                         const Vertex& to) noexcept {
+  if (from.getAngle() == 0) {
+    // linear segment
+    linearInterpolateToPosition(to.getPos());
+  } else {
+    // arc segment
+    // note: due to buggy clients when using single quadrant mode,
+    // we always use multi quadrant mode.
+    // see https://github.com/LibrePCB/LibrePCB/issues/247
+    setMultiQuadrantArcModeOn();
+    if (from.getAngle() < 0) {
+      switchToCircularCwInterpolationModeG02();
     } else {
-      // arc segment
-      // note: due to buggy clients when using single quadrant mode,
-      // we always use multi quadrant mode.
-      // see https://github.com/LibrePCB/LibrePCB/issues/247
-      setMultiQuadrantArcModeOn();
-      if (from.getAngle() < 0) {
-        switchToCircularCwInterpolationModeG02();
-      } else {
-        switchToCircularCcwInterpolationModeG03();
-      }
-      Point center = Toolbox::arcCenter(from.getPos(), to.getPos(), from.getAngle());
-      circularInterpolateToPosition(from.getPos(), center, to.getPos());
-      switchToLinearInterpolationModeG01();
+      switchToCircularCcwInterpolationModeG03();
     }
+    Point center =
+        Toolbox::arcCenter(from.getPos(), to.getPos(), from.getAngle());
+    circularInterpolateToPosition(from.getPos(), center, to.getPos());
+    switchToLinearInterpolationModeG01();
+  }
 }
 
 void GerberGenerator::flashAtPosition(const Point& pos) noexcept {

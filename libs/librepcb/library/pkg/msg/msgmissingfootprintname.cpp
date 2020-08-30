@@ -38,7 +38,7 @@ MsgMissingFootprintName::MsgMissingFootprintName(
     std::shared_ptr<const Footprint> footprint) noexcept
   : LibraryElementCheckMessage(
         Severity::Warning,
-        QString(tr("Missing text '%1' in footprint '%2'"))
+        tr("Missing text '%1' in footprint '%2'")
             .arg("{{NAME}}", *footprint->getNames().getDefaultValue()),
         tr("Most footprints should have a text element for the component's "
            "name, otherwise you won't see that name on the PCB (e.g. on "

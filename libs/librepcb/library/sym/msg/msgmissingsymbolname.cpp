@@ -34,7 +34,7 @@ namespace library {
 
 MsgMissingSymbolName::MsgMissingSymbolName() noexcept
   : LibraryElementCheckMessage(
-        Severity::Warning, QString(tr("Missing text: '%1'")).arg("{{NAME}}"),
+        Severity::Warning, tr("Missing text: '%1'").arg("{{NAME}}"),
         tr("Most symbols should have a text element for the component's name, "
            "otherwise you won't see that name in the schematics. There are "
            "only a few exceptions (e.g. a schematic frame) which don't need a "

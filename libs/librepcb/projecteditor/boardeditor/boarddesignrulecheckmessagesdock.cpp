@@ -69,8 +69,7 @@ void BoardDesignRuleCheckMessagesDock::setMessages(
   }
   mUi->listWidget->blockSignals(signalsBlocked);
 
-  setWindowTitle(
-      QString(tr("DRC [%1]", "Number of messages")).arg(mMessages.count()));
+  setWindowTitle(tr("DRC [%1]", "Number of messages").arg(mMessages.count()));
 }
 
 /*******************************************************************************

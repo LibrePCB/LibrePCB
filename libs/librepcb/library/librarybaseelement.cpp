@@ -83,7 +83,7 @@ LibraryBaseElement::LibraryBaseElement(
   if (!mDirectory->fileExists(versionFileName)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("Directory is not a library element of type %1: \"%2\""))
+        tr("Directory is not a library element of type %1: \"%2\"")
             .arg(mLongElementName, mDirectory->getAbsPath().toNative()));
   }
 
@@ -91,7 +91,7 @@ LibraryBaseElement::LibraryBaseElement(
   QString dirUuidStr = mDirectory->getAbsPath().getFilename();
   if (mDirectoryNameMustBeUuid && (!Uuid::isValid(dirUuidStr))) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Directory name is not a valid UUID: \"%1\""))
+                       tr("Directory name is not a valid UUID: \"%1\"")
                            .arg(mDirectory->getAbsPath().toNative()));
   }
 

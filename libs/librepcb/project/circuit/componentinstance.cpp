@@ -64,8 +64,8 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
   if (!mLibComponent) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("The component with the UUID \"%1\" does not exist in the "
-                   "project's library!"))
+        tr("The component with the UUID \"%1\" does not exist in the "
+           "project's library!")
             .arg(cmpUuid.toStr()));
   }
   Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant");
@@ -274,8 +274,8 @@ void ComponentInstance::removeFromCircuit() {
   }
   if (isUsed()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The component \"%1\" cannot be removed "
-                                  "because it is still in use!"))
+                       tr("The component \"%1\" cannot be removed "
+                          "because it is still in use!")
                            .arg(*mName));
   }
   ScopeGuardList sgl(mSignals.count());
@@ -412,11 +412,11 @@ void ComponentInstance::updateErcMessages() noexcept {
   int required = getUnplacedRequiredSymbolsCount();
   int optional = getUnplacedOptionalSymbolsCount();
   mErcMsgUnplacedRequiredSymbols->setMsg(
-      QString(tr("Unplaced required symbols of component \"%1\": %2"))
+      tr("Unplaced required symbols of component \"%1\": %2")
           .arg(*mName)
           .arg(required));
   mErcMsgUnplacedOptionalSymbols->setMsg(
-      QString(tr("Unplaced optional symbols of component \"%1\": %2"))
+      tr("Unplaced optional symbols of component \"%1\": %2")
           .arg(*mName)
           .arg(optional));
   mErcMsgUnplacedRequiredSymbols->setVisible((mIsAddedToCircuit) &&

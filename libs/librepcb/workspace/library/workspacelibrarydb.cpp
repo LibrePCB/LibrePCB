@@ -396,10 +396,9 @@ void WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
     QByteArray blob = query.value(0).toByteArray();
     if (icon) icon->loadFromData(blob, "png");
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Library not found in workspace library: \"%1\""))
-            .arg(libDir.toNative()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Library not found in workspace library: \"%1\"")
+                           .arg(libDir.toNative()));
   }
 }
 
@@ -418,10 +417,9 @@ void WorkspaceLibraryDb::getDeviceMetadata(const FilePath& devDir,
     uuid = Uuid::fromString(query.value(1).toString());  // can throw
     if (cmpUuid) *cmpUuid = uuid;
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("Device not found in workspace library: \"%1\""))
-            .arg(devDir.toNative()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Device not found in workspace library: \"%1\"")
+                           .arg(devDir.toNative()));
   }
 }
 
@@ -628,8 +626,8 @@ QList<Uuid> WorkspaceLibraryDb::getCategoryParents(const QString& tablename,
   while ((optCategory = getCategoryParent(tablename, *optCategory))) {
     if (parentUuids.contains(*optCategory)) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("Endless loop "
-                                    "in category parentship detected (%1)."))
+                         tr("Endless loop "
+                            "in category parentship detected (%1).")
                              .arg(optCategory->toStr()));
     } else {
       parentUuids.append(*optCategory);
@@ -653,11 +651,10 @@ tl::optional<Uuid> WorkspaceLibraryDb::getCategoryParent(
       return tl::nullopt;
     }
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("The category "
-                   "\"%1\" does not exist in the library database."))
-            .arg(category.toStr()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("The category "
+                          "\"%1\" does not exist in the library database.")
+                           .arg(category.toStr()));
   }
 }
 
@@ -737,11 +734,10 @@ int WorkspaceLibraryDb::getLibraryId(const FilePath& lib) const {
     if (!ok) throw LogicError(__FILE__, __LINE__);
     return id;
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("The library "
-                   "\"%1\" does not exist in the library database."))
-            .arg(relativeLibraryPath));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("The library "
+                          "\"%1\" does not exist in the library database.")
+                           .arg(relativeLibraryPath));
   }
 }
 

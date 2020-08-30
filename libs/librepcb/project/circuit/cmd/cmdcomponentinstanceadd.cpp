@@ -77,8 +77,8 @@ bool CmdComponentInstanceAdd::performExecute() {
     if (!cmp) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The component with the UUID \"%1\" does not exist in the "
-                     "project's library!"))
+          tr("The component with the UUID \"%1\" does not exist in the "
+             "project's library!")
               .arg(mComponentUuid.toStr()));
     }
     const QStringList& normOrder =

@@ -306,7 +306,7 @@ CircuitIdentifier PackagePadListModel::validateNameOrThrow(
   if (mPadList && mPadList->contains(name)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a pad with the name \"%1\".")).arg(name));
+        tr("There is already a pad with the name \"%1\".").arg(name));
   }
   return CircuitIdentifier(name);  // can throw
 }
