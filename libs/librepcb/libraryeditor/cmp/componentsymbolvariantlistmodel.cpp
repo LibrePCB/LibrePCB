@@ -402,7 +402,7 @@ ElementName ComponentSymbolVariantListModel::validateNameOrThrow(
   if (mSymbolVariantList && mSymbolVariantList->contains(name)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a symbol variant with the name \"%1\"."))
+        tr("There is already a symbol variant with the name \"%1\".")
             .arg(name));
   }
   return ElementName(name);  // can throw

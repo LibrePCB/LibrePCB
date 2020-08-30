@@ -48,10 +48,7 @@ public:
   CmdListElementsSwap(const CmdListElementsSwap& other) = delete;
   CmdListElementsSwap(SerializableObjectList<T, P, OnEditedArgs...>& list,
                       int i, int j) noexcept
-    : UndoCommand(QString(tr("Move %1")).arg(P::tagname)),
-      mList(list),
-      mI(i),
-      mJ(j) {}
+    : UndoCommand(tr("Move %1").arg(P::tagname)), mList(list), mI(i), mJ(j) {}
   ~CmdListElementsSwap() noexcept {}
 
   // Operator Overloadings

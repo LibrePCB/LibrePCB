@@ -82,8 +82,8 @@ bool CmdAddComponentToCircuit::performExecute() {
     if (!cmpFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The component with the UUID \"%1\" does not exist in the "
-                     "workspace library!"))
+          tr("The component with the UUID \"%1\" does not exist in the "
+             "workspace library!")
               .arg(mComponentUuid.toStr()));
     }
     library::Component* cmp = new library::Component(

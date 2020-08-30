@@ -178,20 +178,20 @@ void RenameNetSegmentDialog::updateAction() noexcept {
       desc    = tr("No change is made.");
     } else if (renameWholeNet && (mNewNetSignal)) {
       mAction = Action::MERGE_NETSIGNALS;
-      desc = QString(tr("The whole net '%1' will be merged into the net '%2'."))
+      desc    = tr("The whole net '%1' will be merged into the net '%2'.")
                  .arg(*mNetSegment.getNetSignal().getName(), mNewNetName);
     } else if (renameWholeNet && (!mNewNetSignal)) {
       mAction = Action::RENAME_NETSIGNAL;
-      desc    = QString(tr("The whole net '%1' will be renamed to '%2'."))
+      desc    = tr("The whole net '%1' will be renamed to '%2'.")
                  .arg(*mNetSegment.getNetSignal().getName(), mNewNetName);
     } else if ((!renameWholeNet) && (mNewNetSignal)) {
       mAction = Action::MOVE_NETSEGMENT_TO_EXISTING_NET;
-      desc = QString(tr("The segment will be moved to the existing net '%1'."))
+      desc    = tr("The segment will be moved to the existing net '%1'.")
                  .arg(mNewNetName);
     } else if ((!renameWholeNet) && (!mNewNetSignal)) {
       mAction = Action::MOVE_NETSEGMENT_TO_NEW_NET;
-      desc    = QString(tr("The segment will be moved to the new net '%1'."))
-                 .arg(mNewNetName);
+      desc =
+          tr("The segment will be moved to the new net '%1'.").arg(mNewNetName);
     } else {
       mAction = Action::INVALID_NAME;  // Not correct, but sufficient
       desc    = "UNKNOWN ERROR";

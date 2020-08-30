@@ -220,9 +220,8 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
              (errno == static_cast<int>(std::errc::no_such_process))) {
     return QString();  // process not running
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("proc_name() failed with error %1.")).arg(errno));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("proc_name() failed with error %1.").arg(errno));
   }
 #elif defined(Q_OS_FREEBSD)
   char exePath[64];
@@ -270,17 +269,16 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   } else if (!hProcess) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("OpenProcess() failed with error %1.")).arg(GetLastError()));
+        tr("OpenProcess() failed with error %1.").arg(GetLastError()));
   }
   wchar_t buf[MAX_PATH];
   DWORD   length  = MAX_PATH;
   BOOL    success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
   CloseHandle(hProcess);
   if ((!success) || (!length)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("QueryFullProcessImageNameW() failed with error %1."))
-            .arg(GetLastError()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("QueryFullProcessImageNameW() failed with error %1.")
+                           .arg(GetLastError()));
   }
   processName = QString::fromWCharArray(buf, length);
   int i       = processName.lastIndexOf(QLatin1Char('\\'));

@@ -214,31 +214,28 @@ void ErcMsgDock::updateTopLevelItemTexts() noexcept {
   int              countOfNonIgnoredErcMessages = 0;
   QTreeWidgetItem* item;
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitError)];
-  item->setText(0, QString(tr("Circuit Errors (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Circuit Errors (%1)").arg(item->childCount()));
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitWarning)];
-  item->setText(0,
-                QString(tr("Circuit Warnings (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Circuit Warnings (%1)").arg(item->childCount()));
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicError)];
-  item->setText(0,
-                QString(tr("Schematic Errors (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Schematic Errors (%1)").arg(item->childCount()));
   countOfNonIgnoredErcMessages += item->childCount();
   item =
       mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning)];
-  item->setText(0,
-                QString(tr("Schematic Warnings (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Schematic Warnings (%1)").arg(item->childCount()));
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardError)];
-  item->setText(0, QString(tr("Board Errors (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Board Errors (%1)").arg(item->childCount()));
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning)];
-  item->setText(0, QString(tr("Board Warnings (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Board Warnings (%1)").arg(item->childCount()));
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)];
-  item->setText(0, QString(tr("Approved (%1)")).arg(item->childCount()));
+  item->setText(0, tr("Approved (%1)").arg(item->childCount()));
 
-  setWindowTitle(QString(tr("ERC [%1]")).arg(countOfNonIgnoredErcMessages));
+  setWindowTitle(tr("ERC [%1]").arg(countOfNonIgnoredErcMessages));
 }
 
 /*******************************************************************************

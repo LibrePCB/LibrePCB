@@ -49,7 +49,7 @@ public:
   CmdListElementInsert(SerializableObjectList<T, P, OnEditedArgs...>& list,
                        const std::shared_ptr<T>&                      element,
                        int index = -1) noexcept
-    : UndoCommand(QString(tr("Add %1")).arg(P::tagname)),
+    : UndoCommand(tr("Add %1").arg(P::tagname)),
       mList(list),
       mElement(element),
       mIndex(index) {}

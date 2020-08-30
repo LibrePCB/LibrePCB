@@ -109,10 +109,9 @@ void ComponentSymbolVariantItemListModel::addItem(
     std::shared_ptr<const Symbol> symbol =
         mSymbolsCache->getSymbol(*mNewSymbolUuid);
     if (!symbol) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("Symbol '%1' not found in workspace library!"))
-              .arg(mNewSymbolUuid->toStr()));
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("Symbol '%1' not found in workspace library!")
+                             .arg(mNewSymbolUuid->toStr()));
     }
     std::shared_ptr<ComponentSymbolVariantItem> item =
         std::make_shared<ComponentSymbolVariantItem>(
@@ -186,10 +185,9 @@ void ComponentSymbolVariantItemListModel::changeSymbol(
   try {
     std::shared_ptr<const Symbol> sym = mSymbolsCache->getSymbol(symbol);
     if (!sym) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(tr("Symbol '%1' not found in workspace library!"))
-              .arg(symbol.toStr()));
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("Symbol '%1' not found in workspace library!")
+                             .arg(symbol.toStr()));
     }
     tl::optional<Uuid> uuid = Uuid::tryFromString(editData.toString());
     if (uuid) {

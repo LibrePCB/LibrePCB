@@ -39,9 +39,9 @@ MsgWrongSymbolTextLayer::MsgWrongSymbolTextLayer(
     std::shared_ptr<const Text> text, const QString& expectedLayerName) noexcept
   : LibraryElementCheckMessage(
         Severity::Warning,
-        QString(tr("Layer of '%1' is not '%2'"))
+        tr("Layer of '%1' is not '%2'")
             .arg(text->getText(), GraphicsLayer(expectedLayerName).getNameTr()),
-        QString(tr("The text element '%1' should normally be on layer '%2'."))
+        tr("The text element '%1' should normally be on layer '%2'.")
             .arg(text->getText(),
                  GraphicsLayer(expectedLayerName).getNameTr())),
     mText(text),

@@ -87,9 +87,9 @@ void BoardDesignRuleCheck::execute() {
   checkCourtyardClearances(78, 88);
   checkForMissingConnections(88, 90);
 
-  emit progressStatus(QString(tr("Finished with %1 message(s)!",
-                                 "Count of messages", mMessages.count()))
-                          .arg(mMessages.count()));
+  emit progressStatus(
+      tr("Finished with %1 message(s)!", "Count of messages", mMessages.count())
+          .arg(mMessages.count()));
   emit progressPercent(100);
   emit finished();
 }
@@ -114,9 +114,8 @@ void BoardDesignRuleCheck::checkForMissingConnections(int progressStart,
   // instead.
   mBoard.forceAirWiresRebuild();
   foreach (const BI_AirWire* airwire, mBoard.getAirWires()) {
-    QString msg =
-        QString(tr("Missing connection: '%1'", "Placeholder is net name"))
-            .arg(*airwire->getNetSignal().getName());
+    QString msg = tr("Missing connection: '%1'", "Placeholder is net name")
+                      .arg(*airwire->getNetSignal().getName());
     Path location = Path::obround(airwire->getP1(), airwire->getP2(),
                                   PositiveLength(50000));
     addMessage(BoardDesignRuleCheckMessage(msg, location));
@@ -168,8 +167,8 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
       for (const ClipperLib::Path& path :
            ClipperHelpers::flattenTree(*intersections)) {
         QString name1 = netsignals[i] ? *netsignals[i]->getName() : "";
-        QString msg   = QString(tr("Clearance (%1): '%2' <-> Board Outline",
-                                 "Placeholders are layer name + net name"))
+        QString msg   = tr("Clearance (%1): '%2' <-> Board Outline",
+                         "Placeholders are layer name + net name")
                           .arg(layer->getNameTr(), name1);
         Path location = ClipperHelpers::convert(path);
         addMessage(BoardDesignRuleCheckMessage(msg, location));
@@ -214,8 +213,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
              ClipperHelpers::flattenTree(*intersections)) {
           QString name1 = netsignals[i] ? *netsignals[i]->getName() : "";
           QString name2 = netsignals[k] ? *netsignals[k]->getName() : "";
-          QString msg   = QString(tr("Clearance (%1): '%2' <-> '%3'",
-                                   "Placeholders are layer name + net names"))
+          QString msg   = tr("Clearance (%1): '%2' <-> '%3'",
+                           "Placeholders are layer name + net names")
                             .arg(layer->getNameTr(), name1, name2);
           Path location = ClipperHelpers::convert(path);
           addMessage(BoardDesignRuleCheckMessage(msg, location));
@@ -261,10 +260,9 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressStart,
              ClipperHelpers::flattenTree(*intersections)) {
           QString name1 = *dev1->getComponentInstance().getName();
           QString name2 = *dev2->getComponentInstance().getName();
-          QString msg =
-              QString(tr("Clearance (%1): '%2' <-> '%3'",
-                         "Placeholders are layer name + component names"))
-                  .arg(layer->getNameTr(), name1, name2);
+          QString msg   = tr("Clearance (%1): '%2' <-> '%3'",
+                           "Placeholders are layer name + component names")
+                            .arg(layer->getNameTr(), name1, name2);
           Path location = ClipperHelpers::convert(path);
           addMessage(BoardDesignRuleCheckMessage(msg, location));
         }
@@ -288,8 +286,8 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
       continue;
     }
     if (text->getText().getStrokeWidth() < mOptions.minCopperWidth) {
-      QString msg = QString(tr("Min. copper width (%1) of text: %2",
-                               "Placeholders are layer name + width"))
+      QString msg = tr("Min. copper width (%1) of text: %2",
+                       "Placeholders are layer name + width")
                         .arg(layer->getNameTr(),
                              formatLength(*text->getText().getStrokeWidth()));
       QVector<Path> locations;
@@ -313,8 +311,8 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
     }
     if (plane->getMinWidth() < mOptions.minCopperWidth) {
       QString msg =
-          QString(tr("Min. copper width (%1) of plane: %2",
-                     "Placeholders are layer name + width"))
+          tr("Min. copper width (%1) of plane: %2",
+             "Placeholders are layer name + width")
               .arg(layer->getNameTr(), formatLength(*plane->getMinWidth()));
       QVector<Path> locations =
           plane->getOutline().toClosedPath().toOutlineStrokes(
@@ -334,8 +332,8 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
         continue;
       }
       if (text->getText().getStrokeWidth() < mOptions.minCopperWidth) {
-        QString msg = QString(tr("Min. copper width (%1) of text: %2",
-                                 "Placeholders are layer name + width"))
+        QString msg = tr("Min. copper width (%1) of text: %2",
+                         "Placeholders are layer name + width")
                           .arg(layer->getNameTr(),
                                formatLength(*text->getText().getStrokeWidth()));
         QVector<Path> locations;
@@ -359,8 +357,8 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
         continue;
       }
       if (netline->getWidth() < mOptions.minCopperWidth) {
-        QString msg = QString(tr("Min. copper width (%1) of trace: %2",
-                                 "Placeholders are layer name + width"))
+        QString msg = tr("Min. copper width (%1) of trace: %2",
+                         "Placeholders are layer name + width")
                           .arg(netline->getLayer().getNameTr(),
                                formatLength(*netline->getWidth()));
         Path location = Path::obround(netline->getStartPoint().getPosition(),
@@ -384,8 +382,8 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
     foreach (const BI_Via* via, netsegment->getVias()) {
       Length restring = (*via->getSize() - *via->getDrillDiameter() + 1) / 2;
       if (restring < *mOptions.minPthRestring) {
-        QString msg = QString(tr("Min. via restring ('%1'): %2",
-                                 "Placeholders are net name + restring width"))
+        QString msg = tr("Min. via restring ('%1'): %2",
+                         "Placeholders are net name + restring width")
                           .arg(*netsegment->getNetSignal().getName(),
                                formatLength(restring));
         PositiveLength diameter = via->getDrillDiameter() +
@@ -409,8 +407,8 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
           qMin(pad->getLibPad().getWidth(), pad->getLibPad().getHeight());
       Length restring = (*size - *pad->getLibPad().getDrillDiameter() + 1) / 2;
       if (restring < *mOptions.minPthRestring) {
-        QString msg = QString(tr("Min. pad restring ('%1'): %2",
-                                 "Placeholders are pad name + restring width"))
+        QString msg = tr("Min. pad restring ('%1'): %2",
+                         "Placeholders are pad name + restring width")
                           .arg(pad->getDisplayText().simplified(),
                                formatLength(restring));
         PositiveLength diameter =
@@ -434,8 +432,8 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     foreach (const BI_Via* via, netsegment->getVias()) {
       if (via->getDrillDiameter() < mOptions.minPthDrillDiameter) {
-        QString msg = QString(tr("Min. via drill diameter ('%1'): %2",
-                                 "Placeholders are net name + drill diameter"))
+        QString msg = tr("Min. via drill diameter ('%1'): %2",
+                         "Placeholders are net name + drill diameter")
                           .arg(*netsegment->getNetSignal().getName(),
                                formatLength(*via->getDrillDiameter()));
         Path location = Path::circle(via->getDrillDiameter())
@@ -455,8 +453,8 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
       }
       if (pad->getLibPad().getDrillDiameter() < *mOptions.minPthDrillDiameter) {
         QString msg =
-            QString(tr("Min. pad drill diameter ('%1'): %2",
-                       "Placeholders are pad name + drill diameter"))
+            tr("Min. pad drill diameter ('%1'): %2",
+               "Placeholders are pad name + drill diameter")
                 .arg(pad->getDisplayText().simplified(),
                      formatLength(*pad->getLibPad().getDrillDiameter()));
         PositiveLength diameter(

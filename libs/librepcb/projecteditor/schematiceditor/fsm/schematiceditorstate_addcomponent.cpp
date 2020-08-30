@@ -371,8 +371,8 @@ void SchematicEditorState_AddComponent::startAddingComponent(
             .get();
     if (!currentSymbVarItem) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("The component with the UUID \"%1\" does "
-                                    "not have any symbol."))
+                         tr("The component with the UUID \"%1\" does "
+                            "not have any symbol.")
                              .arg(mCurrentComponent->getUuid().toStr()));
     }
     Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(

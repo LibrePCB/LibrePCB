@@ -302,7 +302,7 @@ void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {
   }
   if (extractToDir.isExistingFile() || extractToDir.isExistingDir()) {
     QMessageBox::critical(this, tr("Directory exists already"),
-                          QString(tr("The directory \"%1\" exists already."))
+                          tr("The directory \"%1\" exists already.")
                               .arg(extractToDir.toNative()));
     return;
   }

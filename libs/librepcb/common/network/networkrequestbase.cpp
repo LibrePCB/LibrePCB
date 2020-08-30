@@ -165,7 +165,7 @@ void NetworkRequestBase::replyErrorSlot(
     QNetworkReply::NetworkError code) noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
   mErrored = true;
-  finalize(QString(tr("%1 (%2)")).arg(mReply->errorString()).arg(code));
+  finalize(tr("%1 (%2)").arg(mReply->errorString()).arg(code));
 }
 
 void NetworkRequestBase::replySslErrorsSlot(
@@ -174,7 +174,7 @@ void NetworkRequestBase::replySslErrorsSlot(
   mErrored = true;
   QStringList errorsList;
   foreach (const QSslError& e, errors) { errorsList.append(e.errorString()); }
-  finalize(QString(tr("SSL errors occurred:\n\n%1")).arg(errorsList.join("\n")));
+  finalize(tr("SSL errors occurred:\n\n%1").arg(errorsList.join("\n")));
 }
 
 void NetworkRequestBase::replyDownloadProgressSlot(qint64 bytesReceived,
@@ -190,8 +190,7 @@ void NetworkRequestBase::replyDownloadProgressSlot(qint64 bytesReceived,
   }
   int estimatedPercent =
       (100 * bytesReceived) / qMax(estimatedTotal, qint64(1));
-  emit progressState(
-      QString(tr("Receive data: %1")).arg(formatFileSize(bytesReceived)));
+  emit progressState(tr("Receive data: %1").arg(formatFileSize(bytesReceived)));
   emit progressPercent(estimatedPercent);
   emit progress(bytesReceived, bytesTotal, estimatedPercent);
 }
@@ -225,8 +224,7 @@ void NetworkRequestBase::replyFinishedSlot() noexcept {
       // follow redirection
       qDebug() << "Redirect from" << mUrl.toString() << "to"
                << redirectUrl.toString();
-      emit progressState(
-          QString(tr("Redirect to %1...")).arg(redirectUrl.toString()));
+      emit progressState(tr("Redirect to %1...").arg(redirectUrl.toString()));
       mReply.take()->deleteLater();
       mRedirectedUrls.append(mUrl);
       mUrl = redirectUrl;
@@ -237,8 +235,7 @@ void NetworkRequestBase::replyFinishedSlot() noexcept {
 
   // check for download error
   if (mReply->error() != QNetworkReply::NoError) {
-    finalize(
-        QString(tr("%1 (%2)")).arg(mReply->errorString()).arg(mReply->error()));
+    finalize(tr("%1 (%2)").arg(mReply->errorString()).arg(mReply->error()));
     return;
   }
 
@@ -271,7 +268,7 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
   } else {
     qDebug() << "Request failed:" << mUrl.toString();
     qDebug() << "Network error:" << errorMsg;
-    emit progressState(QString(tr("Request failed: %1")).arg(errorMsg));
+    emit progressState(tr("Request failed: %1").arg(errorMsg));
     emit errored(errorMsg);
     emit finished(false);
   }

@@ -41,7 +41,7 @@ void ClipperHelpers::unite(ClipperLib::Paths& paths) {
               ClipperLib::pftEvenOdd);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
-                     QString(tr("Failed to unite paths: %1")).arg(e.what()));
+                     tr("Failed to unite paths: %1").arg(e.what()));
   }
 }
 
@@ -55,7 +55,7 @@ void ClipperHelpers::unite(ClipperLib::Paths&      subject,
               ClipperLib::pftEvenOdd);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
-                     QString(tr("Failed to unite paths: %1")).arg(e.what()));
+                     tr("Failed to unite paths: %1").arg(e.what()));
   }
 }
 
@@ -69,7 +69,7 @@ void ClipperHelpers::unite(ClipperLib::Paths&       subject,
               ClipperLib::pftEvenOdd);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
-                     QString(tr("Failed to unite paths: %1")).arg(e.what()));
+                     tr("Failed to unite paths: %1").arg(e.what()));
   }
 }
 
@@ -86,9 +86,8 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
               ClipperLib::pftEvenOdd);
     return result;
   } catch (const std::exception& e) {
-    throw LogicError(
-        __FILE__, __LINE__,
-        QString(tr("Failed to intersect paths: %1")).arg(e.what()));
+    throw LogicError(__FILE__, __LINE__,
+                     tr("Failed to intersect paths: %1").arg(e.what()));
   }
 }
 
@@ -102,7 +101,7 @@ void ClipperHelpers::subtract(ClipperLib::Paths&       subject,
               ClipperLib::pftNonZero);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
-                     QString(tr("Failed to subtract paths: %1")).arg(e.what()));
+                     tr("Failed to subtract paths: %1").arg(e.what()));
   }
 }
 
@@ -114,7 +113,7 @@ void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
     o.Execute(paths, offset.toNm());
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
-                     QString(tr("Failed to offset a path: %1")).arg(e.what()));
+                     tr("Failed to offset a path: %1").arg(e.what()));
   }
 }
 

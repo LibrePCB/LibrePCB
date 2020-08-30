@@ -534,7 +534,7 @@ public:
     if (!ok) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("Invalid fixed point number string: \"%1\"")).arg(str));
+          tr("Invalid fixed point number string: \"%1\"").arg(str));
     }
     return result;
   }

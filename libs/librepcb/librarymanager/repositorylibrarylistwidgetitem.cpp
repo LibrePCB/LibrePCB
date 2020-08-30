@@ -206,7 +206,7 @@ void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
     if (installedVersion) {
       if (installedVersion < mVersion) {
         mUi->lblInstalledVersion->setText(
-            QString(tr("v%1")).arg(installedVersion->toStr()));
+            tr("v%1").arg(installedVersion->toStr()));
         mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
         mUi->cbxDownload->setText(tr("Update") % ":");
         mUi->cbxDownload->setVisible(true);

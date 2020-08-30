@@ -66,8 +66,8 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
   mUi->edtRotation->setSingleStep(90.0);  // [°]
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &DeviceInstancePropertiesDialog::buttonBoxClicked);
-  setWindowTitle(QString(tr("Properties of %1"))
-                     .arg(*mDevice.getComponentInstance().getName()));
+  setWindowTitle(
+      tr("Properties of %1").arg(*mDevice.getComponentInstance().getName()));
 
   // Component Instance Attributes
   ComponentInstance& cmp = mDevice.getComponentInstance();
@@ -158,7 +158,7 @@ void DeviceInstancePropertiesDialog::accept() noexcept {
 bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
   try {
     UndoStackTransaction transaction(
-        mUndoStack, QString(tr("Change properties of %1"))
+        mUndoStack, tr("Change properties of %1")
                         .arg(*mDevice.getComponentInstance().getName()));
 
     // Component Instance

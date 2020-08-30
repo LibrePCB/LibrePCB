@@ -173,8 +173,8 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) {
   if (arePinsOrPadsUsed()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString(tr("The net signal of the component signal \"%1:%2\" cannot be "
-                   "changed because it is still in use!"))
+        tr("The net signal of the component signal \"%1:%2\" cannot be "
+           "changed because it is still in use!")
             .arg(*mComponentInstance.getName(), *mComponentSignal->getName()));
   }
   ScopeGuardList sgl;
@@ -226,8 +226,8 @@ void ComponentSignalInstance::removeFromCircuit() {
   }
   if (isUsed()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The component \"%1\" cannot be removed "
-                                  "because it is still in use!"))
+                       tr("The component \"%1\" cannot be removed "
+                          "because it is still in use!")
                            .arg(*mComponentInstance.getName()));
   }
   if (mNetSignal) {
@@ -298,11 +298,11 @@ void ComponentSignalInstance::netSignalNameChanged(
 
 void ComponentSignalInstance::updateErcMessages() noexcept {
   mErcMsgUnconnectedRequiredSignal->setMsg(
-      QString(tr("Unconnected component signal: \"%1\" from \"%2\""))
+      tr("Unconnected component signal: \"%1\" from \"%2\"")
           .arg(*mComponentSignal->getName())
           .arg(*mComponentInstance.getName()));
   mErcMsgForcedNetSignalNameConflict->setMsg(
-      QString(tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")"))
+      tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")")
           .arg((mNetSignal ? *mNetSignal->getName() : QString()),
                getForcedNetSignalName(), *mComponentSignal->getName(),
                *mComponentInstance.getName()));

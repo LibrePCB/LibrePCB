@@ -232,7 +232,7 @@ void SI_SymbolPin::setSelected(bool selected) noexcept {
 
 void SI_SymbolPin::updateErcMessages() noexcept {
   mErcMsgUnconnectedRequiredPin->setMsg(
-      QString(tr("Unconnected pin: \"%1\" of symbol \"%2\""))
+      tr("Unconnected pin: \"%1\" of symbol \"%2\"")
           .arg(getDisplayText(true, true))
           .arg(mSymbol.getName()));
 

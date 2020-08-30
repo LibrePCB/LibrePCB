@@ -160,10 +160,9 @@ void Circuit::addNetClass(NetClass& netclass) {
   }
   // check if there is no netclass with the same name in the list
   if (getNetClassByName(netclass.getName())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a net class with the name \"%1\"!"))
-            .arg(*netclass.getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There is already a net class with the name \"%1\"!")
+                           .arg(*netclass.getName()));
   }
   // add netclass to circuit
   netclass.addToCircuit();  // can throw
@@ -191,8 +190,7 @@ void Circuit::setNetClassName(NetClass& netclass, const ElementName& newName) {
   if (getNetClassByName(newName)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a net class with the name \"%1\"!"))
-            .arg(*newName));
+        tr("There is already a net class with the name \"%1\"!").arg(*newName));
   }
   // apply the new name
   netclass.setName(newName);  // can throw
@@ -248,10 +246,9 @@ void Circuit::addNetSignal(NetSignal& netsignal) {
   }
   // check if there is no netsignal with the same name in the list
   if (getNetSignalByName(*netsignal.getName())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a net signal with the name \"%1\"!"))
-            .arg(*netsignal.getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There is already a net signal with the name \"%1\"!")
+                           .arg(*netsignal.getName()));
   }
   // add netsignal to circuit
   netsignal.addToCircuit();  // can throw
@@ -279,10 +276,9 @@ void Circuit::setNetSignalName(NetSignal&               netsignal,
   }
   // check if there is no netsignal with the same name in the list
   if (getNetSignalByName(*newName)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a net signal with the name \"%1\"!"))
-            .arg(*newName));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There is already a net signal with the name \"%1\"!")
+                           .arg(*newName));
   }
   // apply the new name
   netsignal.setName(newName, isAutoName);  // can throw
@@ -335,10 +331,9 @@ void Circuit::addComponentInstance(ComponentInstance& cmp) {
   }
   // check if there is no component with the same name in the list
   if (getComponentInstanceByName(*cmp.getName())) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString(tr("There is already a component with the name \"%1\"!"))
-            .arg(*cmp.getName()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("There is already a component with the name \"%1\"!")
+                           .arg(*cmp.getName()));
   }
   // add to circuit
   cmp.addToCircuit();  // can throw
@@ -367,8 +362,7 @@ void Circuit::setComponentInstanceName(ComponentInstance&       cmp,
   if ((newName != cmp.getName()) && getComponentInstanceByName(*newName)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already a component with the name \"%1\"!"))
-            .arg(*newName));
+        tr("There is already a component with the name \"%1\"!").arg(*newName));
   }
   // apply the new name
   cmp.setName(newName);  // can throw

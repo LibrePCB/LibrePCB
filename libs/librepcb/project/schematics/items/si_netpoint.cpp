@@ -63,7 +63,7 @@ void SI_NetPoint::init() {
   mErcMsgDeadNetPoint.reset(
       new ErcMsg(mSchematic.getProject(), *this, mUuid.toStr(), "Dead",
                  ErcMsg::ErcMsgType_t::SchematicError,
-                 QString(tr("Dead net point in schematic page \"%1\": %2"))
+                 tr("Dead net point in schematic page \"%1\": %2")
                      .arg(*mSchematic.getName())
                      .arg(mUuid.toStr())));
 }

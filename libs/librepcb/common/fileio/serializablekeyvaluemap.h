@@ -86,16 +86,15 @@ public:
         value = child.getChildByIndex(0);
       }
       if (mValues.contains(key)) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString(tr("Key \"%1\" defined multiple times.")).arg(key));
+        throw RuntimeError(__FILE__, __LINE__,
+                           tr("Key \"%1\" defined multiple times.").arg(key));
       }
       mValues.insert(key, deserializeFromSExpression<typename T::ValueType>(
                               value, false));  // can throw
     }
     if (!mValues.contains(QString(""))) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString(tr("No default %1 defined.")).arg(T::tagname));
+                         tr("No default %1 defined.").arg(T::tagname));
     }
   }
   ~SerializableKeyValueMap() noexcept {}

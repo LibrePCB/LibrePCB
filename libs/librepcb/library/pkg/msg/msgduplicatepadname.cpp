@@ -36,8 +36,7 @@ namespace library {
 
 MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
   : LibraryElementCheckMessage(
-        Severity::Error,
-        QString(tr("Duplicate pad name: '%1'")).arg(*pad.getName()),
+        Severity::Error, tr("Duplicate pad name: '%1'").arg(*pad.getName()),
         tr("All package pads must have unique names, otherwise they cannot be "
            "distinguished later in the device editor. If your part has several "
            "leads with same functionality (e.g. multiple GND leads), you can "

@@ -35,14 +35,14 @@ namespace library {
 MsgMissingComponentDefaultValue::MsgMissingComponentDefaultValue() noexcept
   : LibraryElementCheckMessage(
         Severity::Warning, tr("No default value set"),
-        QString(tr("Most components should have a default value set. The "
-                   "default value becomes the component's value when adding it "
-                   "to a schematic. It can also contain placeholders which are "
-                   "substituted later in the schematic. Commonly used default "
-                   "values are:\n\n"
-                   "Generic parts (e.g. a diode): %1\n"
-                   "Specific parts (e.g. a microcontroller): %2\n"
-                   "Passive parts: Using an attribute, e.g. %3"))
+        tr("Most components should have a default value set. The "
+           "default value becomes the component's value when adding it "
+           "to a schematic. It can also contain placeholders which are "
+           "substituted later in the schematic. Commonly used default "
+           "values are:\n\n"
+           "Generic parts (e.g. a diode): %1\n"
+           "Specific parts (e.g. a microcontroller): %2\n"
+           "Passive parts: Using an attribute, e.g. %3")
             .arg("'{{PARTNUMBER or DEVICE}}'",
                  "'{{PARTNUMBER or DEVICE or COMPONENT}}'",
                  "'{{RESISTANCE}}'")) {

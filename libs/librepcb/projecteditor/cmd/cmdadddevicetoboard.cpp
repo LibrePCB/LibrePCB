@@ -87,8 +87,8 @@ bool CmdAddDeviceToBoard::performExecute() {
     if (!devFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The device with the UUID \"%1\" does not exist in the "
-                     "workspace library!"))
+          tr("The device with the UUID \"%1\" does not exist in the "
+             "workspace library!")
               .arg(mDeviceUuid.toStr()));
     }
     dev = new library::Device(std::unique_ptr<TransactionalDirectory>(
@@ -109,8 +109,8 @@ bool CmdAddDeviceToBoard::performExecute() {
     if (!pkgFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString(tr("The package with the UUID \"%1\" does not exist in the "
-                     "workspace library!"))
+          tr("The package with the UUID \"%1\" does not exist in the "
+             "workspace library!")
               .arg(pkgUuid.toStr()));
     }
     pkg = new library::Package(std::unique_ptr<TransactionalDirectory>(
@@ -128,7 +128,7 @@ bool CmdAddDeviceToBoard::performExecute() {
   }
   if (!mFootprintUuid) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Package does not have any footprints: %1"))
+                       tr("Package does not have any footprints: %1")
                            .arg(pkg->getUuid().toStr()));
   }
 

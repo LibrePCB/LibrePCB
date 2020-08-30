@@ -254,8 +254,8 @@ bool SchematicEditorState_DrawWire::startPositioning(
         } catch (const Exception& e) {
           QMessageBox::warning(
               parentWidget(), tr("Invalid net name"),
-              QString(tr("Could not apply the forced net name because '%1' is "
-                         "not a valid net name."))
+              tr("Could not apply the forced net name because '%1' is "
+                 "not a valid net name.")
                   .arg(name));
         }
       }

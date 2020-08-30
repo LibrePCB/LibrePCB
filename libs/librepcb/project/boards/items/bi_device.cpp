@@ -126,8 +126,8 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   if (!mLibDevice) {
     qDebug() << mCompInstance->getUuid();
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("No device with the UUID \"%1\" found in the "
-                                  "project's library."))
+                       tr("No device with the UUID \"%1\" found in the "
+                          "project's library.")
                            .arg(deviceUuid.toStr()));
   }
   // check if the device matches with the component
@@ -146,8 +146,8 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   if (!mLibPackage) {
     qDebug() << mCompInstance->getUuid();
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("No package with the UUID \"%1\" found in "
-                                  "the project's library."))
+                       tr("No package with the UUID \"%1\" found in "
+                          "the project's library.")
                            .arg(packageUuid.toStr()));
   }
   // get footprint from package

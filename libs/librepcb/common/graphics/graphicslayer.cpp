@@ -250,7 +250,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sBotCopper,                {tr("Bot Copper"),            QColor("#964578CC"),        QColor("#C00A66FC"),        true});
     // clang-format on
     for (int i = 1; i <= getInnerLayerCount(); ++i) {
-      QString nameTr = QString(tr("Inner Copper %1")).arg(i);
+      QString nameTr = tr("Inner Copper %1").arg(i);
       QColor  color;
       QColor  hlColor;
       switch ((i - 1) % 6) {
