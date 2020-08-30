@@ -39,10 +39,10 @@ MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
     const PositiveLength&            gridInterval) noexcept
   : LibraryElementCheckMessage(
         Severity::Error,
-        QString(tr("Pin not on %1mm grid: '%2'"))
+        tr("Pin not on %1mm grid: '%2'")
             .arg(gridInterval->toMmString(), *pin->getName()),
-        QString(tr("Every pin must be placed exactly on the %1mm grid, "
-                   "otherwise it cannot be connected in the schematic editor."))
+        tr("Every pin must be placed exactly on the %1mm grid, "
+           "otherwise it cannot be connected in the schematic editor.")
             .arg(gridInterval->toMmString())),
     mPin(pin),
     mGridInterval(gridInterval) {

@@ -112,18 +112,16 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
 
       // check whether project can still be opened of if we broke something
       try {
-        log(QString(tr("Open project %1..."))
-                .arg(prettyPath(mProjectFilePath)));
+        log(tr("Open project %1...").arg(prettyPath(mProjectFilePath)));
         Project project(std::unique_ptr<TransactionalDirectory>(
                             new TransactionalDirectory(fs)),
                         mProjectFilePath.getFilename());
-        log(QString(tr("Save project %1..."))
-                .arg(prettyPath(mProjectFilePath)));
+        log(tr("Save project %1...").arg(prettyPath(mProjectFilePath)));
         project.save();  // force updating library elements file format
         fs->save();      // can throw
       } catch (const Exception& e) {
         // something is broken -> discard modifications in file system
-        log(QString(tr("[ERROR] %1")).arg(e.getMsg()));
+        log(tr("[ERROR] %1").arg(e.getMsg()));
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Failed to update library elements! Probably "
                               "there were breaking "
@@ -131,7 +129,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
       }
       log(tr("[SUCCESS] All library elements updated."));
     } catch (const Exception& e) {
-      log(QString(tr("[ERROR] %1")).arg(e.getMsg()));
+      log(tr("[ERROR] %1").arg(e.getMsg()));
     }
 
     // re-open project if it was previously open
@@ -173,14 +171,14 @@ void ProjectLibraryUpdater::updateElements(
     QString                dst = dirpath % "/" % dirname;
     TransactionalDirectory dstDir(fs, dst);
     if (src.isValid() && (!dstDir.getFiles().isEmpty())) {
-      log(QString(tr("Update %1...")).arg(dst));
+      log(tr("Update %1...").arg(dst));
       std::shared_ptr<TransactionalFileSystem> srcFs =
           TransactionalFileSystem::openRO(src);
       TransactionalDirectory srcDir(srcFs);
       fs->removeDirRecursively(dst);
       srcDir.saveTo(dstDir);
     } else {
-      log(QString(tr("Skip %1...")).arg(dst));
+      log(tr("Skip %1...").arg(dst));
     }
   }
 }

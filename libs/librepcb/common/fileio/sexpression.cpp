@@ -124,7 +124,7 @@ QList<SExpression> SExpression::getChildren(const QString& name) const
 const SExpression& SExpression::getChildByIndex(int index) const {
   if ((index < 0) || index >= mChildren.count()) {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                         QString(tr("Child not found: %1")).arg(index));
+                         tr("Child not found: %1").arg(index));
   }
   return mChildren.at(index);
 }
@@ -153,7 +153,7 @@ const SExpression& SExpression::getChildByPath(const QString& path) const {
     return *child;
   } else {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                         QString(tr("Child not found: %1")).arg(path));
+                         tr("Child not found: %1").arg(path));
   }
 }
 
@@ -226,9 +226,8 @@ bool SExpression::isValidToken(const QString& token) const noexcept {
 QString SExpression::toString(int indent) const {
   if (mType == Type::List) {
     if (!isValidListName(mValue)) {
-      throw LogicError(
-          __FILE__, __LINE__,
-          QString(tr("Invalid S-Expression list name: %1")).arg(mValue));
+      throw LogicError(__FILE__, __LINE__,
+                       tr("Invalid S-Expression list name: %1").arg(mValue));
     }
     QString str = '(' + mValue;
     for (int i = 0; i < mChildren.count(); ++i) {
@@ -255,9 +254,8 @@ QString SExpression::toString(int indent) const {
     return str + ')';
   } else if (mType == Type::Token) {
     if (!isValidToken(mValue)) {
-      throw LogicError(
-          __FILE__, __LINE__,
-          QString(tr("Invalid S-Expression token: %1")).arg(mValue));
+      throw LogicError(__FILE__, __LINE__,
+                       tr("Invalid S-Expression token: %1").arg(mValue));
     }
     return mValue;
   } else if (mType == Type::String) {

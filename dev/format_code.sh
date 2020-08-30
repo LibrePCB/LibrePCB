@@ -55,7 +55,7 @@ if [ "$DOCKER" == "--docker" ]; then
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
-  $DOCKER_CMD run --rm -t -i --user "$(id -u):$(id -g)" \
+  $DOCKER_CMD run --rm -t --user "$(id -u):$(id -g)" \
     -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
     /bin/bash -c "cd /code && dev/format_code.sh $ALL"

@@ -31,8 +31,8 @@
 #include "componentsignalinstance.h"
 #include "netclass.h"
 
-#include <librepcb/library/cmp/component.h>
 #include <librepcb/common/exceptions.h>
+#include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
 
@@ -151,8 +151,8 @@ void NetSignal::removeFromCircuit() {
   }
   if (isUsed()) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("The net signal \"%1\" cannot be removed "
-                                  "because it is still in use!"))
+                       tr("The net signal \"%1\" cannot be removed "
+                          "because it is still in use!")
                            .arg(*mName));
   }
   mNetClass->unregisterNetSignal(*this);  // can throw
@@ -258,8 +258,7 @@ void NetSignal::updateErcMessages() noexcept {
           new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(), "Unused",
                      ErcMsg::ErcMsgType_t::CircuitError, QString()));
     }
-    mErcMsgUnusedNetSignal->setMsg(
-        QString(tr("Unused net signal: \"%1\"")).arg(*mName));
+    mErcMsgUnusedNetSignal->setMsg(tr("Unused net signal: \"%1\"").arg(*mName));
     mErcMsgUnusedNetSignal->setVisible(true);
   } else if (mErcMsgUnusedNetSignal) {
     mErcMsgUnusedNetSignal.reset();
@@ -282,8 +281,7 @@ void NetSignal::updateErcMessages() noexcept {
           "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning));
     }
     mErcMsgConnectedToLessThanTwoPins->setMsg(
-        QString(tr("Net signal connected to less than two pins: \"%1\""))
-            .arg(*mName));
+        tr("Net signal connected to less than two pins: \"%1\"").arg(*mName));
     mErcMsgConnectedToLessThanTwoPins->setVisible(true);
   } else if (mErcMsgConnectedToLessThanTwoPins) {
     mErcMsgConnectedToLessThanTwoPins.reset();

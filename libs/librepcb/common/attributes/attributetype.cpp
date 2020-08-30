@@ -72,8 +72,7 @@ const AttributeUnit* AttributeType::getUnitFromString(
 
   throw RuntimeError(
       __FILE__, __LINE__,
-      QString(tr("Unknown unit of attribute type \"%1\": \"%2\""))
-          .arg(mTypeName, unit));
+      tr("Unknown unit of attribute type \"%1\": \"%2\"").arg(mTypeName, unit));
 }
 
 bool AttributeType::isUnitAvailable(const AttributeUnit* unit) const noexcept {
@@ -120,7 +119,7 @@ const AttributeType& AttributeType::fromString(const QString& type) {
     if (t->getName() == type) return *t;
   }
   throw RuntimeError(__FILE__, __LINE__,
-                     QString(tr("Invalid attribute type: \"%1\"")).arg(type));
+                     tr("Invalid attribute type: \"%1\"").arg(type));
 }
 
 /*******************************************************************************

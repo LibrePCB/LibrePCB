@@ -462,7 +462,8 @@ void BoardEditor::on_actionRemoveBoard_triggered() {
 
   QMessageBox::StandardButton btn = QMessageBox::question(
       this, tr("Remove board"),
-      tr("Are you really sure to remove the board \"%1\"?").arg(*board->getName()));
+      tr("Are you really sure to remove the board \"%1\"?")
+          .arg(*board->getName()));
   if (btn != QMessageBox::Yes) return;
 
   try {
@@ -549,7 +550,7 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
       board->print(printer);  // can throw
     }
 
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toStr()));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
@@ -811,10 +812,10 @@ QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
   if (Board* board = getActiveBoard()) {
     candidates += board->getDeviceInstances().values();
     std::sort(candidates.begin(), candidates.end(),
-              [](BI_Device* a, BI_Device* b){
-      return a->getComponentInstance().getName()
-          < b->getComponentInstance().getName();
-    });
+              [](BI_Device* a, BI_Device* b) {
+                return a->getComponentInstance().getName() <
+                       b->getComponentInstance().getName();
+              });
   }
   return candidates;
 }
@@ -830,8 +831,8 @@ QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
 void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
   QList<BI_Device*> deviceCandidates = {};
   foreach (BI_Device* device, getSearchCandidates()) {
-    if (device->getComponentInstance().getName()
-        ->startsWith(name, Qt::CaseInsensitive)) {
+    if (device->getComponentInstance().getName()->startsWith(
+            name, Qt::CaseInsensitive)) {
       deviceCandidates.append(device);
     }
   }
@@ -839,14 +840,14 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
   if (deviceCandidates.count()) {
     index %= deviceCandidates.count();
     BI_Device* device = deviceCandidates[index];
-    Board* board = getActiveBoard();
+    Board*     board  = getActiveBoard();
     Q_ASSERT(board);
     board->clearSelection();
     device->setSelected(true);
     QRectF rect = device->getFootprint().getBoundingRect();
     // Zoom to a rectangle relative to the maximum device dimension. The
     // device is 1/4th of the screen.
-    qreal margin = 1.5f*std::max(rect.size().width(), rect.size().height());
+    qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
     rect.adjust(-margin, -margin, margin, margin);
     mGraphicsView->zoomToRect(rect);
   }

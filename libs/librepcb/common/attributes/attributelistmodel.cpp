@@ -433,8 +433,7 @@ AttributeKey AttributeListModel::validateKeyOrThrow(const QString& key) const {
   if (mAttributeList && mAttributeList->contains(key)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("There is already an attribute with the key \"%1\"."))
-            .arg(key));
+        tr("There is already an attribute with the key \"%1\".").arg(key));
   }
   return AttributeKey(key);  // can throw
 }

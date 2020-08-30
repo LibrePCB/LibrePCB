@@ -81,9 +81,9 @@ BI_Plane::BI_Plane(Board& board, const SExpression& node)
   mNetSignal =
       mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
   if (!mNetSignal) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString(tr("Invalid net signal UUID: \"%1\""))
-                           .arg(netSignalUuid.toStr()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("Invalid net signal UUID: \"%1\"").arg(netSignalUuid.toStr()));
   }
   mOutline = Path(node);
   init();

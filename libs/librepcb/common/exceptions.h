@@ -61,21 +61,18 @@ class FilePath;
  * Example how to use exceptions:
  *
  * @code
- * void foo(int i)
- * {
- *     if (i < 0) {
- *         throw Exception(__FILE__, __LINE__, QString(tr("Invalid argument:
- * %1")).arg(i));
- *     }
+ * void foo(int i) {
+ *   if (i < 0) {
+ *     throw Exception(__FILE__, __LINE__, tr("Invalid argument: %1").arg(i));
+ *   }
  * }
  *
- * void bar() noexcept
- * {
- *     try {
- *         foo(-5);
- *     } catch (const Exception& e) {
- *         QMessageBox::critical(0, tr("Error"), e.getMsg());
- *     }
+ * void bar() noexcept {
+ *   try {
+ *     foo(-5);
+ *   } catch (const Exception& e) {
+ *     QMessageBox::critical(0, tr("Error"), e.getMsg());
+ *   }
  * }
  * @endcode
  *

@@ -109,8 +109,8 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         mState = SubState::SELECTING;
       } else {
         // check if the top most item under the cursor is already selected
-        QGraphicsItem* topMostItem = items.first();
-        bool itemAlreadySelected = topMostItem->isSelected();
+        QGraphicsItem* topMostItem         = items.first();
+        bool           itemAlreadySelected = topMostItem->isSelected();
 
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed
@@ -129,8 +129,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           QGraphicsItem* item = items[mCurrentSelectionIndex];
           if (dynamic_cast<FootprintPadGraphicsItem*>(item)) {
             // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<FootprintPadGraphicsItem*>(item)
-                ->setSelected(true);
+            dynamic_cast<FootprintPadGraphicsItem*>(item)->setSelected(true);
           } else {
             item->setSelected(true);
           }
@@ -366,12 +365,13 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool PackageEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
+bool PackageEditorState_Select::openContextMenuAtPos(
+    const Point& pos) noexcept {
   if (mState != SubState::IDLE) return false;
 
   // handle item selection
-  QGraphicsItem* selectedItem = nullptr;
-  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  QGraphicsItem*        selectedItem = nullptr;
+  QList<QGraphicsItem*> items        = findItemsAtPosition(pos);
   if (items.isEmpty()) return false;
   foreach (QGraphicsItem* item, items) {
     if (item->isSelected()) {
@@ -383,8 +383,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept 
     selectedItem = items.first();
     if (dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)) {
       // workaround for selection of a SymbolPinGraphicsItem
-      dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)
-          ->setSelected(true);
+      dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)->setSelected(true);
     } else {
       selectedItem->setSelected(true);
     }
@@ -396,27 +395,22 @@ bool PackageEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept 
   QMenu    menu;
   QAction* aRotateCCW =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
-  connect(aRotateCCW, &QAction::triggered, [this](){
-    rotateSelectedItems(Angle::deg90());
-  });
+  connect(aRotateCCW, &QAction::triggered,
+          [this]() { rotateSelectedItems(Angle::deg90()); });
   QAction* aMirrorH =
       menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
-  connect(aMirrorH, &QAction::triggered, [this](){
-    mirrorSelectedItems(Qt::Horizontal, false);
-  });
+  connect(aMirrorH, &QAction::triggered,
+          [this]() { mirrorSelectedItems(Qt::Horizontal, false); });
   QAction* aFlipH = menu.addAction(QIcon(":/img/actions/swap.png"), tr("Flip"));
-  connect(aFlipH, &QAction::triggered, [this](){
-    mirrorSelectedItems(Qt::Horizontal, true);
-  });
+  connect(aFlipH, &QAction::triggered,
+          [this]() { mirrorSelectedItems(Qt::Horizontal, true); });
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
-  connect(aRemove, &QAction::triggered, [this](){
-    removeSelectedItems();
-  });
+  connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
   menu.addSeparator();
   QAction* aProperties =
       menu.addAction(QIcon(":/img/actions/settings.png"), tr("Properties"));
-  connect(aProperties, &QAction::triggered, [this, &selectedItem](){
+  connect(aProperties, &QAction::triggered, [this, &selectedItem]() {
     openPropertiesDialogOfItem(selectedItem);
   });
 
@@ -430,7 +424,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
   if (!item) return false;
 
   if (FootprintPadGraphicsItem* pad =
-      dynamic_cast<FootprintPadGraphicsItem*>(item)) {
+          dynamic_cast<FootprintPadGraphicsItem*>(item)) {
     Q_ASSERT(pad);
     FootprintPadPropertiesDialog dialog(
         mContext.package, *mContext.currentFootprint, pad->getPad(),
@@ -440,7 +434,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     dialog.exec();
     return true;
   } else if (StrokeTextGraphicsItem* text =
-             dynamic_cast<StrokeTextGraphicsItem*>(item)) {
+                 dynamic_cast<StrokeTextGraphicsItem*>(item)) {
     Q_ASSERT(text);
     StrokeTextPropertiesDialog dialog(
         text->getText(), mContext.undoStack,
@@ -450,7 +444,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     dialog.exec();
     return true;
   } else if (PolygonGraphicsItem* polygon =
-             dynamic_cast<PolygonGraphicsItem*>(item)) {
+                 dynamic_cast<PolygonGraphicsItem*>(item)) {
     Q_ASSERT(polygon);
     PolygonPropertiesDialog dialog(
         polygon->getPolygon(), mContext.undoStack,
@@ -460,7 +454,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     dialog.exec();
     return true;
   } else if (CircleGraphicsItem* circle =
-             dynamic_cast<CircleGraphicsItem*>(item)) {
+                 dynamic_cast<CircleGraphicsItem*>(item)) {
     Q_ASSERT(circle);
     CirclePropertiesDialog dialog(
         circle->getCircle(), mContext.undoStack,
@@ -469,8 +463,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         &mContext.editorWidget);
     dialog.exec();
     return true;
-  } else if (HoleGraphicsItem* hole =
-             dynamic_cast<HoleGraphicsItem*>(item)) {
+  } else if (HoleGraphicsItem* hole = dynamic_cast<HoleGraphicsItem*>(item)) {
     Q_ASSERT(hole);
     HolePropertiesDialog dialog(
         hole->getHole(), mContext.undoStack, getDefaultLengthUnit(),
@@ -660,9 +653,8 @@ QList<QGraphicsItem*> PackageEditorState_Select::findItemsAtPosition(
     result.append(hole.data());
   }
 
-  Q_ASSERT(result.count() == (pads.count() + texts.count()
-                              + polygons.count() + circles.count()
-                              + holes.count()));
+  Q_ASSERT(result.count() == (pads.count() + texts.count() + polygons.count() +
+                              circles.count() + holes.count()));
   Q_ASSERT(result.count() == count);
   return result;
 }

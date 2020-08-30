@@ -64,8 +64,7 @@ const StrokeFont& StrokeFontPool::getFont(const QString& filename) const {
   } else {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(tr("The font \"%1\" does not exist in the font pool."))
-            .arg(filename));
+        tr("The font \"%1\" does not exist in the font pool.").arg(filename));
   }
 }
 

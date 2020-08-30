@@ -114,14 +114,14 @@ private:
   SchematicEditor& operator=(const SchematicEditor& rhs);
 
   // Private Methods
-  bool        graphicsViewEventHandler(QEvent* event);
-  void        toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
-  void        addSchematic() noexcept;
-  void        removeSchematic(int index) noexcept;
-  void        renameSchematic(int index) noexcept;
+  bool graphicsViewEventHandler(QEvent* event);
+  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void addSchematic() noexcept;
+  void removeSchematic(int index) noexcept;
+  void renameSchematic(int index) noexcept;
   QList<SI_Symbol*> getSearchCandidates() noexcept;
-  QStringList getSearchToolBarCompleterList() noexcept;
-  void        goToSymbol(const QString& name, unsigned int index) noexcept;
+  QStringList       getSearchToolBarCompleterList() noexcept;
+  void goToSymbol(const QString& name, unsigned int index) noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;

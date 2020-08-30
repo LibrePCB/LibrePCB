@@ -38,7 +38,7 @@ MsgMissingSymbolVariantItem::MsgMissingSymbolVariantItem(
     std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept
   : LibraryElementCheckMessage(
         Severity::Error,
-        QString(tr("Symbol variant '%1' has no items"))
+        tr("Symbol variant '%1' has no items")
             .arg(*symbVar->getNames().getDefaultValue()),
         tr("Every symbol variant requires at least one symbol item, otherwise "
            "it can't be added to schematics.")),

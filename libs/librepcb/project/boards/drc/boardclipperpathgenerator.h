@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <polyclipping/clipper.hpp>
 #include <librepcb/common/units/length.h>
+#include <polyclipping/clipper.hpp>
 
 #include <QtCore>
 

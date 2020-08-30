@@ -74,7 +74,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   mUi->edtSymbInstPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                   settingsPrefix % "/pos_y");
   mUi->edtSymbInstRotation->setSingleStep(90.0);  // [°]
-  setWindowTitle(QString(tr("Properties of %1")).arg(mSymbol.getName()));
+  setWindowTitle(tr("Properties of %1").arg(mSymbol.getName()));
 
   // Component Instance Attributes
   mUi->edtCompInstName->setText(*mComponentInstance.getName());
@@ -94,7 +94,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
               .toString(),
           *mComponentInstance.getLibComponent().getNames().value(localeOrder)) +
       " (" +
-      QString(tr("symbol variant \"%1\""))
+      tr("symbol variant \"%1\"")
           .arg(*mComponentInstance.getSymbolVariant().getNames().value(
               localeOrder)) +
       ")");
@@ -199,8 +199,7 @@ void SymbolInstancePropertiesDialog::accept() {
 bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
   try {
     UndoStackTransaction transaction(
-        mUndoStack,
-        QString(tr("Change properties of %1")).arg(mSymbol.getName()));
+        mUndoStack, tr("Change properties of %1").arg(mSymbol.getName()));
 
     // Component Instance
     QScopedPointer<CmdComponentInstanceEdit> cmdCmp(

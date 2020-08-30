@@ -134,7 +134,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
       mWorkspace.getSettings().libraryLocaleOrder.get();
   QString libName = *mLibrary->getNames().value(localeOrder);
   if (readOnly) libName.append(tr(" [Read-Only]"));
-  setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
+  setWindowTitle(tr("%1 - LibrePCB Library Editor").arg(libName));
   setWindowIcon(mLibrary->getIconAsPixmap());
 
   // setup "filter" toolbar
@@ -737,7 +737,7 @@ void LibraryEditor::updateTabTitles() noexcept {
   if (mCurrentEditorWidget) {
     mUi->actionSave->setEnabled(true);
     mUi->actionSave->setText(
-        QString(tr("&Save '%1'")).arg(mCurrentEditorWidget->windowTitle()));
+        tr("&Save '%1'").arg(mCurrentEditorWidget->windowTitle()));
   } else {
     mUi->actionSave->setEnabled(false);
   }

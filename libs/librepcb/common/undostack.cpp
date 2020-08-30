@@ -90,14 +90,14 @@ UndoStack::~UndoStack() noexcept {
 
 QString UndoStack::getUndoText() const noexcept {
   if (canUndo())
-    return QString(tr("Undo: %1")).arg(mCommands[mCurrentIndex - 1]->getText());
+    return tr("Undo: %1").arg(mCommands[mCurrentIndex - 1]->getText());
   else
     return tr("Undo");
 }
 
 QString UndoStack::getRedoText() const noexcept {
   if (canRedo())
-    return QString(tr("Redo: %1")).arg(mCommands[mCurrentIndex]->getText());
+    return tr("Redo: %1").arg(mCommands[mCurrentIndex]->getText());
   else
     return tr("Redo");
 }
@@ -168,7 +168,7 @@ bool UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
     mCurrentIndex++;
 
     // emit signals
-    emit undoTextChanged(QString(tr("Undo: %1")).arg(cmd->getText()));
+    emit undoTextChanged(tr("Undo: %1").arg(cmd->getText()));
     emit redoTextChanged(tr("Redo"));
     emit canUndoChanged(true);
     emit canRedoChanged(false);

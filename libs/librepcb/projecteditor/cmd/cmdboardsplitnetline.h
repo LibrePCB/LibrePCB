@@ -61,14 +61,13 @@ public:
 
   BI_NetPoint* getSplitPoint() noexcept { return mSplitPoint; };
 
-private: // Methods
-
+private:  // Methods
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
-  BI_NetLine& mOldNetLine;  ///< The BI_NetLine to be split
-  BI_NetPoint* mSplitPoint; ///< The new BI_NetPoint at the split position
+  BI_NetLine&  mOldNetLine;  ///< The BI_NetLine to be split
+  BI_NetPoint* mSplitPoint;  ///< The new BI_NetPoint at the split position
 };
 
 /*******************************************************************************
@@ -79,4 +78,4 @@ private: // Methods
 }  // namespace project
 }  // namespace librepcb
 
-#endif // LIBREPCB_PROJECT_CMDSPLITNETLINE_H
+#endif  // LIBREPCB_PROJECT_CMDSPLITNETLINE_H

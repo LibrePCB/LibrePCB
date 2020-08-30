@@ -60,7 +60,7 @@ QString MsgOverlappingSymbolPins::buildMessage(
     pinNames.append("'" % pin->getName() % "'");
   }
   std::sort(pinNames.begin(), pinNames.end());
-  return QString(tr("Overlapping pins: %1")).arg(pinNames.join(", "));
+  return tr("Overlapping pins: %1").arg(pinNames.join(", "));
 }
 
 /*******************************************************************************
