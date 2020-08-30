@@ -295,11 +295,15 @@ bool SchematicEditorState_AddComponent::
 bool SchematicEditorState_AddComponent::
     processGraphicsSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent& e) noexcept {
-  if ((mIsUndoCmdActive) &&
-      (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
-    // rotate symbol
-    mLastAngle += Angle::deg90();
-    mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+  if (mIsUndoCmdActive && mCurrentSymbolEditCommand) {
+    // Only rotate symbol if cursor was not moved during click
+    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
+      mLastAngle += Angle::deg90();
+      mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+    }
+
+    // Always accept the event if we are placing a symbol! When ignoring the
+    // event, the state machine will abort the tool by a right click!
     return true;
   }
 
