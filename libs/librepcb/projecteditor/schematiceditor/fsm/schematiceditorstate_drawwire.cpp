@@ -199,14 +199,18 @@ bool SchematicEditorState_DrawWire::
 bool SchematicEditorState_DrawWire::
     processGraphicsSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent& e) noexcept {
-  if ((mSubState == SubState::POSITIONING_NETPOINT) &&
-      (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
-    // switch to next wire mode
-    Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-    mWireMode = static_cast<WireMode>(mWireMode + 1);
-    if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
-    updateWireModeActionsCheckedState();
-    updateNetpointPositions(pos);
+  if (mSubState == SubState::POSITIONING_NETPOINT) {
+    // Only switch to next wire mode if cursor was not moved during click
+    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
+      Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+      mWireMode = static_cast<WireMode>(mWireMode + 1);
+      if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
+      updateWireModeActionsCheckedState();
+      updateNetpointPositions(pos);
+    }
+
+    // Always accept the event if we are drawing a wire! When ignoring the
+    // event, the state machine will abort the tool by a right click!
     return true;
   }
 

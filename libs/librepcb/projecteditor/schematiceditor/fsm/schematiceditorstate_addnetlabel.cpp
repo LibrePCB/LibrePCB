@@ -134,12 +134,14 @@ bool SchematicEditorState_AddNetLabel::
 bool SchematicEditorState_AddNetLabel::
     processGraphicsSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
+    // Only rotate net label if cursor was not moved during click
+    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
+      mEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(), true);
+    }
 
-  if (mCurrentNetLabel && mUndoCmdActive &&
-      (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
-    mEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(), true);
+    // Always accept the event if we are placing a net label! When ignoring the
+    // event, the state machine will abort the tool by a right click!
     return true;
   }
 
