@@ -540,6 +540,60 @@ QList<BI_FootprintPad*> Board::getPadsAtScenePos(
   return list;
 }
 
+BI_NetPoint* Board::getNetPointNextToScenePos(
+    const Point& pos, UnsignedLength& maxDistance, const GraphicsLayer* layer,
+    const NetSignal* netsignal) const {
+  BI_NetPoint* bestMatch = nullptr;
+  foreach (BI_NetSegment* segment, mNetSegments) {
+    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+      BI_NetPoint* newMatch =
+          segment->getNetPointNextToScenePos(pos, layer, maxDistance);
+      if (newMatch) bestMatch = newMatch;
+    }
+  }
+  return bestMatch;
+}
+
+BI_Via* Board::getViaNextToScenePos(const Point&     pos,
+                                    UnsignedLength&  maxDistance,
+                                    const NetSignal* netsignal) const {
+  BI_Via* bestMatch = nullptr;
+  foreach (BI_NetSegment* segment, mNetSegments) {
+    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+      BI_Via* newMatch = segment->getViaNextToScenePos(pos, maxDistance);
+      if (newMatch) bestMatch = newMatch;
+    }
+  }
+  return bestMatch;
+}
+
+BI_FootprintPad* Board::getPadNextToScenePos(const Point&         pos,
+                                             UnsignedLength&      maxDistance,
+                                             const GraphicsLayer* layer,
+                                             const NetSignal* netsignal) const {
+  BI_FootprintPad* bestMatch = nullptr;
+  foreach (BI_Device* device, mDeviceInstances) {
+    foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
+      QPainterPath area = QPainterPath();
+      area.addEllipse(pos.toPxQPointF(), maxDistance->toPx(),
+                      maxDistance->toPx());
+      if (pad->isSelectable() && pad->getGrabAreaScenePx().intersects(area) &&
+          ((!layer) || (pad->isOnLayer(layer->getName()))) &&
+          ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal))) {
+        UnsignedLength distance = (pad->getPosition() - pos).getLength();
+        if (distance < maxDistance) {
+          bestMatch = pad;
+          // NOTE(5n8ke): maxDistance is depending on the center of the pad and
+          // not the actual distance between the position and the edge of the
+          // pad
+          maxDistance = distance;
+        }
+      }
+    }
+  }
+  return bestMatch;
+}
+
 QList<BI_Base*> Board::getAllItems() const noexcept {
   QList<BI_Base*> items;
   foreach (BI_Device* device, mDeviceInstances)
