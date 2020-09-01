@@ -162,6 +162,17 @@ public:
   QList<BI_FootprintPad*> getPadsAtScenePos(
       const Point& pos, const GraphicsLayer* layer = nullptr,
       const NetSignal* netsignal = nullptr) const noexcept;
+
+  BI_NetPoint* getNetPointNextToScenePos(
+      const Point& pos, UnsignedLength& maxDistance,
+      const GraphicsLayer* layer     = nullptr,
+      const NetSignal*     netsignal = nullptr) const;
+  BI_Via* getViaNextToScenePos(const Point& pos, UnsignedLength& maxDistance,
+                               const NetSignal* netsignal = nullptr) const;
+  BI_FootprintPad* getPadNextToScenePos(
+      const Point& pos, UnsignedLength& maxDistance,
+      const GraphicsLayer* layer     = nullptr,
+      const NetSignal*     netsignal = nullptr) const;
   QList<BI_Base*> getAllItems() const noexcept;
 
   // Setters: General
