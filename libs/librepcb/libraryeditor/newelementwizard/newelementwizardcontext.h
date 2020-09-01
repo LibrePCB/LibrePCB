@@ -129,7 +129,7 @@ public:  // Data
   QString                   mElementKeywords;
   QString                   mElementAuthor;
   tl::optional<Version>     mElementVersion;
-  tl::optional<Uuid>        mElementCategoryUuid;
+  QSet<Uuid>                mElementCategoryUuids;
 
   // symbol
   SymbolPinList mSymbolPins;

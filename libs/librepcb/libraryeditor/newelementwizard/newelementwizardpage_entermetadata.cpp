@@ -152,16 +152,24 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
       return;
     }
   }
-  mContext.mElementCategoryUuid = categoryUuid;
+  mContext.mElementCategoryUuids.clear();
+  if (categoryUuid.has_value()) {
+    mContext.mElementCategoryUuids.insert(*categoryUuid);
+  }
   updateCategoryTreeLabel();
 }
 
 void NewElementWizardPage_EnterMetadata::btnResetCategoryClicked() noexcept {
-  mContext.mElementCategoryUuid = tl::nullopt;
+  mContext.mElementCategoryUuids.clear();
   updateCategoryTreeLabel();
 }
 
 void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
+  tl::optional<Uuid> rootCategoryUuid = tl::nullopt;
+  if (mContext.mElementCategoryUuids.count()) {
+    rootCategoryUuid = mContext.mElementCategoryUuids.values().first();
+  }
+
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory:
     case NewElementWizardContext::ElementType::Symbol:
@@ -173,7 +181,7 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
           *mUi->lblCategoryTree);
       builder.setHighlightLastLine(true);
       builder.setOneLine(true);
-      builder.updateText(mContext.mElementCategoryUuid);
+      builder.updateText(rootCategoryUuid);
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory:
@@ -184,13 +192,19 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
           *mUi->lblCategoryTree);
       builder.setHighlightLastLine(true);
       builder.setOneLine(true);
-      builder.updateText(mContext.mElementCategoryUuid);
+      builder.updateText(rootCategoryUuid);
       break;
     }
     default: {
       mUi->lblCategoryTree->setText(tr("Root category"));
       break;
     }
+  }
+  if (mContext.mElementCategoryUuids.count() > 1) {
+    mUi->lblMoreCategories->setText(
+        tr("... and %1 more.").arg(mContext.mElementCategoryUuids.count() - 1));
+  } else {
+    mUi->lblMoreCategories->setText(QString());
   }
 }
 
