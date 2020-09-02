@@ -17,66 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BES_ADDDEVICE_H
-#define LIBREPCB_PROJECT_BES_ADDDEVICE_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bes_base.h"
+#include "boardeditorstate.h"
+
+#include "../boardeditor.h"
+
+#include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/gridproperties.h>
+#include <librepcb/common/undostack.h>
+#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace project {
-
-class Board;
-class ComponentInstance;
-class BI_Device;
-class CmdDeviceInstanceEditAll;
-
 namespace editor {
 
 /*******************************************************************************
- *  Class BES_AddDevice
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The BES_AddDevice class
- */
-class BES_AddDevice final : public BES_Base {
-  Q_OBJECT
+BoardEditorState::BoardEditorState(const Context& context,
+                                   QObject*       parent) noexcept
+  : QObject(parent), mContext(context) {
+}
 
-public:
-  // Constructors / Destructor
-  BES_AddDevice(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                GraphicsView& editorGraphicsView, UndoStack& undoStack);
-  ~BES_AddDevice();
+BoardEditorState::~BoardEditorState() noexcept {
+}
 
-  // General Methods
-  ProcRetVal process(BEE_Base* event) noexcept override;
-  bool       entry(BEE_Base* event) noexcept override;
-  bool       exit(BEE_Base* event) noexcept override;
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
 
-private:
-  // Private Methods
-  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-  void       startAddingDevice(ComponentInstance& cmp, const Uuid& dev,
-                               const Uuid& fpt);
-  bool       abortCommand(bool showErrMsgBox) noexcept;
-  void       rotateDevice(const Angle& angle) noexcept;
-  void       mirrorDevice(Qt::Orientation orientation) noexcept;
+Board* BoardEditorState::getActiveBoard() noexcept {
+  return mContext.editor.getActiveBoard();
+}
 
-  // General Attributes
-  bool mIsUndoCmdActive;
+PositiveLength BoardEditorState::getGridInterval() const noexcept {
+  return mContext.editorGraphicsView.getGridProperties().getInterval();
+}
 
-  // information about the current device to place
-  BI_Device*                               mCurrentDeviceToPlace;
-  QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
-};
+const LengthUnit& BoardEditorState::getDefaultLengthUnit() const noexcept {
+  return mContext.workspace.getSettings().defaultLengthUnit.get();
+}
+
+bool BoardEditorState::execCmd(UndoCommand* cmd) {
+  return mContext.undoStack.execCmd(cmd);
+}
+
+QWidget* BoardEditorState::parentWidget() noexcept {
+  return &mContext.editor;
+}
 
 /*******************************************************************************
  *  End of File
@@ -85,5 +82,3 @@ private:
 }  // namespace editor
 }  // namespace project
 }  // namespace librepcb
-
-#endif  // LIBREPCB_PROJECT_BES_ADDDEVICE_H

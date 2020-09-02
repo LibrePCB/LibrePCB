@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BES_SELECT_H
-#define LIBREPCB_PROJECT_BES_SELECT_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_SELECT_H
+#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bes_base.h"
+#include "boardeditorstate.h"
+
+#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -39,22 +41,25 @@ class Hole;
 
 namespace project {
 
+class BI_Base;
 class BI_Device;
 class BI_Via;
 class BI_Plane;
+class BI_NetSegment;
+class BI_NetLine;
 
 namespace editor {
 
 class CmdDragSelectedBoardItems;
 
 /*******************************************************************************
- *  Class BES_Select
+ *  Class BoardEditorState_Select
  ******************************************************************************/
 
 /**
- * @brief The BES_Select class
+ * @brief The "select" state/tool of the board editor (default state)
  */
-class BES_Select final : public BES_Base {
+class BoardEditorState_Select final : public BoardEditorState {
   Q_OBJECT
 
   struct DeviceMenuItem {
@@ -65,29 +70,40 @@ class BES_Select final : public BES_Base {
 
 public:
   // Constructors / Destructor
-  explicit BES_Select(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                      GraphicsView& editorGraphicsView, UndoStack& undoStack);
-  ~BES_Select();
+  BoardEditorState_Select()                                     = delete;
+  BoardEditorState_Select(const BoardEditorState_Select& other) = delete;
+  explicit BoardEditorState_Select(const Context& context) noexcept;
+  virtual ~BoardEditorState_Select() noexcept;
 
   // General Methods
-  ProcRetVal process(BEE_Base* event) noexcept override;
-  bool       entry(BEE_Base* event) noexcept override;
-  bool       exit(BEE_Base* event) noexcept override;
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-private:
-  // Private Methods
-  ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
-  ProcRetVal processSubStateIdleSceneEvent(BEE_Base* event) noexcept;
-  ProcRetVal processSubStateMoving(BEE_Base* event) noexcept;
-  ProcRetVal processSubStateMovingSceneEvent(BEE_Base* event) noexcept;
-  ProcRetVal processIdleSceneLeftClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                       Board& board) noexcept;
-  ProcRetVal processIdleSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent* mouseEvent, Board& board) noexcept;
-  ProcRetVal processIdleSceneDoubleClick(QGraphicsSceneMouseEvent* mouseEvent,
-                                         Board* board) noexcept;
+  // Event Handlers
+  virtual bool processSelectAll() noexcept override;
+  virtual bool processRotateCw() noexcept override;
+  virtual bool processRotateCcw() noexcept override;
+  virtual bool processFlipHorizontal() noexcept override;
+  virtual bool processFlipVertical() noexcept override;
+  virtual bool processRemove() noexcept override;
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processSwitchToBoard(int index) noexcept override;
 
-  // Menu Helpers
+  // Operator Overloadings
+  BoardEditorState_Select& operator=(const BoardEditorState_Select& rhs) =
+      delete;
+
+private:  // Methods
+          // Menu Helpers
   void addActionRotate(QMenu&         menu,
                        const QString& text = tr("Rotate")) noexcept;
   void addActionFlip(QMenu& menu, const QString& text = tr("Flip")) noexcept;
@@ -107,6 +123,7 @@ private:
       QMenu& menu, BI_NetSegment& netsegment,
       const QString& text = tr("Select Whole Trace")) noexcept;
 
+  // Actions
   bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
@@ -150,15 +167,8 @@ private:
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;
 
-  // Types
-  /// enum for all possible substates
-  enum SubState {
-    SubState_Idle,   ///< left mouse button is not pressed (default state)
-    SubState_Moving  ///< left mouse button is pressed
-  };
-
-  // Attributes
-  SubState mSubState;  ///< the current substate
+private:  // Data
+  /// When moving items, this undo command will be active
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
   int                                       mCurrentSelectionIndex;
 };
@@ -171,4 +181,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BES_SELECT_H
+#endif

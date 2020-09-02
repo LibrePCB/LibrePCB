@@ -52,7 +52,7 @@ class ErcMsgDock;
 class UnplacedComponentsDock;
 class BoardLayersDock;
 class BoardDesignRuleCheckMessagesDock;
-class BES_FSM;
+class BoardEditorFsm;
 
 namespace Ui {
 class BoardEditor;
@@ -80,7 +80,7 @@ public:
   Board*         getActiveBoard() const noexcept { return mActiveBoard.data(); }
 
   // Setters
-  void setActiveBoardIndex(int index) noexcept;
+  bool setActiveBoardIndex(int index) noexcept;
 
   // General Methods
   void abortAllCommands() noexcept;
@@ -162,7 +162,7 @@ private:
   QScopedPointer<BoardDesignRuleCheckMessagesDock> mDrcMessagesDock;
 
   // Finite State Machine
-  BES_FSM* mFsm;
+  QScopedPointer<BoardEditorFsm> mFsm;
 };
 
 /*******************************************************************************

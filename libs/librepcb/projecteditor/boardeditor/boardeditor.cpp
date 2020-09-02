@@ -32,7 +32,7 @@
 #include "boardlayerstacksetupdialog.h"
 #include "boardpickplacegeneratordialog.h"
 #include "fabricationoutputdialog.h"
-#include "fsm/bes_fsm.h"
+#include "fsm/boardeditorfsm.h"
 #include "ui_boardeditor.h"
 #include "unplacedcomponentsdock.h"
 
@@ -106,15 +106,76 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   }
   setWindowTitle(tr("%1 - LibrePCB Board Editor").arg(filenameStr));
 
+  // add graphics view as central widget
+  mGraphicsView = new GraphicsView(nullptr, this);
+  mGraphicsView->setUseOpenGl(
+      mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
+  mGraphicsView->setBackgroundBrush(Qt::black);
+  mGraphicsView->setForegroundBrush(Qt::white);
+  // setCentralWidget(mGraphicsView);
+  mUi->centralwidget->layout()->addWidget(mGraphicsView);
+
+  // build the whole board editor finite state machine with all its substate
+  // objects
+  BoardEditorFsm::Context fsmContext{
+      mProjectEditor.getWorkspace(), mProject, *this, *mUi, *mGraphicsView,
+      mProjectEditor.getUndoStack()};
+  mFsm.reset(new BoardEditorFsm(fsmContext));
+
+  // connect the "tools" toolbar with the state machine
+  mToolsActionGroup.reset(new ExclusiveActionGroup());
+  mToolsActionGroup->addAction(BoardEditorFsm::State::SELECT,
+                               mUi->actionToolSelect);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::DRAW_TRACE,
+                               mUi->actionToolDrawTrace);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_VIA,
+                               mUi->actionToolAddVia);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::DRAW_POLYGON,
+                               mUi->actionToolDrawPolygon);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::DRAW_PLANE,
+                               mUi->actionToolAddPlane);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_STROKE_TEXT,
+                               mUi->actionToolAddText);
+  mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_HOLE,
+                               mUi->actionToolAddHole);
+  mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
+  connect(mFsm.data(), &BoardEditorFsm::stateChanged, mToolsActionGroup.data(),
+          &ExclusiveActionGroup::setCurrentAction);
+  connect(mToolsActionGroup.data(),
+          &ExclusiveActionGroup::changeRequestTriggered, this,
+          &BoardEditor::toolActionGroupChangeTriggered);
+
+  // connect the "command" toolbar with the state machine
+  connect(mUi->actionCommandAbort, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processAbortCommand);
+
+  // connect the "edit" toolbar with the state machine
+  connect(mUi->actionSelectAll, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processSelectAll);
+  connect(mUi->actionCopy, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processCopy);
+  connect(mUi->actionCut, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processCut);
+  connect(mUi->actionPaste, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processPaste);
+  connect(mUi->actionRotate_CW, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processRotateCw);
+  connect(mUi->actionRotate_CCW, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processRotateCcw);
+  connect(mUi->actionFlipHorizontal, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processFlipHorizontal);
+  connect(mUi->actionFlipVertical, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processFlipVertical);
+  connect(mUi->actionRemove, &QAction::triggered, mFsm.data(),
+          &BoardEditorFsm::processRemove);
+
   // Add Dock Widgets
   mUnplacedComponentsDock = new UnplacedComponentsDock(mProjectEditor);
   connect(mUnplacedComponentsDock,
           &UnplacedComponentsDock::unplacedComponentsCountChanged, this,
           &BoardEditor::unplacedComponentsCountChanged);
   connect(mUnplacedComponentsDock, &UnplacedComponentsDock::addDeviceTriggered,
-          [this](ComponentInstance& cmp, const Uuid& dev, const Uuid& fpt) {
-            mFsm->processEvent(new BEE_StartAddDevice(cmp, dev, fpt), true);
-          });
+          mFsm.data(), &BoardEditorFsm::processAddDevice);
   addDockWidget(Qt::RightDockWidgetArea, mUnplacedComponentsDock, Qt::Vertical);
   mBoardLayersDock = new BoardLayersDock(*this);
   addDockWidget(Qt::RightDockWidgetArea, mBoardLayersDock, Qt::Vertical);
@@ -129,15 +190,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   addDockWidget(Qt::RightDockWidgetArea, mDrcMessagesDock.data());
   tabifyDockWidget(mErcMsgDock, mDrcMessagesDock.data());
   mUnplacedComponentsDock->raise();
-
-  // add graphics view as central widget
-  mGraphicsView = new GraphicsView(nullptr, this);
-  mGraphicsView->setUseOpenGl(
-      mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
-  mGraphicsView->setBackgroundBrush(Qt::black);
-  mGraphicsView->setForegroundBrush(Qt::white);
-  // setCentralWidget(mGraphicsView);
-  mUi->centralwidget->layout()->addWidget(mGraphicsView);
 
   // Add actions to toggle visibility of dock widgets
   mUi->menuView->addSeparator();
@@ -187,68 +239,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
       new UndoStackActionGroup(*mUi->actionUndo, *mUi->actionRedo, nullptr,
                                &mProjectEditor.getUndoStack(), this));
 
-  // build the whole board editor finite state machine with all its substate
-  // objects
-  mFsm =
-      new BES_FSM(*this, *mUi, *mGraphicsView, mProjectEditor.getUndoStack());
-
-  // connect the "tools" toolbar with the state machine
-  mToolsActionGroup.reset(new ExclusiveActionGroup());
-  mToolsActionGroup->addAction(BES_FSM::State::State_Select,
-                               mUi->actionToolSelect);
-  mToolsActionGroup->addAction(BES_FSM::State::State_DrawTrace,
-                               mUi->actionToolDrawTrace);
-  mToolsActionGroup->addAction(BES_FSM::State::State_AddVia,
-                               mUi->actionToolAddVia);
-  mToolsActionGroup->addAction(BES_FSM::State::State_DrawPolygon,
-                               mUi->actionToolDrawPolygon);
-  mToolsActionGroup->addAction(BES_FSM::State::State_DrawPlane,
-                               mUi->actionToolAddPlane);
-  mToolsActionGroup->addAction(BES_FSM::State::State_AddStrokeText,
-                               mUi->actionToolAddText);
-  mToolsActionGroup->addAction(BES_FSM::State::State_AddHole,
-                               mUi->actionToolAddHole);
-  mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
-  connect(mFsm, &BES_FSM::stateChanged, mToolsActionGroup.data(),
-          &ExclusiveActionGroup::setCurrentAction);
-  connect(mToolsActionGroup.data(),
-          &ExclusiveActionGroup::changeRequestTriggered, this,
-          &BoardEditor::toolActionGroupChangeTriggered);
-
-  // connect the "command" toolbar with the state machine
-  connect(mUi->actionCommandAbort, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
-  });
-
-  // connect the "edit" toolbar with the state machine
-  connect(mUi->actionSelectAll, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_SelectAll), true);
-  });
-  connect(mUi->actionCopy, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Copy), true);
-  });
-  connect(mUi->actionCut, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Cut), true);
-  });
-  connect(mUi->actionPaste, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Paste), true);
-  });
-  connect(mUi->actionRotate_CW, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_RotateCW), true);
-  });
-  connect(mUi->actionRotate_CCW, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_RotateCCW), true);
-  });
-  connect(mUi->actionFlipHorizontal, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_FlipHorizontal), true);
-  });
-  connect(mUi->actionFlipVertical, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_FlipVertical), true);
-  });
-  connect(mUi->actionRemove, &QAction::triggered, [this]() {
-    mFsm->processEvent(new BEE_Base(BEE_Base::Edit_Remove), true);
-  });
-
   // setup "search" toolbar
   mUi->searchToolbar->setPlaceholderText(tr("Find device..."));
   mUi->searchToolbar->setCompleterListFunction(
@@ -294,8 +284,7 @@ BoardEditor::~BoardEditor() {
   clientSettings.setValue("board_editor/window_geometry", saveGeometry());
   clientSettings.setValue("board_editor/window_state", saveState());
 
-  delete mFsm;
-  mFsm = nullptr;
+  mFsm.reset();
   qDeleteAll(mBoardListActions);
   mBoardListActions.clear();
   delete mBoardLayersDock;
@@ -315,10 +304,16 @@ BoardEditor::~BoardEditor() {
  *  Setters
  ******************************************************************************/
 
-void BoardEditor::setActiveBoardIndex(int index) noexcept {
+bool BoardEditor::setActiveBoardIndex(int index) noexcept {
   Board* newBoard = mProject.getBoardByIndex(index);
 
   if (newBoard != mActiveBoard) {
+    // "Ask" the FSM if changing the scene is allowed at the moment.
+    // If the FSM accepts the event, we can switch to the specified board.
+    if (!mFsm->processSwitchToBoard(index)) {
+      return false;  // changing the board is not allowed!
+    }
+
     if (mActiveBoard) {
       // stop airwire rebuild on every project modification (for performance
       // reasons)
@@ -359,6 +354,8 @@ void BoardEditor::setActiveBoardIndex(int index) noexcept {
   for (int i = 0; i < mBoardListActions.count(); ++i) {
     mBoardListActions.at(i)->setChecked(i == index);
   }
+
+  return true;
 }
 
 /*******************************************************************************
@@ -367,9 +364,9 @@ void BoardEditor::setActiveBoardIndex(int index) noexcept {
 
 void BoardEditor::abortAllCommands() noexcept {
   // ugly... ;-)
-  mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
-  mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
-  mFsm->processEvent(new BEE_Base(BEE_Base::AbortCommand), true);
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
 }
 
 /*******************************************************************************
@@ -736,39 +733,107 @@ void BoardEditor::boardListActionGroupTriggered(QAction* action) {
  ******************************************************************************/
 
 bool BoardEditor::graphicsViewEventHandler(QEvent* event) {
-  // clear DRC location on click
-  if (event->type() == QEvent::GraphicsSceneMousePress) {
-    clearDrcMarker();
+  Q_ASSERT(event);
+  switch (event->type()) {
+    case QEvent::GraphicsSceneMouseMove: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      mFsm->processGraphicsSceneMouseMoved(*e);
+      break;
+    }
+
+    case QEvent::GraphicsSceneMousePress: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      switch (e->button()) {
+        case Qt::LeftButton: {
+          clearDrcMarker();  // clear DRC location on click
+          mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
+          break;
+        }
+        default: { break; }
+      }
+      break;
+    }
+
+    case QEvent::GraphicsSceneMouseRelease: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      switch (e->button()) {
+        case Qt::LeftButton: {
+          mFsm->processGraphicsSceneLeftMouseButtonReleased(*e);
+          break;
+        }
+        case Qt::RightButton: {
+          mFsm->processGraphicsSceneRightMouseButtonReleased(*e);
+          break;
+        }
+        default: { break; }
+      }
+      break;
+    }
+
+    case QEvent::GraphicsSceneMouseDoubleClick: {
+      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      switch (e->button()) {
+        case Qt::LeftButton: {
+          mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(*e);
+          break;
+        }
+        default: { break; }
+      }
+      break;
+    }
+
+    case QEvent::KeyPress: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      mFsm->processKeyPressed(*e);
+      break;
+    }
+
+    case QEvent::KeyRelease: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      mFsm->processKeyReleased(*e);
+      break;
+    }
+
+    default: { break; }
   }
 
-  BEE_RedirectedQEvent* e =
-      new BEE_RedirectedQEvent(BEE_Base::GraphicsViewEvent, event);
-  return mFsm->processEvent(e, true);
+  // Always accept graphics scene events, even if we do not react on some of
+  // the events! This will give us the full control over the graphics scene.
+  // Otherwise, the graphics scene can react on some events and disturb our
+  // state machine. Only the wheel event is ignored because otherwise the
+  // view will not allow to zoom with the mouse wheel.
+  return (event->type() != QEvent::GraphicsSceneWheel);
 }
 
 void BoardEditor::toolActionGroupChangeTriggered(
     const QVariant& newTool) noexcept {
   switch (newTool.toInt()) {
-    case BES_FSM::State::State_Select:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartSelect), true);
+    case BoardEditorFsm::State::SELECT:
+      mFsm->processSelect();
       break;
-    case BES_FSM::State::State_DrawTrace:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawTrace), true);
+    case BoardEditorFsm::State::DRAW_TRACE:
+      mFsm->processDrawTrace();
       break;
-    case BES_FSM::State::State_DrawPolygon:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawPolygon), true);
+    case BoardEditorFsm::State::DRAW_POLYGON:
+      mFsm->processDrawPolygon();
       break;
-    case BES_FSM::State::State_DrawPlane:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartDrawPlane), true);
+    case BoardEditorFsm::State::DRAW_PLANE:
+      mFsm->processDrawPlane();
       break;
-    case BES_FSM::State::State_AddVia:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartAddVia), true);
+    case BoardEditorFsm::State::ADD_VIA:
+      mFsm->processAddVia();
       break;
-    case BES_FSM::State::State_AddStrokeText:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartAddStrokeText), true);
+    case BoardEditorFsm::State::ADD_STROKE_TEXT:
+      mFsm->processAddStrokeText();
       break;
-    case BES_FSM::State::State_AddHole:
-      mFsm->processEvent(new BEE_Base(BEE_Base::StartAddHole), true);
+    case BoardEditorFsm::State::ADD_HOLE:
+      mFsm->processAddHole();
       break;
     default:
       Q_ASSERT(false);

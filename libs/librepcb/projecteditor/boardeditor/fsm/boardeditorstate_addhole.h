@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
-#define LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_ADDHOLE_H
+#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_ADDHOLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bes_base.h"
+#include "boardeditorstate.h"
 
 #include <librepcb/project/boards/items/bi_hole.h>
 
@@ -44,40 +44,55 @@ class Board;
 namespace editor {
 
 /*******************************************************************************
- *  Class BES_AddHole
+ *  Class BoardEditorState_AddHole
  ******************************************************************************/
 
 /**
- * @brief The BES_AddHole class
+ * @brief The "add hole" state/tool of the board editor
  */
-class BES_AddHole final : public BES_Base {
+class BoardEditorState_AddHole final : public BoardEditorState {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit BES_AddHole(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                       GraphicsView& editorGraphicsView, UndoStack& undoStack);
-  ~BES_AddHole();
+  BoardEditorState_AddHole()                                      = delete;
+  BoardEditorState_AddHole(const BoardEditorState_AddHole& other) = delete;
+  explicit BoardEditorState_AddHole(const Context& context) noexcept;
+  virtual ~BoardEditorState_AddHole() noexcept;
 
   // General Methods
-  ProcRetVal process(BEE_Base* event) noexcept override;
-  bool       entry(BEE_Base* event) noexcept override;
-  bool       exit(BEE_Base* event) noexcept override;
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-private:
-  // Private Methods
-  ProcRetVal processSceneEvent(BEE_Base* event) noexcept;
-  bool       addHole(Board& board, const Point& pos) noexcept;
-  void       updateHolePosition(const Point& pos) noexcept;
-  bool       fixHole(const Point& pos) noexcept;
-  void       diameterEditValueChanged(const PositiveLength& value) noexcept;
-  void       makeLayerVisible() noexcept;
+  // Event Handlers
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
 
+  // Operator Overloadings
+  BoardEditorState_AddHole& operator=(const BoardEditorState_AddHole& rhs) =
+      delete;
+
+private:  // Methods
+  bool addHole(Board& board, const Point& pos) noexcept;
+  bool updatePosition(const Point& pos) noexcept;
+  bool fixPosition(const Point& pos) noexcept;
+  bool abortCommand(bool showErrMsgBox) noexcept;
+  void diameterEditValueChanged(const PositiveLength& value) noexcept;
+  void makeLayerVisible() noexcept;
+
+private:  // Data
   // State
-  bool                        mUndoCmdActive;
-  BI_Hole*                    mHole;
-  QScopedPointer<CmdHoleEdit> mEditCmd;
-  PositiveLength              mCurrentDiameter;
+  bool           mIsUndoCmdActive;
+  PositiveLength mLastDiameter;
+
+  // Information about the current hole to place. Only valid if
+  // mIsUndoCmdActive == true.
+  BI_Hole*                    mCurrentHoleToPlace;
+  QScopedPointer<CmdHoleEdit> mCurrentHoleEditCmd;
 
   // Widgets for the command toolbar
   QScopedPointer<QLabel>             mDiameterLabel;
@@ -92,4 +107,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_EDITOR_BES_ADDHOLE_H
+#endif
