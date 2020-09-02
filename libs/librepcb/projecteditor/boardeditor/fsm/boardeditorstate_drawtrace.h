@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BES_DRAWTRACE_H
-#define LIBREPCB_PROJECT_BES_DRAWTRACE_H
+#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_DRAWTRACE_H
+#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_DRAWTRACE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bes_base.h"
+#include "boardeditorstate.h"
 
 #include <librepcb/project/boards/items/bi_via.h>
 
@@ -49,30 +49,45 @@ class BI_NetLineAnchor;
 namespace editor {
 
 /*******************************************************************************
- *  Class BES_DrawTrace
+ *  Class BoardEditorState_DrawTrace
  ******************************************************************************/
 
 /**
- * @brief The BES_DrawTrace class
+ * @brief The "draw trace" state/tool of the board editor
  */
-class BES_DrawTrace final : public BES_Base {
+class BoardEditorState_DrawTrace final : public BoardEditorState {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit BES_DrawTrace(BoardEditor& editor, Ui::BoardEditor& editorUi,
-                         GraphicsView& editorGraphicsView,
-                         UndoStack&    undoStack);
-  ~BES_DrawTrace();
+  BoardEditorState_DrawTrace()                                        = delete;
+  BoardEditorState_DrawTrace(const BoardEditorState_DrawTrace& other) = delete;
+  explicit BoardEditorState_DrawTrace(const Context& context) noexcept;
+  virtual ~BoardEditorState_DrawTrace() noexcept;
 
   // General Methods
-  ProcRetVal process(BEE_Base* event) noexcept override;
-  bool       entry(BEE_Base* event) noexcept override;
-  bool       exit(BEE_Base* event) noexcept override;
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
+
+  // Event Handlers
+  virtual bool processAbortCommand() noexcept override;
+  virtual bool processKeyPressed(const QKeyEvent& e) noexcept override;
+  virtual bool processKeyReleased(const QKeyEvent& e) noexcept override;
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneRightMouseButtonReleased(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processSwitchToBoard(int index) noexcept override;
+
+  // Operator Overloadings
+  BoardEditorState_DrawTrace& operator=(const BoardEditorState_DrawTrace& rhs) =
+      delete;
 
 private:
-  // Private Types
-
   /// Internal FSM States (substates)
   enum SubState {
     SubState_Idle,                ///< idle state [initial state]
@@ -93,12 +108,6 @@ private:
     WireMode_Straight,  ///< straight
     WireMode_COUNT      ///< count of wire modes
   };
-
-  // Private Methods
-  ProcRetVal processSubStateIdle(BEE_Base* event) noexcept;
-  ProcRetVal processSubStatePositioning(BEE_Base* event) noexcept;
-  ProcRetVal processIdleSceneEvent(BEE_Base* event) noexcept;
-  ProcRetVal processPositioningSceneEvent(BEE_Base* event) noexcept;
 
   /**
    * @brief Begin drawing the next BI_NetLine
@@ -246,7 +255,7 @@ private:
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
 
-  // General Attributes
+  // State
   SubState       mSubState;          ///< the current substate
   WireMode       mCurrentWireMode;   ///< the current wire mode
   QString        mCurrentLayerName;  ///< the current board layer name
@@ -275,18 +284,18 @@ private:
   BI_NetPoint* mPositioningNetPoint2;    ///< the second netpoint to place
 
   // Widgets for the command toolbar
-  QHash<WireMode, QAction*> mWireModeActions;
-  QList<QAction*>           mActionSeparators;
-  QLabel*                   mLayerLabel;
-  QComboBox*                mLayerComboBox;
-  QHash<int, QAction*>      mShapeActions;
-  QLabel*                   mSizeLabel;
-  PositiveLengthEdit*       mSizeEdit;
-  QLabel*                   mDrillLabel;
-  PositiveLengthEdit*       mDrillEdit;
-  QLabel*                   mWidthLabel;
-  PositiveLengthEdit*       mWidthEdit;
-  QCheckBox*                mAutoWidthEdit;
+  QHash<WireMode, QAction*>          mWireModeActions;
+  QList<QAction*>                    mActionSeparators;
+  QScopedPointer<QLabel>             mLayerLabel;
+  QScopedPointer<QComboBox>          mLayerComboBox;
+  QHash<int, QAction*>               mShapeActions;
+  QScopedPointer<QLabel>             mSizeLabel;
+  QScopedPointer<PositiveLengthEdit> mSizeEdit;
+  QScopedPointer<QLabel>             mDrillLabel;
+  QScopedPointer<PositiveLengthEdit> mDrillEdit;
+  QScopedPointer<QLabel>             mWidthLabel;
+  QScopedPointer<PositiveLengthEdit> mWidthEdit;
+  QScopedPointer<QCheckBox>          mAutoWidthEdit;
 };
 
 /*******************************************************************************
@@ -297,4 +306,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BES_DRAWTRACE_H
+#endif
