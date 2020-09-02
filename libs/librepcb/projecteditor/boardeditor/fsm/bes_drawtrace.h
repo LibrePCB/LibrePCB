@@ -269,8 +269,6 @@ private:
                                          ///< point of the line)
   BI_NetSegment* mCurrentNetSegment;     ///< the net segment that is currently
                                          ///< edited
-  NetSignal* mCurrentNetSignal;          ///< the net signal that is currently
-                                         ///< edited
   BI_NetLine*  mPositioningNetLine1;     ///< line between fixed point and p1
   BI_NetPoint* mPositioningNetPoint1;    ///< the first netpoint to place
   BI_NetLine*  mPositioningNetLine2;     ///< line between p1 and p2

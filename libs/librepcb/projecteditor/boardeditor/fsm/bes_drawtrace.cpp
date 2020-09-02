@@ -75,7 +75,6 @@ BES_DrawTrace::BES_DrawTrace(BoardEditor& editor, Ui::BoardEditor& editorUi,
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
     mCurrentNetSegment(nullptr),
-    mCurrentNetSignal(nullptr),
     mPositioningNetLine1(nullptr),
     mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr),
@@ -514,8 +513,11 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     layer->setVisible(true);
 
     // determine the fixed anchor (create one if it doesn't exist already)
-    mCurrentNetSignal  = nullptr;
-    mCurrentNetSegment = nullptr;
+    // if the selected item is not part of a NetSegment (e.g. device pads),
+    // netsignal must be set to a valid NetSignal, which is used to create the
+    // new NetSegment
+    NetSignal* netsignal = nullptr;
+    mCurrentNetSegment   = nullptr;
     if (fixedPoint) {
       mFixedStartAnchor  = fixedPoint;
       mCurrentNetSegment = &fixedPoint->getNetSegment();
@@ -534,7 +536,11 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     } else if (BI_FootprintPad* pad = findPad(board, pos)) {
       mFixedStartAnchor  = pad;
       mCurrentNetSegment = pad->getNetSegmentOfLines();
-      mCurrentNetSignal  = pad->getCompSigInstNetSignal();
+      netsignal          = pad->getCompSigInstNetSignal();
+      if (!netsignal) {
+        throw Exception(__FILE__, __LINE__,
+                        tr("Pad is not connected to any signal."));
+      }
       if (pad->getLibPad().getBoardSide() !=
           library::FootprintPad::BoardSide::THT) {
         layer = board.getLayerStack().getLayer(pad->getLayerName());
@@ -571,8 +577,8 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
         } else if (BI_FootprintPad* pad =
                        dynamic_cast<BI_FootprintPad*>(anchor)) {
           mCurrentNetSegment = pad->getNetSegmentOfLines();
-          mCurrentNetSignal  = pad->getCompSigInstNetSignal();
-          if (!mCurrentNetSignal) {
+          netsignal          = pad->getCompSigInstNetSignal();
+          if (!netsignal) {
             throw Exception(__FILE__, __LINE__,
                             tr("Pad is not connected to any signal."));
           }
@@ -584,16 +590,15 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
 
     // create new netsegment if none found
     if (!mCurrentNetSegment) {
-      Q_ASSERT(mCurrentNetSignal);
-      CmdBoardNetSegmentAdd* cmd =
-          new CmdBoardNetSegmentAdd(board, *mCurrentNetSignal);
+      Q_ASSERT(netsignal);
+      CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(board, *netsignal);
       mUndoStack.appendToCmdGroup(cmd);  // can throw
       mCurrentNetSegment = cmd->getNetSegment();
     }
+    Q_ASSERT(mCurrentNetSegment);
 
     // add netpoint if none found
     // TODO(5n8ke): Check if this could be even possible
-    Q_ASSERT(mCurrentNetSegment);
     QScopedPointer<CmdBoardNetSegmentAddElements> cmd(
         new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
     if (!mFixedStartAnchor) {
@@ -631,7 +636,8 @@ bool BES_DrawTrace::startPositioning(Board& board, const Point& pos,
     updateNetpointPositions();
 
     // highlight all elements of the current netsignal
-    // TODO(5n8ke): Should we get it new?
+    // NOTE(5n8ke): Use the NetSignal of the current NetSegment, since it is
+    // only correctly set for device pads.
     mCircuit.setHighlightedNetSignal(&mCurrentNetSegment->getNetSignal());
 
     return true;
@@ -824,7 +830,6 @@ bool BES_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
     mCircuit.setHighlightedNetSignal(nullptr);
     mFixedStartAnchor     = nullptr;
     mCurrentNetSegment    = nullptr;
-    mCurrentNetSignal     = nullptr;
     mPositioningNetLine1  = nullptr;
     mPositioningNetLine2  = nullptr;
     mPositioningNetPoint1 = nullptr;
@@ -859,12 +864,7 @@ BI_FootprintPad* BES_DrawTrace::findPad(Board& board, const Point& pos,
                                         NetSignal* netsignal) const noexcept {
   QList<BI_FootprintPad*> items =
       board.getPadsAtScenePos(pos, layer, netsignal);
-  foreach (BI_FootprintPad* pad, items) {
-    if (pad->getCompSigInstNetSignal()) {
-      return pad;  // only return pads which are electrically connected!
-    }
-  }
-  return nullptr;
+  return items.count() ? *items.constBegin() : nullptr;
 }
 
 BI_NetPoint* BES_DrawTrace::findNetPoint(Board& board, const Point& pos,
@@ -875,8 +875,7 @@ BI_NetPoint* BES_DrawTrace::findNetPoint(Board& board, const Point& pos,
   QSet<BI_NetPoint*> items =
       Toolbox::toSet(board.getNetPointsAtScenePos(pos, layer, netsignal));
   items -= except;
-  return (items.constBegin() != items.constEnd()) ? *items.constBegin()
-                                                  : nullptr;
+  return items.count() ? *items.constBegin() : nullptr;
 }
 
 BI_NetLine* BES_DrawTrace::findNetLine(Board& board, const Point& pos,
@@ -887,8 +886,7 @@ BI_NetLine* BES_DrawTrace::findNetLine(Board& board, const Point& pos,
   QSet<BI_NetLine*> items =
       Toolbox::toSet(board.getNetLinesAtScenePos(pos, layer, netsignal));
   items -= except;
-  return (items.constBegin() != items.constEnd()) ? *items.constBegin()
-                                                  : nullptr;
+  return (items.count() ? *items.constBegin() : nullptr);
 }
 
 BI_NetLineAnchor* BES_DrawTrace::findAnchorNextTo(
@@ -918,23 +916,27 @@ void BES_DrawTrace::updateNetpointPositions() noexcept {
     // find anchor under cursor
     GraphicsLayer* layer = mPositioningNetPoint1->getLayerOfLines();
     Q_ASSERT(layer);
-    if (BI_Via* via =
-            findVia(board, mCursorPos, mCurrentNetSignal, {mTempVia})) {
+    NetSignal* netsignal = &mCurrentNetSegment->getNetSignal();
+    // NOTE(5n8ke): netsignal must not be nullptr, since a connection should
+    // only be made to the current NetSignal
+    Q_ASSERT(netsignal);
+
+    if (BI_Via* via = findVia(board, mCursorPos, netsignal, {mTempVia})) {
       mTargetPos = via->getPosition();
       isOnVia    = true;
     } else if (BI_FootprintPad* pad =
-                   findPad(board, mCursorPos, layer, mCurrentNetSignal)) {
+                   findPad(board, mCursorPos, layer, netsignal)) {
       mTargetPos = pad->getPosition();
       isOnVia    = (pad->getLibPad().getBoardSide() ==
                  library::FootprintPad::BoardSide::THT);
     } else if (BI_NetPoint* netpoint = findNetPoint(
-                   board, mCursorPos, layer, mCurrentNetSignal,
+                   board, mCursorPos, layer, netsignal,
                    {mPositioningNetPoint1, mPositioningNetPoint2})) {
       mTargetPos = netpoint->getPosition();
     } else if (BI_NetLine* netline =
-                   findNetLine(board, mCursorPos, layer, mCurrentNetSignal,
+                   findNetLine(board, mCursorPos, layer, netsignal,
                                {mPositioningNetLine1, mPositioningNetLine2})) {
-      if (findNetLine(board, mTargetPos, layer, mCurrentNetSignal,
+      if (findNetLine(board, mTargetPos, layer, netsignal,
                       {mPositioningNetLine1, mPositioningNetLine2}) ==
           netline) {
         mTargetPos = Toolbox::nearestPointOnLine(
@@ -976,11 +978,14 @@ void BES_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
       ->setVisible(true);
   if (mSubState == SubState_PositioningNetPoint &&
       newLayerName != mCurrentLayerName) {
-    Board&           board    = mPositioningNetPoint1->getBoard();
-    Point            startPos = mFixedStartAnchor->getPosition();
-    BI_FootprintPad* padAtStart =
-        findPad(board, startPos, nullptr, mCurrentNetSignal);
-    if (findVia(board, startPos, mCurrentNetSignal) ||
+    Board&     board     = mPositioningNetPoint1->getBoard();
+    Point      startPos  = mFixedStartAnchor->getPosition();
+    NetSignal* netsignal = &mCurrentNetSegment->getNetSignal();
+    // NOTE(5n8ke): netsignal must not be nullptr, since a connection should
+    // only be made to the current NetSignal
+    Q_ASSERT(netsignal);
+    BI_FootprintPad* padAtStart = findPad(board, startPos, nullptr, netsignal);
+    if (findVia(board, startPos, netsignal) ||
         (padAtStart && padAtStart->getLibPad().getBoardSide() ==
                            library::FootprintPad::BoardSide::THT)) {
       abortPositioning(false);
