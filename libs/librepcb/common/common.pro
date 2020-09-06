@@ -87,6 +87,7 @@ SOURCES += \
     geometry/cmd/cmdtextedit.cpp \
     geometry/hole.cpp \
     geometry/junction.cpp \
+    geometry/netlabel.cpp \
     geometry/netline.cpp \
     geometry/path.cpp \
     geometry/pathmodel.cpp \
@@ -229,6 +230,7 @@ HEADERS += \
     geometry/cmd/cmdtextedit.h \
     geometry/hole.h \
     geometry/junction.h \
+    geometry/netlabel.h \
     geometry/netline.h \
     geometry/path.h \
     geometry/pathmodel.h \
