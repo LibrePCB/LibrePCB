@@ -71,9 +71,9 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mElementName = tl::nullopt;
   mElementDescription.clear();
   mElementKeywords.clear();
-  mElementAuthor       = mWorkspace.getSettings().userName.get();
-  mElementVersion      = Version::fromString("0.1");
-  mElementCategoryUuid = tl::nullopt;
+  mElementAuthor  = mWorkspace.getSettings().userName.get();
+  mElementVersion = Version::fromString("0.1");
+  mElementCategoryUuids.clear();
 
   // symbol
   mSymbolPins.clear();
@@ -143,15 +143,13 @@ void NewElementWizardContext::copyElement(ElementType     type,
   mElementKeywords    = element->getKeywords().getDefaultValue();
   if (const LibraryCategory* category =
           dynamic_cast<const LibraryCategory*>(element.data())) {
-    mElementCategoryUuid = category->getParentUuid();
+    if (category->getParentUuid().has_value()) {
+      mElementCategoryUuids.insert(*category->getParentUuid());
+    }
   }
   if (const LibraryElement* libElement =
           dynamic_cast<const LibraryElement*>(element.data())) {
-    if (libElement->getCategories().count() > 0) {
-      mElementCategoryUuid = libElement->getCategories().values().first();
-    } else {
-      mElementCategoryUuid = tl::nullopt;
-    }
+    mElementCategoryUuids = libElement->getCategories();
   }
 
   switch (mElementType) {
@@ -315,20 +313,20 @@ void NewElementWizardContext::copyElement(ElementType     type,
 }
 
 void NewElementWizardContext::createLibraryElement() {
-  QSet<Uuid> categories;
-  if (mElementCategoryUuid) {
-    categories.insert(*mElementCategoryUuid);
-  }
-
   if (!mElementName) throw LogicError(__FILE__, __LINE__);
   if (!mElementVersion) throw LogicError(__FILE__, __LINE__);
+
+  tl::optional<Uuid> rootCategoryUuid = tl::nullopt;
+  if (mElementCategoryUuids.count()) {
+    rootCategoryUuid = mElementCategoryUuids.values().first();
+  }
 
   switch (mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory: {
       ComponentCategory element(Uuid::createRandom(), *mElementVersion,
                                 mElementAuthor, *mElementName,
                                 mElementDescription, mElementKeywords);
-      element.setParentUuid(mElementCategoryUuid);
+      element.setParentUuid(rootCategoryUuid);
       TransactionalDirectory dir(
           mLibrary.getDirectory(),
           mLibrary.getElementsDirectoryName<ComponentCategory>());
@@ -340,7 +338,7 @@ void NewElementWizardContext::createLibraryElement() {
       PackageCategory element(Uuid::createRandom(), *mElementVersion,
                               mElementAuthor, *mElementName,
                               mElementDescription, mElementKeywords);
-      element.setParentUuid(mElementCategoryUuid);
+      element.setParentUuid(rootCategoryUuid);
       TransactionalDirectory dir(
           mLibrary.getDirectory(),
           mLibrary.getElementsDirectoryName<PackageCategory>());
@@ -351,7 +349,7 @@ void NewElementWizardContext::createLibraryElement() {
     case NewElementWizardContext::ElementType::Symbol: {
       Symbol element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                      *mElementName, mElementDescription, mElementKeywords);
-      element.setCategories(categories);
+      element.setCategories(mElementCategoryUuids);
       element.getPins()     = mSymbolPins;
       element.getPolygons() = mSymbolPolygons;
       element.getCircles()  = mSymbolCircles;
@@ -365,7 +363,7 @@ void NewElementWizardContext::createLibraryElement() {
     case NewElementWizardContext::ElementType::Package: {
       Package element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                       *mElementName, mElementDescription, mElementKeywords);
-      element.setCategories(categories);
+      element.setCategories(mElementCategoryUuids);
       element.getPads()       = mPackagePads;
       element.getFootprints() = mPackageFootprints;
       if (element.getFootprints().isEmpty()) {
@@ -381,7 +379,7 @@ void NewElementWizardContext::createLibraryElement() {
     case NewElementWizardContext::ElementType::Component: {
       Component element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                         *mElementName, mElementDescription, mElementKeywords);
-      element.setCategories(categories);
+      element.setCategories(mElementCategoryUuids);
       element.setIsSchematicOnly(mComponentSchematicOnly);
       element.getAttributes() = mComponentAttributes;
       element.setDefaultValue(mComponentDefaultValue);
@@ -401,7 +399,7 @@ void NewElementWizardContext::createLibraryElement() {
       Device element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                      *mElementName, mElementDescription, mElementKeywords,
                      *mDeviceComponentUuid, *mDevicePackageUuid);
-      element.setCategories(categories);
+      element.setCategories(mElementCategoryUuids);
       element.getPadSignalMap() = mDevicePadSignalMap;
       TransactionalDirectory dir(mLibrary.getDirectory(),
                                  mLibrary.getElementsDirectoryName<Device>());
