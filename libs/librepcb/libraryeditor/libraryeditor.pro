@@ -89,8 +89,8 @@ SOURCES += \
     pkg/packagepadlisteditorwidget.cpp \
     pkg/packagepadlistmodel.cpp \
     pkg/widgets/boardsideselectorwidget.cpp \
-    pkg/widgets/footprintpadshapeselectorwidget.cpp \
     pkg/widgets/packagepadcombobox.cpp \
+    pkg/widgets/padshapeselector.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/dialogs/symbolpinpropertiesdialog.cpp \
     sym/fsm/cmd/cmddragselectedsymbolitems.cpp \
@@ -177,8 +177,8 @@ HEADERS += \
     pkg/packagepadlisteditorwidget.h \
     pkg/packagepadlistmodel.h \
     pkg/widgets/boardsideselectorwidget.h \
-    pkg/widgets/footprintpadshapeselectorwidget.h \
     pkg/widgets/packagepadcombobox.h \
+    pkg/widgets/padshapeselector.h \
     pkgcat/packagecategoryeditorwidget.h \
     sym/dialogs/symbolpinpropertiesdialog.h \
     sym/fsm/cmd/cmddragselectedsymbolitems.h \

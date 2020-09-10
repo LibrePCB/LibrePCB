@@ -24,8 +24,8 @@
 
 #include "../packageeditorwidget.h"
 #include "../widgets/boardsideselectorwidget.h"
-#include "../widgets/footprintpadshapeselectorwidget.h"
 #include "../widgets/packagepadcombobox.h"
+#include "../widgets/padshapeselector.h"
 
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
@@ -114,34 +114,35 @@ bool PackageEditorState_AddPads::entry() noexcept {
   }
 
   // shape
-  std::unique_ptr<FootprintPadShapeSelectorWidget> shapeSelector(
-      new FootprintPadShapeSelectorWidget());
-  connect(shapeSelector.get(),
-          &FootprintPadShapeSelectorWidget::currentShapeChanged, this,
-          &PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged);
-  shapeSelector->setCurrentShape(mLastPad.getShape());
+  std::unique_ptr<PadShapeSelector> shapeSelector(
+      new PadShapeSelector(getDefaultLengthUnit()));
+  shapeSelector->setShape(mLastPad.getShape());
+  shapeSelector->setWidth(mLastPad.getWidth());
+  shapeSelector->setHeight(mLastPad.getHeight());
+
+  connect(shapeSelector.get(), &PadShapeSelector::shapeChanged,
+          [this](const FootprintPad::Shape shape) {
+            mLastPad.setShape(shape);
+            if (mEditCmd) {
+              mEditCmd->setShape(shape, true);
+            }
+          });
+  connect(shapeSelector.get(), &PadShapeSelector::widthChanged,
+          [this](const PositiveLength& width) {
+            mLastPad.setWidth(width);
+            if (mEditCmd) {
+              mEditCmd->setWidth(mLastPad.getWidth(), true);
+            }
+          });
+  connect(shapeSelector.get(), &PadShapeSelector::heightChanged,
+          [this](const PositiveLength& height) {
+            mLastPad.setHeight(height);
+            if (mEditCmd) {
+              mEditCmd->setHeight(mLastPad.getHeight(), true);
+            }
+          });
   mContext.commandToolBar.addWidget(std::move(shapeSelector));
   mContext.commandToolBar.addSeparator();
-
-  // width
-  mContext.commandToolBar.addLabel(tr("Width:"), 10);
-  std::unique_ptr<PositiveLengthEdit> edtWidth(new PositiveLengthEdit());
-  edtWidth->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
-                      "package_editor/add_pads/width");
-  edtWidth->setValue(mLastPad.getWidth());
-  connect(edtWidth.get(), &PositiveLengthEdit::valueChanged, this,
-          &PackageEditorState_AddPads::widthEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtWidth));
-
-  // height
-  mContext.commandToolBar.addLabel(tr("Height:"), 10);
-  std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
-  edtHeight->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
-                       "package_editor/add_pads/height");
-  edtHeight->setValue(mLastPad.getHeight());
-  connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
-          &PackageEditorState_AddPads::heightEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtHeight));
 
   // drill diameter
   if (mPadType == PadType::THT) {
@@ -305,30 +306,6 @@ void PackageEditorState_AddPads::boardSideSelectorCurrentSideChanged(
   mLastPad.setBoardSide(side);
   if (mEditCmd) {
     mEditCmd->setBoardSide(side, true);
-  }
-}
-
-void PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged(
-    FootprintPad::Shape shape) noexcept {
-  mLastPad.setShape(shape);
-  if (mEditCmd) {
-    mEditCmd->setShape(shape, true);
-  }
-}
-
-void PackageEditorState_AddPads::widthEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastPad.setWidth(value);
-  if (mEditCmd) {
-    mEditCmd->setWidth(mLastPad.getWidth(), true);
-  }
-}
-
-void PackageEditorState_AddPads::heightEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastPad.setHeight(value);
-  if (mEditCmd) {
-    mEditCmd->setHeight(mLastPad.getHeight(), true);
   }
 }
 

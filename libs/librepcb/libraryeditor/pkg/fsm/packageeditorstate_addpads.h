@@ -88,9 +88,6 @@ private:  // Methods
   void packagePadComboBoxCurrentPadChanged(PackagePad* pad) noexcept;
   void boardSideSelectorCurrentSideChanged(
       FootprintPad::BoardSide side) noexcept;
-  void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
-  void widthEditValueChanged(const PositiveLength& value) noexcept;
-  void heightEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const UnsignedLength& value) noexcept;
 
 private:  // Types / Data
