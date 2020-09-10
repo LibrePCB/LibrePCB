@@ -95,6 +95,7 @@ SOURCES += \
     geometry/stroketext.cpp \
     geometry/text.cpp \
     geometry/vertex.cpp \
+    geometry/via.cpp \
     graphics/circlegraphicsitem.cpp \
     graphics/defaultgraphicslayerprovider.cpp \
     graphics/graphicslayer.cpp \
@@ -238,6 +239,7 @@ HEADERS += \
     geometry/stroketext.h \
     geometry/text.h \
     geometry/vertex.h \
+    geometry/via.h \
     graphics/circlegraphicsitem.h \
     graphics/defaultgraphicslayerprovider.h \
     graphics/graphicslayer.h \
