@@ -286,8 +286,8 @@ void BoardClipperPathGenerator::addCopper(const QString&   layerName,
         continue;
       }
       ClipperHelpers::unite(
-          mPaths,
-          ClipperHelpers::convert(via->getSceneOutline(), mMaxArcTolerance));
+          mPaths, ClipperHelpers::convert(via->getVia().getSceneOutline(),
+                                          mMaxArcTolerance));
     }
 
     // netlines

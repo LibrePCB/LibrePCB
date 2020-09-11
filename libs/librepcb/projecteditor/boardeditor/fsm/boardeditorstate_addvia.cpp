@@ -66,9 +66,12 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
     mAutoText(tr("Auto")),
     mFindClosestNetSignal(true),
     mLastClosestNetSignal(nullptr),
-    mLastShape(BI_Via::Shape::Round),
-    mLastSize(700000),
-    mLastDrillDiameter(300000),
+    mLastViaProperties(Uuid::createRandom(),    // UUID is not relevant here
+                       Point(),                 // Position is not relevant here
+                       Via::Shape::Round,       // Default shape
+                       PositiveLength(700000),  // Default size
+                       PositiveLength(300000)   // Default drill diameter
+                       ),
     mLastNetSignal(nullptr),
     mCurrentViaToPlace(nullptr) {
 }
@@ -99,14 +102,14 @@ bool BoardEditorState_AddVia::entry() noexcept {
   if (!addVia(*board, pos)) return false;
 
   // Add shape actions to the "command" toolbar
-  mShapeActions.insert(static_cast<int>(BI_Via::Shape::Round),
+  mShapeActions.insert(static_cast<int>(Via::Shape::Round),
                        mContext.editorUi.commandToolbar->addAction(
                            QIcon(":/img/command_toolbars/via_round.png"), ""));
-  mShapeActions.insert(static_cast<int>(BI_Via::Shape::Square),
+  mShapeActions.insert(static_cast<int>(Via::Shape::Square),
                        mContext.editorUi.commandToolbar->addAction(
                            QIcon(":/img/command_toolbars/via_square.png"), ""));
   mShapeActions.insert(
-      static_cast<int>(BI_Via::Shape::Octagon),
+      static_cast<int>(Via::Shape::Octagon),
       mContext.editorUi.commandToolbar->addAction(
           QIcon(":/img/command_toolbars/via_octagon.png"), ""));
   mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
@@ -115,9 +118,9 @@ bool BoardEditorState_AddVia::entry() noexcept {
   // Connect the shape actions with the slot updateShapeActionsCheckedState()
   foreach (int shape, mShapeActions.keys()) {
     connect(mShapeActions.value(shape), &QAction::triggered, [this, shape]() {
-      mLastShape = static_cast<BI_Via::Shape>(shape);
+      mLastViaProperties.setShape(static_cast<Via::Shape>(shape));
       if (mCurrentViaEditCmd) {
-        mCurrentViaEditCmd->setShape(mLastShape, true);
+        mCurrentViaEditCmd->setShape(mLastViaProperties.getShape(), true);
       }
       updateShapeActionsCheckedState();
     });
@@ -130,7 +133,7 @@ bool BoardEditorState_AddVia::entry() noexcept {
 
   // Add the size combobox to the toolbar
   mSizeEdit.reset(new PositiveLengthEdit());
-  mSizeEdit->setValue(mLastSize);
+  mSizeEdit->setValue(mLastViaProperties.getSize());
   mContext.editorUi.commandToolbar->addWidget(mSizeEdit.data());
   connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_AddVia::sizeEditValueChanged);
@@ -142,7 +145,7 @@ bool BoardEditorState_AddVia::entry() noexcept {
 
   // Add the drill combobox to the toolbar
   mDrillEdit.reset(new PositiveLengthEdit());
-  mDrillEdit->setValue(mLastDrillDiameter);
+  mDrillEdit->setValue(mLastViaProperties.getDrillDiameter());
   mContext.editorUi.commandToolbar->addWidget(mDrillEdit.data());
   connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_AddVia::drillDiameterEditValueChanged);
@@ -254,10 +257,11 @@ bool BoardEditorState_AddVia::addVia(Board& board, const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);
+    mLastViaProperties.setPosition(pos);
     QScopedPointer<CmdBoardNetSegmentAddElements> cmdAddVia(
         new CmdBoardNetSegmentAddElements(*netsegment));
     mCurrentViaToPlace =
-        cmdAddVia->addVia(pos, mLastShape, mLastSize, mLastDrillDiameter);
+        cmdAddVia->addVia(Via(Uuid::createRandom(), mLastViaProperties));
     Q_ASSERT(mCurrentViaToPlace);
     mContext.undoStack.appendToCmdGroup(cmdAddVia.take());
     mCurrentViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentViaToPlace));
@@ -454,24 +458,27 @@ bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
 
 void BoardEditorState_AddVia::updateShapeActionsCheckedState() noexcept {
   foreach (int key, mShapeActions.keys()) {
-    mShapeActions.value(key)->setCheckable(key == static_cast<int>(mLastShape));
-    mShapeActions.value(key)->setChecked(key == static_cast<int>(mLastShape));
+    mShapeActions.value(key)->setCheckable(
+        key == static_cast<int>(mLastViaProperties.getShape()));
+    mShapeActions.value(key)->setChecked(
+        key == static_cast<int>(mLastViaProperties.getShape()));
   }
 }
 
 void BoardEditorState_AddVia::sizeEditValueChanged(
     const PositiveLength& value) noexcept {
-  mLastSize = value;
+  mLastViaProperties.setSize(value);
   if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setSize(mLastSize, true);
+    mCurrentViaEditCmd->setSize(mLastViaProperties.getSize(), true);
   }
 }
 
 void BoardEditorState_AddVia::drillDiameterEditValueChanged(
     const PositiveLength& value) noexcept {
-  mLastDrillDiameter = value;
+  mLastViaProperties.setDrillDiameter(value);
   if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setDrillDiameter(mLastDrillDiameter, true);
+    mCurrentViaEditCmd->setDrillDiameter(mLastViaProperties.getDrillDiameter(),
+                                         true);
   }
 }
 

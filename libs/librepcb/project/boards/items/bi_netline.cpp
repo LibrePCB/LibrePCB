@@ -87,15 +87,15 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
                        BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
+    mTrace(Uuid::createRandom(), other.mTrace.getLayer(),
+           other.mTrace.getWidth(), startPoint.toTraceAnchor(),
+           endPoint.toTraceAnchor()),
     mPosition(other.mPosition),
-    mUuid(Uuid::createRandom()),
     mStartPoint(&startPoint),
-    mEndPoint(&endPoint),
-    mLayer(nullptr),
-    mWidth(other.mWidth) {
+    mEndPoint(&endPoint) {
   // don't just copy the pointer "mLayer" because it may come from another
   // board!
-  mLayer = mBoard.getLayerStack().getLayer(other.getLayer().getName());
+  mLayer = mBoard.getLayerStack().getLayer(*mTrace.getLayer());
   if (!mLayer) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -106,23 +106,19 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
 BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
+    mTrace(node),
     mPosition(),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mStartPoint(nullptr),
-    mEndPoint(nullptr),
-    mLayer(nullptr),
-    mWidth(node.getValueByPath<PositiveLength>("width")) {
-  mStartPoint = deserializeAnchor(node, "from");
-  mEndPoint   = deserializeAnchor(node, "to");
+    mStartPoint(getAnchor(mTrace.getStartPoint())),
+    mEndPoint(getAnchor(mTrace.getEndPoint())) {
   if ((!mStartPoint) || (!mEndPoint)) {
     throw RuntimeError(__FILE__, __LINE__, "Invalid trace anchor!");
   }
 
-  QString layerName = node.getValueByPath<QString>("layer", true);
-  mLayer            = mBoard.getLayerStack().getLayer(layerName);
+  mLayer = mBoard.getLayerStack().getLayer(*mTrace.getLayer());
   if (!mLayer) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid board layer: \"%1\"").arg(layerName));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Invalid board layer: \"%1\"").arg(*mTrace.getLayer()));
   }
 
   init();
@@ -133,12 +129,12 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
                        const PositiveLength& width)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
+    mTrace(Uuid::createRandom(), GraphicsLayerName(layer.getName()), width,
+           startPoint.toTraceAnchor(), endPoint.toTraceAnchor()),
     mPosition(),
-    mUuid(Uuid::createRandom()),
     mStartPoint(&startPoint),
     mEndPoint(&endPoint),
-    mLayer(&layer),
-    mWidth(width) {
+    mLayer(&layer) {
   init();
 }
 
@@ -147,7 +143,7 @@ void BI_NetLine::init() {
   if (!mLayer->isCopperLayer()) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("The layer of netpoint \"%1\" is invalid (%2).")
-                           .arg(mUuid.toStr())
+                           .arg(mTrace.getUuid().toStr())
                            .arg(mLayer->getName()));
   }
 
@@ -190,7 +186,7 @@ NetSignal& BI_NetLine::getNetSignalOfNetSegment() const noexcept {
 }
 
 Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept {
-  Length width = mWidth + (expansion * 2);
+  Length width = getWidth() + (expansion * 2);
   if (width > 0) {
     return Path::obround(mStartPoint->getPosition(), mEndPoint->getPosition(),
                          PositiveLength(width));
@@ -212,15 +208,14 @@ void BI_NetLine::setLayer(GraphicsLayer& layer) {
       (mBoard.getLayerStack().getLayer(layer.getName()) != &layer)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (&layer != mLayer) {
+  if (mTrace.setLayer(GraphicsLayerName(layer.getName()))) {
     mLayer = &layer;
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
 
 void BI_NetLine::setWidth(const PositiveLength& width) noexcept {
-  if (width != mWidth) {
-    mWidth = width;
+  if (mTrace.setWidth(width)) {
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
@@ -265,44 +260,20 @@ void BI_NetLine::updateLine() noexcept {
 }
 
 void BI_NetLine::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.appendChild("layer", SExpression::createToken(mLayer->getName()), false);
-  root.appendChild("width", mWidth, false);
-  serializeAnchor(root.appendList("from", true), mStartPoint);
-  serializeAnchor(root.appendList("to", true), mEndPoint);
+  mTrace.serialize(root);
 }
 
-BI_NetLineAnchor* BI_NetLine::deserializeAnchor(const SExpression& root,
-                                                const QString&     key) const {
-  const SExpression& node = root.getChildByPath(key);
-  if (const SExpression* junctionNode = node.tryGetChildByPath("junction")) {
-    return mNetSegment.getNetPointByUuid(
-        junctionNode->getValueOfFirstChild<Uuid>());
-  } else if (const SExpression* viaNode = node.tryGetChildByPath("via")) {
-    return mNetSegment.getViaByUuid(viaNode->getValueOfFirstChild<Uuid>());
+BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
+  if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
+    return mNetSegment.getNetPointByUuid(*uuid);
+  } else if (const tl::optional<Uuid>& uuid = anchor.tryGetVia()) {
+    return mNetSegment.getViaByUuid(*uuid);
+  } else if (const tl::optional<TraceAnchor::PadAnchor>& pad =
+                 anchor.tryGetPad()) {
+    BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(pad->device);
+    return device ? device->getFootprint().getPad(pad->pad) : nullptr;
   } else {
-    Uuid       deviceUuid = node.getValueByPath<Uuid>("device");
-    Uuid       padUuid    = node.getValueByPath<Uuid>("pad");
-    BI_Device* device     = mBoard.getDeviceInstanceByComponentUuid(deviceUuid);
-    return device ? device->getFootprint().getPad(padUuid) : nullptr;
-  }
-}
-
-void BI_NetLine::serializeAnchor(SExpression&      root,
-                                 BI_NetLineAnchor* anchor) const {
-  if (const BI_NetPoint* netpoint = dynamic_cast<const BI_NetPoint*>(anchor)) {
-    root.appendChild("junction", netpoint->getUuid(), false);
-  } else if (const BI_Via* via = dynamic_cast<const BI_Via*>(anchor)) {
-    root.appendChild("via", via->getUuid(), false);
-  } else if (const BI_FootprintPad* pad =
-                 dynamic_cast<const BI_FootprintPad*>(anchor)) {
-    root.appendChild(
-        "device",
-        pad->getFootprint().getDeviceInstance().getComponentInstanceUuid(),
-        false);
-    root.appendChild("pad", pad->getLibPadUuid(), false);
-  } else {
-    throw LogicError(__FILE__, __LINE__);
+    return nullptr;
   }
 }
 

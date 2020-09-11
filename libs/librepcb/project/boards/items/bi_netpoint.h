@@ -29,6 +29,7 @@
 #include "bi_base.h"
 
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/junction.h>
 
 #include <QtCore>
 
@@ -56,18 +57,19 @@ public:
   // Constructors / Destructor
   BI_NetPoint()                         = delete;
   BI_NetPoint(const BI_NetPoint& other) = delete;
-  BI_NetPoint(BI_NetSegment& segment, const BI_NetPoint& other);
   BI_NetPoint(BI_NetSegment& segment, const SExpression& node);
   BI_NetPoint(BI_NetSegment& segment, const Point& position);
   ~BI_NetPoint() noexcept;
 
   // Getters
-  const Uuid&    getUuid() const noexcept { return mUuid; }
-  BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal&     getNetSignalOfNetSegment() const noexcept;
+  const Uuid&     getUuid() const noexcept { return mJunction.getUuid(); }
+  const Junction& getJunction() const noexcept { return mJunction; }
+  BI_NetSegment&  getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal&      getNetSignalOfNetSegment() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   GraphicsLayer* getLayerOfLines() const noexcept;
   bool           isSelectable() const noexcept override;
+  TraceAnchor    toTraceAnchor() const noexcept override;
 
   // Setters
   void setPosition(const Point& position) noexcept;
@@ -79,9 +81,11 @@ public:
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  // Inherited from SI_Base
+  // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::NetPoint; }
-  const Point& getPosition() const noexcept override { return mPosition; }
+  const Point& getPosition() const noexcept override {
+    return mJunction.getPosition();
+  }
   bool         getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void         setSelected(bool selected) noexcept override;
@@ -107,8 +111,7 @@ private:
 
   // Attributes
   BI_NetSegment& mNetSegment;
-  Uuid           mUuid;
-  Point          mPosition;
+  Junction       mJunction;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;  ///< all registered netlines

@@ -224,6 +224,12 @@ Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept {
   return getOutline(expansion).rotated(rotation).translated(mPosition);
 }
 
+TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
+  return TraceAnchor::pad(
+      mFootprint.getDeviceInstance().getComponentInstanceUuid(),
+      mPackagePad->getUuid());
+}
+
 /*******************************************************************************
  *  Private Slots
  ******************************************************************************/

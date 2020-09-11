@@ -72,7 +72,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
   }
   // copy netpoints
   foreach (const BI_NetPoint* netpoint, other.mNetPoints) {
-    BI_NetPoint* copy = new BI_NetPoint(*this, *netpoint);
+    BI_NetPoint* copy = new BI_NetPoint(*this, netpoint->getPosition());
     mNetPoints.append(copy);
     anchorsMap.insert(netpoint, copy);
   }

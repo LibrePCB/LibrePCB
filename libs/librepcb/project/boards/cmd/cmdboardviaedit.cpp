@@ -82,7 +82,7 @@ void CmdBoardViaEdit::rotate(const Angle& angle, const Point& center,
   if (immediate) mVia.setPosition(mNewPos);
 }
 
-void CmdBoardViaEdit::setShape(BI_Via::Shape shape, bool immediate) noexcept {
+void CmdBoardViaEdit::setShape(Via::Shape shape, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewShape = shape;
   if (immediate) mVia.setShape(mNewShape);

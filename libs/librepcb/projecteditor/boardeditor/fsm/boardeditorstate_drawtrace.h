@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/common/geometry/via.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,6 +45,8 @@ class BI_FootprintPad;
 class BI_NetPoint;
 class BI_NetLine;
 class BI_NetLineAnchor;
+class BI_Via;
+class BI_NetSegment;
 
 namespace editor {
 
@@ -256,19 +258,17 @@ private:
       noexcept;
 
   // State
-  SubState       mSubState;          ///< the current substate
-  WireMode       mCurrentWireMode;   ///< the current wire mode
-  QString        mCurrentLayerName;  ///< the current board layer name
-  bool           mAddVia;            ///< whether a via add is requested
-  BI_Via*        mTempVia;
-  BI_Via::Shape  mCurrentViaShape;          ///< the current via shape
-  PositiveLength mCurrentViaSize;           ///< the current via size
-  PositiveLength mCurrentViaDrillDiameter;  ///< the current via drill
-                                            ///< diameter
-  QString mViaLayerName;  ///< the name of the layer where the via
-                          ///< was started
-  Point mTargetPos;       ///< the current target position of the
-                          ///< active trace
+  SubState mSubState;          ///< the current substate
+  WireMode mCurrentWireMode;   ///< the current wire mode
+  QString  mCurrentLayerName;  ///< the current board layer name
+  bool     mAddVia;            ///< whether a via add is requested
+  BI_Via*  mTempVia;
+  Via      mCurrentViaProperties;  ///< The current Via properties
+                                   ///< diameter
+  QString mViaLayerName;           ///< the name of the layer where the via
+                                   ///< was started
+  Point mTargetPos;                ///< the current target position of the
+                                   ///< active trace
 
   Point             mCursorPos;          ///< the current cursor position
   PositiveLength    mCurrentWidth;       ///< the current wire width
