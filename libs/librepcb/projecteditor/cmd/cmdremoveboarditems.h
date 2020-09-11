@@ -39,11 +39,11 @@ class BI_NetSegment;
 class BI_Via;
 class BI_NetPoint;
 class BI_NetLine;
-class BI_NetLineAnchor;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Hole;
+class BI_FootprintPad;
 
 namespace editor {
 
@@ -58,9 +58,10 @@ class CmdRemoveBoardItems final : public UndoCommandGroup {
 private:
   // Private Types
   struct NetSegmentItems {
-    QSet<BI_Via*>      vias;
-    QSet<BI_NetPoint*> netpoints;
-    QSet<BI_NetLine*>  netlines;
+    QSet<BI_Via*>          vias;
+    QSet<BI_NetPoint*>     netpoints;
+    QSet<BI_NetLine*>      netlines;
+    QSet<BI_FootprintPad*> pads;
   };
   typedef QHash<BI_NetSegment*, NetSegmentItems> NetSegmentItemList;
 
@@ -116,17 +117,11 @@ private:  // Methods
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  void                     splitUpNetSegment(BI_NetSegment&         netsegment,
-                                             const NetSegmentItems& itemsToRemove);
-  void                     createNewSubNetSegment(BI_NetSegment&         netsegment,
-                                                  const NetSegmentItems& items);
-  QVector<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(
-      BI_NetSegment& segment, const NetSegmentItems& removedItems) noexcept;
-  void findAllConnectedNetPointsAndNetLines(
-      BI_NetLineAnchor& anchor, QSet<BI_NetLineAnchor*>& processedAnchors,
-      QSet<BI_Via*>& vias, QSet<BI_NetPoint*>& netpoints,
-      QSet<BI_NetLine*>& netlines, QSet<BI_Via*>& availableVias,
-      QSet<BI_NetLine*>& availableNetLines) const noexcept;
+  void removeNetSegmentItems(BI_NetSegment&                netsegment,
+                             const QSet<BI_FootprintPad*>& padsToDisconnect,
+                             const QSet<BI_Via*>&          viasToRemove,
+                             const QSet<BI_NetPoint*>&     netpointsToRemove,
+                             const QSet<BI_NetLine*>&      netlinesToRemove);
 
 private:  // Data
   Board& mBoard;

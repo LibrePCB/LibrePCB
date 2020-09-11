@@ -59,6 +59,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() {
   query->addDeviceInstancesOfSelectedFootprints();
   query->addSelectedVias();
   query->addSelectedNetLines();
+  query->addNetPointsOfNetLines(true);
   query->addSelectedPlanes();
   query->addSelectedPolygons();
   query->addSelectedBoardStrokeTexts();

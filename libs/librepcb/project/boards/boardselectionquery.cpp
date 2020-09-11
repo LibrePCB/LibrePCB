@@ -160,12 +160,19 @@ void BoardSelectionQuery::addSelectedHoles() noexcept {
   }
 }
 
-void BoardSelectionQuery::addNetPointsOfNetLines() noexcept {
+void BoardSelectionQuery::addNetPointsOfNetLines(
+    bool onlyIfAllNetLinesSelected) noexcept {
   foreach (BI_NetLine* netline, mResultNetLines) {
     BI_NetPoint* p1 = dynamic_cast<BI_NetPoint*>(&netline->getStartPoint());
     BI_NetPoint* p2 = dynamic_cast<BI_NetPoint*>(&netline->getEndPoint());
-    if (p1) mResultNetPoints.insert(p1);
-    if (p2) mResultNetPoints.insert(p2);
+    if (p1 && ((!onlyIfAllNetLinesSelected) ||
+               (mResultNetLines.contains(p1->getNetLines())))) {
+      mResultNetPoints.insert(p1);
+    }
+    if (p2 && ((!onlyIfAllNetLinesSelected) ||
+               (mResultNetLines.contains(p2->getNetLines())))) {
+      mResultNetPoints.insert(p2);
+    }
   }
 }
 

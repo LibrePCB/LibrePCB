@@ -100,7 +100,16 @@ public:
   void addSelectedBoardStrokeTexts() noexcept;
   void addSelectedFootprintStrokeTexts() noexcept;
   void addSelectedHoles() noexcept;
-  void addNetPointsOfNetLines() noexcept;
+  /**
+   * @brief Add net points of the selected net lines
+   *
+   * @param onlyIfAllNetLinesSelected   If true, net points are added only if
+   *                                    *all* connected net lines are selected.
+   *                                    If false, net points are added if at
+   *                                    least one of the connected net lines
+   *                                    is selected.
+   */
+  void addNetPointsOfNetLines(bool onlyIfAllNetLinesSelected = false) noexcept;
 
   // Operator Overloadings
   BoardSelectionQuery& operator=(const BoardSelectionQuery& rhs) = delete;

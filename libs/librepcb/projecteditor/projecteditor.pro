@@ -31,6 +31,7 @@ SOURCES += \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
     boardeditor/boardlayerstacksetupdialog.cpp \
+    boardeditor/boardnetsegmentsplitter.cpp \
     boardeditor/boardpickplacegeneratordialog.cpp \
     boardeditor/boardplanepropertiesdialog.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
@@ -99,6 +100,7 @@ HEADERS += \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
     boardeditor/boardlayerstacksetupdialog.h \
+    boardeditor/boardnetsegmentsplitter.h \
     boardeditor/boardpickplacegeneratordialog.h \
     boardeditor/boardplanepropertiesdialog.h \
     boardeditor/boardviapropertiesdialog.h \
