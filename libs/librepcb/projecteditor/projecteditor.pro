@@ -26,6 +26,8 @@ RESOURCES += \
     ../../../img/images.qrc \
 
 SOURCES += \
+    boardeditor/boardclipboarddata.cpp \
+    boardeditor/boardclipboarddatabuilder.cpp \
     boardeditor/boarddesignrulecheckdialog.cpp \
     boardeditor/boarddesignrulecheckmessagesdock.cpp \
     boardeditor/boardeditor.cpp \
@@ -60,6 +62,8 @@ SOURCES += \
     cmd/cmdflipselectedboarditems.cpp \
     cmd/cmdmirrorselectedschematicitems.cpp \
     cmd/cmdmoveselectedschematicitems.cpp \
+    cmd/cmdpasteboarditems.cpp \
+    cmd/cmdpastefootprintitems.cpp \
     cmd/cmdpasteschematicitems.cpp \
     cmd/cmdremoveboarditems.cpp \
     cmd/cmdremoveselectedboarditems.cpp \
@@ -95,6 +99,8 @@ SOURCES += \
     toolbars/searchtoolbar.cpp \
 
 HEADERS += \
+    boardeditor/boardclipboarddata.h \
+    boardeditor/boardclipboarddatabuilder.h \
     boardeditor/boarddesignrulecheckdialog.h \
     boardeditor/boarddesignrulecheckmessagesdock.h \
     boardeditor/boardeditor.h \
@@ -129,6 +135,8 @@ HEADERS += \
     cmd/cmdflipselectedboarditems.h \
     cmd/cmdmirrorselectedschematicitems.h \
     cmd/cmdmoveselectedschematicitems.h \
+    cmd/cmdpasteboarditems.h \
+    cmd/cmdpastefootprintitems.h \
     cmd/cmdpasteschematicitems.h \
     cmd/cmdremoveboarditems.h \
     cmd/cmdremoveselectedboarditems.h \

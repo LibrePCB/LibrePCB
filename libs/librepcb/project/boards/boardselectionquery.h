@@ -57,6 +57,13 @@ class BoardSelectionQuery final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct NetSegmentItems {
+    QSet<BI_Via*>      vias;
+    QSet<BI_NetPoint*> netpoints;
+    QSet<BI_NetLine*>  netlines;
+  };
+
   // Constructors / Destructor
   BoardSelectionQuery()                                 = delete;
   BoardSelectionQuery(const BoardSelectionQuery& other) = delete;
@@ -87,7 +94,18 @@ public:
     return mResultStrokeTexts;
   }
   const QSet<BI_Hole*>& getHoles() const noexcept { return mResultHoles; }
-  int                   getResultCount() const noexcept;
+
+  /**
+   * @brief Get vias, net points and net lines grouped by net segement
+   *
+   * Same as #getVias(), #getNetPoints() and #getNetLines(), but grouped
+   * by their corresponding net segments. Only net segments containing selected
+   * items are returned.
+   *
+   * @return List of net segments containing the selected items
+   */
+  QHash<BI_NetSegment*, NetSegmentItems> getNetSegmentItems() const noexcept;
+  int                                    getResultCount() const noexcept;
   bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
   // General Methods

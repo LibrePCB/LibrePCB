@@ -69,6 +69,21 @@ BoardSelectionQuery::~BoardSelectionQuery() noexcept {
  *  Getters: General
  ******************************************************************************/
 
+QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems>
+BoardSelectionQuery::getNetSegmentItems() const noexcept {
+  QHash<BI_NetSegment*, NetSegmentItems> result;
+  foreach (BI_Via* via, mResultVias) {
+    result[&via->getNetSegment()].vias.insert(via);
+  }
+  foreach (BI_NetPoint* netpoint, mResultNetPoints) {
+    result[&netpoint->getNetSegment()].netpoints.insert(netpoint);
+  }
+  foreach (BI_NetLine* netline, mResultNetLines) {
+    result[&netline->getNetSegment()].netlines.insert(netline);
+  }
+  return result;
+}
+
 int BoardSelectionQuery::getResultCount() const noexcept {
   return mResultDeviceInstances.count() + mResultNetPoints.count() +
          mResultNetLines.count() + mResultVias.count() + mResultPlanes.count() +

@@ -459,9 +459,6 @@
    <property name="shortcut">
     <string notr="true">Ctrl+C</string>
    </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
   </action>
   <action name="actionCut">
    <property name="icon">
@@ -474,9 +471,6 @@
    <property name="shortcut">
     <string notr="true">Ctrl+X</string>
    </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
   </action>
   <action name="actionPaste">
    <property name="icon">
@@ -488,9 +482,6 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+V</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
    </property>
   </action>
   <action name="actionRemove">
