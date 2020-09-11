@@ -94,6 +94,7 @@ SOURCES += \
     geometry/polygon.cpp \
     geometry/stroketext.cpp \
     geometry/text.cpp \
+    geometry/trace.cpp \
     geometry/vertex.cpp \
     geometry/via.cpp \
     graphics/circlegraphicsitem.cpp \
@@ -238,6 +239,7 @@ HEADERS += \
     geometry/polygon.h \
     geometry/stroketext.h \
     geometry/text.h \
+    geometry/trace.h \
     geometry/vertex.h \
     geometry/via.h \
     graphics/circlegraphicsitem.h \
