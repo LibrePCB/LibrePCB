@@ -122,6 +122,8 @@ private:
   QList<SI_Symbol*> getSearchCandidates() noexcept;
   QStringList       getSearchToolBarCompleterList() noexcept;
   void goToSymbol(const QString& name, unsigned int index) noexcept;
+  void updateComponentToolbarIcons() noexcept;
+  bool useIeee315Symbols() const noexcept;
 
   // General Attributes
   ProjectEditor&                       mProjectEditor;
