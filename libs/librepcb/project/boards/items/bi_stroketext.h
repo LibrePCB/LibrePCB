@@ -95,7 +95,7 @@ public:
   BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
 
 private slots:
-  void boardAttributesChanged();
+  void boardOrFootprintAttributesChanged();
 
 private:  // Methods
   void init();
