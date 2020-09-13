@@ -84,6 +84,8 @@ public:
     DRAW_PLANE,
     /// ::librepcb::project::editor::BoardEditorState_DrawTrace
     DRAW_TRACE,
+    /// ::librepcb::project::editor::BoardEditorState_Simplify
+    SIMPLIFY,
   };
 
   /// FSM Context
@@ -116,6 +118,7 @@ public:
   bool processDrawPolygon() noexcept;
   bool processDrawPlane() noexcept;
   bool processDrawTrace() noexcept;
+  bool processSimplify() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;
   bool processCut() noexcept;

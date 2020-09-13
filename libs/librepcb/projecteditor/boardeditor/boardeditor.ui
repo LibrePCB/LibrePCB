@@ -17,7 +17,7 @@
    <string>Board Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../../../../img/images.qrc">
     <normaloff>:/img/actions/board_editor.png</normaloff>:/img/actions/board_editor.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -70,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>886</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -138,6 +138,7 @@
     <addaction name="actionToolSelect"/>
     <addaction name="actionToolAddVia"/>
     <addaction name="actionToolDrawTrace"/>
+    <addaction name="actionToolSimplify"/>
     <addaction name="actionToolDrawPolygon"/>
     <addaction name="actionToolAddText"/>
     <addaction name="actionToolAddHole"/>
@@ -272,6 +273,7 @@
    <addaction name="actionToolSelect"/>
    <addaction name="actionToolAddVia"/>
    <addaction name="actionToolDrawTrace"/>
+   <addaction name="actionToolSimplify"/>
    <addaction name="actionToolDrawPolygon"/>
    <addaction name="actionToolAddText"/>
    <addaction name="actionToolAddHole"/>
@@ -294,7 +296,7 @@
   </widget>
   <action name="actionProjectSave">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
    </property>
    <property name="text">
@@ -306,7 +308,7 @@
   </action>
   <action name="actionProjectClose">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/close.png</normaloff>:/img/actions/close.png</iconset>
    </property>
    <property name="text">
@@ -318,7 +320,7 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
    </property>
    <property name="text">
@@ -330,7 +332,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/quit.png</normaloff>:/img/actions/quit.png</iconset>
    </property>
    <property name="text">
@@ -342,7 +344,7 @@
   </action>
   <action name="actionExportAsPdf">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
@@ -354,7 +356,7 @@
   </action>
   <action name="actionShowControlPanel">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/home.png</normaloff>:/img/actions/home.png</iconset>
    </property>
    <property name="text">
@@ -366,7 +368,7 @@
   </action>
   <action name="actionShowSchematicEditor">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/schematic.png</normaloff>:/img/actions/schematic.png</iconset>
    </property>
    <property name="text">
@@ -378,7 +380,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
    </property>
    <property name="text">
@@ -390,7 +392,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/redo.png</normaloff>:/img/actions/redo.png</iconset>
    </property>
    <property name="text">
@@ -402,7 +404,7 @@
   </action>
   <action name="actionOnlineDocumentation">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/help.png</normaloff>:/img/actions/help.png</iconset>
    </property>
    <property name="text">
@@ -414,7 +416,7 @@
   </action>
   <action name="actionOpenWebsite">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/open_browser.png</normaloff>:/img/actions/open_browser.png</iconset>
    </property>
    <property name="text">
@@ -426,7 +428,7 @@
   </action>
   <action name="actionRotate_CCW">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
    </property>
    <property name="text">
@@ -438,7 +440,7 @@
   </action>
   <action name="actionRotate_CW">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
    </property>
    <property name="text">
@@ -450,7 +452,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
    </property>
    <property name="text">
@@ -465,7 +467,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
    </property>
    <property name="text">
@@ -480,7 +482,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
    </property>
    <property name="text">
@@ -495,7 +497,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
@@ -507,7 +509,7 @@
   </action>
   <action name="actionGrid">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/grid.png</normaloff>:/img/actions/grid.png</iconset>
    </property>
    <property name="text">
@@ -519,7 +521,7 @@
   </action>
   <action name="actionZoomIn">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/zoom_in.png</normaloff>:/img/actions/zoom_in.png</iconset>
    </property>
    <property name="text">
@@ -531,7 +533,7 @@
   </action>
   <action name="actionZoomOut">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/zoom_out.png</normaloff>:/img/actions/zoom_out.png</iconset>
    </property>
    <property name="text">
@@ -543,7 +545,7 @@
   </action>
   <action name="actionZoomAll">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/zoom_all.png</normaloff>:/img/actions/zoom_all.png</iconset>
    </property>
    <property name="text">
@@ -566,7 +568,7 @@
   </action>
   <action name="actionProjectSettings">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
    </property>
    <property name="text">
@@ -581,7 +583,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/info.png</normaloff>:/img/actions/info.png</iconset>
    </property>
    <property name="text">
@@ -607,7 +609,7 @@
   </action>
   <action name="actionToolSelect">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
    </property>
    <property name="text">
@@ -619,7 +621,7 @@
   </action>
   <action name="actionCommandAbort">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/stop.png</normaloff>:/img/actions/stop.png</iconset>
    </property>
    <property name="text">
@@ -631,7 +633,7 @@
   </action>
   <action name="actionNewBoard">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
    </property>
    <property name="text">
@@ -651,7 +653,7 @@
   </action>
   <action name="actionFlipHorizontal">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
    </property>
    <property name="text">
@@ -663,7 +665,7 @@
   </action>
   <action name="actionFlipVertical">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/flip_vertical.png</normaloff>:/img/actions/flip_vertical.png</iconset>
    </property>
    <property name="text">
@@ -675,7 +677,7 @@
   </action>
   <action name="actionToolDrawTrace">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/draw_wire.png</normaloff>:/img/actions/draw_wire.png</iconset>
    </property>
    <property name="text">
@@ -687,7 +689,7 @@
   </action>
   <action name="actionToolAddVia">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/add_via.png</normaloff>:/img/actions/add_via.png</iconset>
    </property>
    <property name="text">
@@ -699,7 +701,7 @@
   </action>
   <action name="actionCopyBoard">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
    </property>
    <property name="text">
@@ -711,7 +713,7 @@
   </action>
   <action name="actionGenerateFabricationData">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/export_gerber.png</normaloff>:/img/actions/export_gerber.png</iconset>
    </property>
    <property name="text">
@@ -742,7 +744,7 @@
   </action>
   <action name="actionRemoveBoard">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
    </property>
    <property name="text">
@@ -754,7 +756,7 @@
   </action>
   <action name="actionToolDrawPolygon">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
    </property>
    <property name="text">
@@ -766,7 +768,7 @@
   </action>
   <action name="actionRebuildPlanes">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/rebuild_plane.png</normaloff>:/img/actions/rebuild_plane.png</iconset>
    </property>
    <property name="text">
@@ -778,7 +780,7 @@
   </action>
   <action name="actionToolAddPlane">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/add_plane.png</normaloff>:/img/actions/add_plane.png</iconset>
    </property>
    <property name="text">
@@ -790,7 +792,7 @@
   </action>
   <action name="actionToolAddText">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/add_text.png</normaloff>:/img/actions/add_text.png</iconset>
    </property>
    <property name="text">
@@ -802,7 +804,7 @@
   </action>
   <action name="actionToolAddHole">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/add_hole.png</normaloff>:/img/actions/add_hole.png</iconset>
    </property>
    <property name="text">
@@ -814,7 +816,7 @@
   </action>
   <action name="actionUpdateLibrary">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
    </property>
    <property name="text">
@@ -826,7 +828,7 @@
   </action>
   <action name="actionExportLppz">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
    </property>
    <property name="text">
@@ -841,7 +843,7 @@
   </action>
   <action name="actionGenerateBom">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
    </property>
    <property name="text">
@@ -856,7 +858,7 @@
   </action>
   <action name="actionShowAllPlanes">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/show_planes.png</normaloff>:/img/actions/show_planes.png</iconset>
    </property>
    <property name="text">
@@ -868,7 +870,7 @@
   </action>
   <action name="actionHideAllPlanes">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/hide_planes.png</normaloff>:/img/actions/hide_planes.png</iconset>
    </property>
    <property name="text">
@@ -880,7 +882,7 @@
   </action>
   <action name="actionDesignRuleCheck">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/drc.png</normaloff>:/img/actions/drc.png</iconset>
    </property>
    <property name="text">
@@ -892,7 +894,7 @@
   </action>
   <action name="actionGeneratePickPlace">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/export_pick_place_file.png</normaloff>:/img/actions/export_pick_place_file.png</iconset>
    </property>
    <property name="text">
@@ -904,7 +906,7 @@
   </action>
   <action name="actionExportAsSvg">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
    </property>
    <property name="text">
@@ -916,7 +918,7 @@
   </action>
   <action name="actionSelectAll">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../img/images.qrc">
      <normaloff>:/img/actions/select_all.png</normaloff>:/img/actions/select_all.png</iconset>
    </property>
    <property name="text">
@@ -924,6 +926,18 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionToolSimplify">
+   <property name="icon">
+    <iconset resource="../../../../img/images.qrc">
+     <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
+   </property>
+   <property name="text">
+    <string>Simplify</string>
+   </property>
+   <property name="toolTip">
+    <string>Simplify Trace</string>
    </property>
   </action>
  </widget>
@@ -944,6 +958,15 @@
    <header location="global">librepcb/projecteditor/toolbars/searchtoolbar.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+  <include location="../../../../img/images.qrc"/>
+ </resources>
  <connections/>
 </ui>

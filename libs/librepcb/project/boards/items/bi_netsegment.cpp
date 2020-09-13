@@ -399,13 +399,15 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>&      vias,
                                    const QList<BI_NetPoint*>& netpoints,
                                    const QList<BI_NetLine*>&  netlines) {
   if (!isAddedToBoard()) {
-    throw LogicError(__FILE__, __LINE__);
+    throw LogicError(__FILE__, __LINE__,
+                     "Element to be removed not added to board.");
   }
 
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (BI_NetLine* netline, netlines) {
     if (!mNetLines.contains(netline)) {
-      throw LogicError(__FILE__, __LINE__);
+      throw LogicError(__FILE__, __LINE__,
+                       "Netline to be removed not part of the netsegment.");
     }
     // remove from board
     netline->removeFromBoard();  // can throw
@@ -417,7 +419,8 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>&      vias,
   }
   foreach (BI_NetPoint* netpoint, netpoints) {
     if (!mNetPoints.contains(netpoint)) {
-      throw LogicError(__FILE__, __LINE__);
+      throw LogicError(__FILE__, __LINE__,
+                       "Netpoint to be removed not part of the netsegment.");
     }
     // remove from board
     netpoint->removeFromBoard();  // can throw
@@ -429,7 +432,8 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>&      vias,
   }
   foreach (BI_Via* via, vias) {
     if (!mVias.contains(via)) {
-      throw LogicError(__FILE__, __LINE__);
+      throw LogicError(__FILE__, __LINE__,
+                       "Via to be removed not part of the netsegment.");
     }
     // remove from board
     via->removeFromBoard();  // can throw

@@ -46,10 +46,12 @@ SOURCES += \
     boardeditor/fsm/boardeditorstate_drawpolygon.cpp \
     boardeditor/fsm/boardeditorstate_drawtrace.cpp \
     boardeditor/fsm/boardeditorstate_select.cpp \
+    boardeditor/fsm/boardeditorstate_simplify.cpp \
     boardeditor/unplacedcomponentsdock.cpp \
     cmd/cmdaddcomponenttocircuit.cpp \
     cmd/cmdadddevicetoboard.cpp \
     cmd/cmdaddsymboltoschematic.cpp \
+    cmd/cmdboardcombineanchors.cpp \
     cmd/cmdboardsplitnetline.cpp \
     cmd/cmdchangenetsignalofschematicnetsegment.cpp \
     cmd/cmdcombineboardnetsegments.cpp \
@@ -114,10 +116,12 @@ HEADERS += \
     boardeditor/fsm/boardeditorstate_drawpolygon.h \
     boardeditor/fsm/boardeditorstate_drawtrace.h \
     boardeditor/fsm/boardeditorstate_select.h \
+    boardeditor/fsm/boardeditorstate_simplify.h \
     boardeditor/unplacedcomponentsdock.h \
     cmd/cmdaddcomponenttocircuit.h \
     cmd/cmdadddevicetoboard.h \
     cmd/cmdaddsymboltoschematic.h \
+    cmd/cmdboardcombineanchors.h \
     cmd/cmdboardsplitnetline.h \
     cmd/cmdchangenetsignalofschematicnetsegment.h \
     cmd/cmdcombineboardnetsegments.h \
