@@ -79,7 +79,12 @@ void BI_Via::init() {
 
   // connect to the "attributes changed" signal of the board
   connect(&mBoard, &Board::attributesChanged, this,
-          &BI_Via::boardAttributesChanged);
+          &BI_Via::boardOrNetAttributesChanged);
+
+  // Connect to the "name changed" signal of the net signal to enforce updating
+  // the displayed net signal name in the board.
+  connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged, this,
+          &BI_Via::boardOrNetAttributesChanged);
 }
 
 BI_Via::~BI_Via() noexcept {
@@ -237,7 +242,7 @@ void BI_Via::setSelected(bool selected) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void BI_Via::boardAttributesChanged() {
+void BI_Via::boardOrNetAttributesChanged() {
   mGraphicsItem->updateCacheAndRepaint();
 }
 
