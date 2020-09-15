@@ -217,10 +217,9 @@ bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     case SubState::IDLE: {
       return openContextMenuAtPos(Point::fromPx(e.scenePos()));
     }
+    case SubState::MOVING:
     case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->rotate(Angle::deg90());
-      return true;
+      return rotateSelectedItems(Angle::deg90());
     }
     default: { return false; }
   }
@@ -274,60 +273,19 @@ bool PackageEditorState_Select::processPaste() noexcept {
 }
 
 bool PackageEditorState_Select::processRotateCw() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return rotateSelectedItems(-Angle::deg90());
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->rotate(-Angle::deg90());
-      return true;
-    }
-    default: { return false; }
-  }
+  return rotateSelectedItems(-Angle::deg90());
 }
 
 bool PackageEditorState_Select::processRotateCcw() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return rotateSelectedItems(Angle::deg90());
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->rotate(Angle::deg90());
-      return true;
-    }
-    default: { return false; }
-  }
+  return rotateSelectedItems(Angle::deg90());
 }
 
 bool PackageEditorState_Select::processMirror() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return mirrorSelectedItems(Qt::Horizontal, false);
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->mirrorGeometry(Qt::Horizontal);
-      return true;
-    }
-    default: { return false; }
-  }
+  return mirrorSelectedItems(Qt::Horizontal, false);
 }
 
 bool PackageEditorState_Select::processFlip() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return mirrorSelectedItems(Qt::Horizontal, true);
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->mirrorGeometry(Qt::Horizontal);
-      mCmdDragSelectedItems->mirrorLayer();
-      return true;
-    }
-    default: { return false; }
-  }
+  return mirrorSelectedItems(Qt::Horizontal, true);
 }
 
 bool PackageEditorState_Select::processRemove() noexcept {
@@ -577,10 +535,14 @@ bool PackageEditorState_Select::pasteFromClipboard() noexcept {
 bool PackageEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
   try {
-    QScopedPointer<CmdDragSelectedFootprintItems> cmd(
-        new CmdDragSelectedFootprintItems(mContext));
-    cmd->rotate(angle);
-    mContext.undoStack.execCmd(cmd.take());
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->rotate(angle);
+    } else {
+      QScopedPointer<CmdDragSelectedFootprintItems> cmd(
+          new CmdDragSelectedFootprintItems(mContext));
+      cmd->rotate(angle);
+      mContext.undoStack.execCmd(cmd.take());
+    }
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
@@ -590,13 +552,20 @@ bool PackageEditorState_Select::rotateSelectedItems(
 bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
                                                     bool flipLayers) noexcept {
   try {
-    QScopedPointer<CmdDragSelectedFootprintItems> cmd(
-        new CmdDragSelectedFootprintItems(mContext));
-    cmd->mirrorGeometry(orientation);
-    if (flipLayers) {
-      cmd->mirrorLayer();
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->mirrorGeometry(Qt::Horizontal);
+      if (flipLayers) {
+        mCmdDragSelectedItems->mirrorLayer();
+      }
+    } else {
+      QScopedPointer<CmdDragSelectedFootprintItems> cmd(
+          new CmdDragSelectedFootprintItems(mContext));
+      cmd->mirrorGeometry(orientation);
+      if (flipLayers) {
+        cmd->mirrorLayer();
+      }
+      mContext.undoStack.execCmd(cmd.take());
     }
-    mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
