@@ -82,7 +82,7 @@ void BI_StrokeText::init() {
 
   // connect to the "attributes changed" signal of the board
   connect(&mBoard, &Board::attributesChanged, this,
-          &BI_StrokeText::boardAttributesChanged);
+          &BI_StrokeText::boardOrFootprintAttributesChanged);
 }
 
 BI_StrokeText::~BI_StrokeText() noexcept {
@@ -93,8 +93,19 @@ BI_StrokeText::~BI_StrokeText() noexcept {
  ******************************************************************************/
 
 void BI_StrokeText::setFootprint(BI_Footprint* footprint) noexcept {
+  if (mFootprint) {
+    disconnect(mFootprint, &BI_Footprint::attributesChanged, this,
+               &BI_StrokeText::boardOrFootprintAttributesChanged);
+  }
+
   mFootprint = footprint;
   updateGraphicsItems();
+
+  // Text might need to be updated if footprint attributes have changed.
+  if (mFootprint) {
+    connect(mFootprint, &BI_Footprint::attributesChanged, this,
+            &BI_StrokeText::boardOrFootprintAttributesChanged);
+  }
 }
 
 void BI_StrokeText::updateGraphicsItems() noexcept {
@@ -171,7 +182,7 @@ void BI_StrokeText::setSelected(bool selected) noexcept {
  *  Private Slots
  ******************************************************************************/
 
-void BI_StrokeText::boardAttributesChanged() {
+void BI_StrokeText::boardOrFootprintAttributesChanged() {
   mText->updatePaths();
 }
 

@@ -168,8 +168,11 @@ void BI_Device::init() {
     }
   }
 
-  // emit the "attributesChanged" signal when the board has emited it
+  // Emit the "attributesChanged" signal when the board or component instance
+  // has emited it.
   connect(&mBoard, &Board::attributesChanged, this,
+          &BI_Device::attributesChanged);
+  connect(mCompInstance, &ComponentInstance::attributesChanged, this,
           &BI_Device::attributesChanged);
 
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
