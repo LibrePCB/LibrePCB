@@ -214,10 +214,9 @@ bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     case SubState::IDLE: {
       return openContextMenuAtPos(Point::fromPx(e.scenePos()));
     }
+    case SubState::MOVING:
     case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->rotate(Angle::deg90());
-      return true;
+      return rotateSelectedItems(Angle::deg90());
     }
     default: { return false; }
   }
@@ -269,45 +268,15 @@ bool SymbolEditorState_Select::processPaste() noexcept {
 }
 
 bool SymbolEditorState_Select::processRotateCw() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return rotateSelectedItems(-Angle::deg90());
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->rotate(-Angle::deg90());
-      return true;
-    }
-    default: { return false; }
-  }
+  return rotateSelectedItems(-Angle::deg90());
 }
 
 bool SymbolEditorState_Select::processRotateCcw() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return rotateSelectedItems(Angle::deg90());
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->rotate(Angle::deg90());
-      return true;
-    }
-    default: { return false; }
-  }
+  return rotateSelectedItems(Angle::deg90());
 }
 
 bool SymbolEditorState_Select::processMirror() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
-      return mirrorSelectedItems(Qt::Horizontal);
-    }
-    case SubState::PASTING: {
-      Q_ASSERT(mCmdDragSelectedItems);
-      mCmdDragSelectedItems->mirror(Qt::Horizontal);
-      return true;
-    }
-    default: { return false; }
-  }
+  return mirrorSelectedItems(Qt::Horizontal);
 }
 
 bool SymbolEditorState_Select::processRemove() noexcept {
@@ -524,10 +493,14 @@ bool SymbolEditorState_Select::pasteFromClipboard() noexcept {
 bool SymbolEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
   try {
-    QScopedPointer<CmdDragSelectedSymbolItems> cmd(
-        new CmdDragSelectedSymbolItems(mContext));
-    cmd->rotate(angle);
-    mContext.undoStack.execCmd(cmd.take());
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->rotate(angle);
+    } else {
+      QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+          new CmdDragSelectedSymbolItems(mContext));
+      cmd->rotate(angle);
+      mContext.undoStack.execCmd(cmd.take());
+    }
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
@@ -537,10 +510,14 @@ bool SymbolEditorState_Select::rotateSelectedItems(
 bool SymbolEditorState_Select::mirrorSelectedItems(
     Qt::Orientation orientation) noexcept {
   try {
-    QScopedPointer<CmdDragSelectedSymbolItems> cmd(
-        new CmdDragSelectedSymbolItems(mContext));
-    cmd->mirror(orientation);
-    mContext.undoStack.execCmd(cmd.take());
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->mirror(orientation);
+    } else {
+      QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+          new CmdDragSelectedSymbolItems(mContext));
+      cmd->mirror(orientation);
+      mContext.undoStack.execCmd(cmd.take());
+    }
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
