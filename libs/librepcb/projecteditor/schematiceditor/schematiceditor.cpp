@@ -216,6 +216,11 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
           mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
 
+  // Make the icons in the components toolbar dependent from project settings
+  updateComponentToolbarIcons();
+  connect(&mProject.getSettings(), &ProjectSettings::settingsChanged, this,
+          &SchematicEditor::updateComponentToolbarIcons);
+
   // Restore Window Geometry
   QSettings clientSettings;
   restoreGeometry(
@@ -511,25 +516,33 @@ void SchematicEditor::on_actionGenerateBom_triggered() {
 
 void SchematicEditor::on_actionAddComp_Resistor_triggered() {
   Uuid componentUuid = Uuid::fromString("ef80cd5e-2689-47ee-8888-31d04fc99174");
-  Uuid symbVarUuid   = Uuid::fromString("a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
+  Uuid symbVarUuid   = Uuid::fromString(
+      useIeee315Symbols() ? "d16e1f44-16af-4773-a310-de370f744548"
+                          : "a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
   mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_BipolarCapacitor_triggered() {
   Uuid componentUuid = Uuid::fromString("d167e0e3-6a92-4b76-b013-77b9c230e5f1");
-  Uuid symbVarUuid   = Uuid::fromString("8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
+  Uuid symbVarUuid   = Uuid::fromString(
+      useIeee315Symbols() ? "6e639ff1-4e81-423b-9d0e-b28b35693a61"
+                          : "8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
   mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_UnipolarCapacitor_triggered() {
   Uuid componentUuid = Uuid::fromString("c54375c5-7149-4ded-95c5-7462f7301ee7");
-  Uuid symbVarUuid   = Uuid::fromString("5412add2-af9c-44b8-876d-a0fb7c201897");
+  Uuid symbVarUuid   = Uuid::fromString(
+      useIeee315Symbols() ? "20a01a81-506e-4fee-9dc0-8b50e6537cd4"
+                          : "5412add2-af9c-44b8-876d-a0fb7c201897");
   mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
 void SchematicEditor::on_actionAddComp_Inductor_triggered() {
   Uuid componentUuid = Uuid::fromString("506bd124-6062-400e-9078-b38bd7e1aaee");
-  Uuid symbVarUuid   = Uuid::fromString("62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
+  Uuid symbVarUuid   = Uuid::fromString(
+      useIeee315Symbols() ? "4245d515-6f6d-48cb-9958-a4ea23d0187f"
+                          : "62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
   mFsm->processAddComponent(componentUuid, symbVarUuid);
 }
 
@@ -740,6 +753,29 @@ void SchematicEditor::goToSymbol(const QString& name,
       mGraphicsView->zoomToRect(rect);
     }
   }
+}
+
+void SchematicEditor::updateComponentToolbarIcons() noexcept {
+  QString suffix = useIeee315Symbols() ? "us" : "eu";
+  mUi->actionAddComp_Resistor->setIcon(
+      QIcon(":/img/library/resistor_" % suffix % ".png"));
+  mUi->actionAddComp_Inductor->setIcon(
+      QIcon(":/img/library/inductor_" % suffix % ".png"));
+  mUi->actionAddComp_BipolarCapacitor->setIcon(
+      QIcon(":/img/library/bipolar_capacitor_" % suffix % ".png"));
+  mUi->actionAddComp_UnipolarCapacitor->setIcon(
+      QIcon(":/img/library/unipolar_capacitor_" % suffix % ".png"));
+}
+
+bool SchematicEditor::useIeee315Symbols() const noexcept {
+  foreach (const QString& norm, mProject.getSettings().getNormOrder()) {
+    if (norm.toLower() == "ieee 315") {
+      return true;
+    } else if (norm.toLower() == "iec 60617") {
+      return false;
+    }
+  }
+  return false;
 }
 
 /*******************************************************************************
