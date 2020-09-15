@@ -108,15 +108,19 @@
         <file>empty.png</file>
         <file>library/3d_model.png</file>
         <file>library/bipolar_capacitor_eu.png</file>
+        <file>library/bipolar_capacitor_us.png</file>
         <file>library/component.png</file>
         <file>library/device.png</file>
         <file>library/footprint.png</file>
         <file>library/gnd.png</file>
         <file>library/inductor_eu.png</file>
+        <file>library/inductor_us.png</file>
         <file>library/package.png</file>
         <file>library/resistor_eu.png</file>
+        <file>library/resistor_us.png</file>
         <file>library/symbol.png</file>
         <file>library/unipolar_capacitor_eu.png</file>
+        <file>library/unipolar_capacitor_us.png</file>
         <file>library/vcc.png</file>
         <file>logo/32x32.png</file>
         <file>logo/48x48.png</file>
