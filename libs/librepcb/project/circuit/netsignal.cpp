@@ -179,10 +179,14 @@ void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal) {
 }
 
 void NetSignal::registerSchematicNetSegment(SI_NetSegment& netsegment) {
-  if ((!mIsAddedToCircuit) ||
-      (mRegisteredSchematicNetSegments.contains(&netsegment)) ||
-      (netsegment.getCircuit() != mCircuit)) {
-    throw LogicError(__FILE__, __LINE__);
+  if (!mIsAddedToCircuit) {
+    throw LogicError(__FILE__, __LINE__, "NetSignal is not added to circuit.");
+  }
+  if (mRegisteredSchematicNetSegments.contains(&netsegment)) {
+    throw LogicError(__FILE__, __LINE__, "NetSegment already in NetSignal.");
+  }
+  if (netsegment.getCircuit() != mCircuit) {
+    throw LogicError(__FILE__, __LINE__, "NetSegment is from other circuit.");
   }
   mRegisteredSchematicNetSegments.append(&netsegment);
   updateErcMessages();

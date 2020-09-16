@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
 
@@ -40,9 +39,6 @@ class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLabel;
 class SI_Symbol;
-class SI_SymbolPin;
-class BI_Device;
-class SI_NetLineAnchor;
 class ComponentSignalInstance;
 
 namespace editor {
@@ -55,15 +51,6 @@ namespace editor {
  * @brief The CmdRemoveSelectedSchematicItems class
  */
 class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup {
-private:
-  // Private Types
-  struct NetSegmentItems {
-    QSet<SI_NetPoint*> netpoints;
-    QSet<SI_NetLine*>  netlines;
-    QSet<SI_NetLabel*> netlabels;
-  };
-  typedef QHash<SI_NetSegment*, NetSegmentItems> NetSegmentItemList;
-
 public:
   // Constructors / Destructor
   explicit CmdRemoveSelectedSchematicItems(Schematic& schematic) noexcept;
@@ -75,26 +62,12 @@ private:
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  void           removeNetSegment(SI_NetSegment& netsegment);
-  void           splitUpNetSegment(SI_NetSegment&         netsegment,
-                                   const NetSegmentItems& selectedItems);
-  SI_NetSegment* createNewSubNetSegment(SI_NetSegment&         netsegment,
-                                        const NetSegmentItems& items);
-  void           removeNetLabel(SI_NetLabel& netlabel);
-  void           removeSymbol(SI_Symbol& symbol);
+  void removeNetSegmentItems(SI_NetSegment&            netsegment,
+                             const QSet<SI_NetPoint*>& netpointsToRemove,
+                             const QSet<SI_NetLine*>&  netlinesToRemove,
+                             const QSet<SI_NetLabel*>& netlabelsToRemove);
+  void removeSymbol(SI_Symbol& symbol);
   void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
-  QList<NetSegmentItems> getNonCohesiveNetSegmentSubSegments(
-      SI_NetSegment& segment, const NetSegmentItems& removedItems) noexcept;
-  void findAllConnectedNetPointsAndNetLines(
-      SI_NetLineAnchor& anchor, QSet<SI_NetLineAnchor*>& processedAnchors,
-      QSet<SI_NetPoint*>& netpoints, QSet<SI_NetLine*>& netlines,
-      QSet<SI_NetLine*>& availableNetLines) const noexcept;
-  int getNearestNetSegmentOfNetLabel(
-      const SI_NetLabel& netlabel, const QList<NetSegmentItems>& segments) const
-      noexcept;
-  Length getDistanceBetweenNetLabelAndNetSegment(
-      const SI_NetLabel& netlabel, const NetSegmentItems& netsegment) const
-      noexcept;
 
   // Attributes from the constructor
   Schematic& mSchematic;

@@ -25,10 +25,10 @@
  ******************************************************************************/
 
 #include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/common/geometry/junction.h>
+#include <librepcb/common/geometry/netlabel.h>
+#include <librepcb/common/geometry/netline.h>
 #include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -148,132 +148,21 @@ public:
     }
   };
 
-  struct NetPoint : public SerializableObject {
-    static constexpr const char* tagname = "junction";
-
-    Uuid             uuid;
-    Point            position;
-    Signal<NetPoint> onEdited;  ///< Dummy event, not used
-
-    NetPoint(const Uuid& uuid, const Point& position)
-      : uuid(uuid), position(position), onEdited(*this) {}
-
-    explicit NetPoint(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        position(node.getChildByPath("position")),
-        onEdited(*this) {}
-
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
-      root.appendChild(uuid);
-      root.appendChild(position.serializeToDomElement("position"), true);
-    }
-  };
-
-  struct NetLine : public SerializableObject {
-    static constexpr const char* tagname = "line";
-
-    Uuid               uuid;
-    tl::optional<Uuid> startJunction;
-    tl::optional<Uuid> startSymbol;
-    tl::optional<Uuid> startPin;
-    tl::optional<Uuid> endJunction;
-    tl::optional<Uuid> endSymbol;
-    tl::optional<Uuid> endPin;
-    Signal<NetLine>    onEdited;  ///< Dummy event, not used
-
-    explicit NetLine(const Uuid& uuid)
-      : uuid(uuid),
-        startJunction(),
-        startSymbol(),
-        startPin(),
-        endJunction(),
-        endSymbol(),
-        endPin(),
-        onEdited(*this) {}
-
-    explicit NetLine(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()), onEdited(*this) {
-      if (node.getChildByPath("from").getChildren().count() == 2) {
-        startSymbol = node.getValueByPath<Uuid>("from/symbol");
-        startPin    = node.getValueByPath<Uuid>("from/pin");
-      } else {
-        startJunction = node.getValueByPath<Uuid>("from/junction");
-      }
-      if (node.getChildByPath("to").getChildren().count() == 2) {
-        endSymbol = node.getValueByPath<Uuid>("to/symbol");
-        endPin    = node.getValueByPath<Uuid>("to/pin");
-      } else {
-        endJunction = node.getValueByPath<Uuid>("to/junction");
-      }
-    }
-
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
-      root.appendChild(uuid);
-      SExpression& from = root.appendList("from", true);
-      if (startSymbol) {
-        from.appendChild("symbol", *startSymbol, false);
-      }
-      if (startPin) {
-        from.appendChild("pin", *startPin, false);
-      }
-      if (startJunction) {
-        from.appendChild("junction", *startJunction, false);
-      }
-      SExpression& to = root.appendList("to", true);
-      if (endSymbol) {
-        to.appendChild("symbol", *endSymbol, false);
-      }
-      if (endPin) {
-        to.appendChild("pin", *endPin, false);
-      }
-      if (endJunction) {
-        to.appendChild("junction", *endJunction, false);
-      }
-    }
-  };
-
-  struct NetLabel : public SerializableObject {
-    static constexpr const char* tagname = "label";
-
-    Uuid             uuid;
-    Point            position;
-    Angle            rotation;
-    Signal<NetLabel> onEdited;  ///< Dummy event, not used
-
-    NetLabel(const Uuid& uuid, const Point& position, const Angle& rotation)
-      : uuid(uuid), position(position), rotation(rotation), onEdited(*this) {}
-
-    explicit NetLabel(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        position(node.getChildByPath("position")),
-        rotation(node.getValueByPath<Angle>("rotation")),
-        onEdited(*this) {}
-
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
-      root.appendChild(uuid);
-      root.appendChild(position.serializeToDomElement("position"), true);
-      root.appendChild("rotation", rotation, false);
-    }
-  };
-
   struct NetSegment : public SerializableObject {
     static constexpr const char* tagname = "netsegment";
 
-    CircuitIdentifier                          netName;
-    SerializableObjectList<NetPoint, NetPoint> points;
-    SerializableObjectList<NetLine, NetLine>   lines;
-    SerializableObjectList<NetLabel, NetLabel> labels;
+    CircuitIdentifier  netName;
+    JunctionList       junctions;
+    NetLineList        lines;
+    NetLabelList       labels;
     Signal<NetSegment> onEdited;  ///< Dummy event, not used
 
     explicit NetSegment(const CircuitIdentifier& netName)
-      : netName(netName), points(), lines(), labels(), onEdited(*this) {}
+      : netName(netName), junctions(), lines(), labels(), onEdited(*this) {}
 
     explicit NetSegment(const SExpression& node)
       : netName(node.getValueByPath<CircuitIdentifier>("net")),
-        points(node),
+        junctions(node),
         lines(node),
         labels(node),
         onEdited(*this) {}
@@ -281,7 +170,7 @@ public:
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
       root.appendChild("net", netName, true);
-      points.serialize(root);
+      junctions.serialize(root);
       lines.serialize(root);
       labels.serialize(root);
     }
