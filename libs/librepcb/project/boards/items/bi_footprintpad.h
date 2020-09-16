@@ -120,6 +120,7 @@ private:
   const library::PackagePad*   mPackagePad;
   ComponentSignalInstance*     mComponentSignalInstance;
   QMetaObject::Connection      mHighlightChangedConnection;
+  QMetaObject::Connection      mNetSignalNameChangedConnection;
 
   // Misc
   Point                            mPosition;

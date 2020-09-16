@@ -59,8 +59,6 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept
     mBottomStopMaskLayer(nullptr),
     mTopCreamMaskLayer(nullptr),
     mBottomCreamMaskLayer(nullptr) {
-  setToolTip(mPad.getDisplayText());
-
   mFont = qApp->getDefaultSansSerifFont();
   mFont.setPixelSize(1);
 
@@ -84,6 +82,8 @@ bool BGI_FootprintPad::isSelectable() const noexcept {
 
 void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
+
+  setToolTip(mPad.getDisplayText());
 
   // set Z value
   if ((mLibPad.getBoardSide() == library::FootprintPad::BoardSide::BOTTOM) !=
