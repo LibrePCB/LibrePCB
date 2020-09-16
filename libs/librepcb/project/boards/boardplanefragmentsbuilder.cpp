@@ -185,8 +185,8 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
     // subtract vias
     foreach (const BI_Via* via, netsegment->getVias()) {
       if (&netsegment->getNetSignal() == &mPlane.getNetSignal()) {
-        ClipperLib::Path path =
-            ClipperHelpers::convert(via->getSceneOutline(), maxArcTolerance());
+        ClipperLib::Path path = ClipperHelpers::convert(
+            via->getVia().getSceneOutline(), maxArcTolerance());
         mConnectedNetSignalAreas.push_back(path);
       }
       c.AddPath(createViaCutOut(*via), ClipperLib::ptClip, true);
@@ -270,7 +270,8 @@ ClipperLib::Path BoardPlaneFragmentsBuilder::createViaCutOut(
   if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
       differentNetSignal) {
     return ClipperHelpers::convert(
-        via.getSceneOutline(*mPlane.getMinClearance()), maxArcTolerance());
+        via.getVia().getSceneOutline(*mPlane.getMinClearance()),
+        maxArcTolerance());
   } else {
     return ClipperLib::Path();
   }

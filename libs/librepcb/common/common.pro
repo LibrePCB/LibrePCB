@@ -86,12 +86,17 @@ SOURCES += \
     geometry/cmd/cmdstroketextedit.cpp \
     geometry/cmd/cmdtextedit.cpp \
     geometry/hole.cpp \
+    geometry/junction.cpp \
+    geometry/netlabel.cpp \
+    geometry/netline.cpp \
     geometry/path.cpp \
     geometry/pathmodel.cpp \
     geometry/polygon.cpp \
     geometry/stroketext.cpp \
     geometry/text.cpp \
+    geometry/trace.cpp \
     geometry/vertex.cpp \
+    geometry/via.cpp \
     graphics/circlegraphicsitem.cpp \
     graphics/defaultgraphicslayerprovider.cpp \
     graphics/graphicslayer.cpp \
@@ -226,12 +231,17 @@ HEADERS += \
     geometry/cmd/cmdstroketextedit.h \
     geometry/cmd/cmdtextedit.h \
     geometry/hole.h \
+    geometry/junction.h \
+    geometry/netlabel.h \
+    geometry/netline.h \
     geometry/path.h \
     geometry/pathmodel.h \
     geometry/polygon.h \
     geometry/stroketext.h \
     geometry/text.h \
+    geometry/trace.h \
     geometry/vertex.h \
+    geometry/via.h \
     graphics/circlegraphicsitem.h \
     graphics/defaultgraphicslayerprovider.h \
     graphics/graphicslayer.h \

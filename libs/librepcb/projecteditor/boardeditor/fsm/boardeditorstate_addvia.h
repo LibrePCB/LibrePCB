@@ -100,14 +100,12 @@ private:  // Methods
 
 private:  // Data
   // State
-  bool           mIsUndoCmdActive;
-  QString        mAutoText;
-  bool           mFindClosestNetSignal;
-  NetSignal*     mLastClosestNetSignal;
-  BI_Via::Shape  mLastShape;
-  PositiveLength mLastSize;
-  PositiveLength mLastDrillDiameter;
-  NetSignal*     mLastNetSignal;
+  bool       mIsUndoCmdActive;
+  QString    mAutoText;
+  bool       mFindClosestNetSignal;
+  NetSignal* mLastClosestNetSignal;
+  Via        mLastViaProperties;
+  NetSignal* mLastNetSignal;
 
   // Information about the current via to place. Only valid if
   // mIsUndoCmdActive == true.

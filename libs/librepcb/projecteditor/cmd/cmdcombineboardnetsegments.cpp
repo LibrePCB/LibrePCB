@@ -79,8 +79,7 @@ bool CmdCombineBoardNetSegments::performExecute() {
     if (via == &mOldAnchor) {
       anchorMap.insert(via, &mNewAnchor);
     } else {
-      BI_Via* newVia = cmdAdd->addVia(via->getPosition(), via->getShape(),
-                                      via->getSize(), via->getDrillDiameter());
+      BI_Via* newVia = cmdAdd->addVia(Via(Uuid::createRandom(), via->getVia()));
       anchorMap.insert(via, newVia);
     }
   }

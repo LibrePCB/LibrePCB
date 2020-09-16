@@ -24,10 +24,7 @@
 
 #include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cmp/component.h>
 #include <librepcb/library/librarybaseelement.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/circuit/netsignal.h>
 
 #include <QtCore>
 #include <QtWidgets>

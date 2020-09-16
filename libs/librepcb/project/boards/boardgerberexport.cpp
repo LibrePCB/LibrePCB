@@ -428,16 +428,16 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
           mBoard.getDesignRules().calcStopMaskClearance(*via.getSize()) * 2);
     }
     switch (via.getShape()) {
-      case BI_Via::Shape::Round: {
+      case Via::Shape::Round: {
         gen.flashCircle(via.getPosition(), outerDiameter, UnsignedLength(0));
         break;
       }
-      case BI_Via::Shape::Square: {
+      case Via::Shape::Square: {
         gen.flashRect(via.getPosition(), outerDiameter, outerDiameter,
                       Angle::deg0(), UnsignedLength(0));
         break;
       }
-      case BI_Via::Shape::Octagon: {
+      case Via::Shape::Octagon: {
         gen.flashRegularPolygon(via.getPosition(), outerDiameter, 8,
                                 Angle::deg0(), UnsignedLength(0));
         break;

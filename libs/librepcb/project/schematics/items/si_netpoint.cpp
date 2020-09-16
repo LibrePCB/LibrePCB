@@ -39,33 +39,29 @@ namespace project {
  ******************************************************************************/
 
 SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node)
-  : SI_Base(segment.getSchematic()),
-    mNetSegment(segment),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")) {
+  : SI_Base(segment.getSchematic()), mNetSegment(segment), mJunction(node) {
   init();
 }
 
 SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const Point& position)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
-    mUuid(Uuid::createRandom()),
-    mPosition(position) {
+    mJunction(Uuid::createRandom(), position) {
   init();
 }
 
 void SI_NetPoint::init() {
   // create the graphics item
   mGraphicsItem.reset(new SGI_NetPoint(*this));
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
+  mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());
 
   // create ERC messages
   mErcMsgDeadNetPoint.reset(
-      new ErcMsg(mSchematic.getProject(), *this, mUuid.toStr(), "Dead",
-                 ErcMsg::ErcMsgType_t::SchematicError,
+      new ErcMsg(mSchematic.getProject(), *this, mJunction.getUuid().toStr(),
+                 "Dead", ErcMsg::ErcMsgType_t::SchematicError,
                  tr("Dead net point in schematic page \"%1\": %2")
                      .arg(*mSchematic.getName())
-                     .arg(mUuid.toStr())));
+                     .arg(mJunction.getUuid().toStr())));
 }
 
 SI_NetPoint::~SI_NetPoint() noexcept {
@@ -88,14 +84,17 @@ NetSignal& SI_NetPoint::getNetSignalOfNetSegment() const noexcept {
   return mNetSegment.getNetSignal();
 }
 
+NetLineAnchor SI_NetPoint::toNetLineAnchor() const noexcept {
+  return NetLineAnchor::junction(mJunction.getUuid());
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
 void SI_NetPoint::setPosition(const Point& position) noexcept {
-  if (position != mPosition) {
-    mPosition = position;
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
+  if (mJunction.setPosition(position)) {
+    mGraphicsItem->setPos(position.toPxQPointF());
     foreach (SI_NetLine* line, mRegisteredNetLines) { line->updateLine(); }
   }
 }
@@ -146,8 +145,7 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
 }
 
 void SI_NetPoint::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.appendChild(mPosition.serializeToDomElement("position"), false);
+  mJunction.serialize(root);
 }
 
 /*******************************************************************************
@@ -155,7 +153,8 @@ void SI_NetPoint::serialize(SExpression& root) const {
  ******************************************************************************/
 
 QPainterPath SI_NetPoint::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+  return mGraphicsItem->shape().translated(
+      mJunction.getPosition().toPxQPointF());
 }
 
 void SI_NetPoint::setSelected(bool selected) noexcept {

@@ -81,6 +81,7 @@ public:
   bool isSelectable() const noexcept override;
   Path getOutline(const Length& expansion = Length(0)) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
+  TraceAnchor toTraceAnchor() const noexcept override;
 
   // General Methods
   void addToBoard() override;

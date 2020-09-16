@@ -23,8 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/common/geometry/junction.h>
+#include <librepcb/common/geometry/netlabel.h>
+#include <librepcb/common/geometry/netline.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,13 +35,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace project {
-
-class SI_NetSegment;
-class SI_NetPoint;
-class SI_NetLine;
-class SI_NetLabel;
-class SI_NetLineAnchor;
-
 namespace editor {
 
 /*******************************************************************************
@@ -54,9 +48,9 @@ class SchematicNetSegmentSplitter final {
 public:
   // Types
   struct Segment {
-    QList<SI_NetLineAnchor*> anchors;
-    QList<SI_NetLine*>       netlines;
-    QList<SI_NetLabel*>      netlabels;
+    JunctionList junctions;
+    NetLineList  netlines;
+    NetLabelList netlabels;
   };
 
   // Constructors / Destructor
@@ -66,36 +60,37 @@ public:
   ~SchematicNetSegmentSplitter() noexcept;
 
   // General Methods
-  void addNetLine(SI_NetLine* netline) noexcept {
-    Q_ASSERT(!mNetLines.contains(netline));
-    mNetLines.append(netline);
-  }
-  void addNetLabel(SI_NetLabel* netlabel) noexcept {
-    Q_ASSERT(!mNetLabels.contains(netlabel));
-    mNetLabels.append(netlabel);
-  }
-  QList<Segment> split() const noexcept;
+  void           addSymbolPin(const NetLineAnchor& anchor, const Point& pos,
+                              bool replaceByJunction = false) noexcept;
+  void           addJunction(const Junction& junction) noexcept;
+  void           addNetLine(const NetLine& netline) noexcept;
+  void           addNetLabel(const NetLabel& netlabel) noexcept;
+  QList<Segment> split() noexcept;
 
   // Operator Overloadings
   SchematicNetSegmentSplitter& operator       =(
       const SchematicNetSegmentSplitter& rhs) = delete;
 
 private:  // Methods
-  void findConnectedLinesAndPoints(SI_NetLineAnchor&         anchor,
-                                   QList<SI_NetLineAnchor*>& processedAnchors,
-                                   QList<SI_NetLineAnchor*>& anchors,
-                                   QList<SI_NetLine*>&       netlines,
-                                   QList<SI_NetLine*>& availableNetLines) const
+  NetLineAnchor replacePinAnchor(const NetLineAnchor& anchor) noexcept;
+  void          findConnectedLinesAndPoints(const NetLineAnchor& anchor,
+                                            NetLineList&         availableNetLines,
+                                            Segment&             segment)
+
       noexcept;
-  int getNearestNetSegmentOfNetLabel(const SI_NetLabel&    netlabel,
-                                     const QList<Segment>& segments) const
-      noexcept;
+  void   addNetLabelToNearestNetSegment(const NetLabel& netlabel,
+                                        QList<Segment>& segments) const noexcept;
   Length getDistanceBetweenNetLabelAndNetSegment(
-      const SI_NetLabel& netlabel, const Segment& netsegment) const noexcept;
+      const NetLabel& netlabel, const Segment& netsegment) const noexcept;
+  Point getAnchorPosition(const NetLineAnchor& anchor) const noexcept;
 
 private:  // Data
-  QList<SI_NetLine*>  mNetLines;
-  QList<SI_NetLabel*> mNetLabels;
+  JunctionList mJunctions;
+  NetLineList  mNetLines;
+  NetLabelList mNetLabels;
+
+  QHash<NetLineAnchor, NetLineAnchor> mPinAnchorsToReplace;
+  QHash<NetLineAnchor, Point>         mPinPositions;
 };
 
 /*******************************************************************************

@@ -26,7 +26,7 @@
 #include "../graphicsitems/sgi_netline.h"
 #include "si_base.h"
 
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/netline.h>
 
 #include <QtCore>
 
@@ -52,6 +52,8 @@ public:
   virtual void                     unregisterNetLine(SI_NetLine& netline) = 0;
   virtual const QSet<SI_NetLine*>& getNetLines() const noexcept           = 0;
   virtual const Point&             getPosition() const noexcept           = 0;
+
+  virtual NetLineAnchor toNetLineAnchor() const noexcept = 0;
 };
 
 /*******************************************************************************
@@ -75,11 +77,14 @@ public:
 
   // Getters
   SI_NetSegment&        getNetSegment() const noexcept { return mNetSegment; }
-  const Uuid&           getUuid() const noexcept { return mUuid; }
-  const UnsignedLength& getWidth() const noexcept { return mWidth; }
-  SI_NetLineAnchor&     getStartPoint() const noexcept { return *mStartPoint; }
-  SI_NetLineAnchor&     getEndPoint() const noexcept { return *mEndPoint; }
-  SI_NetLineAnchor*     getOtherPoint(const SI_NetLineAnchor& firstPoint) const
+  const NetLine&        getNetLine() const noexcept { return mNetLine; }
+  const Uuid&           getUuid() const noexcept { return mNetLine.getUuid(); }
+  const UnsignedLength& getWidth() const noexcept {
+    return mNetLine.getWidth();
+  }
+  SI_NetLineAnchor& getStartPoint() const noexcept { return *mStartPoint; }
+  SI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
+  SI_NetLineAnchor* getOtherPoint(const SI_NetLineAnchor& firstPoint) const
       noexcept;
   NetSignal& getNetSignalOfNetSegment() const noexcept;
 
@@ -105,21 +110,18 @@ public:
 
 private:
   void              init();
-  SI_NetLineAnchor* deserializeAnchor(const SExpression& root,
-                                      const QString&     key) const;
-  void serializeAnchor(SExpression& root, SI_NetLineAnchor* anchor) const;
+  SI_NetLineAnchor* getAnchor(const NetLineAnchor& anchor);
 
   // General
   SI_NetSegment&              mNetSegment;
+  NetLine                     mNetLine;
   QScopedPointer<SGI_NetLine> mGraphicsItem;
   Point                   mPosition;  ///< the center of startpoint and endpoint
   QMetaObject::Connection mHighlightChangedConnection;
 
-  // Attributes
-  Uuid              mUuid;
+  // References
   SI_NetLineAnchor* mStartPoint;
   SI_NetLineAnchor* mEndPoint;
-  UnsignedLength    mWidth;
 };
 
 /*******************************************************************************

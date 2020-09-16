@@ -28,7 +28,7 @@
 #include "./si_netline.h"
 #include "si_base.h"
 
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/junction.h>
 
 #include <QtCore>
 
@@ -62,12 +62,14 @@ public:
   ~SI_NetPoint() noexcept;
 
   // Getters
-  const Uuid&    getUuid() const noexcept { return mUuid; }
-  bool           isVisibleJunction() const noexcept;
-  bool           isOpenLineEnd() const noexcept;
-  SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal&     getNetSignalOfNetSegment() const noexcept;
+  const Uuid&     getUuid() const noexcept { return mJunction.getUuid(); }
+  const Junction& getJunction() const noexcept { return mJunction; }
+  bool            isVisibleJunction() const noexcept;
+  bool            isOpenLineEnd() const noexcept;
+  SI_NetSegment&  getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal&      getNetSignalOfNetSegment() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
+  NetLineAnchor toNetLineAnchor() const noexcept override;
 
   // Setters
   void setPosition(const Point& position) noexcept;
@@ -81,7 +83,9 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetPoint; }
-  const Point& getPosition() const noexcept override { return mPosition; }
+  const Point& getPosition() const noexcept override {
+    return mJunction.getPosition();
+  }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void         setSelected(bool selected) noexcept override;
 
@@ -106,8 +110,7 @@ private:
 
   // Attributes
   SI_NetSegment& mNetSegment;
-  Uuid           mUuid;
-  Point          mPosition;
+  Junction       mJunction;
 
   // Registered Elements
   QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines
