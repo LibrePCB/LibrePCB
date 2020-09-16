@@ -192,22 +192,23 @@ bool CmdPasteSchematicItems::performExecute() {
     QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAddElements(
         new CmdSchematicNetSegmentAddElements(*copy));
     QHash<Uuid, SI_NetPoint*> netPointMap;
-    for (const SchematicClipboardData::NetPoint& np : seg.points) {
+    for (const Junction& junction : seg.junctions) {
       SI_NetPoint* netpoint =
-          cmdAddElements->addNetPoint(np.position + mPosOffset);
+          cmdAddElements->addNetPoint(junction.getPosition() + mPosOffset);
       netpoint->setSelected(true);
-      netPointMap.insert(np.uuid, netpoint);
+      netPointMap.insert(junction.getUuid(), netpoint);
     }
-    for (const SchematicClipboardData::NetLine& nl : seg.lines) {
+    for (const NetLine& nl : seg.lines) {
       SI_NetLineAnchor* start = nullptr;
-      if (nl.startJunction) {
-        start = netPointMap[*nl.startJunction];
+      if (tl::optional<Uuid> anchor = nl.getStartPoint().tryGetJunction()) {
+        start = netPointMap[*anchor];
         Q_ASSERT(start);
-      } else {
+      } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
+                     nl.getStartPoint().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(
-            symbolMap.value(*nl.startSymbol, Uuid::createRandom()));
+            symbolMap.value(anchor->symbol, Uuid::createRandom()));
         Q_ASSERT(symbol);
-        SI_SymbolPin* pin = symbol->getPin(*nl.startPin);
+        SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
         start                            = pin;
         ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
@@ -217,16 +218,19 @@ bool CmdPasteSchematicItems::performExecute() {
         if (sigInst && (sigInst->isNetSignalNameForced()) && (!forcedNetName)) {
           forcedNetName = CircuitIdentifier(sigInst->getForcedNetSignalName());
         }
+      } else {
+        throw LogicError(__FILE__, __LINE__);
       }
       SI_NetLineAnchor* end = nullptr;
-      if (nl.endJunction) {
-        end = netPointMap[*nl.endJunction];
+      if (tl::optional<Uuid> anchor = nl.getEndPoint().tryGetJunction()) {
+        end = netPointMap[*anchor];
         Q_ASSERT(end);
-      } else {
+      } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
+                     nl.getEndPoint().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(
-            symbolMap.value(*nl.endSymbol, Uuid::createRandom()));
+            symbolMap.value(anchor->symbol, Uuid::createRandom()));
         Q_ASSERT(symbol);
-        SI_SymbolPin* pin = symbol->getPin(*nl.endPin);
+        SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
         end                              = pin;
         ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
@@ -236,6 +240,8 @@ bool CmdPasteSchematicItems::performExecute() {
         if (sigInst && (sigInst->isNetSignalNameForced()) && (!forcedNetName)) {
           forcedNetName = CircuitIdentifier(sigInst->getForcedNetSignalName());
         }
+      } else {
+        throw LogicError(__FILE__, __LINE__);
       }
       SI_NetLine* netline = cmdAddElements->addNetLine(*start, *end);
       netline->setSelected(true);
@@ -243,9 +249,9 @@ bool CmdPasteSchematicItems::performExecute() {
     execNewChildCmd(cmdAddElements.take());
 
     // Add netlabels
-    for (const SchematicClipboardData::NetLabel& nl : seg.labels) {
+    for (const NetLabel& nl : seg.labels) {
       CmdSchematicNetLabelAdd* cmd = new CmdSchematicNetLabelAdd(
-          *copy, nl.position + mPosOffset, nl.rotation);
+          *copy, nl.getPosition() + mPosOffset, nl.getRotation());
       execNewChildCmd(cmd);
       cmd->getNetLabel()->setSelected(true);
       if (!forcedNetName) {

@@ -90,9 +90,9 @@ void BGI_Via::updateCacheAndRepaint() noexcept {
       mVia.getBoard().getDesignRules().calcStopMaskClearance(*mVia.getSize());
 
   // set shapes and bounding rect
-  mShape        = mVia.getOutline().toQPainterPathPx();
-  mCopper       = mVia.toQPainterPathPx();
-  mStopMask     = mVia.getOutline(*stopMaskClearance).toQPainterPathPx();
+  mShape    = mVia.getVia().getOutline().toQPainterPathPx();
+  mCopper   = mVia.getVia().toQPainterPathPx();
+  mStopMask = mVia.getVia().getOutline(*stopMaskClearance).toQPainterPathPx();
   mBoundingRect = mStopMask.boundingRect();
 
   update();

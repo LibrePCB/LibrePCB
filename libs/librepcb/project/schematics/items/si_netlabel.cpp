@@ -44,11 +44,7 @@ namespace project {
  ******************************************************************************/
 
 SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node)
-  : SI_Base(segment.getSchematic()),
-    mNetSegment(segment),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mRotation(node.getValueByPath<Angle>("rotation")) {
+  : SI_Base(segment.getSchematic()), mNetSegment(segment), mNetLabel(node) {
   init();
 }
 
@@ -56,17 +52,15 @@ SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const Point& position,
                          const Angle& rotation)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
-    mUuid(Uuid::createRandom()),
-    mPosition(position),
-    mRotation(rotation) {
+    mNetLabel(Uuid::createRandom(), position, rotation) {
   init();
 }
 
 void SI_NetLabel::init() {
   // create the graphics item
   mGraphicsItem.reset(new SGI_NetLabel(*this));
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
-  mGraphicsItem->setRotation(-mRotation.toDeg());
+  mGraphicsItem->setPos(mNetLabel.getPosition().toPxQPointF());
+  mGraphicsItem->setRotation(-mNetLabel.getRotation().toDeg());
 }
 
 SI_NetLabel::~SI_NetLabel() noexcept {
@@ -90,17 +84,15 @@ Length SI_NetLabel::getApproximateWidth() noexcept {
  ******************************************************************************/
 
 void SI_NetLabel::setPosition(const Point& position) noexcept {
-  if (position != mPosition) {
-    mPosition = position;
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
+  if (mNetLabel.setPosition(position)) {
+    mGraphicsItem->setPos(position.toPxQPointF());
     updateAnchor();
   }
 }
 
 void SI_NetLabel::setRotation(const Angle& rotation) noexcept {
-  if (rotation != mRotation) {
-    mRotation = rotation;
-    mGraphicsItem->setRotation(-mRotation.toDeg());
+  if (mNetLabel.setRotation(rotation)) {
+    mGraphicsItem->setRotation(-rotation.toDeg());
     mGraphicsItem->updateCacheAndRepaint();
     updateAnchor();
   }
@@ -111,7 +103,8 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept {
  ******************************************************************************/
 
 void SI_NetLabel::updateAnchor() noexcept {
-  mGraphicsItem->setAnchor(mNetSegment.calcNearestPoint(mPosition));
+  mGraphicsItem->setAnchor(
+      mNetSegment.calcNearestPoint(mNetLabel.getPosition()));
 }
 
 void SI_NetLabel::addToSchematic() {
@@ -139,9 +132,7 @@ void SI_NetLabel::removeFromSchematic() {
 }
 
 void SI_NetLabel::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mRotation, false);
+  mNetLabel.serialize(root);
 }
 
 /*******************************************************************************

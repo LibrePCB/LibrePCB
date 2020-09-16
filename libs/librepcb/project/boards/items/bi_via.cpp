@@ -40,42 +40,25 @@ namespace project {
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
   : BI_Base(netsegment.getBoard()),
-    mNetSegment(netsegment),
-    mUuid(Uuid::createRandom()),
-    mPosition(other.mPosition),
-    mShape(other.mShape),
-    mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter) {
+    mVia(Uuid::createRandom(), other.mVia),
+    mNetSegment(netsegment) {
+  init();
+}
+
+BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
+  : BI_Base(netsegment.getBoard()), mVia(via), mNetSegment(netsegment) {
   init();
 }
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
-  : BI_Base(netsegment.getBoard()),
-    mNetSegment(netsegment),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mShape(node.getValueByPath<Shape>("shape")),
-    mSize(node.getValueByPath<PositiveLength>("size")),
-    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")) {
-  init();
-}
-
-BI_Via::BI_Via(BI_NetSegment& netsegment, const Point& position, Shape shape,
-               const PositiveLength& size, const PositiveLength& drillDiameter)
-  : BI_Base(netsegment.getBoard()),
-    mNetSegment(netsegment),
-    mUuid(Uuid::createRandom()),
-    mPosition(position),
-    mShape(shape),
-    mSize(size),
-    mDrillDiameter(drillDiameter) {
+  : BI_Base(netsegment.getBoard()), mVia(node), mNetSegment(netsegment) {
   init();
 }
 
 void BI_Via::init() {
   // create the graphics item
   mGraphicsItem.reset(new BGI_Via(*this));
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
+  mGraphicsItem->setPos(mVia.getPosition().toPxQPointF());
 
   // connect to the "attributes changed" signal of the board
   connect(&mBoard, &Board::attributesChanged, this,
@@ -103,35 +86,8 @@ bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
   return GraphicsLayer::isCopperLayer(layerName);
 }
 
-Path BI_Via::getOutline(const Length& expansion) const noexcept {
-  Length size = mSize + (expansion * 2);
-  if (size > 0) {
-    PositiveLength pSize(size);
-    switch (mShape) {
-      case Shape::Round:
-        return Path::circle(pSize);
-      case Shape::Square:
-        return Path::centeredRect(pSize, pSize);
-      case Shape::Octagon:
-        return Path::octagon(pSize, pSize);
-      default:
-        Q_ASSERT(false);
-        break;
-    }
-  }
-  return Path();
-}
-
-Path BI_Via::getSceneOutline(const Length& expansion) const noexcept {
-  return getOutline(expansion).translated(mPosition);
-}
-
-QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept {
-  QPainterPath p = getOutline(expansion).toQPainterPathPx();
-  p.setFillRule(Qt::OddEvenFill);  // important to subtract the hole!
-  p.addEllipse(QPointF(0, 0), mDrillDiameter->toPx() / 2,
-               mDrillDiameter->toPx() / 2);
-  return p;
+TraceAnchor BI_Via::toTraceAnchor() const noexcept {
+  return TraceAnchor::via(mVia.getUuid());
 }
 
 /*******************************************************************************
@@ -139,9 +95,8 @@ QPainterPath BI_Via::toQPainterPathPx(const Length& expansion) const noexcept {
  ******************************************************************************/
 
 void BI_Via::setPosition(const Point& position) noexcept {
-  if (position != mPosition) {
-    mPosition = position;
-    mGraphicsItem->setPos(mPosition.toPxQPointF());
+  if (mVia.setPosition(position)) {
+    mGraphicsItem->setPos(position.toPxQPointF());
     foreach (BI_NetLine* netline, mRegisteredNetLines) {
       netline->updateLine();
     }
@@ -149,23 +104,20 @@ void BI_Via::setPosition(const Point& position) noexcept {
   }
 }
 
-void BI_Via::setShape(Shape shape) noexcept {
-  if (shape != mShape) {
-    mShape = shape;
+void BI_Via::setShape(Via::Shape shape) noexcept {
+  if (mVia.setShape(shape)) {
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
 
 void BI_Via::setSize(const PositiveLength& size) noexcept {
-  if (size != mSize) {
-    mSize = size;
+  if (mVia.setSize(size)) {
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
 
 void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
-  if (diameter != mDrillDiameter) {
-    mDrillDiameter = diameter;
+  if (mVia.setDrillDiameter(diameter)) {
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
@@ -214,11 +166,7 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
 }
 
 void BI_Via::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("size", mSize, false);
-  root.appendChild("drill", mDrillDiameter, false);
-  root.appendChild("shape", mShape, false);
+  mVia.serialize(root);
 }
 
 /*******************************************************************************
@@ -226,7 +174,7 @@ void BI_Via::serialize(SExpression& root) const {
  ******************************************************************************/
 
 QPainterPath BI_Via::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape().translated(mPosition.toPxQPointF());
+  return mGraphicsItem->shape().translated(mVia.getPosition().toPxQPointF());
 }
 
 bool BI_Via::isSelectable() const noexcept {

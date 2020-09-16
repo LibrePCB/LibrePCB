@@ -140,6 +140,10 @@ bool SI_SymbolPin::isVisibleJunction() const noexcept {
   return (mRegisteredNetLines.count() > 1);
 }
 
+NetLineAnchor SI_SymbolPin::toNetLineAnchor() const noexcept {
+  return NetLineAnchor::pin(mSymbol.getUuid(), mSymbolPin->getUuid());
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

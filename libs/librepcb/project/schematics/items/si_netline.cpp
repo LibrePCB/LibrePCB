@@ -48,13 +48,10 @@ namespace project {
 SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
+    mNetLine(node),
     mPosition(),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mStartPoint(nullptr),
-    mEndPoint(nullptr),
-    mWidth(node.getValueByPath<UnsignedLength>("width")) {
-  mStartPoint = deserializeAnchor(node, "from");
-  mEndPoint   = deserializeAnchor(node, "to");
+    mStartPoint(getAnchor(mNetLine.getStartPoint())),
+    mEndPoint(getAnchor(mNetLine.getEndPoint())) {
   if ((!mStartPoint) || (!mEndPoint)) {
     throw RuntimeError(__FILE__, __LINE__, "Invalid trace anchor!");
   }
@@ -66,11 +63,11 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
                        SI_NetLineAnchor& endPoint, const UnsignedLength& width)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
+    mNetLine(Uuid::createRandom(), width, startPoint.toNetLineAnchor(),
+             endPoint.toNetLineAnchor()),
     mPosition(),
-    mUuid(Uuid::createRandom()),
     mStartPoint(&startPoint),
-    mEndPoint(&endPoint),
-    mWidth(width) {
+    mEndPoint(&endPoint) {
   init();
 }
 
@@ -113,8 +110,7 @@ NetSignal& SI_NetLine::getNetSignalOfNetSegment() const noexcept {
  ******************************************************************************/
 
 void SI_NetLine::setWidth(const UnsignedLength& width) noexcept {
-  if (width != mWidth) {
-    mWidth = width;
+  if (mNetLine.setWidth(width)) {
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
@@ -159,37 +155,18 @@ void SI_NetLine::updateLine() noexcept {
 }
 
 void SI_NetLine::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.appendChild("width", mWidth, false);
-  serializeAnchor(root.appendList("from", true), mStartPoint);
-  serializeAnchor(root.appendList("to", true), mEndPoint);
+  mNetLine.serialize(root);
 }
 
-SI_NetLineAnchor* SI_NetLine::deserializeAnchor(const SExpression& root,
-                                                const QString&     key) const {
-  const SExpression& node = root.getChildByPath(key);
-  if (const SExpression* junctionNode = node.tryGetChildByPath("junction")) {
-    return mNetSegment.getNetPointByUuid(
-        junctionNode->getValueOfFirstChild<Uuid>());
+SI_NetLineAnchor* SI_NetLine::getAnchor(const NetLineAnchor& anchor) {
+  if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
+    return mNetSegment.getNetPointByUuid(*uuid);
+  } else if (const tl::optional<NetLineAnchor::PinAnchor>& pin =
+                 anchor.tryGetPin()) {
+    SI_Symbol* symbol = mSchematic.getSymbolByUuid(pin->symbol);
+    return symbol ? symbol->getPin(pin->pin) : nullptr;
   } else {
-    Uuid       symbolUuid = node.getValueByPath<Uuid>("symbol");
-    Uuid       pinUuid    = node.getValueByPath<Uuid>("pin");
-    SI_Symbol* symbol     = mSchematic.getSymbolByUuid(symbolUuid);
-    if (symbol) return symbol->getPin(pinUuid);
-  }
-  return nullptr;
-}
-
-void SI_NetLine::serializeAnchor(SExpression&      root,
-                                 SI_NetLineAnchor* anchor) const {
-  if (const SI_NetPoint* netpoint = dynamic_cast<const SI_NetPoint*>(anchor)) {
-    root.appendChild("junction", netpoint->getUuid(), false);
-  } else if (const SI_SymbolPin* pin =
-                 dynamic_cast<const SI_SymbolPin*>(anchor)) {
-    root.appendChild("symbol", pin->getSymbol().getUuid(), false);
-    root.appendChild("pin", pin->getLibPinUuid(), false);
-  } else {
-    throw LogicError(__FILE__, __LINE__);
+    return nullptr;
   }
 }
 

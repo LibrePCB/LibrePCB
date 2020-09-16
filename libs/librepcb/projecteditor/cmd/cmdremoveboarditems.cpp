@@ -210,8 +210,7 @@ void CmdRemoveBoardItems::createNewSubNetSegment(BI_NetSegment& netsegment,
   QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorMap;
   foreach (const BI_Via* via, items.vias) {
     BI_Via* newVia =
-        cmdAddElements->addVia(via->getPosition(), via->getShape(),
-                               via->getSize(), via->getDrillDiameter());
+        cmdAddElements->addVia(Via(Uuid::createRandom(), via->getVia()));
     Q_ASSERT(newVia);
     anchorMap.insert(via, newVia);
   }

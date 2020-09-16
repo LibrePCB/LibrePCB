@@ -28,7 +28,7 @@
 
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/path.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/common/geometry/trace.h>
 
 #include <QtCore>
 
@@ -57,6 +57,8 @@ public:
   virtual void                     unregisterNetLine(BI_NetLine& netline) = 0;
   virtual const QSet<BI_NetLine*>& getNetLines() const noexcept           = 0;
   virtual const Point&             getPosition() const noexcept           = 0;
+
+  virtual TraceAnchor toTraceAnchor() const noexcept = 0;
 
   std::vector<PositiveLength> getLineWidths() const noexcept;
   UnsignedLength              getMaxLineWidth() const noexcept;
@@ -88,9 +90,10 @@ public:
 
   // Getters
   BI_NetSegment&        getNetSegment() const noexcept { return mNetSegment; }
-  const Uuid&           getUuid() const noexcept { return mUuid; }
+  const Trace&          getTrace() const noexcept { return mTrace; }
+  const Uuid&           getUuid() const noexcept { return mTrace.getUuid(); }
   GraphicsLayer&        getLayer() const noexcept { return *mLayer; }
-  const PositiveLength& getWidth() const noexcept { return mWidth; }
+  const PositiveLength& getWidth() const noexcept { return mTrace.getWidth(); }
   BI_NetLineAnchor&     getStartPoint() const noexcept { return *mStartPoint; }
   BI_NetLineAnchor&     getEndPoint() const noexcept { return *mEndPoint; }
   BI_NetLineAnchor*     getOtherPoint(const BI_NetLineAnchor& firstPoint) const
@@ -124,22 +127,19 @@ public:
 
 private:
   void              init();
-  BI_NetLineAnchor* deserializeAnchor(const SExpression& root,
-                                      const QString&     key) const;
-  void serializeAnchor(SExpression& root, BI_NetLineAnchor* anchor) const;
+  BI_NetLineAnchor* getAnchor(const TraceAnchor& anchor);
 
   // General
   BI_NetSegment&              mNetSegment;
+  Trace                       mTrace;
   QScopedPointer<BGI_NetLine> mGraphicsItem;
   Point                   mPosition;  ///< the center of startpoint and endpoint
   QMetaObject::Connection mHighlightChangedConnection;
 
-  // Attributes
-  Uuid              mUuid;
+  // References
   BI_NetLineAnchor* mStartPoint;
   BI_NetLineAnchor* mEndPoint;
   GraphicsLayer*    mLayer;
-  PositiveLength    mWidth;
 };
 
 /*******************************************************************************

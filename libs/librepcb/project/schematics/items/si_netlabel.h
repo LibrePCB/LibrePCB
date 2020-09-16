@@ -26,7 +26,7 @@
 #include "../graphicsitems/sgi_netlabel.h"
 #include "si_base.h"
 
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/geometry/netlabel.h>
 
 #include <QtCore>
 
@@ -61,11 +61,12 @@ public:
   ~SI_NetLabel() noexcept;
 
   // Getters
-  const Uuid&    getUuid() const noexcept { return mUuid; }
-  const Angle&   getRotation() const noexcept { return mRotation; }
-  SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal&     getNetSignalOfNetSegment() const noexcept;
-  Length         getApproximateWidth() noexcept;
+  const Uuid&  getUuid() const noexcept { return mNetLabel.getUuid(); }
+  const Angle& getRotation() const noexcept { return mNetLabel.getRotation(); }
+  const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
+  SI_NetSegment&  getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal&      getNetSignalOfNetSegment() const noexcept;
+  Length          getApproximateWidth() noexcept;
 
   // Setters
   void setPosition(const Point& position) noexcept;
@@ -81,7 +82,9 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLabel; }
-  const Point& getPosition() const noexcept override { return mPosition; }
+  const Point& getPosition() const noexcept override {
+    return mNetLabel.getPosition();
+  }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void         setSelected(bool selected) noexcept override;
 
@@ -98,9 +101,7 @@ private:
 
   // Attributes
   SI_NetSegment& mNetSegment;
-  Uuid           mUuid;
-  Point          mPosition;
-  Angle          mRotation;
+  NetLabel       mNetLabel;
 };
 
 /*******************************************************************************
