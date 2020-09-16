@@ -72,6 +72,15 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid)
             &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
   }
 
+  if (NetSignal* netsignal = getCompSigInstNetSignal()) {
+    mHighlightChangedConnection =
+        connect(netsignal, &NetSignal::highlightedChanged,
+                [this]() { mGraphicsItem->update(); });
+    mNetSignalNameChangedConnection =
+        connect(netsignal, &NetSignal::nameChanged,
+                [this]() { mGraphicsItem->updateCacheAndRepaint(); });
+  }
+
   mGraphicsItem.reset(new BGI_FootprintPad(*this));
   updatePosition();
 
@@ -228,11 +237,19 @@ void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* from,
   Q_ASSERT(!isUsed());  // no netlines must be connected when netsignal changes!
   if (mHighlightChangedConnection) {
     disconnect(mHighlightChangedConnection);
+    mHighlightChangedConnection = QMetaObject::Connection();
+  }
+  if (mNetSignalNameChangedConnection) {
+    disconnect(mNetSignalNameChangedConnection);
+    mNetSignalNameChangedConnection = QMetaObject::Connection();
   }
   if (to) {
     mHighlightChangedConnection =
         connect(to, &NetSignal::highlightedChanged,
                 [this]() { mGraphicsItem->update(); });
+    mNetSignalNameChangedConnection =
+        connect(to, &NetSignal::nameChanged,
+                [this]() { mGraphicsItem->updateCacheAndRepaint(); });
   }
   mBoard.scheduleAirWiresRebuild(from);
   mBoard.scheduleAirWiresRebuild(to);

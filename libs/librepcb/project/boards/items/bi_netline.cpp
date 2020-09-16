@@ -159,6 +159,11 @@ void BI_NetLine::init() {
 
   mGraphicsItem.reset(new BGI_NetLine(*this));
   updateLine();
+
+  // Connect to the "name changed" signal of the net signal to enforce updating
+  // the displayed net signal name in the board.
+  connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged, this,
+          &BI_NetLine::updateLine);
 }
 
 BI_NetLine::~BI_NetLine() noexcept {

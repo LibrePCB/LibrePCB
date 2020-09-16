@@ -115,7 +115,7 @@ public:
 
 private:
   void init();
-  void boardAttributesChanged();
+  void boardOrNetAttributesChanged();
 
   // General
   BI_NetSegment&          mNetSegment;
