@@ -60,8 +60,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::reset() {
-  mAbortConversion        = false;
-  mReadedElementsCount    = 0;
+  mAbortConversion = false;
+  mReadedElementsCount = 0;
   mConvertedElementsCount = 0;
 
   ui->errors->clear();
@@ -105,9 +105,9 @@ void MainWindow::convertAllFiles(ConvertFileType_t type) {
   }
 }
 
-void MainWindow::convertFile(ConvertFileType_t         type,
+void MainWindow::convertFile(ConvertFileType_t type,
                              eagleimport::ConverterDb& db,
-                             const FilePath&           filepath) {
+                             const FilePath& filepath) {
   try {
     parseagle::Library library(filepath.toStr());
     db.setCurrentLibraryFilePath(filepath);
@@ -163,11 +163,11 @@ void MainWindow::convertFile(ConvertFileType_t         type,
 }
 
 bool MainWindow::convertSymbol(eagleimport::ConverterDb& db,
-                               const parseagle::Symbol&  symbol) {
+                               const parseagle::Symbol& symbol) {
   try {
     // create symbol
     eagleimport::SymbolConverter converter(symbol, db);
-    std::unique_ptr<Symbol>      newSymbol = converter.generate();
+    std::unique_ptr<Symbol> newSymbol = converter.generate();
 
     // convert line rects to polygon rects
     PolygonSimplifier<Symbol> polygonSimplifier(*newSymbol);
@@ -193,7 +193,7 @@ bool MainWindow::convertPackage(eagleimport::ConverterDb& db,
   try {
     // create package
     eagleimport::PackageConverter converter(package, db);
-    std::unique_ptr<Package>      newPackage = converter.generate();
+    std::unique_ptr<Package> newPackage = converter.generate();
 
     // convert line rects to polygon rects
     Q_ASSERT(newPackage->getFootprints().count() == 1);
@@ -216,7 +216,7 @@ bool MainWindow::convertPackage(eagleimport::ConverterDb& db,
   return true;
 }
 
-bool MainWindow::convertDevice(eagleimport::ConverterDb&   db,
+bool MainWindow::convertDevice(eagleimport::ConverterDb& db,
                                const parseagle::DeviceSet& deviceSet) {
   try {
     // abort if device name ends with "-US" or "-US_"
@@ -225,14 +225,14 @@ bool MainWindow::convertDevice(eagleimport::ConverterDb&   db,
 
     // create component
     eagleimport::DeviceSetConverter converter(deviceSet, db);
-    std::unique_ptr<Component>      newComponent = converter.generate();
+    std::unique_ptr<Component> newComponent = converter.generate();
 
     // create devices
     foreach (const parseagle::Device& device, deviceSet.getDevices()) {
       if (device.getPackage().isNull()) continue;
 
       eagleimport::DeviceConverter devConverter(deviceSet, device, db);
-      std::unique_ptr<Device>      newDevice = devConverter.generate();
+      std::unique_ptr<Device> newDevice = devConverter.generate();
 
       // save device
       std::shared_ptr<TransactionalFileSystem> fs =

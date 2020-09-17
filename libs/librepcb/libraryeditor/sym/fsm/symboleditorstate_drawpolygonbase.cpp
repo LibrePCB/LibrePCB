@@ -58,7 +58,7 @@ SymbolEditorState_DrawPolygonBase::SymbolEditorState_DrawPolygonBase(
     mLastLayerName(GraphicsLayer::sSymbolOutlines),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
-    mLastFill(false),                  // Fill is needed very rarely
+    mLastFill(false),  // Fill is needed very rarely
     mLastGrabArea(mode != Mode::LINE)  // Most symbol outlines are grab areas
 {
 }
@@ -265,7 +265,7 @@ bool SymbolEditorState_DrawPolygonBase::updateCurrentPosition(
     const Point& pos) noexcept {
   if ((!mCurrentPolygon) || (!mEditCmd)) return false;
   QVector<Vertex> vertices = mCurrentPolygon->getPath().getVertices();
-  int             count    = vertices.count();
+  int count = vertices.count();
   if (mMode == Mode::RECT) {
     Q_ASSERT(count >= 5);
     vertices[count - 4].setPos(

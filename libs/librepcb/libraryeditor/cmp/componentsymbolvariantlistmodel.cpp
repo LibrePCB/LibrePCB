@@ -95,9 +95,9 @@ void ComponentSymbolVariantListModel::addSymbolVariant(
                                                  validateNameOrThrow(mNewName),
                                                  mNewDescription);
     execCmd(new CmdComponentSymbolVariantInsert(*mSymbolVariantList, sv));
-    mNewName        = QString();
+    mNewName = QString();
     mNewDescription = QString();
-    mNewNorm        = QString();
+    mNewNorm = QString();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
@@ -125,8 +125,8 @@ void ComponentSymbolVariantListModel::moveSymbolVariantUp(
   }
 
   try {
-    Uuid uuid  = Uuid::fromString(editData.toString());
-    int  index = mSymbolVariantList->indexOf(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    int index = mSymbolVariantList->indexOf(uuid);
     if ((index >= 1) && (index < mSymbolVariantList->count())) {
       execCmd(new CmdComponentSymbolVariantsSwap(*mSymbolVariantList, index,
                                                  index - 1));
@@ -143,8 +143,8 @@ void ComponentSymbolVariantListModel::moveSymbolVariantDown(
   }
 
   try {
-    Uuid uuid  = Uuid::fromString(editData.toString());
-    int  index = mSymbolVariantList->indexOf(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    int index = mSymbolVariantList->indexOf(uuid);
     if ((index >= 0) && (index < mSymbolVariantList->count() - 1)) {
       execCmd(new CmdComponentSymbolVariantsSwap(*mSymbolVariantList, index,
                                                  index + 1));
@@ -174,7 +174,7 @@ int ComponentSymbolVariantListModel::columnCount(
 }
 
 QVariant ComponentSymbolVariantListModel::data(const QModelIndex& index,
-                                               int                role) const {
+                                               int role) const {
   if (!index.isValid() || !mSymbolVariantList) {
     return QVariant();
   }
@@ -183,9 +183,9 @@ QVariant ComponentSymbolVariantListModel::data(const QModelIndex& index,
       mSymbolVariantList->value(index.row());
   switch (index.column()) {
     case COLUMN_NAME: {
-      QString name     = item ? *item->getNames().getDefaultValue() : mNewName;
-      bool    showHint = (!item) && mNewName.isEmpty();
-      QString hint     = tr("Symbol variant name");
+      QString name = item ? *item->getNames().getDefaultValue() : mNewName;
+      bool showHint = (!item) && mNewName.isEmpty();
+      QString hint = tr("Symbol variant name");
       switch (role) {
         case Qt::DisplayRole:
           if (item && (index.row() == 0) && (mSymbolVariantList->count() > 1)) {
@@ -316,7 +316,7 @@ bool ComponentSymbolVariantListModel::setData(const QModelIndex& index,
       cmd.reset(new CmdComponentSymbolVariantEdit(*item));
     }
     if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
-      QString name        = value.toString().trimmed();
+      QString name = value.toString().trimmed();
       QString cleanedName = cleanElementName(name);
       if (cmd) {
         LocalizedNameMap names = item->getNames();
@@ -365,7 +365,7 @@ bool ComponentSymbolVariantListModel::setData(const QModelIndex& index,
 void ComponentSymbolVariantListModel::symbolVariantListEdited(
     const ComponentSymbolVariantList& list, int index,
     const std::shared_ptr<const ComponentSymbolVariant>& variant,
-    ComponentSymbolVariantList::Event                    event) noexcept {
+    ComponentSymbolVariantList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(variant);
   switch (event) {

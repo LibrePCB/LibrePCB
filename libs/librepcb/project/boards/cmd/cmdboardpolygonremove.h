@@ -63,7 +63,7 @@ private:
 
   // Private Member Variables
 
-  Board&      mBoard;
+  Board& mBoard;
   BI_Polygon& mPolygon;
 };
 

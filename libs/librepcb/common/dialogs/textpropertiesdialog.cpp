@@ -38,8 +38,8 @@ namespace librepcb {
 
 TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
                                            QList<GraphicsLayer*> layers,
-                                           const LengthUnit&     lengthUnit,
-                                           const QString&        settingsPrefix,
+                                           const LengthUnit& lengthUnit,
+                                           const QString& settingsPrefix,
                                            QWidget* parent) noexcept
   : QDialog(parent),
     mText(text),

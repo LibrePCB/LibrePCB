@@ -40,8 +40,8 @@ namespace eagleimport {
  ******************************************************************************/
 
 DeviceConverter::DeviceConverter(const parseagle::DeviceSet& deviceSet,
-                                 const parseagle::Device&    device,
-                                 ConverterDb&                db) noexcept
+                                 const parseagle::Device& device,
+                                 ConverterDb& db) noexcept
   : mDeviceSet(deviceSet), mDevice(device), mDb(db) {
 }
 
@@ -59,7 +59,7 @@ std::unique_ptr<library::Device> DeviceConverter::generate() const {
     deviceName += "_" % mDevice.getName();
   }
   Uuid compUuid = mDb.getComponentUuid(mDeviceSet.getName());
-  Uuid pkgUuid  = mDb.getPackageUuid(mDevice.getPackage());
+  Uuid pkgUuid = mDb.getPackageUuid(mDevice.getPackage());
   std::unique_ptr<library::Device> device(new library::Device(
       mDb.getDeviceUuid(mDeviceSet.getName(), mDevice.getName()),
       Version::fromString("0.1"), "LibrePCB", ElementName(deviceName),
@@ -69,7 +69,7 @@ std::unique_ptr<library::Device> DeviceConverter::generate() const {
   Uuid fptUuid = mDb.getFootprintUuid(mDevice.getPackage());
   foreach (const parseagle::Connection& connection, mDevice.getConnections()) {
     QString gateName = connection.getGate();
-    QString pinName  = connection.getPin();
+    QString pinName = connection.getPin();
     QString padNames = connection.getPad();
     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));

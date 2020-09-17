@@ -63,7 +63,7 @@ bool MsgNameNotTitleCase::isTitleCase(const ElementName& name) noexcept {
 ElementName MsgNameNotTitleCase::getFixedName(
     const ElementName& name) noexcept {
   QString newName;
-  bool    lastCharWasSpace = true;
+  bool lastCharWasSpace = true;
   foreach (QChar c, *name) {
     if (lastCharWasSpace && c.isLetter() && c.isLower()) {
       c = c.toUpper();

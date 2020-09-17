@@ -56,7 +56,7 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
                            const PositiveLength& width,
                            const PositiveLength& height,
                            const UnsignedLength& drillDiameter,
-                           BoardSide             side) noexcept
+                           BoardSide side) noexcept
   : onEdited(*this),
     mPackagePadUuid(padUuid),
     mPosition(pos),
@@ -113,7 +113,7 @@ bool FootprintPad::isOnLayer(const QString& name) const noexcept {
 }
 
 Path FootprintPad::getOutline(const Length& expansion) const noexcept {
-  Length width  = mWidth + (expansion * 2);
+  Length width = mWidth + (expansion * 2);
   Length height = mHeight + (expansion * 2);
   if (width > 0 && height > 0) {
     PositiveLength pWidth(width);

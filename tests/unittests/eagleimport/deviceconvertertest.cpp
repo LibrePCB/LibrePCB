@@ -49,7 +49,7 @@ TEST_F(DeviceConverterTest, testConversion) {
   FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
 
   // load eagle device
-  FilePath           eagleLibFp = testDataDir.getPathTo("resistor.lbr");
+  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
   parseagle::Library eagleLibrary(eagleLibFp.toStr());
   ASSERT_EQ(1, eagleLibrary.getDeviceSets().count());
   const parseagle::DeviceSet& eagleDeviceSet =
@@ -61,7 +61,7 @@ TEST_F(DeviceConverterTest, testConversion) {
   ConverterDb db(testDataDir.getPathTo("db.ini"));
 
   // convert device set
-  DeviceConverter                  converter(eagleDeviceSet, eagleDevice, db);
+  DeviceConverter converter(eagleDeviceSet, eagleDevice, db);
   std::unique_ptr<library::Device> device = converter.generate();
 }
 

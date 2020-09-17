@@ -62,7 +62,7 @@ public:
   enum class LayerPolarity { Positive, Negative };
 
   // Constructors / Destructor
-  GerberGenerator()                             = delete;
+  GerberGenerator() = delete;
   GerberGenerator(const GerberGenerator& other) = delete;
   GerberGenerator(const QString& projName, const Uuid& projUuid,
                   const QString& projRevision) noexcept;
@@ -77,7 +77,7 @@ public:
                 const UnsignedLength& width) noexcept;
   void drawCircleOutline(const Circle& circle) noexcept;
   void drawCircleArea(const Circle& circle) noexcept;
-  void drawPathOutline(const Path&           path,
+  void drawPathOutline(const Path& path,
                        const UnsignedLength& lineWidth) noexcept;
   void drawPathArea(const Path& path) noexcept;
   void flashCircle(const Point& pos, const UnsignedLength& dia,
@@ -89,7 +89,7 @@ public:
                     const UnsignedLength& h, const Angle& rot,
                     const UnsignedLength& hole) noexcept;
   void flashRegularPolygon(const Point& pos, const UnsignedLength& dia, int n,
-                           const Angle&          rot,
+                           const Angle& rot,
                            const UnsignedLength& hole) noexcept;
   void flashOctagon(const Point& pos, const UnsignedLength& w,
                     const UnsignedLength& h, const UnsignedLength& edge,
@@ -105,24 +105,24 @@ public:
 
 private:
   // Private Methods
-  void    setCurrentAperture(int number) noexcept;
-  void    setRegionModeOn() noexcept;
-  void    setRegionModeOff() noexcept;
-  void    setMultiQuadrantArcModeOn() noexcept;
-  void    setMultiQuadrantArcModeOff() noexcept;
-  void    switchToLinearInterpolationModeG01() noexcept;
-  void    switchToCircularCwInterpolationModeG02() noexcept;
-  void    switchToCircularCcwInterpolationModeG03() noexcept;
-  void    moveToPosition(const Point& pos) noexcept;
-  void    linearInterpolateToPosition(const Point& pos) noexcept;
-  void    circularInterpolateToPosition(const Point& start, const Point& center,
-                                        const Point& end) noexcept;
-  void    interpolateBetween(const Vertex& from, const Vertex& to) noexcept;
-  void    flashAtPosition(const Point& pos) noexcept;
-  void    printHeader() noexcept;
-  void    printApertureList() noexcept;
-  void    printContent() noexcept;
-  void    printFooter() noexcept;
+  void setCurrentAperture(int number) noexcept;
+  void setRegionModeOn() noexcept;
+  void setRegionModeOff() noexcept;
+  void setMultiQuadrantArcModeOn() noexcept;
+  void setMultiQuadrantArcModeOff() noexcept;
+  void switchToLinearInterpolationModeG01() noexcept;
+  void switchToCircularCwInterpolationModeG02() noexcept;
+  void switchToCircularCcwInterpolationModeG03() noexcept;
+  void moveToPosition(const Point& pos) noexcept;
+  void linearInterpolateToPosition(const Point& pos) noexcept;
+  void circularInterpolateToPosition(const Point& start, const Point& center,
+                                     const Point& end) noexcept;
+  void interpolateBetween(const Vertex& from, const Vertex& to) noexcept;
+  void flashAtPosition(const Point& pos) noexcept;
+  void printHeader() noexcept;
+  void printApertureList() noexcept;
+  void printContent() noexcept;
+  void printFooter() noexcept;
   QString calcOutputMd5Checksum() const noexcept;
 
   // Static Methods
@@ -130,15 +130,15 @@ private:
 
   // Metadata
   QString mProjectId;
-  Uuid    mProjectUuid;
+  Uuid mProjectUuid;
   QString mProjectRevision;
 
   // Gerber Data
-  QString                            mOutput;
-  QString                            mContent;
+  QString mOutput;
+  QString mContent;
   QScopedPointer<GerberApertureList> mApertureList;
-  int                                mCurrentApertureNumber;
-  bool                               mMultiQuadrantArcModeOn;
+  int mCurrentApertureNumber;
+  bool mMultiQuadrantArcModeOn;
 };
 
 /*******************************************************************************

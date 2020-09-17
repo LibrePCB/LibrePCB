@@ -57,10 +57,10 @@ public:
   void setLayer(const GraphicsLayer* layer) noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   LineGraphicsItem& operator=(const LineGraphicsItem& rhs) = delete;
@@ -72,11 +72,11 @@ private:  // Methods
 
 private:  // Data
   const GraphicsLayer* mLayer;
-  QPen                 mPen;
-  QPen                 mPenHighlighted;
-  QLineF               mLine;
-  QRectF               mBoundingRect;
-  QPainterPath         mShape;
+  QPen mPen;
+  QPen mPenHighlighted;
+  QLineF mLine;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
 
   // Slots
   GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;

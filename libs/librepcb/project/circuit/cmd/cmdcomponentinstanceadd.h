@@ -55,7 +55,7 @@ public:
   CmdComponentInstanceAdd(
       Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
-  CmdComponentInstanceAdd(Circuit&           circuit,
+  CmdComponentInstanceAdd(Circuit& circuit,
                           ComponentInstance* component) noexcept;
   ~CmdComponentInstanceAdd() noexcept;
 
@@ -79,9 +79,9 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Circuit&           mCircuit;
-  Uuid               mComponentUuid;
-  Uuid               mSymbVarUuid;
+  Circuit& mCircuit;
+  Uuid mComponentUuid;
+  Uuid mSymbVarUuid;
   tl::optional<Uuid> mDefaultDeviceUuid;
 
   /// @brief The created component instance

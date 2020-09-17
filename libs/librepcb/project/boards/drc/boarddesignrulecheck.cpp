@@ -128,7 +128,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
                                                       int progressEnd) {
   emit progressStatus(tr("Check board clearances..."));
 
-  qreal             progressSpan = progressEnd - progressStart;
+  qreal progressSpan = progressEnd - progressStart;
   QList<NetSignal*> netsignals =
       mBoard.getProject().getCircuit().getNetSignals().values();
   netsignals.append(nullptr);  // also check unconnected copper objects
@@ -138,7 +138,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
   {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
     gen.addBoardOutline();
-    outlineRestrictedArea               = gen.getPaths();
+    outlineRestrictedArea = gen.getPaths();
     ClipperLib::Paths outlinePathsInner = gen.getPaths();
     ClipperHelpers::offset(
         outlinePathsInner,
@@ -167,15 +167,15 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
       for (const ClipperLib::Path& path :
            ClipperHelpers::flattenTree(*intersections)) {
         QString name1 = netsignals[i] ? *netsignals[i]->getName() : "";
-        QString msg   = tr("Clearance (%1): '%2' <-> Board Outline",
+        QString msg = tr("Clearance (%1): '%2' <-> Board Outline",
                          "Placeholders are layer name + net name")
                           .arg(layer->getNameTr(), name1);
         Path location = ClipperHelpers::convert(path);
         addMessage(BoardDesignRuleCheckMessage(msg, location));
       }
       qreal progress = progressSpan *
-                       qreal((layerIndex + 1) * netsignals.count() + i + 1) /
-                       qreal(layers.count() * netsignals.count());
+          qreal((layerIndex + 1) * netsignals.count() + i + 1) /
+          qreal(layers.count() * netsignals.count());
       emit progressPercent(progressStart + static_cast<int>(progress));
     }
   }
@@ -185,7 +185,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
                                                        int progressEnd) {
   emit progressStatus(tr("Check copper clearances..."));
 
-  qreal             progressSpan = progressEnd - progressStart;
+  qreal progressSpan = progressEnd - progressStart;
   QList<NetSignal*> netsignals =
       mBoard.getProject().getCircuit().getNetSignals().values();
   netsignals.append(nullptr);  // also check unconnected copper objects
@@ -213,7 +213,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
              ClipperHelpers::flattenTree(*intersections)) {
           QString name1 = netsignals[i] ? *netsignals[i]->getName() : "";
           QString name2 = netsignals[k] ? *netsignals[k]->getName() : "";
-          QString msg   = tr("Clearance (%1): '%2' <-> '%3'",
+          QString msg = tr("Clearance (%1): '%2' <-> '%3'",
                            "Placeholders are layer name + net names")
                             .arg(layer->getNameTr(), name1, name2);
           Path location = ClipperHelpers::convert(path);
@@ -221,8 +221,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
         }
       }
       qreal progress = progressSpan *
-                       qreal((layerIndex + 1) * netsignals.count() + i + 1) /
-                       qreal(layers.count() * netsignals.count());
+          qreal((layerIndex + 1) * netsignals.count() + i + 1) /
+          qreal(layers.count() * netsignals.count());
       emit progressPercent(progressStart + static_cast<int>(progress));
     }
   }
@@ -253,14 +253,14 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressStart,
       for (int k = i + 1; k < deviceCourtyards.count(); ++k) {
         const BI_Device* dev2 = deviceCourtyards.keys()[k];
         Q_ASSERT(dev2);
-        const ClipperLib::Paths&              paths2 = deviceCourtyards[dev2];
+        const ClipperLib::Paths& paths2 = deviceCourtyards[dev2];
         std::unique_ptr<ClipperLib::PolyTree> intersections =
             ClipperHelpers::intersect(paths1, paths2);
         for (const ClipperLib::Path& path :
              ClipperHelpers::flattenTree(*intersections)) {
           QString name1 = *dev1->getComponentInstance().getName();
           QString name2 = *dev2->getComponentInstance().getName();
-          QString msg   = tr("Clearance (%1): '%2' <-> '%3'",
+          QString msg = tr("Clearance (%1): '%2' <-> '%3'",
                            "Placeholders are layer name + component names")
                             .arg(layer->getNameTr(), name1, name2);
           Path location = ClipperHelpers::convert(path);
@@ -387,8 +387,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
                           .arg(*netsegment->getNetSignal().getName(),
                                formatLength(restring));
         PositiveLength diameter = via->getDrillDiameter() +
-                                  mOptions.minPthRestring +
-                                  mOptions.minPthRestring;
+            mOptions.minPthRestring + mOptions.minPthRestring;
         Path location = Path::circle(diameter).translated(via->getPosition());
         addMessage(BoardDesignRuleCheckMessage(msg, location));
       }
@@ -479,7 +478,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
     if (hole->getHole().getDiameter() < mOptions.minNpthDrillDiameter) {
       QString msg = msgTr.arg(formatLength(*hole->getHole().getDiameter()));
-      Path    location = Path::circle(hole->getHole().getDiameter())
+      Path location = Path::circle(hole->getHole().getDiameter())
                           .translated(hole->getPosition());
       addMessage(BoardDesignRuleCheckMessage(msg, location));
     }
@@ -491,7 +490,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
     for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
       if (hole.getDiameter() < *mOptions.minNpthDrillDiameter) {
         QString msg = msgTr.arg(formatLength(*hole.getDiameter()));
-        Path    location =
+        Path location =
             Path::circle(hole.getDiameter())
                 .translated(footprint.mapToScene(hole.getPosition()));
         addMessage(BoardDesignRuleCheckMessage(msg, location));
@@ -543,8 +542,9 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
     if (device.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
     absolutePos += device.getPosition();
     ClipperHelpers::unite(
-        paths, ClipperHelpers::convert(Path::circle(circle.getDiameter()),
-                                       maxArcTolerance()));
+        paths,
+        ClipperHelpers::convert(Path::circle(circle.getDiameter()),
+                                maxArcTolerance()));
   }
   return paths;
 }

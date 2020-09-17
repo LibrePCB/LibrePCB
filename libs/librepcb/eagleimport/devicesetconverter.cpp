@@ -40,7 +40,7 @@ namespace eagleimport {
  ******************************************************************************/
 
 DeviceSetConverter::DeviceSetConverter(const parseagle::DeviceSet& deviceSet,
-                                       ConverterDb&                db) noexcept
+                                       ConverterDb& db) noexcept
   : mDeviceSet(deviceSet), mDb(db) {
 }
 
@@ -77,7 +77,7 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const {
   foreach (const parseagle::Connection& connection,
            firstDevice.getConnections()) {
     QString gateName = connection.getGate();
-    QString pinName  = connection.getPin();
+    QString pinName = connection.getPin();
     if (pinName.contains("@")) pinName.truncate(pinName.indexOf("@"));
     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
     Uuid signalUuid =
@@ -93,9 +93,9 @@ std::unique_ptr<library::Component> DeviceSetConverter::generate() const {
 
   // symbol variant items
   foreach (const parseagle::Gate& gate, mDeviceSet.getGates()) {
-    QString gateName   = gate.getName();
+    QString gateName = gate.getName();
     QString symbolName = gate.getSymbol();
-    Uuid    symbolUuid = mDb.getSymbolUuid(symbolName);
+    Uuid symbolUuid = mDb.getSymbolUuid(symbolName);
     library::ComponentSymbolVariantItemSuffix suffix(
         (gateName == "G$1") ? "" : gateName);  // can throw
 

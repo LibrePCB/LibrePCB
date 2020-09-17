@@ -64,14 +64,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QRectF boundingRect() const noexcept { return mBoundingRect; }
   QPainterPath shape() const noexcept { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0);
 
 private:
   // make some methods inaccessible...
-  BGI_FootprintPad()                              = delete;
+  BGI_FootprintPad() = delete;
   BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
   BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
@@ -79,7 +79,7 @@ private:
   GraphicsLayer* getLayer(QString name) const noexcept;
 
   // General Attributes
-  BI_FootprintPad&             mPad;
+  BI_FootprintPad& mPad;
   const library::FootprintPad& mLibPad;
 
   // Cached Attributes
@@ -88,12 +88,12 @@ private:
   GraphicsLayer* mBottomStopMaskLayer;
   GraphicsLayer* mTopCreamMaskLayer;
   GraphicsLayer* mBottomCreamMaskLayer;
-  QPainterPath   mShape;
-  QPainterPath   mCopper;
-  QPainterPath   mStopMask;
-  QPainterPath   mCreamMask;
-  QRectF         mBoundingRect;
-  QFont          mFont;
+  QPainterPath mShape;
+  QPainterPath mCopper;
+  QPainterPath mStopMask;
+  QPainterPath mCreamMask;
+  QRectF mBoundingRect;
+  QFont mFont;
 };
 
 /*******************************************************************************

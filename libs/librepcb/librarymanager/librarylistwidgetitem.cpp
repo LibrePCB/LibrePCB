@@ -41,9 +41,9 @@ namespace manager {
  ******************************************************************************/
 
 LibraryListWidgetItem::LibraryListWidgetItem(workspace::Workspace& ws,
-                                             const FilePath&       libDir,
-                                             const QString&        name,
-                                             const QString&        description,
+                                             const FilePath& libDir,
+                                             const QString& name,
+                                             const QString& description,
                                              const QPixmap& icon) noexcept
   : QWidget(nullptr),
     mUi(new Ui::LibraryListWidgetItem),

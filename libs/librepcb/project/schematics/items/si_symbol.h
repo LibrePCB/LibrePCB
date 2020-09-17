@@ -61,7 +61,7 @@ class SI_Symbol final : public SI_Base,
 
 public:
   // Constructors / Destructor
-  SI_Symbol()                       = delete;
+  SI_Symbol() = delete;
   SI_Symbol(const SI_Symbol& other) = delete;
   explicit SI_Symbol(Schematic& schematic, const SExpression& node);
   explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
@@ -70,15 +70,15 @@ public:
   ~SI_Symbol() noexcept;
 
   // Getters
-  const Uuid&   getUuid() const noexcept { return mUuid; }
-  const Angle&  getRotation() const noexcept { return mRotation; }
-  bool          getMirrored() const noexcept { return mMirrored; }
-  QString       getName() const noexcept;
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const Angle& getRotation() const noexcept { return mRotation; }
+  bool getMirrored() const noexcept { return mMirrored; }
+  QString getName() const noexcept;
   SI_SymbolPin* getPin(const Uuid& pinUuid) const noexcept {
     return mPins.value(pinUuid);
   }
   const QHash<Uuid, SI_SymbolPin*>& getPins() const noexcept { return mPins; }
-  ComponentInstance&                getComponentInstance() const noexcept {
+  ComponentInstance& getComponentInstance() const noexcept {
     return *mComponentInstance;
   }
   const library::Symbol& getLibSymbol() const noexcept { return *mSymbol; }
@@ -114,7 +114,7 @@ public:
   Type_t getType() const noexcept override { return SI_Base::Type_t::Symbol; }
   const Point& getPosition() const noexcept override { return mPosition; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   SI_Symbol& operator=(const SI_Symbol& rhs) = delete;
@@ -134,17 +134,17 @@ private:
   bool checkAttributesValidity() const noexcept;
 
   // General
-  ComponentInstance*                         mComponentInstance;
+  ComponentInstance* mComponentInstance;
   const library::ComponentSymbolVariantItem* mSymbVarItem;
-  const library::Symbol*                     mSymbol;
-  QHash<Uuid, SI_SymbolPin*>                 mPins;  ///< key: symbol pin UUID
-  QScopedPointer<SGI_Symbol>                 mGraphicsItem;
+  const library::Symbol* mSymbol;
+  QHash<Uuid, SI_SymbolPin*> mPins;  ///< key: symbol pin UUID
+  QScopedPointer<SGI_Symbol> mGraphicsItem;
 
   // Attributes
-  Uuid  mUuid;
+  Uuid mUuid;
   Point mPosition;
   Angle mRotation;
-  bool  mMirrored;
+  bool mMirrored;
 };
 
 /*******************************************************************************

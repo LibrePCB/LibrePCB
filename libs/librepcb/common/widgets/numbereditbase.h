@@ -66,7 +66,7 @@ signals:
   void editingFinished();
 
 protected:  // Methods
-  virtual void updateSpinBox() noexcept                   = 0;
+  virtual void updateSpinBox() noexcept = 0;
   virtual void spinBoxValueChanged(double value) noexcept = 0;
 
 protected:  // Data

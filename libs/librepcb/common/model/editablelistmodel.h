@@ -92,7 +92,7 @@ public:
   // Setters
   void setDefaultValue(const ValueType& value) noexcept {
     mDefaultValue = value;
-    mNewValue     = value;
+    mNewValue = value;
   }
 
   void setPlaceholderText(const QString& text) noexcept {
@@ -191,7 +191,7 @@ public:
   }
 
   QVariant data(const QModelIndex& index,
-                int                role = Qt::DisplayRole) const override {
+                int role = Qt::DisplayRole) const override {
     if (!index.isValid()) {
       return QVariant();
     }
@@ -201,14 +201,14 @@ public:
       value = mValues.at(index.row());
     }
     bool showPlaceholder = (index.row() == mValues.count()) &&
-                           ((!value) || getDisplayText(*value).isEmpty());
+        ((!value) || getDisplayText(*value).isEmpty());
     switch (index.column()) {
       case COLUMN_TEXT: {
         switch (role) {
           case Qt::DisplayRole:
             return showPlaceholder
-                       ? mPlaceholderText
-                       : (value ? getDisplayText(*value) : QString());
+                ? mPlaceholderText
+                : (value ? getDisplayText(*value) : QString());
           case Qt::DecorationRole:
             return value ? mIcons.value(*value) : QIcon();
           case Qt::EditRole:
@@ -318,7 +318,7 @@ private:  // Methods
     return value;
   }
 
-  tl::optional<Uuid> convertInputValue(const QVariant&           input,
+  tl::optional<Uuid> convertInputValue(const QVariant& input,
                                        const tl::optional<Uuid>& tag) const
       noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
@@ -332,7 +332,7 @@ private:  // Methods
     return str.isEmpty() ? tl::nullopt : tl::make_optional(str);
   }
 
-  tl::optional<QUrl> convertInputValue(const QVariant&           input,
+  tl::optional<QUrl> convertInputValue(const QVariant& input,
                                        const tl::optional<QUrl>& tag) const
       noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
@@ -351,14 +351,14 @@ private:  // Methods
   }
 
 private:  // Data
-  T                         mChoices;
-  T                         mValues;
-  tl::optional<ValueType>   mDefaultValue;
-  tl::optional<ValueType>   mNewValue;
-  QString                   mPlaceholderText;
+  T mChoices;
+  T mValues;
+  tl::optional<ValueType> mDefaultValue;
+  tl::optional<ValueType> mNewValue;
+  QString mPlaceholderText;
   QHash<ValueType, QString> mDisplayTexts;
-  QHash<ValueType, QIcon>   mIcons;
-  ComboBoxDelegate::Items   mComboBoxItems;
+  QHash<ValueType, QIcon> mIcons;
+  ComboBoxDelegate::Items mComboBoxItems;
 };
 
 /*******************************************************************************

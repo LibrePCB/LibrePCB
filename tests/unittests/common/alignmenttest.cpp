@@ -35,7 +35,7 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  bool   valid;
+  bool valid;
   HAlign origHAling;
   VAlign origVAling;
   HAlign mirrHAling;
@@ -85,7 +85,7 @@ TEST_P(AlignmentTest, testMirrored) {
   const AlignmentTestData& data = GetParam();
 
   if (data.valid) {
-    Alignment alignment         = Alignment(data.origHAling, data.origVAling);
+    Alignment alignment = Alignment(data.origHAling, data.origVAling);
     Alignment alignmentMirrored = alignment.mirrored();
     EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
     EXPECT_EQ(alignmentMirrored, Alignment(data.mirrHAling, data.mirrVAling));
@@ -96,7 +96,7 @@ TEST_P(AlignmentTest, testMirroredH) {
   const AlignmentTestData& data = GetParam();
 
   if (data.valid) {
-    Alignment alignment          = Alignment(data.origHAling, data.origVAling);
+    Alignment alignment = Alignment(data.origHAling, data.origVAling);
     Alignment alignmentMirroredH = alignment.mirroredH();
     EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
     EXPECT_EQ(alignmentMirroredH, Alignment(data.mirrHAling, data.origVAling));
@@ -107,7 +107,7 @@ TEST_P(AlignmentTest, testMirroredV) {
   const AlignmentTestData& data = GetParam();
 
   if (data.valid) {
-    Alignment alignment          = Alignment(data.origHAling, data.origVAling);
+    Alignment alignment = Alignment(data.origHAling, data.origVAling);
     Alignment alignmentMirroredV = alignment.mirroredV();
     EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
     EXPECT_EQ(alignmentMirroredV, Alignment(data.origHAling, data.mirrVAling));

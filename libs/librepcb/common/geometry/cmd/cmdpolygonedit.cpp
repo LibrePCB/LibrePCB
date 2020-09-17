@@ -61,14 +61,14 @@ CmdPolygonEdit::~CmdPolygonEdit() noexcept {
  ******************************************************************************/
 
 void CmdPolygonEdit::setLayerName(const GraphicsLayerName& name,
-                                  bool                     immediate) noexcept {
+                                  bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLayerName = name;
   if (immediate) mPolygon.setLayerName(mNewLayerName);
 }
 
 void CmdPolygonEdit::setLineWidth(const UnsignedLength& width,
-                                  bool                  immediate) noexcept {
+                                  bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLineWidth = width;
   if (immediate) mPolygon.setLineWidth(mNewLineWidth);
@@ -102,8 +102,8 @@ void CmdPolygonEdit::rotate(const Angle& angle, const Point& center,
 }
 
 void CmdPolygonEdit::mirrorGeometry(Qt::Orientation orientation,
-                                    const Point&    center,
-                                    bool            immediate) noexcept {
+                                    const Point& center,
+                                    bool immediate) noexcept {
   setPath(mNewPath.mirrored(orientation, center), immediate);
 }
 

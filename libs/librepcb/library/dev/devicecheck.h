@@ -45,7 +45,7 @@ class Device;
 class DeviceCheck : public LibraryElementCheck {
 public:
   // Constructors / Destructor
-  DeviceCheck()                         = delete;
+  DeviceCheck() = delete;
   DeviceCheck(const DeviceCheck& other) = delete;
   explicit DeviceCheck(const Device& device) noexcept;
   virtual ~DeviceCheck() noexcept;

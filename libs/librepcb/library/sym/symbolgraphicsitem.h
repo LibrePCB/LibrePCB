@@ -58,26 +58,26 @@ class SymbolPinGraphicsItem;
 class SymbolGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
-  SymbolGraphicsItem()                                = delete;
+  SymbolGraphicsItem() = delete;
   SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
-  SymbolGraphicsItem(Symbol&                         symbol,
+  SymbolGraphicsItem(Symbol& symbol,
                      const IF_GraphicsLayerProvider& lp) noexcept;
   ~SymbolGraphicsItem() noexcept;
 
   // Getters
   SymbolPinGraphicsItem* getPinGraphicsItem(const Uuid& pin) noexcept;
-  CircleGraphicsItem*    getCircleGraphicsItem(const Circle& circle) noexcept;
+  CircleGraphicsItem* getCircleGraphicsItem(const Circle& circle) noexcept;
   PolygonGraphicsItem* getPolygonGraphicsItem(const Polygon& polygon) noexcept;
-  TextGraphicsItem*    getTextGraphicsItem(const Text& text) noexcept;
-  int                  getItemsAtPosition(
-                       const Point& pos, QList<QSharedPointer<SymbolPinGraphicsItem>>* pins,
-                       QList<QSharedPointer<CircleGraphicsItem>>*  circles,
-                       QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-                       QList<QSharedPointer<TextGraphicsItem>>*    texts) noexcept;
+  TextGraphicsItem* getTextGraphicsItem(const Text& text) noexcept;
+  int getItemsAtPosition(
+      const Point& pos, QList<QSharedPointer<SymbolPinGraphicsItem>>* pins,
+      QList<QSharedPointer<CircleGraphicsItem>>* circles,
+      QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
+      QList<QSharedPointer<TextGraphicsItem>>* texts) noexcept;
   QList<QSharedPointer<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
-  QList<QSharedPointer<CircleGraphicsItem>>    getSelectedCircles() noexcept;
-  QList<QSharedPointer<PolygonGraphicsItem>>   getSelectedPolygons() noexcept;
-  QList<QSharedPointer<TextGraphicsItem>>      getSelectedTexts() noexcept;
+  QList<QSharedPointer<CircleGraphicsItem>> getSelectedCircles() noexcept;
+  QList<QSharedPointer<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
+  QList<QSharedPointer<TextGraphicsItem>> getSelectedTexts() noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -95,21 +95,21 @@ public:
   void setSelectionRect(const QRectF rect) noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return QRectF(); }
+  QRectF boundingRect() const noexcept override { return QRectF(); }
   QPainterPath shape() const noexcept override { return QPainterPath(); }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
 
 private:  // Data
-  Symbol&                                                  mSymbol;
-  const IF_GraphicsLayerProvider&                          mLayerProvider;
-  QHash<Uuid, QSharedPointer<SymbolPinGraphicsItem>>       mPinGraphicsItems;
+  Symbol& mSymbol;
+  const IF_GraphicsLayerProvider& mLayerProvider;
+  QHash<Uuid, QSharedPointer<SymbolPinGraphicsItem>> mPinGraphicsItems;
   QHash<const Circle*, QSharedPointer<CircleGraphicsItem>> mCircleGraphicsItems;
   QHash<const Polygon*, QSharedPointer<PolygonGraphicsItem>>
-                                                       mPolygonGraphicsItems;
+      mPolygonGraphicsItems;
   QHash<const Text*, QSharedPointer<TextGraphicsItem>> mTextGraphicsItems;
 };
 

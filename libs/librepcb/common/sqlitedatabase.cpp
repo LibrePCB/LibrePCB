@@ -81,7 +81,7 @@ SQLiteDatabase::SQLiteDatabase(const FilePath& filepath)
 
   // set SQLite options
   exec("PRAGMA foreign_keys = ON");  // can throw
-  enableSqliteWriteAheadLogging();   // can throw
+  enableSqliteWriteAheadLogging();  // can throw
 
   // check if all required features are available
   Q_ASSERT(mDb.driver() && mDb.driver()->hasFeature(QSqlDriver::Transactions));
@@ -161,7 +161,7 @@ QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const {
 int SQLiteDatabase::count(QSqlQuery& query) {
   exec(query);  // can throw
 
-  int  count   = 0;
+  int count = 0;
   bool success = query.next() && query.value(0).isValid();
   if (success) {
     count = query.value(0).toInt(&success);
@@ -177,7 +177,7 @@ int SQLiteDatabase::insert(QSqlQuery& query) {
   exec(query);  // can throw
 
   bool ok = false;
-  int  id = query.lastInsertId().toInt(&ok);
+  int id = query.lastInsertId().toInt(&ok);
   if (ok) {
     return id;
   } else {
@@ -209,8 +209,8 @@ void SQLiteDatabase::exec(const QString& query) {
 void SQLiteDatabase::enableSqliteWriteAheadLogging() {
   QSqlQuery query("PRAGMA journal_mode=WAL", mDb);
   exec(query);  // can throw
-  bool    success = query.first();
-  QString result  = query.value(0).toString();
+  bool success = query.first();
+  QString result = query.value(0).toString();
   if ((!success) || (result != "wal")) {
     throw LogicError(
         __FILE__, __LINE__,
@@ -220,12 +220,12 @@ void SQLiteDatabase::enableSqliteWriteAheadLogging() {
 
 QHash<QString, QString> SQLiteDatabase::getSqliteCompileOptions() {
   QHash<QString, QString> options;
-  QSqlQuery               query("PRAGMA compile_options", mDb);
+  QSqlQuery query("PRAGMA compile_options", mDb);
   exec(query);  // can throw
   while (query.next()) {
     QString option = query.value(0).toString();
-    QString key    = option.section('=', 0, 0);
-    QString value  = option.section('=', 1, -1);
+    QString key = option.section('=', 0, 0);
+    QString value = option.section('=', 1, -1);
     options.insert(key, value);
   }
   return options;

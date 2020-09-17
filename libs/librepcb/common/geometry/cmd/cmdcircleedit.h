@@ -43,7 +43,7 @@ namespace librepcb {
 class CmdCircleEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdCircleEdit()                           = delete;
+  CmdCircleEdit() = delete;
   CmdCircleEdit(const CmdCircleEdit& other) = delete;
   explicit CmdCircleEdit(Circle& circle) noexcept;
   ~CmdCircleEdit() noexcept;
@@ -84,16 +84,16 @@ private:
   // General Attributes
   GraphicsLayerName mOldLayerName;
   GraphicsLayerName mNewLayerName;
-  UnsignedLength    mOldLineWidth;
-  UnsignedLength    mNewLineWidth;
-  bool              mOldIsFilled;
-  bool              mNewIsFilled;
-  bool              mOldIsGrabArea;
-  bool              mNewIsGrabArea;
-  PositiveLength    mOldDiameter;
-  PositiveLength    mNewDiameter;
-  Point             mOldCenter;
-  Point             mNewCenter;
+  UnsignedLength mOldLineWidth;
+  UnsignedLength mNewLineWidth;
+  bool mOldIsFilled;
+  bool mNewIsFilled;
+  bool mOldIsGrabArea;
+  bool mNewIsGrabArea;
+  PositiveLength mOldDiameter;
+  PositiveLength mNewDiameter;
+  Point mOldCenter;
+  Point mNewCenter;
 };
 
 /*******************************************************************************

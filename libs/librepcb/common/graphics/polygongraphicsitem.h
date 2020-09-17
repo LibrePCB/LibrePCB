@@ -46,7 +46,7 @@ class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem final : public PrimitivePathGraphicsItem {
 public:
   // Constructors / Destructor
-  PolygonGraphicsItem()                                 = delete;
+  PolygonGraphicsItem() = delete;
   PolygonGraphicsItem(const PolygonGraphicsItem& other) = delete;
   PolygonGraphicsItem(Polygon& polygon, const IF_GraphicsLayerProvider& lp,
                       QGraphicsItem* parent = nullptr) noexcept;
@@ -63,7 +63,7 @@ private:  // Methods
   void updateFillLayer() noexcept;
 
 private:  // Data
-  Polygon&                        mPolygon;
+  Polygon& mPolygon;
   const IF_GraphicsLayerProvider& mLayerProvider;
 
   // Slots

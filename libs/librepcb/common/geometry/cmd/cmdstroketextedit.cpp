@@ -86,7 +86,7 @@ void CmdStrokeTextEdit::setText(const QString& text, bool immediate) noexcept {
 }
 
 void CmdStrokeTextEdit::setHeight(const PositiveLength& height,
-                                  bool                  immediate) noexcept {
+                                  bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewHeight = height;
   if (immediate) mText.setHeight(mNewHeight);
@@ -114,7 +114,7 @@ void CmdStrokeTextEdit::setLineSpacing(const StrokeTextSpacing& spacing,
 }
 
 void CmdStrokeTextEdit::setAlignment(const Alignment& align,
-                                     bool             immediate) noexcept {
+                                     bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewAlign = align;
   if (immediate) mText.setAlign(mNewAlign);
@@ -133,7 +133,7 @@ void CmdStrokeTextEdit::translate(const Point& delta, bool immediate) noexcept {
 }
 
 void CmdStrokeTextEdit::setRotation(const Angle& angle,
-                                    bool         immediate) noexcept {
+                                    bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;
   if (immediate) mText.setRotation(mNewRotation);
@@ -144,8 +144,8 @@ void CmdStrokeTextEdit::rotate(const Angle& angle, const Point& center,
   Q_ASSERT(!wasEverExecuted());
   mNewPosition.rotate(angle, center);
   mNewRotation += mNewMirrored
-                      ? -angle
-                      : angle;  // mirror --> rotation direction is inverted!
+      ? -angle
+      : angle;  // mirror --> rotation direction is inverted!
   if (immediate) {
     mText.setPosition(mNewPosition);
     mText.setRotation(mNewRotation);
@@ -159,8 +159,8 @@ void CmdStrokeTextEdit::setMirrored(bool mirrored, bool immediate) noexcept {
 }
 
 void CmdStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
-                                       const Point&    center,
-                                       bool            immediate) noexcept {
+                                       const Point& center,
+                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPosition.mirror(orientation, center);
   if (orientation == Qt::Horizontal) {

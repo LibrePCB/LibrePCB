@@ -48,7 +48,7 @@ class IF_GraphicsLayerProvider;
 class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem {
 public:
   // Constructors / Destructor
-  HoleGraphicsItem()                              = delete;
+  HoleGraphicsItem() = delete;
   HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
   HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
                    QGraphicsItem* parent = nullptr) noexcept;
@@ -64,13 +64,13 @@ public:
   HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void     holeEdited(const Hole& hole, Hole::Event event) noexcept;
+  void holeEdited(const Hole& hole, Hole::Event event) noexcept;
   QVariant itemChange(GraphicsItemChange change,
-                      const QVariant&    value) noexcept override;
+                      const QVariant& value) noexcept override;
 
 private:  // Data
-  Hole&                                   mHole;
-  const IF_GraphicsLayerProvider&         mLayerProvider;
+  Hole& mHole;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 
   // Slots

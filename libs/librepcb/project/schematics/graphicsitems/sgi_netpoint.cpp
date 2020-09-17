@@ -52,7 +52,7 @@ SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint) noexcept
   Q_ASSERT(mLayer);
 
   if (sBoundingRect.isNull()) {
-    qreal radius  = Length(600000).toPx();
+    qreal radius = Length(600000).toPx();
     sBoundingRect = QRectF(-radius, -radius, 2 * radius, 2 * radius);
   }
 
@@ -71,7 +71,7 @@ void SGI_NetPoint::updateCacheAndRepaint() noexcept {
 
   prepareGeometryChange();
   mIsVisibleJunction = mNetPoint.isVisibleJunction();
-  mIsOpenLineEnd     = mNetPoint.isOpenLineEnd();
+  mIsOpenLineEnd = mNetPoint.isOpenLineEnd();
   setZValue(mIsVisibleJunction ? Schematic::ZValue_VisibleNetPoints
                                : Schematic::ZValue_HiddenNetPoints);
   update();
@@ -81,16 +81,16 @@ void SGI_NetPoint::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_NetPoint::paint(QPainter*                       painter,
+void SGI_NetPoint::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
-                         QWidget*                        widget) {
+                         QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
   const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
   bool highlight = mNetPoint.isSelected() ||
-                   mNetPoint.getNetSignalOfNetSegment().isHighlighted();
+      mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
   if (mLayer->isVisible() && mIsVisibleJunction) {
     painter->setPen(Qt::NoPen);

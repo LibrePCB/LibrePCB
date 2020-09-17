@@ -69,7 +69,7 @@ void CmdBoardViaEdit::setPosition(const Point& pos, bool immediate) noexcept {
 }
 
 void CmdBoardViaEdit::translate(const Point& deltaPos,
-                                bool         immediate) noexcept {
+                                bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
   if (immediate) mVia.setPosition(mNewPos);
@@ -89,7 +89,7 @@ void CmdBoardViaEdit::setShape(Via::Shape shape, bool immediate) noexcept {
 }
 
 void CmdBoardViaEdit::setSize(const PositiveLength& size,
-                              bool                  immediate) noexcept {
+                              bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewSize = size;
   if (immediate) mVia.setSize(mNewSize);

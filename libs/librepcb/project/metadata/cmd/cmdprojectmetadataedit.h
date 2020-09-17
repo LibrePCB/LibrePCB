@@ -72,12 +72,12 @@ private:
   ProjectMetadata& mMetadata;
 
   // Misc
-  ElementName   mOldName;
-  ElementName   mNewName;
-  QString       mOldAuthor;
-  QString       mNewAuthor;
-  QString       mOldVersion;
-  QString       mNewVersion;
+  ElementName mOldName;
+  ElementName mNewName;
+  QString mOldAuthor;
+  QString mNewAuthor;
+  QString mOldVersion;
+  QString mNewVersion;
   AttributeList mOldAttributes;
   AttributeList mNewAttributes;
 };

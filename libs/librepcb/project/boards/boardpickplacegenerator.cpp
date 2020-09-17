@@ -66,13 +66,13 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     QString designator = *device->getComponentInstance().getName();
     QString value = device->getComponentInstance().getValue(true).trimmed();
-    QString deviceName  = *device->getLibDevice().getNames().value(locale);
+    QString deviceName = *device->getLibDevice().getNames().value(locale);
     QString packageName = *device->getLibPackage().getNames().value(locale);
-    Point   position    = device->getPosition();
-    Angle   rotation    = device->getRotation();
-    PickPlaceDataItem::BoardSide boardSide =
-        device->getIsMirrored() ? PickPlaceDataItem::BoardSide::BOTTOM
-                                : PickPlaceDataItem::BoardSide::TOP;
+    Point position = device->getPosition();
+    Angle rotation = device->getRotation();
+    PickPlaceDataItem::BoardSide boardSide = device->getIsMirrored()
+        ? PickPlaceDataItem::BoardSide::BOTTOM
+        : PickPlaceDataItem::BoardSide::TOP;
     data->addItem(PickPlaceDataItem(designator, value, deviceName, packageName,
                                     position, rotation, boardSide));
   }

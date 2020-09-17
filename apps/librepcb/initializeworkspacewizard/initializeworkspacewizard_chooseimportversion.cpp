@@ -48,8 +48,9 @@ InitializeWorkspaceWizard_ChooseImportVersion::
   mUi->setupUi(this);
 
   mUi->cbxVersions->addItem(tr("Do not import any data"));
-  foreach (const Version& version, Workspace::getFileFormatVersionsOfWorkspace(
-                                       mContext.getWorkspacePath())) {
+  foreach (const Version& version,
+           Workspace::getFileFormatVersionsOfWorkspace(
+               mContext.getWorkspacePath())) {
     if (version < qApp->getFileFormatVersion()) {
       mUi->cbxVersions->addItem("LibrePCB " % version.toStr() % ".x",
                                 version.toStr());

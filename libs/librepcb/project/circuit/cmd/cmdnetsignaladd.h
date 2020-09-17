@@ -71,10 +71,10 @@ private:
 
   // Private Member Variables
 
-  Circuit&                        mCircuit;
-  NetClass&                       mNetClass;
+  Circuit& mCircuit;
+  NetClass& mNetClass;
   tl::optional<CircuitIdentifier> mName;
-  NetSignal*                      mNetSignal;
+  NetSignal* mNetSignal;
 };
 
 /*******************************************************************************

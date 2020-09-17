@@ -51,12 +51,12 @@ class HolePropertiesDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  HolePropertiesDialog()                                  = delete;
+  HolePropertiesDialog() = delete;
   HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
   HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
                        const LengthUnit& lengthUnit,
-                       const QString&    settingsPrefix,
-                       QWidget*          parent = nullptr) noexcept;
+                       const QString& settingsPrefix,
+                       QWidget* parent = nullptr) noexcept;
   ~HolePropertiesDialog() noexcept;
 
   // Operator Overloadings
@@ -67,8 +67,8 @@ private:  // Methods
   bool applyChanges() noexcept;
 
 private:  // Data
-  Hole&                                    mHole;
-  UndoStack&                               mUndoStack;
+  Hole& mHole;
+  UndoStack& mUndoStack;
   QScopedPointer<Ui::HolePropertiesDialog> mUi;
 };
 

@@ -110,7 +110,7 @@ TEST(BoardGerberExportTest, test) {
 
   // compare generated files with expected content
   foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
-    QString actual   = FileUtils::readFile(fp);
+    QString actual = FileUtils::readFile(fp);
     QString expected = FileUtils::readFile(
         testDataDir.getPathTo("expected").getPathTo(fp.getFilename()));
     EXPECT_EQ(expected.toStdString(), actual.toStdString());

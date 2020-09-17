@@ -55,33 +55,33 @@ class BI_Base : public QObject {
 public:
   // Types
   enum class Type_t {
-    NetSegment,    ///< ::librepcb::project::BI_NetSegment
-    NetPoint,      ///< ::librepcb::project::BI_NetPoint
-    NetLine,       ///< ::librepcb::project::BI_NetLine
-    Via,           ///< ::librepcb::project::BI_Via
-    Device,        ///< ::librepcb::project::BI_Device
-    Footprint,     ///< ::librepcb::project::BI_Footprint
+    NetSegment,  ///< ::librepcb::project::BI_NetSegment
+    NetPoint,  ///< ::librepcb::project::BI_NetPoint
+    NetLine,  ///< ::librepcb::project::BI_NetLine
+    Via,  ///< ::librepcb::project::BI_Via
+    Device,  ///< ::librepcb::project::BI_Device
+    Footprint,  ///< ::librepcb::project::BI_Footprint
     FootprintPad,  ///< ::librepcb::project::BI_FootprintPad
-    Polygon,       ///< ::librepcb::project::BI_Polygon
-    StrokeText,    ///< ::librepcb::project::BI_StrokeText
-    Hole,          ///< ::librepcb::project::BI_Hole
-    Plane,         ///< ::librepcb::project::BI_Plane
-    AirWire,       ///< ::librepcb::project::BI_AirWire
+    Polygon,  ///< ::librepcb::project::BI_Polygon
+    StrokeText,  ///< ::librepcb::project::BI_StrokeText
+    Hole,  ///< ::librepcb::project::BI_Hole
+    Plane,  ///< ::librepcb::project::BI_Plane
+    AirWire,  ///< ::librepcb::project::BI_AirWire
   };
 
   // Constructors / Destructor
-  BI_Base()                     = delete;
+  BI_Base() = delete;
   BI_Base(const BI_Base& other) = delete;
   BI_Base(Board& board) noexcept;
   virtual ~BI_Base() noexcept;
 
   // Getters
-  Project&             getProject() const noexcept;
-  Circuit&             getCircuit() const noexcept;
-  Board&               getBoard() const noexcept { return mBoard; }
-  virtual Type_t       getType() const noexcept            = 0;
-  virtual const Point& getPosition() const noexcept        = 0;
-  virtual bool         getIsMirrored() const noexcept      = 0;
+  Project& getProject() const noexcept;
+  Circuit& getCircuit() const noexcept;
+  Board& getBoard() const noexcept { return mBoard; }
+  virtual Type_t getType() const noexcept = 0;
+  virtual const Point& getPosition() const noexcept = 0;
+  virtual bool getIsMirrored() const noexcept = 0;
   virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
   virtual bool isAddedToBoard() const noexcept { return mIsAddedToBoard; }
   virtual bool isSelectable() const noexcept = 0;
@@ -91,7 +91,7 @@ public:
   virtual void setSelected(bool selected) noexcept;
 
   // General Methods
-  virtual void addToBoard()      = 0;
+  virtual void addToBoard() = 0;
   virtual void removeFromBoard() = 0;
 
   // Operator Overloadings

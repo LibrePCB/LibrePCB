@@ -48,20 +48,20 @@ public:
   // Types
   class TransactionScopeGuard final {
   public:
-    TransactionScopeGuard()                                   = delete;
+    TransactionScopeGuard() = delete;
     TransactionScopeGuard(const TransactionScopeGuard& other) = delete;
     TransactionScopeGuard(SQLiteDatabase& db);
     ~TransactionScopeGuard() noexcept;
-    void                   commit();
+    void commit();
     TransactionScopeGuard& operator=(const TransactionScopeGuard& rhs) = delete;
 
   private:
     SQLiteDatabase& mDb;
-    bool            mIsCommited;
+    bool mIsCommited;
   };
 
   // Constructors / Destructor
-  SQLiteDatabase()                            = delete;
+  SQLiteDatabase() = delete;
   SQLiteDatabase(const SQLiteDatabase& other) = delete;
   SQLiteDatabase(const FilePath& filepath);
   ~SQLiteDatabase() noexcept;
@@ -74,10 +74,10 @@ public:
 
   // General Methods
   QSqlQuery prepareQuery(const QString& query) const;
-  int       count(QSqlQuery& query);
-  int       insert(QSqlQuery& query);
-  void      exec(QSqlQuery& query);
-  void      exec(const QString& query);
+  int count(QSqlQuery& query);
+  int insert(QSqlQuery& query);
+  void exec(QSqlQuery& query);
+  void exec(const QString& query);
 
   // Operator Overloadings
   SQLiteDatabase& operator=(const SQLiteDatabase& rhs) = delete;

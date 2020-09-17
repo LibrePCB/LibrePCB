@@ -229,7 +229,7 @@ inline SExpression serializeToSExpression(const Version& obj) {
 
 template <>
 inline Version deserializeFromSExpression(const SExpression& sexpr,
-                                          bool               throwIfEmpty) {
+                                          bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Version::fromString(str);  // can throw
 }

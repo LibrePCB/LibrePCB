@@ -59,7 +59,7 @@ private:
   bool performExecute() override;
 
   // Attributes from the constructor
-  Circuit&   mCircuit;
+  Circuit& mCircuit;
   NetSignal& mNetSignalToRemove;
   NetSignal& mResultingNetSignal;
 };

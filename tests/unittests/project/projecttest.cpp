@@ -45,7 +45,7 @@ protected:
 
   ProjectTest() {
     // the whitespaces in the path are there to make the test even stronger ;)
-    mProjectDir  = FilePath::getRandomTempPath().getPathTo("test project dir");
+    mProjectDir = FilePath::getRandomTempPath().getPathTo("test project dir");
     mProjectFile = mProjectDir.getPathTo("test project.lpp");
   }
 
@@ -166,8 +166,8 @@ TEST_F(ProjectTest, testSettersGetters) {
 
   // set properties
   ElementName name("test name 1234");
-  QString     author  = "test author 1234";
-  QString     version = "test version 1234";
+  QString author = "test author 1234";
+  QString version = "test version 1234";
   project->getMetadata().setName(name);
   project->getMetadata().setAuthor(author);
   project->getMetadata().setVersion(version);

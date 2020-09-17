@@ -67,15 +67,15 @@ public:
 
   // Setters
   void setReferences(
-      const workspace::Workspace&                       ws,
-      const IF_GraphicsLayerProvider&                   layerProvider,
-      ComponentSymbolVariantItemList&                   items,
+      const workspace::Workspace& ws,
+      const IF_GraphicsLayerProvider& layerProvider,
+      ComponentSymbolVariantItemList& items,
       const std::shared_ptr<const LibraryElementCache>& symbolCache,
-      UndoStack*                                        undoStack) noexcept;
+      UndoStack* undoStack) noexcept;
   void resetReferences() noexcept;
 
   // Operator Overloadings
-  ComponentSymbolVariantItemListEditorWidget& operator       =(
+  ComponentSymbolVariantItemListEditorWidget& operator=(
       const ComponentSymbolVariantItemListEditorWidget& rhs) = delete;
 
 signals:
@@ -86,7 +86,7 @@ private:  // Methods
   void itemListEdited(
       const ComponentSymbolVariantItemList& list, int index,
       const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-      ComponentSymbolVariantItemList::Event                    event) noexcept;
+      ComponentSymbolVariantItemList::Event event) noexcept;
   void itemEdited(const ComponentSymbolVariantItemList& list, int index,
                   const std::shared_ptr<const ComponentSymbolVariantItem>& item,
                   ComponentSymbolVariantItem::Event event) noexcept;
@@ -94,12 +94,12 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<ComponentSymbolVariantItemListModel> mModel;
-  QScopedPointer<EditableTableWidget>                 mView;
-  const workspace::Workspace*                         mWorkspace;
-  const IF_GraphicsLayerProvider*                     mLayerProvider;
+  QScopedPointer<EditableTableWidget> mView;
+  const workspace::Workspace* mWorkspace;
+  const IF_GraphicsLayerProvider* mLayerProvider;
 
   // Slots
-  ComponentSymbolVariantItemList::OnEditedSlot        mOnItemListEditedSlot;
+  ComponentSymbolVariantItemList::OnEditedSlot mOnItemListEditedSlot;
   ComponentSymbolVariantItemList::OnElementEditedSlot mOnItemEditedSlot;
 };
 

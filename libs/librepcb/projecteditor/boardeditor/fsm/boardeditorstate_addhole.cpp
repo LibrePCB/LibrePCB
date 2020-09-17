@@ -139,7 +139,7 @@ bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonDoubleClicked(
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_AddHole::addHole(Board&       board,
+bool BoardEditorState_AddHole::addHole(Board& board,
                                        const Point& pos) noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
@@ -178,7 +178,7 @@ bool BoardEditorState_AddHole::fixPosition(const Point& pos) noexcept {
       mContext.undoStack.appendToCmdGroup(mCurrentHoleEditCmd.take());
     }
     mContext.undoStack.commitCmdGroup();
-    mIsUndoCmdActive    = false;
+    mIsUndoCmdActive = false;
     mCurrentHoleToPlace = nullptr;
     return true;
   } catch (Exception& e) {

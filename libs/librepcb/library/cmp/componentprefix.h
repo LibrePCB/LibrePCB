@@ -42,14 +42,14 @@ struct ComponentPrefixVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
       typename std::decay<Value>::type {
-    return p(val) ? std::forward<Value>(val)
-                  : (throw RuntimeError(
-                         __FILE__, __LINE__,
-                         QString(QApplication::translate(
-                                     "ComponentPrefix",
-                                     "Invalid component prefix: '%1'"))
-                             .arg(val)),
-                     std::forward<Value>(val));
+    return p(val)
+        ? std::forward<Value>(val)
+        : (throw RuntimeError(
+               __FILE__, __LINE__,
+               QString(QApplication::translate(
+                           "ComponentPrefix", "Invalid component prefix: '%1'"))
+                   .arg(val)),
+           std::forward<Value>(val));
   }
 };
 
@@ -79,26 +79,26 @@ using ComponentPrefix =
 }  // namespace library
 
 inline bool operator==(const library::ComponentPrefix& lhs,
-                       const QString&                  rhs) noexcept {
+                       const QString& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const QString&                  lhs,
+inline bool operator==(const QString& lhs,
                        const library::ComponentPrefix& rhs) noexcept {
   return lhs == (*rhs);
 }
 inline bool operator!=(const library::ComponentPrefix& lhs,
-                       const QString&                  rhs) noexcept {
+                       const QString& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const QString&                  lhs,
+inline bool operator!=(const QString& lhs,
                        const library::ComponentPrefix& rhs) noexcept {
   return lhs != (*rhs);
 }
 inline QString operator%(const library::ComponentPrefix& lhs,
-                         const QString&                  rhs) noexcept {
+                         const QString& rhs) noexcept {
   return (*lhs) % rhs;
 }
-inline QString operator%(const QString&                  lhs,
+inline QString operator%(const QString& lhs,
                          const library::ComponentPrefix& rhs) noexcept {
   return lhs % (*rhs);
 }
@@ -115,7 +115,7 @@ inline library::ComponentPrefix deserializeFromSExpression(
   return library::ComponentPrefix(str);  // can throw
 }
 
-inline QDataStream& operator<<(QDataStream&                    stream,
+inline QDataStream& operator<<(QDataStream& stream,
                                const library::ComponentPrefix& obj) {
   stream << *obj;
   return stream;

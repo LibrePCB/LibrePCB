@@ -63,8 +63,8 @@ private:
 
   // Private Member Variables
   Project& mProject;
-  Board&   mBoard;
-  int      mIndex;
+  Board& mBoard;
+  int mIndex;
 };
 
 /*******************************************************************************

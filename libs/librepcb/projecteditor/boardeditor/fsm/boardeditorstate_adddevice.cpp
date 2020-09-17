@@ -154,8 +154,8 @@ bool BoardEditorState_AddDevice::processGraphicsSceneRightMouseButtonReleased(
  ******************************************************************************/
 
 bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
-                                           const Uuid&        dev,
-                                           const Uuid&        fpt) noexcept {
+                                           const Uuid& dev,
+                                           const Uuid& fpt) noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
 

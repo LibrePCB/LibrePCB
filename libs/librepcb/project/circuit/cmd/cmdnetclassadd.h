@@ -67,9 +67,9 @@ private:
 
   // Private Member Variables
 
-  Circuit&    mCircuit;
+  Circuit& mCircuit;
   ElementName mName;
-  NetClass*   mNetClass;
+  NetClass* mNetClass;
 };
 
 /*******************************************************************************

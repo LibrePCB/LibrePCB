@@ -58,7 +58,7 @@ public:
   void setShape(Via::Shape shape, bool immediate) noexcept;
   void setSize(const PositiveLength& size, bool immediate) noexcept;
   void setDrillDiameter(const PositiveLength& diameter,
-                        bool                  immediate) noexcept;
+                        bool immediate) noexcept;
 
 private:
   // Private Methods
@@ -78,10 +78,10 @@ private:
   BI_Via& mVia;
 
   // General Attributes
-  Point          mOldPos;
-  Point          mNewPos;
-  Via::Shape     mOldShape;
-  Via::Shape     mNewShape;
+  Point mOldPos;
+  Point mNewPos;
+  Via::Shape mOldShape;
+  Via::Shape mNewShape;
   PositiveLength mOldSize;
   PositiveLength mNewSize;
   PositiveLength mOldDrillDiameter;

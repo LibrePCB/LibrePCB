@@ -46,7 +46,7 @@ class Board;
 class BoardAirWiresBuilder final {
 public:
   // Constructors / Destructor
-  BoardAirWiresBuilder()                                  = delete;
+  BoardAirWiresBuilder() = delete;
   BoardAirWiresBuilder(const BoardAirWiresBuilder& other) = delete;
   BoardAirWiresBuilder(const Board& board, const NetSignal& netsignal) noexcept;
   ~BoardAirWiresBuilder() noexcept;
@@ -58,7 +58,7 @@ public:
   BoardAirWiresBuilder& operator=(const BoardAirWiresBuilder& rhs) = delete;
 
 private:  // Data
-  const Board&     mBoard;
+  const Board& mBoard;
   const NetSignal& mNetSignal;
 };
 

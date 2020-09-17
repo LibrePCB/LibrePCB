@@ -74,7 +74,7 @@ public:
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Operator Overloadings
-  SchematicEditorState_AddNetLabel& operator       =(
+  SchematicEditorState_AddNetLabel& operator=(
       const SchematicEditorState_AddNetLabel& rhs) = delete;
 
 private:  // Methods
@@ -83,8 +83,8 @@ private:  // Methods
   bool fixLabel(const Point& pos) noexcept;
 
 private:  // Data
-  bool                      mUndoCmdActive;
-  SI_NetLabel*              mCurrentNetLabel;
+  bool mUndoCmdActive;
+  SI_NetLabel* mCurrentNetLabel;
   CmdSchematicNetLabelEdit* mEditCmd;
 };
 

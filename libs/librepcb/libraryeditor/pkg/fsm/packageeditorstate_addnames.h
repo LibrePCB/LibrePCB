@@ -55,7 +55,7 @@ public:
   ~PackageEditorState_AddNames() noexcept;
 
   // Operator Overloadings
-  PackageEditorState_AddNames& operator       =(
+  PackageEditorState_AddNames& operator=(
       const PackageEditorState_AddNames& rhs) = delete;
 };
 

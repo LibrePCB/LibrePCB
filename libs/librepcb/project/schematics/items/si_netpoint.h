@@ -54,7 +54,7 @@ class SI_NetPoint final : public SI_Base,
 
 public:
   // Constructors / Destructor
-  SI_NetPoint()                         = delete;
+  SI_NetPoint() = delete;
   SI_NetPoint(const SI_NetPoint& other) = delete;
   SI_NetPoint(SI_NetSegment& segment, const SExpression& node);
   SI_NetPoint(SI_NetSegment& segment, const Point& position);
@@ -62,12 +62,12 @@ public:
   ~SI_NetPoint() noexcept;
 
   // Getters
-  const Uuid&     getUuid() const noexcept { return mJunction.getUuid(); }
+  const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }
   const Junction& getJunction() const noexcept { return mJunction; }
-  bool            isVisibleJunction() const noexcept;
-  bool            isOpenLineEnd() const noexcept;
-  SI_NetSegment&  getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal&      getNetSignalOfNetSegment() const noexcept;
+  bool isVisibleJunction() const noexcept;
+  bool isOpenLineEnd() const noexcept;
+  SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal& getNetSignalOfNetSegment() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   NetLineAnchor toNetLineAnchor() const noexcept override;
 
@@ -87,11 +87,11 @@ public:
     return mJunction.getPosition();
   }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Inherited from SI_NetLineAnchor
-  void                     registerNetLine(SI_NetLine& netline) override;
-  void                     unregisterNetLine(SI_NetLine& netline) override;
+  void registerNetLine(SI_NetLine& netline) override;
+  void unregisterNetLine(SI_NetLine& netline) override;
   const QSet<SI_NetLine*>& getNetLines() const noexcept override {
     return mRegisteredNetLines;
   }
@@ -106,11 +106,11 @@ private:
 
   // General
   QScopedPointer<SGI_NetPoint> mGraphicsItem;
-  QMetaObject::Connection      mHighlightChangedConnection;
+  QMetaObject::Connection mHighlightChangedConnection;
 
   // Attributes
   SI_NetSegment& mNetSegment;
-  Junction       mJunction;
+  Junction mJunction;
 
   // Registered Elements
   QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines

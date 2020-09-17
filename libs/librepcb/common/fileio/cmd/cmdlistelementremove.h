@@ -44,7 +44,7 @@ template <typename T, typename P, typename... OnEditedArgs>
 class CmdListElementRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdListElementRemove()                                  = delete;
+  CmdListElementRemove() = delete;
   CmdListElementRemove(const CmdListElementRemove& other) = delete;
   CmdListElementRemove(SerializableObjectList<T, P, OnEditedArgs...>& list,
                        const T* element) noexcept
@@ -77,9 +77,9 @@ private:  // Methods
 
 private:  // Data
   SerializableObjectList<T, P, OnEditedArgs...>& mList;
-  const T*                                       mElement;
-  std::shared_ptr<T>                             mMemorizedElement;
-  int                                            mIndex;
+  const T* mElement;
+  std::shared_ptr<T> mMemorizedElement;
+  int mIndex;
 };
 
 /*******************************************************************************

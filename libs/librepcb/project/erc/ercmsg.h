@@ -48,12 +48,12 @@ public:
   /// ERC message types
   enum class ErcMsgType_t {
     CircuitError = 0,  ///< example: two output pins in the same net
-    CircuitWarning,    ///< example: nets with only one pin
-    SchematicError,    ///< example: unplaced required symbols
+    CircuitWarning,  ///< example: nets with only one pin
+    SchematicError,  ///< example: unplaced required symbols
     SchematicWarning,  ///< example: unplaced optional symbols
-    BoardError,        ///< example: unplaced footprints
-    BoardWarning,      ///< example: ???
-    _Count             ///< count of message types
+    BoardError,  ///< example: unplaced footprints
+    BoardWarning,  ///< example: ???
+    _Count  ///< count of message types
   };
 
   // Constructors / Destructor
@@ -64,12 +64,12 @@ public:
 
   // Getters
   const IF_ErcMsgProvider& getOwner() const noexcept { return mOwner; }
-  const QString&           getOwnerKey() const noexcept { return mOwnerKey; }
-  const QString&           getMsgKey() const noexcept { return mMsgKey; }
-  ErcMsgType_t             getMsgType() const noexcept { return mMsgType; }
-  const QString&           getMsg() const noexcept { return mMsg; }
-  bool                     isVisible() const noexcept { return mIsVisible; }
-  bool                     isIgnored() const noexcept { return mIsIgnored; }
+  const QString& getOwnerKey() const noexcept { return mOwnerKey; }
+  const QString& getMsgKey() const noexcept { return mMsgKey; }
+  ErcMsgType_t getMsgType() const noexcept { return mMsgType; }
+  const QString& getMsg() const noexcept { return mMsg; }
+  bool isVisible() const noexcept { return mIsVisible; }
+  bool isIgnored() const noexcept { return mIsIgnored; }
 
   // Setters
   void setMsg(const QString& msg) noexcept;
@@ -83,15 +83,15 @@ private:
   ErcMsg& operator=(const ErcMsg& rhs);
 
   // General
-  Project&    mProject;
+  Project& mProject;
   ErcMsgList& mErcMsgList;
 
   // Attributes
   const IF_ErcMsgProvider& mOwner;
-  QString                  mOwnerKey;
-  QString                  mMsgKey;
-  ErcMsgType_t             mMsgType;
-  QString                  mMsg;
+  QString mOwnerKey;
+  QString mMsgKey;
+  ErcMsgType_t mMsgType;
+  QString mMsg;
 
   // Misc
   bool mIsVisible;

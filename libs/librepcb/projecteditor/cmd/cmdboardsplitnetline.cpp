@@ -38,7 +38,7 @@ namespace librepcb {
 namespace project {
 namespace editor {
 
-CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine&  netline,
+CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine& netline,
                                            const Point& pos) noexcept
   : UndoCommandGroup(tr("Split trace")), mOldNetLine(netline) {
   mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), pos);

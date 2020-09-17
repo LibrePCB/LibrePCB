@@ -122,7 +122,7 @@ QString BoardGerberExport::getBuiltInAttributeValue(const QString& key) const
 }
 
 QVector<const AttributeProvider*>
-BoardGerberExport::getAttributeProviderParents() const noexcept {
+    BoardGerberExport::getAttributeProviderParents() const noexcept {
   return QVector<const AttributeProvider*>{&mBoard};
 }
 
@@ -131,7 +131,7 @@ BoardGerberExport::getAttributeProviderParents() const noexcept {
  ******************************************************************************/
 
 void BoardGerberExport::exportDrills() const {
-  FilePath          fp = getOutputFilePath(mSettings->getSuffixDrills());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixDrills());
   ExcellonGenerator gen;
   drawPthDrills(gen);
   drawNpthDrills(gen);
@@ -141,9 +141,9 @@ void BoardGerberExport::exportDrills() const {
 }
 
 void BoardGerberExport::exportDrillsNpth() const {
-  FilePath          fp = getOutputFilePath(mSettings->getSuffixDrillsNpth());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixDrillsNpth());
   ExcellonGenerator gen;
-  int               count = drawNpthDrills(gen);
+  int count = drawNpthDrills(gen);
   if (count > 0) {
     // Some PCB manufacturers don't like to have separate drill files for PTH
     // and NPTH. As many boards don't have non-plated holes anyway, we create
@@ -156,7 +156,7 @@ void BoardGerberExport::exportDrillsNpth() const {
 }
 
 void BoardGerberExport::exportDrillsPth() const {
-  FilePath          fp = getOutputFilePath(mSettings->getSuffixDrillsPth());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixDrillsPth());
   ExcellonGenerator gen;
   drawPthDrills(gen);
   gen.generate();
@@ -165,7 +165,7 @@ void BoardGerberExport::exportDrillsPth() const {
 }
 
 void BoardGerberExport::exportLayerBoardOutlines() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixOutlines());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixOutlines());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -176,7 +176,7 @@ void BoardGerberExport::exportLayerBoardOutlines() const {
 }
 
 void BoardGerberExport::exportLayerTopCopper() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixCopperTop());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixCopperTop());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -187,7 +187,7 @@ void BoardGerberExport::exportLayerTopCopper() const {
 }
 
 void BoardGerberExport::exportLayerBottomCopper() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixCopperBot());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixCopperBot());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -200,7 +200,7 @@ void BoardGerberExport::exportLayerBottomCopper() const {
 void BoardGerberExport::exportLayerInnerCopper() const {
   for (int i = 1; i <= mBoard.getLayerStack().getInnerLayerCount(); ++i) {
     mCurrentInnerCopperLayer = i;  // used for attribute provider
-    FilePath        fp = getOutputFilePath(mSettings->getSuffixCopperInner());
+    FilePath fp = getOutputFilePath(mSettings->getSuffixCopperInner());
     GerberGenerator gen(
         mProject.getMetadata().getName() % " - " % mBoard.getName(),
         mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -213,7 +213,7 @@ void BoardGerberExport::exportLayerInnerCopper() const {
 }
 
 void BoardGerberExport::exportLayerTopSolderMask() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixSolderMaskTop());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderMaskTop());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -224,7 +224,7 @@ void BoardGerberExport::exportLayerTopSolderMask() const {
 }
 
 void BoardGerberExport::exportLayerBottomSolderMask() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixSolderMaskBot());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderMaskBot());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -238,7 +238,7 @@ void BoardGerberExport::exportLayerTopSilkscreen() const {
   QStringList layers = mSettings->getSilkscreenLayersTop();
   if (layers.count() >
       0) {  // don't create silkscreen file if no layers selected
-    FilePath        fp = getOutputFilePath(mSettings->getSuffixSilkscreenTop());
+    FilePath fp = getOutputFilePath(mSettings->getSuffixSilkscreenTop());
     GerberGenerator gen(
         mProject.getMetadata().getName() % " - " % mBoard.getName(),
         mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -255,7 +255,7 @@ void BoardGerberExport::exportLayerBottomSilkscreen() const {
   QStringList layers = mSettings->getSilkscreenLayersBot();
   if (layers.count() >
       0) {  // don't create silkscreen file if no layers selected
-    FilePath        fp = getOutputFilePath(mSettings->getSuffixSilkscreenBot());
+    FilePath fp = getOutputFilePath(mSettings->getSuffixSilkscreenBot());
     GerberGenerator gen(
         mProject.getMetadata().getName() % " - " % mBoard.getName(),
         mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -269,7 +269,7 @@ void BoardGerberExport::exportLayerBottomSilkscreen() const {
 }
 
 void BoardGerberExport::exportLayerTopSolderPaste() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixSolderPasteTop());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderPasteTop());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -280,7 +280,7 @@ void BoardGerberExport::exportLayerTopSolderPaste() const {
 }
 
 void BoardGerberExport::exportLayerBottomSolderPaste() const {
-  FilePath        fp = getOutputFilePath(mSettings->getSuffixSolderPasteBot());
+  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderPasteBot());
   GerberGenerator gen(
       mProject.getMetadata().getName() % " - " % mBoard.getName(),
       mBoard.getUuid(), mProject.getMetadata().getVersion());
@@ -340,7 +340,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 }
 
 void BoardGerberExport::drawLayer(GerberGenerator& gen,
-                                  const QString&   layerName) const {
+                                  const QString& layerName) const {
   // draw footprints incl. pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Q_ASSERT(device);
@@ -417,9 +417,8 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
 void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
                                 const QString& layerName) const {
   bool drawCopper = via.isOnLayer(layerName);
-  bool drawStopMask =
-      (layerName == GraphicsLayer::sTopStopMask ||
-       layerName == GraphicsLayer::sBotStopMask) &&
+  bool drawStopMask = (layerName == GraphicsLayer::sTopStopMask ||
+                       layerName == GraphicsLayer::sBotStopMask) &&
       mBoard.getDesignRules().doesViaRequireStopMask(*via.getDrillDiameter());
   if (drawCopper || drawStopMask) {
     UnsignedLength outerDiameter = positiveToUnsigned(via.getSize());
@@ -447,9 +446,9 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
   }
 }
 
-void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
+void BoardGerberExport::drawFootprint(GerberGenerator& gen,
                                       const BI_Footprint& footprint,
-                                      const QString&      layerName) const {
+                                      const QString& layerName) const {
   // draw pads
   foreach (const BI_FootprintPad* pad, footprint.getPads()) {
     drawFootprintPad(gen, *pad, layerName);
@@ -459,8 +458,8 @@ void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
   for (const Polygon& polygon :
        footprint.getLibFootprint().getPolygons().sortedByUuid()) {
     QString layer = footprint.getIsMirrored()
-                        ? GraphicsLayer::getMirroredLayerName(layerName)
-                        : layerName;
+        ? GraphicsLayer::getMirroredLayerName(layerName)
+        : layerName;
     if (layer == polygon.getLayerName()) {
       Path path = polygon.getPath();
       path.rotate(footprint.getRotation());
@@ -480,11 +479,11 @@ void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
   for (const Circle& circle :
        footprint.getLibFootprint().getCircles().sortedByUuid()) {
     QString layer = footprint.getIsMirrored()
-                        ? GraphicsLayer::getMirroredLayerName(layerName)
-                        : layerName;
+        ? GraphicsLayer::getMirroredLayerName(layerName)
+        : layerName;
     if (layer == circle.getLayerName()) {
-      Circle copy        = circle;
-      Point  absolutePos = copy.getCenter();
+      Circle copy = circle;
+      Point absolutePos = copy.getCenter();
       absolutePos.rotate(footprint.getRotation());
       if (footprint.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
       absolutePos += footprint.getPosition();
@@ -513,21 +512,21 @@ void BoardGerberExport::drawFootprint(GerberGenerator&    gen,
   }
 }
 
-void BoardGerberExport::drawFootprintPad(GerberGenerator&       gen,
+void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const QString& layerName) const {
   bool isSmt =
       pad.getLibPad().getBoardSide() != library::FootprintPad::BoardSide::THT;
-  bool isOnCopperLayer   = pad.isOnLayer(layerName);
+  bool isOnCopperLayer = pad.isOnLayer(layerName);
   bool isOnSolderMaskTop = pad.isOnLayer(GraphicsLayer::sTopCopper) &&
-                           (layerName == GraphicsLayer::sTopStopMask);
+      (layerName == GraphicsLayer::sTopStopMask);
   bool isOnSolderMaskBottom = pad.isOnLayer(GraphicsLayer::sBotCopper) &&
-                              (layerName == GraphicsLayer::sBotStopMask);
+      (layerName == GraphicsLayer::sBotStopMask);
   bool isOnSolderPasteTop = isSmt && pad.isOnLayer(GraphicsLayer::sTopCopper) &&
-                            (layerName == GraphicsLayer::sTopSolderPaste);
+      (layerName == GraphicsLayer::sTopSolderPaste);
   bool isOnSolderPasteBottom = isSmt &&
-                               pad.isOnLayer(GraphicsLayer::sBotCopper) &&
-                               (layerName == GraphicsLayer::sBotSolderPaste);
+      pad.isOnLayer(GraphicsLayer::sBotCopper) &&
+      (layerName == GraphicsLayer::sBotSolderPaste);
   if (!isOnCopperLayer && !isOnSolderMaskTop && !isOnSolderMaskBottom &&
       !isOnSolderPasteTop && !isOnSolderPasteBottom) {
     return;
@@ -535,16 +534,16 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator&       gen,
 
   Angle rot = pad.getIsMirrored() ? -pad.getRotation() : pad.getRotation();
   const library::FootprintPad& libPad = pad.getLibPad();
-  Length                       width  = *libPad.getWidth();
-  Length                       height = *libPad.getHeight();
+  Length width = *libPad.getWidth();
+  Length height = *libPad.getHeight();
   if (isOnSolderMaskTop || isOnSolderMaskBottom) {
-    Length         size = qMin(width, height);
+    Length size = qMin(width, height);
     UnsignedLength clearance =
         mBoard.getDesignRules().calcStopMaskClearance(size);
     width += clearance * 2;
     height += clearance * 2;
   } else if (isOnSolderPasteTop || isOnSolderPasteBottom) {
-    Length size      = qMin(width, height);
+    Length size = qMin(width, height);
     Length clearance = -mBoard.getDesignRules().calcCreamMaskClearance(size);
     width += clearance * 2;
     height += clearance * 2;

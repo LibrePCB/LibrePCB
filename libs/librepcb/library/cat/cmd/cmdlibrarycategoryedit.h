@@ -44,7 +44,7 @@ namespace library {
 class CmdLibraryCategoryEdit : public CmdLibraryBaseElementEdit {
 public:
   // Constructors / Destructor
-  CmdLibraryCategoryEdit()                                    = delete;
+  CmdLibraryCategoryEdit() = delete;
   CmdLibraryCategoryEdit(const CmdLibraryCategoryEdit& other) = delete;
   explicit CmdLibraryCategoryEdit(LibraryCategory& category) noexcept;
   virtual ~CmdLibraryCategoryEdit() noexcept;

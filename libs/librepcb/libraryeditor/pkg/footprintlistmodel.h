@@ -70,28 +70,28 @@ public:
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant      data(const QModelIndex& index,
-                     int                role = Qt::DisplayRole) const override;
-  QVariant      headerData(int section, Qt::Orientation orientation,
-                           int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool          setData(const QModelIndex& index, const QVariant& value,
-                        int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value,
+               int role = Qt::EditRole) override;
 
   // Operator Overloadings
   FootprintListModel& operator=(const FootprintListModel& rhs) noexcept;
 
 private:
-  void        footprintListEdited(const FootprintList& list, int index,
-                                  const std::shared_ptr<const Footprint>& footprint,
-                                  FootprintList::Event event) noexcept;
-  void        execCmd(UndoCommand* cmd);
+  void footprintListEdited(const FootprintList& list, int index,
+                           const std::shared_ptr<const Footprint>& footprint,
+                           FootprintList::Event event) noexcept;
+  void execCmd(UndoCommand* cmd);
   ElementName validateNameOrThrow(const QString& name) const;
 
 private:  // Data
   FootprintList* mFootprintList;
-  UndoStack*     mUndoStack;
-  QString        mNewName;
+  UndoStack* mUndoStack;
+  QString mNewName;
 
   // Slots
   FootprintList::OnEditedSlot mOnEditedSlot;

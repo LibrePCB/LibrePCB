@@ -68,8 +68,8 @@ private:
 
   // Private Member Variables
 
-  Board&         mBoard;
-  NetSignal&     mNetSignal;
+  Board& mBoard;
+  NetSignal& mNetSignal;
   BI_NetSegment* mNetSegment;
 };
 

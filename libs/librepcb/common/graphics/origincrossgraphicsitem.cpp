@@ -64,7 +64,7 @@ void OriginCrossGraphicsItem::setRotation(const Angle& rot) noexcept {
 }
 
 void OriginCrossGraphicsItem::setSize(const UnsignedLength& size) noexcept {
-  mSize          = size;
+  mSize = size;
   qreal lengthPx = size->toPx() / qreal(2);
   mLineH.setLine(-lengthPx, qreal(0), lengthPx, qreal(0));
   mLineV.setLine(qreal(0), -lengthPx, qreal(0), lengthPx);
@@ -95,7 +95,7 @@ void OriginCrossGraphicsItem::setVisibleInPrintOutput(bool visible) noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void OriginCrossGraphicsItem::paint(QPainter*                       painter,
+void OriginCrossGraphicsItem::paint(QPainter* painter,
                                     const QStyleOptionGraphicsItem* option,
                                     QWidget* widget) noexcept {
   Q_UNUSED(widget);
@@ -155,7 +155,7 @@ void OriginCrossGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
   mBoundingRect = QRectF(-mSize->toPx() / 2, -mSize->toPx() / 2, mSize->toPx(),
                          mSize->toPx());
-  mShape        = QPainterPath();
+  mShape = QPainterPath();
   mShape.addRect(mBoundingRect);
   update();
 }

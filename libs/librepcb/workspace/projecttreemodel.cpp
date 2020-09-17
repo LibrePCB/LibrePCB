@@ -39,7 +39,7 @@ namespace workspace {
  ******************************************************************************/
 
 ProjectTreeModel::ProjectTreeModel(const Workspace& workspace,
-                                   QObject*         parent) noexcept
+                                   QObject* parent) noexcept
   : QFileSystemModel(parent) {
   setIconProvider(new FileIconProvider());
   setRootPath(workspace.getProjectsPath().toStr());

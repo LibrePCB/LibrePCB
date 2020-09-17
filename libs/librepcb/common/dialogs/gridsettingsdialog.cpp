@@ -37,7 +37,7 @@ namespace librepcb {
  ******************************************************************************/
 
 GridSettingsDialog::GridSettingsDialog(const GridProperties& grid,
-                                       QWidget*              parent) noexcept
+                                       QWidget* parent) noexcept
   : QDialog(parent),
     mUi(new Ui::GridSettingsDialog),
     mOriginalGrid(grid),

@@ -57,7 +57,7 @@ class ConverterDb;
 class SymbolConverter final {
 public:
   // Constructors / Destructor
-  SymbolConverter()                             = delete;
+  SymbolConverter() = delete;
   SymbolConverter(const SymbolConverter& other) = delete;
   SymbolConverter(const parseagle::Symbol& symbol, ConverterDb& db) noexcept;
   ~SymbolConverter() noexcept;
@@ -69,11 +69,11 @@ public:
   SymbolConverter& operator=(const SymbolConverter& rhs) = delete;
 
 private:
-  QString                  createDescription() const noexcept;
+  QString createDescription() const noexcept;
   static GraphicsLayerName convertSchematicLayer(int eagleLayerId);
 
   const parseagle::Symbol& mSymbol;
-  ConverterDb&             mDb;
+  ConverterDb& mDb;
 };
 
 /*******************************************************************************

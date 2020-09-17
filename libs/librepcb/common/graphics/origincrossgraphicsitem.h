@@ -57,10 +57,10 @@ public:
   void setVisibleInPrintOutput(bool visible) noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   OriginCrossGraphicsItem& operator=(const OriginCrossGraphicsItem& rhs) =
@@ -73,14 +73,14 @@ private:  // Methods
 
 private:  // Data
   const GraphicsLayer* mLayer;
-  QPen                 mPen;
-  QPen                 mPenHighlighted;
-  UnsignedLength       mSize;
-  QLineF               mLineH;
-  QLineF               mLineV;
-  QRectF               mBoundingRect;
-  QPainterPath         mShape;
-  bool                 mVisibleInPrintOutput;
+  QPen mPen;
+  QPen mPenHighlighted;
+  UnsignedLength mSize;
+  QLineF mLineH;
+  QLineF mLineV;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
+  bool mVisibleInPrintOutput;
 
   // Slots
   GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;

@@ -45,7 +45,7 @@ class Component;
 class ComponentCheck : public LibraryElementCheck {
 public:
   // Constructors / Destructor
-  ComponentCheck()                            = delete;
+  ComponentCheck() = delete;
   ComponentCheck(const ComponentCheck& other) = delete;
   explicit ComponentCheck(const Component& component) noexcept;
   virtual ~ComponentCheck() noexcept;

@@ -109,7 +109,7 @@ public:
       ++it;
       return *this;
     }
-    O&                 operator*() { return **it; }
+    O& operator*() { return **it; }
     std::shared_ptr<O> ptr() noexcept {
       return std::const_pointer_cast<O>(*it);
     }
@@ -142,22 +142,28 @@ public:
   SerializableObjectList() noexcept
     : onEdited(*this),
       onElementEdited(*this),
-      mOnEditedSlot(*this, &SerializableObjectList<
-                               T, P, OnEditedArgs...>::elementEditedHandler) {}
+      mOnEditedSlot(
+          *this,
+          &SerializableObjectList<T, P,
+                                  OnEditedArgs...>::elementEditedHandler) {}
   SerializableObjectList(
       const SerializableObjectList<T, P, OnEditedArgs...>& other) noexcept
     : onEdited(*this),
       onElementEdited(*this),
-      mOnEditedSlot(*this, &SerializableObjectList<
-                               T, P, OnEditedArgs...>::elementEditedHandler) {
+      mOnEditedSlot(
+          *this,
+          &SerializableObjectList<T, P,
+                                  OnEditedArgs...>::elementEditedHandler) {
     *this = other;  // copy all elements
   }
   SerializableObjectList(
       SerializableObjectList<T, P, OnEditedArgs...>&& other) noexcept
     : onEdited(*this),
       onElementEdited(*this),
-      mOnEditedSlot(*this, &SerializableObjectList<
-                               T, P, OnEditedArgs...>::elementEditedHandler) {
+      mOnEditedSlot(
+          *this,
+          &SerializableObjectList<T, P,
+                                  OnEditedArgs...>::elementEditedHandler) {
     while (!other.isEmpty()) {
       append(other.take(0));  // copy all pointers (NOT the objects!)
     }
@@ -166,22 +172,26 @@ public:
       std::initializer_list<std::shared_ptr<T>> elements) noexcept
     : onEdited(*this),
       onElementEdited(*this),
-      mOnEditedSlot(*this, &SerializableObjectList<
-                               T, P, OnEditedArgs...>::elementEditedHandler) {
+      mOnEditedSlot(
+          *this,
+          &SerializableObjectList<T, P,
+                                  OnEditedArgs...>::elementEditedHandler) {
     foreach (const std::shared_ptr<T>& obj, elements) { append(obj); }
   }
   explicit SerializableObjectList(const SExpression& node)
     : onEdited(*this),
       onElementEdited(*this),
-      mOnEditedSlot(*this, &SerializableObjectList<
-                               T, P, OnEditedArgs...>::elementEditedHandler) {
+      mOnEditedSlot(
+          *this,
+          &SerializableObjectList<T, P,
+                                  OnEditedArgs...>::elementEditedHandler) {
     loadFromSExpression(node);  // can throw
   }
   virtual ~SerializableObjectList() noexcept {}
 
   // Getters
-  bool              isEmpty() const noexcept { return mObjects.empty(); }
-  int               count() const noexcept { return mObjects.count(); }
+  bool isEmpty() const noexcept { return mObjects.empty(); }
+  int count() const noexcept { return mObjects.count(); }
   std::vector<Uuid> getUuids() const noexcept {
     std::vector<Uuid> uuids;
     uuids.reserve(mObjects.count());
@@ -256,11 +266,11 @@ public:
   std::shared_ptr<const T> at(int index) const noexcept {
     return std::const_pointer_cast<const T>(mObjects.at(index));
   }  // always read-only!
-  std::shared_ptr<T>&      first() noexcept { return mObjects.first(); }
+  std::shared_ptr<T>& first() noexcept { return mObjects.first(); }
   std::shared_ptr<const T> first() const noexcept { return mObjects.first(); }
-  std::shared_ptr<T>&      last() noexcept { return mObjects.last(); }
+  std::shared_ptr<T>& last() noexcept { return mObjects.last(); }
   std::shared_ptr<const T> last() const noexcept { return mObjects.last(); }
-  std::shared_ptr<T>       get(const T* obj) {
+  std::shared_ptr<T> get(const T* obj) {
     std::shared_ptr<T> ptr = find(obj);
     if (!ptr) throw LogicError(__FILE__, __LINE__);
     return ptr;
@@ -291,8 +301,8 @@ public:
   const_iterator end() const noexcept { return mObjects.end(); }
   const_iterator cbegin() noexcept { return mObjects.cbegin(); }
   const_iterator cend() noexcept { return mObjects.cend(); }
-  iterator       begin() noexcept { return mObjects.begin(); }
-  iterator       end() noexcept { return mObjects.end(); }
+  iterator begin() noexcept { return mObjects.begin(); }
+  iterator end() noexcept { return mObjects.end(); }
 
   // General Methods
   int loadFromSExpression(const SExpression& node) {
@@ -455,7 +465,7 @@ protected:  // Methods
 
 protected:  // Data
   QVector<std::shared_ptr<T>> mObjects;
-  Slot<T, OnEditedArgs...>    mOnEditedSlot;
+  Slot<T, OnEditedArgs...> mOnEditedSlot;
 };
 
 }  // namespace librepcb

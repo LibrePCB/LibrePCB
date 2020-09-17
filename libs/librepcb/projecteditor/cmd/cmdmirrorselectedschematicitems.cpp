@@ -74,7 +74,7 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
 
   // find the center of all elements
   Point center = Point(0, 0);
-  int   count  = 0;
+  int count = 0;
   foreach (SI_Symbol* symbol, query->getSymbols()) {
     center += symbol->getPosition();
     ++count;

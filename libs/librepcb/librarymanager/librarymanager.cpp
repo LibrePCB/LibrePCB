@@ -49,7 +49,7 @@ namespace manager {
  ******************************************************************************/
 
 LibraryManager::LibraryManager(workspace::Workspace& ws,
-                               QWidget*              parent) noexcept
+                               QWidget* parent) noexcept
   : QMainWindow(parent),
     mWorkspace(ws),
     mUi(new Ui::LibraryManager),
@@ -190,7 +190,7 @@ void LibraryManager::currentListItemChanged(
         connect(widget, &LibraryInfoWidget::openLibraryEditorTriggered, this,
                 &LibraryManager::openLibraryEditorTriggered);
         mUi->verticalLayout->insertWidget(0, widget);
-        mCurrentWidget   = widget;
+        mCurrentWidget = widget;
         mSelectedLibrary = item->getLibraryFilePath();
       } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());

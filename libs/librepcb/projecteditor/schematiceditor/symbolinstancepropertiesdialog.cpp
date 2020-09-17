@@ -136,7 +136,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
     }
     // Then add remaining devices from workspace library (lower priority)
     QSet<Uuid> wsLibDevices = mWorkspace.getLibraryDb().getDevicesOfComponent(
-        mComponentInstance.getLibComponent().getUuid());   // can throw
+        mComponentInstance.getLibComponent().getUuid());  // can throw
     wsLibDevices -= Toolbox::toSet(prjLibDevices.keys());  // avoid duplicates
     foreach (const Uuid& deviceUuid, wsLibDevices) {
       FilePath devFp =

@@ -58,7 +58,7 @@ public:
   ~PathModel() noexcept;
 
   // Setters
-  void        setPath(const Path& path) noexcept;
+  void setPath(const Path& path) noexcept;
   const Path& getPath() const noexcept { return mPath; }
 
   // Slots
@@ -71,19 +71,19 @@ public:
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant      data(const QModelIndex& index,
-                     int                role = Qt::DisplayRole) const override;
-  QVariant      headerData(int section, Qt::Orientation orientation,
-                           int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool          setData(const QModelIndex& index, const QVariant& value,
-                        int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value,
+               int role = Qt::EditRole) override;
 
   // Operator Overloadings
   PathModel& operator=(const PathModel& rhs) noexcept;
 
 private:  // Data
-  Path   mPath;
+  Path mPath;
   Vertex mNewVertex;
 };
 

@@ -50,7 +50,7 @@ namespace editor {
 CmdPasteFootprintItems::CmdPasteFootprintItems(
     Package& package, Footprint& footprint, FootprintGraphicsItem& graphicsItem,
     std::unique_ptr<FootprintClipboardData> data,
-    const Point&                            posOffset) noexcept
+    const Point& posOffset) noexcept
   : UndoCommandGroup(tr("Paste Footprint Elements")),
     mPackage(package),
     mFootprint(footprint),
@@ -83,7 +83,7 @@ bool CmdPasteFootprintItems::performExecute() {
   //    allow dragging them afterwards.
 
   for (const FootprintPad& pad : mData->getFootprintPads().sortedByUuid()) {
-    Uuid              uuid = pad.getPackagePadUuid();
+    Uuid uuid = pad.getPackagePadUuid();
     CircuitIdentifier name = mData->getPackagePads().get(uuid)->getName();
     std::shared_ptr<PackagePad> newPad = mPackage.getPads().find(*name);
     if (newPad && (!mFootprint.getPads().contains(newPad->getUuid()))) {

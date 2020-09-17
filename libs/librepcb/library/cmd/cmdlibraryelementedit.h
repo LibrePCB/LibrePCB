@@ -44,10 +44,10 @@ namespace library {
 class CmdLibraryElementEdit : public CmdLibraryBaseElementEdit {
 public:
   // Constructors / Destructor
-  CmdLibraryElementEdit()                                   = delete;
+  CmdLibraryElementEdit() = delete;
   CmdLibraryElementEdit(const CmdLibraryElementEdit& other) = delete;
   explicit CmdLibraryElementEdit(LibraryElement& element,
-                                 const QString&  text) noexcept;
+                                 const QString& text) noexcept;
   virtual ~CmdLibraryElementEdit() noexcept;
 
   // Setters

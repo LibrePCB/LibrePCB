@@ -105,7 +105,7 @@ int GerberApertureList::setObround(const UnsignedLength& w,
 }
 
 int GerberApertureList::setRegularPolygon(const UnsignedLength& dia, int n,
-                                          const Angle&          rot,
+                                          const Angle& rot,
                                           const UnsignedLength& hole) noexcept {
   if (n < 3 || n > 12) {
     qWarning() << "Gerber Export: Specified number of vertices not supported "
@@ -272,8 +272,8 @@ QString GerberApertureList::generateRotatedObround(
     const UnsignedLength& w, const UnsignedLength& h, const Angle& rot,
     const UnsignedLength& hole) noexcept {
   UnsignedLength width = (w < h ? w : h);
-  Point          start = Point(-w / 2 + width / 2, 0).rotated(rot);
-  Point          end   = Point(w / 2 - width / 2, 0).rotated(rot);
+  Point start = Point(-w / 2 + width / 2, 0).rotated(rot);
+  Point end = Point(w / 2 - width / 2, 0).rotated(rot);
   if (hole > 0) {
     return QString("ROTATEDOBROUNDWITHHOLE,%1X%2X%3X%4X%5X%6")
         .arg(start.getX().toMmString(), start.getY().toMmString(),

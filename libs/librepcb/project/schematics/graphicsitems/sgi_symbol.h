@@ -61,14 +61,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QRectF boundingRect() const noexcept { return mBoundingRect; }
   QPainterPath shape() const noexcept { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0);
 
 private:
   // make some methods inaccessible...
-  SGI_Symbol()                        = delete;
+  SGI_Symbol() = delete;
   SGI_Symbol(const SGI_Symbol& other) = delete;
   SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
@@ -79,22 +79,22 @@ private:
 
   struct CachedTextProperties_t {
     QString text;
-    int     fontPixelSize;
-    qreal   scaleFactor;
-    bool    rotate180;
-    bool    mirrored;
-    int     flags;
-    QRectF  textRect;  // not scaled
+    int fontPixelSize;
+    qreal scaleFactor;
+    bool rotate180;
+    bool mirrored;
+    int flags;
+    QRectF textRect;  // not scaled
   };
 
   // General Attributes
-  SI_Symbol&             mSymbol;
+  SI_Symbol& mSymbol;
   const library::Symbol& mLibSymbol;
-  QFont                  mFont;
+  QFont mFont;
 
   // Cached Attributes
-  QRectF                                     mBoundingRect;
-  QPainterPath                               mShape;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
   QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 

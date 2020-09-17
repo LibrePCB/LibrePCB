@@ -80,7 +80,7 @@ TEST(VersionTest, testFromString_failOnNegative) {
 }
 
 TEST(VersionTest, testFromString_valid) {
-  QString       str;
+  QString str;
   QVector<uint> numbers;
   for (uint i = 0; i < 10; ++i) {
     numbers.append(i * 10);
@@ -169,7 +169,7 @@ TEST(VersionTest, testToComparableStr) {
 TEST(VersionTest, testOperatorAssign) {
   Version v1 = Version::fromString("1.2.3");
   Version v2 = Version::fromString("0.1");
-  v2         = v1;
+  v2 = v1;
   EXPECT_EQ(v1.getNumbers(), v2.getNumbers());
   EXPECT_EQ(v1.toStr(), v2.toStr());
   EXPECT_EQ(v1.toPrettyStr(0), v2.toPrettyStr(0));

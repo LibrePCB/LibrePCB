@@ -58,17 +58,17 @@ public:
 
   // Inherited from QWizardPage
   bool validatePage() noexcept override;
-  int  nextId() const noexcept override;
+  int nextId() const noexcept override;
 
   // Operator Overloadings
-  InitializeWorkspaceWizard_ChooseSettings& operator       =(
+  InitializeWorkspaceWizard_ChooseSettings& operator=(
       const InitializeWorkspaceWizard_ChooseSettings& rhs) = delete;
 
 private:
   void cbxVersionCurrentIndexChanged(int index) noexcept;
 
 private:
-  InitializeWorkspaceWizardContext&                            mContext;
+  InitializeWorkspaceWizardContext& mContext;
   QScopedPointer<Ui::InitializeWorkspaceWizard_ChooseSettings> mUi;
 };
 

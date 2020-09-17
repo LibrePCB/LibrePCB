@@ -40,7 +40,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicClipboardData::SchematicClipboardData(const Uuid&  schematicUuid,
+SchematicClipboardData::SchematicClipboardData(const Uuid& schematicUuid,
                                                const Point& cursorPos) noexcept
   : mFileSystem(TransactionalFileSystem::openRW(FilePath::getRandomTempPath())),
     mSchematicUuid(schematicUuid),
@@ -57,7 +57,7 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
   SExpression root =
       SExpression::parse(mFileSystem->read("schematic.lp"), FilePath());
   mSchematicUuid = root.getValueByPath<Uuid>("schematic");
-  mCursorPos     = Point(root.getChildByPath("cursor_position"));
+  mCursorPos = Point(root.getChildByPath("cursor_position"));
   mComponentInstances.loadFromSExpression(root);
   mSymbolInstances.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);

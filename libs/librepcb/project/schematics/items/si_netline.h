@@ -45,13 +45,13 @@ class SI_NetSegment;
 
 class SI_NetLineAnchor {
 public:
-  SI_NetLineAnchor() noexcept          = default;
+  SI_NetLineAnchor() noexcept = default;
   virtual ~SI_NetLineAnchor() noexcept = default;
 
-  virtual void                     registerNetLine(SI_NetLine& netline)   = 0;
-  virtual void                     unregisterNetLine(SI_NetLine& netline) = 0;
-  virtual const QSet<SI_NetLine*>& getNetLines() const noexcept           = 0;
-  virtual const Point&             getPosition() const noexcept           = 0;
+  virtual void registerNetLine(SI_NetLine& netline) = 0;
+  virtual void unregisterNetLine(SI_NetLine& netline) = 0;
+  virtual const QSet<SI_NetLine*>& getNetLines() const noexcept = 0;
+  virtual const Point& getPosition() const noexcept = 0;
 
   virtual NetLineAnchor toNetLineAnchor() const noexcept = 0;
 };
@@ -68,7 +68,7 @@ class SI_NetLine final : public SI_Base, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  SI_NetLine()                        = delete;
+  SI_NetLine() = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
   SI_NetLine(SI_NetSegment& segment, const SExpression& node);
   SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
@@ -76,9 +76,9 @@ public:
   ~SI_NetLine() noexcept;
 
   // Getters
-  SI_NetSegment&        getNetSegment() const noexcept { return mNetSegment; }
-  const NetLine&        getNetLine() const noexcept { return mNetLine; }
-  const Uuid&           getUuid() const noexcept { return mNetLine.getUuid(); }
+  SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
+  const NetLine& getNetLine() const noexcept { return mNetLine; }
+  const Uuid& getUuid() const noexcept { return mNetLine.getUuid(); }
   const UnsignedLength& getWidth() const noexcept {
     return mNetLine.getWidth();
   }
@@ -103,20 +103,20 @@ public:
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLine; }
   const Point& getPosition() const noexcept override { return mPosition; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   SI_NetLine& operator=(const SI_NetLine& rhs) = delete;
 
 private:
-  void              init();
+  void init();
   SI_NetLineAnchor* getAnchor(const NetLineAnchor& anchor);
 
   // General
-  SI_NetSegment&              mNetSegment;
-  NetLine                     mNetLine;
+  SI_NetSegment& mNetSegment;
+  NetLine mNetLine;
   QScopedPointer<SGI_NetLine> mGraphicsItem;
-  Point                   mPosition;  ///< the center of startpoint and endpoint
+  Point mPosition;  ///< the center of startpoint and endpoint
   QMetaObject::Connection mHighlightChangedConnection;
 
   // References

@@ -119,17 +119,17 @@ private:
   template <typename ElementType>
   void addElement(ElementType& element, QHash<Uuid, ElementType*>& elementList);
   template <typename ElementType>
-  void removeElement(ElementType&               element,
+  void removeElement(ElementType& element,
                      QHash<Uuid, ElementType*>& elementList);
 
   // General
   std::unique_ptr<TransactionalDirectory> mDirectory;
 
   // The currently added library elements
-  QHash<Uuid, library::Symbol*>    mSymbols;
-  QHash<Uuid, library::Package*>   mPackages;
+  QHash<Uuid, library::Symbol*> mSymbols;
+  QHash<Uuid, library::Package*> mPackages;
   QHash<Uuid, library::Component*> mComponents;
-  QHash<Uuid, library::Device*>    mDevices;
+  QHash<Uuid, library::Device*> mDevices;
 
   QSet<library::LibraryBaseElement*> mAllElements;
   QSet<library::LibraryBaseElement*> mElementsToUpgrade;

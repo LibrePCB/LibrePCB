@@ -58,7 +58,7 @@ class BI_StrokeText final : public BI_Base, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  BI_StrokeText()                           = delete;
+  BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
   BI_StrokeText(Board& board, const BI_StrokeText& other);
   BI_StrokeText(Board& board, const SExpression& node);
@@ -66,18 +66,18 @@ public:
   ~BI_StrokeText() noexcept;
 
   // Getters
-  StrokeText&       getText() noexcept { return *mText; }
+  StrokeText& getText() noexcept { return *mText; }
   const StrokeText& getText() const noexcept { return *mText; }
-  const Uuid&       getUuid() const
+  const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
   bool isSelectable() const noexcept override;
 
   // General Methods
   BI_Footprint* getFootprint() const noexcept { return mFootprint; }
-  void          setFootprint(BI_Footprint* footprint) noexcept;
-  void          updateGraphicsItems() noexcept;
-  void          addToBoard() override;
-  void          removeFromBoard() override;
+  void setFootprint(BI_Footprint* footprint) noexcept;
+  void updateGraphicsItems() noexcept;
+  void addToBoard() override;
+  void removeFromBoard() override;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -87,9 +87,9 @@ public:
     return BI_Base::Type_t::StrokeText;
   }
   const Point& getPosition() const noexcept override;
-  bool         getIsMirrored() const noexcept override { return false; }
+  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
@@ -104,10 +104,10 @@ private:  // Methods
                         StrokeText::Event event) noexcept;
 
 private:  // Data
-  BI_Footprint*                          mFootprint;
-  QScopedPointer<StrokeText>             mText;
+  BI_Footprint* mFootprint;
+  QScopedPointer<StrokeText> mText;
   QScopedPointer<StrokeTextGraphicsItem> mGraphicsItem;
-  QScopedPointer<LineGraphicsItem>       mAnchorGraphicsItem;
+  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Slots
   StrokeText::OnEditedSlot mOnStrokeTextEditedSlot;

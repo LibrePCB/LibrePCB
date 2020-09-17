@@ -81,8 +81,8 @@ signals:
   void edited();
 
 protected:  // Data
-  QScopedPointer<Model>                       mModel;
-  QScopedPointer<SortFilterProxyModel>        mProxyModel;
+  QScopedPointer<Model> mModel;
+  QScopedPointer<SortFilterProxyModel> mProxyModel;
   QScopedPointer<Ui::LibraryListEditorWidget> mUi;
 };
 

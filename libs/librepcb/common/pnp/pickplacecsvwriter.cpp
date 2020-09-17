@@ -89,8 +89,8 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
       values += item.getPosition().getY().toMmString();
       values += item.getRotation().mappedTo0_360deg().toDegString();
       values += item.getBoardSide() == PickPlaceDataItem::BoardSide::TOP
-                    ? "Top"
-                    : "Bottom";
+          ? "Top"
+          : "Bottom";
       file->addValue(values);  // can throw
     }
   }
@@ -103,7 +103,7 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
  ******************************************************************************/
 
 bool PickPlaceCsvWriter::isOnBoardSide(const PickPlaceDataItem& item,
-                                       BoardSide                side) noexcept {
+                                       BoardSide side) noexcept {
   switch (side) {
     case BoardSide::TOP:
       return (item.getBoardSide() == PickPlaceDataItem::BoardSide::TOP);

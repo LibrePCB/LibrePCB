@@ -48,7 +48,7 @@ class BI_FootprintPad;
 class BoardPlaneFragmentsBuilder final {
 public:
   // Constructors / Destructor
-  BoardPlaneFragmentsBuilder()                                        = delete;
+  BoardPlaneFragmentsBuilder() = delete;
   BoardPlaneFragmentsBuilder(const BoardPlaneFragmentsBuilder& other) = delete;
   BoardPlaneFragmentsBuilder(BI_Plane& plane) noexcept;
   ~BoardPlaneFragmentsBuilder() noexcept;
@@ -82,7 +82,7 @@ private:  // Methods
   }
 
 private:  // Data
-  BI_Plane&         mPlane;
+  BI_Plane& mPlane;
   ClipperLib::Paths mConnectedNetSignalAreas;
   ClipperLib::Paths mResult;
 };

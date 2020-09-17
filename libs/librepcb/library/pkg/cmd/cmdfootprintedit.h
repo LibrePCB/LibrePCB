@@ -46,7 +46,7 @@ class Footprint;
 class CmdFootprintEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdFootprintEdit()                              = delete;
+  CmdFootprintEdit() = delete;
   CmdFootprintEdit(const CmdFootprintEdit& other) = delete;
   explicit CmdFootprintEdit(Footprint& fpt) noexcept;
   ~CmdFootprintEdit() noexcept;

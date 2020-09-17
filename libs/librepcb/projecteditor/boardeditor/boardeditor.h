@@ -76,8 +76,8 @@ public:
 
   // Getters
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
-  Project&       getProject() const noexcept { return mProject; }
-  Board*         getActiveBoard() const noexcept { return mActiveBoard.data(); }
+  Project& getProject() const noexcept { return mProject; }
+  Board* getActiveBoard() const noexcept { return mActiveBoard.data(); }
 
   // Setters
   bool setActiveBoardIndex(int index) noexcept;
@@ -121,7 +121,7 @@ private slots:
 
 private:
   // make some methods inaccessible...
-  BoardEditor()                         = delete;
+  BoardEditor() = delete;
   BoardEditor(const BoardEditor& other) = delete;
   BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
@@ -130,35 +130,35 @@ private:
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
   void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
-                           bool                               zoomTo) noexcept;
+                           bool zoomTo) noexcept;
   void clearDrcMarker() noexcept;
   QList<BI_Device*> getSearchCandidates() noexcept;
-  QStringList       getSearchToolBarCompleterList() noexcept;
+  QStringList getSearchToolBarCompleterList() noexcept;
   void goToDevice(const QString& name, unsigned int index) noexcept;
 
   // General Attributes
-  ProjectEditor&                       mProjectEditor;
-  Project&                             mProject;
-  Ui::BoardEditor*                     mUi;
-  GraphicsView*                        mGraphicsView;
+  ProjectEditor& mProjectEditor;
+  Project& mProject;
+  Ui::BoardEditor* mUi;
+  GraphicsView* mGraphicsView;
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
   // DRC
   BoardDesignRuleCheck::Options mDrcOptions;
   QHash<Uuid, QList<BoardDesignRuleCheckMessage>>
-                                    mDrcMessages;  ///< Key: Board UUID
+      mDrcMessages;  ///< Key: Board UUID
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
 
   // Misc
   QPointer<Board> mActiveBoard;
   QList<QAction*> mBoardListActions;
-  QActionGroup    mBoardListActionGroup;
+  QActionGroup mBoardListActionGroup;
 
   // Docks
-  ErcMsgDock*                                      mErcMsgDock;
-  UnplacedComponentsDock*                          mUnplacedComponentsDock;
-  BoardLayersDock*                                 mBoardLayersDock;
+  ErcMsgDock* mErcMsgDock;
+  UnplacedComponentsDock* mUnplacedComponentsDock;
+  BoardLayersDock* mBoardLayersDock;
   QScopedPointer<BoardDesignRuleCheckMessagesDock> mDrcMessagesDock;
 
   // Finite State Machine

@@ -61,14 +61,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QRectF boundingRect() const noexcept { return mBoundingRect; }
   QPainterPath shape() const noexcept { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0);
 
 private:
   // make some methods inaccessible...
-  BGI_Plane()                       = delete;
+  BGI_Plane() = delete;
   BGI_Plane(const BGI_Plane& other) = delete;
   BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
 
@@ -79,10 +79,10 @@ private:
   BI_Plane& mPlane;
 
   // Cached Attributes
-  GraphicsLayer*        mLayer;
-  QRectF                mBoundingRect;
-  QPainterPath          mShape;
-  QPainterPath          mOutline;
+  GraphicsLayer* mLayer;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
+  QPainterPath mOutline;
   QVector<QPainterPath> mAreas;
 };
 

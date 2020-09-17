@@ -68,8 +68,8 @@ Workspace::Workspace(const FilePath& wsPath)
         __FILE__, __LINE__,
         tr("Invalid workspace path: \"%1\"").arg(mPath.toNative()));
   }
-  FilePath    versionFp = mPath.getPathTo(".librepcb-workspace");
-  QByteArray  versionRaw(FileUtils::readFile(versionFp));  // can throw
+  FilePath versionFp = mPath.getPathTo(".librepcb-workspace");
+  QByteArray versionRaw(FileUtils::readFile(versionFp));  // can throw
   VersionFile wsVersionFile =
       VersionFile::fromByteArray(versionRaw);  // can throw
   if (wsVersionFile.getVersion() != FILE_FORMAT_VERSION()) {
@@ -80,8 +80,8 @@ Workspace::Workspace(const FilePath& wsPath)
   }
 
   // create directories which do not exist already
-  FileUtils::makePath(mProjectsPath);   // can throw
-  FileUtils::makePath(mMetadataPath);   // can throw
+  FileUtils::makePath(mProjectsPath);  // can throw
+  FileUtils::makePath(mMetadataPath);  // can throw
   FileUtils::makePath(mLibrariesPath);  // can throw
 
   // Check if the workspace is locked (already open or application crashed).
@@ -176,7 +176,7 @@ QList<Version> Workspace::getFileFormatVersionsOfWorkspace(
     const FilePath& path) noexcept {
   QList<Version> list;
   if (isValidWorkspacePath(path)) {
-    QDir        dir(path.toStr());
+    QDir dir(path.toStr());
     QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     foreach (const QString& subdir, subdirs) {
       if (subdir.startsWith('v')) {

@@ -42,7 +42,7 @@ class Repository final : public QObject {
 
 public:
   // Constructors / Destructor
-  Repository()                        = delete;
+  Repository() = delete;
   Repository(const Repository& other) = delete;
   explicit Repository(const QUrl& url) noexcept;
   ~Repository() noexcept;

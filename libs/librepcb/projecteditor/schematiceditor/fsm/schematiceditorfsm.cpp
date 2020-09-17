@@ -42,7 +42,7 @@ namespace editor {
  ******************************************************************************/
 
 SchematicEditorFsm::SchematicEditorFsm(const Context& context,
-                                       QObject*       parent) noexcept
+                                       QObject* parent) noexcept
   : QObject(parent),
     mStates(),
     mCurrentState(State::IDLE),

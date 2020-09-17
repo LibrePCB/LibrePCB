@@ -120,7 +120,7 @@ void AddLibraryWidget::localLibraryNameLineEditTextChanged(
 
 void AddLibraryWidget::downloadZipUrlLineEditTextChanged(
     QString urlStr) noexcept {
-  QString left    = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
+  QString left = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
   QString libName = left.right(left.length() - left.lastIndexOf("/"));
   if (libName == urlStr) {
     libName = QUrl(urlStr).fileName();
@@ -145,11 +145,11 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
       getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
   QString versionStr =
       getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
-  tl::optional<Version> version       = Version::tryFromString(versionStr);
-  QString               urlStr        = mUi->edtLocalUrl->text().trimmed();
-  QUrl                  url           = QUrl::fromUserInput(urlStr);
-  bool                  useCc0License = mUi->cbxLocalCc0License->isChecked();
-  QString               directoryStr =
+  tl::optional<Version> version = Version::tryFromString(versionStr);
+  QString urlStr = mUi->edtLocalUrl->text().trimmed();
+  QUrl url = QUrl::fromUserInput(urlStr);
+  bool useCc0License = mUi->cbxLocalCc0License->isChecked();
+  QString directoryStr =
       getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDirectory, true);
   if ((!directoryStr.isEmpty()) && (!directoryStr.endsWith(".lplib"))) {
     directoryStr.append(".lplib");
@@ -280,7 +280,7 @@ void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {
   }
 
   // get attributes
-  QUrl    url = QUrl::fromUserInput(mUi->edtDownloadZipUrl->text().trimmed());
+  QUrl url = QUrl::fromUserInput(mUi->edtDownloadZipUrl->text().trimmed());
   QString dirStr =
       getTextOrPlaceholderFromQLineEdit(mUi->edtDownloadZipDirectory, true);
   if ((!dirStr.isEmpty()) && (!dirStr.endsWith(".lplib"))) {
@@ -328,7 +328,7 @@ void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {
   mManualLibraryDownload->start();
 }
 
-void AddLibraryWidget::downloadZipFinished(bool           success,
+void AddLibraryWidget::downloadZipFinished(bool success,
                                            const QString& errMsg) noexcept {
   Q_ASSERT(mManualLibraryDownload);
 
@@ -452,9 +452,9 @@ void AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked() noexcept {
 QString AddLibraryWidget::getTextOrPlaceholderFromQLineEdit(
     QLineEdit* edit, bool isFilename) noexcept {
   if (edit) {
-    QString text        = edit->text().trimmed();
+    QString text = edit->text().trimmed();
     QString placeholder = edit->placeholderText().trimmed();
-    QString retval      = (text.length() > 0) ? text : placeholder;
+    QString retval = (text.length() > 0) ? text : placeholder;
     if (isFilename) {
       return FilePath::cleanFileName(
           retval, FilePath::ReplaceSpaces | FilePath::KeepCase);

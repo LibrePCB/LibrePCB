@@ -39,7 +39,7 @@ namespace project {
  ******************************************************************************/
 
 CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetSegment& segment,
-                                                 const Point&   position,
+                                                 const Point& position,
                                                  const Angle& rotation) noexcept
   : UndoCommand(tr("Add netlabel")),
     mNetSegment(segment),

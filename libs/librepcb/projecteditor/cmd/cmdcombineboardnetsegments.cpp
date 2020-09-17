@@ -104,7 +104,7 @@ bool CmdCombineBoardNetSegments::performExecute() {
     Q_ASSERT(newNetLine);
   }
   execNewChildCmd(new CmdBoardNetSegmentRemove(mOldSegment));  // can throw
-  execNewChildCmd(cmdAdd.take());                              // can throw
+  execNewChildCmd(cmdAdd.take());  // can throw
 
   undoScopeGuard.dismiss();  // no undo required
   return true;

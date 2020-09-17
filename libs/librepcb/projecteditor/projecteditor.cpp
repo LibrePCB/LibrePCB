@@ -59,7 +59,7 @@ ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project)
 
     // create the whole schematic/board editor GUI inclusive FSM and so on
     mSchematicEditor = new SchematicEditor(*this, mProject);
-    mBoardEditor     = new BoardEditor(*this, mProject);
+    mBoardEditor = new BoardEditor(*this, mProject);
   } catch (...) {
     // free the allocated memory in the reverse order of their allocation...
     delete mBoardEditor;
@@ -186,7 +186,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     if (!filename.endsWith(".lppz")) filename.append(".lppz");
     FilePath fp(filename);
     qDebug() << "Export project to *.lppz:" << fp.toNative();
-    mProject.save();                                           // can throw
+    mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->exportToZip(fp);  // can throw
     qDebug() << "Project successfully exported.";
   } catch (const Exception& e) {
@@ -197,7 +197,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
 bool ProjectEditor::saveProject() noexcept {
   try {
     qDebug() << "Save project...";
-    mProject.save();                                  // can throw
+    mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->save();  // can throw
 
     // saving was successful --> clean the undo stack
@@ -228,7 +228,7 @@ bool ProjectEditor::autosaveProject() noexcept {
 
   try {
     qDebug() << "Autosave project...";
-    mProject.save();                                      // can throw
+    mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->autosave();  // can throw
     qDebug() << "Project successfully autosaved";
     return true;
@@ -237,7 +237,7 @@ bool ProjectEditor::autosaveProject() noexcept {
   }
 }
 
-bool ProjectEditor::closeAndDestroy(bool     askForSave,
+bool ProjectEditor::closeAndDestroy(bool askForSave,
                                     QWidget* msgBoxParent) noexcept {
   if (mUndoStack->isClean() || (!mProject.getDirectory().isWritable()) ||
       (!askForSave)) {

@@ -61,11 +61,11 @@ class BomGeneratorDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  BomGeneratorDialog()                                = delete;
+  BomGeneratorDialog() = delete;
   BomGeneratorDialog(const BomGeneratorDialog& other) = delete;
   explicit BomGeneratorDialog(const Project& project,
-                              const Board*   board  = nullptr,
-                              QWidget*       parent = nullptr) noexcept;
+                              const Board* board = nullptr,
+                              QWidget* parent = nullptr) noexcept;
   ~BomGeneratorDialog() noexcept;
 
   // Operator Overloads
@@ -78,13 +78,13 @@ private:  // GUI Event Handlers
   void btnGenerateClicked() noexcept;
 
 private:  // Methods
-  void     updateBom() noexcept;
-  void     updateTable() noexcept;
+  void updateBom() noexcept;
+  void updateTable() noexcept;
   FilePath getOutputFilePath() const noexcept;
 
 private:  // Data
-  const Project&                         mProject;
-  std::shared_ptr<Bom>                   mBom;
+  const Project& mProject;
+  std::shared_ptr<Bom> mBom;
   QScopedPointer<Ui::BomGeneratorDialog> mUi;
 };
 

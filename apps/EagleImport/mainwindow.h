@@ -52,25 +52,25 @@ private:
   };
 
   void reset();
-  void addError(const QString&            msg,
+  void addError(const QString& msg,
                 const librepcb::FilePath& inputFile = librepcb::FilePath(),
-                int                       inputLine = 0);
+                int inputLine = 0);
   void convertAllFiles(ConvertFileType_t type);
   void convertFile(ConvertFileType_t type, eagleimport::ConverterDb& db,
                    const librepcb::FilePath& filepath);
   bool convertSymbol(eagleimport::ConverterDb& db,
-                     const parseagle::Symbol&  symbol);
+                     const parseagle::Symbol& symbol);
   bool convertPackage(eagleimport::ConverterDb& db,
                       const parseagle::Package& package);
-  bool convertDevice(eagleimport::ConverterDb&   db,
+  bool convertDevice(eagleimport::ConverterDb& db,
                      const parseagle::DeviceSet& deviceSet);
 
   // Attributes
   Ui::MainWindow* ui;
-  bool            mAbortConversion;
-  QString         mlastInputDirectory;
-  int             mReadedElementsCount;
-  int             mConvertedElementsCount;
+  bool mAbortConversion;
+  QString mlastInputDirectory;
+  int mReadedElementsCount;
+  int mConvertedElementsCount;
 };
 
 }  // namespace librepcb

@@ -39,10 +39,10 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  QUrl       url;
+  QUrl url;
   QByteArray accept;
   QByteArray contentStart;
-  bool       success;
+  bool success;
 } NetworkRequestTestData;
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ public:
 
 protected:
   NetworkRequestBaseSignalReceiver mSignalReceiver;
-  static NetworkAccessManager*     sDownloadManager;
+  static NetworkAccessManager* sDownloadManager;
 };
 
 NetworkAccessManager* NetworkRequestTest::sDownloadManager = nullptr;
@@ -103,8 +103,8 @@ TEST_P(NetworkRequestTest, testDownload) {
   request->start();
 
   // wait until request finished (with timeout)
-  qint64 start       = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto   currentTime = []() {
+  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
+  auto currentTime = []() {
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
   };
   while ((!mSignalReceiver.mDestroyed) && (currentTime() - start < 30000)) {

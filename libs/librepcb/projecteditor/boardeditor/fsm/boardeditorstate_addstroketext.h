@@ -81,7 +81,7 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
-  BoardEditorState_AddStrokeText& operator       =(
+  BoardEditorState_AddStrokeText& operator=(
       const BoardEditorState_AddStrokeText& rhs) = delete;
 
 private:  // Methods
@@ -99,23 +99,23 @@ private:  // Methods
 
 private:  // Data
   // State
-  bool       mIsUndoCmdActive;
+  bool mIsUndoCmdActive;
   StrokeText mLastStrokeTextProperties;
 
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
-  BI_StrokeText*                    mCurrentTextToPlace;
+  BI_StrokeText* mCurrentTextToPlace;
   QScopedPointer<CmdStrokeTextEdit> mCurrentTextEditCmd;
 
   // Widgets for the command toolbar
-  QScopedPointer<QLabel>                mLayerLabel;
+  QScopedPointer<QLabel> mLayerLabel;
   QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
-  QScopedPointer<QLabel>                mTextLabel;
-  QScopedPointer<QComboBox>             mTextComboBox;
-  QScopedPointer<QLabel>                mHeightLabel;
-  QScopedPointer<PositiveLengthEdit>    mHeightEdit;
-  QScopedPointer<QLabel>                mMirrorLabel;
-  QScopedPointer<QCheckBox>             mMirrorCheckBox;
+  QScopedPointer<QLabel> mTextLabel;
+  QScopedPointer<QComboBox> mTextComboBox;
+  QScopedPointer<QLabel> mHeightLabel;
+  QScopedPointer<PositiveLengthEdit> mHeightEdit;
+  QScopedPointer<QLabel> mMirrorLabel;
+  QScopedPointer<QCheckBox> mMirrorCheckBox;
 };
 
 /*******************************************************************************

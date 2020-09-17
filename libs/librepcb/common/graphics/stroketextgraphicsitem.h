@@ -48,7 +48,7 @@ class IF_GraphicsLayerProvider;
 class StrokeTextGraphicsItem final : public PrimitivePathGraphicsItem {
 public:
   // Constructors / Destructor
-  StrokeTextGraphicsItem()                                    = delete;
+  StrokeTextGraphicsItem() = delete;
   StrokeTextGraphicsItem(const StrokeTextGraphicsItem& other) = delete;
   StrokeTextGraphicsItem(StrokeText& text, const IF_GraphicsLayerProvider& lp,
                          QGraphicsItem* parent = nullptr) noexcept;
@@ -64,16 +64,16 @@ public:
   StrokeTextGraphicsItem& operator=(const StrokeTextGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void     strokeTextEdited(const StrokeText& text,
-                            StrokeText::Event event) noexcept;
-  void     updateLayer(const GraphicsLayerName& layerName) noexcept;
-  void     updateTransform() noexcept;
+  void strokeTextEdited(const StrokeText& text,
+                        StrokeText::Event event) noexcept;
+  void updateLayer(const GraphicsLayerName& layerName) noexcept;
+  void updateTransform() noexcept;
   QVariant itemChange(GraphicsItemChange change,
-                      const QVariant&    value) noexcept override;
+                      const QVariant& value) noexcept override;
 
 private:  // Data
-  StrokeText&                             mText;
-  const IF_GraphicsLayerProvider&         mLayerProvider;
+  StrokeText& mText;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 
   // Slots

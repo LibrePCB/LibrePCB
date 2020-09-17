@@ -82,7 +82,7 @@ class Project final : public QObject, public AttributeProvider {
 
 public:
   // Constructors / Destructor
-  Project()                     = delete;
+  Project() = delete;
   Project(const Project& other) = delete;
 
   /**
@@ -94,7 +94,7 @@ public:
    * @throw Exception     If the project could not be opened successfully
    */
   Project(std::unique_ptr<TransactionalDirectory> directory,
-          const QString&                          filename)
+          const QString& filename)
     : Project(std::move(directory), filename, false) {}
 
   /**
@@ -400,13 +400,13 @@ public:
   // Static Methods
 
   static Project* create(std::unique_ptr<TransactionalDirectory> directory,
-                         const QString&                          filename) {
+                         const QString& filename) {
     return new Project(std::move(directory), filename, true);
   }
 
-  static bool    isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
-  static bool    isProjectFile(const FilePath& file) noexcept;
-  static bool    isProjectDirectory(const FilePath& dir) noexcept;
+  static bool isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
+  static bool isProjectFile(const FilePath& file) noexcept;
+  static bool isProjectDirectory(const FilePath& dir) noexcept;
   static Version getProjectFileFormatVersion(const FilePath& dir);
 
 signals:
@@ -485,8 +485,8 @@ private:
   QList<Schematic*>
       mRemovedSchematics;  ///< All removed schematics of this project
   QScopedPointer<SchematicLayerProvider>
-                mSchematicLayerProvider;  ///< All schematic layers of this project
-  QList<Board*> mBoards;                  ///< All boards of this project
+      mSchematicLayerProvider;  ///< All schematic layers of this project
+  QList<Board*> mBoards;  ///< All boards of this project
   QList<Board*> mRemovedBoards;  ///< All removed boards of this project
   QScopedPointer<AttributeList>
       mAttributes;  ///< all attributes in a specific order

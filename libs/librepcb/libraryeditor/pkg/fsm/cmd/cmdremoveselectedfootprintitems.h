@@ -54,7 +54,7 @@ public:
   ~CmdRemoveSelectedFootprintItems() noexcept;
 
   // Operator Overloadings
-  CmdRemoveSelectedFootprintItems& operator       =(
+  CmdRemoveSelectedFootprintItems& operator=(
       const CmdRemoveSelectedFootprintItems& rhs) = delete;
 
 private:

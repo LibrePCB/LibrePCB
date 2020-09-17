@@ -49,7 +49,7 @@ TEST_F(PackageConverterTest, testConversion) {
   FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
 
   // load eagle package
-  FilePath           eagleLibFp = testDataDir.getPathTo("resistor.lbr");
+  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
   parseagle::Library eagleLibrary(eagleLibFp.toStr());
   ASSERT_EQ(1, eagleLibrary.getPackages().count());
   const parseagle::Package& eaglePackage = eagleLibrary.getPackages().first();
@@ -58,7 +58,7 @@ TEST_F(PackageConverterTest, testConversion) {
   ConverterDb db(testDataDir.getPathTo("db.ini"));
 
   // convert package
-  PackageConverter                  converter(eaglePackage, db);
+  PackageConverter converter(eaglePackage, db);
   std::unique_ptr<library::Package> package = converter.generate();
 }
 

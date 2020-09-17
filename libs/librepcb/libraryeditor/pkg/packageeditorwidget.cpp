@@ -57,7 +57,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-PackageEditorWidget::PackageEditorWidget(const Context&  context,
+PackageEditorWidget::PackageEditorWidget(const Context& context,
                                          const FilePath& fp, QWidget* parent)
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::PackageEditorWidget),
@@ -86,7 +86,7 @@ PackageEditorWidget::PackageEditorWidget(const Context&  context,
   mCategoriesEditorWidget.reset(
       new PackageCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
-  int                   row;
+  int row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
@@ -210,7 +210,7 @@ bool PackageEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mPackage->save();     // can throw
+    mPackage->save();  // can throw
     mFileSystem->save();  // can throw
     memorizePackageInterface();
     return EditorWidgetBase::save();
@@ -413,7 +413,7 @@ void PackageEditorWidget::currentFootprintChanged(int index) noexcept {
 }
 
 void PackageEditorWidget::memorizePackageInterface() noexcept {
-  mOriginalPadUuids   = mPackage->getPads().getUuidSet();
+  mOriginalPadUuids = mPackage->getPads().getUuidSet();
   mOriginalFootprints = mPackage->getFootprints();
 }
 

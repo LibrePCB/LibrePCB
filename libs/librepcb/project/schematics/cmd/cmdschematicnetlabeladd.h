@@ -71,9 +71,9 @@ private:
   // Private Member Variables
 
   SI_NetSegment& mNetSegment;
-  Point          mPosition;
-  Angle          mRotation;
-  SI_NetLabel*   mNetLabel;
+  Point mPosition;
+  Angle mRotation;
+  SI_NetLabel* mNetLabel;
 };
 
 /*******************************************************************************

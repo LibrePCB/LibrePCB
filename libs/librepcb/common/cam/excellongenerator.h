@@ -70,7 +70,7 @@ private:
   void printFooter() noexcept;
 
   // Excellon Data
-  QString                  mOutput;
+  QString mOutput;
   QMultiMap<Length, Point> mDrillList;
 };
 

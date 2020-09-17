@@ -55,13 +55,13 @@ class BoardDesignRuleCheckDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  BoardDesignRuleCheckDialog()                                        = delete;
+  BoardDesignRuleCheckDialog() = delete;
   BoardDesignRuleCheckDialog(const BoardDesignRuleCheckDialog& other) = delete;
-  BoardDesignRuleCheckDialog(Board&                               board,
+  BoardDesignRuleCheckDialog(Board& board,
                              const BoardDesignRuleCheck::Options& options,
-                             const LengthUnit&                    lengthUnit,
+                             const LengthUnit& lengthUnit,
                              const QString& settingsPrefix,
-                             QWidget*       parent = 0) noexcept;
+                             QWidget* parent = 0) noexcept;
   ~BoardDesignRuleCheckDialog();
 
   // Getters
@@ -75,8 +75,8 @@ private:  // GUI Event Handlers
   void btnRunDrcClicked() noexcept;
 
 private:
-  Board&                                           mBoard;
-  QScopedPointer<Ui::BoardDesignRuleCheckDialog>   mUi;
+  Board& mBoard;
+  QScopedPointer<Ui::BoardDesignRuleCheckDialog> mUi;
   tl::optional<QList<BoardDesignRuleCheckMessage>> mMessages;
 };
 

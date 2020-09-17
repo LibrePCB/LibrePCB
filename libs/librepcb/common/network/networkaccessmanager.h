@@ -82,8 +82,8 @@ private:  // Methods
   void stop() noexcept;
 
 private:  // Data
-  QSemaphore                   mThreadStartSemaphore;
-  QNetworkAccessManager*       mManager;
+  QSemaphore mThreadStartSemaphore;
+  QNetworkAccessManager* mManager;
   static NetworkAccessManager* sInstance;
 };
 

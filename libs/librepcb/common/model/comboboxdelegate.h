@@ -46,8 +46,8 @@ class ComboBoxDelegate final : public QStyledItemDelegate {
 public:
   // Types
   struct Item final {
-    QString  text;
-    QIcon    icon;
+    QString text;
+    QIcon icon;
     QVariant data;
   };
   struct Items final : public QVector<Item> {
@@ -63,8 +63,8 @@ public:
   };
 
   // Constructors / Destructor
-  explicit ComboBoxDelegate(bool     editable = false,
-                            QObject* parent   = nullptr) noexcept;
+  explicit ComboBoxDelegate(bool editable = false,
+                            QObject* parent = nullptr) noexcept;
   ComboBoxDelegate(const ComboBoxDelegate& other) = delete;
   ~ComboBoxDelegate() noexcept;
 

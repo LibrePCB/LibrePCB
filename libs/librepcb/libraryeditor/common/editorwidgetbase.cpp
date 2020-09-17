@@ -153,7 +153,7 @@ void EditorWidgetBase::setupInterfaceBrokenWarningWidget(
       "background-color: rgb(255, 255, 127); "
       "color: rgb(170, 0, 0);");
   QLabel* label = new QLabel(&widget);
-  QFont   font  = label->font();
+  QFont font = label->font();
   font.setBold(true);
   label->setFont(font);
   label->setWordWrap(true);
@@ -174,7 +174,7 @@ void EditorWidgetBase::setupErrorNotificationWidget(QWidget& widget) noexcept {
       "background-color: rgb(255, 255, 127); "
       "color: rgb(170, 0, 0);");
   QLabel* label = new QLabel(&widget);
-  QFont   font  = label->font();
+  QFont font = label->font();
   font.setBold(true);
   label->setFont(font);
   label->setWordWrap(true);

@@ -41,12 +41,12 @@ class ErcMsg;  // all classes which implement IF_ErcMsgProvider will need this
  * @warning Do not change the name of an existing class if you don't know what
  * you're doing!
  */
-#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName)                     \
-public:                                                                   \
+#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
+public: \
   virtual const char* getErcMsgOwnerClassName() const noexcept override { \
-    return #msgOwnerClassName;                                            \
-  }                                                                       \
-                                                                          \
+    return #msgOwnerClassName; \
+  } \
+\
 private:
 
 /*******************************************************************************

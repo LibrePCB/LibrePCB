@@ -63,7 +63,7 @@ public:
   PackageEditorState_DrawTextBase(
       const PackageEditorState_DrawTextBase& other) = delete;
   explicit PackageEditorState_DrawTextBase(Context& context,
-                                           Mode     mode) noexcept;
+                                           Mode mode) noexcept;
   virtual ~PackageEditorState_DrawTextBase() noexcept;
 
   // General Methods
@@ -81,7 +81,7 @@ public:
   bool processRotateCcw() noexcept override;
 
   // Operator Overloadings
-  PackageEditorState_DrawTextBase& operator       =(
+  PackageEditorState_DrawTextBase& operator=(
       const PackageEditorState_DrawTextBase& rhs) = delete;
 
 private:  // Methods
@@ -98,19 +98,19 @@ private:  // Methods
   void vAlignActionGroupValueChanged(const VAlign& value) noexcept;
 
 private:  // Types / Data
-  Mode                              mMode;
-  Point                             mStartPos;
+  Mode mMode;
+  Point mStartPos;
   QScopedPointer<CmdStrokeTextEdit> mEditCmd;
-  StrokeText*                       mCurrentText;
-  StrokeTextGraphicsItem*           mCurrentGraphicsItem;
+  StrokeText* mCurrentText;
+  StrokeTextGraphicsItem* mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
-  Angle             mLastRotation;
-  PositiveLength    mLastHeight;
-  UnsignedLength    mLastStrokeWidth;
-  Alignment         mLastAlignment;
-  QString           mLastText;
+  Angle mLastRotation;
+  PositiveLength mLastHeight;
+  UnsignedLength mLastStrokeWidth;
+  Alignment mLastAlignment;
+  QString mLastText;
 };
 
 /*******************************************************************************

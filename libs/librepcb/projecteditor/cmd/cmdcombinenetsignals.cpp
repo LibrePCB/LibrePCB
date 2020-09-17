@@ -53,7 +53,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdCombineNetSignals::CmdCombineNetSignals(Circuit&   circuit,
+CmdCombineNetSignals::CmdCombineNetSignals(Circuit& circuit,
                                            NetSignal& toBeRemoved,
                                            NetSignal& result) noexcept
   : UndoCommandGroup(tr("Combine Net Signals")),
@@ -106,7 +106,7 @@ bool CmdCombineNetSignals::performExecute() {
   foreach (BI_NetSegment* netsegment, boardNetSegments) {
     CmdBoardNetSegmentEdit* cmd = new CmdBoardNetSegmentEdit(*netsegment);
     cmd->setNetSignal(mResultingNetSignal);
-    execNewChildCmd(cmd);                                     // can throw
+    execNewChildCmd(cmd);  // can throw
     execNewChildCmd(new CmdBoardNetSegmentAdd(*netsegment));  // can throw
   }
 
@@ -114,7 +114,7 @@ bool CmdCombineNetSignals::performExecute() {
   foreach (BI_Plane* plane, boardPlanes) {
     CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
     cmd->setNetSignal(mResultingNetSignal);
-    execNewChildCmd(cmd);                           // can throw
+    execNewChildCmd(cmd);  // can throw
     execNewChildCmd(new CmdBoardPlaneAdd(*plane));  // can throw
   }
 

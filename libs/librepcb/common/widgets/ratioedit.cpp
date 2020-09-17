@@ -36,7 +36,7 @@ namespace librepcb {
 RatioEdit::RatioEdit(QWidget* parent) noexcept
   : NumberEditBase(parent),
     mMinValue(-2000000000L),  // -2'000% should be sufficient for everything
-    mMaxValue(2000000000L),   // 2'000% should be sufficient for everything
+    mMaxValue(2000000000L),  // 2'000% should be sufficient for everything
     mValue(0) {
   mSpinBox->setSuffix("%");
   updateSpinBox();

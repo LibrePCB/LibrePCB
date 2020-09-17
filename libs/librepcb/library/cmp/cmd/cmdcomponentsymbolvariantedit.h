@@ -59,7 +59,7 @@ public:
   void setSymbolItems(const ComponentSymbolVariantItemList& items) noexcept;
 
   // Operator Overloadings
-  CmdComponentSymbolVariantEdit& operator       =(
+  CmdComponentSymbolVariantEdit& operator=(
       const CmdComponentSymbolVariantEdit& rhs) = delete;
 
 private:  // Methods
@@ -75,12 +75,12 @@ private:  // Methods
 private:  // Data
   ComponentSymbolVariant& mVariant;
 
-  QString                        mOldNorm;
-  QString                        mNewNorm;
-  LocalizedNameMap               mOldNames;
-  LocalizedNameMap               mNewNames;
-  LocalizedDescriptionMap        mOldDescriptions;
-  LocalizedDescriptionMap        mNewDescriptions;
+  QString mOldNorm;
+  QString mNewNorm;
+  LocalizedNameMap mOldNames;
+  LocalizedNameMap mNewNames;
+  LocalizedDescriptionMap mOldDescriptions;
+  LocalizedDescriptionMap mNewDescriptions;
   ComponentSymbolVariantItemList mOldSymbolItems;
   ComponentSymbolVariantItemList mNewSymbolItems;
 };

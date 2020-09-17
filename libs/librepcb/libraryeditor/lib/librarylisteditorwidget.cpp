@@ -74,7 +74,7 @@ LibraryListEditorWidget::LibraryListEditorWidget(const workspace::Workspace& ws,
           &LibraryListEditorWidget::edited);
 
   try {
-    QList<Uuid>                  uuids;
+    QList<Uuid> uuids;
     QMultiMap<Version, FilePath> libs =
         ws.getLibraryDb().getLibraries();  // can throw
     foreach (const FilePath& fp, libs) {

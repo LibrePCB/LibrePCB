@@ -59,7 +59,7 @@ Component::Component(std::unique_ptr<TransactionalDirectory> directory)
   mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only");
   mAttributes.loadFromSExpression(mLoadingFileDocument);  // can throw
   mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value");
-  mPrefixes     = NormDependentPrefixMap(mLoadingFileDocument);
+  mPrefixes = NormDependentPrefixMap(mLoadingFileDocument);
   mSignals.loadFromSExpression(mLoadingFileDocument);
   mSymbolVariants.loadFromSExpression(mLoadingFileDocument);
 

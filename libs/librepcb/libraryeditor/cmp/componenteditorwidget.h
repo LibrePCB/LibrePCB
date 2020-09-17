@@ -62,7 +62,7 @@ class ComponentEditorWidget final
 
 public:
   // Constructors / Destructor
-  ComponentEditorWidget()                                   = delete;
+  ComponentEditorWidget() = delete;
   ComponentEditorWidget(const ComponentEditorWidget& other) = delete;
   ComponentEditorWidget(const Context& context, const FilePath& fp,
                         QWidget* parent = nullptr);
@@ -75,10 +75,10 @@ public slots:
   bool save() noexcept override;
 
 private:  // Methods
-  void    updateMetadata() noexcept;
+  void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
-  bool    openComponentSymbolVariantEditor(
-         ComponentSymbolVariant& variant) noexcept override;
+  bool openComponentSymbolVariantEditor(
+      ComponentSymbolVariant& variant) noexcept override;
   void memorizeComponentInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(LibraryElementCheckMessageList& msgs) const override;
@@ -86,19 +86,19 @@ private:  // Methods
   void fixMsg(const MessageType& msg);
   template <typename MessageType>
   bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
-                    bool                                              applyFix);
+                    bool applyFix);
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool                                              applyFix) override;
+      bool applyFix) override;
 
 private:  // Data
-  QScopedPointer<Ui::ComponentEditorWidget>         mUi;
+  QScopedPointer<Ui::ComponentEditorWidget> mUi;
   QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-  QSharedPointer<Component>                         mComponent;
+  QSharedPointer<Component> mComponent;
 
   // broken interface detection
-  bool                       mOriginalIsSchematicOnly;
-  QSet<Uuid>                 mOriginalSignalUuids;
+  bool mOriginalIsSchematicOnly;
+  QSet<Uuid> mOriginalSignalUuids;
   ComponentSymbolVariantList mOriginalSymbolVariants;
 };
 

@@ -56,7 +56,7 @@ public:
     UuidChanged,
     PositionChanged,
   };
-  Signal<Junction, Event>       onEdited;
+  Signal<Junction, Event> onEdited;
   typedef Slot<Junction, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -68,7 +68,7 @@ public:
   ~Junction() noexcept;
 
   // Getters
-  const Uuid&  getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const Point& getPosition() const noexcept { return mPosition; }
 
   // Setters
@@ -86,7 +86,7 @@ public:
   Junction& operator=(const Junction& rhs) noexcept;
 
 private:  // Data
-  Uuid  mUuid;
+  Uuid mUuid;
   Point mPosition;
 };
 

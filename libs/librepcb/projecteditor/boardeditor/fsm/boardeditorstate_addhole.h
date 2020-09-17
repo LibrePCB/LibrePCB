@@ -55,7 +55,7 @@ class BoardEditorState_AddHole final : public BoardEditorState {
 
 public:
   // Constructors / Destructor
-  BoardEditorState_AddHole()                                      = delete;
+  BoardEditorState_AddHole() = delete;
   BoardEditorState_AddHole(const BoardEditorState_AddHole& other) = delete;
   explicit BoardEditorState_AddHole(const Context& context) noexcept;
   virtual ~BoardEditorState_AddHole() noexcept;
@@ -86,16 +86,16 @@ private:  // Methods
 
 private:  // Data
   // State
-  bool           mIsUndoCmdActive;
+  bool mIsUndoCmdActive;
   PositiveLength mLastDiameter;
 
   // Information about the current hole to place. Only valid if
   // mIsUndoCmdActive == true.
-  BI_Hole*                    mCurrentHoleToPlace;
+  BI_Hole* mCurrentHoleToPlace;
   QScopedPointer<CmdHoleEdit> mCurrentHoleEditCmd;
 
   // Widgets for the command toolbar
-  QScopedPointer<QLabel>             mDiameterLabel;
+  QScopedPointer<QLabel> mDiameterLabel;
   QScopedPointer<PositiveLengthEdit> mDiameterEdit;
 };
 

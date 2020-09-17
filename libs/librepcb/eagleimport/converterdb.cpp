@@ -49,7 +49,7 @@ Uuid ConverterDb::getSymbolUuid(const QString& symbolName) {
   return getOrCreateUuid("symbols", symbolName);
 }
 
-Uuid ConverterDb::getSymbolPinUuid(const Uuid&    symbolUuid,
+Uuid ConverterDb::getSymbolPinUuid(const Uuid& symbolUuid,
                                    const QString& pinName) {
   return getOrCreateUuid("symbol_pins", symbolUuid.toStr(), pinName);
 }
@@ -62,7 +62,7 @@ Uuid ConverterDb::getPackageUuid(const QString& packageName) {
   return getOrCreateUuid("packages_to_packages", packageName);
 }
 
-Uuid ConverterDb::getPackagePadUuid(const Uuid&    footprintUuid,
+Uuid ConverterDb::getPackagePadUuid(const Uuid& footprintUuid,
                                     const QString& padName) {
   return getOrCreateUuid("package_pads", footprintUuid.toStr(), padName);
 }
@@ -71,7 +71,7 @@ Uuid ConverterDb::getComponentUuid(const QString& deviceSetName) {
   return getOrCreateUuid("devices_to_components", deviceSetName);
 }
 
-Uuid ConverterDb::getComponentSignalUuid(const Uuid&    componentUuid,
+Uuid ConverterDb::getComponentSignalUuid(const Uuid& componentUuid,
                                          const QString& gateName,
                                          const QString& pinName) {
   return getOrCreateUuid("gatepins_to_componentsignals", componentUuid.toStr(),
@@ -82,7 +82,7 @@ Uuid ConverterDb::getSymbolVariantUuid(const Uuid& componentUuid) {
   return getOrCreateUuid("component_symbolvariants", componentUuid.toStr());
 }
 
-Uuid ConverterDb::getSymbolVariantItemUuid(const Uuid&    componentUuid,
+Uuid ConverterDb::getSymbolVariantItemUuid(const Uuid& componentUuid,
                                            const QString& gateName) {
   return getOrCreateUuid("symbolgates_to_symbvaritems", componentUuid.toStr(),
                          gateName);
@@ -115,7 +115,7 @@ Uuid ConverterDb::getOrCreateUuid(const QString& cat, const QString& key1,
   }
   settingsKey.prepend(cat % '/');
 
-  Uuid    uuid  = Uuid::createRandom();
+  Uuid uuid = Uuid::createRandom();
   QString value = mIniFile.value(settingsKey).toString();
   if (!value.isEmpty()) uuid = Uuid::fromString(value);  // can throw
   mIniFile.setValue(settingsKey, uuid.toStr());

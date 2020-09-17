@@ -81,7 +81,7 @@ void SchematicNetSegmentSplitter::addNetLabel(
 }
 
 QList<SchematicNetSegmentSplitter::Segment>
-SchematicNetSegmentSplitter::split() noexcept {
+    SchematicNetSegmentSplitter::split() noexcept {
   QList<Segment> segments;
 
   // Split netsegment by anchors and lines
@@ -139,13 +139,13 @@ void SchematicNetSegmentSplitter::findConnectedLinesAndPoints(
 
 void SchematicNetSegmentSplitter::addNetLabelToNearestNetSegment(
     const NetLabel& netlabel, QList<Segment>& segments) const noexcept {
-  int    nearestIndex = -1;
+  int nearestIndex = -1;
   Length nearestDistance;
   for (int i = 0; i < segments.count(); ++i) {
     Length distance =
         getDistanceBetweenNetLabelAndNetSegment(netlabel, segments.at(i));
     if ((distance < nearestDistance) || (nearestIndex < 0)) {
-      nearestIndex    = i;
+      nearestIndex = i;
       nearestDistance = distance;
     }
   }
@@ -157,7 +157,7 @@ void SchematicNetSegmentSplitter::addNetLabelToNearestNetSegment(
 
 Length SchematicNetSegmentSplitter::getDistanceBetweenNetLabelAndNetSegment(
     const NetLabel& netlabel, const Segment& netsegment) const noexcept {
-  bool   firstRun = true;
+  bool firstRun = true;
   Length nearestDistance;
   for (const NetLine& netline : netsegment.netlines) {
     UnsignedLength distance = Toolbox::shortestDistanceBetweenPointAndLine(
@@ -165,7 +165,7 @@ Length SchematicNetSegmentSplitter::getDistanceBetweenNetLabelAndNetSegment(
         getAnchorPosition(netline.getEndPoint()));
     if ((distance < nearestDistance) || firstRun) {
       nearestDistance = *distance;
-      firstRun        = false;
+      firstRun = false;
     }
   }
   return nearestDistance;

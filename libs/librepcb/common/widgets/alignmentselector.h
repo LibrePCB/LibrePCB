@@ -55,14 +55,14 @@ public:
 
   // General Methods
   Alignment getAlignment() const noexcept;
-  void      setAlignment(const Alignment& align) noexcept;
+  void setAlignment(const Alignment& align) noexcept;
 
   // Operator Overloadings
   AlignmentSelector& operator=(const AlignmentSelector& rhs) = delete;
 
 private:  // Data
   QScopedPointer<Ui::AlignmentSelector> mUi;
-  QMap<QRadioButton*, Alignment>        mLookupTable;
+  QMap<QRadioButton*, Alignment> mLookupTable;
 };
 
 /*******************************************************************************

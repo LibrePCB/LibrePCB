@@ -162,9 +162,9 @@ bool CmdRemoveBoardItems::performExecute() {
 
 void CmdRemoveBoardItems::removeNetSegmentItems(
     BI_NetSegment& netsegment, const QSet<BI_FootprintPad*>& padsToDisconnect,
-    const QSet<BI_Via*>&      viasToRemove,
+    const QSet<BI_Via*>& viasToRemove,
     const QSet<BI_NetPoint*>& netpointsToRemove,
-    const QSet<BI_NetLine*>&  netlinesToRemove) {
+    const QSet<BI_NetLine*>& netlinesToRemove) {
   // Determine resulting sub-netsegments
   BoardNetSegmentSplitter splitter;
   foreach (BI_FootprintPad* pad, padsToDisconnect) {

@@ -50,7 +50,7 @@ namespace editor {
 
 CmdReplaceDevice::CmdReplaceDevice(
     workspace::Workspace& workspace, Board& board, BI_Device& device,
-    const Uuid&               newDeviceUuid,
+    const Uuid& newDeviceUuid,
     const tl::optional<Uuid>& newFootprintUuid) noexcept
   : UndoCommandGroup(tr("Change Device")),
     mWorkspace(workspace),
@@ -77,8 +77,8 @@ bool CmdReplaceDevice::performExecute() {
     if (netsegment) {
       QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
           new CmdBoardNetSegmentAddElements(*netsegment));
-      QMap<GraphicsLayer*, BI_NetPoint*> newNetPoints      = {};
-      QSet<BI_NetLine*>                  connectedNetLines = pad->getNetLines();
+      QMap<GraphicsLayer*, BI_NetPoint*> newNetPoints = {};
+      QSet<BI_NetLine*> connectedNetLines = pad->getNetLines();
       if (connectedNetLines.count() > 1) {
         foreach (BI_NetLine* netline, connectedNetLines) {
           auto it = newNetPoints.find(&netline->getLayer());

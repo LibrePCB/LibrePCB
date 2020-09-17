@@ -178,7 +178,7 @@ void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
 }
 
 template <typename ElementType>
-void ProjectLibrary::addElement(ElementType&               element,
+void ProjectLibrary::addElement(ElementType& element,
                                 QHash<Uuid, ElementType*>& elementList) {
   if (elementList.contains(element.getUuid())) {
     throw LogicError(__FILE__, __LINE__,
@@ -193,7 +193,7 @@ void ProjectLibrary::addElement(ElementType&               element,
 }
 
 template <typename ElementType>
-void ProjectLibrary::removeElement(ElementType&               element,
+void ProjectLibrary::removeElement(ElementType& element,
                                    QHash<Uuid, ElementType*>& elementList) {
   Q_ASSERT(elementList.value(element.getUuid()) == &element);
   Q_ASSERT(mAllElements.contains(&element));

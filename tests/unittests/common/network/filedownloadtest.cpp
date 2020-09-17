@@ -40,11 +40,11 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  QUrl       url;
-  QString    destFilename;
-  QString    extractDirname;
+  QUrl url;
+  QString destFilename;
+  QString extractDirname;
   QByteArray sha256;
-  bool       success;
+  bool success;
 } FileDownloadTestData;
 
 /*******************************************************************************
@@ -71,7 +71,7 @@ public:
 
 protected:
   NetworkRequestBaseSignalReceiver mSignalReceiver;
-  static NetworkAccessManager*     sDownloadManager;
+  static NetworkAccessManager* sDownloadManager;
 };
 
 NetworkAccessManager* FileDownloadTest::sDownloadManager = nullptr;
@@ -127,8 +127,8 @@ TEST_P(FileDownloadTest, testDownload) {
   dl->start();
 
   // wait until download finished (with timeout)
-  qint64 start       = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto   currentTime = []() {
+  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
+  auto currentTime = []() {
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
   };
   while ((!mSignalReceiver.mDestroyed) && (currentTime() - start < 30000)) {

@@ -62,7 +62,7 @@ public:
   };
 
   // Constructors / Destructor
-  BI_Plane()                      = delete;
+  BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
   BI_Plane(Board& board, const BI_Plane& other);
   BI_Plane(Board& board, const SExpression& node);
@@ -71,23 +71,23 @@ public:
   ~BI_Plane() noexcept;
 
   // Getters
-  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
-  NetSignal&               getNetSignal() const noexcept { return *mNetSignal; }
-  const UnsignedLength&    getMinWidth() const noexcept { return mMinWidth; }
-  const UnsignedLength&    getMinClearance() const noexcept {
+  NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
+  const UnsignedLength& getMinWidth() const noexcept { return mMinWidth; }
+  const UnsignedLength& getMinClearance() const noexcept {
     return mMinClearance;
   }
-  bool         getKeepOrphans() const noexcept { return mKeepOrphans; }
-  int          getPriority() const noexcept { return mPriority; }
+  bool getKeepOrphans() const noexcept { return mKeepOrphans; }
+  int getPriority() const noexcept { return mPriority; }
   ConnectStyle getConnectStyle() const noexcept { return mConnectStyle; }
   // const Length& getThermalGapWidth() const noexcept {return
   // mThermalGapWidth;} const Length& getThermalSpokeWidth() const noexcept
   // {return mThermalSpokeWidth;}
-  const Path&          getOutline() const noexcept { return mOutline; }
+  const Path& getOutline() const noexcept { return mOutline; }
   const QVector<Path>& getFragments() const noexcept { return mFragments; }
-  bool                 isSelectable() const noexcept override;
-  bool                 isVisible() const noexcept { return mIsVisible; }
+  bool isSelectable() const noexcept override;
+  bool isVisible() const noexcept { return mIsVisible; }
 
   // Setters
   void setOutline(const Path& outline) noexcept;
@@ -115,13 +115,13 @@ public:
     static Point p(0, 0);
     return p;
   }
-  bool         getIsMirrored() const noexcept override { return false; }
+  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_Plane& operator=(const BI_Plane& rhs) = delete;
-  bool      operator<(const BI_Plane& rhs) const noexcept;
+  bool operator<(const BI_Plane& rhs) const noexcept;
 
 private slots:
 
@@ -131,20 +131,20 @@ private:  // Methods
   void init();
 
 private:  // Data
-  Uuid              mUuid;
+  Uuid mUuid;
   GraphicsLayerName mLayerName;
-  NetSignal*        mNetSignal;
-  Path              mOutline;
-  UnsignedLength    mMinWidth;
-  UnsignedLength    mMinClearance;
-  bool              mKeepOrphans;
-  int               mPriority;
-  ConnectStyle      mConnectStyle;
+  NetSignal* mNetSignal;
+  Path mOutline;
+  UnsignedLength mMinWidth;
+  UnsignedLength mMinClearance;
+  bool mKeepOrphans;
+  int mPriority;
+  ConnectStyle mConnectStyle;
   // Length mThermalGapWidth;
   // Length mThermalSpokeWidth;
   // style [round square miter] ?
   QScopedPointer<BGI_Plane> mGraphicsItem;
-  bool                      mIsVisible;  // volatile, not saved to file
+  bool mIsVisible;  // volatile, not saved to file
 
   QVector<Path> mFragments;
 };

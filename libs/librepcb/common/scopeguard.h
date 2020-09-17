@@ -70,7 +70,7 @@ protected:
 template <class Fun>
 class ScopeGuard final : public ScopeGuardBase {
 public:
-  ScopeGuard()                  = delete;
+  ScopeGuard() = delete;
   ScopeGuard(const ScopeGuard&) = delete;
 
   ScopeGuard(Fun f) noexcept : mF(std::move(f)) {}

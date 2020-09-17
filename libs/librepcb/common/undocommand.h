@@ -49,7 +49,7 @@ class UndoCommand {
 
 public:
   // Constructors / Destructor
-  UndoCommand()                         = delete;
+  UndoCommand() = delete;
   UndoCommand(const UndoCommand& other) = delete;
   explicit UndoCommand(const QString& text) noexcept;
   virtual ~UndoCommand() noexcept;
@@ -129,9 +129,9 @@ protected:
 
 private:
   QString mText;
-  bool    mIsExecuted;  ///< @brief Shows whether #execute() was called or not
-  int     mRedoCount;   ///< @brief Counter of how often #redo() was called
-  int     mUndoCount;   ///< @brief Counter of how often #undo() was called
+  bool mIsExecuted;  ///< @brief Shows whether #execute() was called or not
+  int mRedoCount;  ///< @brief Counter of how often #redo() was called
+  int mUndoCount;  ///< @brief Counter of how often #undo() was called
 };
 
 /*******************************************************************************

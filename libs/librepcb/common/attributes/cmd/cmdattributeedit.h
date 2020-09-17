@@ -43,7 +43,7 @@ namespace librepcb {
 class CmdAttributeEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdAttributeEdit()                              = delete;
+  CmdAttributeEdit() = delete;
   CmdAttributeEdit(const CmdAttributeEdit& other) = delete;
   explicit CmdAttributeEdit(Attribute& attribute) noexcept;
   ~CmdAttributeEdit() noexcept;
@@ -75,12 +75,12 @@ private:
   Attribute& mAttribute;
 
   // General Attributes
-  AttributeKey         mOldKey;
-  AttributeKey         mNewKey;
+  AttributeKey mOldKey;
+  AttributeKey mNewKey;
   const AttributeType* mOldType;
   const AttributeType* mNewType;
-  QString              mOldValue;
-  QString              mNewValue;
+  QString mOldValue;
+  QString mNewValue;
   const AttributeUnit* mOldUnit;
   const AttributeUnit* mNewUnit;
 };

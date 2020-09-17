@@ -44,7 +44,7 @@ class ToolboxTest : public ::testing::Test {};
 TEST_F(ToolboxTest, testNoPenReturnsUnmodifiedPath) {
   QPainterPath path;
   path.addRect(10, 20, 30, 40);
-  QPen   pen(QBrush(Qt::SolidPattern), 1, Qt::NoPen);
+  QPen pen(QBrush(Qt::SolidPattern), 1, Qt::NoPen);
   QBrush brush(Qt::SolidPattern);
   EXPECT_EQ(path, Toolbox::shapeFromPath(path, pen, brush));
 }
@@ -52,7 +52,7 @@ TEST_F(ToolboxTest, testNoPenReturnsUnmodifiedPath) {
 TEST_F(ToolboxTest, testNoPenBrushReturnsUnmodifiedPath) {
   QPainterPath path;
   path.addRect(10, 20, 30, 40);
-  QPen   pen(QBrush(Qt::NoBrush), 1, Qt::SolidLine);
+  QPen pen(QBrush(Qt::NoBrush), 1, Qt::SolidLine);
   QBrush brush(Qt::SolidPattern);
   EXPECT_EQ(path, Toolbox::shapeFromPath(path, pen, brush));
 }
@@ -143,7 +143,7 @@ INSTANTIATE_TEST_SUITE_P(
  ******************************************************************************/
 
 struct ToolboxExpandRangesInStringTestData {
-  QString     input;
+  QString input;
   QStringList output;
 };
 
@@ -158,7 +158,7 @@ TEST_P(ToolboxExpandRangesInStringTest, test) {
   QStringList actual = Toolbox::expandRangesInString(data.input);
 
   QString msg;
-  QDebug  dbg(&msg);
+  QDebug dbg(&msg);
   dbg << data.input << "->" << actual << "!=" << data.output;
   EXPECT_EQ(data.output, actual) << msg.toStdString();
 }
@@ -191,8 +191,8 @@ INSTANTIATE_TEST_SUITE_P(
  ******************************************************************************/
 
 struct ToolboxFloatToStringTestData {
-  double  number;
-  int     decimals;
+  double number;
+  int decimals;
   QLocale locale;
   QString output;
 };

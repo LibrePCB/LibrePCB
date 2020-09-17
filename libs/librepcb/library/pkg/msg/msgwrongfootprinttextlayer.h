@@ -51,7 +51,7 @@ class MsgWrongFootprintTextLayer final : public LibraryElementCheckMessage {
 public:
   // Constructors / Destructor
   MsgWrongFootprintTextLayer() = delete;
-  MsgWrongFootprintTextLayer(std::shared_ptr<const Footprint>  footprint,
+  MsgWrongFootprintTextLayer(std::shared_ptr<const Footprint> footprint,
                              std::shared_ptr<const StrokeText> text,
                              const QString& expectedLayerName) noexcept;
   MsgWrongFootprintTextLayer(const MsgWrongFootprintTextLayer& other) noexcept
@@ -69,9 +69,9 @@ public:
   QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
 
 private:
-  std::shared_ptr<const Footprint>  mFootprint;
+  std::shared_ptr<const Footprint> mFootprint;
   std::shared_ptr<const StrokeText> mText;
-  QString                           mExpectedLayerName;
+  QString mExpectedLayerName;
 };
 
 /*******************************************************************************

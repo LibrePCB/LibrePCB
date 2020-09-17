@@ -90,7 +90,7 @@ const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept {
 
 QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept {
-  QString                       text;
+  QString text;
   library::CmpSigPinDisplayType displayType =
       mPinSignalMapItem->getDisplayType();
   if (displayType == library::CmpSigPinDisplayType::pinName()) {

@@ -51,7 +51,7 @@ class BomGenerator final {
 
 public:
   // Constructors / Destructor
-  BomGenerator()                          = delete;
+  BomGenerator() = delete;
   BomGenerator(const BomGenerator& other) = delete;
   explicit BomGenerator(const Project& project) noexcept;
   ~BomGenerator() noexcept;
@@ -69,7 +69,7 @@ public:
 
 private:
   const Project& mProject;
-  QStringList    mAdditionalAttributes;
+  QStringList mAdditionalAttributes;
 };
 
 /*******************************************************************************

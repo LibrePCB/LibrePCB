@@ -36,7 +36,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CircleGraphicsItem::CircleGraphicsItem(Circle&                         circle,
+CircleGraphicsItem::CircleGraphicsItem(Circle& circle,
                                        const IF_GraphicsLayerProvider& lp,
                                        QGraphicsItem* parent) noexcept
   : PrimitiveCircleGraphicsItem(parent),

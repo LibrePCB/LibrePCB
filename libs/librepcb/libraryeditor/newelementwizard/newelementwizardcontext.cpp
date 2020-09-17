@@ -71,7 +71,7 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mElementName = tl::nullopt;
   mElementDescription.clear();
   mElementKeywords.clear();
-  mElementAuthor  = mWorkspace.getSettings().userName.get();
+  mElementAuthor = mWorkspace.getSettings().userName.get();
   mElementVersion = Version::fromString("0.1");
   mElementCategoryUuids.clear();
 
@@ -95,10 +95,10 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
 
   // device
   mDeviceComponentUuid = tl::nullopt;
-  mDevicePackageUuid   = tl::nullopt;
+  mDevicePackageUuid = tl::nullopt;
 }
 
-void NewElementWizardContext::copyElement(ElementType     type,
+void NewElementWizardContext::copyElement(ElementType type,
                                           const FilePath& fp) {
   mElementType = type;
 
@@ -138,9 +138,9 @@ void NewElementWizardContext::copyElement(ElementType     type,
     }
   }
 
-  mElementName        = element->getNames().getDefaultValue();
+  mElementName = element->getNames().getDefaultValue();
   mElementDescription = element->getDescriptions().getDefaultValue();
-  mElementKeywords    = element->getKeywords().getDefaultValue();
+  mElementKeywords = element->getKeywords().getDefaultValue();
   if (const LibraryCategory* category =
           dynamic_cast<const LibraryCategory*>(element.data())) {
     if (category->getParentUuid().has_value()) {
@@ -253,9 +253,9 @@ void NewElementWizardContext::copyElement(ElementType     type,
       const Component* component = dynamic_cast<Component*>(element.data());
       Q_ASSERT(component);
       mComponentSchematicOnly = component->isSchematicOnly();
-      mComponentAttributes    = component->getAttributes();
-      mComponentDefaultValue  = component->getDefaultValue();
-      mComponentPrefixes      = component->getPrefixes();
+      mComponentAttributes = component->getAttributes();
+      mComponentDefaultValue = component->getDefaultValue();
+      mComponentPrefixes = component->getPrefixes();
       // copy signals but generate new UUIDs
       QHash<Uuid, Uuid> signalUuidMap;
       mComponentSignals.clear();
@@ -303,8 +303,8 @@ void NewElementWizardContext::copyElement(ElementType     type,
       const Device* device = dynamic_cast<Device*>(element.data());
       Q_ASSERT(device);
       mDeviceComponentUuid = device->getComponentUuid();
-      mDevicePackageUuid   = device->getPackageUuid();
-      mDevicePadSignalMap  = device->getPadSignalMap();
+      mDevicePackageUuid = device->getPackageUuid();
+      mDevicePadSignalMap = device->getPadSignalMap();
       break;
     }
 
@@ -350,10 +350,10 @@ void NewElementWizardContext::createLibraryElement() {
       Symbol element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                      *mElementName, mElementDescription, mElementKeywords);
       element.setCategories(mElementCategoryUuids);
-      element.getPins()     = mSymbolPins;
+      element.getPins() = mSymbolPins;
       element.getPolygons() = mSymbolPolygons;
-      element.getCircles()  = mSymbolCircles;
-      element.getTexts()    = mSymbolTexts;
+      element.getCircles() = mSymbolCircles;
+      element.getTexts() = mSymbolTexts;
       TransactionalDirectory dir(mLibrary.getDirectory(),
                                  mLibrary.getElementsDirectoryName<Symbol>());
       element.moveIntoParentDirectory(dir);
@@ -364,7 +364,7 @@ void NewElementWizardContext::createLibraryElement() {
       Package element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                       *mElementName, mElementDescription, mElementKeywords);
       element.setCategories(mElementCategoryUuids);
-      element.getPads()       = mPackagePads;
+      element.getPads() = mPackagePads;
       element.getFootprints() = mPackageFootprints;
       if (element.getFootprints().isEmpty()) {
         element.getFootprints().append(std::make_shared<Footprint>(
@@ -384,7 +384,7 @@ void NewElementWizardContext::createLibraryElement() {
       element.getAttributes() = mComponentAttributes;
       element.setDefaultValue(mComponentDefaultValue);
       element.setPrefixes(mComponentPrefixes);
-      element.getSignals()        = mComponentSignals;
+      element.getSignals() = mComponentSignals;
       element.getSymbolVariants() = mComponentSymbolVariants;
       TransactionalDirectory dir(
           mLibrary.getDirectory(),

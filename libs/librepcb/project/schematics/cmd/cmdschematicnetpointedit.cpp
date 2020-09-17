@@ -54,14 +54,14 @@ CmdSchematicNetPointEdit::~CmdSchematicNetPointEdit() noexcept {
  ******************************************************************************/
 
 void CmdSchematicNetPointEdit::setPosition(const Point& pos,
-                                           bool         immediate) noexcept {
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos = pos;
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
 void CmdSchematicNetPointEdit::translate(const Point& deltaPos,
-                                         bool         immediate) noexcept {
+                                         bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
   if (immediate) mNetPoint.setPosition(mNewPos);

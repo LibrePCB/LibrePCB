@@ -63,9 +63,9 @@ private:
 
   // Private Member Variables
 
-  Project&   mProject;
+  Project& mProject;
   Schematic& mSchematic;
-  int        mPageIndex;
+  int mPageIndex;
 };
 
 /*******************************************************************************

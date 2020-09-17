@@ -120,9 +120,9 @@ public:
 private:  // Methods
   CmpSigPinDisplayType(const QString& type, const QString& name) noexcept;
 
-private:                 // Data
+private:  // Data
   QString mDisplayType;  ///< used for serialization (DO NOT MODIFY VALUES!)
-  QString mName;         ///< human readable (translated)
+  QString mName;  ///< human readable (translated)
 };
 
 /*******************************************************************************

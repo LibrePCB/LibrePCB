@@ -63,9 +63,9 @@ public:
   CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
                       ComponentInstance& cmpInstance, const Uuid& deviceUuid,
                       const tl::optional<Uuid>& footprintUuid,
-                      const Point&              position = Point(),
-                      const Angle&              rotation = Angle(),
-                      bool                      mirror   = false) noexcept;
+                      const Point& position = Point(),
+                      const Angle& rotation = Angle(),
+                      bool mirror = false) noexcept;
   ~CmdAddDeviceToBoard() noexcept;
 
   // Getters
@@ -81,13 +81,13 @@ private:
 
   // Attributes from the constructor
   workspace::Workspace& mWorkspace;
-  Board&                mBoard;
-  ComponentInstance&    mComponentInstance;
-  Uuid                  mDeviceUuid;
-  tl::optional<Uuid>    mFootprintUuid;
-  Point                 mPosition;
-  Angle                 mRotation;
-  bool                  mMirror;
+  Board& mBoard;
+  ComponentInstance& mComponentInstance;
+  Uuid mDeviceUuid;
+  tl::optional<Uuid> mFootprintUuid;
+  Point mPosition;
+  Angle mRotation;
+  bool mMirror;
 
   // child commands
   BI_Device* mDeviceInstance;

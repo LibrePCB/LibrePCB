@@ -63,7 +63,7 @@ TransactionalFileSystem::TransactionalFileSystem(
   // Lock directory if the file system is opened in R/W mode.
   if (mIsWritable) {
     FileUtils::makePath(mFilePath);  // can throw
-    mLock.tryLock();                 // can throw
+    mLock.tryLock();  // can throw
   }
 
   // If there is an autosave backup, load it according the restore mode.
@@ -105,7 +105,7 @@ FilePath TransactionalFileSystem::getAbsPath(const QString& path) const
 QStringList TransactionalFileSystem::getDirs(const QString& path) const
     noexcept {
   QSet<QString> dirnames;
-  QString       dirpath = cleanPath(path);
+  QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");
 
   // add directories from file system, if not removed
@@ -133,7 +133,7 @@ QStringList TransactionalFileSystem::getDirs(const QString& path) const
 QStringList TransactionalFileSystem::getFiles(const QString& path) const
     noexcept {
   QSet<QString> filenames;
-  QString       dirpath = cleanPath(path);
+  QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");
 
   // add files from file system, if not removed
@@ -181,9 +181,9 @@ QByteArray TransactionalFileSystem::read(const QString& path) const {
   }
 }
 
-void TransactionalFileSystem::write(const QString&    path,
+void TransactionalFileSystem::write(const QString& path,
                                     const QByteArray& content) {
-  QString cleanedPath         = cleanPath(path);
+  QString cleanedPath = cleanPath(path);
   mModifiedFiles[cleanedPath] = content;
   mRemovedFiles.remove(cleanedPath);
 }
@@ -216,7 +216,7 @@ void TransactionalFileSystem::removeDirRecursively(const QString& path) {
 
 void TransactionalFileSystem::loadFromZip(QByteArray content) {
   QBuffer buffer(&content);
-  QuaZip  zip(&buffer);
+  QuaZip zip(&buffer);
   if (!zip.open(QuaZip::mdUnzip)) {
     throw RuntimeError(__FILE__, __LINE__, tr("Failed to open ZIP file '%1'."));
   }
@@ -247,8 +247,8 @@ void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
 
 QByteArray TransactionalFileSystem::exportToZip() const {
   FilePath fp = FilePath::getRandomTempPath();
-  QBuffer  buffer;
-  QuaZip   zip(&buffer);
+  QBuffer buffer;
+  QuaZip zip(&buffer);
   if (!zip.open(QuaZip::mdCreate)) {
     throw RuntimeError(__FILE__, __LINE__, tr("Failed to create ZIP file."));
   }
@@ -311,7 +311,7 @@ QStringList TransactionalFileSystem::checkForModifications() const {
 
   // new or modified files
   foreach (const QString& filepath, mModifiedFiles.keys()) {
-    FilePath   fp      = mFilePath.getPathTo(filepath);
+    FilePath fp = mFilePath.getPathTo(filepath);
     QByteArray content = mModifiedFiles.value(filepath);
     if ((!fp.isExistingFile()) ||
         (FileUtils::readFile(fp) != content)) {  // can throw
@@ -397,9 +397,9 @@ bool TransactionalFileSystem::isRemoved(const QString& path) const noexcept {
   return false;
 }
 
-void TransactionalFileSystem::exportDirToZip(QuaZipFile&     file,
+void TransactionalFileSystem::exportDirToZip(QuaZipFile& file,
                                              const FilePath& zipFp,
-                                             const QString&  dir) const {
+                                             const QString& dir) const {
   QString path = dir.isEmpty() ? dir : dir % "/";
 
   // export directories
@@ -421,7 +421,7 @@ void TransactionalFileSystem::exportDirToZip(QuaZipFile&     file,
     if (filename == ".lock") continue;
     // read file content and add it to the ZIP archive
     const QByteArray& content = read(filepath);  // can throw
-    QuaZipNewInfo     newFileInfo(filepath);
+    QuaZipNewInfo newFileInfo(filepath);
     newFileInfo.setPermissions(QFileDevice::ReadOwner | QFileDevice::ReadGroup |
                                QFileDevice::ReadOther |
                                QFileDevice::WriteOwner);
@@ -439,9 +439,9 @@ void TransactionalFileSystem::exportDirToZip(QuaZipFile&     file,
 }
 
 void TransactionalFileSystem::saveDiff(const QString& type) const {
-  QDateTime dt       = QDateTime::currentDateTime();
-  FilePath  dir      = mFilePath.getPathTo("." % type);
-  FilePath  filesDir = dir.getPathTo(dt.toString("yyyy-MM-dd_hh-mm-ss-zzz"));
+  QDateTime dt = QDateTime::currentDateTime();
+  FilePath dir = mFilePath.getPathTo("." % type);
+  FilePath filesDir = dir.getPathTo(dt.toString("yyyy-MM-dd_hh-mm-ss-zzz"));
 
   if (!mIsWritable) {
     throw RuntimeError(__FILE__, __LINE__, tr("File system is read-only."));
@@ -477,7 +477,7 @@ void TransactionalFileSystem::loadDiff(const FilePath& fp) {
       root.getValueByPath<QString>("modified_files_directory", true);
   FilePath modifiedFilesDir = fp.getParentDir().getPathTo(modifiedFilesDirName);
   foreach (const SExpression& node, root.getChildren("modified_file")) {
-    QString  relPath = node.getValueOfFirstChild<QString>(true);
+    QString relPath = node.getValueOfFirstChild<QString>(true);
     FilePath absPath = modifiedFilesDir.getPathTo(relPath);
     mModifiedFiles.insert(relPath, FileUtils::readFile(absPath));  // can throw
   }
@@ -492,7 +492,7 @@ void TransactionalFileSystem::loadDiff(const FilePath& fp) {
 }
 
 void TransactionalFileSystem::removeDiff(const QString& type) {
-  FilePath dir  = mFilePath.getPathTo("." % type);
+  FilePath dir = mFilePath.getPathTo("." % type);
   FilePath file = dir.getPathTo(type % ".lp");
 
   // remove the index file first to mark the diff directory as incomplete

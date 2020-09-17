@@ -54,14 +54,14 @@ class LibraryBaseElement : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  LibraryBaseElement()                                = delete;
+  LibraryBaseElement() = delete;
   LibraryBaseElement(const LibraryBaseElement& other) = delete;
   LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
                      const QString& longElementName, const Uuid& uuid,
                      const Version& version, const QString& author,
                      const ElementName& name_en_US,
-                     const QString&     description_en_US,
-                     const QString&     keywords_en_US);
+                     const QString& description_en_US,
+                     const QString& keywords_en_US);
   LibraryBaseElement(std::unique_ptr<TransactionalDirectory> directory,
                      bool dirnameMustBeUuid, const QString& shortElementName,
                      const QString& longElementName);
@@ -72,7 +72,7 @@ public:
     return *mDirectory;
   }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  const QString&          getShortElementName() const noexcept {
+  const QString& getShortElementName() const noexcept {
     return mShortElementName;
   }
   const QString& getLongElementName() const noexcept {
@@ -80,17 +80,17 @@ public:
   }
 
   // Getters: Attributes
-  const Uuid&      getUuid() const noexcept { return mUuid; }
-  const Version&   getVersion() const noexcept { return mVersion; }
-  const QString&   getAuthor() const noexcept { return mAuthor; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const Version& getVersion() const noexcept { return mVersion; }
+  const QString& getAuthor() const noexcept { return mAuthor; }
   const QDateTime& getCreated() const noexcept { return mCreated; }
-  bool             isDeprecated() const noexcept { return mIsDeprecated; }
-  const LocalizedNameMap&        getNames() const noexcept { return mNames; }
+  bool isDeprecated() const noexcept { return mIsDeprecated; }
+  const LocalizedNameMap& getNames() const noexcept { return mNames; }
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
   }
   const LocalizedKeywordsMap& getKeywords() const noexcept { return mKeywords; }
-  QStringList                 getAllAvailableLocales() const noexcept;
+  QStringList getAllAvailableLocales() const noexcept;
 
   // Setters
   void setVersion(const Version& version) noexcept { mVersion = version; }
@@ -106,9 +106,9 @@ public:
 
   // General Methods
   virtual LibraryElementCheckMessageList runChecks() const;
-  virtual void                           save();
-  virtual void                           saveTo(TransactionalDirectory& dest);
-  virtual void                           moveTo(TransactionalDirectory& dest);
+  virtual void save();
+  virtual void saveTo(TransactionalDirectory& dest);
+  virtual void moveTo(TransactionalDirectory& dest);
   virtual void saveIntoParentDirectory(TransactionalDirectory& dest);
   virtual void moveIntoParentDirectory(TransactionalDirectory& dest);
 
@@ -137,7 +137,7 @@ protected:
 
   // General Attributes
   std::unique_ptr<TransactionalDirectory> mDirectory;
-  bool                                    mDirectoryNameMustBeUuid;
+  bool mDirectoryNameMustBeUuid;
   QString mShortElementName;  ///< e.g. "lib", "cmpcat", "sym"
   QString mLongElementName;  ///< e.g. "library", "component_category", "symbol"
 
@@ -145,14 +145,14 @@ protected:
   SExpression mLoadingFileDocument;
 
   // General Library Element Attributes
-  Uuid                    mUuid;
-  Version                 mVersion;
-  QString                 mAuthor;
-  QDateTime               mCreated;
-  bool                    mIsDeprecated;
-  LocalizedNameMap        mNames;
+  Uuid mUuid;
+  Version mVersion;
+  QString mAuthor;
+  QDateTime mCreated;
+  bool mIsDeprecated;
+  LocalizedNameMap mNames;
   LocalizedDescriptionMap mDescriptions;
-  LocalizedKeywordsMap    mKeywords;
+  LocalizedKeywordsMap mKeywords;
 };
 
 /*******************************************************************************

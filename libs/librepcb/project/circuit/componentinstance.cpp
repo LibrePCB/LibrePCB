@@ -59,7 +59,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
     mCompSymbVar(nullptr),
     mAttributes() {
   // read general attributes
-  Uuid cmpUuid  = node.getValueByPath<Uuid>("lib_component");
+  Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component");
   mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
   if (!mLibComponent) {
     throw RuntimeError(
@@ -101,10 +101,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
   init();
 }
 
-ComponentInstance::ComponentInstance(Circuit&                  circuit,
+ComponentInstance::ComponentInstance(Circuit& circuit,
                                      const library::Component& cmp,
-                                     const Uuid&               symbVar,
-                                     const CircuitIdentifier&  name,
+                                     const Uuid& symbVar,
+                                     const CircuitIdentifier& name,
                                      const tl::optional<Uuid>& defaultDevice)
   : QObject(&circuit),
     mCircuit(circuit),
@@ -391,7 +391,7 @@ QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const
 }
 
 QVector<const AttributeProvider*>
-ComponentInstance::getAttributeProviderParents() const noexcept {
+    ComponentInstance::getAttributeProviderParents() const noexcept {
   // TODO: add support for multiple boards!
   const BI_Device* dev =
       (mRegisteredDevices.count() == 1) ? mRegisteredDevices.first() : nullptr;

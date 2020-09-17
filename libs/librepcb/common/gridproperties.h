@@ -56,9 +56,9 @@ public:
   ~GridProperties() noexcept;
 
   // Getters
-  Type_t                getType() const noexcept { return mType; }
+  Type_t getType() const noexcept { return mType; }
   const PositiveLength& getInterval() const noexcept { return mInterval; }
-  const LengthUnit&     getUnit() const noexcept { return mUnit; }
+  const LengthUnit& getUnit() const noexcept { return mUnit; }
 
   // Setters
   void setType(Type_t type) noexcept { mType = type; }
@@ -76,9 +76,9 @@ public:
   GridProperties& operator=(const GridProperties& rhs) noexcept;
 
 private:  // Data
-  Type_t         mType;
+  Type_t mType;
   PositiveLength mInterval;
-  LengthUnit     mUnit;
+  LengthUnit mUnit;
 };
 
 /*******************************************************************************

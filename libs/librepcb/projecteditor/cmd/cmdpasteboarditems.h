@@ -54,7 +54,7 @@ class BoardClipboardData;
 class CmdPasteBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdPasteBoardItems()                                = delete;
+  CmdPasteBoardItems() = delete;
   CmdPasteBoardItems(const CmdPasteBoardItems& other) = delete;
   CmdPasteBoardItems(Board& board, std::unique_ptr<BoardClipboardData> data,
                      const Point& posOffset) noexcept;
@@ -70,10 +70,10 @@ private:  // Methods
   NetSignal* getOrCreateNetSignal(const QString& name);
 
 private:  // Data
-  Project&                            mProject;
-  Board&                              mBoard;
+  Project& mProject;
+  Board& mBoard;
   std::unique_ptr<BoardClipboardData> mData;
-  Point                               mPosOffset;
+  Point mPosOffset;
 };
 
 /*******************************************************************************

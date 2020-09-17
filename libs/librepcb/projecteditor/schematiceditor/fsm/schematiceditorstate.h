@@ -57,10 +57,10 @@ public:
   using Context = SchematicEditorFsm::Context;
 
   // Constructors / Destructor
-  SchematicEditorState()                                  = delete;
+  SchematicEditorState() = delete;
   SchematicEditorState(const SchematicEditorState& other) = delete;
   explicit SchematicEditorState(const Context& context,
-                                QObject*       parent = nullptr) noexcept;
+                                QObject* parent = nullptr) noexcept;
   virtual ~SchematicEditorState() noexcept;
 
   // General Methods
@@ -118,11 +118,11 @@ public:
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;
 
 protected:  // Methods
-  Schematic*        getActiveSchematic() noexcept;
-  PositiveLength    getGridInterval() const noexcept;
+  Schematic* getActiveSchematic() noexcept;
+  PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getDefaultLengthUnit() const noexcept;
-  bool              execCmd(UndoCommand* cmd);
-  QWidget*          parentWidget() noexcept;
+  bool execCmd(UndoCommand* cmd);
+  QWidget* parentWidget() noexcept;
 
 protected:  // Data
   Context mContext;

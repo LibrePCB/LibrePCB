@@ -37,7 +37,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-TextGraphicsItem::TextGraphicsItem(Text&                           text,
+TextGraphicsItem::TextGraphicsItem(Text& text,
                                    const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept
   : PrimitiveTextGraphicsItem(parent),

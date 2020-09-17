@@ -39,7 +39,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GraphicsView::GraphicsView(QWidget*                     parent,
+GraphicsView::GraphicsView(QWidget* parent,
                            IF_GraphicsViewEventHandler* eventHandler) noexcept
   : QGraphicsView(parent),
     mEventHandlerObject(eventHandler),
@@ -148,7 +148,7 @@ void GraphicsView::setEventHandlerObject(
  ******************************************************************************/
 
 Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
-                                           bool          boundToView,
+                                           bool boundToView,
                                            bool mapToGrid) const noexcept {
   QPoint localPosPx = mapFromGlobal(globalPosPx);
   if (boundToView) {
@@ -291,7 +291,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       Q_ASSERT(e);
       if (e->buttons().testFlag(Qt::MiddleButton) && (!mPanningActive)) {
         QPoint diff = mapFromScene(e->scenePos()) -
-                      mapFromScene(e->buttonDownScenePos(Qt::MiddleButton));
+            mapFromScene(e->buttonDownScenePos(Qt::MiddleButton));
         mPanningActive = true;  // avoid recursive calls (=> stack overflow)
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
                                         diff.x());
@@ -343,12 +343,12 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
   painter->setPen(gridPen);
   painter->setBrush(Qt::NoBrush);
   qreal gridIntervalPixels = mGridProperties->getInterval()->toPx();
-  qreal scaleFactor        = width() / rect.width();
+  qreal scaleFactor = width() / rect.width();
   if (gridIntervalPixels * scaleFactor >= (qreal)5) {
     qreal left, right, top, bottom;
-    left   = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
-    right  = rect.right();
-    top    = rect.top();
+    left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
+    right = rect.right();
+    top = rect.top();
     bottom = qFloor(rect.bottom() / gridIntervalPixels) * gridIntervalPixels;
     switch (mGridProperties->getType()) {
       case GridProperties::Type_t::Lines: {

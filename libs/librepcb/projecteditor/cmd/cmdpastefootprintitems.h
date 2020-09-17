@@ -58,10 +58,10 @@ namespace editor {
 class CmdPasteFootprintItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdPasteFootprintItems()                                    = delete;
+  CmdPasteFootprintItems() = delete;
   CmdPasteFootprintItems(const CmdPasteFootprintItems& other) = delete;
   CmdPasteFootprintItems(
-      Board&                                                   board,
+      Board& board,
       std::unique_ptr<library::editor::FootprintClipboardData> data,
       const Point& posOffset) noexcept;
   ~CmdPasteFootprintItems() noexcept;
@@ -74,10 +74,10 @@ private:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  Project&                                                 mProject;
-  Board&                                                   mBoard;
+  Project& mProject;
+  Board& mBoard;
   std::unique_ptr<library::editor::FootprintClipboardData> mData;
-  Point                                                    mPosOffset;
+  Point mPosOffset;
 };
 
 /*******************************************************************************

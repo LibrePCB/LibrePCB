@@ -62,7 +62,7 @@ protected:
  ******************************************************************************/
 
 TEST_F(PickPlaceCsvWriterTest, testEmptyData) {
-  PickPlaceData      data("project", "version", "board");
+  PickPlaceData data("project", "version", "board");
   PickPlaceCsvWriter writer(data);
   writer.setIncludeMetadataComment(false);
   std::shared_ptr<CsvFile> file = writer.generateCsv();
@@ -73,9 +73,9 @@ TEST_F(PickPlaceCsvWriterTest, testEmptyData) {
 
 TEST_F(PickPlaceCsvWriterTest, testBothSides) {
   std::shared_ptr<PickPlaceData> data = createData();
-  PickPlaceCsvWriter             writer(*data);
-  std::shared_ptr<CsvFile>       file  = writer.generateCsv();
-  QStringList                    lines = file->toString().split("\n");
+  PickPlaceCsvWriter writer(*data);
+  std::shared_ptr<CsvFile> file = writer.generateCsv();
+  QStringList lines = file->toString().split("\n");
   EXPECT_EQ("# Pick&Place Position Data File", lines[0].toStdString());
   EXPECT_EQ("#", lines[1].toStdString());
   EXPECT_EQ("# Project Name:        project", lines[2].toStdString());
@@ -101,11 +101,11 @@ TEST_F(PickPlaceCsvWriterTest, testBothSides) {
 
 TEST_F(PickPlaceCsvWriterTest, testTopSide) {
   std::shared_ptr<PickPlaceData> data = createData();
-  PickPlaceCsvWriter             writer(*data);
+  PickPlaceCsvWriter writer(*data);
   writer.setIncludeMetadataComment(false);
   writer.setBoardSide(PickPlaceCsvWriter::BoardSide::TOP);
-  std::shared_ptr<CsvFile> file  = writer.generateCsv();
-  QStringList              lines = file->toString().split("\n");
+  std::shared_ptr<CsvFile> file = writer.generateCsv();
+  QStringList lines = file->toString().split("\n");
   EXPECT_EQ(
       "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side",
       lines[0].toStdString());
@@ -120,11 +120,11 @@ TEST_F(PickPlaceCsvWriterTest, testTopSide) {
 
 TEST_F(PickPlaceCsvWriterTest, testBottomSide) {
   std::shared_ptr<PickPlaceData> data = createData();
-  PickPlaceCsvWriter             writer(*data);
+  PickPlaceCsvWriter writer(*data);
   writer.setIncludeMetadataComment(false);
   writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTTOM);
-  std::shared_ptr<CsvFile> file  = writer.generateCsv();
-  QStringList              lines = file->toString().split("\n");
+  std::shared_ptr<CsvFile> file = writer.generateCsv();
+  QStringList lines = file->toString().split("\n");
   EXPECT_EQ(
       "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side",
       lines[0].toStdString());

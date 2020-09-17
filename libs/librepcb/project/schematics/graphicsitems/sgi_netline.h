@@ -56,14 +56,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const { return mBoundingRect; }
+  QRectF boundingRect() const { return mBoundingRect; }
   QPainterPath shape() const { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget);
 
 private:
   // make some methods inaccessible...
-  SGI_NetLine()                         = delete;
+  SGI_NetLine() = delete;
   SGI_NetLine(const SGI_NetLine& other) = delete;
   SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
 
@@ -71,12 +71,12 @@ private:
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
   // Attributes
-  SI_NetLine&    mNetLine;
+  SI_NetLine& mNetLine;
   GraphicsLayer* mLayer;
 
   // Cached Attributes
-  QLineF       mLineF;
-  QRectF       mBoundingRect;
+  QLineF mLineF;
+  QRectF mBoundingRect;
   QPainterPath mShape;
 };
 

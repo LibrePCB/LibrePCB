@@ -131,7 +131,7 @@ void LengthEditBase::configureClientSettings(
 
   try {
     QSettings clientSettings;
-    QString   unit = clientSettings.value(mSettingsKey).toString();
+    QString unit = clientSettings.value(mSettingsKey).toString();
     if (!unit.isEmpty()) {
       mSelectedUnit = LengthUnit::fromString(unit);  // can throw
     } else {
@@ -143,7 +143,7 @@ void LengthEditBase::configureClientSettings(
   }
 }
 
-void LengthEditBase::configure(const LengthUnit&              defaultUnit,
+void LengthEditBase::configure(const LengthUnit& defaultUnit,
                                const QVector<PositiveLength>& steps,
                                const QString& uniqueIdentifier) noexcept {
   setDefaultUnit(defaultUnit);
@@ -204,7 +204,7 @@ void LengthEditBase::setValueImpl(Length value) noexcept {
 
 void LengthEditBase::updateValueFromText(QString text) noexcept {
   try {
-    LengthUnit         unit   = extractUnitFromExpression(text);
+    LengthUnit unit = extractUnitFromExpression(text);
     MathParser::Result result = MathParser().parse(text);
     if (result.valid) {
       Length value = unit.convertFromUnit(result.value);  // can throw
@@ -271,7 +271,7 @@ void LengthEditBase::updateSingleStepPredefined() noexcept {
     down = 0;
   }
 
-  mSingleStepUp   = up;
+  mSingleStepUp = up;
   mSingleStepDown = down;
 }
 
@@ -303,7 +303,7 @@ LengthUnit LengthEditBase::extractUnitFromExpression(QString& expression) const
 }
 
 void LengthEditBase::changeUnitActionTriggered() noexcept {
-  QMenu        menu(this);
+  QMenu menu(this);
   QActionGroup group(&menu);
   foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
     QString text = getValueStr(unit);
@@ -358,7 +358,7 @@ QString LengthEditBase::getValueStr(const LengthUnit& unit) const noexcept {
     return Toolbox::floatToString(unit.convertToUnit(mValue),
                                   unit.getReasonableNumberOfDecimals(),
                                   locale()) %
-           " " % unit.toShortStringTr();
+        " " % unit.toShortStringTr();
   }
 }
 

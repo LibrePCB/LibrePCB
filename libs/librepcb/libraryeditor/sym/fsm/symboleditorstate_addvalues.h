@@ -55,7 +55,7 @@ public:
   ~SymbolEditorState_AddValues() noexcept;
 
   // Operator Overloadings
-  SymbolEditorState_AddValues& operator       =(
+  SymbolEditorState_AddValues& operator=(
       const SymbolEditorState_AddValues& rhs) = delete;
 };
 

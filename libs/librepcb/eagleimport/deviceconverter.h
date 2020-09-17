@@ -56,7 +56,7 @@ class ConverterDb;
 class DeviceConverter final {
 public:
   // Constructors / Destructor
-  DeviceConverter()                             = delete;
+  DeviceConverter() = delete;
   DeviceConverter(const DeviceConverter& other) = delete;
   DeviceConverter(const parseagle::DeviceSet& deviceSet,
                   const parseagle::Device& device, ConverterDb& db) noexcept;
@@ -72,8 +72,8 @@ private:
   QString createDescription() const noexcept;
 
   const parseagle::DeviceSet& mDeviceSet;
-  const parseagle::Device&    mDevice;
-  ConverterDb&                mDb;
+  const parseagle::Device& mDevice;
+  ConverterDb& mDb;
 };
 
 /*******************************************************************************

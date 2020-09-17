@@ -81,7 +81,7 @@ void CmdHoleEdit::mirror(Qt::Orientation orientation, const Point& center,
 }
 
 void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
-                              bool                  immediate) noexcept {
+                              bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewDiameter = diameter;
   if (immediate) mHole.setDiameter(mNewDiameter);

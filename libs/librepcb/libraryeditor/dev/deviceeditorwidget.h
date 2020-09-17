@@ -66,7 +66,7 @@ class DeviceEditorWidget final : public EditorWidgetBase {
 
 public:
   // Constructors / Destructor
-  DeviceEditorWidget()                                = delete;
+  DeviceEditorWidget() = delete;
   DeviceEditorWidget(const DeviceEditorWidget& other) = delete;
   DeviceEditorWidget(const Context& context, const FilePath& fp,
                      QWidget* parent = nullptr);
@@ -82,41 +82,41 @@ public slots:
   bool zoomAll() noexcept override;
 
 private:  // Methods
-  void    updateMetadata() noexcept;
+  void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
-  void    btnChooseComponentClicked() noexcept;
-  void    btnChoosePackageClicked() noexcept;
-  void    updateDeviceComponentUuid(const Uuid& uuid) noexcept;
-  void    updateComponentPreview() noexcept;
-  void    updateDevicePackageUuid(const Uuid& uuid) noexcept;
-  void    updatePackagePreview() noexcept;
-  void    memorizeDeviceInterface() noexcept;
-  bool    isInterfaceBroken() const noexcept override;
-  bool    runChecks(LibraryElementCheckMessageList& msgs) const override;
+  void btnChooseComponentClicked() noexcept;
+  void btnChoosePackageClicked() noexcept;
+  void updateDeviceComponentUuid(const Uuid& uuid) noexcept;
+  void updateComponentPreview() noexcept;
+  void updateDevicePackageUuid(const Uuid& uuid) noexcept;
+  void updatePackagePreview() noexcept;
+  void memorizeDeviceInterface() noexcept;
+  bool isInterfaceBroken() const noexcept override;
+  bool runChecks(LibraryElementCheckMessageList& msgs) const override;
   template <typename MessageType>
   void fixMsg(const MessageType& msg);
   template <typename MessageType>
   bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
-                    bool                                              applyFix);
+                    bool applyFix);
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool                                              applyFix) override;
+      bool applyFix) override;
 
 private:  // Data
-  QScopedPointer<Ui::DeviceEditorWidget>            mUi;
+  QScopedPointer<Ui::DeviceEditorWidget> mUi;
   QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-  QScopedPointer<Device>                            mDevice;
-  QScopedPointer<DefaultGraphicsLayerProvider>      mGraphicsLayerProvider;
+  QScopedPointer<Device> mDevice;
+  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
 
   // component
-  QScopedPointer<Component>                         mComponent;
-  QScopedPointer<GraphicsScene>                     mComponentGraphicsScene;
-  QList<std::shared_ptr<Symbol>>                    mSymbols;
+  QScopedPointer<Component> mComponent;
+  QScopedPointer<GraphicsScene> mComponentGraphicsScene;
+  QList<std::shared_ptr<Symbol>> mSymbols;
   QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
 
   // package
-  QScopedPointer<Package>                      mPackage;
-  QScopedPointer<GraphicsScene>                mPackageGraphicsScene;
+  QScopedPointer<Package> mPackage;
+  QScopedPointer<GraphicsScene> mPackageGraphicsScene;
   QScopedPointer<FootprintPreviewGraphicsItem> mFootprintGraphicsItem;
 
   // broken interface detection

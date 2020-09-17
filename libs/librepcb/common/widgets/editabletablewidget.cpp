@@ -41,14 +41,14 @@ EditableTableWidget::EditableTableWidget(QWidget* parent) noexcept
     mShowMoveButtons(false),
     mBrowseButtonColumn(-1) {
   // set reasonable default values - they can still be changed afterwards
-  setAlternatingRowColors(true);                         // increase readability
-  setCornerButtonEnabled(false);                         // not needed
-  setSelectionBehavior(QAbstractItemView::SelectRows);   // our default style
+  setAlternatingRowColors(true);  // increase readability
+  setCornerButtonEnabled(false);  // not needed
+  setSelectionBehavior(QAbstractItemView::SelectRows);  // our default style
   setSelectionMode(QAbstractItemView::SingleSelection);  // our default style
   setSortingEnabled(false);  // avoid too wide last column (no indicator)
-  setWordWrap(false);        // avoid too high cells due to word wrap
+  setWordWrap(false);  // avoid too high cells due to word wrap
   horizontalHeader()->setMinimumSectionSize(5);  // for button columns
-  verticalHeader()->setMinimumSectionSize(10);   // more compact rows
+  verticalHeader()->setMinimumSectionSize(10);  // more compact rows
   verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 

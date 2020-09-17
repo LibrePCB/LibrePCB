@@ -45,17 +45,17 @@ class BoardDesignRuleCheckMessage final {
 public:
   // Constructors / Destructor
   BoardDesignRuleCheckMessage(const QString& message,
-                              const Path&    location) noexcept;
-  BoardDesignRuleCheckMessage(const QString&       message,
+                              const Path& location) noexcept;
+  BoardDesignRuleCheckMessage(const QString& message,
                               const QVector<Path>& locations) noexcept;
   ~BoardDesignRuleCheckMessage() noexcept;
 
   // Getters
-  const QString&       getMessage() const noexcept { return mMessage; }
+  const QString& getMessage() const noexcept { return mMessage; }
   const QVector<Path>& getLocations() const noexcept { return mLocations; }
 
 private:  // Data
-  QString       mMessage;
+  QString mMessage;
   QVector<Path> mLocations;
 };
 

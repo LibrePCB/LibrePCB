@@ -89,17 +89,21 @@ bool SchematicEditorState_DrawWire::entry() noexcept {
 
   // Add wire mode actions to the "command" toolbar
   mWireModeActions.insert(
-      WireMode_HV, mContext.editorUi.commandToolbar->addAction(
-                       QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
+      WireMode_HV,
+      mContext.editorUi.commandToolbar->addAction(
+          QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
   mWireModeActions.insert(
-      WireMode_VH, mContext.editorUi.commandToolbar->addAction(
-                       QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
+      WireMode_VH,
+      mContext.editorUi.commandToolbar->addAction(
+          QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
   mWireModeActions.insert(
-      WireMode_9045, mContext.editorUi.commandToolbar->addAction(
-                         QIcon(":/img/command_toolbars/wire_90_45.png"), ""));
+      WireMode_9045,
+      mContext.editorUi.commandToolbar->addAction(
+          QIcon(":/img/command_toolbars/wire_90_45.png"), ""));
   mWireModeActions.insert(
-      WireMode_4590, mContext.editorUi.commandToolbar->addAction(
-                         QIcon(":/img/command_toolbars/wire_45_90.png"), ""));
+      WireMode_4590,
+      mContext.editorUi.commandToolbar->addAction(
+          QIcon(":/img/command_toolbars/wire_45_90.png"), ""));
   mWireModeActions.insert(
       WireMode_Straight,
       mContext.editorUi.commandToolbar->addAction(
@@ -236,19 +240,19 @@ bool SchematicEditorState_DrawWire::startPositioning(
     mSubState = SubState::POSITIONING_NETPOINT;
 
     // determine the fixed anchor (create one if it doesn't exist already)
-    NetSignal*                      netsignal  = nullptr;
-    SI_NetSegment*                  netsegment = nullptr;
+    NetSignal* netsignal = nullptr;
+    SI_NetSegment* netsegment = nullptr;
     tl::optional<CircuitIdentifier> forcedNetName;
     if (fixedPoint) {
       mFixedStartAnchor = fixedPoint;
-      netsegment        = &fixedPoint->getNetSegment();
+      netsegment = &fixedPoint->getNetSegment();
     } else if (SI_NetPoint* netpoint = findNetPoint(schematic, pos)) {
       mFixedStartAnchor = netpoint;
-      netsegment        = &netpoint->getNetSegment();
+      netsegment = &netpoint->getNetSegment();
     } else if (SI_SymbolPin* pin = findSymbolPin(schematic, pos)) {
       mFixedStartAnchor = pin;
-      netsegment        = pin->getNetSegmentOfLines();
-      netsignal         = pin->getCompSigInstNetSignal();
+      netsegment = pin->getNetSegmentOfLines();
+      netsignal = pin->getCompSigInstNetSignal();
       if (pin->getComponentSignalInstance()) {
         QString name =
             pin->getComponentSignalInstance()->getForcedNetSignalName();
@@ -335,14 +339,14 @@ bool SchematicEditorState_DrawWire::startPositioning(
     SI_NetPoint* p3 = cmd->addNetPoint(pos);
     Q_ASSERT(p3);  // third netpoint
     SI_NetLine* l2 = cmd->addNetLine(*p2, *p3);
-    Q_ASSERT(l2);                              // second netline
+    Q_ASSERT(l2);  // second netline
     mContext.undoStack.appendToCmdGroup(cmd);  // can throw
 
     // update members
     mPositioningNetPoint1 = p2;
-    mPositioningNetLine1  = l1;
+    mPositioningNetLine1 = l1;
     mPositioningNetPoint2 = p3;
-    mPositioningNetLine2  = l2;
+    mPositioningNetLine2 = l2;
 
     // properly place the new netpoints/netlines according the current wire mode
     updateNetpointPositions(pos);
@@ -360,7 +364,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
   }
 }
 
-bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic&   schematic,
+bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic& schematic,
                                                     const Point& pos) noexcept {
   Q_ASSERT(mSubState == SubState::POSITIONING_NETPOINT);
 
@@ -397,15 +401,15 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic&   schematic,
       }
 
       // find anchor under cursor
-      SI_NetLineAnchor* otherAnchor     = nullptr;
-      SI_NetSegment*    otherNetSegment = nullptr;
-      QString           otherForcedNetName;
+      SI_NetLineAnchor* otherAnchor = nullptr;
+      SI_NetSegment* otherNetSegment = nullptr;
+      QString otherForcedNetName;
       if (SI_NetPoint* netpoint =
               findNetPoint(schematic, pos, mPositioningNetPoint2)) {
-        otherAnchor     = netpoint;
+        otherAnchor = netpoint;
         otherNetSegment = &netpoint->getNetSegment();
       } else if (SI_SymbolPin* pin = findSymbolPin(schematic, pos)) {
-        otherAnchor     = pin;
+        otherAnchor = pin;
         otherNetSegment = pin->getNetSegmentOfLines();
         // connect pin if needed
         if (!otherNetSegment) {
@@ -455,7 +459,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic&   schematic,
               &mPositioningNetPoint2->getNetSignalOfNetSegment();
           NetSignal* otherSignal = &otherNetSegment->getNetSignal();
           if (thisSignal != otherSignal) {
-            NetSignal*     resultingNetSignal       = nullptr;
+            NetSignal* resultingNetSignal = nullptr;
             SI_NetSegment* netSegmentToChangeSignal = nullptr;
             if (otherNetSegment->getForcedNetNames().count() > 0) {
               resultingNetSignal = &otherNetSegment->getNetSignal();
@@ -552,10 +556,10 @@ bool SchematicEditorState_DrawWire::abortPositioning(
     bool showErrMsgBox) noexcept {
   try {
     mCircuit.setHighlightedNetSignal(nullptr);
-    mSubState             = SubState::IDLE;
-    mFixedStartAnchor     = nullptr;
-    mPositioningNetLine1  = nullptr;
-    mPositioningNetLine2  = nullptr;
+    mSubState = SubState::IDLE;
+    mFixedStartAnchor = nullptr;
+    mPositioningNetLine1 = nullptr;
+    mPositioningNetLine2 = nullptr;
     mPositioningNetPoint1 = nullptr;
     mPositioningNetPoint2 = nullptr;
     mContext.undoStack.abortCmdGroup();  // can throw
@@ -587,7 +591,7 @@ SI_NetPoint* SchematicEditorState_DrawWire::findNetPoint(
   return (items.count() > 0) ? items.first() : nullptr;
 }
 
-SI_NetLine* SchematicEditorState_DrawWire::findNetLine(Schematic&   schematic,
+SI_NetLine* SchematicEditorState_DrawWire::findNetLine(Schematic& schematic,
                                                        const Point& pos,
                                                        SI_NetLine* except) const
     noexcept {
@@ -612,8 +616,8 @@ void SchematicEditorState_DrawWire::
 }
 
 Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
-                                                        const Point  p2,
-                                                        WireMode     mode) const
+                                                        const Point p2,
+                                                        WireMode mode) const
     noexcept {
   Point delta = p2 - p1;
   switch (mode) {
@@ -627,16 +631,18 @@ Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
             p2.getX() - delta.getY().abs() * (delta.getX() >= 0 ? 1 : -1),
             p1.getY());
       else
-        return Point(p1.getX(), p2.getY() - delta.getX().abs() *
-                                                (delta.getY() >= 0 ? 1 : -1));
+        return Point(
+            p1.getX(),
+            p2.getY() - delta.getX().abs() * (delta.getY() >= 0 ? 1 : -1));
     case WireMode_4590:
       if (delta.getX().abs() >= delta.getY().abs())
         return Point(
             p1.getX() + delta.getY().abs() * (delta.getX() >= 0 ? 1 : -1),
             p2.getY());
       else
-        return Point(p2.getX(), p1.getY() + delta.getX().abs() *
-                                                (delta.getY() >= 0 ? 1 : -1));
+        return Point(
+            p2.getX(),
+            p1.getY() + delta.getX().abs() * (delta.getY() >= 0 ? 1 : -1));
     case WireMode_Straight:
       return p1;
     default:

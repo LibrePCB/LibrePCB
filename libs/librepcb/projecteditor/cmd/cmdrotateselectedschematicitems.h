@@ -48,7 +48,7 @@ namespace editor {
 class CmdRotateSelectedSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdRotateSelectedSchematicItems(Schematic&   schematic,
+  CmdRotateSelectedSchematicItems(Schematic& schematic,
                                   const Angle& angle) noexcept;
   ~CmdRotateSelectedSchematicItems() noexcept;
 
@@ -62,7 +62,7 @@ private:
 
   // Attributes from the constructor
   Schematic& mSchematic;
-  Angle      mAngle;
+  Angle mAngle;
 };
 
 /*******************************************************************************

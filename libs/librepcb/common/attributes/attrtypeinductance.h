@@ -41,9 +41,9 @@ namespace librepcb {
  */
 class AttrTypeInductance final : public AttributeType {
 public:
-  bool    isValueValid(const QString& value) const noexcept;
+  bool isValueValid(const QString& value) const noexcept;
   QString valueFromTr(const QString& value) const noexcept;
-  QString printableValueTr(const QString&       value,
+  QString printableValueTr(const QString& value,
                            const AttributeUnit* unit = nullptr) const noexcept;
   static const AttrTypeInductance& instance() noexcept {
     static AttrTypeInductance x;

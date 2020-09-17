@@ -43,7 +43,7 @@ namespace librepcb {
 class CmdPolygonEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdPolygonEdit()                            = delete;
+  CmdPolygonEdit() = delete;
   CmdPolygonEdit(const CmdPolygonEdit& other) = delete;
   explicit CmdPolygonEdit(Polygon& polygon) noexcept;
   ~CmdPolygonEdit() noexcept;
@@ -83,14 +83,14 @@ private:
   // General Attributes
   GraphicsLayerName mOldLayerName;
   GraphicsLayerName mNewLayerName;
-  UnsignedLength    mOldLineWidth;
-  UnsignedLength    mNewLineWidth;
-  bool              mOldIsFilled;
-  bool              mNewIsFilled;
-  bool              mOldIsGrabArea;
-  bool              mNewIsGrabArea;
-  Path              mOldPath;
-  Path              mNewPath;
+  UnsignedLength mOldLineWidth;
+  UnsignedLength mNewLineWidth;
+  bool mOldIsFilled;
+  bool mNewIsFilled;
+  bool mOldIsGrabArea;
+  bool mNewIsGrabArea;
+  Path mOldPath;
+  Path mNewPath;
 };
 
 /*******************************************************************************

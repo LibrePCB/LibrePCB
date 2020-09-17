@@ -67,7 +67,7 @@ class Signal {
 
 public:
   // Constructors / Destructor
-  Signal()                    = delete;
+  Signal() = delete;
   Signal(const Signal& other) = delete;
 
   /**
@@ -172,7 +172,7 @@ class Slot {
 
 public:
   // Constructors / Destructor
-  Slot()                  = delete;
+  Slot() = delete;
   Slot(const Slot& other) = delete;
 
   /**

@@ -43,7 +43,7 @@ namespace librepcb {
 class CmdTextEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdTextEdit()                         = delete;
+  CmdTextEdit() = delete;
   CmdTextEdit(const CmdTextEdit& other) = delete;
   explicit CmdTextEdit(Text& text) noexcept;
   ~CmdTextEdit() noexcept;
@@ -83,16 +83,16 @@ private:
   // General Attributes
   GraphicsLayerName mOldLayerName;
   GraphicsLayerName mNewLayerName;
-  QString           mOldText;
-  QString           mNewText;
-  Point             mOldPosition;
-  Point             mNewPosition;
-  Angle             mOldRotation;
-  Angle             mNewRotation;
-  PositiveLength    mOldHeight;
-  PositiveLength    mNewHeight;
-  Alignment         mOldAlign;
-  Alignment         mNewAlign;
+  QString mOldText;
+  QString mNewText;
+  Point mOldPosition;
+  Point mNewPosition;
+  Angle mOldRotation;
+  Angle mNewRotation;
+  PositiveLength mOldHeight;
+  PositiveLength mNewHeight;
+  Alignment mOldAlign;
+  Alignment mNewAlign;
 };
 
 /*******************************************************************************

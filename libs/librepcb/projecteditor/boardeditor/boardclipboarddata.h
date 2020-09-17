@@ -67,12 +67,12 @@ public:
   struct Device : public SerializableObject {
     static constexpr const char* tagname = "device";
 
-    Uuid           componentUuid;
-    Uuid           libDeviceUuid;
-    Uuid           libFootprintUuid;
-    Point          position;
-    Angle          rotation;
-    bool           mirrored;
+    Uuid componentUuid;
+    Uuid libDeviceUuid;
+    Uuid libFootprintUuid;
+    Point position;
+    Angle rotation;
+    bool mirrored;
     StrokeTextList strokeTexts;
     Signal<Device> onEdited;  ///< Dummy event, not used
 
@@ -114,10 +114,10 @@ public:
   struct NetSegment : public SerializableObject {
     static constexpr const char* tagname = "netsegment";
 
-    CircuitIdentifier  netName;
-    ViaList            vias;
-    JunctionList       junctions;
-    TraceList          traces;
+    CircuitIdentifier netName;
+    ViaList vias;
+    JunctionList junctions;
+    TraceList traces;
     Signal<NetSegment> onEdited;  ///< Dummy event, not used
 
     explicit NetSegment(const CircuitIdentifier& netName)
@@ -142,16 +142,16 @@ public:
   struct Plane : public SerializableObject {
     static constexpr const char* tagname = "plane";
 
-    Uuid                   uuid;
-    QString                layer;
-    QString                netSignalName;
-    Path                   outline;
-    UnsignedLength         minWidth;
-    UnsignedLength         minClearance;
-    bool                   keepOrphans;
-    int                    priority;
+    Uuid uuid;
+    QString layer;
+    QString netSignalName;
+    Path outline;
+    UnsignedLength minWidth;
+    UnsignedLength minClearance;
+    bool keepOrphans;
+    int priority;
     BI_Plane::ConnectStyle connectStyle;
-    Signal<Plane>          onEdited;  ///< Dummy event, not used
+    Signal<Plane> onEdited;  ///< Dummy event, not used
 
     Plane(const Uuid& uuid, const QString& layer, const QString& netSignalName,
           const Path& outline, const UnsignedLength& minWidth,
@@ -196,7 +196,7 @@ public:
   };
 
   // Constructors / Destructor
-  BoardClipboardData()                                = delete;
+  BoardClipboardData() = delete;
   BoardClipboardData(const BoardClipboardData& other) = delete;
   BoardClipboardData(const Uuid& boardUuid, const Point& cursorPos) noexcept;
   explicit BoardClipboardData(const QByteArray& mimeData);
@@ -205,7 +205,7 @@ public:
   // Getters
   std::unique_ptr<TransactionalDirectory> getDirectory(
       const QString& path = "") noexcept;
-  const Uuid&  getBoardUuid() const noexcept { return mBoardUuid; }
+  const Uuid& getBoardUuid() const noexcept { return mBoardUuid; }
   const Point& getCursorPos() const noexcept { return mCursorPos; }
   SerializableObjectList<Device, Device>& getDevices() noexcept {
     return mDevices;
@@ -214,15 +214,15 @@ public:
     return mNetSegments;
   }
   SerializableObjectList<Plane, Plane>& getPlanes() noexcept { return mPlanes; }
-  PolygonList&    getPolygons() noexcept { return mPolygons; }
+  PolygonList& getPolygons() noexcept { return mPolygons; }
   StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
-  HoleList&       getHoles() noexcept { return mHoles; }
+  HoleList& getHoles() noexcept { return mHoles; }
   QMap<std::pair<Uuid, Uuid>, Point>& getPadPositions() noexcept {
     return mPadPositions;
   }
 
   // General Methods
-  std::unique_ptr<QMimeData>                 toMimeData() const;
+  std::unique_ptr<QMimeData> toMimeData() const;
   static std::unique_ptr<BoardClipboardData> fromMimeData(
       const QMimeData* mime);
 
@@ -236,16 +236,16 @@ private:  // Methods
   static QString getMimeType() noexcept;
 
 private:  // Data
-  std::shared_ptr<TransactionalFileSystem>       mFileSystem;
-  Uuid                                           mBoardUuid;
-  Point                                          mCursorPos;
-  SerializableObjectList<Device, Device>         mDevices;
+  std::shared_ptr<TransactionalFileSystem> mFileSystem;
+  Uuid mBoardUuid;
+  Point mCursorPos;
+  SerializableObjectList<Device, Device> mDevices;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
-  SerializableObjectList<Plane, Plane>           mPlanes;
-  PolygonList                                    mPolygons;
-  StrokeTextList                                 mStrokeTexts;
-  HoleList                                       mHoles;
-  QMap<std::pair<Uuid, Uuid>, Point>             mPadPositions;
+  SerializableObjectList<Plane, Plane> mPlanes;
+  PolygonList mPolygons;
+  StrokeTextList mStrokeTexts;
+  HoleList mHoles;
+  QMap<std::pair<Uuid, Uuid>, Point> mPadPositions;
 };
 
 /*******************************************************************************

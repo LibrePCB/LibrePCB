@@ -79,13 +79,13 @@ BI_Device::BI_Device(Board& board, const SExpression& node)
             .arg(compInstUuid.toStr()));
   }
   // get device and footprint uuid
-  Uuid deviceUuid    = node.getValueByPath<Uuid>("lib_device");
+  Uuid deviceUuid = node.getValueByPath<Uuid>("lib_device");
   Uuid footprintUuid = node.getValueByPath<Uuid>("lib_footprint");
   initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
   // get position, rotation and mirrored
-  mPosition   = Point(node.getChildByPath("position"));
-  mRotation   = node.getValueByPath<Angle>("rotation");
+  mPosition = Point(node.getChildByPath("position"));
+  mRotation = node.getValueByPath<Angle>("rotation");
   mIsMirrored = node.getValueByPath<bool>("mirror");
 
   // load attributes
@@ -142,7 +142,7 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   }
   // get package from library
   Uuid packageUuid = mLibDevice->getPackageUuid();
-  mLibPackage      = mBoard.getProject().getLibrary().getPackage(packageUuid);
+  mLibPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
   if (!mLibPackage) {
     qDebug() << mCompInstance->getUuid();
     throw RuntimeError(__FILE__, __LINE__,

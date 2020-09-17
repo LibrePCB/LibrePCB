@@ -59,12 +59,12 @@ public:
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const { return mBoundingRect; }
-  void   paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-               QWidget* widget);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget);
 
 private:
   // make some methods inaccessible...
-  SGI_NetLabel()                          = delete;
+  SGI_NetLabel() = delete;
   SGI_NetLabel(const SGI_NetLabel& other) = delete;
   SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
@@ -72,15 +72,15 @@ private:
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
   // Attributes
-  SI_NetLabel&                     mNetLabel;
+  SI_NetLabel& mNetLabel;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Cached Attributes
   QStaticText mStaticText;
-  QFont       mFont;
-  bool        mRotate180;
-  QPointF     mTextOrigin;
-  QRectF      mBoundingRect;
+  QFont mFont;
+  bool mRotate180;
+  QPointF mTextOrigin;
+  QRectF mBoundingRect;
 
   // Static Stuff
   static QVector<QLineF> sOriginCrossLines;

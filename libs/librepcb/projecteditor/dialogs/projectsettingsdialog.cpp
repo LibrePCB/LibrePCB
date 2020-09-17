@@ -45,8 +45,8 @@ namespace editor {
  ******************************************************************************/
 
 ProjectSettingsDialog::ProjectSettingsDialog(ProjectSettings& settings,
-                                             UndoStack&       undoStack,
-                                             QWidget*         parent) noexcept
+                                             UndoStack& undoStack,
+                                             QWidget* parent) noexcept
   : QDialog(parent),
     mSettings(settings),
     mUi(new Ui::ProjectSettingsDialog),

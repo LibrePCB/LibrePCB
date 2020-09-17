@@ -61,26 +61,26 @@ public:
   ~Path() noexcept {}
 
   // Getters
-  bool             isClosed() const noexcept;
+  bool isClosed() const noexcept;
   QVector<Vertex>& getVertices() noexcept {
     invalidatePainterPath();
     return mVertices;
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
-  Path                   toClosedPath() const noexcept;
+  Path toClosedPath() const noexcept;
   QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
   const QPainterPath& toQPainterPathPx() const noexcept;
 
   // Transformations
   Path& translate(const Point& offset) noexcept;
-  Path  translated(const Point& offset) const noexcept;
+  Path translated(const Point& offset) const noexcept;
   Path& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
-  Path  rotated(const Angle& angle, const Point& center = Point(0, 0)) const
+  Path rotated(const Angle& angle, const Point& center = Point(0, 0)) const
       noexcept;
   Path& mirror(Qt::Orientation orientation,
-               const Point&    center = Point(0, 0)) noexcept;
-  Path  mirrored(Qt::Orientation orientation,
-                 const Point&    center = Point(0, 0)) const noexcept;
+               const Point& center = Point(0, 0)) noexcept;
+  Path mirrored(Qt::Orientation orientation,
+                const Point& center = Point(0, 0)) const noexcept;
 
   // General Methods
   void addVertex(const Vertex& vertex) noexcept;
@@ -97,7 +97,7 @@ public:
   bool operator==(const Path& rhs) const noexcept {
     return mVertices == rhs.mVertices;
   }
-  bool  operator!=(const Path& rhs) const noexcept { return !(*this == rhs); }
+  bool operator!=(const Path& rhs) const noexcept { return !(*this == rhs); }
   Path& operator=(const Path& rhs) noexcept;
 
   // Static Methods
@@ -129,7 +129,7 @@ public:
    * @return        The QPainterPath with the united paths.
    */
   static QPainterPath toQPainterPathPx(const QVector<Path>& paths,
-                                       bool                 area) noexcept;
+                                       bool area) noexcept;
 
 private:  // Methods
   void invalidatePainterPath() const noexcept {
@@ -137,7 +137,7 @@ private:  // Methods
   }
 
 private:  // Data
-  QVector<Vertex>      mVertices;
+  QVector<Vertex> mVertices;
   mutable QPainterPath mPainterPathPx;  // cached path for #toQPainterPathPx()
 };
 

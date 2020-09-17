@@ -55,7 +55,7 @@ public:
       ComponentSymbolVariant& variant) noexcept = 0;
 
   // Operator Overloadings
-  IF_ComponentSymbolVariantEditorProvider& operator       =(
+  IF_ComponentSymbolVariantEditorProvider& operator=(
       const IF_ComponentSymbolVariantEditorProvider& rhs) = delete;
 };
 

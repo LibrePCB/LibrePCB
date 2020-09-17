@@ -72,7 +72,7 @@ private:
   ProjectSettings& mSettings;
 
   // Old/New Settings
-  bool        mRestoreDefaults;
+  bool mRestoreDefaults;
   QStringList mLocaleOrderOld;
   QStringList mLocaleOrderNew;
   QStringList mNormOrderOld;

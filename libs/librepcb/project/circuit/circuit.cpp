@@ -202,7 +202,7 @@ void Circuit::setNetClassName(NetClass& netclass, const ElementName& newName) {
 
 QString Circuit::generateAutoNetSignalName() const noexcept {
   QString name;
-  int     i = 1;
+  int i = 1;
   do {
     name = QString("N%1").arg(i++);
   } while (getNetSignalByName(name));
@@ -225,8 +225,9 @@ NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept {
 NetSignal* Circuit::getNetSignalWithMostElements() const noexcept {
   NetSignal* netsignal = nullptr;
   foreach (NetSignal* ns, mNetSignals) {
-    if ((!netsignal) || (ns->getRegisteredElementsCount() >
-                         netsignal->getRegisteredElementsCount())) {
+    if ((!netsignal) ||
+        (ns->getRegisteredElementsCount() >
+         netsignal->getRegisteredElementsCount())) {
       netsignal = ns;
     }
   }
@@ -267,9 +268,9 @@ void Circuit::removeNetSignal(NetSignal& netsignal) {
   emit netSignalRemoved(netsignal);
 }
 
-void Circuit::setNetSignalName(NetSignal&               netsignal,
+void Circuit::setNetSignalName(NetSignal& netsignal,
                                const CircuitIdentifier& newName,
-                               bool                     isAutoName) {
+                               bool isAutoName) {
   // check if the netsignal was added to the circuit
   if (mNetSignals.value(netsignal.getUuid()) != &netsignal) {
     throw LogicError(__FILE__, __LINE__);
@@ -297,7 +298,7 @@ void Circuit::setHighlightedNetSignal(NetSignal* signal) noexcept {
 QString Circuit::generateAutoComponentInstanceName(
     const library::ComponentPrefix& cmpPrefix) const noexcept {
   QString name;
-  int     i = 1;
+  int i = 1;
   do {
     name =
         QString("%1%2").arg(cmpPrefix->isEmpty() ? "?" : *cmpPrefix).arg(i++);
@@ -352,7 +353,7 @@ void Circuit::removeComponentInstance(ComponentInstance& cmp) {
   emit componentRemoved(cmp);
 }
 
-void Circuit::setComponentInstanceName(ComponentInstance&       cmp,
+void Circuit::setComponentInstanceName(ComponentInstance& cmp,
                                        const CircuitIdentifier& newName) {
   // check if the component instance was added to the circuit
   if (mComponentInstances.value(cmp.getUuid()) != &cmp) {
@@ -374,7 +375,7 @@ void Circuit::setComponentInstanceName(ComponentInstance&       cmp,
 
 void Circuit::save() {
   SExpression doc(serializeToDomElement("librepcb_circuit"));  // can throw
-  mDirectory->write("circuit.lp", doc.toByteArray());          // can throw
+  mDirectory->write("circuit.lp", doc.toByteArray());  // can throw
 }
 
 /*******************************************************************************

@@ -52,7 +52,7 @@ LibraryElementCache::~LibraryElementCache() noexcept {
  ******************************************************************************/
 
 std::shared_ptr<const ComponentCategory>
-LibraryElementCache::getComponentCategory(const Uuid& uuid) const noexcept {
+    LibraryElementCache::getComponentCategory(const Uuid& uuid) const noexcept {
   return getElement(&workspace::WorkspaceLibraryDb::getLatestComponentCategory,
                     mCmpCat, uuid);
 }
@@ -100,7 +100,7 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
   if ((!element) && mDb) {
     try {
       FilePath fp = (mDb->*getter)(uuid);
-      element     = std::make_shared<T>(std::unique_ptr<TransactionalDirectory>(
+      element = std::make_shared<T>(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
       container.insert(uuid, element);
     } catch (const Exception& e) {

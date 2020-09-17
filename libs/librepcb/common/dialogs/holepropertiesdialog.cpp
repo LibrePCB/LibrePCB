@@ -37,8 +37,8 @@ namespace librepcb {
 
 HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
                                            const LengthUnit& lengthUnit,
-                                           const QString&    settingsPrefix,
-                                           QWidget*          parent) noexcept
+                                           const QString& settingsPrefix,
+                                           QWidget* parent) noexcept
   : QDialog(parent),
     mHole(hole),
     mUndoStack(undoStack),

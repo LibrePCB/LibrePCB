@@ -52,10 +52,10 @@ public:
   explicit GraphicsLayerStackAppearanceSettings(
       IF_GraphicsLayerProvider& layers) noexcept;
   GraphicsLayerStackAppearanceSettings(
-      IF_GraphicsLayerProvider&                   layers,
+      IF_GraphicsLayerProvider& layers,
       const GraphicsLayerStackAppearanceSettings& other) noexcept;
   GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
-                                       const SExpression&        node);
+                                       const SExpression& node);
   ~GraphicsLayerStackAppearanceSettings() noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()

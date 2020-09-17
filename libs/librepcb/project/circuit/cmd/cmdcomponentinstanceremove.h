@@ -64,7 +64,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Circuit&           mCircuit;
+  Circuit& mCircuit;
   ComponentInstance& mComponentInstance;
 };
 

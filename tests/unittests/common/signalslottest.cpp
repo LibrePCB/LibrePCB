@@ -59,9 +59,9 @@ class SignalSlotTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST(SignalSlotTest, testDuringCallbackAttachedSlotsAreNotCalled) {
-  Sender                           sender;
+  Sender sender;
   QList<std::shared_ptr<Receiver>> receivers;
-  Slot<Sender, int>                slot([&](const Sender&, int) {
+  Slot<Sender, int> slot([&](const Sender&, int) {
     for (int i = 0; i < 100; ++i) {
       std::shared_ptr<Receiver> receiver = std::make_shared<Receiver>();
       sender.signal.attach(receiver->slot);
@@ -79,8 +79,8 @@ TEST(SignalSlotTest, testDuringCallbackAttachedSlotsAreNotCalled) {
 }
 
 TEST(SignalSlotTest, testDuringCallbackDetachedSlotsAreNotCalled) {
-  int                                       callbackCounter = 0;
-  Sender                                    sender;
+  int callbackCounter = 0;
+  Sender sender;
   QList<std::shared_ptr<Slot<Sender, int>>> receivers;
   for (int i = 0; i < 100; ++i) {
     std::shared_ptr<Slot<Sender, int>> receiver =

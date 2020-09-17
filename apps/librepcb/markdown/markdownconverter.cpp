@@ -51,8 +51,8 @@ QString MarkdownConverter::convertMarkdownToHtml(
 QString MarkdownConverter::convertMarkdownToHtml(
     const QString& markdown) noexcept {
   // create HTML renderer
-  hoedown_html_flags flags    = static_cast<hoedown_html_flags>(0);
-  hoedown_renderer*  renderer = hoedown_html_renderer_new(flags, 0);
+  hoedown_html_flags flags = static_cast<hoedown_html_flags>(0);
+  hoedown_renderer* renderer = hoedown_html_renderer_new(flags, 0);
 
   // create document parser
   hoedown_extensions extensions = static_cast<hoedown_extensions>(
@@ -61,7 +61,7 @@ QString MarkdownConverter::convertMarkdownToHtml(
   hoedown_document* document = hoedown_document_new(renderer, extensions, 16);
 
   // render markdown
-  QByteArray   markdownUtf8 = markdown.toUtf8();
+  QByteArray markdownUtf8 = markdown.toUtf8();
   const uchar* markdownData =
       reinterpret_cast<const uchar*>(markdownUtf8.constData());
   hoedown_buffer* htmlBuffer = hoedown_buffer_new(64);

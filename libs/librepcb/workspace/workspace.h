@@ -64,7 +64,7 @@ class Workspace final : public QObject {
 
 public:
   // Constructors / Destructor
-  Workspace()                       = delete;
+  Workspace() = delete;
   Workspace(const Workspace& other) = delete;
 
   /**
@@ -118,8 +118,8 @@ public:
     return mLibrariesPath.getPathTo("remote");
   }
 
-  ProjectTreeModel&      getProjectTreeModel() const noexcept;
-  RecentProjectsModel&   getRecentProjectsModel() const noexcept;
+  ProjectTreeModel& getProjectTreeModel() const noexcept;
+  RecentProjectsModel& getRecentProjectsModel() const noexcept;
   FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
 
   /**

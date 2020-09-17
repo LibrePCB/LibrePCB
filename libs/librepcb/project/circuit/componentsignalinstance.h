@@ -66,13 +66,13 @@ class ComponentSignalInstance final : public QObject,
 
 public:
   // Constructors / Destructor
-  ComponentSignalInstance()                                     = delete;
+  ComponentSignalInstance() = delete;
   ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
-  explicit ComponentSignalInstance(Circuit&           circuit,
+  explicit ComponentSignalInstance(Circuit& circuit,
                                    ComponentInstance& cmpInstance,
                                    const SExpression& node);
-  explicit ComponentSignalInstance(Circuit&                        circuit,
-                                   ComponentInstance&              cmpInstance,
+  explicit ComponentSignalInstance(Circuit& circuit,
+                                   ComponentInstance& cmpInstance,
                                    const library::ComponentSignal& cmpSignal,
                                    NetSignal* netsignal = nullptr);
   ~ComponentSignalInstance() noexcept;
@@ -82,19 +82,19 @@ public:
   const library::ComponentSignal& getCompSignal() const noexcept {
     return *mComponentSignal;
   }
-  NetSignal*         getNetSignal() const noexcept { return mNetSignal; }
+  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
   ComponentInstance& getComponentInstance() const noexcept {
     return mComponentInstance;
   }
-  bool                        isNetSignalNameForced() const noexcept;
-  QString                     getForcedNetSignalName() const noexcept;
+  bool isNetSignalNameForced() const noexcept;
+  QString getForcedNetSignalName() const noexcept;
   const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {
     return mRegisteredSymbolPins;
   }
   const QList<BI_FootprintPad*>& getRegisteredFootprintPads() const noexcept {
     return mRegisteredFootprintPads;
   }
-  int  getRegisteredElementsCount() const noexcept;
+  int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept { return (getRegisteredElementsCount() > 0); }
   bool arePinsOrPadsUsed() const noexcept;
 
@@ -141,16 +141,16 @@ private:
   bool checkAttributesValidity() const noexcept;
 
   // General
-  Circuit&                        mCircuit;
-  ComponentInstance&              mComponentInstance;
+  Circuit& mCircuit;
+  ComponentInstance& mComponentInstance;
   const library::ComponentSignal* mComponentSignal;
-  bool                            mIsAddedToCircuit;
+  bool mIsAddedToCircuit;
 
   // Attributes
   NetSignal* mNetSignal;
 
   // Registered Elements
-  QList<SI_SymbolPin*>    mRegisteredSymbolPins;
+  QList<SI_SymbolPin*> mRegisteredSymbolPins;
   QList<BI_FootprintPad*> mRegisteredFootprintPads;
 
   // ERC Messages

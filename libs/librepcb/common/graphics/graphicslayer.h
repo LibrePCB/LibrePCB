@@ -144,7 +144,7 @@ public:
     EnabledChanged,
     Destroyed,
   };
-  Signal<GraphicsLayer, Event>       onEdited;
+  Signal<GraphicsLayer, Event> onEdited;
   typedef Slot<GraphicsLayer, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -156,7 +156,7 @@ public:
   // Getters
   const QString& getName() const noexcept { return mName; }
   const QString& getNameTr() const noexcept { return mNameTr; }
-  const QColor&  getColor(bool highlighted = false) const noexcept {
+  const QColor& getColor(bool highlighted = false) const noexcept {
     return highlighted ? mColorHighlighted : mColor;
   }
   bool getVisible() const noexcept { return mIsVisible; }
@@ -166,7 +166,7 @@ public:
   bool isBottomLayer() const noexcept { return isBottomLayer(mName); }
   bool isInnerLayer() const noexcept { return isInnerLayer(mName); }
   bool isCopperLayer() const noexcept { return isCopperLayer(mName); }
-  int  getInnerLayerNumber() const noexcept {
+  int getInnerLayerNumber() const noexcept {
     return getInnerLayerNumber(mName);
   }
   QString getMirroredLayerName() const noexcept {
@@ -189,12 +189,12 @@ public:
   static int getInnerLayerCount() noexcept {
     return 62;
   }  // some random number... ;)
-  static bool    isTopLayer(const QString& name) noexcept;
-  static bool    isBottomLayer(const QString& name) noexcept;
-  static bool    isInnerLayer(const QString& name) noexcept;
-  static bool    isCopperLayer(const QString& name) noexcept;
+  static bool isTopLayer(const QString& name) noexcept;
+  static bool isBottomLayer(const QString& name) noexcept;
+  static bool isInnerLayer(const QString& name) noexcept;
+  static bool isCopperLayer(const QString& name) noexcept;
   static QString getInnerLayerName(int number) noexcept;
-  static int     getInnerLayerNumber(const QString& name) noexcept;
+  static int getInnerLayerNumber(const QString& name) noexcept;
   static QString getMirroredLayerName(const QString& name) noexcept;
   static QString getGrabAreaLayerName(const QString& outlineLayerName) noexcept;
   static const QStringList& getSchematicGeometryElementLayerNames() noexcept;
@@ -206,14 +206,14 @@ public:
 signals:
   void attributesChanged();
 
-protected:          // Data
-  QString mName;    ///< Unique name which is used for serialization
+protected:  // Data
+  QString mName;  ///< Unique name which is used for serialization
   QString mNameTr;  ///< Layer name (translated into the user's language)
-  QColor  mColor;   ///< Color of graphics items on that layer
-  QColor  mColorHighlighted;  ///< Color of hightlighted graphics items on that
-                              ///< layer
-  bool mIsVisible;            ///< Visibility of graphics items on that layer
-  bool mIsEnabled;            ///< Visibility/availability of the layer itself
+  QColor mColor;  ///< Color of graphics items on that layer
+  QColor mColorHighlighted;  ///< Color of hightlighted graphics items on that
+                             ///< layer
+  bool mIsVisible;  ///< Visibility of graphics items on that layer
+  bool mIsEnabled;  ///< Visibility/availability of the layer itself
 };
 
 /*******************************************************************************
@@ -229,7 +229,7 @@ public:
   virtual ~IF_GraphicsLayerProvider() {}
 
   virtual GraphicsLayer* getLayer(const QString& name) const noexcept = 0;
-  virtual QList<GraphicsLayer*> getAllLayers() const noexcept         = 0;
+  virtual QList<GraphicsLayer*> getAllLayers() const noexcept = 0;
 
   GraphicsLayer* getGrabAreaLayer(const QString outlineLayerName) const
       noexcept {

@@ -64,9 +64,9 @@ class PackageChooserDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  PackageChooserDialog()                                  = delete;
+  PackageChooserDialog() = delete;
   PackageChooserDialog(const PackageChooserDialog& other) = delete;
-  PackageChooserDialog(const workspace::Workspace&     ws,
+  PackageChooserDialog(const workspace::Workspace& ws,
                        const IF_GraphicsLayerProvider* layerProvider,
                        QWidget* parent = nullptr) noexcept;
   ~PackageChooserDialog() noexcept;
@@ -94,16 +94,16 @@ private:  // Methods
   const QStringList& localeOrder() const noexcept;
 
 private:  // Data
-  const workspace::Workspace&              mWorkspace;
-  const IF_GraphicsLayerProvider*          mLayerProvider;
+  const workspace::Workspace& mWorkspace;
+  const IF_GraphicsLayerProvider* mLayerProvider;
   QScopedPointer<Ui::PackageChooserDialog> mUi;
-  QScopedPointer<QAbstractItemModel>       mCategoryTreeModel;
-  tl::optional<Uuid>                       mSelectedCategoryUuid;
-  tl::optional<Uuid>                       mSelectedPackageUuid;
+  QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
+  tl::optional<Uuid> mSelectedCategoryUuid;
+  tl::optional<Uuid> mSelectedPackageUuid;
 
   // preview
-  QScopedPointer<Package>                      mPackage;
-  QScopedPointer<GraphicsScene>                mGraphicsScene;
+  QScopedPointer<Package> mPackage;
+  QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<FootprintPreviewGraphicsItem> mGraphicsItem;
 };
 

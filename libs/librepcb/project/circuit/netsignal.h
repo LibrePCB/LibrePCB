@@ -61,7 +61,7 @@ class NetSignal final : public QObject,
 
 public:
   // Constructors / Destructor
-  NetSignal()                       = delete;
+  NetSignal() = delete;
   NetSignal(const NetSignal& other) = delete;
   explicit NetSignal(Circuit& circuit, const SExpression& node);
   explicit NetSignal(Circuit& circuit, NetClass& netclass,
@@ -69,10 +69,10 @@ public:
   ~NetSignal() noexcept;
 
   // Getters: Attributes
-  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
-  bool                     hasAutoName() const noexcept { return mHasAutoName; }
-  NetClass&                getNetClass() const noexcept { return *mNetClass; }
+  bool hasAutoName() const noexcept { return mHasAutoName; }
+  NetClass& getNetClass() const noexcept { return *mNetClass; }
   bool isHighlighted() const noexcept { return mIsHighlighted; }
 
   // Getters: General
@@ -89,7 +89,7 @@ public:
   const QList<BI_Plane*>& getBoardPlanes() const noexcept {
     return mRegisteredBoardPlanes;
   }
-  int  getRegisteredElementsCount() const noexcept;
+  int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
   bool isNameForced() const noexcept;
   bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }
@@ -129,20 +129,20 @@ private:
 
   // General
   Circuit& mCircuit;
-  bool     mIsAddedToCircuit;
-  bool     mIsHighlighted;
+  bool mIsAddedToCircuit;
+  bool mIsHighlighted;
 
   // Attributes
-  Uuid              mUuid;
+  Uuid mUuid;
   CircuitIdentifier mName;
-  bool              mHasAutoName;
-  NetClass*         mNetClass;
+  bool mHasAutoName;
+  NetClass* mNetClass;
 
   // Registered Elements of this NetSignal
   QList<ComponentSignalInstance*> mRegisteredComponentSignals;
-  QList<SI_NetSegment*>           mRegisteredSchematicNetSegments;
-  QList<BI_NetSegment*>           mRegisteredBoardNetSegments;
-  QList<BI_Plane*>                mRegisteredBoardPlanes;
+  QList<SI_NetSegment*> mRegisteredSchematicNetSegments;
+  QList<BI_NetSegment*> mRegisteredBoardNetSegments;
+  QList<BI_Plane*> mRegisteredBoardPlanes;
 
   // ERC Messages
   /// @brief the ERC message for unused netsignals

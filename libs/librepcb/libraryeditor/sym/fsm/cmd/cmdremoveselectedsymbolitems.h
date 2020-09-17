@@ -54,7 +54,7 @@ public:
   ~CmdRemoveSelectedSymbolItems() noexcept;
 
   // Operator Overloadings
-  CmdRemoveSelectedSymbolItems& operator       =(
+  CmdRemoveSelectedSymbolItems& operator=(
       const CmdRemoveSelectedSymbolItems& rhs) = delete;
 
 private:

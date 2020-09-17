@@ -58,7 +58,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
+DeviceEditorWidget::DeviceEditorWidget(const Context& context,
                                        const FilePath& fp, QWidget* parent)
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::DeviceEditorWidget) {
   mUi->setupUi(this);
@@ -78,7 +78,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context&  context,
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
-  int                   row;
+  int row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
@@ -147,7 +147,7 @@ bool DeviceEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mDevice->save();      // can throw
+    mDevice->save();  // can throw
     mFileSystem->save();  // can throw
     memorizeDeviceInterface();
     return EditorWidgetBase::save();
@@ -401,8 +401,8 @@ void DeviceEditorWidget::updatePackagePreview() noexcept {
 
 void DeviceEditorWidget::memorizeDeviceInterface() noexcept {
   mOriginalComponentUuid = mDevice->getComponentUuid();
-  mOriginalPackageUuid   = mDevice->getPackageUuid();
-  mOriginalPadSignalMap  = mDevice->getPadSignalMap();
+  mOriginalPackageUuid = mDevice->getPackageUuid();
+  mOriginalPadSignalMap = mDevice->getPadSignalMap();
 }
 
 bool DeviceEditorWidget::isInterfaceBroken() const noexcept {

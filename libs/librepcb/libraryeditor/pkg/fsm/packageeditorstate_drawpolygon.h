@@ -55,7 +55,7 @@ public:
   ~PackageEditorState_DrawPolygon() noexcept;
 
   // Operator Overloadings
-  PackageEditorState_DrawPolygon& operator       =(
+  PackageEditorState_DrawPolygon& operator=(
       const PackageEditorState_DrawPolygon& rhs) = delete;
 };
 

@@ -71,7 +71,7 @@ public:
   // Constructors / Destructor
   explicit LibraryElementCheckListItemWidget(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
-      IF_LibraryElementCheckHandler&                    handler,
+      IF_LibraryElementCheckHandler& handler,
       QWidget* parent = nullptr) noexcept
     : QWidget(parent),
       mMessage(msg),
@@ -116,7 +116,7 @@ public:
   ~LibraryElementCheckListItemWidget() noexcept {}
 
   // Operator Overloadings
-  LibraryElementCheckListItemWidget& operator       =(
+  LibraryElementCheckListItemWidget& operator=(
       const LibraryElementCheckListItemWidget& rhs) = delete;
 
 private:  // Methods
@@ -127,8 +127,8 @@ private:  // Methods
 
 private:  // Data
   std::shared_ptr<const LibraryElementCheckMessage> mMessage;
-  IF_LibraryElementCheckHandler&                    mHandler;
-  QScopedPointer<QLabel>                            mIconLabel;
+  IF_LibraryElementCheckHandler& mHandler;
+  QScopedPointer<QLabel> mIconLabel;
 };
 
 /*******************************************************************************
@@ -155,7 +155,7 @@ public:
   void setMessages(LibraryElementCheckMessageList messages) noexcept;
 
   // Operator Overloadings
-  LibraryElementCheckListWidget& operator       =(
+  LibraryElementCheckListWidget& operator=(
       const LibraryElementCheckListWidget& rhs) = delete;
 
 private:  // Methods
@@ -169,7 +169,7 @@ private:  // Methods
       std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
 
 private:  // Data
-  QScopedPointer<QListWidget>    mListWidget;
+  QScopedPointer<QListWidget> mListWidget;
   IF_LibraryElementCheckHandler* mHandler;
   LibraryElementCheckMessageList mMessages;
 };

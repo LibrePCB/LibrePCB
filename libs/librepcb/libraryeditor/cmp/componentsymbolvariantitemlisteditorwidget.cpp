@@ -104,15 +104,15 @@ ComponentSymbolVariantItemListEditorWidget::
  ******************************************************************************/
 
 void ComponentSymbolVariantItemListEditorWidget::setReferences(
-    const workspace::Workspace&                       ws,
-    const IF_GraphicsLayerProvider&                   layerProvider,
-    ComponentSymbolVariantItemList&                   items,
+    const workspace::Workspace& ws,
+    const IF_GraphicsLayerProvider& layerProvider,
+    ComponentSymbolVariantItemList& items,
     const std::shared_ptr<const LibraryElementCache>& symbolCache,
-    UndoStack*                                        undoStack) noexcept {
+    UndoStack* undoStack) noexcept {
   mOnItemListEditedSlot.detachAll();
   mOnItemEditedSlot.detachAll();
 
-  mWorkspace     = &ws;
+  mWorkspace = &ws;
   mLayerProvider = &layerProvider;
   mModel->setSymbolsCache(symbolCache);
   mModel->setItemList(&items);
@@ -130,7 +130,7 @@ void ComponentSymbolVariantItemListEditorWidget::resetReferences() noexcept {
   mModel->setUndoStack(nullptr);
   mModel->setSymbolsCache(nullptr);
   mLayerProvider = nullptr;
-  mWorkspace     = nullptr;
+  mWorkspace = nullptr;
 }
 
 /*******************************************************************************
@@ -140,7 +140,7 @@ void ComponentSymbolVariantItemListEditorWidget::resetReferences() noexcept {
 void ComponentSymbolVariantItemListEditorWidget::itemListEdited(
     const ComponentSymbolVariantItemList& list, int index,
     const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-    ComponentSymbolVariantItemList::Event                    event) noexcept {
+    ComponentSymbolVariantItemList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
   Q_UNUSED(item);
@@ -159,7 +159,7 @@ void ComponentSymbolVariantItemListEditorWidget::itemListEdited(
 void ComponentSymbolVariantItemListEditorWidget::itemEdited(
     const ComponentSymbolVariantItemList& list, int index,
     const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-    ComponentSymbolVariantItem::Event                        event) noexcept {
+    ComponentSymbolVariantItem::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
   Q_UNUSED(item);

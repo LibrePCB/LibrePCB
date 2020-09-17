@@ -57,10 +57,10 @@ public:
   using Context = BoardEditorFsm::Context;
 
   // Constructors / Destructor
-  BoardEditorState()                              = delete;
+  BoardEditorState() = delete;
   BoardEditorState(const BoardEditorState& other) = delete;
   explicit BoardEditorState(const Context& context,
-                            QObject*       parent = nullptr) noexcept;
+                            QObject* parent = nullptr) noexcept;
   virtual ~BoardEditorState() noexcept;
 
   // General Methods
@@ -69,8 +69,8 @@ public:
 
   // Event Handlers
   virtual bool processAddDevice(ComponentInstance& component,
-                                const Uuid&        device,
-                                const Uuid&        footprint) noexcept {
+                                const Uuid& device,
+                                const Uuid& footprint) noexcept {
     Q_UNUSED(component);
     Q_UNUSED(device);
     Q_UNUSED(footprint);
@@ -128,11 +128,11 @@ public:
   BoardEditorState& operator=(const BoardEditorState& rhs) = delete;
 
 protected:  // Methods
-  Board*            getActiveBoard() noexcept;
-  PositiveLength    getGridInterval() const noexcept;
+  Board* getActiveBoard() noexcept;
+  PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getDefaultLengthUnit() const noexcept;
-  bool              execCmd(UndoCommand* cmd);
-  QWidget*          parentWidget() noexcept;
+  bool execCmd(UndoCommand* cmd);
+  QWidget* parentWidget() noexcept;
 
 protected:  // Data
   Context mContext;

@@ -147,8 +147,8 @@ void ComponentSymbolVariantItemListModel::moveItemUp(
   }
 
   try {
-    Uuid uuid  = Uuid::fromString(editData.toString());
-    int  index = mItemList->indexOf(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    int index = mItemList->indexOf(uuid);
     if ((index >= 1) && (index < mItemList->count())) {
       execCmd(
           new CmdComponentSymbolVariantItemsSwap(*mItemList, index, index - 1));
@@ -165,8 +165,8 @@ void ComponentSymbolVariantItemListModel::moveItemDown(
   }
 
   try {
-    Uuid uuid  = Uuid::fromString(editData.toString());
-    int  index = mItemList->indexOf(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    int index = mItemList->indexOf(uuid);
     if ((index >= 0) && (index < mItemList->count() - 1)) {
       execCmd(
           new CmdComponentSymbolVariantItemsSwap(*mItemList, index, index + 1));
@@ -253,8 +253,8 @@ QVariant ComponentSymbolVariantItemListModel::data(const QModelIndex& index,
       }
       QString name = symbol ? *symbol->getNames().getDefaultValue()
                             : (uuid ? uuid->toStr() : QString());
-      bool    showHint = (!item) && (!mNewSymbolUuid);
-      QString hint     = tr("Choose symbol...");
+      bool showHint = (!item) && (!mNewSymbolUuid);
+      QString hint = tr("Choose symbol...");
       switch (role) {
         case Qt::DisplayRole:
           return showHint ? hint : name;
@@ -290,8 +290,8 @@ QVariant ComponentSymbolVariantItemListModel::data(const QModelIndex& index,
           return required ? Qt::Checked : Qt::Unchecked;
         case Qt::ToolTipRole:
           return required
-                     ? tr("Placing this symbol in schematics is mandatory.")
-                     : tr("Placing this symbol in schematics is optional");
+              ? tr("Placing this symbol in schematics is mandatory.")
+              : tr("Placing this symbol in schematics is optional");
         default:
           return QVariant();
       }
@@ -407,8 +407,8 @@ Qt::ItemFlags ComponentSymbolVariantItemListModel::flags(
 }
 
 bool ComponentSymbolVariantItemListModel::setData(const QModelIndex& index,
-                                                  const QVariant&    value,
-                                                  int                role) {
+                                                  const QVariant& value,
+                                                  int role) {
   if (!mItemList) {
     return false;
   }
@@ -480,7 +480,7 @@ bool ComponentSymbolVariantItemListModel::setData(const QModelIndex& index,
 void ComponentSymbolVariantItemListModel::itemListEdited(
     const ComponentSymbolVariantItemList& list, int index,
     const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-    ComponentSymbolVariantItemList::Event                    event) noexcept {
+    ComponentSymbolVariantItemList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(item);
   switch (event) {

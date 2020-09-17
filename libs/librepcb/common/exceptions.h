@@ -150,14 +150,14 @@ public:
   const char* what() const noexcept override;
 
   // Inherited from QException (see QException documentation for more details)
-  virtual void       raise() const override { throw *this; }
+  virtual void raise() const override { throw *this; }
   virtual Exception* clone() const override { return new Exception(*this); }
 
 private:
   // Attributes
-  QString mMsg;   ///< the error message (translated)
+  QString mMsg;  ///< the error message (translated)
   QString mFile;  ///< the source filename where the exception was thrown
-  int     mLine;  ///< the line number where the exception was thrown
+  int mLine;  ///< the line number where the exception was thrown
 
   // Cached Attributes
   mutable QByteArray mMsgUtf8;  ///< the message as an UTF8 byte array
@@ -195,7 +195,7 @@ public:
   LogicError(const LogicError& other) noexcept;
 
   // Inherited from Exception
-  virtual void        raise() const override { throw *this; }
+  virtual void raise() const override { throw *this; }
   virtual LogicError* clone() const override { return new LogicError(*this); }
 };
 
@@ -237,7 +237,7 @@ public:
   virtual ~RuntimeError() noexcept {}
 
   // Inherited from Exception
-  virtual void          raise() const override { throw *this; }
+  virtual void raise() const override { throw *this; }
   virtual RuntimeError* clone() const override {
     return new RuntimeError(*this);
   }
@@ -291,7 +291,7 @@ public:
   RangeError(const RangeError& other) noexcept;
 
   // Inherited from RuntimeError
-  virtual void        raise() const override { throw *this; }
+  virtual void raise() const override { throw *this; }
   virtual RangeError* clone() const override { return new RangeError(*this); }
 };
 
@@ -337,7 +337,7 @@ public:
   FileParseError(const FileParseError& other) noexcept;
 
   // Inherited from RuntimeError
-  virtual void            raise() const override { throw *this; }
+  virtual void raise() const override { throw *this; }
   virtual FileParseError* clone() const override {
     return new FileParseError(*this);
   }
@@ -389,7 +389,7 @@ public:
   UserCanceled(const UserCanceled& other) noexcept;
 
   // Inherited from Exception
-  virtual void          raise() const override { throw *this; }
+  virtual void raise() const override { throw *this; }
   virtual UserCanceled* clone() const override {
     return new UserCanceled(*this);
   }

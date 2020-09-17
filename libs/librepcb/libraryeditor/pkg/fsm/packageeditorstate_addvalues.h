@@ -55,7 +55,7 @@ public:
   ~PackageEditorState_AddValues() noexcept;
 
   // Operator Overloadings
-  PackageEditorState_AddValues& operator       =(
+  PackageEditorState_AddValues& operator=(
       const PackageEditorState_AddValues& rhs) = delete;
 };
 

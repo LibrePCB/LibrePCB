@@ -153,7 +153,7 @@ void NewProjectWizardPage_Metadata::updateProjectFilePath() noexcept {
   mFullFilePath = FilePath();
 
   // check filename
-  QString name     = mUi->edtName->text();
+  QString name = mUi->edtName->text();
   QString filename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces);
   if (filename.isEmpty()) {
     mUi->lblFullFilePath->setText(tr("Please enter a valid project name."));
@@ -169,7 +169,7 @@ void NewProjectWizardPage_Metadata::updateProjectFilePath() noexcept {
   }
 
   // determine project directory and filepath
-  FilePath projDir      = location.getPathTo(filename);
+  FilePath projDir = location.getPathTo(filename);
   FilePath fullFilePath = projDir.getPathTo(filename % ".lpp");
   if ((!projDir.isValid()) || (!fullFilePath.isValid())) {
     mUi->lblFullFilePath->setText(

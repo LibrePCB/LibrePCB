@@ -67,10 +67,10 @@ private:
 
   // Private Member Variables
 
-  Project&    mProject;
+  Project& mProject;
   ElementName mName;
-  Schematic*  mSchematic;
-  int         mPageIndex;
+  Schematic* mSchematic;
+  int mPageIndex;
 };
 
 /*******************************************************************************

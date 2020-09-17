@@ -45,7 +45,7 @@ namespace library {
 class CmdSymbolPinEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdSymbolPinEdit()                              = delete;
+  CmdSymbolPinEdit() = delete;
   CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
   explicit CmdSymbolPinEdit(SymbolPin& pin) noexcept;
   ~CmdSymbolPinEdit() noexcept;
@@ -83,12 +83,12 @@ private:
   // General Attributes
   CircuitIdentifier mOldName;
   CircuitIdentifier mNewName;
-  UnsignedLength    mOldLength;
-  UnsignedLength    mNewLength;
-  Point             mOldPos;
-  Point             mNewPos;
-  Angle             mOldRotation;
-  Angle             mNewRotation;
+  UnsignedLength mOldLength;
+  UnsignedLength mNewLength;
+  Point mOldPos;
+  Point mNewPos;
+  Angle mOldRotation;
+  Angle mNewRotation;
 };
 
 /*******************************************************************************

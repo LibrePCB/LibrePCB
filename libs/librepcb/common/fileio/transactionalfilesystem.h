@@ -129,13 +129,13 @@ public:
   TransactionalFileSystem() = delete;
   TransactionalFileSystem(const FilePath& filepath, bool writable = false,
                           RestoreCallback restoreCallback = RestoreCallback(),
-                          QObject*        parent          = nullptr);
+                          QObject* parent = nullptr);
   TransactionalFileSystem(const TransactionalFileSystem& other) = delete;
   virtual ~TransactionalFileSystem() noexcept;
 
   // Getters
   const FilePath& getPath() const noexcept { return mFilePath; }
-  bool            isWritable() const noexcept { return mIsWritable; }
+  bool isWritable() const noexcept { return mIsWritable; }
   bool isRestoredFromAutosave() const noexcept { return mRestoredFromAutosave; }
 
   // Inherited from FileSystem
@@ -143,40 +143,40 @@ public:
   virtual QStringList getDirs(const QString& path = "") const noexcept override;
   virtual QStringList getFiles(const QString& path = "") const
       noexcept override;
-  virtual bool       fileExists(const QString& path) const noexcept override;
+  virtual bool fileExists(const QString& path) const noexcept override;
   virtual QByteArray read(const QString& path) const override;
   virtual void write(const QString& path, const QByteArray& content) override;
   virtual void removeFile(const QString& path) override;
   virtual void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
-  void        loadFromZip(QByteArray content);
-  void        loadFromZip(const FilePath& fp);
-  QByteArray  exportToZip() const;
-  void        exportToZip(const FilePath& fp) const;
-  void        discardChanges() noexcept;
+  void loadFromZip(QByteArray content);
+  void loadFromZip(const FilePath& fp);
+  QByteArray exportToZip() const;
+  void exportToZip(const FilePath& fp) const;
+  void discardChanges() noexcept;
   QStringList checkForModifications() const;
-  void        autosave();
-  void        save();
+  void autosave();
+  void save();
 
   // Static Methods
   static std::shared_ptr<TransactionalFileSystem> open(
       const FilePath& filepath, bool writable,
       RestoreCallback restoreCallback = &RestoreMode::no,
-      QObject*        parent          = nullptr) {
+      QObject* parent = nullptr) {
     return std::make_shared<TransactionalFileSystem>(filepath, writable,
                                                      restoreCallback, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRO(
       const FilePath& filepath,
       RestoreCallback restoreCallback = &RestoreMode::no,
-      QObject*        parent          = nullptr) {
+      QObject* parent = nullptr) {
     return open(filepath, false, restoreCallback, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRW(
       const FilePath& filepath,
       RestoreCallback restoreCallback = &RestoreMode::no,
-      QObject*        parent          = nullptr) {
+      QObject* parent = nullptr) {
     return open(filepath, true, restoreCallback, parent);
   }
   static QString cleanPath(QString path) noexcept;
@@ -190,15 +190,15 @@ private:  // Methods
   void removeDiff(const QString& type);
 
 private:  // Data
-  FilePath      mFilePath;
-  bool          mIsWritable;
+  FilePath mFilePath;
+  bool mIsWritable;
   DirectoryLock mLock;
-  bool          mRestoredFromAutosave;
+  bool mRestoredFromAutosave;
 
   // File system modifications
   QHash<QString, QByteArray> mModifiedFiles;
-  QSet<QString>              mRemovedFiles;
-  QSet<QString>              mRemovedDirs;
+  QSet<QString> mRemovedFiles;
+  QSet<QString> mRemovedDirs;
 };
 
 /*******************************************************************************

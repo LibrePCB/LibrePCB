@@ -68,7 +68,7 @@ FootprintPadPreviewGraphicsItem::~FootprintPadPreviewGraphicsItem() noexcept {
  ******************************************************************************/
 
 void FootprintPadPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
-  mShape        = mFootprintPad.toQPainterPathPx();
+  mShape = mFootprintPad.toQPainterPathPx();
   mBoundingRect = mShape.boundingRect();
 
   update();

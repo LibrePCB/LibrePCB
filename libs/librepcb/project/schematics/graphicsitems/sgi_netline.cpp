@@ -87,14 +87,14 @@ void SGI_NetLine::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_NetLine::paint(QPainter*                       painter,
+void SGI_NetLine::paint(QPainter* painter,
                         const QStyleOptionGraphicsItem* option,
-                        QWidget*                        widget) {
+                        QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
   bool highlight = mNetLine.isSelected() ||
-                   mNetLine.getNetSignalOfNetSegment().isHighlighted();
+      mNetLine.getNetSignalOfNetSegment().isHighlighted();
 
   // draw line
   if (mLayer->isVisible()) {

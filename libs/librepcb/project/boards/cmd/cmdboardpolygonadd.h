@@ -46,7 +46,7 @@ class BI_Polygon;
 class CmdBoardPolygonAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardPolygonAdd()                                = delete;
+  CmdBoardPolygonAdd() = delete;
   CmdBoardPolygonAdd(const CmdBoardPolygonAdd& other) = delete;
   explicit CmdBoardPolygonAdd(BI_Polygon& polygon) noexcept;
   ~CmdBoardPolygonAdd() noexcept;
@@ -65,7 +65,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  Board&      mBoard;
+  Board& mBoard;
   BI_Polygon& mPolygon;
 };
 

@@ -105,10 +105,10 @@ HoleGraphicsItem* FootprintGraphicsItem::getHoleGraphicsItem(
 
 int FootprintGraphicsItem::getItemsAtPosition(
     const Point& pos, QList<QSharedPointer<FootprintPadGraphicsItem>>* pads,
-    QList<QSharedPointer<CircleGraphicsItem>>*     circles,
-    QList<QSharedPointer<PolygonGraphicsItem>>*    polygons,
+    QList<QSharedPointer<CircleGraphicsItem>>* circles,
+    QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
     QList<QSharedPointer<StrokeTextGraphicsItem>>* texts,
-    QList<QSharedPointer<HoleGraphicsItem>>*       holes) noexcept {
+    QList<QSharedPointer<HoleGraphicsItem>>* holes) noexcept {
   int count = 0;
   if (pads) {
     foreach (const QSharedPointer<FootprintPadGraphicsItem>& item,
@@ -163,7 +163,7 @@ int FootprintGraphicsItem::getItemsAtPosition(
 }
 
 QList<QSharedPointer<FootprintPadGraphicsItem>>
-FootprintGraphicsItem::getSelectedPads() noexcept {
+    FootprintGraphicsItem::getSelectedPads() noexcept {
   QList<QSharedPointer<FootprintPadGraphicsItem>> pins;
   foreach (const QSharedPointer<FootprintPadGraphicsItem>& item,
            mPadGraphicsItems) {
@@ -175,7 +175,7 @@ FootprintGraphicsItem::getSelectedPads() noexcept {
 }
 
 QList<QSharedPointer<CircleGraphicsItem>>
-FootprintGraphicsItem::getSelectedCircles() noexcept {
+    FootprintGraphicsItem::getSelectedCircles() noexcept {
   QList<QSharedPointer<CircleGraphicsItem>> circles;
   foreach (const QSharedPointer<CircleGraphicsItem>& item,
            mCircleGraphicsItems) {
@@ -187,7 +187,7 @@ FootprintGraphicsItem::getSelectedCircles() noexcept {
 }
 
 QList<QSharedPointer<PolygonGraphicsItem>>
-FootprintGraphicsItem::getSelectedPolygons() noexcept {
+    FootprintGraphicsItem::getSelectedPolygons() noexcept {
   QList<QSharedPointer<PolygonGraphicsItem>> polygons;
   foreach (const QSharedPointer<PolygonGraphicsItem>& item,
            mPolygonGraphicsItems) {
@@ -199,7 +199,7 @@ FootprintGraphicsItem::getSelectedPolygons() noexcept {
 }
 
 QList<QSharedPointer<StrokeTextGraphicsItem>>
-FootprintGraphicsItem::getSelectedStrokeTexts() noexcept {
+    FootprintGraphicsItem::getSelectedStrokeTexts() noexcept {
   QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
   foreach (const QSharedPointer<StrokeTextGraphicsItem>& item,
            mStrokeTextGraphicsItems) {
@@ -211,7 +211,7 @@ FootprintGraphicsItem::getSelectedStrokeTexts() noexcept {
 }
 
 QList<QSharedPointer<HoleGraphicsItem>>
-FootprintGraphicsItem::getSelectedHoles() noexcept {
+    FootprintGraphicsItem::getSelectedHoles() noexcept {
   QList<QSharedPointer<HoleGraphicsItem>> holes;
   foreach (const QSharedPointer<HoleGraphicsItem>& item, mHoleGraphicsItems) {
     if (item->isSelected()) {
@@ -325,7 +325,7 @@ void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void FootprintGraphicsItem::paint(QPainter*                       painter,
+void FootprintGraphicsItem::paint(QPainter* painter,
                                   const QStyleOptionGraphicsItem* option,
                                   QWidget* widget) noexcept {
   Q_UNUSED(painter);

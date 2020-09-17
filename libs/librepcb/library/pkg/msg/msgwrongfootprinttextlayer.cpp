@@ -38,9 +38,9 @@ namespace library {
  ******************************************************************************/
 
 MsgWrongFootprintTextLayer::MsgWrongFootprintTextLayer(
-    std::shared_ptr<const Footprint>  footprint,
+    std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const StrokeText> text,
-    const QString&                    expectedLayerName) noexcept
+    const QString& expectedLayerName) noexcept
   : LibraryElementCheckMessage(
         Severity::Warning,
         tr("Layer of '%1' in '%2' is not '%3'")

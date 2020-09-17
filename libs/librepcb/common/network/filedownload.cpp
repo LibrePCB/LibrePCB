@@ -59,7 +59,7 @@ FileDownload::~FileDownload() noexcept {
 void FileDownload::setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
                                        const QByteArray& checksum) noexcept {
   Q_ASSERT(!mStarted);
-  mHashAlgorithm    = algorithm;
+  mHashAlgorithm = algorithm;
   mExpectedChecksum = checksum;
 }
 
@@ -118,7 +118,7 @@ void FileDownload::finalizeRequest() {
 
   // verify checksum of downloaded file
   if (!mExpectedChecksum.isEmpty()) {
-    emit  progressState(tr("Verify checksum..."));
+    emit progressState(tr("Verify checksum..."));
     QFile file(mDestination.toStr());
     if (!file.open(QFile::ReadOnly)) {
       throw RuntimeError(__FILE__, __LINE__,
@@ -127,7 +127,7 @@ void FileDownload::finalizeRequest() {
     }
     QCryptographicHash hash(mHashAlgorithm);
     hash.addData(&file);
-    QString result   = hash.result().toHex();
+    QString result = hash.result().toHex();
     QString expected = mExpectedChecksum.toHex();
     if (result != expected) {
       qDebug() << "expected" << expected << "but got" << result;
@@ -141,7 +141,7 @@ void FileDownload::finalizeRequest() {
 
   // extract zip file if neccessary
   if (mExtractZipToDir.isValid()) {
-    emit        progressState(tr("Extract files..."));
+    emit progressState(tr("Extract files..."));
     QStringList files =
         JlCompress::extractDir(mDestination.toStr(), mExtractZipToDir.toStr());
     if (files.isEmpty()) {

@@ -61,10 +61,10 @@ public:
   // Getters
   bool validatePage() noexcept override;
   bool isComplete() const noexcept override;
-  int  nextId() const noexcept override;
+  int nextId() const noexcept override;
 
   // Operator Overloadings
-  NewElementWizardPage_ComponentProperties& operator       =(
+  NewElementWizardPage_ComponentProperties& operator=(
       const NewElementWizardPage_ComponentProperties& rhs) = delete;
 
 private:  // Methods
@@ -72,7 +72,7 @@ private:  // Methods
   void cleanupPage() noexcept override;
 
 private:  // Data
-  NewElementWizardContext&                                     mContext;
+  NewElementWizardContext& mContext;
   QScopedPointer<Ui::NewElementWizardPage_ComponentProperties> mUi;
 };
 

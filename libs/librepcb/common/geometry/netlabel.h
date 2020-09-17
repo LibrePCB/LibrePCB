@@ -56,7 +56,7 @@ public:
     PositionChanged,
     RotationChanged,
   };
-  Signal<NetLabel, Event>       onEdited;
+  Signal<NetLabel, Event> onEdited;
   typedef Slot<NetLabel, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -69,7 +69,7 @@ public:
   ~NetLabel() noexcept;
 
   // Getters
-  const Uuid&  getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
 
@@ -89,7 +89,7 @@ public:
   NetLabel& operator=(const NetLabel& rhs) noexcept;
 
 private:  // Data
-  Uuid  mUuid;
+  Uuid mUuid;
   Point mPosition;
   Angle mRotation;
 };

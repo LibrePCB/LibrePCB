@@ -51,7 +51,7 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
-                                                       PadType  type) noexcept
+                                                       PadType type) noexcept
   : PackageEditorState(context),
     mPadType(type),
     mCurrentPad(nullptr),
@@ -60,15 +60,15 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mLastPad(
         Uuid::createRandom(), Point(0, 0), Angle::deg0(),
         FootprintPad::Shape::ROUND,  // Commonly used pad shape
-        PositiveLength(2500000),     // There is no default/recommended pad size
-        PositiveLength(1300000),     // -> choose reasonable multiple of 0.1mm
-        UnsignedLength(800000),      // Commonly used drill diameter
+        PositiveLength(2500000),  // There is no default/recommended pad size
+        PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
+        UnsignedLength(800000),  // Commonly used drill diameter
         FootprintPad::BoardSide::THT) {
   if (mPadType == PadType::SMT) {
     mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);  // Default side
     mLastPad.setShape(FootprintPad::Shape::RECT);  // Commonly used SMT shape
     mLastPad.setDrillDiameter(UnsignedLength(0));  // Disable drill
-    mLastPad.setWidth(PositiveLength(1500000));    // Same as for THT pads ->
+    mLastPad.setWidth(PositiveLength(1500000));  // Same as for THT pads ->
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
   }
 }
@@ -248,7 +248,7 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
     mCurrentGraphicsItem = nullptr;
-    mCurrentPad          = nullptr;
+    mCurrentPad = nullptr;
     mEditCmd.reset();
     return false;
   }
@@ -263,7 +263,7 @@ bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mLastPad             = *mCurrentPad;
+    mLastPad = *mCurrentPad;
     mCurrentPad.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
@@ -279,7 +279,7 @@ bool PackageEditorState_AddPads::abortAddPad() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mLastPad             = *mCurrentPad;
+    mLastPad = *mCurrentPad;
     mCurrentPad.reset();
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();

@@ -62,7 +62,7 @@ public:
     SignalUuidChanged,
     DisplayTypeChanged,
   };
-  Signal<ComponentPinSignalMapItem, Event>       onEdited;
+  Signal<ComponentPinSignalMapItem, Event> onEdited;
   typedef Slot<ComponentPinSignalMapItem, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -77,7 +77,7 @@ public:
   const Uuid& getUuid() const noexcept {
     return mPinUuid;
   }  // used for UuidObjectMap
-  const Uuid&               getPinUuid() const noexcept { return mPinUuid; }
+  const Uuid& getPinUuid() const noexcept { return mPinUuid; }
   const tl::optional<Uuid>& getSignalUuid() const noexcept {
     return mSignalUuid;
   }
@@ -100,8 +100,8 @@ public:
   ComponentPinSignalMapItem& operator=(
       const ComponentPinSignalMapItem& rhs) noexcept;
 
-private:                           // Data
-  Uuid               mPinUuid;     ///< must be valid
+private:  // Data
+  Uuid mPinUuid;  ///< must be valid
   tl::optional<Uuid> mSignalUuid;  ///< tl::nullopt if not connected to a signal
   CmpSigPinDisplayType mDisplayType;
 };
@@ -139,7 +139,7 @@ public:
   ComponentPinSignalMapHelpers() = delete;  // disable instantiation
 
   static ComponentPinSignalMap create(
-      const QSet<Uuid>            pins,
+      const QSet<Uuid> pins,
       const CmpSigPinDisplayType& display =
           CmpSigPinDisplayType::componentSignal()) noexcept {
     ComponentPinSignalMap map;

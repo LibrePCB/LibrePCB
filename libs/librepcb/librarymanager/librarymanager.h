@@ -62,7 +62,7 @@ class LibraryManager final : public QMainWindow {
 
 public:
   // Constructors / Destructor
-  LibraryManager()                            = delete;
+  LibraryManager() = delete;
   LibraryManager(const LibraryManager& other) = delete;
   LibraryManager(workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
   ~LibraryManager() noexcept;
@@ -88,11 +88,11 @@ signals:
   void openLibraryEditorTriggered(const FilePath& libDir);
 
 private:  // Data
-  workspace::Workspace&              mWorkspace;
+  workspace::Workspace& mWorkspace;
   QScopedPointer<Ui::LibraryManager> mUi;
-  QScopedPointer<AddLibraryWidget>   mAddLibraryWidget;
-  QWidget*                           mCurrentWidget;
-  FilePath                           mSelectedLibrary;
+  QScopedPointer<AddLibraryWidget> mAddLibraryWidget;
+  QWidget* mCurrentWidget;
+  FilePath mSelectedLibrary;
 };
 
 /*******************************************************************************

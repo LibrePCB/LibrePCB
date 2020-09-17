@@ -122,8 +122,8 @@ void WorkspaceLibraryScanner::scan() noexcept {
     getLibrariesOfDirectory(fs, "local", libraries);
     getLibrariesOfDirectory(fs, "remote", libraries);
     QHash<QString, int> libIds = updateLibraries(db, libraries);  // can throw
-    emit                scanLibraryListUpdated(libIds.count());
-    emit                scanProgressUpdate(1);
+    emit scanLibraryListUpdated(libIds.count());
+    emit scanProgressUpdate(1);
     qDebug() << "Workspace libraries indexed:" << libIds.count()
              << "libraries in" << timer.elapsed() << "ms";
 
@@ -134,12 +134,12 @@ void WorkspaceLibraryScanner::scan() noexcept {
     clearAllTables(db);
 
     // scan all libraries
-    int   count   = 0;
+    int count = 0;
     qreal percent = 1;
     foreach (const QString& fp, libraries.keys()) {
       Q_ASSERT(libIds.contains(fp));
-      int                             libId = libIds[fp];
-      const std::shared_ptr<Library>& lib   = libraries[fp];
+      int libId = libIds[fp];
+      const std::shared_ptr<Library>& lib = libraries[fp];
       Q_ASSERT(lib);
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addCategoriesToDb<ComponentCategory>(
@@ -195,7 +195,7 @@ void WorkspaceLibraryScanner::getLibrariesOfDirectory(
     std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
     QHash<QString, std::shared_ptr<Library>>& libs) noexcept {
   foreach (const QString& name, fs->getDirs(root)) {
-    QString                                 dirpath = root % "/" % name;
+    QString dirpath = root % "/" % name;
     std::unique_ptr<TransactionalDirectory> dir(
         new TransactionalDirectory(fs, dirpath));
     if (Library::isValidElementDirectory<Library>(*dir, "")) {
@@ -222,7 +222,7 @@ QHash<QString, int> WorkspaceLibraryScanner::updateLibraries(
   QSqlQuery query = db.prepareQuery("SELECT id, filepath FROM libraries");
   db.exec(query);
   while (query.next()) {
-    int     id = query.value(0).toInt();
+    int id = query.value(0).toInt();
     QString fp = query.value(1).toString();
     if (fp.isEmpty()) throw LogicError(__FILE__, __LINE__);
     dbLibIds[fp] = id;
@@ -345,8 +345,8 @@ int WorkspaceLibraryScanner::addCategoriesToDb(
     try {
       std::unique_ptr<TransactionalDirectory> dir(
           new TransactionalDirectory(fs, fullPath));  // can throw
-      ElementType element(std::move(dir));            // can throw
-      QSqlQuery   query = db.prepareQuery(
+      ElementType element(std::move(dir));  // can throw
+      QSqlQuery query = db.prepareQuery(
           "INSERT INTO " % table %
           " "
           "(lib_id, filepath, uuid, version, parent_uuid) VALUES "
@@ -355,9 +355,9 @@ int WorkspaceLibraryScanner::addCategoriesToDb(
       query.bindValue(":filepath", fullPath);
       query.bindValue(":uuid", element.getUuid().toStr());
       query.bindValue(":version", element.getVersion().toStr());
-      query.bindValue(":parent_uuid", element.getParentUuid()
-                                          ? element.getParentUuid()->toStr()
-                                          : QVariant(QVariant::String));
+      query.bindValue(":parent_uuid",
+                      element.getParentUuid() ? element.getParentUuid()->toStr()
+                                              : QVariant(QVariant::String));
       int id = db.insert(query);
       foreach (const QString& locale, element.getAllAvailableLocales()) {
         QSqlQuery query = db.prepareQuery(
@@ -374,8 +374,9 @@ int WorkspaceLibraryScanner::addCategoriesToDb(
         query.bindValue(
             ":description",
             optionalToVariant(element.getDescriptions().tryGet(locale)));
-        query.bindValue(":keywords", optionalToVariant(
-                                         element.getKeywords().tryGet(locale)));
+        query.bindValue(
+            ":keywords",
+            optionalToVariant(element.getKeywords().tryGet(locale)));
         db.insert(query);
       }
       count++;
@@ -398,7 +399,7 @@ int WorkspaceLibraryScanner::addElementsToDb(
     try {
       std::unique_ptr<TransactionalDirectory> dir(
           new TransactionalDirectory(fs, fullPath));  // can throw
-      ElementType element(std::move(dir));            // can throw
+      ElementType element(std::move(dir));  // can throw
       addElementToDb(db, table, idColumn, libId, fullPath, element);
       count++;
     } catch (const Exception& e) {
@@ -410,9 +411,9 @@ int WorkspaceLibraryScanner::addElementsToDb(
 
 template <typename ElementType>
 void WorkspaceLibraryScanner::addElementToDb(SQLiteDatabase& db,
-                                             const QString&  table,
+                                             const QString& table,
                                              const QString& idColumn, int libId,
-                                             const QString&     path,
+                                             const QString& path,
                                              const ElementType& element) {
   QSqlQuery query = db.prepareQuery("INSERT INTO " % table %
                                     " (lib_id, filepath, uuid, version) VALUES "

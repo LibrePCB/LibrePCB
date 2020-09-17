@@ -45,7 +45,7 @@ class UndoCommandGroup : public UndoCommand {
 
 public:
   // Constructors / Destructor
-  UndoCommandGroup()                              = delete;
+  UndoCommandGroup() = delete;
   UndoCommandGroup(const UndoCommandGroup& other) = delete;
   explicit UndoCommandGroup(const QString& text) noexcept;
   virtual ~UndoCommandGroup() noexcept;

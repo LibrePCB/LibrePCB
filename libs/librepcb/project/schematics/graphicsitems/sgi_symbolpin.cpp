@@ -136,9 +136,9 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_SymbolPin::paint(QPainter*                       painter,
+void SGI_SymbolPin::paint(QPainter* painter,
                           const QStyleOptionGraphicsItem* option,
-                          QWidget*                        widget) {
+                          QWidget* widget) {
   Q_UNUSED(widget);
   const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
@@ -146,7 +146,7 @@ void SGI_SymbolPin::paint(QPainter*                       painter,
       option->levelOfDetailFromTransform(painter->worldTransform());
 
   const NetSignal* netsignal = mPin.getCompSigInstNetSignal();
-  bool             highlight =
+  bool highlight =
       mPin.isSelected() || (netsignal && netsignal->isHighlighted());
 
   // draw line

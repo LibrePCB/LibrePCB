@@ -36,8 +36,8 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  QString             locale;
-  QString             input;
+  QString locale;
+  QString input;
   tl::optional<qreal> output;
 } MathParserTestData;
 

@@ -69,10 +69,10 @@ private:
   void performRedo() override;
 
   // Private Member Variables
-  BI_NetSegment&      mNetSegment;
-  QList<BI_Via*>      mVias;
+  BI_NetSegment& mNetSegment;
+  QList<BI_Via*> mVias;
   QList<BI_NetPoint*> mNetPoints;
-  QList<BI_NetLine*>  mNetLines;
+  QList<BI_NetLine*> mNetLines;
 };
 
 /*******************************************************************************

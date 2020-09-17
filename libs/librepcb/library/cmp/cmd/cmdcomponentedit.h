@@ -44,7 +44,7 @@ namespace library {
 class CmdComponentEdit : public CmdLibraryElementEdit {
 public:
   // Constructors / Destructor
-  CmdComponentEdit()                              = delete;
+  CmdComponentEdit() = delete;
   CmdComponentEdit(const CmdComponentEdit& other) = delete;
   explicit CmdComponentEdit(Component& component) noexcept;
   virtual ~CmdComponentEdit() noexcept;
@@ -71,10 +71,10 @@ protected:  // Methods
 private:  // Data
   Component& mComponent;
 
-  bool                   mOldSchematicOnly;
-  bool                   mNewSchematicOnly;
-  QString                mOldDefaultValue;
-  QString                mNewDefaultValue;
+  bool mOldSchematicOnly;
+  bool mNewSchematicOnly;
+  QString mOldDefaultValue;
+  QString mNewDefaultValue;
   NormDependentPrefixMap mOldPrefixes;
   NormDependentPrefixMap mNewPrefixes;
 };

@@ -71,7 +71,7 @@ public:
   };
 
   // Constructors / Destructor
-  WorkspaceSettings()                               = delete;
+  WorkspaceSettings() = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
   explicit WorkspaceSettings(const FilePath& fp, QObject* parent = nullptr);
   ~WorkspaceSettings() noexcept;
@@ -100,7 +100,7 @@ private:  // Methods
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-private:               // Data
+private:  // Data
   FilePath mFilePath;  ///< path to the "settings.lp" file
 
 public:

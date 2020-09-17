@@ -50,13 +50,14 @@ struct CircuitIdentifierVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
       typename std::decay<Value>::type {
-    return p(val) ? std::forward<Value>(val)
-                  : (throw RuntimeError(__FILE__, __LINE__,
-                                        QString(QApplication::translate(
-                                                    "CircuitIdentifier",
-                                                    "Invalid identifier: '%1'"))
-                                            .arg(val)),
-                     std::forward<Value>(val));
+    return p(val)
+        ? std::forward<Value>(val)
+        : (throw RuntimeError(
+               __FILE__, __LINE__,
+               QString(QApplication::translate("CircuitIdentifier",
+                                               "Invalid identifier: '%1'"))
+                   .arg(val)),
+           std::forward<Value>(val));
   }
 };
 
@@ -89,26 +90,26 @@ using CircuitIdentifier =
                                 CircuitIdentifierVerifier>;
 
 inline bool operator==(const CircuitIdentifier& lhs,
-                       const QString&           rhs) noexcept {
+                       const QString& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const QString&           lhs,
+inline bool operator==(const QString& lhs,
                        const CircuitIdentifier& rhs) noexcept {
   return lhs == (*rhs);
 }
 inline bool operator!=(const CircuitIdentifier& lhs,
-                       const QString&           rhs) noexcept {
+                       const QString& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const QString&           lhs,
+inline bool operator!=(const QString& lhs,
                        const CircuitIdentifier& rhs) noexcept {
   return lhs != (*rhs);
 }
 inline QString operator%(const CircuitIdentifier& lhs,
-                         const QString&           rhs) noexcept {
+                         const QString& rhs) noexcept {
   return (*lhs) % rhs;
 }
-inline QString operator%(const QString&           lhs,
+inline QString operator%(const QString& lhs,
                          const CircuitIdentifier& rhs) noexcept {
   return lhs % (*rhs);
 }
@@ -128,7 +129,7 @@ inline CircuitIdentifier deserializeFromSExpression(const SExpression& sexpr,
   return CircuitIdentifier(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 
-inline QDataStream& operator<<(QDataStream&             stream,
+inline QDataStream& operator<<(QDataStream& stream,
                                const CircuitIdentifier& obj) {
   stream << *obj;
   return stream;

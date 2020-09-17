@@ -49,7 +49,7 @@ namespace library {
 FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(
     const IF_GraphicsLayerProvider& layerProvider,
     const QStringList& localeOrder, const Footprint& footprint,
-    const Package*   package, /*const Device* device,*/
+    const Package* package, /*const Device* device,*/
     const Component* component, const AttributeProvider* attrProvider) noexcept
   : QGraphicsItem(),
     mLayerProvider(layerProvider),
@@ -110,7 +110,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   mBoundingRect = QRectF();
-  mShape        = QPainterPath();
+  mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);
 
   // cross rect
@@ -121,7 +121,7 @@ void FootprintPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
   // polygons
   for (const Polygon& polygon : mFootprint.getPolygons()) {
     QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-    qreal        w           = polygon.getLineWidth()->toPx() / 2;
+    qreal w = polygon.getLineWidth()->toPx() / 2;
     mBoundingRect =
         mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
     if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
@@ -139,9 +139,9 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter,
                                          QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  QPen                 pen;
+  QPen pen;
   const GraphicsLayer* layer = 0;
-  const bool selected        = option->state.testFlag(QStyle::State_Selected);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
   const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
@@ -199,7 +199,7 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter,
     layer = mLayerProvider.getLayer(GraphicsLayer::sTopReferences);
     if (layer) {
       qreal width = Length(700000).toPx();
-      pen         = QPen(layer->getColor(selected), 0);
+      pen = QPen(layer->getColor(selected), 0);
       painter->setPen(pen);
       painter->drawLine(-2 * width, 0, 2 * width, 0);
       painter->drawLine(0, -2 * width, 0, 2 * width);

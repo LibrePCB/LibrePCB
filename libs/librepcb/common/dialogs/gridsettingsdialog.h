@@ -50,10 +50,10 @@ class GridSettingsDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  GridSettingsDialog()                                = delete;
+  GridSettingsDialog() = delete;
   GridSettingsDialog(const GridSettingsDialog& other) = delete;
   explicit GridSettingsDialog(const GridProperties& grid,
-                              QWidget*              parent = nullptr) noexcept;
+                              QWidget* parent = nullptr) noexcept;
   ~GridSettingsDialog() noexcept;
 
   // Getters
@@ -73,8 +73,8 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::GridSettingsDialog> mUi;
-  GridProperties                         mOriginalGrid;
-  GridProperties                         mCurrentGrid;
+  GridProperties mOriginalGrid;
+  GridProperties mCurrentGrid;
 };
 
 /*******************************************************************************

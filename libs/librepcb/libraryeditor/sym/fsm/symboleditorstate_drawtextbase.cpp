@@ -205,7 +205,7 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
     mCurrentGraphicsItem = nullptr;
-    mCurrentText         = nullptr;
+    mCurrentText = nullptr;
     mEditCmd.reset();
     return false;
   }
@@ -220,7 +220,7 @@ bool SymbolEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentText         = nullptr;
+    mCurrentText = nullptr;
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -234,7 +234,7 @@ bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentText         = nullptr;
+    mCurrentText = nullptr;
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;
@@ -249,20 +249,20 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
     case Mode::NAME:
       // Set all properties according library conventions
       mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolNames);
-      mLastHeight    = PositiveLength(2500000);
-      mLastText      = "{{NAME}}";
+      mLastHeight = PositiveLength(2500000);
+      mLastText = "{{NAME}}";
       break;
     case Mode::VALUE:
       // Set all properties according library conventions
       mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolValues);
-      mLastHeight    = PositiveLength(2500000);
-      mLastText      = "{{VALUE}}";
+      mLastHeight = PositiveLength(2500000);
+      mLastText = "{{VALUE}}";
       break;
     default:
       // Set properties to something reasonable
       mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
-      mLastHeight    = PositiveLength(2500000);
-      mLastText      = "Text";  // Non-empty to avoid invisible graphics item
+      mLastHeight = PositiveLength(2500000);
+      mLastText = "Text";  // Non-empty to avoid invisible graphics item
       break;
   }
 }

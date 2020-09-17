@@ -51,7 +51,8 @@ InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
  ******************************************************************************/
 
 std::unique_ptr<AsyncCopyOperation>
-InitializeWorkspaceWizardContext::createImportCopyOperation() const noexcept {
+    InitializeWorkspaceWizardContext::createImportCopyOperation() const
+    noexcept {
   if (mVersionToImport) {
     FilePath src = mWorkspacePath.getPathTo("v" % mVersionToImport->toStr());
     FilePath dst =

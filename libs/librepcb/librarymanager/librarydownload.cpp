@@ -39,7 +39,7 @@ namespace manager {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryDownload::LibraryDownload(const QUrl&     urlToZip,
+LibraryDownload::LibraryDownload(const QUrl& urlToZip,
                                  const FilePath& destDir) noexcept
   : QObject(nullptr),
     mDestDir(destDir),
@@ -79,7 +79,7 @@ void LibraryDownload::setExpectedZipFileSize(qint64 bytes) noexcept {
 
 void LibraryDownload::setExpectedChecksum(
     QCryptographicHash::Algorithm algorithm,
-    const QByteArray&             checksum) noexcept {
+    const QByteArray& checksum) noexcept {
   if (mFileDownload) {
     mFileDownload->setExpectedChecksum(algorithm, checksum);
   } else {
@@ -172,7 +172,7 @@ void LibraryDownload::downloadSucceeded() noexcept {
   // clean up
   try {
     FileUtils::removeDirRecursively(mTempDestDir);  // can throw
-    FileUtils::removeDirRecursively(backupDir);     // can throw
+    FileUtils::removeDirRecursively(backupDir);  // can throw
   } catch (...) {
   }
 

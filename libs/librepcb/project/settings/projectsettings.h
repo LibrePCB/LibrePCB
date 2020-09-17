@@ -89,7 +89,7 @@ private:
 
   // All Settings
   QStringList
-              mLocaleOrder;  ///< The list of locales (like "de_CH") in the right order
+      mLocaleOrder;  ///< The list of locales (like "de_CH") in the right order
   QStringList mNormOrder;  ///< the list of norms in the right order
 };
 

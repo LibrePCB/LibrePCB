@@ -74,9 +74,9 @@ private:
   EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs);
 
   // General Attributes
-  Circuit&                  mCircuit;
+  Circuit& mCircuit;
   Ui::EditNetClassesDialog* mUi;
-  UndoStack&                mUndoStack;
+  UndoStack& mUndoStack;
 };
 
 /*******************************************************************************

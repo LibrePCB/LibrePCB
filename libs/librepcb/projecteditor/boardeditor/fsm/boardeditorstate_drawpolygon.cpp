@@ -56,9 +56,9 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
     mLastPolygonProperties(
         Uuid::createRandom(),  // UUID is not relevant here
         GraphicsLayerName(GraphicsLayer::sBoardOutlines),  // Layer
-        UnsignedLength(0),                                 // Line width
-        false,                                             // Is filled
-        false,                                             // Is grab area
+        UnsignedLength(0),  // Line width
+        false,  // Is filled
+        false,  // Is grab area
         Path()  // Path is not relevant here
         ),
     mLastSegmentPos(),
@@ -200,7 +200,7 @@ bool BoardEditorState_DrawPolygon::processSwitchToBoard(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawPolygon::startAddPolygon(Board&       board,
+bool BoardEditorState_DrawPolygon::startAddPolygon(Board& board,
                                                    const Point& pos) noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
@@ -337,7 +337,7 @@ void BoardEditorState_DrawPolygon::filledCheckBoxCheckedChanged(
 
 void BoardEditorState_DrawPolygon::makeSelectedLayerVisible() noexcept {
   if (mCurrentPolygon) {
-    Board&         board = mCurrentPolygon->getBoard();
+    Board& board = mCurrentPolygon->getBoard();
     GraphicsLayer* layer =
         board.getLayerStack().getLayer(*mLastPolygonProperties.getLayerName());
     if (layer && layer->isEnabled()) layer->setVisible(true);
