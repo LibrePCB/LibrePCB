@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "cmdremoveboarditems.h"
 
+#include "../boardeditor/boardnetsegmentsplitter.h"
 #include "cmdremoveunusedlibraryelements.h"
 
 #include <librepcb/common/scopeguard.h>
 #include <librepcb/common/toolbox.h>
-#include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/cmd/cmdboardholeremove.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
 #include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
@@ -40,12 +41,10 @@
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
 #include <librepcb/project/boards/items/bi_hole.h>
-#include <librepcb/project/boards/items/bi_netline.h>
 #include <librepcb/project/boards/items/bi_netpoint.h>
 #include <librepcb/project/boards/items/bi_netsegment.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/items/bi_stroketext.h>
 #include <librepcb/project/boards/items/bi_via.h>
 
 #include <QtCore>
@@ -76,25 +75,16 @@ bool CmdRemoveBoardItems::performExecute() {
   // if an error occurs, undo all already executed child commands
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
-  // also remove all netlines from devices
+  // determine all affected netsegments and their items to remove
+  NetSegmentItemList netSegmentItemsToRemove;
   foreach (BI_Device* device, mDeviceInstances) {
     Q_ASSERT(device->isAddedToBoard());
     foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
-      Q_ASSERT(pad->isAddedToBoard());
-      mNetLines += pad->getNetLines();
+      if (BI_NetSegment* segment = pad->getNetSegmentOfLines()) {
+        netSegmentItemsToRemove[segment].pads.insert(pad);
+      }
     }
   }
-
-  // also remove all netlines from vias
-  // TODO: we shouldn't do that! but currenlty it leads to errors when not doing
-  // it...
-  foreach (BI_Via* via, mVias) {
-    Q_ASSERT(via->isAddedToBoard());
-    mNetLines += via->getNetLines();
-  }
-
-  // determine all affected netsegments and their items to remove
-  NetSegmentItemList netSegmentItemsToRemove;
   foreach (BI_Via* via, mVias) {
     Q_ASSERT(via->isAddedToBoard());
     netSegmentItemsToRemove[&via->getNetSegment()].vias.insert(via);
@@ -113,19 +103,9 @@ bool CmdRemoveBoardItems::performExecute() {
   for (auto it = netSegmentItemsToRemove.begin();
        it != netSegmentItemsToRemove.end(); ++it) {
     Q_ASSERT(it.key()->isAddedToBoard());
-    bool removeAllVias =
-        (it.value().vias == Toolbox::toSet(it.key()->getVias()));
-    bool removeAllNetLines =
-        (it.value().netlines == Toolbox::toSet(it.key()->getNetLines()));
-    if (removeAllVias && removeAllNetLines) {
-      // all items of the netsegment are selected --> remove the whole
-      // netsegment
-      execNewChildCmd(new CmdBoardNetSegmentRemove(*it.key()));  // can throw
-    } else {
-      // only some of the netsegment's lines are selected --> split up the
-      // netsegment
-      splitUpNetSegment(*it.key(), it.value());  // can throw
-    }
+    removeNetSegmentItems(*it.key(), it.value().pads, it.value().vias,
+                          it.value().netpoints,
+                          it.value().netlines);  // can throw
   }
 
   // remove all device instances
@@ -180,125 +160,91 @@ bool CmdRemoveBoardItems::performExecute() {
  *  Private Methods
  ******************************************************************************/
 
-void CmdRemoveBoardItems::splitUpNetSegment(
-    BI_NetSegment& netsegment, const NetSegmentItems& itemsToRemove) {
-  // determine all resulting sub-netsegments
-  QVector<NetSegmentItems> subsegments =
-      getNonCohesiveNetSegmentSubSegments(netsegment, itemsToRemove);
-
-  // remove the whole netsegment
-  execNewChildCmd(new CmdBoardNetSegmentRemove(netsegment));
-
-  // create new sub-netsegments
-  foreach (const NetSegmentItems& subsegment, subsegments) {
-    createNewSubNetSegment(netsegment, subsegment);  // can throw
+void CmdRemoveBoardItems::removeNetSegmentItems(
+    BI_NetSegment& netsegment, const QSet<BI_FootprintPad*>& padsToDisconnect,
+    const QSet<BI_Via*>&      viasToRemove,
+    const QSet<BI_NetPoint*>& netpointsToRemove,
+    const QSet<BI_NetLine*>&  netlinesToRemove) {
+  // Determine resulting sub-netsegments
+  BoardNetSegmentSplitter splitter;
+  foreach (BI_FootprintPad* pad, padsToDisconnect) {
+    splitter.replaceFootprintPadByJunctions(pad->toTraceAnchor(),
+                                            pad->getPosition());
   }
-}
-
-void CmdRemoveBoardItems::createNewSubNetSegment(BI_NetSegment& netsegment,
-                                                 const NetSegmentItems& items) {
-  // create new netsegment
-  CmdBoardNetSegmentAdd* cmdAddNetSegment = new CmdBoardNetSegmentAdd(
-      netsegment.getBoard(), netsegment.getNetSignal());
-  execNewChildCmd(cmdAddNetSegment);  // can throw
-  BI_NetSegment* newNetSegment = cmdAddNetSegment->getNetSegment();
-  Q_ASSERT(newNetSegment);
-  QScopedPointer<CmdBoardNetSegmentAddElements> cmdAddElements(
-      new CmdBoardNetSegmentAddElements(*newNetSegment));
-
-  // copy vias
-  QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorMap;
-  foreach (const BI_Via* via, items.vias) {
-    BI_Via* newVia =
-        cmdAddElements->addVia(Via(Uuid::createRandom(), via->getVia()));
-    Q_ASSERT(newVia);
-    anchorMap.insert(via, newVia);
+  foreach (BI_Via* via, netsegment.getVias()) {
+    bool replaceByJunctions = viasToRemove.contains(via);
+    splitter.addVia(via->getVia(), replaceByJunctions);
   }
-
-  // copy netpoints
-  foreach (const BI_NetPoint* netpoint, items.netpoints) {
-    BI_NetPoint* newNetPoint =
-        cmdAddElements->addNetPoint(netpoint->getPosition());
-    Q_ASSERT(newNetPoint);
-    anchorMap.insert(netpoint, newNetPoint);
-  }
-
-  // copy netlines
-  foreach (const BI_NetLine* netline, items.netlines) {
-    BI_NetLineAnchor* p1 =
-        anchorMap.value(&netline->getStartPoint(), &netline->getStartPoint());
-    Q_ASSERT(p1);
-    BI_NetLineAnchor* p2 =
-        anchorMap.value(&netline->getEndPoint(), &netline->getEndPoint());
-    Q_ASSERT(p2);
-    BI_NetLine* newNetLine = cmdAddElements->addNetLine(
-        *p1, *p2, netline->getLayer(), netline->getWidth());
-    Q_ASSERT(newNetLine);
-  }
-
-  execNewChildCmd(cmdAddElements.take());  // can throw
-}
-
-QVector<CmdRemoveBoardItems::NetSegmentItems>
-CmdRemoveBoardItems::getNonCohesiveNetSegmentSubSegments(
-    BI_NetSegment& segment, const NetSegmentItems& removedItems) noexcept {
-  // only works with segments which are added to board!!!
-  Q_ASSERT(segment.isAddedToBoard());
-
-  // get all vias and netlines of the segment to keep
-  QSet<BI_Via*> vias = Toolbox::toSet(segment.getVias()) - removedItems.vias;
-  QSet<BI_NetLine*> netlines =
-      Toolbox::toSet(segment.getNetLines()) - removedItems.netlines;
-
-  // find all separate segments of the netsegment
-  QVector<NetSegmentItems> segments;
-  while (netlines.count() + vias.count() > 0) {
-    NetSegmentItems         seg;
-    QSet<BI_NetLineAnchor*> processedAnchors;
-    BI_NetLineAnchor*       nextAnchor =
-        netlines.count() > 0 ? &netlines.values().first()->getStartPoint()
-                             : vias.values().first();
-    findAllConnectedNetPointsAndNetLines(*nextAnchor, processedAnchors,
-                                         seg.vias, seg.netpoints, seg.netlines,
-                                         vias, netlines);
-    vias -= seg.vias;
-    netlines -= seg.netlines;
-    segments.append(seg);
-  }
-  Q_ASSERT(vias.isEmpty());
-  Q_ASSERT(netlines.isEmpty());
-  return segments;
-}
-
-void CmdRemoveBoardItems::findAllConnectedNetPointsAndNetLines(
-    BI_NetLineAnchor& anchor, QSet<BI_NetLineAnchor*>& processedAnchors,
-    QSet<BI_Via*>& vias, QSet<BI_NetPoint*>& netpoints,
-    QSet<BI_NetLine*>& netlines, QSet<BI_Via*>& availableVias,
-    QSet<BI_NetLine*>& availableNetLines) const noexcept {
-  Q_ASSERT(!processedAnchors.contains(&anchor));
-  processedAnchors.insert(&anchor);
-
-  if (BI_NetPoint* anchorPoint = dynamic_cast<BI_NetPoint*>(&anchor)) {
-    Q_ASSERT(!netpoints.contains(anchorPoint));
-    netpoints.insert(anchorPoint);
-  } else if (BI_Via* anchorVia = dynamic_cast<BI_Via*>(&anchor)) {
-    Q_ASSERT(!vias.contains(anchorVia));
-    vias.insert(anchorVia);
-    availableVias.remove(anchorVia);
-  }
-
-  foreach (BI_NetLine* line, anchor.getNetLines()) {
-    if (availableNetLines.contains(line) && (!netlines.contains(line))) {
-      netlines.insert(line);
-      availableNetLines.remove(line);
-      BI_NetLineAnchor* p2 = line->getOtherPoint(anchor);
-      Q_ASSERT(p2);
-      if (!processedAnchors.contains(p2)) {
-        findAllConnectedNetPointsAndNetLines(*p2, processedAnchors, vias,
-                                             netpoints, netlines, availableVias,
-                                             availableNetLines);
-      }
+  foreach (BI_NetPoint* netpoint, netsegment.getNetPoints()) {
+    if (!netpointsToRemove.contains(netpoint)) {
+      splitter.addJunction(netpoint->getJunction());
     }
+  }
+  foreach (BI_NetLine* netline, netsegment.getNetLines()) {
+    if (!netlinesToRemove.contains(netline)) {
+      splitter.addTrace(netline->getTrace());
+    }
+  }
+
+  // Remove whole netsegment
+  execNewChildCmd(new CmdBoardNetSegmentRemove(netsegment));  // can throw
+
+  // Create new sub-netsegments
+  foreach (const BoardNetSegmentSplitter::Segment& segment, splitter.split()) {
+    // Add new netsegment
+    CmdBoardNetSegmentAdd* cmdAddNetSegment = new CmdBoardNetSegmentAdd(
+        netsegment.getBoard(), netsegment.getNetSignal());
+    execNewChildCmd(cmdAddNetSegment);  // can throw
+    BI_NetSegment* newNetSegment = cmdAddNetSegment->getNetSegment();
+    Q_ASSERT(newNetSegment);
+
+    // Add new vias, netpoints, netlines
+    CmdBoardNetSegmentAddElements* cmdAddElements =
+        new CmdBoardNetSegmentAddElements(*newNetSegment);
+    QHash<Uuid, BI_NetLineAnchor*> viaMap;
+    for (const Via& via : segment.vias) {
+      BI_Via* newVia = cmdAddElements->addVia(via);
+      viaMap.insert(via.getUuid(), newVia);
+    }
+    QHash<Uuid, BI_NetLineAnchor*> junctionMap;
+    for (const Junction& junction : segment.junctions) {
+      BI_NetPoint* newNetPoint =
+          cmdAddElements->addNetPoint(junction.getPosition());
+      junctionMap.insert(junction.getUuid(), newNetPoint);
+    }
+    for (const Trace& trace : segment.traces) {
+      BI_NetLineAnchor* start = nullptr;
+      if (tl::optional<Uuid> anchor = trace.getStartPoint().tryGetJunction()) {
+        start = junctionMap[*anchor];
+      } else if (tl::optional<Uuid> anchor =
+                     trace.getStartPoint().tryGetVia()) {
+        start = viaMap[*anchor];
+      } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+                     trace.getStartPoint().tryGetPad()) {
+        BI_Device* device =
+            mBoard.getDeviceInstanceByComponentUuid(anchor->device);
+        start = device ? device->getFootprint().getPad(anchor->pad) : nullptr;
+      }
+      BI_NetLineAnchor* end = nullptr;
+      if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
+        end = junctionMap[*anchor];
+      } else if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetVia()) {
+        end = viaMap[*anchor];
+      } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+                     trace.getEndPoint().tryGetPad()) {
+        BI_Device* device =
+            mBoard.getDeviceInstanceByComponentUuid(anchor->device);
+        end = device ? device->getFootprint().getPad(anchor->pad) : nullptr;
+      }
+      GraphicsLayer* layer = mBoard.getLayerStack().getLayer(*trace.getLayer());
+      if ((!start) || (!end) || (!layer)) {
+        throw LogicError(__FILE__, __LINE__);
+      }
+      BI_NetLine* newNetLine =
+          cmdAddElements->addNetLine(*start, *end, *layer, trace.getWidth());
+      Q_ASSERT(newNetLine);
+    }
+    execNewChildCmd(cmdAddElements);  // can throw
   }
 }
 

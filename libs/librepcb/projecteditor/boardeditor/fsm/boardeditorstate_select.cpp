@@ -25,8 +25,11 @@
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmddragselectedboarditems.h"
 #include "../../cmd/cmdflipselectedboarditems.h"
+#include "../../cmd/cmdpasteboarditems.h"
+#include "../../cmd/cmdpastefootprintitems.h"
 #include "../../cmd/cmdremoveselectedboarditems.h"
 #include "../../cmd/cmdreplacedevice.h"
+#include "../boardclipboarddatabuilder.h"
 #include "../boardeditor.h"
 #include "../boardplanepropertiesdialog.h"
 #include "../boardviapropertiesdialog.h"
@@ -36,8 +39,10 @@
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
+#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/elements.h>
+#include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/boardselectionquery.h>
@@ -75,7 +80,9 @@ namespace editor {
 
 BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
-  : BoardEditorState(context), mCurrentSelectionIndex(0) {
+  : BoardEditorState(context),
+    mIsUndoCmdActive(false),
+    mCurrentSelectionIndex(0) {
 }
 
 BoardEditorState_Select::~BoardEditorState_Select() noexcept {
@@ -86,11 +93,15 @@ BoardEditorState_Select::~BoardEditorState_Select() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Select::entry() noexcept {
+  Q_ASSERT(mIsUndoCmdActive == false);
+  Q_ASSERT(mSelectedItemsDragCommand.isNull());
   return true;
 }
 
 bool BoardEditorState_Select::exit() noexcept {
-  mSelectedItemsDragCommand.reset();
+  // Abort the currently active command
+  if (!abortCommand(true)) return false;
+
   return true;
 }
 
@@ -99,7 +110,7 @@ bool BoardEditorState_Select::exit() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Select::processSelectAll() noexcept {
-  if (mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
 
   if (Board* board = getActiveBoard()) {
     board->selectAll();
@@ -107,6 +118,33 @@ bool BoardEditorState_Select::processSelectAll() noexcept {
   } else {
     return false;
   }
+}
+
+bool BoardEditorState_Select::processCut() noexcept {
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand)) {
+    if (copySelectedItemsToClipboard()) {
+      removeSelectedItems();
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool BoardEditorState_Select::processCopy() noexcept {
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand)) {
+    return copySelectedItemsToClipboard();
+  }
+
+  return false;
+}
+
+bool BoardEditorState_Select::processPaste() noexcept {
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand)) {
+    return pasteFromClipboard();
+  }
+
+  return false;
 }
 
 bool BoardEditorState_Select::processRotateCw() noexcept {
@@ -118,18 +156,22 @@ bool BoardEditorState_Select::processRotateCcw() noexcept {
 }
 
 bool BoardEditorState_Select::processFlipHorizontal() noexcept {
-  if (mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
   return flipSelectedItems(Qt::Horizontal);
 }
 
 bool BoardEditorState_Select::processFlipVertical() noexcept {
-  if (mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
   return flipSelectedItems(Qt::Vertical);
 }
 
 bool BoardEditorState_Select::processRemove() noexcept {
-  if (mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
   return removeSelectedItems();
+}
+
+bool BoardEditorState_Select::processAbortCommand() noexcept {
+  return abortCommand(true);
 }
 
 bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
@@ -158,7 +200,23 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   Board* board = getActiveBoard();
   if (!board) return false;
 
-  if (!mSelectedItemsDragCommand) {
+  if (mIsUndoCmdActive) {
+    // Place pasted items
+    try {
+      if (mSelectedItemsDragCommand) {
+        mSelectedItemsDragCommand->setCurrentPosition(
+            Point::fromPx(e.scenePos()));
+        mContext.undoStack.appendToCmdGroup(
+            mSelectedItemsDragCommand.take());  // can throw
+      }
+      mContext.undoStack.commitCmdGroup();  // can throw
+      mIsUndoCmdActive = false;
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+      abortCommand(false);
+    }
+    return true;
+  } else if (!mSelectedItemsDragCommand) {
     // handle items selection
     QList<BI_Base*> items =
         board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
@@ -200,17 +258,17 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   Board* board = getActiveBoard();
   if (!board) return false;
 
-  if (mSelectedItemsDragCommand) {
+  if ((!mIsUndoCmdActive) && mSelectedItemsDragCommand) {
     // Stop moving items (set position of all selected elements permanent)
-    Point pos = Point::fromPx(e.scenePos());
-    mSelectedItemsDragCommand->setCurrentPosition(pos);
     try {
+      mSelectedItemsDragCommand->setCurrentPosition(
+          Point::fromPx(e.scenePos()));
       mContext.undoStack.execCmd(
           mSelectedItemsDragCommand.take());  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+      abortCommand(false);
     }
-    mSelectedItemsDragCommand.reset();
     return true;
   } else {
     // Remove selection rectangle and keep the selection state of all items
@@ -229,7 +287,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 #if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
   if (mSelectedItemsDragCommand) {
     // Abort moving and handle double click
-    mSelectedItemsDragCommand.reset();
+    abortCommand(false);
   }
 #endif
 
@@ -480,7 +538,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
 bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
   Q_UNUSED(index);
-  return mSelectedItemsDragCommand.isNull();
+  return (!mIsUndoCmdActive) && mSelectedItemsDragCommand.isNull();
 }
 
 /*******************************************************************************
@@ -616,6 +674,100 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return false;
+
+  try {
+    Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
+        QCursor::pos(), true, false);
+    BoardClipboardDataBuilder           builder(*board);
+    std::unique_ptr<BoardClipboardData> data = builder.generate(cursorPos);
+    qApp->clipboard()->setMimeData(data->toMimeData().release());
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+  return true;
+}
+
+bool BoardEditorState_Select::pasteFromClipboard() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return false;
+
+  try {
+    // get data from clipboard
+    std::unique_ptr<BoardClipboardData> boardData =
+        BoardClipboardData::fromMimeData(
+            qApp->clipboard()->mimeData());  // can throw
+    std::unique_ptr<library::editor::FootprintClipboardData> footprintData =
+        library::editor::FootprintClipboardData::fromMimeData(
+            qApp->clipboard()->mimeData());  // can throw
+    if ((!boardData) && (!footprintData)) {
+      return false;
+    }
+
+    // memorize cursor position
+    Point startPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
+        QCursor::pos(), true, false);
+
+    // start undo command group
+    board->clearSelection();
+    mContext.undoStack.beginCmdGroup(tr("Paste board elements"));
+    mIsUndoCmdActive = true;
+
+    // paste items from clipboard
+    bool addedSomething = false;
+    if (boardData) {
+      Point offset = (startPos - boardData->getCursorPos())
+                         .mappedToGrid(getGridInterval());
+      addedSomething =
+          mContext.undoStack.appendToCmdGroup(new CmdPasteBoardItems(
+              *board, std::move(boardData), offset));  // can throw
+    } else if (footprintData) {
+      Point offset = (startPos - footprintData->getCursorPos())
+                         .mappedToGrid(getGridInterval());
+      addedSomething =
+          mContext.undoStack.appendToCmdGroup(new CmdPasteFootprintItems(
+              *board, std::move(footprintData), offset));  // can throw
+    }
+
+    if (addedSomething) {  // can throw
+      // start moving the selected items
+      mSelectedItemsDragCommand.reset(
+          new CmdDragSelectedBoardItems(*board, startPos));
+      return true;
+    } else {
+      // no items pasted -> abort
+      mContext.undoStack.abortCmdGroup();  // can throw
+      mIsUndoCmdActive = false;
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    abortCommand(false);
+  }
+  return false;
+}
+
+bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
+  try {
+    // Delete the current undo command
+    mSelectedItemsDragCommand.reset();
+
+    // Abort the undo command
+    if (mIsUndoCmdActive) {
+      mContext.undoStack.abortCmdGroup();
+      mIsUndoCmdActive = false;
+    }
+
+    return true;
+  } catch (const Exception& e) {
+    if (showErrMsgBox) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
     return false;
   }
 }
