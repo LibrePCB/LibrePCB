@@ -81,11 +81,15 @@ public:
 
   // Event Handlers
   virtual bool processSelectAll() noexcept override;
+  virtual bool processCut() noexcept override;
+  virtual bool processCopy() noexcept override;
+  virtual bool processPaste() noexcept override;
   virtual bool processRotateCw() noexcept override;
   virtual bool processRotateCcw() noexcept override;
   virtual bool processFlipHorizontal() noexcept override;
   virtual bool processFlipVertical() noexcept override;
   virtual bool processRemove() noexcept override;
+  virtual bool processAbortCommand() noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
@@ -128,6 +132,9 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
+  bool copySelectedItemsToClipboard() noexcept;
+  bool pasteFromClipboard() noexcept;
+  bool abortCommand(bool showErrMsgBox) noexcept;
 
   /**
    * @brief Measure the length of the selected items.
@@ -168,7 +175,10 @@ private:  // Methods
       const ComponentInstance& cmpInst) const noexcept;
 
 private:  // Data
-  /// When moving items, this undo command will be active
+  /// An undo command will be active while dragging pasted items
+  bool mIsUndoCmdActive;
+
+  /// When dragging items, this undo command will be active
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
   int                                       mCurrentSelectionIndex;
 };

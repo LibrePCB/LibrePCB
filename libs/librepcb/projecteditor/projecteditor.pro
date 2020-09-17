@@ -26,11 +26,14 @@ RESOURCES += \
     ../../../img/images.qrc \
 
 SOURCES += \
+    boardeditor/boardclipboarddata.cpp \
+    boardeditor/boardclipboarddatabuilder.cpp \
     boardeditor/boarddesignrulecheckdialog.cpp \
     boardeditor/boarddesignrulecheckmessagesdock.cpp \
     boardeditor/boardeditor.cpp \
     boardeditor/boardlayersdock.cpp \
     boardeditor/boardlayerstacksetupdialog.cpp \
+    boardeditor/boardnetsegmentsplitter.cpp \
     boardeditor/boardpickplacegeneratordialog.cpp \
     boardeditor/boardplanepropertiesdialog.cpp \
     boardeditor/boardviapropertiesdialog.cpp \
@@ -59,6 +62,8 @@ SOURCES += \
     cmd/cmdflipselectedboarditems.cpp \
     cmd/cmdmirrorselectedschematicitems.cpp \
     cmd/cmdmoveselectedschematicitems.cpp \
+    cmd/cmdpasteboarditems.cpp \
+    cmd/cmdpastefootprintitems.cpp \
     cmd/cmdpasteschematicitems.cpp \
     cmd/cmdremoveboarditems.cpp \
     cmd/cmdremoveselectedboarditems.cpp \
@@ -94,11 +99,14 @@ SOURCES += \
     toolbars/searchtoolbar.cpp \
 
 HEADERS += \
+    boardeditor/boardclipboarddata.h \
+    boardeditor/boardclipboarddatabuilder.h \
     boardeditor/boarddesignrulecheckdialog.h \
     boardeditor/boarddesignrulecheckmessagesdock.h \
     boardeditor/boardeditor.h \
     boardeditor/boardlayersdock.h \
     boardeditor/boardlayerstacksetupdialog.h \
+    boardeditor/boardnetsegmentsplitter.h \
     boardeditor/boardpickplacegeneratordialog.h \
     boardeditor/boardplanepropertiesdialog.h \
     boardeditor/boardviapropertiesdialog.h \
@@ -127,6 +135,8 @@ HEADERS += \
     cmd/cmdflipselectedboarditems.h \
     cmd/cmdmirrorselectedschematicitems.h \
     cmd/cmdmoveselectedschematicitems.h \
+    cmd/cmdpasteboarditems.h \
+    cmd/cmdpastefootprintitems.h \
     cmd/cmdpasteschematicitems.h \
     cmd/cmdremoveboarditems.h \
     cmd/cmdremoveselectedboarditems.h \
