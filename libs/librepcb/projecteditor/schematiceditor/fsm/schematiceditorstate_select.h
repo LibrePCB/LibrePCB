@@ -91,11 +91,11 @@ public:
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Operator Overloadings
-  SchematicEditorState_Select& operator       =(
+  SchematicEditorState_Select& operator=(
       const SchematicEditorState_Select& rhs) = delete;
 
 private:  // Methods
-  bool startMovingSelectedItems(Schematic&   schematic,
+  bool startMovingSelectedItems(Schematic& schematic,
                                 const Point& startPos) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems() noexcept;
@@ -108,13 +108,13 @@ private:  // Methods
 
   // Right Click Menu
   QAction* addActionCut(QMenu& menu, const QString& text = tr("Cut")) noexcept;
-  QAction* addActionCopy(QMenu&         menu,
+  QAction* addActionCopy(QMenu& menu,
                          const QString& text = tr("Copy")) noexcept;
-  QAction* addActionRemove(QMenu&         menu,
+  QAction* addActionRemove(QMenu& menu,
                            const QString& text = tr("Remove")) noexcept;
-  QAction* addActionMirror(QMenu&         menu,
+  QAction* addActionMirror(QMenu& menu,
                            const QString& text = tr("Mirror")) noexcept;
-  QAction* addActionRotate(QMenu&         menu,
+  QAction* addActionRotate(QMenu& menu,
                            const QString& text = tr("Rotate")) noexcept;
   QAction* addActionOpenProperties(
       QMenu& menu, SI_Base* item,
@@ -123,16 +123,16 @@ private:  // Methods
 private:  // Data
   /// enum for all possible substates
   enum class SubState {
-    IDLE,       ///< left mouse button is not pressed (default state)
+    IDLE,  ///< left mouse button is not pressed (default state)
     SELECTING,  ///< left mouse button pressed to draw selection rect
-    MOVING,     ///< left mouse button pressed to move items
-    PASTING,    ///< move pasted items
+    MOVING,  ///< left mouse button pressed to move items
+    PASTING,  ///< move pasted items
   };
 
   SubState mSubState;  ///< the current substate
-  Point    mStartPos;
+  Point mStartPos;
   QScopedPointer<CmdMoveSelectedSchematicItems> mSelectedItemsMoveCommand;
-  int                                           mCurrentSelectionIndex;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************

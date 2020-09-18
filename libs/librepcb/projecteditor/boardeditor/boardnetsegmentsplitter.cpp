@@ -59,7 +59,7 @@ void BoardNetSegmentSplitter::addJunction(const Junction& junction) noexcept {
 }
 
 void BoardNetSegmentSplitter::addVia(const Via& via,
-                                     bool       replaceByJunctions) noexcept {
+                                     bool replaceByJunctions) noexcept {
   if (replaceByJunctions) {
     mAnchorsToReplace[TraceAnchor::via(via.getUuid())] = via.getPosition();
   } else {
@@ -75,11 +75,11 @@ void BoardNetSegmentSplitter::addTrace(const Trace& trace) noexcept {
 }
 
 QList<BoardNetSegmentSplitter::Segment>
-BoardNetSegmentSplitter::split() noexcept {
+    BoardNetSegmentSplitter::split() noexcept {
   QList<Segment> segments;
 
   // Split netsegment by anchors and lines
-  ViaList   availableVias   = mVias;
+  ViaList availableVias = mVias;
   TraceList availableTraces = mTraces;
   while (!availableTraces.isEmpty()) {
     Segment segment;
@@ -108,7 +108,7 @@ TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
     const TraceAnchor& anchor, const GraphicsLayerName& layer) noexcept {
   if (mAnchorsToReplace.contains(anchor)) {
     auto key = qMakePair(anchor, layer);
-    auto it  = mReplacedAnchors.find(key);
+    auto it = mReplacedAnchors.find(key);
     if (it == mReplacedAnchors.constEnd()) {
       std::shared_ptr<Junction> newJunction = std::make_shared<Junction>(
           Uuid::createRandom(), mAnchorsToReplace.value(anchor));

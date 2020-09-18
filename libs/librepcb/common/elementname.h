@@ -54,13 +54,13 @@ struct ElementNameVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
       typename std::decay<Value>::type {
-    return p(val) ? std::forward<Value>(val)
-                  : (throw RuntimeError(
-                         __FILE__, __LINE__,
-                         QString(QApplication::translate("ElementName",
-                                                         "Invalid name: '%1'"))
-                             .arg(val)),
-                     std::forward<Value>(val));
+    return p(val)
+        ? std::forward<Value>(val)
+        : (throw RuntimeError(__FILE__, __LINE__,
+                              QString(QApplication::translate(
+                                          "ElementName", "Invalid name: '%1'"))
+                                  .arg(val)),
+           std::forward<Value>(val));
   }
 };
 
@@ -121,7 +121,7 @@ inline SExpression serializeToSExpression(const ElementName& obj) {
 
 template <>
 inline ElementName deserializeFromSExpression(const SExpression& sexpr,
-                                              bool               throwIfEmpty) {
+                                              bool throwIfEmpty) {
   return ElementName(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 

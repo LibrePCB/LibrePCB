@@ -43,7 +43,7 @@ namespace tests {
 
 class MinimalSerializableObjectMock final : public SerializableObject {
 public:
-  QString                               mValue;
+  QString mValue;
   Signal<MinimalSerializableObjectMock> onEdited;
   MinimalSerializableObjectMock() = delete;
   MinimalSerializableObjectMock(const QString& value)
@@ -61,7 +61,7 @@ public:
 
   bool operator==(const MinimalSerializableObjectMock& rhs) = delete;
   bool operator!=(const MinimalSerializableObjectMock& rhs) = delete;
-  MinimalSerializableObjectMock& operator                   =(
+  MinimalSerializableObjectMock& operator=(
       const MinimalSerializableObjectMock& rhs) = delete;
 };
 
@@ -71,8 +71,8 @@ public:
 
 class SerializableObjectMock final : public SerializableObject {
 public:
-  Uuid                           mUuid;
-  QString                        mName;
+  Uuid mUuid;
+  QString mName;
   Signal<SerializableObjectMock> onEdited;
   SerializableObjectMock() = delete;
   SerializableObjectMock(const SerializableObjectMock& other) noexcept
@@ -89,7 +89,7 @@ public:
       onEdited(*this) {}
   ~SerializableObjectMock() {}
 
-  const Uuid&    getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const QString& getName() const noexcept { return mName; }
 
   void serialize(SExpression& root) const override {

@@ -131,7 +131,7 @@ void StrokeTextGraphicsItem::updateTransform() noexcept {
 }
 
 QVariant StrokeTextGraphicsItem::itemChange(GraphicsItemChange change,
-                                            const QVariant&    value) noexcept {
+                                            const QVariant& value) noexcept {
   if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
     mOriginCrossGraphicsItem->setSelected(value.toBool());
   }

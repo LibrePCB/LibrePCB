@@ -151,25 +151,25 @@ public:
   }
 
 private:  // Data
-  QString     mOutputBasePath;
-  QString     mSuffixDrills;  // NPTH and PTH combined
-  QString     mSuffixDrillsNpth;
-  QString     mSuffixDrillsPth;
-  QString     mSuffixOutlines;
-  QString     mSuffixCopperTop;
-  QString     mSuffixCopperInner;
-  QString     mSuffixCopperBot;
-  QString     mSuffixSolderMaskTop;
-  QString     mSuffixSolderMaskBot;
-  QString     mSuffixSilkscreenTop;
-  QString     mSuffixSilkscreenBot;
-  QString     mSuffixSolderPasteTop;
-  QString     mSuffixSolderPasteBot;
+  QString mOutputBasePath;
+  QString mSuffixDrills;  // NPTH and PTH combined
+  QString mSuffixDrillsNpth;
+  QString mSuffixDrillsPth;
+  QString mSuffixOutlines;
+  QString mSuffixCopperTop;
+  QString mSuffixCopperInner;
+  QString mSuffixCopperBot;
+  QString mSuffixSolderMaskTop;
+  QString mSuffixSolderMaskBot;
+  QString mSuffixSilkscreenTop;
+  QString mSuffixSilkscreenBot;
+  QString mSuffixSolderPasteTop;
+  QString mSuffixSolderPasteBot;
   QStringList mSilkscreenLayersTop;
   QStringList mSilkscreenLayersBot;
-  bool        mMergeDrillFiles;
-  bool        mEnableSolderPasteTop;
-  bool        mEnableSolderPasteBot;
+  bool mMergeDrillFiles;
+  bool mEnableSolderPasteTop;
+  bool mEnableSolderPasteBot;
 };
 
 /*******************************************************************************

@@ -364,7 +364,7 @@ public:
    * @throws RangeError   If the argument is out of range, a RangeError
    * exception will be thrown
    */
-  static Length fromMm(qreal         millimeters,
+  static Length fromMm(qreal millimeters,
                        const Length& gridInterval = Length(0));
 
   /**
@@ -393,7 +393,7 @@ public:
    * @see #setLengthMm(const QString&), #toMmString()
    */
   static Length fromMm(const QString& millimeters,
-                       const Length&  gridInterval = Length(0));
+                       const Length& gridInterval = Length(0));
 
   /**
    * @brief Get a Length object with a specific length and map it to a specific
@@ -583,7 +583,7 @@ private:
    * @return  The length which is mapped to the grid (always a multiple of
    * gridInterval)
    */
-  static LengthBase_t mapNmToGrid(LengthBase_t  nanometers,
+  static LengthBase_t mapNmToGrid(LengthBase_t nanometers,
                                   const Length& gridInterval) noexcept;
 
   /**
@@ -605,10 +605,10 @@ private:
 
   // Static Length Converting Constants
   static constexpr LengthBase_t sNmPerInch = 25400000;  ///< 1 inch = 25.4mm
-  static constexpr LengthBase_t sNmPerMil  = 25400;     ///< 1 inch = 25.4mm
+  static constexpr LengthBase_t sNmPerMil = 25400;  ///< 1 inch = 25.4mm
   static constexpr LengthBase_t sPixelsPerInch =
       72;  ///< 72 dpi for the QGraphics* objects
-  static constexpr qreal sNmPerPixel  = (qreal)sNmPerInch / sPixelsPerInch;
+  static constexpr qreal sNmPerPixel = (qreal)sNmPerInch / sPixelsPerInch;
   static constexpr qreal sPixelsPerNm = (qreal)sPixelsPerInch / sNmPerInch;
 };
 
@@ -623,7 +623,7 @@ inline SExpression serializeToSExpression(const Length& obj) {
 
 template <>
 inline Length deserializeFromSExpression(const SExpression& sexpr,
-                                         bool               throwIfEmpty) {
+                                         bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Length::fromMm(str);
 }
@@ -678,7 +678,7 @@ inline UnsignedLength operator+(const UnsignedLength& lhs,
                         *rhs);  // will not throw as long as there's no overflow
 }
 
-inline UnsignedLength& operator+=(UnsignedLength&       lhs,
+inline UnsignedLength& operator+=(UnsignedLength& lhs,
                                   const UnsignedLength& rhs) noexcept {
   lhs = lhs + rhs;  // will not throw as long as there's no overflow
   return lhs;
@@ -748,7 +748,7 @@ inline UnsignedLength deserializeFromSExpression(const SExpression& sexpr,
   return UnsignedLength(Length::fromMm(str));
 }
 
-inline QDataStream& operator<<(QDataStream&          stream,
+inline QDataStream& operator<<(QDataStream& stream,
                                const UnsignedLength& length) {
   stream << length->toMm();
   return stream;
@@ -815,19 +815,19 @@ inline PositiveLength operator+(const UnsignedLength& lhs,
                         *rhs);  // will not throw as long as there's no overflow
 }
 
-inline PositiveLength& operator+=(PositiveLength&       lhs,
+inline PositiveLength& operator+=(PositiveLength& lhs,
                                   const PositiveLength& rhs) noexcept {
   lhs = lhs + rhs;  // will not throw as long as there's no overflow
   return lhs;
 }
 
-inline PositiveLength& operator+=(PositiveLength&       lhs,
+inline PositiveLength& operator+=(PositiveLength& lhs,
                                   const UnsignedLength& rhs) noexcept {
   lhs = lhs + rhs;  // will not throw as long as there's no overflow
   return lhs;
 }
 
-inline UnsignedLength& operator+=(UnsignedLength&       lhs,
+inline UnsignedLength& operator+=(UnsignedLength& lhs,
                                   const PositiveLength& rhs) noexcept {
   lhs = positiveToUnsigned(
       lhs + rhs);  // will not throw as long as there's no overflow
@@ -946,7 +946,7 @@ inline PositiveLength deserializeFromSExpression(const SExpression& sexpr,
   return PositiveLength(Length::fromMm(str));
 }
 
-inline QDataStream& operator<<(QDataStream&          stream,
+inline QDataStream& operator<<(QDataStream& stream,
                                const PositiveLength& length) {
   stream << length->toMm();
   return stream;

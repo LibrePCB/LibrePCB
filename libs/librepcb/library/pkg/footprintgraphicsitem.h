@@ -62,31 +62,31 @@ class FootprintPadGraphicsItem;
 class FootprintGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
-  FootprintGraphicsItem()                                   = delete;
+  FootprintGraphicsItem() = delete;
   FootprintGraphicsItem(const FootprintGraphicsItem& other) = delete;
   FootprintGraphicsItem(Footprint& fpt, const IF_GraphicsLayerProvider& lp,
                         const PackagePadList* packagePadList) noexcept;
   ~FootprintGraphicsItem() noexcept;
 
   // Getters
-  Footprint&                getFootprint() noexcept { return mFootprint; }
+  Footprint& getFootprint() noexcept { return mFootprint; }
   FootprintPadGraphicsItem* getPadGraphicsItem(
       const FootprintPad& pin) noexcept;
-  CircleGraphicsItem*  getCircleGraphicsItem(const Circle& circle) noexcept;
+  CircleGraphicsItem* getCircleGraphicsItem(const Circle& circle) noexcept;
   PolygonGraphicsItem* getPolygonGraphicsItem(const Polygon& polygon) noexcept;
   StrokeTextGraphicsItem* getTextGraphicsItem(const StrokeText& text) noexcept;
-  HoleGraphicsItem*       getHoleGraphicsItem(const Hole& hole) noexcept;
-  int                     getItemsAtPosition(
-                          const Point& pos, QList<QSharedPointer<FootprintPadGraphicsItem>>* pads,
-                          QList<QSharedPointer<CircleGraphicsItem>>*     circles,
-                          QList<QSharedPointer<PolygonGraphicsItem>>*    polygons,
-                          QList<QSharedPointer<StrokeTextGraphicsItem>>* texts,
-                          QList<QSharedPointer<HoleGraphicsItem>>*       holes) noexcept;
+  HoleGraphicsItem* getHoleGraphicsItem(const Hole& hole) noexcept;
+  int getItemsAtPosition(
+      const Point& pos, QList<QSharedPointer<FootprintPadGraphicsItem>>* pads,
+      QList<QSharedPointer<CircleGraphicsItem>>* circles,
+      QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
+      QList<QSharedPointer<StrokeTextGraphicsItem>>* texts,
+      QList<QSharedPointer<HoleGraphicsItem>>* holes) noexcept;
   QList<QSharedPointer<FootprintPadGraphicsItem>> getSelectedPads() noexcept;
-  QList<QSharedPointer<CircleGraphicsItem>>       getSelectedCircles() noexcept;
+  QList<QSharedPointer<CircleGraphicsItem>> getSelectedCircles() noexcept;
   QList<QSharedPointer<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
   QList<QSharedPointer<StrokeTextGraphicsItem>>
-                                          getSelectedStrokeTexts() noexcept;
+      getSelectedStrokeTexts() noexcept;
   QList<QSharedPointer<HoleGraphicsItem>> getSelectedHoles() noexcept;
 
   // Setters
@@ -107,25 +107,25 @@ public:
   void setSelectionRect(const QRectF rect) noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return QRectF(); }
+  QRectF boundingRect() const noexcept override { return QRectF(); }
   QPainterPath shape() const noexcept override { return QPainterPath(); }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;
 
 private:  // Data
-  Footprint&                      mFootprint;
+  Footprint& mFootprint;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  const PackagePadList*           mPackagePadList;
+  const PackagePadList* mPackagePadList;
   QHash<const FootprintPad*, QSharedPointer<FootprintPadGraphicsItem>>
-                                                           mPadGraphicsItems;
+      mPadGraphicsItems;
   QHash<const Circle*, QSharedPointer<CircleGraphicsItem>> mCircleGraphicsItems;
   QHash<const Polygon*, QSharedPointer<PolygonGraphicsItem>>
       mPolygonGraphicsItems;
   QHash<const StrokeText*, QSharedPointer<StrokeTextGraphicsItem>>
-                                                       mStrokeTextGraphicsItems;
+      mStrokeTextGraphicsItems;
   QHash<const Hole*, QSharedPointer<HoleGraphicsItem>> mHoleGraphicsItems;
 };
 

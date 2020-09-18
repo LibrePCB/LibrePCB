@@ -47,7 +47,7 @@ namespace eagleimport {
 class ConverterDb final {
 public:
   // Constructors / Destructor
-  ConverterDb()                         = delete;
+  ConverterDb() = delete;
   ConverterDb(const ConverterDb& other) = delete;
   ConverterDb(const FilePath& ini) noexcept;
   ~ConverterDb() noexcept;
@@ -65,10 +65,10 @@ public:
   Uuid getPackageUuid(const QString& packageName);
   Uuid getPackagePadUuid(const Uuid& footprintUuid, const QString& padName);
   Uuid getComponentUuid(const QString& deviceSetName);
-  Uuid getComponentSignalUuid(const Uuid&    componentUuid,
+  Uuid getComponentSignalUuid(const Uuid& componentUuid,
                               const QString& gateName, const QString& pinName);
   Uuid getSymbolVariantUuid(const Uuid& componentUuid);
-  Uuid getSymbolVariantItemUuid(const Uuid&    componentUuid,
+  Uuid getSymbolVariantItemUuid(const Uuid& componentUuid,
                                 const QString& gateName);
   Uuid getDeviceUuid(const QString& deviceSetName, const QString& deviceName);
 
@@ -80,7 +80,7 @@ private:
                        const QString& key2 = QString());
 
   QSettings mIniFile;
-  FilePath  mLibFilePath;
+  FilePath mLibFilePath;
 };
 
 /*******************************************************************************

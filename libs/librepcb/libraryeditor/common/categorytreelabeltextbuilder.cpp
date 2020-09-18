@@ -110,7 +110,7 @@ bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
     QStringList lines;
     foreach (const Uuid& uuid, uuids) {
       FilePath filepath = getLatestCategory(uuid);  // can throw
-      QString  name;
+      QString name;
       mDb.getElementTranslations<ElementType>(filepath, mLocaleOrder,
                                               &name);  // can throw
       lines.prepend(name);
@@ -132,7 +132,7 @@ void CategoryTreeLabelTextBuilder<ElementType>::setText(
     const QStringList& lines) noexcept {
   QString text;
   for (int i = 0; i < lines.count(); ++i) {
-    QString line   = lines.value(i);
+    QString line = lines.value(i);
     QString spaces = QString("&nbsp;").repeated(i * 2);
     QString separator =
         mOneLine ? QString(" &rArr; ") : QString("<br>%1⤷ ").arg(spaces);

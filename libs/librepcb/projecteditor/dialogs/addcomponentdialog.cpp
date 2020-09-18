@@ -104,7 +104,7 @@ AddComponentDialog::AddComponentDialog(workspace::Workspace& workspace,
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
   const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-  mCategoryTreeModel             = new workspace::ComponentCategoryTreeModel(
+  mCategoryTreeModel = new workspace::ComponentCategoryTreeModel(
       mWorkspace.getLibraryDb(), localeOrder,
       workspace::CategoryTreeFilter::COMPONENTS);
   mUi->treeCategories->setModel(mCategoryTreeModel);
@@ -124,7 +124,7 @@ AddComponentDialog::~AddComponentDialog() noexcept {
   delete mSelectedPackage;
   mSelectedPackage = nullptr;
   delete mSelectedDevice;
-  mSelectedDevice  = nullptr;
+  mSelectedDevice = nullptr;
   mSelectedSymbVar = nullptr;
   delete mSelectedComponent;
   mSelectedComponent = nullptr;
@@ -291,7 +291,7 @@ void AddComponentDialog::searchComponents(const QString& input) {
 
 AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
     const QString& input) {
-  SearchResult       result;
+  SearchResult result;
   const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
 
   // add matching devices and their corresponding components
@@ -312,8 +312,8 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
     FilePath pkgFp =
         mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
     SearchResultDevice& resDev = result[cmpFp].devices[devFp];
-    resDev.pkgFp               = pkgFp;
-    resDev.match               = true;
+    resDev.pkgFp = pkgFp;
+    resDev.match = true;
   }
 
   // add matching components and all their devices
@@ -327,7 +327,7 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
     QSet<Uuid> devices =
         mWorkspace.getLibraryDb().getDevicesOfComponent(cmpUuid);  // can throw
     SearchResultComponent& resCmp = result[cmpFp];
-    resCmp.match                  = true;
+    resCmp.match = true;
     foreach (const Uuid& devUuid, devices) {
       FilePath devFp =
           mWorkspace.getLibraryDb().getLatestDevice(devUuid);  // can throw
@@ -339,7 +339,7 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
       FilePath pkgFp =
           mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
       SearchResultDevice& resDev = resCmp.devices[devFp];
-      resDev.pkgFp               = pkgFp;
+      resDev.pkgFp = pkgFp;
     }
   }
 
@@ -450,8 +450,9 @@ void AddComponentDialog::setSelectedComponent(const library::Component* cmp) {
     }
     if (!cmp->getSymbolVariants().isEmpty()) {
       mUi->cbxSymbVar->setCurrentIndex(
-          qMax(0, cmp->getSymbolVariantIndexByNorm(
-                      mProject.getSettings().getNormOrder())));
+          qMax(0,
+               cmp->getSymbolVariantIndexByNorm(
+                   mProject.getSettings().getNormOrder())));
     }
   }
 
@@ -504,9 +505,9 @@ void AddComponentDialog::setSelectedDevice(const library::Device* dev) {
   mSelectedDevice = nullptr;
 
   if (dev) {
-    mSelectedDevice                = dev;
+    mSelectedDevice = dev;
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    FilePath           pkgFp       = mWorkspace.getLibraryDb().getLatestPackage(
+    FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(
         mSelectedDevice->getPackageUuid());
     if (pkgFp.isValid()) {
       mSelectedPackage = new library::Package(

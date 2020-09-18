@@ -63,14 +63,14 @@ CmdCircleEdit::~CmdCircleEdit() noexcept {
  ******************************************************************************/
 
 void CmdCircleEdit::setLayerName(const GraphicsLayerName& name,
-                                 bool                     immediate) noexcept {
+                                 bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLayerName = name;
   if (immediate) mCircle.setLayerName(mNewLayerName);
 }
 
 void CmdCircleEdit::setLineWidth(const UnsignedLength& width,
-                                 bool                  immediate) noexcept {
+                                 bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLineWidth = width;
   if (immediate) mCircle.setLineWidth(mNewLineWidth);
@@ -89,7 +89,7 @@ void CmdCircleEdit::setIsGrabArea(bool grabArea, bool immediate) noexcept {
 }
 
 void CmdCircleEdit::setDiameter(const PositiveLength& dia,
-                                bool                  immediate) noexcept {
+                                bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewDiameter = dia;
   if (immediate) mCircle.setDiameter(mNewDiameter);
@@ -117,8 +117,8 @@ void CmdCircleEdit::rotate(const Angle& angle, const Point& center,
 }
 
 void CmdCircleEdit::mirrorGeometry(Qt::Orientation orientation,
-                                   const Point&    center,
-                                   bool            immediate) noexcept {
+                                   const Point& center,
+                                   bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewCenter.mirror(orientation, center);
   if (immediate) {

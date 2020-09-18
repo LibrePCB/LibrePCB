@@ -47,7 +47,7 @@ class NetworkRequest final : public NetworkRequestBase {
 
 public:
   // Constructors / Destructor
-  NetworkRequest()                            = delete;
+  NetworkRequest() = delete;
   NetworkRequest(const NetworkRequest& other) = delete;
   NetworkRequest(const QUrl& url) noexcept;
   ~NetworkRequest() noexcept;

@@ -63,23 +63,23 @@ class SI_SymbolPin final : public SI_Base,
 
 public:
   // Constructors / Destructor
-  SI_SymbolPin()                          = delete;
+  SI_SymbolPin() = delete;
   SI_SymbolPin(const SI_SymbolPin& other) = delete;
   explicit SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid);
   ~SI_SymbolPin();
 
   // Getters
   const Uuid& getLibPinUuid() const noexcept;
-  QString     getDisplayText(bool returnCmpSignalNameIfEmpty = false,
-                             bool returnPinNameIfEmpty = false) const noexcept;
-  SI_Symbol&  getSymbol() const noexcept { return mSymbol; }
+  QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
+                         bool returnPinNameIfEmpty = false) const noexcept;
+  SI_Symbol& getSymbol() const noexcept { return mSymbol; }
   const library::SymbolPin& getLibPin() const noexcept { return *mSymbolPin; }
-  ComponentSignalInstance*  getComponentSignalInstance() const noexcept {
+  ComponentSignalInstance* getComponentSignalInstance() const noexcept {
     return mComponentSignalInstance;
   }
-  NetSignal*     getCompSigInstNetSignal() const noexcept;
+  NetSignal* getCompSigInstNetSignal() const noexcept;
   SI_NetSegment* getNetSegmentOfLines() const noexcept;
-  bool           isRequired() const noexcept;
+  bool isRequired() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isVisibleJunction() const noexcept;
   NetLineAnchor toNetLineAnchor() const noexcept override;
@@ -95,11 +95,11 @@ public:
   }
   const Point& getPosition() const noexcept override { return mPosition; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Inherited from SI_NetLineAnchor
-  void                     registerNetLine(SI_NetLine& netline) override;
-  void                     unregisterNetLine(SI_NetLine& netline) override;
+  void registerNetLine(SI_NetLine& netline) override;
+  void unregisterNetLine(SI_NetLine& netline) override;
   const QSet<SI_NetLine*>& getNetLines() const noexcept override {
     return mRegisteredNetLines;
   }
@@ -115,15 +115,15 @@ private:
   void updateGraphicsItemTransform() noexcept;
 
   // General
-  SI_Symbol&                                mSymbol;
-  const library::SymbolPin*                 mSymbolPin;
+  SI_Symbol& mSymbol;
+  const library::SymbolPin* mSymbolPin;
   const library::ComponentPinSignalMapItem* mPinSignalMapItem;
-  ComponentSignalInstance*                  mComponentSignalInstance;
-  QMetaObject::Connection                   mHighlightChangedConnection;
+  ComponentSignalInstance* mComponentSignalInstance;
+  QMetaObject::Connection mHighlightChangedConnection;
 
   // Misc
-  Point                         mPosition;
-  Angle                         mRotation;
+  Point mPosition;
+  Angle mRotation;
   QScopedPointer<SGI_SymbolPin> mGraphicsItem;
 
   // Registered Elements

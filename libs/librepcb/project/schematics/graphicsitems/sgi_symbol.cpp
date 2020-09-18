@@ -80,7 +80,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
   for (const Polygon& polygon : mLibSymbol.getPolygons()) {
     // query polygon path and line width
     QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-    qreal        w           = polygon.getLineWidth()->toPx() / 2;
+    qreal w = polygon.getLineWidth()->toPx() / 2;
 
     // update bounding rectangle
     mBoundingRect =
@@ -107,7 +107,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
 
     // get the bounding rectangle for the circle
     QPointF center = circle.getCenter().toPxQPointF();
-    QRectF  boundingRect =
+    QRectF boundingRect =
         QRectF(QPointF(center.x() - r, center.y() - r), QSizeF(r * 2, r * 2));
 
     // update bounding rectangle
@@ -133,7 +133,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
     mFont.setPixelSize(props.fontPixelSize);
     QFontMetricsF metrics(mFont);
     props.scaleFactor = text.getHeight()->toPx() / metrics.height();
-    props.textRect    = metrics.boundingRect(
+    props.textRect = metrics.boundingRect(
         QRectF(), text.getAlign().toQtAlign() | Qt::TextDontClip, props.text);
     QRectF scaledTextRect =
         QRectF(props.textRect.topLeft() * props.scaleFactor,
@@ -160,7 +160,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
       props.flags = text.getAlign().toQtAlign();
 
     // calculate text bounding rect
-    mBoundingRect  = mBoundingRect.united(scaledTextRect);
+    mBoundingRect = mBoundingRect.united(scaledTextRect);
     props.textRect = QRectF(scaledTextRect.topLeft() / props.scaleFactor,
                             scaledTextRect.bottomRight() / props.scaleFactor);
     if (props.rotate180) {
@@ -180,14 +180,14 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_Symbol::paint(QPainter*                       painter,
+void SGI_Symbol::paint(QPainter* painter,
                        const QStyleOptionGraphicsItem* option,
-                       QWidget*                        widget) {
+                       QWidget* widget) {
   Q_UNUSED(widget);
 
-  const GraphicsLayer* layer    = 0;
-  const bool           selected = mSymbol.isSelected();
-  const bool           deviceIsPrinter =
+  const GraphicsLayer* layer = 0;
+  const bool selected = mSymbol.isSelected();
+  const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
@@ -320,7 +320,7 @@ void SGI_Symbol::paint(QPainter*                       painter,
   Q_ASSERT(layer);
   if (layer->isVisible()) {
     // show symbols count of the component
-    int count    = mSymbol.getComponentInstance().getPlacedSymbolsCount();
+    int count = mSymbol.getComponentInstance().getPlacedSymbolsCount();
     int maxCount = mSymbol.getComponentInstance()
                        .getSymbolVariant()
                        .getSymbolItems()

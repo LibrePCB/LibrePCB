@@ -47,7 +47,7 @@ class RecentProjectsModel : public QAbstractListModel {
 
 public:
   // Constructors / Destructor
-  RecentProjectsModel()                                 = delete;
+  RecentProjectsModel() = delete;
   RecentProjectsModel(const RecentProjectsModel& other) = delete;
   explicit RecentProjectsModel(const Workspace& workspace) noexcept;
   ~RecentProjectsModel() noexcept;
@@ -60,15 +60,15 @@ public:
   RecentProjectsModel& operator=(const RecentProjectsModel& rhs) = delete;
 
 private:
-  void     save() noexcept;
-  int      rowCount(const QModelIndex& parent = QModelIndex()) const;
+  void save() noexcept;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   // Attributes
   const Workspace& mWorkspace;
-  FilePath         mFilePath;
-  QList<FilePath>  mAllProjects;
-  QList<FilePath>  mVisibleProjects;
+  FilePath mFilePath;
+  QList<FilePath> mAllProjects;
+  QList<FilePath> mVisibleProjects;
 };
 
 /*******************************************************************************

@@ -63,7 +63,7 @@ bool CmpSigPinDisplayType::operator==(const CmpSigPinDisplayType& rhs) const
 CmpSigPinDisplayType& CmpSigPinDisplayType::operator=(
     const CmpSigPinDisplayType& rhs) noexcept {
   mDisplayType = rhs.mDisplayType;
-  mName        = rhs.mName;
+  mName = rhs.mName;
   return *this;
 }
 
@@ -84,7 +84,7 @@ const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(
 }
 
 const QList<CmpSigPinDisplayType>&
-CmpSigPinDisplayType::getAllTypes() noexcept {
+    CmpSigPinDisplayType::getAllTypes() noexcept {
   static QList<CmpSigPinDisplayType> list{
       none(),
       pinName(),

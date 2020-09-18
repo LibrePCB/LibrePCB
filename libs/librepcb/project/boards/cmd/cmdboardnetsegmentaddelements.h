@@ -55,14 +55,14 @@ public:
   ~CmdBoardNetSegmentAddElements() noexcept;
 
   // General Methods
-  BI_Via*      addVia(BI_Via& via);
-  BI_Via*      addVia(const Via& via);
+  BI_Via* addVia(BI_Via& via);
+  BI_Via* addVia(const Via& via);
   BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
   BI_NetPoint* addNetPoint(const Point& position);
-  BI_NetLine*  addNetLine(BI_NetLine& netline);
-  BI_NetLine*  addNetLine(BI_NetLineAnchor& startPoint,
-                          BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
-                          const PositiveLength& width);
+  BI_NetLine* addNetLine(BI_NetLine& netline);
+  BI_NetLine* addNetLine(BI_NetLineAnchor& startPoint,
+                         BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
+                         const PositiveLength& width);
 
 private:
   // Private Methods
@@ -77,10 +77,10 @@ private:
   void performRedo() override;
 
   // Private Member Variables
-  BI_NetSegment&      mNetSegment;
-  QList<BI_Via*>      mVias;
+  BI_NetSegment& mNetSegment;
+  QList<BI_Via*> mVias;
   QList<BI_NetPoint*> mNetPoints;
-  QList<BI_NetLine*>  mNetLines;
+  QList<BI_NetLine*> mNetLines;
 };
 
 /*******************************************************************************

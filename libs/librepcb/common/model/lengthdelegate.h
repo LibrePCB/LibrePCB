@@ -54,8 +54,8 @@ public:
   void setUnit(const LengthUnit& unit) noexcept;
 
   // Inherited from QStyledItemDelegate
-  QString  displayText(const QVariant& value,
-                       const QLocale&  locale) const override;
+  QString displayText(const QVariant& value,
+                      const QLocale& locale) const override;
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
                         const QModelIndex& index) const override;
   void setEditorData(QWidget* editor, const QModelIndex& index) const override;

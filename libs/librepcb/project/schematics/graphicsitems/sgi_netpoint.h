@@ -57,12 +57,12 @@ public:
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const { return sBoundingRect; }
-  void   paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-               QWidget* widget);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget);
 
 private:
   // make some methods inaccessible...
-  SGI_NetPoint()                          = delete;
+  SGI_NetPoint() = delete;
   SGI_NetPoint(const SGI_NetPoint& other) = delete;
   SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;
 
@@ -70,7 +70,7 @@ private:
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
   // General Attributes
-  SI_NetPoint&   mNetPoint;
+  SI_NetPoint& mNetPoint;
   GraphicsLayer* mLayer;
 
   // Cached Attributes

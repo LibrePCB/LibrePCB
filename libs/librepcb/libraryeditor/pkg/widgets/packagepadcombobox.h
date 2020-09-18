@@ -71,7 +71,7 @@ private:  // Methods
   void currentIndexChanged(int index) noexcept;
 
 private:  // Data
-  Package*   mPackage;
+  Package* mPackage;
   Footprint* mFootprint;
   QComboBox* mComboBox;
 };

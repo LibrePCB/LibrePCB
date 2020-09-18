@@ -57,35 +57,35 @@ namespace editor {
 class FootprintClipboardData final : public SerializableObject {
 public:
   // Constructors / Destructor
-  FootprintClipboardData()                                    = delete;
+  FootprintClipboardData() = delete;
   FootprintClipboardData(const FootprintClipboardData& other) = delete;
-  FootprintClipboardData(const Uuid&           footprintUuid,
+  FootprintClipboardData(const Uuid& footprintUuid,
                          const PackagePadList& packagePads,
-                         const Point&          cursorPos) noexcept;
+                         const Point& cursorPos) noexcept;
   explicit FootprintClipboardData(const SExpression& node);
   ~FootprintClipboardData() noexcept;
 
   // Getters
   bool getItemCount() const noexcept {
     return mFootprintPads.count() + mPolygons.count() + mCircles.count() +
-           mStrokeTexts.count() + mHoles.count();
+        mStrokeTexts.count() + mHoles.count();
   }
-  const Uuid&     getFootprintUuid() const noexcept { return mFootprintUuid; }
-  const Point&    getCursorPos() const noexcept { return mCursorPos; }
+  const Uuid& getFootprintUuid() const noexcept { return mFootprintUuid; }
+  const Point& getCursorPos() const noexcept { return mCursorPos; }
   PackagePadList& getPackagePads() noexcept { return mPackagePads; }
   const PackagePadList& getPackagePads() const noexcept { return mPackagePads; }
-  FootprintPadList&     getFootprintPads() noexcept { return mFootprintPads; }
+  FootprintPadList& getFootprintPads() noexcept { return mFootprintPads; }
   const FootprintPadList& getFootprintPads() const noexcept {
     return mFootprintPads;
   }
-  PolygonList&          getPolygons() noexcept { return mPolygons; }
-  const PolygonList&    getPolygons() const noexcept { return mPolygons; }
-  CircleList&           getCircles() noexcept { return mCircles; }
-  const CircleList&     getCircles() const noexcept { return mCircles; }
-  StrokeTextList&       getStrokeTexts() noexcept { return mStrokeTexts; }
+  PolygonList& getPolygons() noexcept { return mPolygons; }
+  const PolygonList& getPolygons() const noexcept { return mPolygons; }
+  CircleList& getCircles() noexcept { return mCircles; }
+  const CircleList& getCircles() const noexcept { return mCircles; }
+  StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
   const StrokeTextList& getStrokeTexts() const noexcept { return mStrokeTexts; }
-  HoleList&             getHoles() noexcept { return mHoles; }
-  const HoleList&       getHoles() const noexcept { return mHoles; }
+  HoleList& getHoles() noexcept { return mHoles; }
+  const HoleList& getHoles() const noexcept { return mHoles; }
 
   // General Methods
   std::unique_ptr<QMimeData> toMimeData(const IF_GraphicsLayerProvider& lp);
@@ -99,18 +99,18 @@ private:  // Methods
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  QPixmap        generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
+  QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
   static QString getMimeType() noexcept;
 
 private:  // Data
-  Uuid             mFootprintUuid;
-  PackagePadList   mPackagePads;
-  Point            mCursorPos;
+  Uuid mFootprintUuid;
+  PackagePadList mPackagePads;
+  Point mCursorPos;
   FootprintPadList mFootprintPads;
-  PolygonList      mPolygons;
-  CircleList       mCircles;
-  StrokeTextList   mStrokeTexts;
-  HoleList         mHoles;
+  PolygonList mPolygons;
+  CircleList mCircles;
+  StrokeTextList mStrokeTexts;
+  HoleList mHoles;
 };
 
 /*******************************************************************************

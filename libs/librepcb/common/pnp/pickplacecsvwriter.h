@@ -50,7 +50,7 @@ public:
   enum class BoardSide { TOP, BOTTOM, BOTH };
 
   // Constructors / Destructor
-  PickPlaceCsvWriter()                                = delete;
+  PickPlaceCsvWriter() = delete;
   PickPlaceCsvWriter(const PickPlaceCsvWriter& other) = delete;
   explicit PickPlaceCsvWriter(const PickPlaceData& data) noexcept;
   ~PickPlaceCsvWriter() noexcept;
@@ -68,14 +68,14 @@ public:
   PickPlaceCsvWriter& operator=(const PickPlaceCsvWriter& rhs) = delete;
 
 private:  // Methods
-  static bool    isOnBoardSide(const PickPlaceDataItem& item,
-                               BoardSide                side) noexcept;
+  static bool isOnBoardSide(const PickPlaceDataItem& item,
+                            BoardSide side) noexcept;
   static QString boardSideToString(BoardSide side) noexcept;
 
 private:  // Data
   const PickPlaceData& mData;
-  BoardSide            mBoardSide;
-  bool                 mIncludeMetadataComment;
+  BoardSide mBoardSide;
+  bool mIncludeMetadataComment;
 };
 
 /*******************************************************************************

@@ -75,9 +75,9 @@ PackagePad* PackagePadComboBox::getCurrentPad() const noexcept {
  *  Setters
  ******************************************************************************/
 
-void PackagePadComboBox::setPackage(Package*   package,
+void PackagePadComboBox::setPackage(Package* package,
                                     Footprint* footprint) noexcept {
-  mPackage   = package;
+  mPackage = package;
   mFootprint = footprint;
   updatePads();
 }

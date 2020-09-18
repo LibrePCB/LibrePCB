@@ -106,7 +106,7 @@ void PrimitiveCircleGraphicsItem::setFillLayer(
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void PrimitiveCircleGraphicsItem::paint(QPainter*                       painter,
+void PrimitiveCircleGraphicsItem::paint(QPainter* painter,
                                         const QStyleOptionGraphicsItem* option,
                                         QWidget* widget) noexcept {
   Q_UNUSED(widget);
@@ -115,7 +115,7 @@ void PrimitiveCircleGraphicsItem::paint(QPainter*                       painter,
   const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
 
-  QPen   pen   = isSelected ? mPenHighlighted : mPen;
+  QPen pen = isSelected ? mPenHighlighted : mPen;
   QBrush brush = isSelected ? mBrushHighlighted : mBrush;
 
   // When printing, enforce a minimum line width to make sure the line will be

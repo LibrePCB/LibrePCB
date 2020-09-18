@@ -55,14 +55,14 @@ class LibraryOverviewWidget final : public EditorWidgetBase {
   Q_OBJECT
 
   struct LibraryMenuItem {
-    QString  name;
-    QPixmap  pixmap;
+    QString name;
+    QPixmap pixmap;
     FilePath filepath;
   };
 
 public:
   // Constructors / Destructor
-  LibraryOverviewWidget()                                   = delete;
+  LibraryOverviewWidget() = delete;
   LibraryOverviewWidget(const LibraryOverviewWidget& other) = delete;
   LibraryOverviewWidget(const Context& context, const FilePath& fp,
                         QWidget* parent = nullptr) noexcept;
@@ -103,18 +103,18 @@ signals:
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
-  void    updateMetadata() noexcept;
+  void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
-  bool    isInterfaceBroken() const noexcept override { return false; }
-  bool    runChecks(LibraryElementCheckMessageList& msgs) const override;
+  bool isInterfaceBroken() const noexcept override { return false; }
+  bool runChecks(LibraryElementCheckMessageList& msgs) const override;
   template <typename MessageType>
   void fixMsg(const MessageType& msg);
   template <typename MessageType>
   bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
-                    bool                                              applyFix);
+                    bool applyFix);
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool                                              applyFix) override;
+      bool applyFix) override;
   void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
@@ -138,10 +138,10 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
-  QScopedPointer<LibraryListEditorWidget>   mDependenciesEditorWidget;
-  QSharedPointer<Library>                   mLibrary;
-  QByteArray                                mIcon;
-  QString                                   mCurrentFilter;
+  QScopedPointer<LibraryListEditorWidget> mDependenciesEditorWidget;
+  QSharedPointer<Library> mLibrary;
+  QByteArray mIcon;
+  QString mCurrentFilter;
 };
 
 /*******************************************************************************

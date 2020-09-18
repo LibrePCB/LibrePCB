@@ -52,13 +52,13 @@ class TextPropertiesDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  TextPropertiesDialog()                                  = delete;
+  TextPropertiesDialog() = delete;
   TextPropertiesDialog(const TextPropertiesDialog& other) = delete;
   TextPropertiesDialog(Text& text, UndoStack& undoStack,
                        QList<GraphicsLayer*> layers,
-                       const LengthUnit&     lengthUnit,
-                       const QString&        settingsPrefix,
-                       QWidget*              parent = nullptr) noexcept;
+                       const LengthUnit& lengthUnit,
+                       const QString& settingsPrefix,
+                       QWidget* parent = nullptr) noexcept;
   ~TextPropertiesDialog() noexcept;
 
   // Operator Overloadings
@@ -71,8 +71,8 @@ private:  // Methods
   void selectLayerNameInCombobox(const QString& name) noexcept;
 
 private:  // Data
-  Text&                                    mText;
-  UndoStack&                               mUndoStack;
+  Text& mText;
+  UndoStack& mUndoStack;
   QScopedPointer<Ui::TextPropertiesDialog> mUi;
 };
 

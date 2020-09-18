@@ -51,7 +51,7 @@ namespace editor {
 class BoardClipboardDataBuilder final {
 public:
   // Constructors / Destructor
-  BoardClipboardDataBuilder()                                       = delete;
+  BoardClipboardDataBuilder() = delete;
   BoardClipboardDataBuilder(const BoardClipboardDataBuilder& other) = delete;
   explicit BoardClipboardDataBuilder(Board& board) noexcept;
   ~BoardClipboardDataBuilder() noexcept;

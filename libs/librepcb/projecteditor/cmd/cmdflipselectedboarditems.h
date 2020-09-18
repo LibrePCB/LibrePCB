@@ -61,7 +61,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Board&          mBoard;
+  Board& mBoard;
   Qt::Orientation mOrientation;
 };
 

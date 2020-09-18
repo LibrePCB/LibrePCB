@@ -69,8 +69,9 @@ void BoardClipperPathGenerator::addBoardOutline() {
       continue;
     }
     ClipperHelpers::unite(
-        mPaths, ClipperHelpers::convert(polygon->getPolygon().getPath(),
-                                        mMaxArcTolerance));
+        mPaths,
+        ClipperHelpers::convert(polygon->getPolygon().getPath(),
+                                mMaxArcTolerance));
   }
 
   // footprint polygons
@@ -120,7 +121,7 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
   }
 }
 
-void BoardClipperPathGenerator::addCopper(const QString&   layerName,
+void BoardClipperPathGenerator::addCopper(const QString& layerName,
                                           const NetSignal* netsignal) {
   // polygons
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
@@ -142,8 +143,9 @@ void BoardClipperPathGenerator::addCopper(const QString&   layerName,
     if (polygon->getPolygon().isFilled() &&
         polygon->getPolygon().getPath().isClosed()) {
       ClipperHelpers::unite(
-          mPaths, ClipperHelpers::convert(polygon->getPolygon().getPath(),
-                                          mMaxArcTolerance));
+          mPaths,
+          ClipperHelpers::convert(polygon->getPolygon().getPath(),
+                                  mMaxArcTolerance));
     }
   }
 
@@ -286,8 +288,9 @@ void BoardClipperPathGenerator::addCopper(const QString&   layerName,
         continue;
       }
       ClipperHelpers::unite(
-          mPaths, ClipperHelpers::convert(via->getVia().getSceneOutline(),
-                                          mMaxArcTolerance));
+          mPaths,
+          ClipperHelpers::convert(via->getVia().getSceneOutline(),
+                                  mMaxArcTolerance));
     }
 
     // netlines

@@ -49,12 +49,12 @@ public:
   ~GraphicsScene() noexcept;
 
   // General Methods
-  void    addItem(QGraphicsItem& item) noexcept;
-  void    removeItem(QGraphicsItem& item) noexcept;
-  void    setSelectionRect(const Point& p1, const Point& p2) noexcept;
-  QPixmap toPixmap(int           dpi,
+  void addItem(QGraphicsItem& item) noexcept;
+  void removeItem(QGraphicsItem& item) noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2) noexcept;
+  QPixmap toPixmap(int dpi,
                    const QColor& background = Qt::transparent) noexcept;
-  QPixmap toPixmap(const QSize&  size,
+  QPixmap toPixmap(const QSize& size,
                    const QColor& background = Qt::transparent) noexcept;
 
 private:

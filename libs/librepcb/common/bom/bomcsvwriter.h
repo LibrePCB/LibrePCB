@@ -47,7 +47,7 @@ class BomCsvWriter final {
 
 public:
   // Constructors / Destructor
-  BomCsvWriter()                          = delete;
+  BomCsvWriter() = delete;
   BomCsvWriter(const BomCsvWriter& other) = delete;
   explicit BomCsvWriter(const Bom& bom) noexcept;
   ~BomCsvWriter() noexcept;

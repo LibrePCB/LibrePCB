@@ -69,8 +69,8 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws)
     mDb.reset();
     QFile(mFilePath.toStr()).remove();
     mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
-    createAllTables();                         // can throw
-    setDbVersion(sCurrentDbVersion);           // can throw
+    createAllTables();  // can throw
+    setDbVersion(sCurrentDbVersion);  // can throw
   }
 
   // create library scanner object
@@ -339,7 +339,7 @@ void WorkspaceLibraryDb::getElementTranslations<Device>(
 
 template <>
 void WorkspaceLibraryDb::getElementMetadata<Library>(const FilePath elemDir,
-                                                     Uuid*          uuid,
+                                                     Uuid* uuid,
                                                      Version* version) const {
   return getElementMetadata("libraries", elemDir, uuid, version);
 }
@@ -358,34 +358,34 @@ void WorkspaceLibraryDb::getElementMetadata<PackageCategory>(
 
 template <>
 void WorkspaceLibraryDb::getElementMetadata<Symbol>(const FilePath elemDir,
-                                                    Uuid*          uuid,
+                                                    Uuid* uuid,
                                                     Version* version) const {
   return getElementMetadata("symbols", elemDir, uuid, version);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementMetadata<Package>(const FilePath elemDir,
-                                                     Uuid*          uuid,
+                                                     Uuid* uuid,
                                                      Version* version) const {
   return getElementMetadata("packages", elemDir, uuid, version);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementMetadata<Component>(const FilePath elemDir,
-                                                       Uuid*          uuid,
+                                                       Uuid* uuid,
                                                        Version* version) const {
   return getElementMetadata("components", elemDir, uuid, version);
 }
 
 template <>
 void WorkspaceLibraryDb::getElementMetadata<Device>(const FilePath elemDir,
-                                                    Uuid*          uuid,
+                                                    Uuid* uuid,
                                                     Version* version) const {
   return getElementMetadata("devices", elemDir, uuid, version);
 }
 
 void WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
-                                            QPixmap*       icon) const {
+                                            QPixmap* icon) const {
   QSqlQuery query = mDb->prepareQuery(
       "SELECT icon_png FROM libraries WHERE filepath = :filepath");
   query.bindValue(":filepath",
@@ -521,9 +521,9 @@ void WorkspaceLibraryDb::startLibraryRescan() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void WorkspaceLibraryDb::getElementTranslations(const QString&     table,
-                                                const QString&     idRow,
-                                                const FilePath&    elemDir,
+void WorkspaceLibraryDb::getElementTranslations(const QString& table,
+                                                const QString& idRow,
+                                                const FilePath& elemDir,
                                                 const QStringList& localeOrder,
                                                 QString* name, QString* desc,
                                                 QString* keywords) const {
@@ -539,14 +539,14 @@ void WorkspaceLibraryDb::getElementTranslations(const QString&     table,
                   elemDir.toRelative(mWorkspace.getLibrariesPath()));
   mDb->exec(query);
 
-  LocalizedNameMap        nameMap(ElementName("unknown"));
+  LocalizedNameMap nameMap(ElementName("unknown"));
   LocalizedDescriptionMap descriptionMap("unknown");
-  LocalizedKeywordsMap    keywordsMap("unknown");
+  LocalizedKeywordsMap keywordsMap("unknown");
   while (query.next()) {
-    QString locale      = query.value(0).toString();
-    QString name        = query.value(1).toString();
+    QString locale = query.value(0).toString();
+    QString name = query.value(1).toString();
     QString description = query.value(2).toString();
-    QString keywords    = query.value(3).toString();
+    QString keywords = query.value(3).toString();
     if (!name.isNull()) nameMap.insert(locale, ElementName(name));  // can throw
     if (!description.isNull()) descriptionMap.insert(locale, description);
     if (!keywords.isNull()) keywordsMap.insert(locale, keywords);
@@ -567,9 +567,9 @@ void WorkspaceLibraryDb::getElementMetadata(const QString& table,
   mDb->exec(query);
 
   while (query.next()) {
-    QString uuidStr    = query.value(0).toString();
+    QString uuidStr = query.value(0).toString();
     QString versionStr = query.value(1).toString();
-    if (uuid) *uuid = Uuid::fromString(uuidStr);              // can throw
+    if (uuid) *uuid = Uuid::fromString(uuidStr);  // can throw
     if (version) *version = Version::fromString(versionStr);  // can throw
   }
 }
@@ -622,7 +622,7 @@ QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(
 QList<Uuid> WorkspaceLibraryDb::getCategoryParents(const QString& tablename,
                                                    const Uuid& category) const {
   tl::optional<Uuid> optCategory = category;
-  QList<Uuid>        parentUuids;
+  QList<Uuid> parentUuids;
   while ((optCategory = getCategoryParent(tablename, *optCategory))) {
     if (parentUuids.contains(*optCategory)) {
       throw RuntimeError(__FILE__, __LINE__,
@@ -719,8 +719,8 @@ QList<Uuid> WorkspaceLibraryDb::getElementsBySearchKeyword(
 }
 
 int WorkspaceLibraryDb::getLibraryId(const FilePath& lib) const {
-  QString   relativeLibraryPath = lib.toRelative(mWorkspace.getLibrariesPath());
-  QSqlQuery query               = mDb->prepareQuery(
+  QString relativeLibraryPath = lib.toRelative(mWorkspace.getLibrariesPath());
+  QSqlQuery query = mDb->prepareQuery(
       "SELECT id FROM libraries "
       "WHERE filepath = '" %
       relativeLibraryPath %
@@ -730,7 +730,7 @@ int WorkspaceLibraryDb::getLibraryId(const FilePath& lib) const {
 
   if (query.next()) {
     bool ok = false;
-    int  id = query.value(0).toInt(&ok);
+    int id = query.value(0).toInt(&ok);
     if (!ok) throw LogicError(__FILE__, __LINE__);
     return id;
   } else {
@@ -961,7 +961,7 @@ void WorkspaceLibraryDb::createAllTables() {
   // execute queries
   foreach (const QString& string, queries) {
     QSqlQuery query = mDb->prepareQuery(string);  // can throw
-    mDb->exec(query);                             // can throw
+    mDb->exec(query);  // can throw
   }
 }
 
@@ -971,8 +971,8 @@ int WorkspaceLibraryDb::getDbVersion() const noexcept {
         "SELECT value_int FROM internal WHERE key = 'version'");
     mDb->exec(query);
     if (query.next()) {
-      bool ok      = false;
-      int  version = query.value(0).toInt(&ok);
+      bool ok = false;
+      int version = query.value(0).toInt(&ok);
       if (!ok) throw LogicError(__FILE__, __LINE__);
       return version;
     } else {

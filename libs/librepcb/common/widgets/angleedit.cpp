@@ -36,7 +36,7 @@ namespace librepcb {
 AngleEdit::AngleEdit(QWidget* parent) noexcept
   : NumberEditBase(parent), mValue(0) {
   mSpinBox->setMinimum(-361.0);  // < -360° to avoid rounding issues
-  mSpinBox->setMaximum(361.0);   // > 360° to avoid rounding issues
+  mSpinBox->setMaximum(361.0);  // > 360° to avoid rounding issues
   mSpinBox->setSuffix("°");
   updateSpinBox();
 }

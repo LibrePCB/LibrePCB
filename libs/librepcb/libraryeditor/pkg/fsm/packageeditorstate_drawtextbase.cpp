@@ -246,7 +246,7 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
     mCurrentGraphicsItem = nullptr;
-    mCurrentText         = nullptr;
+    mCurrentText = nullptr;
     mEditCmd.reset();
     return false;
   }
@@ -261,7 +261,7 @@ bool PackageEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentText         = nullptr;
+    mCurrentText = nullptr;
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -275,7 +275,7 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentText         = nullptr;
+    mCurrentText = nullptr;
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;
@@ -289,27 +289,27 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
       // Set all properties according library conventions
-      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopNames);
-      mLastHeight      = PositiveLength(1000000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sTopNames);
+      mLastHeight = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
-      mLastAlignment   = Alignment(HAlign::center(), VAlign::bottom());
-      mLastText        = "{{NAME}}";
+      mLastAlignment = Alignment(HAlign::center(), VAlign::bottom());
+      mLastText = "{{NAME}}";
       break;
     case Mode::VALUE:
       // Set all properties according library conventions
-      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopValues);
-      mLastHeight      = PositiveLength(1000000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sTopValues);
+      mLastHeight = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
-      mLastAlignment   = Alignment(HAlign::center(), VAlign::top());
-      mLastText        = "{{VALUE}}";
+      mLastAlignment = Alignment(HAlign::center(), VAlign::top());
+      mLastText = "{{VALUE}}";
       break;
     default:
       // Set properties to something reasonable
-      mLastLayerName   = GraphicsLayerName(GraphicsLayer::sTopPlacement);
-      mLastHeight      = PositiveLength(2000000);
+      mLastLayerName = GraphicsLayerName(GraphicsLayer::sTopPlacement);
+      mLastHeight = PositiveLength(2000000);
       mLastStrokeWidth = UnsignedLength(200000);
-      mLastAlignment   = Alignment(HAlign::left(), VAlign::bottom());
-      mLastText        = "Text";  // Non-empty to avoid invisible graphics item
+      mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());
+      mLastText = "Text";  // Non-empty to avoid invisible graphics item
       break;
   }
 }

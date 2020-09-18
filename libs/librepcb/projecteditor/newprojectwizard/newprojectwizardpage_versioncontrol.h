@@ -61,7 +61,7 @@ public:
   bool getInitGitRepository() const noexcept;
 
   // Operator Overloadings
-  NewProjectWizardPage_VersionControl& operator       =(
+  NewProjectWizardPage_VersionControl& operator=(
       const NewProjectWizardPage_VersionControl& rhs) = delete;
 
 private:  // GUI Action Handlers

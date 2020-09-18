@@ -62,7 +62,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
+SymbolEditorWidget::SymbolEditorWidget(const Context& context,
                                        const FilePath& fp, QWidget* parent)
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::SymbolEditorWidget),
@@ -88,7 +88,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context&  context,
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
-  int                   row;
+  int row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
@@ -199,7 +199,7 @@ bool SymbolEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mSymbol->save();      // can throw
+    mSymbol->save();  // can throw
     mFileSystem->save();  // can throw
     mOriginalSymbolPinUuids = mSymbol->getPins().getUuidSet();
     return EditorWidgetBase::save();

@@ -56,7 +56,7 @@ SchematicSelectionQuery::~SchematicSelectionQuery() noexcept {
  ******************************************************************************/
 
 QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
-SchematicSelectionQuery::getNetSegmentItems() const noexcept {
+    SchematicSelectionQuery::getNetSegmentItems() const noexcept {
   QHash<SI_NetSegment*, NetSegmentItems> result;
   foreach (SI_NetPoint* netpoint, mResultNetPoints) {
     result[&netpoint->getNetSegment()].netpoints.insert(netpoint);
@@ -72,7 +72,7 @@ SchematicSelectionQuery::getNetSegmentItems() const noexcept {
 
 int SchematicSelectionQuery::getResultCount() const noexcept {
   return mResultSymbols.count() + mResultNetPoints.count() +
-         mResultNetLines.count() + mResultNetLabels.count();
+      mResultNetLines.count() + mResultNetLabels.count();
 }
 
 /*******************************************************************************
@@ -122,12 +122,14 @@ void SchematicSelectionQuery::addNetPointsOfNetLines(
   foreach (SI_NetLine* netline, mResultNetLines) {
     SI_NetPoint* p1 = dynamic_cast<SI_NetPoint*>(&netline->getStartPoint());
     SI_NetPoint* p2 = dynamic_cast<SI_NetPoint*>(&netline->getEndPoint());
-    if (p1 && ((!onlyIfAllNetLinesSelected) ||
-               (mResultNetLines.contains(p1->getNetLines())))) {
+    if (p1 &&
+        ((!onlyIfAllNetLinesSelected) ||
+         (mResultNetLines.contains(p1->getNetLines())))) {
       mResultNetPoints.insert(p1);
     }
-    if (p2 && ((!onlyIfAllNetLinesSelected) ||
-               (mResultNetLines.contains(p2->getNetLines())))) {
+    if (p2 &&
+        ((!onlyIfAllNetLinesSelected) ||
+         (mResultNetLines.contains(p2->getNetLines())))) {
       mResultNetPoints.insert(p2);
     }
   }

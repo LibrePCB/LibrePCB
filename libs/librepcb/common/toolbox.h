@@ -49,9 +49,9 @@ class Toolbox final {
 
 public:
   // Constructors / Destructor
-  Toolbox()                     = delete;
+  Toolbox() = delete;
   Toolbox(const Toolbox& other) = delete;
-  ~Toolbox()                    = delete;
+  ~Toolbox() = delete;
 
   // Operator Overloadings
   Toolbox& operator=(const Toolbox& rhs) = delete;
@@ -102,7 +102,7 @@ public:
   }
 
   static QRectF adjustedBoundingRect(const QRectF& rect,
-                                     qreal         offset) noexcept {
+                                     qreal offset) noexcept {
     return rect.adjusted(-offset, -offset, offset, offset);
   }
 
@@ -112,8 +112,8 @@ public:
 
   static Length arcRadius(const Point& p1, const Point& p2,
                           const Angle& a) noexcept;
-  static Point  arcCenter(const Point& p1, const Point& p2,
-                          const Angle& a) noexcept;
+  static Point arcCenter(const Point& p1, const Point& p2,
+                         const Angle& a) noexcept;
 
   /**
    * @brief Calculate the point on a given line which is nearest to a given
@@ -196,12 +196,12 @@ public:
    *
    * @return The cleaned string (may be empty)
    */
-  static QString cleanUserInputString(const QString&            input,
+  static QString cleanUserInputString(const QString& input,
                                       const QRegularExpression& removeRegex,
                                       bool trim = true, bool toLower = false,
-                                      bool           toUpper          = false,
+                                      bool toUpper = false,
                                       const QString& spaceReplacement = " ",
-                                      int            maxLength = -1) noexcept;
+                                      int maxLength = -1) noexcept;
 
   /**
    * @brief Pretty print the name of a QLocale
@@ -286,8 +286,8 @@ public:
   static T decimalFixedPointFromString(const QString& str, qint32 pointPos) {
     using UnsignedT = typename std::make_unsigned<T>::type;
 
-    const T         min   = std::numeric_limits<T>::min();
-    const T         max   = std::numeric_limits<T>::max();
+    const T min = std::numeric_limits<T>::min();
+    const T max = std::numeric_limits<T>::max();
     const UnsignedT max_u = std::numeric_limits<UnsignedT>::max();
 
     enum class State {
@@ -301,14 +301,14 @@ public:
       EXP_AFTER_SIGN,
       EXP_DIGITS,
     };
-    State     state     = State::START;
-    UnsignedT valueAbs  = 0;
-    bool      sign      = false;
-    qint32    expOffset = pointPos;
+    State state = State::START;
+    UnsignedT valueAbs = 0;
+    bool sign = false;
+    qint32 expOffset = pointPos;
 
-    const quint32 maxExp  = std::numeric_limits<quint32>::max();
-    quint32       exp     = 0;
-    bool          expSign = false;
+    const quint32 maxExp = std::numeric_limits<quint32>::max();
+    quint32 exp = 0;
+    bool expSign = false;
 
     for (QChar c : str) {
       if (state == State::INVALID) {
@@ -322,7 +322,7 @@ public:
 
         case State::START:
           if (c == '-') {
-            sign  = true;
+            sign = true;
             state = State::AFTER_SIGN;
           } else if (c == '+') {
             state = State::AFTER_SIGN;
@@ -330,7 +330,7 @@ public:
             state = State::LONELY_DOT;
           } else if (c.isDigit()) {
             valueAbs = static_cast<UnsignedT>(c.digitValue());
-            state    = State::INT_PART;
+            state = State::INT_PART;
           } else {
             state = State::INVALID;
           }
@@ -341,7 +341,7 @@ public:
             state = State::LONELY_DOT;
           } else if (c.isDigit()) {
             valueAbs = static_cast<UnsignedT>(c.digitValue());
-            state    = State::INT_PART;
+            state = State::INT_PART;
           } else {
             state = State::INVALID;
           }
@@ -407,11 +407,11 @@ public:
         case State::EXP:
           if (c == '-') {
             expSign = true;
-            state   = State::EXP_AFTER_SIGN;
+            state = State::EXP_AFTER_SIGN;
           } else if (c == '+') {
             state = State::EXP_AFTER_SIGN;
           } else if (c.isDigit()) {
-            exp   = static_cast<quint32>(c.digitValue());
+            exp = static_cast<quint32>(c.digitValue());
             state = State::EXP_DIGITS;
           } else {
             state = State::INVALID;
@@ -420,7 +420,7 @@ public:
 
         case State::EXP_AFTER_SIGN:
           if (c.isDigit()) {
-            exp   = static_cast<quint32>(c.digitValue());
+            exp = static_cast<quint32>(c.digitValue());
             state = State::EXP_DIGITS;
           } else {
             state = State::INVALID;
@@ -544,7 +544,7 @@ private:
    * @brief Internal helper function for #expandRangesInString(const QString&)
    */
   static QStringList expandRangesInString(
-      const QString&                                    input,
+      const QString& input,
       const QVector<std::tuple<int, int, QStringList>>& replacements) noexcept;
 };
 

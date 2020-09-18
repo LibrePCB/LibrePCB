@@ -63,7 +63,7 @@ private:
 
   // Private Member Variables
 
-  Circuit&   mCircuit;
+  Circuit& mCircuit;
   NetSignal& mNetSignal;
 };
 

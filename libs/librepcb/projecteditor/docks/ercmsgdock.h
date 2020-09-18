@@ -79,10 +79,10 @@ private:
   ErcMsgDock& operator=(const ErcMsgDock& rhs);
 
   // General
-  Project&                         mProject;
-  ErcMsgList&                      mErcMsgList;
-  Ui::ErcMsgDock*                  mUi;
-  QHash<int, QTreeWidgetItem*>     mTopLevelItems;
+  Project& mProject;
+  ErcMsgList& mErcMsgList;
+  Ui::ErcMsgDock* mUi;
+  QHash<int, QTreeWidgetItem*> mTopLevelItems;
   QHash<ErcMsg*, QTreeWidgetItem*> mErcMsgItems;
 };
 

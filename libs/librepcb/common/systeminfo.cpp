@@ -107,7 +107,7 @@ const QString& SystemInfo::getFullUsername() noexcept {
                         .remove('\n')
                         .remove('\r')
                         .trimmed();
-#elif defined(Q_OS_UNIX)                          // UNIX/Linux
+#elif defined(Q_OS_UNIX)  // UNIX/Linux
     passwd* userinfo = getpwuid(getuid());
     if (userinfo == NULL) {
       qWarning() << "Could not fetch user info via getpwuid!";
@@ -117,7 +117,7 @@ const QString& SystemInfo::getFullUsername() noexcept {
           gecosString.section(',', 0, 0).remove('\n').remove('\r').trimmed();
     }
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
-    QString  command("net user %USERNAME%");
+    QString command("net user %USERNAME%");
     QProcess process;
     process.start("cmd", QStringList() << "/c" << command);
     process.waitForFinished(500);
@@ -162,7 +162,7 @@ bool SystemInfo::isProcessRunning(qint64 pid) {
 #if defined(Q_OS_UNIX)  // Mac OS X / Linux / UNIX
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
-  errno   = 0;
+  errno = 0;
   int ret = ::kill(pid, 0);
   if (ret == 0) {
     return true;
@@ -211,9 +211,9 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
 #if defined(Q_OS_OSX)  // Mac OS X
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
-  errno           = 0;
+  errno = 0;
   char name[1024] = {0};
-  int  retval     = proc_name(pid, name, sizeof(name) / sizeof(char));
+  int retval = proc_name(pid, name, sizeof(name) / sizeof(char));
   if (retval > 0) {
     processName = QFile::decodeName(name);
   } else if ((retval == 0) &&
@@ -272,8 +272,8 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
         tr("OpenProcess() failed with error %1.").arg(GetLastError()));
   }
   wchar_t buf[MAX_PATH];
-  DWORD   length  = MAX_PATH;
-  BOOL    success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
+  DWORD length = MAX_PATH;
+  BOOL success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
   CloseHandle(hProcess);
   if ((!success) || (!length)) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -281,7 +281,7 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
                            .arg(GetLastError()));
   }
   processName = QString::fromWCharArray(buf, length);
-  int i       = processName.lastIndexOf(QLatin1Char('\\'));
+  int i = processName.lastIndexOf(QLatin1Char('\\'));
   if (i >= 0) processName.remove(0, i + 1);
   i = processName.lastIndexOf(QLatin1Char('.'));
   if (i >= 0) processName.truncate(i);

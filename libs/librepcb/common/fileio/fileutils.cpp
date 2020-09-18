@@ -160,9 +160,9 @@ void FileUtils::makePath(const FilePath& path) {
   }
 }
 
-QList<FilePath> FileUtils::getFilesInDirectory(const FilePath&    dir,
+QList<FilePath> FileUtils::getFilesInDirectory(const FilePath& dir,
                                                const QStringList& filters,
-                                               bool               recursive) {
+                                               bool recursive) {
   if (!dir.isExistingDir()) {
     throw LogicError(
         __FILE__, __LINE__,
@@ -170,7 +170,7 @@ QList<FilePath> FileUtils::getFilesInDirectory(const FilePath&    dir,
   }
 
   QList<FilePath> files;
-  QDir            qDir(dir.toStr());
+  QDir qDir(dir.toStr());
   qDir.setFilter(QDir::Files | QDir::Hidden | QDir::Dirs |
                  QDir::NoDotAndDotDot);
   if (!filters.isEmpty()) qDir.setNameFilters(filters);

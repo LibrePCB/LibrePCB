@@ -101,7 +101,7 @@ tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
   QStringList splitted =
       str.split('.', QString::KeepEmptyParts, Qt::CaseSensitive);
   foreach (const QString& numberStr, splitted) {
-    bool ok     = false;
+    bool ok = false;
     uint number = numberStr.toUInt(&ok);
     if ((!ok) || (number > 99999)) {
       return tl::nullopt;

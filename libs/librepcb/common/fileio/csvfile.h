@@ -131,13 +131,13 @@ public:
   CsvFile& operator=(const CsvFile& rhs) = delete;
 
 private:  // Methods
-  QString        getCommentLines() const noexcept;
-  QString        lineToString(const QStringList& line) const noexcept;
+  QString getCommentLines() const noexcept;
+  QString lineToString(const QStringList& line) const noexcept;
   static QString escapeValue(const QString& value) noexcept;
 
 private:  // Data
-  QString            mComment;
-  QStringList        mHeader;
+  QString mComment;
+  QStringList mHeader;
   QList<QStringList> mValues;
 };
 

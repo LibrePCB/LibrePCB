@@ -66,7 +66,7 @@ private:  // Methods
   bool performExecute() override;
 
   // Private Member Variables
-  BI_NetLine&  mOldNetLine;  ///< The BI_NetLine to be split
+  BI_NetLine& mOldNetLine;  ///< The BI_NetLine to be split
   BI_NetPoint* mSplitPoint;  ///< The new BI_NetPoint at the split position
 };
 

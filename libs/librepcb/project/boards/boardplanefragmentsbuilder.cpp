@@ -91,7 +91,7 @@ void BoardPlaneFragmentsBuilder::addPlaneOutline() {
 
 void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
   // determine board area
-  ClipperLib::Paths   boardArea;
+  ClipperLib::Paths boardArea;
   ClipperLib::Clipper boardAreaClipper;
   foreach (const BI_Polygon* polygon, mPlane.getBoard().getPolygons()) {
     if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
@@ -155,7 +155,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
          device->getFootprint().getLibFootprint().getHoles()) {
       Point pos = device->getFootprint().mapToScene(hole.getPosition());
       PositiveLength dia(hole.getDiameter() + mPlane.getMinClearance() * 2);
-      Path           path = Path::circle(dia).translated(pos);
+      Path path = Path::circle(dia).translated(pos);
       c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
                 ClipperLib::ptClip, true);
     }
@@ -215,13 +215,13 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
 void BoardPlaneFragmentsBuilder::ensureMinimumWidth() {
   Length delta = mPlane.getMinWidth() / 2;
   ClipperHelpers::offset(mResult, -delta, maxArcTolerance());  // can throw
-  ClipperHelpers::offset(mResult, delta, maxArcTolerance());   // can throw
+  ClipperHelpers::offset(mResult, delta, maxArcTolerance());  // can throw
 }
 
 void BoardPlaneFragmentsBuilder::flattenResult() {
   // convert paths to tree
   ClipperLib::PolyTree tree;
-  ClipperLib::Clipper  c;
+  ClipperLib::Clipper c;
   c.AddPaths(mResult, ClipperLib::ptSubject, true);
   c.Execute(ClipperLib::ctXor, tree, ClipperLib::pftEvenOdd,
             ClipperLib::pftEvenOdd);
@@ -234,7 +234,7 @@ void BoardPlaneFragmentsBuilder::removeOrphans() {
   mResult.erase(std::remove_if(
                     mResult.begin(), mResult.end(),
                     [this](const ClipperLib::Path& p) {
-                      ClipperLib::Paths   intersections;
+                      ClipperLib::Paths intersections;
                       ClipperLib::Clipper c;
                       c.AddPaths(mConnectedNetSignalAreas,
                                  ClipperLib::ptSubject, true);

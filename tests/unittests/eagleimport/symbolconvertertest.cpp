@@ -49,7 +49,7 @@ TEST_F(SymbolConverterTest, testConversion) {
   FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
 
   // load eagle symbol
-  FilePath           eagleLibFp = testDataDir.getPathTo("resistor.lbr");
+  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
   parseagle::Library eagleLibrary(eagleLibFp.toStr());
   ASSERT_EQ(1, eagleLibrary.getSymbols().count());
   const parseagle::Symbol& eagleSymbol = eagleLibrary.getSymbols().first();
@@ -58,7 +58,7 @@ TEST_F(SymbolConverterTest, testConversion) {
   ConverterDb db(testDataDir.getPathTo("db.ini"));
 
   // convert symbol
-  SymbolConverter                  converter(eagleSymbol, db);
+  SymbolConverter converter(eagleSymbol, db);
   std::unique_ptr<library::Symbol> symbol = converter.generate();
 }
 

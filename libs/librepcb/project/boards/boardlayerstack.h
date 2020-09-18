@@ -52,7 +52,7 @@ class BoardLayerStack final : public QObject,
 
 public:
   // Constructors / Destructor
-  BoardLayerStack()                             = delete;
+  BoardLayerStack() = delete;
   BoardLayerStack(const BoardLayerStack& other) = delete;
   BoardLayerStack(Board& board, const BoardLayerStack& other);
   BoardLayerStack(Board& board, const SExpression& node);
@@ -61,7 +61,7 @@ public:
 
   // Getters
   Board& getBoard() const noexcept { return mBoard; }
-  int    getInnerLayerCount() const noexcept { return mInnerLayerCount; }
+  int getInnerLayerCount() const noexcept { return mInnerLayerCount; }
   QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
   /// @copydoc ::librepcb::IF_GraphicsLayerProvider::getAllLayers()
@@ -102,7 +102,7 @@ private:
   // General
   Board& mBoard;  ///< A reference to the Board object (from the ctor)
   QList<GraphicsLayer*> mLayers;
-  bool                  mLayersChanged;
+  bool mLayersChanged;
 
   // Settings
   int mInnerLayerCount;

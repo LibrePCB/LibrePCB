@@ -37,7 +37,7 @@ namespace librepcb {
 
 AsyncCopyOperation::AsyncCopyOperation(const FilePath& source,
                                        const FilePath& destination,
-                                       QObject*        parent) noexcept
+                                       QObject* parent) noexcept
   : QThread(parent), mSource(source), mDestination(destination) {
 }
 
@@ -73,27 +73,27 @@ void AsyncCopyOperation::run() noexcept {
     // First copy to a temporary directory and rename it afterwards to make
     // the operation "more atomic", i.e. avoiding half-copied destination in
     // in case of errors.
-    emit     progressStatus(tr("Removing temporary directory..."));
+    emit progressStatus(tr("Removing temporary directory..."));
     FilePath tmpDst(mDestination.toStr() % "~");
     FileUtils::removeDirRecursively(tmpDst);  // can throw
 
     // Get list of entries to copy
-    emit            progressStatus(tr("Looking for files to copy..."));
+    emit progressStatus(tr("Looking for files to copy..."));
     QList<FilePath> files = FileUtils::getFilesInDirectory(
         mSource, QStringList(), true);  // can throw
 
     try {
       for (int i = 0; i < files.count(); ++i) {
-        FilePath src         = files.at(i);
-        QString  srcRelative = src.toRelative(mSource);
-        FilePath dst         = tmpDst.getPathTo(srcRelative);
+        FilePath src = files.at(i);
+        QString srcRelative = src.toRelative(mSource);
+        FilePath dst = tmpDst.getPathTo(srcRelative);
         if (i % (files.count() / 100) == 0) {
           emit progressStatus(
               tr("Copy file %1 of %2...").arg(i + 1).arg(files.count()));
           emit progressPercent((95 * (i + 1)) / files.count());
         }
         FileUtils::makePath(dst.getParentDir());  // can throw
-        FileUtils::copyFile(src, dst);            // can throw
+        FileUtils::copyFile(src, dst);  // can throw
       }
 
       emit progressStatus(tr("Renaming temporary directory..."));
@@ -106,7 +106,7 @@ void AsyncCopyOperation::run() noexcept {
     } catch (const Exception& e) {
       // clean up
       FileUtils::removeDirRecursively(mDestination);  // can throw
-      FileUtils::removeDirRecursively(tmpDst);        // can throw
+      FileUtils::removeDirRecursively(tmpDst);  // can throw
       throw e;
     }
   } catch (const Exception& e) {

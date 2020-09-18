@@ -74,34 +74,34 @@ public:
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant      data(const QModelIndex& index,
-                     int                role = Qt::DisplayRole) const override;
-  QVariant      headerData(int section, Qt::Orientation orientation,
-                           int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool          setData(const QModelIndex& index, const QVariant& value,
-                        int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value,
+               int role = Qt::EditRole) override;
 
   // Operator Overloadings
   AttributeListModel& operator=(const AttributeListModel& rhs) noexcept;
 
 private:
-  void         attributeListEdited(const AttributeList& list, int index,
-                                   const std::shared_ptr<const Attribute>& attribute,
-                                   AttributeList::Event event) noexcept;
-  void         execCmd(UndoCommand* cmd);
+  void attributeListEdited(const AttributeList& list, int index,
+                           const std::shared_ptr<const Attribute>& attribute,
+                           AttributeList::Event event) noexcept;
+  void execCmd(UndoCommand* cmd);
   AttributeKey validateKeyOrThrow(const QString& key) const;
   static ComboBoxDelegate::Items buildUnitComboBoxData(
       const AttributeType& type) noexcept;
 
 private:  // Data
-  AttributeList*          mAttributeList;
-  UndoStack*              mUndoStack;
+  AttributeList* mAttributeList;
+  UndoStack* mUndoStack;
   ComboBoxDelegate::Items mTypeComboBoxItems;
-  QString                 mNewKey;
-  const AttributeType*    mNewType;
-  QString                 mNewValue;
-  const AttributeUnit*    mNewUnit;
+  QString mNewKey;
+  const AttributeType* mNewType;
+  QString mNewValue;
+  const AttributeUnit* mNewUnit;
 
   // Slots
   AttributeList::OnEditedSlot mOnEditedSlot;

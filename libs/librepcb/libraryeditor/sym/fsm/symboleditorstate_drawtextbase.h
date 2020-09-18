@@ -63,7 +63,7 @@ public:
   SymbolEditorState_DrawTextBase(const SymbolEditorState_DrawTextBase& other) =
       delete;
   explicit SymbolEditorState_DrawTextBase(const Context& context,
-                                          Mode           mode) noexcept;
+                                          Mode mode) noexcept;
   virtual ~SymbolEditorState_DrawTextBase() noexcept;
 
   // General Methods
@@ -81,14 +81,14 @@ public:
   bool processRotateCcw() noexcept override;
 
   // Operator Overloadings
-  SymbolEditorState_DrawTextBase& operator       =(
+  SymbolEditorState_DrawTextBase& operator=(
       const SymbolEditorState_DrawTextBase& rhs) = delete;
 
 private:  // Methods
-  bool      startAddText(const Point& pos) noexcept;
-  bool      finishAddText(const Point& pos) noexcept;
-  bool      abortAddText() noexcept;
-  void      resetToDefaultParameters() noexcept;
+  bool startAddText(const Point& pos) noexcept;
+  bool finishAddText(const Point& pos) noexcept;
+  bool abortAddText() noexcept;
+  void resetToDefaultParameters() noexcept;
   Alignment getAlignment() const noexcept;
 
   void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
@@ -96,17 +96,17 @@ private:  // Methods
   void textComboBoxValueChanged(const QString& value) noexcept;
 
 private:  // Types / Data
-  Mode                        mMode;
-  Point                       mStartPos;
+  Mode mMode;
+  Point mStartPos;
   QScopedPointer<CmdTextEdit> mEditCmd;
-  Text*                       mCurrentText;
-  TextGraphicsItem*           mCurrentGraphicsItem;
+  Text* mCurrentText;
+  TextGraphicsItem* mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
-  Angle             mLastRotation;
-  PositiveLength    mLastHeight;
-  QString           mLastText;
+  Angle mLastRotation;
+  PositiveLength mLastHeight;
+  QString mLastText;
 };
 
 /*******************************************************************************

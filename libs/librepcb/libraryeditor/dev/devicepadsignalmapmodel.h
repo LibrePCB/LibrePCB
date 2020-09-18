@@ -68,13 +68,13 @@ public:
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant      data(const QModelIndex& index,
-                     int                role = Qt::DisplayRole) const override;
-  QVariant      headerData(int section, Qt::Orientation orientation,
-                           int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool          setData(const QModelIndex& index, const QVariant& value,
-                        int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value,
+               int role = Qt::EditRole) override;
 
   // Operator Overloadings
   DevicePadSignalMapModel& operator=(
@@ -84,15 +84,15 @@ private:
   void padSignalMapEdited(
       const DevicePadSignalMap& map, int index,
       const std::shared_ptr<const DevicePadSignalMapItem>& item,
-      DevicePadSignalMap::Event                            event) noexcept;
+      DevicePadSignalMap::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   void updateComboBoxItems() noexcept;
 
 private:  // Data
-  DevicePadSignalMap*     mPadSignalMap;
-  UndoStack*              mUndoStack;
-  ComponentSignalList     mSignals;
-  PackagePadList          mPads;
+  DevicePadSignalMap* mPadSignalMap;
+  UndoStack* mUndoStack;
+  ComponentSignalList mSignals;
+  PackagePadList mPads;
   ComboBoxDelegate::Items mComboBoxItems;
 
   // Slots

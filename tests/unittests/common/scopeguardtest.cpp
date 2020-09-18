@@ -62,7 +62,7 @@ TEST(ScopeGuardTest, testScopeGuardPerformance) {
   std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
   // make volatile to avoid optimizations
   volatile int setByGuard0 = 0;
-  start                    = std::chrono::high_resolution_clock::now();
+  start = std::chrono::high_resolution_clock::now();
   for (int n = 0; n < 10000000; ++n) {
     auto guard0 = scopeGuard([&] { setByGuard0 += 1; });
   }
@@ -135,7 +135,7 @@ TEST(ScopeGuardTest, testScopeGuardListPerformance) {
   std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
   // make volatile to avoid optimizations
   volatile int setByGuard0 = 0;
-  start                    = std::chrono::high_resolution_clock::now();
+  start = std::chrono::high_resolution_clock::now();
   for (int n = 0; n < 10000000; ++n) {
     auto guardList = ScopeGuardList();
     guardList.add([&] { setByGuard0 += 1; });

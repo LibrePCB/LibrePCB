@@ -60,14 +60,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept { return mBoundingRect; }
+  QRectF boundingRect() const noexcept { return mBoundingRect; }
   QPainterPath shape() const noexcept { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0);
 
 private:
   // make some methods inaccessible...
-  SGI_SymbolPin()                           = delete;
+  SGI_SymbolPin() = delete;
   SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
   SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
 
@@ -75,21 +75,21 @@ private:
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
   // General Attributes
-  SI_SymbolPin&             mPin;
+  SI_SymbolPin& mPin;
   const library::SymbolPin& mLibPin;
-  QFont                     mFont;
-  qreal                     mRadiusPx;
+  QFont mFont;
+  qreal mRadiusPx;
 
   // Cached Attributes
-  bool           mIsVisibleJunction;
+  bool mIsVisibleJunction;
   GraphicsLayer* mJunctionLayer;
-  QStaticText    mStaticText;
-  bool           mRotate180;
-  bool           mMirrored;
-  QRectF         mBoundingRect;
-  QPointF        mTextOrigin;
-  QRectF         mTextBoundingRect;
-  QPainterPath   mShape;
+  QStaticText mStaticText;
+  bool mRotate180;
+  bool mMirrored;
+  QRectF mBoundingRect;
+  QPointF mTextOrigin;
+  QRectF mTextBoundingRect;
+  QPainterPath mShape;
 };
 
 /*******************************************************************************

@@ -45,7 +45,7 @@ class LibraryBaseElement;
 class LibraryBaseElementCheck {
 public:
   // Constructors / Destructor
-  LibraryBaseElementCheck()                                     = delete;
+  LibraryBaseElementCheck() = delete;
   LibraryBaseElementCheck(const LibraryBaseElementCheck& other) = delete;
   explicit LibraryBaseElementCheck(const LibraryBaseElement& element) noexcept;
   virtual ~LibraryBaseElementCheck() noexcept;

@@ -53,14 +53,14 @@ public:
   CmdCombineSchematicNetSegments() = delete;
   CmdCombineSchematicNetSegments(const CmdCombineSchematicNetSegments& other) =
       delete;
-  CmdCombineSchematicNetSegments(SI_NetSegment&    toBeRemoved,
+  CmdCombineSchematicNetSegments(SI_NetSegment& toBeRemoved,
                                  SI_NetLineAnchor& oldAnchor,
-                                 SI_NetSegment&    result,
+                                 SI_NetSegment& result,
                                  SI_NetLineAnchor& newAnchor) noexcept;
   ~CmdCombineSchematicNetSegments() noexcept;
 
   // Operator Overloadings
-  CmdCombineSchematicNetSegments& operator       =(
+  CmdCombineSchematicNetSegments& operator=(
       const CmdCombineSchematicNetSegments& rhs) = delete;
 
 private:  // Methods
@@ -68,8 +68,8 @@ private:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  SI_NetSegment&    mOldSegment;
-  SI_NetSegment&    mNewSegment;
+  SI_NetSegment& mOldSegment;
+  SI_NetSegment& mNewSegment;
   SI_NetLineAnchor& mOldAnchor;
   SI_NetLineAnchor& mNewAnchor;
 };

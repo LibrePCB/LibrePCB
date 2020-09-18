@@ -44,10 +44,10 @@ template <typename T, typename P, typename... OnEditedArgs>
 class CmdListElementInsert final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdListElementInsert()                                  = delete;
+  CmdListElementInsert() = delete;
   CmdListElementInsert(const CmdListElementInsert& other) = delete;
   CmdListElementInsert(SerializableObjectList<T, P, OnEditedArgs...>& list,
-                       const std::shared_ptr<T>&                      element,
+                       const std::shared_ptr<T>& element,
                        int index = -1) noexcept
     : UndoCommand(tr("Add %1").arg(P::tagname)),
       mList(list),
@@ -74,8 +74,8 @@ private:  // Methods
 
 private:  // Data
   SerializableObjectList<T, P, OnEditedArgs...>& mList;
-  std::shared_ptr<T>                             mElement;
-  int                                            mIndex;
+  std::shared_ptr<T> mElement;
+  int mIndex;
 };
 
 /*******************************************************************************

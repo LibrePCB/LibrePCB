@@ -140,8 +140,8 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
           std::make_shared<SchematicClipboardData::NetSegment>(
               it.key()->getNetSignal().getName());
       newSegment->junctions = segment.junctions;
-      newSegment->lines     = segment.netlines;
-      newSegment->labels    = segment.netlabels;
+      newSegment->lines = segment.netlines;
+      newSegment->labels = segment.netlabels;
       data->getNetSegments().append(newSegment);
     }
   }

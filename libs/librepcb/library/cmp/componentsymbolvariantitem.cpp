@@ -193,7 +193,7 @@ ComponentSymbolVariantItem& ComponentSymbolVariantItem::operator=(
 void ComponentSymbolVariantItem::pinSignalMapEdited(
     const ComponentPinSignalMap& map, int index,
     const std::shared_ptr<const ComponentPinSignalMapItem>& item,
-    ComponentPinSignalMap::Event                            event) noexcept {
+    ComponentPinSignalMap::Event event) noexcept {
   Q_UNUSED(map);
   Q_UNUSED(index);
   Q_UNUSED(item);

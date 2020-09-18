@@ -47,7 +47,7 @@ ProjectSettings::ProjectSettings(Project& project, bool create)
 
   // load settings from file
   if (!create) {
-    QString     fp = "project/settings.lp";
+    QString fp = "project/settings.lp";
     SExpression root =
         SExpression::parse(mProject.getDirectory().read(fp),
                            mProject.getDirectory().getAbsPath(fp));

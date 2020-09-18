@@ -72,9 +72,9 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Board::Board(const Board&                            other,
+Board::Board(const Board& other,
              std::unique_ptr<TransactionalDirectory> directory,
-             const ElementName&                      name)
+             const ElementName& name)
   : QObject(&other.getProject()),
     mProject(other.getProject()),
     mDirectory(std::move(directory)),
@@ -184,7 +184,7 @@ Board::Board(const Board&                            other,
   }
 }
 
-Board::Board(Project&                                project,
+Board::Board(Project& project,
              std::unique_ptr<TransactionalDirectory> directory, bool create,
              const QString& newName)
   : QObject(&project),
@@ -199,7 +199,7 @@ Board::Board(Project&                                project,
     // try to open/create the board file
     if (create) {
       // set attributes
-      mName                = ElementName(newName);  // can throw
+      mName = ElementName(newName);  // can throw
       mDefaultFontFileName = qApp->getDefaultStrokeFontName();
 
       // load default layer stack
@@ -258,7 +258,7 @@ Board::Board(Project&                                project,
 
       // load user settings
       try {
-        QString     userSettingsFp = "settings.user.lp";
+        QString userSettingsFp = "settings.user.lp";
         SExpression userSettingsRoot =
             SExpression::parse(mDirectory->read(userSettingsFp),
                                mDirectory->getAbsPath(userSettingsFp));
@@ -487,7 +487,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
   return list;
 }
 
-QList<BI_Via*> Board::getViasAtScenePos(const Point&     pos,
+QList<BI_Via*> Board::getViasAtScenePos(const Point& pos,
                                         const NetSignal* netsignal) const
     noexcept {
   QList<BI_Via*> list;
@@ -554,8 +554,8 @@ BI_NetPoint* Board::getNetPointNextToScenePos(
   return bestMatch;
 }
 
-BI_Via* Board::getViaNextToScenePos(const Point&     pos,
-                                    UnsignedLength&  maxDistance,
+BI_Via* Board::getViaNextToScenePos(const Point& pos,
+                                    UnsignedLength& maxDistance,
                                     const NetSignal* netsignal) const {
   BI_Via* bestMatch = nullptr;
   foreach (BI_NetSegment* segment, mNetSegments) {
@@ -567,8 +567,8 @@ BI_Via* Board::getViaNextToScenePos(const Point&     pos,
   return bestMatch;
 }
 
-BI_FootprintPad* Board::getPadNextToScenePos(const Point&         pos,
-                                             UnsignedLength&      maxDistance,
+BI_FootprintPad* Board::getPadNextToScenePos(const Point& pos,
+                                             UnsignedLength& maxDistance,
                                              const GraphicsLayer* layer,
                                              const NetSignal* netsignal) const {
   BI_FootprintPad* bestMatch = nullptr;
@@ -810,7 +810,7 @@ void Board::triggerAirWiresRebuild() noexcept {
 
       if (netsignal && netsignal->isAddedToCircuit()) {
         // calculate new airwires
-        BoardAirWiresBuilder         builder(*this, *netsignal);
+        BoardAirWiresBuilder builder(*this, *netsignal);
         QVector<QPair<Point, Point>> airwires = builder.buildAirWires();
 
         // add new airwires
@@ -845,7 +845,7 @@ void Board::addToProject() {
     throw LogicError(__FILE__, __LINE__);
   }
   QList<BI_Base*> items = getAllItems();
-  ScopeGuardList  sgl(items.count());
+  ScopeGuardList sgl(items.count());
   for (int i = 0; i < items.count(); ++i) {
     BI_Base* item = items.at(i);
     item->addToBoard();  // can throw
@@ -862,7 +862,7 @@ void Board::removeFromProject() {
     throw LogicError(__FILE__, __LINE__);
   }
   QList<BI_Base*> items = getAllItems();
-  ScopeGuardList  sgl(items.count());
+  ScopeGuardList sgl(items.count());
   for (int i = items.count() - 1; i >= 0; --i) {
     BI_Base* item = items.at(i);
     item->removeFromBoard();  // can throw
@@ -882,7 +882,7 @@ void Board::save() {
 
     // save user settings
     SExpression usrDoc(mUserSettings->serializeToDomElement(
-        "librepcb_board_user_settings"));                         // can throw
+        "librepcb_board_user_settings"));  // can throw
     mDirectory->write("settings.user.lp", usrDoc.toByteArray());  // can throw
   } else {
     mDirectory->removeDirRecursively();  // can throw
@@ -899,7 +899,7 @@ void Board::print(QPrinter& printer) {
     sgl.add([layer, color]() { layer->setColor(color); });  // restore color
     int h = color.hsvHue();
     int s = color.hsvSaturation();
-    int v = color.value() / 2;          // avoid white colors
+    int v = color.value() / 2;  // avoid white colors
     int a = (color.alpha() / 2) + 127;  // avoid transparent colors
     layer->setColor(QColor::fromHsv(h, s, v, a));
   }
@@ -912,7 +912,7 @@ void Board::renderToQPainter(QPainter& painter, int dpi) const {
   QRectF sceneRect = mGraphicsScene->itemsBoundingRect();
   QRectF printerRect(
       qreal(0), qreal(0),
-      Length::fromPx(sceneRect.width()).toInch() * dpi,    // can throw
+      Length::fromPx(sceneRect.width()).toInch() * dpi,  // can throw
       Length::fromPx(sceneRect.height()).toInch() * dpi);  // can throw
   mGraphicsScene->render(&painter, printerRect, sceneRect,
                          Qt::IgnoreAspectRatio);
@@ -945,9 +945,9 @@ void Board::setSelectionRect(const Point& p1, const Point& p2,
   if (updateItems) {
     QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
     foreach (BI_Device* component, mDeviceInstances) {
-      BI_Footprint& footprint       = component->getFootprint();
-      bool          selectFootprint = footprint.isSelectable() &&
-                             footprint.getGrabAreaScenePx().intersects(rectPx);
+      BI_Footprint& footprint = component->getFootprint();
+      bool selectFootprint = footprint.isSelectable() &&
+          footprint.getGrabAreaScenePx().intersects(rectPx);
       footprint.setSelected(selectFootprint);
       foreach (BI_FootprintPad* pad, footprint.getPads()) {
         bool selectPad =
@@ -956,7 +956,7 @@ void Board::setSelectionRect(const Point& p1, const Point& p2,
       }
       foreach (BI_StrokeText* text, footprint.getStrokeTexts()) {
         bool selectText = text->isSelectable() &&
-                          text->getGrabAreaScenePx().intersects(rectPx);
+            text->getGrabAreaScenePx().intersects(rectPx);
         text->setSelected(selectFootprint || selectText);
       }
     }
@@ -965,12 +965,12 @@ void Board::setSelectionRect(const Point& p1, const Point& p2,
     }
     foreach (BI_Plane* plane, mPlanes) {
       bool select = plane->isSelectable() &&
-                    plane->getGrabAreaScenePx().intersects(rectPx);
+          plane->getGrabAreaScenePx().intersects(rectPx);
       plane->setSelected(select);
     }
     foreach (BI_Polygon* polygon, mPolygons) {
       bool select = polygon->isSelectable() &&
-                    polygon->getGrabAreaScenePx().intersects(rectPx);
+          polygon->getGrabAreaScenePx().intersects(rectPx);
       polygon->setSelected(select);
     }
     foreach (BI_StrokeText* text, mStrokeTexts) {
@@ -1061,7 +1061,7 @@ void Board::updateErcMessages() noexcept {
     foreach (const ComponentInstance* component, componentInstances) {
       if (component->getLibComponent().isSchematicOnly()) continue;
       BI_Device* device = mDeviceInstances.value(component->getUuid());
-      ErcMsg*    ercMsg =
+      ErcMsg* ercMsg =
           mErcMsgListUnplacedComponentInstances.value(component->getUuid());
       if ((!device) && (!ercMsg)) {
         ErcMsg* ercMsg = new ErcMsg(
@@ -1091,9 +1091,9 @@ void Board::updateErcMessages() noexcept {
  *  Static Methods
  ******************************************************************************/
 
-Board* Board::create(Project&                                project,
+Board* Board::create(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
-                     const ElementName&                      name) {
+                     const ElementName& name) {
   return new Board(project, std::move(directory), true, *name);
 }
 

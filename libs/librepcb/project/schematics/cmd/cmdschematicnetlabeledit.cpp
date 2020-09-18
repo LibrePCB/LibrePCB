@@ -59,21 +59,21 @@ CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept {
  ******************************************************************************/
 
 void CmdSchematicNetLabelEdit::setPosition(const Point& position,
-                                           bool         immediate) noexcept {
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos = position;
   if (immediate) mNetLabel.setPosition(mNewPos);
 }
 
 void CmdSchematicNetLabelEdit::translate(const Point& deltaPos,
-                                         bool         immediate) noexcept {
+                                         bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
   if (immediate) mNetLabel.setPosition(mNewPos);
 }
 
 void CmdSchematicNetLabelEdit::setRotation(const Angle& angle,
-                                           bool         immediate) noexcept {
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;
   if (immediate) mNetLabel.setRotation(mNewRotation);

@@ -66,7 +66,7 @@ protected:
 
 private:
   QCollator mCollator;
-  bool      mKeepLastRowAtBottom;
+  bool mKeepLastRowAtBottom;
 };
 
 /*******************************************************************************

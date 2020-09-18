@@ -73,7 +73,7 @@ private:
   void enterPressed() noexcept;
 
 private:
-  CompleterListFunction     mCompleterListFunction;
+  CompleterListFunction mCompleterListFunction;
   QScopedPointer<QLineEdit> mLineEdit;
   unsigned int mIndex;  ///< Number of searches with the current search term
 };

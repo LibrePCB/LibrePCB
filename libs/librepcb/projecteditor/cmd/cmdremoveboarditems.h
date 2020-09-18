@@ -58,16 +58,16 @@ class CmdRemoveBoardItems final : public UndoCommandGroup {
 private:
   // Private Types
   struct NetSegmentItems {
-    QSet<BI_Via*>          vias;
-    QSet<BI_NetPoint*>     netpoints;
-    QSet<BI_NetLine*>      netlines;
+    QSet<BI_Via*> vias;
+    QSet<BI_NetPoint*> netpoints;
+    QSet<BI_NetLine*> netlines;
     QSet<BI_FootprintPad*> pads;
   };
   typedef QHash<BI_NetSegment*, NetSegmentItems> NetSegmentItemList;
 
 public:
   // Constructors / Destructor
-  CmdRemoveBoardItems()                                 = delete;
+  CmdRemoveBoardItems() = delete;
   CmdRemoveBoardItems(const CmdRemoveBoardItems& other) = delete;
   explicit CmdRemoveBoardItems(Board& board) noexcept;
   ~CmdRemoveBoardItems() noexcept;
@@ -117,25 +117,25 @@ private:  // Methods
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  void removeNetSegmentItems(BI_NetSegment&                netsegment,
+  void removeNetSegmentItems(BI_NetSegment& netsegment,
                              const QSet<BI_FootprintPad*>& padsToDisconnect,
-                             const QSet<BI_Via*>&          viasToRemove,
-                             const QSet<BI_NetPoint*>&     netpointsToRemove,
-                             const QSet<BI_NetLine*>&      netlinesToRemove);
+                             const QSet<BI_Via*>& viasToRemove,
+                             const QSet<BI_NetPoint*>& netpointsToRemove,
+                             const QSet<BI_NetLine*>& netlinesToRemove);
 
 private:  // Data
   Board& mBoard;
 
   // Items to remove
-  QSet<BI_Device*>     mDeviceInstances;
+  QSet<BI_Device*> mDeviceInstances;
   QSet<BI_NetSegment*> mNetSegments;
-  QSet<BI_Via*>        mVias;
-  QSet<BI_NetPoint*>   mNetPoints;
-  QSet<BI_NetLine*>    mNetLines;
-  QSet<BI_Plane*>      mPlanes;
-  QSet<BI_Polygon*>    mPolygons;
+  QSet<BI_Via*> mVias;
+  QSet<BI_NetPoint*> mNetPoints;
+  QSet<BI_NetLine*> mNetLines;
+  QSet<BI_Plane*> mPlanes;
+  QSet<BI_Polygon*> mPolygons;
   QSet<BI_StrokeText*> mStrokeTexts;
-  QSet<BI_Hole*>       mHoles;
+  QSet<BI_Hole*> mHoles;
 };
 
 /*******************************************************************************

@@ -45,9 +45,9 @@ ComponentSignal::ComponentSignal(const ComponentSignal& other) noexcept
     mIsClock(other.mIsClock) {
 }
 
-ComponentSignal::ComponentSignal(const Uuid&              uuid,
+ComponentSignal::ComponentSignal(const Uuid& uuid,
                                  const CircuitIdentifier& name,
-                                 const SignalRole&        role,
+                                 const SignalRole& role,
                                  const QString& forcedNetName, bool isRequired,
                                  bool isNegated, bool isClock) noexcept
   : onEdited(*this),

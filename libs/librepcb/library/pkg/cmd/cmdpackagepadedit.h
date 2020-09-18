@@ -45,7 +45,7 @@ namespace library {
 class CmdPackagePadEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdPackagePadEdit()                               = delete;
+  CmdPackagePadEdit() = delete;
   CmdPackagePadEdit(const CmdPackagePadEdit& other) = delete;
   explicit CmdPackagePadEdit(PackagePad& pad) noexcept;
   ~CmdPackagePadEdit() noexcept;

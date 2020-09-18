@@ -178,13 +178,13 @@ void ErcMsgDock::ercMsgChanged(ErcMsg* ercMsg) noexcept {
 
 void ErcMsgDock::on_treeWidget_itemSelectionChanged() {
   bool allDisplayed = true;
-  bool allIgnored   = true;
+  bool allIgnored = true;
 
   foreach (QTreeWidgetItem* item, mUi->treeWidget->selectedItems()) {
     ErcMsg* ercMsg = mErcMsgItems.key(item, nullptr);
     if (!ercMsg) {
       allDisplayed = false;
-      allIgnored   = false;
+      allIgnored = false;
       break;
     }
     if (ercMsg->isIgnored())
@@ -211,7 +211,7 @@ void ErcMsgDock::on_btnIgnore_clicked(bool checked) {
  ******************************************************************************/
 
 void ErcMsgDock::updateTopLevelItemTexts() noexcept {
-  int              countOfNonIgnoredErcMessages = 0;
+  int countOfNonIgnoredErcMessages = 0;
   QTreeWidgetItem* item;
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitError)];
   item->setText(0, tr("Circuit Errors (%1)").arg(item->childCount()));

@@ -45,7 +45,7 @@ namespace library {
 class CmdFootprintPadEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdFootprintPadEdit()                                 = delete;
+  CmdFootprintPadEdit() = delete;
   CmdFootprintPadEdit(const CmdFootprintPadEdit& other) = delete;
   explicit CmdFootprintPadEdit(FootprintPad& pad) noexcept;
   ~CmdFootprintPadEdit() noexcept;
@@ -86,22 +86,22 @@ private:
   FootprintPad& mPad;
 
   // General Attributes
-  Uuid                    mOldPackagePadUuid;
-  Uuid                    mNewPackagePadUuid;
+  Uuid mOldPackagePadUuid;
+  Uuid mNewPackagePadUuid;
   FootprintPad::BoardSide mOldBoardSide;
   FootprintPad::BoardSide mNewBoardSide;
-  FootprintPad::Shape     mOldShape;
-  FootprintPad::Shape     mNewShape;
-  PositiveLength          mOldWidth;
-  PositiveLength          mNewWidth;
-  PositiveLength          mOldHeight;
-  PositiveLength          mNewHeight;
-  Point                   mOldPos;
-  Point                   mNewPos;
-  Angle                   mOldRotation;
-  Angle                   mNewRotation;
-  UnsignedLength          mOldDrillDiameter;
-  UnsignedLength          mNewDrillDiameter;
+  FootprintPad::Shape mOldShape;
+  FootprintPad::Shape mNewShape;
+  PositiveLength mOldWidth;
+  PositiveLength mNewWidth;
+  PositiveLength mOldHeight;
+  PositiveLength mNewHeight;
+  Point mOldPos;
+  Point mNewPos;
+  Angle mOldRotation;
+  Angle mNewRotation;
+  UnsignedLength mOldDrillDiameter;
+  UnsignedLength mNewDrillDiameter;
 };
 
 /*******************************************************************************

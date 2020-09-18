@@ -67,7 +67,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  Board&                              mBoard;
+  Board& mBoard;
   QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
 };
 

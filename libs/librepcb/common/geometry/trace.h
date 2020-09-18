@@ -68,7 +68,7 @@ public:
   const tl::optional<Uuid>& tryGetJunction() const noexcept {
     return mJunction;
   }
-  const tl::optional<Uuid>&      tryGetVia() const noexcept { return mVia; }
+  const tl::optional<Uuid>& tryGetVia() const noexcept { return mVia; }
   const tl::optional<PadAnchor>& tryGetPad() const noexcept { return mPad; }
 
   /// @copydoc librepcb::SerializableObject::serialize()
@@ -91,8 +91,8 @@ private:  // Methods
               const tl::optional<PadAnchor>& pad) noexcept;
 
 private:  // Data
-  tl::optional<Uuid>      mJunction;
-  tl::optional<Uuid>      mVia;
+  tl::optional<Uuid> mJunction;
+  tl::optional<Uuid> mVia;
   tl::optional<PadAnchor> mPad;
 };
 
@@ -117,7 +117,7 @@ public:
     StartPointChanged,
     EndPointChanged,
   };
-  Signal<Trace, Event>       onEdited;
+  Signal<Trace, Event> onEdited;
   typedef Slot<Trace, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -131,11 +131,11 @@ public:
   ~Trace() noexcept;
 
   // Getters
-  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const GraphicsLayerName& getLayer() const noexcept { return mLayer; }
-  const PositiveLength&    getWidth() const noexcept { return mWidth; }
-  const TraceAnchor&       getStartPoint() const noexcept { return mStart; }
-  const TraceAnchor&       getEndPoint() const noexcept { return mEnd; }
+  const PositiveLength& getWidth() const noexcept { return mWidth; }
+  const TraceAnchor& getStartPoint() const noexcept { return mStart; }
+  const TraceAnchor& getEndPoint() const noexcept { return mEnd; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
@@ -148,16 +148,16 @@ public:
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
-  bool   operator==(const Trace& rhs) const noexcept;
-  bool   operator!=(const Trace& rhs) const noexcept { return !(*this == rhs); }
+  bool operator==(const Trace& rhs) const noexcept;
+  bool operator!=(const Trace& rhs) const noexcept { return !(*this == rhs); }
   Trace& operator=(const Trace& rhs) noexcept;
 
 private:  // Data
-  Uuid              mUuid;
+  Uuid mUuid;
   GraphicsLayerName mLayer;
-  PositiveLength    mWidth;
-  TraceAnchor       mStart;
-  TraceAnchor       mEnd;
+  PositiveLength mWidth;
+  TraceAnchor mStart;
+  TraceAnchor mEnd;
 };
 
 /*******************************************************************************

@@ -71,7 +71,7 @@ public:
   // Operator Overloadings
   BomItem& operator=(const BomItem& rhs) noexcept {
     mDesignators = rhs.mDesignators;
-    mAttributes  = rhs.mAttributes;
+    mAttributes = rhs.mAttributes;
     return *this;
   }
 
@@ -92,24 +92,24 @@ class Bom final {
 
 public:
   // Constructors / Destructor
-  Bom()                          = delete;
+  Bom() = delete;
   Bom(const Bom& other) noexcept = delete;
   explicit Bom(const QStringList& columns) noexcept;
   ~Bom() noexcept;
 
   // Getters
-  const QStringList&    getColumns() const noexcept { return mColumns; }
+  const QStringList& getColumns() const noexcept { return mColumns; }
   const QList<BomItem>& getItems() const noexcept { return mItems; }
 
   // General Methods
-  void addItem(const QString&     designator,
+  void addItem(const QString& designator,
                const QStringList& attributes) noexcept;
 
   // Operator Overloadings
   Bom& operator=(const Bom& rhs) noexcept = delete;
 
 private:
-  QStringList    mColumns;
+  QStringList mColumns;
   QList<BomItem> mItems;
 };
 

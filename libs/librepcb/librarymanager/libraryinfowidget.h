@@ -80,8 +80,8 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::LibraryInfoWidget> mUi;
-  workspace::Workspace&                 mWorkspace;
-  FilePath                              mLibDir;
+  workspace::Workspace& mWorkspace;
+  FilePath mLibDir;
 };
 
 /*******************************************************************************

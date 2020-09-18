@@ -109,22 +109,22 @@ LibraryBaseElement::LibraryBaseElement(
   }
 
   // open main file
-  QString  sexprFileName = mLongElementName % ".lp";
+  QString sexprFileName = mLongElementName % ".lp";
   FilePath sexprFilePath = mDirectory->getAbsPath(sexprFileName);
   mLoadingFileDocument =
       SExpression::parse(mDirectory->read(sexprFileName), sexprFilePath);
 
   // read attributes
-  mUuid         = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
-  mVersion      = mLoadingFileDocument.getValueByPath<Version>("version");
-  mAuthor       = mLoadingFileDocument.getValueByPath<QString>("author");
-  mCreated      = mLoadingFileDocument.getValueByPath<QDateTime>("created");
+  mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
+  mVersion = mLoadingFileDocument.getValueByPath<Version>("version");
+  mAuthor = mLoadingFileDocument.getValueByPath<QString>("author");
+  mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created");
   mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated");
 
   // read names, descriptions and keywords in all available languages
-  mNames        = LocalizedNameMap(mLoadingFileDocument);
+  mNames = LocalizedNameMap(mLoadingFileDocument);
   mDescriptions = LocalizedDescriptionMap(mLoadingFileDocument);
-  mKeywords     = LocalizedKeywordsMap(mLoadingFileDocument);
+  mKeywords = LocalizedKeywordsMap(mLoadingFileDocument);
 
   // check if the UUID equals to the directory basename
   if (mDirectoryNameMustBeUuid && (mUuid.toStr() != dirUuidStr)) {
@@ -176,12 +176,12 @@ void LibraryBaseElement::save() {
 
 void LibraryBaseElement::saveTo(TransactionalDirectory& dest) {
   mDirectory->saveTo(dest);  // can throw
-  save();                    // can throw
+  save();  // can throw
 }
 
 void LibraryBaseElement::moveTo(TransactionalDirectory& dest) {
   mDirectory->moveTo(dest);  // can throw
-  save();                    // can throw
+  save();  // can throw
 }
 
 void LibraryBaseElement::saveIntoParentDirectory(TransactionalDirectory& dest) {

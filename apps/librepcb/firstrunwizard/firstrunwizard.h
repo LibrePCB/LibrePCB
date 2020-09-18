@@ -59,7 +59,7 @@ public:
   ~FirstRunWizard() noexcept;
 
   // Getters
-  bool     getCreateNewWorkspace() const noexcept;
+  bool getCreateNewWorkspace() const noexcept;
   FilePath getWorkspaceFilePath() const noexcept;
 
   // General Methods

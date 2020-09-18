@@ -55,7 +55,7 @@ public:
   ~SymbolEditorState_DrawPolygon() noexcept;
 
   // Operator Overloadings
-  SymbolEditorState_DrawPolygon& operator       =(
+  SymbolEditorState_DrawPolygon& operator=(
       const SymbolEditorState_DrawPolygon& rhs) = delete;
 };
 

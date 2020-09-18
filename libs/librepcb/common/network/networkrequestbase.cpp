@@ -281,10 +281,10 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
  ******************************************************************************/
 
 QString NetworkRequestBase::formatFileSize(qint64 bytes) noexcept {
-  qreal               num = bytes;
-  QStringList         list({"KB", "MB", "GB", "TB"});
+  qreal num = bytes;
+  QStringList list({"KB", "MB", "GB", "TB"});
   QStringListIterator i(list);
-  QString             unit("Bytes");
+  QString unit("Bytes");
   while (num >= 1024.0 && i.hasNext()) {
     unit = i.next();
     num /= 1024;

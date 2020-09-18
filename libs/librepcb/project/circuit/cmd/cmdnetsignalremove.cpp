@@ -37,7 +37,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdNetSignalRemove::CmdNetSignalRemove(Circuit&   circuit,
+CmdNetSignalRemove::CmdNetSignalRemove(Circuit& circuit,
                                        NetSignal& netsignal) noexcept
   : UndoCommand(tr("Remove netsignal")),
     mCircuit(circuit),

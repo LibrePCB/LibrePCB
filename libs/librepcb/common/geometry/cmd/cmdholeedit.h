@@ -45,7 +45,7 @@ class Hole;
 class CmdHoleEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdHoleEdit()                         = delete;
+  CmdHoleEdit() = delete;
   CmdHoleEdit(const CmdHoleEdit& other) = delete;
   explicit CmdHoleEdit(Hole& hole) noexcept;
   ~CmdHoleEdit() noexcept;
@@ -79,8 +79,8 @@ private:
   Hole& mHole;
 
   // General Attributes
-  Point          mOldPosition;
-  Point          mNewPosition;
+  Point mOldPosition;
+  Point mNewPosition;
   PositiveLength mOldDiameter;
   PositiveLength mNewDiameter;
 };

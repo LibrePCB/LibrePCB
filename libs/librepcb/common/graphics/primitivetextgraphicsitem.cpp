@@ -120,7 +120,7 @@ void PrimitiveTextGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void PrimitiveTextGraphicsItem::paint(QPainter*                       painter,
+void PrimitiveTextGraphicsItem::paint(QPainter* painter,
                                       const QStyleOptionGraphicsItem* option,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
@@ -179,7 +179,7 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
   mTextFlags = Qt::TextDontClip | mAlignment.toQtAlign();
   QFontMetricsF fm(mFont);
   mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
-  mShape        = QPainterPath();
+  mShape = QPainterPath();
   mShape.addRect(mBoundingRect);
   update();
 }

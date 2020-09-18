@@ -53,7 +53,7 @@ TEST_F(PathTest, testLine) {
   Point p1(Length(12), Length(34));
   Point p2(Length(56), Length(78));
   Angle angle(1234);
-  Path  path = Path::line(p1, p2, angle);
+  Path path = Path::line(p1, p2, angle);
   EXPECT_EQ(2, path.getVertices().count());
   EXPECT_EQ(p1, path.getVertices().value(0).getPos());
   EXPECT_EQ(angle, path.getVertices().value(0).getAngle());
@@ -64,9 +64,9 @@ TEST_F(PathTest, testLine) {
 
 TEST_F(PathTest, testCircle) {
   PositiveLength diameter(1000);
-  Path           path = Path::circle(diameter);
-  Point          p1(Length(500), Length(0));
-  Point          p2(Length(-500), Length(0));
+  Path path = Path::circle(diameter);
+  Point p1(Length(500), Length(0));
+  Point p2(Length(-500), Length(0));
   EXPECT_EQ(3, path.getVertices().count());
   EXPECT_EQ(p1, path.getVertices().value(0).getPos());
   EXPECT_EQ(-Angle::deg180(), path.getVertices().value(0).getAngle());
@@ -82,8 +82,8 @@ TEST_F(PathTest, testCircle) {
  ******************************************************************************/
 
 struct PathObroundWidthHeightTestData {
-  PositiveLength             width;
-  PositiveLength             height;
+  PositiveLength width;
+  PositiveLength height;
   QList<QPair<Point, Angle>> vertices;
 };
 
@@ -146,9 +146,9 @@ INSTANTIATE_TEST_SUITE_P(PathObroundWidthHeightTest, PathObroundWidthHeightTest,
  ******************************************************************************/
 
 struct PathObroundP1P2WidthTestData {
-  Point                      p1;
-  Point                      p2;
-  PositiveLength             width;
+  Point p1;
+  Point p2;
+  PositiveLength width;
   QList<QPair<Point, Angle>> vertices;
 };
 

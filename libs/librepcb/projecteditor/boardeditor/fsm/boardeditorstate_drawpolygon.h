@@ -81,7 +81,7 @@ public:
   virtual bool processSwitchToBoard(int index) noexcept override;
 
   // Operator Overloadings
-  BoardEditorState_DrawPolygon& operator       =(
+  BoardEditorState_DrawPolygon& operator=(
       const BoardEditorState_DrawPolygon& rhs) = delete;
 
 private:  // Methods
@@ -96,23 +96,23 @@ private:  // Methods
 
 private:
   // State
-  bool    mIsUndoCmdActive;
+  bool mIsUndoCmdActive;
   Polygon mLastPolygonProperties;
-  Point   mLastSegmentPos;
+  Point mLastSegmentPos;
 
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.
-  BI_Polygon*                    mCurrentPolygon;
+  BI_Polygon* mCurrentPolygon;
   QScopedPointer<CmdPolygonEdit> mCurrentPolygonEditCmd;
 
   // Widgets for the command toolbar
-  QList<QAction*>                       mActionSeparators;
-  QScopedPointer<QLabel>                mLayerLabel;
+  QList<QAction*> mActionSeparators;
+  QScopedPointer<QLabel> mLayerLabel;
   QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
-  QScopedPointer<QLabel>                mWidthLabel;
-  QScopedPointer<UnsignedLengthEdit>    mWidthEdit;
-  QScopedPointer<QLabel>                mFillLabel;
-  QScopedPointer<QCheckBox>             mFillCheckBox;
+  QScopedPointer<QLabel> mWidthLabel;
+  QScopedPointer<UnsignedLengthEdit> mWidthEdit;
+  QScopedPointer<QLabel> mFillLabel;
+  QScopedPointer<QCheckBox> mFillCheckBox;
 };
 
 /*******************************************************************************

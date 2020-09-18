@@ -79,13 +79,13 @@ public:
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant      data(const QModelIndex& index,
-                     int                role = Qt::DisplayRole) const override;
-  QVariant      headerData(int section, Qt::Orientation orientation,
-                           int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool          setData(const QModelIndex& index, const QVariant& value,
-                        int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value,
+               int role = Qt::EditRole) override;
 
   // Operator Overloadings
   ComponentPinSignalMapModel& operator=(
@@ -95,7 +95,7 @@ private:
   void symbolItemsEdited(
       const ComponentSymbolVariantItemList& list, int index,
       const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-      ComponentSymbolVariantItemList::Event                    event) noexcept;
+      ComponentSymbolVariantItemList::Event event) noexcept;
   void signalListEdited(const ComponentSignalList& list, int index,
                         const std::shared_ptr<const ComponentSignal>& signal,
                         ComponentSignalList::Event event) noexcept;
@@ -103,20 +103,20 @@ private:
   void updateSignalComboBoxItems() noexcept;
   void getRowItem(int row, int& symbolItemIndex,
                   std::shared_ptr<ComponentSymbolVariantItem>& symbolItem,
-                  std::shared_ptr<ComponentPinSignalMapItem>&  mapItem) const
+                  std::shared_ptr<ComponentPinSignalMapItem>& mapItem) const
       noexcept;
 
 private:  // Data
-  ComponentSymbolVariant*                    mSymbolVariant;
-  const ComponentSignalList*                 mSignals;
+  ComponentSymbolVariant* mSymbolVariant;
+  const ComponentSignalList* mSignals;
   std::shared_ptr<const LibraryElementCache> mSymbolsCache;
-  UndoStack*                                 mUndoStack;
-  ComboBoxDelegate::Items                    mSignalComboBoxItems;
-  ComboBoxDelegate::Items                    mDisplayTypeComboBoxItems;
+  UndoStack* mUndoStack;
+  ComboBoxDelegate::Items mSignalComboBoxItems;
+  ComboBoxDelegate::Items mDisplayTypeComboBoxItems;
 
   // Slots
   ComponentSymbolVariantItemList::OnEditedSlot mOnItemsEditedSlot;
-  ComponentSignalList::OnEditedSlot            mOnSignalsEditedSlot;
+  ComponentSignalList::OnEditedSlot mOnSignalsEditedSlot;
 };
 
 /*******************************************************************************

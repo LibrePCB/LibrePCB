@@ -50,7 +50,7 @@ TransactionalDirectory::TransactionalDirectory(
 }
 
 TransactionalDirectory::TransactionalDirectory(TransactionalDirectory& other,
-                                               const QString&          subdir,
+                                               const QString& subdir,
                                                QObject* parent) noexcept
   : FileSystem(parent),
     mFileSystem(other.mFileSystem),
@@ -99,7 +99,7 @@ QByteArray TransactionalDirectory::read(const QString& path) const {
   return mFileSystem->read(mPath % "/" % path);
 }
 
-void TransactionalDirectory::write(const QString&    path,
+void TransactionalDirectory::write(const QString& path,
                                    const QByteArray& content) {
   mFileSystem->write(mPath % "/" % path, content);
 }
@@ -130,7 +130,7 @@ void TransactionalDirectory::saveTo(TransactionalDirectory& dest) {
 
   // update members
   mFileSystem = dest.mFileSystem;
-  mPath       = dest.mPath;
+  mPath = dest.mPath;
 }
 
 void TransactionalDirectory::moveTo(TransactionalDirectory& dest) {
@@ -142,7 +142,7 @@ void TransactionalDirectory::moveTo(TransactionalDirectory& dest) {
 
   // update members
   mFileSystem = dest.mFileSystem;
-  mPath       = dest.mPath;
+  mPath = dest.mPath;
 }
 
 /*******************************************************************************
@@ -150,7 +150,7 @@ void TransactionalDirectory::moveTo(TransactionalDirectory& dest) {
  ******************************************************************************/
 
 void TransactionalDirectory::copyDirRecursively(TransactionalFileSystem& srcFs,
-                                                const QString&           srcDir,
+                                                const QString& srcDir,
                                                 TransactionalFileSystem& dstFs,
                                                 const QString& dstDir) {
   Q_ASSERT(srcDir.isEmpty() || srcDir.endsWith('/'));

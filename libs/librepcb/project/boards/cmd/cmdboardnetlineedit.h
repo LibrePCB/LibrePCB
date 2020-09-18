@@ -63,7 +63,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  BI_NetLine&    mNetLine;
+  BI_NetLine& mNetLine;
   GraphicsLayer* mOldLayer;
   GraphicsLayer* mNewLayer;
   PositiveLength mOldWidth;

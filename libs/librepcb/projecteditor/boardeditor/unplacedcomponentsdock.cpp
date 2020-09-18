@@ -235,7 +235,7 @@ void UnplacedComponentsDock::on_pushButton_clicked() {
     return;
 
   Uuid componentLibUuid = mSelectedComponent->getLibComponent().getUuid();
-  Uuid deviceLibUuid    = mSelectedDevice->getUuid();
+  Uuid deviceLibUuid = mSelectedDevice->getUuid();
 
   beginUndoCmdGroup();
   for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++) {
@@ -302,11 +302,11 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
       if (component->getLibComponent().isSchematicOnly()) continue;
 
       // add component to list
-      CircuitIdentifier name  = component->getName();
-      QString           value = component->getValue(true).replace("\n", "|");
-      ElementName compName    = component->getLibComponent().getNames().value(
+      CircuitIdentifier name = component->getName();
+      QString value = component->getValue(true).replace("\n", "|");
+      ElementName compName = component->getLibComponent().getNames().value(
           mProject.getSettings().getLocaleOrder());
-      QString          text = QString("%1: %2 %3").arg(*name, value, *compName);
+      QString text = QString("%1: %2 %3").arg(*name, value, *compName);
       QListWidgetItem* item =
           new QListWidgetItem(text, mUi->lstUnplacedComponents);
       item->setData(Qt::UserRole, component->getUuid().toStr());
@@ -333,7 +333,7 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
 
   if (mBoard && mSelectedComponent) {
     QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-    QSet<Uuid>  devices =
+    QSet<Uuid> devices =
         mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(
             mSelectedComponent->getLibComponent().getUuid());
     foreach (const Uuid& deviceUuid, devices) {
@@ -381,8 +381,8 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
             Uuid::createRandom());
       }
       int index = deviceUuid
-                      ? mUi->cbxSelectedDevice->findData(deviceUuid->toStr())
-                      : 0;
+          ? mUi->cbxSelectedDevice->findData(deviceUuid->toStr())
+          : 0;
       mUi->cbxSelectedDevice->setCurrentIndex(qMax(index, 0));
     } else {
       mUi->cbxSelectedDevice->hide();
@@ -403,8 +403,8 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
   if (mBoard && mSelectedComponent && device && package) {
     if (device->getComponentUuid() ==
         mSelectedComponent->getLibComponent().getUuid()) {
-      mSelectedDevice         = device;
-      mSelectedPackage        = package;
+      mSelectedDevice = device;
+      mSelectedPackage = package;
       QStringList localeOrder = mProject.getSettings().getLocaleOrder();
       for (const library::Footprint& fpt : mSelectedPackage->getFootprints()) {
         mUi->cbxSelectedFootprint->addItem(*fpt.getNames().value(localeOrder),
@@ -413,10 +413,9 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
       if (mUi->cbxSelectedFootprint->count() > 0) {
         tl::optional<Uuid> footprintUuid =
             mLastFootprintOfDevice.value(mSelectedDevice->getUuid());
-        int index =
-            footprintUuid
-                ? mUi->cbxSelectedFootprint->findData(footprintUuid->toStr())
-                : 0;
+        int index = footprintUuid
+            ? mUi->cbxSelectedFootprint->findData(footprintUuid->toStr())
+            : 0;
         mUi->cbxSelectedFootprint->setCurrentIndex(index);
       }
     }
@@ -482,7 +481,7 @@ void UnplacedComponentsDock::commitUndoCmdGroup() noexcept {
 }
 
 void UnplacedComponentsDock::addDeviceManually(ComponentInstance& cmp,
-                                               const Uuid&        deviceUuid,
+                                               const Uuid& deviceUuid,
                                                Uuid footprintUuid) noexcept {
   Q_ASSERT(mBoard);
   mLastDeviceOfComponent.insert(cmp.getLibComponent().getUuid(), deviceUuid);

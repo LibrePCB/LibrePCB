@@ -99,7 +99,7 @@ bool CmdCombineSchematicNetSegments::performExecute() {
     Q_ASSERT(newNetLine);
   }
   execNewChildCmd(new CmdSchematicNetSegmentRemove(mOldSegment));  // can throw
-  execNewChildCmd(cmdAdd.take());                                  // can throw
+  execNewChildCmd(cmdAdd.take());  // can throw
 
   // copy net labels
   foreach (SI_NetLabel* netlabel, mOldSegment.getNetLabels()) {

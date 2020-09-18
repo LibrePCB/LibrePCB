@@ -41,20 +41,20 @@ namespace tests {
 
 class ProjectLibraryTest : public ::testing::Test {
 protected:
-  FilePath                                 mTempDir;
-  FilePath                                 mLibDir;
+  FilePath mTempDir;
+  FilePath mLibDir;
   std::shared_ptr<TransactionalFileSystem> mTempFs;
   std::shared_ptr<TransactionalFileSystem> mLibFs;
-  QFileInfo                                mExistingSymbolFile;
-  qint64                                   mExistingSymbolCreationSize;
-  QScopedPointer<library::Symbol>          mNewSymbol;
-  QFileInfo                                mNewSymbolFile;
+  QFileInfo mExistingSymbolFile;
+  qint64 mExistingSymbolCreationSize;
+  QScopedPointer<library::Symbol> mNewSymbol;
+  QFileInfo mNewSymbolFile;
 
   ProjectLibraryTest() {
     mTempDir = FilePath::getRandomTempPath();
-    mLibDir  = mTempDir.getPathTo("project library test");
-    mTempFs  = TransactionalFileSystem::openRW(mTempDir);
-    mLibFs   = TransactionalFileSystem::openRW(mLibDir);
+    mLibDir = mTempDir.getPathTo("project library test");
+    mTempFs = TransactionalFileSystem::openRW(mTempDir);
+    mLibFs = TransactionalFileSystem::openRW(mLibDir);
 
     // create symbol inside project library
     library::Symbol sym(Uuid::createRandom(), Version::fromString("1"), "",
@@ -221,7 +221,7 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol_Save) {
 
 TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
   {
-    ProjectLibrary   lib(std::unique_ptr<TransactionalDirectory>(
+    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     library::Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
@@ -236,7 +236,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
 
 TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
   {
-    ProjectLibrary   lib(std::unique_ptr<TransactionalDirectory>(
+    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     library::Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);

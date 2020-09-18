@@ -61,7 +61,7 @@ public:
   void setPinSignalMap(const ComponentPinSignalMap& map) noexcept;
 
   // Operator Overloadings
-  CmdComponentSymbolVariantItemEdit& operator       =(
+  CmdComponentSymbolVariantItemEdit& operator=(
       const CmdComponentSymbolVariantItemEdit& rhs) = delete;
 
 private:  // Methods
@@ -77,18 +77,18 @@ private:  // Methods
 private:  // Data
   ComponentSymbolVariantItem& mItem;
 
-  Uuid                             mOldSymbolUuid;
-  Uuid                             mNewSymbolUuid;
-  Point                            mOldSymbolPos;
-  Point                            mNewSymbolPos;
-  Angle                            mOldSymbolRot;
-  Angle                            mNewSymbolRot;
-  bool                             mOldIsRequired;
-  bool                             mNewIsRequired;
+  Uuid mOldSymbolUuid;
+  Uuid mNewSymbolUuid;
+  Point mOldSymbolPos;
+  Point mNewSymbolPos;
+  Angle mOldSymbolRot;
+  Angle mNewSymbolRot;
+  bool mOldIsRequired;
+  bool mNewIsRequired;
   ComponentSymbolVariantItemSuffix mOldSuffix;
   ComponentSymbolVariantItemSuffix mNewSuffix;
-  ComponentPinSignalMap            mOldPinSignalMap;
-  ComponentPinSignalMap            mNewPinSignalMap;
+  ComponentPinSignalMap mOldPinSignalMap;
+  ComponentPinSignalMap mNewPinSignalMap;
 };
 
 /*******************************************************************************

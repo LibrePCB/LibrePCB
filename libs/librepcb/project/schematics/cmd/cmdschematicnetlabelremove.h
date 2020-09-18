@@ -65,7 +65,7 @@ private:
   // Private Member Variables
 
   SI_NetSegment& mNetSegment;
-  SI_NetLabel&   mNetLabel;
+  SI_NetLabel& mNetLabel;
 };
 
 /*******************************************************************************

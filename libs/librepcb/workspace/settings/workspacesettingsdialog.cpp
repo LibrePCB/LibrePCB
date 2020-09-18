@@ -46,7 +46,7 @@ namespace workspace {
  ******************************************************************************/
 
 WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
-                                                 QWidget*           parent)
+                                                 QWidget* parent)
   : QDialog(parent),
     mSettings(settings),
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),

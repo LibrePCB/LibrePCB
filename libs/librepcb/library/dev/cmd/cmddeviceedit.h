@@ -46,7 +46,7 @@ class Device;
 class CmdDeviceEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdDeviceEdit()                           = delete;
+  CmdDeviceEdit() = delete;
   CmdDeviceEdit(const CmdDeviceEdit& other) = delete;
   explicit CmdDeviceEdit(Device& device) noexcept;
   ~CmdDeviceEdit() noexcept;

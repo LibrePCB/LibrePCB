@@ -73,7 +73,7 @@ TEST_F(PathModelTest, testSetData) {
                     QVariant::fromValue(Angle(45000000)));
   EXPECT_TRUE(r);
 
-  Path expected             = createPopulatedPath();
+  Path expected = createPopulatedPath();
   expected.getVertices()[1] = Vertex(Point(5080000, 1234568), Angle(45000000));
   EXPECT_EQ(expected, model.getPath());
 }

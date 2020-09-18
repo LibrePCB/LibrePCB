@@ -63,7 +63,7 @@ public:
 
 private:
   std::shared_ptr<const Text> mText;
-  QString                     mExpectedLayerName;
+  QString mExpectedLayerName;
 };
 
 /*******************************************************************************

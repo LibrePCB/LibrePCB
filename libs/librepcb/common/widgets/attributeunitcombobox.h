@@ -67,7 +67,7 @@ private:  // Methods
   void currentIndexChanged(int index) noexcept;
 
 private:  // Data
-  QComboBox*           mComboBox;
+  QComboBox* mComboBox;
   const AttributeType* mAttributeType;
 };
 

@@ -175,7 +175,7 @@ void Symbol::circlesEdited(const CircleList& list, int index,
 
 void Symbol::textsEdited(const TextList& list, int index,
                          const std::shared_ptr<const Text>& text,
-                         TextList::Event                    event) noexcept {
+                         TextList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
   switch (event) {

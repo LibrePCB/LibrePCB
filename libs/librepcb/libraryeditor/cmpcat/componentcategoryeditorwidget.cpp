@@ -100,7 +100,7 @@ bool ComponentCategoryEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mCategory->save();    // can throw
+    mCategory->save();  // can throw
     mFileSystem->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -210,7 +210,7 @@ void ComponentCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
 }
 
 void ComponentCategoryEditorWidget::updateCategoryLabel() noexcept {
-  const workspace::WorkspaceLibraryDb&  db = mContext.workspace.getLibraryDb();
+  const workspace::WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
   ComponentCategoryTreeLabelTextBuilder textBuilder(db, getLibLocaleOrder(),
                                                     *mUi->lblParentCategories);
   textBuilder.setEndlessRecursionUuid(mCategory->getUuid());

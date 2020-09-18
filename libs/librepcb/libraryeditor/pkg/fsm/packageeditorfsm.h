@@ -81,21 +81,21 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    workspace::Workspace&                  workspace;
-    PackageEditorWidget&                   editorWidget;
-    UndoStack&                             undoStack;
-    GraphicsScene&                         graphicsScene;
-    GraphicsView&                          graphicsView;
-    const IF_GraphicsLayerProvider&        layerProvider;
-    Package&                               package;
-    std::shared_ptr<Footprint>             currentFootprint;
+    workspace::Workspace& workspace;
+    PackageEditorWidget& editorWidget;
+    UndoStack& undoStack;
+    GraphicsScene& graphicsScene;
+    GraphicsView& graphicsView;
+    const IF_GraphicsLayerProvider& layerProvider;
+    Package& package;
+    std::shared_ptr<Footprint> currentFootprint;
     std::shared_ptr<FootprintGraphicsItem> currentGraphicsItem;
-    ToolBarProxy&                          commandToolBar;
+    ToolBarProxy& commandToolBar;
   };
 
 public:
   // Constructors / Destructor
-  PackageEditorFsm()                              = delete;
+  PackageEditorFsm() = delete;
   PackageEditorFsm(const PackageEditorFsm& other) = delete;
   explicit PackageEditorFsm(const Context& context) noexcept;
   virtual ~PackageEditorFsm() noexcept;
@@ -145,14 +145,14 @@ signals:
 
 private:  // Methods
   PackageEditorState* getCurrentState() const noexcept;
-  bool                setNextState(State state) noexcept;
-  bool                leaveCurrentState() noexcept;
-  bool                enterNextState(State state) noexcept;
+  bool setNextState(State state) noexcept;
+  bool leaveCurrentState() noexcept;
+  bool enterNextState(State state) noexcept;
 
 private:  // Data
-  Context                                   mContext;
-  QMap<State, PackageEditorState*>          mStates;
-  State                                     mCurrentState;
+  Context mContext;
+  QMap<State, PackageEditorState*> mStates;
+  State mCurrentState;
   QScopedPointer<PrimitiveTextGraphicsItem> mSelectFootprintGraphicsItem;
 };
 

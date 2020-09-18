@@ -130,7 +130,7 @@ QPainterPath FootprintPadGraphicsItem::shape() const noexcept {
   return mPathGraphicsItem->shape();
 }
 
-void FootprintPadGraphicsItem::paint(QPainter*                       painter,
+void FootprintPadGraphicsItem::paint(QPainter* painter,
                                      const QStyleOptionGraphicsItem* option,
                                      QWidget* widget) noexcept {
   Q_UNUSED(painter);
@@ -145,7 +145,7 @@ void FootprintPadGraphicsItem::paint(QPainter*                       painter,
 void FootprintPadGraphicsItem::packagePadListEdited(
     const PackagePadList& list, int index,
     const std::shared_ptr<const PackagePad>& pad,
-    PackagePadList::Event                    event) noexcept {
+    PackagePadList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
   Q_UNUSED(pad);
@@ -154,11 +154,11 @@ void FootprintPadGraphicsItem::packagePadListEdited(
 }
 
 void FootprintPadGraphicsItem::updateTextHeight() noexcept {
-  QRectF padRect     = mPathGraphicsItem->boundingRect();
-  QRectF textRect    = mTextGraphicsItem->boundingRect();
-  qreal  heightRatio = textRect.height() / padRect.height();
-  qreal  widthRatio  = textRect.width() / padRect.width();
-  qreal  ratio       = qMax(heightRatio, widthRatio);
+  QRectF padRect = mPathGraphicsItem->boundingRect();
+  QRectF textRect = mTextGraphicsItem->boundingRect();
+  qreal heightRatio = textRect.height() / padRect.height();
+  qreal widthRatio = textRect.width() / padRect.width();
+  qreal ratio = qMax(heightRatio, widthRatio);
   mTextGraphicsItem->setScale(1.0 / ratio);
 }
 

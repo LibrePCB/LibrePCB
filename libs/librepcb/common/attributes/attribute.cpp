@@ -85,7 +85,7 @@ bool Attribute::setKey(const AttributeKey& key) noexcept {
 }
 
 bool Attribute::setTypeValueUnit(const AttributeType& type,
-                                 const QString&       value,
+                                 const QString& value,
                                  const AttributeUnit* unit) {
   if ((&type == mType) && (value == mValue) && (unit == mUnit)) {
     return false;
@@ -98,9 +98,9 @@ bool Attribute::setTypeValueUnit(const AttributeType& type,
             .arg(type.getName(), value, unit ? unit->getName() : "-"));
   }
 
-  mType  = &type;
+  mType = &type;
   mValue = value;
-  mUnit  = unit;
+  mUnit = unit;
   onEdited.notify(Event::TypeValueUnitChanged);
   return true;
 }

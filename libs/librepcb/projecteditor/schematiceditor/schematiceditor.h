@@ -72,7 +72,7 @@ public:
 
   // Getters
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
-  Project&       getProject() const noexcept { return mProject; }
+  Project& getProject() const noexcept { return mProject; }
   int getActiveSchematicIndex() const noexcept { return mActiveSchematicIndex; }
   Schematic* getActiveSchematic() const noexcept;
 
@@ -120,16 +120,16 @@ private:
   void removeSchematic(int index) noexcept;
   void renameSchematic(int index) noexcept;
   QList<SI_Symbol*> getSearchCandidates() noexcept;
-  QStringList       getSearchToolBarCompleterList() noexcept;
+  QStringList getSearchToolBarCompleterList() noexcept;
   void goToSymbol(const QString& name, unsigned int index) noexcept;
   void updateComponentToolbarIcons() noexcept;
   bool useIeee315Symbols() const noexcept;
 
   // General Attributes
-  ProjectEditor&                       mProjectEditor;
-  Project&                             mProject;
-  Ui::SchematicEditor*                 mUi;
-  GraphicsView*                        mGraphicsView;
+  ProjectEditor& mProjectEditor;
+  Project& mProject;
+  Ui::SchematicEditor* mUi;
+  GraphicsView* mGraphicsView;
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
   QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
 
@@ -137,7 +137,7 @@ private:
 
   // Docks
   SchematicPagesDock* mPagesDock;
-  ErcMsgDock*         mErcMsgDock;
+  ErcMsgDock* mErcMsgDock;
 
   // Finite State Machine
   SchematicEditorFsm* mFsm;

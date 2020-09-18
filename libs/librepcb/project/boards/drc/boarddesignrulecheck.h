@@ -62,17 +62,17 @@ public:
     UnsignedLength minPthRestring;
     UnsignedLength minNpthDrillDiameter;
     UnsignedLength minPthDrillDiameter;
-    Length         courtyardOffset;
+    Length courtyardOffset;
 
     Options()
-      : minCopperWidth(200000),            // 200um
+      : minCopperWidth(200000),  // 200um
         minCopperCopperClearance(200000),  // 200um
-        minCopperBoardClearance(300000),   // 300um
-        minCopperNpthClearance(200000),    // 200um
-        minPthRestring(150000),            // 150um
-        minNpthDrillDiameter(250000),      // 250um
-        minPthDrillDiameter(250000),       // 250um
-        courtyardOffset(0)                 // 0um
+        minCopperBoardClearance(300000),  // 300um
+        minCopperNpthClearance(200000),  // 200um
+        minPthRestring(150000),  // 150um
+        minNpthDrillDiameter(250000),  // 250um
+        minPthDrillDiameter(250000),  // 250um
+        courtyardOffset(0)  // 0um
     {}
   };
 
@@ -107,10 +107,10 @@ private:  // Methods
   void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);
   void checkMinimumNpthDrillDiameter(int progressStart, int progressEnd);
   const ClipperLib::Paths& getCopperPaths(const GraphicsLayer* layer,
-                                          const NetSignal*     netsignal);
-  ClipperLib::Paths        getDeviceCourtyardPaths(const BI_Device&     device,
-                                                   const GraphicsLayer* layer);
-  void    addMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
+                                          const NetSignal* netsignal);
+  ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
+                                            const GraphicsLayer* layer);
+  void addMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;
 
   /**
@@ -121,8 +121,8 @@ private:  // Methods
   }
 
 private:  // Data
-  Board&                             mBoard;
-  Options                            mOptions;
+  Board& mBoard;
+  Options mOptions;
   QList<BoardDesignRuleCheckMessage> mMessages;
   QHash<const GraphicsLayer*, QHash<const NetSignal*, ClipperLib::Paths>>
       mCachedPaths;

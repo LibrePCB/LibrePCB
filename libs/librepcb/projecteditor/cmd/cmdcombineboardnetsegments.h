@@ -50,9 +50,9 @@ namespace editor {
 class CmdCombineBoardNetSegments final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdCombineBoardNetSegments()                                        = delete;
+  CmdCombineBoardNetSegments() = delete;
   CmdCombineBoardNetSegments(const CmdCombineBoardNetSegments& other) = delete;
-  CmdCombineBoardNetSegments(BI_NetSegment&    toBeRemoved,
+  CmdCombineBoardNetSegments(BI_NetSegment& toBeRemoved,
                              BI_NetLineAnchor& oldAnchor, BI_NetSegment& result,
                              BI_NetLineAnchor& newAnchor) noexcept;
   ~CmdCombineBoardNetSegments() noexcept;
@@ -66,8 +66,8 @@ private:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  BI_NetSegment&    mOldSegment;
-  BI_NetSegment&    mNewSegment;
+  BI_NetSegment& mOldSegment;
+  BI_NetSegment& mNewSegment;
   BI_NetLineAnchor& mOldAnchor;
   BI_NetLineAnchor& mNewAnchor;
 };

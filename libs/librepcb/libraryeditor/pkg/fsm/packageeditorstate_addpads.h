@@ -58,7 +58,7 @@ public:
   enum class PadType { THT, SMT };
 
   // Constructors / Destructor
-  PackageEditorState_AddPads()                                        = delete;
+  PackageEditorState_AddPads() = delete;
   PackageEditorState_AddPads(const PackageEditorState_AddPads& other) = delete;
   explicit PackageEditorState_AddPads(Context& context, PadType type) noexcept;
   virtual ~PackageEditorState_AddPads() noexcept;
@@ -94,12 +94,12 @@ private:  // Methods
   void drillDiameterEditValueChanged(const UnsignedLength& value) noexcept;
 
 private:  // Types / Data
-  PadType                             mPadType;
-  Point                               mStartPos;
+  PadType mPadType;
+  Point mStartPos;
   QScopedPointer<CmdFootprintPadEdit> mEditCmd;
-  std::shared_ptr<FootprintPad>       mCurrentPad;
-  FootprintPadGraphicsItem*           mCurrentGraphicsItem;
-  PackagePadComboBox*                 mPackagePadComboBox;
+  std::shared_ptr<FootprintPad> mCurrentPad;
+  FootprintPadGraphicsItem* mCurrentGraphicsItem;
+  PackagePadComboBox* mPackagePadComboBox;
 
   // parameter memory
   FootprintPad mLastPad;
@@ -125,7 +125,7 @@ public:
   ~PackageEditorState_AddPadsTht() noexcept {}
 
   // Operator Overloadings
-  PackageEditorState_AddPadsTht& operator       =(
+  PackageEditorState_AddPadsTht& operator=(
       const PackageEditorState_AddPadsTht& rhs) = delete;
 };
 
@@ -149,7 +149,7 @@ public:
   ~PackageEditorState_AddPadsSmt() noexcept {}
 
   // Operator Overloadings
-  PackageEditorState_AddPadsSmt& operator       =(
+  PackageEditorState_AddPadsSmt& operator=(
       const PackageEditorState_AddPadsSmt& rhs) = delete;
 };
 

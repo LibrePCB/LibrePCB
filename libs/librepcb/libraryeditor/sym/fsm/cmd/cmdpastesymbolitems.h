@@ -53,11 +53,11 @@ class SymbolClipboardData;
 class CmdPasteSymbolItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdPasteSymbolItems()                                 = delete;
+  CmdPasteSymbolItems() = delete;
   CmdPasteSymbolItems(const CmdPasteSymbolItems& other) = delete;
   CmdPasteSymbolItems(Symbol& symbol, SymbolGraphicsItem& graphicsItem,
                       std::unique_ptr<SymbolClipboardData> data,
-                      const Point&                         posOffset) noexcept;
+                      const Point& posOffset) noexcept;
   ~CmdPasteSymbolItems() noexcept;
 
   // Operator Overloadings
@@ -68,10 +68,10 @@ protected:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  Symbol&                              mSymbol;
-  SymbolGraphicsItem&                  mGraphicsItem;
+  Symbol& mSymbol;
+  SymbolGraphicsItem& mGraphicsItem;
   std::unique_ptr<SymbolClipboardData> mData;
-  Point                                mPosOffset;
+  Point mPosOffset;
 };
 
 /*******************************************************************************

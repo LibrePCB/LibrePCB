@@ -49,13 +49,13 @@ struct AttributeKeyVerifier {
   static constexpr auto verify(Value&& val, const Predicate& p) ->
       typename std::decay<Value>::type {
     return p(val)
-               ? std::forward<Value>(val)
-               : (throw RuntimeError(__FILE__, __LINE__,
-                                     QString(QApplication::translate(
-                                                 "AttributeKey",
-                                                 "Invalid attribute key: '%1'"))
-                                         .arg(val)),
-                  std::forward<Value>(val));
+        ? std::forward<Value>(val)
+        : (throw RuntimeError(
+               __FILE__, __LINE__,
+               QString(QApplication::translate("AttributeKey",
+                                               "Invalid attribute key: '%1'"))
+                   .arg(val)),
+           std::forward<Value>(val));
   }
 };
 

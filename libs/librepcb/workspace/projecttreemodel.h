@@ -44,10 +44,10 @@ class Workspace;
 class ProjectTreeModel : public QFileSystemModel {
 public:
   // Constructors / Destructor
-  ProjectTreeModel()                              = delete;
+  ProjectTreeModel() = delete;
   ProjectTreeModel(const ProjectTreeModel& other) = delete;
   explicit ProjectTreeModel(const Workspace& workspace,
-                            QObject*         parent = nullptr) noexcept;
+                            QObject* parent = nullptr) noexcept;
   ~ProjectTreeModel() noexcept;
 
   // General methods

@@ -53,14 +53,14 @@ class WorkspaceSettingsDialog final : public QDialog {
   using LibraryLocaleOrderModel =
       EditableListModel<QStringList, EditableListModelType::LOCALE>;
   using LibraryNormOrderModel = EditableListModel<QStringList>;
-  using RepositoryUrlModel    = EditableListModel<QList<QUrl>>;
+  using RepositoryUrlModel = EditableListModel<QList<QUrl>>;
 
 public:
   // Constructors / Destructor
-  WorkspaceSettingsDialog()                                     = delete;
+  WorkspaceSettingsDialog() = delete;
   WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
   explicit WorkspaceSettingsDialog(WorkspaceSettings& settings,
-                                   QWidget*           parent = nullptr);
+                                   QWidget* parent = nullptr);
   ~WorkspaceSettingsDialog();
 
   // Operator Overloadings
@@ -74,9 +74,9 @@ private:
 
 private:
   WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
-  QScopedPointer<LibraryLocaleOrderModel>     mLibLocaleOrderModel;
-  QScopedPointer<LibraryNormOrderModel>       mLibNormOrderModel;
-  QScopedPointer<RepositoryUrlModel>          mRepositoryUrlsModel;
+  QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
+  QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;
+  QScopedPointer<RepositoryUrlModel> mRepositoryUrlsModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
 };
 

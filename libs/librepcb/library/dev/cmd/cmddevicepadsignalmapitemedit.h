@@ -56,7 +56,7 @@ public:
   void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
   // Operator Overloadings
-  CmdDevicePadSignalMapItemEdit& operator       =(
+  CmdDevicePadSignalMapItemEdit& operator=(
       const CmdDevicePadSignalMapItemEdit& rhs) = delete;
 
 private:  // Methods

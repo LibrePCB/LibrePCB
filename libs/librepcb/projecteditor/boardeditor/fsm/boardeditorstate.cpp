@@ -44,7 +44,7 @@ namespace editor {
  ******************************************************************************/
 
 BoardEditorState::BoardEditorState(const Context& context,
-                                   QObject*       parent) noexcept
+                                   QObject* parent) noexcept
   : QObject(parent), mContext(context) {
 }
 

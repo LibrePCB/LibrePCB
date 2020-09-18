@@ -56,16 +56,16 @@ BoardEditorState_AddStrokeText::BoardEditorState_AddStrokeText(
     mLastStrokeTextProperties(
         Uuid::createRandom(),  // UUID is not relevant here
         GraphicsLayerName(GraphicsLayer::sBoardDocumentation),  // Layer
-        "{{PROJECT}}",                                          // Text
-        Point(),                  // Position is not relevant here
-        Angle::deg0(),            // Rotation
+        "{{PROJECT}}",  // Text
+        Point(),  // Position is not relevant here
+        Angle::deg0(),  // Rotation
         PositiveLength(1500000),  // Height
-        UnsignedLength(200000),   // Line width
-        StrokeTextSpacing(),      // Letter spacing
-        StrokeTextSpacing(),      // Line spacing
+        UnsignedLength(200000),  // Line width
+        StrokeTextSpacing(),  // Letter spacing
+        StrokeTextSpacing(),  // Line spacing
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false,                                        // Mirror
-        true                                          // Auto rotate
+        false,  // Mirror
+        true  // Auto rotate
         ),
     mCurrentTextToPlace(nullptr) {
 }
@@ -236,7 +236,7 @@ bool BoardEditorState_AddStrokeText::
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_AddStrokeText::addText(Board&       board,
+bool BoardEditorState_AddStrokeText::addText(Board& board,
                                              const Point& pos) noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
@@ -302,7 +302,7 @@ bool BoardEditorState_AddStrokeText::fixPosition(const Point& pos) noexcept {
       mContext.undoStack.appendToCmdGroup(mCurrentTextEditCmd.take());
     }
     mContext.undoStack.commitCmdGroup();
-    mIsUndoCmdActive    = false;
+    mIsUndoCmdActive = false;
     mCurrentTextToPlace = nullptr;
     return true;
   } catch (const Exception& e) {

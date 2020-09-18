@@ -46,7 +46,7 @@ class UndoStackActionGroup final : public QObject {
 
 public:
   // Constructors / Destructor
-  UndoStackActionGroup()                                  = delete;
+  UndoStackActionGroup() = delete;
   UndoStackActionGroup(const UndoStackActionGroup& other) = delete;
   UndoStackActionGroup(QAction& undo, QAction& redo, QAction* save,
                        UndoStack* stack, QWidget* msgBoxParent) noexcept;
@@ -65,11 +65,11 @@ private:  // Methods
   void registerToStack(UndoStack* stack) noexcept;
 
 private:  // Data
-  QAction&                       mUndo;
-  QAction&                       mRedo;
-  QAction*                       mSave;
-  UndoStack*                     mStack;
-  QWidget*                       mMsgBoxParent;
+  QAction& mUndo;
+  QAction& mRedo;
+  QAction* mSave;
+  UndoStack* mStack;
+  QWidget* mMsgBoxParent;
   QList<QMetaObject::Connection> mConnections;
 };
 

@@ -49,10 +49,10 @@ public:
   struct Steps {
     static QVector<PositiveLength> generic() noexcept {
       return {
-          PositiveLength(10000),    // 0.01mm
-          PositiveLength(25400),    // 0.0254mm
-          PositiveLength(100000),   // 0.1mm
-          PositiveLength(254000),   // 0.254mm
+          PositiveLength(10000),  // 0.01mm
+          PositiveLength(25400),  // 0.0254mm
+          PositiveLength(100000),  // 0.1mm
+          PositiveLength(254000),  // 0.254mm
           PositiveLength(1000000),  // 1mm
           PositiveLength(2540000),  // 2.54mm
       };
@@ -90,7 +90,7 @@ public:
   LengthEditBase() = delete;
   explicit LengthEditBase(const Length& min, const Length& max,
                           const Length& value,
-                          QWidget*      parent = nullptr) noexcept;
+                          QWidget* parent = nullptr) noexcept;
   LengthEditBase(const LengthEditBase& other) = delete;
   virtual ~LengthEditBase() noexcept;
 
@@ -119,9 +119,9 @@ public:
   // General Methods
   void resetUnit() noexcept;
   void configureClientSettings(const QString& uniqueIdentifier) noexcept;
-  void configure(const LengthUnit&              defaultUnit,
+  void configure(const LengthUnit& defaultUnit,
                  const QVector<PositiveLength>& steps,
-                 const QString&                 uniqueIdentifier) noexcept;
+                 const QString& uniqueIdentifier) noexcept;
   virtual void stepBy(int steps) override;
 
   // Reimplemented Methods
@@ -136,32 +136,32 @@ signals:
 
 protected:  // Methods
   virtual QAbstractSpinBox::StepEnabled stepEnabled() const override;
-  void                                  setValueImpl(Length value) noexcept;
-  void         updateValueFromText(QString text) noexcept;
-  void         updateSingleStep() noexcept;
-  void         updateSingleStepPredefined() noexcept;
-  void         updateSingleStepHalfDouble() noexcept;
-  void         updateText() noexcept;
-  LengthUnit   extractUnitFromExpression(QString& expression) const noexcept;
-  void         changeUnitActionTriggered() noexcept;
-  void         setSelectedUnit(const LengthUnit& unit) noexcept;
-  void         saveSelectedUnit() noexcept;
-  QString      getValueStr(const LengthUnit& unit) const noexcept;
+  void setValueImpl(Length value) noexcept;
+  void updateValueFromText(QString text) noexcept;
+  void updateSingleStep() noexcept;
+  void updateSingleStepPredefined() noexcept;
+  void updateSingleStepHalfDouble() noexcept;
+  void updateText() noexcept;
+  LengthUnit extractUnitFromExpression(QString& expression) const noexcept;
+  void changeUnitActionTriggered() noexcept;
+  void setSelectedUnit(const LengthUnit& unit) noexcept;
+  void saveSelectedUnit() noexcept;
+  QString getValueStr(const LengthUnit& unit) const noexcept;
   virtual void valueChangedImpl() noexcept = 0;
 
 protected:  // Data
-  QAction*                 mChangeUnitAction;
-  LengthUnit               mDefaultUnit;
+  QAction* mChangeUnitAction;
+  LengthUnit mDefaultUnit;
   tl::optional<LengthUnit> mSelectedUnit;
-  Length                   mMinimum;
-  Length                   mMaximum;
-  Length                   mValue;
-  StepBehavior             mStepBehavior;
-  QVector<PositiveLength>  mSteps;
-  Length                   mSingleStepUp;    ///< Zero means "no step available"
-  Length                   mSingleStepDown;  ///< Zero means "no step available"
-  QSize                    mAdditionalSize;
-  QString                  mSettingsKey;  ///< Empty means "do not save"
+  Length mMinimum;
+  Length mMaximum;
+  Length mValue;
+  StepBehavior mStepBehavior;
+  QVector<PositiveLength> mSteps;
+  Length mSingleStepUp;  ///< Zero means "no step available"
+  Length mSingleStepDown;  ///< Zero means "no step available"
+  QSize mAdditionalSize;
+  QString mSettingsKey;  ///< Empty means "do not save"
 };
 
 /*******************************************************************************

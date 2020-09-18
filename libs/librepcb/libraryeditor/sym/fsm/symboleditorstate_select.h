@@ -49,7 +49,7 @@ class SymbolEditorState_Select final : public SymbolEditorState {
 
 public:
   // Constructors / Destructor
-  SymbolEditorState_Select()                                      = delete;
+  SymbolEditorState_Select() = delete;
   SymbolEditorState_Select(const SymbolEditorState_Select& other) = delete;
   explicit SymbolEditorState_Select(const Context& context) noexcept;
   ~SymbolEditorState_Select() noexcept;
@@ -100,10 +100,10 @@ private:  // Methods
 
 private:  // Types / Data
   enum class SubState { IDLE, SELECTING, MOVING, PASTING };
-  SubState                                   mState;
-  Point                                      mStartPos;
+  SubState mState;
+  Point mStartPos;
   QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
-  int                                        mCurrentSelectionIndex;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************

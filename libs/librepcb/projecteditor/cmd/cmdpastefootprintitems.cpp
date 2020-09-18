@@ -70,7 +70,7 @@ bool CmdPasteFootprintItems::performExecute() {
 
   // Paste polygons
   for (const Polygon& polygon : mData->getPolygons()) {
-    Polygon copy(Uuid::createRandom(), polygon);          // assign new UUID
+    Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     BI_Polygon* item = new BI_Polygon(mBoard, copy);
     item->setSelected(true);
@@ -79,7 +79,7 @@ bool CmdPasteFootprintItems::performExecute() {
 
   // Paste stroke texts
   for (const StrokeText& text : mData->getStrokeTexts()) {
-    StrokeText copy(Uuid::createRandom(), text);        // assign new UUID
+    StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
     item->setSelected(true);
@@ -88,7 +88,7 @@ bool CmdPasteFootprintItems::performExecute() {
 
   // Paste holes
   for (const Hole& hole : mData->getHoles()) {
-    Hole copy(Uuid::createRandom(), hole);              // assign new UUID
+    Hole copy(Uuid::createRandom(), hole);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_Hole* item = new BI_Hole(mBoard, copy);
     item->setSelected(true);

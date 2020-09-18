@@ -93,9 +93,9 @@ void LineGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void LineGraphicsItem::paint(QPainter*                       painter,
+void LineGraphicsItem::paint(QPainter* painter,
                              const QStyleOptionGraphicsItem* option,
-                             QWidget*                        widget) noexcept {
+                             QWidget* widget) noexcept {
   Q_UNUSED(widget);
   if (option->state.testFlag(QStyle::State_Selected)) {
     painter->setPen(mPenHighlighted);

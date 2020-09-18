@@ -56,15 +56,15 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
   connect(mUi->cbxDownload, &QCheckBox::toggled, this,
           &RepositoryLibraryListWidgetItem::checkedChanged);
 
-  mUuid    = Uuid::tryFromString(mJsonObject.value("uuid").toString());
+  mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
   mVersion = Version::tryFromString(mJsonObject.value("version").toString());
   mIsRecommended = mJsonObject.value("recommended").toBool();
   QString name =
       mJsonObject.value("name").toObject().value("default").toString();
   QString desc =
       mJsonObject.value("description").toObject().value("default").toString();
-  QString author  = mJsonObject.value("author").toString();
-  QUrl    iconUrl = QUrl(mJsonObject.value("icon_url").toString());
+  QString author = mJsonObject.value("author").toString();
+  QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
   foreach (const QJsonValue& value,
            mJsonObject.value("dependencies").toArray()) {
     tl::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
@@ -122,13 +122,13 @@ void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept {
     mUi->prgProgress->setVisible(true);
 
     // read ZIP metadata from JSON
-    QUrl       url     = QUrl(mJsonObject.value("download_url").toString());
-    qint64     zipSize = mJsonObject.value("download_size").toInt(-1);
+    QUrl url = QUrl(mJsonObject.value("download_url").toString());
+    qint64 zipSize = mJsonObject.value("download_size").toInt(-1);
     QByteArray zipSha256 =
         mJsonObject.value("download_sha256").toString().toUtf8();
 
     // determine destination directory
-    QString  libDirName = mUuid->toStr() % ".lplib";
+    QString libDirName = mUuid->toStr() % ".lplib";
     FilePath destDir =
         mWorkspace.getLibrariesPath().getPathTo("remote/" % libDirName);
 

@@ -57,7 +57,7 @@ public:
     UuidChanged,
     NameChanged,
   };
-  Signal<PackagePad, Event>       onEdited;
+  Signal<PackagePad, Event> onEdited;
   typedef Slot<PackagePad, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -68,7 +68,7 @@ public:
   ~PackagePad() noexcept;
 
   // Getters
-  const Uuid&       getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   CircuitIdentifier getName() const noexcept { return mName; }
 
   // Setters
@@ -87,7 +87,7 @@ public:
   PackagePad& operator=(const PackagePad& rhs) noexcept;
 
 private:  // Data
-  Uuid              mUuid;
+  Uuid mUuid;
   CircuitIdentifier mName;
 };
 

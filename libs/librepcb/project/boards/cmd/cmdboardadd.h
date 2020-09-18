@@ -69,11 +69,11 @@ private:
 
   // Private Member Variables
 
-  Project&     mProject;
+  Project& mProject;
   const Board* mBoardToCopy;
-  ElementName  mName;
-  Board*       mBoard;
-  int          mPageIndex;
+  ElementName mName;
+  Board* mBoard;
+  int mPageIndex;
 };
 
 /*******************************************************************************

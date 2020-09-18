@@ -60,7 +60,7 @@ DirectoryLock::~DirectoryLock() noexcept {
 
 void DirectoryLock::setDirToLock(const FilePath& dir) noexcept {
   Q_ASSERT(!mLockedByThisObject);
-  mDirToLock    = dir;
+  mDirToLock = dir;
   mLockFilePath = dir.getPathTo(".lock");
 }
 
@@ -95,9 +95,9 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const {
                            .arg(mLockFilePath.toNative()));
   }
   // read lock metadata
-  QString lockUser    = lines.at(1);
-  QString lockHost    = lines.at(2);
-  qint64  lockPid     = lines.at(3).toLongLong();
+  QString lockUser = lines.at(1);
+  QString lockHost = lines.at(2);
+  qint64 lockPid = lines.at(3).toLongLong();
   QString lockAppName = lines.at(4);
 
   // read metadata about this application instance

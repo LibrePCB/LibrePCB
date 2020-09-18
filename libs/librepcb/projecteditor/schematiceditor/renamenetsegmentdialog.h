@@ -65,7 +65,7 @@ class RenameNetSegmentDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  RenameNetSegmentDialog()                                    = delete;
+  RenameNetSegmentDialog() = delete;
   RenameNetSegmentDialog(const RenameNetSegmentDialog& other) = delete;
   RenameNetSegmentDialog(UndoStack& undoStack, SI_NetSegment& segment,
                          QWidget* parent = nullptr) noexcept;
@@ -81,12 +81,12 @@ private:  // Methods
   void updateAction() noexcept;
 
 private:  // Data
-  UndoStack&                                 mUndoStack;
-  SI_NetSegment&                             mNetSegment;
+  UndoStack& mUndoStack;
+  SI_NetSegment& mNetSegment;
   QScopedPointer<Ui::RenameNetSegmentDialog> mUi;
-  Action                                     mAction;
-  QString                                    mNewNetName;
-  NetSignal*                                 mNewNetSignal;
+  Action mAction;
+  QString mNewNetName;
+  NetSignal* mNewNetSignal;
 };
 
 /*******************************************************************************

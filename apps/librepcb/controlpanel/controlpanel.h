@@ -167,7 +167,7 @@ private:
    * @retval  true if the project was successfully closed, false otherwise
    */
   bool closeProject(project::editor::ProjectEditor& editor,
-                    bool                            askForSave) noexcept;
+                    bool askForSave) noexcept;
 
   /**
    * @brief Close an opened project editor
@@ -231,12 +231,12 @@ private:
   bool closeAllLibraryEditors(bool askForSave) noexcept;
 
   // Attributes
-  workspace::Workspace&                            mWorkspace;
-  QScopedPointer<Ui::ControlPanel>                 mUi;
+  workspace::Workspace& mWorkspace;
+  QScopedPointer<Ui::ControlPanel> mUi;
   QScopedPointer<library::manager::LibraryManager> mLibraryManager;
-  QHash<QString, project::editor::ProjectEditor*>  mOpenProjectEditors;
+  QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
   QHash<FilePath, library::editor::LibraryEditor*> mOpenLibraryEditors;
-  QScopedPointer<ProjectLibraryUpdater>            mProjectLibraryUpdater;
+  QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;
 };
 
 /*******************************************************************************

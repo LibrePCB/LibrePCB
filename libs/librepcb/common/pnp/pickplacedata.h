@@ -79,29 +79,29 @@ public:
   const QString& getValue() const noexcept { return mValue; }
   const QString& getDeviceName() const noexcept { return mDeviceName; }
   const QString& getPackageName() const noexcept { return mPackageName; }
-  const Point&   getPosition() const noexcept { return mPosition; }
-  const Angle&   getRotation() const noexcept { return mRotation; }
-  BoardSide      getBoardSide() const noexcept { return mBoardSide; }
+  const Point& getPosition() const noexcept { return mPosition; }
+  const Angle& getRotation() const noexcept { return mRotation; }
+  BoardSide getBoardSide() const noexcept { return mBoardSide; }
 
   // Operator Overloadings
   PickPlaceDataItem& operator=(const PickPlaceDataItem& rhs) noexcept {
-    mDesignator  = rhs.mDesignator;
-    mValue       = rhs.mValue;
-    mDeviceName  = rhs.mDeviceName;
+    mDesignator = rhs.mDesignator;
+    mValue = rhs.mValue;
+    mDeviceName = rhs.mDeviceName;
     mPackageName = rhs.mPackageName;
-    mPosition    = rhs.mPosition;
-    mRotation    = rhs.mRotation;
-    mBoardSide   = rhs.mBoardSide;
+    mPosition = rhs.mPosition;
+    mRotation = rhs.mRotation;
+    mBoardSide = rhs.mBoardSide;
     return *this;
   }
 
 private:
-  QString   mDesignator;
-  QString   mValue;
-  QString   mDeviceName;
-  QString   mPackageName;
-  Point     mPosition;
-  Angle     mRotation;
+  QString mDesignator;
+  QString mValue;
+  QString mDeviceName;
+  QString mPackageName;
+  Point mPosition;
+  Angle mRotation;
   BoardSide mBoardSide;
 };
 
@@ -118,7 +118,7 @@ class PickPlaceData final {
 
 public:
   // Constructors / Destructor
-  PickPlaceData()                                    = delete;
+  PickPlaceData() = delete;
   PickPlaceData(const PickPlaceData& other) noexcept = delete;
   PickPlaceData(const QString& projectName, const QString& projectVersion,
                 const QString& boardName) noexcept;
@@ -137,9 +137,9 @@ public:
   PickPlaceData& operator=(const PickPlaceData& rhs) noexcept = delete;
 
 private:
-  QString                  mProjectName;
-  QString                  mProjectVersion;
-  QString                  mBoardName;
+  QString mProjectName;
+  QString mProjectVersion;
+  QString mBoardName;
   QList<PickPlaceDataItem> mItems;
 };
 

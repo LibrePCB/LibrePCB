@@ -57,7 +57,7 @@ class UndoCommandGroup;
 class UndoStackTransaction final {
 public:
   // Constructors / Destructor
-  UndoStackTransaction()                                  = delete;
+  UndoStackTransaction() = delete;
   UndoStackTransaction(const UndoStackTransaction& other) = delete;
   UndoStackTransaction(UndoStack& stack, const QString& text);
   ~UndoStackTransaction() noexcept;
@@ -72,7 +72,7 @@ public:
 
 private:
   UndoStack& mStack;
-  bool       mCmdActive;
+  bool mCmdActive;
 };
 
 /*******************************************************************************

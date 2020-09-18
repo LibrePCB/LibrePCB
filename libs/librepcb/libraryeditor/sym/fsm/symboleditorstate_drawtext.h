@@ -47,7 +47,7 @@ class SymbolEditorState_DrawText final : public SymbolEditorState_DrawTextBase {
 
 public:
   // Constructors / Destructor
-  SymbolEditorState_DrawText()                                        = delete;
+  SymbolEditorState_DrawText() = delete;
   SymbolEditorState_DrawText(const SymbolEditorState_DrawText& other) = delete;
   explicit SymbolEditorState_DrawText(const Context& context) noexcept;
   ~SymbolEditorState_DrawText() noexcept;

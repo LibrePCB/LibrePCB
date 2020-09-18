@@ -58,7 +58,7 @@ public:
               bool immediate) noexcept;
   void setOutline(const Path& outline, bool immediate) noexcept;
   void setLayerName(const GraphicsLayerName& layerName,
-                    bool                     immediate) noexcept;
+                    bool immediate) noexcept;
   void setNetSignal(NetSignal& netsignal) noexcept;
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
@@ -82,25 +82,25 @@ private:
 
   // Attributes from the constructor
   BI_Plane& mPlane;
-  bool      mDoRebuildOnChanges;
+  bool mDoRebuildOnChanges;
 
   // General Attributes
-  Path                   mOldOutline;
-  Path                   mNewOutline;
-  GraphicsLayerName      mOldLayerName;
-  GraphicsLayerName      mNewLayerName;
-  NetSignal*             mOldNetSignal;
-  NetSignal*             mNewNetSignal;
-  UnsignedLength         mOldMinWidth;
-  UnsignedLength         mNewMinWidth;
-  UnsignedLength         mOldMinClearance;
-  UnsignedLength         mNewMinClearance;
+  Path mOldOutline;
+  Path mNewOutline;
+  GraphicsLayerName mOldLayerName;
+  GraphicsLayerName mNewLayerName;
+  NetSignal* mOldNetSignal;
+  NetSignal* mNewNetSignal;
+  UnsignedLength mOldMinWidth;
+  UnsignedLength mNewMinWidth;
+  UnsignedLength mOldMinClearance;
+  UnsignedLength mNewMinClearance;
   BI_Plane::ConnectStyle mOldConnectStyle;
   BI_Plane::ConnectStyle mNewConnectStyle;
-  int                    mOldPriority;
-  int                    mNewPriority;
-  bool                   mOldKeepOrphans;
-  bool                   mNewKeepOrphans;
+  int mOldPriority;
+  int mNewPriority;
+  bool mOldKeepOrphans;
+  bool mNewKeepOrphans;
 };
 
 /*******************************************************************************

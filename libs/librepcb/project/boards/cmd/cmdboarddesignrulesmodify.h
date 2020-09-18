@@ -46,9 +46,9 @@ class Board;
 class CmdBoardDesignRulesModify final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardDesignRulesModify()                                       = delete;
+  CmdBoardDesignRulesModify() = delete;
   CmdBoardDesignRulesModify(const CmdBoardDesignRulesModify& other) = delete;
-  CmdBoardDesignRulesModify(Board&                  board,
+  CmdBoardDesignRulesModify(Board& board,
                             const BoardDesignRules& newRules) noexcept;
   ~CmdBoardDesignRulesModify() noexcept;
 

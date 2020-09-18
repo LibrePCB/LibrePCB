@@ -89,10 +89,10 @@ void CategoryListEditorWidgetBase::btnAddClicked() noexcept {
 }
 
 void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
-  QListWidgetItem*   item = mUi->listWidget->currentItem();
-  tl::optional<Uuid> uuid =
-      item ? Uuid::tryFromString(item->data(Qt::UserRole).toString())
-           : tl::nullopt;
+  QListWidgetItem* item = mUi->listWidget->currentItem();
+  tl::optional<Uuid> uuid = item
+      ? Uuid::tryFromString(item->data(Qt::UserRole).toString())
+      : tl::nullopt;
   if (item && uuid) {
     mUuids.remove(*uuid);
     delete item;
@@ -113,7 +113,7 @@ void CategoryListEditorWidgetBase::addItem(
       parents.prepend(*category);
       foreach (const Uuid& parent, parents) {
         FilePath filepath = getLatestCategory(parent);  // can throw
-        lines.prepend(getCategoryName(filepath));       // can throw
+        lines.prepend(getCategoryName(filepath));  // can throw
       }
     }
     lines.prepend(tr("Root category"));
@@ -169,7 +169,7 @@ CategoryListEditorWidget<ElementType>::~CategoryListEditorWidget() noexcept {
 
 template <typename ElementType>
 tl::optional<Uuid>
-CategoryListEditorWidget<ElementType>::chooseCategoryWithDialog() noexcept {
+    CategoryListEditorWidget<ElementType>::chooseCategoryWithDialog() noexcept {
   CategoryChooserDialog<ElementType> dialog(mWorkspace, this);
   if (dialog.exec() == QDialog::Accepted) {
     return dialog.getSelectedCategoryUuid();

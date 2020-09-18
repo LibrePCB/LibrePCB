@@ -45,7 +45,7 @@ class StrokeText;
 class CmdStrokeTextEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdStrokeTextEdit()                               = delete;
+  CmdStrokeTextEdit() = delete;
   CmdStrokeTextEdit(const CmdStrokeTextEdit& other) = delete;
   explicit CmdStrokeTextEdit(StrokeText& text) noexcept;
   ~CmdStrokeTextEdit() noexcept;
@@ -55,11 +55,11 @@ public:
   void setText(const QString& text, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setStrokeWidth(const UnsignedLength& strokeWidth,
-                      bool                  immediate) noexcept;
+                      bool immediate) noexcept;
   void setLetterSpacing(const StrokeTextSpacing& spacing,
-                        bool                     immediate) noexcept;
+                        bool immediate) noexcept;
   void setLineSpacing(const StrokeTextSpacing& spacing,
-                      bool                     immediate) noexcept;
+                      bool immediate) noexcept;
   void setAlignment(const Alignment& align, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& delta, bool immediate) noexcept;
@@ -94,26 +94,26 @@ private:
   // General Attributes
   GraphicsLayerName mOldLayerName;
   GraphicsLayerName mNewLayerName;
-  QString           mOldText;
-  QString           mNewText;
-  Point             mOldPosition;
-  Point             mNewPosition;
-  Angle             mOldRotation;
-  Angle             mNewRotation;
-  PositiveLength    mOldHeight;
-  PositiveLength    mNewHeight;
-  UnsignedLength    mOldStrokeWidth;
-  UnsignedLength    mNewStrokeWidth;
+  QString mOldText;
+  QString mNewText;
+  Point mOldPosition;
+  Point mNewPosition;
+  Angle mOldRotation;
+  Angle mNewRotation;
+  PositiveLength mOldHeight;
+  PositiveLength mNewHeight;
+  UnsignedLength mOldStrokeWidth;
+  UnsignedLength mNewStrokeWidth;
   StrokeTextSpacing mOldLetterSpacing;
   StrokeTextSpacing mNewLetterSpacing;
   StrokeTextSpacing mOldLineSpacing;
   StrokeTextSpacing mNewLineSpacing;
-  Alignment         mOldAlign;
-  Alignment         mNewAlign;
-  bool              mOldMirrored;
-  bool              mNewMirrored;
-  bool              mOldAutoRotate;
-  bool              mNewAutoRotate;
+  Alignment mOldAlign;
+  Alignment mNewAlign;
+  bool mOldMirrored;
+  bool mNewMirrored;
+  bool mOldAutoRotate;
+  bool mNewAutoRotate;
 };
 
 /*******************************************************************************

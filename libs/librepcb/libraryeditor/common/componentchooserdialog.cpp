@@ -49,7 +49,7 @@ namespace editor {
  ******************************************************************************/
 
 ComponentChooserDialog::ComponentChooserDialog(
-    const workspace::Workspace&     ws,
+    const workspace::Workspace& ws,
     const IF_GraphicsLayerProvider* layerProvider, QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
@@ -181,8 +181,8 @@ void ComponentChooserDialog::setSelectedCategory(
 void ComponentChooserDialog::setSelectedComponent(
     const tl::optional<Uuid>& uuid) noexcept {
   FilePath fp;
-  QString  name = tr("No component selected");
-  QString  desc;
+  QString name = tr("No component selected");
+  QString desc;
   mSelectedComponentUuid = uuid;
 
   if (uuid) {

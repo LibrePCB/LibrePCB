@@ -54,7 +54,7 @@ class SchematicEditorState_DrawWire final : public SchematicEditorState {
 
   /// Internal FSM States (substates)
   enum class SubState {
-    IDLE,                 ///< idle state [initial state]
+    IDLE,  ///< idle state [initial state]
     POSITIONING_NETPOINT  ///< in this state, an undo command is active!
   };
 
@@ -64,12 +64,12 @@ class SchematicEditorState_DrawWire final : public SchematicEditorState {
    * @note The first item must have the value 0!
    */
   enum WireMode {
-    WireMode_HV = 0,    ///< horizontal - vertical [default]
-    WireMode_VH,        ///< vertical - horizontal
-    WireMode_9045,      ///< 90° - 45°
-    WireMode_4590,      ///< 45° - 90°
+    WireMode_HV = 0,  ///< horizontal - vertical [default]
+    WireMode_VH,  ///< vertical - horizontal
+    WireMode_9045,  ///< 90° - 45°
+    WireMode_4590,  ///< 45° - 90°
     WireMode_Straight,  ///< straight
-    WireMode_COUNT      ///< count of wire modes
+    WireMode_COUNT  ///< count of wire modes
   };
 
 public:
@@ -97,7 +97,7 @@ public:
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Operator Overloadings
-  SchematicEditorState_DrawWire& operator       =(
+  SchematicEditorState_DrawWire& operator=(
       const SchematicEditorState_DrawWire& rhs) = delete;
 
 private:  //  Methods
@@ -109,10 +109,10 @@ private:  //  Methods
       noexcept;
   SI_NetPoint* findNetPoint(Schematic& schematic, const Point& pos,
                             SI_NetPoint* except = nullptr) const noexcept;
-  SI_NetLine*  findNetLine(Schematic& schematic, const Point& pos,
-                           SI_NetLine* except = nullptr) const noexcept;
-  void         updateNetpointPositions(const Point& cursorPos) noexcept;
-  void         updateWireModeActionsCheckedState() noexcept;
+  SI_NetLine* findNetLine(Schematic& schematic, const Point& pos,
+                          SI_NetLine* except = nullptr) const noexcept;
+  void updateNetpointPositions(const Point& cursorPos) noexcept;
+  void updateWireModeActionsCheckedState() noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
 
@@ -121,15 +121,15 @@ private:  // Data
   SubState mSubState;  ///< the current substate
   WireMode mWireMode;  ///< the current wire mode
   SI_NetLineAnchor*
-               mFixedStartAnchor;  ///< the fixed anchor (start point of the line)
-  SI_NetLine*  mPositioningNetLine1;   ///< line between fixed point and p1
+      mFixedStartAnchor;  ///< the fixed anchor (start point of the line)
+  SI_NetLine* mPositioningNetLine1;  ///< line between fixed point and p1
   SI_NetPoint* mPositioningNetPoint1;  ///< the first netpoint to place
-  SI_NetLine*  mPositioningNetLine2;   ///< line between p1 and p2
+  SI_NetLine* mPositioningNetLine2;  ///< line between p1 and p2
   SI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
 
   // Widgets for the command toolbar
   QHash<WireMode, QAction*> mWireModeActions;
-  QList<QAction*>           mActionSeparators;
+  QList<QAction*> mActionSeparators;
 };
 
 /*******************************************************************************

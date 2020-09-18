@@ -51,7 +51,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Schematic::Schematic(Project&                                project,
+Schematic::Schematic(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
                      bool create, const QString& newName)
   : QObject(&project),
@@ -459,9 +459,9 @@ void Schematic::serialize(SExpression& root) const {
  *  Static Methods
  ******************************************************************************/
 
-Schematic* Schematic::create(Project&                                project,
+Schematic* Schematic::create(Project& project,
                              std::unique_ptr<TransactionalDirectory> directory,
-                             const ElementName&                      name) {
+                             const ElementName& name) {
   return new Schematic(project, std::move(directory), true, *name);
 }
 

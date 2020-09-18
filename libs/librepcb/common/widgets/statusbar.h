@@ -48,7 +48,7 @@ public:
   // Types
   enum Field {
     AbsolutePosition = 1 << 0,
-    ProgressBar      = 1 << 1,
+    ProgressBar = 1 << 1,
   };
   Q_DECLARE_FLAGS(Fields, Field);
 
@@ -75,13 +75,13 @@ private:  // Methods
   void updateAbsoluteCursorPosition() noexcept;
 
 private:  // Data
-  Fields                       mFields;
-  LengthUnit                   mLengthUnit;
-  Point                        mAbsoluteCursorPosition;
-  QScopedPointer<QLabel>       mAbsPosXLabel;
-  QScopedPointer<QLabel>       mAbsPosYLabel;
+  Fields mFields;
+  LengthUnit mLengthUnit;
+  Point mAbsoluteCursorPosition;
+  QScopedPointer<QLabel> mAbsPosXLabel;
+  QScopedPointer<QLabel> mAbsPosYLabel;
   QScopedPointer<QProgressBar> mProgressBar;
-  QScopedPointer<QWidget>      mProgressBarPlaceHolder;
+  QScopedPointer<QWidget> mProgressBarPlaceHolder;
 };
 
 /*******************************************************************************

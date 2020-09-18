@@ -342,7 +342,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       case BI_Base::Type_t::Footprint: {
         BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(selectedItem);
         Q_ASSERT(footprint);
-        BI_Device&         devInst = footprint->getDeviceInstance();
+        BI_Device& devInst = footprint->getDeviceInstance();
         ComponentInstance& cmpInst = devInst.getComponentInstance();
 
         // build the context menu
@@ -545,7 +545,7 @@ bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void BoardEditorState_Select::addActionRotate(QMenu&         menu,
+void BoardEditorState_Select::addActionRotate(QMenu& menu,
                                               const QString& text) noexcept {
   QAction* action =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
@@ -553,7 +553,7 @@ void BoardEditorState_Select::addActionRotate(QMenu&         menu,
           [this]() { rotateSelectedItems(Angle::deg90()); });
 }
 
-void BoardEditorState_Select::addActionFlip(QMenu&         menu,
+void BoardEditorState_Select::addActionFlip(QMenu& menu,
                                             const QString& text) noexcept {
   QAction* action =
       menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
@@ -561,13 +561,13 @@ void BoardEditorState_Select::addActionFlip(QMenu&         menu,
           [this]() { flipSelectedItems(Qt::Horizontal); });
 }
 
-void BoardEditorState_Select::addActionDelete(QMenu&         menu,
+void BoardEditorState_Select::addActionDelete(QMenu& menu,
                                               const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
   connect(action, &QAction::triggered, [this]() { removeSelectedItems(); });
 }
 
-void BoardEditorState_Select::addActionDeleteAll(QMenu&         menu,
+void BoardEditorState_Select::addActionDeleteAll(QMenu& menu,
                                                  BI_NetSegment& netsegment,
                                                  const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/minus.png"), text);
@@ -612,7 +612,7 @@ void BoardEditorState_Select::addActionSnap(QMenu& menu, const Point pos,
   }
 }
 
-void BoardEditorState_Select::addActionSelectAll(QMenu&         menu,
+void BoardEditorState_Select::addActionSelectAll(QMenu& menu,
                                                  BI_NetSegment& netsegment,
                                                  const QString& text) noexcept {
   QAction* action = menu.addAction(QIcon(":/img/actions/bookmark.png"), text);
@@ -685,7 +685,7 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
   try {
     Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, false);
-    BoardClipboardDataBuilder           builder(*board);
+    BoardClipboardDataBuilder builder(*board);
     std::unique_ptr<BoardClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
   } catch (const Exception& e) {
@@ -812,9 +812,10 @@ bool BoardEditorState_Select::measureSelectedItems(
   if (totalSelectedNetlines == visitedNetLines.count()) {
     QMessageBox::information(parentWidget(), title, text);
   } else {
-    text += "\n\n" + tr("WARNING: There are %1 trace segments selected, but "
-                        "not all of them are connected!")
-                         .arg(totalSelectedNetlines);
+    text += "\n\n" +
+        tr("WARNING: There are %1 trace segments selected, but "
+           "not all of them are connected!")
+            .arg(totalSelectedNetlines);
     QMessageBox::warning(parentWidget(), title, text);
   }
 
@@ -855,7 +856,7 @@ void BoardEditorState_Select::measureLengthInDirection(
   }
 }
 
-bool BoardEditorState_Select::openPropertiesDialog(Board&   board,
+bool BoardEditorState_Select::openPropertiesDialog(Board& board,
                                                    BI_Base* item) {
   switch (item->getType()) {
     case BI_Base::Type_t::Footprint: {
@@ -951,7 +952,7 @@ void BoardEditorState_Select::openStrokeTextPropertiesDialog(
 }
 
 void BoardEditorState_Select::openHolePropertiesDialog(Board& board,
-                                                       Hole&  hole) noexcept {
+                                                       Hole& hole) noexcept {
   Q_UNUSED(board);
   HolePropertiesDialog dialog(hole, mContext.undoStack, getDefaultLengthUnit(),
                               "board_editor/hole_properties_dialog",
@@ -960,16 +961,16 @@ void BoardEditorState_Select::openHolePropertiesDialog(Board& board,
 }
 
 QList<BoardEditorState_Select::DeviceMenuItem>
-BoardEditorState_Select::getDeviceMenuItems(
-    const ComponentInstance& cmpInst) const noexcept {
+    BoardEditorState_Select::getDeviceMenuItems(
+        const ComponentInstance& cmpInst) const noexcept {
   QList<BoardEditorState_Select::DeviceMenuItem> items;
   try {
-    QIcon      icon(":/img/library/device.png");
+    QIcon icon(":/img/library/device.png");
     QSet<Uuid> devices =
         mContext.workspace.getLibraryDb().getDevicesOfComponent(
             cmpInst.getLibComponent().getUuid());  // can throw
     foreach (const Uuid& deviceUuid, devices) {
-      QString  devName, pkgName;
+      QString devName, pkgName;
       FilePath devFp =
           mContext.workspace.getLibraryDb().getLatestDevice(deviceUuid);
       mContext.workspace.getLibraryDb().getElementTranslations<library::Device>(

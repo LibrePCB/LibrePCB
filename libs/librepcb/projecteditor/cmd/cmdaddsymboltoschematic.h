@@ -62,9 +62,9 @@ public:
   // Constructors / Destructor
   CmdAddSymbolToSchematic(workspace::Workspace& workspace, Schematic& schematic,
                           ComponentInstance& cmpInstance,
-                          const Uuid&        symbolItem,
-                          const Point&       position = Point(),
-                          const Angle&       angle    = Angle()) noexcept;
+                          const Uuid& symbolItem,
+                          const Point& position = Point(),
+                          const Angle& angle = Angle()) noexcept;
   ~CmdAddSymbolToSchematic() noexcept;
 
   // Getters
@@ -80,11 +80,11 @@ private:
 
   // Attributes from the constructor
   workspace::Workspace& mWorkspace;
-  Schematic&            mSchematic;
-  ComponentInstance&    mComponentInstance;
-  Uuid                  mSymbolItemUuid;
-  Point                 mPosition;
-  Angle                 mAngle;
+  Schematic& mSchematic;
+  ComponentInstance& mComponentInstance;
+  Uuid mSymbolItemUuid;
+  Point mPosition;
+  Angle mAngle;
 
   SI_Symbol* mSymbolInstance;  // the created symbol instance
 };

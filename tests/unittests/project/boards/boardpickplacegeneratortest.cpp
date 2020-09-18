@@ -64,11 +64,11 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
                   projectFp.getFilename()));
 
   // export pick&place data
-  QList<FilePath>                writtenFiles;
-  Board*                         board = project->getBoards().first();
-  BoardPickPlaceGenerator        gen(*board);
+  QList<FilePath> writtenFiles;
+  Board* board = project->getBoards().first();
+  BoardPickPlaceGenerator gen(*board);
   std::shared_ptr<PickPlaceData> data = gen.generate();
-  PickPlaceCsvWriter             writer(*data);
+  PickPlaceCsvWriter writer(*data);
 
   // top devices with comment
   {
@@ -109,7 +109,7 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
 
   // compare generated files with expected content
   foreach (const FilePath& fp, writtenFiles) {
-    QString actual   = FileUtils::readFile(fp);
+    QString actual = FileUtils::readFile(fp);
     QString expected = FileUtils::readFile(
         testDataDir.getPathTo("expected").getPathTo(fp.getFilename()));
     EXPECT_EQ(expected.toStdString(), actual.toStdString());

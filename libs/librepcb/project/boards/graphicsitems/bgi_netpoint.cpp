@@ -72,7 +72,7 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept {
   GraphicsLayer* layer = mNetPoint.getLayerOfLines();
   setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
 
-  qreal radius  = mNetPoint.getMaxLineWidth()->toPx() / 2;
+  qreal radius = mNetPoint.getMaxLineWidth()->toPx() / 2;
   mBoundingRect = QRectF(-radius, -radius, 2 * radius, 2 * radius);
 
   update();
@@ -82,14 +82,14 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void BGI_NetPoint::paint(QPainter*                       painter,
+void BGI_NetPoint::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
-                         QWidget*                        widget) {
+                         QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
   bool highlight = mNetPoint.isSelected() ||
-                   mNetPoint.getNetSignalOfNetSegment().isHighlighted();
+      mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
 #ifdef QT_DEBUG
   GraphicsLayer* layer =

@@ -54,7 +54,7 @@ class BI_Hole final : public BI_Base, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  BI_Hole()                     = delete;
+  BI_Hole() = delete;
   BI_Hole(const BI_Hole& other) = delete;
   BI_Hole(Board& board, const BI_Hole& other);
   BI_Hole(Board& board, const SExpression& node);
@@ -62,7 +62,7 @@ public:
   ~BI_Hole() noexcept;
 
   // Getters
-  Hole&       getHole() noexcept { return *mHole; }
+  Hole& getHole() noexcept { return *mHole; }
   const Hole& getHole() const noexcept { return *mHole; }
   const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
@@ -78,9 +78,9 @@ public:
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Hole; }
   const Point& getPosition() const noexcept override;
-  bool         getIsMirrored() const noexcept override { return false; }
+  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_Hole& operator=(const BI_Hole& rhs) = delete;
@@ -89,7 +89,7 @@ private:  // Methods
   void init();
 
 private:  // Data
-  QScopedPointer<Hole>             mHole;
+  QScopedPointer<Hole> mHole;
   QScopedPointer<HoleGraphicsItem> mGraphicsItem;
 };
 

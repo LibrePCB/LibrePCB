@@ -36,12 +36,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon&   polygon,
+PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
                                                  UndoStack& undoStack,
                                                  QList<GraphicsLayer*> layers,
                                                  const LengthUnit& lengthUnit,
                                                  const QString& settingsPrefix,
-                                                 QWidget*       parent) noexcept
+                                                 QWidget* parent) noexcept
   : QDialog(parent),
     mPolygon(polygon),
     mUndoStack(undoStack),

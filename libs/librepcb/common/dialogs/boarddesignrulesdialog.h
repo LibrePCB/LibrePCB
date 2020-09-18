@@ -49,10 +49,10 @@ class BoardDesignRulesDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  BoardDesignRulesDialog()                                    = delete;
+  BoardDesignRulesDialog() = delete;
   BoardDesignRulesDialog(const BoardDesignRulesDialog& other) = delete;
   BoardDesignRulesDialog(const BoardDesignRules& rules,
-                         const LengthUnit&       lengthUnit,
+                         const LengthUnit& lengthUnit,
                          const QString& settingsPrefix, QWidget* parent = 0);
   ~BoardDesignRulesDialog();
 
@@ -77,7 +77,7 @@ private:
   void applyRules() noexcept;
 
   Ui::BoardDesignRulesDialog* mUi;
-  BoardDesignRules            mDesignRules;
+  BoardDesignRules mDesignRules;
 };
 
 /*******************************************************************************

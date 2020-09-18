@@ -60,10 +60,10 @@ public:
 
   // Getters
   bool isComplete() const noexcept override;
-  int  nextId() const noexcept override;
+  int nextId() const noexcept override;
 
   // Operator Overloadings
-  NewElementWizardPage_ChooseType& operator       =(
+  NewElementWizardPage_ChooseType& operator=(
       const NewElementWizardPage_ChooseType& rhs) = delete;
 
 private:  // Methods
@@ -78,7 +78,7 @@ private:  // Methods
   void setElementType(NewElementWizardContext::ElementType type) noexcept;
 
 private:  // Data
-  NewElementWizardContext&                            mContext;
+  NewElementWizardContext& mContext;
   QScopedPointer<Ui::NewElementWizardPage_ChooseType> mUi;
 };
 

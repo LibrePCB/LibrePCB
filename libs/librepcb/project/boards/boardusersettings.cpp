@@ -48,7 +48,7 @@ BoardUserSettings::BoardUserSettings(Board& board) noexcept
         new GraphicsLayerStackAppearanceSettings(board.getLayerStack())) {
 }
 
-BoardUserSettings::BoardUserSettings(Board&                   board,
+BoardUserSettings::BoardUserSettings(Board& board,
                                      const BoardUserSettings& other) noexcept
   : BoardUserSettings(board) {
   *mLayerSettings = *other.mLayerSettings;

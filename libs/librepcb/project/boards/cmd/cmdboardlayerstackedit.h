@@ -45,7 +45,7 @@ class BoardLayerStack;
 class CmdBoardLayerStackEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardLayerStackEdit()                                    = delete;
+  CmdBoardLayerStackEdit() = delete;
   CmdBoardLayerStackEdit(const CmdBoardLayerStackEdit& other) = delete;
   CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept;
   ~CmdBoardLayerStackEdit() noexcept;

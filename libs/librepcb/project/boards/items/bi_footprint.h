@@ -61,7 +61,7 @@ class BI_Footprint final : public BI_Base,
 
 public:
   // Constructors / Destructor
-  BI_Footprint()                          = delete;
+  BI_Footprint() = delete;
   BI_Footprint(const BI_Footprint& other) = delete;
   BI_Footprint(BI_Device& device, const BI_Footprint& other);
   BI_Footprint(BI_Device& device, const SExpression& node);
@@ -69,17 +69,17 @@ public:
   ~BI_Footprint() noexcept;
 
   // Getters
-  const Uuid&      getComponentInstanceUuid() const noexcept;
-  BI_Device&       getDeviceInstance() const noexcept { return mDevice; }
+  const Uuid& getComponentInstanceUuid() const noexcept;
+  BI_Device& getDeviceInstance() const noexcept { return mDevice; }
   BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {
     return mPads.value(padUuid);
   }
   const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
-  const library::Footprint&           getLibFootprint() const noexcept;
-  const Angle&                        getRotation() const noexcept;
-  bool                                isSelectable() const noexcept override;
-  bool                                isUsed() const noexcept;
-  QRectF                              getBoundingRect() const noexcept;
+  const library::Footprint& getLibFootprint() const noexcept;
+  const Angle& getRotation() const noexcept;
+  bool isSelectable() const noexcept override;
+  bool isUsed() const noexcept;
+  QRectF getBoundingRect() const noexcept;
   BGI_Footprint& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   // StrokeText Methods
@@ -110,9 +110,9 @@ public:
     return BI_Base::Type_t::Footprint;
   }
   const Point& getPosition() const noexcept override;
-  bool         getIsMirrored() const noexcept override;
+  bool getIsMirrored() const noexcept override;
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_Footprint& operator=(const BI_Footprint& rhs) = delete;
@@ -132,10 +132,10 @@ private:
   void updateGraphicsItemTransform() noexcept;
 
   // General
-  BI_Device&                    mDevice;
+  BI_Device& mDevice;
   QScopedPointer<BGI_Footprint> mGraphicsItem;
-  QMap<Uuid, BI_FootprintPad*>  mPads;  ///< key: footprint pad UUID
-  QList<BI_StrokeText*>         mStrokeTexts;
+  QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID
+  QList<BI_StrokeText*> mStrokeTexts;
 };
 
 /*******************************************************************************

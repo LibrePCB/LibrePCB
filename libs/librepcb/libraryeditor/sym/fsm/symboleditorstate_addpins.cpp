@@ -99,7 +99,7 @@ bool SymbolEditorState_AddPins::exit() noexcept {
   // abort command
   try {
     mCurrentGraphicsItem = nullptr;
-    mCurrentPin          = nullptr;
+    mCurrentPin = nullptr;
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
   } catch (const Exception& e) {
@@ -136,7 +136,7 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
   try {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentPin          = nullptr;
+    mCurrentPin = nullptr;
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return addNextPin(currentPos, currentRot);
@@ -186,7 +186,7 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos,
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
     mCurrentGraphicsItem = nullptr;
-    mCurrentPin          = nullptr;
+    mCurrentPin = nullptr;
     mEditCmd.reset();
     return false;
   }

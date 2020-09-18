@@ -48,7 +48,7 @@ class SymbolEditorState_DrawRect final
 
 public:
   // Constructors / Destructor
-  SymbolEditorState_DrawRect()                                        = delete;
+  SymbolEditorState_DrawRect() = delete;
   SymbolEditorState_DrawRect(const SymbolEditorState_DrawRect& other) = delete;
   explicit SymbolEditorState_DrawRect(const Context& context) noexcept;
   ~SymbolEditorState_DrawRect() noexcept;

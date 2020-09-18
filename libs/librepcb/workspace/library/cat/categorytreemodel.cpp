@@ -89,7 +89,7 @@ QModelIndex CategoryTreeModel<ElementType>::index(
   if (parent.isValid() && parent.column() != 0) return QModelIndex();
 
   CategoryTreeItem<ElementType>* parentItem = getItem(parent);
-  CategoryTreeItem<ElementType>* childItem  = parentItem->getChild(row);
+  CategoryTreeItem<ElementType>* childItem = parentItem->getChild(row);
 
   if (childItem)
     return createIndex(row, column, childItem);
@@ -102,7 +102,7 @@ QModelIndex CategoryTreeModel<ElementType>::parent(
     const QModelIndex& index) const {
   if (!index.isValid()) return QModelIndex();
 
-  CategoryTreeItem<ElementType>* childItem  = getItem(index);
+  CategoryTreeItem<ElementType>* childItem = getItem(index);
   CategoryTreeItem<ElementType>* parentItem = childItem->getParent();
 
   if (parentItem == mRootItem.data()) return QModelIndex();
@@ -111,7 +111,7 @@ QModelIndex CategoryTreeModel<ElementType>::parent(
 }
 
 template <typename ElementType>
-QVariant CategoryTreeModel<ElementType>::headerData(int             section,
+QVariant CategoryTreeModel<ElementType>::headerData(int section,
                                                     Qt::Orientation orientation,
                                                     int role) const {
   if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal)) {
@@ -125,7 +125,7 @@ QVariant CategoryTreeModel<ElementType>::headerData(int             section,
 
 template <typename ElementType>
 QVariant CategoryTreeModel<ElementType>::data(const QModelIndex& index,
-                                              int                role) const {
+                                              int role) const {
   CategoryTreeItem<ElementType>* item = getItem(index);
   return item->data(role);
 }

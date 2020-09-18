@@ -150,9 +150,9 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       std::shared_ptr<BoardClipboardData::NetSegment> newSegment =
           std::make_shared<BoardClipboardData::NetSegment>(
               it.key()->getNetSignal().getName());
-      newSegment->vias      = segment.vias;
+      newSegment->vias = segment.vias;
       newSegment->junctions = segment.junctions;
-      newSegment->traces    = segment.traces;
+      newSegment->traces = segment.traces;
       data->getNetSegments().append(newSegment);
     }
   }

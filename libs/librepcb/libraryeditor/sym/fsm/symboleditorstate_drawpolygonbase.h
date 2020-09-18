@@ -79,7 +79,7 @@ public:
   bool processAbortCommand() noexcept override;
 
   // Operator Overloadings
-  SymbolEditorState_DrawPolygonBase& operator       =(
+  SymbolEditorState_DrawPolygonBase& operator=(
       const SymbolEditorState_DrawPolygonBase& rhs) = delete;
 
 private:  // Methods
@@ -95,18 +95,18 @@ private:  // Methods
   void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
 
 private:  // Types / Data
-  Mode                           mMode;
+  Mode mMode;
   QScopedPointer<CmdPolygonEdit> mEditCmd;
-  std::shared_ptr<Polygon>       mCurrentPolygon;
-  Point                          mSegmentStartPos;
-  PolygonGraphicsItem*           mCurrentGraphicsItem;
+  std::shared_ptr<Polygon> mCurrentPolygon;
+  Point mSegmentStartPos;
+  PolygonGraphicsItem* mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
-  UnsignedLength    mLastLineWidth;
-  Angle             mLastAngle;
-  bool              mLastFill;
-  bool              mLastGrabArea;
+  UnsignedLength mLastLineWidth;
+  Angle mLastAngle;
+  bool mLastFill;
+  bool mLastGrabArea;
 };
 
 /*******************************************************************************

@@ -54,16 +54,16 @@ public:
   // Types
   struct NetSegmentItems {
     QSet<SI_NetPoint*> netpoints;
-    QSet<SI_NetLine*>  netlines;
+    QSet<SI_NetLine*> netlines;
     QSet<SI_NetLabel*> netlabels;
   };
 
   // Constructors / Destructor
-  SchematicSelectionQuery()                                     = delete;
+  SchematicSelectionQuery() = delete;
   SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
-  SchematicSelectionQuery(const QList<SI_Symbol*>&     symbols,
+  SchematicSelectionQuery(const QList<SI_Symbol*>& symbols,
                           const QList<SI_NetSegment*>& netsegments,
-                          QObject*                     parent = nullptr);
+                          QObject* parent = nullptr);
   ~SchematicSelectionQuery() noexcept;
 
   // Getters
@@ -88,7 +88,7 @@ public:
    * @return List of net segments containing the selected items
    */
   QHash<SI_NetSegment*, NetSegmentItems> getNetSegmentItems() const noexcept;
-  int                                    getResultCount() const noexcept;
+  int getResultCount() const noexcept;
   bool isResultEmpty() const noexcept { return (getResultCount() == 0); }
 
   // General Methods
@@ -114,13 +114,13 @@ public:
 
 private:
   // references to the Schematic object
-  const QList<SI_Symbol*>&     mSymbols;
+  const QList<SI_Symbol*>& mSymbols;
   const QList<SI_NetSegment*>& mNetSegments;
 
   // query result
-  QSet<SI_Symbol*>   mResultSymbols;
+  QSet<SI_Symbol*> mResultSymbols;
   QSet<SI_NetPoint*> mResultNetPoints;
-  QSet<SI_NetLine*>  mResultNetLines;
+  QSet<SI_NetLine*> mResultNetLines;
   QSet<SI_NetLabel*> mResultNetLabels;
 };
 

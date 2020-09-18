@@ -109,8 +109,8 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         mState = SubState::SELECTING;
       } else {
         // check if the top most item under the cursor is already selected
-        QGraphicsItem* topMostItem         = items.first();
-        bool           itemAlreadySelected = topMostItem->isSelected();
+        QGraphicsItem* topMostItem = items.first();
+        bool itemAlreadySelected = topMostItem->isSelected();
 
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed
@@ -328,8 +328,8 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   if (mState != SubState::IDLE) return false;
 
   // handle item selection
-  QGraphicsItem*        selectedItem = nullptr;
-  QList<QGraphicsItem*> items        = findItemsAtPosition(pos);
+  QGraphicsItem* selectedItem = nullptr;
+  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
   if (items.isEmpty()) return false;
   foreach (QGraphicsItem* item, items) {
     if (item->isSelected()) {
@@ -350,7 +350,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   Q_ASSERT(selectedItem->isSelected());
 
   // build the context menu
-  QMenu    menu;
+  QMenu menu;
   QAction* aRotateCCW =
       menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
   connect(aRotateCCW, &QAction::triggered,
@@ -599,10 +599,10 @@ void PackageEditorState_Select::clearSelectionRect(
 QList<QGraphicsItem*> PackageEditorState_Select::findItemsAtPosition(
     const Point& pos) noexcept {
   QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
-  QList<QSharedPointer<CircleGraphicsItem>>       circles;
-  QList<QSharedPointer<PolygonGraphicsItem>>      polygons;
-  QList<QSharedPointer<StrokeTextGraphicsItem>>   texts;
-  QList<QSharedPointer<HoleGraphicsItem>>         holes;
+  QList<QSharedPointer<CircleGraphicsItem>> circles;
+  QList<QSharedPointer<PolygonGraphicsItem>> polygons;
+  QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
+  QList<QSharedPointer<HoleGraphicsItem>> holes;
   int count = mContext.currentGraphicsItem->getItemsAtPosition(
       pos, &pads, &circles, &polygons, &texts, &holes);
   QList<QGraphicsItem*> result = {};
@@ -622,8 +622,9 @@ QList<QGraphicsItem*> PackageEditorState_Select::findItemsAtPosition(
     result.append(hole.data());
   }
 
-  Q_ASSERT(result.count() == (pads.count() + texts.count() + polygons.count() +
-                              circles.count() + holes.count()));
+  Q_ASSERT(result.count() ==
+           (pads.count() + texts.count() + polygons.count() + circles.count() +
+            holes.count()));
   Q_ASSERT(result.count() == count);
   return result;
 }

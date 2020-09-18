@@ -66,7 +66,7 @@ public:
 
   // Operator Overloadings
   SignalRole& operator=(const SignalRole& rhs) noexcept;
-  bool        operator==(const SignalRole& rhs) const noexcept {
+  bool operator==(const SignalRole& rhs) const noexcept {
     return mRole == rhs.mRole;
   }
   bool operator!=(const SignalRole& rhs) const noexcept {
@@ -121,7 +121,7 @@ public:
 private:  // Methods
   SignalRole(const QString& role, const QString& name) noexcept;
 
-private:          // Data
+private:  // Data
   QString mRole;  ///< used for serialization (DO NOT MODIFY VALUES!)
   QString mName;  ///< human readable (translated)
 };
@@ -137,7 +137,7 @@ inline SExpression serializeToSExpression(const SignalRole& obj) {
 
 template <>
 inline SignalRole deserializeFromSExpression(const SExpression& sexpr,
-                                             bool               throwIfEmpty) {
+                                             bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   foreach (const SignalRole& role, SignalRole::getAllRoles()) {
     if (role.toStr() == str) {

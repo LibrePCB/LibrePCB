@@ -55,7 +55,7 @@ namespace editor {
 class SymbolClipboardData final : public SerializableObject {
 public:
   // Constructors / Destructor
-  SymbolClipboardData()                                 = delete;
+  SymbolClipboardData() = delete;
   SymbolClipboardData(const SymbolClipboardData& other) = delete;
   SymbolClipboardData(const Uuid& symbolUuid, const Point& cursorPos) noexcept;
   explicit SymbolClipboardData(const SExpression& node);
@@ -64,18 +64,18 @@ public:
   // Getters
   bool getItemCount() const noexcept {
     return mPins.count() + mPolygons.count() + mCircles.count() +
-           mTexts.count();
+        mTexts.count();
   }
-  const Uuid&          getSymbolUuid() const noexcept { return mSymbolUuid; }
-  const Point&         getCursorPos() const noexcept { return mCursorPos; }
-  SymbolPinList&       getPins() noexcept { return mPins; }
+  const Uuid& getSymbolUuid() const noexcept { return mSymbolUuid; }
+  const Point& getCursorPos() const noexcept { return mCursorPos; }
+  SymbolPinList& getPins() noexcept { return mPins; }
   const SymbolPinList& getPins() const noexcept { return mPins; }
-  PolygonList&         getPolygons() noexcept { return mPolygons; }
-  const PolygonList&   getPolygons() const noexcept { return mPolygons; }
-  CircleList&          getCircles() noexcept { return mCircles; }
-  const CircleList&    getCircles() const noexcept { return mCircles; }
-  TextList&            getTexts() noexcept { return mTexts; }
-  const TextList&      getTexts() const noexcept { return mTexts; }
+  PolygonList& getPolygons() noexcept { return mPolygons; }
+  const PolygonList& getPolygons() const noexcept { return mPolygons; }
+  CircleList& getCircles() noexcept { return mCircles; }
+  const CircleList& getCircles() const noexcept { return mCircles; }
+  TextList& getTexts() noexcept { return mTexts; }
+  const TextList& getTexts() const noexcept { return mTexts; }
 
   // General Methods
   std::unique_ptr<QMimeData> toMimeData(const IF_GraphicsLayerProvider& lp);
@@ -89,16 +89,16 @@ private:  // Methods
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  QPixmap        generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
+  QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
   static QString getMimeType() noexcept;
 
 private:  // Data
-  Uuid          mSymbolUuid;
-  Point         mCursorPos;
+  Uuid mSymbolUuid;
+  Point mCursorPos;
   SymbolPinList mPins;
-  PolygonList   mPolygons;
-  CircleList    mCircles;
-  TextList      mTexts;
+  PolygonList mPolygons;
+  CircleList mCircles;
+  TextList mTexts;
 };
 
 /*******************************************************************************

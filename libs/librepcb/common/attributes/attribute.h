@@ -55,7 +55,7 @@ public:
     KeyChanged,
     TypeValueUnitChanged,
   };
-  Signal<Attribute, Event>       onEdited;
+  Signal<Attribute, Event> onEdited;
   typedef Slot<Attribute, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -68,13 +68,13 @@ public:
 
   // Getters
   const AttributeKey& getKey() const noexcept { return mKey; }
-  const QString&      getName() const noexcept {
+  const QString& getName() const noexcept {
     return *mKey;
   }  // required for SerializableObjectList
   const AttributeType& getType() const noexcept { return *mType; }
   const AttributeUnit* getUnit() const noexcept { return mUnit; }
-  const QString&       getValue() const noexcept { return mValue; }
-  QString              getValueTr(bool showUnit) const noexcept;
+  const QString& getValue() const noexcept { return mValue; }
+  QString getValueTr(bool showUnit) const noexcept;
 
   // Setters
   bool setKey(const AttributeKey& key) noexcept;
@@ -97,9 +97,9 @@ private:  // Methods
   bool checkAttributesValidity() const noexcept;
 
 private:  // Data
-  AttributeKey         mKey;
+  AttributeKey mKey;
   const AttributeType* mType;
-  QString              mValue;
+  QString mValue;
   const AttributeUnit* mUnit;
 };
 

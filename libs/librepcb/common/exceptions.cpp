@@ -94,7 +94,7 @@ RangeError::RangeError(const RangeError& other) noexcept : RuntimeError(other) {
 
 FileParseError::FileParseError(const char* file, int line,
                                const FilePath& filePath, int fileLine,
-                               int            fileColumn,
+                               int fileColumn,
                                const QString& invalidFileContent,
                                const QString& msg) noexcept
   : RuntimeError(file, line,

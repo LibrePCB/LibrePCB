@@ -41,7 +41,7 @@ GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
 }
 
 GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
-    IF_GraphicsLayerProvider&                   layers,
+    IF_GraphicsLayerProvider& layers,
     const GraphicsLayerStackAppearanceSettings& other) noexcept
   : mLayers(layers) {
   *this = other;
@@ -84,7 +84,7 @@ void GraphicsLayerStackAppearanceSettings::serialize(SExpression& root) const {
  ******************************************************************************/
 
 GraphicsLayerStackAppearanceSettings& GraphicsLayerStackAppearanceSettings::
-                                      operator=(const GraphicsLayerStackAppearanceSettings& rhs) noexcept {
+    operator=(const GraphicsLayerStackAppearanceSettings& rhs) noexcept {
   Q_UNUSED(rhs);  // actually there is nothing to copy here...
   return *this;
 }

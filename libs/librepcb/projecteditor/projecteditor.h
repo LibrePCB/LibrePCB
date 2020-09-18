@@ -65,7 +65,7 @@ class ProjectEditor final : public QObject {
 
 public:
   // Constructors / Destructor
-  ProjectEditor()                     = delete;
+  ProjectEditor() = delete;
   ProjectEditor(const Project& other) = delete;
 
   /**
@@ -81,8 +81,8 @@ public:
   // Getters: General
 
   workspace::Workspace& getWorkspace() const noexcept { return mWorkspace; }
-  Project&              getProject() const noexcept { return mProject; }
-  const LengthUnit&     getDefaultLengthUnit() const noexcept;
+  Project& getProject() const noexcept { return mProject; }
+  const LengthUnit& getDefaultLengthUnit() const noexcept;
 
   /**
    * @brief Get a reference to the undo stack of the project
@@ -216,12 +216,12 @@ private:  // Methods
 
 private:  // Data
   workspace::Workspace& mWorkspace;
-  Project&              mProject;
+  Project& mProject;
   QTimer mAutoSaveTimer;  ///< the timer for the periodically automatic saving
                           ///< functionality (see also @ref doc_project_save)
-  UndoStack*       mUndoStack;        ///< See @ref doc_project_undostack
+  UndoStack* mUndoStack;  ///< See @ref doc_project_undostack
   SchematicEditor* mSchematicEditor;  ///< The schematic editor (GUI)
-  BoardEditor*     mBoardEditor;      ///< The board editor (GUI)
+  BoardEditor* mBoardEditor;  ///< The board editor (GUI)
 };
 
 /*******************************************************************************

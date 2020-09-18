@@ -82,9 +82,9 @@ Point Point::rotated(const Angle& angle, const Point& center) const noexcept {
 }
 
 Point& Point::rotate(const Angle& angle, const Point& center) noexcept {
-  Length dx         = mX - center.getX();
-  Length dy         = mY - center.getY();
-  Angle  angle0_360 = angle.mappedTo0_360deg();
+  Length dx = mX - center.getX();
+  Length dy = mY - center.getY();
+  Angle angle0_360 = angle.mappedTo0_360deg();
 
   // if angle is a multiple of 90 degrees, rotating can be done without loosing
   // accuracy
@@ -117,7 +117,7 @@ Point Point::mirrored(Qt::Orientation orientation, const Point& center) const
 }
 
 Point& Point::mirror(Qt::Orientation orientation,
-                     const Point&    center) noexcept {
+                     const Point& center) noexcept {
   switch (orientation) {
     case Qt::Horizontal:
       mX += Length(2) * (center.getX() - mX);

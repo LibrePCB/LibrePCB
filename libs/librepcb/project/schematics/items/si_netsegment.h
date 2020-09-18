@@ -57,7 +57,7 @@ class SI_NetSegment final : public SI_Base, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  SI_NetSegment()                           = delete;
+  SI_NetSegment() = delete;
   SI_NetSegment(const SI_NetSegment& other) = delete;
   SI_NetSegment(Schematic& schematic, const SExpression& node);
   SI_NetSegment(Schematic& schematic, NetSignal& signal);
@@ -65,17 +65,17 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  NetSignal&  getNetSignal() const noexcept { return *mNetSignal; }
-  bool        isUsed() const noexcept;
-  int         getNetPointsAtScenePos(const Point&         pos,
-                                     QList<SI_NetPoint*>& points) const noexcept;
+  NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
+  bool isUsed() const noexcept;
+  int getNetPointsAtScenePos(const Point& pos,
+                             QList<SI_NetPoint*>& points) const noexcept;
   int getNetLinesAtScenePos(const Point& pos, QList<SI_NetLine*>& lines) const
       noexcept;
-  int                 getNetLabelsAtScenePos(const Point&         pos,
-                                             QList<SI_NetLabel*>& labels) const noexcept;
-  QSet<QString>       getForcedNetNames() const noexcept;
-  QString             getForcedNetName() const noexcept;
-  Point               calcNearestPoint(const Point& p) const noexcept;
+  int getNetLabelsAtScenePos(const Point& pos,
+                             QList<SI_NetLabel*>& labels) const noexcept;
+  QSet<QString> getForcedNetNames() const noexcept;
+  QString getForcedNetName() const noexcept;
+  Point calcNearestPoint(const Point& p) const noexcept;
   QSet<SI_SymbolPin*> getAllConnectedPins() const noexcept;
 
   // Setters
@@ -89,22 +89,22 @@ public:
 
   // NetLine Methods
   const QList<SI_NetLine*>& getNetLines() const noexcept { return mNetLines; }
-  SI_NetLine*               getNetLineByUuid(const Uuid& uuid) const noexcept;
+  SI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
 
   // NetPoint+NetLine Methods
   void addNetPointsAndNetLines(const QList<SI_NetPoint*>& netpoints,
-                               const QList<SI_NetLine*>&  netlines);
+                               const QList<SI_NetLine*>& netlines);
   void removeNetPointsAndNetLines(const QList<SI_NetPoint*>& netpoints,
-                                  const QList<SI_NetLine*>&  netlines);
+                                  const QList<SI_NetLine*>& netlines);
 
   // NetLabel Methods
   const QList<SI_NetLabel*>& getNetLabels() const noexcept {
     return mNetLabels;
   }
   SI_NetLabel* getNetLabelByUuid(const Uuid& uuid) const noexcept;
-  void         addNetLabel(SI_NetLabel& netlabel);
-  void         removeNetLabel(SI_NetLabel& netlabel);
-  void         updateAllNetLabelAnchors() noexcept;
+  void addNetLabel(SI_NetLabel& netlabel);
+  void removeNetLabel(SI_NetLabel& netlabel);
+  void updateAllNetLabelAnchors() noexcept;
 
   // General Methods
   void addToSchematic() override;
@@ -125,8 +125,8 @@ public:
     return p;
   }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  bool         isSelected() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  bool isSelected() const noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   SI_NetSegment& operator=(const SI_NetSegment& rhs) = delete;
@@ -136,18 +136,18 @@ public:
 private:
   bool checkAttributesValidity() const noexcept;
   bool areAllNetPointsConnectedTogether() const noexcept;
-  void findAllConnectedNetPoints(const SI_NetLineAnchor&    p,
+  void findAllConnectedNetPoints(const SI_NetLineAnchor& p,
                                  QSet<const SI_SymbolPin*>& pins,
-                                 QSet<const SI_NetPoint*>&  points) const
+                                 QSet<const SI_NetPoint*>& points) const
       noexcept;
 
   // Attributes
-  Uuid       mUuid;
+  Uuid mUuid;
   NetSignal* mNetSignal;
 
   // Items
   QList<SI_NetPoint*> mNetPoints;
-  QList<SI_NetLine*>  mNetLines;
+  QList<SI_NetLine*> mNetLines;
   QList<SI_NetLabel*> mNetLabels;
 };
 

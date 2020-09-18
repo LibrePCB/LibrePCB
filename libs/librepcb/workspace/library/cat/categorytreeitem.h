@@ -47,11 +47,11 @@ class WorkspaceLibraryDb;
 
 struct CategoryTreeFilter {
   enum Flag {
-    SYMBOLS    = 1 << 0,  ///< Show items containing symbols
-    PACKAGES   = 1 << 1,  ///< Show items containing packages
+    SYMBOLS = 1 << 0,  ///< Show items containing symbols
+    PACKAGES = 1 << 1,  ///< Show items containing packages
     COMPONENTS = 1 << 2,  ///< Show items containing components
-    DEVICES    = 1 << 3,  ///< Show items containing devices
-    ALL        = 1 << 4,  ///< Show all items, even empty ones
+    DEVICES = 1 << 3,  ///< Show items containing devices
+    ALL = 1 << 4,  ///< Show all items, even empty ones
   };
   Q_DECLARE_FLAGS(Flags, Flag)
 };
@@ -67,7 +67,7 @@ template <typename ElementType>
 class CategoryTreeItem final {
 public:
   // Constructors / Destructor
-  CategoryTreeItem()                              = delete;
+  CategoryTreeItem() = delete;
   CategoryTreeItem(const CategoryTreeItem& other) = delete;
   CategoryTreeItem(const WorkspaceLibraryDb& library,
                    const QStringList localeOrder, CategoryTreeItem* parent,
@@ -77,16 +77,16 @@ public:
 
   // Getters
   const tl::optional<Uuid>& getUuid() const noexcept { return mUuid; }
-  unsigned int              getDepth() const noexcept { return mDepth; }
-  int                       getColumnCount() const noexcept { return 1; }
-  CategoryTreeItem*         getParent() const noexcept { return mParent; }
-  CategoryTreeItem*         getChild(int index) const noexcept {
+  unsigned int getDepth() const noexcept { return mDepth; }
+  int getColumnCount() const noexcept { return 1; }
+  CategoryTreeItem* getParent() const noexcept { return mParent; }
+  CategoryTreeItem* getChild(int index) const noexcept {
     return mChilds.value(index).data();
   }
-  int      getChildCount() const noexcept { return mChilds.count(); }
-  int      getChildNumber() const noexcept;
+  int getChildCount() const noexcept { return mChilds.count(); }
+  int getChildNumber() const noexcept;
   QVariant data(int role) const noexcept;
-  bool     isVisible() const noexcept { return mIsVisible; }
+  bool isVisible() const noexcept { return mIsVisible; }
 
   // Operator Overloadings
   CategoryTreeItem& operator=(const CategoryTreeItem& rhs) = delete;
@@ -96,25 +96,25 @@ private:
   using ChildType = QSharedPointer<CategoryTreeItem<ElementType>>;
 
   // Methods
-  FilePath   getLatestCategory(const WorkspaceLibraryDb& lib) const;
+  FilePath getLatestCategory(const WorkspaceLibraryDb& lib) const;
   QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
-  bool       matchesFilter(const WorkspaceLibraryDb& lib,
-                           CategoryTreeFilter::Flags filter) const;
+  bool matchesFilter(const WorkspaceLibraryDb& lib,
+                     CategoryTreeFilter::Flags filter) const;
 
   // Attributes
-  CategoryTreeItem*  mParent;
+  CategoryTreeItem* mParent;
   tl::optional<Uuid> mUuid;
-  QString            mName;
-  QString            mDescription;
-  unsigned int       mDepth;  ///< this is to avoid endless recursion in the
-                              ///< parent-child relationship
-  QString          mExceptionMessage;
-  bool             mIsVisible;
+  QString mName;
+  QString mDescription;
+  unsigned int mDepth;  ///< this is to avoid endless recursion in the
+                        ///< parent-child relationship
+  QString mExceptionMessage;
+  bool mIsVisible;
   QList<ChildType> mChilds;
 };
 
 typedef CategoryTreeItem<library::ComponentCategory> ComponentCategoryTreeItem;
-typedef CategoryTreeItem<library::PackageCategory>   PackageCategoryTreeItem;
+typedef CategoryTreeItem<library::PackageCategory> PackageCategoryTreeItem;
 
 /*******************************************************************************
  *  End of File

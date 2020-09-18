@@ -61,7 +61,7 @@ CmdTextEdit::~CmdTextEdit() noexcept {
  ******************************************************************************/
 
 void CmdTextEdit::setLayerName(const GraphicsLayerName& name,
-                               bool                     immediate) noexcept {
+                               bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLayerName = name;
   if (immediate) mText.setLayerName(mNewLayerName);
@@ -74,14 +74,14 @@ void CmdTextEdit::setText(const QString& text, bool immediate) noexcept {
 }
 
 void CmdTextEdit::setHeight(const PositiveLength& height,
-                            bool                  immediate) noexcept {
+                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewHeight = height;
   if (immediate) mText.setHeight(mNewHeight);
 }
 
 void CmdTextEdit::setAlignment(const Alignment& align,
-                               bool             immediate) noexcept {
+                               bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewAlign = align;
   if (immediate) mText.setAlign(mNewAlign);

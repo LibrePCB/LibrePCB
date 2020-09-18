@@ -45,34 +45,34 @@ namespace librepcb {
 class FileDialog final {
 public:
   // Constructors / Destructor
-  FileDialog()                        = delete;
+  FileDialog() = delete;
   FileDialog(const FileDialog& other) = delete;
-  ~FileDialog()                       = delete;
+  ~FileDialog() = delete;
 
-  static QString getOpenFileName(QWidget*             parent  = 0,
-                                 const QString&       caption = QString(),
-                                 const QString&       dir     = QString(),
-                                 const QString&       filter  = QString(),
-                                 QString*             selectedFilter = 0,
-                                 QFileDialog::Options options        = 0);
+  static QString getOpenFileName(QWidget* parent = 0,
+                                 const QString& caption = QString(),
+                                 const QString& dir = QString(),
+                                 const QString& filter = QString(),
+                                 QString* selectedFilter = 0,
+                                 QFileDialog::Options options = 0);
 
-  static QStringList getOpenFileNames(QWidget*             parent  = 0,
-                                      const QString&       caption = QString(),
-                                      const QString&       dir     = QString(),
-                                      const QString&       filter  = QString(),
-                                      QString*             selectedFilter = 0,
-                                      QFileDialog::Options options        = 0);
+  static QStringList getOpenFileNames(QWidget* parent = 0,
+                                      const QString& caption = QString(),
+                                      const QString& dir = QString(),
+                                      const QString& filter = QString(),
+                                      QString* selectedFilter = 0,
+                                      QFileDialog::Options options = 0);
 
-  static QString getSaveFileName(QWidget*             parent  = 0,
-                                 const QString&       caption = QString(),
-                                 const QString&       dir     = QString(),
-                                 const QString&       filter  = QString(),
-                                 QString*             selectedFilter = 0,
-                                 QFileDialog::Options options        = 0);
+  static QString getSaveFileName(QWidget* parent = 0,
+                                 const QString& caption = QString(),
+                                 const QString& dir = QString(),
+                                 const QString& filter = QString(),
+                                 QString* selectedFilter = 0,
+                                 QFileDialog::Options options = 0);
 
   static QString getExistingDirectory(
       QWidget* parent = 0, const QString& caption = QString(),
-      const QString&       dir     = QString(),
+      const QString& dir = QString(),
       QFileDialog::Options options = QFileDialog::ShowDirsOnly);
 
 private:

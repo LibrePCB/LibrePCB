@@ -48,7 +48,7 @@ namespace editor {
  ******************************************************************************/
 
 SymbolChooserDialog::SymbolChooserDialog(
-    const workspace::Workspace&     ws,
+    const workspace::Workspace& ws,
     const IF_GraphicsLayerProvider& layerProvider, QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
@@ -96,8 +96,8 @@ QString SymbolChooserDialog::getSelectedSymbolNameTr() const noexcept {
 
 QString SymbolChooserDialog::getSelectedSymbolDescriptionTr() const noexcept {
   return mSelectedSymbol
-             ? mSelectedSymbol->getDescriptions().value(localeOrder())
-             : QString();
+      ? mSelectedSymbol->getDescriptions().value(localeOrder())
+      : QString();
 }
 
 /*******************************************************************************
@@ -178,7 +178,7 @@ void SymbolChooserDialog::setSelectedCategory(
         mWorkspace.getLibraryDb().getSymbolsByCategory(uuid);  // can throw
     foreach (const Uuid& symbolUuid, symbols) {
       try {
-        QString  symName;
+        QString symName;
         FilePath symFp =
             mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid);  // can throw
         mWorkspace.getLibraryDb().getElementTranslations<Symbol>(

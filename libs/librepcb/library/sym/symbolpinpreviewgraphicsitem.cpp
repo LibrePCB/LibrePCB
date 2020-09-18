@@ -44,7 +44,7 @@ namespace library {
 
 SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(
     const IF_GraphicsLayerProvider& layerProvider, const SymbolPin& pin,
-    const ComponentSignal*      compSignal,
+    const ComponentSignal* compSignal,
     const CmpSigPinDisplayType& displayType) noexcept
   : QGraphicsItem(),
     mPin(pin),
@@ -89,7 +89,7 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
 
   // rotation
   Angle absAngle = mPin.getRotation() +
-                   Angle::fromDeg(parentItem() ? -parentItem()->rotation() : 0);
+      Angle::fromDeg(parentItem() ? -parentItem()->rotation() : 0);
   absAngle.mapTo180deg();
   mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
 

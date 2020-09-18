@@ -44,7 +44,7 @@ bool Uuid::isValid(const QString& str) noexcept {
   // Helper function
   auto isLowerHex = [](const QChar& chr) {
     return (chr >= QChar('0') && chr <= QChar('9')) ||
-           (chr >= QChar('a') && chr <= QChar('f'));
+        (chr >= QChar('a') && chr <= QChar('f'));
   };
 
   if (!isLowerHex(str[0])) return false;

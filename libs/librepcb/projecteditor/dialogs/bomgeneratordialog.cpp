@@ -48,8 +48,8 @@ namespace editor {
  ******************************************************************************/
 
 BomGeneratorDialog::BomGeneratorDialog(const Project& project,
-                                       const Board*   board,
-                                       QWidget*       parent) noexcept
+                                       const Board* board,
+                                       QWidget* parent) noexcept
   : QDialog(parent),
     mProject(project),
     mBom(new Bom(QStringList())),
@@ -111,9 +111,9 @@ void BomGeneratorDialog::btnOpenOutputDirectoryClicked() noexcept {
 
 void BomGeneratorDialog::btnGenerateClicked() noexcept {
   try {
-    BomCsvWriter             writer(*mBom);
+    BomCsvWriter writer(*mBom);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-    csv->saveToFile(getOutputFilePath());                 // can throw
+    csv->saveToFile(getOutputFilePath());  // can throw
     mUi->lblSuccess->show();
   } catch (const Exception& e) {
     mUi->lblSuccess->hide();
@@ -130,8 +130,9 @@ void BomGeneratorDialog::updateBom() noexcept {
       mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
 
   QStringList attributes;
-  foreach (const QString str, mUi->edtAttributes->text().simplified().split(
-                                  ',', QString::SkipEmptyParts)) {
+  foreach (const QString str,
+           mUi->edtAttributes->text().simplified().split(
+               ',', QString::SkipEmptyParts)) {
     attributes.append(str.trimmed());
   }
 
@@ -145,7 +146,7 @@ void BomGeneratorDialog::updateTable() noexcept {
   mUi->tableWidget->clear();
 
   try {
-    BomCsvWriter             writer(*mBom);
+    BomCsvWriter writer(*mBom);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
@@ -169,7 +170,7 @@ void BomGeneratorDialog::updateTable() noexcept {
 
 FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
   QString path = mUi->edtOutputPath->text().trimmed();
-  path         = AttributeSubstitutor::substitute(
+  path = AttributeSubstitutor::substitute(
       path, &mProject, [&](const QString& str) {
         return FilePath::cleanFileName(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);

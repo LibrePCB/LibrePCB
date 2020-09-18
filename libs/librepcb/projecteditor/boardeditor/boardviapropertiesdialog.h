@@ -58,13 +58,13 @@ class BoardViaPropertiesDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  BoardViaPropertiesDialog()                                      = delete;
+  BoardViaPropertiesDialog() = delete;
   BoardViaPropertiesDialog(const BoardViaPropertiesDialog& other) = delete;
   explicit BoardViaPropertiesDialog(Project& project, BI_Via& via,
-                                    UndoStack&        undoStack,
+                                    UndoStack& undoStack,
                                     const LengthUnit& lengthUnit,
-                                    const QString&    settingsPrefix,
-                                    QWidget*          parent) noexcept;
+                                    const QString& settingsPrefix,
+                                    QWidget* parent) noexcept;
   ~BoardViaPropertiesDialog() noexcept;
 
 private:
@@ -74,10 +74,10 @@ private:
   bool applyChanges() noexcept;
 
   // General
-  Project&                                     mProject;
-  BI_Via&                                      mVia;
+  Project& mProject;
+  BI_Via& mVia;
   QScopedPointer<Ui::BoardViaPropertiesDialog> mUi;
-  UndoStack&                                   mUndoStack;
+  UndoStack& mUndoStack;
 };
 
 /*******************************************************************************

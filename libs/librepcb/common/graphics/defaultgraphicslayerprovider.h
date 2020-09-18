@@ -46,7 +46,7 @@ public:
   ~DefaultGraphicsLayerProvider() noexcept;
 
   // Getters
-  GraphicsLayer*        getLayer(const QString& name) const noexcept override;
+  GraphicsLayer* getLayer(const QString& name) const noexcept override;
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
     return mLayers;
   }

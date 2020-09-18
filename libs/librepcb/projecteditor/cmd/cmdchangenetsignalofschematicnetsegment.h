@@ -55,7 +55,7 @@ public:
   CmdChangeNetSignalOfSchematicNetSegment(
       const CmdChangeNetSignalOfSchematicNetSegment& other) = delete;
   CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg,
-                                          NetSignal&     newSig) noexcept;
+                                          NetSignal& newSig) noexcept;
   ~CmdChangeNetSignalOfSchematicNetSegment() noexcept;
 
 private:
@@ -71,7 +71,7 @@ private:
 
   // Attributes from the constructor
   SI_NetSegment& mNetSegment;
-  NetSignal&     mNewNetSignal;
+  NetSignal& mNewNetSignal;
 };
 
 /*******************************************************************************

@@ -89,18 +89,18 @@ public:
   /// FSM Context
   struct Context {
     workspace::Workspace& workspace;
-    Project&              project;
-    BoardEditor&          editor;
-    Ui::BoardEditor&      editorUi;
-    GraphicsView&         editorGraphicsView;
-    UndoStack&            undoStack;
+    Project& project;
+    BoardEditor& editor;
+    Ui::BoardEditor& editorUi;
+    GraphicsView& editorGraphicsView;
+    UndoStack& undoStack;
   };
 
   // Constructors / Destructor
-  BoardEditorFsm()                            = delete;
+  BoardEditorFsm() = delete;
   BoardEditorFsm(const BoardEditorFsm& other) = delete;
   explicit BoardEditorFsm(const Context& context,
-                          QObject*       parent = nullptr) noexcept;
+                          QObject* parent = nullptr) noexcept;
   virtual ~BoardEditorFsm() noexcept;
 
   // Getters
@@ -163,15 +163,15 @@ signals:
 
 private:
   BoardEditorState* getCurrentStateObj() const noexcept;
-  bool              setNextState(State state) noexcept;
-  bool              leaveCurrentState() noexcept;
-  bool              enterNextState(State state) noexcept;
-  bool              switchToPreviousState() noexcept;
+  bool setNextState(State state) noexcept;
+  bool leaveCurrentState() noexcept;
+  bool enterNextState(State state) noexcept;
+  bool switchToPreviousState() noexcept;
 
 private:  // Data
   QMap<State, BoardEditorState*> mStates;
-  State                          mCurrentState;
-  State                          mPreviousState;
+  State mCurrentState;
+  State mPreviousState;
 };
 
 /*******************************************************************************

@@ -174,7 +174,7 @@ FilePath FilePath::getPathTo(const QString& filename) const noexcept {
 
 FilePath& FilePath::operator=(const FilePath& rhs) noexcept {
   mFileInfo = rhs.mFileInfo;
-  mIsValid  = rhs.mIsValid;
+  mIsValid = rhs.mIsValid;
   return *this;
 }
 
@@ -197,7 +197,7 @@ bool FilePath::operator<(const FilePath& rhs) const noexcept {
  ******************************************************************************/
 
 FilePath FilePath::fromRelative(const FilePath& base,
-                                const QString&  relative) noexcept {
+                                const QString& relative) noexcept {
   if (!base.mIsValid) return FilePath();
 
   return FilePath(base.mFileInfo.filePath() % QLatin1Char('/') % relative);
@@ -222,7 +222,7 @@ FilePath FilePath::getRandomTempPath() noexcept {
   return getApplicationTempPath().getPathTo(random);
 }
 
-QString FilePath::cleanFileName(const QString&       userInput,
+QString FilePath::cleanFileName(const QString& userInput,
                                 CleanFileNameOptions options) noexcept {
   // perform compatibility decomposition (NFKD)
   QString ret = userInput.normalized(QString::NormalizationForm_KD);
@@ -251,7 +251,7 @@ QString FilePath::makeWellFormatted(const QString& filepath) noexcept {
   // will do this again to ensure that this will always work correctly!
   while ((newPath.endsWith("/")) &&
          (newPath != "/"))  // the last character is "/"
-    newPath.chop(1);        // remove the last character
+    newPath.chop(1);  // remove the last character
 
   // Make sure that Windows drive paths end with a slash (i.e. convert "C:" to
   // "C:/"). This is important for FilePath::isRoot() to work properly (it fails

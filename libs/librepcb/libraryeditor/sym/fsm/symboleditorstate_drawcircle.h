@@ -72,7 +72,7 @@ public:
   bool processAbortCommand() noexcept override;
 
   // Operator Overloadings
-  SymbolEditorState_DrawCircle& operator       =(
+  SymbolEditorState_DrawCircle& operator=(
       const SymbolEditorState_DrawCircle& rhs) = delete;
 
 private:  // Methods
@@ -88,14 +88,14 @@ private:  // Methods
 
 private:  // Types / Data
   QScopedPointer<CmdCircleEdit> mEditCmd;
-  Circle*                       mCurrentCircle;
-  CircleGraphicsItem*           mCurrentGraphicsItem;
+  Circle* mCurrentCircle;
+  CircleGraphicsItem* mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
-  UnsignedLength    mLastLineWidth;
-  bool              mLastFill;
-  bool              mLastGrabArea;
+  UnsignedLength mLastLineWidth;
+  bool mLastFill;
+  bool mLastGrabArea;
 };
 
 /*******************************************************************************

@@ -48,7 +48,7 @@ class ClipperHelpers final {
 
 public:
   // Disable instantiation
-  ClipperHelpers()  = delete;
+  ClipperHelpers() = delete;
   ~ClipperHelpers() = delete;
 
   // General Methods
@@ -57,39 +57,39 @@ public:
   static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
   static std::unique_ptr<ClipperLib::PolyTree> intersect(
       const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
-  static void subtract(ClipperLib::Paths&       subject,
+  static void subtract(ClipperLib::Paths& subject,
                        const ClipperLib::Paths& clip);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
                      const PositiveLength& maxArcTolerance);
   static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
 
   // Type Conversions
-  static QVector<Path>     convert(const ClipperLib::Paths& paths) noexcept;
-  static Path              convert(const ClipperLib::Path& path) noexcept;
-  static Point             convert(const ClipperLib::IntPoint& point) noexcept;
+  static QVector<Path> convert(const ClipperLib::Paths& paths) noexcept;
+  static Path convert(const ClipperLib::Path& path) noexcept;
+  static Point convert(const ClipperLib::IntPoint& point) noexcept;
   static ClipperLib::Paths convert(
-      const QVector<Path>&  paths,
+      const QVector<Path>& paths,
       const PositiveLength& maxArcTolerance) noexcept;
   static ClipperLib::Path convert(
       const Path& path, const PositiveLength& maxArcTolerance) noexcept;
   static ClipperLib::IntPoint convert(const Point& point) noexcept;
 
 private:  // Internal Helper Methods
-  static ClipperLib::Path  convertHolesToCutIns(const ClipperLib::Path&  outline,
-                                                const ClipperLib::Paths& holes);
+  static ClipperLib::Path convertHolesToCutIns(const ClipperLib::Path& outline,
+                                               const ClipperLib::Paths& holes);
   static ClipperLib::Paths prepareHoles(
       const ClipperLib::Paths& holes) noexcept;
   static ClipperLib::Path rotateCutInHole(
       const ClipperLib::Path& hole) noexcept;
   static int getHoleConnectionPointIndex(const ClipperLib::Path& hole) noexcept;
-  static void addCutInToPath(ClipperLib::Path&       outline,
+  static void addCutInToPath(ClipperLib::Path& outline,
                              const ClipperLib::Path& hole);
-  static int  insertConnectionPointToPath(ClipperLib::Path&           path,
-                                          const ClipperLib::IntPoint& p);
+  static int insertConnectionPointToPath(ClipperLib::Path& path,
+                                         const ClipperLib::IntPoint& p);
   static bool calcIntersectionPos(const ClipperLib::IntPoint& p1,
                                   const ClipperLib::IntPoint& p2,
-                                  const ClipperLib::cInt&     x,
-                                  ClipperLib::cInt&           y) noexcept;
+                                  const ClipperLib::cInt& x,
+                                  ClipperLib::cInt& y) noexcept;
 };
 
 /*******************************************************************************

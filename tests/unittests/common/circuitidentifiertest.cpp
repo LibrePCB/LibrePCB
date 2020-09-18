@@ -35,7 +35,7 @@ namespace tests {
 
 typedef struct {
   QString input;
-  bool    valid;
+  bool valid;
 } CircuitIdentifierTestData;
 
 /*******************************************************************************

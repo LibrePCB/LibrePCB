@@ -102,8 +102,8 @@ public:
   }
 
   template <typename T>
-  static void serializePointerContainerUuidSorted(SExpression&   root,
-                                                  const T&       container,
+  static void serializePointerContainerUuidSorted(SExpression& root,
+                                                  const T& container,
                                                   const QString& itemName) {
     T copy = container;
     std::sort(

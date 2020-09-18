@@ -66,7 +66,7 @@ SExpression::SExpression(sexpresso::Sexp& sexp, const FilePath& filePath)
     }
   } else if (sexp.isString()) {
     mValue = QString::fromStdString(sexp.getString());
-    mType  = Type::String;
+    mType = Type::String;
   } else {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
                          tr("Unknown node type."));
@@ -171,7 +171,7 @@ SExpression& SExpression::appendList(const QString& name, bool linebreak) {
 }
 
 SExpression& SExpression::appendChild(const SExpression& child,
-                                      bool               linebreak) {
+                                      bool linebreak) {
   if (mType == Type::List) {
     if (linebreak) appendLineBreak();
     mChildren.append(child);
@@ -191,7 +191,7 @@ void SExpression::removeLineBreaks() noexcept {
 
 QByteArray SExpression::toByteArray() const {
   QString str = toString(0);  // can throw
-  str += '\n';                // newline at end of file
+  str += '\n';  // newline at end of file
   return str.toUtf8();
 }
 
@@ -200,8 +200,8 @@ QByteArray SExpression::toByteArray() const {
  ******************************************************************************/
 
 SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
-  mType     = rhs.mType;
-  mValue    = rhs.mValue;
+  mType = rhs.mType;
+  mValue = rhs.mValue;
   mChildren = rhs.mChildren;
   mFilePath = rhs.mFilePath;
   return *this;
@@ -236,8 +236,8 @@ QString SExpression::toString(int indent) const {
         str += ' ';
       }
       bool nextChildIsLineBreak = (i < mChildren.count() - 1)
-                                      ? mChildren.at(i + 1).isLineBreak()
-                                      : true;
+          ? mChildren.at(i + 1).isLineBreak()
+          : true;
       if (child.isLineBreak() && nextChildIsLineBreak) {
         if ((i > 0) && mChildren.at(i - 1).isLineBreak()) {
           // too many line breaks ;)
@@ -288,9 +288,9 @@ SExpression SExpression::createLineBreak() {
 }
 
 SExpression SExpression::parse(const QByteArray& content,
-                               const FilePath&   filePath) {
-  std::string     error;
-  QString         str  = QString::fromUtf8(content);
+                               const FilePath& filePath) {
+  std::string error;
+  QString str = QString::fromUtf8(content);
   sexpresso::Sexp tree = sexpresso::parse(str.toStdString(), error);
   if (error.empty()) {
     if (tree.childCount() == 1) {

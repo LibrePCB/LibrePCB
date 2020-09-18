@@ -44,7 +44,7 @@ namespace library {
 class CmdLibraryEdit : public CmdLibraryBaseElementEdit {
 public:
   // Constructors / Destructor
-  CmdLibraryEdit()                            = delete;
+  CmdLibraryEdit() = delete;
   CmdLibraryEdit(const CmdLibraryEdit& other) = delete;
   explicit CmdLibraryEdit(Library& library) noexcept;
   virtual ~CmdLibraryEdit() noexcept;
@@ -70,8 +70,8 @@ protected:  // Methods
 private:  // Data
   Library& mLibrary;
 
-  QUrl       mOldUrl;
-  QUrl       mNewUrl;
+  QUrl mOldUrl;
+  QUrl mNewUrl;
   QSet<Uuid> mOldDependencies;
   QSet<Uuid> mNewDependencies;
   QByteArray mOldIcon;

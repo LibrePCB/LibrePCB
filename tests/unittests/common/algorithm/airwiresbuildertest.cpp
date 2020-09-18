@@ -55,7 +55,7 @@ protected:
  ******************************************************************************/
 
 TEST_F(AirWiresBuilderTest, testEmpty) {
-  AirWiresBuilder           builder;
+  AirWiresBuilder builder;
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   EXPECT_EQ(0, airwires.size());
 }
@@ -89,8 +89,8 @@ TEST_F(AirWiresBuilderTest, testTwoUnconnectedOverlappingPoints) {
 
 TEST_F(AirWiresBuilderTest, testTwoConnectedPoints) {
   AirWiresBuilder builder;
-  int             id0 = builder.addPoint(Point(100000, 200000));
-  int             id1 = builder.addPoint(Point(300000, 400000));
+  int id0 = builder.addPoint(Point(100000, 200000));
+  int id1 = builder.addPoint(Point(300000, 400000));
   builder.addEdge(id0, id1);
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   EXPECT_EQ(0, airwires.size());

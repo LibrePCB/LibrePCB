@@ -42,7 +42,7 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
     mLineEdit(new QLineEdit()),
     mIndex(0) {
   mLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  mLineEdit->setMaxLength(30);             // avoid too large widget in toolbar
+  mLineEdit->setMaxLength(30);  // avoid too large widget in toolbar
   mLineEdit->setClearButtonEnabled(true);  // to quickly clear the search term
   connect(mLineEdit.data(), &QLineEdit::textEdited, this,
           &SearchToolBar::textEdited);

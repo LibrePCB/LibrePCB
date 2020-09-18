@@ -39,20 +39,20 @@ BoardDesignRules::BoardDesignRules() noexcept
     mDescription(),
     // stop mask
     mStopMaskClearanceRatio(Ratio::percent0()),  // 0%
-    mStopMaskClearanceMin(100000),               // 0.1mm
-    mStopMaskClearanceMax(100000),               // 0.1mm
-    mStopMaskMaxViaDrillDiameter(500000),        // 0.5mm
+    mStopMaskClearanceMin(100000),  // 0.1mm
+    mStopMaskClearanceMax(100000),  // 0.1mm
+    mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
     // cream mask
     mCreamMaskClearanceRatio(Ratio::percent100() / 10),  // 10%
-    mCreamMaskClearanceMin(0),                           // 0.0mm
-    mCreamMaskClearanceMax(1000000),                     // 1.0mm
+    mCreamMaskClearanceMin(0),  // 0.0mm
+    mCreamMaskClearanceMax(1000000),  // 1.0mm
     // restring
     mRestringPadRatio(Ratio::percent100() / 4),  // 25%
-    mRestringPadMin(250000),                     // 0.25mm
-    mRestringPadMax(2000000),                    // 2.0mm
+    mRestringPadMin(250000),  // 0.25mm
+    mRestringPadMax(2000000),  // 2.0mm
     mRestringViaRatio(Ratio::percent100() / 4),  // 25%
-    mRestringViaMin(200000),                     // 0.2mm
-    mRestringViaMax(2000000)                     // 2.0mm
+    mRestringViaMin(200000),  // 0.2mm
+    mRestringViaMax(2000000)  // 2.0mm
 {
 }
 
@@ -65,7 +65,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
   : BoardDesignRules()  // this loads all default values!
 {
   // general attributes
-  mName        = node.getValueByPath<ElementName>("name");
+  mName = node.getValueByPath<ElementName>("name");
   mDescription = node.getValueByPath<QString>("description");
   // stop mask
   if (const SExpression* e =
@@ -255,24 +255,24 @@ UnsignedLength BoardDesignRules::calcViaRestring(const Length& drillDia) const
 BoardDesignRules& BoardDesignRules::operator=(
     const BoardDesignRules& rhs) noexcept {
   // general attributes
-  mName        = rhs.mName;
+  mName = rhs.mName;
   mDescription = rhs.mDescription;
   // stop mask
-  mStopMaskClearanceRatio      = rhs.mStopMaskClearanceRatio;
-  mStopMaskClearanceMin        = rhs.mStopMaskClearanceMin;
-  mStopMaskClearanceMax        = rhs.mStopMaskClearanceMax;
+  mStopMaskClearanceRatio = rhs.mStopMaskClearanceRatio;
+  mStopMaskClearanceMin = rhs.mStopMaskClearanceMin;
+  mStopMaskClearanceMax = rhs.mStopMaskClearanceMax;
   mStopMaskMaxViaDrillDiameter = rhs.mStopMaskMaxViaDrillDiameter;
   // cream mask
   mCreamMaskClearanceRatio = rhs.mCreamMaskClearanceRatio;
-  mCreamMaskClearanceMin   = rhs.mCreamMaskClearanceMin;
-  mCreamMaskClearanceMax   = rhs.mCreamMaskClearanceMax;
+  mCreamMaskClearanceMin = rhs.mCreamMaskClearanceMin;
+  mCreamMaskClearanceMax = rhs.mCreamMaskClearanceMax;
   // restring
   mRestringPadRatio = rhs.mRestringPadRatio;
-  mRestringPadMin   = rhs.mRestringPadMin;
-  mRestringPadMax   = rhs.mRestringPadMax;
+  mRestringPadMin = rhs.mRestringPadMin;
+  mRestringPadMax = rhs.mRestringPadMax;
   mRestringViaRatio = rhs.mRestringViaRatio;
-  mRestringViaMin   = rhs.mRestringViaMin;
-  mRestringViaMax   = rhs.mRestringViaMax;
+  mRestringViaMin = rhs.mRestringViaMin;
+  mRestringViaMax = rhs.mRestringViaMax;
   return *this;
 }
 

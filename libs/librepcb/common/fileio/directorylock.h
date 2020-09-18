@@ -167,7 +167,7 @@ public:
    */
   enum class LockStatus {
     Unlocked,  ///< the directory is not locked (lock file does not exist)
-    Locked,    ///< the directory is locked by another application instance
+    Locked,  ///< the directory is locked by another application instance
     StaleLock  ///< the directory is locked by a crashed application instance
   };
 

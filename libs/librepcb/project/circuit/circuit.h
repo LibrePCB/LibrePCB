@@ -75,7 +75,7 @@ class Circuit final : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  Circuit()                     = delete;
+  Circuit() = delete;
   Circuit(const Circuit& other) = delete;
   Circuit(Project& project, bool create);
   ~Circuit() noexcept;
@@ -89,20 +89,20 @@ public:
   }
   NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
   NetClass* getNetClassByName(const ElementName& name) const noexcept;
-  void      addNetClass(NetClass& netclass);
-  void      removeNetClass(NetClass& netclass);
-  void      setNetClassName(NetClass& netclass, const ElementName& newName);
+  void addNetClass(NetClass& netclass);
+  void removeNetClass(NetClass& netclass);
+  void setNetClassName(NetClass& netclass, const ElementName& newName);
 
   // NetSignal Methods
-  QString                       generateAutoNetSignalName() const noexcept;
+  QString generateAutoNetSignalName() const noexcept;
   const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {
     return mNetSignals;
   }
   NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
   NetSignal* getNetSignalByName(const QString& name) const noexcept;
   NetSignal* getNetSignalWithMostElements() const noexcept;
-  void       addNetSignal(NetSignal& netsignal);
-  void       removeNetSignal(NetSignal& netsignal);
+  void addNetSignal(NetSignal& netsignal);
+  void removeNetSignal(NetSignal& netsignal);
   void setNetSignalName(NetSignal& netsignal, const CircuitIdentifier& newName,
                         bool isAutoName);
   void setHighlightedNetSignal(NetSignal* signal) noexcept;
@@ -119,7 +119,7 @@ public:
       noexcept;
   void addComponentInstance(ComponentInstance& cmp);
   void removeComponentInstance(ComponentInstance& cmp);
-  void setComponentInstanceName(ComponentInstance&       cmp,
+  void setComponentInstanceName(ComponentInstance& cmp,
                                 const CircuitIdentifier& newName);
 
   // General Methods
@@ -127,8 +127,8 @@ public:
 
   // Operator Overloadings
   Circuit& operator=(const Circuit& rhs) = delete;
-  bool     operator==(const Circuit& rhs) noexcept { return (this == &rhs); }
-  bool     operator!=(const Circuit& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const Circuit& rhs) noexcept { return (this == &rhs); }
+  bool operator!=(const Circuit& rhs) noexcept { return (this != &rhs); }
 
 signals:
 
@@ -147,8 +147,8 @@ private:
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   QScopedPointer<TransactionalDirectory> mDirectory;
 
-  QMap<Uuid, NetClass*>          mNetClasses;
-  QMap<Uuid, NetSignal*>         mNetSignals;
+  QMap<Uuid, NetClass*> mNetClasses;
+  QMap<Uuid, NetSignal*> mNetSignals;
   QMap<Uuid, ComponentInstance*> mComponentInstances;
 };
 

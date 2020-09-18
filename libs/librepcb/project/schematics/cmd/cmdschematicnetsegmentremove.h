@@ -63,7 +63,7 @@ private:
 
   // Private Member Variables
 
-  Schematic&     mSchematic;
+  Schematic& mSchematic;
   SI_NetSegment& mNetSegment;
 };
 

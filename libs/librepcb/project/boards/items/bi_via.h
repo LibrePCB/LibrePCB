@@ -53,7 +53,7 @@ class BI_Via final : public BI_Base,
 
 public:
   // Constructors / Destructor
-  BI_Via()                    = delete;
+  BI_Via() = delete;
   BI_Via(const BI_Via& other) = delete;
   BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
   BI_Via(BI_NetSegment& netsegment, const Via& via);
@@ -61,11 +61,11 @@ public:
   ~BI_Via() noexcept;
 
   // Getters
-  BI_NetSegment&        getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal&            getNetSignalOfNetSegment() const noexcept;
-  const Via&            getVia() const noexcept { return mVia; }
-  const Uuid&           getUuid() const noexcept { return mVia.getUuid(); }
-  Via::Shape            getShape() const noexcept { return mVia.getShape(); }
+  BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
+  NetSignal& getNetSignalOfNetSegment() const noexcept;
+  const Via& getVia() const noexcept { return mVia; }
+  const Uuid& getUuid() const noexcept { return mVia.getUuid(); }
+  Via::Shape getShape() const noexcept { return mVia.getShape(); }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mVia.getDrillDiameter();
   }
@@ -93,29 +93,29 @@ public:
   const Point& getPosition() const noexcept override {
     return mVia.getPosition();
   }
-  bool         getIsMirrored() const noexcept override { return false; }
+  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Inherited from BI_NetLineAnchor
-  void                     registerNetLine(BI_NetLine& netline) override;
-  void                     unregisterNetLine(BI_NetLine& netline) override;
+  void registerNetLine(BI_NetLine& netline) override;
+  void unregisterNetLine(BI_NetLine& netline) override;
   const QSet<BI_NetLine*>& getNetLines() const noexcept override {
     return mRegisteredNetLines;
   }
 
   // Operator Overloadings
   BI_Via& operator=(const BI_Via& rhs) = delete;
-  bool    operator==(const BI_Via& rhs) noexcept { return (this == &rhs); }
-  bool    operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const BI_Via& rhs) noexcept { return (this == &rhs); }
+  bool operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
 private:
   void init();
   void boardOrNetAttributesChanged();
 
   // General
-  Via                     mVia;
-  BI_NetSegment&          mNetSegment;
+  Via mVia;
+  BI_NetSegment& mNetSegment;
   QScopedPointer<BGI_Via> mGraphicsItem;
   QMetaObject::Connection mHighlightChangedConnection;
 

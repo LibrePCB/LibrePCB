@@ -45,7 +45,7 @@ namespace library {
 class CmdComponentSignalEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdComponentSignalEdit()                                    = delete;
+  CmdComponentSignalEdit() = delete;
   CmdComponentSignalEdit(const CmdComponentSignalEdit& other) = delete;
   explicit CmdComponentSignalEdit(ComponentSignal& signal) noexcept;
   ~CmdComponentSignalEdit() noexcept;
@@ -76,16 +76,16 @@ private:  // Data
 
   CircuitIdentifier mOldName;
   CircuitIdentifier mNewName;
-  SignalRole        mOldRole;
-  SignalRole        mNewRole;
-  QString           mOldForcedNetName;
-  QString           mNewForcedNetName;
-  bool              mOldIsRequired;
-  bool              mNewIsRequired;
-  bool              mOldIsNegated;
-  bool              mNewIsNegated;
-  bool              mOldIsClock;
-  bool              mNewIsClock;
+  SignalRole mOldRole;
+  SignalRole mNewRole;
+  QString mOldForcedNetName;
+  QString mNewForcedNetName;
+  bool mOldIsRequired;
+  bool mNewIsRequired;
+  bool mOldIsNegated;
+  bool mNewIsNegated;
+  bool mOldIsClock;
+  bool mNewIsClock;
 };
 
 /*******************************************************************************

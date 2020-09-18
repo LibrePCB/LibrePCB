@@ -55,7 +55,7 @@ CompSymbVarPinSignalMapEditorWidget::CompSymbVarPinSignalMapEditorWidget(
   mView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   mView->setSortingEnabled(true);
   mView->setWordWrap(false);  // avoid too high cells due to word wrap
-  mView->verticalHeader()->setVisible(false);          // no content
+  mView->verticalHeader()->setVisible(false);  // no content
   mView->verticalHeader()->setMinimumSectionSize(10);  // more compact rows
   mView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   mView->horizontalHeader()->setSectionResizeMode(
@@ -93,7 +93,7 @@ CompSymbVarPinSignalMapEditorWidget::
  ******************************************************************************/
 
 void CompSymbVarPinSignalMapEditorWidget::setReferences(
-    ComponentSymbolVariant*                           variant,
+    ComponentSymbolVariant* variant,
     const std::shared_ptr<const LibraryElementCache>& symbolCache,
     const ComponentSignalList* sigs, UndoStack* undoStack) noexcept {
   mModel->setUndoStack(undoStack);

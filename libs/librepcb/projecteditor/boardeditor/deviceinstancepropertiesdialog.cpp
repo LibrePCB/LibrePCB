@@ -158,8 +158,9 @@ void DeviceInstancePropertiesDialog::accept() noexcept {
 bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
   try {
     UndoStackTransaction transaction(
-        mUndoStack, tr("Change properties of %1")
-                        .arg(*mDevice.getComponentInstance().getName()));
+        mUndoStack,
+        tr("Change properties of %1")
+            .arg(*mDevice.getComponentInstance().getName()));
 
     // Component Instance
     QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
@@ -178,7 +179,7 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
         Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()), false);
     cmdDev->setRotation(mUi->edtRotation->getValue(), false);
     cmdDev->setMirrored(mUi->cbxMirror->isChecked(), false);  // can throw
-    transaction.append(cmdDev.take());                        // can throw
+    transaction.append(cmdDev.take());  // can throw
 
     transaction.commit();  // can throw
     return true;

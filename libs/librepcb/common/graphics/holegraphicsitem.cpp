@@ -37,7 +37,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-HoleGraphicsItem::HoleGraphicsItem(Hole&                           hole,
+HoleGraphicsItem::HoleGraphicsItem(Hole& hole,
                                    const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept
   : PrimitiveCircleGraphicsItem(parent),
@@ -72,7 +72,7 @@ HoleGraphicsItem::~HoleGraphicsItem() noexcept {
 
 QPainterPath HoleGraphicsItem::shape() const noexcept {
   return PrimitiveCircleGraphicsItem::shape() +
-         mOriginCrossGraphicsItem->shape();
+      mOriginCrossGraphicsItem->shape();
 }
 
 /*******************************************************************************
@@ -97,7 +97,7 @@ void HoleGraphicsItem::holeEdited(const Hole& hole,
 }
 
 QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change,
-                                      const QVariant&    value) noexcept {
+                                      const QVariant& value) noexcept {
   if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
     mOriginCrossGraphicsItem->setSelected(value.toBool());
   }

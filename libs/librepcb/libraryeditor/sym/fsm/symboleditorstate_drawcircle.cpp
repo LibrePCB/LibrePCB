@@ -55,8 +55,8 @@ SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sSymbolOutlines),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
-    mLastFill(false),        // Fill is needed very rarely
-    mLastGrabArea(true)      // Most symbol outlines are used as grab areas
+    mLastFill(false),  // Fill is needed very rarely
+    mLastGrabArea(true)  // Most symbol outlines are used as grab areas
 {
 }
 
@@ -177,7 +177,7 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
     mCurrentGraphicsItem = nullptr;
-    mCurrentCircle       = nullptr;
+    mCurrentCircle = nullptr;
     mEditCmd.reset();
     return false;
   }
@@ -185,7 +185,7 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
 
 bool SymbolEditorState_DrawCircle::updateCircleDiameter(
     const Point& pos) noexcept {
-  Point  delta    = pos - mCurrentCircle->getCenter();
+  Point delta = pos - mCurrentCircle->getCenter();
   Length diameter = delta.getLength() * 2;
   if (diameter < 1) {
     diameter = 1;
@@ -203,7 +203,7 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
     updateCircleDiameter(pos);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentCircle       = nullptr;
+    mCurrentCircle = nullptr;
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -217,7 +217,7 @@ bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
-    mCurrentCircle       = nullptr;
+    mCurrentCircle = nullptr;
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;

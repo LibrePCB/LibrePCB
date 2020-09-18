@@ -36,12 +36,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-CirclePropertiesDialog::CirclePropertiesDialog(Circle&               circle,
-                                               UndoStack&            undoStack,
+CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle,
+                                               UndoStack& undoStack,
                                                QList<GraphicsLayer*> layers,
-                                               const LengthUnit&     lengthUnit,
+                                               const LengthUnit& lengthUnit,
                                                const QString& settingsPrefix,
-                                               QWidget*       parent) noexcept
+                                               QWidget* parent) noexcept
   : QDialog(parent),
     mCircle(circle),
     mUndoStack(undoStack),

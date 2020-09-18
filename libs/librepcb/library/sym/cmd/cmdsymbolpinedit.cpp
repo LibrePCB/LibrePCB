@@ -62,14 +62,14 @@ CmdSymbolPinEdit::~CmdSymbolPinEdit() noexcept {
  ******************************************************************************/
 
 void CmdSymbolPinEdit::setName(const CircuitIdentifier& name,
-                               bool                     immediate) noexcept {
+                               bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewName = name;
   if (immediate) mPin.setName(mNewName);
 }
 
 void CmdSymbolPinEdit::setLength(const UnsignedLength& length,
-                                 bool                  immediate) noexcept {
+                                 bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLength = length;
   if (immediate) mPin.setLength(mNewLength);
@@ -82,14 +82,14 @@ void CmdSymbolPinEdit::setPosition(const Point& pos, bool immediate) noexcept {
 }
 
 void CmdSymbolPinEdit::translate(const Point& deltaPos,
-                                 bool         immediate) noexcept {
+                                 bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
   if (immediate) mPin.setPosition(mNewPos);
 }
 
 void CmdSymbolPinEdit::setRotation(const Angle& angle,
-                                   bool         immediate) noexcept {
+                                   bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;
   if (immediate) mPin.setRotation(mNewRotation);

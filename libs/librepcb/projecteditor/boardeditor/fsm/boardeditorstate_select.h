@@ -64,13 +64,13 @@ class BoardEditorState_Select final : public BoardEditorState {
 
   struct DeviceMenuItem {
     QString name;
-    QIcon   icon;
-    Uuid    uuid;
+    QIcon icon;
+    Uuid uuid;
   };
 
 public:
   // Constructors / Destructor
-  BoardEditorState_Select()                                     = delete;
+  BoardEditorState_Select() = delete;
   BoardEditorState_Select(const BoardEditorState_Select& other) = delete;
   explicit BoardEditorState_Select(const Context& context) noexcept;
   virtual ~BoardEditorState_Select() noexcept;
@@ -108,10 +108,10 @@ public:
 
 private:  // Methods
           // Menu Helpers
-  void addActionRotate(QMenu&         menu,
+  void addActionRotate(QMenu& menu,
                        const QString& text = tr("Rotate")) noexcept;
   void addActionFlip(QMenu& menu, const QString& text = tr("Flip")) noexcept;
-  void addActionDelete(QMenu&         menu,
+  void addActionDelete(QMenu& menu,
                        const QString& text = tr("Remove")) noexcept;
   void addActionDeleteAll(
       QMenu& menu, BI_NetSegment& netsegment,
@@ -159,10 +159,10 @@ private:  // Methods
    *   found segments will be appended to this total length.
    * @throws LogicError if there are branches or loops.
    */
-  void measureLengthInDirection(bool              directionBackwards,
+  void measureLengthInDirection(bool directionBackwards,
                                 const BI_NetLine& netline,
-                                QSet<Uuid>&       visitedNetLines,
-                                UnsignedLength&   totalLength);
+                                QSet<Uuid>& visitedNetLines,
+                                UnsignedLength& totalLength);
 
   bool openPropertiesDialog(Board& board, BI_Base* item);
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
@@ -180,7 +180,7 @@ private:  // Data
 
   /// When dragging items, this undo command will be active
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
-  int                                       mCurrentSelectionIndex;
+  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************

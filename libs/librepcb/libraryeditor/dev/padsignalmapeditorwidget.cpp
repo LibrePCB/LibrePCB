@@ -76,7 +76,7 @@ PadSignalMapEditorWidget::~PadSignalMapEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
-void PadSignalMapEditorWidget::setReferences(UndoStack*          undoStack,
+void PadSignalMapEditorWidget::setReferences(UndoStack* undoStack,
                                              DevicePadSignalMap* map) noexcept {
   mModel->setPadSignalMap(map);
   mModel->setUndoStack(undoStack);

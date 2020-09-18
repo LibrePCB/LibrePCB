@@ -88,7 +88,7 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(
     }
   } catch (const Exception& e) {
     mExceptionMessage = e.getMsg();
-    mIsVisible        = true;  // make sure errors are visible
+    mIsVisible = true;  // make sure errors are visible
   }
 }
 

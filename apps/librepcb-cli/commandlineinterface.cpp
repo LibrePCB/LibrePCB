@@ -77,9 +77,9 @@ int CommandLineInterface::execute() noexcept {
   // Add global options
   QCommandLineParser parser;
   parser.setApplicationDescription(tr("LibrePCB Command Line Interface"));
-  const QCommandLineOption helpOption    = parser.addHelpOption();
+  const QCommandLineOption helpOption = parser.addHelpOption();
   const QCommandLineOption versionOption = parser.addVersionOption();
-  QCommandLineOption       verboseOption("verbose", tr("Verbose output."));
+  QCommandLineOption verboseOption("verbose", tr("Verbose output."));
   parser.addOption(verboseOption);
   parser.addPositionalArgument("command", tr("The command to execute."));
 
@@ -133,20 +133,24 @@ int CommandLineInterface::execute() noexcept {
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
   QCommandLineOption prjStrictOption(
-      "strict", tr("Fail if the project files are not strictly canonical, i.e. "
-                   "there would be changes when saving the project. Note that "
-                   "this option is not available for *.lppz files."));
+      "strict",
+      tr("Fail if the project files are not strictly canonical, i.e. "
+         "there would be changes when saving the project. Note that "
+         "this option is not available for *.lppz files."));
 
   // Define options for "open-library"
   QCommandLineOption libAllOption(
-      "all", tr("Perform the selected action(s) on all elements contained in "
-                "the opened library."));
+      "all",
+      tr("Perform the selected action(s) on all elements contained in "
+         "the opened library."));
   QCommandLineOption libSaveOption(
-      "save", tr("Save library (and contained elements if '--all' is given) "
-                 "before closing them (useful to upgrade file format)."));
+      "save",
+      tr("Save library (and contained elements if '--all' is given) "
+         "before closing them (useful to upgrade file format)."));
   QCommandLineOption libStrictOption(
-      "strict", tr("Fail if the opened files are not strictly canonical, i.e. "
-                   "there would be changes when saving the library elements."));
+      "strict",
+      tr("Fail if the opened files are not strictly canonical, i.e. "
+         "there would be changes when saving the library elements."));
 
   // First parse to get the supplied command (ignoring errors because the parser
   // does not yet know the command-dependent options).
@@ -154,7 +158,7 @@ int CommandLineInterface::execute() noexcept {
 
   // Add command-dependent options
   QStringList positionalArgs = parser.positionalArguments();
-  QString     command =
+  QString command =
       positionalArgs.isEmpty() ? QString() : positionalArgs.first();
   if (positionalArgs.count() > 0) {
     positionalArgs.removeFirst();  // command is now stored in separate variable
@@ -233,17 +237,17 @@ int CommandLineInterface::execute() noexcept {
       return 1;
     }
     cmdSuccess = openProject(
-        positionalArgs.value(0),                       // project filepath
-        parser.isSet(ercOption),                       // run ERC
-        parser.values(exportSchematicsOption),         // export schematics
-        parser.values(exportBomOption),                // export generic BOM
-        parser.values(exportBoardBomOption),           // export board BOM
-        parser.value(bomAttributesOption),             // BOM attributes
+        positionalArgs.value(0),  // project filepath
+        parser.isSet(ercOption),  // run ERC
+        parser.values(exportSchematicsOption),  // export schematics
+        parser.values(exportBomOption),  // export generic BOM
+        parser.values(exportBoardBomOption),  // export board BOM
+        parser.value(bomAttributesOption),  // BOM attributes
         parser.isSet(exportPcbFabricationDataOption),  // export PCB fab. data
-        parser.value(pcbFabricationSettingsOption),    // PCB fab. settings
-        parser.values(boardOption),                    // boards
-        parser.isSet(saveOption),                      // save project
-        parser.isSet(prjStrictOption)                  // strict mode
+        parser.value(pcbFabricationSettingsOption),  // PCB fab. settings
+        parser.values(boardOption),  // boards
+        parser.isSet(saveOption),  // save project
+        parser.isSet(prjStrictOption)  // strict mode
     );
   } else if (command == "open-library") {
     if (positionalArgs.count() != 1) {
@@ -251,9 +255,9 @@ int CommandLineInterface::execute() noexcept {
       print(parser.helpText(), 0);
       return 1;
     }
-    cmdSuccess = openLibrary(positionalArgs.value(0),       // library directory
-                             parser.isSet(libAllOption),    // all elements
-                             parser.isSet(libSaveOption),   // save
+    cmdSuccess = openLibrary(positionalArgs.value(0),  // library directory
+                             parser.isSet(libAllOption),  // all elements
+                             parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
     );
   } else {
@@ -279,14 +283,14 @@ bool CommandLineInterface::openProject(
     bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
     const QStringList& boards, bool save, bool strict) const noexcept {
   try {
-    bool                success = true;
+    bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
 
     // Open project
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
     print(tr("Open project '%1'...").arg(prettyPath(projectFp, projectFile)));
     std::shared_ptr<TransactionalFileSystem> projectFs;
-    QString                                  projectFileName;
+    QString projectFileName;
     if (projectFp.getSuffix() == "lppz") {
       projectFs = TransactionalFileSystem::openRO(projectFp.getParentDir());
       projectFs->removeDirRecursively();  // 1) get a clean initial state
@@ -308,11 +312,12 @@ bool CommandLineInterface::openProject(
     if (strict) {
       print(tr("Check for non-canonical files..."));
       if (projectFp.getSuffix() == "lppz") {
-        printErr("  " % tr("ERROR: The option '--strict' is not available for "
-                           "*.lppz files!"));
+        printErr("  " %
+                 tr("ERROR: The option '--strict' is not available for "
+                    "*.lppz files!"));
         success = false;
       } else {
-        project.save();                                          // can throw
+        project.save();  // can throw
         QStringList paths = projectFs->checkForModifications();  // can throw
         // ignore user config files
         paths = paths.filter(QRegularExpression("^((?!\\.user\\.lp).)*$"));
@@ -333,7 +338,7 @@ bool CommandLineInterface::openProject(
     if (runErc) {
       print(tr("Run ERC..."));
       QStringList messages;
-      int         approvedMsgCount = 0;
+      int approvedMsgCount = 0;
       foreach (const ErcMsg* msg, project.getErcMsgList().getItems()) {
         if (!msg->isVisible()) continue;
         if (msg->isIgnored()) {
@@ -418,8 +423,8 @@ bool CommandLineInterface::openProject(
         attributes.append(str.trimmed());
       }
       foreach (const auto& job, jobs) {
-        const QString& destStr       = job.first;
-        bool           boardSpecific = job.second;
+        const QString& destStr = job.first;
+        bool boardSpecific = job.second;
         if (boardSpecific) {
           print(tr("Export board-specific BOM to '%1'...").arg(destStr));
         } else {
@@ -437,7 +442,7 @@ bool CommandLineInterface::openProject(
                 return FilePath::cleanFileName(
                     str, FilePath::ReplaceSpaces | FilePath::KeepCase);
               });
-          FilePath     fp(QFileInfo(destPathStr).absoluteFilePath());
+          FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
           BomGenerator gen(project);
           gen.setAdditionalAttributes(attributes);
           std::shared_ptr<Bom> bom = gen.generate(board);
@@ -449,9 +454,9 @@ bool CommandLineInterface::openProject(
           }
           QString suffix = destStr.split('.').last().toLower();
           if (suffix == "csv") {
-            BomCsvWriter             writer(*bom);
+            BomCsvWriter writer(*bom);
             std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-            csv->saveToFile(fp);                                  // can throw
+            csv->saveToFile(fp);  // can throw
             writtenFilesCounter[fp]++;
           } else {
             printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
@@ -482,8 +487,9 @@ bool CommandLineInterface::openProject(
       foreach (const Board* board, boardList) {
         print("  " % tr("Board '%1':").arg(*board->getName()));
         BoardGerberExport grbExport(
-            *board, customSettings ? *customSettings
-                                   : board->getFabricationOutputSettings());
+            *board,
+            customSettings ? *customSettings
+                           : board->getFabricationOutputSettings());
         grbExport.exportAllLayers();  // can throw
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
           print(QString("    => '%1'").arg(prettyPath(fp, projectFile)));
@@ -508,7 +514,7 @@ bool CommandLineInterface::openProject(
     }
 
     // Fail if some files were written multiple times
-    bool                        filesOverwritten = false;
+    bool filesOverwritten = false;
     QMapIterator<FilePath, int> writtenFilesIterator(writtenFilesCounter);
     while (writtenFilesIterator.hasNext()) {
       writtenFilesIterator.next();
@@ -697,7 +703,7 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
 }
 
 QString CommandLineInterface::prettyPath(const FilePath& path,
-                                         const QString&  style) noexcept {
+                                         const QString& style) noexcept {
   if (QFileInfo(style).isAbsolute()) {
     return path.toStr();  // absolute path
   } else if (path == FilePath(QDir::currentPath())) {

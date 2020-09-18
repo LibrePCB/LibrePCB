@@ -50,7 +50,7 @@ class BoardPickPlaceGenerator final {
 
 public:
   // Constructors / Destructor
-  BoardPickPlaceGenerator()                                     = delete;
+  BoardPickPlaceGenerator() = delete;
   BoardPickPlaceGenerator(const BoardPickPlaceGenerator& other) = delete;
   explicit BoardPickPlaceGenerator(const Board& board) noexcept;
   ~BoardPickPlaceGenerator() noexcept;

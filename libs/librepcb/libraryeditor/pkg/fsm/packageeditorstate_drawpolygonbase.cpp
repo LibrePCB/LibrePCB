@@ -58,7 +58,7 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
     mLastLayerName(GraphicsLayer::sTopPlacement),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
-    mLastFill(false),     // Fill is needed very rarely
+    mLastFill(false),  // Fill is needed very rarely
     mLastGrabArea(false)  // Avoid creating annoying grab areas "by accident"
 {
 }
@@ -266,7 +266,7 @@ bool PackageEditorState_DrawPolygonBase::updateCurrentPosition(
     const Point& pos) noexcept {
   if ((!mCurrentPolygon) || (!mEditCmd)) return false;
   QVector<Vertex> vertices = mCurrentPolygon->getPath().getVertices();
-  int             count    = vertices.count();
+  int count = vertices.count();
   if (mMode == Mode::RECT) {
     Q_ASSERT(count >= 5);
     vertices[count - 4].setPos(

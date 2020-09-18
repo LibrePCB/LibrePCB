@@ -71,11 +71,11 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
     const SExpression& node)
   : BoardFabricationOutputSettings()  // init and load defaults
 {
-  mOutputBasePath      = node.getValueByPath<QString>("base_path");
-  mSuffixOutlines      = node.getValueByPath<QString>("outlines/suffix");
-  mSuffixCopperTop     = node.getValueByPath<QString>("copper_top/suffix");
-  mSuffixCopperInner   = node.getValueByPath<QString>("copper_inner/suffix");
-  mSuffixCopperBot     = node.getValueByPath<QString>("copper_bot/suffix");
+  mOutputBasePath = node.getValueByPath<QString>("base_path");
+  mSuffixOutlines = node.getValueByPath<QString>("outlines/suffix");
+  mSuffixCopperTop = node.getValueByPath<QString>("copper_top/suffix");
+  mSuffixCopperInner = node.getValueByPath<QString>("copper_inner/suffix");
+  mSuffixCopperBot = node.getValueByPath<QString>("copper_bot/suffix");
   mSuffixSolderMaskTop = node.getValueByPath<QString>("soldermask_top/suffix");
   mSuffixSolderMaskBot = node.getValueByPath<QString>("soldermask_bot/suffix");
   mSuffixSilkscreenTop = node.getValueByPath<QString>("silkscreen_top/suffix");
@@ -84,10 +84,10 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
       node.getValueByPath<QString>("solderpaste_top/suffix");
   mSuffixSolderPasteBot =
       node.getValueByPath<QString>("solderpaste_bot/suffix");
-  mSuffixDrillsPth      = node.getValueByPath<QString>("drills/suffix_pth");
-  mSuffixDrillsNpth     = node.getValueByPath<QString>("drills/suffix_npth");
-  mSuffixDrills         = node.getValueByPath<QString>("drills/suffix_merged");
-  mMergeDrillFiles      = node.getValueByPath<bool>("drills/merge");
+  mSuffixDrillsPth = node.getValueByPath<QString>("drills/suffix_pth");
+  mSuffixDrillsNpth = node.getValueByPath<QString>("drills/suffix_npth");
+  mSuffixDrills = node.getValueByPath<QString>("drills/suffix_merged");
+  mMergeDrillFiles = node.getValueByPath<bool>("drills/merge");
   mEnableSolderPasteTop = node.getValueByPath<bool>("solderpaste_top/create");
   mEnableSolderPasteBot = node.getValueByPath<bool>("solderpaste_bot/create");
 
@@ -161,23 +161,23 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
 
 BoardFabricationOutputSettings& BoardFabricationOutputSettings::operator=(
     const BoardFabricationOutputSettings& rhs) noexcept {
-  mOutputBasePath       = rhs.mOutputBasePath;
-  mSuffixDrills         = rhs.mSuffixDrills;
-  mSuffixDrillsNpth     = rhs.mSuffixDrillsNpth;
-  mSuffixDrillsPth      = rhs.mSuffixDrillsPth;
-  mSuffixOutlines       = rhs.mSuffixOutlines;
-  mSuffixCopperTop      = rhs.mSuffixCopperTop;
-  mSuffixCopperInner    = rhs.mSuffixCopperInner;
-  mSuffixCopperBot      = rhs.mSuffixCopperBot;
-  mSuffixSolderMaskTop  = rhs.mSuffixSolderMaskTop;
-  mSuffixSolderMaskBot  = rhs.mSuffixSolderMaskBot;
-  mSuffixSilkscreenTop  = rhs.mSuffixSilkscreenTop;
-  mSuffixSilkscreenBot  = rhs.mSuffixSilkscreenBot;
+  mOutputBasePath = rhs.mOutputBasePath;
+  mSuffixDrills = rhs.mSuffixDrills;
+  mSuffixDrillsNpth = rhs.mSuffixDrillsNpth;
+  mSuffixDrillsPth = rhs.mSuffixDrillsPth;
+  mSuffixOutlines = rhs.mSuffixOutlines;
+  mSuffixCopperTop = rhs.mSuffixCopperTop;
+  mSuffixCopperInner = rhs.mSuffixCopperInner;
+  mSuffixCopperBot = rhs.mSuffixCopperBot;
+  mSuffixSolderMaskTop = rhs.mSuffixSolderMaskTop;
+  mSuffixSolderMaskBot = rhs.mSuffixSolderMaskBot;
+  mSuffixSilkscreenTop = rhs.mSuffixSilkscreenTop;
+  mSuffixSilkscreenBot = rhs.mSuffixSilkscreenBot;
   mSuffixSolderPasteTop = rhs.mSuffixSolderPasteTop;
   mSuffixSolderPasteBot = rhs.mSuffixSolderPasteBot;
-  mSilkscreenLayersTop  = rhs.mSilkscreenLayersTop;
-  mSilkscreenLayersBot  = rhs.mSilkscreenLayersBot;
-  mMergeDrillFiles      = rhs.mMergeDrillFiles;
+  mSilkscreenLayersTop = rhs.mSilkscreenLayersTop;
+  mSilkscreenLayersBot = rhs.mSilkscreenLayersBot;
+  mMergeDrillFiles = rhs.mMergeDrillFiles;
   mEnableSolderPasteTop = rhs.mEnableSolderPasteTop;
   mEnableSolderPasteBot = rhs.mEnableSolderPasteBot;
   return *this;

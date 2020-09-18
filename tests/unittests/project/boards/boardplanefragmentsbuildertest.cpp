@@ -94,7 +94,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
                        actualSexpr.toByteArray());
 
   // load expected plane fragments from file
-  FilePath    expectedFp = testDataDir.getPathTo("expected.lp");
+  FilePath expectedFp = testDataDir.getPathTo("expected.lp");
   SExpression expectedSexpr =
       SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
   QMap<Uuid, QSet<Path>> expectedPlaneFragments;

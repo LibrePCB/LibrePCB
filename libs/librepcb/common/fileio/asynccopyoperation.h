@@ -45,7 +45,7 @@ class AsyncCopyOperation final : public QThread {
 
 public:
   // Constructors / Destructor
-  AsyncCopyOperation()                                = delete;
+  AsyncCopyOperation() = delete;
   AsyncCopyOperation(const AsyncCopyOperation& other) = delete;
   AsyncCopyOperation(const FilePath& source, const FilePath& destination,
                      QObject* parent = nullptr) noexcept;

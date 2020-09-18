@@ -89,7 +89,7 @@ Application::Application(int& argc, char** argv) noexcept
       QLocale(QLocale::C)
           .toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
   QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
-  mBuildDate      = QDateTime(buildDate, buildTime);
+  mBuildDate = QDateTime(buildDate, buildTime);
 
   // check git revision
   if (mGitRevision.isEmpty()) {
@@ -108,7 +108,7 @@ Application::Application(int& argc, char** argv) noexcept
 
   // determine the path to the resources directory (e.g. /usr/share/librepcb)
   FilePath buildOutputDirPath(BUILD_OUTPUT_DIRECTORY);
-  bool     runningFromBuildOutput =
+  bool runningFromBuildOutput =
       executableFilePath.isLocatedInDir(buildOutputDirPath);
   if (runningFromBuildOutput) {
     // The executable is located inside the build output directory, so we assume
@@ -142,7 +142,7 @@ Application::Application(int& argc, char** argv) noexcept
   fontsDir.setNameFilters({"*.ttf", "*.otf"});
   foreach (const QFileInfo& info, fontsDir.entryInfoList()) {
     QString fp = info.absoluteFilePath();
-    int     id = QFontDatabase::addApplicationFont(fp);
+    int id = QFontDatabase::addApplicationFont(fp);
     if (id < 0) {
       qCritical() << "Failed to load font" << fp;
     }
@@ -186,7 +186,7 @@ FilePath Application::getResourcesFilePath(const QString& filepath) const
 
 QStringList Application::getAvailableTranslationLocales() const noexcept {
   QStringList locales;
-  QDir        dir(getResourcesFilePath("i18n").toStr());
+  QDir dir(getResourcesFilePath("i18n").toStr());
   foreach (QString filename, dir.entryList({"*.qm"}, QDir::Files, QDir::Name)) {
     filename.remove("librepcb_");
     filename.remove(".qm");
@@ -223,8 +223,8 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
 
   // Install system language translations (all system languages defined in the
   // system settings, in the defined order)
-  const QString dir              = getResourcesFilePath("i18n").toStr();
-  auto          systemTranslator = std::make_shared<QTranslator>(this);
+  const QString dir = getResourcesFilePath("i18n").toStr();
+  auto systemTranslator = std::make_shared<QTranslator>(this);
   systemTranslator->load(locale, "librepcb", "_", dir);
   installTranslator(systemTranslator.get());
   mTranslators.append(systemTranslator);
@@ -270,7 +270,7 @@ Application* Application::instance() noexcept {
  ******************************************************************************/
 
 void Application::about() noexcept {
-  QWidget*    parent = QApplication::activeWindow();
+  QWidget* parent = QApplication::activeWindow();
   AboutDialog aboutDialog(parent);
   aboutDialog.exec();
 }

@@ -53,7 +53,7 @@ public:
   // Constructors / Destructor
   explicit SymbolPinPreviewGraphicsItem(
       const IF_GraphicsLayerProvider& layerProvider, const SymbolPin& pin,
-      const ComponentSignal*      compSignal,
+      const ComponentSignal* compSignal,
       const CmpSigPinDisplayType& displayType) noexcept;
   ~SymbolPinPreviewGraphicsItem() noexcept;
 
@@ -64,36 +64,36 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
 private:
   // make some methods inaccessible...
   SymbolPinPreviewGraphicsItem() = delete;
   SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) =
       delete;
-  SymbolPinPreviewGraphicsItem& operator       =(
+  SymbolPinPreviewGraphicsItem& operator=(
       const SymbolPinPreviewGraphicsItem& rhs) = delete;
 
   // General Attributes
-  const SymbolPin&       mPin;
+  const SymbolPin& mPin;
   const ComponentSignal* mComponentSignal;
-  CmpSigPinDisplayType   mDisplayType;
-  GraphicsLayer*         mCircleLayer;
-  GraphicsLayer*         mLineLayer;
-  GraphicsLayer*         mTextLayer;
-  QFont                  mFont;
-  qreal                  mRadiusPx;
-  bool                   mDrawBoundingRect;
+  CmpSigPinDisplayType mDisplayType;
+  GraphicsLayer* mCircleLayer;
+  GraphicsLayer* mLineLayer;
+  GraphicsLayer* mTextLayer;
+  QFont mFont;
+  qreal mRadiusPx;
+  bool mDrawBoundingRect;
 
   // Cached Attributes
-  QStaticText  mStaticText;
-  bool         mRotate180;
-  QRectF       mBoundingRect;
-  QPointF      mTextOrigin;
-  QRectF       mTextBoundingRect;
+  QStaticText mStaticText;
+  bool mRotate180;
+  QRectF mBoundingRect;
+  QPointF mTextOrigin;
+  QRectF mTextBoundingRect;
   QPainterPath mShape;
 };
 

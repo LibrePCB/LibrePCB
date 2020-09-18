@@ -62,7 +62,7 @@ private:
   void performRedo() override;
 
   // Private Member Variables
-  Board&    mBoard;
+  Board& mBoard;
   BI_Plane& mPlane;
 };
 

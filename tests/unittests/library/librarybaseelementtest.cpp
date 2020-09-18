@@ -40,7 +40,7 @@ namespace tests {
 
 class LibraryBaseElementTest : public ::testing::Test {
 protected:
-  FilePath                           mTempDir;
+  FilePath mTempDir;
   QScopedPointer<LibraryBaseElement> mNewElement;
 
   LibraryBaseElementTest() {

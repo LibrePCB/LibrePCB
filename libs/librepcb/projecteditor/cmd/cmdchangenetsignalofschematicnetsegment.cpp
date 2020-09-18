@@ -51,7 +51,7 @@ namespace editor {
 
 CmdChangeNetSignalOfSchematicNetSegment::
     CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg,
-                                            NetSignal&     newSig) noexcept
+                                            NetSignal& newSig) noexcept
   : UndoCommandGroup(tr("Change netsignal of netsegment")),
     mNetSegment(seg),
     mNewNetSignal(newSig) {
@@ -77,9 +77,9 @@ bool CmdChangeNetSignalOfSchematicNetSegment::performExecute() {
              1) {
     // this netsegment is the only one in its netsignal,
     // we just need to combine both netsignals
-    Circuit&   circuit     = mNetSegment.getCircuit();
+    Circuit& circuit = mNetSegment.getCircuit();
     NetSignal& toBeRemoved = mNetSegment.getNetSignal();
-    NetSignal& result      = mNewNetSignal;
+    NetSignal& result = mNewNetSignal;
     execNewChildCmd(
         new CmdCombineNetSignals(circuit, toBeRemoved, result));  // can throw
   } else {

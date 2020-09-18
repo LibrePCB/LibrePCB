@@ -78,18 +78,18 @@ using GraphicsLayerName =
                                 GraphicsLayerNameVerifier>;
 
 inline bool operator==(const GraphicsLayerName& lhs,
-                       const QString&           rhs) noexcept {
+                       const QString& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const QString&           lhs,
+inline bool operator==(const QString& lhs,
                        const GraphicsLayerName& rhs) noexcept {
   return lhs == (*rhs);
 }
 inline bool operator!=(const GraphicsLayerName& lhs,
-                       const QString&           rhs) noexcept {
+                       const QString& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const QString&           lhs,
+inline bool operator!=(const QString& lhs,
                        const GraphicsLayerName& rhs) noexcept {
   return lhs != (*rhs);
 }
@@ -106,7 +106,7 @@ inline GraphicsLayerName deserializeFromSExpression(const SExpression& sexpr,
   return GraphicsLayerName(str);  // can throw
 }
 
-inline QDataStream& operator<<(QDataStream&             stream,
+inline QDataStream& operator<<(QDataStream& stream,
                                const GraphicsLayerName& obj) {
   stream << *obj;
   return stream;

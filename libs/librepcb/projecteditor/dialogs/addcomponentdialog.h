@@ -76,16 +76,16 @@ class AddComponentDialog final : public QDialog {
 
   // Types
   struct SearchResultDevice {
-    QString  name;
+    QString name;
     FilePath pkgFp;
-    QString  pkgName;
-    bool     match = false;
+    QString pkgName;
+    bool match = false;
   };
 
   struct SearchResultComponent {
-    QString                             name;
+    QString name;
     QHash<FilePath, SearchResultDevice> devices;
-    bool                                match = false;
+    bool match = false;
   };
 
   typedef QHash<FilePath, SearchResultComponent> SearchResult;
@@ -108,36 +108,36 @@ private slots:
   void treeComponents_currentItemChanged(QTreeWidgetItem* current,
                                          QTreeWidgetItem* previous) noexcept;
   void treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
-                                        int              column) noexcept;
+                                        int column) noexcept;
   void on_cbxSymbVar_currentIndexChanged(int index) noexcept;
 
 private:
   // Private Methods
-  void         searchComponents(const QString& input);
+  void searchComponents(const QString& input);
   SearchResult searchComponentsAndDevices(const QString& input);
-  void         setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
-  void         setSelectedComponent(const library::Component* cmp);
+  void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
+  void setSelectedComponent(const library::Component* cmp);
   void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
   void setSelectedDevice(const library::Device* dev);
   void accept() noexcept;
 
   // General
-  workspace::Workspace&                        mWorkspace;
-  Project&                                     mProject;
-  Ui::AddComponentDialog*                      mUi;
-  GraphicsScene*                               mComponentPreviewScene;
-  GraphicsScene*                               mDevicePreviewScene;
+  workspace::Workspace& mWorkspace;
+  Project& mProject;
+  Ui::AddComponentDialog* mUi;
+  GraphicsScene* mComponentPreviewScene;
+  GraphicsScene* mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
-  workspace::ComponentCategoryTreeModel*       mCategoryTreeModel;
+  workspace::ComponentCategoryTreeModel* mCategoryTreeModel;
 
   // Attributes
-  tl::optional<Uuid>                         mSelectedCategoryUuid;
-  const library::Component*                  mSelectedComponent;
-  const library::ComponentSymbolVariant*     mSelectedSymbVar;
-  const library::Device*                     mSelectedDevice;
-  const library::Package*                    mSelectedPackage;
+  tl::optional<Uuid> mSelectedCategoryUuid;
+  const library::Component* mSelectedComponent;
+  const library::ComponentSymbolVariant* mSelectedSymbVar;
+  const library::Device* mSelectedDevice;
+  const library::Package* mSelectedPackage;
   QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
-  library::FootprintPreviewGraphicsItem*     mPreviewFootprintGraphicsItem;
+  library::FootprintPreviewGraphicsItem* mPreviewFootprintGraphicsItem;
 };
 
 /*******************************************************************************

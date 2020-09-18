@@ -143,7 +143,7 @@ bool SI_NetSegment::isUsed() const noexcept {
           (!mNetLabels.isEmpty()));
 }
 
-int SI_NetSegment::getNetPointsAtScenePos(const Point&         pos,
+int SI_NetSegment::getNetPointsAtScenePos(const Point& pos,
                                           QList<SI_NetPoint*>& points) const
     noexcept {
   int count = 0;
@@ -156,7 +156,7 @@ int SI_NetSegment::getNetPointsAtScenePos(const Point&         pos,
   return count;
 }
 
-int SI_NetSegment::getNetLinesAtScenePos(const Point&        pos,
+int SI_NetSegment::getNetLinesAtScenePos(const Point& pos,
                                          QList<SI_NetLine*>& lines) const
     noexcept {
   int count = 0;
@@ -169,7 +169,7 @@ int SI_NetSegment::getNetLinesAtScenePos(const Point&        pos,
   return count;
 }
 
-int SI_NetSegment::getNetLabelsAtScenePos(const Point&         pos,
+int SI_NetSegment::getNetLabelsAtScenePos(const Point& pos,
                                           QList<SI_NetLabel*>& labels) const
     noexcept {
   int count = 0;
@@ -209,16 +209,16 @@ QString SI_NetSegment::getForcedNetName() const noexcept {
 }
 
 Point SI_NetSegment::calcNearestPoint(const Point& p) const noexcept {
-  Point  pos = p;
+  Point pos = p;
   Length dist;
   for (int i = 0; i < mNetLines.count(); ++i) {
-    Point          lp;
+    Point lp;
     UnsignedLength ld = Toolbox::shortestDistanceBetweenPointAndLine(
         p, mNetLines.at(i)->getStartPoint().getPosition(),
         mNetLines.at(i)->getEndPoint().getPosition(), &lp);
     if ((i == 0) || (ld < dist)) {
       dist = *ld;
-      pos  = lp;
+      pos = lp;
     }
   }
   return pos;
@@ -559,9 +559,9 @@ bool SI_NetSegment::checkAttributesValidity() const noexcept {
 
 bool SI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   if (mNetPoints.count() > 1) {
-    const SI_NetPoint*        firstPoint = mNetPoints.first();
+    const SI_NetPoint* firstPoint = mNetPoints.first();
     QSet<const SI_SymbolPin*> pins;
-    QSet<const SI_NetPoint*>  points;
+    QSet<const SI_NetPoint*> points;
     findAllConnectedNetPoints(*firstPoint, pins, points);
     return (points.count() == mNetPoints.count());
   } else {

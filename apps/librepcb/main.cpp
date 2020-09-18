@@ -45,13 +45,13 @@ using namespace librepcb::application;
  *  Function Prototypes
  ******************************************************************************/
 
-static void     setApplicationMetadata() noexcept;
-static void     configureApplicationSettings() noexcept;
-static void     writeLogHeader() noexcept;
-static bool     isFileFormatStableOrAcceptUnstable() noexcept;
+static void setApplicationMetadata() noexcept;
+static void configureApplicationSettings() noexcept;
+static void writeLogHeader() noexcept;
+static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static FilePath determineWorkspacePath() noexcept;
-static int      openWorkspace(const FilePath& path) noexcept;
-static int      appExec() noexcept;
+static int openWorkspace(const FilePath& path) noexcept;
+static int appExec() noexcept;
 
 /*******************************************************************************
  *  main()

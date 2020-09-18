@@ -80,18 +80,18 @@ public:
   /// FSM Context
   struct Context {
     workspace::Workspace& workspace;
-    Project&              project;
-    SchematicEditor&      editor;
-    Ui::SchematicEditor&  editorUi;
-    GraphicsView&         editorGraphicsView;
-    UndoStack&            undoStack;
+    Project& project;
+    SchematicEditor& editor;
+    Ui::SchematicEditor& editorUi;
+    GraphicsView& editorGraphicsView;
+    UndoStack& undoStack;
   };
 
   // Constructors / Destructor
-  SchematicEditorFsm()                                = delete;
+  SchematicEditorFsm() = delete;
   SchematicEditorFsm(const SchematicEditorFsm& other) = delete;
   explicit SchematicEditorFsm(const Context& context,
-                              QObject*       parent = nullptr) noexcept;
+                              QObject* parent = nullptr) noexcept;
   virtual ~SchematicEditorFsm() noexcept;
 
   // Getters
@@ -148,15 +148,15 @@ signals:
 
 private:
   SchematicEditorState* getCurrentStateObj() const noexcept;
-  bool                  setNextState(State state) noexcept;
-  bool                  leaveCurrentState() noexcept;
-  bool                  enterNextState(State state) noexcept;
-  bool                  switchToPreviousState() noexcept;
+  bool setNextState(State state) noexcept;
+  bool leaveCurrentState() noexcept;
+  bool enterNextState(State state) noexcept;
+  bool switchToPreviousState() noexcept;
 
 private:  // Data
   QMap<State, SchematicEditorState*> mStates;
-  State                              mCurrentState;
-  State                              mPreviousState;
+  State mCurrentState;
+  State mPreviousState;
 };
 
 /*******************************************************************************

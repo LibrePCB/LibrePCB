@@ -68,9 +68,9 @@ private:
 
   // Private Member Variables
 
-  SI_NetSegment&      mNetSegment;
+  SI_NetSegment& mNetSegment;
   QList<SI_NetPoint*> mNetPoints;
-  QList<SI_NetLine*>  mNetLines;
+  QList<SI_NetLine*> mNetLines;
 };
 
 /*******************************************************************************

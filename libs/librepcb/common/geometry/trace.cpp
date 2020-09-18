@@ -33,8 +33,8 @@ namespace librepcb {
  *  Class TraceAnchor
  ******************************************************************************/
 
-TraceAnchor::TraceAnchor(const tl::optional<Uuid>&      junction,
-                         const tl::optional<Uuid>&      via,
+TraceAnchor::TraceAnchor(const tl::optional<Uuid>& junction,
+                         const tl::optional<Uuid>& via,
                          const tl::optional<PadAnchor>& pad) noexcept
   : mJunction(junction), mVia(via), mPad(pad) {
   Q_ASSERT(((junction) && (!via) && (!pad)) ||
@@ -75,13 +75,13 @@ void TraceAnchor::serialize(SExpression& root) const {
 
 bool TraceAnchor::operator==(const TraceAnchor& rhs) const noexcept {
   return (mJunction == rhs.mJunction) && (mVia == rhs.mVia) &&
-         (mPad == rhs.mPad);
+      (mPad == rhs.mPad);
 }
 
 TraceAnchor& TraceAnchor::operator=(const TraceAnchor& rhs) noexcept {
   mJunction = rhs.mJunction;
-  mVia      = rhs.mVia;
-  mPad      = rhs.mPad;
+  mVia = rhs.mVia;
+  mPad = rhs.mPad;
   return *this;
 }
 

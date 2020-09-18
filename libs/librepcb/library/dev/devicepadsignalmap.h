@@ -50,13 +50,13 @@ public:
     PadUuidChanged,
     SignalUuidChanged,
   };
-  Signal<DevicePadSignalMapItem, Event>       onEdited;
+  Signal<DevicePadSignalMapItem, Event> onEdited;
   typedef Slot<DevicePadSignalMapItem, Event> OnEditedSlot;
 
   // Constructors / Destructor
   DevicePadSignalMapItem() = delete;
   DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
-  DevicePadSignalMapItem(const Uuid&               pad,
+  DevicePadSignalMapItem(const Uuid& pad,
                          const tl::optional<Uuid>& signal) noexcept;
   explicit DevicePadSignalMapItem(const SExpression& node);
   ~DevicePadSignalMapItem() noexcept;
@@ -65,7 +65,7 @@ public:
   const Uuid& getUuid() const noexcept {
     return mPadUuid;
   }  // used for UuidObjectMap
-  const Uuid&               getPadUuid() const noexcept { return mPadUuid; }
+  const Uuid& getPadUuid() const noexcept { return mPadUuid; }
   const tl::optional<Uuid>& getSignalUuid() const noexcept {
     return mSignalUuid;
   }
@@ -83,8 +83,8 @@ public:
   }
   DevicePadSignalMapItem& operator=(const DevicePadSignalMapItem& rhs) noexcept;
 
-private:                           // Data
-  Uuid               mPadUuid;     ///< must be valid
+private:  // Data
+  Uuid mPadUuid;  ///< must be valid
   tl::optional<Uuid> mSignalUuid;  ///< tl::nullopt if not connected to a signal
 };
 

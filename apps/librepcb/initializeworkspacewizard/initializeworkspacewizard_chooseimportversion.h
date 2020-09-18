@@ -58,17 +58,17 @@ public:
 
   // Inherited from QWizardPage
   bool validatePage() noexcept override;
-  int  nextId() const noexcept override;
+  int nextId() const noexcept override;
 
   // Operator Overloadings
-  InitializeWorkspaceWizard_ChooseImportVersion& operator       =(
+  InitializeWorkspaceWizard_ChooseImportVersion& operator=(
       const InitializeWorkspaceWizard_ChooseImportVersion& rhs) = delete;
 
 private:
   void cbxVersionCurrentIndexChanged(int index) noexcept;
 
 private:
-  InitializeWorkspaceWizardContext&                                 mContext;
+  InitializeWorkspaceWizardContext& mContext;
   QScopedPointer<Ui::InitializeWorkspaceWizard_ChooseImportVersion> mUi;
 };
 

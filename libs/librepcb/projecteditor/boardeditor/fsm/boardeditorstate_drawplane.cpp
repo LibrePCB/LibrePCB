@@ -205,7 +205,7 @@ bool BoardEditorState_DrawPlane::processSwitchToBoard(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawPlane::startAddPlane(Board&       board,
+bool BoardEditorState_DrawPlane::startAddPlane(Board& board,
                                                const Point& pos) noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
@@ -328,7 +328,7 @@ void BoardEditorState_DrawPlane::layerComboBoxLayerChanged(
 
 void BoardEditorState_DrawPlane::makeSelectedLayerVisible() noexcept {
   if (mCurrentPlane) {
-    Board&         board = mCurrentPlane->getBoard();
+    Board& board = mCurrentPlane->getBoard();
     GraphicsLayer* layer = board.getLayerStack().getLayer(*mLastLayerName);
     if (layer && layer->isEnabled()) layer->setVisible(true);
   }

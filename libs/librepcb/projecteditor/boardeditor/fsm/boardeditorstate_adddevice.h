@@ -52,7 +52,7 @@ class BoardEditorState_AddDevice final : public BoardEditorState {
 
 public:
   // Constructors / Destructor
-  BoardEditorState_AddDevice()                                        = delete;
+  BoardEditorState_AddDevice() = delete;
   BoardEditorState_AddDevice(const BoardEditorState_AddDevice& other) = delete;
   BoardEditorState_AddDevice(const Context& context) noexcept;
   virtual ~BoardEditorState_AddDevice() noexcept;
@@ -63,8 +63,8 @@ public:
 
   // Event Handlers
   virtual bool processAddDevice(ComponentInstance& component,
-                                const Uuid&        device,
-                                const Uuid&        footprint) noexcept override;
+                                const Uuid& device,
+                                const Uuid& footprint) noexcept override;
   virtual bool processRotateCw() noexcept override;
   virtual bool processRotateCcw() noexcept override;
   virtual bool processFlipHorizontal() noexcept override;
@@ -95,7 +95,7 @@ private:
 
   // Information about the current device to place. Only valid if
   // mIsUndoCmdActive == true.
-  BI_Device*                               mCurrentDeviceToPlace;
+  BI_Device* mCurrentDeviceToPlace;
   QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
 };
 

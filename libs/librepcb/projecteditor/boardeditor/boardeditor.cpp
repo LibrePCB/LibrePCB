@@ -390,7 +390,7 @@ void BoardEditor::boardAdded(int newIndex) {
   if (!board) return;
 
   QAction* actionBefore = mBoardListActions.value(newIndex - 1);
-  QAction* newAction    = new QAction(*board->getName(), this);
+  QAction* newAction = new QAction(*board->getName(), this);
   newAction->setCheckable(true);
   mUi->menuBoard->insertAction(actionBefore, newAction);
   mBoardListActions.insert(newIndex, newAction);
@@ -417,7 +417,7 @@ void BoardEditor::on_actionProjectClose_triggered() {
 }
 
 void BoardEditor::on_actionNewBoard_triggered() {
-  bool    ok = false;
+  bool ok = false;
   QString name =
       QInputDialog::getText(this, tr("Add New Board"), tr("Choose a name:"),
                             QLineEdit::Normal, tr("new_board"), &ok);
@@ -437,7 +437,7 @@ void BoardEditor::on_actionCopyBoard_triggered() {
   Board* board = getActiveBoard();
   if (!board) return;
 
-  bool    ok   = false;
+  bool ok = false;
   QString name = QInputDialog::getText(
       this, tr("Copy Board"), tr("Choose a name:"), QLineEdit::Normal,
       tr("copy_of_%1").arg(*board->getName()), &ok);
@@ -579,7 +579,7 @@ void BoardEditor::on_actionExportAsSvg_triggered() {
     FileUtils::makePath(filepath.getParentDir());  // can throw
 
     // Export
-    int    dpi    = 254;
+    int dpi = 254;
     QRectF rectPx = board->getGraphicsScene().itemsBoundingRect();
     QRectF rectSvg(Length::fromPx(rectPx.left()).toInch() * dpi,
                    Length::fromPx(rectPx.top()).toInch() * dpi,
@@ -650,7 +650,7 @@ void BoardEditor::on_actionModifyDesignRules_triggered() {
   if (!board) return;
 
   try {
-    BoardDesignRules       originalRules = board->getDesignRules();
+    BoardDesignRules originalRules = board->getDesignRules();
     BoardDesignRulesDialog dialog(board->getDesignRules(),
                                   mProjectEditor.getDefaultLengthUnit(),
                                   "board_editor/design_rules_dialog", this);
@@ -659,7 +659,7 @@ void BoardEditor::on_actionModifyDesignRules_triggered() {
               board->getDesignRules() = rules;
               emit board->attributesChanged();
             });
-    int result              = dialog.exec();
+    int result = dialog.exec();
     board->getDesignRules() = originalRules;  // important hack ;)
     if (result == QDialog::Accepted) {
       CmdBoardDesignRulesModify* cmd =
@@ -857,8 +857,8 @@ void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
     mDrcLocationGraphicsItem->setPath(path);
     scene->addItem(mDrcLocationGraphicsItem.data());
 
-    qreal  margin = Length(1000000).toPx();
-    QRectF rect   = path.boundingRect();
+    qreal margin = Length(1000000).toPx();
+    QRectF rect = path.boundingRect();
     rect.adjust(-margin, -margin, margin, margin);
     mGraphicsView->setSceneRectMarker(rect);
     if (zoomTo) {
@@ -879,7 +879,7 @@ QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
     std::sort(candidates.begin(), candidates.end(),
               [](BI_Device* a, BI_Device* b) {
                 return a->getComponentInstance().getName() <
-                       b->getComponentInstance().getName();
+                    b->getComponentInstance().getName();
               });
   }
   return candidates;
@@ -905,7 +905,7 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
   if (deviceCandidates.count()) {
     index %= deviceCandidates.count();
     BI_Device* device = deviceCandidates[index];
-    Board*     board  = getActiveBoard();
+    Board* board = getActiveBoard();
     Q_ASSERT(board);
     board->clearSelection();
     device->setSelected(true);

@@ -99,8 +99,8 @@ void ComponentSymbolVariantListWidget::setReferences(
   mModel->setSymbolVariantList(list);
   mModel->setUndoStack(undoStack);
   mSymbolVariantList = list;
-  mUndoStack         = undoStack;
-  mEditorProvider    = editorProvider;
+  mUndoStack = undoStack;
+  mEditorProvider = editorProvider;
 }
 
 /*******************************************************************************
@@ -129,7 +129,7 @@ void ComponentSymbolVariantListWidget::viewDoubleClicked(
 
 void ComponentSymbolVariantListWidget::editVariant(const Uuid& uuid) noexcept {
   try {
-    auto                   variant = mSymbolVariantList->get(uuid);
+    auto variant = mSymbolVariantList->get(uuid);
     ComponentSymbolVariant copy(*variant);
     if (mEditorProvider->openComponentSymbolVariantEditor(copy)) {
       QScopedPointer<CmdComponentSymbolVariantEdit> cmd(
