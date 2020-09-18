@@ -130,7 +130,7 @@ void NewElementWizardPage_CopyFrom::setSelectedCategory(
       foreach (const Uuid& elementUuid, elements) {
         try {
           FilePath fp;
-          QString  name;
+          QString name;
           getElementMetadata(elementUuid, fp, name);
           QListWidgetItem* item = new QListWidgetItem(name);
           item->setData(Qt::UserRole, fp.toStr());
@@ -210,8 +210,8 @@ QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
 }
 
 void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
-                                                       FilePath&   fp,
-                                                       QString&    name) const {
+                                                       FilePath& fp,
+                                                       QString& name) const {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::Symbol:
       fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(

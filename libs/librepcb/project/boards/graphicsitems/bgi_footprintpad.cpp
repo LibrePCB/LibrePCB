@@ -96,35 +96,35 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   // set layers
   mPadLayer = getLayer(mLibPad.getLayerName());
   if (mLibPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
-    mTopStopMaskLayer     = getLayer(GraphicsLayer::sTopStopMask);
-    mBottomStopMaskLayer  = getLayer(GraphicsLayer::sBotStopMask);
-    mTopCreamMaskLayer    = nullptr;
+    mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
+    mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
+    mTopCreamMaskLayer = nullptr;
     mBottomCreamMaskLayer = nullptr;
   } else if (mLibPad.getBoardSide() ==
              library::FootprintPad::BoardSide::BOTTOM) {
-    mTopStopMaskLayer     = nullptr;
-    mBottomStopMaskLayer  = getLayer(GraphicsLayer::sBotStopMask);
-    mTopCreamMaskLayer    = nullptr;
+    mTopStopMaskLayer = nullptr;
+    mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
+    mTopCreamMaskLayer = nullptr;
     mBottomCreamMaskLayer = getLayer(GraphicsLayer::sBotSolderPaste);
   } else {
-    mTopStopMaskLayer     = getLayer(GraphicsLayer::sTopStopMask);
-    mBottomStopMaskLayer  = nullptr;
-    mTopCreamMaskLayer    = getLayer(GraphicsLayer::sTopSolderPaste);
+    mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
+    mBottomStopMaskLayer = nullptr;
+    mTopCreamMaskLayer = getLayer(GraphicsLayer::sTopSolderPaste);
     mBottomCreamMaskLayer = nullptr;
   }
 
   // determine stop/cream mask clearance
   PositiveLength size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
-  Length         stopMaskClearance =
+  Length stopMaskClearance =
       *mPad.getBoard().getDesignRules().calcStopMaskClearance(*size);
   Length creamMaskClearance =
       -mPad.getBoard().getDesignRules().calcCreamMaskClearance(*size);
 
   // set shapes and bounding rect
-  mShape        = mLibPad.getOutline().toQPainterPathPx();
-  mCopper       = mLibPad.toQPainterPathPx();
-  mStopMask     = mLibPad.getOutline(stopMaskClearance).toQPainterPathPx();
-  mCreamMask    = mLibPad.getOutline(creamMaskClearance).toQPainterPathPx();
+  mShape = mLibPad.getOutline().toQPainterPathPx();
+  mCopper = mLibPad.toQPainterPathPx();
+  mStopMask = mLibPad.getOutline(stopMaskClearance).toQPainterPathPx();
+  mCreamMask = mLibPad.getOutline(creamMaskClearance).toQPainterPathPx();
   mBoundingRect = mStopMask.boundingRect();
 
   update();
@@ -134,9 +134,9 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void BGI_FootprintPad::paint(QPainter*                       painter,
+void BGI_FootprintPad::paint(QPainter* painter,
                              const QStyleOptionGraphicsItem* option,
-                             QWidget*                        widget) {
+                             QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
   // const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) !=
@@ -144,7 +144,7 @@ void BGI_FootprintPad::paint(QPainter*                       painter,
   // option->levelOfDetailFromTransform(painter->worldTransform());
 
   const NetSignal* netsignal = mPad.getCompSigInstNetSignal();
-  bool             highlight =
+  bool highlight =
       mPad.isSelected() || (netsignal && netsignal->isHighlighted());
 
   if (mBottomCreamMaskLayer && mBottomCreamMaskLayer->isVisible()) {

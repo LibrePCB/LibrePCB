@@ -54,10 +54,10 @@ class FootprintClipboardData;
 class CmdPasteFootprintItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdPasteFootprintItems()                                    = delete;
+  CmdPasteFootprintItems() = delete;
   CmdPasteFootprintItems(const CmdPasteFootprintItems& other) = delete;
   CmdPasteFootprintItems(Package& package, Footprint& footprint,
-                         FootprintGraphicsItem&                  graphicsItem,
+                         FootprintGraphicsItem& graphicsItem,
                          std::unique_ptr<FootprintClipboardData> data,
                          const Point& posOffset) noexcept;
   ~CmdPasteFootprintItems() noexcept;
@@ -70,11 +70,11 @@ protected:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  Package&                                mPackage;
-  Footprint&                              mFootprint;
-  FootprintGraphicsItem&                  mGraphicsItem;
+  Package& mPackage;
+  Footprint& mFootprint;
+  FootprintGraphicsItem& mGraphicsItem;
   std::unique_ptr<FootprintClipboardData> mData;
-  Point                                   mPosOffset;
+  Point mPosOffset;
 };
 
 /*******************************************************************************

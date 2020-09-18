@@ -45,7 +45,7 @@ protected:
     emittedValues.push_back(value);
   }
 
-  PositiveLengthEdit          edit;
+  PositiveLengthEdit edit;
   std::vector<PositiveLength> emittedValues;
 };
 
@@ -55,8 +55,8 @@ protected:
 
 TEST_F(PositiveLengthEditTest, testStep) {
   edit.setSteps({
-      PositiveLength(100000),   // 0.1mm
-      PositiveLength(254000),   // 0.254mm
+      PositiveLength(100000),  // 0.1mm
+      PositiveLength(254000),  // 0.254mm
       PositiveLength(1000000),  // 1mm
       PositiveLength(2540000),  // 2.54mm
   });
@@ -105,10 +105,10 @@ TEST_F(PositiveLengthEditTest, testValueChangedWhileTyping) {
   QTest::keyClick(&edit, Qt::Key_Enter);
 
   std::vector<PositiveLength> expectedValues = {
-      PositiveLength(1000000),   // "1" -> 1mm
+      PositiveLength(1000000),  // "1" -> 1mm
       PositiveLength(12000000),  // "12" -> 12mm
       PositiveLength(15000000),  // "12+3" -> 15mm
-      PositiveLength(15000),     // "12+3um" -> 15 um
+      PositiveLength(15000),  // "12+3um" -> 15 um
   };
 
   ASSERT_EQ(expectedValues.size(), emittedValues.size());
@@ -149,12 +149,12 @@ TEST_F(PositiveLengthEditTest, testTooSmallValue) {
   edit.selectAll();
 
   QTest::keyClicks(&edit, "0");
-  EXPECT_EQ("0", edit.text().toStdString());    // text entered...
+  EXPECT_EQ("0", edit.text().toStdString());  // text entered...
   EXPECT_EQ(1000000, edit.getValue()->toNm());  // ...but value not updated
 
   QTest::keyClick(&edit, Qt::Key_Enter);
   EXPECT_EQ("1.0 mm", edit.text().toStdString());  // text reverted...
-  EXPECT_EQ(1000000, edit.getValue()->toNm());     // ...to the actual value
+  EXPECT_EQ(1000000, edit.getValue()->toNm());  // ...to the actual value
 }
 
 /*******************************************************************************

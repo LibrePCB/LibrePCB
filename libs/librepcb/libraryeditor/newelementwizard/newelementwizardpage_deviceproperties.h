@@ -60,10 +60,10 @@ public:
 
   // Getters
   bool isComplete() const noexcept override;
-  int  nextId() const noexcept override;
+  int nextId() const noexcept override;
 
   // Operator Overloadings
-  NewElementWizardPage_DeviceProperties& operator       =(
+  NewElementWizardPage_DeviceProperties& operator=(
       const NewElementWizardPage_DeviceProperties& rhs) = delete;
 
 private:  // Methods
@@ -75,7 +75,7 @@ private:  // Methods
   void cleanupPage() noexcept override;
 
 private:  // Data
-  NewElementWizardContext&                                  mContext;
+  NewElementWizardContext& mContext;
   QScopedPointer<Ui::NewElementWizardPage_DeviceProperties> mUi;
 };
 

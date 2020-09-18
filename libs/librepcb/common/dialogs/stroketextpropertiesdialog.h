@@ -52,13 +52,13 @@ class StrokeTextPropertiesDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  StrokeTextPropertiesDialog()                                        = delete;
+  StrokeTextPropertiesDialog() = delete;
   StrokeTextPropertiesDialog(const StrokeTextPropertiesDialog& other) = delete;
   StrokeTextPropertiesDialog(StrokeText& text, UndoStack& undoStack,
                              QList<GraphicsLayer*> layers,
-                             const LengthUnit&     lengthUnit,
-                             const QString&        settingsPrefix,
-                             QWidget*              parent = nullptr) noexcept;
+                             const LengthUnit& lengthUnit,
+                             const QString& settingsPrefix,
+                             QWidget* parent = nullptr) noexcept;
   ~StrokeTextPropertiesDialog() noexcept;
 
   // Operator Overloadings
@@ -72,8 +72,8 @@ private:  // Methods
   void selectLayerNameInCombobox(const QString& name) noexcept;
 
 private:  // Data
-  StrokeText&                                    mText;
-  UndoStack&                                     mUndoStack;
+  StrokeText& mText;
+  UndoStack& mUndoStack;
   QScopedPointer<Ui::StrokeTextPropertiesDialog> mUi;
 };
 

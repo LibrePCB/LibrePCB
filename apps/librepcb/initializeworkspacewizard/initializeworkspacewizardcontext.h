@@ -66,7 +66,7 @@ public:
   InitializeWorkspaceWizardContext(
       const InitializeWorkspaceWizardContext& other) = delete;
   InitializeWorkspaceWizardContext(const FilePath& ws,
-                                   QObject*        parent = nullptr) noexcept;
+                                   QObject* parent = nullptr) noexcept;
   ~InitializeWorkspaceWizardContext() noexcept;
 
   // Getters
@@ -74,8 +74,8 @@ public:
   const tl::optional<Version>& getVersionToImport() const noexcept {
     return mVersionToImport;
   }
-  const QString&     getAppLocale() const noexcept { return mAppLocale; }
-  const LengthUnit&  getLengthUnit() const noexcept { return mLengthUnit; }
+  const QString& getAppLocale() const noexcept { return mAppLocale; }
+  const LengthUnit& getLengthUnit() const noexcept { return mLengthUnit; }
   const QStringList& getLibraryNormOrder() const noexcept {
     return mLibraryNormOrder;
   }
@@ -98,16 +98,16 @@ public:
   void initializeEmptyWorkspace() const;
 
   // Operator Overloadings
-  InitializeWorkspaceWizardContext& operator       =(
+  InitializeWorkspaceWizardContext& operator=(
       const InitializeWorkspaceWizardContext& rhs) = delete;
 
 private:  // Data
-  FilePath              mWorkspacePath;
+  FilePath mWorkspacePath;
   tl::optional<Version> mVersionToImport;
-  QString               mAppLocale;
-  LengthUnit            mLengthUnit;
-  QStringList           mLibraryNormOrder;
-  QString               mUserName;
+  QString mAppLocale;
+  LengthUnit mLengthUnit;
+  QStringList mLibraryNormOrder;
+  QString mUserName;
 };
 
 /*******************************************************************************

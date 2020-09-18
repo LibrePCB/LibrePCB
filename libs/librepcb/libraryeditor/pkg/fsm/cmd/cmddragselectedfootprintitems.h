@@ -71,7 +71,7 @@ public:
   void mirrorLayer() noexcept;
 
   // Operator Overloadings
-  CmdDragSelectedFootprintItems& operator       =(
+  CmdDragSelectedFootprintItems& operator=(
       const CmdDragSelectedFootprintItems& rhs) = delete;
 
 private:
@@ -84,18 +84,18 @@ private:
 
   // Private Member Variables
   const PackageEditorState::Context& mContext;
-  Point                              mCenterPos;
-  Point                              mDeltaPos;
-  Angle                              mDeltaRot;
-  bool                               mMirroredGeometry;
-  bool                               mMirroredLayer;
+  Point mCenterPos;
+  Point mDeltaPos;
+  Angle mDeltaRot;
+  bool mMirroredGeometry;
+  bool mMirroredLayer;
 
   // Move commands
   QList<CmdFootprintPadEdit*> mPadEditCmds;
-  QList<CmdCircleEdit*>       mCircleEditCmds;
-  QList<CmdPolygonEdit*>      mPolygonEditCmds;
-  QList<CmdStrokeTextEdit*>   mTextEditCmds;
-  QList<CmdHoleEdit*>         mHoleEditCmds;
+  QList<CmdCircleEdit*> mCircleEditCmds;
+  QList<CmdPolygonEdit*> mPolygonEditCmds;
+  QList<CmdStrokeTextEdit*> mTextEditCmds;
+  QList<CmdHoleEdit*> mHoleEditCmds;
 };
 
 /*******************************************************************************

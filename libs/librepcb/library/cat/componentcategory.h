@@ -45,7 +45,7 @@ class ComponentCategory final : public LibraryCategory {
 
 public:
   // Constructors / Destructor
-  ComponentCategory()                               = delete;
+  ComponentCategory() = delete;
   ComponentCategory(const ComponentCategory& other) = delete;
   ComponentCategory(const Uuid& uuid, const Version& version,
                     const QString& author, const ElementName& name_en_US,

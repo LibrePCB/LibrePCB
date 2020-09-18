@@ -113,7 +113,7 @@ void PrimitivePathGraphicsItem::setFillLayer(
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void PrimitivePathGraphicsItem::paint(QPainter*                       painter,
+void PrimitivePathGraphicsItem::paint(QPainter* painter,
                                       const QStyleOptionGraphicsItem* option,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
@@ -122,7 +122,7 @@ void PrimitivePathGraphicsItem::paint(QPainter*                       painter,
   const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
 
-  QPen   pen   = isSelected ? mPenHighlighted : mPen;
+  QPen pen = isSelected ? mPenHighlighted : mPen;
   QBrush brush = isSelected ? mBrushHighlighted : mBrush;
 
   // When printing, enforce a minimum line width to make sure the line will be
@@ -192,7 +192,7 @@ void PrimitivePathGraphicsItem::updateColors() noexcept {
 
 void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
-  mShape        = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
+  mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
                                   UnsignedLength(200000));
   mBoundingRect = mShape.controlPointRect();
   update();

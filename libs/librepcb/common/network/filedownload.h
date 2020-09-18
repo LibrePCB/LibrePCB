@@ -48,7 +48,7 @@ class FileDownload final : public NetworkRequestBase {
 
 public:
   // Constructors / Destructor
-  FileDownload()                          = delete;
+  FileDownload() = delete;
   FileDownload(const FileDownload& other) = delete;
 
   /**
@@ -74,7 +74,7 @@ public:
    * @param checksum      The expected checksum of the file to download
    */
   void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
-                           const QByteArray&             checksum) noexcept;
+                           const QByteArray& checksum) noexcept;
 
   /**
    * @brief Set extraction directory of the ZIP file to download
@@ -120,11 +120,11 @@ private:  // Methods
   void fetchNewData() noexcept override;
 
 private:  // Data
-  FilePath                      mDestination;
-  QScopedPointer<QSaveFile>     mFile;
+  FilePath mDestination;
+  QScopedPointer<QSaveFile> mFile;
   QCryptographicHash::Algorithm mHashAlgorithm;
-  QByteArray                    mExpectedChecksum;
-  FilePath                      mExtractZipToDir;
+  QByteArray mExpectedChecksum;
+  FilePath mExtractZipToDir;
 };
 
 /*******************************************************************************

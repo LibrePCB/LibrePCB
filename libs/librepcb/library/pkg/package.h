@@ -58,7 +58,7 @@ class Package final : public LibraryElement {
 
 public:
   // Constructors / Destructor
-  Package()                     = delete;
+  Package() = delete;
   Package(const Package& other) = delete;
   Package(const Uuid& uuid, const Version& version, const QString& author,
           const ElementName& name_en_US, const QString& description_en_US,
@@ -67,10 +67,10 @@ public:
   ~Package() noexcept;
 
   // Getters
-  PackagePadList&       getPads() noexcept { return mPads; }
+  PackagePadList& getPads() noexcept { return mPads; }
   const PackagePadList& getPads() const noexcept { return mPads; }
-  FootprintList&        getFootprints() noexcept { return mFootprints; }
-  const FootprintList&  getFootprints() const noexcept { return mFootprints; }
+  FootprintList& getFootprints() noexcept { return mFootprints; }
+  const FootprintList& getFootprints() const noexcept { return mFootprints; }
 
   // General Methods
   virtual LibraryElementCheckMessageList runChecks() const override;
@@ -90,9 +90,9 @@ private:  // Methods
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-private:                       // Data
-  PackagePadList mPads;        ///< empty list if the package has no pads
-  FootprintList  mFootprints;  ///< minimum one footprint
+private:  // Data
+  PackagePadList mPads;  ///< empty list if the package has no pads
+  FootprintList mFootprints;  ///< minimum one footprint
 };
 
 /*******************************************************************************

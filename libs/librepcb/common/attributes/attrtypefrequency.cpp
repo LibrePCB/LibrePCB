@@ -66,19 +66,19 @@ bool AttrTypeFrequency::isValueValid(const QString& value) const noexcept {
 }
 
 QString AttrTypeFrequency::valueFromTr(const QString& value) const noexcept {
-  bool  ok = false;
-  float v  = QLocale().toFloat(value, &ok);
+  bool ok = false;
+  float v = QLocale().toFloat(value, &ok);
   if (ok)
     return QString::number(v);
   else
     return QString();
 }
 
-QString AttrTypeFrequency::printableValueTr(const QString&       value,
+QString AttrTypeFrequency::printableValueTr(const QString& value,
                                             const AttributeUnit* unit) const
     noexcept {
-  bool  ok = false;
-  float v  = value.toFloat(&ok);
+  bool ok = false;
+  float v = value.toFloat(&ok);
   if (ok && unit)
     return QLocale().toString(v) % unit->getSymbolTr();
   else if (ok)

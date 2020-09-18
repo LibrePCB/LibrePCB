@@ -61,10 +61,10 @@ public:
   using FilterFunction = std::function<QString(const QString&)>;
 
   // Constructors / Destructor / Operator Overloadings
-  AttributeSubstitutor()                                  = delete;
+  AttributeSubstitutor() = delete;
   AttributeSubstitutor(const AttributeSubstitutor& other) = delete;
   AttributeSubstitutor& operator=(const AttributeSubstitutor& rhs) = delete;
-  ~AttributeSubstitutor()                                          = delete;
+  ~AttributeSubstitutor() = delete;
 
   // General Methods
 

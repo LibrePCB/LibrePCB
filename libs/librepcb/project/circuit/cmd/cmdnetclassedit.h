@@ -68,7 +68,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Circuit&  mCircuit;
+  Circuit& mCircuit;
   NetClass& mNetClass;
 
   // General Attributes

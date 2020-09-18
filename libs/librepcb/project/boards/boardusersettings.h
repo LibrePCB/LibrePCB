@@ -50,7 +50,7 @@ class BoardUserSettings final : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  BoardUserSettings()                               = delete;
+  BoardUserSettings() = delete;
   BoardUserSettings(const BoardUserSettings& other) = delete;
   explicit BoardUserSettings(Board& board) noexcept;
   BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept;
@@ -67,7 +67,7 @@ public:
 
 private:  // Methods
   // General
-  Board&                                               mBoard;
+  Board& mBoard;
   QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
 };
 

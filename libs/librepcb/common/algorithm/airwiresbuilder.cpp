@@ -96,10 +96,10 @@ AirWiresBuilder::AirWires AirWiresBuilder::buildAirWires() noexcept {
 
 // adapted from horizon/kicad
 AirWiresBuilder::AirWires AirWiresBuilder::kruskalMst() noexcept {
-  unsigned int nodeNumber      = mPoints.size();
+  unsigned int nodeNumber = mPoints.size();
   unsigned int mstExpectedSize = nodeNumber - 1;
-  unsigned int mstSize         = 0;
-  bool         ratsnestLines   = false;
+  unsigned int mstSize = 0;
+  bool ratsnestLines = false;
 
   // printf("mst nodes : %d edges : %d\n", mPoints.size(), mEdges.size () );
   // The output
@@ -107,10 +107,10 @@ AirWiresBuilder::AirWires AirWiresBuilder::kruskalMst() noexcept {
 
   // Set tags for marking cycles
   std::unordered_map<int, int> tags;
-  unsigned int                 tag = 0;
+  unsigned int tag = 0;
 
   for (auto& node : mPoints) {
-    node.tag      = tag;
+    node.tag = tag;
     tags[node.id] = tag++;
   }
 
@@ -171,7 +171,7 @@ AirWiresBuilder::AirWires AirWiresBuilder::kruskalMst() noexcept {
         for (auto it = cycles[trgTag].begin(); it != cycles[trgTag].end();
              ++it) {
           tags[mPoints[*it].id] = srcTag;
-          mPoints[*it].tag      = srcTag;
+          mPoints[*it].tag = srcTag;
         }
 
         // Processing a connection, decrease the expected size of the

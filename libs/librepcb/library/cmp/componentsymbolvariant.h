@@ -65,7 +65,7 @@ public:
     DescriptionsChanged,
     SymbolItemsEdited,
   };
-  Signal<ComponentSymbolVariant, Event>       onEdited;
+  Signal<ComponentSymbolVariant, Event> onEdited;
   typedef Slot<ComponentSymbolVariant, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -73,17 +73,17 @@ public:
   ComponentSymbolVariant(const ComponentSymbolVariant& other) noexcept;
   ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                          const ElementName& name_en_US,
-                         const QString&     desc_en_US) noexcept;
+                         const QString& desc_en_US) noexcept;
   explicit ComponentSymbolVariant(const SExpression& node);
   ~ComponentSymbolVariant() noexcept;
 
   // Getters: Attributes
-  const Uuid&        getUuid() const noexcept { return mUuid; }
-  const QString&     getNorm() const noexcept { return mNorm; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const QString& getNorm() const noexcept { return mNorm; }
   const ElementName& getName() const noexcept {
     return mNames.getDefaultValue();  // Used for SerializableObjectList
   }
-  const LocalizedNameMap&        getNames() const noexcept { return mNames; }
+  const LocalizedNameMap& getNames() const noexcept { return mNames; }
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
   }
@@ -123,13 +123,13 @@ private:  // Methods
   void itemsEdited(
       const ComponentSymbolVariantItemList& list, int index,
       const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-      ComponentSymbolVariantItemList::Event                    event) noexcept;
+      ComponentSymbolVariantItemList::Event event) noexcept;
 
 private:  // Data
-  Uuid                           mUuid;
-  QString                        mNorm;
-  LocalizedNameMap               mNames;
-  LocalizedDescriptionMap        mDescriptions;
+  Uuid mUuid;
+  QString mNorm;
+  LocalizedNameMap mNames;
+  LocalizedDescriptionMap mDescriptions;
   ComponentSymbolVariantItemList mSymbolItems;
 
   // Slots

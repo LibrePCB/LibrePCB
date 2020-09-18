@@ -59,10 +59,10 @@ public:
   // Inherited from QWizardPage
   void initializePage() noexcept override;
   bool isComplete() const noexcept override;
-  int  nextId() const noexcept override;
+  int nextId() const noexcept override;
 
   // Operator Overloadings
-  InitializeWorkspaceWizard_FinalizeImport& operator       =(
+  InitializeWorkspaceWizard_FinalizeImport& operator=(
       const InitializeWorkspaceWizard_FinalizeImport& rhs) = delete;
 
 private:
@@ -71,10 +71,10 @@ private:
   void importSucceeded() noexcept;
 
 private:
-  InitializeWorkspaceWizardContext&                            mContext;
+  InitializeWorkspaceWizardContext& mContext;
   QScopedPointer<Ui::InitializeWorkspaceWizard_FinalizeImport> mUi;
-  std::unique_ptr<AsyncCopyOperation>                          mCopyOperation;
-  bool                                                         mImportSucceeded;
+  std::unique_ptr<AsyncCopyOperation> mCopyOperation;
+  bool mImportSucceeded;
 };
 
 /*******************************************************************************

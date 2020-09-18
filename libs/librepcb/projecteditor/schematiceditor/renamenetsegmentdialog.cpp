@@ -47,9 +47,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-RenameNetSegmentDialog::RenameNetSegmentDialog(UndoStack&     undoStack,
+RenameNetSegmentDialog::RenameNetSegmentDialog(UndoStack& undoStack,
                                                SI_NetSegment& segment,
-                                               QWidget*       parent) noexcept
+                                               QWidget* parent) noexcept
   : QDialog(parent),
     mUndoStack(undoStack),
     mNetSegment(segment),
@@ -151,7 +151,7 @@ void RenameNetSegmentDialog::accept() noexcept {
         }
         transaction.append(new CmdChangeNetSignalOfSchematicNetSegment(
             mNetSegment, *mNewNetSignal));  // can throw
-        transaction.commit();               // can throw
+        transaction.commit();  // can throw
         break;
       }
       default: { break; }
@@ -167,7 +167,7 @@ void RenameNetSegmentDialog::accept() noexcept {
  ******************************************************************************/
 
 void RenameNetSegmentDialog::updateAction() noexcept {
-  mNewNetName   = cleanCircuitIdentifier(mUi->cbxNetName->currentText());
+  mNewNetName = cleanCircuitIdentifier(mUi->cbxNetName->currentText());
   mNewNetSignal = mNetSegment.getCircuit().getNetSignalByName(mNewNetName);
   bool renameWholeNet = mUi->rbtnRenameWholeNet->isChecked();
 
@@ -175,18 +175,18 @@ void RenameNetSegmentDialog::updateAction() noexcept {
     QString desc;
     if (mNewNetSignal == &mNetSegment.getNetSignal()) {
       mAction = Action::NONE;
-      desc    = tr("No change is made.");
+      desc = tr("No change is made.");
     } else if (renameWholeNet && (mNewNetSignal)) {
       mAction = Action::MERGE_NETSIGNALS;
-      desc    = tr("The whole net '%1' will be merged into the net '%2'.")
+      desc = tr("The whole net '%1' will be merged into the net '%2'.")
                  .arg(*mNetSegment.getNetSignal().getName(), mNewNetName);
     } else if (renameWholeNet && (!mNewNetSignal)) {
       mAction = Action::RENAME_NETSIGNAL;
-      desc    = tr("The whole net '%1' will be renamed to '%2'.")
+      desc = tr("The whole net '%1' will be renamed to '%2'.")
                  .arg(*mNetSegment.getNetSignal().getName(), mNewNetName);
     } else if ((!renameWholeNet) && (mNewNetSignal)) {
       mAction = Action::MOVE_NETSEGMENT_TO_EXISTING_NET;
-      desc    = tr("The segment will be moved to the existing net '%1'.")
+      desc = tr("The segment will be moved to the existing net '%1'.")
                  .arg(mNewNetName);
     } else if ((!renameWholeNet) && (!mNewNetSignal)) {
       mAction = Action::MOVE_NETSEGMENT_TO_NEW_NET;
@@ -194,7 +194,7 @@ void RenameNetSegmentDialog::updateAction() noexcept {
           tr("The segment will be moved to the new net '%1'.").arg(mNewNetName);
     } else {
       mAction = Action::INVALID_NAME;  // Not correct, but sufficient
-      desc    = "UNKNOWN ERROR";
+      desc = "UNKNOWN ERROR";
       qCritical() << "Unhandled case in RenameNetSegmentDialog!";
     }
     mUi->lblDescription->setText(desc);

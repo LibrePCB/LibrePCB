@@ -45,7 +45,7 @@ void ClipperHelpers::unite(ClipperLib::Paths& paths) {
   }
 }
 
-void ClipperHelpers::unite(ClipperLib::Paths&      subject,
+void ClipperHelpers::unite(ClipperLib::Paths& subject,
                            const ClipperLib::Path& clip) {
   try {
     ClipperLib::Clipper c;
@@ -59,7 +59,7 @@ void ClipperHelpers::unite(ClipperLib::Paths&      subject,
   }
 }
 
-void ClipperHelpers::unite(ClipperLib::Paths&       subject,
+void ClipperHelpers::unite(ClipperLib::Paths& subject,
                            const ClipperLib::Paths& clip) {
   try {
     ClipperLib::Clipper c;
@@ -79,7 +79,7 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
     std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::Clipper                   c;
+    ClipperLib::Clipper c;
     c.AddPaths(subject, ClipperLib::ptSubject, true);
     c.AddPaths(clip, ClipperLib::ptClip, true);
     c.Execute(ClipperLib::ctIntersection, *result, ClipperLib::pftEvenOdd,
@@ -91,7 +91,7 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
   }
 }
 
-void ClipperHelpers::subtract(ClipperLib::Paths&       subject,
+void ClipperHelpers::subtract(ClipperLib::Paths& subject,
                               const ClipperLib::Paths& clip) {
   try {
     ClipperLib::Clipper c;
@@ -164,7 +164,7 @@ Point ClipperHelpers::convert(const ClipperLib::IntPoint& point) noexcept {
 }
 
 ClipperLib::Paths ClipperHelpers::convert(
-    const QVector<Path>&  paths,
+    const QVector<Path>& paths,
     const PositiveLength& maxArcTolerance) noexcept {
   ClipperLib::Paths p;
   p.reserve(paths.size());
@@ -178,7 +178,7 @@ ClipperLib::Path ClipperHelpers::convert(
     const Path& path, const PositiveLength& maxArcTolerance) noexcept {
   ClipperLib::Path p;
   for (int i = 0; i < path.getVertices().count(); ++i) {
-    const Vertex& v  = path.getVertices().at(i);
+    const Vertex& v = path.getVertices().at(i);
     const Vertex& v0 = path.getVertices().at(qMax(i - 1, 0));
     if ((i == 0) || (v0.getAngle() == 0)) {
       p.push_back(convert(v.getPos()));
@@ -210,7 +210,7 @@ ClipperLib::IntPoint ClipperHelpers::convert(const Point& point) noexcept {
 
 ClipperLib::Path ClipperHelpers::convertHolesToCutIns(
     const ClipperLib::Path& outline, const ClipperLib::Paths& holes) {
-  ClipperLib::Path  path          = outline;
+  ClipperLib::Path path = outline;
   ClipperLib::Paths preparedHoles = prepareHoles(holes);
   for (const ClipperLib::Path& hole : preparedHoles) {
     addCutInToPath(path, hole);  // can throw
@@ -259,7 +259,7 @@ int ClipperHelpers::getHoleConnectionPointIndex(
   return index;
 }
 
-void ClipperHelpers::addCutInToPath(ClipperLib::Path&       outline,
+void ClipperHelpers::addCutInToPath(ClipperLib::Path& outline,
                                     const ClipperLib::Path& hole) {
   int index = insertConnectionPointToPath(outline, hole.front());  // can throw
   outline.insert(outline.begin() + index, hole.begin(), hole.end());
@@ -267,7 +267,7 @@ void ClipperHelpers::addCutInToPath(ClipperLib::Path&       outline,
 
 int ClipperHelpers::insertConnectionPointToPath(ClipperLib::Path& path,
                                                 const ClipperLib::IntPoint& p) {
-  int                  nearestIndex = -1;
+  int nearestIndex = -1;
   ClipperLib::IntPoint nearestPoint;
   for (size_t i = 0; i < path.size(); ++i) {
     ClipperLib::cInt y;
@@ -294,7 +294,7 @@ int ClipperHelpers::insertConnectionPointToPath(ClipperLib::Path& path,
 
 bool ClipperHelpers::calcIntersectionPos(const ClipperLib::IntPoint& p1,
                                          const ClipperLib::IntPoint& p2,
-                                         const ClipperLib::cInt&     x,
+                                         const ClipperLib::cInt& x,
                                          ClipperLib::cInt& y) noexcept {
   if (((p1.X <= x) && (p2.X > x)) || ((p1.X >= x) && (p2.X < x))) {
     qreal yCalc =

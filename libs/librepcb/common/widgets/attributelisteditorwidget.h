@@ -61,7 +61,7 @@ public:
       delete;
 
 private:  // Data
-  QScopedPointer<AttributeListModel>  mModel;
+  QScopedPointer<AttributeListModel> mModel;
   QScopedPointer<EditableTableWidget> mView;
 };
 

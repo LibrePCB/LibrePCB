@@ -69,14 +69,14 @@ public:
       delete;
   SymbolInstancePropertiesDialog(workspace::Workspace& ws, Project& project,
                                  ComponentInstance& cmp, SI_Symbol& symbol,
-                                 UndoStack&        undoStack,
+                                 UndoStack& undoStack,
                                  const LengthUnit& lengthUnit,
-                                 const QString&    settingsPrefix,
-                                 QWidget*          parent) noexcept;
+                                 const QString& settingsPrefix,
+                                 QWidget* parent) noexcept;
   ~SymbolInstancePropertiesDialog() noexcept;
 
   // Operator Overloadings
-  SymbolInstancePropertiesDialog& operator       =(
+  SymbolInstancePropertiesDialog& operator=(
       const SymbolInstancePropertiesDialog& rhs) = delete;
 
 private:  // Methods
@@ -85,12 +85,12 @@ private:  // Methods
   bool applyChanges() noexcept;
 
 private:  // Data
-  workspace::Workspace&                              mWorkspace;
-  Project&                                           mProject;
-  ComponentInstance&                                 mComponentInstance;
-  SI_Symbol&                                         mSymbol;
-  UndoStack&                                         mUndoStack;
-  AttributeList                                      mAttributes;
+  workspace::Workspace& mWorkspace;
+  Project& mProject;
+  ComponentInstance& mComponentInstance;
+  SI_Symbol& mSymbol;
+  UndoStack& mUndoStack;
+  AttributeList mAttributes;
   QScopedPointer<Ui::SymbolInstancePropertiesDialog> mUi;
 };
 

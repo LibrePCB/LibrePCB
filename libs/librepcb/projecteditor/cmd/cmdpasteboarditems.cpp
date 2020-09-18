@@ -146,7 +146,7 @@ bool CmdPasteBoardItems::performExecute() {
       device->getFootprint().removeStrokeText(*text);
     }
     for (const StrokeText& text : dev.strokeTexts) {
-      StrokeText copy(Uuid::createRandom(), text);        // assign new UUID
+      StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
       item->setSelected(true);
@@ -163,7 +163,7 @@ bool CmdPasteBoardItems::performExecute() {
     for (auto it = mData->getPadPositions().constBegin();
          it != mData->getPadPositions().constEnd(); ++it) {
       const Uuid& device = it.key().first;
-      const Uuid& pad    = it.key().second;
+      const Uuid& pad = it.key().second;
       if (!pastedDevices.contains(device)) {
         // Device was not pasted, so we have to replace all pads by junctions
         splitter.replaceFootprintPadByJunctions(TraceAnchor::pad(device, pad),
@@ -266,7 +266,7 @@ bool CmdPasteBoardItems::performExecute() {
 
   // Paste polygons
   for (const Polygon& polygon : mData->getPolygons()) {
-    Polygon copy(Uuid::createRandom(), polygon);          // assign new UUID
+    Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     BI_Polygon* item = new BI_Polygon(mBoard, copy);
     item->setSelected(true);
@@ -275,7 +275,7 @@ bool CmdPasteBoardItems::performExecute() {
 
   // Paste stroke texts
   for (const StrokeText& text : mData->getStrokeTexts()) {
-    StrokeText copy(Uuid::createRandom(), text);        // assign new UUID
+    StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
     item->setSelected(true);
@@ -284,7 +284,7 @@ bool CmdPasteBoardItems::performExecute() {
 
   // Paste holes
   for (const Hole& hole : mData->getHoles()) {
-    Hole copy(Uuid::createRandom(), hole);              // assign new UUID
+    Hole copy(Uuid::createRandom(), hole);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_Hole* item = new BI_Hole(mBoard, copy);
     item->setSelected(true);

@@ -58,8 +58,8 @@ public:
   explicit SymbolPreviewGraphicsItem(
       const IF_GraphicsLayerProvider& layerProvider,
       const QStringList& localeOrder, const Symbol& symbol,
-      const Component*          cmp             = nullptr,
-      const tl::optional<Uuid>& symbVarUuid     = tl::nullopt,
+      const Component* cmp = nullptr,
+      const tl::optional<Uuid>& symbVarUuid = tl::nullopt,
       const tl::optional<Uuid>& symbVarItemUuid = tl::nullopt) noexcept;
   ~SymbolPreviewGraphicsItem() noexcept;
 
@@ -70,10 +70,10 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
 signals:
 
@@ -82,7 +82,7 @@ signals:
 
 private:
   // make some methods inaccessible...
-  SymbolPreviewGraphicsItem()                                       = delete;
+  SymbolPreviewGraphicsItem() = delete;
   SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
   SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
       delete;
@@ -94,25 +94,25 @@ private:
   // Types
 
   struct CachedTextProperties_t {
-    QString       text;
-    qreal         fontSize;
-    bool          rotate180;
+    QString text;
+    qreal fontSize;
+    bool rotate180;
     Qt::Alignment align;
-    QRectF        textRect;
+    QRectF textRect;
   };
 
   // General Attributes
-  const IF_GraphicsLayerProvider&   mLayerProvider;
-  const Symbol&                     mSymbol;
-  const Component*                  mComponent;
+  const IF_GraphicsLayerProvider& mLayerProvider;
+  const Symbol& mSymbol;
+  const Component* mComponent;
   const ComponentSymbolVariantItem* mSymbVarItem;
-  QFont                             mFont;
-  bool                              mDrawBoundingRect;
-  QStringList                       mLocaleOrder;
+  QFont mFont;
+  bool mDrawBoundingRect;
+  QStringList mLocaleOrder;
 
   // Cached Attributes
-  QRectF                                     mBoundingRect;
-  QPainterPath                               mShape;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
   QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 

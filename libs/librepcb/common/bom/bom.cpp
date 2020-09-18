@@ -43,7 +43,7 @@ Bom::~Bom() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void Bom::addItem(const QString&     designator,
+void Bom::addItem(const QString& designator,
                   const QStringList& attributes) noexcept {
   Q_ASSERT(attributes.count() == mColumns.count());
 

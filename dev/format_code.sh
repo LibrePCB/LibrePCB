@@ -5,6 +5,10 @@ set -euo pipefail
 # available, *.pro project files will be sorted with sort_qmake_file_entries.py.
 #
 # Usage:
+#
+#   format_code.sh [--all] [--sudo] [--docker]
+#
+# Notes:
 #   - Make sure the executables "clang-format" and "git" are available in PATH.
 #   - Run the command "./dev/format_code.sh" in the root of the repository.
 #   - To run clang-format in a docker-container, use the "--docker" parameter.

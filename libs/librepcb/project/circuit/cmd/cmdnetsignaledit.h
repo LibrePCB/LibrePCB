@@ -68,14 +68,14 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Circuit&   mCircuit;
+  Circuit& mCircuit;
   NetSignal& mNetSignal;
 
   // General Attributes
   CircuitIdentifier mOldName;
   CircuitIdentifier mNewName;
-  bool              mOldIsAutoName;
-  bool              mNewIsAutoName;
+  bool mOldIsAutoName;
+  bool mNewIsAutoName;
 };
 
 /*******************************************************************************

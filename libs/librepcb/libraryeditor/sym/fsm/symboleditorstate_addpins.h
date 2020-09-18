@@ -52,7 +52,7 @@ class SymbolEditorState_AddPins final : public SymbolEditorState {
 
 public:
   // Constructors / Destructor
-  SymbolEditorState_AddPins()                                       = delete;
+  SymbolEditorState_AddPins() = delete;
   SymbolEditorState_AddPins(const SymbolEditorState_AddPins& other) = delete;
   explicit SymbolEditorState_AddPins(const Context& context) noexcept;
   ~SymbolEditorState_AddPins() noexcept;
@@ -76,17 +76,17 @@ public:
       delete;
 
 private:  // Methods
-  bool    addNextPin(const Point& pos, const Angle& rot) noexcept;
-  void    nameLineEditTextChanged(const QString& text) noexcept;
-  void    lengthEditValueChanged(const UnsignedLength& value) noexcept;
+  bool addNextPin(const Point& pos, const Angle& rot) noexcept;
+  void nameLineEditTextChanged(const QString& text) noexcept;
+  void lengthEditValueChanged(const UnsignedLength& value) noexcept;
   QString determineNextPinName() const noexcept;
-  bool    hasPin(const QString& name) const noexcept;
+  bool hasPin(const QString& name) const noexcept;
 
 private:  // Types / Data
   QScopedPointer<CmdSymbolPinEdit> mEditCmd;
-  SymbolPin*                       mCurrentPin;
-  SymbolPinGraphicsItem*           mCurrentGraphicsItem;
-  QLineEdit*                       mNameLineEdit;
+  SymbolPin* mCurrentPin;
+  SymbolPinGraphicsItem* mCurrentGraphicsItem;
+  QLineEdit* mNameLineEdit;
 
   // parameter memory
   UnsignedLength mLastLength;

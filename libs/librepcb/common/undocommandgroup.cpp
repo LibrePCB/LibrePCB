@@ -78,7 +78,7 @@ bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
  ******************************************************************************/
 
 bool UndoCommandGroup::performExecute() {
-  bool           modified = false;
+  bool modified = false;
   ScopeGuardList sgl(mChilds.count());
   for (int i = 0; i < mChilds.count(); ++i) {  // from bottom to top
     UndoCommand* cmd = mChilds.at(i);

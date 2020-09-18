@@ -57,13 +57,13 @@ namespace editor {
 class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdDragSelectedBoardItems(Board&       board,
+  explicit CmdDragSelectedBoardItems(Board& board,
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
   void setCurrentPosition(const Point& pos,
-                          const bool   gridIncrement = true) noexcept;
+                          const bool gridIncrement = true) noexcept;
   void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
 
 private:
@@ -74,19 +74,19 @@ private:
 
   // Private Member Variables
   Board& mBoard;
-  Point  mStartPos;
-  Point  mDeltaPos;
-  Point  mCenterPos;
-  Angle  mDeltaAngle;
+  Point mStartPos;
+  Point mDeltaPos;
+  Point mCenterPos;
+  Angle mDeltaAngle;
 
   // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-  QList<CmdBoardViaEdit*>       mViaEditCmds;
-  QList<CmdBoardNetPointEdit*>  mNetPointEditCmds;
-  QList<CmdBoardPlaneEdit*>     mPlaneEditCmds;
-  QList<CmdPolygonEdit*>        mPolygonEditCmds;
-  QList<CmdStrokeTextEdit*>     mStrokeTextEditCmds;
-  QList<CmdHoleEdit*>           mHoleEditCmds;
+  QList<CmdBoardViaEdit*> mViaEditCmds;
+  QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
+  QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
+  QList<CmdPolygonEdit*> mPolygonEditCmds;
+  QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
+  QList<CmdHoleEdit*> mHoleEditCmds;
 };
 
 /*******************************************************************************

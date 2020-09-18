@@ -53,7 +53,7 @@ public:
   using Context = PackageEditorFsm::Context;
 
   // Constructors / Destructor
-  PackageEditorState()                                = delete;
+  PackageEditorState() = delete;
   PackageEditorState(const PackageEditorState& other) = delete;
   explicit PackageEditorState(Context& context) noexcept;
   virtual ~PackageEditorState() noexcept;
@@ -104,7 +104,7 @@ public:
 
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;
-  const LengthUnit&     getDefaultLengthUnit() const noexcept;
+  const LengthUnit& getDefaultLengthUnit() const noexcept;
 
 protected:  // Data
   Context& mContext;

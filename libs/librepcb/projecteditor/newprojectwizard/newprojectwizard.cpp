@@ -51,7 +51,7 @@ namespace editor {
  ******************************************************************************/
 
 NewProjectWizard::NewProjectWizard(const workspace::Workspace& ws,
-                                   QWidget*                    parent) noexcept
+                                   QWidget* parent) noexcept
   : QWizard(parent), mWorkspace(ws), mUi(new Ui::NewProjectWizard) {
   mUi->setupUi(this);
 
@@ -155,7 +155,7 @@ Project* NewProjectWizard::createProject() const {
 
   // save project to filesystem
   project->save();  // can throw
-  fs->save();       // can throw
+  fs->save();  // can throw
 
   // all done, return the new project
   return project.take();

@@ -45,7 +45,7 @@ class Package;
 class PackageCheck : public LibraryElementCheck {
 public:
   // Constructors / Destructor
-  PackageCheck()                          = delete;
+  PackageCheck() = delete;
   PackageCheck(const PackageCheck& other) = delete;
   explicit PackageCheck(const Package& package) noexcept;
   virtual ~PackageCheck() noexcept;

@@ -144,7 +144,7 @@ void Library::moveTo(TransactionalDirectory& dest) {
 template <typename ElementType>
 QStringList Library::searchForElements() const noexcept {
   QStringList list;
-  QString     subdir = getElementsDirectoryName<ElementType>();
+  QString subdir = getElementsDirectoryName<ElementType>();
   foreach (const QString& dirname, mDirectory->getDirs(subdir)) {
     QString dirPath = subdir % "/" % dirname;
     if (isValidElementDirectory<ElementType>(*mDirectory, dirPath)) {

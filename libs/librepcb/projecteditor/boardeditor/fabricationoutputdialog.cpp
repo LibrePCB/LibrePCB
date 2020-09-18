@@ -180,7 +180,7 @@ void FabricationOutputDialog::on_btnGenerate_clicked() {
 
 void FabricationOutputDialog::on_btnBrowseOutputDir_clicked() {
   BoardGerberExport grbExport(mBoard, mBoard.getFabricationOutputSettings());
-  FilePath          dir = grbExport.getOutputDirectory();
+  FilePath dir = grbExport.getOutputDirectory();
   if (dir.isExistingDir()) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir.toStr()));
   } else {

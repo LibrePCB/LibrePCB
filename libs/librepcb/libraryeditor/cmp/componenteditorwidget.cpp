@@ -48,9 +48,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
+ComponentEditorWidget::ComponentEditorWidget(const Context& context,
                                              const FilePath& fp,
-                                             QWidget*        parent)
+                                             QWidget* parent)
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::ComponentEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
@@ -61,7 +61,7 @@ ComponentEditorWidget::ComponentEditorWidget(const Context&  context,
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
-  int                   row;
+  int row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
@@ -134,7 +134,7 @@ bool ComponentEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mComponent->save();   // can throw
+    mComponent->save();  // can throw
     mFileSystem->save();  // can throw
     memorizeComponentInterface();
     return EditorWidgetBase::save();
@@ -209,8 +209,8 @@ bool ComponentEditorWidget::openComponentSymbolVariantEditor(
 
 void ComponentEditorWidget::memorizeComponentInterface() noexcept {
   mOriginalIsSchematicOnly = mComponent->isSchematicOnly();
-  mOriginalSignalUuids     = mComponent->getSignals().getUuidSet();
-  mOriginalSymbolVariants  = mComponent->getSymbolVariants();
+  mOriginalSignalUuids = mComponent->getSignals().getUuidSet();
+  mOriginalSymbolVariants = mComponent->getSymbolVariants();
 }
 
 bool ComponentEditorWidget::isInterfaceBroken() const noexcept {

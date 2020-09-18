@@ -80,7 +80,7 @@ void Debug::setDebugLevelLogFile(DebugLevel_t level) {
       (level != DebugLevel_t::Nothing)) {
     // enable logging to file
     QDir().mkpath(mLogFilepath.getParentDir().toStr());
-    mLogFile     = new QFile(mLogFilepath.toStr());
+    mLogFile = new QFile(mLogFilepath.toStr());
     bool success = mLogFile->open(QFile::WriteOnly);
     if (success) {
       mDebugLevelLogFile = level;  // activate logging to file immediately!

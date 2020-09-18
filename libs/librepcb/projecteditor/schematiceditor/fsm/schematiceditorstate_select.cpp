@@ -202,7 +202,7 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
   if (mSubState == SubState::IDLE) {
     // handle items selection
-    Point           pos   = Point::fromPx(mouseEvent.scenePos());
+    Point pos = Point::fromPx(mouseEvent.scenePos());
     QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
     if (items.isEmpty()) {
       // no items under mouse --> start drawing a selection rectangle
@@ -443,7 +443,7 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
   try {
     Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, false);
-    SchematicClipboardDataBuilder           builder(*schematic);
+    SchematicClipboardDataBuilder builder(*schematic);
     std::unique_ptr<SchematicClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
   } catch (Exception& e) {

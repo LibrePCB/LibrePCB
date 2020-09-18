@@ -68,7 +68,7 @@ QVector<Path> Path::toOutlineStrokes(const PositiveLength& width) const
   QVector<Path> paths;
   paths.reserve(mVertices.count());
   for (int i = 1; i < mVertices.count(); ++i) {  // skip first vertex!
-    const Vertex& v  = mVertices.at(i);
+    const Vertex& v = mVertices.at(i);
     const Vertex& v0 = mVertices.at(i - 1);
     if (v0.getAngle() == 0) {
       paths.append(obround(v0.getPos(), v.getPos(), width));
@@ -99,7 +99,7 @@ const QPainterPath& Path::toQPainterPathPx() const noexcept {
                 .abs()
                 .toPx();
         QPointF diffPx = v0.getPos().toPxQPointF() - centerPx;
-        qreal   startAngleDeg =
+        qreal startAngleDeg =
             -qRadiansToDegrees(qAtan2(diffPx.y(), diffPx.x()));
         mPainterPathPx.arcTo(centerPx.x() - radiusPx, centerPx.y() - radiusPx,
                              radiusPx * 2, radiusPx * 2, startAngleDeg,
@@ -194,7 +194,7 @@ void Path::serialize(SExpression& root) const {
  ******************************************************************************/
 
 Path& Path::operator=(const Path& rhs) noexcept {
-  mVertices      = rhs.mVertices;
+  mVertices = rhs.mVertices;
   mPainterPathPx = rhs.mPainterPathPx;
   return *this;
 }
@@ -213,7 +213,7 @@ Path Path::circle(const PositiveLength& diameter) noexcept {
 
 Path Path::obround(const PositiveLength& width,
                    const PositiveLength& height) noexcept {
-  Path   p;
+  Path p;
   Length rx = width / 2;
   Length ry = height / 2;
   if (width > height) {
@@ -240,7 +240,7 @@ Path Path::obround(const PositiveLength& width,
 Path Path::obround(const Point& p1, const Point& p2,
                    const PositiveLength& width) noexcept {
   Point diff = p2 - p1;
-  Path  p    = obround(UnsignedLength(diff.getLength()) + width, width);
+  Path p = obround(UnsignedLength(diff.getLength()) + width, width);
   p.rotate(Angle::fromRad(qAtan2(diff.getY().toMm(), diff.getX().toMm())));
   p.translate((p1 + p2) / 2);
   return p;
@@ -251,15 +251,15 @@ Path Path::arcObround(const Point& p1, const Point& p2, const Angle& angle,
   if (p1 == p2) {
     return circle(width).translated(p1);
   }
-  Length radius      = Toolbox::arcRadius(p1, p2, angle).abs();
+  Length radius = Toolbox::arcRadius(p1, p2, angle).abs();
   Length innerRadius = radius - (*width / 2);
   Length outerRadius = radius + (*width / 2);
-  Point  center      = Toolbox::arcCenter(p1, p2, angle);
-  Point  delta1      = p1 - center;
-  Point  delta2      = p2 - center;
-  qreal  angle1Rad   = qAtan2(delta1.getY().toPx(), delta1.getX().toPx());
-  qreal  angle2Rad   = qAtan2(delta2.getY().toPx(), delta2.getX().toPx());
-  Point  p1Inner =
+  Point center = Toolbox::arcCenter(p1, p2, angle);
+  Point delta1 = p1 - center;
+  Point delta2 = p2 - center;
+  qreal angle1Rad = qAtan2(delta1.getY().toPx(), delta1.getX().toPx());
+  qreal angle2Rad = qAtan2(delta2.getY().toPx(), delta2.getX().toPx());
+  Point p1Inner =
       center + Point(innerRadius, 0).rotated(Angle::fromRad(angle1Rad));
   Point p1Outer =
       center + Point(outerRadius, 0).rotated(Angle::fromRad(angle1Rad));
@@ -289,7 +289,7 @@ Path Path::rect(const Point& p1, const Point& p2) noexcept {
 
 Path Path::centeredRect(const PositiveLength& width,
                         const PositiveLength& height) noexcept {
-  Path   p;
+  Path p;
   Length rx = width / 2;
   Length ry = height / 2;
   p.addVertex(Point(-rx, ry));
@@ -302,10 +302,10 @@ Path Path::centeredRect(const PositiveLength& width,
 
 Path Path::octagon(const PositiveLength& width,
                    const PositiveLength& height) noexcept {
-  Path   p;
+  Path p;
   Length rx = width / 2;
   Length ry = height / 2;
-  Length a  = Length::fromMm(qMin(rx, ry).toMm() * (2 - qSqrt(2)));
+  Length a = Length::fromMm(qMin(rx, ry).toMm() * (2 - qSqrt(2)));
   p.addVertex(Point(rx, ry - a));
   p.addVertex(Point(rx - a, ry));
   p.addVertex(Point(a - rx, ry));
@@ -337,7 +337,7 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
 
   // some other very complex calculations...
   qreal angleDelta = angle.toMicroDeg() / (qreal)steps;
-  Point center     = Toolbox::arcCenter(p1, p2, angle);
+  Point center = Toolbox::arcCenter(p1, p2, angle);
 
   // create line segments
   Path p;
@@ -350,7 +350,7 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
 }
 
 QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths,
-                                    bool                 area) noexcept {
+                                    bool area) noexcept {
   QPainterPath p;
   p.setFillRule(Qt::WindingFill);
   foreach (const Path& path, paths) {

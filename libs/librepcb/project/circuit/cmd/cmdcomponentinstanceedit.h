@@ -78,16 +78,16 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Circuit&           mCircuit;
+  Circuit& mCircuit;
   ComponentInstance& mComponentInstance;
 
   // Misc
-  CircuitIdentifier  mOldName;
-  CircuitIdentifier  mNewName;
-  QString            mOldValue;
-  QString            mNewValue;
-  AttributeList      mOldAttributes;
-  AttributeList      mNewAttributes;
+  CircuitIdentifier mOldName;
+  CircuitIdentifier mNewName;
+  QString mOldValue;
+  QString mNewValue;
+  AttributeList mOldAttributes;
+  AttributeList mNewAttributes;
   tl::optional<Uuid> mOldDefaultDeviceUuid;
   tl::optional<Uuid> mNewDefaultDeviceUuid;
 };

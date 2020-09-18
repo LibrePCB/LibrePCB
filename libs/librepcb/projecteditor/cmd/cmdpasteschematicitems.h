@@ -53,9 +53,9 @@ class SchematicClipboardData;
 class CmdPasteSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdPasteSchematicItems()                                    = delete;
+  CmdPasteSchematicItems() = delete;
   CmdPasteSchematicItems(const CmdPasteSchematicItems& other) = delete;
-  CmdPasteSchematicItems(Schematic&                              schematic,
+  CmdPasteSchematicItems(Schematic& schematic,
                          std::unique_ptr<SchematicClipboardData> data,
                          const Point& posOffset) noexcept;
   ~CmdPasteSchematicItems() noexcept;
@@ -68,10 +68,10 @@ private:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  Project&                                mProject;
-  Schematic&                              mSchematic;
+  Project& mProject;
+  Schematic& mSchematic;
   std::unique_ptr<SchematicClipboardData> mData;
-  Point                                   mPosOffset;
+  Point mPosOffset;
 };
 
 /*******************************************************************************

@@ -64,21 +64,21 @@ CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept {
  ******************************************************************************/
 
 void CmdDeviceInstanceEdit::setPosition(const Point& pos,
-                                        bool         immediate) noexcept {
+                                        bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos = pos;
   if (immediate) mDevice.setPosition(mNewPos);
 }
 
 void CmdDeviceInstanceEdit::translate(const Point& deltaPos,
-                                      bool         immediate) noexcept {
+                                      bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
   if (immediate) mDevice.setPosition(mNewPos);
 }
 
 void CmdDeviceInstanceEdit::setRotation(const Angle& angle,
-                                        bool         immediate) noexcept {
+                                        bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;
   if (immediate) mDevice.setRotation(mNewRotation);
@@ -89,8 +89,8 @@ void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center,
   Q_ASSERT(!wasEverExecuted());
   mNewPos.rotate(angle, center);
   mNewRotation += mNewMirrored
-                      ? -angle
-                      : angle;  // mirror --> rotation direction is inverted!
+      ? -angle
+      : angle;  // mirror --> rotation direction is inverted!
   if (immediate) {
     mDevice.setPosition(mNewPos);
     mDevice.setRotation(mNewRotation);
@@ -105,11 +105,11 @@ void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) {
   mNewMirrored = mirrored;
 }
 
-void CmdDeviceInstanceEdit::mirror(const Point&    center,
+void CmdDeviceInstanceEdit::mirror(const Point& center,
                                    Qt::Orientation orientation,
-                                   bool            immediate) {
+                                   bool immediate) {
   Q_ASSERT(!wasEverExecuted());
-  bool  mirror   = !mNewMirrored;
+  bool mirror = !mNewMirrored;
   Point position = mNewPos;
   Angle rotation = mNewRotation;
   switch (orientation) {
@@ -135,7 +135,7 @@ void CmdDeviceInstanceEdit::mirror(const Point&    center,
     mDevice.setRotation(rotation);
   }
   mNewMirrored = mirror;
-  mNewPos      = position;
+  mNewPos = position;
   mNewRotation = rotation;
 }
 

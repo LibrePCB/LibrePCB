@@ -74,9 +74,8 @@ int NewElementWizardPage_ComponentSignals::nextId() const noexcept {
  ******************************************************************************/
 
 QHash<Uuid, CircuitIdentifier>
-NewElementWizardPage_ComponentSignals::getPinNames(const Uuid&    symbol,
-                                                   const QString& suffix) const
-    noexcept {
+    NewElementWizardPage_ComponentSignals::getPinNames(
+        const Uuid& symbol, const QString& suffix) const noexcept {
   QHash<Uuid, CircuitIdentifier> names;
   try {
     FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(

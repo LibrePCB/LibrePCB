@@ -99,10 +99,10 @@ void AttributeListModel::addAttribute(const QVariant& editData) noexcept {
     std::shared_ptr<Attribute> attr = std::make_shared<Attribute>(
         validateKeyOrThrow(mNewKey), *mNewType, mNewValue, mNewUnit);
     execCmd(new CmdAttributeInsert(*mAttributeList, attr));
-    mNewKey   = QString();
-    mNewType  = &AttrTypeString::instance();
+    mNewKey = QString();
+    mNewType = &AttrTypeString::instance();
     mNewValue = QString();
-    mNewUnit  = mNewType->getDefaultUnit();
+    mNewUnit = mNewType->getDefaultUnit();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
@@ -114,7 +114,7 @@ void AttributeListModel::removeAttribute(const QVariant& editData) noexcept {
   }
 
   try {
-    QString                    key  = editData.toString();
+    QString key = editData.toString();
     std::shared_ptr<Attribute> attr = mAttributeList->get(key);
     execCmd(new CmdAttributeRemove(*mAttributeList, attr.get()));
   } catch (const Exception& e) {
@@ -128,8 +128,8 @@ void AttributeListModel::moveAttributeUp(const QVariant& editData) noexcept {
   }
 
   try {
-    QString key   = editData.toString();
-    int     index = mAttributeList->indexOf(key);
+    QString key = editData.toString();
+    int index = mAttributeList->indexOf(key);
     if ((index >= 1) && (index < mAttributeList->count())) {
       execCmd(new CmdAttributesSwap(*mAttributeList, index, index - 1));
     }
@@ -144,8 +144,8 @@ void AttributeListModel::moveAttributeDown(const QVariant& editData) noexcept {
   }
 
   try {
-    QString key   = editData.toString();
-    int     index = mAttributeList->indexOf(key);
+    QString key = editData.toString();
+    int index = mAttributeList->indexOf(key);
     if ((index >= 0) && (index < mAttributeList->count() - 1)) {
       execCmd(new CmdAttributesSwap(*mAttributeList, index, index + 1));
     }
@@ -180,9 +180,9 @@ QVariant AttributeListModel::data(const QModelIndex& index, int role) const {
   std::shared_ptr<Attribute> item = mAttributeList->value(index.row());
   switch (index.column()) {
     case COLUMN_KEY: {
-      QString key      = item ? *item->getKey() : mNewKey;
-      bool    showHint = (!item) && mNewKey.isEmpty();
-      QString hint     = tr("Attribute key");
+      QString key = item ? *item->getKey() : mNewKey;
+      bool showHint = (!item) && mNewKey.isEmpty();
+      QString hint = tr("Attribute key");
       switch (role) {
         case Qt::DisplayRole:
           return showHint ? hint : key;
@@ -258,9 +258,9 @@ QVariant AttributeListModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
-QVariant AttributeListModel::headerData(int             section,
+QVariant AttributeListModel::headerData(int section,
                                         Qt::Orientation orientation,
-                                        int             role) const {
+                                        int role) const {
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
@@ -304,7 +304,7 @@ Qt::ItemFlags AttributeListModel::flags(const QModelIndex& index) const {
   if (index.isValid() && (index.column() != COLUMN_ACTIONS)) {
     if (index.column() == COLUMN_UNIT) {
       std::shared_ptr<Attribute> item = mAttributeList->value(index.row());
-      const AttributeType*       type = item ? &item->getType() : mNewType;
+      const AttributeType* type = item ? &item->getType() : mNewType;
       if (type->getAvailableUnits().count() > 1) {
         f |= Qt::ItemIsEditable;
       }
@@ -322,7 +322,7 @@ bool AttributeListModel::setData(const QModelIndex& index,
   }
 
   try {
-    std::shared_ptr<Attribute>       item = mAttributeList->value(index.row());
+    std::shared_ptr<Attribute> item = mAttributeList->value(index.row());
     QScopedPointer<CmdAttributeEdit> cmd;
     if (item) {
       cmd.reset(new CmdAttributeEdit(*item));
@@ -349,14 +349,14 @@ bool AttributeListModel::setData(const QModelIndex& index,
         cmd->setValue(value);
         cmd->setUnit(unit);
       } else {
-        mNewType  = type;
+        mNewType = type;
         mNewValue = value;
-        mNewUnit  = unit;
+        mNewUnit = unit;
       }
     } else if ((index.column() == COLUMN_VALUE) && role == Qt::EditRole) {
-      QString              attrValue = value.toString().trimmed();
-      const AttributeType* type      = item ? &item->getType() : mNewType;
-      const AttributeUnit* unit      = type->tryExtractUnitFromValue(attrValue);
+      QString attrValue = value.toString().trimmed();
+      const AttributeType* type = item ? &item->getType() : mNewType;
+      const AttributeUnit* unit = type->tryExtractUnitFromValue(attrValue);
       if (cmd) {
         cmd->setValue(attrValue);
         if (unit) {
@@ -398,7 +398,7 @@ bool AttributeListModel::setData(const QModelIndex& index,
 void AttributeListModel::attributeListEdited(
     const AttributeList& list, int index,
     const std::shared_ptr<const Attribute>& attribute,
-    AttributeList::Event                    event) noexcept {
+    AttributeList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(attribute);
   switch (event) {

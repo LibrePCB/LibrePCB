@@ -81,7 +81,7 @@ void GerberGenerator::drawLine(const Point& start, const Point& end,
 
 void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept {
   PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
-  Length         innerDia = circle.getDiameter() - circle.getLineWidth();
+  Length innerDia = circle.getDiameter() - circle.getLineWidth();
   if (innerDia < 0) innerDia = 0;
   flashCircle(circle.getCenter(), positiveToUnsigned(outerDia),
               UnsignedLength(innerDia));
@@ -101,7 +101,7 @@ void GerberGenerator::drawPathOutline(
   setCurrentAperture(mApertureList->setCircle(lineWidth, UnsignedLength(0)));
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex& v  = path.getVertices().at(i);
+    const Vertex& v = path.getVertices().at(i);
     const Vertex& v0 = path.getVertices().at(i - 1);
     interpolateBetween(v0, v);
   }
@@ -117,7 +117,7 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept {
   setRegionModeOn();
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex& v  = path.getVertices().at(i);
+    const Vertex& v = path.getVertices().at(i);
     const Vertex& v0 = path.getVertices().at(i - 1);
     interpolateBetween(v0, v);
   }
@@ -144,9 +144,9 @@ void GerberGenerator::flashObround(const Point& pos, const UnsignedLength& w,
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRegularPolygon(const Point&          pos,
+void GerberGenerator::flashRegularPolygon(const Point& pos,
                                           const UnsignedLength& dia, int n,
-                                          const Angle&          rot,
+                                          const Angle& rot,
                                           const UnsignedLength& hole) noexcept {
   setCurrentAperture(mApertureList->setRegularPolygon(dia, n, rot, hole));
   flashAtPosition(pos);
@@ -282,10 +282,10 @@ void GerberGenerator::printHeader() noexcept {
   mOutput.append("G04 --- HEADER BEGIN --- *\n");
 
   // add some X2 attributes
-  QString appVersion   = qApp->applicationVersion();
+  QString appVersion = qApp->applicationVersion();
   QString creationDate = QDateTime::currentDateTime().toString(Qt::ISODate);
-  QString projId       = mProjectId.remove(',');
-  QString projUuid     = mProjectUuid.toStr();
+  QString projId = mProjectId.remove(',');
+  QString projUuid = mProjectUuid.toStr();
   QString projRevision = mProjectRevision.remove(',');
   mOutput.append(QString("%TF.GenerationSoftware,LibrePCB,LibrePCB,%1*%\n")
                      .arg(appVersion));

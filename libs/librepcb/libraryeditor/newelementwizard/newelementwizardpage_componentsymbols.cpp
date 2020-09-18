@@ -64,8 +64,7 @@ bool NewElementWizardPage_ComponentSymbols::validatePage() noexcept {
 
 bool NewElementWizardPage_ComponentSymbols::isComplete() const noexcept {
   return (mContext.mComponentSymbolVariants.count() > 0) &&
-         (mContext.mComponentSymbolVariants.first()->getSymbolItems().count() >
-          0);
+      (mContext.mComponentSymbolVariants.first()->getSymbolItems().count() > 0);
 }
 
 int NewElementWizardPage_ComponentSymbols::nextId() const noexcept {

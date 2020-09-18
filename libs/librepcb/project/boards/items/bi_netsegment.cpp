@@ -181,7 +181,7 @@ bool BI_NetSegment::isUsed() const noexcept {
           (!mNetLines.isEmpty()));
 }
 
-int BI_NetSegment::getViasAtScenePos(const Point&    pos,
+int BI_NetSegment::getViasAtScenePos(const Point& pos,
                                      QList<BI_Via*>& vias) const noexcept {
   int count = 0;
   foreach (BI_Via* via, mVias) {
@@ -194,7 +194,7 @@ int BI_NetSegment::getViasAtScenePos(const Point&    pos,
   return count;
 }
 
-int BI_NetSegment::getNetPointsAtScenePos(const Point&         pos,
+int BI_NetSegment::getNetPointsAtScenePos(const Point& pos,
                                           const GraphicsLayer* layer,
                                           QList<BI_NetPoint*>& points) const
     noexcept {
@@ -210,9 +210,9 @@ int BI_NetSegment::getNetPointsAtScenePos(const Point&         pos,
   return count;
 }
 
-int BI_NetSegment::getNetLinesAtScenePos(const Point&         pos,
+int BI_NetSegment::getNetLinesAtScenePos(const Point& pos,
                                          const GraphicsLayer* layer,
-                                         QList<BI_NetLine*>&  lines) const
+                                         QList<BI_NetLine*>& lines) const
     noexcept {
   int count = 0;
   foreach (BI_NetLine* netline, mNetLines) {
@@ -236,14 +236,14 @@ BI_NetPoint* BI_NetSegment::getNetPointNextToScenePos(
       UnsignedLength distance = (netpoint->getPosition() - pos).getLength();
       if (distance < maxDistance) {
         maxDistance = distance;
-        result      = netpoint;
+        result = netpoint;
       }
     }
   }
   return result;
 }
 
-BI_Via* BI_NetSegment::getViaNextToScenePos(const Point&    pos,
+BI_Via* BI_NetSegment::getViaNextToScenePos(const Point& pos,
                                             UnsignedLength& maxDistance) const
     noexcept {
   BI_Via* result = nullptr;
@@ -254,7 +254,7 @@ BI_Via* BI_NetSegment::getViaNextToScenePos(const Point&    pos,
       UnsignedLength distance = (via->getPosition() - pos).getLength();
       if (distance < maxDistance) {
         maxDistance = distance;
-        result      = via;
+        result = via;
       }
     }
   }
@@ -319,9 +319,9 @@ BI_NetLine* BI_NetSegment::getNetLineByUuid(const Uuid& uuid) const noexcept {
  *  NetPoint+NetLine Methods
  ******************************************************************************/
 
-void BI_NetSegment::addElements(const QList<BI_Via*>&      vias,
+void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
                                 const QList<BI_NetPoint*>& netpoints,
-                                const QList<BI_NetLine*>&  netlines) {
+                                const QList<BI_NetLine*>& netlines) {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -395,9 +395,9 @@ void BI_NetSegment::addElements(const QList<BI_Via*>&      vias,
   sgl.dismiss();
 }
 
-void BI_NetSegment::removeElements(const QList<BI_Via*>&      vias,
+void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
                                    const QList<BI_NetPoint*>& netpoints,
-                                   const QList<BI_NetLine*>&  netlines) {
+                                   const QList<BI_NetLine*>& netlines) {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -591,12 +591,12 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
                   // together" :)
   }
   Q_ASSERT(p);
-  QSet<const BI_Via*>          vias;
-  QSet<const BI_NetPoint*>     points;
+  QSet<const BI_Via*> vias;
+  QSet<const BI_NetPoint*> points;
   QSet<const BI_FootprintPad*> pads;
   findAllConnectedNetPoints(*p, vias, pads, points);
   return (vias.count() == mVias.count()) &&
-         (points.count() == mNetPoints.count());
+      (points.count() == mNetPoints.count());
 }
 
 void BI_NetSegment::findAllConnectedNetPoints(

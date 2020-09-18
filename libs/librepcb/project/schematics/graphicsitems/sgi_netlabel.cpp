@@ -113,16 +113,16 @@ void SGI_NetLabel::setAnchor(const Point& pos) noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_NetLabel::paint(QPainter*                       painter,
+void SGI_NetLabel::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
-                         QWidget*                        widget) {
+                         QWidget* widget) {
   Q_UNUSED(widget);
   bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
   bool highlight = mNetLabel.isSelected() ||
-                   mNetLabel.getNetSignalOfNetSegment().isHighlighted();
+      mNetLabel.getNetSignalOfNetSegment().isHighlighted();
 
   GraphicsLayer* layer = getLayer(GraphicsLayer::sSchematicReferences);
   Q_ASSERT(layer);

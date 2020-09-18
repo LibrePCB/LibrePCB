@@ -95,13 +95,13 @@ BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
     noexcept {
   BoardDesignRuleCheck::Options options;
   options.minCopperCopperClearance = mUi->edtClearanceCopperCopper->getValue();
-  options.minCopperBoardClearance  = mUi->edtClearanceCopperBoard->getValue();
-  options.minCopperNpthClearance   = mUi->edtClearanceCopperNpth->getValue();
-  options.minCopperWidth           = mUi->edtMinCopperWidth->getValue();
-  options.minPthRestring           = mUi->edtMinPthRestring->getValue();
-  options.minPthDrillDiameter      = mUi->edtMinPthDrillDiameter->getValue();
-  options.minNpthDrillDiameter     = mUi->edtMinNpthDrillDiameter->getValue();
-  options.courtyardOffset          = mUi->edtCourtyardOffset->getValue();
+  options.minCopperBoardClearance = mUi->edtClearanceCopperBoard->getValue();
+  options.minCopperNpthClearance = mUi->edtClearanceCopperNpth->getValue();
+  options.minCopperWidth = mUi->edtMinCopperWidth->getValue();
+  options.minPthRestring = mUi->edtMinPthRestring->getValue();
+  options.minPthDrillDiameter = mUi->edtMinPthDrillDiameter->getValue();
+  options.minNpthDrillDiameter = mUi->edtMinNpthDrillDiameter->getValue();
+  options.courtyardOffset = mUi->edtCourtyardOffset->getValue();
   return options;
 }
 

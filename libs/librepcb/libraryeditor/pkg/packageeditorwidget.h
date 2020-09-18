@@ -66,7 +66,7 @@ class PackageEditorWidget final : public EditorWidgetBase,
 
 public:
   // Constructors / Destructor
-  PackageEditorWidget()                                 = delete;
+  PackageEditorWidget() = delete;
   PackageEditorWidget(const PackageEditorWidget& other) = delete;
   PackageEditorWidget(const Context& context, const FilePath& fp,
                       QWidget* parent = nullptr);
@@ -101,7 +101,7 @@ public slots:
   bool editGridProperties() noexcept override;
 
 private:  // Methods
-  void    updateMetadata() noexcept;
+  void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
   /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
@@ -114,20 +114,20 @@ private:  // Methods
   void fixMsg(const MessageType& msg);
   template <typename MessageType>
   bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
-                    bool                                              applyFix);
+                    bool applyFix);
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool                                              applyFix) override;
+      bool applyFix) override;
 
 private:  // Data
-  QScopedPointer<Ui::PackageEditorWidget>         mUi;
+  QScopedPointer<Ui::PackageEditorWidget> mUi;
   QScopedPointer<PackageCategoryListEditorWidget> mCategoriesEditorWidget;
-  QScopedPointer<GraphicsScene>                   mGraphicsScene;
-  QScopedPointer<Package>                         mPackage;
-  QScopedPointer<PackageEditorFsm>                mFsm;
+  QScopedPointer<GraphicsScene> mGraphicsScene;
+  QScopedPointer<Package> mPackage;
+  QScopedPointer<PackageEditorFsm> mFsm;
 
   // broken interface detection
-  QSet<Uuid>    mOriginalPadUuids;
+  QSet<Uuid> mOriginalPadUuids;
   FootprintList mOriginalFootprints;
 };
 

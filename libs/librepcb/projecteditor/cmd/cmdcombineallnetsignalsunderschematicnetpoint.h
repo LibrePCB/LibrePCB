@@ -64,8 +64,8 @@ private:
   bool performExecute() override;
 
   // Attributes from the constructor
-  Circuit&     mCircuit;
-  Schematic&   mSchematic;
+  Circuit& mCircuit;
+  Schematic& mSchematic;
   SI_NetPoint& mNetPoint;
 
   // Private Member Variables

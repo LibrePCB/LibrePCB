@@ -76,7 +76,7 @@ FootprintListEditorWidget::~FootprintListEditorWidget() noexcept {
  ******************************************************************************/
 
 void FootprintListEditorWidget::setReferences(FootprintList& list,
-                                              UndoStack&     stack) noexcept {
+                                              UndoStack& stack) noexcept {
   mModel->setFootprintList(&list);
   mModel->setUndoStack(&stack);
 }

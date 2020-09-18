@@ -46,17 +46,17 @@ class LibraryCategory : public LibraryBaseElement {
 
 public:
   // Constructors / Destructor
-  LibraryCategory()                             = delete;
+  LibraryCategory() = delete;
   LibraryCategory(const LibraryCategory& other) = delete;
   LibraryCategory(const QString& shortElementName,
                   const QString& longElementName, const Uuid& uuid,
                   const Version& version, const QString& author,
                   const ElementName& name_en_US,
-                  const QString&     description_en_US,
-                  const QString&     keywords_en_US);
+                  const QString& description_en_US,
+                  const QString& keywords_en_US);
   LibraryCategory(std::unique_ptr<TransactionalDirectory> directory,
-                  const QString&                          shortElementName,
-                  const QString&                          longElementName);
+                  const QString& shortElementName,
+                  const QString& longElementName);
   virtual ~LibraryCategory() noexcept;
 
   // Getters: Attributes

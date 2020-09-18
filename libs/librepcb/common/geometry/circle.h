@@ -58,7 +58,7 @@ public:
     CenterChanged,
     DiameterChanged,
   };
-  Signal<Circle, Event>       onEdited;
+  Signal<Circle, Event> onEdited;
   typedef Slot<Circle, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -72,13 +72,13 @@ public:
   virtual ~Circle() noexcept;
 
   // Getters
-  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
-  const UnsignedLength&    getLineWidth() const noexcept { return mLineWidth; }
-  bool                     isFilled() const noexcept { return mIsFilled; }
-  bool                     isGrabArea() const noexcept { return mIsGrabArea; }
-  const Point&             getCenter() const noexcept { return mCenter; }
-  const PositiveLength&    getDiameter() const noexcept { return mDiameter; }
+  const UnsignedLength& getLineWidth() const noexcept { return mLineWidth; }
+  bool isFilled() const noexcept { return mIsFilled; }
+  bool isGrabArea() const noexcept { return mIsGrabArea; }
+  const Point& getCenter() const noexcept { return mCenter; }
+  const PositiveLength& getDiameter() const noexcept { return mDiameter; }
 
   // Setters
   bool setLayerName(const GraphicsLayerName& name) noexcept;
@@ -97,13 +97,13 @@ public:
   Circle& operator=(const Circle& rhs) noexcept;
 
 private:  // Data
-  Uuid              mUuid;
+  Uuid mUuid;
   GraphicsLayerName mLayerName;
-  UnsignedLength    mLineWidth;
-  bool              mIsFilled;
-  bool              mIsGrabArea;
-  Point             mCenter;
-  PositiveLength    mDiameter;
+  UnsignedLength mLineWidth;
+  bool mIsFilled;
+  bool mIsGrabArea;
+  Point mCenter;
+  PositiveLength mDiameter;
 };
 
 /*******************************************************************************

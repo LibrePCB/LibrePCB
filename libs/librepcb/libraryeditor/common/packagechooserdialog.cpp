@@ -48,7 +48,7 @@ namespace editor {
  ******************************************************************************/
 
 PackageChooserDialog::PackageChooserDialog(
-    const workspace::Workspace&     ws,
+    const workspace::Workspace& ws,
     const IF_GraphicsLayerProvider* layerProvider, QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
@@ -182,8 +182,8 @@ void PackageChooserDialog::setSelectedCategory(
 void PackageChooserDialog::setSelectedPackage(
     const tl::optional<Uuid>& uuid) noexcept {
   FilePath fp;
-  QString  name = tr("No package selected");
-  QString  desc;
+  QString name = tr("No package selected");
+  QString desc;
   mSelectedPackageUuid = uuid;
 
   if (uuid) {

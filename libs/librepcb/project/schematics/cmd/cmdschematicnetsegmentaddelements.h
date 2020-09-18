@@ -55,9 +55,9 @@ public:
   // General Methods
   SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);
   SI_NetPoint* addNetPoint(const Point& position);
-  SI_NetLine*  addNetLine(SI_NetLine& netline);
-  SI_NetLine*  addNetLine(SI_NetLineAnchor& startPoint,
-                          SI_NetLineAnchor& endPoint);
+  SI_NetLine* addNetLine(SI_NetLine& netline);
+  SI_NetLine* addNetLine(SI_NetLineAnchor& startPoint,
+                         SI_NetLineAnchor& endPoint);
 
 private:
   // Private Methods
@@ -73,9 +73,9 @@ private:
 
   // Private Member Variables
 
-  SI_NetSegment&      mNetSegment;
+  SI_NetSegment& mNetSegment;
   QList<SI_NetPoint*> mNetPoints;
-  QList<SI_NetLine*>  mNetLines;
+  QList<SI_NetLine*> mNetLines;
 };
 
 /*******************************************************************************

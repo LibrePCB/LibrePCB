@@ -56,7 +56,7 @@ public:
   const ElementName& getName() const noexcept { return mName; }
   ElementName getFixedName() const noexcept { return getFixedName(mName); }
 
-  static bool        isTitleCase(const ElementName& name) noexcept;
+  static bool isTitleCase(const ElementName& name) noexcept;
   static ElementName getFixedName(const ElementName& name) noexcept;
 
 private:

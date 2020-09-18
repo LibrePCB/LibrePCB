@@ -102,7 +102,7 @@ bool CmdAddDeviceToBoard::performExecute() {
 
   // if there is no such package in the project's library, copy it from the
   // workspace library to the project's library
-  Uuid              pkgUuid = dev->getPackageUuid();
+  Uuid pkgUuid = dev->getPackageUuid();
   library::Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
   if (!pkg) {
     FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);

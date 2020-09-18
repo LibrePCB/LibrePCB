@@ -55,7 +55,7 @@ namespace editor {
 class CmdDragSelectedSymbolItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdDragSelectedSymbolItems()                                        = delete;
+  CmdDragSelectedSymbolItems() = delete;
   CmdDragSelectedSymbolItems(const CmdDragSelectedSymbolItems& other) = delete;
   explicit CmdDragSelectedSymbolItems(
       const SymbolEditorState::Context& context) noexcept;
@@ -81,16 +81,16 @@ private:
 
   // Private Member Variables
   const SymbolEditorState::Context& mContext;
-  Point                             mCenterPos;
-  Point                             mDeltaPos;
-  Angle                             mDeltaRot;
-  bool                              mMirrored;
+  Point mCenterPos;
+  Point mDeltaPos;
+  Angle mDeltaRot;
+  bool mMirrored;
 
   // Move commands
   QList<CmdSymbolPinEdit*> mPinEditCmds;
-  QList<CmdCircleEdit*>    mCircleEditCmds;
-  QList<CmdPolygonEdit*>   mPolygonEditCmds;
-  QList<CmdTextEdit*>      mTextEditCmds;
+  QList<CmdCircleEdit*> mCircleEditCmds;
+  QList<CmdPolygonEdit*> mPolygonEditCmds;
+  QList<CmdTextEdit*> mTextEditCmds;
 };
 
 /*******************************************************************************

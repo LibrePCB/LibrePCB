@@ -42,23 +42,23 @@ class NetworkRequestBaseSignalReceiver final : public QObject {
   Q_OBJECT
 
 public:
-  QThread*   mThread;
-  int        mProgressStateCallCount;
-  int        mSimpleProgressCallCount;
-  int        mAdvancedProgressCallCount;
-  int        mAbortedCallCount;
-  int        mSucceededCallCount;
-  int        mErroredCallCount;
-  int        mFinishedCallCount;
-  int        mDataReceivedCallCount;
-  int        mFileDownloadedCallCount;
-  int        mZipFileExtractedCallCount;
-  bool       mDestroyed;
-  QString    mErrorMessage;
-  bool       mFinishedSuccess;
+  QThread* mThread;
+  int mProgressStateCallCount;
+  int mSimpleProgressCallCount;
+  int mAdvancedProgressCallCount;
+  int mAbortedCallCount;
+  int mSucceededCallCount;
+  int mErroredCallCount;
+  int mFinishedCallCount;
+  int mDataReceivedCallCount;
+  int mFileDownloadedCallCount;
+  int mZipFileExtractedCallCount;
+  bool mDestroyed;
+  QString mErrorMessage;
+  bool mFinishedSuccess;
   QByteArray mReceivedData;
-  FilePath   mDownloadedToFilePath;
-  FilePath   mExtractedToFilePath;
+  FilePath mDownloadedToFilePath;
+  FilePath mExtractedToFilePath;
 
   NetworkRequestBaseSignalReceiver()
     : QObject(),

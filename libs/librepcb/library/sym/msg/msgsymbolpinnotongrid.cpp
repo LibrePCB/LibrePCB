@@ -36,7 +36,7 @@ namespace library {
 
 MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
     std::shared_ptr<const SymbolPin> pin,
-    const PositiveLength&            gridInterval) noexcept
+    const PositiveLength& gridInterval) noexcept
   : LibraryElementCheckMessage(
         Severity::Error,
         tr("Pin not on %1mm grid: '%2'")

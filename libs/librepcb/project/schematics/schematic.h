@@ -100,58 +100,58 @@ public:
    */
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
-    ZValue_Symbols,      ///< Z value for ::librepcb::project::SI_Symbol items
-    ZValue_NetLabels,    ///< Z value for ::librepcb::project::SI_NetLabel items
-    ZValue_NetLines,     ///< Z value for ::librepcb::project::SI_NetLine items
-    ZValue_HiddenNetPoints,   ///< Z value for hidden
-                              ///< ::librepcb::project::SI_NetPoint items
+    ZValue_Symbols,  ///< Z value for ::librepcb::project::SI_Symbol items
+    ZValue_NetLabels,  ///< Z value for ::librepcb::project::SI_NetLabel items
+    ZValue_NetLines,  ///< Z value for ::librepcb::project::SI_NetLine items
+    ZValue_HiddenNetPoints,  ///< Z value for hidden
+                             ///< ::librepcb::project::SI_NetPoint items
     ZValue_VisibleNetPoints,  ///< Z value for visible
                               ///< ::librepcb::project::SI_NetPoint items
   };
 
   // Constructors / Destructor
-  Schematic()                       = delete;
+  Schematic() = delete;
   Schematic(const Schematic& other) = delete;
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory)
     : Schematic(project, std::move(directory), false, QString()) {}
   ~Schematic() noexcept;
 
   // Getters: General
-  Project&              getProject() const noexcept { return mProject; }
-  FilePath              getFilePath() const noexcept;
+  Project& getProject() const noexcept { return mProject; }
+  FilePath getFilePath() const noexcept;
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
-  GraphicsScene&  getGraphicsScene() const noexcept { return *mGraphicsScene; }
-  bool            isEmpty() const noexcept;
+  GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
+  bool isEmpty() const noexcept;
   QList<SI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
-  QList<SI_NetPoint*>  getNetPointsAtScenePos(const Point& pos) const noexcept;
-  QList<SI_NetLine*>   getNetLinesAtScenePos(const Point& pos) const noexcept;
-  QList<SI_NetLabel*>  getNetLabelsAtScenePos(const Point& pos) const noexcept;
+  QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
+  QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
+  QList<SI_NetLabel*> getNetLabelsAtScenePos(const Point& pos) const noexcept;
   QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
 
   // Setters: General
   void setGridProperties(const GridProperties& grid) noexcept;
 
   // Getters: Attributes
-  const Uuid&        getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
-  const QIcon&       getIcon() const noexcept { return mIcon; }
+  const QIcon& getIcon() const noexcept { return mIcon; }
 
   // Setters: Attributes
   void setName(const ElementName& name) noexcept;
 
   // Symbol Methods
   QList<SI_Symbol*> getSymbols() const noexcept { return mSymbols; }
-  SI_Symbol*        getSymbolByUuid(const Uuid& uuid) const noexcept;
-  void              addSymbol(SI_Symbol& symbol);
-  void              removeSymbol(SI_Symbol& symbol);
+  SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
+  void addSymbol(SI_Symbol& symbol);
+  void removeSymbol(SI_Symbol& symbol);
 
   // NetSegment Methods
   QList<SI_NetSegment*> getNetSegments() const noexcept { return mNetSegments; }
-  SI_NetSegment*        getNetSegmentByUuid(const Uuid& uuid) const noexcept;
-  void                  addNetSegment(SI_NetSegment& netsegment);
-  void                  removeNetSegment(SI_NetSegment& netsegment);
+  SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
+  void addNetSegment(SI_NetSegment& netsegment);
+  void removeNetSegment(SI_NetSegment& netsegment);
 
   // General Methods
   void addToProject();
@@ -160,12 +160,12 @@ public:
   void showInView(GraphicsView& view) noexcept;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
-  void          selectAll() noexcept;
-  void          setSelectionRect(const Point& p1, const Point& p2,
-                                 bool updateItems) noexcept;
-  void          clearSelection() const noexcept;
-  void          updateAllNetLabelAnchors() noexcept;
-  void          renderToQPainter(QPainter& painter) const noexcept;
+  void selectAll() noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2,
+                        bool updateItems) noexcept;
+  void clearSelection() const noexcept;
+  void updateAllNetLabelAnchors() noexcept;
+  void renderToQPainter(QPainter& painter) const noexcept;
   std::unique_ptr<SchematicSelectionQuery> createSelectionQuery() const
       noexcept;
 
@@ -182,9 +182,9 @@ public:
   bool operator!=(const Schematic& rhs) noexcept { return (this != &rhs); }
 
   // Static Methods
-  static Schematic* create(Project&                                project,
+  static Schematic* create(Project& project,
                            std::unique_ptr<TransactionalDirectory> directory,
-                           const ElementName&                      name);
+                           const ElementName& name);
 
 signals:
 
@@ -202,18 +202,18 @@ private:
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   std::unique_ptr<TransactionalDirectory> mDirectory;
-  bool                                    mIsAddedToProject;
+  bool mIsAddedToProject;
 
-  QScopedPointer<GraphicsScene>  mGraphicsScene;
+  QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<GridProperties> mGridProperties;
-  QRectF                         mViewRect;
+  QRectF mViewRect;
 
   // Attributes
-  Uuid        mUuid;
+  Uuid mUuid;
   ElementName mName;
-  QIcon       mIcon;
+  QIcon mIcon;
 
-  QList<SI_Symbol*>     mSymbols;
+  QList<SI_Symbol*> mSymbols;
   QList<SI_NetSegment*> mNetSegments;
 };
 

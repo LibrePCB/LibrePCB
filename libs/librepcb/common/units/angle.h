@@ -297,9 +297,9 @@ public:
   static Angle fromRad(qreal radians) noexcept;
 
   // Static Methods to create often used angles
-  static Angle deg0() noexcept { return Angle(0); }            ///<   0 degrees
-  static Angle deg45() noexcept { return Angle(45000000); }    ///<  45 degrees
-  static Angle deg90() noexcept { return Angle(90000000); }    ///<  90 degrees
+  static Angle deg0() noexcept { return Angle(0); }  ///<   0 degrees
+  static Angle deg45() noexcept { return Angle(45000000); }  ///<  45 degrees
+  static Angle deg90() noexcept { return Angle(90000000); }  ///<  90 degrees
   static Angle deg135() noexcept { return Angle(135000000); }  ///< 135 degrees
   static Angle deg180() noexcept { return Angle(180000000); }  ///< 180 degrees
   static Angle deg225() noexcept { return Angle(225000000); }  ///< 225 degrees
@@ -360,7 +360,7 @@ public:
   bool operator!=(const Angle& rhs) const {
     return mMicrodegrees != rhs.mMicrodegrees;
   }
-  bool     operator!=(qint32 rhs) const { return mMicrodegrees != rhs; }
+  bool operator!=(qint32 rhs) const { return mMicrodegrees != rhs; }
   explicit operator bool() const { return mMicrodegrees != 0; }
 
 private:
@@ -395,7 +395,7 @@ inline SExpression serializeToSExpression(const Angle& obj) {
 
 template <>
 inline Angle deserializeFromSExpression(const SExpression& sexpr,
-                                        bool               throwIfEmpty) {
+                                        bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Angle::fromDeg(str);  // can throw
 }

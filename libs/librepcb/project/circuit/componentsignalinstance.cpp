@@ -47,7 +47,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentSignalInstance::ComponentSignalInstance(Circuit&           circuit,
+ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
                                                  ComponentInstance& cmpInstance,
                                                  const SExpression& node)
   : QObject(&cmpInstance),
@@ -58,7 +58,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit&           circuit,
     mNetSignal(nullptr) {
   // read attributes
   Uuid compSignalUuid = node.getChildByIndex(0).getValue<Uuid>();
-  mComponentSignal    = mComponentInstance.getLibComponent()
+  mComponentSignal = mComponentInstance.getLibComponent()
                          .getSignals()
                          .get(compSignalUuid)
                          .get();  // can throw
@@ -199,7 +199,7 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) {
     });
   }
   NetSignal* old = mNetSignal;
-  mNetSignal     = netsignal;
+  mNetSignal = netsignal;
   updateErcMessages();
   sgl.dismiss();
   emit netSignalChanged(old, mNetSignal);

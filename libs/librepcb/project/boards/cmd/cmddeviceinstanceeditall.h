@@ -62,7 +62,7 @@ public:
   void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
 
 private:
-  CmdDeviceInstanceEdit*      mDevEditCmd;
+  CmdDeviceInstanceEdit* mDevEditCmd;
   QVector<CmdStrokeTextEdit*> mTextEditCmds;
 };
 

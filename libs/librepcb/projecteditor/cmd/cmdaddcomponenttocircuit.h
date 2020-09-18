@@ -61,7 +61,7 @@ public:
   // Constructors / Destructor
   CmdAddComponentToCircuit(
       workspace::Workspace& workspace, Project& project, const Uuid& component,
-      const Uuid&               symbolVariant,
+      const Uuid& symbolVariant,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
   ~CmdAddComponentToCircuit() noexcept;
 
@@ -78,10 +78,10 @@ private:
 
   // Attributes from the constructor
   workspace::Workspace& mWorkspace;
-  Project&              mProject;
-  Uuid                  mComponentUuid;
-  Uuid                  mSymbVarUuid;
-  tl::optional<Uuid>    mDefaultDeviceUuid;
+  Project& mProject;
+  Uuid mComponentUuid;
+  Uuid mSymbVarUuid;
+  tl::optional<Uuid> mDefaultDeviceUuid;
 
   // child commands
   CmdComponentInstanceAdd* mCmdAddToCircuit;

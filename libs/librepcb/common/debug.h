@@ -67,12 +67,12 @@ public:
     Nothing = 0,  ///< nothing
     Fatal =
         10,  ///< fatal errors [qFatal()] --> this will quit the application!
-    Critical  = 20,  ///< errors [qCritical()]
+    Critical = 20,  ///< errors [qCritical()]
     Exception = 30,  ///< thrown exceptions of (sub)class Exception
-    Warning   = 40,  ///< warnings [qWarning()]
-    Info      = 50,  ///< info messages [qInfo()]
+    Warning = 40,  ///< warnings [qWarning()]
+    Info = 50,  ///< info messages [qInfo()]
     DebugMsg =
-        60,     ///< irrelevant debug messages (a lot of messages!) [qDebug()]
+        60,  ///< irrelevant debug messages (a lot of messages!) [qDebug()]
     All = 100,  ///< all
   };
 
@@ -173,11 +173,11 @@ private:
   DebugLevel_t
       mDebugLevelStderr;  ///< the current debug level for the stderr output
   DebugLevel_t
-               mDebugLevelLogFile;  ///< the current debug level for the log file
-  QTextStream* mStderrStream;       ///< the stream to stderr
-  FilePath     mLogFilepath;        ///< the filepath for the log file
-  QFile*       mLogFile;            ///< NULL if file logging is disabled
-  QMutex       mMutex;              ///< for thread safety
+      mDebugLevelLogFile;  ///< the current debug level for the log file
+  QTextStream* mStderrStream;  ///< the stream to stderr
+  FilePath mLogFilepath;  ///< the filepath for the log file
+  QFile* mLogFile;  ///< NULL if file logging is disabled
+  QMutex mMutex;  ///< for thread safety
 };
 
 /*******************************************************************************

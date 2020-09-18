@@ -46,7 +46,7 @@ class BI_Plane;
 class CmdBoardPlaneAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardPlaneAdd()                              = delete;
+  CmdBoardPlaneAdd() = delete;
   CmdBoardPlaneAdd(const CmdBoardPlaneAdd& other) = delete;
   explicit CmdBoardPlaneAdd(BI_Plane& plane) noexcept;
   ~CmdBoardPlaneAdd() noexcept;
@@ -62,7 +62,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  Board&    mBoard;
+  Board& mBoard;
   BI_Plane& mPlane;
 };
 

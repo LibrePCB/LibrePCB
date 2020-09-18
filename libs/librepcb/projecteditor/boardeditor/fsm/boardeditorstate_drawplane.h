@@ -57,7 +57,7 @@ class BoardEditorState_DrawPlane final : public BoardEditorState {
 
 public:
   // Constructors / Destructor
-  BoardEditorState_DrawPlane()                                        = delete;
+  BoardEditorState_DrawPlane() = delete;
   BoardEditorState_DrawPlane(const BoardEditorState_DrawPlane& other) = delete;
   explicit BoardEditorState_DrawPlane(const Context& context) noexcept;
   virtual ~BoardEditorState_DrawPlane() noexcept;
@@ -93,21 +93,21 @@ private:  // Methods
 
 private:  // Data
   // State
-  bool              mIsUndoCmdActive;
-  NetSignal*        mLastNetSignal;
+  bool mIsUndoCmdActive;
+  NetSignal* mLastNetSignal;
   GraphicsLayerName mLastLayerName;
-  Point             mLastVertexPos;
+  Point mLastVertexPos;
 
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
-  BI_Plane*                         mCurrentPlane;
+  BI_Plane* mCurrentPlane;
   QScopedPointer<CmdBoardPlaneEdit> mCurrentPlaneEditCmd;
 
   // Widgets for the command toolbar
-  QList<QAction*>                       mActionSeparators;
-  QScopedPointer<QLabel>                mNetSignalLabel;
-  QScopedPointer<QComboBox>             mNetSignalComboBox;
-  QScopedPointer<QLabel>                mLayerLabel;
+  QList<QAction*> mActionSeparators;
+  QScopedPointer<QLabel> mNetSignalLabel;
+  QScopedPointer<QComboBox> mNetSignalComboBox;
+  QScopedPointer<QLabel> mLayerLabel;
   QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
 };
 

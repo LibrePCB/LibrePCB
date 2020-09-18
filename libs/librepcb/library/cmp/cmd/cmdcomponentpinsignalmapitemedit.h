@@ -60,7 +60,7 @@ public:
   void setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
   // Operator Overloadings
-  CmdComponentPinSignalMapItemEdit& operator       =(
+  CmdComponentPinSignalMapItemEdit& operator=(
       const CmdComponentPinSignalMapItemEdit& rhs) = delete;
 
 private:  // Methods
@@ -76,8 +76,8 @@ private:  // Methods
 private:  // Data
   ComponentPinSignalMapItem& mItem;
 
-  tl::optional<Uuid>   mOldSignalUuid;
-  tl::optional<Uuid>   mNewSignalUuid;
+  tl::optional<Uuid> mOldSignalUuid;
+  tl::optional<Uuid> mNewSignalUuid;
   CmpSigPinDisplayType mOldDisplayType;
   CmpSigPinDisplayType mNewDisplayType;
 };

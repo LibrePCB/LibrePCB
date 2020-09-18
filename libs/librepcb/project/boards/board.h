@@ -111,16 +111,16 @@ public:
     ZValue_CopperTop,
     ZValue_FootprintPadsTop,  ///< Z value for
                               ///< librepcb::project::BI_FootprintPad items
-    ZValue_FootprintsTop,     ///< Z value for librepcb::project::BI_Footprint
-                              ///< items
+    ZValue_FootprintsTop,  ///< Z value for librepcb::project::BI_Footprint
+                           ///< items
     ZValue_TextsTop,  ///< Z value for librepcb::project::BI_StrokeText items
-    ZValue_Vias,      ///< Z value for librepcb::project::BI_Via items
-    ZValue_Texts,     ///< Z value for librepcb::project::BI_StrokeText items
+    ZValue_Vias,  ///< Z value for librepcb::project::BI_Via items
+    ZValue_Texts,  ///< Z value for librepcb::project::BI_StrokeText items
     ZValue_AirWires,  ///< Z value for librepcb::project::BI_AirWire items
   };
 
   // Constructors / Destructor
-  Board()                   = delete;
+  Board() = delete;
   Board(const Board& other) = delete;
   Board(const Board& other, std::unique_ptr<TransactionalDirectory> directory,
         const ElementName& name);
@@ -129,15 +129,15 @@ public:
   ~Board() noexcept;
 
   // Getters: General
-  Project&              getProject() const noexcept { return mProject; }
-  FilePath              getFilePath() const noexcept;
+  Project& getProject() const noexcept { return mProject; }
+  FilePath getFilePath() const noexcept;
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
-  GraphicsScene&   getGraphicsScene() const noexcept { return *mGraphicsScene; }
+  GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   BoardLayerStack& getLayerStack() noexcept { return *mLayerStack; }
   const BoardLayerStack& getLayerStack() const noexcept { return *mLayerStack; }
-  BoardDesignRules&      getDesignRules() noexcept { return *mDesignRules; }
+  BoardDesignRules& getDesignRules() noexcept { return *mDesignRules; }
   const BoardDesignRules& getDesignRules() const noexcept {
     return *mDesignRules;
   }
@@ -148,10 +148,10 @@ public:
       noexcept {
     return *mFabricationOutputSettings;
   }
-  bool            isEmpty() const noexcept;
+  bool isEmpty() const noexcept;
   QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
-  QList<BI_Via*>  getViasAtScenePos(const Point&     pos,
-                                    const NetSignal* netsignal = nullptr) const
+  QList<BI_Via*> getViasAtScenePos(const Point& pos,
+                                   const NetSignal* netsignal = nullptr) const
       noexcept;
   QList<BI_NetPoint*> getNetPointsAtScenePos(
       const Point& pos, const GraphicsLayer* layer = nullptr,
@@ -165,24 +165,24 @@ public:
 
   BI_NetPoint* getNetPointNextToScenePos(
       const Point& pos, UnsignedLength& maxDistance,
-      const GraphicsLayer* layer     = nullptr,
-      const NetSignal*     netsignal = nullptr) const;
+      const GraphicsLayer* layer = nullptr,
+      const NetSignal* netsignal = nullptr) const;
   BI_Via* getViaNextToScenePos(const Point& pos, UnsignedLength& maxDistance,
                                const NetSignal* netsignal = nullptr) const;
   BI_FootprintPad* getPadNextToScenePos(
       const Point& pos, UnsignedLength& maxDistance,
-      const GraphicsLayer* layer     = nullptr,
-      const NetSignal*     netsignal = nullptr) const;
+      const GraphicsLayer* layer = nullptr,
+      const NetSignal* netsignal = nullptr) const;
   QList<BI_Base*> getAllItems() const noexcept;
 
   // Setters: General
   void setGridProperties(const GridProperties& grid) noexcept;
 
   // Getters: Attributes
-  const Uuid&        getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
-  const QIcon&       getIcon() const noexcept { return mIcon; }
-  const QString&     getDefaultFontName() const noexcept {
+  const QIcon& getIcon() const noexcept { return mIcon; }
+  const QString& getDefaultFontName() const noexcept {
     return mDefaultFontFileName;
   }
 
@@ -191,27 +191,27 @@ public:
     return mDeviceInstances;
   }
   BI_Device* getDeviceInstanceByComponentUuid(const Uuid& uuid) const noexcept;
-  void       addDeviceInstance(BI_Device& instance);
-  void       removeDeviceInstance(BI_Device& instance);
+  void addDeviceInstance(BI_Device& instance);
+  void removeDeviceInstance(BI_Device& instance);
 
   // NetSegment Methods
   const QList<BI_NetSegment*>& getNetSegments() const noexcept {
     return mNetSegments;
   }
   BI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
-  void           addNetSegment(BI_NetSegment& netsegment);
-  void           removeNetSegment(BI_NetSegment& netsegment);
+  void addNetSegment(BI_NetSegment& netsegment);
+  void removeNetSegment(BI_NetSegment& netsegment);
 
   // Plane Methods
   const QList<BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
-  void                    addPlane(BI_Plane& plane);
-  void                    removePlane(BI_Plane& plane);
-  void                    rebuildAllPlanes() noexcept;
+  void addPlane(BI_Plane& plane);
+  void removePlane(BI_Plane& plane);
+  void rebuildAllPlanes() noexcept;
 
   // Polygon Methods
   const QList<BI_Polygon*>& getPolygons() const noexcept { return mPolygons; }
-  void                      addPolygon(BI_Polygon& polygon);
-  void                      removePolygon(BI_Polygon& polygon);
+  void addPolygon(BI_Polygon& polygon);
+  void removePolygon(BI_Polygon& polygon);
 
   // StrokeText Methods
   const QList<BI_StrokeText*>& getStrokeTexts() const noexcept {
@@ -222,12 +222,12 @@ public:
 
   // Hole Methods
   const QList<BI_Hole*>& getHoles() const noexcept { return mHoles; }
-  void                   addHole(BI_Hole& hole);
-  void                   removeHole(BI_Hole& hole);
+  void addHole(BI_Hole& hole);
+  void removeHole(BI_Hole& hole);
 
   // AirWire Methods
   QList<BI_AirWire*> getAirWires() const noexcept { return mAirWires.values(); }
-  void               scheduleAirWiresRebuild(NetSignal* netsignal) noexcept {
+  void scheduleAirWiresRebuild(NetSignal* netsignal) noexcept {
     mScheduledNetSignalsForAirWireRebuild.insert(netsignal);
   }
   void triggerAirWiresRebuild() noexcept;
@@ -257,10 +257,10 @@ public:
   void showInView(GraphicsView& view) noexcept;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
-  void          selectAll() noexcept;
-  void          setSelectionRect(const Point& p1, const Point& p2,
-                                 bool updateItems) noexcept;
-  void          clearSelection() const noexcept;
+  void selectAll() noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2,
+                        bool updateItems) noexcept;
+  void clearSelection() const noexcept;
   std::unique_ptr<BoardSelectionQuery> createSelectionQuery() const noexcept;
 
   // Inherited from AttributeProvider
@@ -272,13 +272,13 @@ public:
 
   // Operator Overloadings
   Board& operator=(const Board& rhs) = delete;
-  bool   operator==(const Board& rhs) noexcept { return (this == &rhs); }
-  bool   operator!=(const Board& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const Board& rhs) noexcept { return (this == &rhs); }
+  bool operator!=(const Board& rhs) noexcept { return (this != &rhs); }
 
   // Static Methods
-  static Board* create(Project&                                project,
+  static Board* create(Project& project,
                        std::unique_ptr<TransactionalDirectory> directory,
-                       const ElementName&                      name);
+                       const ElementName& name);
 
 signals:
 
@@ -300,30 +300,30 @@ private:
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   std::unique_ptr<TransactionalDirectory> mDirectory;
-  bool                                    mIsAddedToProject;
+  bool mIsAddedToProject;
 
-  QScopedPointer<GraphicsScene>                  mGraphicsScene;
-  QScopedPointer<BoardLayerStack>                mLayerStack;
-  QScopedPointer<GridProperties>                 mGridProperties;
-  QScopedPointer<BoardDesignRules>               mDesignRules;
+  QScopedPointer<GraphicsScene> mGraphicsScene;
+  QScopedPointer<BoardLayerStack> mLayerStack;
+  QScopedPointer<GridProperties> mGridProperties;
+  QScopedPointer<BoardDesignRules> mDesignRules;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
-  QScopedPointer<BoardUserSettings>              mUserSettings;
-  QRectF                                         mViewRect;
+  QScopedPointer<BoardUserSettings> mUserSettings;
+  QRectF mViewRect;
   QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;
 
   // Attributes
-  Uuid        mUuid;
+  Uuid mUuid;
   ElementName mName;
-  QIcon       mIcon;
-  QString     mDefaultFontFileName;
+  QIcon mIcon;
+  QString mDefaultFontFileName;
 
   // items
-  QMap<Uuid, BI_Device*>              mDeviceInstances;
-  QList<BI_NetSegment*>               mNetSegments;
-  QList<BI_Plane*>                    mPlanes;
-  QList<BI_Polygon*>                  mPolygons;
-  QList<BI_StrokeText*>               mStrokeTexts;
-  QList<BI_Hole*>                     mHoles;
+  QMap<Uuid, BI_Device*> mDeviceInstances;
+  QList<BI_NetSegment*> mNetSegments;
+  QList<BI_Plane*> mPlanes;
+  QList<BI_Polygon*> mPolygons;
+  QList<BI_StrokeText*> mStrokeTexts;
+  QList<BI_Hole*> mHoles;
   QMultiHash<NetSignal*, BI_AirWire*> mAirWires;
 
   // ERC messages

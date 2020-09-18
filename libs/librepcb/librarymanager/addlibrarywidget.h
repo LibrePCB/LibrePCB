@@ -93,10 +93,10 @@ private:  // Methods
                                                    bool isFilename) noexcept;
 
 private:  // Data
-  workspace::Workspace&                mWorkspace;
+  workspace::Workspace& mWorkspace;
   QScopedPointer<Ui::AddLibraryWidget> mUi;
-  QScopedPointer<LibraryDownload>      mManualLibraryDownload;
-  QList<std::shared_ptr<Repository>>   mRepositories;
+  QScopedPointer<LibraryDownload> mManualLibraryDownload;
+  QList<std::shared_ptr<Repository>> mRepositories;
 };
 
 /*******************************************************************************

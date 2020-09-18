@@ -45,7 +45,7 @@ class Symbol;
 class SymbolCheck : public LibraryElementCheck {
 public:
   // Constructors / Destructor
-  SymbolCheck()                         = delete;
+  SymbolCheck() = delete;
   SymbolCheck(const SymbolCheck& other) = delete;
   explicit SymbolCheck(const Symbol& symbol) noexcept;
   virtual ~SymbolCheck() noexcept;

@@ -67,24 +67,24 @@ class ProjectLibraryUpdater : public QMainWindow {
 
 public:
   explicit ProjectLibraryUpdater(workspace::Workspace& ws,
-                                 const FilePath&       project,
-                                 ControlPanel&         cp) noexcept;
+                                 const FilePath& project,
+                                 ControlPanel& cp) noexcept;
   ~ProjectLibraryUpdater();
 
 private slots:
   void btnUpdateClicked();
 
 private:
-  void    log(const QString& msg) noexcept;
+  void log(const QString& msg) noexcept;
   QString prettyPath(const FilePath& fp) const noexcept;
-  void    updateElements(
-         std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
-         FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const);
+  void updateElements(
+      std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
+      FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const);
 
 private:
-  workspace::Workspace&                     mWorkspace;
-  FilePath                                  mProjectFilePath;
-  ControlPanel&                             mControlPanel;
+  workspace::Workspace& mWorkspace;
+  FilePath mProjectFilePath;
+  ControlPanel& mControlPanel;
   QScopedPointer<Ui::ProjectLibraryUpdater> mUi;
 };
 

@@ -46,7 +46,7 @@ class Schematic;
 class CmdSchematicEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdSchematicEdit()                              = delete;
+  CmdSchematicEdit() = delete;
   CmdSchematicEdit(const CmdSchematicEdit& other) = delete;
   explicit CmdSchematicEdit(Schematic& schematic) noexcept;
   ~CmdSchematicEdit() noexcept;

@@ -44,7 +44,7 @@ namespace editor {
  ******************************************************************************/
 
 SchematicEditorState::SchematicEditorState(const Context& context,
-                                           QObject*       parent) noexcept
+                                           QObject* parent) noexcept
   : QObject(parent), mContext(context) {
 }
 

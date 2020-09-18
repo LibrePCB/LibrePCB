@@ -47,16 +47,16 @@ class LibraryElementCheckMessage {
 public:
   /// Message severity type (higher numer = higher severity)
   enum class Severity {
-    Hint    = 0,
+    Hint = 0,
     Warning = 1,
-    Error   = 2,
+    Error = 2,
   };
 
   // Constructors / Destructor
   LibraryElementCheckMessage() = delete;
 
   // Getters
-  Severity       getSeverity() const noexcept { return mSeverity; }
+  Severity getSeverity() const noexcept { return mSeverity; }
   const QPixmap& getSeverityPixmap() const noexcept { return mSeverityPixmap; }
   const QString& getMessage() const noexcept { return mMessage; }
   const QString& getDescription() const noexcept { return mDescription; }
@@ -87,9 +87,9 @@ protected:  // Methods
 
 protected:  // Data
   Severity mSeverity;
-  QPixmap  mSeverityPixmap;
-  QString  mMessage;
-  QString  mDescription;
+  QPixmap mSeverityPixmap;
+  QString mMessage;
+  QString mDescription;
 };
 
 typedef QVector<std::shared_ptr<const LibraryElementCheckMessage>>

@@ -53,7 +53,7 @@ public:
     PositionChanged,
     DiameterChanged,
   };
-  Signal<Hole, Event>       onEdited;
+  Signal<Hole, Event> onEdited;
   typedef Slot<Hole, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -66,8 +66,8 @@ public:
   ~Hole() noexcept;
 
   // Getters
-  const Uuid&           getUuid() const noexcept { return mUuid; }
-  const Point&          getPosition() const noexcept { return mPosition; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const Point& getPosition() const noexcept { return mPosition; }
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
 
   // Setters
@@ -78,13 +78,13 @@ public:
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
-  bool  operator==(const Hole& rhs) const noexcept;
-  bool  operator!=(const Hole& rhs) const noexcept { return !(*this == rhs); }
+  bool operator==(const Hole& rhs) const noexcept;
+  bool operator!=(const Hole& rhs) const noexcept { return !(*this == rhs); }
   Hole& operator=(const Hole& rhs) noexcept;
 
 private:  // Data
-  Uuid           mUuid;
-  Point          mPosition;
+  Uuid mUuid;
+  Point mPosition;
   PositiveLength mDiameter;
 };
 

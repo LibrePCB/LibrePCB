@@ -60,12 +60,12 @@ public:
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const { return mBoundingRect; }
-  void   paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-               QWidget* widget);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget);
 
 private:
   // make some methods inaccessible...
-  BGI_NetPoint()                          = delete;
+  BGI_NetPoint() = delete;
   BGI_NetPoint(const BGI_NetPoint& other) = delete;
   BGI_NetPoint& operator=(const BGI_NetPoint& rhs) = delete;
 

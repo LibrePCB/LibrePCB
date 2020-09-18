@@ -111,7 +111,7 @@ int DevicePadSignalMapModel::columnCount(const QModelIndex& parent) const {
 }
 
 QVariant DevicePadSignalMapModel::data(const QModelIndex& index,
-                                       int                role) const {
+                                       int role) const {
   if (!index.isValid() || !mPadSignalMap) {
     return QVariant();
   }
@@ -124,8 +124,8 @@ QVariant DevicePadSignalMapModel::data(const QModelIndex& index,
 
   switch (index.column()) {
     case COLUMN_PAD: {
-      Uuid                              uuid = item->getPadUuid();
-      std::shared_ptr<const PackagePad> pad  = mPads.find(uuid);
+      Uuid uuid = item->getPadUuid();
+      std::shared_ptr<const PackagePad> pad = mPads.find(uuid);
       switch (role) {
         case Qt::DisplayRole:
           return pad ? *pad->getName() : uuid.toStr();
@@ -136,7 +136,7 @@ QVariant DevicePadSignalMapModel::data(const QModelIndex& index,
       }
     }
     case COLUMN_SIGNAL: {
-      tl::optional<Uuid>                     uuid = item->getSignalUuid();
+      tl::optional<Uuid> uuid = item->getSignalUuid();
       std::shared_ptr<const ComponentSignal> sig =
           uuid ? mSignals.find(*uuid) : nullptr;
       switch (role) {
@@ -160,9 +160,9 @@ QVariant DevicePadSignalMapModel::data(const QModelIndex& index,
   return QVariant();
 }
 
-QVariant DevicePadSignalMapModel::headerData(int             section,
+QVariant DevicePadSignalMapModel::headerData(int section,
                                              Qt::Orientation orientation,
-                                             int             role) const {
+                                             int role) const {
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
@@ -233,7 +233,7 @@ bool DevicePadSignalMapModel::setData(const QModelIndex& index,
 void DevicePadSignalMapModel::padSignalMapEdited(
     const DevicePadSignalMap& map, int index,
     const std::shared_ptr<const DevicePadSignalMapItem>& item,
-    DevicePadSignalMap::Event                            event) noexcept {
+    DevicePadSignalMap::Event event) noexcept {
   Q_UNUSED(map);
   Q_UNUSED(item);
   switch (event) {
@@ -272,8 +272,9 @@ void DevicePadSignalMapModel::updateComboBoxItems() noexcept {
   }
   mComboBoxItems.sort();
   mComboBoxItems.insert(
-      0, ComboBoxDelegate::Item{QString("(%1)").arg(tr("unconnected")), QIcon(),
-                                QVariant()});
+      0,
+      ComboBoxDelegate::Item{QString("(%1)").arg(tr("unconnected")), QIcon(),
+                             QVariant()});
 }
 
 /*******************************************************************************

@@ -62,18 +62,18 @@ public:
   BoardPickPlaceGeneratorDialog() = delete;
   BoardPickPlaceGeneratorDialog(const BoardPickPlaceGeneratorDialog& other) =
       delete;
-  explicit BoardPickPlaceGeneratorDialog(Board&   board,
+  explicit BoardPickPlaceGeneratorDialog(Board& board,
                                          QWidget* parent = nullptr);
   ~BoardPickPlaceGeneratorDialog();
 
 private:  // Methods
-  void     btnGenerateClicked() noexcept;
-  void     updateTable() noexcept;
+  void btnGenerateClicked() noexcept;
+  void updateTable() noexcept;
   FilePath getOutputFilePath(const QString& text) const noexcept;
 
 private:  // Data
-  Board&                                            mBoard;
-  std::shared_ptr<PickPlaceData>                    mData;
+  Board& mBoard;
+  std::shared_ptr<PickPlaceData> mData;
   QScopedPointer<Ui::BoardPickPlaceGeneratorDialog> mUi;
 };
 

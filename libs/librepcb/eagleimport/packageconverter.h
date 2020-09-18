@@ -57,7 +57,7 @@ class ConverterDb;
 class PackageConverter final {
 public:
   // Constructors / Destructor
-  PackageConverter()                              = delete;
+  PackageConverter() = delete;
   PackageConverter(const PackageConverter& other) = delete;
   PackageConverter(const parseagle::Package& package, ConverterDb& db) noexcept;
   ~PackageConverter() noexcept;
@@ -69,11 +69,11 @@ public:
   PackageConverter& operator=(const PackageConverter& rhs) = delete;
 
 private:
-  QString                  createDescription() const noexcept;
+  QString createDescription() const noexcept;
   static GraphicsLayerName convertBoardLayer(int eagleLayerId);
 
   const parseagle::Package& mPackage;
-  ConverterDb&              mDb;
+  ConverterDb& mDb;
 };
 
 /*******************************************************************************

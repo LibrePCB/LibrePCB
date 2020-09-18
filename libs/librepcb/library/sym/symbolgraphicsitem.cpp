@@ -92,9 +92,9 @@ TextGraphicsItem* SymbolGraphicsItem::getTextGraphicsItem(
 
 int SymbolGraphicsItem::getItemsAtPosition(
     const Point& pos, QList<QSharedPointer<SymbolPinGraphicsItem>>* pins,
-    QList<QSharedPointer<CircleGraphicsItem>>*  circles,
+    QList<QSharedPointer<CircleGraphicsItem>>* circles,
     QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-    QList<QSharedPointer<TextGraphicsItem>>*    texts) noexcept {
+    QList<QSharedPointer<TextGraphicsItem>>* texts) noexcept {
   int count = 0;
   if (pins) {
     foreach (const QSharedPointer<SymbolPinGraphicsItem>& item,
@@ -139,7 +139,7 @@ int SymbolGraphicsItem::getItemsAtPosition(
 }
 
 QList<QSharedPointer<SymbolPinGraphicsItem>>
-SymbolGraphicsItem::getSelectedPins() noexcept {
+    SymbolGraphicsItem::getSelectedPins() noexcept {
   QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
   foreach (const QSharedPointer<SymbolPinGraphicsItem>& item,
            mPinGraphicsItems) {
@@ -151,7 +151,7 @@ SymbolGraphicsItem::getSelectedPins() noexcept {
 }
 
 QList<QSharedPointer<CircleGraphicsItem>>
-SymbolGraphicsItem::getSelectedCircles() noexcept {
+    SymbolGraphicsItem::getSelectedCircles() noexcept {
   QList<QSharedPointer<CircleGraphicsItem>> circles;
   foreach (const QSharedPointer<CircleGraphicsItem>& item,
            mCircleGraphicsItems) {
@@ -163,7 +163,7 @@ SymbolGraphicsItem::getSelectedCircles() noexcept {
 }
 
 QList<QSharedPointer<PolygonGraphicsItem>>
-SymbolGraphicsItem::getSelectedPolygons() noexcept {
+    SymbolGraphicsItem::getSelectedPolygons() noexcept {
   QList<QSharedPointer<PolygonGraphicsItem>> polygons;
   foreach (const QSharedPointer<PolygonGraphicsItem>& item,
            mPolygonGraphicsItems) {
@@ -175,7 +175,7 @@ SymbolGraphicsItem::getSelectedPolygons() noexcept {
 }
 
 QList<QSharedPointer<TextGraphicsItem>>
-SymbolGraphicsItem::getSelectedTexts() noexcept {
+    SymbolGraphicsItem::getSelectedTexts() noexcept {
   QList<QSharedPointer<TextGraphicsItem>> texts;
   foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
     if (item->isSelected()) {
@@ -273,7 +273,7 @@ void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SymbolGraphicsItem::paint(QPainter*                       painter,
+void SymbolGraphicsItem::paint(QPainter* painter,
                                const QStyleOptionGraphicsItem* option,
                                QWidget* widget) noexcept {
   Q_UNUSED(painter);

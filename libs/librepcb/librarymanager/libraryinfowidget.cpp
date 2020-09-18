@@ -46,7 +46,7 @@ namespace manager {
  ******************************************************************************/
 
 LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws,
-                                     const FilePath&       libDir)
+                                     const FilePath& libDir)
   : QWidget(nullptr),
     mUi(new Ui::LibraryInfoWidget),
     mWorkspace(ws),
@@ -90,8 +90,8 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws,
   mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
   QString dependencies;
   foreach (const Uuid& uuid, lib.getDependencies()) {
-    QString  line = dependencies.isEmpty() ? "" : "<br>";
-    FilePath fp   = ws.getLibraryDb().getLatestLibrary(uuid);  // can throw
+    QString line = dependencies.isEmpty() ? "" : "<br>";
+    FilePath fp = ws.getLibraryDb().getLatestLibrary(uuid);  // can throw
     if (fp.isValid()) {
       QString name;
       ws.getLibraryDb().getElementTranslations<Library>(fp, localeOrder,
@@ -123,7 +123,7 @@ void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept {
 
 void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept {
   QString title = tr("Remove Library");
-  QString text  = tr("Attention! This will remove the whole library directory:"
+  QString text = tr("Attention! This will remove the whole library directory:"
                     "\n\n%1\n\nAre you really sure to remove \"%2\"?")
                      .arg(mLibDir.toNative(), mUi->lblName->text());
 

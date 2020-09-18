@@ -47,7 +47,7 @@ class FavoriteProjectsModel : public QAbstractListModel {
 
 public:
   // Constructors / Destructor
-  FavoriteProjectsModel()                                   = delete;
+  FavoriteProjectsModel() = delete;
   FavoriteProjectsModel(const FavoriteProjectsModel& other) = delete;
   explicit FavoriteProjectsModel(const Workspace& workspace) noexcept;
   ~FavoriteProjectsModel() noexcept;
@@ -62,15 +62,15 @@ public:
   FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs) = delete;
 
 private:
-  void     save() noexcept;
-  int      rowCount(const QModelIndex& parent = QModelIndex()) const;
+  void save() noexcept;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   // Attributes
   const Workspace& mWorkspace;
-  FilePath         mFilePath;
-  QList<FilePath>  mAllProjects;
-  QList<FilePath>  mVisibleProjects;
+  FilePath mFilePath;
+  QList<FilePath> mAllProjects;
+  QList<FilePath> mVisibleProjects;
 };
 
 /*******************************************************************************

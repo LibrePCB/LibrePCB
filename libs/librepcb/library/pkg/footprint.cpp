@@ -179,13 +179,13 @@ Footprint& Footprint::operator=(const Footprint& rhs) noexcept {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
-  mNames        = rhs.mNames;
+  mNames = rhs.mNames;
   mDescriptions = rhs.mDescriptions;
-  mPads         = rhs.mPads;
-  mPolygons     = rhs.mPolygons;
-  mCircles      = rhs.mCircles;
-  mStrokeTexts  = rhs.mStrokeTexts;
-  mHoles        = rhs.mHoles;
+  mPads = rhs.mPads;
+  mPolygons = rhs.mPolygons;
+  mCircles = rhs.mCircles;
+  mStrokeTexts = rhs.mStrokeTexts;
+  mHoles = rhs.mHoles;
   return *this;
 }
 
@@ -302,7 +302,7 @@ void Footprint::strokeTextsEdited(const StrokeTextList& list, int index,
 
 void Footprint::holesEdited(const HoleList& list, int index,
                             const std::shared_ptr<const Hole>& hole,
-                            HoleList::Event                    event) noexcept {
+                            HoleList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
   switch (event) {

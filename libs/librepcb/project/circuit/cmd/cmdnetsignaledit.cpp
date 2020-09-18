@@ -37,7 +37,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdNetSignalEdit::CmdNetSignalEdit(Circuit&   circuit,
+CmdNetSignalEdit::CmdNetSignalEdit(Circuit& circuit,
                                    NetSignal& netsignal) noexcept
   : UndoCommand(tr("Edit netsignal")),
     mCircuit(circuit),
@@ -56,9 +56,9 @@ CmdNetSignalEdit::~CmdNetSignalEdit() noexcept {
  ******************************************************************************/
 
 void CmdNetSignalEdit::setName(const CircuitIdentifier& name,
-                               bool                     isAutoName) noexcept {
+                               bool isAutoName) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewName       = name;
+  mNewName = name;
   mNewIsAutoName = isAutoName;
 }
 

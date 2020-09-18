@@ -34,7 +34,7 @@ namespace librepcb {
  ******************************************************************************/
 
 QPainterPath Toolbox::shapeFromPath(const QPainterPath& path, const QPen& pen,
-                                    const QBrush&         brush,
+                                    const QBrush& brush,
                                     const UnsignedLength& minWidth) noexcept {
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/graphicsview/qgraphicsitem.cpp
   // Function: qt_graphicsItem_shapeFromPath()
@@ -61,13 +61,13 @@ Length Toolbox::arcRadius(const Point& p1, const Point& p2,
   if (a == 0) {
     return Length(0);
   } else {
-    qreal x1    = p1.getX().toMm();
-    qreal y1    = p1.getY().toMm();
-    qreal x2    = p2.getX().toMm();
-    qreal y2    = p2.getY().toMm();
+    qreal x1 = p1.getX().toMm();
+    qreal y1 = p1.getY().toMm();
+    qreal x2 = p2.getX().toMm();
+    qreal y2 = p2.getY().toMm();
     qreal angle = a.mappedTo180deg().toRad();
-    qreal d     = qSqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-    qreal r     = d / (2 * qSin(angle / 2));
+    qreal d = qSqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    qreal r = d / (2 * qSin(angle / 2));
     return Length::fromMm(r);
   }
 }
@@ -79,19 +79,19 @@ Point Toolbox::arcCenter(const Point& p1, const Point& p2,
     return (p1 + p2) / 2;
   } else {
     // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
-    qreal x0       = p1.getX().toMm();
-    qreal y0       = p1.getY().toMm();
-    qreal x1       = p2.getX().toMm();
-    qreal y1       = p2.getY().toMm();
-    qreal angle    = a.mappedTo180deg().toRad();
+    qreal x0 = p1.getX().toMm();
+    qreal y0 = p1.getY().toMm();
+    qreal x1 = p2.getX().toMm();
+    qreal y1 = p2.getY().toMm();
+    qreal angle = a.mappedTo180deg().toRad();
     qreal angleSgn = (angle >= 0) ? 1 : -1;
-    qreal d        = qSqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-    qreal r        = d / (2 * qSin(angle / 2));
-    qreal h        = qSqrt(r * r - d * d / 4);
-    qreal u        = (x1 - x0) / d;
-    qreal v        = (y1 - y0) / d;
-    qreal a        = ((x0 + x1) / 2) - h * v * angleSgn;
-    qreal b        = ((y0 + y1) / 2) + h * u * angleSgn;
+    qreal d = qSqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+    qreal r = d / (2 * qSin(angle / 2));
+    qreal h = qSqrt(r * r - d * d / 4);
+    qreal u = (x1 - x0) / d;
+    qreal v = (y1 - y0) / d;
+    qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
+    qreal b = ((y0 + y1) / 2) + h * u * angleSgn;
     return Point::fromMm(a, b);
   }
 }
@@ -125,11 +125,11 @@ UnsignedLength Toolbox::shortestDistanceBetweenPointAndLine(
 }
 
 QString Toolbox::incrementNumberInString(QString string) noexcept {
-  QRegularExpression      regex("([0-9]+)(?!.*[0-9]+)");
+  QRegularExpression regex("([0-9]+)(?!.*[0-9]+)");
   QRegularExpressionMatch match = regex.match(string);
   if (match.hasMatch()) {
     // string contains numbers -> increment last number
-    bool ok     = false;
+    bool ok = false;
     uint number = match.captured().toUInt(&ok);
     if (ok) {
       string.replace(match.capturedStart(), match.capturedLength(),
@@ -146,7 +146,7 @@ QStringList Toolbox::expandRangesInString(const QString& string) noexcept {
   // Do NOT accept '+' and '-', they are considered as strings, not numbers!
   // For example in the range connector signals range "X-1..10" you expect
   // numbers starting from 1, not -1.
-  QString number    = "\\d+";
+  QString number = "\\d+";
   QString character = "[a-zA-Z]";
   QString separator = "\\.\\.";
   QString numberRange =
@@ -155,16 +155,16 @@ QStringList Toolbox::expandRangesInString(const QString& string) noexcept {
       QString("(?<char_start>%1)%2(?<char_end>%1)").arg(character, separator);
   QString pattern =
       QString("(?<num>%1)|(?<char>%2)").arg(numberRange, characterRange);
-  QRegularExpression                         re(pattern);
-  QRegularExpressionMatchIterator            it = re.globalMatch(string);
+  QRegularExpression re(pattern);
+  QRegularExpressionMatchIterator it = re.globalMatch(string);
   QVector<std::tuple<int, int, QStringList>> replacements;
   while (it.hasNext()) {
     QRegularExpressionMatch match = it.next();
-    QStringList             matchReplacements;
+    QStringList matchReplacements;
     if (!match.captured("num").isEmpty()) {
       bool okStart = false, okEnd = false;
-      int  start = match.captured("num_start").toInt(&okStart);
-      int  end   = match.captured("num_end").toInt(&okEnd);
+      int start = match.captured("num_start").toInt(&okStart);
+      int end = match.captured("num_end").toInt(&okEnd);
       if (okStart && okEnd) {
         bool invert = start > end;
         if (invert) std::swap(start, end);
@@ -178,10 +178,10 @@ QStringList Toolbox::expandRangesInString(const QString& string) noexcept {
       }
     } else if (!match.captured("char").isEmpty()) {
       QString startStr = match.captured("char_start");
-      QString endStr   = match.captured("char_end");
+      QString endStr = match.captured("char_end");
       if ((startStr.length()) == 1 && (endStr.length() == 1)) {
-        int  start  = startStr[0].unicode();
-        int  end    = endStr[0].unicode();
+        int start = startStr[0].unicode();
+        int end = endStr[0].unicode();
         bool invert = start > end;
         if (invert) std::swap(start, end);
         if (((start >= 'a') && (end <= 'z')) ||
@@ -205,11 +205,11 @@ QStringList Toolbox::expandRangesInString(const QString& string) noexcept {
   return expandRangesInString(string, replacements);
 }
 
-QString Toolbox::cleanUserInputString(const QString&            input,
+QString Toolbox::cleanUserInputString(const QString& input,
                                       const QRegularExpression& removeRegex,
                                       bool trim, bool toLower, bool toUpper,
                                       const QString& spaceReplacement,
-                                      int            maxLength) noexcept {
+                                      int maxLength) noexcept {
   // perform compatibility decomposition (NFKD)
   QString ret = input.normalized(QString::NormalizationForm_KD);
   // change case of all characters
@@ -245,14 +245,14 @@ QString Toolbox::prettyPrintLocale(const QString& code) noexcept {
  ******************************************************************************/
 
 QStringList Toolbox::expandRangesInString(
-    const QString&                                    input,
+    const QString& input,
     const QVector<std::tuple<int, int, QStringList>>& replacements) noexcept {
   if (replacements.isEmpty()) {
     return QStringList{input};
   } else {
     QStringList result;
-    int         pos = std::get<0>(replacements.first());
-    int         len = std::get<1>(replacements.first());
+    int pos = std::get<0>(replacements.first());
+    int len = std::get<1>(replacements.first());
     foreach (const QString& replacement, std::get<2>(replacements.first())) {
       foreach (QString str, expandRangesInString(input, replacements.mid(1))) {
         result.append(str.replace(pos, len, replacement));

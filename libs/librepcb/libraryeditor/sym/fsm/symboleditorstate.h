@@ -53,7 +53,7 @@ public:
   using Context = SymbolEditorFsm::Context;
 
   // Constructors / Destructor
-  SymbolEditorState()                               = delete;
+  SymbolEditorState() = delete;
   SymbolEditorState(const SymbolEditorState& other) = delete;
   explicit SymbolEditorState(const Context& context) noexcept;
   virtual ~SymbolEditorState() noexcept;
@@ -103,7 +103,7 @@ public:
 
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;
-  const LengthUnit&     getDefaultLengthUnit() const noexcept;
+  const LengthUnit& getDefaultLengthUnit() const noexcept;
 
 protected:  // Data
   Context mContext;

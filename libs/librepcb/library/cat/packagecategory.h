@@ -45,7 +45,7 @@ class PackageCategory final : public LibraryCategory {
 
 public:
   // Constructors / Destructor
-  PackageCategory()                             = delete;
+  PackageCategory() = delete;
   PackageCategory(const PackageCategory& other) = delete;
   PackageCategory(const Uuid& uuid, const Version& version,
                   const QString& author, const ElementName& name_en_US,

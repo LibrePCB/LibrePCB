@@ -44,7 +44,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(Board&   board,
+BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(Board& board,
                                                              QWidget* parent)
   : QDialog(parent),
     mBoard(board),
@@ -103,16 +103,16 @@ void BoardPickPlaceGeneratorDialog::updateTable() noexcept {
   mUi->tableWidget->clear();
 
   try {
-    PickPlaceCsvWriter       writer(*mData);
+    PickPlaceCsvWriter writer(*mData);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
     mUi->tableWidget->setHorizontalHeaderLabels(csv->getHeader());
     for (int column = 0; column < csv->getHeader().count(); ++column) {
       mUi->tableWidget->horizontalHeader()->setSectionResizeMode(
-          column, (column >= 1) && (column <= 3)
-                      ? QHeaderView::Stretch
-                      : QHeaderView::ResizeToContents);
+          column,
+          (column >= 1) && (column <= 3) ? QHeaderView::Stretch
+                                         : QHeaderView::ResizeToContents);
       for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
         text.replace("\n", " ");

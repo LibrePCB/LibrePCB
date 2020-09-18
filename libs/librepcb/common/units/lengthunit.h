@@ -336,7 +336,7 @@ inline SExpression serializeToSExpression(const LengthUnit& obj) {
 
 template <>
 inline LengthUnit deserializeFromSExpression(const SExpression& sexpr,
-                                             bool               throwIfEmpty) {
+                                             bool throwIfEmpty) {
   return LengthUnit::fromString(
       sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }

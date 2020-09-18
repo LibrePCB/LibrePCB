@@ -35,9 +35,9 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  bool    valid;
+  bool valid;
   QString origStr;
-  Angle   value;
+  Angle value;
   QString genStr;
 } AngleTestData;
 

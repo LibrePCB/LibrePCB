@@ -51,7 +51,7 @@ class InitializeWorkspaceWizard final : public QWizard {
 public:
   // Constructors / Destructor
   explicit InitializeWorkspaceWizard(const FilePath& workspacePath,
-                                     QWidget*        parent = nullptr) noexcept;
+                                     QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard(const InitializeWorkspaceWizard& other) = delete;
   ~InitializeWorkspaceWizard() noexcept;
 
@@ -65,7 +65,7 @@ public:
       delete;
 
 private:
-  InitializeWorkspaceWizardContext              mContext;
+  InitializeWorkspaceWizardContext mContext;
   QScopedPointer<Ui::InitializeWorkspaceWizard> mUi;
 };
 

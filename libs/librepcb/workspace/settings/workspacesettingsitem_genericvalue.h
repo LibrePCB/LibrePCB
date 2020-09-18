@@ -101,13 +101,13 @@ public:
   }
 
   // Operator Overloadings
-  WorkspaceSettingsItem_GenericValue& operator       =(
+  WorkspaceSettingsItem_GenericValue& operator=(
       const WorkspaceSettingsItem_GenericValue& rhs) = delete;
 
 private:
-  QString mKey;           ///< Key used for serialization
-  T       mDefaultValue;  ///< Initial, default value
-  T       mCurrentValue;  ///< Current value
+  QString mKey;  ///< Key used for serialization
+  T mDefaultValue;  ///< Initial, default value
+  T mCurrentValue;  ///< Current value
 };
 
 /*******************************************************************************

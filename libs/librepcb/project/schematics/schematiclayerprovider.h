@@ -48,7 +48,7 @@ class Project;
 class SchematicLayerProvider final : public IF_GraphicsLayerProvider {
 public:
   // Constructors / Destructor
-  SchematicLayerProvider()                                    = delete;
+  SchematicLayerProvider() = delete;
   SchematicLayerProvider(const SchematicLayerProvider& other) = delete;
   explicit SchematicLayerProvider(Project& project);
   ~SchematicLayerProvider() noexcept;
@@ -76,7 +76,7 @@ public:
 private:  // Methods
   void addLayer(const QString& name) noexcept;
 
-private:              // Data
+private:  // Data
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   QList<GraphicsLayer*> mLayers;
 };

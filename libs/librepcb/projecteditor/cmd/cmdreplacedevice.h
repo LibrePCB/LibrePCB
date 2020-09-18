@@ -69,10 +69,10 @@ private:
 
   // Attributes from the constructor
   workspace::Workspace& mWorkspace;
-  Board&                mBoard;
-  BI_Device&            mDeviceInstance;
-  Uuid                  mNewDeviceUuid;
-  tl::optional<Uuid>    mNewFootprintUuid;
+  Board& mBoard;
+  BI_Device& mDeviceInstance;
+  Uuid mNewDeviceUuid;
+  tl::optional<Uuid> mNewFootprintUuid;
 };
 
 /*******************************************************************************

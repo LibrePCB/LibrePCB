@@ -210,7 +210,7 @@ bool CmdPasteSchematicItems::performExecute() {
         Q_ASSERT(symbol);
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
-        start                            = pin;
+        start = pin;
         ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
         if (sigInst && (sigInst->getNetSignal() != netSignal)) {
           execNewChildCmd(new CmdCompSigInstSetNetSignal(*sigInst, netSignal));
@@ -232,7 +232,7 @@ bool CmdPasteSchematicItems::performExecute() {
         Q_ASSERT(symbol);
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
-        end                              = pin;
+        end = pin;
         ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
         if (sigInst && (sigInst->getNetSignal() != netSignal)) {
           execNewChildCmd(new CmdCompSigInstSetNetSignal(*sigInst, netSignal));

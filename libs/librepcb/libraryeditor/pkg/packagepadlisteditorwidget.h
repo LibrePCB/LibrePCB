@@ -66,9 +66,9 @@ public:
       delete;
 
 private:
-  QScopedPointer<PackagePadListModel>  mModel;
+  QScopedPointer<PackagePadListModel> mModel;
   QScopedPointer<SortFilterProxyModel> mProxy;
-  QScopedPointer<EditableTableWidget>  mView;
+  QScopedPointer<EditableTableWidget> mView;
 };
 
 /*******************************************************************************

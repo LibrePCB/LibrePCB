@@ -50,7 +50,7 @@ class AboutDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  AboutDialog()                         = delete;
+  AboutDialog() = delete;
   AboutDialog(const AboutDialog& other) = delete;
   explicit AboutDialog(QWidget* parent = nullptr) noexcept;
   ~AboutDialog() noexcept;

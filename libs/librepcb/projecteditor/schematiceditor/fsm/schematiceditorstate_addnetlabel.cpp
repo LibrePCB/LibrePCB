@@ -158,7 +158,7 @@ bool SchematicEditorState_AddNetLabel::processSwitchToSchematicPage(
  *  Private Methods
  ******************************************************************************/
 
-bool SchematicEditorState_AddNetLabel::addLabel(Schematic&   schematic,
+bool SchematicEditorState_AddNetLabel::addLabel(Schematic& schematic,
                                                 const Point& pos) noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
@@ -169,12 +169,12 @@ bool SchematicEditorState_AddNetLabel::addLabel(Schematic&   schematic,
     SI_NetSegment& netsegment = netlinesUnderCursor.first()->getNetSegment();
 
     mContext.undoStack.beginCmdGroup(tr("Add net label to schematic"));
-    mUndoCmdActive                  = true;
+    mUndoCmdActive = true;
     CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(
         netsegment, pos.mappedToGrid(getGridInterval()), Angle::deg0());
     mContext.undoStack.appendToCmdGroup(cmdAdd);
     mCurrentNetLabel = cmdAdd->getNetLabel();
-    mEditCmd         = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
+    mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
     return true;
   } catch (Exception& e) {
     if (mUndoCmdActive) {

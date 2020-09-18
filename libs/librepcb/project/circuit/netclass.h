@@ -57,17 +57,17 @@ class NetClass final : public QObject,
 
 public:
   // Constructors / Destructor
-  NetClass()                      = delete;
+  NetClass() = delete;
   NetClass(const NetClass& other) = delete;
   explicit NetClass(Circuit& circuit, const SExpression& node);
   explicit NetClass(Circuit& circuit, const ElementName& name);
   ~NetClass() noexcept;
 
   // Getters
-  Circuit&           getCircuit() const noexcept { return mCircuit; }
-  const Uuid&        getUuid() const noexcept { return mUuid; }
+  Circuit& getCircuit() const noexcept { return mCircuit; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
-  int                getNetSignalCount() const noexcept {
+  int getNetSignalCount() const noexcept {
     return mRegisteredNetSignals.count();
   }
   bool isUsed() const noexcept { return (getNetSignalCount() > 0); }
@@ -92,10 +92,10 @@ private:
 
   // General
   Circuit& mCircuit;
-  bool     mIsAddedToCircuit;
+  bool mIsAddedToCircuit;
 
   // Attributes
-  Uuid        mUuid;
+  Uuid mUuid;
   ElementName mName;
 
   // Registered Elements

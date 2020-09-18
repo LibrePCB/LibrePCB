@@ -47,9 +47,9 @@ public:
 
 private:
   // Constructors / Destructor
-  MarkdownConverter()                               = delete;
+  MarkdownConverter() = delete;
   MarkdownConverter(const MarkdownConverter& other) = delete;
-  ~MarkdownConverter()                              = delete;
+  ~MarkdownConverter() = delete;
 };
 
 /*******************************************************************************

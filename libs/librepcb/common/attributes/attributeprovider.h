@@ -122,7 +122,7 @@ signals:
   virtual void attributesChanged() = 0;
 
 private:
-  QString getAttributeValue(const QString&                     key,
+  QString getAttributeValue(const QString& key,
                             QVector<const AttributeProvider*>& backtrace) const
       noexcept;
 };

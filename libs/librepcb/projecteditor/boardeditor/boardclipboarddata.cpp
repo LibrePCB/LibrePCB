@@ -40,7 +40,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardClipboardData::BoardClipboardData(const Uuid&  boardUuid,
+BoardClipboardData::BoardClipboardData(const Uuid& boardUuid,
                                        const Point& cursorPos) noexcept
   : mFileSystem(TransactionalFileSystem::openRW(FilePath::getRandomTempPath())),
     mBoardUuid(boardUuid),

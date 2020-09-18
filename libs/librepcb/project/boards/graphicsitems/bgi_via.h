@@ -59,14 +59,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const { return mBoundingRect; }
+  QRectF boundingRect() const { return mBoundingRect; }
   QPainterPath shape() const noexcept { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget);
 
 private:
   // make some methods inaccessible...
-  BGI_Via()                     = delete;
+  BGI_Via() = delete;
   BGI_Via(const BGI_Via& other) = delete;
   BGI_Via& operator=(const BGI_Via& rhs) = delete;
 
@@ -74,19 +74,19 @@ private:
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
   // General Attributes
-  BI_Via&        mVia;
+  BI_Via& mVia;
   GraphicsLayer* mViaLayer;
   GraphicsLayer* mTopStopMaskLayer;
   GraphicsLayer* mBottomStopMaskLayer;
 
   // Cached Attributes
-  bool         mDrawStopMask;
+  bool mDrawStopMask;
   QPainterPath mShape;
   QPainterPath mCopper;
   QPainterPath mStopMask;
   QPainterPath mCreamMask;
-  QRectF       mBoundingRect;
-  QFont        mFont;
+  QRectF mBoundingRect;
+  QFont mFont;
 };
 
 /*******************************************************************************

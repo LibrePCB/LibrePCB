@@ -70,17 +70,17 @@ class ComponentInstance : public QObject,
 
 public:
   // Constructors / Destructor
-  ComponentInstance()                               = delete;
+  ComponentInstance() = delete;
   ComponentInstance(const ComponentInstance& other) = delete;
   explicit ComponentInstance(Circuit& circuit, const SExpression& node);
   explicit ComponentInstance(
       Circuit& circuit, const library::Component& cmp, const Uuid& symbVar,
-      const CircuitIdentifier&  name,
+      const CircuitIdentifier& name,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt);
   ~ComponentInstance() noexcept;
 
   // Getters: Attributes
-  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
   QString getValue(bool replaceAttributes = false) const noexcept;
   const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {
@@ -100,13 +100,13 @@ public:
 
   // Getters: General
   Circuit& getCircuit() const noexcept { return mCircuit; }
-  int      getPlacedSymbolsCount() const noexcept {
+  int getPlacedSymbolsCount() const noexcept {
     return mRegisteredSymbols.count();
   }
-  int  getUnplacedSymbolsCount() const noexcept;
-  int  getUnplacedRequiredSymbolsCount() const noexcept;
-  int  getUnplacedOptionalSymbolsCount() const noexcept;
-  int  getRegisteredElementsCount() const noexcept;
+  int getUnplacedSymbolsCount() const noexcept;
+  int getUnplacedRequiredSymbolsCount() const noexcept;
+  int getUnplacedOptionalSymbolsCount() const noexcept;
+  int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
 
   // Setters
@@ -175,14 +175,14 @@ signals:
   void attributesChanged() override;
 
 private:
-  void               init();
-  bool               checkAttributesValidity() const noexcept;
-  void               updateErcMessages() noexcept;
+  void init();
+  bool checkAttributesValidity() const noexcept;
+  void updateErcMessages() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
   // General
   Circuit& mCircuit;
-  bool     mIsAddedToCircuit;
+  bool mIsAddedToCircuit;
 
   // Attributes
 

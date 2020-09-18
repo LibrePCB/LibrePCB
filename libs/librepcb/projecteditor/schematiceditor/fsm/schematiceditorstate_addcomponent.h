@@ -91,42 +91,42 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
-  SchematicEditorState_AddComponent& operator       =(
+  SchematicEditorState_AddComponent& operator=(
       const SchematicEditorState_AddComponent& rhs) = delete;
 
 private:  // Methods
-  void startAddingComponent(const tl::optional<Uuid>& cmp       = tl::nullopt,
-                            const tl::optional<Uuid>& symbVar   = tl::nullopt,
-                            const tl::optional<Uuid>& dev       = tl::nullopt,
-                            bool                      keepValue = false);
+  void startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
+                            const tl::optional<Uuid>& symbVar = tl::nullopt,
+                            const tl::optional<Uuid>& dev = tl::nullopt,
+                            bool keepValue = false);
   bool abortCommand(bool showErrMsgBox) noexcept;
   std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
-  void                             valueChanged(QString text) noexcept;
-  void                             attributeChanged() noexcept;
-  void                             updateValueToolbar() noexcept;
-  void                             updateAttributeToolbar() noexcept;
-  void                             setFocusToToolbar() noexcept;
-  static QString                   toSingleLine(const QString& text) noexcept;
-  static QString                   toMultiLine(const QString& text) noexcept;
+  void valueChanged(QString text) noexcept;
+  void attributeChanged() noexcept;
+  void updateValueToolbar() noexcept;
+  void updateAttributeToolbar() noexcept;
+  void setFocusToToolbar() noexcept;
+  static QString toSingleLine(const QString& text) noexcept;
+  static QString toMultiLine(const QString& text) noexcept;
 
 private:  // Data
-  bool                               mIsUndoCmdActive;
+  bool mIsUndoCmdActive;
   QScopedPointer<AddComponentDialog> mAddComponentDialog;
-  Angle                              mLastAngle;
+  Angle mLastAngle;
 
   // information about the current component/symbol to place
-  ComponentInstance*     mCurrentComponent;
-  int                    mCurrentSymbVarItemIndex;
-  SI_Symbol*             mCurrentSymbolToPlace;
+  ComponentInstance* mCurrentComponent;
+  int mCurrentSymbVarItemIndex;
+  SI_Symbol* mCurrentSymbolToPlace;
   CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 
   // Widgets for the command toolbar
-  QLabel*                mValueLabel;
-  QComboBox*             mValueComboBox;
-  QLineEdit*             mAttributeValueEdit;
-  QAction*               mAttributeValueEditAction;
+  QLabel* mValueLabel;
+  QComboBox* mValueComboBox;
+  QLineEdit* mAttributeValueEdit;
+  QAction* mAttributeValueEditAction;
   AttributeUnitComboBox* mAttributeUnitComboBox;
-  QAction*               mAttributeUnitComboBoxAction;
+  QAction* mAttributeUnitComboBoxAction;
 };
 
 /*******************************************************************************

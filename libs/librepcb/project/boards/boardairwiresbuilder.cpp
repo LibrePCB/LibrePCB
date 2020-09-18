@@ -50,7 +50,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardAirWiresBuilder::BoardAirWiresBuilder(const Board&     board,
+BoardAirWiresBuilder::BoardAirWiresBuilder(const Board& board,
                                            const NetSignal& netsignal) noexcept
   : mBoard(board), mNetSignal(netsignal) {
 }
@@ -63,9 +63,9 @@ BoardAirWiresBuilder::~BoardAirWiresBuilder() noexcept {
  ******************************************************************************/
 
 QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
-  AirWiresBuilder                       builder;
+  AirWiresBuilder builder;
   QHash<int, std::pair<Point, QString>> pointLayerMap;  // ID -> (point, layer)
-  QHash<const BI_NetLineAnchor*, int>   anchorMap;      // anchor -> ID
+  QHash<const BI_NetLineAnchor*, int> anchorMap;  // anchor -> ID
 
   // pads
   foreach (ComponentSignalInstance* cmpSig, mNetSignal.getComponentSignals()) {
@@ -73,12 +73,12 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
     foreach (BI_FootprintPad* pad, cmpSig->getRegisteredFootprintPads()) {
       if (&pad->getBoard() != &mBoard) continue;
       const Point& pos = pad->getPosition();
-      int          id  = builder.addPoint(pos);
-      pointLayerMap[id] =
-          std::make_pair(pos, (pad->getLibPad().getBoardSide() ==
-                               library::FootprintPad::BoardSide::THT)
-                                  ? QString()  // on all layers
-                                  : pad->getLayerName());
+      int id = builder.addPoint(pos);
+      pointLayerMap[id] = std::make_pair(pos,
+                                         (pad->getLibPad().getBoardSide() ==
+                                          library::FootprintPad::BoardSide::THT)
+                                             ? QString()  // on all layers
+                                             : pad->getLayerName());
       anchorMap[pad] = id;
     }
   }
@@ -89,17 +89,17 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
     if (&netsegment->getBoard() != &mBoard) continue;
     foreach (const BI_Via* via, netsegment->getVias()) {
       Q_ASSERT(via);
-      const Point& pos  = via->getPosition();
-      int          id   = builder.addPoint(pos);
+      const Point& pos = via->getPosition();
+      int id = builder.addPoint(pos);
       pointLayerMap[id] = std::make_pair(pos, QString());  // on all layers
-      anchorMap[via]    = id;
+      anchorMap[via] = id;
     }
     foreach (const BI_NetPoint* netpoint, netsegment->getNetPoints()) {
       Q_ASSERT(netpoint);
       if (const GraphicsLayer* layer = netpoint->getLayerOfLines()) {
-        Point pos           = netpoint->getPosition();
-        int   id            = builder.addPoint(pos);
-        pointLayerMap[id]   = std::make_pair(pos, layer->getName());
+        Point pos = netpoint->getPosition();
+        int id = builder.addPoint(pos);
+        pointLayerMap[id] = std::make_pair(pos, layer->getName());
         anchorMap[netpoint] = id;
       }
     }
@@ -117,11 +117,11 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
     Q_ASSERT(plane);
     if (&plane->getBoard() != &mBoard) continue;
     foreach (const Path& fragment, plane->getFragments()) {
-      int                                           lastId = -1;
+      int lastId = -1;
       QHashIterator<int, std::pair<Point, QString>> i(pointLayerMap);
       while (i.hasNext()) {
         i.next();
-        const Point&   pos        = i.value().first;
+        const Point& pos = i.value().first;
         const QString& pointLayer = i.value().second;
         if (pointLayer.isNull() || (pointLayer == plane->getLayerName())) {
           if (fragment.toQPainterPathPx().contains(pos.toPxQPointF())) {

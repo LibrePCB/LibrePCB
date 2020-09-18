@@ -80,8 +80,8 @@ private:
   Point mNewPos;
   Angle mOldRotation;
   Angle mNewRotation;
-  bool  mOldMirrored;
-  bool  mNewMirrored;
+  bool mOldMirrored;
+  bool mNewMirrored;
 
   friend class CmdDeviceInstanceEditAll;
 };

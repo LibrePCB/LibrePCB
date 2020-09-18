@@ -78,18 +78,18 @@ signals:
   void btnBrowseClicked(const QVariant& data);
 
 private:
-  void         installButtons(int row) noexcept;
+  void installButtons(int row) noexcept;
   QToolButton* createButton(const QString& objectName, const QIcon& icon,
                             const QString& text, const QString& toolTip,
                             int width, int height, Signal clickedSignal,
                             const QPersistentModelIndex& index) noexcept;
-  void         buttonClickedHandler(Signal                       clickedSignal,
-                                    const QPersistentModelIndex& index) noexcept;
+  void buttonClickedHandler(Signal clickedSignal,
+                            const QPersistentModelIndex& index) noexcept;
 
   bool mShowCopyButton;
   bool mShowEditButton;
   bool mShowMoveButtons;
-  int  mBrowseButtonColumn;
+  int mBrowseButtonColumn;
 };
 
 /*******************************************************************************

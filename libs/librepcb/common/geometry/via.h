@@ -59,7 +59,7 @@ public:
     SizeChanged,
     DrillDiameterChanged,
   };
-  Signal<Via, Event>       onEdited;
+  Signal<Via, Event> onEdited;
   typedef Slot<Via, Event> OnEditedSlot;
 
   // Public Types
@@ -75,9 +75,9 @@ public:
   ~Via() noexcept;
 
   // Getters
-  const Uuid&           getUuid() const noexcept { return mUuid; }
-  const Point&          getPosition() const noexcept { return mPosition; }
-  Shape                 getShape() const noexcept { return mShape; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const Point& getPosition() const noexcept { return mPosition; }
+  Shape getShape() const noexcept { return mShape; }
   const PositiveLength& getSize() const noexcept { return mSize; }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
@@ -103,9 +103,9 @@ public:
   Via& operator=(const Via& rhs) noexcept;
 
 private:  // Data
-  Uuid           mUuid;
-  Point          mPosition;
-  Shape          mShape;
+  Uuid mUuid;
+  Point mPosition;
+  Shape mShape;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
 };
@@ -120,7 +120,7 @@ struct ViaListNameProvider {
 using ViaList = SerializableObjectList<Via, ViaListNameProvider, Via::Event>;
 using CmdViaInsert = CmdListElementInsert<Via, ViaListNameProvider, Via::Event>;
 using CmdViaRemove = CmdListElementRemove<Via, ViaListNameProvider, Via::Event>;
-using CmdViasSwap  = CmdListElementsSwap<Via, ViaListNameProvider, Via::Event>;
+using CmdViasSwap = CmdListElementsSwap<Via, ViaListNameProvider, Via::Event>;
 
 /*******************************************************************************
  *  Non-Member Functions
@@ -142,7 +142,7 @@ inline SExpression serializeToSExpression(const Via::Shape& obj) {
 
 template <>
 inline Via::Shape deserializeFromSExpression(const SExpression& sexpr,
-                                             bool               throwIfEmpty) {
+                                             bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "round")
     return Via::Shape::Round;

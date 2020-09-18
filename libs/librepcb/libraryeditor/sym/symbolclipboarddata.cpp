@@ -42,7 +42,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolClipboardData::SymbolClipboardData(const Uuid&  symbolUuid,
+SymbolClipboardData::SymbolClipboardData(const Uuid& symbolUuid,
                                          const Point& cursorPos) noexcept
   : mSymbolUuid(symbolUuid), mCursorPos(cursorPos) {
 }
@@ -101,7 +101,7 @@ void SymbolClipboardData::serialize(SExpression& root) const {
 
 QPixmap SymbolClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
-  GraphicsScene                           scene;
+  GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (SymbolPin& pin : mPins) {
     items.append(std::make_shared<SymbolPinGraphicsItem>(pin, lp));

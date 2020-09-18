@@ -37,13 +37,13 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  bool    valid;
+  bool valid;
   QString inputFilePath;
   QString inputBasePath;  // used to test toRelative() and fromRelative()
   QString toStr;
   QString toWindowsStyle;  // used to test toNative() on Windows
   QString toRelative;
-  bool    isRoot;
+  bool isRoot;
 } FilePathTestData;
 
 /*******************************************************************************

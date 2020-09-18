@@ -61,13 +61,13 @@ CmdDeviceInstanceEditAll::~CmdDeviceInstanceEditAll() noexcept {
  ******************************************************************************/
 
 void CmdDeviceInstanceEditAll::setPosition(const Point& pos,
-                                           bool         immediate) noexcept {
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   translate(pos - mDevEditCmd->mNewPos, immediate);
 }
 
 void CmdDeviceInstanceEditAll::translate(const Point& deltaPos,
-                                         bool         immediate) noexcept {
+                                         bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->translate(deltaPos, immediate);
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
@@ -76,7 +76,7 @@ void CmdDeviceInstanceEditAll::translate(const Point& deltaPos,
 }
 
 void CmdDeviceInstanceEditAll::setRotation(const Angle& angle,
-                                           bool         immediate) noexcept {
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   rotate(angle - mDevEditCmd->mNewRotation, mDevEditCmd->mNewPos, immediate);
 }
@@ -97,9 +97,9 @@ void CmdDeviceInstanceEditAll::setMirrored(bool mirrored, bool immediate) {
   }
 }
 
-void CmdDeviceInstanceEditAll::mirror(const Point&    center,
+void CmdDeviceInstanceEditAll::mirror(const Point& center,
                                       Qt::Orientation orientation,
-                                      bool            immediate) {
+                                      bool immediate) {
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->mirror(center, orientation, immediate);  // can throw
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {

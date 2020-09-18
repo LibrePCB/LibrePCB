@@ -48,7 +48,7 @@ class Library final : public LibraryBaseElement {
 
 public:
   // Constructors / Destructor
-  Library()                     = delete;
+  Library() = delete;
   Library(const Library& other) = delete;
   Library(const Uuid& uuid, const Version& version, const QString& author,
           const ElementName& name_en_US, const QString& description_en_US,
@@ -58,11 +58,11 @@ public:
 
   // Getters
   template <typename ElementType>
-  QString           getElementsDirectoryName() const noexcept;
-  const QUrl&       getUrl() const noexcept { return mUrl; }
+  QString getElementsDirectoryName() const noexcept;
+  const QUrl& getUrl() const noexcept { return mUrl; }
   const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
   const QByteArray& getIcon() const noexcept { return mIcon; }
-  QPixmap           getIconAsPixmap() const noexcept;
+  QPixmap getIconAsPixmap() const noexcept;
 
   // Setters
   void setUrl(const QUrl& url) noexcept { mUrl = url; }
@@ -93,7 +93,7 @@ private:  // Methods
   virtual void serialize(SExpression& root) const override;
 
 private:  // Data
-  QUrl       mUrl;
+  QUrl mUrl;
   QSet<Uuid> mDependencies;
   QByteArray mIcon;
 };

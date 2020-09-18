@@ -52,8 +52,8 @@ public:
   // Types
   struct Segment {
     JunctionList junctions;
-    ViaList      vias;
-    TraceList    traces;
+    ViaList vias;
+    TraceList traces;
   };
 
   // Constructors / Destructor
@@ -62,11 +62,11 @@ public:
   ~BoardNetSegmentSplitter() noexcept;
 
   // General Methods
-  void           replaceFootprintPadByJunctions(const TraceAnchor& anchor,
-                                                const Point&       pos) noexcept;
-  void           addJunction(const Junction& junction) noexcept;
-  void           addVia(const Via& via, bool replaceByJunctions) noexcept;
-  void           addTrace(const Trace& trace) noexcept;
+  void replaceFootprintPadByJunctions(const TraceAnchor& anchor,
+                                      const Point& pos) noexcept;
+  void addJunction(const Junction& junction) noexcept;
+  void addVia(const Via& via, bool replaceByJunctions) noexcept;
+  void addTrace(const Trace& trace) noexcept;
   QList<Segment> split() noexcept;
 
   // Operator Overloadings
@@ -74,20 +74,20 @@ public:
       delete;
 
 private:  // Methods
-  TraceAnchor replaceAnchor(const TraceAnchor&       anchor,
+  TraceAnchor replaceAnchor(const TraceAnchor& anchor,
                             const GraphicsLayerName& layer) noexcept;
-  void        findConnectedLinesAndPoints(const TraceAnchor& anchor,
-                                          ViaList&           availableVias,
-                                          TraceList& availableTraces, Segment& segment)
+  void findConnectedLinesAndPoints(const TraceAnchor& anchor,
+                                   ViaList& availableVias,
+                                   TraceList& availableTraces, Segment& segment)
 
       noexcept;
 
 private:  // Data
   JunctionList mJunctions;
-  ViaList      mVias;
-  TraceList    mTraces;
+  ViaList mVias;
+  TraceList mTraces;
 
-  QHash<TraceAnchor, Point>                                 mAnchorsToReplace;
+  QHash<TraceAnchor, Point> mAnchorsToReplace;
   QHash<QPair<TraceAnchor, GraphicsLayerName>, TraceAnchor> mReplacedAnchors;
 };
 

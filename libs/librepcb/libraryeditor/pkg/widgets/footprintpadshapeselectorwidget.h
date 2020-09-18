@@ -59,7 +59,7 @@ public:
   void setCurrentShape(FootprintPad::Shape shape) noexcept;
 
   // Operator Overloadings
-  FootprintPadShapeSelectorWidget& operator       =(
+  FootprintPadShapeSelectorWidget& operator=(
       const FootprintPadShapeSelectorWidget& rhs) = delete;
 
 signals:

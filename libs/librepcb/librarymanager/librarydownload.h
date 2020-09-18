@@ -49,7 +49,7 @@ class LibraryDownload final : public QObject {
 
 public:
   // Constructors / Destructor
-  LibraryDownload()                             = delete;
+  LibraryDownload() = delete;
   LibraryDownload(const LibraryDownload& other) = delete;
   LibraryDownload(const QUrl& urlToZip, const FilePath& destDir) noexcept;
   ~LibraryDownload() noexcept;
@@ -68,7 +68,7 @@ public:
    * @copydoc ::librepcb::FileDownload::setExpectedChecksum()
    */
   void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
-                           const QByteArray&             checksum) noexcept;
+                           const QByteArray& checksum) noexcept;
 
   // Operator Overloadings
   LibraryDownload& operator=(const LibraryDownload& rhs) = delete;
@@ -93,15 +93,15 @@ signals:
   void abortRequested();  // internal signal!
 
 private:  // Methods
-  void     downloadErrored(const QString& errMsg) noexcept;
-  void     downloadAborted() noexcept;
-  void     downloadSucceeded() noexcept;
+  void downloadErrored(const QString& errMsg) noexcept;
+  void downloadAborted() noexcept;
+  void downloadSucceeded() noexcept;
   FilePath getPathToLibDir() noexcept;
 
 private:  // Data
   QScopedPointer<FileDownload> mFileDownload;
-  FilePath                     mDestDir;
-  FilePath                     mTempDestDir;
+  FilePath mDestDir;
+  FilePath mTempDestDir;
 };
 
 /*******************************************************************************

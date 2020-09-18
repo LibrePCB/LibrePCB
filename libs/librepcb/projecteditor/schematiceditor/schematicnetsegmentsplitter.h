@@ -49,7 +49,7 @@ public:
   // Types
   struct Segment {
     JunctionList junctions;
-    NetLineList  netlines;
+    NetLineList netlines;
     NetLabelList netlabels;
   };
 
@@ -60,37 +60,37 @@ public:
   ~SchematicNetSegmentSplitter() noexcept;
 
   // General Methods
-  void           addSymbolPin(const NetLineAnchor& anchor, const Point& pos,
-                              bool replaceByJunction = false) noexcept;
-  void           addJunction(const Junction& junction) noexcept;
-  void           addNetLine(const NetLine& netline) noexcept;
-  void           addNetLabel(const NetLabel& netlabel) noexcept;
+  void addSymbolPin(const NetLineAnchor& anchor, const Point& pos,
+                    bool replaceByJunction = false) noexcept;
+  void addJunction(const Junction& junction) noexcept;
+  void addNetLine(const NetLine& netline) noexcept;
+  void addNetLabel(const NetLabel& netlabel) noexcept;
   QList<Segment> split() noexcept;
 
   // Operator Overloadings
-  SchematicNetSegmentSplitter& operator       =(
+  SchematicNetSegmentSplitter& operator=(
       const SchematicNetSegmentSplitter& rhs) = delete;
 
 private:  // Methods
   NetLineAnchor replacePinAnchor(const NetLineAnchor& anchor) noexcept;
-  void          findConnectedLinesAndPoints(const NetLineAnchor& anchor,
-                                            NetLineList&         availableNetLines,
-                                            Segment&             segment)
+  void findConnectedLinesAndPoints(const NetLineAnchor& anchor,
+                                   NetLineList& availableNetLines,
+                                   Segment& segment)
 
       noexcept;
-  void   addNetLabelToNearestNetSegment(const NetLabel& netlabel,
-                                        QList<Segment>& segments) const noexcept;
+  void addNetLabelToNearestNetSegment(const NetLabel& netlabel,
+                                      QList<Segment>& segments) const noexcept;
   Length getDistanceBetweenNetLabelAndNetSegment(
       const NetLabel& netlabel, const Segment& netsegment) const noexcept;
   Point getAnchorPosition(const NetLineAnchor& anchor) const noexcept;
 
 private:  // Data
   JunctionList mJunctions;
-  NetLineList  mNetLines;
+  NetLineList mNetLines;
   NetLabelList mNetLabels;
 
   QHash<NetLineAnchor, NetLineAnchor> mPinAnchorsToReplace;
-  QHash<NetLineAnchor, Point>         mPinPositions;
+  QHash<NetLineAnchor, Point> mPinPositions;
 };
 
 /*******************************************************************************

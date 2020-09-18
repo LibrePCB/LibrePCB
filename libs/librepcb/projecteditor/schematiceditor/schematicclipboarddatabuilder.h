@@ -62,7 +62,7 @@ public:
       noexcept;
 
   // Operator Overloadings
-  SchematicClipboardDataBuilder& operator       =(
+  SchematicClipboardDataBuilder& operator=(
       const SchematicClipboardDataBuilder& rhs) = delete;
 
 private:  // Data

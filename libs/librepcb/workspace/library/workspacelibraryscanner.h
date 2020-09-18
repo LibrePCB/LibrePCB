@@ -83,23 +83,23 @@ signals:
   void scanFinished();
 
 private:  // Methods
-  void                run() noexcept override;
-  void                scan() noexcept;
+  void run() noexcept override;
+  void scan() noexcept;
   QHash<QString, int> updateLibraries(
-      SQLiteDatabase&                                          db,
+      SQLiteDatabase& db,
       const QHash<QString, std::shared_ptr<library::Library>>& libs);
   void clearAllTables(SQLiteDatabase& db);
   void getLibrariesOfDirectory(
       std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
       QHash<QString, std::shared_ptr<library::Library>>& libs) noexcept;
   template <typename ElementType>
-  int addCategoriesToDb(SQLiteDatabase&                          db,
+  int addCategoriesToDb(SQLiteDatabase& db,
                         std::shared_ptr<TransactionalFileSystem> fs,
                         const QString& libPath, const QStringList& dirs,
                         const QString& table, const QString& idColumn,
                         int libId);
   template <typename ElementType>
-  int addElementsToDb(SQLiteDatabase&                          db,
+  int addElementsToDb(SQLiteDatabase& db,
                       std::shared_ptr<TransactionalFileSystem> fs,
                       const QString& libPath, const QStringList& dirs,
                       const QString& table, const QString& idColumn, int libId);
@@ -118,9 +118,9 @@ private:  // Methods
   static QVariant optionalToVariant(const T& opt) noexcept;
 
 private:  // Data
-  Workspace&    mWorkspace;
-  FilePath      mDbFilePath;
-  QSemaphore    mSemaphore;
+  Workspace& mWorkspace;
+  FilePath mDbFilePath;
+  QSemaphore mSemaphore;
   volatile bool mAbort;
 };
 

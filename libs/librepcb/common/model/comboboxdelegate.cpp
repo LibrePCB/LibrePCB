@@ -44,7 +44,7 @@ ComboBoxDelegate::~ComboBoxDelegate() noexcept {
  *  Inherited from QStyledItemDelegate
  ******************************************************************************/
 
-QWidget* ComboBoxDelegate::createEditor(QWidget*                    parent,
+QWidget* ComboBoxDelegate::createEditor(QWidget* parent,
                                         const QStyleOptionViewItem& option,
                                         const QModelIndex& index) const {
   Q_UNUSED(option);
@@ -60,11 +60,11 @@ QWidget* ComboBoxDelegate::createEditor(QWidget*                    parent,
   return cbx;
 }
 
-void ComboBoxDelegate::setEditorData(QWidget*           editor,
+void ComboBoxDelegate::setEditorData(QWidget* editor,
                                      const QModelIndex& index) const {
-  QComboBox* cbx  = static_cast<QComboBox*>(editor);
-  QVariant   data = index.data(Qt::EditRole);
-  int        i    = cbx->findData(data, Qt::UserRole);
+  QComboBox* cbx = static_cast<QComboBox*>(editor);
+  QVariant data = index.data(Qt::EditRole);
+  int i = cbx->findData(data, Qt::UserRole);
   if ((i >= 0) || (!mEditable)) {
     cbx->setCurrentIndex(i);
   } else {
@@ -82,7 +82,7 @@ void ComboBoxDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
   }
 }
 
-void ComboBoxDelegate::updateEditorGeometry(QWidget*                    editor,
+void ComboBoxDelegate::updateEditorGeometry(QWidget* editor,
                                             const QStyleOptionViewItem& option,
                                             const QModelIndex& index) const {
   Q_UNUSED(index);

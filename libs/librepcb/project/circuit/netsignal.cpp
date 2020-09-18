@@ -56,7 +56,7 @@ NetSignal::NetSignal(Circuit& circuit, const SExpression& node)
     mHasAutoName(node.getValueByPath<bool>("auto")),
     mNetClass(nullptr) {
   Uuid netclassUuid = node.getValueByPath<Uuid>("netclass");
-  mNetClass         = circuit.getNetClassByUuid(netclassUuid);
+  mNetClass = circuit.getNetClassByUuid(netclassUuid);
   if (!mNetClass) {
     throw RuntimeError(
         __FILE__, __LINE__,
@@ -115,11 +115,11 @@ bool NetSignal::isNameForced() const noexcept {
  ******************************************************************************/
 
 void NetSignal::setName(const CircuitIdentifier& name,
-                        bool                     isAutoName) noexcept {
+                        bool isAutoName) noexcept {
   if ((name == mName) && (isAutoName == mHasAutoName)) {
     return;
   }
-  mName        = name;
+  mName = name;
   mHasAutoName = isAutoName;
   updateErcMessages();
   emit nameChanged(mName);

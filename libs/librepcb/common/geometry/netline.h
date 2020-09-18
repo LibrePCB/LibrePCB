@@ -84,11 +84,11 @@ public:
   static NetLineAnchor pin(const Uuid& symbol, const Uuid& pin) noexcept;
 
 private:  // Methods
-  NetLineAnchor(const tl::optional<Uuid>&      junction,
+  NetLineAnchor(const tl::optional<Uuid>& junction,
                 const tl::optional<PinAnchor>& pin) noexcept;
 
 private:  // Data
-  tl::optional<Uuid>      mJunction;
+  tl::optional<Uuid> mJunction;
   tl::optional<PinAnchor> mPin;
 };
 
@@ -113,7 +113,7 @@ public:
     StartPointChanged,
     EndPointChanged,
   };
-  Signal<NetLine, Event>       onEdited;
+  Signal<NetLine, Event> onEdited;
   typedef Slot<NetLine, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -126,10 +126,10 @@ public:
   ~NetLine() noexcept;
 
   // Getters
-  const Uuid&           getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const UnsignedLength& getWidth() const noexcept { return mWidth; }
-  const NetLineAnchor&  getStartPoint() const noexcept { return mStart; }
-  const NetLineAnchor&  getEndPoint() const noexcept { return mEnd; }
+  const NetLineAnchor& getStartPoint() const noexcept { return mStart; }
+  const NetLineAnchor& getEndPoint() const noexcept { return mEnd; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
@@ -146,10 +146,10 @@ public:
   NetLine& operator=(const NetLine& rhs) noexcept;
 
 private:  // Data
-  Uuid           mUuid;
+  Uuid mUuid;
   UnsignedLength mWidth;
-  NetLineAnchor  mStart;
-  NetLineAnchor  mEnd;
+  NetLineAnchor mStart;
+  NetLineAnchor mEnd;
 };
 
 /*******************************************************************************

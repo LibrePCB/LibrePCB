@@ -68,7 +68,7 @@ class BI_Device final : public BI_Base,
 
 public:
   // Constructors / Destructor
-  BI_Device()                       = delete;
+  BI_Device() = delete;
   BI_Device(const BI_Device& other) = delete;
   BI_Device(Board& board, const BI_Device& other);
   BI_Device(Board& board, const SExpression& node);
@@ -78,11 +78,11 @@ public:
   ~BI_Device() noexcept;
 
   // Getters
-  const Uuid&        getComponentInstanceUuid() const noexcept;
+  const Uuid& getComponentInstanceUuid() const noexcept;
   ComponentInstance& getComponentInstance() const noexcept {
     return *mCompInstance;
   }
-  const library::Device&  getLibDevice() const noexcept { return *mLibDevice; }
+  const library::Device& getLibDevice() const noexcept { return *mLibDevice; }
   const library::Package& getLibPackage() const noexcept {
     return *mLibPackage;
   }
@@ -90,9 +90,9 @@ public:
     return *mLibFootprint;
   }
   BI_Footprint& getFootprint() const noexcept { return *mFootprint; }
-  const Angle&  getRotation() const noexcept { return mRotation; }
-  bool          isSelectable() const noexcept override;
-  bool          isUsed() const noexcept;
+  const Angle& getRotation() const noexcept { return mRotation; }
+  bool isSelectable() const noexcept override;
+  bool isUsed() const noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -119,9 +119,9 @@ public:
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Device; }
   const Point& getPosition() const noexcept override { return mPosition; }
-  bool         getIsMirrored() const noexcept override { return mIsMirrored; }
+  bool getIsMirrored() const noexcept override { return mIsMirrored; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_Device& operator=(const BI_Device& rhs) = delete;
@@ -136,24 +136,24 @@ signals:
   void mirrored(bool newIsMirrored);
 
 private:
-  void               initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                                      const Uuid& footprintUuid);
-  void               init();
-  bool               checkAttributesValidity() const noexcept;
-  void               updateErcMessages() noexcept;
+  void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
+                                        const Uuid& footprintUuid);
+  void init();
+  bool checkAttributesValidity() const noexcept;
+  void updateErcMessages() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
   // General
-  ComponentInstance*           mCompInstance;
-  const library::Device*       mLibDevice;
-  const library::Package*      mLibPackage;
-  const library::Footprint*    mLibFootprint;
+  ComponentInstance* mCompInstance;
+  const library::Device* mLibDevice;
+  const library::Package* mLibPackage;
+  const library::Footprint* mLibFootprint;
   QScopedPointer<BI_Footprint> mFootprint;
 
   // Attributes
   Point mPosition;
   Angle mRotation;
-  bool  mIsMirrored;
+  bool mIsMirrored;
   AttributeList
       mAttributes;  ///< not yet used, but already specified in file format
 };

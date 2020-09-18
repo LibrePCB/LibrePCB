@@ -59,7 +59,7 @@ public:
   void setCurrentItem(const CmpSigPinDisplayType& type) noexcept;
 
   // Operator Overloadings
-  CmpSigPinDisplayTypeComboBox& operator       =(
+  CmpSigPinDisplayTypeComboBox& operator=(
       const CmpSigPinDisplayTypeComboBox& rhs) = delete;
 
 signals:

@@ -69,7 +69,7 @@ public:
     SuffixChanged,
     PinSignalMapEdited,
   };
-  Signal<ComponentSymbolVariantItem, Event>       onEdited;
+  Signal<ComponentSymbolVariantItem, Event> onEdited;
   typedef Slot<ComponentSymbolVariantItem, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -83,11 +83,11 @@ public:
   ~ComponentSymbolVariantItem() noexcept;
 
   // Getters: Attributes
-  const Uuid&  getUuid() const noexcept { return mUuid; }
-  const Uuid&  getSymbolUuid() const noexcept { return mSymbolUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const Uuid& getSymbolUuid() const noexcept { return mSymbolUuid; }
   const Point& getSymbolPosition() const noexcept { return mSymbolPos; }
   const Angle& getSymbolRotation() const noexcept { return mSymbolRot; }
-  bool         isRequired() const noexcept { return mIsRequired; }
+  bool isRequired() const noexcept { return mIsRequired; }
   const ComponentSymbolVariantItemSuffix& getSuffix() const noexcept {
     return mSuffix;
   }
@@ -120,16 +120,16 @@ private:  // Methods
   void pinSignalMapEdited(
       const ComponentPinSignalMap& map, int index,
       const std::shared_ptr<const ComponentPinSignalMapItem>& item,
-      ComponentPinSignalMap::Event                            event) noexcept;
+      ComponentPinSignalMap::Event event) noexcept;
 
 private:  // Data
-  Uuid                             mUuid;
-  Uuid                             mSymbolUuid;
-  Point                            mSymbolPos;
-  Angle                            mSymbolRot;
-  bool                             mIsRequired;
+  Uuid mUuid;
+  Uuid mSymbolUuid;
+  Point mSymbolPos;
+  Angle mSymbolRot;
+  bool mIsRequired;
   ComponentSymbolVariantItemSuffix mSuffix;
-  ComponentPinSignalMap            mPinSignalMap;
+  ComponentPinSignalMap mPinSignalMap;
 
   // Slots
   ComponentPinSignalMap::OnEditedSlot mOnPinSignalMapEditedSlot;

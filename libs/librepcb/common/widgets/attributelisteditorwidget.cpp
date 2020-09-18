@@ -83,7 +83,7 @@ AttributeListEditorWidget::~AttributeListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
-void AttributeListEditorWidget::setReferences(UndoStack*     undoStack,
+void AttributeListEditorWidget::setReferences(UndoStack* undoStack,
                                               AttributeList* list) noexcept {
   mModel->setAttributeList(list);
   mModel->setUndoStack(undoStack);

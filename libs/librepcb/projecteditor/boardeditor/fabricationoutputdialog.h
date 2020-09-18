@@ -53,7 +53,7 @@ class FabricationOutputDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  FabricationOutputDialog()                                     = delete;
+  FabricationOutputDialog() = delete;
   FabricationOutputDialog(const FabricationOutputDialog& other) = delete;
   explicit FabricationOutputDialog(Board& board, QWidget* parent = 0);
   ~FabricationOutputDialog();
@@ -68,8 +68,8 @@ private:
   QStringList getTopSilkscreenLayers() const noexcept;
   QStringList getBotSilkscreenLayers() const noexcept;
 
-  Project&                     mProject;
-  Board&                       mBoard;
+  Project& mProject;
+  Board& mBoard;
   Ui::FabricationOutputDialog* mUi;
 };
 

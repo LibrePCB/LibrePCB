@@ -46,7 +46,7 @@ class BI_StrokeText;
 class CmdFootprintStrokeTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdFootprintStrokeTextAdd(BI_Footprint&  footprint,
+  CmdFootprintStrokeTextAdd(BI_Footprint& footprint,
                             BI_StrokeText& text) noexcept;
   ~CmdFootprintStrokeTextAdd() noexcept;
 
@@ -65,7 +65,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  BI_Footprint&  mFootprint;
+  BI_Footprint& mFootprint;
   BI_StrokeText& mText;
 };
 

@@ -87,7 +87,7 @@ public:
   };
 
   // Constructors / Destructor
-  NewElementWizardContext()                                     = delete;
+  NewElementWizardContext() = delete;
   NewElementWizardContext(const NewElementWizardContext& other) = delete;
   NewElementWizardContext(const workspace::Workspace& ws, Library& lib,
                           const IF_GraphicsLayerProvider& lp,
@@ -116,37 +116,37 @@ public:
       delete;
 
 private:  // Data
-  const workspace::Workspace&     mWorkspace;
-  library::Library&               mLibrary;
+  const workspace::Workspace& mWorkspace;
+  library::Library& mLibrary;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  FilePath                        mOutputDirectory;
+  FilePath mOutputDirectory;
 
 public:  // Data
   // common
-  ElementType               mElementType;
+  ElementType mElementType;
   tl::optional<ElementName> mElementName;
-  QString                   mElementDescription;
-  QString                   mElementKeywords;
-  QString                   mElementAuthor;
-  tl::optional<Version>     mElementVersion;
-  QSet<Uuid>                mElementCategoryUuids;
+  QString mElementDescription;
+  QString mElementKeywords;
+  QString mElementAuthor;
+  tl::optional<Version> mElementVersion;
+  QSet<Uuid> mElementCategoryUuids;
 
   // symbol
   SymbolPinList mSymbolPins;
-  PolygonList   mSymbolPolygons;
-  CircleList    mSymbolCircles;
-  TextList      mSymbolTexts;
+  PolygonList mSymbolPolygons;
+  CircleList mSymbolCircles;
+  TextList mSymbolTexts;
 
   // package
   PackagePadList mPackagePads;
-  FootprintList  mPackageFootprints;
+  FootprintList mPackageFootprints;
 
   // component
-  bool                       mComponentSchematicOnly;
-  AttributeList              mComponentAttributes;
-  QString                    mComponentDefaultValue;
-  NormDependentPrefixMap     mComponentPrefixes;
-  ComponentSignalList        mComponentSignals;
+  bool mComponentSchematicOnly;
+  AttributeList mComponentAttributes;
+  QString mComponentDefaultValue;
+  NormDependentPrefixMap mComponentPrefixes;
+  ComponentSignalList mComponentSignals;
   ComponentSymbolVariantList mComponentSymbolVariants;
 
   // device

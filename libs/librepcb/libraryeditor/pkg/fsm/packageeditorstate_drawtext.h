@@ -55,7 +55,7 @@ public:
   ~PackageEditorState_DrawText() noexcept;
 
   // Operator Overloadings
-  PackageEditorState_DrawText& operator       =(
+  PackageEditorState_DrawText& operator=(
       const PackageEditorState_DrawText& rhs) = delete;
 };
 

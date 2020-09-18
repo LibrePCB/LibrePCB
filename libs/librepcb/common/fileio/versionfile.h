@@ -49,7 +49,7 @@ class VersionFile final {
 
 public:
   // Constructors / Destructor
-  VersionFile()                         = delete;
+  VersionFile() = delete;
   VersionFile(const VersionFile& other) = default;
 
   /**

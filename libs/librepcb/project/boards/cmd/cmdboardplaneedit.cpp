@@ -39,7 +39,7 @@ namespace project {
  ******************************************************************************/
 
 CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane,
-                                     bool      rebuildOnChanges) noexcept
+                                     bool rebuildOnChanges) noexcept
   : UndoCommand(tr("Edit plane")),
     mPlane(plane),
     mDoRebuildOnChanges(rebuildOnChanges),
@@ -73,7 +73,7 @@ CmdBoardPlaneEdit::~CmdBoardPlaneEdit() noexcept {
  ******************************************************************************/
 
 void CmdBoardPlaneEdit::translate(const Point& deltaPos,
-                                  bool         immediate) noexcept {
+                                  bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewOutline.translate(deltaPos);
   if (immediate) mPlane.setOutline(mNewOutline);
@@ -95,7 +95,7 @@ void CmdBoardPlaneEdit::mirror(const Point& center, Qt::Orientation orientation,
 }
 
 void CmdBoardPlaneEdit::setOutline(const Path& outline,
-                                   bool        immediate) noexcept {
+                                   bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewOutline = outline;
   if (immediate) mPlane.setOutline(mNewOutline);

@@ -67,14 +67,14 @@ public:
   void setDefaultLocation(const FilePath& dir) noexcept;
 
   // Getters
-  QString  getProjectName() const noexcept;
-  QString  getProjectAuthor() const noexcept;
-  bool     isLicenseSet() const noexcept;
+  QString getProjectName() const noexcept;
+  QString getProjectAuthor() const noexcept;
+  bool isLicenseSet() const noexcept;
   FilePath getProjectLicenseFilePath() const noexcept;
   FilePath getFullFilePath() const noexcept;
 
   // Operator Overloadings
-  NewProjectWizardPage_Metadata& operator       =(
+  NewProjectWizardPage_Metadata& operator=(
       const NewProjectWizardPage_Metadata& rhs) = delete;
 
 private:  // GUI Action Handlers
@@ -89,7 +89,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
-  FilePath                                          mFullFilePath;
+  FilePath mFullFilePath;
 };
 
 /*******************************************************************************

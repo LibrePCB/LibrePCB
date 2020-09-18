@@ -65,7 +65,7 @@ private:  // Methods
                    const QStringList& exportBomFiles,
                    const QStringList& exportBoardBomFiles,
                    const QString& bomAttributes, bool exportPcbFabricationData,
-                   const QString&     pcbFabricationSettingsPath,
+                   const QString& pcbFabricationSettingsPath,
                    const QStringList& boards, bool save, bool strict) const
       noexcept;
   bool openLibrary(const QString& libDir, bool all, bool save,
@@ -74,10 +74,10 @@ private:  // Methods
                              library::LibraryBaseElement& element, bool save,
                              bool strict, bool& success) const;
   static QString prettyPath(const FilePath& path,
-                            const QString&  style) noexcept;
-  static bool    failIfFileFormatUnstable() noexcept;
-  static void    print(const QString& str, int newlines = 1) noexcept;
-  static void    printErr(const QString& str, int newlines = 1) noexcept;
+                            const QString& style) noexcept;
+  static bool failIfFileFormatUnstable() noexcept;
+  static void print(const QString& str, int newlines = 1) noexcept;
+  static void printErr(const QString& str, int newlines = 1) noexcept;
 
 private:  // Data
   const Application& mApp;

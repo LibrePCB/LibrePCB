@@ -47,8 +47,8 @@ class MathParser {
 
 public:
   struct Result {
-    bool    valid;
-    qreal   value;
+    bool valid;
+    qreal value;
     QString error;
 
     Result() : valid(false), value(0), error() {}

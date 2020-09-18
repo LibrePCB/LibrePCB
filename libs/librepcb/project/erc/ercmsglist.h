@@ -51,7 +51,7 @@ class ErcMsgList final : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  ErcMsgList()                        = delete;
+  ErcMsgList() = delete;
   ErcMsgList(const ErcMsgList& other) = delete;
   explicit ErcMsgList(Project& project);
   ~ErcMsgList() noexcept;

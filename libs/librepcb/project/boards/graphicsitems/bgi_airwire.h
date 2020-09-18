@@ -59,14 +59,14 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const { return mBoundingRect; }
+  QRectF boundingRect() const { return mBoundingRect; }
   QPainterPath shape() const { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget);
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget);
 
 private:
   // make some methods inaccessible...
-  BGI_AirWire()                         = delete;
+  BGI_AirWire() = delete;
   BGI_AirWire(const BGI_AirWire& other) = delete;
   BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
 
@@ -74,13 +74,13 @@ private:
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
   // Attributes
-  BI_AirWire&    mAirWire;
+  BI_AirWire& mAirWire;
   GraphicsLayer* mLayer;
 
   // Cached Attributes
   QVector<QLineF> mLines;
-  QRectF          mBoundingRect;
-  QPainterPath    mShape;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
 };
 
 /*******************************************************************************

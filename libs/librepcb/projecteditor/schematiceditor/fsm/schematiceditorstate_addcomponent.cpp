@@ -133,7 +133,7 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
 
   // Remove actions / widgets from the "command" toolbar
   mAttributeUnitComboBoxAction = nullptr;
-  mAttributeValueEditAction    = nullptr;
+  mAttributeValueEditAction = nullptr;
   delete mAttributeUnitComboBox;
   mAttributeUnitComboBox = nullptr;
   delete mAttributeValueEdit;
@@ -267,7 +267,7 @@ bool SchematicEditorState_AddComponent::
     } else {
       // all symbols placed, start adding the next component
       Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
-      Uuid symbVarUuid   = mCurrentComponent->getSymbolVariant().getUuid();
+      Uuid symbVarUuid = mCurrentComponent->getSymbolVariant().getUuid();
       tl::optional<Uuid> defaultDeviceUuid =
           mCurrentComponent->getDefaultDeviceUuid();
       mContext.undoStack.commitCmdGroup();
@@ -419,9 +419,9 @@ bool SchematicEditorState_AddComponent::abortCommand(
     }
 
     // reset attributes, go back to idle state
-    mCurrentComponent        = nullptr;
+    mCurrentComponent = nullptr;
     mCurrentSymbVarItemIndex = -1;
-    mCurrentSymbolToPlace    = nullptr;
+    mCurrentSymbolToPlace = nullptr;
     return true;
   } catch (Exception& e) {
     if (showErrMsgBox)
@@ -431,11 +431,11 @@ bool SchematicEditorState_AddComponent::abortCommand(
 }
 
 std::shared_ptr<const Attribute>
-SchematicEditorState_AddComponent::getToolbarAttribute() const noexcept {
+    SchematicEditorState_AddComponent::getToolbarAttribute() const noexcept {
   if (mCurrentComponent) {
     QString value = mCurrentComponent->getValue();
-    QString key   = QString(value).remove("{{").remove("}}").trimmed();
-    auto    attr  = mCurrentComponent->getAttributes().find(key);
+    QString key = QString(value).remove("{{").remove("}}").trimmed();
+    auto attr = mCurrentComponent->getAttributes().find(key);
     if (attr && value.startsWith("{{") && value.endsWith("}}")) {
       return attr;
     }
@@ -455,11 +455,11 @@ void SchematicEditorState_AddComponent::attributeChanged() noexcept {
 
   std::shared_ptr<const Attribute> selected = getToolbarAttribute();
   if (!selected) return;
-  AttributeList              attributes = mCurrentComponent->getAttributes();
-  std::shared_ptr<Attribute> attribute  = attributes.find(*selected->getKey());
+  AttributeList attributes = mCurrentComponent->getAttributes();
+  std::shared_ptr<Attribute> attribute = attributes.find(*selected->getKey());
   if (!attribute) return;
-  const AttributeType& type  = attribute->getType();
-  QString              value = toMultiLine(mAttributeValueEdit->text());
+  const AttributeType& type = attribute->getType();
+  QString value = toMultiLine(mAttributeValueEdit->text());
   if (const AttributeUnit* unit = type.tryExtractUnitFromValue(value)) {
     // avoid recursion by blocking signals from combobox
     const bool wasBlocked = mAttributeUnitComboBox->blockSignals(true);

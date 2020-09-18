@@ -49,14 +49,14 @@ public:
   virtual ~FileSystem() noexcept {}
 
   // File Operations
-  virtual FilePath    getAbsPath(const QString& path = "") const noexcept   = 0;
-  virtual QStringList getDirs(const QString& path = "") const noexcept      = 0;
-  virtual QStringList getFiles(const QString& path = "") const noexcept     = 0;
-  virtual bool        fileExists(const QString& path) const noexcept        = 0;
-  virtual QByteArray  read(const QString& path) const                       = 0;
-  virtual void        write(const QString& path, const QByteArray& content) = 0;
-  virtual void        removeFile(const QString& path)                       = 0;
-  virtual void        removeDirRecursively(const QString& path = "")        = 0;
+  virtual FilePath getAbsPath(const QString& path = "") const noexcept = 0;
+  virtual QStringList getDirs(const QString& path = "") const noexcept = 0;
+  virtual QStringList getFiles(const QString& path = "") const noexcept = 0;
+  virtual bool fileExists(const QString& path) const noexcept = 0;
+  virtual QByteArray read(const QString& path) const = 0;
+  virtual void write(const QString& path, const QByteArray& content) = 0;
+  virtual void removeFile(const QString& path) = 0;
+  virtual void removeDirRecursively(const QString& path = "") = 0;
 };
 
 /*******************************************************************************

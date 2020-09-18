@@ -48,7 +48,7 @@ class IF_GraphicsLayerProvider;
 class TextGraphicsItem final : public PrimitiveTextGraphicsItem {
 public:
   // Constructors / Destructor
-  TextGraphicsItem()                              = delete;
+  TextGraphicsItem() = delete;
   TextGraphicsItem(const TextGraphicsItem& other) = delete;
   TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& lp,
                    QGraphicsItem* parent = nullptr) noexcept;
@@ -64,8 +64,8 @@ private:  // Methods
   void textEdited(const Text& text, Text::Event event) noexcept;
 
 private:  // Data
-  Text&                                   mText;
-  const IF_GraphicsLayerProvider&         mLayerProvider;
+  Text& mText;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 
   // Slots

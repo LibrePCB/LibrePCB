@@ -63,13 +63,13 @@ public:
   void setReferences(UndoStack* undoStack, ComponentSignalList* list) noexcept;
 
   // Operator Overloadings
-  ComponentSignalListEditorWidget& operator       =(
+  ComponentSignalListEditorWidget& operator=(
       const ComponentSignalListEditorWidget& rhs) = delete;
 
 private:
   QScopedPointer<ComponentSignalListModel> mModel;
-  QScopedPointer<SortFilterProxyModel>     mProxy;
-  QScopedPointer<EditableTableWidget>      mView;
+  QScopedPointer<SortFilterProxyModel> mProxy;
+  QScopedPointer<EditableTableWidget> mView;
 };
 
 /*******************************************************************************

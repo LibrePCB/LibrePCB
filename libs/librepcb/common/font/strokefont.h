@@ -80,26 +80,26 @@ public:
   StrokeFont& operator=(const StrokeFont& rhs) = delete;
 
 private:
-  void                                fontLoaded() noexcept;
+  void fontLoaded() noexcept;
   const fontobene::GlyphListAccessor& accessor() const noexcept;
-  static QVector<Path>                polylines2paths(
-                     const QVector<fontobene::Polyline>& polylines,
-                     const PositiveLength&               height) noexcept;
-  static Path   polyline2path(const fontobene::Polyline& p,
-                              const PositiveLength&      height) noexcept;
+  static QVector<Path> polylines2paths(
+      const QVector<fontobene::Polyline>& polylines,
+      const PositiveLength& height) noexcept;
+  static Path polyline2path(const fontobene::Polyline& p,
+                            const PositiveLength& height) noexcept;
   static Vertex convertVertex(const fontobene::Vertex& v,
-                              const PositiveLength&    height) noexcept;
-  Length        convertLength(const PositiveLength& height, qreal length) const
+                              const PositiveLength& height) noexcept;
+  Length convertLength(const PositiveLength& height, qreal length) const
       noexcept;
   static void computeBoundingRect(const QVector<Path>& paths, Point& bottomLeft,
                                   Point& topRight) noexcept;
 
 private:  // Data
-  FilePath                                             mFilePath;
-  QFuture<fontobene::Font>                             mFuture;
-  QFutureWatcher<fontobene::Font>                      mWatcher;
-  mutable QScopedPointer<fontobene::Font>              mFont;
-  mutable QScopedPointer<fontobene::GlyphListCache>    mGlyphListCache;
+  FilePath mFilePath;
+  QFuture<fontobene::Font> mFuture;
+  QFutureWatcher<fontobene::Font> mWatcher;
+  mutable QScopedPointer<fontobene::Font> mFont;
+  mutable QScopedPointer<fontobene::GlyphListCache> mGlyphListCache;
   mutable QScopedPointer<fontobene::GlyphListAccessor> mGlyphListAccessor;
 };
 

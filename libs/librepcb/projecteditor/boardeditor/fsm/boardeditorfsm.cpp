@@ -90,8 +90,8 @@ bool BoardEditorFsm::processAddVia() noexcept {
 }
 
 bool BoardEditorFsm::processAddDevice(ComponentInstance& component,
-                                      const Uuid&        device,
-                                      const Uuid&        footprint) noexcept {
+                                      const Uuid& device,
+                                      const Uuid& footprint) noexcept {
   State oldState = mCurrentState;
   if (!setNextState(State::ADD_DEVICE)) {
     return false;

@@ -50,7 +50,7 @@ protected:
   WorkspaceTest() {
     // the whitespaces in the path are there to make the test even stronger ;)
     mWsDir = FilePath::getRandomTempPath().getPathTo("test workspace dir");
-    mVersionFile  = mWsDir.getPathTo(".librepcb-workspace");
+    mVersionFile = mWsDir.getPathTo(".librepcb-workspace");
     mProjectsPath = mWsDir.getPathTo("projects");
     mMetadataPath =
         mWsDir.getPathTo("v" % qApp->getFileFormatVersion().toStr());

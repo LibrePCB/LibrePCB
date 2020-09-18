@@ -60,7 +60,7 @@ public:
   void setMessages(const QList<BoardDesignRuleCheckMessage>& messages) noexcept;
 
   // Operator Overloadings
-  BoardDesignRuleCheckMessagesDock& operator       =(
+  BoardDesignRuleCheckMessagesDock& operator=(
       const BoardDesignRuleCheckMessagesDock& rhs) = delete;
 
 signals:
@@ -72,7 +72,7 @@ private:  // Methods
 
 private:
   QScopedPointer<Ui::BoardDesignRuleCheckMessagesDock> mUi;
-  QList<BoardDesignRuleCheckMessage>                   mMessages;
+  QList<BoardDesignRuleCheckMessage> mMessages;
 };
 
 /*******************************************************************************

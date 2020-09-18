@@ -81,9 +81,9 @@ QPixmap GraphicsScene::toPixmap(int dpi, const QColor& background) noexcept {
                   background);
 }
 
-QPixmap GraphicsScene::toPixmap(const QSize&  size,
+QPixmap GraphicsScene::toPixmap(const QSize& size,
                                 const QColor& background) noexcept {
-  QRectF  rect = itemsBoundingRect();
+  QRectF rect = itemsBoundingRect();
   QPixmap pixmap(size);
   pixmap.fill(background);
   QPainter painter(&pixmap);

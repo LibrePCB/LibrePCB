@@ -70,7 +70,7 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
-  PackageEditorState_AddHoles& operator       =(
+  PackageEditorState_AddHoles& operator=(
       const PackageEditorState_AddHoles& rhs) = delete;
 
 private:  // Methods
@@ -80,10 +80,10 @@ private:  // Methods
   void diameterEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Data
-  Point                       mStartPos;
+  Point mStartPos;
   QScopedPointer<CmdHoleEdit> mEditCmd;
-  Hole*                       mCurrentHole;
-  HoleGraphicsItem*           mCurrentGraphicsItem;
+  Hole* mCurrentHole;
+  HoleGraphicsItem* mCurrentGraphicsItem;
 
   // parameter memory
   PositiveLength mLastDiameter;

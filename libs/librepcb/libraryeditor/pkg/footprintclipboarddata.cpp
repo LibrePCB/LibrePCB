@@ -111,7 +111,7 @@ void FootprintClipboardData::serialize(SExpression& root) const {
 
 QPixmap FootprintClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
-  GraphicsScene                           scene;
+  GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (FootprintPad& pad : mFootprintPads) {
     items.append(

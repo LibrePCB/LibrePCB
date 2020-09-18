@@ -47,7 +47,7 @@ class FileUtils final {
 
 public:
   // Constructors / Destructor
-  FileUtils()                       = delete;
+  FileUtils() = delete;
   FileUtils(const FileUtils& other) = delete;
 
   // Static methods

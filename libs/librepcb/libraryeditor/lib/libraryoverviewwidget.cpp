@@ -49,9 +49,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryOverviewWidget::LibraryOverviewWidget(const Context&  context,
+LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
                                              const FilePath& fp,
-                                             QWidget*        parent) noexcept
+                                             QWidget* parent) noexcept
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::LibraryOverviewWidget),
     mCurrentFilter() {
@@ -75,7 +75,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context&  context,
   // Insert dependencies editor widget.
   mDependenciesEditorWidget.reset(
       new LibraryListEditorWidget(mContext.workspace, this));
-  int                   row;
+  int row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblDependencies, &row, &role);
   mUi->formLayout->setWidget(row, QFormLayout::FieldRole,
@@ -160,7 +160,7 @@ bool LibraryOverviewWidget::save() noexcept {
 
   // Save element.
   try {
-    mLibrary->save();     // can throw
+    mLibrary->save();  // can throw
     mFileSystem->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -329,7 +329,7 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
 
   // add new list widget items
   foreach (const FilePath& fp, elementNames.keys()) {
-    QString          name = elementNames.value(fp);
+    QString name = elementNames.value(fp);
     QListWidgetItem* item = new QListWidgetItem(&listWidget);
     item->setText(name);
     item->setToolTip(name);
@@ -342,8 +342,8 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
 }
 
 QHash<QListWidgetItem*, FilePath>
-LibraryOverviewWidget::getElementListItemFilePaths(
-    const QList<QListWidgetItem*>& items) const noexcept {
+    LibraryOverviewWidget::getElementListItemFilePaths(
+        const QList<QListWidgetItem*>& items) const noexcept {
   QHash<QListWidgetItem*, FilePath> itemPaths;
   foreach (QListWidgetItem* item, items) {
     FilePath fp = FilePath(item->data(Qt::UserRole).toString());
@@ -377,7 +377,7 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QHash<QAction*, FilePath> aMoveToLibChildren;
 
   // Build the context menu
-  QMenu    menu;
+  QMenu menu;
   QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"), tr("Edit"));
   aEdit->setVisible(!selectedItemPaths.isEmpty());
   QAction* aDuplicate =
@@ -446,7 +446,7 @@ void LibraryOverviewWidget::newItem(QListWidget* list) noexcept {
   }
 }
 
-void LibraryOverviewWidget::duplicateItem(QListWidget*    list,
+void LibraryOverviewWidget::duplicateItem(QListWidget* list,
                                           const FilePath& fp) noexcept {
   if (list == mUi->lstCmpCat) {
     emit duplicateComponentCategoryTriggered(fp);
@@ -465,7 +465,7 @@ void LibraryOverviewWidget::duplicateItem(QListWidget*    list,
   }
 }
 
-void LibraryOverviewWidget::editItem(QListWidget*    list,
+void LibraryOverviewWidget::editItem(QListWidget* list,
                                      const FilePath& fp) noexcept {
   if (list == mUi->lstCmpCat) {
     emit editComponentCategoryTriggered(fp);
@@ -493,7 +493,7 @@ void LibraryOverviewWidget::removeItems(
                    "this one! They should be just marked as deprecated "
                    "instead.\n\nAre you still sure to delete the following "
                    "library elements?") %
-                "\n\n";
+      "\n\n";
   QList<QListWidgetItem*> listedItems = selectedItemPaths.keys().mid(0, 10);
   foreach (QListWidgetItem* item, listedItems) {
     msg.append(" - " % item->text() % "\n");
@@ -549,7 +549,7 @@ void LibraryOverviewWidget::moveElementsToOtherLibrary(
   if (ret == QMessageBox::Yes) {
     foreach (QListWidgetItem* item, selectedItemPaths.keys()) {
       FilePath itemPath = selectedItemPaths.value(item);
-      QString  relativePath =
+      QString relativePath =
           itemPath.toRelative(itemPath.getParentDir().getParentDir());
       try {
         // Emit signal so that the library editor can close any tabs that have
@@ -566,7 +566,7 @@ void LibraryOverviewWidget::moveElementsToOtherLibrary(
 }
 
 QList<LibraryOverviewWidget::LibraryMenuItem>
-LibraryOverviewWidget::getLocalLibraries() const noexcept {
+    LibraryOverviewWidget::getLocalLibraries() const noexcept {
   QList<LibraryMenuItem> libs;
   try {
     QMultiMap<Version, FilePath> libraries =
@@ -620,7 +620,7 @@ void LibraryOverviewWidget::lstDoubleClicked(
   QListWidget* list = dynamic_cast<QListWidget*>(sender());
   Q_ASSERT(list);
   QListWidgetItem* item = list->item(index.row());
-  FilePath         fp =
+  FilePath fp =
       item ? FilePath(item->data(Qt::UserRole).toString()) : FilePath();
   if (fp.isValid()) {
     editItem(list, fp);

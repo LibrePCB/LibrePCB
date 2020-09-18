@@ -62,9 +62,9 @@ private:
   /// @copydoc UndoCommand::performExecute()
   bool performExecute() override;
 
-  void removeNetSegmentItems(SI_NetSegment&            netsegment,
+  void removeNetSegmentItems(SI_NetSegment& netsegment,
                              const QSet<SI_NetPoint*>& netpointsToRemove,
-                             const QSet<SI_NetLine*>&  netlinesToRemove,
+                             const QSet<SI_NetLine*>& netlinesToRemove,
                              const QSet<SI_NetLabel*>& netlabelsToRemove);
   void removeSymbol(SI_Symbol& symbol);
   void disconnectComponentSignalInstance(ComponentSignalInstance& signal);

@@ -111,10 +111,10 @@ QString CsvFile::lineToString(const QStringList& line) const noexcept {
 
 QString CsvFile::escapeValue(const QString& value) noexcept {
   QString escaped = value;
-  escaped.remove("\r");        // remove DOS line endings, if any
+  escaped.remove("\r");  // remove DOS line endings, if any
   escaped.replace("\n", " ");  // replace linebreaks by spaces
   if (escaped.contains(",") || escaped.contains("\"")) {
-    escaped.replace("\"", "\"\"");    // escape quotes
+    escaped.replace("\"", "\"\"");  // escape quotes
     escaped = "\"" + escaped + "\"";  // add quotes around value
   }
   return escaped;

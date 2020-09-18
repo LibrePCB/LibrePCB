@@ -245,7 +245,7 @@ public:
   constexpr bool operator==(qint32 rhs) const { return mPpm == rhs; }
   constexpr bool operator!=(const Ratio& rhs) const { return mPpm != rhs.mPpm; }
   constexpr bool operator!=(qint32 rhs) const { return mPpm != rhs; }
-  explicit       operator bool() const { return mPpm != 0; }
+  explicit operator bool() const { return mPpm != 0; }
 
 private:
   // Private Static Functions
@@ -280,7 +280,7 @@ inline SExpression serializeToSExpression(const Ratio& obj) {
 
 template <>
 inline Ratio deserializeFromSExpression(const SExpression& sexpr,
-                                        bool               throwIfEmpty) {
+                                        bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Ratio::fromNormalized(str);
 }
@@ -341,7 +341,7 @@ inline UnsignedRatio deserializeFromSExpression(const SExpression& sexpr,
   return UnsignedRatio(Ratio::fromNormalized(str));
 }
 
-inline QDataStream& operator<<(QDataStream&         stream,
+inline QDataStream& operator<<(QDataStream& stream,
                                const UnsignedRatio& ratio) {
   stream << ratio->toNormalizedString();
   return stream;

@@ -47,7 +47,7 @@ class SymbolEditorState_AddNames final : public SymbolEditorState_DrawTextBase {
 
 public:
   // Constructors / Destructor
-  SymbolEditorState_AddNames()                                        = delete;
+  SymbolEditorState_AddNames() = delete;
   SymbolEditorState_AddNames(const SymbolEditorState_AddNames& other) = delete;
   explicit SymbolEditorState_AddNames(const Context& context) noexcept;
   ~SymbolEditorState_AddNames() noexcept;

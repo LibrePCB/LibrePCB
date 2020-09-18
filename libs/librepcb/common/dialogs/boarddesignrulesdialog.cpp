@@ -37,8 +37,8 @@ namespace librepcb {
 
 BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
                                                const LengthUnit& lengthUnit,
-                                               const QString&    settingsPrefix,
-                                               QWidget*          parent)
+                                               const QString& settingsPrefix,
+                                               QWidget* parent)
   : QDialog(parent), mUi(new Ui::BoardDesignRulesDialog), mDesignRules(rules) {
   mUi->setupUi(this);
   mUi->edtStopMaskClrRatio->setSingleStep(5.0);  // [%]

@@ -118,7 +118,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
 
   // add overview tab
   EditorWidgetBase::Context context{mWorkspace, *this, false, readOnly};
-  LibraryOverviewWidget*    overviewWidget =
+  LibraryOverviewWidget* overviewWidget =
       new LibraryOverviewWidget(context, libFp);
   mLibrary = &overviewWidget->getLibrary();
   connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
@@ -548,7 +548,7 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
 
     EditorWidgetBase::Context context{mWorkspace, *this, isNewElement,
                                       mIsOpenedReadOnly};
-    EditWidgetType*           widget = new EditWidgetType(context, fp);
+    EditWidgetType* widget = new EditWidgetType(context, fp);
     connect(widget, &QWidget::windowTitleChanged, this,
             &LibraryEditor::updateTabTitles);
     connect(widget, &EditorWidgetBase::dirtyChanged, this,
@@ -637,7 +637,7 @@ bool LibraryEditor::closeTab(int index) noexcept {
 
 void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   bool hasGraphicalEditor = false;
-  bool supportsFlip       = false;
+  bool supportsFlip = false;
   bool isOverviewTab = dynamic_cast<LibraryOverviewWidget*>(widget) != nullptr;
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->setUndoStackActionGroup(nullptr);
@@ -652,7 +652,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mCurrentEditorWidget->setCommandToolBar(mUi->commandToolbar);
     mCurrentEditorWidget->setStatusBar(mUi->statusBar);
     hasGraphicalEditor = mCurrentEditorWidget->hasGraphicalEditor();
-    supportsFlip       = mCurrentEditorWidget->supportsFlip();
+    supportsFlip = mCurrentEditorWidget->supportsFlip();
   }
   foreach (QAction* action, mUi->editToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
@@ -720,7 +720,7 @@ void LibraryEditor::editNewLibraryElement(
 
 void LibraryEditor::updateTabTitles() noexcept {
   for (int i = 0; i < mUi->tabWidget->count(); ++i) {
-    QWidget*                widget = mUi->tabWidget->widget(i);
+    QWidget* widget = mUi->tabWidget->widget(i);
     const EditorWidgetBase* editorWidget =
         dynamic_cast<EditorWidgetBase*>(widget);
     if (editorWidget) {

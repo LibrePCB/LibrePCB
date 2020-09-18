@@ -62,7 +62,7 @@ public:
     ElementRemoved,
     ElementValueChanged,
   };
-  Signal<SerializableKeyValueMap<T>, const QString&, Event>       onEdited;
+  Signal<SerializableKeyValueMap<T>, const QString&, Event> onEdited;
   typedef Slot<SerializableKeyValueMap<T>, const QString&, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -76,21 +76,22 @@ public:
   }
   explicit SerializableKeyValueMap(const SExpression& node) : onEdited(*this) {
     foreach (const SExpression& child, node.getChildren(T::tagname)) {
-      QString     key;
+      QString key;
       SExpression value;
       if (child.getChildren().count() > 1) {
-        key   = child.getValueByPath<QString>(T::keyname);
+        key = child.getValueByPath<QString>(T::keyname);
         value = child.getChildByIndex(1);
       } else {
-        key   = QString("");
+        key = QString("");
         value = child.getChildByIndex(0);
       }
       if (mValues.contains(key)) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Key \"%1\" defined multiple times.").arg(key));
       }
-      mValues.insert(key, deserializeFromSExpression<typename T::ValueType>(
-                              value, false));  // can throw
+      mValues.insert(key,
+                     deserializeFromSExpression<typename T::ValueType>(
+                         value, false));  // can throw
     }
     if (!mValues.contains(QString(""))) {
       throw RuntimeError(__FILE__, __LINE__,
@@ -100,7 +101,7 @@ public:
   ~SerializableKeyValueMap() noexcept {}
 
   // Getters
-  QStringList                  keys() const noexcept { return mValues.keys(); }
+  QStringList keys() const noexcept { return mValues.keys(); }
   const typename T::ValueType& getDefaultValue() const noexcept {
     auto i = mValues.find(QString(""));
     // there must always be a default value!!!
@@ -120,7 +121,7 @@ public:
     }
   }
   const typename T::ValueType& value(const QStringList& keyOrder,
-                                     QString*           usedKey = nullptr) const
+                                     QString* usedKey = nullptr) const
       noexcept {
     // search in the specified key order
     foreach (const QString& key, keyOrder) {
@@ -194,7 +195,7 @@ private:  // Data
  ******************************************************************************/
 
 struct LocalizedNameMapPolicy {
-  typedef ElementName          ValueType;
+  typedef ElementName ValueType;
   static constexpr const char* tagname = "name";
   static constexpr const char* keyname = "locale";
 };
@@ -205,7 +206,7 @@ using LocalizedNameMap = SerializableKeyValueMap<LocalizedNameMapPolicy>;
  ******************************************************************************/
 
 struct LocalizedDescriptionMapPolicy {
-  typedef QString              ValueType;
+  typedef QString ValueType;
   static constexpr const char* tagname = "description";
   static constexpr const char* keyname = "locale";
 };
@@ -217,7 +218,7 @@ using LocalizedDescriptionMap =
  ******************************************************************************/
 
 struct LocalizedKeywordsMapPolicy {
-  typedef QString              ValueType;
+  typedef QString ValueType;
   static constexpr const char* tagname = "keywords";
   static constexpr const char* keyname = "locale";
 };

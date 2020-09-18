@@ -85,7 +85,7 @@ inline bool operator==(const library::ComponentSymbolVariantItemSuffix& lhs,
   return (*lhs) == rhs;
 }
 inline bool operator==(
-    const QString&                                   lhs,
+    const QString& lhs,
     const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
   return lhs == (*rhs);
 }
@@ -94,7 +94,7 @@ inline bool operator!=(const library::ComponentSymbolVariantItemSuffix& lhs,
   return (*lhs) != rhs;
 }
 inline bool operator!=(
-    const QString&                                   lhs,
+    const QString& lhs,
     const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
   return lhs != (*rhs);
 }
@@ -103,7 +103,7 @@ inline QString operator%(const library::ComponentSymbolVariantItemSuffix& lhs,
   return (*lhs) % rhs;
 }
 inline QString operator%(
-    const QString&                                   lhs,
+    const QString& lhs,
     const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
   return lhs % (*rhs);
 }

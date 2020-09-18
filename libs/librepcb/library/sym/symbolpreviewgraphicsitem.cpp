@@ -68,7 +68,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(
     updateCacheAndRepaint();
 
     for (const SymbolPin& pin : symbol.getPins()) {
-      const ComponentSignal*           signal  = nullptr;
+      const ComponentSignal* signal = nullptr;
       const ComponentPinSignalMapItem* mapItem = nullptr;
       CmpSigPinDisplayType displayType = CmpSigPinDisplayType::pinName();
       if (mComponent && symbVarUuid && symbVarItemUuid) {
@@ -118,7 +118,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
   mBoundingRect = QRectF();
-  mShape        = QPainterPath();
+  mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);
 
   // cross rect
@@ -129,7 +129,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
   // polygons
   for (const Polygon& polygon : mSymbol.getPolygons()) {
     QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-    qreal        w           = polygon.getLineWidth()->toPx() / 2;
+    qreal w = polygon.getLineWidth()->toPx() / 2;
     mBoundingRect =
         mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
     if (polygon.isGrabArea()) mShape = mShape.united(polygonPath);
@@ -148,9 +148,9 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
     mFont.setPointSizeF(text.getHeight()->toPx());
     QFontMetricsF metrics(mFont);
     props.fontSize = text.getHeight()->toPx() * 0.8 * text.getHeight()->toPx() /
-                     metrics.height();
+        metrics.height();
     mFont.setPointSizeF(props.fontSize);
-    metrics        = QFontMetricsF(mFont);
+    metrics = QFontMetricsF(mFont);
     props.textRect = metrics.boundingRect(
         QRectF(), text.getAlign().toQtAlign() | Qt::TextDontClip, props.text);
 
@@ -168,14 +168,14 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
       dy = text.getPosition().toPxQPointF().y() - props.textRect.bottom();
     else
       dy = text.getPosition().toPxQPointF().y() -
-           (props.textRect.top() + props.textRect.bottom()) / 2;
+          (props.textRect.top() + props.textRect.bottom()) / 2;
     if (text.getAlign().getH() == HAlign::left())
       dx = text.getPosition().toPxQPointF().x() - props.textRect.left();
     else if (text.getAlign().getH() == HAlign::right())
       dx = text.getPosition().toPxQPointF().x() - props.textRect.right();
     else
       dx = text.getPosition().toPxQPointF().x() -
-           (props.textRect.left() + props.textRect.right()) / 2;
+          (props.textRect.left() + props.textRect.right()) / 2;
 
     // text alignment
     if (props.rotate180) {
@@ -197,7 +197,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
 
     // calculate text bounding rect
     props.textRect = props.textRect.translated(dx, dy).normalized();
-    mBoundingRect  = mBoundingRect.united(props.textRect);
+    mBoundingRect = mBoundingRect.united(props.textRect);
     if (props.rotate180) {
       props.textRect = QRectF(-props.textRect.x(), -props.textRect.y(),
                               -props.textRect.width(), -props.textRect.height())
@@ -215,14 +215,14 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
+void SymbolPreviewGraphicsItem::paint(QPainter* painter,
                                       const QStyleOptionGraphicsItem* option,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  QPen                 pen;
+  QPen pen;
   const GraphicsLayer* layer = 0;
-  const bool selected        = option->state.testFlag(QStyle::State_Selected);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
   const bool deviceIsPrinter =
       (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
@@ -318,7 +318,7 @@ void SymbolPreviewGraphicsItem::paint(QPainter*                       painter,
     layer = mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences);
     if (layer) {
       qreal width = Length(700000).toPx();
-      pen         = QPen(layer->getColor(selected), 0);
+      pen = QPen(layer->getColor(selected), 0);
       painter->setPen(pen);
       painter->drawLine(-2 * width, 0, 2 * width, 0);
       painter->drawLine(0, -2 * width, 0, 2 * width);

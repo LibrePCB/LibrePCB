@@ -132,7 +132,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
 
 void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
     SI_NetSegment& netsegment, const QSet<SI_NetPoint*>& netpointsToRemove,
-    const QSet<SI_NetLine*>&  netlinesToRemove,
+    const QSet<SI_NetLine*>& netlinesToRemove,
     const QSet<SI_NetLabel*>& netlabelsToRemove) {
   // Determine resulting sub-netsegments
   SchematicNetSegmentSplitter splitter;
@@ -209,7 +209,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getStartPoint().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(anchor->symbol);
-        start             = symbol ? symbol->getPin(anchor->pin) : nullptr;
+        start = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       SI_NetLineAnchor* end = nullptr;
       if (tl::optional<Uuid> anchor = netline.getEndPoint().tryGetJunction()) {
@@ -217,7 +217,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getEndPoint().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbolByUuid(anchor->symbol);
-        end               = symbol ? symbol->getPin(anchor->pin) : nullptr;
+        end = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       if ((!start) || (!end)) {
         throw LogicError(__FILE__, __LINE__);
@@ -238,7 +238,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
   // net segments were added, otherwise net signals might be deleted too early.
   foreach (SI_NetSegment* newNetSegment, newNetSegments) {
     NetSignal* newNetSignal = nullptr;
-    QString    forcedName   = newNetSegment->getForcedNetName();
+    QString forcedName = newNetSegment->getForcedNetName();
     if (!forcedName.isEmpty()) {
       // Set netsignal to forced name
       if (newNetSegment->getNetSignal().getName() != forcedName) {
@@ -250,7 +250,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
               new CmdNetSignalAdd(newNetSegment->getCircuit(),
                                   newNetSegment->getNetSignal().getNetClass(),
                                   CircuitIdentifier(forcedName));  // can throw
-          execNewChildCmd(cmdAddNetSignal);                        // can throw
+          execNewChildCmd(cmdAddNetSignal);  // can throw
           newNetSignal = cmdAddNetSignal->getNetSignal();
           Q_ASSERT(newNetSignal);
         }

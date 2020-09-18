@@ -35,7 +35,7 @@ namespace librepcb {
 
 Vertex::Vertex(const SExpression& node) {
   try {
-    mPos   = Point(node.getChildByPath("position"));
+    mPos = Point(node.getChildByPath("position"));
     mAngle = node.getValueByPath<Angle>("angle");
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
@@ -61,7 +61,7 @@ bool Vertex::operator==(const Vertex& rhs) const noexcept {
 }
 
 Vertex& Vertex::operator=(const Vertex& rhs) noexcept {
-  mPos   = rhs.mPos;
+  mPos = rhs.mPos;
   mAngle = rhs.mAngle;
   return *this;
 }

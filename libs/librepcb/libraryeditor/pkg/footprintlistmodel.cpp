@@ -105,11 +105,11 @@ void FootprintListModel::copyFootprint(const QVariant& editData) noexcept {
     std::shared_ptr<Footprint> copy(
         new Footprint(Uuid::createRandom(), newName, ""));  // can throw
     copy->getDescriptions() = original->getDescriptions();
-    copy->getPads()         = original->getPads();
-    copy->getPolygons()     = original->getPolygons();
-    copy->getCircles()      = original->getCircles();
-    copy->getStrokeTexts()  = original->getStrokeTexts();
-    copy->getHoles()        = original->getHoles();
+    copy->getPads() = original->getPads();
+    copy->getPolygons() = original->getPolygons();
+    copy->getCircles() = original->getCircles();
+    copy->getStrokeTexts() = original->getStrokeTexts();
+    copy->getHoles() = original->getHoles();
     execCmd(new CmdFootprintInsert(*mFootprintList, copy));
     mNewName = QString();
   } catch (const Exception& e) {
@@ -123,8 +123,8 @@ void FootprintListModel::removeFootprint(const QVariant& editData) noexcept {
   }
 
   try {
-    Uuid                       uuid = Uuid::fromString(editData.toString());
-    std::shared_ptr<Footprint> fpt  = mFootprintList->get(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    std::shared_ptr<Footprint> fpt = mFootprintList->get(uuid);
     execCmd(new CmdFootprintRemove(*mFootprintList, fpt.get()));
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -137,8 +137,8 @@ void FootprintListModel::moveFootprintUp(const QVariant& editData) noexcept {
   }
 
   try {
-    Uuid uuid  = Uuid::fromString(editData.toString());
-    int  index = mFootprintList->indexOf(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    int index = mFootprintList->indexOf(uuid);
     if ((index >= 1) && (index < mFootprintList->count())) {
       execCmd(new CmdFootprintsSwap(*mFootprintList, index, index - 1));
     }
@@ -153,8 +153,8 @@ void FootprintListModel::moveFootprintDown(const QVariant& editData) noexcept {
   }
 
   try {
-    Uuid uuid  = Uuid::fromString(editData.toString());
-    int  index = mFootprintList->indexOf(uuid);
+    Uuid uuid = Uuid::fromString(editData.toString());
+    int index = mFootprintList->indexOf(uuid);
     if ((index >= 0) && (index < mFootprintList->count() - 1)) {
       execCmd(new CmdFootprintsSwap(*mFootprintList, index, index + 1));
     }
@@ -189,9 +189,9 @@ QVariant FootprintListModel::data(const QModelIndex& index, int role) const {
   std::shared_ptr<Footprint> item = mFootprintList->value(index.row());
   switch (index.column()) {
     case COLUMN_NAME: {
-      QString name     = item ? *item->getNames().getDefaultValue() : mNewName;
-      bool    showHint = (!item) && mNewName.isEmpty();
-      QString hint     = tr("Footprint name");
+      QString name = item ? *item->getNames().getDefaultValue() : mNewName;
+      bool showHint = (!item) && mNewName.isEmpty();
+      QString hint = tr("Footprint name");
       switch (role) {
         case Qt::DisplayRole:
           return showHint ? hint : name;
@@ -226,9 +226,9 @@ QVariant FootprintListModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
-QVariant FootprintListModel::headerData(int             section,
+QVariant FootprintListModel::headerData(int section,
                                         Qt::Orientation orientation,
-                                        int             role) const {
+                                        int role) const {
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
@@ -273,13 +273,13 @@ bool FootprintListModel::setData(const QModelIndex& index,
   }
 
   try {
-    std::shared_ptr<Footprint>       item = mFootprintList->value(index.row());
+    std::shared_ptr<Footprint> item = mFootprintList->value(index.row());
     QScopedPointer<CmdFootprintEdit> cmd;
     if (item) {
       cmd.reset(new CmdFootprintEdit(*item));
     }
     if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
-      QString name        = value.toString().trimmed();
+      QString name = value.toString().trimmed();
       QString cleanedName = cleanElementName(name);
       if (cmd) {
         if (cleanedName != item->getNames().getDefaultValue()) {
@@ -310,7 +310,7 @@ bool FootprintListModel::setData(const QModelIndex& index,
 void FootprintListModel::footprintListEdited(
     const FootprintList& list, int index,
     const std::shared_ptr<const Footprint>& footprint,
-    FootprintList::Event                    event) noexcept {
+    FootprintList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(footprint);
   switch (event) {

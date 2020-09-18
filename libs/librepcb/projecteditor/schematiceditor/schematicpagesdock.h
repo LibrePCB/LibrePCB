@@ -52,7 +52,7 @@ class SchematicPagesDock final : public QDockWidget {
 
 public:
   // Constructors / Destructor
-  SchematicPagesDock()                                = delete;
+  SchematicPagesDock() = delete;
   SchematicPagesDock(const SchematicPagesDock& other) = delete;
   SchematicPagesDock(Project& project, QWidget* parent = nullptr);
   ~SchematicPagesDock();
@@ -81,7 +81,7 @@ private:  // Methods
   void updateSchematicNames() noexcept;
 
 private:  // Data
-  Project&                               mProject;
+  Project& mProject;
   QScopedPointer<Ui::SchematicPagesDock> mUi;
 };
 

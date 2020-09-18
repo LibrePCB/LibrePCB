@@ -73,7 +73,7 @@ public:
     StrokeTextsEdited,
     HolesEdited,
   };
-  Signal<Footprint, Event>       onEdited;
+  Signal<Footprint, Event> onEdited;
   typedef Slot<Footprint, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -85,9 +85,9 @@ public:
   ~Footprint() noexcept;
 
   // Getters: General
-  const Uuid&              getUuid() const noexcept { return mUuid; }
-  LocalizedNameMap&        getNames() noexcept { return mNames; }
-  const LocalizedNameMap&  getNames() const noexcept { return mNames; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  LocalizedNameMap& getNames() noexcept { return mNames; }
+  const LocalizedNameMap& getNames() const noexcept { return mNames; }
   LocalizedDescriptionMap& getDescriptions() noexcept { return mDescriptions; }
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
@@ -95,15 +95,15 @@ public:
 
   // Getters: Geometry
   const FootprintPadList& getPads() const noexcept { return mPads; }
-  FootprintPadList&       getPads() noexcept { return mPads; }
-  const PolygonList&      getPolygons() const noexcept { return mPolygons; }
-  PolygonList&            getPolygons() noexcept { return mPolygons; }
-  const CircleList&       getCircles() const noexcept { return mCircles; }
-  CircleList&             getCircles() noexcept { return mCircles; }
+  FootprintPadList& getPads() noexcept { return mPads; }
+  const PolygonList& getPolygons() const noexcept { return mPolygons; }
+  PolygonList& getPolygons() noexcept { return mPolygons; }
+  const CircleList& getCircles() const noexcept { return mCircles; }
+  CircleList& getCircles() noexcept { return mCircles; }
   const StrokeTextList& getStrokeTexts() const noexcept { return mStrokeTexts; }
-  StrokeTextList&       getStrokeTexts() noexcept { return mStrokeTexts; }
-  const HoleList&       getHoles() const noexcept { return mHoles; }
-  HoleList&             getHoles() noexcept { return mHoles; }
+  StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
+  const HoleList& getHoles() const noexcept { return mHoles; }
+  HoleList& getHoles() noexcept { return mHoles; }
 
   // General Methods
   void setStrokeFontForAllTexts(const StrokeFont* font) noexcept;
@@ -126,45 +126,45 @@ private:  // Methods
   void namesEdited(const LocalizedNameMap& names, const QString& key,
                    LocalizedNameMap::Event event) noexcept;
   void descriptionsEdited(const LocalizedDescriptionMap& names,
-                          const QString&                 key,
+                          const QString& key,
                           LocalizedDescriptionMap::Event event) noexcept;
   void padsEdited(const FootprintPadList& list, int index,
                   const std::shared_ptr<const FootprintPad>& pad,
-                  FootprintPadList::Event                    event) noexcept;
+                  FootprintPadList::Event event) noexcept;
   void polygonsEdited(const PolygonList& list, int index,
                       const std::shared_ptr<const Polygon>& polygon,
-                      PolygonList::Event                    event) noexcept;
+                      PolygonList::Event event) noexcept;
   void circlesEdited(const CircleList& list, int index,
                      const std::shared_ptr<const Circle>& circle,
-                     CircleList::Event                    event) noexcept;
+                     CircleList::Event event) noexcept;
   void strokeTextsEdited(const StrokeTextList& list, int index,
                          const std::shared_ptr<const StrokeText>& text,
                          StrokeTextList::Event event) noexcept;
   void holesEdited(const HoleList& list, int index,
                    const std::shared_ptr<const Hole>& hole,
-                   HoleList::Event                    event) noexcept;
+                   HoleList::Event event) noexcept;
 
 private:  // Data
-  Uuid                    mUuid;
-  LocalizedNameMap        mNames;
+  Uuid mUuid;
+  LocalizedNameMap mNames;
   LocalizedDescriptionMap mDescriptions;
-  FootprintPadList        mPads;
-  PolygonList             mPolygons;
-  CircleList              mCircles;
-  StrokeTextList          mStrokeTexts;
-  HoleList                mHoles;
+  FootprintPadList mPads;
+  PolygonList mPolygons;
+  CircleList mCircles;
+  StrokeTextList mStrokeTexts;
+  HoleList mHoles;
 
-  const StrokeFont*      mStrokeFont;
+  const StrokeFont* mStrokeFont;
   FootprintGraphicsItem* mRegisteredGraphicsItem;
 
   // Slots
-  LocalizedNameMap::OnEditedSlot        mNamesEditedSlot;
+  LocalizedNameMap::OnEditedSlot mNamesEditedSlot;
   LocalizedDescriptionMap::OnEditedSlot mDescriptionsEditedSlot;
-  FootprintPadList::OnEditedSlot        mPadsEditedSlot;
-  PolygonList::OnEditedSlot             mPolygonsEditedSlot;
-  CircleList::OnEditedSlot              mCirclesEditedSlot;
-  StrokeTextList::OnEditedSlot          mStrokeTextsEditedSlot;
-  HoleList::OnEditedSlot                mHolesEditedSlot;
+  FootprintPadList::OnEditedSlot mPadsEditedSlot;
+  PolygonList::OnEditedSlot mPolygonsEditedSlot;
+  CircleList::OnEditedSlot mCirclesEditedSlot;
+  StrokeTextList::OnEditedSlot mStrokeTextsEditedSlot;
+  HoleList::OnEditedSlot mHolesEditedSlot;
 };
 
 /*******************************************************************************

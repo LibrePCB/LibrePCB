@@ -46,12 +46,12 @@ public:
   HAlign() noexcept : mAlign(Qt::AlignLeft) {}
   HAlign(const HAlign& other) noexcept : mAlign(other.mAlign) {}
   Qt::AlignmentFlag toQtAlignFlag() const noexcept { return mAlign; }
-  HAlign&           mirror() noexcept;
-  HAlign            mirrored() const noexcept { return HAlign(*this).mirror(); }
-  static HAlign     left() noexcept { return HAlign(Qt::AlignLeft); }
-  static HAlign     center() noexcept { return HAlign(Qt::AlignHCenter); }
-  static HAlign     right() noexcept { return HAlign(Qt::AlignRight); }
-  HAlign&           operator=(const HAlign& rhs) noexcept {
+  HAlign& mirror() noexcept;
+  HAlign mirrored() const noexcept { return HAlign(*this).mirror(); }
+  static HAlign left() noexcept { return HAlign(Qt::AlignLeft); }
+  static HAlign center() noexcept { return HAlign(Qt::AlignHCenter); }
+  static HAlign right() noexcept { return HAlign(Qt::AlignRight); }
+  HAlign& operator=(const HAlign& rhs) noexcept {
     mAlign = rhs.mAlign;
     return *this;
   }
@@ -88,7 +88,7 @@ inline SExpression serializeToSExpression(const HAlign& obj) {
 
 template <>
 inline HAlign deserializeFromSExpression(const SExpression& sexpr,
-                                         bool               throwIfEmpty) {
+                                         bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "left")
     return HAlign::left();
@@ -117,12 +117,12 @@ public:
   VAlign() noexcept : mAlign(Qt::AlignTop) {}
   VAlign(const VAlign& other) noexcept : mAlign(other.mAlign) {}
   Qt::AlignmentFlag toQtAlignFlag() const noexcept { return mAlign; }
-  VAlign&           mirror() noexcept;
-  VAlign            mirrored() const noexcept { return VAlign(*this).mirror(); }
-  static VAlign     top() noexcept { return VAlign(Qt::AlignTop); }
-  static VAlign     center() noexcept { return VAlign(Qt::AlignVCenter); }
-  static VAlign     bottom() noexcept { return VAlign(Qt::AlignBottom); }
-  VAlign&           operator=(const VAlign& rhs) noexcept {
+  VAlign& mirror() noexcept;
+  VAlign mirrored() const noexcept { return VAlign(*this).mirror(); }
+  static VAlign top() noexcept { return VAlign(Qt::AlignTop); }
+  static VAlign center() noexcept { return VAlign(Qt::AlignVCenter); }
+  static VAlign bottom() noexcept { return VAlign(Qt::AlignBottom); }
+  VAlign& operator=(const VAlign& rhs) noexcept {
     mAlign = rhs.mAlign;
     return *this;
   }
@@ -159,7 +159,7 @@ inline SExpression serializeToSExpression(const VAlign& obj) {
 
 template <>
 inline VAlign deserializeFromSExpression(const SExpression& sexpr,
-                                         bool               throwIfEmpty) {
+                                         bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "top")
     return VAlign::top();
@@ -190,19 +190,19 @@ public:
   explicit Alignment(const HAlign& h, const VAlign& v) noexcept
     : mH(h), mV(v) {}
   explicit Alignment(const SExpression& node);
-  const HAlign  getH() const noexcept { return mH; }
-  const VAlign  getV() const noexcept { return mV; }
-  void          setH(const HAlign& h) noexcept { mH = h; }
-  void          setV(const VAlign& v) noexcept { mV = v; }
+  const HAlign getH() const noexcept { return mH; }
+  const VAlign getV() const noexcept { return mV; }
+  void setH(const HAlign& h) noexcept { mH = h; }
+  void setV(const VAlign& v) noexcept { mV = v; }
   Qt::Alignment toQtAlign() const noexcept {
     return mH.toQtAlignFlag() | mV.toQtAlignFlag();
   }
   Alignment& mirror() noexcept;
   Alignment& mirrorH() noexcept;
   Alignment& mirrorV() noexcept;
-  Alignment  mirrored() const noexcept { return Alignment(*this).mirror(); }
-  Alignment  mirroredH() const noexcept { return Alignment(*this).mirrorH(); }
-  Alignment  mirroredV() const noexcept { return Alignment(*this).mirrorV(); }
+  Alignment mirrored() const noexcept { return Alignment(*this).mirror(); }
+  Alignment mirroredH() const noexcept { return Alignment(*this).mirrorH(); }
+  Alignment mirroredV() const noexcept { return Alignment(*this).mirrorV(); }
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;

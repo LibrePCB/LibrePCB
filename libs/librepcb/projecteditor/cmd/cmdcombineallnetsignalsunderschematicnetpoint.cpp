@@ -94,7 +94,7 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() {
 
   // get all other netsignals of the items under the netpoint
   QList<NetSignal*> netSignalsUnderCursor;
-  QStringList       forcedNetNames;
+  QStringList forcedNetNames;
   foreach (SI_NetPoint* netpoint, netpointsUnderCursor) {
     if (!netSignalsUnderCursor.contains(&netpoint->getNetSignal())) {
       netSignalsUnderCursor.append(&netpoint->getNetSignal());
@@ -107,7 +107,7 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() {
   }
   foreach (SI_SymbolPin* pin, pinsUnderCursor) {
     ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance();
-    NetSignal*               signal = pin->getCompSigInstNetSignal();
+    NetSignal* signal = pin->getCompSigInstNetSignal();
     if ((signal) && (!netSignalsUnderCursor.contains(signal))) {
       netSignalsUnderCursor.append(signal);
     }

@@ -57,7 +57,7 @@ void ExclusiveActionGroup::setEnabled(bool enabled) noexcept {
 }
 
 void ExclusiveActionGroup::addAction(const QVariant& key,
-                                     QAction*        action) noexcept {
+                                     QAction* action) noexcept {
   Q_ASSERT(!key.isNull());
   Q_ASSERT(!mActions.contains(key));
   mActions.insert(key, action);
@@ -70,7 +70,7 @@ void ExclusiveActionGroup::addAction(const QVariant& key,
 }
 
 void ExclusiveActionGroup::setActionEnabled(const QVariant& key,
-                                            bool            enabled) noexcept {
+                                            bool enabled) noexcept {
   QAction* action = mActions.value(key);
   if (action) action->setEnabled(enabled);
 }

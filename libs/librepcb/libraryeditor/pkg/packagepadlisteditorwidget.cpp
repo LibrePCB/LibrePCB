@@ -71,7 +71,7 @@ PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
  ******************************************************************************/
 
 void PackagePadListEditorWidget::setReferences(PackagePadList& list,
-                                               UndoStack*      stack) noexcept {
+                                               UndoStack* stack) noexcept {
   mModel->setPadList(&list);
   mModel->setUndoStack(stack);
 }

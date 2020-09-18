@@ -45,7 +45,7 @@ protected:
     emittedValues.append(value);
   }
 
-  LengthEdit      edit;
+  LengthEdit edit;
   QVector<Length> emittedValues;
 };
 
@@ -55,8 +55,8 @@ protected:
 
 TEST_F(LengthEditTest, testStep) {
   edit.setSteps({
-      PositiveLength(100000),   // 0.1mm
-      PositiveLength(254000),   // 0.254mm
+      PositiveLength(100000),  // 0.1mm
+      PositiveLength(254000),  // 0.254mm
       PositiveLength(1000000),  // 1mm
       PositiveLength(2540000),  // 2.54mm
   });
@@ -103,10 +103,10 @@ TEST_F(LengthEditTest, testValueChangedWhileTyping) {
   QTest::keyClick(&edit, Qt::Key_Enter);
 
   QVector<Length> expectedValues = {
-      Length(1000000),   // "1" -> 1mm
+      Length(1000000),  // "1" -> 1mm
       Length(12000000),  // "12" -> 12mm
       Length(15000000),  // "12+3" -> 15mm
-      Length(15000),     // "12+3um" -> 15 um
+      Length(15000),  // "12+3um" -> 15 um
   };
 
   ASSERT_EQ(expectedValues.count(), emittedValues.count());

@@ -81,8 +81,8 @@ private:
   BoardLayersDock& operator=(const BoardLayersDock& rhs);
 
   // Private Methods
-  void           updateListWidget() noexcept;
-  void           setVisibleLayers(const QList<QString>& layers) noexcept;
+  void updateListWidget() noexcept;
+  void setVisibleLayers(const QList<QString>& layers) noexcept;
   QList<QString> getCommonLayers() const noexcept;
   QList<QString> getTopLayers() const noexcept;
   QList<QString> getBottomLayers() const noexcept;
@@ -90,9 +90,9 @@ private:
 
   // General
   QScopedPointer<Ui::BoardLayersDock> mUi;
-  BoardEditor&                        mBoardEditor;
-  Board*                              mActiveBoard;
-  QMetaObject::Connection             mActiveBoardConnection;
+  BoardEditor& mBoardEditor;
+  Board* mActiveBoard;
+  QMetaObject::Connection mActiveBoardConnection;
 };
 
 /*******************************************************************************

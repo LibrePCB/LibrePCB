@@ -60,21 +60,21 @@ CmdSymbolInstanceEdit::~CmdSymbolInstanceEdit() noexcept {
  ******************************************************************************/
 
 void CmdSymbolInstanceEdit::setPosition(const Point& pos,
-                                        bool         immediate) noexcept {
+                                        bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos = pos;
   if (immediate) mSymbol.setPosition(mNewPos);
 }
 
 void CmdSymbolInstanceEdit::translate(const Point& deltaPos,
-                                      bool         immediate) noexcept {
+                                      bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
   if (immediate) mSymbol.setPosition(mNewPos);
 }
 
 void CmdSymbolInstanceEdit::setRotation(const Angle& angle,
-                                        bool         immediate) noexcept {
+                                        bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;
   if (immediate) mSymbol.setRotation(mNewRotation);
@@ -85,8 +85,8 @@ void CmdSymbolInstanceEdit::rotate(const Angle& angle, const Point& center,
   Q_ASSERT(!wasEverExecuted());
   mNewPos.rotate(angle, center);
   mNewRotation += mNewMirrored
-                      ? -angle
-                      : angle;  // mirror --> rotation direction is inverted!
+      ? -angle
+      : angle;  // mirror --> rotation direction is inverted!
   if (immediate) {
     mSymbol.setPosition(mNewPos);
     mSymbol.setRotation(mNewRotation);
@@ -100,11 +100,11 @@ void CmdSymbolInstanceEdit::setMirrored(bool mirrored,
   if (immediate) mSymbol.setMirrored(mNewMirrored);
 }
 
-void CmdSymbolInstanceEdit::mirror(const Point&    center,
+void CmdSymbolInstanceEdit::mirror(const Point& center,
                                    Qt::Orientation orientation,
-                                   bool            immediate) noexcept {
+                                   bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  bool  mirror   = !mNewMirrored;
+  bool mirror = !mNewMirrored;
   Point position = mNewPos;
   Angle rotation = mNewRotation;
   switch (orientation) {
@@ -130,7 +130,7 @@ void CmdSymbolInstanceEdit::mirror(const Point&    center,
     mSymbol.setMirrored(mirror);
   }
   mNewMirrored = mirror;
-  mNewPos      = position;
+  mNewPos = position;
   mNewRotation = rotation;
 }
 

@@ -50,14 +50,14 @@ class GraphicsView final : public QGraphicsView {
 public:
   // Constructors / Destructor
   explicit GraphicsView(
-      QWidget*                     parent       = nullptr,
+      QWidget* parent = nullptr,
       IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
   ~GraphicsView() noexcept;
 
   // Getters
-  GraphicsScene*        getScene() const noexcept { return mScene; }
-  QRectF                getVisibleSceneRect() const noexcept;
-  bool                  getUseOpenGl() const noexcept { return mUseOpenGl; }
+  GraphicsScene* getScene() const noexcept { return mScene; }
+  QRectF getVisibleSceneRect() const noexcept;
+  bool getUseOpenGl() const noexcept { return mUseOpenGl; }
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
@@ -85,7 +85,7 @@ public:
   // General Methods
   Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
                                bool mapToGrid) const noexcept;
-  void  handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
+  void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
 public slots:
 
@@ -121,14 +121,14 @@ private:
 
   // General Attributes
   IF_GraphicsViewEventHandler* mEventHandlerObject;
-  GraphicsScene*               mScene;
-  QVariantAnimation*           mZoomAnimation;
-  GridProperties*              mGridProperties;
-  QRectF                       mSceneRectMarker;
-  bool                         mOriginCrossVisible;
-  bool                         mUseOpenGl;
-  volatile bool                mPanningActive;
-  QCursor                      mCursorBeforePanning;
+  GraphicsScene* mScene;
+  QVariantAnimation* mZoomAnimation;
+  GridProperties* mGridProperties;
+  QRectF mSceneRectMarker;
+  bool mOriginCrossVisible;
+  bool mUseOpenGl;
+  volatile bool mPanningActive;
+  QCursor mCursorBeforePanning;
 
   // Static Variables
   static constexpr qreal sZoomStepFactor = 1.3;

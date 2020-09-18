@@ -111,7 +111,7 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
  * @param label Pointer to the QLabel instance
  */
 void AboutDialog::formatLabelHeading(QLabel* label) noexcept {
-  int headerMarginTop    = 12;
+  int headerMarginTop = 12;
   int headerMarginBottom = 4;
   label->setContentsMargins(0, headerMarginTop, 0, headerMarginBottom);
 }

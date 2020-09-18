@@ -59,7 +59,7 @@ class NetworkRequestBase : public QObject {
 
 public:
   // Constructors / Destructor
-  NetworkRequestBase()                                = delete;
+  NetworkRequestBase() = delete;
   NetworkRequestBase(const NetworkRequestBase& other) = delete;
   NetworkRequestBase(const QUrl& url) noexcept;
   virtual ~NetworkRequestBase() noexcept;
@@ -172,36 +172,36 @@ signals:
   void finished(bool success);
 
 public:  // Methods
-  virtual void prepareRequest()                           = 0;
-  virtual void finalizeRequest()                          = 0;
+  virtual void prepareRequest() = 0;
+  virtual void finalizeRequest() = 0;
   virtual void emitSuccessfullyFinishedSignals() noexcept = 0;
-  virtual void fetchNewData() noexcept                    = 0;
+  virtual void fetchNewData() noexcept = 0;
 
 private:  // Methods
-  void           executeRequest() noexcept;
-  void           replyReadyReadSlot() noexcept;
-  void           replyErrorSlot(QNetworkReply::NetworkError code) noexcept;
-  void           replySslErrorsSlot(const QList<QSslError>& errors) noexcept;
-  void           replyDownloadProgressSlot(qint64 bytesReceived,
-                                           qint64 bytesTotal) noexcept;
-  void           replyFinishedSlot() noexcept;
-  void           finalize(const QString& errorMsg = QString()) noexcept;
+  void executeRequest() noexcept;
+  void replyReadyReadSlot() noexcept;
+  void replyErrorSlot(QNetworkReply::NetworkError code) noexcept;
+  void replySslErrorsSlot(const QList<QSslError>& errors) noexcept;
+  void replyDownloadProgressSlot(qint64 bytesReceived,
+                                 qint64 bytesTotal) noexcept;
+  void replyFinishedSlot() noexcept;
+  void finalize(const QString& errorMsg = QString()) noexcept;
   static QString formatFileSize(qint64 bytes) noexcept;
   static QString getUserAgent() noexcept;
 
 protected:  // Data
   // from constructor
-  QUrl   mUrl;
+  QUrl mUrl;
   qint64 mExpectedContentSize;
 
   // internal data
-  QList<QUrl>                   mRedirectedUrls;
-  QNetworkRequest               mRequest;
+  QList<QUrl> mRedirectedUrls;
+  QNetworkRequest mRequest;
   QScopedPointer<QNetworkReply> mReply;
-  bool                          mStarted;
-  bool                          mAborted;
-  bool                          mErrored;
-  bool                          mFinished;
+  bool mStarted;
+  bool mAborted;
+  bool mErrored;
+  bool mFinished;
 };
 
 /*******************************************************************************

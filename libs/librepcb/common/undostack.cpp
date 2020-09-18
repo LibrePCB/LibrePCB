@@ -37,7 +37,7 @@ namespace librepcb {
  *  Class UndoStackTransaction
  ******************************************************************************/
 
-UndoStackTransaction::UndoStackTransaction(UndoStack&     stack,
+UndoStackTransaction::UndoStackTransaction(UndoStack& stack,
                                            const QString& text)
   : mStack(stack), mCmdActive(true) {
   mStack.beginCmdGroup(text);  // can throw
@@ -334,8 +334,8 @@ void UndoStack::clear() noexcept {
     delete mCommands.takeLast();
   }
 
-  mCurrentIndex       = 0;
-  mCleanIndex         = 0;
+  mCurrentIndex = 0;
+  mCleanIndex = 0;
   mActiveCommandGroup = nullptr;
 
   // emit signals

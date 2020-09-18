@@ -56,27 +56,27 @@ public:
   // Types
   enum class Type_t {
     NetSegment,  ///< ::librepcb::project::SI_NetSegment
-    NetPoint,    ///< ::librepcb::project::SI_NetPoint
-    NetLine,     ///< ::librepcb::project::SI_NetLine
-    NetLabel,    ///< ::librepcb::project::SI_NetLabel
-    Symbol,      ///< ::librepcb::project::SI_Symbol
-    SymbolPin,   ///< ::librepcb::project::SI_SymbolPin
+    NetPoint,  ///< ::librepcb::project::SI_NetPoint
+    NetLine,  ///< ::librepcb::project::SI_NetLine
+    NetLabel,  ///< ::librepcb::project::SI_NetLabel
+    Symbol,  ///< ::librepcb::project::SI_Symbol
+    SymbolPin,  ///< ::librepcb::project::SI_SymbolPin
   };
 
   // Constructors / Destructor
-  SI_Base()                     = delete;
+  SI_Base() = delete;
   SI_Base(const SI_Base& other) = delete;
   SI_Base(Schematic& schematic) noexcept;
   virtual ~SI_Base() noexcept;
 
   // Getters
-  Project&             getProject() const noexcept;
-  Circuit&             getCircuit() const noexcept;
-  Schematic&           getSchematic() const noexcept { return mSchematic; }
-  virtual Type_t       getType() const noexcept            = 0;
-  virtual const Point& getPosition() const noexcept        = 0;
+  Project& getProject() const noexcept;
+  Circuit& getCircuit() const noexcept;
+  Schematic& getSchematic() const noexcept { return mSchematic; }
+  virtual Type_t getType() const noexcept = 0;
+  virtual const Point& getPosition() const noexcept = 0;
   virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
-  virtual bool         isAddedToSchematic() const noexcept {
+  virtual bool isAddedToSchematic() const noexcept {
     return mIsAddedToSchematic;
   }
   virtual bool isSelected() const noexcept { return mIsSelected; }
@@ -85,7 +85,7 @@ public:
   virtual void setSelected(bool selected) noexcept;
 
   // General Methods
-  virtual void addToSchematic()      = 0;
+  virtual void addToSchematic() = 0;
   virtual void removeFromSchematic() = 0;
 
   // Operator Overloadings

@@ -67,9 +67,9 @@ class ComponentChooserDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  ComponentChooserDialog()                                    = delete;
+  ComponentChooserDialog() = delete;
   ComponentChooserDialog(const ComponentChooserDialog& other) = delete;
-  ComponentChooserDialog(const workspace::Workspace&     ws,
+  ComponentChooserDialog(const workspace::Workspace& ws,
                          const IF_GraphicsLayerProvider* layerProvider,
                          QWidget* parent = nullptr) noexcept;
   ~ComponentChooserDialog() noexcept;
@@ -97,17 +97,17 @@ private:  // Methods
   const QStringList& localeOrder() const noexcept;
 
 private:  // Data
-  const workspace::Workspace&                mWorkspace;
-  const IF_GraphicsLayerProvider*            mLayerProvider;
+  const workspace::Workspace& mWorkspace;
+  const IF_GraphicsLayerProvider* mLayerProvider;
   QScopedPointer<Ui::ComponentChooserDialog> mUi;
-  QScopedPointer<QAbstractItemModel>         mCategoryTreeModel;
-  tl::optional<Uuid>                         mSelectedCategoryUuid;
-  tl::optional<Uuid>                         mSelectedComponentUuid;
+  QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
+  tl::optional<Uuid> mSelectedCategoryUuid;
+  tl::optional<Uuid> mSelectedComponentUuid;
 
   // preview
-  QScopedPointer<Component>                         mComponent;
-  QScopedPointer<GraphicsScene>                     mGraphicsScene;
-  QList<std::shared_ptr<Symbol>>                    mSymbols;
+  QScopedPointer<Component> mComponent;
+  QScopedPointer<GraphicsScene> mGraphicsScene;
+  QList<std::shared_ptr<Symbol>> mSymbols;
   QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
 };
 

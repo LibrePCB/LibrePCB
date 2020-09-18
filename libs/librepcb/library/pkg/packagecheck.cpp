@@ -152,11 +152,11 @@ void PackageCheck::checkPadsOverlapWithPlacement(MsgList& msgs) const {
     for (auto it = (*itFtp).getPads().begin(); it != (*itFtp).getPads().end();
          ++it) {
       std::shared_ptr<const FootprintPad> pad = it.ptr();
-      std::shared_ptr<const PackagePad>   pkgPad =
+      std::shared_ptr<const PackagePad> pkgPad =
           mPackage.getPads().find(pad->getUuid());
       Length clearance(150000);  // 150 µm
-      Length tolerance(10);      // 0.01 µm, to avoid rounding issues
-      Path   stopMaskPath = pad->getOutline(clearance - tolerance);
+      Length tolerance(10);  // 0.01 µm, to avoid rounding issues
+      Path stopMaskPath = pad->getOutline(clearance - tolerance);
       stopMaskPath.rotate(pad->getRotation()).translate(pad->getPosition());
       QPainterPath stopMask = stopMaskPath.toQPainterPathPx();
       if (pad->isOnLayer(GraphicsLayer::sTopCopper) &&

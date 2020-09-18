@@ -55,7 +55,7 @@ class BoardEditorState_AddVia final : public BoardEditorState {
 
 public:
   // Constructors / Destructor
-  BoardEditorState_AddVia()                                     = delete;
+  BoardEditorState_AddVia() = delete;
   BoardEditorState_AddVia(const BoardEditorState_AddVia& other) = delete;
   explicit BoardEditorState_AddVia(const Context& context) noexcept;
   virtual ~BoardEditorState_AddVia() noexcept;
@@ -85,42 +85,42 @@ private:  // Methods
   void updateShapeActionsCheckedState() noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
-  NetSignal*       getClosestNetSignal(Board& board, const Point& pos) noexcept;
+  NetSignal* getClosestNetSignal(Board& board, const Point& pos) noexcept;
   QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
                                            QSet<BI_Base*> except = {}) const
       noexcept;
   BI_Via* findVia(Board& board, const Point pos, NetSignal* netsignal = nullptr,
                   const QSet<BI_Via*>& except = {}) const noexcept;
   BI_FootprintPad* findPad(Board& board, const Point pos,
-                           NetSignal*                    netsignal = nullptr,
-                           const QSet<BI_FootprintPad*>& except    = {}) const
+                           NetSignal* netsignal = nullptr,
+                           const QSet<BI_FootprintPad*>& except = {}) const
       noexcept;
   BI_NetLine* findNetLine(Board& board, const Point pos,
                           NetSignal* netsignal = nullptr) const noexcept;
 
 private:  // Data
   // State
-  bool       mIsUndoCmdActive;
-  QString    mAutoText;
-  bool       mFindClosestNetSignal;
+  bool mIsUndoCmdActive;
+  QString mAutoText;
+  bool mFindClosestNetSignal;
   NetSignal* mLastClosestNetSignal;
-  Via        mLastViaProperties;
+  Via mLastViaProperties;
   NetSignal* mLastNetSignal;
 
   // Information about the current via to place. Only valid if
   // mIsUndoCmdActive == true.
-  BI_Via*                         mCurrentViaToPlace;
+  BI_Via* mCurrentViaToPlace;
   QScopedPointer<CmdBoardViaEdit> mCurrentViaEditCmd;
 
   // Widgets for the command toolbar
-  QHash<int, QAction*>               mShapeActions;
-  QList<QAction*>                    mActionSeparators;
-  QScopedPointer<QLabel>             mSizeLabel;
+  QHash<int, QAction*> mShapeActions;
+  QList<QAction*> mActionSeparators;
+  QScopedPointer<QLabel> mSizeLabel;
   QScopedPointer<PositiveLengthEdit> mSizeEdit;
-  QScopedPointer<QLabel>             mDrillLabel;
+  QScopedPointer<QLabel> mDrillLabel;
   QScopedPointer<PositiveLengthEdit> mDrillEdit;
-  QScopedPointer<QLabel>             mNetSignalLabel;
-  QScopedPointer<QComboBox>          mNetSignalComboBox;
+  QScopedPointer<QLabel> mNetSignalLabel;
+  QScopedPointer<QComboBox> mNetSignalComboBox;
 };
 
 /*******************************************************************************

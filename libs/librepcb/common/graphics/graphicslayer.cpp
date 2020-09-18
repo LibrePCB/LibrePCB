@@ -118,8 +118,8 @@ int GraphicsLayer::getInnerLayerNumber(const QString& name) noexcept {
   QString number = name;
   number.remove("in");
   number.remove("_cu");
-  bool ok     = false;
-  int  result = number.toInt(&ok);
+  bool ok = false;
+  int result = number.toInt(&ok);
   return ok ? result : -1;
 }
 
@@ -147,7 +147,7 @@ QString GraphicsLayer::getGrabAreaLayerName(
 }
 
 const QStringList&
-GraphicsLayer::getSchematicGeometryElementLayerNames() noexcept {
+    GraphicsLayer::getSchematicGeometryElementLayerNames() noexcept {
   static QStringList names = {
       sSymbolOutlines,    sSymbolHiddenGrabAreas, sSymbolNames,
       sSymbolValues,      sSchematicSheetFrames,  sSchematicDocumentation,
@@ -181,9 +181,9 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
                                      bool& visible) noexcept {
   typedef struct {
     QString nameTr;
-    QColor  color;
-    QColor  colorHl;
-    bool    visible;
+    QColor color;
+    QColor colorHl;
+    bool visible;
   } Item;
   static QHash<QString, Item> h;
   if (h.isEmpty()) {
@@ -251,36 +251,36 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     // clang-format on
     for (int i = 1; i <= getInnerLayerCount(); ++i) {
       QString nameTr = tr("Inner Copper %1").arg(i);
-      QColor  color;
-      QColor  hlColor;
+      QColor color;
+      QColor hlColor;
       switch ((i - 1) % 6) {
         case 0:
-          color   = QColor("#96CC57FF");
+          color = QColor("#96CC57FF");
           hlColor = QColor("#C0DA84FF");
           break;
         case 1:
-          color   = QColor("#96E2A1FF");
+          color = QColor("#96E2A1FF");
           hlColor = QColor("#C0E9BAFF");
           break;
         case 2:
-          color   = QColor("#96EE5C9B");
+          color = QColor("#96EE5C9B");
           hlColor = QColor("#C0FF4C99");
           break;
         case 3:
-          color   = QColor("#96E50063");
+          color = QColor("#96E50063");
           hlColor = QColor("#C0E50063");
           break;
         case 4:
-          color   = QColor("#96A70049");
+          color = QColor("#96A70049");
           hlColor = QColor("#C0CC0058");
           break;
         case 5:
-          color   = QColor("#967B20A3");
+          color = QColor("#967B20A3");
           hlColor = QColor("#C09739BF");
           break;
         default:
           qWarning() << "Invalid remainder!";
-          color   = QColor("#FFFF00FF");
+          color = QColor("#FFFF00FF");
           hlColor = QColor("#FFFF00FF");
       }
       h.insert(getInnerLayerName(i), {nameTr, color, hlColor, true});
@@ -288,10 +288,10 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
   }
 
   Item item = h.value(name, {name, Qt::darkRed, Qt::red, false});
-  nameTr    = item.nameTr;
-  color     = item.color;
-  colorHl   = item.colorHl;
-  visible   = item.visible;
+  nameTr = item.nameTr;
+  color = item.color;
+  colorHl = item.colorHl;
+  visible = item.visible;
 }
 
 /*******************************************************************************

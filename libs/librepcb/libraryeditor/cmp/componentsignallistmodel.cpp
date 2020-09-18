@@ -99,8 +99,8 @@ void ComponentSignalListModel::addSignal(const QVariant& editData) noexcept {
       cmd->appendChild(new CmdComponentSignalInsert(*mSignalList, sig));
     }
     execCmd(cmd.take());
-    mNewName          = QString();
-    mNewIsRequired    = false;
+    mNewName = QString();
+    mNewIsRequired = false;
     mNewForcedNetName = QString();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -140,7 +140,7 @@ int ComponentSignalListModel::columnCount(const QModelIndex& parent) const {
 }
 
 QVariant ComponentSignalListModel::data(const QModelIndex& index,
-                                        int                role) const {
+                                        int role) const {
   if (!index.isValid() || !mSignalList) {
     return QVariant();
   }
@@ -148,8 +148,8 @@ QVariant ComponentSignalListModel::data(const QModelIndex& index,
   std::shared_ptr<ComponentSignal> item = mSignalList->value(index.row());
   switch (index.column()) {
     case COLUMN_NAME: {
-      QString name     = item ? *item->getName() : mNewName;
-      bool    showHint = (!item) && mNewName.isEmpty();
+      QString name = item ? *item->getName() : mNewName;
+      bool showHint = (!item) && mNewName.isEmpty();
       QString hint =
           tr("Signal name (may contain ranges like \"%1\")").arg("1..5");
       switch (role) {
@@ -211,9 +211,9 @@ QVariant ComponentSignalListModel::data(const QModelIndex& index,
   return QVariant();
 }
 
-QVariant ComponentSignalListModel::headerData(int             section,
+QVariant ComponentSignalListModel::headerData(int section,
                                               Qt::Orientation orientation,
-                                              int             role) const {
+                                              int role) const {
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
@@ -270,7 +270,7 @@ bool ComponentSignalListModel::setData(const QModelIndex& index,
       cmd.reset(new CmdComponentSignalEdit(*item));
     }
     if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
-      QString name        = value.toString().trimmed();
+      QString name = value.toString().trimmed();
       QString cleanedName = cleanCircuitIdentifier(name);
       if (cmd) {
         if (cleanedName != item->getName()) {
@@ -322,7 +322,7 @@ bool ComponentSignalListModel::setData(const QModelIndex& index,
 void ComponentSignalListModel::signalListEdited(
     const ComponentSignalList& list, int index,
     const std::shared_ptr<const ComponentSignal>& signal,
-    ComponentSignalList::Event                    event) noexcept {
+    ComponentSignalList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(signal);
   switch (event) {

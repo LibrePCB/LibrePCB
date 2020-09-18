@@ -142,7 +142,7 @@ void SchematicPagesDock::schematicRemoved(int oldIndex) noexcept {
 
 void SchematicPagesDock::updateSchematicNames() noexcept {
   for (int i = 0; i < mUi->listWidget->count(); ++i) {
-    QListWidgetItem* item      = mUi->listWidget->item(i);
+    QListWidgetItem* item = mUi->listWidget->item(i);
     const Schematic* schematic = mProject.getSchematicByIndex(i);
     if (item && schematic) {
       item->setText(*schematic->getName());

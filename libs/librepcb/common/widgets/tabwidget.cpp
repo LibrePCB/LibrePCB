@@ -44,9 +44,9 @@ TabWidget::TabWidget(QWidget* parent) noexcept : QTabWidget(parent) {
 
 bool TabWidget::eventFilter(QObject* o, QEvent* e) {
   // Handle middle mouse click on closable tabs
-  bool isTabBar           = o == tabBar();
+  bool isTabBar = o == tabBar();
   bool isMouseButtonPress = e->type() == QEvent::MouseButtonPress;
-  bool tabsAreClosable    = tabBar()->tabsClosable();
+  bool tabsAreClosable = tabBar()->tabsClosable();
   if (isTabBar && isMouseButtonPress && tabsAreClosable) {
     auto me = static_cast<QMouseEvent*>(e);
     if (me->buttons() == Qt::MiddleButton) {

@@ -48,7 +48,7 @@ namespace editor {
 
 PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
                                                          const FilePath& fp,
-                                                         QWidget*        parent)
+                                                         QWidget* parent)
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::PackageCategoryEditorWidget) {
   mUi->setupUi(this);
@@ -100,7 +100,7 @@ bool PackageCategoryEditorWidget::save() noexcept {
 
   // Save element.
   try {
-    mCategory->save();    // can throw
+    mCategory->save();  // can throw
     mFileSystem->save();  // can throw
     return EditorWidgetBase::save();
   } catch (const Exception& e) {
@@ -211,7 +211,7 @@ void PackageCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
 
 void PackageCategoryEditorWidget::updateCategoryLabel() noexcept {
   const workspace::WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
-  PackageCategoryTreeLabelTextBuilder  textBuilder(db, getLibLocaleOrder(),
+  PackageCategoryTreeLabelTextBuilder textBuilder(db, getLibLocaleOrder(),
                                                   *mUi->lblParentCategories);
   textBuilder.setEndlessRecursionUuid(mCategory->getUuid());
   textBuilder.setHighlightLastLine(true);

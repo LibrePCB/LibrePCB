@@ -64,8 +64,8 @@ public:
   void addCopper(const QString& layerName, const NetSignal* netsignal);
 
 private:  // Data
-  Board&            mBoard;
-  PositiveLength    mMaxArcTolerance;
+  Board& mBoard;
+  PositiveLength mMaxArcTolerance;
   ClipperLib::Paths mPaths;
 };
 

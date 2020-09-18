@@ -57,16 +57,16 @@ void LengthDelegate::setUnit(const LengthUnit& unit) noexcept {
  ******************************************************************************/
 
 QString LengthDelegate::displayText(const QVariant& value,
-                                    const QLocale&  locale) const {
+                                    const QLocale& locale) const {
   qreal converted = mUnit.convertToUnit(value.value<Length>());
   return Toolbox::floatToString(converted,
                                 mUnit.getReasonableNumberOfDecimals(), locale) %
-         " " % mUnit.toShortStringTr();
+      " " % mUnit.toShortStringTr();
 }
 
-QWidget* LengthDelegate::createEditor(QWidget*                    parent,
+QWidget* LengthDelegate::createEditor(QWidget* parent,
                                       const QStyleOptionViewItem& option,
-                                      const QModelIndex&          index) const {
+                                      const QModelIndex& index) const {
   Q_UNUSED(option);
   LengthEdit* edt = new LengthEdit(parent);
   edt->setFrame(false);
@@ -86,7 +86,7 @@ QWidget* LengthDelegate::createEditor(QWidget*                    parent,
   return edt;
 }
 
-void LengthDelegate::setEditorData(QWidget*           editor,
+void LengthDelegate::setEditorData(QWidget* editor,
                                    const QModelIndex& index) const {
   LengthEdit* edt = static_cast<LengthEdit*>(editor);
   edt->setValue(index.data(Qt::EditRole).value<Length>());
@@ -98,7 +98,7 @@ void LengthDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
   model->setData(index, QVariant::fromValue(edt->getValue()), Qt::EditRole);
 }
 
-void LengthDelegate::updateEditorGeometry(QWidget*                    editor,
+void LengthDelegate::updateEditorGeometry(QWidget* editor,
                                           const QStyleOptionViewItem& option,
                                           const QModelIndex& index) const {
   Q_UNUSED(index);

@@ -46,7 +46,7 @@ class BI_AirWire final : public BI_Base {
 
 public:
   // Constructors / Destructor
-  BI_AirWire()                        = delete;
+  BI_AirWire() = delete;
   BI_AirWire(const BI_AirWire& other) = delete;
   BI_AirWire(Board& board, const NetSignal& netsignal, const Point& p1,
              const Point& p2);
@@ -54,9 +54,9 @@ public:
 
   // Getters
   const NetSignal& getNetSignal() const noexcept { return mNetSignal; }
-  const Point&     getP1() const noexcept { return mP1; }
-  const Point&     getP2() const noexcept { return mP2; }
-  bool             isVertical() const noexcept { return mP1 == mP2; }
+  const Point& getP1() const noexcept { return mP1; }
+  const Point& getP2() const noexcept { return mP2; }
+  bool isVertical() const noexcept { return mP1 == mP2; }
 
   // General Methods
   void addToBoard() override;
@@ -65,20 +65,20 @@ public:
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::AirWire; }
   const Point& getPosition() const noexcept override { return mP1; }
-  bool         getIsMirrored() const noexcept override { return false; }
+  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
-  void         setSelected(bool selected) noexcept override;
-  bool         isSelectable() const noexcept override;
+  void setSelected(bool selected) noexcept override;
+  bool isSelectable() const noexcept override;
 
   // Operator Overloadings
   BI_AirWire& operator=(const BI_AirWire& rhs) = delete;
 
 private:
   QScopedPointer<BGI_AirWire> mGraphicsItem;
-  QMetaObject::Connection     mHighlightChangedConnection;
-  const NetSignal&            mNetSignal;
-  Point                       mP1;
-  Point                       mP2;
+  QMetaObject::Connection mHighlightChangedConnection;
+  const NetSignal& mNetSignal;
+  Point mP1;
+  Point mP2;
 };
 
 /*******************************************************************************

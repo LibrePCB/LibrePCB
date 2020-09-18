@@ -59,7 +59,7 @@ CmdLibraryBaseElementEdit::~CmdLibraryBaseElementEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdLibraryBaseElementEdit::setName(const QString&     locale,
+void CmdLibraryBaseElementEdit::setName(const QString& locale,
                                         const ElementName& name) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewNames.insert(locale, name);

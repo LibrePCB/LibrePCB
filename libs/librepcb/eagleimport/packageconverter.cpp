@@ -42,7 +42,7 @@ namespace eagleimport {
  ******************************************************************************/
 
 PackageConverter::PackageConverter(const parseagle::Package& package,
-                                   ConverterDb&              db) noexcept
+                                   ConverterDb& db) noexcept
   : mPackage(package), mDb(db) {
 }
 
@@ -64,25 +64,25 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
       ""));  // can throw
 
   foreach (const parseagle::Wire& wire, mPackage.getWires()) {
-    GraphicsLayerName layerName  = convertBoardLayer(wire.getLayer());
-    bool              fill       = false;
-    bool              isGrabArea = true;
-    UnsignedLength    lineWidth(Length::fromMm(wire.getWidth()));  // can throw
-    Point             startpos = Point::fromMm(wire.getP1().x, wire.getP1().y);
-    Point             endpos   = Point::fromMm(wire.getP2().x, wire.getP2().y);
-    Angle             angle    = Angle::fromDeg(wire.getCurve());
+    GraphicsLayerName layerName = convertBoardLayer(wire.getLayer());
+    bool fill = false;
+    bool isGrabArea = true;
+    UnsignedLength lineWidth(Length::fromMm(wire.getWidth()));  // can throw
+    Point startpos = Point::fromMm(wire.getP1().x, wire.getP1().y);
+    Point endpos = Point::fromMm(wire.getP2().x, wire.getP2().y);
+    Angle angle = Angle::fromDeg(wire.getCurve());
     footprint->getPolygons().append(std::make_shared<Polygon>(
         Uuid::createRandom(), layerName, lineWidth, fill, isGrabArea,
         Path::line(startpos, endpos, angle)));
   }
 
   foreach (const parseagle::Rectangle& rect, mPackage.getRectangles()) {
-    GraphicsLayerName layerName  = convertBoardLayer(rect.getLayer());
-    bool              fill       = true;
-    bool              isGrabArea = true;
-    UnsignedLength    lineWidth(0);
-    Point             p1 = Point::fromMm(rect.getP1().x, rect.getP1().y);
-    Point             p2 = Point::fromMm(rect.getP2().x, rect.getP2().y);
+    GraphicsLayerName layerName = convertBoardLayer(rect.getLayer());
+    bool fill = true;
+    bool isGrabArea = true;
+    UnsignedLength lineWidth(0);
+    Point p1 = Point::fromMm(rect.getP1().x, rect.getP1().y);
+    Point p2 = Point::fromMm(rect.getP2().x, rect.getP2().y);
     footprint->getPolygons().append(
         std::make_shared<Polygon>(Uuid::createRandom(), layerName, lineWidth,
                                   fill, isGrabArea, Path::rect(p1, p2)));
@@ -90,24 +90,24 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
 
   foreach (const parseagle::Circle& circle, mPackage.getCircles()) {
     GraphicsLayerName layerName = convertBoardLayer(circle.getLayer());
-    PositiveLength    diameter(Length::fromMm(circle.getRadius()) *
+    PositiveLength diameter(Length::fromMm(circle.getRadius()) *
                             2);  // can throw
-    Point             center =
+    Point center =
         Point::fromMm(circle.getPosition().x, circle.getPosition().y);
     UnsignedLength lineWidth(Length::fromMm(circle.getWidth()));  // can throw
-    bool           fill       = (lineWidth == 0);
-    bool           isGrabArea = true;
+    bool fill = (lineWidth == 0);
+    bool isGrabArea = true;
     footprint->getCircles().append(
         std::make_shared<Circle>(Uuid::createRandom(), layerName, lineWidth,
                                  fill, isGrabArea, center, diameter));
   }
 
   foreach (const parseagle::Polygon& polygon, mPackage.getPolygons()) {
-    GraphicsLayerName layerName  = convertBoardLayer(polygon.getLayer());
-    bool              fill       = false;
-    bool              isGrabArea = true;
+    GraphicsLayerName layerName = convertBoardLayer(polygon.getLayer());
+    bool fill = false;
+    bool isGrabArea = true;
     UnsignedLength lineWidth(Length::fromMm(polygon.getWidth()));  // can throw
-    Path           path;
+    Path path;
     for (int i = 0; i < polygon.getVertices().count(); ++i) {
       const parseagle::Vertex vertex = polygon.getVertices().at(i);
       Point pos = Point::fromMm(vertex.getPosition().x, vertex.getPosition().y);
@@ -121,7 +121,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
 
   foreach (const parseagle::Text& text, mPackage.getTexts()) {
     GraphicsLayerName layerName = convertBoardLayer(text.getLayer());
-    QString           textStr   = text.getValue();
+    QString textStr = text.getValue();
     if (textStr.startsWith(">")) {
       textStr = "{{" + textStr.mid(1) + "}}";
     }
@@ -129,8 +129,8 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
     if ((textStr == "{{NAME}}") || (textStr == "{{VALUE}}")) {
       height = PositiveLength(1000000);
     }
-    Point     pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
-    Angle     rot = Angle::fromDeg(text.getRotation().getAngle());
+    Point pos = Point::fromMm(text.getPosition().x, text.getPosition().y);
+    Angle rot = Angle::fromDeg(text.getRotation().getAngle());
     Alignment align(HAlign::left(), VAlign::bottom());
     footprint->getStrokeTexts().append(std::make_shared<StrokeText>(
         Uuid::createRandom(), layerName, textStr, pos, rot, height,
@@ -157,8 +157,8 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
         Length::fromMm(pad.getOuterDiameter()));  // can throw
     Length padDiameter =
         (outerDiameter > 0) ? *outerDiameter : (drillDiameter * 2);
-    PositiveLength               width(padDiameter);   // can throw
-    PositiveLength               height(padDiameter);  // can throw
+    PositiveLength width(padDiameter);  // can throw
+    PositiveLength height(padDiameter);  // can throw
     library::FootprintPad::Shape shape;
     switch (pad.getShape()) {
       case parseagle::ThtPad::Shape::Square:
@@ -201,7 +201,7 @@ std::unique_ptr<library::Package> PackageConverter::generate() const {
     }
     Point pos = Point::fromMm(pad.getPosition().x, pad.getPosition().y);
     Angle rot = Angle::fromDeg(pad.getRotation().getAngle());
-    PositiveLength width(Length::fromMm(pad.getWidth()));    // can throw
+    PositiveLength width(Length::fromMm(pad.getWidth()));  // can throw
     PositiveLength height(Length::fromMm(pad.getHeight()));  // can throw
     std::shared_ptr<library::FootprintPad> fptPad(new library::FootprintPad(
         uuid, pos, rot, library::FootprintPad::Shape::RECT, width, height,

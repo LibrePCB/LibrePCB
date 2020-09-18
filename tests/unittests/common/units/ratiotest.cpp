@@ -37,10 +37,10 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  Ratio   ratio;
-  qint32  ppm;
-  qreal   percent;
-  qreal   normalized;
+  Ratio ratio;
+  qint32 ppm;
+  qreal percent;
+  qreal normalized;
   QString string;
 } RatioTestData_t;
 

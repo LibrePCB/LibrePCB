@@ -57,11 +57,11 @@ public:
   ~ExclusiveActionGroup() noexcept;
 
   // General Methods
-  void            reset() noexcept;
-  void            setEnabled(bool enabled) noexcept;
-  void            addAction(const QVariant& key, QAction* action) noexcept;
-  void            setActionEnabled(const QVariant& key, bool enabled) noexcept;
-  void            setCurrentAction(const QVariant& key) noexcept;
+  void reset() noexcept;
+  void setEnabled(bool enabled) noexcept;
+  void addAction(const QVariant& key, QAction* action) noexcept;
+  void setActionEnabled(const QVariant& key, bool enabled) noexcept;
+  void setCurrentAction(const QVariant& key) noexcept;
   const QVariant& getCurrentAction() const noexcept { return mCurrentAction; }
 
   // Operator Overloadings
@@ -74,7 +74,7 @@ private:  // Methods
   void actionTriggered() noexcept;
 
 private:  // Data
-  QVariant                 mCurrentAction;
+  QVariant mCurrentAction;
   QMap<QVariant, QAction*> mActions;
 };
 

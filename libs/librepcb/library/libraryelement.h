@@ -47,17 +47,17 @@ class LibraryElement : public LibraryBaseElement {
 
 public:
   // Constructors / Destructor
-  LibraryElement()                            = delete;
+  LibraryElement() = delete;
   LibraryElement(const LibraryElement& other) = delete;
   LibraryElement(const QString& shortElementName,
                  const QString& longElementName, const Uuid& uuid,
                  const Version& version, const QString& author,
                  const ElementName& name_en_US,
-                 const QString&     description_en_US,
-                 const QString&     keywords_en_US);
+                 const QString& description_en_US,
+                 const QString& keywords_en_US);
   LibraryElement(std::unique_ptr<TransactionalDirectory> directory,
-                 const QString&                          shortElementName,
-                 const QString&                          longElementName);
+                 const QString& shortElementName,
+                 const QString& longElementName);
   virtual ~LibraryElement() noexcept;
 
   // Getters: Attributes

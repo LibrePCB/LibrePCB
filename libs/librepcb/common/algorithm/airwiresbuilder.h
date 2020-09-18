@@ -47,7 +47,7 @@ class AirWiresBuilder final {
 public:
   // Types
   typedef QPair<Point, Point> AirWire;
-  typedef QVector<AirWire>    AirWires;
+  typedef QVector<AirWire> AirWires;
 
   // Constructors / Destructor
 
@@ -100,7 +100,7 @@ private:  // Methods
 
 private:  // Data
   std::vector<delaunay::Vector2<qreal>> mPoints;
-  std::vector<delaunay::Edge<qreal>>    mEdges;
+  std::vector<delaunay::Edge<qreal>> mEdges;
 };
 
 /*******************************************************************************

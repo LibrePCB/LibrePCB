@@ -70,9 +70,9 @@ void GridProperties::serialize(SExpression& root) const {
  ******************************************************************************/
 
 GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept {
-  mType     = rhs.mType;
+  mType = rhs.mType;
   mInterval = rhs.mInterval;
-  mUnit     = rhs.mUnit;
+  mUnit = rhs.mUnit;
   return *this;
 }
 

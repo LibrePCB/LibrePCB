@@ -67,7 +67,7 @@ public:
                      QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
-  PrimitiveCircleGraphicsItem& operator       =(
+  PrimitiveCircleGraphicsItem& operator=(
       const PrimitiveCircleGraphicsItem& rhs) = delete;
 
 private:  // Methods
@@ -80,13 +80,13 @@ private:  // Methods
 private:  // Data
   const GraphicsLayer* mLineLayer;
   const GraphicsLayer* mFillLayer;
-  QPen                 mPen;
-  QPen                 mPenHighlighted;
-  QBrush               mBrush;
-  QBrush               mBrushHighlighted;
-  QRectF               mCircleRect;
-  QRectF               mBoundingRect;
-  QPainterPath         mShape;
+  QPen mPen;
+  QPen mPenHighlighted;
+  QBrush mBrush;
+  QBrush mBrushHighlighted;
+  QRectF mCircleRect;
+  QRectF mBoundingRect;
+  QPainterPath mShape;
 
   // Slots
   GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;

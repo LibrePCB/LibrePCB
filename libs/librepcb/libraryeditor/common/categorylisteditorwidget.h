@@ -75,23 +75,23 @@ public:
   void openAddCategoryDialog() noexcept { btnAddClicked(); }
 
   // Operator Overloadings
-  CategoryListEditorWidgetBase& operator       =(
+  CategoryListEditorWidgetBase& operator=(
       const CategoryListEditorWidgetBase& rhs) = delete;
 
 protected:
-  virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept            = 0;
-  virtual FilePath           getLatestCategory(const Uuid& category) const  = 0;
-  virtual QList<Uuid>        getCategoryParents(const Uuid& category) const = 0;
-  virtual QString            getCategoryName(const FilePath& fp) const      = 0;
+  virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept = 0;
+  virtual FilePath getLatestCategory(const Uuid& category) const = 0;
+  virtual QList<Uuid> getCategoryParents(const Uuid& category) const = 0;
+  virtual QString getCategoryName(const FilePath& fp) const = 0;
 
 private:
   void btnAddClicked() noexcept;
   void btnRemoveClicked() noexcept;
   void addItem(const tl::optional<Uuid>& category) noexcept;
   void addItem(const tl::optional<Uuid>& category,
-               const QStringList&        lines) noexcept;
+               const QStringList& lines) noexcept;
   void addItem(const tl::optional<Uuid>& category,
-               const QString&            text) noexcept;
+               const QString& text) noexcept;
   void updateColor() noexcept;
 
 signals:
@@ -100,10 +100,10 @@ signals:
   void categoryRemoved(const Uuid& category);
 
 protected:  // Data
-  const workspace::Workspace&                  mWorkspace;
+  const workspace::Workspace& mWorkspace;
   QScopedPointer<Ui::CategoryListEditorWidget> mUi;
-  bool                                         mRequiresMinimumOneEntry;
-  QSet<Uuid>                                   mUuids;
+  bool mRequiresMinimumOneEntry;
+  QSet<Uuid> mUuids;
 };
 
 /*******************************************************************************
@@ -129,9 +129,9 @@ public:
 
 private:
   tl::optional<Uuid> chooseCategoryWithDialog() noexcept override;
-  FilePath           getLatestCategory(const Uuid& category) const override;
-  QList<Uuid>        getCategoryParents(const Uuid& category) const override;
-  QString            getCategoryName(const FilePath& fp) const override;
+  FilePath getLatestCategory(const Uuid& category) const override;
+  QList<Uuid> getCategoryParents(const Uuid& category) const override;
+  QString getCategoryName(const FilePath& fp) const override;
 };
 
 typedef CategoryListEditorWidget<library::ComponentCategory>

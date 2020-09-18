@@ -58,7 +58,7 @@ public:
     IsNegatedChanged,
     IsClockChanged,
   };
-  Signal<ComponentSignal, Event>       onEdited;
+  Signal<ComponentSignal, Event> onEdited;
   typedef Slot<ComponentSignal, Event> OnEditedSlot;
 
   // Constructors / Destructor
@@ -71,14 +71,14 @@ public:
   ~ComponentSignal() noexcept;
 
   // Getters
-  const Uuid&              getUuid() const noexcept { return mUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
-  const SignalRole&        getRole() const noexcept { return mRole; }
+  const SignalRole& getRole() const noexcept { return mRole; }
   const QString& getForcedNetName() const noexcept { return mForcedNetName; }
-  bool           isRequired() const noexcept { return mIsRequired; }
-  bool           isNegated() const noexcept { return mIsNegated; }
-  bool           isClock() const noexcept { return mIsClock; }
-  bool           isNetSignalNameForced() const noexcept {
+  bool isRequired() const noexcept { return mIsRequired; }
+  bool isNegated() const noexcept { return mIsNegated; }
+  bool isClock() const noexcept { return mIsClock; }
+  bool isNetSignalNameForced() const noexcept {
     return !mForcedNetName.isEmpty();
   }
 
@@ -103,13 +103,13 @@ public:
   ComponentSignal& operator=(const ComponentSignal& rhs) noexcept;
 
 private:  // Data
-  Uuid              mUuid;
+  Uuid mUuid;
   CircuitIdentifier mName;
-  SignalRole        mRole;
-  QString           mForcedNetName;
-  bool              mIsRequired;
-  bool              mIsNegated;
-  bool              mIsClock;
+  SignalRole mRole;
+  QString mForcedNetName;
+  bool mIsRequired;
+  bool mIsNegated;
+  bool mIsClock;
 };
 
 /*******************************************************************************

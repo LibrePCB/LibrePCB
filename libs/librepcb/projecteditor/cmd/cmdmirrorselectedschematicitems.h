@@ -48,7 +48,7 @@ namespace editor {
 class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdMirrorSelectedSchematicItems(Schematic&      schematic,
+  CmdMirrorSelectedSchematicItems(Schematic& schematic,
                                   Qt::Orientation orientation) noexcept;
   ~CmdMirrorSelectedSchematicItems() noexcept;
 
@@ -61,7 +61,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Schematic&      mSchematic;
+  Schematic& mSchematic;
   Qt::Orientation mOrientation;
 };
 

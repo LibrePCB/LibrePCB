@@ -61,29 +61,29 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF       boundingRect() const noexcept override { return mBoundingRect; }
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
-  void         paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
 private:
   // make some methods inaccessible...
   FootprintPadPreviewGraphicsItem() = delete;
   FootprintPadPreviewGraphicsItem(
       const FootprintPadPreviewGraphicsItem& other) = delete;
-  FootprintPadPreviewGraphicsItem& operator         =(
+  FootprintPadPreviewGraphicsItem& operator=(
       const FootprintPadPreviewGraphicsItem& rhs) = delete;
 
   // General Attributes
   const FootprintPad& mFootprintPad;
-  const PackagePad*   mPackagePad;
-  GraphicsLayer*      mLayer;
-  bool                mDrawBoundingRect;
+  const PackagePad* mPackagePad;
+  GraphicsLayer* mLayer;
+  bool mDrawBoundingRect;
 
   // Cached Attributes
-  QRectF       mBoundingRect;
+  QRectF mBoundingRect;
   QPainterPath mShape;
-  QFont        mFont;
+  QFont mFont;
 };
 
 /*******************************************************************************

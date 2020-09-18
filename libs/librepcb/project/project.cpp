@@ -138,7 +138,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
           Uuid::createRandom(), ElementName(name), tr("Unknown"), "v1",
           QDateTime::currentDateTime(), QDateTime::currentDateTime()));
     } else {
-      QString     fp = "project/metadata.lp";
+      QString fp = "project/metadata.lp";
       SExpression root =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       mProjectMetadata.reset(new ProjectMetadata(root));
@@ -159,7 +159,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
 
     // Load all schematics
     if (!create) {
-      QString     fp = "schematics/schematics.lp";
+      QString fp = "schematics/schematics.lp";
       SExpression schRoot =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       foreach (const SExpression& node, schRoot.getChildren("schematic")) {
@@ -175,7 +175,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
 
     // Load all boards
     if (!create) {
-      QString     fp = "boards/boards.lp";
+      QString fp = "boards/boards.lp";
       SExpression brdRoot =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       foreach (const SExpression& node, brdRoot.getChildren("board")) {
@@ -623,7 +623,7 @@ bool Project::isFilePathInsideProjectDirectory(const FilePath& fp) noexcept {
 
 bool Project::isProjectFile(const FilePath& file) noexcept {
   return file.getSuffix() == "lpp" && file.isExistingFile() &&
-         isProjectDirectory(file.getParentDir());
+      isProjectDirectory(file.getParentDir());
 }
 
 bool Project::isProjectDirectory(const FilePath& dir) noexcept {
@@ -631,8 +631,8 @@ bool Project::isProjectDirectory(const FilePath& dir) noexcept {
 }
 
 Version Project::getProjectFileFormatVersion(const FilePath& dir) {
-  QByteArray  content = FileUtils::readFile(dir.getPathTo(".librepcb-project"));
-  VersionFile file    = VersionFile::fromByteArray(content);
+  QByteArray content = FileUtils::readFile(dir.getPathTo(".librepcb-project"));
+  VersionFile file = VersionFile::fromByteArray(content);
   return file.getVersion();
 }
 
