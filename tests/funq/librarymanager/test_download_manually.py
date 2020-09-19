@@ -2,16 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import pytest
-import sys
 
 """
 Test manually downloading libraries with the library manager
 """
 
 
-@pytest.mark.xfail(sys.platform == "darwin",
-                   reason="Test fails on macOS for an unknown reason.")
 def test(librepcb, helpers):
     """
     Download library by URL
