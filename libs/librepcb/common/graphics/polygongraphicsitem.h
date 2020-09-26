@@ -55,16 +55,39 @@ public:
   // Getters
   Polygon& getPolygon() noexcept { return mPolygon; }
 
+  /// Get the line segment at a specific position
+  ///
+  /// @param pos    The position to check for lines.
+  /// @return       The index of the vertex *after* the line under the cursor.
+  ///               So for the first line segment, index 1 is returned. If no
+  ///               line is located under the specified position, -1 is
+  ///               returned.
+  int getLineIndexAtPosition(const Point& pos) const noexcept;
+
+  /// Get the vertices at a specific position
+  ///
+  /// @param pos    The position to check for vertices.
+  /// @return       All indices of the vertices at the specified position.
+  QVector<int> getVertexIndicesAtPosition(const Point& pos) const noexcept;
+
+  // Inherited Methods
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
+
   // Operator Overloadings
   PolygonGraphicsItem& operator=(const PolygonGraphicsItem& rhs) = delete;
 
 private:  // Methods
   void polygonEdited(const Polygon& polygon, Polygon::Event event) noexcept;
   void updateFillLayer() noexcept;
+  void updateVertexGraphicsItems() noexcept;
 
 private:  // Data
   Polygon& mPolygon;
   const IF_GraphicsLayerProvider& mLayerProvider;
+
+  /// The square graphics items to drag each vertex
+  QList<std::shared_ptr<PrimitivePathGraphicsItem>> mVertexGraphicsItems;
 
   // Slots
   Polygon::OnEditedSlot mOnEditedSlot;
