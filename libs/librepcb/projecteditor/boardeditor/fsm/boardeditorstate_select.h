@@ -49,6 +49,7 @@ class BI_Plane;
 class BI_NetSegment;
 class BI_NetLine;
 class BI_Polygon;
+class CmdBoardPlaneEdit;
 
 namespace editor {
 
@@ -119,9 +120,9 @@ private:  // Methods
       QMenu& menu, BI_NetSegment& netsegment,
       const QString& text = tr("Remove Whole Trace")) noexcept;
   void addActionRemoveVertex(
-      QMenu& menu, BI_Polygon& polygon, const QVector<int>& verticesToRemove,
+      QMenu& menu, BI_Base& item, const QVector<int>& verticesToRemove,
       const QString& text = tr("Remove Vertex")) noexcept;
-  bool addActionAddVertex(QMenu& menu, BI_Polygon& polygon, const Point& pos,
+  bool addActionAddVertex(QMenu& menu, BI_Base& item, const Point& pos,
                           const QString& text = tr("Add Vertex")) noexcept;
   void addActionMeasure(
       QMenu& menu, BI_NetLine& netline,
@@ -140,12 +141,16 @@ private:  // Methods
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
   void removeSelectedPolygonVertices() noexcept;
+  void removeSelectedPlaneVertices() noexcept;
   void startAddingPolygonVertex(BI_Polygon& polygon, int vertex,
                                 const Point& pos) noexcept;
+  void startAddingPlaneVertex(BI_Plane& plane, int vertex,
+                              const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
+  bool findPlaneVerticesAtPosition(const Point& pos) noexcept;
 
   /**
    * @brief Measure the length of the selected items.
@@ -199,6 +204,13 @@ private:  // Data
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
   QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+
+  /// The current plane selected for editing (nullptr if none)
+  BI_Plane* mSelectedPlane;
+  /// The plane vertex indices selected for editing (empty if none)
+  QVector<int> mSelectedPlaneVertices;
+  /// The plane edit command (nullptr if not editing)
+  QScopedPointer<CmdBoardPlaneEdit> mCmdPlaneEdit;
 };
 
 /*******************************************************************************
