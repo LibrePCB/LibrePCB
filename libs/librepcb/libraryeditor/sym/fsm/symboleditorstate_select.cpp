@@ -32,6 +32,7 @@
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/textpropertiesdialog.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
@@ -60,7 +61,10 @@ SymbolEditorState_Select::SymbolEditorState_Select(
   : SymbolEditorState(context),
     mState(SubState::IDLE),
     mStartPos(),
-    mCurrentSelectionIndex(0) {
+    mCurrentSelectionIndex(0),
+    mSelectedPolygon(nullptr),
+    mSelectedPolygonVertices(),
+    mCmdPolygonEdit() {
 }
 
 SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
@@ -89,6 +93,22 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdDragSelectedItems->setDeltaToStartPos(delta);
       return true;
     }
+    case SubState::MOVING_POLYGON_VERTEX: {
+      if (!mSelectedPolygon) {
+        return false;
+      }
+      if (!mCmdPolygonEdit) {
+        mCmdPolygonEdit.reset(new CmdPolygonEdit(*mSelectedPolygon));
+      }
+      QVector<Vertex> vertices = mSelectedPolygon->getPath().getVertices();
+      foreach (int i, mSelectedPolygonVertices) {
+        if ((i >= 0) && (i < vertices.count())) {
+          vertices[i].setPos(currentPos.mappedToGrid(getGridInterval()));
+        }
+      }
+      mCmdPolygonEdit->setPath(Path(vertices), true);
+      return true;
+    }
     default: { return false; }
   }
 }
@@ -101,7 +121,9 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
       QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
-      if (items.isEmpty()) {
+      if (findPolygonVerticesAtPosition(mStartPos)) {
+        mState = SubState::MOVING_POLYGON_VERTEX;
+      } else if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
         mState = SubState::SELECTING;
@@ -179,6 +201,18 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       if (mCmdDragSelectedItems) {
         try {
           mContext.undoStack.execCmd(mCmdDragSelectedItems.take());
+        } catch (const Exception& e) {
+          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
+                                e.getMsg());
+        }
+      }
+      mState = SubState::IDLE;
+      return true;
+    }
+    case SubState::MOVING_POLYGON_VERTEX: {
+      if (mCmdPolygonEdit) {
+        try {
+          mContext.undoStack.execCmd(mCmdPolygonEdit.take());
         } catch (const Exception& e) {
           QMessageBox::critical(&mContext.editorWidget, tr("Error"),
                                 e.getMsg());
@@ -268,15 +302,36 @@ bool SymbolEditorState_Select::processPaste() noexcept {
 }
 
 bool SymbolEditorState_Select::processRotateCw() noexcept {
-  return rotateSelectedItems(-Angle::deg90());
+  switch (mState) {
+    case SubState::IDLE:
+    case SubState::MOVING:
+    case SubState::PASTING: {
+      return rotateSelectedItems(-Angle::deg90());
+    }
+    default: { return false; }
+  }
 }
 
 bool SymbolEditorState_Select::processRotateCcw() noexcept {
-  return rotateSelectedItems(Angle::deg90());
+  switch (mState) {
+    case SubState::IDLE:
+    case SubState::MOVING:
+    case SubState::PASTING: {
+      return rotateSelectedItems(Angle::deg90());
+    }
+    default: { return false; }
+  }
 }
 
 bool SymbolEditorState_Select::processMirror() noexcept {
-  return mirrorSelectedItems(Qt::Horizontal);
+  switch (mState) {
+    case SubState::IDLE:
+    case SubState::MOVING:
+    case SubState::PASTING: {
+      return mirrorSelectedItems(Qt::Horizontal);
+    }
+    default: { return false; }
+  }
 }
 
 bool SymbolEditorState_Select::processRemove() noexcept {
@@ -292,6 +347,11 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
   switch (mState) {
     case SubState::MOVING: {
       mCmdDragSelectedItems.reset();
+      mState = SubState::IDLE;
+      return true;
+    }
+    case SubState::MOVING_POLYGON_VERTEX: {
+      mCmdPolygonEdit.reset();
       mState = SubState::IDLE;
       return true;
     }
@@ -317,47 +377,73 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
 bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
   if (mState != SubState::IDLE) return false;
 
-  // handle item selection
-  QGraphicsItem* selectedItem = nullptr;
-  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
-  if (items.isEmpty()) return false;
-  foreach (QGraphicsItem* item, items) {
-    if (item->isSelected()) {
-      selectedItem = item;
-    }
-  }
-  if (!selectedItem) {
-    clearSelectionRect(true);
-    selectedItem = items.first();
-    if (dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)) {
-      // workaround for selection of a SymbolPinGraphicsItem
-      dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)->setSelected(true);
-    } else {
-      selectedItem->setSelected(true);
-    }
-  }
-  Q_ASSERT(selectedItem);
-  Q_ASSERT(selectedItem->isSelected());
-
-  // build the context menu
   QMenu menu;
-  QAction* aRotateCCW =
-      menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("&Rotate"));
-  connect(aRotateCCW, &QAction::triggered,
-          [this]() { rotateSelectedItems(Angle::deg90()); });
-  QAction* aMirrorH =
-      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("&Mirror"));
-  connect(aMirrorH, &QAction::triggered,
-          [this]() { mirrorSelectedItems(Qt::Horizontal); });
-  QAction* aRemove =
-      menu.addAction(QIcon(":/img/actions/delete.png"), tr("R&emove"));
-  connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
-  menu.addSeparator();
-  QAction* aProperties =
-      menu.addAction(QIcon(":/img/actions/settings.png"), tr("&Properties"));
-  connect(aProperties, &QAction::triggered, [this, &selectedItem]() {
-    openPropertiesDialogOfItem(selectedItem);
-  });
+  if (findPolygonVerticesAtPosition(pos)) {
+    // special menu for polygon vertices
+    QAction* aRemove =
+        menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove Vertex"));
+    connect(aRemove, &QAction::triggered,
+            [this]() { removeSelectedPolygonVertices(); });
+    int remainingVertices = mSelectedPolygon->getPath().getVertices().count() -
+        mSelectedPolygonVertices.count();
+    aRemove->setEnabled(remainingVertices >= 2);
+  } else {
+    // handle item selection
+    QGraphicsItem* selectedItem = nullptr;
+    QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+    if (items.isEmpty()) return false;
+    foreach (QGraphicsItem* item, items) {
+      if (item->isSelected()) {
+        selectedItem = item;
+      }
+    }
+    if (!selectedItem) {
+      clearSelectionRect(true);
+      selectedItem = items.first();
+      if (dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)) {
+        // workaround for selection of a SymbolPinGraphicsItem
+        dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)->setSelected(true);
+      } else {
+        selectedItem->setSelected(true);
+      }
+    }
+    Q_ASSERT(selectedItem);
+    Q_ASSERT(selectedItem->isSelected());
+
+    // if a polygon line is under the cursor, add the "Add Vertex" menu item
+    if (PolygonGraphicsItem* i =
+            dynamic_cast<PolygonGraphicsItem*>(selectedItem)) {
+      Polygon* polygon = &i->getPolygon();
+      int index = i->getLineIndexAtPosition(pos);
+      if (index >= 0) {
+        QAction* aAddVertex =
+            menu.addAction(QIcon(":/img/actions/add.png"), tr("Add Vertex"));
+        connect(aAddVertex, &QAction::triggered,
+                [=]() { startAddingPolygonVertex(*polygon, index, pos); });
+        menu.addSeparator();
+      }
+    }
+
+    // build the context menu
+    QMenu menu;
+    QAction* aRotateCCW =
+        menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("&Rotate"));
+    connect(aRotateCCW, &QAction::triggered,
+            [this]() { rotateSelectedItems(Angle::deg90()); });
+    QAction* aMirrorH = menu.addAction(
+        QIcon(":/img/actions/flip_horizontal.png"), tr("&Mirror"));
+    connect(aMirrorH, &QAction::triggered,
+            [this]() { mirrorSelectedItems(Qt::Horizontal); });
+    QAction* aRemove =
+        menu.addAction(QIcon(":/img/actions/delete.png"), tr("R&emove"));
+    connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
+    menu.addSeparator();
+    QAction* aProperties =
+        menu.addAction(QIcon(":/img/actions/settings.png"), tr("&Properties"));
+    connect(aProperties, &QAction::triggered, [this, &selectedItem]() {
+      openPropertiesDialogOfItem(selectedItem);
+    });
+  }
 
   // execute the context menu
   menu.exec(QCursor::pos());
@@ -533,6 +619,57 @@ bool SymbolEditorState_Select::removeSelectedItems() noexcept {
   return true;  // TODO: return false if no items were selected
 }
 
+void SymbolEditorState_Select::removeSelectedPolygonVertices() noexcept {
+  if ((!mSelectedPolygon) || mSelectedPolygonVertices.isEmpty()) {
+    return;
+  }
+
+  try {
+    Path path;
+    for (int i = 0; i < mSelectedPolygon->getPath().getVertices().count();
+         ++i) {
+      if (!mSelectedPolygonVertices.contains(i)) {
+        path.getVertices().append(mSelectedPolygon->getPath().getVertices()[i]);
+      }
+    }
+    if (mSelectedPolygon->getPath().isClosed() &&
+        path.getVertices().count() > 2) {
+      path.close();
+    }
+    if (path.isClosed() && (path.getVertices().count() == 3)) {
+      path.getVertices().removeLast();  // Avoid overlapping lines
+    }
+    if (path.getVertices().count() < 2) {
+      return;  // Do not allow to create invalid polygons!
+    }
+    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(*mSelectedPolygon));
+    cmd->setPath(path, false);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+}
+
+void SymbolEditorState_Select::startAddingPolygonVertex(
+    Polygon& polygon, int vertex, const Point& pos) noexcept {
+  try {
+    Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
+    Path path = polygon.getPath();
+    Point newPos = pos.mappedToGrid(getGridInterval());
+    Angle newAngle = path.getVertices()[vertex - 1].getAngle();
+    path.getVertices().insert(vertex, Vertex(newPos, newAngle));
+    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon));
+    mCmdPolygonEdit->setPath(path, true);
+
+    mSelectedPolygon = &polygon;
+    mSelectedPolygonVertices = {vertex};
+    mStartPos = pos;
+    mState = SubState::MOVING_POLYGON_VERTEX;
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+}
+
 void SymbolEditorState_Select::setSelectionRect(const Point& p1,
                                                 const Point& p2) noexcept {
   mContext.graphicsScene.setSelectionRect(p1, p2);
@@ -574,6 +711,25 @@ QList<QGraphicsItem*> SymbolEditorState_Select::findItemsAtPosition(
            (pins.count() + texts.count() + polygons.count() + circles.count()));
   Q_ASSERT(result.count() == count);
   return result;
+}
+
+bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
+    const Point& pos) noexcept {
+  for (Polygon& p : mContext.symbol.getPolygons()) {
+    PolygonGraphicsItem* i =
+        mContext.symbolGraphicsItem.getPolygonGraphicsItem(p);
+    if (i && i->isSelected()) {
+      mSelectedPolygonVertices = i->getVertexIndicesAtPosition(pos);
+      if (!mSelectedPolygonVertices.isEmpty()) {
+        mSelectedPolygon = &p;
+        return true;
+      }
+    }
+  }
+
+  mSelectedPolygon = nullptr;
+  mSelectedPolygonVertices.clear();
+  return false;
 }
 
 /*******************************************************************************

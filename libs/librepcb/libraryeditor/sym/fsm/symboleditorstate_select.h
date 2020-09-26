@@ -32,6 +32,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Polygon;
+class CmdPolygonEdit;
+
 namespace library {
 namespace editor {
 
@@ -94,16 +98,34 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
+  void removeSelectedPolygonVertices() noexcept;
+  void startAddingPolygonVertex(Polygon& polygon, int vertex,
+                                const Point& pos) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
   QList<QGraphicsItem*> findItemsAtPosition(const Point& pos) noexcept;
+  bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
 
 private:  // Types / Data
-  enum class SubState { IDLE, SELECTING, MOVING, PASTING };
+  enum class SubState {
+    IDLE,
+    SELECTING,
+    MOVING,
+    PASTING,
+    MOVING_POLYGON_VERTEX
+  };
+
   SubState mState;
   Point mStartPos;
   QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
   int mCurrentSelectionIndex;
+
+  /// The current polygon selected for editing (nullptr if none)
+  Polygon* mSelectedPolygon;
+  /// The polygon vertex indices selected for editing (empty if none)
+  QVector<int> mSelectedPolygonVertices;
+  /// The polygon edit command (nullptr if not editing)
+  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
 };
 
 /*******************************************************************************
