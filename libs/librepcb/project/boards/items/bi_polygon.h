@@ -73,6 +73,7 @@ public:
   const Polygon& getPolygon() const noexcept { return *mPolygon; }
   const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
+  PolygonGraphicsItem& getGraphicsItem() noexcept { return *mGraphicsItem; }
   bool isSelectable() const noexcept override;
 
   // General Methods

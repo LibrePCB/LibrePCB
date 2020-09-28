@@ -35,6 +35,7 @@
 namespace librepcb {
 
 class UndoCommandGroup;
+class CmdPolygonEdit;
 class Polygon;
 class StrokeText;
 class Hole;
@@ -47,6 +48,7 @@ class BI_Via;
 class BI_Plane;
 class BI_NetSegment;
 class BI_NetLine;
+class BI_Polygon;
 
 namespace editor {
 
@@ -107,7 +109,7 @@ public:
       delete;
 
 private:  // Methods
-          // Menu Helpers
+  // Menu Helpers
   void addActionRotate(QMenu& menu,
                        const QString& text = tr("Rotate")) noexcept;
   void addActionFlip(QMenu& menu, const QString& text = tr("Flip")) noexcept;
@@ -116,6 +118,11 @@ private:  // Methods
   void addActionDeleteAll(
       QMenu& menu, BI_NetSegment& netsegment,
       const QString& text = tr("Remove Whole Trace")) noexcept;
+  void addActionRemoveVertex(
+      QMenu& menu, BI_Polygon& polygon, const QVector<int>& verticesToRemove,
+      const QString& text = tr("Remove Vertex")) noexcept;
+  bool addActionAddVertex(QMenu& menu, BI_Polygon& polygon, const Point& pos,
+                          const QString& text = tr("Add Vertex")) noexcept;
   void addActionMeasure(
       QMenu& menu, BI_NetLine& netline,
       const QString& text = tr("Measure Selected Segments Length")) noexcept;
@@ -132,9 +139,13 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
+  void removeSelectedPolygonVertices() noexcept;
+  void startAddingPolygonVertex(BI_Polygon& polygon, int vertex,
+                                const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
+  bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
 
   /**
    * @brief Measure the length of the selected items.
@@ -181,6 +192,13 @@ private:  // Data
   /// When dragging items, this undo command will be active
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
   int mCurrentSelectionIndex;
+
+  /// The current polygon selected for editing (nullptr if none)
+  BI_Polygon* mSelectedPolygon;
+  /// The polygon vertex indices selected for editing (empty if none)
+  QVector<int> mSelectedPolygonVertices;
+  /// The polygon edit command (nullptr if not editing)
+  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
 };
 
 /*******************************************************************************
