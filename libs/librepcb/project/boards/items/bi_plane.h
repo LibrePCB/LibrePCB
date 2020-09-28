@@ -86,6 +86,7 @@ public:
   // {return mThermalSpokeWidth;}
   const Path& getOutline() const noexcept { return mOutline; }
   const QVector<Path>& getFragments() const noexcept { return mFragments; }
+  BGI_Plane& getGraphicsItem() noexcept { return *mGraphicsItem; }
   bool isSelectable() const noexcept override;
   bool isVisible() const noexcept { return mIsVisible; }
 

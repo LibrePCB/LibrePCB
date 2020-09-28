@@ -48,8 +48,10 @@
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/boardselectionquery.h>
+#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
 #include <librepcb/project/boards/cmd/cmdfootprintstroketextsreset.h>
+#include <librepcb/project/boards/graphicsitems/bgi_plane.h>
 #include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/boards/items/bi_footprint.h>
 #include <librepcb/project/boards/items/bi_footprintpad.h>
@@ -87,7 +89,10 @@ BoardEditorState_Select::BoardEditorState_Select(
     mCurrentSelectionIndex(0),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
-    mCmdPolygonEdit() {
+    mCmdPolygonEdit(),
+    mSelectedPlane(nullptr),
+    mSelectedPlaneVertices(),
+    mCmdPlaneEdit() {
 }
 
 BoardEditorState_Select::~BoardEditorState_Select() noexcept {
@@ -101,6 +106,7 @@ bool BoardEditorState_Select::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   Q_ASSERT(mCmdPolygonEdit.isNull());
+  Q_ASSERT(mCmdPlaneEdit.isNull());
   return true;
 }
 
@@ -116,7 +122,8 @@ bool BoardEditorState_Select::exit() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Select::processSelectAll() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit) {
     return false;
   }
 
@@ -130,7 +137,7 @@ bool BoardEditorState_Select::processSelectAll() noexcept {
 
 bool BoardEditorState_Select::processCut() noexcept {
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     if (copySelectedItemsToClipboard()) {
       removeSelectedItems();
       return true;
@@ -142,7 +149,7 @@ bool BoardEditorState_Select::processCut() noexcept {
 
 bool BoardEditorState_Select::processCopy() noexcept {
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return copySelectedItemsToClipboard();
   }
 
@@ -151,7 +158,7 @@ bool BoardEditorState_Select::processCopy() noexcept {
 
 bool BoardEditorState_Select::processPaste() noexcept {
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return pasteFromClipboard();
   }
 
@@ -159,7 +166,7 @@ bool BoardEditorState_Select::processPaste() noexcept {
 }
 
 bool BoardEditorState_Select::processRotateCw() noexcept {
-  if (!mCmdPolygonEdit) {
+  if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return rotateSelectedItems(-Angle::deg90());
   }
 
@@ -167,7 +174,7 @@ bool BoardEditorState_Select::processRotateCw() noexcept {
 }
 
 bool BoardEditorState_Select::processRotateCcw() noexcept {
-  if (!mCmdPolygonEdit) {
+  if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return rotateSelectedItems(Angle::deg90());
   }
 
@@ -175,21 +182,24 @@ bool BoardEditorState_Select::processRotateCcw() noexcept {
 }
 
 bool BoardEditorState_Select::processFlipHorizontal() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit) {
     return false;
   }
   return flipSelectedItems(Qt::Horizontal);
 }
 
 bool BoardEditorState_Select::processFlipVertical() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit) {
     return false;
   }
   return flipSelectedItems(Qt::Vertical);
 }
 
 bool BoardEditorState_Select::processRemove() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit) {
     return false;
   }
   return removeSelectedItems();
@@ -220,6 +230,17 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
       }
     }
     mCmdPolygonEdit->setPath(Path(vertices), true);
+    return true;
+  } else if (mSelectedPlane && mCmdPlaneEdit) {
+    // Move plane vertices
+    QVector<Vertex> vertices = mSelectedPlane->getOutline().getVertices();
+    foreach (int i, mSelectedPlaneVertices) {
+      if ((i >= 0) && (i < vertices.count())) {
+        vertices[i].setPos(
+            Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+      }
+    }
+    mCmdPlaneEdit->setOutline(Path(vertices), true);
     return true;
   } else if (e.buttons().testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
@@ -253,10 +274,15 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       abortCommand(false);
     }
     return true;
-  } else if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit)) {
+  } else if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) &&
+             (!mCmdPlaneEdit)) {
     if (findPolygonVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving polygon vertex
       mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
+      return true;
+    } else if (findPlaneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
+      // start moving plane vertex
+      mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(*mSelectedPlane, false));
       return true;
     } else {
       // handle items selection
@@ -322,6 +348,15 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     }
     mSelectedPolygon = nullptr;
     mSelectedPolygonVertices.clear();
+  } else if (mCmdPlaneEdit) {
+    // Stop moving plane vertices
+    try {
+      mContext.undoStack.execCmd(mCmdPlaneEdit.take());
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+    mSelectedPlane = nullptr;
+    mSelectedPlaneVertices.clear();
   } else {
     // Remove selection rectangle and keep the selection state of all items
     board->setSelectionRect(Point(), Point(), false);
@@ -343,7 +378,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   }
 #endif
 
-  if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit)) {
+  if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     // Check if there is an element under the mouse
     QList<BI_Base*> items =
         board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
@@ -365,13 +400,16 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
       return rotateSelectedItems(Angle::deg90());
     }
-  } else if (!mCmdPolygonEdit) {
+  } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     Point pos = Point::fromPx(e.scenePos());
 
     QMenu menu;
     if (findPolygonVerticesAtPosition(pos)) {
       // special menu for polygon vertices
       addActionRemoveVertex(menu, *mSelectedPolygon, mSelectedPolygonVertices);
+    } else if (findPlaneVerticesAtPosition(pos)) {
+      // special menu for plane vertices
+      addActionRemoveVertex(menu, *mSelectedPlane, mSelectedPlaneVertices);
     } else {
       // handle item selection
       QList<BI_Base*> items = board->getItemsAtScenePos(pos);
@@ -528,6 +566,9 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           BI_Plane* plane = dynamic_cast<BI_Plane*>(selectedItem);
           Q_ASSERT(plane);
 
+          if (addActionAddVertex(menu, *plane, pos)) {
+            menu.addSeparator();
+          }
           addActionRotate(menu);
           addActionFlip(menu);
           addActionDelete(menu, tr("Remove Plane"));
@@ -601,7 +642,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
   Q_UNUSED(index);
   return (!mIsUndoCmdActive) && mSelectedItemsDragCommand.isNull() &&
-      mCmdPolygonEdit.isNull();
+      mCmdPolygonEdit.isNull() && mCmdPlaneEdit.isNull();
 }
 
 /*******************************************************************************
@@ -641,26 +682,40 @@ void BoardEditorState_Select::addActionDeleteAll(QMenu& menu,
 }
 
 void BoardEditorState_Select::addActionRemoveVertex(
-    QMenu& menu, BI_Polygon& polygon, const QVector<int>& verticesToRemove,
+    QMenu& menu, BI_Base& item, const QVector<int>& verticesToRemove,
     const QString& text) noexcept {
+  int remainingVertices = 0;
   QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
-  connect(action, &QAction::triggered,
-          [this]() { removeSelectedPolygonVertices(); });
-  int remainingVertices = polygon.getPolygon().getPath().getVertices().count() -
-      verticesToRemove.count();
+  if (BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(&item)) {
+    connect(action, &QAction::triggered,
+            [this]() { removeSelectedPolygonVertices(); });
+    remainingVertices = polygon->getPolygon().getPath().getVertices().count() -
+        verticesToRemove.count();
+  } else if (BI_Plane* plane = dynamic_cast<BI_Plane*>(&item)) {
+    connect(action, &QAction::triggered,
+            [this]() { removeSelectedPlaneVertices(); });
+    remainingVertices =
+        plane->getOutline().getVertices().count() - verticesToRemove.count();
+  }
   action->setEnabled(remainingVertices >= 2);
 }
 
-bool BoardEditorState_Select::addActionAddVertex(QMenu& menu,
-                                                 BI_Polygon& polygon,
+bool BoardEditorState_Select::addActionAddVertex(QMenu& menu, BI_Base& item,
                                                  const Point& pos,
                                                  const QString& text) noexcept {
-  int index = polygon.getGraphicsItem().getLineIndexAtPosition(pos);
+  int index = -1;
+  std::function<void()> slot;
+  if (BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(&item)) {
+    index = polygon->getGraphicsItem().getLineIndexAtPosition(pos);
+    slot = [=]() { startAddingPolygonVertex(*polygon, index, pos); };
+  } else if (BI_Plane* plane = dynamic_cast<BI_Plane*>(&item)) {
+    index = plane->getGraphicsItem().getLineIndexAtPosition(pos);
+    slot = [=]() { startAddingPlaneVertex(*plane, index, pos); };
+  }
+
   if (index >= 0) {
     QAction* action = menu.addAction(QIcon(":/img/actions/add.png"), text);
-    connect(action, &QAction::triggered, [this, &polygon, index, pos]() {
-      startAddingPolygonVertex(polygon, index, pos);
-    });
+    connect(action, &QAction::triggered, slot);
     return true;
   }
 
@@ -799,6 +854,40 @@ void BoardEditorState_Select::removeSelectedPolygonVertices() noexcept {
   }
 }
 
+void BoardEditorState_Select::removeSelectedPlaneVertices() noexcept {
+  Board* board = getActiveBoard();
+  if ((!board) || (!mSelectedPlane) || mSelectedPlaneVertices.isEmpty()) {
+    return;
+  }
+
+  try {
+    Path path;
+    for (int i = 0; i < mSelectedPlane->getOutline().getVertices().count();
+         ++i) {
+      if (!mSelectedPlaneVertices.contains(i)) {
+        path.getVertices().append(
+            mSelectedPlane->getOutline().getVertices()[i]);
+      }
+    }
+    if (mSelectedPlane->getOutline().isClosed() &&
+        path.getVertices().count() > 2) {
+      path.close();
+    }
+    if (path.isClosed() && (path.getVertices().count() == 3)) {
+      path.getVertices().removeLast();  // Avoid overlapping lines
+    }
+    if (path.getVertices().count() < 2) {
+      return;  // Do not allow to create invalid outlines!
+    }
+    QScopedPointer<CmdBoardPlaneEdit> cmd(
+        new CmdBoardPlaneEdit(*mSelectedPlane, false));
+    cmd->setOutline(path, false);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
 void BoardEditorState_Select::startAddingPolygonVertex(
     BI_Polygon& polygon, int vertex, const Point& pos) noexcept {
   try {
@@ -812,6 +901,24 @@ void BoardEditorState_Select::startAddingPolygonVertex(
     mSelectedPolygonVertices = {vertex};
     mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon.getPolygon()));
     mCmdPolygonEdit->setPath(path, true);
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditorState_Select::startAddingPlaneVertex(
+    BI_Plane& plane, int vertex, const Point& pos) noexcept {
+  try {
+    Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
+    Path path = plane.getOutline();
+    Point newPos = pos.mappedToGrid(getGridInterval());
+    Angle newAngle = path.getVertices()[vertex - 1].getAngle();
+    path.getVertices().insert(vertex, Vertex(newPos, newAngle));
+
+    mSelectedPlane = &plane;
+    mSelectedPlaneVertices = {vertex};
+    mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(plane, false));
+    mCmdPlaneEdit->setOutline(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -898,6 +1005,11 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
     mSelectedPolygon = nullptr;
     mSelectedPolygonVertices.clear();
 
+    // Stop editing planes
+    mCmdPlaneEdit.reset();
+    mSelectedPlane = nullptr;
+    mSelectedPlaneVertices.clear();
+
     // Delete the current undo command
     mSelectedItemsDragCommand.reset();
 
@@ -933,6 +1045,26 @@ bool BoardEditorState_Select::findPolygonVerticesAtPosition(
 
   mSelectedPolygon = nullptr;
   mSelectedPolygonVertices.clear();
+  return false;
+}
+
+bool BoardEditorState_Select::findPlaneVerticesAtPosition(
+    const Point& pos) noexcept {
+  if (Board* board = getActiveBoard()) {
+    foreach (BI_Plane* plane, board->getPlanes()) {
+      if (plane->isSelected()) {
+        mSelectedPlaneVertices =
+            plane->getGraphicsItem().getVertexIndicesAtPosition(pos);
+        if (!mSelectedPlaneVertices.isEmpty()) {
+          mSelectedPlane = plane;
+          return true;
+        }
+      }
+    }
+  }
+
+  mSelectedPlane = nullptr;
+  mSelectedPlaneVertices.clear();
   return false;
 }
 

@@ -28,6 +28,7 @@
 #include "../items/bi_plane.h"
 
 #include <librepcb/common/geometry/polygon.h>
+#include <librepcb/common/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/common/toolbox.h>
 
 #include <QPrinter>
@@ -45,7 +46,11 @@ namespace project {
  ******************************************************************************/
 
 BGI_Plane::BGI_Plane(BI_Plane& plane) noexcept
-  : BGI_Base(), mPlane(plane), mLayer(nullptr) {
+  : BGI_Base(),
+    mPlane(plane),
+    mLayer(nullptr),
+    mLineWidthPx(0),
+    mVertexRadiusPx(0) {
   updateCacheAndRepaint();
 }
 
@@ -58,6 +63,41 @@ BGI_Plane::~BGI_Plane() noexcept {
 
 bool BGI_Plane::isSelectable() const noexcept {
   return mLayer && mLayer->isVisible();
+}
+
+int BGI_Plane::getLineIndexAtPosition(const Point& pos) const noexcept {
+  // We build temporary PrimitivePathGraphicsItem objects for each segment of
+  // the plane and check if the specified position is located within the shape
+  // of one of these graphics items. This is quite ugly, but was easy to
+  // implement and seems to work nicely... ;-)
+  for (int i = 1; i < mPlane.getOutline().getVertices().count(); ++i) {
+    Path path;
+    path.addVertex(mPlane.getOutline().getVertices()[i - 1]);
+    path.addVertex(mPlane.getOutline().getVertices()[i]);
+
+    PrimitivePathGraphicsItem item(const_cast<BGI_Plane*>(this));
+    item.setPath(path.toQPainterPathPx());
+    item.setLineWidth(UnsignedLength(Length::fromPx(mLineWidthPx)));
+    item.setLineLayer(mLayer);
+
+    if (item.shape().contains(item.mapFromScene(pos.toPxQPointF()))) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+QVector<int> BGI_Plane::getVertexIndicesAtPosition(const Point& pos) const
+    noexcept {
+  QVector<int> indices;
+  for (int i = 0; i < mPlane.getOutline().getVertices().count(); ++i) {
+    Point diff = (mPlane.getOutline().getVertices()[i].getPos() - pos);
+    if (diff.getLength()->toPx() < mVertexRadiusPx) {
+      indices.append(i);
+    }
+  }
+  return indices;
 }
 
 /*******************************************************************************
@@ -104,10 +144,22 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
   if (mLayer && mLayer->isVisible()) {
     // draw outline only on screen, not for print or PDF export
     if (!deviceIsPrinter) {
-      painter->setPen(QPen(mLayer->getColor(selected), 3 / lod, Qt::DashLine,
-                           Qt::RoundCap));
+      mLineWidthPx = 3 / lod;
+      painter->setPen(QPen(mLayer->getColor(selected), mLineWidthPx,
+                           Qt::DashLine, Qt::RoundCap));
       painter->setBrush(Qt::NoBrush);
       painter->drawPath(mOutline);
+
+      // if the plane is selected, draw vertex handles
+      if (selected) {
+        mVertexRadiusPx = (mLineWidthPx / 2) + Length::fromMm(0.2).toPx();
+        painter->setPen(
+            QPen(mLayer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
+        foreach (const Vertex& vertex, mPlane.getOutline().getVertices()) {
+          painter->drawEllipse(vertex.getPos().toPxQPointF(), mVertexRadiusPx,
+                               mVertexRadiusPx);
+        }
+      }
     }
 
     // draw plane only if plane should be visible
