@@ -42,6 +42,7 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
   : QGraphicsItem(parent),
     mLineLayer(nullptr),
     mFillLayer(nullptr),
+    mShapeMode(ShapeMode::STROKE_AND_AREA_BY_LAYER),
     mOnLayerEditedSlot(*this, &PrimitivePathGraphicsItem::layerEdited) {
   mPen.setCapStyle(Qt::RoundCap);
   mPenHighlighted.setCapStyle(Qt::RoundCap);
@@ -107,6 +108,11 @@ void PrimitivePathGraphicsItem::setFillLayer(
   updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
+}
+
+void PrimitivePathGraphicsItem::setShapeMode(ShapeMode mode) noexcept {
+  mShapeMode = mode;
+  updateBoundingRectAndShape();
 }
 
 /*******************************************************************************
@@ -192,8 +198,12 @@ void PrimitivePathGraphicsItem::updateColors() noexcept {
 
 void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
-  mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
-                                  UnsignedLength(200000));
+  if (mShapeMode == ShapeMode::FILLED_OUTLINE) {
+    mShape = mPainterPath;
+  } else {
+    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
+                                    UnsignedLength(200000));
+  }
   mBoundingRect = mShape.controlPointRect();
   update();
 }

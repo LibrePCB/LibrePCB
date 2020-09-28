@@ -39,7 +39,9 @@
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
@@ -82,7 +84,10 @@ BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mCurrentSelectionIndex(0) {
+    mCurrentSelectionIndex(0),
+    mSelectedPolygon(nullptr),
+    mSelectedPolygonVertices(),
+    mCmdPolygonEdit() {
 }
 
 BoardEditorState_Select::~BoardEditorState_Select() noexcept {
@@ -95,6 +100,7 @@ BoardEditorState_Select::~BoardEditorState_Select() noexcept {
 bool BoardEditorState_Select::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
+  Q_ASSERT(mCmdPolygonEdit.isNull());
   return true;
 }
 
@@ -110,7 +116,9 @@ bool BoardEditorState_Select::exit() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Select::processSelectAll() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+    return false;
+  }
 
   if (Board* board = getActiveBoard()) {
     board->selectAll();
@@ -121,7 +129,8 @@ bool BoardEditorState_Select::processSelectAll() noexcept {
 }
 
 bool BoardEditorState_Select::processCut() noexcept {
-  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand)) {
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
+      (!mCmdPolygonEdit)) {
     if (copySelectedItemsToClipboard()) {
       removeSelectedItems();
       return true;
@@ -132,7 +141,8 @@ bool BoardEditorState_Select::processCut() noexcept {
 }
 
 bool BoardEditorState_Select::processCopy() noexcept {
-  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand)) {
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
+      (!mCmdPolygonEdit)) {
     return copySelectedItemsToClipboard();
   }
 
@@ -140,7 +150,8 @@ bool BoardEditorState_Select::processCopy() noexcept {
 }
 
 bool BoardEditorState_Select::processPaste() noexcept {
-  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand)) {
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
+      (!mCmdPolygonEdit)) {
     return pasteFromClipboard();
   }
 
@@ -148,25 +159,39 @@ bool BoardEditorState_Select::processPaste() noexcept {
 }
 
 bool BoardEditorState_Select::processRotateCw() noexcept {
-  return rotateSelectedItems(-Angle::deg90());
+  if (!mCmdPolygonEdit) {
+    return rotateSelectedItems(-Angle::deg90());
+  }
+
+  return false;
 }
 
 bool BoardEditorState_Select::processRotateCcw() noexcept {
-  return rotateSelectedItems(Angle::deg90());
+  if (!mCmdPolygonEdit) {
+    return rotateSelectedItems(Angle::deg90());
+  }
+
+  return false;
 }
 
 bool BoardEditorState_Select::processFlipHorizontal() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+    return false;
+  }
   return flipSelectedItems(Qt::Horizontal);
 }
 
 bool BoardEditorState_Select::processFlipVertical() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+    return false;
+  }
   return flipSelectedItems(Qt::Vertical);
 }
 
 bool BoardEditorState_Select::processRemove() noexcept {
-  if (mIsUndoCmdActive || mSelectedItemsDragCommand) return false;
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit) {
+    return false;
+  }
   return removeSelectedItems();
 }
 
@@ -183,6 +208,18 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     // Move selected elements to cursor position
     Point pos = Point::fromPx(e.scenePos());
     mSelectedItemsDragCommand->setCurrentPosition(pos);
+    return true;
+  } else if (mSelectedPolygon && mCmdPolygonEdit) {
+    // Move polygon vertices
+    QVector<Vertex> vertices =
+        mSelectedPolygon->getPolygon().getPath().getVertices();
+    foreach (int i, mSelectedPolygonVertices) {
+      if ((i >= 0) && (i < vertices.count())) {
+        vertices[i].setPos(
+            Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+      }
+    }
+    mCmdPolygonEdit->setPath(Path(vertices), true);
     return true;
   } else if (e.buttons().testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
@@ -216,37 +253,43 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       abortCommand(false);
     }
     return true;
-  } else if (!mSelectedItemsDragCommand) {
-    // handle items selection
-    QList<BI_Base*> items =
-        board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) {
-      // no items under mouse --> start drawing a selection rectangle
-      board->clearSelection();
-      mCurrentSelectionIndex = 0;
+  } else if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit)) {
+    if (findPolygonVerticesAtPosition(Point::fromPx(e.scenePos()))) {
+      // start moving polygon vertex
+      mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
       return true;
-    }
+    } else {
+      // handle items selection
+      QList<BI_Base*> items =
+          board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+      if (items.isEmpty()) {
+        // no items under mouse --> start drawing a selection rectangle
+        board->clearSelection();
+        mCurrentSelectionIndex = 0;
+        return true;
+      }
 
-    bool itemAlreadySelected = items.first()->isSelected();
+      bool itemAlreadySelected = items.first()->isSelected();
 
-    if ((e.modifiers() & Qt::ControlModifier)) {
-      // Toggle selection when CTRL is pressed
-      items.first()->setSelected(!itemAlreadySelected);
-    } else if ((e.modifiers() & Qt::ShiftModifier)) {
-      // Cycle Selection, when holding shift
-      mCurrentSelectionIndex += 1;
-      mCurrentSelectionIndex %= items.count();
-      board->clearSelection();
-      items[mCurrentSelectionIndex]->setSelected(true);
-    } else if (!itemAlreadySelected) {
-      // Only select the topmost item when clicking an unselected item
-      // without CTRL
-      board->clearSelection();
-      items.first()->setSelected(true);
-    }
+      if ((e.modifiers() & Qt::ControlModifier)) {
+        // Toggle selection when CTRL is pressed
+        items.first()->setSelected(!itemAlreadySelected);
+      } else if ((e.modifiers() & Qt::ShiftModifier)) {
+        // Cycle Selection, when holding shift
+        mCurrentSelectionIndex += 1;
+        mCurrentSelectionIndex %= items.count();
+        board->clearSelection();
+        items[mCurrentSelectionIndex]->setSelected(true);
+      } else if (!itemAlreadySelected) {
+        // Only select the topmost item when clicking an unselected item
+        // without CTRL
+        board->clearSelection();
+        items.first()->setSelected(true);
+      }
 
-    if (startMovingSelectedItems(*board, Point::fromPx(e.scenePos()))) {
-      return true;
+      if (startMovingSelectedItems(*board, Point::fromPx(e.scenePos()))) {
+        return true;
+      }
     }
   }
 
@@ -270,6 +313,15 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       abortCommand(false);
     }
     return true;
+  } else if (mCmdPolygonEdit) {
+    // Stop moving polygon vertices
+    try {
+      mContext.undoStack.execCmd(mCmdPolygonEdit.take());
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+    mSelectedPolygon = nullptr;
+    mSelectedPolygonVertices.clear();
   } else {
     // Remove selection rectangle and keep the selection state of all items
     board->setSelectionRect(Point(), Point(), false);
@@ -291,7 +343,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   }
 #endif
 
-  if (!mSelectedItemsDragCommand) {
+  if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit)) {
     // Check if there is an element under the mouse
     QList<BI_Base*> items =
         board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
@@ -313,219 +365,229 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
       return rotateSelectedItems(Angle::deg90());
     }
-  } else {
-    // handle item selection
-    QList<BI_Base*> items =
-        board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) return false;
+  } else if (!mCmdPolygonEdit) {
+    Point pos = Point::fromPx(e.scenePos());
 
-    // If the right-clicked element is part of an active selection, keep it
-    // as-is. However, if it's not part of an active selection, clear the
-    // selection and select the right-clicked element instead.
-    BI_Base* selectedItem = nullptr;
-    foreach (BI_Base* item, items) {
-      if (item->isSelected()) {
-        selectedItem = item;
-      }
-    }
-    if (!selectedItem) {
-      selectedItem = items.first();
-      board->clearSelection();
-      selectedItem->setSelected(true);
-    }
-    Q_ASSERT(selectedItem);
-    Q_ASSERT(selectedItem->isSelected());
-
-    // build the context menus
     QMenu menu;
-    switch (selectedItem->getType()) {
-      case BI_Base::Type_t::Footprint: {
-        BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(selectedItem);
-        Q_ASSERT(footprint);
-        BI_Device& devInst = footprint->getDeviceInstance();
-        ComponentInstance& cmpInst = devInst.getComponentInstance();
+    if (findPolygonVerticesAtPosition(pos)) {
+      // special menu for polygon vertices
+      addActionRemoveVertex(menu, *mSelectedPolygon, mSelectedPolygonVertices);
+    } else {
+      // handle item selection
+      QList<BI_Base*> items = board->getItemsAtScenePos(pos);
+      if (items.isEmpty()) return false;
 
-        // build the context menu
-        addActionRotate(menu);
-        addActionFlip(menu);
-        addActionDelete(menu, tr("Remove %1").arg(*cmpInst.getName()));
-        menu.addSeparator();
-        addActionSnap(menu, devInst.getPosition(), *board, *selectedItem);
-        QAction* aResetTexts = menu.addAction(QIcon(":/img/actions/undo.png"),
-                                              tr("Reset all texts"));
-        connect(aResetTexts, &QAction::triggered, [this, footprint]() {
-          try {
-            mContext.undoStack.execCmd(
-                new CmdFootprintStrokeTextsReset(*footprint));
-          } catch (const Exception& e) {
-            QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-          }
-        });
-        menu.addSeparator();
-
-        QMenu* aChangeDeviceMenu = menu.addMenu(
-            QIcon(":/img/library/device.png"), tr("Change Device"));
-        foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
-          QAction* a = aChangeDeviceMenu->addAction(item.icon, item.name);
-          a->setData(item.uuid.toStr());
-          if (item.uuid == devInst.getLibDevice().getUuid()) {
-            a->setCheckable(true);
-            a->setChecked(true);
-            a->setEnabled(false);
-          } else {
-            connect(a, &QAction::triggered, [this, board, &devInst, item]() {
-              try {
-                CmdReplaceDevice* cmd =
-                    new CmdReplaceDevice(mContext.workspace, *board, devInst,
-                                         item.uuid, tl::optional<Uuid>());
-                mContext.undoStack.execCmd(cmd);
-              } catch (const Exception& e) {
-                QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-              }
-            });
-          }
+      // If the right-clicked element is part of an active selection, keep it
+      // as-is. However, if it's not part of an active selection, clear the
+      // selection and select the right-clicked element instead.
+      BI_Base* selectedItem = nullptr;
+      foreach (BI_Base* item, items) {
+        if (item->isSelected()) {
+          selectedItem = item;
         }
-        aChangeDeviceMenu->setEnabled(!aChangeDeviceMenu->isEmpty());
-
-        QMenu* aChangeFootprintMenu = menu.addMenu(
-            QIcon(":/img/library/footprint.png"), tr("Change Footprint"));
-        QIcon footprintIcon(":/img/library/footprint.png");
-        for (const library::Footprint& footprint :
-             devInst.getLibPackage().getFootprints()) {
-          QAction* a = aChangeFootprintMenu->addAction(
-              footprintIcon,
-              *footprint.getNames().value(
-                  mContext.project.getSettings().getLocaleOrder()));
-          if (footprint.getUuid() ==
-              devInst.getFootprint().getLibFootprint().getUuid()) {
-            a->setCheckable(true);
-            a->setChecked(true);
-            a->setEnabled(false);
-          } else {
-            connect(a, &QAction::triggered,
-                    [this, board, &devInst, &footprint]() {
-                      try {
-                        Uuid deviceUuid = devInst.getLibDevice().getUuid();
-                        CmdReplaceDevice* cmd = new CmdReplaceDevice(
-                            mContext.workspace, *board, devInst, deviceUuid,
-                            footprint.getUuid());
-                        mContext.undoStack.execCmd(cmd);
-                      } catch (const Exception& e) {
-                        QMessageBox::critical(parentWidget(), tr("Error"),
-                                              e.getMsg());
-                      }
-                    });
-          }
-        }
-        aChangeFootprintMenu->setEnabled(!aChangeFootprintMenu->isEmpty());
-        menu.addSeparator();
-        addActionProperties(menu, *board, *selectedItem);
-        break;
       }
-
-      case BI_Base::Type_t::NetLine: {
-        BI_NetLine* netline = dynamic_cast<BI_NetLine*>(selectedItem);
-        Q_ASSERT(netline);
-
-        addActionDelete(menu, tr("Remove Trace Segment"));
-        addActionDeleteAll(menu, netline->getNetSegment());
-        menu.addSeparator();
-        addActionSelectAll(menu, netline->getNetSegment());
-        menu.addSeparator();
-        addActionMeasure(menu, *netline);
-        break;
+      if (!selectedItem) {
+        selectedItem = items.first();
+        board->clearSelection();
+        selectedItem->setSelected(true);
       }
+      Q_ASSERT(selectedItem);
+      Q_ASSERT(selectedItem->isSelected());
 
-      case BI_Base::Type_t::NetPoint: {
-        BI_NetPoint* netpoint = dynamic_cast<BI_NetPoint*>(selectedItem);
-        Q_ASSERT(netpoint);
+      // build the context menus
+      switch (selectedItem->getType()) {
+        case BI_Base::Type_t::Footprint: {
+          BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(selectedItem);
+          Q_ASSERT(footprint);
+          BI_Device& devInst = footprint->getDeviceInstance();
+          ComponentInstance& cmpInst = devInst.getComponentInstance();
 
-        addActionDeleteAll(menu, netpoint->getNetSegment());
-        menu.addSeparator();
-        addActionSelectAll(menu, netpoint->getNetSegment());
-        menu.addSeparator();
-        addActionSnap(menu, netpoint->getPosition(), *board, *selectedItem);
-        if (!netpoint->getNetLines().isEmpty()) {
+          // build the context menu
+          addActionRotate(menu);
+          addActionFlip(menu);
+          addActionDelete(menu, tr("Remove %1").arg(*cmpInst.getName()));
           menu.addSeparator();
-          addActionMeasure(menu, **netpoint->getNetLines().begin());
+          addActionSnap(menu, devInst.getPosition(), *board, *selectedItem);
+          QAction* aResetTexts = menu.addAction(QIcon(":/img/actions/undo.png"),
+                                                tr("Reset all texts"));
+          connect(aResetTexts, &QAction::triggered, [this, footprint]() {
+            try {
+              mContext.undoStack.execCmd(
+                  new CmdFootprintStrokeTextsReset(*footprint));
+            } catch (const Exception& e) {
+              QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+            }
+          });
+          menu.addSeparator();
+
+          QMenu* aChangeDeviceMenu = menu.addMenu(
+              QIcon(":/img/library/device.png"), tr("Change Device"));
+          foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
+            QAction* a = aChangeDeviceMenu->addAction(item.icon, item.name);
+            a->setData(item.uuid.toStr());
+            if (item.uuid == devInst.getLibDevice().getUuid()) {
+              a->setCheckable(true);
+              a->setChecked(true);
+              a->setEnabled(false);
+            } else {
+              connect(a, &QAction::triggered, [this, board, &devInst, item]() {
+                try {
+                  CmdReplaceDevice* cmd =
+                      new CmdReplaceDevice(mContext.workspace, *board, devInst,
+                                           item.uuid, tl::optional<Uuid>());
+                  mContext.undoStack.execCmd(cmd);
+                } catch (const Exception& e) {
+                  QMessageBox::critical(parentWidget(), tr("Error"),
+                                        e.getMsg());
+                }
+              });
+            }
+          }
+          aChangeDeviceMenu->setEnabled(!aChangeDeviceMenu->isEmpty());
+
+          QMenu* aChangeFootprintMenu = menu.addMenu(
+              QIcon(":/img/library/footprint.png"), tr("Change Footprint"));
+          QIcon footprintIcon(":/img/library/footprint.png");
+          for (const library::Footprint& footprint :
+               devInst.getLibPackage().getFootprints()) {
+            QAction* a = aChangeFootprintMenu->addAction(
+                footprintIcon,
+                *footprint.getNames().value(
+                    mContext.project.getSettings().getLocaleOrder()));
+            if (footprint.getUuid() ==
+                devInst.getFootprint().getLibFootprint().getUuid()) {
+              a->setCheckable(true);
+              a->setChecked(true);
+              a->setEnabled(false);
+            } else {
+              connect(a, &QAction::triggered,
+                      [this, board, &devInst, &footprint]() {
+                        try {
+                          Uuid deviceUuid = devInst.getLibDevice().getUuid();
+                          CmdReplaceDevice* cmd = new CmdReplaceDevice(
+                              mContext.workspace, *board, devInst, deviceUuid,
+                              footprint.getUuid());
+                          mContext.undoStack.execCmd(cmd);
+                        } catch (const Exception& e) {
+                          QMessageBox::critical(parentWidget(), tr("Error"),
+                                                e.getMsg());
+                        }
+                      });
+            }
+          }
+          aChangeFootprintMenu->setEnabled(!aChangeFootprintMenu->isEmpty());
+          menu.addSeparator();
+          addActionProperties(menu, *board, *selectedItem);
+          break;
         }
-        break;
+
+        case BI_Base::Type_t::NetLine: {
+          BI_NetLine* netline = dynamic_cast<BI_NetLine*>(selectedItem);
+          Q_ASSERT(netline);
+
+          addActionDelete(menu, tr("Remove Trace Segment"));
+          addActionDeleteAll(menu, netline->getNetSegment());
+          menu.addSeparator();
+          addActionSelectAll(menu, netline->getNetSegment());
+          menu.addSeparator();
+          addActionMeasure(menu, *netline);
+          break;
+        }
+
+        case BI_Base::Type_t::NetPoint: {
+          BI_NetPoint* netpoint = dynamic_cast<BI_NetPoint*>(selectedItem);
+          Q_ASSERT(netpoint);
+
+          addActionDeleteAll(menu, netpoint->getNetSegment());
+          menu.addSeparator();
+          addActionSelectAll(menu, netpoint->getNetSegment());
+          menu.addSeparator();
+          addActionSnap(menu, netpoint->getPosition(), *board, *selectedItem);
+          if (!netpoint->getNetLines().isEmpty()) {
+            menu.addSeparator();
+            addActionMeasure(menu, **netpoint->getNetLines().begin());
+          }
+          break;
+        }
+
+        case BI_Base::Type_t::Via: {
+          BI_Via* via = dynamic_cast<BI_Via*>(selectedItem);
+          Q_ASSERT(via);
+
+          addActionDelete(menu, tr("Remove Via"));
+          addActionDeleteAll(menu, via->getNetSegment());
+          menu.addSeparator();
+          addActionSelectAll(menu, via->getNetSegment());
+          addActionSnap(menu, via->getPosition(), *board, *selectedItem);
+          menu.addSeparator();
+          addActionProperties(menu, *board, *selectedItem);
+          break;
+        }
+
+        case BI_Base::Type_t::Plane: {
+          BI_Plane* plane = dynamic_cast<BI_Plane*>(selectedItem);
+          Q_ASSERT(plane);
+
+          addActionRotate(menu);
+          addActionFlip(menu);
+          addActionDelete(menu, tr("Remove Plane"));
+          menu.addSeparator();
+          QAction* aIsVisible = menu.addAction(tr("Visible"));
+          aIsVisible->setCheckable(true);
+          aIsVisible->setChecked(plane->isVisible());
+          connect(aIsVisible, &QAction::triggered, [plane, aIsVisible]() {
+            // Visibility is not saved, thus no undo command is needed here.
+            plane->setVisible(aIsVisible->isChecked());
+          });
+          menu.addSeparator();
+          addActionProperties(menu, *board, *selectedItem,
+                              tr("Plane Properties"));
+          break;
+        }
+
+        case BI_Base::Type_t::Polygon: {
+          BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(selectedItem);
+          Q_ASSERT(polygon);
+
+          if (addActionAddVertex(menu, *polygon, pos)) {
+            menu.addSeparator();
+          }
+          addActionRotate(menu);
+          addActionFlip(menu);
+          addActionDelete(menu, tr("Remove Polygon"));
+          menu.addSeparator();
+          addActionProperties(menu, *board, *selectedItem);
+          break;
+        }
+
+        case BI_Base::Type_t::StrokeText: {
+          BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(selectedItem);
+          Q_ASSERT(text);
+
+          addActionRotate(menu);
+          addActionFlip(menu);
+          addActionDelete(menu, tr("Remove Text"));
+          menu.addSeparator();
+          addActionSnap(menu, text->getPosition(), *board, *selectedItem);
+          menu.addSeparator();
+          addActionProperties(menu, *board, *selectedItem);
+          break;
+        }
+
+        case BI_Base::Type_t::Hole: {
+          BI_Hole* hole = dynamic_cast<BI_Hole*>(selectedItem);
+          Q_ASSERT(hole);
+
+          addActionDelete(menu, tr("Remove Hole"));
+          menu.addSeparator();
+          addActionSnap(menu, hole->getPosition(), *board, *selectedItem);
+          menu.addSeparator();
+          addActionProperties(menu, *board, *selectedItem);
+          break;
+        }
+
+        default: { return false; }
       }
-
-      case BI_Base::Type_t::Via: {
-        BI_Via* via = dynamic_cast<BI_Via*>(selectedItem);
-        Q_ASSERT(via);
-
-        addActionDelete(menu, tr("Remove Via"));
-        addActionDeleteAll(menu, via->getNetSegment());
-        menu.addSeparator();
-        addActionSelectAll(menu, via->getNetSegment());
-        addActionSnap(menu, via->getPosition(), *board, *selectedItem);
-        menu.addSeparator();
-        addActionProperties(menu, *board, *selectedItem);
-        break;
-      }
-
-      case BI_Base::Type_t::Plane: {
-        BI_Plane* plane = dynamic_cast<BI_Plane*>(selectedItem);
-        Q_ASSERT(plane);
-
-        addActionRotate(menu);
-        addActionFlip(menu);
-        addActionDelete(menu, tr("Remove Plane"));
-        menu.addSeparator();
-        QAction* aIsVisible = menu.addAction(tr("Visible"));
-        aIsVisible->setCheckable(true);
-        aIsVisible->setChecked(plane->isVisible());
-        connect(aIsVisible, &QAction::triggered, [plane, aIsVisible]() {
-          // Visibility is not saved, thus no undo command is needed here.
-          plane->setVisible(aIsVisible->isChecked());
-        });
-        menu.addSeparator();
-        addActionProperties(menu, *board, *selectedItem,
-                            tr("Plane Properties"));
-        break;
-      }
-
-      case BI_Base::Type_t::Polygon: {
-        BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(selectedItem);
-        Q_ASSERT(polygon);
-
-        addActionRotate(menu);
-        addActionFlip(menu);
-        addActionDelete(menu, tr("Remove Polygon"));
-        menu.addSeparator();
-        addActionProperties(menu, *board, *selectedItem);
-        break;
-      }
-
-      case BI_Base::Type_t::StrokeText: {
-        BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(selectedItem);
-        Q_ASSERT(text);
-
-        addActionRotate(menu);
-        addActionFlip(menu);
-        addActionDelete(menu, tr("Remove Text"));
-        menu.addSeparator();
-        addActionSnap(menu, text->getPosition(), *board, *selectedItem);
-        menu.addSeparator();
-        addActionProperties(menu, *board, *selectedItem);
-        break;
-      }
-
-      case BI_Base::Type_t::Hole: {
-        BI_Hole* hole = dynamic_cast<BI_Hole*>(selectedItem);
-        Q_ASSERT(hole);
-
-        addActionDelete(menu, tr("Remove Hole"));
-        menu.addSeparator();
-        addActionSnap(menu, hole->getPosition(), *board, *selectedItem);
-        menu.addSeparator();
-        addActionProperties(menu, *board, *selectedItem);
-        break;
-      }
-
-      default: { return false; }
     }
 
     // execute the context menu
@@ -538,7 +600,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
 bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
   Q_UNUSED(index);
-  return (!mIsUndoCmdActive) && mSelectedItemsDragCommand.isNull();
+  return (!mIsUndoCmdActive) && mSelectedItemsDragCommand.isNull() &&
+      mCmdPolygonEdit.isNull();
 }
 
 /*******************************************************************************
@@ -575,6 +638,33 @@ void BoardEditorState_Select::addActionDeleteAll(QMenu& menu,
     netsegment.setSelected(true);
     removeSelectedItems();
   });
+}
+
+void BoardEditorState_Select::addActionRemoveVertex(
+    QMenu& menu, BI_Polygon& polygon, const QVector<int>& verticesToRemove,
+    const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
+  connect(action, &QAction::triggered,
+          [this]() { removeSelectedPolygonVertices(); });
+  int remainingVertices = polygon.getPolygon().getPath().getVertices().count() -
+      verticesToRemove.count();
+  action->setEnabled(remainingVertices >= 2);
+}
+
+bool BoardEditorState_Select::addActionAddVertex(QMenu& menu,
+                                                 BI_Polygon& polygon,
+                                                 const Point& pos,
+                                                 const QString& text) noexcept {
+  int index = polygon.getGraphicsItem().getLineIndexAtPosition(pos);
+  if (index >= 0) {
+    QAction* action = menu.addAction(QIcon(":/img/actions/add.png"), text);
+    connect(action, &QAction::triggered, [this, &polygon, index, pos]() {
+      startAddingPolygonVertex(polygon, index, pos);
+    });
+    return true;
+  }
+
+  return false;
 }
 
 void BoardEditorState_Select::addActionMeasure(QMenu& menu, BI_NetLine& netline,
@@ -678,6 +768,55 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
   }
 }
 
+void BoardEditorState_Select::removeSelectedPolygonVertices() noexcept {
+  Board* board = getActiveBoard();
+  if ((!board) || (!mSelectedPolygon) || mSelectedPolygonVertices.isEmpty()) {
+    return;
+  }
+
+  try {
+    Path path;
+    Polygon& polygon = mSelectedPolygon->getPolygon();
+    for (int i = 0; i < polygon.getPath().getVertices().count(); ++i) {
+      if (!mSelectedPolygonVertices.contains(i)) {
+        path.getVertices().append(polygon.getPath().getVertices()[i]);
+      }
+    }
+    if (polygon.getPath().isClosed() && path.getVertices().count() > 2) {
+      path.close();
+    }
+    if (path.isClosed() && (path.getVertices().count() == 3)) {
+      path.getVertices().removeLast();  // Avoid overlapping lines
+    }
+    if (path.getVertices().count() < 2) {
+      return;  // Do not allow to create invalid polygons!
+    }
+    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
+    cmd->setPath(path, false);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditorState_Select::startAddingPolygonVertex(
+    BI_Polygon& polygon, int vertex, const Point& pos) noexcept {
+  try {
+    Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
+    Path path = polygon.getPolygon().getPath();
+    Point newPos = pos.mappedToGrid(getGridInterval());
+    Angle newAngle = path.getVertices()[vertex - 1].getAngle();
+    path.getVertices().insert(vertex, Vertex(newPos, newAngle));
+
+    mSelectedPolygon = &polygon;
+    mSelectedPolygonVertices = {vertex};
+    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon.getPolygon()));
+    mCmdPolygonEdit->setPath(path, true);
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
 bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
@@ -754,6 +893,11 @@ bool BoardEditorState_Select::pasteFromClipboard() noexcept {
 
 bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
   try {
+    // Stop editing polygons
+    mCmdPolygonEdit.reset();
+    mSelectedPolygon = nullptr;
+    mSelectedPolygonVertices.clear();
+
     // Delete the current undo command
     mSelectedItemsDragCommand.reset();
 
@@ -770,6 +914,26 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
     }
     return false;
   }
+}
+
+bool BoardEditorState_Select::findPolygonVerticesAtPosition(
+    const Point& pos) noexcept {
+  if (Board* board = getActiveBoard()) {
+    foreach (BI_Polygon* polygon, board->getPolygons()) {
+      if (polygon->isSelected()) {
+        mSelectedPolygonVertices =
+            polygon->getGraphicsItem().getVertexIndicesAtPosition(pos);
+        if (!mSelectedPolygonVertices.isEmpty()) {
+          mSelectedPolygon = polygon;
+          return true;
+        }
+      }
+    }
+  }
+
+  mSelectedPolygon = nullptr;
+  mSelectedPolygonVertices.clear();
+  return false;
 }
 
 bool BoardEditorState_Select::measureSelectedItems(

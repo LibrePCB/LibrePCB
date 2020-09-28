@@ -43,6 +43,16 @@ namespace librepcb {
  */
 class PrimitivePathGraphicsItem : public QGraphicsItem {
 public:
+  // Types
+  enum class ShapeMode {
+    /// Both the line stroke (with its specified width) and the filled area
+    /// are used as shape, if the corresponding layers are set and visible.
+    STROKE_AND_AREA_BY_LAYER,
+
+    /// Only the area within the painter path is used as shape.
+    FILLED_OUTLINE,
+  };
+
   // Constructors / Destructor
   // PrimitivePathGraphicsItem() = delete;
   PrimitivePathGraphicsItem(const PrimitivePathGraphicsItem& other) = delete;
@@ -56,6 +66,7 @@ public:
   void setLineWidth(const UnsignedLength& width) noexcept;
   void setLineLayer(const GraphicsLayer* layer) noexcept;
   void setFillLayer(const GraphicsLayer* layer) noexcept;
+  void setShapeMode(ShapeMode mode) noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -74,9 +85,10 @@ private:  // Methods
   void updateBoundingRectAndShape() noexcept;
   void updateVisibility() noexcept;
 
-private:  // Data
+protected:  // Data
   const GraphicsLayer* mLineLayer;
   const GraphicsLayer* mFillLayer;
+  ShapeMode mShapeMode;
   QPen mPen;
   QPen mPenHighlighted;
   QBrush mBrush;
