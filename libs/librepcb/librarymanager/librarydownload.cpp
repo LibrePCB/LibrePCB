@@ -43,9 +43,9 @@ LibraryDownload::LibraryDownload(const QUrl& urlToZip,
                                  const FilePath& destDir) noexcept
   : QObject(nullptr),
     mDestDir(destDir),
-    mTempDestDir(destDir.toStr() % ".tmp") {
-  mFileDownload.reset(
-      new FileDownload(urlToZip, FilePath(mDestDir.toStr() % ".zip")));
+    mTempDestDir(destDir.toStr() % ".tmp"),
+    mTempZipFile(mDestDir.toStr() % ".zip") {
+  mFileDownload.reset(new FileDownload(urlToZip, mTempZipFile));
   mFileDownload->setZipExtractionDirectory(mTempDestDir);
   connect(mFileDownload.data(), &FileDownload::progressState, this,
           &LibraryDownload::progressState, Qt::QueuedConnection);
@@ -97,6 +97,8 @@ void LibraryDownload::start() noexcept {
     return;
   }
 
+  // Delete the temporary destination directory if it already exists. It might
+  // be left there after a failed or aborted download attempt.
   if (mTempDestDir.isExistingDir()) {
     try {
       FileUtils::removeDirRecursively(mTempDestDir);
@@ -106,8 +108,20 @@ void LibraryDownload::start() noexcept {
     }
   }
 
-  mFileDownload.take()
-      ->start();  // release ownership of the FileDownload object!
+  // Delete the temporary ZIP file if it already exists. It might
+  // be left there after a failed or aborted download attempt.
+  if (mTempZipFile.isExistingFile()) {
+    try {
+      FileUtils::removeFile(mTempZipFile);
+    } catch (const Exception& e) {
+      emit finished(false, e.getMsg());
+      return;
+    }
+  }
+
+  // Release ownership of the FileDownload object because it will be deleted by
+  // itself after the download finished!
+  mFileDownload.take()->start();
 }
 
 void LibraryDownload::abort() noexcept {
