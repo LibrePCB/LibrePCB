@@ -102,6 +102,7 @@ private:  // Data
   QScopedPointer<FileDownload> mFileDownload;
   FilePath mDestDir;
   FilePath mTempDestDir;
+  FilePath mTempZipFile;
 };
 
 /*******************************************************************************

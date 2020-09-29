@@ -19,6 +19,7 @@ CONFIG -= app_bundle
 LIBS += \
     -L$${DESTDIR} \
     -lgoogletest \
+    -llibrepcblibrarymanager \
     -llibrepcbeagleimport \
     -llibrepcbworkspace \
     -llibrepcbproject \
@@ -40,6 +41,7 @@ INCLUDEPATH += \
     ../../libs/type_safe/external/debug_assert \
 
 DEPENDPATH += \
+    ../../libs/librepcb/librarymanager \
     ../../libs/librepcb/eagleimport \
     ../../libs/librepcb/workspace \
     ../../libs/librepcb/project \
@@ -57,6 +59,7 @@ PRE_TARGETDEPS += \
 isEmpty(UNBUNDLE) {
     # These libraries will only be linked statically when not unbundling
     PRE_TARGETDEPS += \
+        $${DESTDIR}/liblibrepcblibrarymanager.a \
         $${DESTDIR}/liblibrepcbeagleimport.a \
         $${DESTDIR}/liblibrepcbworkspace.a \
         $${DESTDIR}/liblibrepcbproject.a \
@@ -110,6 +113,7 @@ SOURCES += \
     library/cmp/componentsymbolvariantitemsuffixtest.cpp \
     library/cmp/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
+    librarymanager/librarydownloadtest.cpp \
     main.cpp \
     project/boards/boardgerberexporttest.cpp \
     project/boards/boardpickplacegeneratortest.cpp \
