@@ -79,7 +79,9 @@ This project welcomes non-code contributions, too! The following types of contri
   [Transifex](https://www.transifex.com/librepcb/librepcb-application/dashboard/).
   Follow [this guide](https://docs.transifex.com/getting-started/translators) to
   get started.
-- **Website**: Improve our [website](https://librepcb.org) which is hosted in the repository [LibrePCB/LibrePCB.github.io](https://github.com/LibrePCB/LibrePCB.github.io).
+- **Website**: Improve our [website](https://librepcb.org) which is hosted in
+  the repository
+  [LibrePCB/librepcb-website](https://github.com/LibrePCB/librepcb-website).
 - **Sharing**: Speak about LibrePCB with your friends and colleagues, or write about it in the internet!
 - **Donations**: There are several ways to contribute financially to LibrePCB,
   see [details here](https://librepcb.org/donate/).
