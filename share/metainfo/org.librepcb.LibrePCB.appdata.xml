@@ -56,6 +56,17 @@
   </provides>
 
   <releases>
+    <release version="0.1.5" date="2020-10-04" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Copy&amp;Paste in Boards and Schematics</li>
+          <li>Many Usability Improvements</li>
+          <li>Various Bugfixes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2020-10-04_release_0.1.5/</url>
+    </release>
     <release version="0.1.4" date="2020-05-03" type="stable">
       <description>
         <p>Highlights:</p>
