@@ -79,7 +79,7 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
     mStopMaskClearanceMax = e->getValueOfFirstChild<UnsignedLength>();
   }
   if (const SExpression* e =
-          node.tryGetChildByPath("stopmask_max_via_diameter")) {
+          node.tryGetChildByPath("stopmask_max_via_drill_diameter")) {
     mStopMaskMaxViaDrillDiameter = e->getValueOfFirstChild<UnsignedLength>();
   }
   // cream mask
