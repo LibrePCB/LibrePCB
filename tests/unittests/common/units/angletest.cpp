@@ -69,23 +69,22 @@ TEST_P(AngleTest, testToDegString) {
   }
 }
 
-TEST_P(AngleTest, testSerializeToSExpression) {
+TEST_P(AngleTest, testSerialize) {
   const AngleTestData& data = GetParam();
 
   if (data.valid) {
-    EXPECT_EQ(data.genStr % "\n",
-              serializeToSExpression(data.value).toByteArray());
+    EXPECT_EQ(data.genStr % "\n", serialize(data.value).toByteArray());
   }
 }
 
-TEST_P(AngleTest, testDeserializeFromSExpression) {
+TEST_P(AngleTest, testDeserialize) {
   const AngleTestData& data = GetParam();
 
   SExpression sexpr = SExpression::createString(data.origStr);
   if (data.valid) {
-    EXPECT_EQ(data.value, deserializeFromSExpression<Angle>(sexpr, false));
+    EXPECT_EQ(data.value, deserialize<Angle>(sexpr, false));
   } else {
-    EXPECT_THROW(deserializeFromSExpression<Angle>(sexpr, false), RuntimeError);
+    EXPECT_THROW(deserialize<Angle>(sexpr, false), RuntimeError);
   }
 }
 

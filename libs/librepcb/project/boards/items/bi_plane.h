@@ -157,8 +157,7 @@ private:  // Data
 }  // namespace project
 
 template <>
-inline SExpression serializeToSExpression(
-    const project::BI_Plane::ConnectStyle& obj) {
+inline SExpression serialize(const project::BI_Plane::ConnectStyle& obj) {
   switch (obj) {
     case project::BI_Plane::ConnectStyle::None:
       return SExpression::createToken("none");
@@ -172,8 +171,8 @@ inline SExpression serializeToSExpression(
 }
 
 template <>
-inline project::BI_Plane::ConnectStyle deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
+inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
+                                                   bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "none") return project::BI_Plane::ConnectStyle::None;
   // else if (str == "thermal")  return

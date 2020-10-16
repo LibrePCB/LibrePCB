@@ -132,8 +132,7 @@ private:  // Data
 }  // namespace library
 
 template <>
-inline SExpression serializeToSExpression(
-    const library::CmpSigPinDisplayType& obj) {
+inline SExpression serialize(const library::CmpSigPinDisplayType& obj) {
   return SExpression::createToken(obj.toString());
 }
 

@@ -89,23 +89,23 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const StrokeTextSpacing& obj) {
+inline SExpression serialize(const StrokeTextSpacing& obj) {
   if (obj.isAuto()) {
     return SExpression::createToken("auto");
   } else {
-    return serializeToSExpression(obj.getRatio());
+    return serialize(obj.getRatio());
   }
 }
 
 template <>
-inline StrokeTextSpacing deserializeFromSExpression(const SExpression& sexpr,
-                                                    bool throwIfEmpty) {
+inline StrokeTextSpacing deserialize(const SExpression& sexpr,
+                                     bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "auto") {
     return StrokeTextSpacing();
   } else {
     return StrokeTextSpacing(
-        deserializeFromSExpression<Ratio>(sexpr, throwIfEmpty));  // can throw
+        deserialize<Ratio>(sexpr, throwIfEmpty));  // can throw
   }
 }
 

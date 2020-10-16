@@ -109,13 +109,13 @@ inline QString operator%(
 }
 
 template <>
-inline SExpression serializeToSExpression(
+inline SExpression serialize(
     const library::ComponentSymbolVariantItemSuffix& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline library::ComponentSymbolVariantItemSuffix deserializeFromSExpression(
+inline library::ComponentSymbolVariantItemSuffix deserialize(
     const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return library::ComponentSymbolVariantItemSuffix(str);  // can throw

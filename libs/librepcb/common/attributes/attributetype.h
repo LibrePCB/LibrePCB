@@ -103,7 +103,7 @@ protected:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const AttributeType& obj) {
+inline SExpression serialize(const AttributeType& obj) {
   return SExpression::createToken(obj.getName());
 }
 

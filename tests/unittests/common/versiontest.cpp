@@ -239,25 +239,24 @@ TEST(VersionTest, testOperatorNotEqual) {
                Version::fromString("0.001.0.0.0"));
 }
 
-TEST(VersionTest, testSerializeToSExpression) {
+TEST(VersionTest, testSerialize) {
   Version obj = Version::fromString("0.1.0");
-  EXPECT_EQ(QByteArray("\"0.1\"\n"), serializeToSExpression(obj).toByteArray());
+  EXPECT_EQ(QByteArray("\"0.1\"\n"), serialize(obj).toByteArray());
 }
 
-TEST(VersionTest, testDeserializeFromSExpression) {
+TEST(VersionTest, testDeserialize) {
   SExpression sexpr = SExpression::createString("0.1");
-  EXPECT_EQ(Version::fromString("0.1"),
-            deserializeFromSExpression<Version>(sexpr, false));
+  EXPECT_EQ(Version::fromString("0.1"), deserialize<Version>(sexpr, false));
 }
 
-TEST(VersionTest, testDeserializeFromEmptySExpression) {
+TEST(VersionTest, testDeserializeEmpty) {
   SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserializeFromSExpression<Version>(sexpr, false), RuntimeError);
+  EXPECT_THROW(deserialize<Version>(sexpr, false), RuntimeError);
 }
 
-TEST(VersionTest, testDeserializeFromInvalidSExpression) {
+TEST(VersionTest, testDeserializeInvalid) {
   SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserializeFromSExpression<Version>(sexpr, false), RuntimeError);
+  EXPECT_THROW(deserialize<Version>(sexpr, false), RuntimeError);
 }
 
 /*******************************************************************************

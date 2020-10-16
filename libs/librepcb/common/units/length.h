@@ -617,13 +617,12 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Length& obj) {
+inline SExpression serialize(const Length& obj) {
   return SExpression::createToken(obj.toMmString());
 }
 
 template <>
-inline Length deserializeFromSExpression(const SExpression& sexpr,
-                                         bool throwIfEmpty) {
+inline Length deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Length::fromMm(str);
 }
@@ -737,13 +736,12 @@ inline bool operator!=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
 }
 
 template <>
-inline SExpression serializeToSExpression(const UnsignedLength& obj) {
+inline SExpression serialize(const UnsignedLength& obj) {
   return SExpression::createToken(obj->toMmString());
 }
 
 template <>
-inline UnsignedLength deserializeFromSExpression(const SExpression& sexpr,
-                                                 bool throwIfEmpty) {
+inline UnsignedLength deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return UnsignedLength(Length::fromMm(str));
 }
@@ -935,13 +933,12 @@ inline bool operator!=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
 }
 
 template <>
-inline SExpression serializeToSExpression(const PositiveLength& obj) {
+inline SExpression serialize(const PositiveLength& obj) {
   return SExpression::createToken(obj->toMmString());
 }
 
 template <>
-inline PositiveLength deserializeFromSExpression(const SExpression& sexpr,
-                                                 bool throwIfEmpty) {
+inline PositiveLength deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return PositiveLength(Length::fromMm(str));
 }

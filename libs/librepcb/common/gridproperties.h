@@ -86,7 +86,7 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const GridProperties::Type_t& obj) {
+inline SExpression serialize(const GridProperties::Type_t& obj) {
   switch (obj) {
     case GridProperties::Type_t::Off:
       return SExpression::createToken("off");
@@ -100,8 +100,8 @@ inline SExpression serializeToSExpression(const GridProperties::Type_t& obj) {
 }
 
 template <>
-inline GridProperties::Type_t deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
+inline GridProperties::Type_t deserialize(const SExpression& sexpr,
+                                          bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "off")
     return GridProperties::Type_t::Off;

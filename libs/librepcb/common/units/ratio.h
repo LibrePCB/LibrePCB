@@ -274,13 +274,12 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Ratio& obj) {
+inline SExpression serialize(const Ratio& obj) {
   return SExpression::createToken(obj.toNormalizedString());
 }
 
 template <>
-inline Ratio deserializeFromSExpression(const SExpression& sexpr,
-                                        bool throwIfEmpty) {
+inline Ratio deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Ratio::fromNormalized(str);
 }
@@ -330,13 +329,12 @@ using UnsignedRatio =
                                 UnsignedRatioVerifier>;
 
 template <>
-inline SExpression serializeToSExpression(const UnsignedRatio& obj) {
+inline SExpression serialize(const UnsignedRatio& obj) {
   return SExpression::createToken(obj->toNormalizedString());
 }
 
 template <>
-inline UnsignedRatio deserializeFromSExpression(const SExpression& sexpr,
-                                                bool throwIfEmpty) {
+inline UnsignedRatio deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return UnsignedRatio(Ratio::fromNormalized(str));
 }

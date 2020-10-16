@@ -389,13 +389,12 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Angle& obj) {
+inline SExpression serialize(const Angle& obj) {
   return SExpression::createToken(obj.toDegString());
 }
 
 template <>
-inline Angle deserializeFromSExpression(const SExpression& sexpr,
-                                        bool throwIfEmpty) {
+inline Angle deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Angle::fromDeg(str);  // can throw
 }

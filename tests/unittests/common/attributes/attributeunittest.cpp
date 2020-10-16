@@ -39,9 +39,9 @@ class AttributeUnitTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(AttributeUnitTest, testSerializeToSExpression) {
+TEST_F(AttributeUnitTest, testSerialize) {
   AttributeUnit unit("volt", "V", {});
-  EXPECT_EQ("volt\n", serializeToSExpression(unit).toByteArray());
+  EXPECT_EQ("volt\n", serialize(unit).toByteArray());
 }
 
 /*******************************************************************************

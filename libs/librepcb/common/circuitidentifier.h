@@ -119,13 +119,13 @@ inline QString operator%(const CircuitIdentifier& lhs,
 }
 
 template <>
-inline SExpression serializeToSExpression(const CircuitIdentifier& obj) {
+inline SExpression serialize(const CircuitIdentifier& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline CircuitIdentifier deserializeFromSExpression(const SExpression& sexpr,
-                                                    bool throwIfEmpty) {
+inline CircuitIdentifier deserialize(const SExpression& sexpr,
+                                     bool throwIfEmpty) {
   return CircuitIdentifier(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 

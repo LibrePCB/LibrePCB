@@ -330,13 +330,12 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const LengthUnit& obj) {
+inline SExpression serialize(const LengthUnit& obj) {
   return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline LengthUnit deserializeFromSExpression(const SExpression& sexpr,
-                                             bool throwIfEmpty) {
+inline LengthUnit deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   return LengthUnit::fromString(
       sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }

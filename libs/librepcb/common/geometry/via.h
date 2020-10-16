@@ -127,7 +127,7 @@ using CmdViasSwap = CmdListElementsSwap<Via, ViaListNameProvider, Via::Event>;
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Via::Shape& obj) {
+inline SExpression serialize(const Via::Shape& obj) {
   switch (obj) {
     case Via::Shape::Round:
       return SExpression::createToken("round");
@@ -141,8 +141,7 @@ inline SExpression serializeToSExpression(const Via::Shape& obj) {
 }
 
 template <>
-inline Via::Shape deserializeFromSExpression(const SExpression& sexpr,
-                                             bool throwIfEmpty) {
+inline Via::Shape deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "round")
     return Via::Shape::Round;

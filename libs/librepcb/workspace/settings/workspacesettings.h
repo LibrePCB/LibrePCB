@@ -213,7 +213,7 @@ public:
 
 // Serialize settings values
 template <>
-inline SExpression serializeToSExpression(
+inline SExpression serialize(
     const workspace::WorkspaceSettings::PdfOpenBehavior& b) {
   using namespace workspace;
   switch (b) {
@@ -229,7 +229,7 @@ inline SExpression serializeToSExpression(
 }
 
 template <>
-inline workspace::WorkspaceSettings::PdfOpenBehavior deserializeFromSExpression(
+inline workspace::WorkspaceSettings::PdfOpenBehavior deserialize(
     const SExpression& sexpr, bool throwIfEmpty) {
   using namespace workspace;
   QString str = sexpr.getStringOrToken(throwIfEmpty);

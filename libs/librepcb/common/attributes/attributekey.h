@@ -96,13 +96,12 @@ inline bool operator!=(const QString& lhs, const AttributeKey& rhs) noexcept {
 }
 
 template <>
-inline SExpression serializeToSExpression(const AttributeKey& obj) {
+inline SExpression serialize(const AttributeKey& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline AttributeKey deserializeFromSExpression(const SExpression& sexpr,
-                                               bool throwIfEmpty) {
+inline AttributeKey deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   return AttributeKey(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 

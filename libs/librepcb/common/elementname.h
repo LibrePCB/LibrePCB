@@ -115,13 +115,12 @@ inline ElementName operator%(const ElementName& lhs,
 }
 
 template <>
-inline SExpression serializeToSExpression(const ElementName& obj) {
+inline SExpression serialize(const ElementName& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline ElementName deserializeFromSExpression(const SExpression& sexpr,
-                                              bool throwIfEmpty) {
+inline ElementName deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   return ElementName(sexpr.getStringOrToken(throwIfEmpty));  // can throw
 }
 

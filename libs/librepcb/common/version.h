@@ -223,13 +223,12 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Version& obj) {
+inline SExpression serialize(const Version& obj) {
   return SExpression::createString(obj.toStr());
 }
 
 template <>
-inline Version deserializeFromSExpression(const SExpression& sexpr,
-                                          bool throwIfEmpty) {
+inline Version deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return Version::fromString(str);  // can throw
 }

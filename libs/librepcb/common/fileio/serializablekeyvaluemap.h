@@ -89,9 +89,8 @@ public:
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Key \"%1\" defined multiple times.").arg(key));
       }
-      mValues.insert(key,
-                     deserializeFromSExpression<typename T::ValueType>(
-                         value, false));  // can throw
+      mValues.insert(
+          key, deserialize<typename T::ValueType>(value, false));  // can throw
     }
     if (!mValues.contains(QString(""))) {
       throw RuntimeError(__FILE__, __LINE__,

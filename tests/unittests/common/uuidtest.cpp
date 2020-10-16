@@ -179,42 +179,36 @@ TEST_P(UuidTest, testTryFromString) {
   }
 }
 
-TEST_P(UuidTest, testSerializeToSExpression) {
+TEST_P(UuidTest, testSerialize) {
   const UuidTestData& data = GetParam();
   if (data.valid) {
     Uuid uuid = Uuid::fromString(data.uuid);
-    EXPECT_EQ(data.uuid, serializeToSExpression(uuid).getStringOrToken());
-    EXPECT_EQ(
-        data.uuid,
-        serializeToSExpression(tl::make_optional(uuid)).getStringOrToken());
+    EXPECT_EQ(data.uuid, serialize(uuid).getStringOrToken());
+    EXPECT_EQ(data.uuid, serialize(tl::make_optional(uuid)).getStringOrToken());
   }
 }
 
-TEST_P(UuidTest, testDeserializeFromSExpression) {
+TEST_P(UuidTest, testDeserialize) {
   const UuidTestData& data = GetParam();
   SExpression sexpr = SExpression::createToken(data.uuid);
   if (data.valid) {
+    EXPECT_EQ(data.uuid, deserialize<Uuid>(sexpr, false).toStr());
     EXPECT_EQ(data.uuid,
-              deserializeFromSExpression<Uuid>(sexpr, false).toStr());
-    EXPECT_EQ(
-        data.uuid,
-        deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false)->toStr());
+              deserialize<tl::optional<Uuid>>(sexpr, false)->toStr());
   } else {
-    EXPECT_THROW(deserializeFromSExpression<Uuid>(sexpr, false), Exception);
-    EXPECT_THROW(deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false),
-                 Exception);
+    EXPECT_THROW(deserialize<Uuid>(sexpr, false), Exception);
+    EXPECT_THROW(deserialize<tl::optional<Uuid>>(sexpr, false), Exception);
   }
 }
 
-TEST(UuidTest, testSerializeOptionalToSExpression) {
+TEST(UuidTest, testSerializeOptional) {
   tl::optional<Uuid> uuid = tl::nullopt;
-  EXPECT_EQ("none", serializeToSExpression(uuid).getStringOrToken());
+  EXPECT_EQ("none", serialize(uuid).getStringOrToken());
 }
 
-TEST(UuidTest, testDeserializeOptionalFromSExpression) {
+TEST(UuidTest, testDeserializeOptional) {
   SExpression sexpr = SExpression::createToken("none");
-  EXPECT_EQ(tl::nullopt,
-            deserializeFromSExpression<tl::optional<Uuid>>(sexpr, false));
+  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<Uuid>>(sexpr, false));
 }
 
 /*******************************************************************************

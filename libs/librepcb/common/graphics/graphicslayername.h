@@ -95,13 +95,13 @@ inline bool operator!=(const QString& lhs,
 }
 
 template <>
-inline SExpression serializeToSExpression(const GraphicsLayerName& obj) {
+inline SExpression serialize(const GraphicsLayerName& obj) {
   return SExpression::createToken(*obj);
 }
 
 template <>
-inline GraphicsLayerName deserializeFromSExpression(const SExpression& sexpr,
-                                                    bool throwIfEmpty) {
+inline GraphicsLayerName deserialize(const SExpression& sexpr,
+                                     bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   return GraphicsLayerName(str);  // can throw
 }

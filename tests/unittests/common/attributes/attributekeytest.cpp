@@ -72,27 +72,26 @@ TEST_P(AttributeKeyTest, testClean) {
   }
 }
 
-TEST_P(AttributeKeyTest, testSerializeToSExpression) {
+TEST_P(AttributeKeyTest, testSerialize) {
   const AttributeKeyTestData& data = GetParam();
 
   if (data.valid) {
     AttributeKey obj(data.input);
-    EXPECT_EQ("\"" % data.input % "\"\n",
-              serializeToSExpression(obj).toByteArray());
+    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj).toByteArray());
   }
 }
 
-TEST_P(AttributeKeyTest, testDeserializeFromSExpression) {
+TEST_P(AttributeKeyTest, testDeserialize) {
   const AttributeKeyTestData& data = GetParam();
 
   if (data.valid) {
     EXPECT_EQ(AttributeKey(data.input),
-              deserializeFromSExpression<AttributeKey>(
-                  SExpression::createString(data.input), false));
+              deserialize<AttributeKey>(SExpression::createString(data.input),
+                                        false));
   } else {
-    EXPECT_THROW(deserializeFromSExpression<AttributeKey>(
-                     SExpression::createString(data.input), false),
-                 RuntimeError);
+    EXPECT_THROW(
+        deserialize<AttributeKey>(SExpression::createString(data.input), false),
+        RuntimeError);
   }
 }
 

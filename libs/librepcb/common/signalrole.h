@@ -131,13 +131,12 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const SignalRole& obj) {
+inline SExpression serialize(const SignalRole& obj) {
   return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline SignalRole deserializeFromSExpression(const SExpression& sexpr,
-                                             bool throwIfEmpty) {
+inline SignalRole deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   foreach (const SignalRole& role, SignalRole::getAllRoles()) {
     if (role.toStr() == str) {

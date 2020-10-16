@@ -42,27 +42,23 @@ class SignalRoleTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST(SignalRoleTest, testSerializeToSExpression) {
-  EXPECT_EQ("opendrain\n",
-            serializeToSExpression(SignalRole::opendrain()).toByteArray());
+TEST(SignalRoleTest, testSerialize) {
+  EXPECT_EQ("opendrain\n", serialize(SignalRole::opendrain()).toByteArray());
 }
 
-TEST(SignalRoleTest, testDeserializeFromSExpression) {
+TEST(SignalRoleTest, testDeserialize) {
   SExpression sexpr = SExpression::createString("opendrain");
-  EXPECT_EQ(SignalRole::opendrain(),
-            deserializeFromSExpression<SignalRole>(sexpr, false));
+  EXPECT_EQ(SignalRole::opendrain(), deserialize<SignalRole>(sexpr, false));
 }
 
-TEST(SignalRoleTest, testDeserializeFromEmptySExpression) {
+TEST(SignalRoleTest, testDeserializeEmpty) {
   SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserializeFromSExpression<SignalRole>(sexpr, false),
-               RuntimeError);
+  EXPECT_THROW(deserialize<SignalRole>(sexpr, false), RuntimeError);
 }
 
-TEST(SignalRoleTest, testDeserializeFromInvalidSExpression) {
+TEST(SignalRoleTest, testDeserializeInvalid) {
   SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserializeFromSExpression<SignalRole>(sexpr, false),
-               RuntimeError);
+  EXPECT_THROW(deserialize<SignalRole>(sexpr, false), RuntimeError);
 }
 
 /*******************************************************************************

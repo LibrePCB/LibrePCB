@@ -73,7 +73,7 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const HAlign& obj) {
+inline SExpression serialize(const HAlign& obj) {
   switch (obj.toQtAlignFlag()) {
     case Qt::AlignLeft:
       return SExpression::createToken("left");
@@ -87,8 +87,7 @@ inline SExpression serializeToSExpression(const HAlign& obj) {
 }
 
 template <>
-inline HAlign deserializeFromSExpression(const SExpression& sexpr,
-                                         bool throwIfEmpty) {
+inline HAlign deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "left")
     return HAlign::left();
@@ -144,7 +143,7 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const VAlign& obj) {
+inline SExpression serialize(const VAlign& obj) {
   switch (obj.toQtAlignFlag()) {
     case Qt::AlignTop:
       return SExpression::createToken("top");
@@ -158,8 +157,7 @@ inline SExpression serializeToSExpression(const VAlign& obj) {
 }
 
 template <>
-inline VAlign deserializeFromSExpression(const SExpression& sexpr,
-                                         bool throwIfEmpty) {
+inline VAlign deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   QString str = sexpr.getStringOrToken(throwIfEmpty);
   if (str == "top")
     return VAlign::top();
