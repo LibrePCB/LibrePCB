@@ -46,6 +46,13 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
 
+# QuaZIP
+!contains(UNBUNDLE, quazip) {
+    LIBS += -lquazip -lz
+    INCLUDEPATH += ../../libs/quazip
+    DEPENDPATH += ../../libs/quazip
+}
+
 # polyclipping
 !contains(UNBUNDLE, polyclipping) {
     LIBS += -lpolyclipping
