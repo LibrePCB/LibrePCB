@@ -94,7 +94,7 @@ QString MarkdownConverter::convertMarkdownToHtml(
   // now (rendering README files in the project manager) this is fine, because
   // it makes the API simpler (QString in, QString out).
   QTextDocument document;
-  document.setMarkdown(markdown, QTextDocument::MarkdownDialectCommonMark);
+  document.setMarkdown(markdown, QTextDocument::MarkdownDialectGitHub);
   return document.toHtml();
 }
 #endif
