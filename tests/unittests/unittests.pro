@@ -75,6 +75,7 @@ SOURCES += \
     common/applicationtest.cpp \
     common/attributes/attributekeytest.cpp \
     common/attributes/attributesubstitutortest.cpp \
+    common/boarddesignrulestest.cpp \
     common/circuitidentifiertest.cpp \
     common/fileio/csvfiletest.cpp \
     common/fileio/directorylocktest.cpp \
