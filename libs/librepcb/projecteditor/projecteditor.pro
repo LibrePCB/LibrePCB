@@ -17,6 +17,8 @@ isEmpty(UNBUNDLE) {
     INSTALLS += target
 }
 
+LIBS += -L../../../output -llibrepcbcommon -llibrepcblibrary -llibrepcblibraryeditor -llibrepcbproject -llibrepcbworkspace
+
 INCLUDEPATH += \
     ../../ \
     ../../type_safe/include \

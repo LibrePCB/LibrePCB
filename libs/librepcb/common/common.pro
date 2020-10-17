@@ -331,11 +331,14 @@ FORMS += \
     dialogs/textpropertiesdialog.ui \
     widgets/alignmentselector.ui \
 
+LIBS += -L../../../output -lmuparser -lsexpresso
+
 # quazip
 contains(UNBUNDLE, quazip) {
     PKGCONFIG += quazip
 } else {
     INCLUDEPATH += ../../quazip
+    LIBS += -lquazip
 }
 
 # polyclipping
@@ -343,6 +346,7 @@ contains(UNBUNDLE, polyclipping) {
     PKGCONFIG += polyclipping
 } else {
     INCLUDEPATH += ../../polyclipping
+    LIBS += -lpolyclipping
 }
 
 # fontobene-qt5
