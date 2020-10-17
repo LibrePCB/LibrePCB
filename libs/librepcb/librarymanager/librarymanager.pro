@@ -13,7 +13,7 @@ QT += core widgets xml sql printsupport network
 isEmpty(UNBUNDLE) {
     CONFIG += staticlib
 } else {
-    target.path = $${PREFIX}/lib
+    target.path = $${LIBDIR}
     INSTALLS += target
 }
 
