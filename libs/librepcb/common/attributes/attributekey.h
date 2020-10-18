@@ -101,8 +101,8 @@ inline SExpression serialize(const AttributeKey& obj) {
 }
 
 template <>
-inline AttributeKey deserialize(const SExpression& sexpr, bool throwIfEmpty) {
-  return AttributeKey(sexpr.getStringOrToken(throwIfEmpty));  // can throw
+inline AttributeKey deserialize(const SExpression& sexpr) {
+  return AttributeKey(sexpr.getStringOrToken());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const AttributeKey& obj) {

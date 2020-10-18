@@ -178,9 +178,8 @@ inline SExpression serialize(const library::FootprintPad::BoardSide& obj) {
 }
 
 template <>
-inline library::FootprintPad::BoardSide deserialize(const SExpression& sexpr,
-                                                    bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline library::FootprintPad::BoardSide deserialize(const SExpression& sexpr) {
+  QString str = sexpr.getStringOrToken();
   if (str == QLatin1String("top"))
     return library::FootprintPad::BoardSide::TOP;
   else if (str == QLatin1String("bottom"))
@@ -206,9 +205,8 @@ inline SExpression serialize(const library::FootprintPad::Shape& obj) {
 }
 
 template <>
-inline library::FootprintPad::Shape deserialize(const SExpression& sexpr,
-                                                bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline library::FootprintPad::Shape deserialize(const SExpression& sexpr) {
+  QString str = sexpr.getStringOrToken();
   if (str == QLatin1String("round"))
     return library::FootprintPad::Shape::ROUND;
   else if (str == QLatin1String("rect"))

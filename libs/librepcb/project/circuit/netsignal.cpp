@@ -52,7 +52,7 @@ NetSignal::NetSignal(Circuit& circuit, const SExpression& node)
     mIsAddedToCircuit(false),
     mIsHighlighted(false),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mName(node.getValueByPath<CircuitIdentifier>("name")),
     mHasAutoName(node.getValueByPath<bool>("auto")),
     mNetClass(nullptr) {
   Uuid netclassUuid = node.getValueByPath<Uuid>("netclass");

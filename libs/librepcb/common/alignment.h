@@ -87,8 +87,8 @@ inline SExpression serialize(const HAlign& obj) {
 }
 
 template <>
-inline HAlign deserialize(const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline HAlign deserialize(const SExpression& sexpr) {
+  QString str = sexpr.getStringOrToken();
   if (str == "left")
     return HAlign::left();
   else if (str == "center")
@@ -98,7 +98,7 @@ inline HAlign deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   else {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(HAlign::tr("Invalid horizontal alignment: \"%1\"")).arg(str));
+        HAlign::tr("Invalid horizontal alignment: \"%1\"").arg(str));
   }
 }
 
@@ -157,8 +157,8 @@ inline SExpression serialize(const VAlign& obj) {
 }
 
 template <>
-inline VAlign deserialize(const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline VAlign deserialize(const SExpression& sexpr) {
+  QString str = sexpr.getStringOrToken();
   if (str == "top")
     return VAlign::top();
   else if (str == "center")
@@ -168,7 +168,7 @@ inline VAlign deserialize(const SExpression& sexpr, bool throwIfEmpty) {
   else {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(VAlign::tr("Invalid vertical alignment: \"%1\"")).arg(str));
+        VAlign::tr("Invalid vertical alignment: \"%1\"").arg(str));
   }
 }
 

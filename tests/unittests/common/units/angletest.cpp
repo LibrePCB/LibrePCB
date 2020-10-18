@@ -82,9 +82,9 @@ TEST_P(AngleTest, testDeserialize) {
 
   SExpression sexpr = SExpression::createString(data.origStr);
   if (data.valid) {
-    EXPECT_EQ(data.value, deserialize<Angle>(sexpr, false));
+    EXPECT_EQ(data.value, deserialize<Angle>(sexpr));
   } else {
-    EXPECT_THROW(deserialize<Angle>(sexpr, false), RuntimeError);
+    EXPECT_THROW(deserialize<Angle>(sexpr), RuntimeError);
   }
 }
 

@@ -236,7 +236,7 @@ Board::Board(Project& project,
       mUuid = root.getChildByIndex(0).getValue<Uuid>();
       mName = root.getValueByPath<ElementName>("name");
       if (const SExpression* child = root.tryGetChildByPath("default_font")) {
-        mDefaultFontFileName = child->getValueOfFirstChild<QString>(true);
+        mDefaultFontFileName = child->getValueOfFirstChild<QString>();
       } else {
         mDefaultFontFileName = qApp->getDefaultStrokeFontName();
       }

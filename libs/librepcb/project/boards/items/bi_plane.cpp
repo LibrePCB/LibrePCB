@@ -65,7 +65,7 @@ BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
 BI_Plane::BI_Plane(Board& board, const SExpression& node)
   : BI_Base(board),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<QString>("layer", true)),
+    mLayerName(node.getValueByPath<QString>("layer")),
     mNetSignal(nullptr),
     mOutline(),
     mMinWidth(node.getValueByPath<UnsignedLength>("min_width")),

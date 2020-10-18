@@ -88,7 +88,7 @@ public:
         libComponentUuid(node.getValueByPath<Uuid>("lib_component")),
         libVariantUuid(node.getValueByPath<Uuid>("lib_variant")),
         libDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
-        name(node.getValueByPath<CircuitIdentifier>("name", true)),
+        name(node.getValueByPath<CircuitIdentifier>("name")),
         value(node.getValueByPath<QString>("value")),
         attributes(node),
         onEdited(*this) {}

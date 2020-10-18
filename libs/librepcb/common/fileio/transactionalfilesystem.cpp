@@ -474,19 +474,19 @@ void TransactionalFileSystem::loadDiff(const FilePath& fp) {
   SExpression root =
       SExpression::parse(FileUtils::readFile(fp), fp);  // can throw
   QString modifiedFilesDirName =
-      root.getValueByPath<QString>("modified_files_directory", true);
+      root.getValueByPath<QString>("modified_files_directory");
   FilePath modifiedFilesDir = fp.getParentDir().getPathTo(modifiedFilesDirName);
   foreach (const SExpression& node, root.getChildren("modified_file")) {
-    QString relPath = node.getValueOfFirstChild<QString>(true);
+    QString relPath = node.getValueOfFirstChild<QString>();
     FilePath absPath = modifiedFilesDir.getPathTo(relPath);
     mModifiedFiles.insert(relPath, FileUtils::readFile(absPath));  // can throw
   }
   foreach (const SExpression& node, root.getChildren("removed_file")) {
-    QString relPath = node.getValueOfFirstChild<QString>(true);
+    QString relPath = node.getValueOfFirstChild<QString>();
     mRemovedFiles.insert(relPath);
   }
   foreach (const SExpression& node, root.getChildren("removed_directory")) {
-    QString relPath = node.getValueOfFirstChild<QString>(true);
+    QString relPath = node.getValueOfFirstChild<QString>();
     mRemovedDirs.insert(relPath);
   }
 }

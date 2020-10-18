@@ -64,7 +64,7 @@ Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
 Circle::Circle(const SExpression& node)
   : onEdited(*this),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer")),
     mLineWidth(node.getValueByPath<UnsignedLength>("width")),
     mIsFilled(node.getValueByPath<bool>("fill")),
     mIsGrabArea(node.getValueByPath<bool>("grab_area")),

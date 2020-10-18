@@ -98,14 +98,11 @@ inline SExpression serialize(const StrokeTextSpacing& obj) {
 }
 
 template <>
-inline StrokeTextSpacing deserialize(const SExpression& sexpr,
-                                     bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  if (str == "auto") {
+inline StrokeTextSpacing deserialize(const SExpression& sexpr) {
+  if (sexpr.getStringOrToken() == "auto") {
     return StrokeTextSpacing();
   } else {
-    return StrokeTextSpacing(
-        deserialize<Ratio>(sexpr, throwIfEmpty));  // can throw
+    return StrokeTextSpacing(deserialize<Ratio>(sexpr));  // can throw
   }
 }
 

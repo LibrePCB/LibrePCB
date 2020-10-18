@@ -61,7 +61,7 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
 SymbolPin::SymbolPin(const SExpression& node)
   : onEdited(*this),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mName(node.getValueByPath<CircuitIdentifier>("name")),
     mPosition(node.getChildByPath("position")),
     mLength(node.getValueByPath<UnsignedLength>("length")),
     mRotation(node.getValueByPath<Angle>("rotation")),

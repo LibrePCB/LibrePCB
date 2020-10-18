@@ -170,8 +170,8 @@ inline SExpression serialize(const Uuid& obj) {
 }
 
 template <>
-inline Uuid deserialize(const SExpression& sexpr, bool throwIfEmpty) {
-  return Uuid::fromString(sexpr.getStringOrToken(throwIfEmpty));
+inline Uuid deserialize(const SExpression& sexpr) {
+  return Uuid::fromString(sexpr.getStringOrToken());  // can throw
 }
 
 template <>
@@ -184,13 +184,11 @@ inline SExpression serialize(const tl::optional<Uuid>& obj) {
 }
 
 template <>
-inline tl::optional<Uuid> deserialize(const SExpression& sexpr,
-                                      bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  if (str == "none") {
+inline tl::optional<Uuid> deserialize(const SExpression& sexpr) {
+  if (sexpr.getStringOrToken() == "none") {
     return tl::nullopt;
   } else {
-    return deserialize<Uuid>(sexpr, throwIfEmpty);  // can throw
+    return deserialize<Uuid>(sexpr);  // can throw
   }
 }
 

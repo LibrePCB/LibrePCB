@@ -64,7 +64,7 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
 Text::Text(const SExpression& node)
   : onEdited(*this),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
+    mLayerName(node.getValueByPath<GraphicsLayerName>("layer")),
     mText(node.getValueByPath<QString>("value")),
     mPosition(node.getChildByPath("position")),
     mRotation(node.getValueByPath<Angle>("rotation")),

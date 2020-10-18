@@ -52,7 +52,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mName(node.getValueByPath<CircuitIdentifier>("name")),
     mValue(node.getValueByPath<QString>("value")),
     mDefaultDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
     mLibComponent(nullptr),

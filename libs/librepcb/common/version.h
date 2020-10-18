@@ -228,9 +228,8 @@ inline SExpression serialize(const Version& obj) {
 }
 
 template <>
-inline Version deserialize(const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return Version::fromString(str);  // can throw
+inline Version deserialize(const SExpression& sexpr) {
+  return Version::fromString(sexpr.getStringOrToken());  // can throw
 }
 
 /*******************************************************************************

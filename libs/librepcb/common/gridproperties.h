@@ -100,9 +100,8 @@ inline SExpression serialize(const GridProperties::Type_t& obj) {
 }
 
 template <>
-inline GridProperties::Type_t deserialize(const SExpression& sexpr,
-                                          bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline GridProperties::Type_t deserialize(const SExpression& sexpr) {
+  QString str = sexpr.getStringOrToken();
   if (str == "off")
     return GridProperties::Type_t::Off;
   else if (str == "lines")
@@ -112,7 +111,7 @@ inline GridProperties::Type_t deserialize(const SExpression& sexpr,
   else
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(GridProperties::tr("Unknown grid type: \"%1\"")).arg(str));
+        GridProperties::tr("Unknown grid type: \"%1\"").arg(str));
 }
 
 /*******************************************************************************

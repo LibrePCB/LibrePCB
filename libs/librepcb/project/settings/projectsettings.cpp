@@ -57,13 +57,13 @@ ProjectSettings::ProjectSettings(Project& project, bool create)
     // locale order
     foreach (const SExpression& node,
              root.getChildByPath("library_locale_order").getChildren()) {
-      mLocaleOrder.append(node.getValueOfFirstChild<QString>(true));
+      mLocaleOrder.append(node.getValueOfFirstChild<QString>());
     }
 
     // norm order
     foreach (const SExpression& node,
              root.getChildByPath("library_norm_order").getChildren()) {
-      mNormOrder.append(node.getValueOfFirstChild<QString>(true));
+      mNormOrder.append(node.getValueOfFirstChild<QString>());
     }
   }
 

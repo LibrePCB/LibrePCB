@@ -46,7 +46,7 @@ Attribute::Attribute(const Attribute& other) noexcept
 
 Attribute::Attribute(const SExpression& node)
   : onEdited(*this),
-    mKey(node.getChildByIndex(0).getValue<QString>(true)),
+    mKey(node.getChildByIndex(0).getValue<QString>()),
     mType(&AttributeType::fromString(node.getValueByPath<QString>("type"))),
     mValue(node.getValueByPath<QString>("value")),
     mUnit(mType->getUnitFromString(node.getValueByPath<QString>("unit"))) {

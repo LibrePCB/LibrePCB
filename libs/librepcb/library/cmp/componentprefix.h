@@ -109,10 +109,8 @@ inline SExpression serialize(const library::ComponentPrefix& obj) {
 }
 
 template <>
-inline library::ComponentPrefix deserialize(const SExpression& sexpr,
-                                            bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return library::ComponentPrefix(str);  // can throw
+inline library::ComponentPrefix deserialize(const SExpression& sexpr) {
+  return library::ComponentPrefix(sexpr.getStringOrToken());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

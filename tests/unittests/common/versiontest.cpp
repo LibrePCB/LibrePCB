@@ -246,17 +246,17 @@ TEST(VersionTest, testSerialize) {
 
 TEST(VersionTest, testDeserialize) {
   SExpression sexpr = SExpression::createString("0.1");
-  EXPECT_EQ(Version::fromString("0.1"), deserialize<Version>(sexpr, false));
+  EXPECT_EQ(Version::fromString("0.1"), deserialize<Version>(sexpr));
 }
 
 TEST(VersionTest, testDeserializeEmpty) {
   SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<Version>(sexpr, false), RuntimeError);
+  EXPECT_THROW(deserialize<Version>(sexpr), RuntimeError);
 }
 
 TEST(VersionTest, testDeserializeInvalid) {
   SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<Version>(sexpr, false), RuntimeError);
+  EXPECT_THROW(deserialize<Version>(sexpr), RuntimeError);
 }
 
 /*******************************************************************************

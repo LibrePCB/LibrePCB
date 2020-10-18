@@ -183,8 +183,8 @@ public:
 
     explicit Plane(const SExpression& node)
       : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        layer(node.getValueByPath<QString>("layer", true)),
-        netSignalName(node.getValueByPath<QString>("net", true)),
+        layer(node.getValueByPath<QString>("layer")),
+        netSignalName(node.getValueByPath<QString>("net")),
         outline(node),
         minWidth(node.getValueByPath<UnsignedLength>("min_width")),
         minClearance(node.getValueByPath<UnsignedLength>("min_clearance")),

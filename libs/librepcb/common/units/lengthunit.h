@@ -335,9 +335,8 @@ inline SExpression serialize(const LengthUnit& obj) {
 }
 
 template <>
-inline LengthUnit deserialize(const SExpression& sexpr, bool throwIfEmpty) {
-  return LengthUnit::fromString(
-      sexpr.getStringOrToken(throwIfEmpty));  // can throw
+inline LengthUnit deserialize(const SExpression& sexpr) {
+  return LengthUnit::fromString(sexpr.getStringOrToken());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {

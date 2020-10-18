@@ -86,11 +86,10 @@ TEST_P(AttributeKeyTest, testDeserialize) {
 
   if (data.valid) {
     EXPECT_EQ(AttributeKey(data.input),
-              deserialize<AttributeKey>(SExpression::createString(data.input),
-                                        false));
+              deserialize<AttributeKey>(SExpression::createString(data.input)));
   } else {
     EXPECT_THROW(
-        deserialize<AttributeKey>(SExpression::createString(data.input), false),
+        deserialize<AttributeKey>(SExpression::createString(data.input)),
         RuntimeError);
   }
 }

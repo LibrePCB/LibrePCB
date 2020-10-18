@@ -171,9 +171,8 @@ inline SExpression serialize(const project::BI_Plane::ConnectStyle& obj) {
 }
 
 template <>
-inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
-                                                   bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr) {
+  QString str = sexpr.getStringOrToken();
   if (str == "none") return project::BI_Plane::ConnectStyle::None;
   // else if (str == "thermal")  return
   // project::BI_Plane::ConnectStyle::Thermal;
@@ -182,8 +181,7 @@ inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
   else
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(project::BI_Plane::tr("Unknown plane connect style: \"%1\""))
-            .arg(str));
+        project::BI_Plane::tr("Unknown plane connect style: \"%1\"").arg(str));
 }
 
 /*******************************************************************************

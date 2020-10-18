@@ -230,9 +230,9 @@ inline SExpression serialize(
 
 template <>
 inline workspace::WorkspaceSettings::PdfOpenBehavior deserialize(
-    const SExpression& sexpr, bool throwIfEmpty) {
+    const SExpression& sexpr) {
   using namespace workspace;
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  QString str = sexpr.getStringOrToken();
   if (str == QLatin1String("always"))
     return WorkspaceSettings::PdfOpenBehavior::ALWAYS;
   else if (str == QLatin1String("never"))

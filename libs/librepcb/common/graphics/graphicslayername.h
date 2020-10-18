@@ -100,10 +100,8 @@ inline SExpression serialize(const GraphicsLayerName& obj) {
 }
 
 template <>
-inline GraphicsLayerName deserialize(const SExpression& sexpr,
-                                     bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return GraphicsLayerName(str);  // can throw
+inline GraphicsLayerName deserialize(const SExpression& sexpr) {
+  return GraphicsLayerName(sexpr.getStringOrToken());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

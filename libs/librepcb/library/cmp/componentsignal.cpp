@@ -63,7 +63,7 @@ ComponentSignal::ComponentSignal(const Uuid& uuid,
 ComponentSignal::ComponentSignal(const SExpression& node)
   : onEdited(*this),
     mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
+    mName(node.getValueByPath<CircuitIdentifier>("name")),
     mRole(node.getValueByPath<SignalRole>("role")),
     mForcedNetName(node.getValueByPath<QString>("forced_net")),
     mIsRequired(node.getValueByPath<bool>("required")),

@@ -74,14 +74,10 @@ const QString& SExpression::getName() const {
   }
 }
 
-const QString& SExpression::getStringOrToken(bool throwIfEmpty) const {
+const QString& SExpression::getStringOrToken() const {
   if (!isToken() && !isString()) {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue,
                          tr("Node is not a token or string."));
-  }
-  if (mValue.isEmpty() && throwIfEmpty) {
-    throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue,
-                         tr("Node value is empty."));
   }
   return mValue;
 }
