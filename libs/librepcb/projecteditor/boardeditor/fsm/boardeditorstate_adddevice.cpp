@@ -123,6 +123,9 @@ bool BoardEditorState_AddDevice::processGraphicsSceneLeftMouseButtonPressed(
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;
+
+    // Placing finished, leave tool now.
+    emit requestLeavingState();
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     abortCommand(false);

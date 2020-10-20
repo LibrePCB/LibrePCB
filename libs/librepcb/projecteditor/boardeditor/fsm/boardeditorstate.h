@@ -127,6 +127,15 @@ public:
   // Operator Overloadings
   BoardEditorState& operator=(const BoardEditorState& rhs) = delete;
 
+signals:
+  /**
+   * @brief Signal to indicate that the current tool should be exited
+   *
+   * This signal can be emitted by each state to signalize the FSM to leave
+   * the current state and entering the select tool.
+   */
+  void requestLeavingState();
+
 protected:  // Methods
   Board* getActiveBoard() noexcept;
   PositiveLength getGridInterval() const noexcept;

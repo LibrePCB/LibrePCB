@@ -61,6 +61,14 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
   mStates.insert(State::DRAW_PLANE, new BoardEditorState_DrawPlane(context));
   mStates.insert(State::DRAW_TRACE, new BoardEditorState_DrawTrace(context));
   enterNextState(State::SELECT);
+
+  // Connect the requestLeavingState() signal of all states to the
+  // processSelect() method to leave the state. Using a queued connection to
+  // avoid complex nested call stacks of two different states at the same time.
+  foreach (BoardEditorState* state, mStates) {
+    connect(state, &BoardEditorState::requestLeavingState, this,
+            &BoardEditorFsm::processSelect, Qt::QueuedConnection);
+  }
 }
 
 BoardEditorFsm::~BoardEditorFsm() noexcept {
