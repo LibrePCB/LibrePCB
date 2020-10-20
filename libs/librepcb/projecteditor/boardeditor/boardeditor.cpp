@@ -208,6 +208,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // connect some actions which are created with the Qt Designer
   connect(mUi->actionProjectSave, &QAction::triggered, &mProjectEditor,
           &ProjectEditor::saveProject);
+    connect(mUi->actionProjectSaveAs, &QAction::triggered,
+          [this]() { mProjectEditor.saveProjectAs(this); });
   connect(mUi->actionQuit, &QAction::triggered, this, &BoardEditor::close);
   connect(mUi->actionOpenWebsite, &QAction::triggered,
           []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });

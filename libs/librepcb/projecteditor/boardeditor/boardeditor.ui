@@ -78,6 +78,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionProjectSave"/>
+    <addaction name="actionProjectSaveAs"/>
     <addaction name="actionExportLppz"/>
     <addaction name="actionExportAsPdf"/>
     <addaction name="actionExportAsSvg"/>
@@ -302,6 +303,15 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionProjectSaveAs">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save Project</string>
    </property>
   </action>
   <action name="actionProjectClose">
