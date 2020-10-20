@@ -69,6 +69,6 @@ contains(UNBUNDLE, all) {
 # QuaZIP configuration
 contains(UNBUNDLE, quazip) {
     DEFINES += SYSTEM_QUAZIP
-} else {
+} else:isEmpty(UNBUNDLE) {
     DEFINES += QUAZIP_STATIC
 }
