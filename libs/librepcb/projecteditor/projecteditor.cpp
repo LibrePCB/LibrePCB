@@ -229,7 +229,7 @@ bool ProjectEditor::saveProjectAs(QWidget* parent) noexcept {
 
     // Create a new project
     Project* project = Project::create(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)), 
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
         directoryName);
 
     // Save project to its own transactional directory, and then copies it to the
