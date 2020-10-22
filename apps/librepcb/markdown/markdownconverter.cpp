@@ -24,9 +24,13 @@
 
 #include <QtCore>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+#include <qtextdocument.h>
+#else
 extern "C" {
 #include <hoedown/src/html.h>
 }
+#endif
 
 /*******************************************************************************
  *  Namespace
@@ -48,6 +52,7 @@ QString MarkdownConverter::convertMarkdownToHtml(
   }
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
 QString MarkdownConverter::convertMarkdownToHtml(
     const QString& markdown) noexcept {
   // create HTML renderer
@@ -78,6 +83,21 @@ QString MarkdownConverter::convertMarkdownToHtml(
 
   return html;
 }
+#endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+QString MarkdownConverter::convertMarkdownToHtml(
+    const QString& markdown) noexcept {
+  // Use a temporary QTextDocument to convert markdown to HTML.
+  // This is not terribly efficient (we could return a QTextDocument instead),
+  // but since this method is only used in non-performance-sensitive code right
+  // now (rendering README files in the project manager) this is fine, because
+  // it makes the API simpler (QString in, QString out).
+  QTextDocument document;
+  document.setMarkdown(markdown, QTextDocument::MarkdownDialectGitHub);
+  return document.toHtml();
+}
+#endif
 
 /*******************************************************************************
  *  End of File

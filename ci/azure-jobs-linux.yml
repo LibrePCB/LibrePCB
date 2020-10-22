@@ -14,6 +14,7 @@ jobs:
       Ubuntu_1604_Qt_5_14_2_GCC:
         IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.14.2-1
         DEPLOY: true
+        NO_HOEDOWN: true
       Ubuntu_1804_Clang:
         IMAGE: librepcb/librepcb-dev:ubuntu-18.04-2
         CC: clang
@@ -40,6 +41,9 @@ jobs:
   - bash: rm -rf libs/polyclipping
     displayName: Remove bundled polyclipping lib
     condition: and(succeeded(), contains(variables['UNBUNDLE'], 'polyclipping'))
+  - bash: rm -rf libs/hoedown
+    displayName: Remove bundled hoedown lib
+    condition: and(succeeded(), eq(variables['NO_HOEDOWN'], 'true'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_linux_appimage.sh

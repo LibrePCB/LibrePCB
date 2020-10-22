@@ -5,7 +5,6 @@ include(../common.pri)
 
 SUBDIRS = \
     delaunay-triangulation \
-    hoedown \
     googletest \
     librepcb \
     muparser \
@@ -18,8 +17,13 @@ librepcb.depends = \
     muparser \
     optional \
     parseagle \
-    hoedown \
     sexpresso \
+
+# Hoedown is only needed for Qt <5.14
+equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
+    SUBDIRS += hoedown
+    librepcb.depends += hoedown
+}
 
 !contains(UNBUNDLE, quazip) {
     SUBDIRS += quazip
