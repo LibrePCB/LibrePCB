@@ -37,7 +37,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-HoleGraphicsItem::HoleGraphicsItem(Hole& hole,
+HoleGraphicsItem::HoleGraphicsItem(const Hole& hole,
                                    const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept
   : PrimitiveCircleGraphicsItem(parent),
