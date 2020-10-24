@@ -21,15 +21,28 @@ then
 elif [ "$OS" = "mac" ]
 then
 
-  brew update
+  # MacOS resp. homebrew needs workarounds to make it less unstable.
+  # See https://github.com/actions/virtual-environments/issues/1811
+  brew uninstall openssl@1.0.2t || true
+  brew uninstall python@2.7.17 || true
+  brew untap local/openssl || true
+  brew untap local/python2 || true
+
+  # Update homebrow to avoid issues due to outdated package database. But
+  # because even the update sometimes fails, let's ignore any errors with
+  # "|| true" (Apple-style error handling). Maybe this way we get succussful
+  # builds even if homebrow failed, which saves a lot of time and nerves.
+  brew update || true
+
+  # Install Qt
   brew install qt5
   brew link --force qt5
 
-  # python packages
-  pip2 install --user future "flake8==3.7.7"
-  pip2 install --user -r ./tests/cli/requirements.txt
-  pip2 install --user -r ./tests/funq/requirements.txt
-  export PATH="$PATH:`python2 -m site --user-base`/bin"
+  # Install Python packages
+  pip3 install --user future "flake8==3.7.7"
+  pip3 install --user -r ./tests/cli/requirements.txt
+  pip3 install --user -r ./tests/funq/requirements.txt
+  export PATH="$PATH:`python3 -m site --user-base`/bin"
 
   # Qt Installer Framework
   wget -cq "$QTIFW_URL_BASE/QtInstallerFramework-mac-x64.dmg"
