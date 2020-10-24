@@ -105,7 +105,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
       context.currentGraphicsItem->getSelectedHoles();
   foreach (const QSharedPointer<HoleGraphicsItem>& hole, holes) {
     Q_ASSERT(hole);
-    mHoleEditCmds.append(new CmdHoleEdit(hole->getHole()));
+    // Note: The const_cast<> is a bit ugly, but it was by far the easiest
+    // way and is safe since here we know that we're allowed to modify the hole.
+    mHoleEditCmds.append(new CmdHoleEdit(const_cast<Hole&>(hole->getHole())));
     mCenterPos += hole->getHole().getPosition();
     ++count;
   }

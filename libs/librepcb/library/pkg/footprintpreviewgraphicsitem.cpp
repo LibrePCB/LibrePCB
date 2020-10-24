@@ -30,6 +30,7 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/attributes/attributesubstitutor.h>
 #include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
 
 #include <QPrinter>
@@ -80,6 +81,11 @@ FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(
     text.setAttributeProvider(this);
     StrokeTextGraphicsItem* item =
         new StrokeTextGraphicsItem(text, layerProvider);
+    item->setParentItem(this);
+  }
+
+  for (const Hole& hole : footprint.getHoles()) {
+    HoleGraphicsItem* item = new HoleGraphicsItem(hole, layerProvider);
     item->setParentItem(this);
   }
 }

@@ -50,12 +50,12 @@ public:
   // Constructors / Destructor
   HoleGraphicsItem() = delete;
   HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
-  HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
+  HoleGraphicsItem(const Hole& hole, const IF_GraphicsLayerProvider& lp,
                    QGraphicsItem* parent = nullptr) noexcept;
   ~HoleGraphicsItem() noexcept;
 
   // Getters
-  Hole& getHole() noexcept { return mHole; }
+  const Hole& getHole() noexcept { return mHole; }
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -69,7 +69,7 @@ private:  // Methods
                       const QVariant& value) noexcept override;
 
 private:  // Data
-  Hole& mHole;
+  const Hole& mHole;
   const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 
