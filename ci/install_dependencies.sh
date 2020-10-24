@@ -39,10 +39,10 @@ then
   brew link --force qt5
 
   # Install Python packages
-  pip2 install --user future "flake8==3.7.7"
-  pip2 install --user -r ./tests/cli/requirements.txt
-  pip2 install --user -r ./tests/funq/requirements.txt
-  export PATH="$PATH:`python2 -m site --user-base`/bin"
+  pip3 install --user future "flake8==3.7.7"
+  pip3 install --user -r ./tests/cli/requirements.txt
+  pip3 install --user -r ./tests/funq/requirements.txt
+  export PATH="$PATH:`python3 -m site --user-base`/bin"
 
   # Qt Installer Framework
   wget -cq "$QTIFW_URL_BASE/QtInstallerFramework-mac-x64.dmg"
