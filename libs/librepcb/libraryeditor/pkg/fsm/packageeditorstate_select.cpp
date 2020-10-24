@@ -517,9 +517,12 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (HoleGraphicsItem* hole = dynamic_cast<HoleGraphicsItem*>(item)) {
     Q_ASSERT(hole);
-    HolePropertiesDialog dialog(
-        hole->getHole(), mContext.undoStack, getDefaultLengthUnit(),
-        "package_editor/hole_properties_dialog", &mContext.editorWidget);
+    // Note: The const_cast<> is a bit ugly, but it was by far the easiest
+    // way and is safe since here we know that we're allowed to modify the hole.
+    HolePropertiesDialog dialog(const_cast<Hole&>(hole->getHole()),
+                                mContext.undoStack, getDefaultLengthUnit(),
+                                "package_editor/hole_properties_dialog",
+                                &mContext.editorWidget);
     dialog.exec();
     return true;
   }
