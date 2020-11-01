@@ -24,7 +24,6 @@ isEmpty(UNBUNDLE) {
 
 INCLUDEPATH += \
     ../../ \
-    ../../sexpresso \
     ../../type_safe/include \
     ../../type_safe/external/debug_assert \
     ../../muparser/include \

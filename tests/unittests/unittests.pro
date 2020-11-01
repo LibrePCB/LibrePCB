@@ -25,7 +25,6 @@ LIBS += \
     -llibrepcbproject \
     -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
     -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
-    -lsexpresso \
     -lmuparser \
     -lparseagle \
 
@@ -48,12 +47,10 @@ DEPENDPATH += \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
     ../../libs/parseagle \
-    ../../libs/sexpresso \
     ../../libs/muparser \
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libgoogletest.a \
-    $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libmuparser.a \
 
 isEmpty(UNBUNDLE) {
