@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "sexpression.h"
 
-#include <sexpresso/sexpresso.hpp>
+#include "../application.h"
 
 #include <QtCore>
 
@@ -47,30 +47,6 @@ SExpression::SExpression(const SExpression& other) noexcept
     mValue(other.mValue),
     mChildren(other.mChildren),
     mFilePath(other.mFilePath) {
-}
-
-SExpression::SExpression(sexpresso::Sexp& sexp, const FilePath& filePath)
-  : mType(Type::List), mValue(), mFilePath(filePath) {
-  if (sexp.childCount() < 1) {
-    throw RuntimeError(__FILE__, __LINE__);
-  }
-
-  if (sexp.isSexp()) {
-    sexpresso::Sexp& first = sexp.getChild(0);
-    if (!first.isString()) {
-      throw RuntimeError(__FILE__, __LINE__);
-    }
-    mValue = QString::fromStdString(first.getString());
-    for (auto&& arg : sexp.arguments()) {
-      mChildren.append(SExpression(arg, filePath));
-    }
-  } else if (sexp.isString()) {
-    mValue = QString::fromStdString(sexp.getString());
-    mType = Type::String;
-  } else {
-    throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                         tr("Unknown node type."));
-  }
 }
 
 SExpression::~SExpression() noexcept {
@@ -211,21 +187,58 @@ SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-QString SExpression::escapeString(const QString& string) const noexcept {
-  return QString::fromStdString(sexpresso::escape(string.toStdString()));
+QString SExpression::escapeString(const QString& string) noexcept {
+  static QHash<QChar, QString> replacements;
+  if (replacements.isEmpty()) {
+    replacements = {
+        {'"', "\\\""},  // Double quote *must* be escaped
+        {'\\', "\\\\"},  // Backslash *must* be escaped
+        {'\b', "\\b"},  // Escape backspace to increase readability
+        {'\f', "\\f"},  // Escape form feed to increase readability
+        {'\n', "\\n"},  // Escape line feed to increase readability
+        {'\r', "\\r"},  // Escape carriage return to increase readability
+        {'\t', "\\t"},  // Escape horizontal tab to increase readability
+        {'\v', "\\v"},  // Escape vertical tab to increase readability
+    };
+    if (qApp->getFileFormatVersion() < Version::fromString("0.2")) {
+      // Until LibrePCB 0.1.5 we used sexpresso::escape() to escape strings.
+      // This function escaped more characters than actually needed. To avoid
+      // modifying the file format in LibrePCB 0.1.6, we emulate the same
+      // escaping behavior. In LibrePCB 0.2.x we are allowed to modify the file
+      // format, so let's get rid of these legacy escaping behavior.
+      replacements.insert('\'', "\\\'");  // Single quote
+      replacements.insert('\?', "\\?");  // Question mark
+      replacements.insert('\a', "\\a");  // Audible bell
+    }
+  }
+
+  QString escaped;
+  escaped.reserve(string.length() + (string.length() / 10));
+  foreach (const QChar& c, string) { escaped += replacements.value(c, c); }
+  return escaped;
 }
 
-bool SExpression::isValidListName(const QString& name) const noexcept {
-  return QRegExp("[a-z][a-z0-9_]*").exactMatch(name);
+bool SExpression::isValidToken(const QString& token) noexcept {
+  if (token.isEmpty()) {
+    return false;
+  }
+  foreach (const QChar& c, token) {
+    if (!isValidTokenChar(c)) {
+      return false;
+    }
+  }
+  return true;
 }
 
-bool SExpression::isValidToken(const QString& token) const noexcept {
-  return QRegExp("[a-zA-Z0-9\\.:_-]+").exactMatch(token);
+bool SExpression::isValidTokenChar(const QChar& c) noexcept {
+  static QSet<QChar> allowedSpecialChars = {'\\', '.', ':', '_', '-'};
+  return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) ||
+      ((c >= '0') && (c <= '9')) || allowedSpecialChars.contains(c);
 }
 
 QString SExpression::toString(int indent) const {
   if (mType == Type::List) {
-    if (!isValidListName(mValue)) {
+    if (!isValidToken(mValue)) {
       throw LogicError(__FILE__, __LINE__,
                        tr("Invalid S-Expression list name: %1").arg(mValue));
     }
@@ -289,19 +302,151 @@ SExpression SExpression::createLineBreak() {
 
 SExpression SExpression::parse(const QByteArray& content,
                                const FilePath& filePath) {
-  std::string error;
-  QString str = QString::fromUtf8(content);
-  sexpresso::Sexp tree = sexpresso::parse(str.toStdString(), error);
-  if (error.empty()) {
-    if (tree.childCount() == 1) {
-      return SExpression(tree.getChild(0), filePath);
-    } else {
-      throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
-                           tr("File does not have exactly one root node."));
-    }
-  } else {
+  int index = 0;
+  QString contentStr = QString::fromUtf8(content);
+  skipWhitespaceAndComments(contentStr, index);
+  if (index >= contentStr.length()) {
     throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
-                         QString::fromStdString(error));
+                         "No S-Expression node found.");
+  }
+  SExpression root = parse(contentStr, index, filePath);
+  if (index < contentStr.length()) {
+    throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+                         "File contains more than one root node.");
+  }
+  return root;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+SExpression SExpression::parse(const QString& content, int& index,
+                               const FilePath& filePath) {
+  Q_ASSERT(index < content.length());
+
+  if (content.at(index) == '(') {
+    return parseList(content, index, filePath);
+  } else if (content.at(index) == '"') {
+    return createString(parseString(content, index, filePath));
+  } else {
+    return createToken(parseToken(content, index, filePath));
+  }
+}
+
+SExpression SExpression::parseList(const QString& content, int& index,
+                                   const FilePath& filePath) {
+  Q_ASSERT((index < content.length()) && (content.at(index) == '('));
+
+  ++index;  // consume the '('
+
+  SExpression list = createList(parseToken(content, index, filePath));
+
+  while (true) {
+    if (index >= content.length()) {
+      throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+                           "S-Expression node ended without closing ')'.");
+    }
+    if (content.at(index) == ')') {
+      ++index;  // consume the ')'
+      skipWhitespaceAndComments(content, index);  // consume following spaces
+      break;
+    } else {
+      list.appendChild(parse(content, index, filePath));
+    }
+  }
+
+  return list;
+}
+
+QString SExpression::parseToken(const QString& content, int& index,
+                                const FilePath& filePath) {
+  int oldIndex = index;
+  while ((index < content.length()) && (isValidTokenChar(content.at(index)))) {
+    ++index;
+  }
+  QString token = content.mid(oldIndex, index - oldIndex);
+  if (token.isEmpty()) {
+    throw FileParseError(
+        __FILE__, __LINE__, filePath, -1, -1, QString(),
+        QString("Invalid token character detected: '%1'")
+            .arg(index < content.length() ? content.at(index) : QChar()));
+  }
+  skipWhitespaceAndComments(content, index);  // consume following spaces
+  return token;
+}
+
+QString SExpression::parseString(const QString& content, int& index,
+                                 const FilePath& filePath) {
+  ++index;  // consume the '"'
+
+  // Note: Until LibrePCB 0.1.5 we used the sexpresso library for escaping
+  // strings. This library escaped more characters than we do now. To still
+  // support reading the file format 0.1, we have to keep support for the
+  // old escaping behavior.
+  static QHash<QChar, QChar> escapedChars = {
+      {'\'', '\''},  // Single quote
+      {'"', '"'},  // Double quote
+      {'?', '\?'},  // Question mark
+      {'\\', '\\'},  // Backslash
+      {'a', '\a'},  // Audible bell
+      {'b', '\b'},  // Backspace
+      {'f', '\f'},  // Form feed
+      {'n', '\n'},  // Line feed
+      {'r', '\r'},  // Carriage return
+      {'t', '\t'},  // Horizontal tab
+      {'v', '\v'},  // Vertical tab
+  };
+
+  QString string;
+  bool escaped = false;
+  while (true) {
+    if (index >= content.length()) {
+      throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+                           "String ended without quote.");
+    }
+    const QChar& c = content.at(index);
+    if (escaped) {
+      if (escapedChars.contains(c)) {
+        string += escapedChars[c];
+        ++index;
+        escaped = false;
+      } else {
+        throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+                             QString("Illegal escape sequence: '\\%1'").arg(c));
+      }
+    } else if (c == '"') {
+      ++index;  // consume the '"'
+      skipWhitespaceAndComments(content, index);  // consume following spaces
+      break;
+    } else if (c == '\\') {
+      escaped = true;
+      ++index;
+    } else {
+      string += c;
+      ++index;
+    }
+  }
+  return string;
+}
+
+void SExpression::skipWhitespaceAndComments(const QString& content,
+                                            int& index) {
+  static QSet<QChar> spaces = {' ', '\f', '\n', '\r', '\t', '\v'};
+
+  bool isComment = false;
+  while (index < content.length()) {
+    const QChar& c = content.at(index);
+    if (c == ';') {  // Line-comment of the Lisp language
+      isComment = true;
+    } else if (c == '\n') {
+      isComment = false;
+    }
+    if (isComment || spaces.contains(c)) {
+      ++index;
+    } else {
+      break;
+    }
   }
 }
 
