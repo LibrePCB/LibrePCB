@@ -81,6 +81,7 @@ SOURCES += \
     common/fileio/directorylocktest.cpp \
     common/fileio/filepathtest.cpp \
     common/fileio/serializableobjectlisttest.cpp \
+    common/fileio/sexpressiontest.cpp \
     common/fileio/transactionaldirectorytest.cpp \
     common/fileio/transactionalfilesystemtest.cpp \
     common/geometry/pathmodeltest.cpp \
