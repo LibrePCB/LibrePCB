@@ -19,7 +19,6 @@ LIBS += \
     -llibrepcblibrary \
     -llibrepcbcommon \
     -lparseagle \
-    -lsexpresso \
     -lmuparser \
 
 # Solaris based systems need to link against libproc
@@ -36,7 +35,6 @@ DEPENDPATH += \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
     ../../libs/parseagle \
-    ../../libs/sexpresso \
 
 isEmpty(UNBUNDLE) {
     # These libraries will only be linked statically when not unbundling
@@ -49,7 +47,6 @@ isEmpty(UNBUNDLE) {
 
 PRE_TARGETDEPS += \
     $${DESTDIR}/libparseagle.a \
-    $${DESTDIR}/libsexpresso.a \
 
 RESOURCES += \
     ../../img/images.qrc \

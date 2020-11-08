@@ -29,7 +29,6 @@ LIBS += \
     -llibrepcblibrary \
     -llibrepcbcommon \
     -lmuparser \
-    -lsexpresso \
 
 # Solaris based systems need to link against libproc
 solaris:LIBS += -lproc
@@ -47,11 +46,9 @@ DEPENDPATH += \
     ../../libs/librepcb/project \
     ../../libs/librepcb/library \
     ../../libs/librepcb/common \
-    ../../libs/sexpresso \
     ../../libs/muparser \
 
 PRE_TARGETDEPS += \
-    $${DESTDIR}/libsexpresso.a \
     $${DESTDIR}/libmuparser.a \
 
 isEmpty(UNBUNDLE) {

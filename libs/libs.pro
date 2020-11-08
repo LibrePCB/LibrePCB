@@ -10,14 +10,12 @@ SUBDIRS = \
     muparser \
     optional \
     parseagle \
-    sexpresso \
 
 librepcb.depends = \
     delaunay-triangulation \
     muparser \
     optional \
     parseagle \
-    sexpresso \
 
 # Hoedown is only needed for Qt <5.14
 equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
