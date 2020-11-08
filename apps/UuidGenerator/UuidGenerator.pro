@@ -13,7 +13,6 @@ QT += core widgets
 LIBS += \
     -L$${DESTDIR} \
     -llibrepcbcommon \
-    -lsexpresso \
     -lmuparser \
 
 # Solaris based systems need to link against libproc

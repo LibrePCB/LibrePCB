@@ -32,10 +32,6 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-namespace sexpresso {
-struct Sexp;
-}
-
 namespace librepcb {
 
 class SExpression;
@@ -140,11 +136,19 @@ public:
 
 private:  // Methods
   SExpression(Type type, const QString& value);
-  SExpression(sexpresso::Sexp& sexp, const FilePath& filePath);
 
-  QString escapeString(const QString& string) const noexcept;
-  bool isValidListName(const QString& name) const noexcept;
-  bool isValidToken(const QString& token) const noexcept;
+  static SExpression parse(const QString& content, int& index,
+                           const FilePath& filePath);
+  static SExpression parseList(const QString& content, int& index,
+                               const FilePath& filePath);
+  static QString parseToken(const QString& content, int& index,
+                            const FilePath& filePath);
+  static QString parseString(const QString& content, int& index,
+                             const FilePath& filePath);
+  static void skipWhitespaceAndComments(const QString& content, int& index);
+  static QString escapeString(const QString& string) noexcept;
+  static bool isValidToken(const QString& token) noexcept;
+  static bool isValidTokenChar(const QChar& c) noexcept;
   QString toString(int indent) const;
 
 private:  // Data
