@@ -38,9 +38,9 @@ GridProperties::GridProperties() noexcept
 }
 
 GridProperties::GridProperties(const SExpression& node)
-  : mType(node.getValueByPath<Type_t>("type")),
-    mInterval(node.getValueByPath<PositiveLength>("interval")),
-    mUnit(node.getValueByPath<LengthUnit>("unit")) {
+  : mType(deserialize<Type_t>(node.getChild("type/@0"))),
+    mInterval(deserialize<PositiveLength>(node.getChild("interval/@0"))),
+    mUnit(deserialize<LengthUnit>(node.getChild("unit/@0"))) {
 }
 
 GridProperties::GridProperties(Type_t type, const PositiveLength& interval,

@@ -99,7 +99,7 @@ inline SExpression serialize(const StrokeTextSpacing& obj) {
 
 template <>
 inline StrokeTextSpacing deserialize(const SExpression& sexpr) {
-  if (sexpr.getStringOrToken() == "auto") {
+  if (sexpr.getValue() == "auto") {
     return StrokeTextSpacing();
   } else {
     return StrokeTextSpacing(deserialize<Ratio>(sexpr));  // can throw

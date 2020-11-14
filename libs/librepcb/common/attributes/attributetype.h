@@ -107,6 +107,11 @@ inline SExpression serialize(const AttributeType& obj) {
   return SExpression::createToken(obj.getName());
 }
 
+template <>
+inline const AttributeType& deserialize(const SExpression& sexpr) {
+  return AttributeType::fromString(sexpr.getValue());  // can throw
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

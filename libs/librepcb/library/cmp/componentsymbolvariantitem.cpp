@@ -71,12 +71,13 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(
 
 ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
-    mSymbolPos(node.getChildByPath("position")),
-    mSymbolRot(node.getValueByPath<Angle>("rotation")),
-    mIsRequired(node.getValueByPath<bool>("required")),
-    mSuffix(node.getValueByPath<ComponentSymbolVariantItemSuffix>("suffix")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mSymbolUuid(deserialize<Uuid>(node.getChild("symbol/@0"))),
+    mSymbolPos(node.getChild("position")),
+    mSymbolRot(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mIsRequired(deserialize<bool>(node.getChild("required/@0"))),
+    mSuffix(deserialize<ComponentSymbolVariantItemSuffix>(
+        node.getChild("suffix/@0"))),
     mPinSignalMap(node),
     mOnPinSignalMapEditedSlot(*this,
                               &ComponentSymbolVariantItem::pinSignalMapEdited) {

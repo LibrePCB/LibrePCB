@@ -51,9 +51,9 @@ Hole::Hole(const Uuid& uuid, const Point& position,
 
 Hole::Hole(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")),
+    mDiameter(deserialize<PositiveLength>(node.getChild("diameter/@0"))) {
 }
 
 Hole::~Hole() noexcept {

@@ -96,7 +96,7 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
 
 Footprint::Footprint(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mNames(node),
     mDescriptions(node),
     mPads(node),

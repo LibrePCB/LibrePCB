@@ -56,8 +56,8 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
 
   SExpression root =
       SExpression::parse(mFileSystem->read("schematic.lp"), FilePath());
-  mSchematicUuid = root.getValueByPath<Uuid>("schematic");
-  mCursorPos = Point(root.getChildByPath("cursor_position"));
+  mSchematicUuid = deserialize<Uuid>(root.getChild("schematic/@0"));
+  mCursorPos = Point(root.getChild("cursor_position"));
   mComponentInstances.loadFromSExpression(root);
   mSymbolInstances.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);

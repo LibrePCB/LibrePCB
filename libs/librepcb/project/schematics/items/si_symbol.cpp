@@ -51,11 +51,11 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node)
     mComponentInstance(nullptr),
     mSymbVarItem(nullptr),
     mSymbol(nullptr),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mRotation(node.getValueByPath<Angle>("rotation")),
-    mMirrored(node.getValueByPath<bool>("mirror")) {
-  Uuid gcUuid = node.getValueByPath<Uuid>("component");
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mMirrored(deserialize<bool>(node.getChild("mirror/@0"))) {
+  Uuid gcUuid = deserialize<Uuid>(node.getChild("component/@0"));
   mComponentInstance =
       schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
   if (!mComponentInstance) {
@@ -64,7 +64,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node)
         QString("No component with the UUID \"%1\" found in the circuit!")
             .arg(gcUuid.toStr()));
   }
-  Uuid symbVarItemUuid = node.getValueByPath<Uuid>("lib_gate");
+  Uuid symbVarItemUuid = deserialize<Uuid>(node.getChild("lib_gate/@0"));
   init(symbVarItemUuid);
 }
 

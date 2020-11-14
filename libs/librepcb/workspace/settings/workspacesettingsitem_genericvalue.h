@@ -90,7 +90,7 @@ public:
    * @copydoc ::librepcb::workspace::WorkspaceSettingsItem::load()
    */
   void load(const SExpression& root) override {
-    set(root.getChildByPath(mKey).template getValueOfFirstChild<T>());
+    set(deserialize<T>(root.getChild(mKey % "/@0")));  // can throw
   }
 
   /**

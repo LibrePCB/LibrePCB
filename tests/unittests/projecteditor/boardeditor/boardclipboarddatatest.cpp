@@ -143,14 +143,16 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
 
   std::shared_ptr<BoardClipboardData::Plane> plane1 =
       std::make_shared<BoardClipboardData::Plane>(
-          Uuid::createRandom(), "foo", "bar",
+          Uuid::createRandom(), GraphicsLayerName("foo"),
+          CircuitIdentifier("bar"),
           Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
           UnsignedLength(1), UnsignedLength(2), false, 0,
           BI_Plane::ConnectStyle::None);
 
   std::shared_ptr<BoardClipboardData::Plane> plane2 =
       std::make_shared<BoardClipboardData::Plane>(
-          Uuid::createRandom(), "bar", "foo",
+          Uuid::createRandom(), GraphicsLayerName("bar"),
+          CircuitIdentifier("foo"),
           Path({Vertex(Point(10, 20), Angle(30)),
                 Vertex(Point(40, 50), Angle(60))}),
           UnsignedLength(10), UnsignedLength(20), true, 5,

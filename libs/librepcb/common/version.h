@@ -229,7 +229,7 @@ inline SExpression serialize(const Version& obj) {
 
 template <>
 inline Version deserialize(const SExpression& sexpr) {
-  return Version::fromString(sexpr.getStringOrToken());  // can throw
+  return Version::fromString(sexpr.getValue());  // can throw
 }
 
 /*******************************************************************************

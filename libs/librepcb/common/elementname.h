@@ -121,7 +121,7 @@ inline SExpression serialize(const ElementName& obj) {
 
 template <>
 inline ElementName deserialize(const SExpression& sexpr) {
-  return ElementName(sexpr.getStringOrToken());  // can throw
+  return ElementName(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const ElementName& obj) {

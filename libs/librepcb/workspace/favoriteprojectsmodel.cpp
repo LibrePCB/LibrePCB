@@ -50,7 +50,7 @@ FavoriteProjectsModel::FavoriteProjectsModel(
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
       const QList<SExpression>& childs = root.getChildren("project");
       foreach (const SExpression& child, childs) {
-        QString path = child.getValueOfFirstChild<QString>();
+        QString path = child.getChild("@0").getValue();
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
         mAllProjects.append(absPath);
       }

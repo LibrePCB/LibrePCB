@@ -68,13 +68,13 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory)
   // read properties
   // Note: Don't use SExpression::getValueByPath<QUrl>() because it would throw
   // an exception if the URL is empty, which is actually legal in this case.
-  mUrl = QUrl(mLoadingFileDocument.getValueByPath<QString>("url"),
+  mUrl = QUrl(mLoadingFileDocument.getChild("url/@0").getValue(),
               QUrl::StrictMode);
 
   // read dependency UUIDs
   foreach (const SExpression& node,
            mLoadingFileDocument.getChildren("dependency")) {
-    mDependencies.insert(node.getValueOfFirstChild<Uuid>());
+    mDependencies.insert(deserialize<Uuid>(node.getChild("@0")));
   }
 
   // load image if available

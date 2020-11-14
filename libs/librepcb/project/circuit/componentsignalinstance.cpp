@@ -57,13 +57,13 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
     mIsAddedToCircuit(false),
     mNetSignal(nullptr) {
   // read attributes
-  Uuid compSignalUuid = node.getChildByIndex(0).getValue<Uuid>();
+  Uuid compSignalUuid = deserialize<Uuid>(node.getChild("@0"));
   mComponentSignal = mComponentInstance.getLibComponent()
                          .getSignals()
                          .get(compSignalUuid)
                          .get();  // can throw
   tl::optional<Uuid> netsignalUuid =
-      node.getValueByPath<tl::optional<Uuid>>("net");
+      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"));
   if (netsignalUuid) {
     mNetSignal = mCircuit.getNetSignalByUuid(*netsignalUuid);
     if (!mNetSignal) {

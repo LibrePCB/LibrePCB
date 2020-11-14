@@ -51,11 +51,11 @@ NetSignal::NetSignal(Circuit& circuit, const SExpression& node)
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mIsHighlighted(false),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name")),
-    mHasAutoName(node.getValueByPath<bool>("auto")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
+    mHasAutoName(deserialize<bool>(node.getChild("auto/@0"))),
     mNetClass(nullptr) {
-  Uuid netclassUuid = node.getValueByPath<Uuid>("netclass");
+  Uuid netclassUuid = deserialize<Uuid>(node.getChild("netclass/@0"));
   mNetClass = circuit.getNetClassByUuid(netclassUuid);
   if (!mNetClass) {
     throw RuntimeError(

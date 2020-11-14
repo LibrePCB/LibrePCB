@@ -136,6 +136,13 @@ inline SExpression serialize(const library::CmpSigPinDisplayType& obj) {
   return SExpression::createToken(obj.toString());
 }
 
+template <>
+inline const library::CmpSigPinDisplayType& deserialize(
+    const SExpression& sexpr) {
+  return library::CmpSigPinDisplayType::fromString(
+      sexpr.getValue());  // can throw
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

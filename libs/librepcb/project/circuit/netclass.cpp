@@ -44,8 +44,8 @@ NetClass::NetClass(Circuit& circuit, const SExpression& node)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<ElementName>("name")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<ElementName>(node.getChild("name/@0"))) {
 }
 
 NetClass::NetClass(Circuit& circuit, const ElementName& name)

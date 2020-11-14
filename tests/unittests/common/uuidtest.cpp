@@ -183,8 +183,8 @@ TEST_P(UuidTest, testSerialize) {
   const UuidTestData& data = GetParam();
   if (data.valid) {
     Uuid uuid = Uuid::fromString(data.uuid);
-    EXPECT_EQ(data.uuid, serialize(uuid).getStringOrToken());
-    EXPECT_EQ(data.uuid, serialize(tl::make_optional(uuid)).getStringOrToken());
+    EXPECT_EQ(data.uuid, serialize(uuid).getValue());
+    EXPECT_EQ(data.uuid, serialize(tl::make_optional(uuid)).getValue());
   }
 }
 
@@ -202,7 +202,7 @@ TEST_P(UuidTest, testDeserialize) {
 
 TEST(UuidTest, testSerializeOptional) {
   tl::optional<Uuid> uuid = tl::nullopt;
-  EXPECT_EQ("none", serialize(uuid).getStringOrToken());
+  EXPECT_EQ("none", serialize(uuid).getValue());
 }
 
 TEST(UuidTest, testDeserializeOptional) {

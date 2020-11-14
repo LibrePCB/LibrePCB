@@ -118,7 +118,7 @@ template <>
 inline library::ComponentSymbolVariantItemSuffix deserialize(
     const SExpression& sexpr) {
   return library::ComponentSymbolVariantItemSuffix(
-      sexpr.getStringOrToken());  // can throw
+      sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(

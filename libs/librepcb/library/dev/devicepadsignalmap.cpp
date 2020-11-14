@@ -46,8 +46,8 @@ DevicePadSignalMapItem::DevicePadSignalMapItem(
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node)
   : onEdited(*this),
-    mPadUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("signal")) {
+    mPadUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mSignalUuid(deserialize<tl::optional<Uuid>>(node.getChild("signal/@0"))) {
 }
 
 DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {

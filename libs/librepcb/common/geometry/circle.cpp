@@ -63,13 +63,13 @@ Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
 
 Circle::Circle(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<GraphicsLayerName>("layer")),
-    mLineWidth(node.getValueByPath<UnsignedLength>("width")),
-    mIsFilled(node.getValueByPath<bool>("fill")),
-    mIsGrabArea(node.getValueByPath<bool>("grab_area")),
-    mCenter(node.getChildByPath("position")),
-    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mLineWidth(deserialize<UnsignedLength>(node.getChild("width/@0"))),
+    mIsFilled(deserialize<bool>(node.getChild("fill/@0"))),
+    mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"))),
+    mCenter(node.getChild("position")),
+    mDiameter(deserialize<PositiveLength>(node.getChild("diameter/@0"))) {
 }
 
 Circle::~Circle() noexcept {

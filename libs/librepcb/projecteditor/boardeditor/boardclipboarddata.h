@@ -90,12 +90,12 @@ public:
         onEdited(*this) {}
 
     explicit Device(const SExpression& node)
-      : componentUuid(node.getChildByIndex(0).getValue<Uuid>()),
-        libDeviceUuid(node.getValueByPath<Uuid>("lib_device")),
-        libFootprintUuid(node.getValueByPath<Uuid>("lib_footprint")),
-        position(node.getChildByPath("position")),
-        rotation(node.getValueByPath<Angle>("rotation")),
-        mirrored(node.getValueByPath<bool>("mirror")),
+      : componentUuid(deserialize<Uuid>(node.getChild("@0"))),
+        libDeviceUuid(deserialize<Uuid>(node.getChild("lib_device/@0"))),
+        libFootprintUuid(deserialize<Uuid>(node.getChild("lib_footprint/@0"))),
+        position(node.getChild("position")),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
         strokeTexts(node),
         onEdited(*this) {}
 
@@ -132,7 +132,7 @@ public:
       : netName(netName), vias(), junctions(), traces(), onEdited(*this) {}
 
     explicit NetSegment(const SExpression& node)
-      : netName(node.getValueByPath<CircuitIdentifier>("net")),
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
         vias(node),
         junctions(node),
         traces(node),
@@ -156,8 +156,8 @@ public:
     static constexpr const char* tagname = "plane";
 
     Uuid uuid;
-    QString layer;
-    QString netSignalName;
+    GraphicsLayerName layer;
+    CircuitIdentifier netSignalName;
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
@@ -166,10 +166,10 @@ public:
     BI_Plane::ConnectStyle connectStyle;
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
-    Plane(const Uuid& uuid, const QString& layer, const QString& netSignalName,
-          const Path& outline, const UnsignedLength& minWidth,
-          const UnsignedLength& minClearance, bool keepOrphans, int priority,
-          BI_Plane::ConnectStyle connectStyle)
+    Plane(const Uuid& uuid, const GraphicsLayerName& layer,
+          const CircuitIdentifier& netSignalName, const Path& outline,
+          const UnsignedLength& minWidth, const UnsignedLength& minClearance,
+          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle)
       : uuid(uuid),
         layer(layer),
         netSignalName(netSignalName),
@@ -182,16 +182,17 @@ public:
         onEdited(*this) {}
 
     explicit Plane(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        layer(node.getValueByPath<QString>("layer")),
-        netSignalName(node.getValueByPath<QString>("net")),
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        layer(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+        netSignalName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
         outline(node),
-        minWidth(node.getValueByPath<UnsignedLength>("min_width")),
-        minClearance(node.getValueByPath<UnsignedLength>("min_clearance")),
-        keepOrphans(node.getValueByPath<bool>("keep_orphans")),
-        priority(node.getValueByPath<int>("priority")),
-        connectStyle(
-            node.getValueByPath<BI_Plane::ConnectStyle>("connect_style")),
+        minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
+        minClearance(
+            deserialize<UnsignedLength>(node.getChild("min_clearance/@0"))),
+        keepOrphans(deserialize<bool>(node.getChild("keep_orphans/@0"))),
+        priority(deserialize<int>(node.getChild("priority/@0"))),
+        connectStyle(deserialize<BI_Plane::ConnectStyle>(
+            node.getChild("connect_style/@0"))),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()

@@ -77,8 +77,8 @@ VAlign& VAlign::mirror() noexcept {
 
 Alignment::Alignment(const SExpression& node) {
   try {
-    mH = node.getChildByIndex(0).getValue<HAlign>();
-    mV = node.getChildByIndex(1).getValue<VAlign>();
+    mH = deserialize<HAlign>(node.getChild("@0"));
+    mV = deserialize<VAlign>(node.getChild("@1"));
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                          QString(), e.getMsg());

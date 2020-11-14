@@ -56,14 +56,14 @@ ProjectSettings::ProjectSettings(Project& project, bool create)
 
     // locale order
     foreach (const SExpression& node,
-             root.getChildByPath("library_locale_order").getChildren()) {
-      mLocaleOrder.append(node.getValueOfFirstChild<QString>());
+             root.getChild("library_locale_order").getChildren()) {
+      mLocaleOrder.append(node.getChild("@0").getValue());
     }
 
     // norm order
     foreach (const SExpression& node,
-             root.getChildByPath("library_norm_order").getChildren()) {
-      mNormOrder.append(node.getValueOfFirstChild<QString>());
+             root.getChild("library_norm_order").getChildren()) {
+      mNormOrder.append(node.getChild("@0").getValue());
     }
   }
 

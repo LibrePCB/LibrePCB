@@ -60,11 +60,11 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
 
 SymbolPin::SymbolPin(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name")),
-    mPosition(node.getChildByPath("position")),
-    mLength(node.getValueByPath<UnsignedLength>("length")),
-    mRotation(node.getValueByPath<Angle>("rotation")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
+    mPosition(node.getChild("position")),
+    mLength(deserialize<UnsignedLength>(node.getChild("length/@0"))),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
     mRegisteredGraphicsItem(nullptr) {
 }
 

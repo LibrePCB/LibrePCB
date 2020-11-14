@@ -110,7 +110,7 @@ inline SExpression serialize(const library::ComponentPrefix& obj) {
 
 template <>
 inline library::ComponentPrefix deserialize(const SExpression& sexpr) {
-  return library::ComponentPrefix(sexpr.getStringOrToken());  // can throw
+  return library::ComponentPrefix(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

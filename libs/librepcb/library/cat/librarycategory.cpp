@@ -52,8 +52,8 @@ LibraryCategory::LibraryCategory(
     const QString& shortElementName, const QString& longElementName)
   : LibraryBaseElement(std::move(directory), true, shortElementName,
                        longElementName),
-    mParentUuid(
-        mLoadingFileDocument.getValueByPath<tl::optional<Uuid>>("parent")) {
+    mParentUuid(deserialize<tl::optional<Uuid>>(
+        mLoadingFileDocument.getChild("parent/@0"))) {
 }
 
 LibraryCategory::~LibraryCategory() noexcept {

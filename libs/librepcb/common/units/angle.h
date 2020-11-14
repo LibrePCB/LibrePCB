@@ -395,7 +395,7 @@ inline SExpression serialize(const Angle& obj) {
 
 template <>
 inline Angle deserialize(const SExpression& sexpr) {
-  return Angle::fromDeg(sexpr.getStringOrToken());  // can throw
+  return Angle::fromDeg(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const Angle& angle) {

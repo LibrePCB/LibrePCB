@@ -79,11 +79,11 @@ public:
       QString key;
       SExpression value;
       if (child.getChildren().count() > 1) {
-        key = child.getValueByPath<QString>(T::keyname);
-        value = child.getChildByIndex(1);
+        key = child.getChild(QString(T::keyname) % "/@0").getValue();
+        value = child.getChild("@1");
       } else {
         key = QString("");
-        value = child.getChildByIndex(0);
+        value = child.getChild("@0");
       }
       if (mValues.contains(key)) {
         throw RuntimeError(__FILE__, __LINE__,

@@ -99,7 +99,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
   QMap<Uuid, QSet<Path>> expectedPlaneFragments;
   foreach (const SExpression& child, expectedSexpr.getChildren("plane")) {
-    Uuid uuid = child.getValueOfFirstChild<Uuid>();
+    Uuid uuid = deserialize<Uuid>(child.getChild("@0"));
     foreach (const SExpression& fragmentChild, child.getChildren("fragment")) {
       expectedPlaneFragments[uuid].insert(Path(fragmentChild));
     }

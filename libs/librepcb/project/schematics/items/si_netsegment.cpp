@@ -50,10 +50,10 @@ namespace project {
 
 SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
   : SI_Base(schematic),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mNetSignal(nullptr) {
   try {
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
+    Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"));
     mNetSignal =
         mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if (!mNetSignal) {

@@ -623,7 +623,7 @@ inline SExpression serialize(const Length& obj) {
 
 template <>
 inline Length deserialize(const SExpression& sexpr) {
-  return Length::fromMm(sexpr.getStringOrToken());
+  return Length::fromMm(sexpr.getValue());
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const Length& length) {
@@ -741,7 +741,7 @@ inline SExpression serialize(const UnsignedLength& obj) {
 
 template <>
 inline UnsignedLength deserialize(const SExpression& sexpr) {
-  return UnsignedLength(Length::fromMm(sexpr.getStringOrToken()));  // can throw
+  return UnsignedLength(Length::fromMm(sexpr.getValue()));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,
@@ -937,7 +937,7 @@ inline SExpression serialize(const PositiveLength& obj) {
 
 template <>
 inline PositiveLength deserialize(const SExpression& sexpr) {
-  return PositiveLength(Length::fromMm(sexpr.getStringOrToken()));  // can throw
+  return PositiveLength(Length::fromMm(sexpr.getValue()));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

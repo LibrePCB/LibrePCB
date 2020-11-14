@@ -52,9 +52,9 @@ NetLabel::NetLabel(const Uuid& uuid, const Point& position,
 
 NetLabel::NetLabel(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mRotation(node.getValueByPath<Angle>("rotation")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))) {
 }
 
 NetLabel::~NetLabel() noexcept {

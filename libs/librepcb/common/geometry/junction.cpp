@@ -48,8 +48,8 @@ Junction::Junction(const Uuid& uuid, const Point& position) noexcept
 
 Junction::Junction(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")) {
 }
 
 Junction::~Junction() noexcept {

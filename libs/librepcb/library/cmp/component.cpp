@@ -56,9 +56,10 @@ Component::Component(std::unique_ptr<TransactionalDirectory> directory)
     mDefaultValue(),
     mPrefixes(ComponentPrefix("")) {
   // Load all properties
-  mSchematicOnly = mLoadingFileDocument.getValueByPath<bool>("schematic_only");
+  mSchematicOnly =
+      deserialize<bool>(mLoadingFileDocument.getChild("schematic_only/@0"));
   mAttributes.loadFromSExpression(mLoadingFileDocument);  // can throw
-  mDefaultValue = mLoadingFileDocument.getValueByPath<QString>("default_value");
+  mDefaultValue = mLoadingFileDocument.getChild("default_value/@0").getValue();
   mPrefixes = NormDependentPrefixMap(mLoadingFileDocument);
   mSignals.loadFromSExpression(mLoadingFileDocument);
   mSymbolVariants.loadFromSExpression(mLoadingFileDocument);

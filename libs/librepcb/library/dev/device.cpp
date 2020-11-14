@@ -53,8 +53,10 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
 Device::Device(std::unique_ptr<TransactionalDirectory> directory)
   : LibraryElement(std::move(directory), getShortElementName(),
                    getLongElementName()),
-    mComponentUuid(mLoadingFileDocument.getValueByPath<Uuid>("component")),
-    mPackageUuid(mLoadingFileDocument.getValueByPath<Uuid>("package")),
+    mComponentUuid(
+        deserialize<Uuid>(mLoadingFileDocument.getChild("component/@0"))),
+    mPackageUuid(
+        deserialize<Uuid>(mLoadingFileDocument.getChild("package/@0"))),
     mAttributes(mLoadingFileDocument),
     mPadSignalMap(mLoadingFileDocument) {
   cleanupAfterLoadingElementFromFile();

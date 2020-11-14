@@ -51,15 +51,16 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name")),
-    mValue(node.getValueByPath<QString>("value")),
-    mDefaultDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
+    mValue(node.getChild("value/@0").getValue()),
+    mDefaultDeviceUuid(
+        deserialize<tl::optional<Uuid>>(node.getChild("lib_device/@0"))),
     mLibComponent(nullptr),
     mCompSymbVar(nullptr),
     mAttributes() {
   // read general attributes
-  Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component");
+  Uuid cmpUuid = deserialize<Uuid>(node.getChild("lib_component/@0"));
   mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
   if (!mLibComponent) {
     throw RuntimeError(
@@ -68,7 +69,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
            "project's library!")
             .arg(cmpUuid.toStr()));
   }
-  Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant");
+  Uuid symbVarUuid = deserialize<Uuid>(node.getChild("lib_variant/@0"));
   mCompSymbVar =
       mLibComponent->getSymbolVariants().get(symbVarUuid).get();  // can throw
 

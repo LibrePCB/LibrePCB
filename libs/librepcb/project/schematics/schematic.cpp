@@ -78,11 +78,11 @@ Schematic::Schematic(Project& project,
       // the schematic seems to be ready to open, so we will create all needed
       // objects
 
-      mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      mName = root.getValueByPath<ElementName>("name");
+      mUuid = deserialize<Uuid>(root.getChild("@0"));
+      mName = deserialize<ElementName>(root.getChild("name/@0"));
 
       // Load grid properties
-      mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
+      mGridProperties.reset(new GridProperties(root.getChild("grid")));
 
       // Load all symbols
       foreach (const SExpression& node, root.getChildren("symbol")) {

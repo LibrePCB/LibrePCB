@@ -84,12 +84,13 @@ public:
         onEdited(*this) {}
 
     explicit ComponentInstance(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        libComponentUuid(node.getValueByPath<Uuid>("lib_component")),
-        libVariantUuid(node.getValueByPath<Uuid>("lib_variant")),
-        libDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
-        name(node.getValueByPath<CircuitIdentifier>("name")),
-        value(node.getValueByPath<QString>("value")),
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        libComponentUuid(deserialize<Uuid>(node.getChild("lib_component/@0"))),
+        libVariantUuid(deserialize<Uuid>(node.getChild("lib_variant/@0"))),
+        libDeviceUuid(
+            deserialize<tl::optional<Uuid>>(node.getChild("lib_device/@0"))),
+        name(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
+        value(node.getChild("value/@0").getValue()),
         attributes(node),
         onEdited(*this) {}
 
@@ -136,12 +137,12 @@ public:
         onEdited(*this) {}
 
     explicit SymbolInstance(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        componentInstanceUuid(node.getValueByPath<Uuid>("component")),
-        symbolVariantItemUuid(node.getValueByPath<Uuid>("lib_gate")),
-        position(node.getChildByPath("position")),
-        rotation(node.getValueByPath<Angle>("rotation")),
-        mirrored(node.getValueByPath<bool>("mirror")),
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        componentInstanceUuid(deserialize<Uuid>(node.getChild("component/@0"))),
+        symbolVariantItemUuid(deserialize<Uuid>(node.getChild("lib_gate/@0"))),
+        position(node.getChild("position")),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -176,7 +177,7 @@ public:
       : netName(netName), junctions(), lines(), labels(), onEdited(*this) {}
 
     explicit NetSegment(const SExpression& node)
-      : netName(node.getValueByPath<CircuitIdentifier>("net")),
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
         junctions(node),
         lines(node),
         labels(node),

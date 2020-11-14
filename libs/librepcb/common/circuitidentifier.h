@@ -125,7 +125,7 @@ inline SExpression serialize(const CircuitIdentifier& obj) {
 
 template <>
 inline CircuitIdentifier deserialize(const SExpression& sexpr) {
-  return CircuitIdentifier(sexpr.getStringOrToken());  // can throw
+  return CircuitIdentifier(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

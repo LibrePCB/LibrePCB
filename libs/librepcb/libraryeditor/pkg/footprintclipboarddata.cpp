@@ -53,9 +53,9 @@ FootprintClipboardData::FootprintClipboardData(
 }
 
 FootprintClipboardData::FootprintClipboardData(const SExpression& node)
-  : mFootprintUuid(node.getValueByPath<Uuid>("footprint")),
-    mPackagePads(node.getChildByPath("package")),
-    mCursorPos(node.getChildByPath("cursor_position")),
+  : mFootprintUuid(deserialize<Uuid>(node.getChild("footprint/@0"))),
+    mPackagePads(node.getChild("package")),
+    mCursorPos(node.getChild("cursor_position")),
     mFootprintPads(node),
     mPolygons(node),
     mCircles(node),

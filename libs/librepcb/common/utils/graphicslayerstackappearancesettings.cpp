@@ -51,11 +51,12 @@ GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
     IF_GraphicsLayerProvider& layers, const SExpression& node)
   : mLayers(layers) {
   for (const SExpression& child : node.getChildren("layer")) {
-    QString name = child.getChildByIndex(0).getValue<QString>();
+    QString name = child.getChild("@0").getValue();
     if (GraphicsLayer* layer = mLayers.getLayer(name)) {
-      layer->setColor(child.getValueByPath<QColor>("color"));
-      layer->setColorHighlighted(child.getValueByPath<QColor>("color_hl"));
-      layer->setVisible(child.getValueByPath<bool>("visible"));
+      layer->setColor(deserialize<QColor>(child.getChild("color/@0")));
+      layer->setColorHighlighted(
+          deserialize<QColor>(child.getChild("color_hl/@0")));
+      layer->setVisible(deserialize<bool>(child.getChild("visible/@0")));
     }
   }
 }

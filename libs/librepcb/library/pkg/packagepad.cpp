@@ -44,8 +44,8 @@ PackagePad::PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept
 
 PackagePad::PackagePad(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))) {
 }
 
 PackagePad::~PackagePad() noexcept {

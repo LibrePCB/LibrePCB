@@ -76,28 +76,28 @@ TEST(SExpressionTest, testParseString) {
   SExpression s = SExpression::parse("(test \"foo bar\")", FilePath());
   EXPECT_TRUE(s.isList());
   EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo bar", s.getChildByIndex(0).getStringOrToken());
+  EXPECT_EQ("foo bar", s.getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseStringWithQuotes) {
   SExpression s = SExpression::parse("(test \"foo \\\"bar\\\"\")", FilePath());
   EXPECT_TRUE(s.isList());
   EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo \"bar\"", s.getChildByIndex(0).getStringOrToken());
+  EXPECT_EQ("foo \"bar\"", s.getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseStringWithNewlines) {
   SExpression s = SExpression::parse("(test \"foo\\nbar\")", FilePath());
   EXPECT_TRUE(s.isList());
   EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo\nbar", s.getChildByIndex(0).getStringOrToken());
+  EXPECT_EQ("foo\nbar", s.getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseStringWithBackslash) {
   SExpression s = SExpression::parse("(test \"foo\\\\bar\")", FilePath());
   EXPECT_TRUE(s.isList());
   EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo\\bar", s.getChildByIndex(0).getStringOrToken());
+  EXPECT_EQ("foo\\bar", s.getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseExpressionWithChildrenAndComments) {
@@ -115,16 +115,16 @@ TEST(SExpressionTest, testParseExpressionWithChildrenAndComments) {
       " )\n"
       ")\n";
   SExpression s = SExpression::parse(input, FilePath());
-  EXPECT_EQ("newstroke.bene", s.getValueByPath<QString>("default_font"));
-  EXPECT_EQ("0.15875", s.getValueByPath<QString>("grid/interval"));
+  EXPECT_EQ("newstroke.bene", s.getChild("default_font/@0").getValue());
+  EXPECT_EQ("0.15875", s.getChild("grid/interval/@0").getValue());
   EXPECT_EQ("./output/{{VERSION}}/gerber/{{PROJECT}}",
-            s.getValueByPath<QString>("fabrication_output_settings/base_path"));
+            s.getChild("fabrication_output_settings/base_path/@0").getValue());
   EXPECT_EQ(
       "",
-      s.getValueByPath<QString>("fabrication_output_settings/outlines/suffix"));
+      s.getChild("fabrication_output_settings/outlines/suffix/@0").getValue());
   EXPECT_EQ(".gto",
-            s.getValueByPath<QString>(
-                "fabrication_output_settings/silkscreen_top/suffix"));
+            s.getChild("fabrication_output_settings/silkscreen_top/suffix/@0")
+                .getValue());
 }
 
 TEST(SExpressionTest, testParsePartialExpression) {

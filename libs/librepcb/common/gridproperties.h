@@ -101,7 +101,7 @@ inline SExpression serialize(const GridProperties::Type_t& obj) {
 
 template <>
 inline GridProperties::Type_t deserialize(const SExpression& sexpr) {
-  QString str = sexpr.getStringOrToken();
+  QString str = sexpr.getValue();
   if (str == "off")
     return GridProperties::Type_t::Off;
   else if (str == "lines")

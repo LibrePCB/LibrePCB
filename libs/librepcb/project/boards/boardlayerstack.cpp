@@ -56,7 +56,7 @@ BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node)
     mInnerLayerCount(-1) {
   addAllLayers();
 
-  setInnerLayerCount(node.getValueByPath<uint>("inner"));
+  setInnerLayerCount(deserialize<uint>(node.getChild("inner/@0")));
 
   connect(&mBoard, &Board::attributesChanged, this,
           &BoardLayerStack::boardAttributesChanged, Qt::QueuedConnection);

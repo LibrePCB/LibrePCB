@@ -64,20 +64,21 @@ BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
 
 BI_Plane::BI_Plane(Board& board, const SExpression& node)
   : BI_Base(board),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<QString>("layer")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
     mNetSignal(nullptr),
     mOutline(),
-    mMinWidth(node.getValueByPath<UnsignedLength>("min_width")),
-    mMinClearance(node.getValueByPath<UnsignedLength>("min_clearance")),
-    mKeepOrphans(node.getValueByPath<bool>("keep_orphans")),
-    mPriority(node.getValueByPath<int>("priority")),
-    mConnectStyle(node.getValueByPath<ConnectStyle>("connect_style")),
+    mMinWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
+    mMinClearance(
+        deserialize<UnsignedLength>(node.getChild("min_clearance/@0"))),
+    mKeepOrphans(deserialize<bool>(node.getChild("keep_orphans/@0"))),
+    mPriority(deserialize<int>(node.getChild("priority/@0"))),
+    mConnectStyle(deserialize<ConnectStyle>(node.getChild("connect_style/@0"))),
     // mThermalGapWidth(node.getValueByPath<Length>("thermal_gap_width", true)),
     // mThermalSpokeWidth(node.getValueByPath<Length>("thermal_spoke_width",
     // true))
     mIsVisible(true) {
-  Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
+  Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"));
   mNetSignal =
       mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
   if (!mNetSignal) {

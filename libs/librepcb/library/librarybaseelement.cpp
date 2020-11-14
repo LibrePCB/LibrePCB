@@ -115,11 +115,13 @@ LibraryBaseElement::LibraryBaseElement(
       SExpression::parse(mDirectory->read(sexprFileName), sexprFilePath);
 
   // read attributes
-  mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
-  mVersion = mLoadingFileDocument.getValueByPath<Version>("version");
-  mAuthor = mLoadingFileDocument.getValueByPath<QString>("author");
-  mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created");
-  mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated");
+  mUuid = deserialize<Uuid>(mLoadingFileDocument.getChild("@0"));
+  mVersion = deserialize<Version>(mLoadingFileDocument.getChild("version/@0"));
+  mAuthor = mLoadingFileDocument.getChild("author/@0").getValue();
+  mCreated =
+      deserialize<QDateTime>(mLoadingFileDocument.getChild("created/@0"));
+  mIsDeprecated =
+      deserialize<bool>(mLoadingFileDocument.getChild("deprecated/@0"));
 
   // read names, descriptions and keywords in all available languages
   mNames = LocalizedNameMap(mLoadingFileDocument);

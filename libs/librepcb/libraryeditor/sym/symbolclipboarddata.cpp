@@ -48,8 +48,8 @@ SymbolClipboardData::SymbolClipboardData(const Uuid& symbolUuid,
 }
 
 SymbolClipboardData::SymbolClipboardData(const SExpression& node)
-  : mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
-    mCursorPos(node.getChildByPath("cursor_position")),
+  : mSymbolUuid(deserialize<Uuid>(node.getChild("symbol/@0"))),
+    mCursorPos(node.getChild("cursor_position")),
     mPins(node),
     mPolygons(node),
     mCircles(node),

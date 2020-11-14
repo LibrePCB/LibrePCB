@@ -60,8 +60,8 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
 
   SExpression root =
       SExpression::parse(mFileSystem->read("board.lp"), FilePath());
-  mBoardUuid = root.getValueByPath<Uuid>("board");
-  mCursorPos = Point(root.getChildByPath("cursor_position"));
+  mBoardUuid = deserialize<Uuid>(root.getChild("board/@0"));
+  mCursorPos = Point(root.getChild("cursor_position"));
   mDevices.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);
   mPlanes.loadFromSExpression(root);
@@ -70,9 +70,10 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
   mHoles.loadFromSExpression(root);
 
   foreach (const SExpression& child, root.getChildren("pad_position")) {
-    mPadPositions.insert(std::make_pair(child.getValueByPath<Uuid>("device"),
-                                        child.getValueByPath<Uuid>("pad")),
-                         Point(child.getChildByPath("position")));
+    mPadPositions.insert(
+        std::make_pair(deserialize<Uuid>(child.getChild("device/@0")),
+                       deserialize<Uuid>(child.getChild("pad/@0"))),
+        Point(child.getChild("position")));
   }
 }
 

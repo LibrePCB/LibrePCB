@@ -63,13 +63,13 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
 
 Text::Text(const SExpression& node)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<GraphicsLayerName>("layer")),
-    mText(node.getValueByPath<QString>("value")),
-    mPosition(node.getChildByPath("position")),
-    mRotation(node.getValueByPath<Angle>("rotation")),
-    mHeight(node.getValueByPath<PositiveLength>("height")),
-    mAlign(node.getChildByPath("align")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mText(node.getChild("value/@0").getValue()),
+    mPosition(node.getChild("position")),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mHeight(deserialize<PositiveLength>(node.getChild("height/@0"))),
+    mAlign(node.getChild("align")) {
 }
 
 Text::~Text() noexcept {

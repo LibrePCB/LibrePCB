@@ -232,7 +232,7 @@ template <>
 inline workspace::WorkspaceSettings::PdfOpenBehavior deserialize(
     const SExpression& sexpr) {
   using namespace workspace;
-  QString str = sexpr.getStringOrToken();
+  QString str = sexpr.getValue();
   if (str == QLatin1String("always"))
     return WorkspaceSettings::PdfOpenBehavior::ALWAYS;
   else if (str == QLatin1String("never"))

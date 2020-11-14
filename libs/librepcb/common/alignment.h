@@ -88,7 +88,7 @@ inline SExpression serialize(const HAlign& obj) {
 
 template <>
 inline HAlign deserialize(const SExpression& sexpr) {
-  QString str = sexpr.getStringOrToken();
+  QString str = sexpr.getValue();
   if (str == "left")
     return HAlign::left();
   else if (str == "center")
@@ -158,7 +158,7 @@ inline SExpression serialize(const VAlign& obj) {
 
 template <>
 inline VAlign deserialize(const SExpression& sexpr) {
-  QString str = sexpr.getStringOrToken();
+  QString str = sexpr.getValue();
   if (str == "top")
     return VAlign::top();
   else if (str == "center")

@@ -233,28 +233,26 @@ Board::Board(Project& project,
       // the board seems to be ready to open, so we will create all needed
       // objects
 
-      mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      mName = root.getValueByPath<ElementName>("name");
-      if (const SExpression* child = root.tryGetChildByPath("default_font")) {
-        mDefaultFontFileName = child->getValueOfFirstChild<QString>();
+      mUuid = deserialize<Uuid>(root.getChild("@0"));
+      mName = deserialize<ElementName>(root.getChild("name/@0"));
+      if (const SExpression* child = root.tryGetChild("default_font")) {
+        mDefaultFontFileName = child->getChild("@0").getValue();
       } else {
         mDefaultFontFileName = qApp->getDefaultStrokeFontName();
       }
 
       // Load grid properties
-      mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
+      mGridProperties.reset(new GridProperties(root.getChild("grid")));
 
       // Load layer stack
-      mLayerStack.reset(
-          new BoardLayerStack(*this, root.getChildByPath("layers")));
+      mLayerStack.reset(new BoardLayerStack(*this, root.getChild("layers")));
 
       // load design rules
-      mDesignRules.reset(
-          new BoardDesignRules(root.getChildByPath("design_rules")));
+      mDesignRules.reset(new BoardDesignRules(root.getChild("design_rules")));
 
       // load fabrication output settings
       mFabricationOutputSettings.reset(new BoardFabricationOutputSettings(
-          root.getChildByPath("fabrication_output_settings")));
+          root.getChild("fabrication_output_settings")));
 
       // load user settings
       try {

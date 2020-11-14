@@ -35,8 +35,8 @@ namespace librepcb {
 
 Vertex::Vertex(const SExpression& node) {
   try {
-    mPos = Point(node.getChildByPath("position"));
-    mAngle = node.getValueByPath<Angle>("angle");
+    mPos = Point(node.getChild("position"));
+    mAngle = deserialize<Angle>(node.getChild("angle/@0"));
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                          QString(), e.getMsg());

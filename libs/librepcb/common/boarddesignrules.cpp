@@ -65,54 +65,51 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
   : BoardDesignRules()  // this loads all default values!
 {
   // general attributes
-  mName = node.getValueByPath<ElementName>("name");
-  mDescription = node.getValueByPath<QString>("description");
+  mName = deserialize<ElementName>(node.getChild("name/@0"));
+  mDescription = node.getChild("description/@0").getValue();
   // stop mask
+  if (const SExpression* e = node.tryGetChild("stopmask_clearance_ratio")) {
+    mStopMaskClearanceRatio = deserialize<UnsignedRatio>(e->getChild("@0"));
+  }
+  if (const SExpression* e = node.tryGetChild("stopmask_clearance_min")) {
+    mStopMaskClearanceMin = deserialize<UnsignedLength>(e->getChild("@0"));
+  }
+  if (const SExpression* e = node.tryGetChild("stopmask_clearance_max")) {
+    mStopMaskClearanceMax = deserialize<UnsignedLength>(e->getChild("@0"));
+  }
   if (const SExpression* e =
-          node.tryGetChildByPath("stopmask_clearance_ratio")) {
-    mStopMaskClearanceRatio = e->getValueOfFirstChild<UnsignedRatio>();
-  }
-  if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_min")) {
-    mStopMaskClearanceMin = e->getValueOfFirstChild<UnsignedLength>();
-  }
-  if (const SExpression* e = node.tryGetChildByPath("stopmask_clearance_max")) {
-    mStopMaskClearanceMax = e->getValueOfFirstChild<UnsignedLength>();
-  }
-  if (const SExpression* e =
-          node.tryGetChildByPath("stopmask_max_via_drill_diameter")) {
-    mStopMaskMaxViaDrillDiameter = e->getValueOfFirstChild<UnsignedLength>();
+          node.tryGetChild("stopmask_max_via_drill_diameter")) {
+    mStopMaskMaxViaDrillDiameter =
+        deserialize<UnsignedLength>(e->getChild("@0"));
   }
   // cream mask
-  if (const SExpression* e =
-          node.tryGetChildByPath("creammask_clearance_ratio")) {
-    mCreamMaskClearanceRatio = e->getValueOfFirstChild<UnsignedRatio>();
+  if (const SExpression* e = node.tryGetChild("creammask_clearance_ratio")) {
+    mCreamMaskClearanceRatio = deserialize<UnsignedRatio>(e->getChild("@0"));
   }
-  if (const SExpression* e =
-          node.tryGetChildByPath("creammask_clearance_min")) {
-    mCreamMaskClearanceMin = e->getValueOfFirstChild<UnsignedLength>();
+  if (const SExpression* e = node.tryGetChild("creammask_clearance_min")) {
+    mCreamMaskClearanceMin = deserialize<UnsignedLength>(e->getChild("@0"));
   }
-  if (const SExpression* e =
-          node.tryGetChildByPath("creammask_clearance_max")) {
-    mCreamMaskClearanceMax = e->getValueOfFirstChild<UnsignedLength>();
+  if (const SExpression* e = node.tryGetChild("creammask_clearance_max")) {
+    mCreamMaskClearanceMax = deserialize<UnsignedLength>(e->getChild("@0"));
   }
   // restring
-  if (const SExpression* e = node.tryGetChildByPath("restring_pad_ratio")) {
-    mRestringPadRatio = e->getValueOfFirstChild<UnsignedRatio>();
+  if (const SExpression* e = node.tryGetChild("restring_pad_ratio")) {
+    mRestringPadRatio = deserialize<UnsignedRatio>(e->getChild("@0"));
   }
-  if (const SExpression* e = node.tryGetChildByPath("restring_pad_min")) {
-    mRestringPadMin = e->getValueOfFirstChild<UnsignedLength>();
+  if (const SExpression* e = node.tryGetChild("restring_pad_min")) {
+    mRestringPadMin = deserialize<UnsignedLength>(e->getChild("@0"));
   }
-  if (const SExpression* e = node.tryGetChildByPath("restring_pad_max")) {
-    mRestringPadMax = e->getValueOfFirstChild<UnsignedLength>();
+  if (const SExpression* e = node.tryGetChild("restring_pad_max")) {
+    mRestringPadMax = deserialize<UnsignedLength>(e->getChild("@0"));
   }
-  if (const SExpression* e = node.tryGetChildByPath("restring_via_ratio")) {
-    mRestringViaRatio = e->getValueOfFirstChild<UnsignedRatio>();
+  if (const SExpression* e = node.tryGetChild("restring_via_ratio")) {
+    mRestringViaRatio = deserialize<UnsignedRatio>(e->getChild("@0"));
   }
-  if (const SExpression* e = node.tryGetChildByPath("restring_via_min")) {
-    mRestringViaMin = e->getValueOfFirstChild<UnsignedLength>();
+  if (const SExpression* e = node.tryGetChild("restring_via_min")) {
+    mRestringViaMin = deserialize<UnsignedLength>(e->getChild("@0"));
   }
-  if (const SExpression* e = node.tryGetChildByPath("restring_via_max")) {
-    mRestringViaMax = e->getValueOfFirstChild<UnsignedLength>();
+  if (const SExpression* e = node.tryGetChild("restring_via_max")) {
+    mRestringViaMax = deserialize<UnsignedLength>(e->getChild("@0"));
   }
 
   // force validating properties, throw exception on error

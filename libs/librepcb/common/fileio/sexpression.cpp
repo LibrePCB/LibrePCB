@@ -74,7 +74,7 @@ const QString& SExpression::getName() const {
   }
 }
 
-const QString& SExpression::getStringOrToken() const {
+const QString& SExpression::getValue() const {
   if (!isToken() && !isString()) {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue,
                          tr("Node is not a token or string."));
@@ -93,40 +93,43 @@ QList<SExpression> SExpression::getChildren(const QString& name) const
   return children;
 }
 
-const SExpression& SExpression::getChildByIndex(int index) const {
-  if ((index < 0) || index >= mChildren.count()) {
-    throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                         tr("Child not found: %1").arg(index));
-  }
-  return mChildren.at(index);
-}
-
-const SExpression* SExpression::tryGetChildByPath(const QString& path) const
-    noexcept {
-  const SExpression* child = this;
-  foreach (const QString& name, path.split('/')) {
-    bool found = false;
-    foreach (const SExpression& childchild, child->mChildren) {
-      if (childchild.isList() && (childchild.mValue == name)) {
-        child = &childchild;
-        found = true;
-      }
-    }
-    if (!found) {
-      return nullptr;
-    }
-  }
-  return child;
-}
-
-const SExpression& SExpression::getChildByPath(const QString& path) const {
-  const SExpression* child = tryGetChildByPath(path);
+const SExpression& SExpression::getChild(const QString& path) const {
+  const SExpression* child = tryGetChild(path);
   if (child) {
     return *child;
   } else {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
                          tr("Child not found: %1").arg(path));
   }
+}
+
+const SExpression* SExpression::tryGetChild(const QString& path) const
+    noexcept {
+  const SExpression* child = this;
+  foreach (const QString& name, path.split('/')) {
+    if (name.startsWith('@')) {
+      bool valid = false;
+      int index = name.mid(1).toInt(&valid);
+      if ((valid) && (index >= 0) && (index < child->mChildren.count())) {
+        child = &child->mChildren.at(index);
+      } else {
+        return nullptr;
+      }
+    } else {
+      bool found = false;
+      foreach (const SExpression& childchild, child->mChildren) {
+        if (childchild.isList() && (childchild.mValue == name)) {
+          child = &childchild;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        return nullptr;
+      }
+    }
+  }
+  return child;
 }
 
 /*******************************************************************************
