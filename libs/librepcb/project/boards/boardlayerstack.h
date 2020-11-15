@@ -55,7 +55,8 @@ public:
   BoardLayerStack() = delete;
   BoardLayerStack(const BoardLayerStack& other) = delete;
   BoardLayerStack(Board& board, const BoardLayerStack& other);
-  BoardLayerStack(Board& board, const SExpression& node);
+  BoardLayerStack(Board& board, const SExpression& node,
+                  const Version& fileFormat);
   explicit BoardLayerStack(Board& board);
   ~BoardLayerStack() noexcept;
 

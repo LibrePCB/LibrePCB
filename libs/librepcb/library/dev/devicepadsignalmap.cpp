@@ -44,10 +44,12 @@ DevicePadSignalMapItem::DevicePadSignalMapItem(
   : onEdited(*this), mPadUuid(pad), mSignalUuid(signal) {
 }
 
-DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node)
+DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node,
+                                               const Version& fileFormat)
   : onEdited(*this),
-    mPadUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mSignalUuid(deserialize<tl::optional<Uuid>>(node.getChild("signal/@0"))) {
+    mPadUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mSignalUuid(deserialize<tl::optional<Uuid>>(node.getChild("signal/@0"),
+                                                fileFormat)) {
 }
 
 DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {

@@ -49,7 +49,8 @@ namespace project {
 
 ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
                                                  ComponentInstance& cmpInstance,
-                                                 const SExpression& node)
+                                                 const SExpression& node,
+                                                 const Version& fileFormat)
   : QObject(&cmpInstance),
     mCircuit(circuit),
     mComponentInstance(cmpInstance),
@@ -57,13 +58,13 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
     mIsAddedToCircuit(false),
     mNetSignal(nullptr) {
   // read attributes
-  Uuid compSignalUuid = deserialize<Uuid>(node.getChild("@0"));
+  Uuid compSignalUuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
   mComponentSignal = mComponentInstance.getLibComponent()
                          .getSignals()
                          .get(compSignalUuid)
                          .get();  // can throw
   tl::optional<Uuid> netsignalUuid =
-      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"));
+      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"), fileFormat);
   if (netsignalUuid) {
     mNetSignal = mCircuit.getNetSignalByUuid(*netsignalUuid);
     if (!mNetSignal) {

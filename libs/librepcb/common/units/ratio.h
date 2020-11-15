@@ -279,7 +279,8 @@ inline SExpression serialize(const Ratio& obj) {
 }
 
 template <>
-inline Ratio deserialize(const SExpression& sexpr) {
+inline Ratio deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return Ratio::fromNormalized(sexpr.getValue());
 }
 
@@ -333,8 +334,9 @@ inline SExpression serialize(const UnsignedRatio& obj) {
 }
 
 template <>
-inline UnsignedRatio deserialize(const SExpression& sexpr) {
-  return UnsignedRatio(Ratio::fromNormalized(sexpr.getValue()));  // can throw
+inline UnsignedRatio deserialize(const SExpression& sexpr,
+                                 const Version& fileFormat) {
+  return UnsignedRatio(deserialize<Ratio>(sexpr, fileFormat));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

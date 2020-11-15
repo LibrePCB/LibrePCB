@@ -87,7 +87,8 @@ inline SExpression serialize(const HAlign& obj) {
 }
 
 template <>
-inline HAlign deserialize(const SExpression& sexpr) {
+inline HAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == "left")
     return HAlign::left();
@@ -157,7 +158,8 @@ inline SExpression serialize(const VAlign& obj) {
 }
 
 template <>
-inline VAlign deserialize(const SExpression& sexpr) {
+inline VAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == "top")
     return VAlign::top();
@@ -187,7 +189,7 @@ public:
   Alignment(const Alignment& other) noexcept : mH(other.mH), mV(other.mV) {}
   explicit Alignment(const HAlign& h, const VAlign& v) noexcept
     : mH(h), mV(v) {}
-  explicit Alignment(const SExpression& node);
+  Alignment(const SExpression& node, const Version& fileFormat);
   const HAlign getH() const noexcept { return mH; }
   const VAlign getV() const noexcept { return mV; }
   void setH(const HAlign& h) noexcept { mH = h; }

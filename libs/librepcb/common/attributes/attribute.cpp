@@ -44,10 +44,11 @@ Attribute::Attribute(const Attribute& other) noexcept
     mUnit(other.mUnit) {
 }
 
-Attribute::Attribute(const SExpression& node)
+Attribute::Attribute(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mKey(deserialize<AttributeKey>(node.getChild("@0"))),
-    mType(&AttributeType::fromString(node.getChild("type/@0").getValue())),
+    mKey(deserialize<AttributeKey>(node.getChild("@0"), fileFormat)),
+    mType(&deserialize<const AttributeType&>(node.getChild("type/@0"),
+                                             fileFormat)),
     mValue(node.getChild("value/@0").getValue()),
     mUnit(mType->getUnitFromString(node.getChild("unit/@0").getValue())) {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);

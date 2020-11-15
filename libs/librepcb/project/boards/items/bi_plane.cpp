@@ -62,23 +62,28 @@ BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
   init();
 }
 
-BI_Plane::BI_Plane(Board& board, const SExpression& node)
+BI_Plane::BI_Plane(Board& board, const SExpression& node,
+                   const Version& fileFormat)
   : BI_Base(board),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mLayerName(
+        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
     mNetSignal(nullptr),
     mOutline(),
-    mMinWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
-    mMinClearance(
-        deserialize<UnsignedLength>(node.getChild("min_clearance/@0"))),
-    mKeepOrphans(deserialize<bool>(node.getChild("keep_orphans/@0"))),
-    mPriority(deserialize<int>(node.getChild("priority/@0"))),
-    mConnectStyle(deserialize<ConnectStyle>(node.getChild("connect_style/@0"))),
+    mMinWidth(
+        deserialize<UnsignedLength>(node.getChild("min_width/@0"), fileFormat)),
+    mMinClearance(deserialize<UnsignedLength>(node.getChild("min_clearance/@0"),
+                                              fileFormat)),
+    mKeepOrphans(
+        deserialize<bool>(node.getChild("keep_orphans/@0"), fileFormat)),
+    mPriority(deserialize<int>(node.getChild("priority/@0"), fileFormat)),
+    mConnectStyle(deserialize<ConnectStyle>(node.getChild("connect_style/@0"),
+                                            fileFormat)),
     // mThermalGapWidth(node.getValueByPath<Length>("thermal_gap_width", true)),
     // mThermalSpokeWidth(node.getValueByPath<Length>("thermal_spoke_width",
     // true))
     mIsVisible(true) {
-  Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"));
+  Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
   mNetSignal =
       mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
   if (!mNetSignal) {
@@ -86,7 +91,7 @@ BI_Plane::BI_Plane(Board& board, const SExpression& node)
         __FILE__, __LINE__,
         tr("Invalid net signal UUID: \"%1\"").arg(netSignalUuid.toStr()));
   }
-  mOutline = Path(node);
+  mOutline = Path(node, fileFormat);
   init();
 }
 

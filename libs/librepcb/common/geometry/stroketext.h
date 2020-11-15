@@ -98,11 +98,13 @@ inline SExpression serialize(const StrokeTextSpacing& obj) {
 }
 
 template <>
-inline StrokeTextSpacing deserialize(const SExpression& sexpr) {
+inline StrokeTextSpacing deserialize(const SExpression& sexpr,
+                                     const Version& fileFormat) {
   if (sexpr.getValue() == "auto") {
     return StrokeTextSpacing();
   } else {
-    return StrokeTextSpacing(deserialize<Ratio>(sexpr));  // can throw
+    return StrokeTextSpacing(
+        deserialize<Ratio>(sexpr, fileFormat));  // can throw
   }
 }
 
@@ -146,7 +148,7 @@ public:
              const StrokeTextSpacing& letterSpacing,
              const StrokeTextSpacing& lineSpacing, const Alignment& align,
              bool mirrored, bool autoRotate) noexcept;
-  explicit StrokeText(const SExpression& node);
+  StrokeText(const SExpression& node, const Version& fileFormat);
   ~StrokeText() noexcept;
 
   // Getters

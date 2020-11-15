@@ -62,14 +62,16 @@ Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
     mPath(path) {
 }
 
-Polygon::Polygon(const SExpression& node)
+Polygon::Polygon(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
-    mLineWidth(deserialize<UnsignedLength>(node.getChild("width/@0"))),
-    mIsFilled(deserialize<bool>(node.getChild("fill/@0"))),
-    mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"))),
-    mPath(node) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mLayerName(
+        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
+    mLineWidth(
+        deserialize<UnsignedLength>(node.getChild("width/@0"), fileFormat)),
+    mIsFilled(deserialize<bool>(node.getChild("fill/@0"), fileFormat)),
+    mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"), fileFormat)),
+    mPath(node, fileFormat) {
 }
 
 Polygon::~Polygon() noexcept {

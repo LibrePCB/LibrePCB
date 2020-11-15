@@ -74,7 +74,8 @@ public:
     : onEdited(*this) {
     mValues.insert("", defaultValue);
   }
-  explicit SerializableKeyValueMap(const SExpression& node) : onEdited(*this) {
+  SerializableKeyValueMap(const SExpression& node, const Version& fileFormat)
+    : onEdited(*this) {
     foreach (const SExpression& child, node.getChildren(T::tagname)) {
       QString key;
       SExpression value;
@@ -89,8 +90,9 @@ public:
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Key \"%1\" defined multiple times.").arg(key));
       }
-      mValues.insert(key,
-                     deserialize<typename T::ValueType>(value));  // can throw
+      mValues.insert(
+          key,
+          deserialize<typename T::ValueType>(value, fileFormat));  // can throw
     }
     if (!mValues.contains(QString(""))) {
       throw RuntimeError(__FILE__, __LINE__,

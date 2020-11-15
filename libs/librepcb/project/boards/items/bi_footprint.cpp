@@ -57,10 +57,11 @@ BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other)
   init();
 }
 
-BI_Footprint::BI_Footprint(BI_Device& device, const SExpression& node)
+BI_Footprint::BI_Footprint(BI_Device& device, const SExpression& node,
+                           const Version& fileFormat)
   : BI_Base(device.getBoard()), mDevice(device) {
   foreach (const SExpression& node, node.getChildren("stroke_text")) {
-    addStrokeText(*new BI_StrokeText(mBoard, node));  // can throw
+    addStrokeText(*new BI_StrokeText(mBoard, node, fileFormat));  // can throw
   }
   init();
 }

@@ -116,7 +116,8 @@ inline SExpression serialize(
 
 template <>
 inline library::ComponentSymbolVariantItemSuffix deserialize(
-    const SExpression& sexpr) {
+    const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return library::ComponentSymbolVariantItemSuffix(
       sexpr.getValue());  // can throw
 }

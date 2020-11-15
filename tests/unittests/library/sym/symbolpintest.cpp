@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/library/sym/symbolpin.h>
 
 #include <QtCore>
@@ -42,13 +43,29 @@ class SymbolPinTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(SymbolPinTest, testConstructFromSExpression) {
+TEST_F(SymbolPinTest, testConstructFromSExpressionV01) {
+  // Attention: Do NOT modify this string! It represents the freezed(!) file
+  // format V0.1 and even current versions of LibrePCB must be able to load it!
   SExpression sexpr = SExpression::parse(
       "(pin d48b8bd2-a46c-4495-87a5-662747034098 (name \"1\")\n"
       " (position 1.234 2.345) (rotation 45.0) (length 0.5)\n"
       ")",
       FilePath());
-  SymbolPin obj(sexpr);
+  SymbolPin obj(sexpr, Version::fromString("0.1"));
+  EXPECT_EQ(Uuid::fromString("d48b8bd2-a46c-4495-87a5-662747034098"),
+            obj.getUuid());
+  EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
+  EXPECT_EQ(Angle::deg45(), obj.getRotation());
+  EXPECT_EQ(UnsignedLength(500000), obj.getLength());
+}
+
+TEST_F(SymbolPinTest, testConstructFromSExpressionCurrentVersion) {
+  SExpression sexpr = SExpression::parse(
+      "(pin d48b8bd2-a46c-4495-87a5-662747034098 (name \"1\")\n"
+      " (position 1.234 2.345) (rotation 45.0) (length 0.5)\n"
+      ")",
+      FilePath());
+  SymbolPin obj(sexpr, qApp->getFileFormatVersion());
   EXPECT_EQ(Uuid::fromString("d48b8bd2-a46c-4495-87a5-662747034098"),
             obj.getUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
@@ -61,7 +78,7 @@ TEST_F(SymbolPinTest, testSerializeAndDeserialize) {
                  Point(123, 567), UnsignedLength(321), Angle(789));
   SExpression sexpr1 = obj1.serializeToDomElement("pin");
 
-  SymbolPin obj2(sexpr1);
+  SymbolPin obj2(sexpr1, qApp->getFileFormatVersion());
   SExpression sexpr2 = obj2.serializeToDomElement("pin");
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());

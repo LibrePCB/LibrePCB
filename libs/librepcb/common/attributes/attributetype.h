@@ -108,7 +108,9 @@ inline SExpression serialize(const AttributeType& obj) {
 }
 
 template <>
-inline const AttributeType& deserialize(const SExpression& sexpr) {
+inline const AttributeType& deserialize(const SExpression& sexpr,
+                                        const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return AttributeType::fromString(sexpr.getValue());  // can throw
 }
 

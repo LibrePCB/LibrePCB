@@ -53,11 +53,12 @@ BI_StrokeText::BI_StrokeText(Board& board, const BI_StrokeText& other)
   init();
 }
 
-BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node)
+BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node,
+                             const Version& fileFormat)
   : BI_Base(board),
     mFootprint(nullptr),
     mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
-  mText.reset(new StrokeText(node));
+  mText.reset(new StrokeText(node, fileFormat));
   init();
 }
 

@@ -49,7 +49,7 @@ public:
 
   // Constructors / Destructor
   GridProperties() noexcept;
-  explicit GridProperties(const SExpression& node);
+  GridProperties(const SExpression& node, const Version& fileFormat);
   GridProperties(Type_t type, const PositiveLength& interval,
                  const LengthUnit& unit) noexcept;
   GridProperties(const GridProperties& other) noexcept;
@@ -100,7 +100,9 @@ inline SExpression serialize(const GridProperties::Type_t& obj) {
 }
 
 template <>
-inline GridProperties::Type_t deserialize(const SExpression& sexpr) {
+inline GridProperties::Type_t deserialize(const SExpression& sexpr,
+                                          const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == "off")
     return GridProperties::Type_t::Off;

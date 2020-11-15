@@ -83,15 +83,18 @@ public:
         attributes(attributes),
         onEdited(*this) {}
 
-    explicit ComponentInstance(const SExpression& node)
-      : uuid(deserialize<Uuid>(node.getChild("@0"))),
-        libComponentUuid(deserialize<Uuid>(node.getChild("lib_component/@0"))),
-        libVariantUuid(deserialize<Uuid>(node.getChild("lib_variant/@0"))),
-        libDeviceUuid(
-            deserialize<tl::optional<Uuid>>(node.getChild("lib_device/@0"))),
-        name(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
+    ComponentInstance(const SExpression& node, const Version& fileFormat)
+      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        libComponentUuid(
+            deserialize<Uuid>(node.getChild("lib_component/@0"), fileFormat)),
+        libVariantUuid(
+            deserialize<Uuid>(node.getChild("lib_variant/@0"), fileFormat)),
+        libDeviceUuid(deserialize<tl::optional<Uuid>>(
+            node.getChild("lib_device/@0"), fileFormat)),
+        name(deserialize<CircuitIdentifier>(node.getChild("name/@0"),
+                                            fileFormat)),
         value(node.getChild("value/@0").getValue()),
-        attributes(node),
+        attributes(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -136,13 +139,15 @@ public:
         mirrored(mirrored),
         onEdited(*this) {}
 
-    explicit SymbolInstance(const SExpression& node)
-      : uuid(deserialize<Uuid>(node.getChild("@0"))),
-        componentInstanceUuid(deserialize<Uuid>(node.getChild("component/@0"))),
-        symbolVariantItemUuid(deserialize<Uuid>(node.getChild("lib_gate/@0"))),
-        position(node.getChild("position")),
-        rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-        mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
+    SymbolInstance(const SExpression& node, const Version& fileFormat)
+      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        componentInstanceUuid(
+            deserialize<Uuid>(node.getChild("component/@0"), fileFormat)),
+        symbolVariantItemUuid(
+            deserialize<Uuid>(node.getChild("lib_gate/@0"), fileFormat)),
+        position(node.getChild("position"), fileFormat),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -176,11 +181,12 @@ public:
     explicit NetSegment(const CircuitIdentifier& netName)
       : netName(netName), junctions(), lines(), labels(), onEdited(*this) {}
 
-    explicit NetSegment(const SExpression& node)
-      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
-        junctions(node),
-        lines(node),
-        labels(node),
+    NetSegment(const SExpression& node, const Version& fileFormat)
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
+                                               fileFormat)),
+        junctions(node, fileFormat),
+        lines(node, fileFormat),
+        labels(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()

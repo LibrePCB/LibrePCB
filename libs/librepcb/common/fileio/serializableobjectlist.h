@@ -178,14 +178,15 @@ public:
                                   OnEditedArgs...>::elementEditedHandler) {
     foreach (const std::shared_ptr<T>& obj, elements) { append(obj); }
   }
-  explicit SerializableObjectList(const SExpression& node)
+  explicit SerializableObjectList(const SExpression& node,
+                                  const Version& fileFormat)
     : onEdited(*this),
       onElementEdited(*this),
       mOnEditedSlot(
           *this,
           &SerializableObjectList<T, P,
                                   OnEditedArgs...>::elementEditedHandler) {
-    loadFromSExpression(node);  // can throw
+    loadFromSExpression(node, fileFormat);  // can throw
   }
   virtual ~SerializableObjectList() noexcept {}
 
@@ -305,10 +306,10 @@ public:
   iterator end() noexcept { return mObjects.end(); }
 
   // General Methods
-  int loadFromSExpression(const SExpression& node) {
+  int loadFromSExpression(const SExpression& node, const Version& fileFormat) {
     clear();
     foreach (const SExpression& node, node.getChildren(P::tagname)) {
-      append(std::make_shared<T>(node));  // can throw
+      append(std::make_shared<T>(node, fileFormat));  // can throw
     }
     return count();
   }

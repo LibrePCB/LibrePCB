@@ -84,22 +84,25 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
     mFont(nullptr) {
 }
 
-StrokeText::StrokeText(const SExpression& node)
+StrokeText::StrokeText(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mLayerName(
+        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
     mText(node.getChild("value/@0").getValue()),
-    mPosition(node.getChild("position")),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-    mHeight(deserialize<PositiveLength>(node.getChild("height/@0"))),
-    mStrokeWidth(deserialize<UnsignedLength>(node.getChild("stroke_width/@0"))),
-    mLetterSpacing(
-        deserialize<StrokeTextSpacing>(node.getChild("letter_spacing/@0"))),
-    mLineSpacing(
-        deserialize<StrokeTextSpacing>(node.getChild("line_spacing/@0"))),
-    mAlign(node.getChild("align")),
-    mMirrored(deserialize<bool>(node.getChild("mirror/@0"))),
-    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"))),
+    mPosition(node.getChild("position"), fileFormat),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mHeight(
+        deserialize<PositiveLength>(node.getChild("height/@0"), fileFormat)),
+    mStrokeWidth(deserialize<UnsignedLength>(node.getChild("stroke_width/@0"),
+                                             fileFormat)),
+    mLetterSpacing(deserialize<StrokeTextSpacing>(
+        node.getChild("letter_spacing/@0"), fileFormat)),
+    mLineSpacing(deserialize<StrokeTextSpacing>(
+        node.getChild("line_spacing/@0"), fileFormat)),
+    mAlign(node.getChild("align"), fileFormat),
+    mMirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
+    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"), fileFormat)),
     mAttributeProvider(nullptr),
     mFont(nullptr) {
 }

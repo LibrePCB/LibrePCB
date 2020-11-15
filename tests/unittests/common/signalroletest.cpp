@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/signalrole.h>
 
 #include <QtCore>
@@ -46,19 +47,30 @@ TEST(SignalRoleTest, testSerialize) {
   EXPECT_EQ("opendrain\n", serialize(SignalRole::opendrain()).toByteArray());
 }
 
-TEST(SignalRoleTest, testDeserialize) {
+TEST(SignalRoleTest, testDeserializeV01) {
+  // Attention: Do NOT modify this string! It represents the freezed(!) file
+  // format V0.1 and even current versions of LibrePCB must be able to load it!
   SExpression sexpr = SExpression::createString("opendrain");
-  EXPECT_EQ(SignalRole::opendrain(), deserialize<SignalRole>(sexpr));
+  EXPECT_EQ(SignalRole::opendrain(),
+            deserialize<SignalRole>(sexpr, Version::fromString("0.1")));
+}
+
+TEST(SignalRoleTest, testDeserializeCurrentVersion) {
+  SExpression sexpr = SExpression::createString("opendrain");
+  EXPECT_EQ(SignalRole::opendrain(),
+            deserialize<SignalRole>(sexpr, qApp->getFileFormatVersion()));
 }
 
 TEST(SignalRoleTest, testDeserializeEmpty) {
   SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<SignalRole>(sexpr), RuntimeError);
+  EXPECT_THROW(deserialize<SignalRole>(sexpr, qApp->getFileFormatVersion()),
+               RuntimeError);
 }
 
 TEST(SignalRoleTest, testDeserializeInvalid) {
   SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<SignalRole>(sexpr), RuntimeError);
+  EXPECT_THROW(deserialize<SignalRole>(sexpr, qApp->getFileFormatVersion()),
+               RuntimeError);
 }
 
 /*******************************************************************************

@@ -54,11 +54,12 @@ BoardUserSettings::BoardUserSettings(Board& board,
   *mLayerSettings = *other.mLayerSettings;
 }
 
-BoardUserSettings::BoardUserSettings(Board& board, const SExpression& node)
+BoardUserSettings::BoardUserSettings(Board& board, const SExpression& node,
+                                     const Version& fileFormat)
   : QObject(&board),
     mBoard(board),
-    mLayerSettings(
-        new GraphicsLayerStackAppearanceSettings(board.getLayerStack(), node)) {
+    mLayerSettings(new GraphicsLayerStackAppearanceSettings(
+        board.getLayerStack(), node, fileFormat)) {
 }
 
 BoardUserSettings::~BoardUserSettings() noexcept {

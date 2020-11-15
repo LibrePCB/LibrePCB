@@ -46,16 +46,18 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const SExpression& node)
+NetSignal::NetSignal(Circuit& circuit, const SExpression& node,
+                     const Version& fileFormat)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mIsHighlighted(false),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
-    mHasAutoName(deserialize<bool>(node.getChild("auto/@0"))),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
+    mHasAutoName(deserialize<bool>(node.getChild("auto/@0"), fileFormat)),
     mNetClass(nullptr) {
-  Uuid netclassUuid = deserialize<Uuid>(node.getChild("netclass/@0"));
+  Uuid netclassUuid =
+      deserialize<Uuid>(node.getChild("netclass/@0"), fileFormat);
   mNetClass = circuit.getNetClassByUuid(netclassUuid);
   if (!mNetClass) {
     throw RuntimeError(

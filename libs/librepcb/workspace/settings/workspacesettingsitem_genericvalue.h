@@ -89,8 +89,8 @@ public:
   /**
    * @copydoc ::librepcb::workspace::WorkspaceSettingsItem::load()
    */
-  void load(const SExpression& root) override {
-    set(deserialize<T>(root.getChild(mKey % "/@0")));  // can throw
+  void load(const SExpression& root, const Version& fileFormat) override {
+    set(deserialize<T>(root.getChild(mKey % "/@0"), fileFormat));  // can throw
   }
 
   /**

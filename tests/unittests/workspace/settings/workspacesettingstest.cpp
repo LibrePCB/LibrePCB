@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 
@@ -43,7 +44,9 @@ class WorkspaceSettingsTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(WorkspaceSettingsTest, testConstructFromSExpression) {
+TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionV01) {
+  // Attention: Do NOT modify this string! It represents the freezed(!) file
+  // format V0.1 and even current versions of LibrePCB must be able to load it!
   SExpression sexpr = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (user \"Foo Bar\")\n"
@@ -65,7 +68,41 @@ TEST_F(WorkspaceSettingsTest, testConstructFromSExpression) {
   FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
   FileUtils::writeFile(fp, sexpr.toByteArray());
 
-  WorkspaceSettings obj(fp);
+  WorkspaceSettings obj(fp, Version::fromString("0.1"));
+  EXPECT_EQ("Foo Bar", obj.userName.get());
+  EXPECT_EQ("de_CH", obj.applicationLocale.get());
+  EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
+  EXPECT_EQ(120U, obj.projectAutosaveIntervalSeconds.get());
+  EXPECT_EQ(true, obj.useOpenGl.get());
+  EXPECT_EQ(QStringList{"de_DE"}, obj.libraryLocaleOrder.get());
+  EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
+  EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
+            obj.repositoryUrls.get());
+}
+
+TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionCurrentVersion) {
+  SExpression sexpr = SExpression::parse(
+      "(librepcb_workspace_settings\n"
+      " (user \"Foo Bar\")\n"
+      " (application_locale \"de_CH\")\n"
+      " (default_length_unit micrometers)\n"
+      " (project_autosave_interval 120)\n"
+      " (use_opengl true)\n"
+      " (library_locale_order\n"
+      "  (locale \"de_DE\")\n"
+      " )\n"
+      " (library_norm_order\n"
+      "  (norm \"IEC 60617\")\n"
+      " )\n"
+      " (repositories\n"
+      "  (repository \"https://api.librepcb.org\")\n"
+      " )\n"
+      ")",
+      FilePath());
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
+  FileUtils::writeFile(fp, sexpr.toByteArray());
+
+  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -81,7 +118,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
 
   // Store
-  WorkspaceSettings obj1(fp);
+  WorkspaceSettings obj1(fp, qApp->getFileFormatVersion());
   obj1.userName.set("foo bar");
   obj1.applicationLocale.set("de_CH");
   obj1.defaultLengthUnit.set(LengthUnit::nanometers());
@@ -96,7 +133,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.saveToFile();
 
   // Load
-  WorkspaceSettings obj2(fp);
+  WorkspaceSettings obj2(fp, qApp->getFileFormatVersion());
   EXPECT_EQ(obj1.userName.get().toStdString(),
             obj2.userName.get().toStdString());
   EXPECT_EQ(obj1.applicationLocale.get().toStdString(),

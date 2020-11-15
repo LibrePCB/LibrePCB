@@ -68,7 +68,7 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
 }
 
 BoardFabricationOutputSettings::BoardFabricationOutputSettings(
-    const SExpression& node)
+    const SExpression& node, const Version& fileFormat)
   : BoardFabricationOutputSettings()  // init and load defaults
 {
   mOutputBasePath = node.getChild("base_path/@0").getValue();
@@ -85,11 +85,12 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
   mSuffixDrillsPth = node.getChild("drills/suffix_pth/@0").getValue();
   mSuffixDrillsNpth = node.getChild("drills/suffix_npth/@0").getValue();
   mSuffixDrills = node.getChild("drills/suffix_merged/@0").getValue();
-  mMergeDrillFiles = deserialize<bool>(node.getChild("drills/merge/@0"));
+  mMergeDrillFiles =
+      deserialize<bool>(node.getChild("drills/merge/@0"), fileFormat);
   mEnableSolderPasteTop =
-      deserialize<bool>(node.getChild("solderpaste_top/create/@0"));
+      deserialize<bool>(node.getChild("solderpaste_top/create/@0"), fileFormat);
   mEnableSolderPasteBot =
-      deserialize<bool>(node.getChild("solderpaste_bot/create/@0"));
+      deserialize<bool>(node.getChild("solderpaste_bot/create/@0"), fileFormat);
 
   mSilkscreenLayersTop.clear();
   foreach (const SExpression& child,

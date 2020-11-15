@@ -74,7 +74,8 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory)
   // read dependency UUIDs
   foreach (const SExpression& node,
            mLoadingFileDocument.getChildren("dependency")) {
-    mDependencies.insert(deserialize<Uuid>(node.getChild("@0")));
+    mDependencies.insert(
+        deserialize<Uuid>(node.getChild("@0"), mLoadingFileFormat));
   }
 
   // load image if available

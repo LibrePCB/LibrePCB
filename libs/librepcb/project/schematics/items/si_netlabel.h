@@ -55,7 +55,8 @@ public:
   // Constructors / Destructor
   SI_NetLabel() = delete;
   SI_NetLabel(const SI_NetLabel& other) = delete;
-  explicit SI_NetLabel(SI_NetSegment& segment, const SExpression& node);
+  SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
+              const Version& fileFormat);
   explicit SI_NetLabel(SI_NetSegment& segment, const Point& position,
                        const Angle& rotation);
   ~SI_NetLabel() noexcept;

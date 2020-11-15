@@ -138,7 +138,8 @@ inline SExpression serialize(const library::CmpSigPinDisplayType& obj) {
 
 template <>
 inline const library::CmpSigPinDisplayType& deserialize(
-    const SExpression& sexpr) {
+    const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return library::CmpSigPinDisplayType::fromString(
       sexpr.getValue());  // can throw
 }

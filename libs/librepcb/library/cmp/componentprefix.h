@@ -109,7 +109,9 @@ inline SExpression serialize(const library::ComponentPrefix& obj) {
 }
 
 template <>
-inline library::ComponentPrefix deserialize(const SExpression& sexpr) {
+inline library::ComponentPrefix deserialize(const SExpression& sexpr,
+                                            const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return library::ComponentPrefix(sexpr.getValue());  // can throw
 }
 

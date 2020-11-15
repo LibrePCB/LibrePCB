@@ -124,7 +124,9 @@ inline SExpression serialize(const CircuitIdentifier& obj) {
 }
 
 template <>
-inline CircuitIdentifier deserialize(const SExpression& sexpr) {
+inline CircuitIdentifier deserialize(const SExpression& sexpr,
+                                     const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return CircuitIdentifier(sexpr.getValue());  // can throw
 }
 

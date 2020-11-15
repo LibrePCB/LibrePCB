@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/boards/board.h>
@@ -99,9 +100,11 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
   QMap<Uuid, QSet<Path>> expectedPlaneFragments;
   foreach (const SExpression& child, expectedSexpr.getChildren("plane")) {
-    Uuid uuid = deserialize<Uuid>(child.getChild("@0"));
+    Uuid uuid =
+        deserialize<Uuid>(child.getChild("@0"), qApp->getFileFormatVersion());
     foreach (const SExpression& fragmentChild, child.getChildren("fragment")) {
-      expectedPlaneFragments[uuid].insert(Path(fragmentChild));
+      expectedPlaneFragments[uuid].insert(
+          Path(fragmentChild, qApp->getFileFormatVersion()));
     }
   }
 

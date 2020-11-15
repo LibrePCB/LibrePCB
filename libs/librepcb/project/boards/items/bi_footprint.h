@@ -64,7 +64,8 @@ public:
   BI_Footprint() = delete;
   BI_Footprint(const BI_Footprint& other) = delete;
   BI_Footprint(BI_Device& device, const BI_Footprint& other);
-  BI_Footprint(BI_Device& device, const SExpression& node);
+  BI_Footprint(BI_Device& device, const SExpression& node,
+               const Version& fileFormat);
   explicit BI_Footprint(BI_Device& device);
   ~BI_Footprint() noexcept;
 

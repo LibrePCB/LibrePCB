@@ -170,7 +170,8 @@ inline SExpression serialize(const Uuid& obj) {
 }
 
 template <>
-inline Uuid deserialize(const SExpression& sexpr) {
+inline Uuid deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return Uuid::fromString(sexpr.getValue());  // can throw
 }
 
@@ -184,11 +185,12 @@ inline SExpression serialize(const tl::optional<Uuid>& obj) {
 }
 
 template <>
-inline tl::optional<Uuid> deserialize(const SExpression& sexpr) {
+inline tl::optional<Uuid> deserialize(const SExpression& sexpr,
+                                      const Version& fileFormat) {
   if (sexpr.getValue() == "none") {
     return tl::nullopt;
   } else {
-    return deserialize<Uuid>(sexpr);  // can throw
+    return deserialize<Uuid>(sexpr, fileFormat);  // can throw
   }
 }
 

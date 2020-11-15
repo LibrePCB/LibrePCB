@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/units/angle.h>
 
 /*******************************************************************************
@@ -77,14 +78,29 @@ TEST_P(AngleTest, testSerialize) {
   }
 }
 
-TEST_P(AngleTest, testDeserialize) {
+TEST_P(AngleTest, testDeserializeV01) {
   const AngleTestData& data = GetParam();
 
   SExpression sexpr = SExpression::createString(data.origStr);
   if (data.valid) {
-    EXPECT_EQ(data.value, deserialize<Angle>(sexpr));
+    EXPECT_EQ(data.value,
+              deserialize<Angle>(sexpr, Version::fromString("0.1")));
   } else {
-    EXPECT_THROW(deserialize<Angle>(sexpr), RuntimeError);
+    EXPECT_THROW(deserialize<Angle>(sexpr, Version::fromString("0.1")),
+                 RuntimeError);
+  }
+}
+
+TEST_P(AngleTest, testDeserializeCurrentVersion) {
+  const AngleTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::createString(data.origStr);
+  if (data.valid) {
+    EXPECT_EQ(data.value,
+              deserialize<Angle>(sexpr, qApp->getFileFormatVersion()));
+  } else {
+    EXPECT_THROW(deserialize<Angle>(sexpr, qApp->getFileFormatVersion()),
+                 RuntimeError);
   }
 }
 

@@ -53,7 +53,7 @@ LibraryCategory::LibraryCategory(
   : LibraryBaseElement(std::move(directory), true, shortElementName,
                        longElementName),
     mParentUuid(deserialize<tl::optional<Uuid>>(
-        mLoadingFileDocument.getChild("parent/@0"))) {
+        mLoadingFileDocument.getChild("parent/@0"), mLoadingFileFormat)) {
 }
 
 LibraryCategory::~LibraryCategory() noexcept {

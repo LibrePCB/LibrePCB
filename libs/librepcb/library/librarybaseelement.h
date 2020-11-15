@@ -143,6 +143,7 @@ protected:
 
   // Members required for loading elements from file
   SExpression mLoadingFileDocument;
+  Version mLoadingFileFormat;
 
   // General Library Element Attributes
   Uuid mUuid;

@@ -37,10 +37,12 @@ GridProperties::GridProperties() noexcept
   : mType(Type_t::Lines), mInterval(2540000), mUnit(LengthUnit::millimeters()) {
 }
 
-GridProperties::GridProperties(const SExpression& node)
-  : mType(deserialize<Type_t>(node.getChild("type/@0"))),
-    mInterval(deserialize<PositiveLength>(node.getChild("interval/@0"))),
-    mUnit(deserialize<LengthUnit>(node.getChild("unit/@0"))) {
+GridProperties::GridProperties(const SExpression& node,
+                               const Version& fileFormat)
+  : mType(deserialize<Type_t>(node.getChild("type/@0"), fileFormat)),
+    mInterval(
+        deserialize<PositiveLength>(node.getChild("interval/@0"), fileFormat)),
+    mUnit(deserialize<LengthUnit>(node.getChild("unit/@0"), fileFormat)) {
 }
 
 GridProperties::GridProperties(Type_t type, const PositiveLength& interval,

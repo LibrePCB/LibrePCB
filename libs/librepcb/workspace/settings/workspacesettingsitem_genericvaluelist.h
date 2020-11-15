@@ -91,11 +91,12 @@ public:
   /**
    * @copydoc ::librepcb::workspace::WorkspaceSettingsItem::load()
    */
-  void load(const SExpression& root) override {
+  void load(const SExpression& root, const Version& fileFormat) override {
     T values;  // temporary object to make this method atomic
     foreach (const SExpression& child,
              root.getChild(mListKey).getChildren(mItemKey)) {
-      values.append(deserialize<typename T::value_type>(child.getChild("@0")));
+      values.append(deserialize<typename T::value_type>(child.getChild("@0"),
+                                                        fileFormat));
     }
     set(values);
   }

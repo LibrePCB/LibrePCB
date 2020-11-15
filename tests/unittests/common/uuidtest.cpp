@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>
@@ -188,15 +189,40 @@ TEST_P(UuidTest, testSerialize) {
   }
 }
 
-TEST_P(UuidTest, testDeserialize) {
+TEST_P(UuidTest, testDeserializeV01) {
   const UuidTestData& data = GetParam();
   SExpression sexpr = SExpression::createToken(data.uuid);
   if (data.valid) {
-    EXPECT_EQ(data.uuid, deserialize<Uuid>(sexpr).toStr());
-    EXPECT_EQ(data.uuid, deserialize<tl::optional<Uuid>>(sexpr)->toStr());
+    EXPECT_EQ(data.uuid,
+              deserialize<Uuid>(sexpr, Version::fromString("0.1")).toStr());
+    EXPECT_EQ(data.uuid,
+              deserialize<tl::optional<Uuid>>(sexpr, Version::fromString("0.1"))
+                  ->toStr());
   } else {
-    EXPECT_THROW(deserialize<Uuid>(sexpr), Exception);
-    EXPECT_THROW(deserialize<tl::optional<Uuid>>(sexpr), Exception);
+    EXPECT_THROW(deserialize<Uuid>(sexpr, Version::fromString("0.1")),
+                 Exception);
+    EXPECT_THROW(
+        deserialize<tl::optional<Uuid>>(sexpr, Version::fromString("0.1")),
+        Exception);
+  }
+}
+
+TEST_P(UuidTest, testDeserializeCurrentVersion) {
+  const UuidTestData& data = GetParam();
+  SExpression sexpr = SExpression::createToken(data.uuid);
+  if (data.valid) {
+    EXPECT_EQ(data.uuid,
+              deserialize<Uuid>(sexpr, qApp->getFileFormatVersion()).toStr());
+    EXPECT_EQ(
+        data.uuid,
+        deserialize<tl::optional<Uuid>>(sexpr, qApp->getFileFormatVersion())
+            ->toStr());
+  } else {
+    EXPECT_THROW(deserialize<Uuid>(sexpr, qApp->getFileFormatVersion()),
+                 Exception);
+    EXPECT_THROW(
+        deserialize<tl::optional<Uuid>>(sexpr, qApp->getFileFormatVersion()),
+        Exception);
   }
 }
 
@@ -205,9 +231,19 @@ TEST(UuidTest, testSerializeOptional) {
   EXPECT_EQ("none", serialize(uuid).getValue());
 }
 
-TEST(UuidTest, testDeserializeOptional) {
+TEST(UuidTest, testDeserializeOptionalV01) {
+  // Attention: Do NOT modify this string! It represents the freezed(!) file
+  // format V0.1 and even current versions of LibrePCB must be able to load it!
   SExpression sexpr = SExpression::createToken("none");
-  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<Uuid>>(sexpr));
+  EXPECT_EQ(tl::nullopt,
+            deserialize<tl::optional<Uuid>>(sexpr, Version::fromString("0.1")));
+}
+
+TEST(UuidTest, testDeserializeOptionalCurrentVersion) {
+  SExpression sexpr = SExpression::createToken("none");
+  EXPECT_EQ(
+      tl::nullopt,
+      deserialize<tl::optional<Uuid>>(sexpr, qApp->getFileFormatVersion()));
 }
 
 /*******************************************************************************

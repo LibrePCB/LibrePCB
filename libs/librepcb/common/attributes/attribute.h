@@ -61,7 +61,7 @@ public:
   // Constructors / Destructor
   Attribute() = delete;
   Attribute(const Attribute& other) noexcept;
-  explicit Attribute(const SExpression& node);
+  Attribute(const SExpression& node, const Version& fileFormat);
   Attribute(const AttributeKey& key, const AttributeType& type,
             const QString& value, const AttributeUnit* unit);
   ~Attribute() noexcept;

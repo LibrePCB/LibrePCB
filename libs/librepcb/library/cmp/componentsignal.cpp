@@ -60,15 +60,16 @@ ComponentSignal::ComponentSignal(const Uuid& uuid,
     mIsClock(isClock) {
 }
 
-ComponentSignal::ComponentSignal(const SExpression& node)
+ComponentSignal::ComponentSignal(const SExpression& node,
+                                 const Version& fileFormat)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
-    mRole(deserialize<SignalRole>(node.getChild("role/@0"))),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
+    mRole(deserialize<SignalRole>(node.getChild("role/@0"), fileFormat)),
     mForcedNetName(node.getChild("forced_net/@0").getValue()),
-    mIsRequired(deserialize<bool>(node.getChild("required/@0"))),
-    mIsNegated(deserialize<bool>(node.getChild("negated/@0"))),
-    mIsClock(deserialize<bool>(node.getChild("clock/@0"))) {
+    mIsRequired(deserialize<bool>(node.getChild("required/@0"), fileFormat)),
+    mIsNegated(deserialize<bool>(node.getChild("negated/@0"), fileFormat)),
+    mIsClock(deserialize<bool>(node.getChild("clock/@0"), fileFormat)) {
 }
 
 ComponentSignal::~ComponentSignal() noexcept {

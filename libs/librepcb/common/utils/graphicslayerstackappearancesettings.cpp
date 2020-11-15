@@ -48,15 +48,18 @@ GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
 }
 
 GraphicsLayerStackAppearanceSettings::GraphicsLayerStackAppearanceSettings(
-    IF_GraphicsLayerProvider& layers, const SExpression& node)
+    IF_GraphicsLayerProvider& layers, const SExpression& node,
+    const Version& fileFormat)
   : mLayers(layers) {
   for (const SExpression& child : node.getChildren("layer")) {
     QString name = child.getChild("@0").getValue();
     if (GraphicsLayer* layer = mLayers.getLayer(name)) {
-      layer->setColor(deserialize<QColor>(child.getChild("color/@0")));
+      layer->setColor(
+          deserialize<QColor>(child.getChild("color/@0"), fileFormat));
       layer->setColorHighlighted(
-          deserialize<QColor>(child.getChild("color_hl/@0")));
-      layer->setVisible(deserialize<bool>(child.getChild("visible/@0")));
+          deserialize<QColor>(child.getChild("color_hl/@0"), fileFormat));
+      layer->setVisible(
+          deserialize<bool>(child.getChild("visible/@0"), fileFormat));
     }
   }
 }

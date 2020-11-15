@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/geometry/via.h>
 
 /*******************************************************************************
@@ -40,12 +41,28 @@ class ViaTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(ViaTest, testConstructFromSExpression) {
+TEST_F(ViaTest, testConstructFromSExpressionV01) {
+  // Attention: Do NOT modify this string! It represents the freezed(!) file
+  // format V0.1 and even current versions of LibrePCB must be able to load it!
   SExpression sexpr = SExpression::parse(
       "(via b9445237-8982-4a9f-af06-bfc6c507e010 (position 1.234 2.345) "
       "(size 0.9) (drill 0.4) (shape round))",
       FilePath());
-  Via obj(sexpr);
+  Via obj(sexpr, Version::fromString("0.1"));
+  EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
+            obj.getUuid());
+  EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
+  EXPECT_EQ(PositiveLength(900000), obj.getSize());
+  EXPECT_EQ(PositiveLength(400000), obj.getDrillDiameter());
+  EXPECT_EQ(Via::Shape::Round, obj.getShape());
+}
+
+TEST_F(ViaTest, testConstructFromSExpressionCurrentVersion) {
+  SExpression sexpr = SExpression::parse(
+      "(via b9445237-8982-4a9f-af06-bfc6c507e010 (position 1.234 2.345) "
+      "(size 0.9) (drill 0.4) (shape round))",
+      FilePath());
+  Via obj(sexpr, qApp->getFileFormatVersion());
   EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
             obj.getUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
@@ -59,7 +76,7 @@ TEST_F(ViaTest, testSerializeAndDeserialize) {
            PositiveLength(789), PositiveLength(321));
   SExpression sexpr1 = obj1.serializeToDomElement("via");
 
-  Via obj2(sexpr1);
+  Via obj2(sexpr1, qApp->getFileFormatVersion());
   SExpression sexpr2 = obj2.serializeToDomElement("via");
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());

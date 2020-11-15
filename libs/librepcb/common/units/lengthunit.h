@@ -335,7 +335,9 @@ inline SExpression serialize(const LengthUnit& obj) {
 }
 
 template <>
-inline LengthUnit deserialize(const SExpression& sexpr) {
+inline LengthUnit deserialize(const SExpression& sexpr,
+                              const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return LengthUnit::fromString(sexpr.getValue());  // can throw
 }
 

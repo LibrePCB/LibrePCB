@@ -38,8 +38,11 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node)
-  : SI_Base(segment.getSchematic()), mNetSegment(segment), mJunction(node) {
+SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node,
+                         const Version& fileFormat)
+  : SI_Base(segment.getSchematic()),
+    mNetSegment(segment),
+    mJunction(node, fileFormat) {
   init();
 }
 

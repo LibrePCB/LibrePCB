@@ -120,7 +120,9 @@ inline SExpression serialize(const ElementName& obj) {
 }
 
 template <>
-inline ElementName deserialize(const SExpression& sexpr) {
+inline ElementName deserialize(const SExpression& sexpr,
+                               const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return ElementName(sexpr.getValue());  // can throw
 }
 

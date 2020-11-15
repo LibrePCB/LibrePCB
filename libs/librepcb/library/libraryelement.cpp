@@ -57,7 +57,8 @@ LibraryElement::LibraryElement(
   // read category UUIDs
   foreach (const SExpression& node,
            mLoadingFileDocument.getChildren("category")) {
-    mCategories.insert(deserialize<Uuid>(node.getChild("@0")));
+    mCategories.insert(
+        deserialize<Uuid>(node.getChild("@0"), mLoadingFileFormat));
   }
 }
 

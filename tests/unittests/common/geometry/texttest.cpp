@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/geometry/text.h>
 
 /*******************************************************************************
@@ -40,13 +41,32 @@ class TextTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(TextTest, testConstructFromSExpression) {
+TEST_F(TextTest, testConstructFromSExpressionV01) {
+  // Attention: Do NOT modify this string! It represents the freezed(!) file
+  // format V0.1 and even current versions of LibrePCB must be able to load it!
   SExpression sexpr = SExpression::parse(
       "(text eabf43fb-496b-4dc8-8ff7-ffac67991390 (layer sym_names) "
       "(value \"{{NAME}}\") (align center bottom) (height 2.54) "
       "(position 1.234 2.345) (rotation 45.0))",
       FilePath());
-  Text obj(sexpr);
+  Text obj(sexpr, Version::fromString("0.1"));
+  EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
+            obj.getUuid());
+  EXPECT_EQ(GraphicsLayerName("sym_names"), obj.getLayerName());
+  EXPECT_EQ("{{NAME}}", obj.getText());
+  EXPECT_EQ(Alignment(HAlign::center(), VAlign::bottom()), obj.getAlign());
+  EXPECT_EQ(PositiveLength(2540000), obj.getHeight());
+  EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
+  EXPECT_EQ(Angle::deg45(), obj.getRotation());
+}
+
+TEST_F(TextTest, testConstructFromSExpressionCurrentVersion) {
+  SExpression sexpr = SExpression::parse(
+      "(text eabf43fb-496b-4dc8-8ff7-ffac67991390 (layer sym_names) "
+      "(value \"{{NAME}}\") (align center bottom) (height 2.54) "
+      "(position 1.234 2.345) (rotation 45.0))",
+      FilePath());
+  Text obj(sexpr, qApp->getFileFormatVersion());
   EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
             obj.getUuid());
   EXPECT_EQ(GraphicsLayerName("sym_names"), obj.getLayerName());
@@ -63,7 +83,7 @@ TEST_F(TextTest, testSerializeAndDeserialize) {
             Alignment(HAlign::right(), VAlign::center()));
   SExpression sexpr1 = obj1.serializeToDomElement("text");
 
-  Text obj2(sexpr1);
+  Text obj2(sexpr1, qApp->getFileFormatVersion());
   SExpression sexpr2 = obj2.serializeToDomElement("text");
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());

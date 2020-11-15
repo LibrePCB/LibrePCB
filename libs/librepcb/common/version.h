@@ -228,7 +228,9 @@ inline SExpression serialize(const Version& obj) {
 }
 
 template <>
-inline Version deserialize(const SExpression& sexpr) {
+inline Version deserialize(const SExpression& sexpr,
+                           const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return Version::fromString(sexpr.getValue());  // can throw
 }
 

@@ -24,6 +24,7 @@
 #include "serializableobjectmock.h"
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 
 #include <QtCore>
@@ -77,7 +78,8 @@ private:
 TEST_F(SerializableObjectListTest, testInstantiationWithMinimalElementClass) {
   MinimalList l1;  // default ctor
   MinimalList l2(std::move(l1));  // move ctor
-  MinimalList l3(SExpression::createList("list"));  // SExpression ctor
+  MinimalList l3(SExpression::createList("list"),
+                 qApp->getFileFormatVersion());  // SExpression ctor
   l3.append(std::make_shared<MinimalMock>("foo"));
   EXPECT_TRUE(l1.isEmpty());
   EXPECT_EQ(0, l2.count());
@@ -121,7 +123,7 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor) {
   EXPECT_EQ("bar", l[1]->mName);
 }
 
-TEST_F(SerializableObjectListTest, testSExpressionConstructor) {
+TEST_F(SerializableObjectListTest, testSExpressionConstructorV01) {
   SExpression e = SExpression::createList("list");
   e.appendChild("test", mMocks[0]->mUuid, true)
       .appendChild<QString>("name", "foo", true);
@@ -129,7 +131,23 @@ TEST_F(SerializableObjectListTest, testSExpressionConstructor) {
       .appendChild<QString>("name", "bar", true);
   e.appendChild("none", mMocks[2]->mUuid, true)
       .appendChild<QString>("name", "bar", true);
-  List l(e);
+  List l(e, Version::fromString("0.1"));
+  EXPECT_EQ(2, l.count());
+  EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
+  EXPECT_EQ(mMocks[1]->mUuid, l[1]->mUuid);
+  EXPECT_EQ("foo", l[0]->mName);
+  EXPECT_EQ("bar", l[1]->mName);
+}
+
+TEST_F(SerializableObjectListTest, testSExpressionConstructorCurrentVersion) {
+  SExpression e = SExpression::createList("list");
+  e.appendChild("test", mMocks[0]->mUuid, true)
+      .appendChild<QString>("name", "foo", true);
+  e.appendChild("test", mMocks[1]->mUuid, true)
+      .appendChild<QString>("name", "bar", true);
+  e.appendChild("none", mMocks[2]->mUuid, true)
+      .appendChild<QString>("name", "bar", true);
+  List l(e, qApp->getFileFormatVersion());
   EXPECT_EQ(2, l.count());
   EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
   EXPECT_EQ(mMocks[1]->mUuid, l[1]->mUuid);
@@ -277,7 +295,9 @@ TEST_F(SerializableObjectListTest, testSerialize) {
   e.removeLineBreaks();  // we are not interested in line breaks...
   EXPECT_EQ(3, e.getChildren().count());
   EXPECT_EQ("test", e.getChildren()[0].getName());
-  EXPECT_EQ(mMocks[1]->mUuid, deserialize<Uuid>(e.getChild("@1/@0")));
+  EXPECT_EQ(
+      mMocks[1]->mUuid,
+      deserialize<Uuid>(e.getChild("@1/@0"), qApp->getFileFormatVersion()));
   EXPECT_EQ(mMocks[2]->mName, e.getChild("@2/name/@0").getValue());
 }
 

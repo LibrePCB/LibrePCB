@@ -100,7 +100,9 @@ inline SExpression serialize(const GraphicsLayerName& obj) {
 }
 
 template <>
-inline GraphicsLayerName deserialize(const SExpression& sexpr) {
+inline GraphicsLayerName deserialize(const SExpression& sexpr,
+                                     const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   return GraphicsLayerName(sexpr.getValue());  // can throw
 }
 

@@ -66,14 +66,15 @@ public:
   /**
    * @brief Load value from S-Expression node
    *
-   * @param root  Root node of the settings file.
+   * @param root        Root node of the settings file.
+   * @param fileFormat  The file format of the settings file.
    *
    * @note Implementation must emit the #edited() signal.
    *
    * @note Implementation must be atomic, i.e. either the value must be loaded
    *       completely from file, or left at the old value (in case of errors).
    */
-  virtual void load(const SExpression& root) = 0;
+  virtual void load(const SExpression& root, const Version& fileFormat) = 0;
 
   /**
    * @brief Serialize the value into S-Expression node

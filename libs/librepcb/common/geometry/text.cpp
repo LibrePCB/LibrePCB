@@ -61,15 +61,17 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
     mAlign(align) {
 }
 
-Text::Text(const SExpression& node)
+Text::Text(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mLayerName(
+        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
     mText(node.getChild("value/@0").getValue()),
-    mPosition(node.getChild("position")),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-    mHeight(deserialize<PositiveLength>(node.getChild("height/@0"))),
-    mAlign(node.getChild("align")) {
+    mPosition(node.getChild("position"), fileFormat),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mHeight(
+        deserialize<PositiveLength>(node.getChild("height/@0"), fileFormat)),
+    mAlign(node.getChild("align"), fileFormat) {
 }
 
 Text::~Text() noexcept {

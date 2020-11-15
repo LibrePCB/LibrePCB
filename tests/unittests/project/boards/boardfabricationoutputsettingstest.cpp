@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/project/boards/boardfabricationoutputsettings.h>
 
 #include <QtCore>
@@ -65,7 +66,7 @@ TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
   obj.setEnableSolderPasteBot(!obj.getEnableSolderPasteBot());
   SExpression sexpr1 = obj.serializeToDomElement("settings");
 
-  BoardFabricationOutputSettings obj2(sexpr1);
+  BoardFabricationOutputSettings obj2(sexpr1, qApp->getFileFormatVersion());
   SExpression sexpr2 = obj2.serializeToDomElement("settings");
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());

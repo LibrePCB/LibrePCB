@@ -23,6 +23,7 @@
 
 #include <gtest/gtest.h>
 #include <librepcb/common/alignment.h>
+#include <librepcb/common/application.h>
 
 /*******************************************************************************
  *  Namespace
@@ -53,15 +54,31 @@ class AlignmentTest : public ::testing::TestWithParam<AlignmentTestData> {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_P(AlignmentTest, testConstructFromSExpression) {
+TEST_P(AlignmentTest, testConstructFromSExpressionV01) {
   const AlignmentTestData& data = GetParam();
 
   SExpression sexpr = SExpression::parse(data.serialized, FilePath());
 
   if (data.validSExpression) {
-    EXPECT_EQ(Alignment(data.hAlign, data.vAlign), Alignment(sexpr));
+    EXPECT_EQ(Alignment(data.hAlign, data.vAlign),
+              Alignment(sexpr, Version::fromString("0.1")));
   } else {
-    EXPECT_THROW({ Alignment a(sexpr); }, RuntimeError);
+    EXPECT_THROW({ Alignment a(sexpr, Version::fromString("0.1")); },
+                 RuntimeError);
+  }
+}
+
+TEST_P(AlignmentTest, testConstructFromSExpressionCurrentVersion) {
+  const AlignmentTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
+
+  if (data.validSExpression) {
+    EXPECT_EQ(Alignment(data.hAlign, data.vAlign),
+              Alignment(sexpr, qApp->getFileFormatVersion()));
+  } else {
+    EXPECT_THROW({ Alignment a(sexpr, qApp->getFileFormatVersion()); },
+                 RuntimeError);
   }
 }
 

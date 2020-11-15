@@ -38,8 +38,11 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectSettings::ProjectSettings(Project& project, bool create)
+ProjectSettings::ProjectSettings(Project& project, const Version& fileFormat,
+                                 bool create)
   : QObject(nullptr), mProject(project) {
+  Q_UNUSED(fileFormat);
+
   qDebug() << "load settings...";
 
   // restore all default values

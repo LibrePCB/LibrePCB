@@ -89,14 +89,16 @@ public:
         strokeTexts(strokeTexts),
         onEdited(*this) {}
 
-    explicit Device(const SExpression& node)
-      : componentUuid(deserialize<Uuid>(node.getChild("@0"))),
-        libDeviceUuid(deserialize<Uuid>(node.getChild("lib_device/@0"))),
-        libFootprintUuid(deserialize<Uuid>(node.getChild("lib_footprint/@0"))),
-        position(node.getChild("position")),
-        rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-        mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
-        strokeTexts(node),
+    Device(const SExpression& node, const Version& fileFormat)
+      : componentUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        libDeviceUuid(
+            deserialize<Uuid>(node.getChild("lib_device/@0"), fileFormat)),
+        libFootprintUuid(
+            deserialize<Uuid>(node.getChild("lib_footprint/@0"), fileFormat)),
+        position(node.getChild("position"), fileFormat),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
+        strokeTexts(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -131,11 +133,12 @@ public:
     explicit NetSegment(const CircuitIdentifier& netName)
       : netName(netName), vias(), junctions(), traces(), onEdited(*this) {}
 
-    explicit NetSegment(const SExpression& node)
-      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
-        vias(node),
-        junctions(node),
-        traces(node),
+    NetSegment(const SExpression& node, const Version& fileFormat)
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
+                                               fileFormat)),
+        vias(node, fileFormat),
+        junctions(node, fileFormat),
+        traces(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -181,18 +184,22 @@ public:
         connectStyle(connectStyle),
         onEdited(*this) {}
 
-    explicit Plane(const SExpression& node)
-      : uuid(deserialize<Uuid>(node.getChild("@0"))),
-        layer(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
-        netSignalName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
-        outline(node),
-        minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
-        minClearance(
-            deserialize<UnsignedLength>(node.getChild("min_clearance/@0"))),
-        keepOrphans(deserialize<bool>(node.getChild("keep_orphans/@0"))),
-        priority(deserialize<int>(node.getChild("priority/@0"))),
+    Plane(const SExpression& node, const Version& fileFormat)
+      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        layer(deserialize<GraphicsLayerName>(node.getChild("layer/@0"),
+                                             fileFormat)),
+        netSignalName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
+                                                     fileFormat)),
+        outline(node, fileFormat),
+        minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"),
+                                             fileFormat)),
+        minClearance(deserialize<UnsignedLength>(
+            node.getChild("min_clearance/@0"), fileFormat)),
+        keepOrphans(
+            deserialize<bool>(node.getChild("keep_orphans/@0"), fileFormat)),
+        priority(deserialize<int>(node.getChild("priority/@0"), fileFormat)),
         connectStyle(deserialize<BI_Plane::ConnectStyle>(
-            node.getChild("connect_style/@0"))),
+            node.getChild("connect_style/@0"), fileFormat)),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()

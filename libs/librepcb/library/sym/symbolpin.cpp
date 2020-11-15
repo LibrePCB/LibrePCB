@@ -58,13 +58,14 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
     mRegisteredGraphicsItem(nullptr) {
 }
 
-SymbolPin::SymbolPin(const SExpression& node)
+SymbolPin::SymbolPin(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
-    mPosition(node.getChild("position")),
-    mLength(deserialize<UnsignedLength>(node.getChild("length/@0"))),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
+    mPosition(node.getChild("position"), fileFormat),
+    mLength(
+        deserialize<UnsignedLength>(node.getChild("length/@0"), fileFormat)),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
     mRegisteredGraphicsItem(nullptr) {
 }
 

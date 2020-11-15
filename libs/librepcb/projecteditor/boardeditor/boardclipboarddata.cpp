@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardclipboarddata.h"
 
+#include <librepcb/common/application.h>
 #include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/project/circuit/netsignal.h>
@@ -60,20 +61,22 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
 
   SExpression root =
       SExpression::parse(mFileSystem->read("board.lp"), FilePath());
-  mBoardUuid = deserialize<Uuid>(root.getChild("board/@0"));
-  mCursorPos = Point(root.getChild("cursor_position"));
-  mDevices.loadFromSExpression(root);
-  mNetSegments.loadFromSExpression(root);
-  mPlanes.loadFromSExpression(root);
-  mPolygons.loadFromSExpression(root);
-  mStrokeTexts.loadFromSExpression(root);
-  mHoles.loadFromSExpression(root);
+  Version fileFormat = qApp->getFileFormatVersion();
+  mBoardUuid = deserialize<Uuid>(root.getChild("board/@0"), fileFormat);
+  mCursorPos = Point(root.getChild("cursor_position"), fileFormat);
+  mDevices.loadFromSExpression(root, fileFormat);
+  mNetSegments.loadFromSExpression(root, fileFormat);
+  mPlanes.loadFromSExpression(root, fileFormat);
+  mPolygons.loadFromSExpression(root, fileFormat);
+  mStrokeTexts.loadFromSExpression(root, fileFormat);
+  mHoles.loadFromSExpression(root, fileFormat);
 
   foreach (const SExpression& child, root.getChildren("pad_position")) {
     mPadPositions.insert(
-        std::make_pair(deserialize<Uuid>(child.getChild("device/@0")),
-                       deserialize<Uuid>(child.getChild("pad/@0"))),
-        Point(child.getChild("position")));
+        std::make_pair(
+            deserialize<Uuid>(child.getChild("device/@0"), fileFormat),
+            deserialize<Uuid>(child.getChild("pad/@0"), fileFormat)),
+        Point(child.getChild("position"), fileFormat));
   }
 }
 

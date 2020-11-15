@@ -49,14 +49,15 @@ BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other)
           &BoardLayerStack::boardAttributesChanged, Qt::QueuedConnection);
 }
 
-BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node)
+BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node,
+                                 const Version& fileFormat)
   : QObject(&board),
     mBoard(board),
     mLayersChanged(false),
     mInnerLayerCount(-1) {
   addAllLayers();
 
-  setInnerLayerCount(deserialize<uint>(node.getChild("inner/@0")));
+  setInnerLayerCount(deserialize<uint>(node.getChild("inner/@0"), fileFormat));
 
   connect(&mBoard, &Board::attributesChanged, this,
           &BoardLayerStack::boardAttributesChanged, Qt::QueuedConnection);

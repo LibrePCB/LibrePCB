@@ -70,7 +70,8 @@ public:
   // Constructors / Destructor
   SI_NetLine() = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
-  SI_NetLine(SI_NetSegment& segment, const SExpression& node);
+  SI_NetLine(SI_NetSegment& segment, const SExpression& node,
+             const Version& fileFormat);
   SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
              SI_NetLineAnchor& endPoint, const UnsignedLength& width);
   ~SI_NetLine() noexcept;

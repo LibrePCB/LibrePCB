@@ -69,16 +69,17 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
     mRegisteredGraphicsItem(nullptr) {
 }
 
-FootprintPad::FootprintPad(const SExpression& node)
+FootprintPad::FootprintPad(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mPackagePadUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mPosition(node.getChild("position")),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-    mShape(deserialize<Shape>(node.getChild("shape/@0"))),
-    mWidth(Point(node.getChild("size")).getX()),
-    mHeight(Point(node.getChild("size")).getY()),
-    mDrillDiameter(deserialize<UnsignedLength>(node.getChild("drill/@0"))),
-    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"))),
+    mPackagePadUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mPosition(node.getChild("position"), fileFormat),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mShape(deserialize<Shape>(node.getChild("shape/@0"), fileFormat)),
+    mWidth(Point(node.getChild("size"), fileFormat).getX()),
+    mHeight(Point(node.getChild("size"), fileFormat).getY()),
+    mDrillDiameter(
+        deserialize<UnsignedLength>(node.getChild("drill/@0"), fileFormat)),
+    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"), fileFormat)),
     mRegisteredGraphicsItem(nullptr) {
 }
 

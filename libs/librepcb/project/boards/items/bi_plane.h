@@ -65,7 +65,7 @@ public:
   BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
   BI_Plane(Board& board, const BI_Plane& other);
-  BI_Plane(Board& board, const SExpression& node);
+  BI_Plane(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
            NetSignal& netsignal, const Path& outline);
   ~BI_Plane() noexcept;
@@ -171,7 +171,9 @@ inline SExpression serialize(const project::BI_Plane::ConnectStyle& obj) {
 }
 
 template <>
-inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr) {
+inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
+                                                   const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == "none") return project::BI_Plane::ConnectStyle::None;
   // else if (str == "thermal")  return

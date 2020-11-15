@@ -35,10 +35,10 @@ namespace librepcb {
  *  Class Point
  ******************************************************************************/
 
-Point::Point(const SExpression& node) {
+Point::Point(const SExpression& node, const Version& fileFormat) {
   try {
-    mX = deserialize<Length>(node.getChild("@0"));
-    mY = deserialize<Length>(node.getChild("@1"));
+    mX = deserialize<Length>(node.getChild("@0"), fileFormat);
+    mY = deserialize<Length>(node.getChild("@1"), fileFormat);
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                          QString(), e.getMsg());

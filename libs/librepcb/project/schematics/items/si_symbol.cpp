@@ -46,16 +46,17 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node)
+SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node,
+                     const Version& fileFormat)
   : SI_Base(schematic),
     mComponentInstance(nullptr),
     mSymbVarItem(nullptr),
     mSymbol(nullptr),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mPosition(node.getChild("position")),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-    mMirrored(deserialize<bool>(node.getChild("mirror/@0"))) {
-  Uuid gcUuid = deserialize<Uuid>(node.getChild("component/@0"));
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mPosition(node.getChild("position"), fileFormat),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mMirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)) {
+  Uuid gcUuid = deserialize<Uuid>(node.getChild("component/@0"), fileFormat);
   mComponentInstance =
       schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
   if (!mComponentInstance) {
@@ -64,7 +65,8 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node)
         QString("No component with the UUID \"%1\" found in the circuit!")
             .arg(gcUuid.toStr()));
   }
-  Uuid symbVarItemUuid = deserialize<Uuid>(node.getChild("lib_gate/@0"));
+  Uuid symbVarItemUuid =
+      deserialize<Uuid>(node.getChild("lib_gate/@0"), fileFormat);
   init(symbVarItemUuid);
 }
 

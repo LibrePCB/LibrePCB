@@ -71,7 +71,7 @@ public:
   Via(const Uuid& uuid, const Via& other) noexcept;
   Via(const Uuid& uuid, const Point& position, Shape shape,
       const PositiveLength& size, const PositiveLength& drillDiameter) noexcept;
-  explicit Via(const SExpression& node);
+  Via(const SExpression& node, const Version& fileFormat);
   ~Via() noexcept;
 
   // Getters
@@ -141,7 +141,9 @@ inline SExpression serialize(const Via::Shape& obj) {
 }
 
 template <>
-inline Via::Shape deserialize(const SExpression& sexpr) {
+inline Via::Shape deserialize(const SExpression& sexpr,
+                              const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == "round")
     return Via::Shape::Round;
