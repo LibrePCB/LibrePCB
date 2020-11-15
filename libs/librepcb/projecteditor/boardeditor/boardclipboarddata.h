@@ -109,6 +109,14 @@ public:
       root.appendChild("mirror", mirrored, false);
       strokeTexts.serialize(root);
     }
+
+    bool operator!=(const Device& rhs) noexcept {
+      return (componentUuid != rhs.componentUuid) ||
+          (libDeviceUuid != rhs.libDeviceUuid) ||
+          (libFootprintUuid != rhs.libFootprintUuid) ||
+          (position != rhs.position) || (rotation != rhs.rotation) ||
+          (mirrored != rhs.mirrored) || (strokeTexts != rhs.strokeTexts);
+    }
   };
 
   struct NetSegment : public SerializableObject {
@@ -136,6 +144,11 @@ public:
       vias.serialize(root);
       junctions.serialize(root);
       traces.serialize(root);
+    }
+
+    bool operator!=(const NetSegment& rhs) noexcept {
+      return (netName != rhs.netName) || (vias != rhs.vias) ||
+          (junctions != rhs.junctions) || (traces != rhs.traces);
     }
   };
 
@@ -192,6 +205,14 @@ public:
       root.appendChild("keep_orphans", keepOrphans, false);
       root.appendChild("connect_style", connectStyle, true);
       outline.serialize(root);
+    }
+
+    bool operator!=(const Plane& rhs) noexcept {
+      return (uuid != rhs.uuid) || (layer != rhs.layer) ||
+          (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
+          (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
+          (keepOrphans != rhs.keepOrphans) || (priority != rhs.priority) ||
+          (connectStyle != rhs.connectStyle);
     }
   };
 

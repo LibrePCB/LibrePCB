@@ -72,6 +72,30 @@ TEST_P(AttributeKeyTest, testClean) {
   }
 }
 
+TEST_P(AttributeKeyTest, testSerializeToSExpression) {
+  const AttributeKeyTestData& data = GetParam();
+
+  if (data.valid) {
+    AttributeKey obj(data.input);
+    EXPECT_EQ("\"" % data.input % "\"\n",
+              serializeToSExpression(obj).toByteArray());
+  }
+}
+
+TEST_P(AttributeKeyTest, testDeserializeFromSExpression) {
+  const AttributeKeyTestData& data = GetParam();
+
+  if (data.valid) {
+    EXPECT_EQ(AttributeKey(data.input),
+              deserializeFromSExpression<AttributeKey>(
+                  SExpression::createString(data.input), false));
+  } else {
+    EXPECT_THROW(deserializeFromSExpression<AttributeKey>(
+                     SExpression::createString(data.input), false),
+                 RuntimeError);
+  }
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/

@@ -184,6 +184,30 @@ TEST(RatioTest, testOperatorBool) {
   EXPECT_TRUE(Ratio(-987654321));
 }
 
+TEST_P(RatioTest, testSerializeToSExpression) {
+  const RatioTestData_t& data = GetParam();
+
+  EXPECT_EQ(data.string % "\n",
+            serializeToSExpression(data.ratio).toByteArray());
+}
+
+TEST_P(RatioTest, testDeserializeFromSExpression) {
+  const RatioTestData_t& data = GetParam();
+
+  SExpression sexpr = SExpression::createString(data.string);
+  EXPECT_EQ(data.ratio, deserializeFromSExpression<Ratio>(sexpr, false));
+}
+
+TEST(RatioTest, testDeserializeFromEmptySExpression) {
+  SExpression sexpr = SExpression::createString("");
+  EXPECT_THROW(deserializeFromSExpression<Ratio>(sexpr, false), RuntimeError);
+}
+
+TEST(RatioTest, testDeserializeFromInvalidSExpression) {
+  SExpression sexpr = SExpression::createString("foo");
+  EXPECT_THROW(deserializeFromSExpression<Ratio>(sexpr, false), RuntimeError);
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/

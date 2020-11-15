@@ -121,7 +121,7 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor) {
   EXPECT_EQ("bar", l[1]->mName);
 }
 
-TEST_F(SerializableObjectListTest, testDomElementConstructor) {
+TEST_F(SerializableObjectListTest, testSExpressionConstructor) {
   SExpression e = SExpression::createList("list");
   e.appendChild("test", mMocks[0]->mUuid, true)
       .appendChild<QString>("name", "foo", true);

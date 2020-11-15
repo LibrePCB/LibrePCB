@@ -40,6 +40,44 @@ class BoardDesignRulesTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
+TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
+  SExpression sexpr = SExpression::parse(
+      "(design_rules\n"
+      " (name \"Foo Bar\")\n"
+      " (description \"Hello World\")\n"
+      " (stopmask_clearance_ratio 0.1)\n"
+      " (stopmask_clearance_min 1.1)\n"
+      " (stopmask_clearance_max 2.1)\n"
+      " (stopmask_max_via_drill_diameter 0.2)\n"
+      " (creammask_clearance_ratio 0.3)\n"
+      " (creammask_clearance_min 1.3)\n"
+      " (creammask_clearance_max 2.3)\n"
+      " (restring_pad_ratio 0.4)\n"
+      " (restring_pad_min 1.4)\n"
+      " (restring_pad_max 2.4)\n"
+      " (restring_via_ratio 0.5)\n"
+      " (restring_via_min 1.5)\n"
+      " (restring_via_max 2.5)\n"
+      ")",
+      FilePath());
+  BoardDesignRules obj(sexpr);
+  EXPECT_EQ("Foo Bar", obj.getName());
+  EXPECT_EQ("Hello World", obj.getDescription());
+  EXPECT_EQ(UnsignedRatio(Ratio(100000)), obj.getStopMaskClearanceRatio());
+  EXPECT_EQ(UnsignedLength(1100000), obj.getStopMaskClearanceMin());
+  EXPECT_EQ(UnsignedLength(2100000), obj.getStopMaskClearanceMax());
+  EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
+  EXPECT_EQ(UnsignedRatio(Ratio(300000)), obj.getCreamMaskClearanceRatio());
+  EXPECT_EQ(UnsignedLength(1300000), obj.getCreamMaskClearanceMin());
+  EXPECT_EQ(UnsignedLength(2300000), obj.getCreamMaskClearanceMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(400000)), obj.getRestringPadRatio());
+  EXPECT_EQ(UnsignedLength(1400000), obj.getRestringPadMin());
+  EXPECT_EQ(UnsignedLength(2400000), obj.getRestringPadMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(500000)), obj.getRestringViaRatio());
+  EXPECT_EQ(UnsignedLength(1500000), obj.getRestringViaMin());
+  EXPECT_EQ(UnsignedLength(2500000), obj.getRestringViaMax());
+}
+
 TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   BoardDesignRules obj1;
   obj1.setName(ElementName("foo bar"));

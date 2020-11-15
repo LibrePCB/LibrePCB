@@ -50,6 +50,7 @@ class AngleTest : public ::testing::TestWithParam<AngleTestData> {};
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
+
 TEST_P(AngleTest, testFromDeg) {
   const AngleTestData& data = GetParam();
 
@@ -65,6 +66,26 @@ TEST_P(AngleTest, testToDegString) {
 
   if (data.valid) {
     EXPECT_EQ(data.value.toDegString(), data.genStr);
+  }
+}
+
+TEST_P(AngleTest, testSerializeToSExpression) {
+  const AngleTestData& data = GetParam();
+
+  if (data.valid) {
+    EXPECT_EQ(data.genStr % "\n",
+              serializeToSExpression(data.value).toByteArray());
+  }
+}
+
+TEST_P(AngleTest, testDeserializeFromSExpression) {
+  const AngleTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::createString(data.origStr);
+  if (data.valid) {
+    EXPECT_EQ(data.value, deserializeFromSExpression<Angle>(sexpr, false));
+  } else {
+    EXPECT_THROW(deserializeFromSExpression<Angle>(sexpr, false), RuntimeError);
   }
 }
 

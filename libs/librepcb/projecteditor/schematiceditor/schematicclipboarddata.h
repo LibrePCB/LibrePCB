@@ -103,6 +103,13 @@ public:
       root.appendChild("value", value, false);
       attributes.serialize(root);
     }
+
+    bool operator!=(const ComponentInstance& rhs) noexcept {
+      return (uuid != rhs.uuid) || (libComponentUuid != rhs.libComponentUuid) ||
+          (libVariantUuid != rhs.libVariantUuid) ||
+          (libDeviceUuid != rhs.libDeviceUuid) || (name != rhs.name) ||
+          (value != rhs.value) || (attributes != rhs.attributes);
+    }
   };
 
   struct SymbolInstance : public SerializableObject {
@@ -146,6 +153,14 @@ public:
       root.appendChild("rotation", rotation, false);
       root.appendChild("mirror", mirrored, false);
     }
+
+    bool operator!=(const SymbolInstance& rhs) noexcept {
+      return (uuid != rhs.uuid) ||
+          (componentInstanceUuid != rhs.componentInstanceUuid) ||
+          (symbolVariantItemUuid != rhs.symbolVariantItemUuid) ||
+          (position != rhs.position) || (rotation != rhs.rotation) ||
+          (mirrored != rhs.mirrored);
+    }
   };
 
   struct NetSegment : public SerializableObject {
@@ -173,6 +188,11 @@ public:
       junctions.serialize(root);
       lines.serialize(root);
       labels.serialize(root);
+    }
+
+    bool operator!=(const NetSegment& rhs) noexcept {
+      return (netName != rhs.netName) || (junctions != rhs.junctions) ||
+          (lines != rhs.lines) || (labels != rhs.labels);
     }
   };
 
