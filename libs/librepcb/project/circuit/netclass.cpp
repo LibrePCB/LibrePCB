@@ -40,12 +40,13 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const SExpression& node)
+NetClass::NetClass(Circuit& circuit, const SExpression& node,
+                   const Version& fileFormat)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<ElementName>("name")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mName(deserialize<ElementName>(node.getChild("name/@0"), fileFormat)) {
 }
 
 NetClass::NetClass(Circuit& circuit, const ElementName& name)

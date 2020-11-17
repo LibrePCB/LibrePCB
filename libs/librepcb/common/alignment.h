@@ -73,7 +73,7 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const HAlign& obj) {
+inline SExpression serialize(const HAlign& obj) {
   switch (obj.toQtAlignFlag()) {
     case Qt::AlignLeft:
       return SExpression::createToken("left");
@@ -87,9 +87,9 @@ inline SExpression serializeToSExpression(const HAlign& obj) {
 }
 
 template <>
-inline HAlign deserializeFromSExpression(const SExpression& sexpr,
-                                         bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline HAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   if (str == "left")
     return HAlign::left();
   else if (str == "center")
@@ -99,7 +99,7 @@ inline HAlign deserializeFromSExpression(const SExpression& sexpr,
   else {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(HAlign::tr("Invalid horizontal alignment: \"%1\"")).arg(str));
+        HAlign::tr("Invalid horizontal alignment: \"%1\"").arg(str));
   }
 }
 
@@ -144,7 +144,7 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const VAlign& obj) {
+inline SExpression serialize(const VAlign& obj) {
   switch (obj.toQtAlignFlag()) {
     case Qt::AlignTop:
       return SExpression::createToken("top");
@@ -158,9 +158,9 @@ inline SExpression serializeToSExpression(const VAlign& obj) {
 }
 
 template <>
-inline VAlign deserializeFromSExpression(const SExpression& sexpr,
-                                         bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline VAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   if (str == "top")
     return VAlign::top();
   else if (str == "center")
@@ -170,7 +170,7 @@ inline VAlign deserializeFromSExpression(const SExpression& sexpr,
   else {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(VAlign::tr("Invalid vertical alignment: \"%1\"")).arg(str));
+        VAlign::tr("Invalid vertical alignment: \"%1\"").arg(str));
   }
 }
 
@@ -189,7 +189,7 @@ public:
   Alignment(const Alignment& other) noexcept : mH(other.mH), mV(other.mV) {}
   explicit Alignment(const HAlign& h, const VAlign& v) noexcept
     : mH(h), mV(v) {}
-  explicit Alignment(const SExpression& node);
+  Alignment(const SExpression& node, const Version& fileFormat);
   const HAlign getH() const noexcept { return mH; }
   const VAlign getV() const noexcept { return mV; }
   void setH(const HAlign& h) noexcept { mH = h; }

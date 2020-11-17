@@ -39,9 +39,9 @@ Path::Path(const Path& other) noexcept
   : mVertices(other.mVertices), mPainterPathPx(other.mPainterPathPx) {
 }
 
-Path::Path(const SExpression& node) {
+Path::Path(const SExpression& node, const Version& fileFormat) {
   foreach (const SExpression& child, node.getChildren("vertex")) {
-    mVertices.append(Vertex(child));
+    mVertices.append(Vertex(child, fileFormat));
   }
 }
 

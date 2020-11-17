@@ -68,9 +68,8 @@ public:
   // Constructors / Destructor
   ComponentSignalInstance() = delete;
   ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
-  explicit ComponentSignalInstance(Circuit& circuit,
-                                   ComponentInstance& cmpInstance,
-                                   const SExpression& node);
+  ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
+                          const SExpression& node, const Version& fileFormat);
   explicit ComponentSignalInstance(Circuit& circuit,
                                    ComponentInstance& cmpInstance,
                                    const library::ComponentSignal& cmpSignal,

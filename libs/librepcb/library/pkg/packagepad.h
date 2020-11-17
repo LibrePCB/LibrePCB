@@ -64,7 +64,7 @@ public:
   PackagePad() = delete;
   PackagePad(const PackagePad& other) noexcept;
   PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept;
-  explicit PackagePad(const SExpression& node);
+  PackagePad(const SExpression& node, const Version& fileFormat);
   ~PackagePad() noexcept;
 
   // Getters

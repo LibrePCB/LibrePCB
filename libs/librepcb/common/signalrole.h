@@ -131,22 +131,22 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const SignalRole& obj) {
+inline SExpression serialize(const SignalRole& obj) {
   return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline SignalRole deserializeFromSExpression(const SExpression& sexpr,
-                                             bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline SignalRole deserialize(const SExpression& sexpr,
+                              const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   foreach (const SignalRole& role, SignalRole::getAllRoles()) {
     if (role.toStr() == str) {
       return role;
     }
   }
-  throw RuntimeError(
-      __FILE__, __LINE__,
-      QString(SignalRole::tr("Invalid signal role: \"%1\"")).arg(str));
+  throw RuntimeError(__FILE__, __LINE__,
+                     SignalRole::tr("Invalid signal role: \"%1\"").arg(str));
 }
 
 /*******************************************************************************

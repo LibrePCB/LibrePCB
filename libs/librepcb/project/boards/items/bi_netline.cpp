@@ -103,10 +103,11 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
   init();
 }
 
-BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node)
+BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node,
+                       const Version& fileFormat)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
-    mTrace(node),
+    mTrace(node, fileFormat),
     mPosition(),
     mStartPoint(getAnchor(mTrace.getStartPoint())),
     mEndPoint(getAnchor(mTrace.getEndPoint())) {

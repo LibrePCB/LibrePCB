@@ -50,6 +50,8 @@ LibraryBaseElement::LibraryBaseElement(
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName),
     mLongElementName(longElementName),
+    mLoadingFileDocument(),
+    mLoadingFileFormat(qApp->getFileFormatVersion()),
     mUuid(uuid),
     mVersion(version),
     mAuthor(author),
@@ -68,6 +70,8 @@ LibraryBaseElement::LibraryBaseElement(
     mDirectoryNameMustBeUuid(dirnameMustBeUuid),
     mShortElementName(shortElementName),
     mLongElementName(longElementName),
+    mLoadingFileDocument(),
+    mLoadingFileFormat(qApp->getFileFormatVersion()),
     mUuid(Uuid::createRandom()),  // just for initialization, will be
                                   // overwritten
     mVersion(Version::fromString(
@@ -98,14 +102,15 @@ LibraryBaseElement::LibraryBaseElement(
   // read version number from version file
   VersionFile versionFile =
       VersionFile::fromByteArray(mDirectory->read(versionFileName));
-  if (versionFile.getVersion() > qApp->getAppVersion()) {
+  mLoadingFileFormat = versionFile.getVersion();
+  if (mLoadingFileFormat > qApp->getAppVersion()) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString(
             tr("The library element %1 was created with a newer application "
                "version. You need at least LibrePCB version %2 to open it."))
             .arg(mDirectory->getAbsPath().toNative())
-            .arg(versionFile.getVersion().toPrettyStr(3)));
+            .arg(mLoadingFileFormat.toPrettyStr(3)));
   }
 
   // open main file
@@ -115,16 +120,21 @@ LibraryBaseElement::LibraryBaseElement(
       SExpression::parse(mDirectory->read(sexprFileName), sexprFilePath);
 
   // read attributes
-  mUuid = mLoadingFileDocument.getChildByIndex(0).getValue<Uuid>();
-  mVersion = mLoadingFileDocument.getValueByPath<Version>("version");
-  mAuthor = mLoadingFileDocument.getValueByPath<QString>("author");
-  mCreated = mLoadingFileDocument.getValueByPath<QDateTime>("created");
-  mIsDeprecated = mLoadingFileDocument.getValueByPath<bool>("deprecated");
+  mUuid = deserialize<Uuid>(mLoadingFileDocument.getChild("@0"),
+                            mLoadingFileFormat);
+  mVersion = deserialize<Version>(mLoadingFileDocument.getChild("version/@0"),
+                                  mLoadingFileFormat);
+  mAuthor = mLoadingFileDocument.getChild("author/@0").getValue();
+  mCreated = deserialize<QDateTime>(mLoadingFileDocument.getChild("created/@0"),
+                                    mLoadingFileFormat);
+  mIsDeprecated = deserialize<bool>(
+      mLoadingFileDocument.getChild("deprecated/@0"), mLoadingFileFormat);
 
   // read names, descriptions and keywords in all available languages
-  mNames = LocalizedNameMap(mLoadingFileDocument);
-  mDescriptions = LocalizedDescriptionMap(mLoadingFileDocument);
-  mKeywords = LocalizedKeywordsMap(mLoadingFileDocument);
+  mNames = LocalizedNameMap(mLoadingFileDocument, mLoadingFileFormat);
+  mDescriptions =
+      LocalizedDescriptionMap(mLoadingFileDocument, mLoadingFileFormat);
+  mKeywords = LocalizedKeywordsMap(mLoadingFileDocument, mLoadingFileFormat);
 
   // check if the UUID equals to the directory basename
   if (mDirectoryNameMustBeUuid && (mUuid.toStr() != dirUuidStr)) {

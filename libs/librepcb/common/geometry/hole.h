@@ -62,7 +62,7 @@ public:
   Hole(const Uuid& uuid, const Hole& other) noexcept;
   Hole(const Uuid& uuid, const Point& position,
        const PositiveLength& diameter) noexcept;
-  explicit Hole(const SExpression& node);
+  Hole(const SExpression& node, const Version& fileFormat);
   ~Hole() noexcept;
 
   // Getters

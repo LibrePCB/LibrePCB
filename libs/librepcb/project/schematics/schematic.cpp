@@ -53,7 +53,8 @@ namespace project {
 
 Schematic::Schematic(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
-                     bool create, const QString& newName)
+                     const Version& fileFormat, bool create,
+                     const QString& newName)
   : QObject(&project),
     AttributeProvider(),
     mProject(project),
@@ -78,15 +79,16 @@ Schematic::Schematic(Project& project,
       // the schematic seems to be ready to open, so we will create all needed
       // objects
 
-      mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      mName = root.getValueByPath<ElementName>("name");
+      mUuid = deserialize<Uuid>(root.getChild("@0"), fileFormat);
+      mName = deserialize<ElementName>(root.getChild("name/@0"), fileFormat);
 
       // Load grid properties
-      mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
+      mGridProperties.reset(
+          new GridProperties(root.getChild("grid"), fileFormat));
 
       // Load all symbols
       foreach (const SExpression& node, root.getChildren("symbol")) {
-        SI_Symbol* symbol = new SI_Symbol(*this, node);
+        SI_Symbol* symbol = new SI_Symbol(*this, node, fileFormat);
         if (getSymbolByUuid(symbol->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
@@ -98,7 +100,7 @@ Schematic::Schematic(Project& project,
 
       // Load all netsegments
       foreach (const SExpression& node, root.getChildren("netsegment")) {
-        SI_NetSegment* netsegment = new SI_NetSegment(*this, node);
+        SI_NetSegment* netsegment = new SI_NetSegment(*this, node, fileFormat);
         if (getNetSegmentByUuid(netsegment->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
@@ -462,7 +464,8 @@ void Schematic::serialize(SExpression& root) const {
 Schematic* Schematic::create(Project& project,
                              std::unique_ptr<TransactionalDirectory> directory,
                              const ElementName& name) {
-  return new Schematic(project, std::move(directory), true, *name);
+  return new Schematic(project, std::move(directory),
+                       qApp->getFileFormatVersion(), true, *name);
 }
 
 /*******************************************************************************

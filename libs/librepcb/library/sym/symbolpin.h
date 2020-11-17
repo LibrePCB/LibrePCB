@@ -72,7 +72,7 @@ public:
   SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
             const Point& position, const UnsignedLength& length,
             const Angle& rotation) noexcept;
-  explicit SymbolPin(const SExpression& node);
+  SymbolPin(const SExpression& node, const Version& fileFormat);
   ~SymbolPin() noexcept;
 
   // Getters

@@ -74,24 +74,25 @@ public:
     : onEdited(*this) {
     mValues.insert("", defaultValue);
   }
-  explicit SerializableKeyValueMap(const SExpression& node) : onEdited(*this) {
+  SerializableKeyValueMap(const SExpression& node, const Version& fileFormat)
+    : onEdited(*this) {
     foreach (const SExpression& child, node.getChildren(T::tagname)) {
       QString key;
       SExpression value;
       if (child.getChildren().count() > 1) {
-        key = child.getValueByPath<QString>(T::keyname);
-        value = child.getChildByIndex(1);
+        key = child.getChild(QString(T::keyname) % "/@0").getValue();
+        value = child.getChild("@1");
       } else {
         key = QString("");
-        value = child.getChildByIndex(0);
+        value = child.getChild("@0");
       }
       if (mValues.contains(key)) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Key \"%1\" defined multiple times.").arg(key));
       }
-      mValues.insert(key,
-                     deserializeFromSExpression<typename T::ValueType>(
-                         value, false));  // can throw
+      mValues.insert(
+          key,
+          deserialize<typename T::ValueType>(value, fileFormat));  // can throw
     }
     if (!mValues.contains(QString(""))) {
       throw RuntimeError(__FILE__, __LINE__,

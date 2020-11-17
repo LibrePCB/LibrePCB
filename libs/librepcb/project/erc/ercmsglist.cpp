@@ -90,10 +90,10 @@ void ErcMsgList::restoreIgnoreState() {
     foreach (const SExpression& node, root.getChildren("approved")) {
       foreach (ErcMsg* ercMsg, mItems) {
         if ((ercMsg->getOwner().getErcMsgOwnerClassName() ==
-             node.getValueByPath<QString>("class")) &&
+             node.getChild("class/@0").getValue()) &&
             (ercMsg->getOwnerKey() ==
-             node.getValueByPath<QString>("instance")) &&
-            (ercMsg->getMsgKey() == node.getValueByPath<QString>("message"))) {
+             node.getChild("instance/@0").getValue()) &&
+            (ercMsg->getMsgKey() == node.getChild("message/@0").getValue())) {
           ercMsg->setIgnored(true);
         }
       }

@@ -59,7 +59,8 @@ public:
   // Constructors / Destructor
   NetClass() = delete;
   NetClass(const NetClass& other) = delete;
-  explicit NetClass(Circuit& circuit, const SExpression& node);
+  NetClass(Circuit& circuit, const SExpression& node,
+           const Version& fileFormat);
   explicit NetClass(Circuit& circuit, const ElementName& name);
   ~NetClass() noexcept;
 

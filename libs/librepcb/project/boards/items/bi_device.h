@@ -71,7 +71,7 @@ public:
   BI_Device() = delete;
   BI_Device(const BI_Device& other) = delete;
   BI_Device(Board& board, const BI_Device& other);
-  BI_Device(Board& board, const SExpression& node);
+  BI_Device(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Device(Board& board, ComponentInstance& compInstance,
             const Uuid& deviceUuid, const Uuid& footprintUuid,
             const Point& position, const Angle& rotation, bool mirror);

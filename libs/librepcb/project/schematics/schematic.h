@@ -112,8 +112,9 @@ public:
   // Constructors / Destructor
   Schematic() = delete;
   Schematic(const Schematic& other) = delete;
-  Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory)
-    : Schematic(project, std::move(directory), false, QString()) {}
+  Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
+            const Version& fileFormat)
+    : Schematic(project, std::move(directory), fileFormat, false, QString()) {}
   ~Schematic() noexcept;
 
   // Getters: General
@@ -193,7 +194,7 @@ signals:
 
 private:
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            bool create, const QString& newName);
+            const Version& fileFormat, bool create, const QString& newName);
   void updateIcon() noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()

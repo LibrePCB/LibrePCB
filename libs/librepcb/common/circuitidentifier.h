@@ -119,14 +119,15 @@ inline QString operator%(const CircuitIdentifier& lhs,
 }
 
 template <>
-inline SExpression serializeToSExpression(const CircuitIdentifier& obj) {
+inline SExpression serialize(const CircuitIdentifier& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline CircuitIdentifier deserializeFromSExpression(const SExpression& sexpr,
-                                                    bool throwIfEmpty) {
-  return CircuitIdentifier(sexpr.getStringOrToken(throwIfEmpty));  // can throw
+inline CircuitIdentifier deserialize(const SExpression& sexpr,
+                                     const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return CircuitIdentifier(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

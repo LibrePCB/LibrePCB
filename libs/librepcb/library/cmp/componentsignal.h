@@ -67,7 +67,7 @@ public:
   ComponentSignal(const Uuid& uuid, const CircuitIdentifier& name,
                   const SignalRole& role, const QString& forcedNetName,
                   bool isRequired, bool isNegated, bool isClock) noexcept;
-  explicit ComponentSignal(const SExpression& node);
+  ComponentSignal(const SExpression& node, const Version& fileFormat);
   ~ComponentSignal() noexcept;
 
   // Getters

@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/version.h>
 
 #include <QtCore>
@@ -237,6 +238,35 @@ TEST(VersionTest, testOperatorNotEqual) {
   EXPECT_FALSE(Version::fromString("10.0.1") != Version::fromString("10.0.1"));
   EXPECT_FALSE(Version::fromString("0.1.0") !=
                Version::fromString("0.001.0.0.0"));
+}
+
+TEST(VersionTest, testSerialize) {
+  Version obj = Version::fromString("0.1.0");
+  EXPECT_EQ(QByteArray("\"0.1\"\n"), serialize(obj).toByteArray());
+}
+
+TEST(VersionTest, testDeserializeV01) {
+  SExpression sexpr = SExpression::createString("0.1");
+  EXPECT_EQ(Version::fromString("0.1"),
+            deserialize<Version>(sexpr, Version::fromString("0.1")));
+}
+
+TEST(VersionTest, testDeserializeCurrentVersion) {
+  SExpression sexpr = SExpression::createString("0.1");
+  EXPECT_EQ(Version::fromString("0.1"),
+            deserialize<Version>(sexpr, qApp->getFileFormatVersion()));
+}
+
+TEST(VersionTest, testDeserializeEmpty) {
+  SExpression sexpr = SExpression::createString("");
+  EXPECT_THROW(deserialize<Version>(sexpr, qApp->getFileFormatVersion()),
+               RuntimeError);
+}
+
+TEST(VersionTest, testDeserializeInvalid) {
+  SExpression sexpr = SExpression::createString("foo");
+  EXPECT_THROW(deserialize<Version>(sexpr, qApp->getFileFormatVersion()),
+               RuntimeError);
 }
 
 /*******************************************************************************

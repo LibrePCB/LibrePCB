@@ -101,7 +101,7 @@ public:
    */
   explicit Point(const Length& x, const Length& y) noexcept : mX(x), mY(y) {}
 
-  explicit Point(const SExpression& node);
+  Point(const SExpression& node, const Version& fileFormat);
 
   /**
    * @brief Destructor

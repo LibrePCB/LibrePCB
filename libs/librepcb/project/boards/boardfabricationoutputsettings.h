@@ -46,7 +46,8 @@ public:
   BoardFabricationOutputSettings() noexcept;
   BoardFabricationOutputSettings(
       const BoardFabricationOutputSettings& other) noexcept;
-  explicit BoardFabricationOutputSettings(const SExpression& node);
+  BoardFabricationOutputSettings(const SExpression& node,
+                                 const Version& fileFormat);
   ~BoardFabricationOutputSettings() noexcept;
 
   // Getters

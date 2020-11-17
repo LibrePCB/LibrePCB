@@ -38,8 +38,11 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node)
-  : BI_Base(segment.getBoard()), mNetSegment(segment), mJunction(node) {
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node,
+                         const Version& fileFormat)
+  : BI_Base(segment.getBoard()),
+    mNetSegment(segment),
+    mJunction(node, fileFormat) {
   init();
 }
 

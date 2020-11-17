@@ -73,7 +73,8 @@ public:
   // Constructors / Destructor
   WorkspaceSettings() = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
-  explicit WorkspaceSettings(const FilePath& fp, QObject* parent = nullptr);
+  explicit WorkspaceSettings(const FilePath& fp, const Version& fileFormat,
+                             QObject* parent = nullptr);
   ~WorkspaceSettings() noexcept;
 
   /**
@@ -213,7 +214,7 @@ public:
 
 // Serialize settings values
 template <>
-inline SExpression serializeToSExpression(
+inline SExpression serialize(
     const workspace::WorkspaceSettings::PdfOpenBehavior& b) {
   using namespace workspace;
   switch (b) {
@@ -229,10 +230,11 @@ inline SExpression serializeToSExpression(
 }
 
 template <>
-inline workspace::WorkspaceSettings::PdfOpenBehavior deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
+inline workspace::WorkspaceSettings::PdfOpenBehavior deserialize(
+    const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   using namespace workspace;
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+  QString str = sexpr.getValue();
   if (str == QLatin1String("always"))
     return WorkspaceSettings::PdfOpenBehavior::ALWAYS;
   else if (str == QLatin1String("never"))

@@ -47,8 +47,10 @@ BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) : BI_Base(board) {
   init();
 }
 
-BI_Polygon::BI_Polygon(Board& board, const SExpression& node) : BI_Base(board) {
-  mPolygon.reset(new Polygon(node));
+BI_Polygon::BI_Polygon(Board& board, const SExpression& node,
+                       const Version& fileFormat)
+  : BI_Base(board) {
+  mPolygon.reset(new Polygon(node, fileFormat));
   init();
 }
 

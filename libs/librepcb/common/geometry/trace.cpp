@@ -46,14 +46,14 @@ TraceAnchor::TraceAnchor(const TraceAnchor& other) noexcept
   : mJunction(other.mJunction), mVia(other.mVia), mPad(other.mPad) {
 }
 
-TraceAnchor::TraceAnchor(const SExpression& node) {
-  if (const SExpression* junctionNode = node.tryGetChildByPath("junction")) {
-    mJunction = junctionNode->getValueOfFirstChild<Uuid>();
-  } else if (const SExpression* viaNode = node.tryGetChildByPath("via")) {
-    mVia = viaNode->getValueOfFirstChild<Uuid>();
+TraceAnchor::TraceAnchor(const SExpression& node, const Version& fileFormat) {
+  if (const SExpression* junctionNode = node.tryGetChild("junction")) {
+    mJunction = deserialize<Uuid>(junctionNode->getChild("@0"), fileFormat);
+  } else if (const SExpression* viaNode = node.tryGetChild("via")) {
+    mVia = deserialize<Uuid>(viaNode->getChild("@0"), fileFormat);
   } else {
-    mPad = PadAnchor{node.getValueByPath<Uuid>("device"),
-                     node.getValueByPath<Uuid>("pad")};
+    mPad = PadAnchor{deserialize<Uuid>(node.getChild("device/@0"), fileFormat),
+                     deserialize<Uuid>(node.getChild("pad/@0"), fileFormat)};
   }
 }
 
@@ -125,13 +125,14 @@ Trace::Trace(const Uuid& uuid, const GraphicsLayerName& layer,
     mEnd(end) {
 }
 
-Trace::Trace(const SExpression& node)
+Trace::Trace(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayer(node.getValueByPath<GraphicsLayerName>("layer")),
-    mWidth(node.getValueByPath<PositiveLength>("width")),
-    mStart(node.getChildByPath("from")),
-    mEnd(node.getChildByPath("to")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mLayer(
+        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
+    mWidth(deserialize<PositiveLength>(node.getChild("width/@0"), fileFormat)),
+    mStart(node.getChild("from"), fileFormat),
+    mEnd(node.getChild("to"), fileFormat) {
 }
 
 Trace::~Trace() noexcept {

@@ -109,16 +109,17 @@ inline QString operator%(
 }
 
 template <>
-inline SExpression serializeToSExpression(
+inline SExpression serialize(
     const library::ComponentSymbolVariantItemSuffix& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline library::ComponentSymbolVariantItemSuffix deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return library::ComponentSymbolVariantItemSuffix(str);  // can throw
+inline library::ComponentSymbolVariantItemSuffix deserialize(
+    const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return library::ComponentSymbolVariantItemSuffix(
+      sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(

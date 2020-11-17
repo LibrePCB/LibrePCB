@@ -20,11 +20,13 @@ LIBS += \
     -L$${DESTDIR} \
     -lgoogletest \
     -llibrepcblibrarymanager \
+    -llibrepcblibraryeditor \
+    -llibrepcbprojecteditor \
     -llibrepcbeagleimport \
     -llibrepcbworkspace \
     -llibrepcbproject \
-    -llibrepcblibrary \    # Note: The order of the libraries is very important for the linker!
-    -llibrepcbcommon \     # Another order could end up in "undefined reference" errors!
+    -llibrepcblibrary \
+    -llibrepcbcommon \
     -lmuparser \
     -lparseagle \
 
@@ -41,6 +43,8 @@ INCLUDEPATH += \
 
 DEPENDPATH += \
     ../../libs/librepcb/librarymanager \
+    ../../libs/librepcb/projecteditor \
+    ../../libs/librepcb/libraryeditor \
     ../../libs/librepcb/eagleimport \
     ../../libs/librepcb/workspace \
     ../../libs/librepcb/project \
@@ -57,7 +61,8 @@ isEmpty(UNBUNDLE) {
     # These libraries will only be linked statically when not unbundling
     PRE_TARGETDEPS += \
         $${DESTDIR}/liblibrepcblibrarymanager.a \
-        $${DESTDIR}/liblibrepcbeagleimport.a \
+        $${DESTDIR}/liblibrepcbprojecteditor.a \
+        $${DESTDIR}/liblibrepcblibraryeditor.a \
         $${DESTDIR}/liblibrepcbworkspace.a \
         $${DESTDIR}/liblibrepcbproject.a \
         $${DESTDIR}/liblibrepcblibrary.a \
@@ -72,6 +77,9 @@ SOURCES += \
     common/applicationtest.cpp \
     common/attributes/attributekeytest.cpp \
     common/attributes/attributesubstitutortest.cpp \
+    common/attributes/attributetest.cpp \
+    common/attributes/attributetypetest.cpp \
+    common/attributes/attributeunittest.cpp \
     common/boarddesignrulestest.cpp \
     common/circuitidentifiertest.cpp \
     common/fileio/csvfiletest.cpp \
@@ -83,11 +91,18 @@ SOURCES += \
     common/fileio/transactionalfilesystemtest.cpp \
     common/geometry/pathmodeltest.cpp \
     common/geometry/pathtest.cpp \
+    common/geometry/polygontest.cpp \
+    common/geometry/stroketexttest.cpp \
+    common/geometry/texttest.cpp \
+    common/geometry/tracetest.cpp \
+    common/geometry/vertextest.cpp \
+    common/geometry/viatest.cpp \
     common/graphics/graphicslayernametest.cpp \
     common/network/filedownloadtest.cpp \
     common/network/networkrequesttest.cpp \
     common/pnp/pickplacecsvwritertest.cpp \
     common/scopeguardtest.cpp \
+    common/signalroletest.cpp \
     common/signalslottest.cpp \
     common/sqlitedatabasetest.cpp \
     common/systeminfotest.cpp \
@@ -112,13 +127,20 @@ SOURCES += \
     library/cmp/componentsymbolvariantitemsuffixtest.cpp \
     library/cmp/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
+    library/sym/symbolpintest.cpp \
+    libraryeditor/pkg/footprintclipboarddatatest.cpp \
+    libraryeditor/sym/symbolclipboarddatatest.cpp \
     librarymanager/librarydownloadtest.cpp \
     main.cpp \
+    project/boards/boardfabricationoutputsettingstest.cpp \
     project/boards/boardgerberexporttest.cpp \
     project/boards/boardpickplacegeneratortest.cpp \
     project/boards/boardplanefragmentsbuildertest.cpp \
     project/library/projectlibrarytest.cpp \
     project/projecttest.cpp \
+    projecteditor/boardeditor/boardclipboarddatatest.cpp \
+    projecteditor/schematiceditor/schematicclipboarddatatest.cpp \
+    workspace/settings/workspacesettingstest.cpp \
     workspace/workspacetest.cpp \
 
 HEADERS += \
@@ -128,6 +150,13 @@ HEADERS += \
     common/widgets/editabletablewidgetreceiver.h \
 
 FORMS += \
+
+# Hoedown and markdownconverter are only needed for Qt <5.14
+equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
+    LIBS += -lhoedown
+    DEPENDPATH += ../../libs/hoedown
+    PRE_TARGETDEPS += $${DESTDIR}/libhoedown.a
+}
 
 # QuaZIP
 !contains(UNBUNDLE, quazip) {

@@ -72,7 +72,8 @@ public:
   // Constructors / Destructor
   ComponentInstance() = delete;
   ComponentInstance(const ComponentInstance& other) = delete;
-  explicit ComponentInstance(Circuit& circuit, const SExpression& node);
+  ComponentInstance(Circuit& circuit, const SExpression& node,
+                    const Version& fileFormat);
   explicit ComponentInstance(
       Circuit& circuit, const library::Component& cmp, const Uuid& symbVar,
       const CircuitIdentifier& name,

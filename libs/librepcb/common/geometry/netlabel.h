@@ -65,7 +65,7 @@ public:
   NetLabel(const Uuid& uuid, const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const Point& position,
            const Angle& rotation) noexcept;
-  explicit NetLabel(const SExpression& node);
+  NetLabel(const SExpression& node, const Version& fileFormat);
   ~NetLabel() noexcept;
 
   // Getters

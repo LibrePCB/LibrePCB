@@ -43,12 +43,13 @@ NetLineAnchor::NetLineAnchor(const NetLineAnchor& other) noexcept
   : mJunction(other.mJunction), mPin(other.mPin) {
 }
 
-NetLineAnchor::NetLineAnchor(const SExpression& node) {
-  if (const SExpression* junctionNode = node.tryGetChildByPath("junction")) {
-    mJunction = junctionNode->getValueOfFirstChild<Uuid>();
+NetLineAnchor::NetLineAnchor(const SExpression& node,
+                             const Version& fileFormat) {
+  if (const SExpression* junctionNode = node.tryGetChild("junction")) {
+    mJunction = deserialize<Uuid>(junctionNode->getChild("@0"), fileFormat);
   } else {
-    mPin = PinAnchor{node.getValueByPath<Uuid>("symbol"),
-                     node.getValueByPath<Uuid>("pin")};
+    mPin = PinAnchor{deserialize<Uuid>(node.getChild("symbol/@0"), fileFormat),
+                     deserialize<Uuid>(node.getChild("pin/@0"), fileFormat)};
   }
 }
 
@@ -106,12 +107,12 @@ NetLine::NetLine(const Uuid& uuid, const UnsignedLength& width,
   : onEdited(*this), mUuid(uuid), mWidth(width), mStart(start), mEnd(end) {
 }
 
-NetLine::NetLine(const SExpression& node)
+NetLine::NetLine(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mWidth(node.getValueByPath<UnsignedLength>("width")),
-    mStart(node.getChildByPath("from")),
-    mEnd(node.getChildByPath("to")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mWidth(deserialize<UnsignedLength>(node.getChild("width/@0"), fileFormat)),
+    mStart(node.getChild("from"), fileFormat),
+    mEnd(node.getChild("to"), fileFormat) {
 }
 
 NetLine::~NetLine() noexcept {

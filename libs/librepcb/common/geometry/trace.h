@@ -61,7 +61,7 @@ public:
   // Constructors / Destructor
   TraceAnchor() = delete;
   TraceAnchor(const TraceAnchor& other) noexcept;
-  explicit TraceAnchor(const SExpression& node);
+  TraceAnchor(const SExpression& node, const Version& fileFormat);
   ~TraceAnchor() noexcept;
 
   // Getters
@@ -127,7 +127,7 @@ public:
   Trace(const Uuid& uuid, const GraphicsLayerName& layer,
         const PositiveLength& width, const TraceAnchor& start,
         const TraceAnchor& end) noexcept;
-  explicit Trace(const SExpression& node);
+  Trace(const SExpression& node, const Version& fileFormat);
   ~Trace() noexcept;
 
   // Getters

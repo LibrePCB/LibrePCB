@@ -89,14 +89,16 @@ public:
         strokeTexts(strokeTexts),
         onEdited(*this) {}
 
-    explicit Device(const SExpression& node)
-      : componentUuid(node.getChildByIndex(0).getValue<Uuid>()),
-        libDeviceUuid(node.getValueByPath<Uuid>("lib_device")),
-        libFootprintUuid(node.getValueByPath<Uuid>("lib_footprint")),
-        position(node.getChildByPath("position")),
-        rotation(node.getValueByPath<Angle>("rotation")),
-        mirrored(node.getValueByPath<bool>("mirror")),
-        strokeTexts(node),
+    Device(const SExpression& node, const Version& fileFormat)
+      : componentUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        libDeviceUuid(
+            deserialize<Uuid>(node.getChild("lib_device/@0"), fileFormat)),
+        libFootprintUuid(
+            deserialize<Uuid>(node.getChild("lib_footprint/@0"), fileFormat)),
+        position(node.getChild("position"), fileFormat),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
+        strokeTexts(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -108,6 +110,14 @@ public:
       root.appendChild("rotation", rotation, false);
       root.appendChild("mirror", mirrored, false);
       strokeTexts.serialize(root);
+    }
+
+    bool operator!=(const Device& rhs) noexcept {
+      return (componentUuid != rhs.componentUuid) ||
+          (libDeviceUuid != rhs.libDeviceUuid) ||
+          (libFootprintUuid != rhs.libFootprintUuid) ||
+          (position != rhs.position) || (rotation != rhs.rotation) ||
+          (mirrored != rhs.mirrored) || (strokeTexts != rhs.strokeTexts);
     }
   };
 
@@ -123,11 +133,12 @@ public:
     explicit NetSegment(const CircuitIdentifier& netName)
       : netName(netName), vias(), junctions(), traces(), onEdited(*this) {}
 
-    explicit NetSegment(const SExpression& node)
-      : netName(node.getValueByPath<CircuitIdentifier>("net")),
-        vias(node),
-        junctions(node),
-        traces(node),
+    NetSegment(const SExpression& node, const Version& fileFormat)
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
+                                               fileFormat)),
+        vias(node, fileFormat),
+        junctions(node, fileFormat),
+        traces(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -137,14 +148,19 @@ public:
       junctions.serialize(root);
       traces.serialize(root);
     }
+
+    bool operator!=(const NetSegment& rhs) noexcept {
+      return (netName != rhs.netName) || (vias != rhs.vias) ||
+          (junctions != rhs.junctions) || (traces != rhs.traces);
+    }
   };
 
   struct Plane : public SerializableObject {
     static constexpr const char* tagname = "plane";
 
     Uuid uuid;
-    QString layer;
-    QString netSignalName;
+    GraphicsLayerName layer;
+    CircuitIdentifier netSignalName;
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
@@ -153,10 +169,10 @@ public:
     BI_Plane::ConnectStyle connectStyle;
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
-    Plane(const Uuid& uuid, const QString& layer, const QString& netSignalName,
-          const Path& outline, const UnsignedLength& minWidth,
-          const UnsignedLength& minClearance, bool keepOrphans, int priority,
-          BI_Plane::ConnectStyle connectStyle)
+    Plane(const Uuid& uuid, const GraphicsLayerName& layer,
+          const CircuitIdentifier& netSignalName, const Path& outline,
+          const UnsignedLength& minWidth, const UnsignedLength& minClearance,
+          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle)
       : uuid(uuid),
         layer(layer),
         netSignalName(netSignalName),
@@ -168,17 +184,22 @@ public:
         connectStyle(connectStyle),
         onEdited(*this) {}
 
-    explicit Plane(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        layer(node.getValueByPath<QString>("layer", true)),
-        netSignalName(node.getValueByPath<QString>("net", true)),
-        outline(node),
-        minWidth(node.getValueByPath<UnsignedLength>("min_width")),
-        minClearance(node.getValueByPath<UnsignedLength>("min_clearance")),
-        keepOrphans(node.getValueByPath<bool>("keep_orphans")),
-        priority(node.getValueByPath<int>("priority")),
-        connectStyle(
-            node.getValueByPath<BI_Plane::ConnectStyle>("connect_style")),
+    Plane(const SExpression& node, const Version& fileFormat)
+      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        layer(deserialize<GraphicsLayerName>(node.getChild("layer/@0"),
+                                             fileFormat)),
+        netSignalName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
+                                                     fileFormat)),
+        outline(node, fileFormat),
+        minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"),
+                                             fileFormat)),
+        minClearance(deserialize<UnsignedLength>(
+            node.getChild("min_clearance/@0"), fileFormat)),
+        keepOrphans(
+            deserialize<bool>(node.getChild("keep_orphans/@0"), fileFormat)),
+        priority(deserialize<int>(node.getChild("priority/@0"), fileFormat)),
+        connectStyle(deserialize<BI_Plane::ConnectStyle>(
+            node.getChild("connect_style/@0"), fileFormat)),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -192,6 +213,14 @@ public:
       root.appendChild("keep_orphans", keepOrphans, false);
       root.appendChild("connect_style", connectStyle, true);
       outline.serialize(root);
+    }
+
+    bool operator!=(const Plane& rhs) noexcept {
+      return (uuid != rhs.uuid) || (layer != rhs.layer) ||
+          (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
+          (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
+          (keepOrphans != rhs.keepOrphans) || (priority != rhs.priority) ||
+          (connectStyle != rhs.connectStyle);
     }
   };
 

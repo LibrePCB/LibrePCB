@@ -114,7 +114,8 @@ Workspace::Workspace(const FilePath& wsPath)
 
   // load workspace settings
   mWorkspaceSettings.reset(
-      new WorkspaceSettings(mMetadataPath.getPathTo("settings.lp"), this));
+      new WorkspaceSettings(mMetadataPath.getPathTo("settings.lp"),
+                            qApp->getFileFormatVersion(), this));
 
   // load library database
   mLibraryDb.reset(new WorkspaceLibraryDb(*this));  // can throw

@@ -84,20 +84,25 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
     mFont(nullptr) {
 }
 
-StrokeText::StrokeText(const SExpression& node)
+StrokeText::StrokeText(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mLayerName(node.getValueByPath<GraphicsLayerName>("layer", true)),
-    mText(node.getValueByPath<QString>("value")),
-    mPosition(node.getChildByPath("position")),
-    mRotation(node.getValueByPath<Angle>("rotation")),
-    mHeight(node.getValueByPath<PositiveLength>("height")),
-    mStrokeWidth(node.getValueByPath<UnsignedLength>("stroke_width")),
-    mLetterSpacing(node.getValueByPath<StrokeTextSpacing>("letter_spacing")),
-    mLineSpacing(node.getValueByPath<StrokeTextSpacing>("line_spacing")),
-    mAlign(node.getChildByPath("align")),
-    mMirrored(node.getValueByPath<bool>("mirror")),
-    mAutoRotate(node.getValueByPath<bool>("auto_rotate")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mLayerName(
+        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
+    mText(node.getChild("value/@0").getValue()),
+    mPosition(node.getChild("position"), fileFormat),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mHeight(
+        deserialize<PositiveLength>(node.getChild("height/@0"), fileFormat)),
+    mStrokeWidth(deserialize<UnsignedLength>(node.getChild("stroke_width/@0"),
+                                             fileFormat)),
+    mLetterSpacing(deserialize<StrokeTextSpacing>(
+        node.getChild("letter_spacing/@0"), fileFormat)),
+    mLineSpacing(deserialize<StrokeTextSpacing>(
+        node.getChild("line_spacing/@0"), fileFormat)),
+    mAlign(node.getChild("align"), fileFormat),
+    mMirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
+    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"), fileFormat)),
     mAttributeProvider(nullptr),
     mFont(nullptr) {
 }

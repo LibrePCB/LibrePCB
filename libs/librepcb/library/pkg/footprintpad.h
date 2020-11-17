@@ -78,7 +78,7 @@ public:
                Shape shape, const PositiveLength& width,
                const PositiveLength& height,
                const UnsignedLength& drillDiameter, BoardSide side) noexcept;
-  explicit FootprintPad(const SExpression& node);
+  FootprintPad(const SExpression& node, const Version& fileFormat);
   ~FootprintPad() noexcept;
 
   // Getters
@@ -164,8 +164,7 @@ using CmdFootprintPadsSwap =
 }  // namespace library
 
 template <>
-inline SExpression serializeToSExpression(
-    const library::FootprintPad::BoardSide& obj) {
+inline SExpression serialize(const library::FootprintPad::BoardSide& obj) {
   switch (obj) {
     case library::FootprintPad::BoardSide::TOP:
       return SExpression::createToken("top");
@@ -179,9 +178,10 @@ inline SExpression serializeToSExpression(
 }
 
 template <>
-inline library::FootprintPad::BoardSide deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline library::FootprintPad::BoardSide deserialize(const SExpression& sexpr,
+                                                    const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   if (str == QLatin1String("top"))
     return library::FootprintPad::BoardSide::TOP;
   else if (str == QLatin1String("bottom"))
@@ -193,8 +193,7 @@ inline library::FootprintPad::BoardSide deserializeFromSExpression(
 }
 
 template <>
-inline SExpression serializeToSExpression(
-    const library::FootprintPad::Shape& obj) {
+inline SExpression serialize(const library::FootprintPad::Shape& obj) {
   switch (obj) {
     case library::FootprintPad::Shape::ROUND:
       return SExpression::createToken("round");
@@ -208,9 +207,10 @@ inline SExpression serializeToSExpression(
 }
 
 template <>
-inline library::FootprintPad::Shape deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline library::FootprintPad::Shape deserialize(const SExpression& sexpr,
+                                                const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   if (str == QLatin1String("round"))
     return library::FootprintPad::Shape::ROUND;
   else if (str == QLatin1String("rect"))

@@ -252,7 +252,7 @@ bool CmdPasteBoardItems::performExecute() {
     BI_Plane* copy = new BI_Plane(mBoard,
                                   Uuid::createRandom(),  // assign new UUID
                                   GraphicsLayerName(plane.layer),
-                                  *getOrCreateNetSignal(plane.netSignalName),
+                                  *getOrCreateNetSignal(*plane.netSignalName),
                                   plane.outline.translated(mPosOffset)  // move
     );
     copy->setMinWidth(plane.minWidth);

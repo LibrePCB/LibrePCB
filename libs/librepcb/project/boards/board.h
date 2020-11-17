@@ -124,8 +124,9 @@ public:
   Board(const Board& other) = delete;
   Board(const Board& other, std::unique_ptr<TransactionalDirectory> directory,
         const ElementName& name);
-  Board(Project& project, std::unique_ptr<TransactionalDirectory> directory)
-    : Board(project, std::move(directory), false, QString()) {}
+  Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
+        const Version& fileFormat)
+    : Board(project, std::move(directory), fileFormat, false, QString()) {}
   ~Board() noexcept;
 
   // Getters: General
@@ -290,7 +291,7 @@ signals:
 
 private:
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        bool create, const QString& newName);
+        const Version& fileFormat, bool create, const QString& newName);
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 

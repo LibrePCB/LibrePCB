@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   BoardDesignRules() noexcept;
   BoardDesignRules(const BoardDesignRules& other);
-  explicit BoardDesignRules(const SExpression& node);
+  BoardDesignRules(const SExpression& node, const Version& fileFormat);
   ~BoardDesignRules() noexcept;
 
   // Getters : General Attributes

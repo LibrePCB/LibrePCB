@@ -83,14 +83,18 @@ public:
         attributes(attributes),
         onEdited(*this) {}
 
-    explicit ComponentInstance(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        libComponentUuid(node.getValueByPath<Uuid>("lib_component")),
-        libVariantUuid(node.getValueByPath<Uuid>("lib_variant")),
-        libDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
-        name(node.getValueByPath<CircuitIdentifier>("name", true)),
-        value(node.getValueByPath<QString>("value")),
-        attributes(node),
+    ComponentInstance(const SExpression& node, const Version& fileFormat)
+      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        libComponentUuid(
+            deserialize<Uuid>(node.getChild("lib_component/@0"), fileFormat)),
+        libVariantUuid(
+            deserialize<Uuid>(node.getChild("lib_variant/@0"), fileFormat)),
+        libDeviceUuid(deserialize<tl::optional<Uuid>>(
+            node.getChild("lib_device/@0"), fileFormat)),
+        name(deserialize<CircuitIdentifier>(node.getChild("name/@0"),
+                                            fileFormat)),
+        value(node.getChild("value/@0").getValue()),
+        attributes(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -102,6 +106,13 @@ public:
       root.appendChild("name", name, true);
       root.appendChild("value", value, false);
       attributes.serialize(root);
+    }
+
+    bool operator!=(const ComponentInstance& rhs) noexcept {
+      return (uuid != rhs.uuid) || (libComponentUuid != rhs.libComponentUuid) ||
+          (libVariantUuid != rhs.libVariantUuid) ||
+          (libDeviceUuid != rhs.libDeviceUuid) || (name != rhs.name) ||
+          (value != rhs.value) || (attributes != rhs.attributes);
     }
   };
 
@@ -128,13 +139,15 @@ public:
         mirrored(mirrored),
         onEdited(*this) {}
 
-    explicit SymbolInstance(const SExpression& node)
-      : uuid(node.getChildByIndex(0).getValue<Uuid>()),
-        componentInstanceUuid(node.getValueByPath<Uuid>("component")),
-        symbolVariantItemUuid(node.getValueByPath<Uuid>("lib_gate")),
-        position(node.getChildByPath("position")),
-        rotation(node.getValueByPath<Angle>("rotation")),
-        mirrored(node.getValueByPath<bool>("mirror")),
+    SymbolInstance(const SExpression& node, const Version& fileFormat)
+      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+        componentInstanceUuid(
+            deserialize<Uuid>(node.getChild("component/@0"), fileFormat)),
+        symbolVariantItemUuid(
+            deserialize<Uuid>(node.getChild("lib_gate/@0"), fileFormat)),
+        position(node.getChild("position"), fileFormat),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -145,6 +158,14 @@ public:
       root.appendChild(position.serializeToDomElement("position"), true);
       root.appendChild("rotation", rotation, false);
       root.appendChild("mirror", mirrored, false);
+    }
+
+    bool operator!=(const SymbolInstance& rhs) noexcept {
+      return (uuid != rhs.uuid) ||
+          (componentInstanceUuid != rhs.componentInstanceUuid) ||
+          (symbolVariantItemUuid != rhs.symbolVariantItemUuid) ||
+          (position != rhs.position) || (rotation != rhs.rotation) ||
+          (mirrored != rhs.mirrored);
     }
   };
 
@@ -160,11 +181,12 @@ public:
     explicit NetSegment(const CircuitIdentifier& netName)
       : netName(netName), junctions(), lines(), labels(), onEdited(*this) {}
 
-    explicit NetSegment(const SExpression& node)
-      : netName(node.getValueByPath<CircuitIdentifier>("net")),
-        junctions(node),
-        lines(node),
-        labels(node),
+    NetSegment(const SExpression& node, const Version& fileFormat)
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
+                                               fileFormat)),
+        junctions(node, fileFormat),
+        lines(node, fileFormat),
+        labels(node, fileFormat),
         onEdited(*this) {}
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -173,6 +195,11 @@ public:
       junctions.serialize(root);
       lines.serialize(root);
       labels.serialize(root);
+    }
+
+    bool operator!=(const NetSegment& rhs) noexcept {
+      return (netName != rhs.netName) || (junctions != rhs.junctions) ||
+          (lines != rhs.lines) || (labels != rhs.labels);
     }
   };
 

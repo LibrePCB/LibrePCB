@@ -96,14 +96,15 @@ inline bool operator!=(const QString& lhs, const AttributeKey& rhs) noexcept {
 }
 
 template <>
-inline SExpression serializeToSExpression(const AttributeKey& obj) {
+inline SExpression serialize(const AttributeKey& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline AttributeKey deserializeFromSExpression(const SExpression& sexpr,
-                                               bool throwIfEmpty) {
-  return AttributeKey(sexpr.getStringOrToken(throwIfEmpty));  // can throw
+inline AttributeKey deserialize(const SExpression& sexpr,
+                                const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return AttributeKey(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const AttributeKey& obj) {

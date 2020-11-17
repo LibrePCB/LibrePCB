@@ -63,7 +63,8 @@ public:
   // Constructors / Destructor
   SI_Symbol() = delete;
   SI_Symbol(const SI_Symbol& other) = delete;
-  explicit SI_Symbol(Schematic& schematic, const SExpression& node);
+  SI_Symbol(Schematic& schematic, const SExpression& node,
+            const Version& fileFormat);
   explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
                      const Uuid& symbolItem, const Point& position = Point(),
                      const Angle& rotation = Angle(), bool mirrored = false);
