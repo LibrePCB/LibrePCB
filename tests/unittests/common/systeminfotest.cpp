@@ -55,8 +55,11 @@ protected:
 
   QString getOwnProcessExeName() const noexcept {
 #if defined(Q_OS_SOLARIS)
-    // Note: Solaris limits process names to 16 bytes
+    // Note: Solaris limits process names to 15 bytes
     return QString("librepcb-unitte");
+#elif defined(Q_OS_OPENBSD)
+    // Note: OpenBSD limits process names to 16 bytes
+    return QString("librepcb-unittes");
 #else
     return QString("librepcb-unittests");
 #endif

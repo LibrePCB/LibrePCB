@@ -45,6 +45,9 @@
 #if defined(Q_OS_SOLARIS)
 #include <libproc.h>
 #endif
+#if defined(Q_OS_OPENBSD)
+#include <sys/sysctl.h>
+#endif
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
 #ifdef WINVER
 #undef WINVER
@@ -233,6 +236,26 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   }
   buf[len] = 0;
   processName = QFileInfo(QFile::decodeName(buf)).fileName();
+#elif defined(Q_OS_OPENBSD)
+  // https://man.openbsd.org/sysctl.2
+  // NOTE: This will return only the first 16 bytes of the process name. If
+  // someone finds a way to get the full process name, feel free to improve it.
+  kinfo_proc proc;
+  size_t procSize = sizeof(proc);
+  int mib[6] = {CTL_KERN,     KERN_PROC, KERN_PROC_PID, static_cast<int>(pid),
+                sizeof(proc), 1};
+  int retval = sysctl(mib, 6, &proc, &procSize, NULL, 0);
+  if (retval != 0) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("sysctl() failed with retval=%1 and errno=%2.")
+                           .arg(retval)
+                           .arg(errno));
+  }
+  if (procSize < sizeof(proc)) {
+    return QString();  // process not running
+  }
+  processName = QString::fromLocal8Bit(proc.p_comm, sizeof(proc.p_comm))
+                    .section('\0', 0, 0);
 #elif defined(Q_OS_LINUX)
 
   // From:
