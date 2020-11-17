@@ -48,7 +48,8 @@ SchematicClipboardData::SchematicClipboardData(const Uuid& schematicUuid,
     mCursorPos(cursorPos),
     mComponentInstances(),
     mSymbolInstances(),
-    mNetSegments() {
+    mNetSegments(),
+    mTexts() {
 }
 
 SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
@@ -63,6 +64,7 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
   mComponentInstances.loadFromSExpression(root, fileFormat);
   mSymbolInstances.loadFromSExpression(root, fileFormat);
   mNetSegments.loadFromSExpression(root, fileFormat);
+  mTexts.loadFromSExpression(root, fileFormat);
 }
 
 SchematicClipboardData::~SchematicClipboardData() noexcept {
@@ -121,6 +123,7 @@ void SchematicClipboardData::serialize(SExpression& root) const {
   mComponentInstances.serialize(root);
   mSymbolInstances.serialize(root);
   mNetSegments.serialize(root);
+  mTexts.serialize(root);
 }
 
 QString SchematicClipboardData::getMimeType() noexcept {

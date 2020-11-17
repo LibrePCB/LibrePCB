@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdmirrorselectedschematicitems.h"
 
+#include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetlabelanchorsupdate.h>
@@ -33,6 +34,7 @@
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/project/schematics/items/si_text.h>
 #include <librepcb/project/schematics/schematic.h>
 #include <librepcb/project/schematics/schematicselectionquery.h>
 
@@ -71,6 +73,7 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
   query->addSelectedNetPoints();
   query->addNetPointsOfNetLines();
   query->addSelectedNetLabels();
+  query->addSelectedTexts();
 
   // find the center of all elements
   Point center = Point(0, 0);
@@ -85,6 +88,10 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
   }
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
     center += netlabel->getPosition();
+    ++count;
+  }
+  foreach (SI_Text* text, query->getTexts()) {
+    center += text->getPosition();
     ++count;
   }
   if (count > 0) {
@@ -122,6 +129,11 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
 
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
     cmd->setPosition(newpos, false);
+    appendChild(cmd);
+  }
+  foreach (SI_Text* text, query->getTexts()) {
+    CmdTextEdit* cmd = new CmdTextEdit(text->getText());
+    cmd->mirror(mOrientation, center, false);
     appendChild(cmd);
   }
 

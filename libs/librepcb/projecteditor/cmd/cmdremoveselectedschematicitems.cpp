@@ -48,6 +48,7 @@
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematictextremove.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceremove.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
@@ -93,6 +94,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   query->addSelectedSymbols();
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
+  query->addSelectedTexts();
   query->addNetPointsOfNetLines(true);
   query->addNetLinesOfSymbolPins();
 
@@ -112,6 +114,11 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   foreach (SI_Symbol* symbol, query->getSymbols()) {
     Q_ASSERT(symbol->isAddedToSchematic());
     removeSymbol(*symbol);  // can throw
+  }
+
+  // remove texts
+  foreach (SI_Text* text, query->getTexts()) {
+    execNewChildCmd(new CmdSchematicTextRemove(*text));  // can throw
   }
 
   // remove netsignals which are no longer required

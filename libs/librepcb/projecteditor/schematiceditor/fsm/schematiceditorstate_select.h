@@ -40,6 +40,7 @@ namespace project {
 class SI_Base;
 class SI_Symbol;
 class SI_NetLabel;
+class SI_Text;
 class Schematic;
 
 namespace editor {
@@ -105,6 +106,7 @@ private:  // Methods
   void openPropertiesDialog(SI_Base* item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
+  void openTextPropertiesDialog(SI_Text& text) noexcept;
 
   // Right Click Menu
   QAction* addActionCut(QMenu& menu, const QString& text = tr("Cut")) noexcept;

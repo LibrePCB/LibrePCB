@@ -32,6 +32,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class CmdTextEdit;
+
 namespace project {
 
 class Schematic;
@@ -73,6 +76,7 @@ private:
   QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
   QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
   QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
+  QList<CmdTextEdit*> mTextEditCmds;
 };
 
 /*******************************************************************************
