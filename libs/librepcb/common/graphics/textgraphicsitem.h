@@ -36,6 +36,7 @@ namespace librepcb {
 
 class OriginCrossGraphicsItem;
 class IF_GraphicsLayerProvider;
+class AttributeProvider;
 
 /*******************************************************************************
  *  Class TextGraphicsItem
@@ -57,6 +58,10 @@ public:
   // Getters
   Text& getText() noexcept { return mText; }
 
+  // General Methods
+  void setAttributeProvider(const AttributeProvider* provider) noexcept;
+  void updateText() noexcept;
+
   // Operator Overloadings
   TextGraphicsItem& operator=(const TextGraphicsItem& rhs) = delete;
 
@@ -67,6 +72,9 @@ private:  // Data
   Text& mText;
   const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+
+  /// Object for substituting placeholders in text
+  const AttributeProvider* mAttributeProvider;
 
   // Slots
   Text::OnEditedSlot mOnEditedSlot;

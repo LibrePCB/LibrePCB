@@ -66,8 +66,10 @@ void PrimitiveTextGraphicsItem::setRotation(const Angle& rot) noexcept {
 }
 
 void PrimitiveTextGraphicsItem::setText(const QString& text) noexcept {
-  mText = text;
-  updateBoundingRectAndShape();
+  if (text != mText) {
+    mText = text;
+    updateBoundingRectAndShape();
+  }
 }
 
 void PrimitiveTextGraphicsItem::setHeight(
