@@ -20,13 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "si_base.h"
+#include "cmdschematictextremove.h"
 
-#include "../../project.h"
-#include "../graphicsitems/sgi_base.h"
+#include "../items/si_text.h"
 #include "../schematic.h"
-
-#include <librepcb/common/graphics/graphicsscene.h>
 
 #include <QtCore>
 
@@ -40,55 +37,29 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_Base::SI_Base(Schematic& schematic) noexcept
-  : QObject(&schematic),
-    mSchematic(schematic),
-    mIsAddedToSchematic(false),
-    mIsSelected(false) {
+CmdSchematicTextRemove::CmdSchematicTextRemove(SI_Text& text) noexcept
+  : UndoCommand(tr("Remove schematic text")), mText(text) {
 }
 
-SI_Base::~SI_Base() noexcept {
-  Q_ASSERT(!mIsAddedToSchematic);
+CmdSchematicTextRemove::~CmdSchematicTextRemove() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Inherited from UndoCommand
  ******************************************************************************/
 
-Project& SI_Base::getProject() const noexcept {
-  return mSchematic.getProject();
+bool CmdSchematicTextRemove::performExecute() {
+  performRedo();  // can throw
+
+  return true;
 }
 
-Circuit& SI_Base::getCircuit() const noexcept {
-  return mSchematic.getProject().getCircuit();
+void CmdSchematicTextRemove::performUndo() {
+  mText.getSchematic().addText(mText);  // can throw
 }
 
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void SI_Base::setSelected(bool selected) noexcept {
-  mIsSelected = selected;
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void SI_Base::addToSchematic(QGraphicsItem* item) noexcept {
-  Q_ASSERT(!mIsAddedToSchematic);
-  if (item) {
-    mSchematic.getGraphicsScene().addItem(*item);
-  }
-  mIsAddedToSchematic = true;
-}
-
-void SI_Base::removeFromSchematic(QGraphicsItem* item) noexcept {
-  Q_ASSERT(mIsAddedToSchematic);
-  if (item) {
-    mSchematic.getGraphicsScene().removeItem(*item);
-  }
-  mIsAddedToSchematic = false;
+void CmdSchematicTextRemove::performRedo() {
+  mText.getSchematic().removeText(mText);  // can throw
 }
 
 /*******************************************************************************

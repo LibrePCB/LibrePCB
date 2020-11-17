@@ -58,6 +58,7 @@ class SI_NetSegment;
 class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLabel;
+class SI_Text;
 class SchematicSelectionQuery;
 
 /*******************************************************************************
@@ -78,7 +79,7 @@ class SchematicSelectionQuery;
  *      - symbol pin:   ::librepcb::project::SI_SymbolPin
  *  - polygon:          TODO
  *  - circle:           TODO
- *  - text:             TODO
+ *  - text:             ::librepcb::project::SI_Text
  */
 class Schematic final : public QObject,
                         public AttributeProvider,
@@ -101,6 +102,7 @@ public:
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
     ZValue_Symbols,  ///< Z value for ::librepcb::project::SI_Symbol items
+    ZValue_Texts,  ///< Z value for ::librepcb::project::SI_Text items
     ZValue_NetLabels,  ///< Z value for ::librepcb::project::SI_NetLabel items
     ZValue_NetLines,  ///< Z value for ::librepcb::project::SI_NetLine items
     ZValue_HiddenNetPoints,  ///< Z value for hidden
@@ -130,6 +132,7 @@ public:
   QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
   QList<SI_NetLabel*> getNetLabelsAtScenePos(const Point& pos) const noexcept;
   QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
+  QList<SI_Text*> getTextsAtScenePos(const Point& pos) const noexcept;
 
   // Setters: General
   void setGridProperties(const GridProperties& grid) noexcept;
@@ -153,6 +156,12 @@ public:
   SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
   void addNetSegment(SI_NetSegment& netsegment);
   void removeNetSegment(SI_NetSegment& netsegment);
+
+  // Text Methods
+  QList<SI_Text*> getTexts() const noexcept { return mTexts; }
+  SI_Text* getTextByUuid(const Uuid& uuid) const noexcept;
+  void addText(SI_Text& text);
+  void removeText(SI_Text& text);
 
   // General Methods
   void addToProject();
@@ -216,6 +225,7 @@ private:
 
   QList<SI_Symbol*> mSymbols;
   QList<SI_NetSegment*> mNetSegments;
+  QList<SI_Text*> mTexts;
 };
 
 /*******************************************************************************

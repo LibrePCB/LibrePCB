@@ -124,6 +124,8 @@ SOURCES += \
     schematics/cmd/cmdschematicnetsegmentremove.cpp \
     schematics/cmd/cmdschematicnetsegmentremoveelements.cpp \
     schematics/cmd/cmdschematicremove.cpp \
+    schematics/cmd/cmdschematictextadd.cpp \
+    schematics/cmd/cmdschematictextremove.cpp \
     schematics/cmd/cmdsymbolinstanceadd.cpp \
     schematics/cmd/cmdsymbolinstanceedit.cpp \
     schematics/cmd/cmdsymbolinstanceremove.cpp \
@@ -140,6 +142,7 @@ SOURCES += \
     schematics/items/si_netsegment.cpp \
     schematics/items/si_symbol.cpp \
     schematics/items/si_symbolpin.cpp \
+    schematics/items/si_text.cpp \
     schematics/schematic.cpp \
     schematics/schematiclayerprovider.cpp \
     schematics/schematicselectionquery.cpp \
@@ -246,6 +249,8 @@ HEADERS += \
     schematics/cmd/cmdschematicnetsegmentremove.h \
     schematics/cmd/cmdschematicnetsegmentremoveelements.h \
     schematics/cmd/cmdschematicremove.h \
+    schematics/cmd/cmdschematictextadd.h \
+    schematics/cmd/cmdschematictextremove.h \
     schematics/cmd/cmdsymbolinstanceadd.h \
     schematics/cmd/cmdsymbolinstanceedit.h \
     schematics/cmd/cmdsymbolinstanceremove.h \
@@ -262,6 +267,7 @@ HEADERS += \
     schematics/items/si_netsegment.h \
     schematics/items/si_symbol.h \
     schematics/items/si_symbolpin.h \
+    schematics/items/si_text.h \
     schematics/schematic.h \
     schematics/schematiclayerprovider.h \
     schematics/schematicselectionquery.h \

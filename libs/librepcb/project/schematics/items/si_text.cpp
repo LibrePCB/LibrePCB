@@ -20,13 +20,14 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "si_base.h"
+#include "si_text.h"
 
 #include "../../project.h"
-#include "../graphicsitems/sgi_base.h"
 #include "../schematic.h"
+#include "../schematiclayerprovider.h"
 
-#include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/graphics/origincrossgraphicsitem.h>
+#include <librepcb/common/graphics/textgraphicsitem.h>
 
 #include <QtCore>
 
@@ -40,55 +41,75 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_Base::SI_Base(Schematic& schematic) noexcept
-  : QObject(&schematic),
-    mSchematic(schematic),
-    mIsAddedToSchematic(false),
-    mIsSelected(false) {
+SI_Text::SI_Text(Schematic& schematic, const SExpression& node,
+                 const Version& fileFormat)
+  : SI_Base(schematic), mText(node, fileFormat) {
+  init();
 }
 
-SI_Base::~SI_Base() noexcept {
-  Q_ASSERT(!mIsAddedToSchematic);
+SI_Text::SI_Text(Schematic& schematic, const Text& text)
+  : SI_Base(schematic), mText(text) {
+  init();
 }
 
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
+void SI_Text::init() {
+  // Create the graphics item.
+  mGraphicsItem.reset(
+      new TextGraphicsItem(mText, mSchematic.getProject().getLayers()));
+  mGraphicsItem->setZValue(Schematic::ZValue_Texts);
+  mGraphicsItem->setAttributeProvider(&mSchematic);
 
-Project& SI_Base::getProject() const noexcept {
-  return mSchematic.getProject();
+  // Connect to the "attributes changed" signal of the schematic.
+  connect(&mSchematic, &Schematic::attributesChanged, this,
+          &SI_Text::schematicAttributesChanged);
 }
 
-Circuit& SI_Base::getCircuit() const noexcept {
-  return mSchematic.getProject().getCircuit();
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void SI_Base::setSelected(bool selected) noexcept {
-  mIsSelected = selected;
+SI_Text::~SI_Text() noexcept {
+  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void SI_Base::addToSchematic(QGraphicsItem* item) noexcept {
-  Q_ASSERT(!mIsAddedToSchematic);
-  if (item) {
-    mSchematic.getGraphicsScene().addItem(*item);
+void SI_Text::addToSchematic() {
+  if (isAddedToSchematic()) {
+    throw LogicError(__FILE__, __LINE__);
   }
-  mIsAddedToSchematic = true;
+  SI_Base::addToSchematic(mGraphicsItem.data());
 }
 
-void SI_Base::removeFromSchematic(QGraphicsItem* item) noexcept {
-  Q_ASSERT(mIsAddedToSchematic);
-  if (item) {
-    mSchematic.getGraphicsScene().removeItem(*item);
+void SI_Text::removeFromSchematic() {
+  if (!isAddedToSchematic()) {
+    throw LogicError(__FILE__, __LINE__);
   }
-  mIsAddedToSchematic = false;
+  SI_Base::removeFromSchematic(mGraphicsItem.data());
+}
+
+void SI_Text::serialize(SExpression& root) const {
+  mText.serialize(root);
+}
+
+/*******************************************************************************
+ *  Inherited from SI_Base
+ ******************************************************************************/
+
+QPainterPath SI_Text::getGrabAreaScenePx() const noexcept {
+  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
+}
+
+void SI_Text::setSelected(bool selected) noexcept {
+  SI_Base::setSelected(selected);
+  mGraphicsItem->setSelected(selected);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void SI_Text::schematicAttributesChanged() noexcept {
+  // Attribute changed -> graphics item needs to perform attribute substitution.
+  mGraphicsItem->updateText();
 }
 
 /*******************************************************************************

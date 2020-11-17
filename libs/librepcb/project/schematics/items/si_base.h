@@ -40,7 +40,6 @@ namespace project {
 class Project;
 class Circuit;
 class Schematic;
-class SGI_Base;
 
 /*******************************************************************************
  *  Class SI_Base
@@ -61,6 +60,7 @@ public:
     NetLabel,  ///< ::librepcb::project::SI_NetLabel
     Symbol,  ///< ::librepcb::project::SI_Symbol
     SymbolPin,  ///< ::librepcb::project::SI_SymbolPin
+    Text,  ///< ::librepcb::project::SI_Text
   };
 
   // Constructors / Destructor
@@ -93,8 +93,8 @@ public:
 
 protected:
   // General Methods
-  void addToSchematic(SGI_Base* item) noexcept;
-  void removeFromSchematic(SGI_Base* item) noexcept;
+  void addToSchematic(QGraphicsItem* item) noexcept;
+  void removeFromSchematic(QGraphicsItem* item) noexcept;
 
 protected:
   Schematic& mSchematic;
