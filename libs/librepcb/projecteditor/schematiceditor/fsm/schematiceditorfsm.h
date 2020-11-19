@@ -74,7 +74,9 @@ public:
     /// ::librepcb::project::editor::SchematicEditorState_AddNetLabel
     ADD_NETLABEL,
     /// ::librepcb::project::editor::SchematicEditorState_AddComponent
-    ADD_COMPONENT
+    ADD_COMPONENT,
+    /// ::librepcb::project::editor::SchematicEditorState_AddText
+    ADD_TEXT,
   };
 
   /// FSM Context
@@ -102,6 +104,7 @@ public:
   bool processAddComponent() noexcept;
   bool processAddComponent(const Uuid& cmp, const Uuid& symbVar) noexcept;
   bool processAddNetLabel() noexcept;
+  bool processAddText() noexcept;
   bool processDrawWire() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;

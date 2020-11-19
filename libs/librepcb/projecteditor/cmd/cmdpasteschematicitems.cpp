@@ -42,6 +42,7 @@
 #include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematictextadd.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceadd.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
@@ -49,6 +50,7 @@
 #include <librepcb/project/schematics/items/si_netsegment.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/project/schematics/items/si_text.h>
 #include <librepcb/project/schematics/schematic.h>
 #include <librepcb/project/settings/projectsettings.h>
 
@@ -277,6 +279,15 @@ bool CmdPasteSchematicItems::performExecute() {
         execNewChildCmd(cmd);
       }
     }
+  }
+
+  // Paste texts
+  for (const Text& text : mData->getTexts()) {
+    Text copy(Uuid::createRandom(), text);  // assign new UUID
+    copy.setPosition(copy.getPosition() + mPosOffset);  // move
+    SI_Text* item = new SI_Text(mSchematic, copy);
+    item->setSelected(true);
+    execNewChildCmd(new CmdSchematicTextAdd(*item));
   }
 
   undoScopeGuard.dismiss();  // no undo required

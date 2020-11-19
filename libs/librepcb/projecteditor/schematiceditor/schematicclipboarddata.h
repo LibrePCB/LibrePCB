@@ -28,6 +28,7 @@
 #include <librepcb/common/geometry/junction.h>
 #include <librepcb/common/geometry/netlabel.h>
 #include <librepcb/common/geometry/netline.h>
+#include <librepcb/common/geometry/text.h>
 #include <librepcb/project/circuit/componentinstance.h>
 
 #include <QtCore>
@@ -227,6 +228,7 @@ public:
   SerializableObjectList<NetSegment, NetSegment>& getNetSegments() noexcept {
     return mNetSegments;
   }
+  TextList& getTexts() noexcept { return mTexts; }
 
   // General Methods
   std::unique_ptr<QMimeData> toMimeData() const;
@@ -250,6 +252,7 @@ private:  // Data
       mComponentInstances;
   SerializableObjectList<SymbolInstance, SymbolInstance> mSymbolInstances;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
+  TextList mTexts;
 };
 
 /*******************************************************************************

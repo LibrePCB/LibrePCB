@@ -105,6 +105,7 @@
     <addaction name="actionToolSelect"/>
     <addaction name="actionToolDrawWire"/>
     <addaction name="actionToolAddNetLabel"/>
+    <addaction name="actionToolAddText"/>
     <addaction name="actionToolAddComponent"/>
    </widget>
    <widget class="QMenu" name="menuProject">
@@ -234,6 +235,7 @@
    <addaction name="actionToolSelect"/>
    <addaction name="actionToolDrawWire"/>
    <addaction name="actionToolAddNetLabel"/>
+   <addaction name="actionToolAddText"/>
    <addaction name="actionToolAddComponent"/>
   </widget>
   <widget class="QToolBar" name="commandToolbar">
@@ -808,7 +810,22 @@
     <string>Select All</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+A</string>
+    <string notr="true">Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionToolAddText">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/add_text.png</normaloff>:/img/actions/add_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add &amp;Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Text</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
  </widget>

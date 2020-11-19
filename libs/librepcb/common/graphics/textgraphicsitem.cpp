@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "textgraphicsitem.h"
 
+#include "../attributes/attributesubstitutor.h"
 #include "../graphics/graphicslayer.h"
 #include "origincrossgraphicsitem.h"
 
@@ -43,16 +44,17 @@ TextGraphicsItem::TextGraphicsItem(Text& text,
   : PrimitiveTextGraphicsItem(parent),
     mText(text),
     mLayerProvider(lp),
+    mAttributeProvider(nullptr),
     mOnEditedSlot(*this, &TextGraphicsItem::textEdited) {
   setFont(TextGraphicsItem::Font::SansSerif);
   setPosition(mText.getPosition());
   setRotation(mText.getRotation());
-  setText(mText.getText());
   setHeight(mText.getHeight());
   setAlignment(mText.getAlign());
   setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(5);
+  updateText();
 
   // add origin cross
   mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
@@ -68,6 +70,26 @@ TextGraphicsItem::~TextGraphicsItem() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void TextGraphicsItem::setAttributeProvider(
+    const AttributeProvider* provider) noexcept {
+  if (provider != mAttributeProvider) {
+    mAttributeProvider = provider;
+    updateText();
+  }
+}
+
+void TextGraphicsItem::updateText() noexcept {
+  QString text = mText.getText();
+  if (mAttributeProvider) {
+    text = AttributeSubstitutor::substitute(text, mAttributeProvider);
+  }
+  setText(text);
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -78,7 +100,7 @@ void TextGraphicsItem::textEdited(const Text& text,
       setLayer(mLayerProvider.getLayer(*text.getLayerName()));
       break;
     case Text::Event::TextChanged:
-      setText(text.getText());
+      updateText();
       break;
     case Text::Event::PositionChanged:
       setPosition(text.getPosition());

@@ -28,6 +28,7 @@
 #include "items/si_netsegment.h"
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
+#include "items/si_text.h"
 #include "schematic.h"
 
 #include <QtCore>
@@ -44,8 +45,11 @@ namespace project {
 
 SchematicSelectionQuery::SchematicSelectionQuery(
     const QList<SI_Symbol*>& symbols, const QList<SI_NetSegment*>& netsegments,
-    QObject* parent)
-  : QObject(parent), mSymbols(symbols), mNetSegments(netsegments) {
+    const QList<SI_Text*>& texts, QObject* parent)
+  : QObject(parent),
+    mSymbols(symbols),
+    mNetSegments(netsegments),
+    mTexts(texts) {
 }
 
 SchematicSelectionQuery::~SchematicSelectionQuery() noexcept {
@@ -72,7 +76,7 @@ QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
 
 int SchematicSelectionQuery::getResultCount() const noexcept {
   return mResultSymbols.count() + mResultNetPoints.count() +
-      mResultNetLines.count() + mResultNetLabels.count();
+      mResultNetLines.count() + mResultNetLabels.count() + mResultTexts.count();
 }
 
 /*******************************************************************************
@@ -113,6 +117,14 @@ void SchematicSelectionQuery::addSelectedNetLabels() noexcept {
       if (netlabel->isSelected()) {
         mResultNetLabels.insert(netlabel);
       }
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedTexts() noexcept {
+  foreach (SI_Text* text, mTexts) {
+    if (text->isSelected()) {
+      mResultTexts.insert(text);
     }
   }
 }

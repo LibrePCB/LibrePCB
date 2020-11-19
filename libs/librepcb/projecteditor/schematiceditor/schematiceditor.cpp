@@ -170,6 +170,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
                                mUi->actionToolAddNetLabel);
   mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
                                mUi->actionToolAddComponent);
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_TEXT,
+                               mUi->actionToolAddText);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
   connect(mFsm, &SchematicEditorFsm::stateChanged, mToolsActionGroup.data(),
           &ExclusiveActionGroup::setCurrentAction);
@@ -653,6 +655,9 @@ void SchematicEditor::toolActionGroupChangeTriggered(
       break;
     case SchematicEditorFsm::State::ADD_COMPONENT:
       mFsm->processAddComponent();
+      break;
+    case SchematicEditorFsm::State::ADD_TEXT:
+      mFsm->processAddText();
       break;
     default:
       Q_ASSERT(false);

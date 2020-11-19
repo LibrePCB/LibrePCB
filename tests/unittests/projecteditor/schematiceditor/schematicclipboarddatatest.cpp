@@ -140,6 +140,15 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   netSegment2->labels.append(std::make_shared<NetLabel>(
       Uuid::createRandom(), Point(1230, 4560), Angle(7890)));
 
+  std::shared_ptr<Text> text1 = std::make_shared<Text>(
+      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
+      Angle(3), PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
+
+  std::shared_ptr<Text> text2 = std::make_shared<Text>(
+      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
+      Angle(30), PositiveLength(40),
+      Alignment(HAlign::center(), VAlign::bottom()));
+
   // Create object
   SchematicClipboardData obj1(uuid, pos);
   obj1.getComponentInstances().append(component1);
@@ -148,6 +157,8 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getSymbolInstances().append(symbol2);
   obj1.getNetSegments().append(netSegment1);
   obj1.getNetSegments().append(netSegment2);
+  obj1.getTexts().append(text1);
+  obj1.getTexts().append(text2);
 
   // Serialize to MIME data
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData();
@@ -160,6 +171,7 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   EXPECT_EQ(obj1.getComponentInstances(), obj2->getComponentInstances());
   EXPECT_EQ(obj1.getNetSegments(), obj2->getNetSegments());
   EXPECT_EQ(obj1.getSymbolInstances(), obj2->getSymbolInstances());
+  EXPECT_EQ(obj1.getTexts(), obj2->getTexts());
 }
 
 /*******************************************************************************

@@ -17,73 +17,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TEXTGRAPHICSITEM_H
-#define LIBREPCB_TEXTGRAPHICSITEM_H
+#ifndef LIBREPCB_PROJECT_SI_TEXT_H
+#define LIBREPCB_PROJECT_SI_TEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/text.h"
-#include "primitivetextgraphicsitem.h"
+#include "si_base.h"
+
+#include <librepcb/common/geometry/text.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class OriginCrossGraphicsItem;
-class IF_GraphicsLayerProvider;
-class AttributeProvider;
+class TextGraphicsItem;
+
+namespace project {
+
+class Schematic;
 
 /*******************************************************************************
- *  Class TextGraphicsItem
+ *  Class SI_Text
  ******************************************************************************/
 
 /**
- * @brief The TextGraphicsItem class is the graphical representation of a
- *        librepcb::Text
+ * @brief The SI_Text class represents a text label in a schematic
  */
-class TextGraphicsItem final : public PrimitiveTextGraphicsItem {
+class SI_Text final : public SI_Base, public SerializableObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  TextGraphicsItem() = delete;
-  TextGraphicsItem(const TextGraphicsItem& other) = delete;
-  TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& lp,
-                   QGraphicsItem* parent = nullptr) noexcept;
-  ~TextGraphicsItem() noexcept;
+  SI_Text() = delete;
+  SI_Text(const SI_Text& other) = delete;
+  SI_Text(Schematic& schematic, const SExpression& node,
+          const Version& fileFormat);
+  SI_Text(Schematic& schematic, const Text& text);
+  ~SI_Text() noexcept;
 
   // Getters
+  const Uuid& getUuid() const noexcept { return mText.getUuid(); }
+  const Angle& getRotation() const noexcept { return mText.getRotation(); }
   Text& getText() noexcept { return mText; }
+  const Text& getText() const noexcept { return mText; }
 
   // General Methods
-  void setAttributeProvider(const AttributeProvider* provider) noexcept;
-  void updateText() noexcept;
+  void addToSchematic() override;
+  void removeFromSchematic() override;
+
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
+
+  // Inherited from SI_Base
+  Type_t getType() const noexcept override { return SI_Base::Type_t::Text; }
+  const Point& getPosition() const noexcept override {
+    return mText.getPosition();
+  }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
-  TextGraphicsItem& operator=(const TextGraphicsItem& rhs) = delete;
+  SI_Text& operator=(const SI_Text& rhs) = delete;
 
 private:  // Methods
-  void textEdited(const Text& text, Text::Event event) noexcept;
+  void init();
+  void schematicAttributesChanged() noexcept;
 
-private:  // Data
-  Text& mText;
-  const IF_GraphicsLayerProvider& mLayerProvider;
-  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
-
-  /// Object for substituting placeholders in text
-  const AttributeProvider* mAttributeProvider;
-
-  // Slots
-  Text::OnEditedSlot mOnEditedSlot;
+private:  // Attributes
+  Text mText;
+  QScopedPointer<TextGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TEXTGRAPHICSITEM_H
+#endif

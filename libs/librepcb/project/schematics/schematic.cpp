@@ -29,6 +29,7 @@
 #include "items/si_netsegment.h"
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
+#include "items/si_text.h"
 #include "schematicselectionquery.h"
 
 #include <librepcb/common/application.h>
@@ -109,6 +110,21 @@ Schematic::Schematic(Project& project,
         }
         mNetSegments.append(netsegment);
       }
+
+      // Load all texts
+      // Note: Support for texts was added in file format v0.2. However, there
+      // is no need to check the file format here - v0.1 simply doesn't contain
+      // texts.
+      foreach (const SExpression& node, root.getChildren("text")) {
+        SI_Text* text = new SI_Text(*this, node, fileFormat);
+        if (getTextByUuid(text->getUuid())) {
+          throw RuntimeError(
+              __FILE__, __LINE__,
+              QString("There is already a text with the UUID \"%1\"!")
+                  .arg(text->getUuid().toStr()));
+        }
+        mTexts.append(text);
+      }
     }
 
     // emit the "attributesChanged" signal when the project has emited it
@@ -116,6 +132,8 @@ Schematic::Schematic(Project& project,
             &Schematic::attributesChanged);
   } catch (...) {
     // free the allocated memory in the reverse order of their allocation...
+    qDeleteAll(mTexts);
+    mTexts.clear();
     qDeleteAll(mNetSegments);
     mNetSegments.clear();
     qDeleteAll(mSymbols);
@@ -130,6 +148,8 @@ Schematic::~Schematic() noexcept {
   Q_ASSERT(!mIsAddedToProject);
 
   // delete all items
+  qDeleteAll(mTexts);
+  mTexts.clear();
   qDeleteAll(mNetSegments);
   mNetSegments.clear();
   qDeleteAll(mSymbols);
@@ -148,7 +168,7 @@ FilePath Schematic::getFilePath() const noexcept {
 }
 
 bool Schematic::isEmpty() const noexcept {
-  return (mSymbols.isEmpty() && mNetSegments.isEmpty());
+  return (mSymbols.isEmpty() && mNetSegments.isEmpty() && mTexts.isEmpty());
 }
 
 QList<SI_Base*> Schematic::getItemsAtScenePos(const Point& pos) const noexcept {
@@ -185,6 +205,8 @@ QList<SI_Base*> Schematic::getItemsAtScenePos(const Point& pos) const noexcept {
     }
     if (symbol->getGrabAreaScenePx().contains(scenePosPx)) list.append(symbol);
   }
+  // texts
+  foreach (SI_Text* text, getTextsAtScenePos(pos)) { list.append(text); }
   return list;
 }
 
@@ -222,6 +244,16 @@ QList<SI_SymbolPin*> Schematic::getPinsAtScenePos(const Point& pos) const
     foreach (SI_SymbolPin* pin, symbol->getPins()) {
       if (pin->getGrabAreaScenePx().contains(pos.toPxQPointF()))
         list.append(pin);
+    }
+  }
+  return list;
+}
+
+QList<SI_Text*> Schematic::getTextsAtScenePos(const Point& pos) const noexcept {
+  QList<SI_Text*> list;
+  foreach (SI_Text* text, mTexts) {
+    if (text->getGrabAreaScenePx().contains(pos.toPxQPointF())) {
+      list.append(text);
     }
   }
   return list;
@@ -315,6 +347,42 @@ void Schematic::removeNetSegment(SI_NetSegment& netsegment) {
 }
 
 /*******************************************************************************
+ *  Text Methods
+ ******************************************************************************/
+
+SI_Text* Schematic::getTextByUuid(const Uuid& uuid) const noexcept {
+  foreach (SI_Text* text, mTexts) {
+    if (text->getUuid() == uuid) return text;
+  }
+  return nullptr;
+}
+
+void Schematic::addText(SI_Text& text) {
+  if ((!mIsAddedToProject) || (mTexts.contains(&text)) ||
+      (&text.getSchematic() != this)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  // check if there is no text with the same uuid in the list
+  if (getTextByUuid(text.getUuid())) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a text with the UUID \"%1\"!")
+                           .arg(text.getUuid().toStr()));
+  }
+  // add to schematic
+  text.addToSchematic();  // can throw
+  mTexts.append(&text);
+}
+
+void Schematic::removeText(SI_Text& text) {
+  if ((!mIsAddedToProject) || (!mTexts.contains(&text))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  // remove from schematic
+  text.removeFromSchematic();  // can throw
+  mTexts.removeOne(&text);
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
@@ -323,7 +391,7 @@ void Schematic::addToProject() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count());
+  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() + mTexts.count());
   foreach (SI_Symbol* symbol, mSymbols) {
     symbol->addToSchematic();  // can throw
     sgl.add([symbol]() { symbol->removeFromSchematic(); });
@@ -331,6 +399,10 @@ void Schematic::addToProject() {
   foreach (SI_NetSegment* segment, mNetSegments) {
     segment->addToSchematic();  // can throw
     sgl.add([segment]() { segment->removeFromSchematic(); });
+  }
+  foreach (SI_Text* text, mTexts) {
+    text->addToSchematic();  // can throw
+    sgl.add([text]() { text->removeFromSchematic(); });
   }
 
   mIsAddedToProject = true;
@@ -343,7 +415,11 @@ void Schematic::removeFromProject() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count());
+  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() + mTexts.count());
+  foreach (SI_Text* text, mTexts) {
+    text->removeFromSchematic();  // can throw
+    sgl.add([text]() { text->addToSchematic(); });
+  }
   foreach (SI_NetSegment* segment, mNetSegments) {
     segment->removeFromSchematic();  // can throw
     sgl.add([segment]() { segment->addToSchematic(); });
@@ -375,6 +451,7 @@ void Schematic::showInView(GraphicsView& view) noexcept {
 void Schematic::selectAll() noexcept {
   foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(true); }
   foreach (SI_NetSegment* segment, mNetSegments) { segment->selectAll(); }
+  foreach (SI_Text* text, mTexts) { text->setSelected(true); }
 }
 
 void Schematic::setSelectionRect(const Point& p1, const Point& p2,
@@ -393,12 +470,17 @@ void Schematic::setSelectionRect(const Point& p1, const Point& p2,
     foreach (SI_NetSegment* segment, mNetSegments) {
       segment->setSelectionRect(rectPx);
     }
+    foreach (SI_Text* text, mTexts) {
+      bool selectText = text->getGrabAreaScenePx().intersects(rectPx);
+      text->setSelected(selectText);
+    }
   }
 }
 
 void Schematic::clearSelection() const noexcept {
   foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(false); }
   foreach (SI_NetSegment* segment, mNetSegments) { segment->clearSelection(); }
+  foreach (SI_Text* text, mTexts) { text->setSelected(false); }
 }
 
 void Schematic::updateAllNetLabelAnchors() noexcept {
@@ -416,7 +498,7 @@ void Schematic::renderToQPainter(QPainter& painter) const noexcept {
 std::unique_ptr<SchematicSelectionQuery> Schematic::createSelectionQuery() const
     noexcept {
   return std::unique_ptr<SchematicSelectionQuery>(new SchematicSelectionQuery(
-      mSymbols, mNetSegments, const_cast<Schematic*>(this)));
+      mSymbols, mNetSegments, mTexts, const_cast<Schematic*>(this)));
 }
 
 /*******************************************************************************
@@ -455,6 +537,7 @@ void Schematic::serialize(SExpression& root) const {
   root.appendLineBreak();
   serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
   root.appendLineBreak();
+  serializePointerContainerUuidSorted(root, mTexts, "text");
 }
 
 /*******************************************************************************

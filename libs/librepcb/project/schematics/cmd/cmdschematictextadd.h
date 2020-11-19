@@ -17,73 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TEXTGRAPHICSITEM_H
-#define LIBREPCB_TEXTGRAPHICSITEM_H
+#ifndef LIBREPCB_PROJECT_CMDSCHEMATICTEXTADD_H
+#define LIBREPCB_PROJECT_CMDSCHEMATICTEXTADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/text.h"
-#include "primitivetextgraphicsitem.h"
+#include <librepcb/common/undocommand.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace project {
 
-class OriginCrossGraphicsItem;
-class IF_GraphicsLayerProvider;
-class AttributeProvider;
+class SI_Text;
 
 /*******************************************************************************
- *  Class TextGraphicsItem
+ *  Class CmdSchematicTextAdd
  ******************************************************************************/
 
 /**
- * @brief The TextGraphicsItem class is the graphical representation of a
- *        librepcb::Text
+ * @brief The CmdSchematicTextAdd class
  */
-class TextGraphicsItem final : public PrimitiveTextGraphicsItem {
+class CmdSchematicTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  TextGraphicsItem() = delete;
-  TextGraphicsItem(const TextGraphicsItem& other) = delete;
-  TextGraphicsItem(Text& text, const IF_GraphicsLayerProvider& lp,
-                   QGraphicsItem* parent = nullptr) noexcept;
-  ~TextGraphicsItem() noexcept;
-
-  // Getters
-  Text& getText() noexcept { return mText; }
-
-  // General Methods
-  void setAttributeProvider(const AttributeProvider* provider) noexcept;
-  void updateText() noexcept;
+  CmdSchematicTextAdd() = delete;
+  CmdSchematicTextAdd(const CmdSchematicTextAdd& other) = delete;
+  explicit CmdSchematicTextAdd(SI_Text& text) noexcept;
+  ~CmdSchematicTextAdd() noexcept;
 
   // Operator Overloadings
-  TextGraphicsItem& operator=(const TextGraphicsItem& rhs) = delete;
+  CmdSchematicTextAdd& operator=(const CmdSchematicTextAdd& rhs) = delete;
 
 private:  // Methods
-  void textEdited(const Text& text, Text::Event event) noexcept;
+  /// @copydoc ::librepcb::UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc ::librepcb::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::UndoCommand::performRedo()
+  void performRedo() override;
 
 private:  // Data
-  Text& mText;
-  const IF_GraphicsLayerProvider& mLayerProvider;
-  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
-
-  /// Object for substituting placeholders in text
-  const AttributeProvider* mAttributeProvider;
-
-  // Slots
-  Text::OnEditedSlot mOnEditedSlot;
+  SI_Text& mText;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TEXTGRAPHICSITEM_H
+#endif

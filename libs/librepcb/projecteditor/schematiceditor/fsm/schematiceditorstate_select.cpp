@@ -31,10 +31,14 @@
 #include "../schematicclipboarddatabuilder.h"
 #include "../symbolinstancepropertiesdialog.h"
 
+#include <librepcb/common/dialogs/textpropertiesdialog.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/project/project.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
+#include <librepcb/project/schematics/items/si_text.h>
+#include <librepcb/project/schematics/schematiclayerprovider.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -360,6 +364,21 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       break;
     }
 
+    case SI_Base::Type_t::Text: {
+      SI_Text* text = dynamic_cast<SI_Text*>(selectedItem);
+      Q_ASSERT(text);
+
+      addActionCut(menu);
+      addActionCopy(menu);
+      addActionRemove(menu);
+      menu.addSeparator();
+      addActionRotate(menu);
+      addActionMirror(menu);
+      menu.addSeparator();
+      addActionOpenProperties(menu, selectedItem);
+      break;
+    }
+
     default:
       return false;
   }
@@ -521,6 +540,13 @@ void SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
       break;
     }
 
+    case SI_Base::Type_t::Text: {
+      SI_Text* text = dynamic_cast<SI_Text*>(item);
+      Q_ASSERT(text);
+      openTextPropertiesDialog(*text);
+      break;
+    }
+
     default:
       break;
   }
@@ -540,6 +566,16 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
   RenameNetSegmentDialog dialog(mContext.undoStack, netlabel.getNetSegment(),
                                 parentWidget());
   dialog.exec();  // performs the rename, if needed
+}
+
+void SchematicEditorState_Select::openTextPropertiesDialog(
+    SI_Text& text) noexcept {
+  TextPropertiesDialog dialog(
+      text.getText(), mContext.undoStack,
+      mContext.project.getLayers().getSchematicGeometryElementLayers(),
+      getDefaultLengthUnit(), "schematic_editor/text_properties_dialog",
+      parentWidget());
+  dialog.exec();  // performs the modifications
 }
 
 QAction* SchematicEditorState_Select::addActionCut(
