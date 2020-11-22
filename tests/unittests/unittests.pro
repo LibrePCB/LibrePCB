@@ -127,6 +127,7 @@ SOURCES += \
     library/cmp/componentsymbolvariantitemsuffixtest.cpp \
     library/cmp/componentsymbolvariantitemtest.cpp \
     library/librarybaseelementtest.cpp \
+    library/pkg/footprintpadtest.cpp \
     library/sym/symbolpintest.cpp \
     libraryeditor/pkg/footprintclipboarddatatest.cpp \
     libraryeditor/sym/symbolclipboarddatatest.cpp \
