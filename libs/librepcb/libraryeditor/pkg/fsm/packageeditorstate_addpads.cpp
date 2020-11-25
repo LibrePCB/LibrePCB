@@ -58,7 +58,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mCurrentGraphicsItem(nullptr),
     mPackagePadComboBox(nullptr),
     mLastPad(
-        Uuid::createRandom(), Point(0, 0), Angle::deg0(),
+        Uuid::createRandom(), tl::nullopt, Point(0, 0), Angle::deg0(),
         FootprintPad::Shape::ROUND,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
@@ -96,10 +96,10 @@ bool PackageEditorState_AddPads::entry() noexcept {
   connect(packagePadComboBox.get(), &PackagePadComboBox::currentPadChanged,
           this,
           &PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged);
-  packagePadComboBox->setPackage(&mContext.package,
-                                 mContext.currentFootprint.get());
+  packagePadComboBox->setPads(mContext.package.getPads());
   mContext.commandToolBar.addWidget(std::move(packagePadComboBox));
   mContext.commandToolBar.addSeparator();
+  selectNextFreePadInComboBox();
 
   // board side
   if (mPadType == PadType::SMT) {
@@ -233,10 +233,8 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
   try {
     mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add footprint pad"));
-    mCurrentPad.reset(new FootprintPad(
-        mLastPad.getPackagePadUuid(), pos, mLastPad.getRotation(),
-        mLastPad.getShape(), mLastPad.getWidth(), mLastPad.getHeight(),
-        mLastPad.getDrillDiameter(), mLastPad.getBoardSide()));
+    mLastPad.setPosition(pos);
+    mCurrentPad.reset(new FootprintPad(Uuid::createRandom(), mLastPad));
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
         mContext.currentFootprint->getPads(), mCurrentPad));
     mEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
@@ -267,7 +265,7 @@ bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
     mCurrentPad.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
-    mPackagePadComboBox->updatePads();
+    selectNextFreePadInComboBox();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -290,13 +288,30 @@ bool PackageEditorState_AddPads::abortAddPad() noexcept {
   }
 }
 
-void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(
-    PackagePad* pad) noexcept {
-  if (pad) {
-    mLastPad.setPackagePadUuid(pad->getUuid());
-    if (mEditCmd) {
-      mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
+void PackageEditorState_AddPads::selectNextFreePadInComboBox() noexcept {
+  if (mContext.currentFootprint && mPackagePadComboBox) {
+    tl::optional<Uuid> pad;
+    for (const PackagePad& pkgPad : mContext.package.getPads()) {
+      bool connected = false;
+      for (const FootprintPad& fptPad : mContext.currentFootprint->getPads()) {
+        if (fptPad.getPackagePadUuid() == pkgPad.getUuid()) {
+          connected = true;
+        }
+      }
+      if (!connected) {
+        pad = pkgPad.getUuid();
+        break;
+      }
     }
+    mPackagePadComboBox->setCurrentPad(pad);
+  }
+}
+
+void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(
+    tl::optional<Uuid> pad) noexcept {
+  mLastPad.setPackagePadUuid(pad);
+  if (mEditCmd) {
+    mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
   }
 }
 

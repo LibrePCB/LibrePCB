@@ -85,7 +85,8 @@ private:  // Methods
   bool startAddPad(const Point& pos) noexcept;
   bool finishAddPad(const Point& pos) noexcept;
   bool abortAddPad() noexcept;
-  void packagePadComboBoxCurrentPadChanged(PackagePad* pad) noexcept;
+  void selectNextFreePadInComboBox() noexcept;
+  void packagePadComboBoxCurrentPadChanged(tl::optional<Uuid> pad) noexcept;
   void boardSideSelectorCurrentSideChanged(
       FootprintPad::BoardSide side) noexcept;
   void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;

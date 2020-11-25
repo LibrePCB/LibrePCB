@@ -40,9 +40,9 @@ namespace library {
 namespace editor {
 
 FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
-    const Package& pkg, const Footprint& fpt, FootprintPad& pad,
-    UndoStack& undoStack, const LengthUnit& lengthUnit,
-    const QString& settingsPrefix, QWidget* parent) noexcept
+    const Package& pkg, FootprintPad& pad, UndoStack& undoStack,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mPad(pad),
     mUndoStack(undoStack),
@@ -67,12 +67,9 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   int currentPadIndex = 0;
   mUi->cbxPackagePad->addItem(tr("(not connected)"), "");
   for (const PackagePad& p : pkg.getPads()) {
-    if ((p.getUuid() == mPad.getUuid()) ||
-        (!fpt.getPads().contains(p.getUuid()))) {
-      mUi->cbxPackagePad->addItem(*p.getName(), p.getUuid().toStr());
-      if (mPad.getPackagePadUuid() == p.getUuid()) {
-        currentPadIndex = mUi->cbxPackagePad->count() - 1;
-      }
+    mUi->cbxPackagePad->addItem(*p.getName(), p.getUuid().toStr());
+    if (mPad.getPackagePadUuid() == p.getUuid()) {
+      currentPadIndex = mUi->cbxPackagePad->count() - 1;
     }
   }
   mUi->cbxPackagePad->setCurrentIndex(currentPadIndex);
@@ -147,8 +144,8 @@ void FootprintPadPropertiesDialog::on_buttonBox_clicked(
 bool FootprintPadPropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
-    Uuid pkgPad = Uuid::fromString(
-        mUi->cbxPackagePad->currentData().toString());  // can throw
+    tl::optional<Uuid> pkgPad =
+        Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
     if (mUi->rbtnBoardSideTop->isChecked()) {
       cmd->setBoardSide(FootprintPad::BoardSide::TOP, false);

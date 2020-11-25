@@ -59,6 +59,7 @@ public:
 
   // Signals
   enum class Event {
+    UuidChanged,
     PackagePadUuidChanged,
     PositionChanged,
     RotationChanged,
@@ -74,18 +75,19 @@ public:
   // Constructors / Destructor
   FootprintPad() = delete;
   FootprintPad(const FootprintPad& other) noexcept;
-  FootprintPad(const Uuid& padUuid, const Point& pos, const Angle& rot,
-               Shape shape, const PositiveLength& width,
-               const PositiveLength& height,
+  FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept;
+  FootprintPad(const Uuid& uuid, const tl::optional<Uuid>& pkgPadUuid,
+               const Point& pos, const Angle& rot, Shape shape,
+               const PositiveLength& width, const PositiveLength& height,
                const UnsignedLength& drillDiameter, BoardSide side) noexcept;
   FootprintPad(const SExpression& node, const Version& fileFormat);
   ~FootprintPad() noexcept;
 
   // Getters
-  const Uuid& getUuid() const noexcept {
-    return getPackagePadUuid();
-  }  // for SerializableObjectList
-  const Uuid& getPackagePadUuid() const noexcept { return mPackagePadUuid; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const tl::optional<Uuid>& getPackagePadUuid() const noexcept {
+    return mPackagePadUuid;
+  }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   Shape getShape() const noexcept { return mShape; }
@@ -102,7 +104,7 @@ public:
       noexcept;
 
   // Setters
-  bool setPackagePadUuid(const Uuid& pad) noexcept;
+  bool setPackagePadUuid(const tl::optional<Uuid>& pad) noexcept;
   bool setPosition(const Point& pos) noexcept;
   bool setRotation(const Angle& rot) noexcept;
   bool setShape(Shape shape) noexcept;
@@ -126,7 +128,14 @@ public:
   FootprintPad& operator=(const FootprintPad& rhs) noexcept;
 
 protected:  // Data
-  Uuid mPackagePadUuid;
+  Uuid mUuid;
+
+  /// The connected package pad
+  ///
+  /// This is the UUID of the package pad where this footprint pad is
+  /// connected to. It can be tl::nullopt, which means that the footprint pad
+  /// is electrically not connected (e.g. for mechanical-only pads).
+  tl::optional<Uuid> mPackagePadUuid;
   Point mPosition;
   Angle mRotation;
   Shape mShape;

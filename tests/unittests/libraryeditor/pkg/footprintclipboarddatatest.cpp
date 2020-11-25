@@ -83,14 +83,14 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
       Uuid::createRandom(), CircuitIdentifier("pad2"));
 
   std::shared_ptr<FootprintPad> footprintPad1 = std::make_shared<FootprintPad>(
-      Uuid::createRandom(), Point(12, 34), Angle(56),
+      Uuid::createRandom(), packagePad1->getUuid(), Point(12, 34), Angle(56),
       FootprintPad::Shape::OCTAGON, PositiveLength(11), PositiveLength(22),
       UnsignedLength(0), FootprintPad::BoardSide::TOP);
 
   std::shared_ptr<FootprintPad> footprintPad2 = std::make_shared<FootprintPad>(
-      Uuid::createRandom(), Point(12, 34), Angle(56), FootprintPad::Shape::RECT,
-      PositiveLength(123), PositiveLength(456), UnsignedLength(789),
-      FootprintPad::BoardSide::THT);
+      Uuid::createRandom(), tl::nullopt, Point(12, 34), Angle(56),
+      FootprintPad::Shape::RECT, PositiveLength(123), PositiveLength(456),
+      UnsignedLength(789), FootprintPad::BoardSide::THT);
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
       Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,

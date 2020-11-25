@@ -71,7 +71,7 @@ CmdFootprintPadEdit::~CmdFootprintPadEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdFootprintPadEdit::setPackagePadUuid(const Uuid& pad,
+void CmdFootprintPadEdit::setPackagePadUuid(const tl::optional<Uuid>& pad,
                                             bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPackagePadUuid = pad;

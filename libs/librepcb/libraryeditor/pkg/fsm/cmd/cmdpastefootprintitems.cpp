@@ -77,25 +77,32 @@ bool CmdPasteFootprintItems::performExecute() {
   //    different to the source footprint, generate a new random UUID. Otherwise
   //    use the same UUID to avoid modifications after cut+paste within one
   //    footprint.
-  //  - Footprint pads are only copied if there is an unused package pad with
-  //    the same name available.
   //  - The graphics items of the added elements are selected immediately to
   //    allow dragging them afterwards.
 
   for (const FootprintPad& pad : mData->getFootprintPads().sortedByUuid()) {
-    Uuid uuid = pad.getPackagePadUuid();
-    CircuitIdentifier name = mData->getPackagePads().get(uuid)->getName();
-    std::shared_ptr<PackagePad> newPad = mPackage.getPads().find(*name);
-    if (newPad && (!mFootprint.getPads().contains(newPad->getUuid()))) {
-      std::shared_ptr<FootprintPad> copy = std::make_shared<FootprintPad>(
-          uuid, pad.getPosition() + mPosOffset, pad.getRotation(),
-          pad.getShape(), pad.getWidth(), pad.getHeight(),
-          pad.getDrillDiameter(), pad.getBoardSide());
-      execNewChildCmd(new CmdFootprintPadInsert(mFootprint.getPads(), copy));
-      FootprintPadGraphicsItem* item = mGraphicsItem.getPadGraphicsItem(*copy);
-      Q_ASSERT(item);
-      item->setSelected(true);
+    Uuid uuid = pad.getUuid();
+    if (mFootprint.getPads().contains(uuid) ||
+        (mFootprint.getUuid() != mData->getFootprintUuid())) {
+      uuid = Uuid::createRandom();
     }
+    std::shared_ptr<PackagePad> pkgPad;
+    if (pad.getPackagePadUuid()) {
+      pkgPad = mData->getPackagePads().get(*pad.getPackagePadUuid());
+    }
+    if (pkgPad) {
+      pkgPad = mPackage.getPads().find(*pkgPad->getName());
+    }
+    tl::optional<Uuid> pkgPadUuid =
+        pkgPad ? pkgPad->getUuid() : tl::optional<Uuid>();
+    std::shared_ptr<FootprintPad> copy = std::make_shared<FootprintPad>(
+        uuid, pkgPadUuid, pad.getPosition() + mPosOffset, pad.getRotation(),
+        pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getDrillDiameter(),
+        pad.getBoardSide());
+    execNewChildCmd(new CmdFootprintPadInsert(mFootprint.getPads(), copy));
+    FootprintPadGraphicsItem* item = mGraphicsItem.getPadGraphicsItem(*copy);
+    Q_ASSERT(item);
+    item->setSelected(true);
   }
 
   for (const Circle& circle : mData->getCircles().sortedByUuid()) {

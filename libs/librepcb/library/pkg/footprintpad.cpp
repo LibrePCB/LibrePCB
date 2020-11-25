@@ -25,6 +25,7 @@
 #include "footprintpadgraphicsitem.h"
 
 #include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/common/version.h>
 
 #include <QtCore>
 
@@ -40,6 +41,7 @@ namespace library {
 
 FootprintPad::FootprintPad(const FootprintPad& other) noexcept
   : onEdited(*this),
+    mUuid(other.mUuid),
     mPackagePadUuid(other.mPackagePadUuid),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
@@ -51,14 +53,21 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mRegisteredGraphicsItem(nullptr) {
 }
 
-FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
-                           const Angle& rot, Shape shape,
+FootprintPad::FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept
+  : FootprintPad(other) {
+  mUuid = uuid;
+}
+
+FootprintPad::FootprintPad(const Uuid& uuid,
+                           const tl::optional<Uuid>& pkgPadUuid,
+                           const Point& pos, const Angle& rot, Shape shape,
                            const PositiveLength& width,
                            const PositiveLength& height,
                            const UnsignedLength& drillDiameter,
                            BoardSide side) noexcept
   : onEdited(*this),
-    mPackagePadUuid(padUuid),
+    mUuid(uuid),
+    mPackagePadUuid(pkgPadUuid),
     mPosition(pos),
     mRotation(rot),
     mShape(shape),
@@ -71,7 +80,8 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
 
 FootprintPad::FootprintPad(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mPackagePadUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mPackagePadUuid(mUuid),  // See initialization below!
     mPosition(node.getChild("position"), fileFormat),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
     mShape(deserialize<Shape>(node.getChild("shape/@0"), fileFormat)),
@@ -81,6 +91,17 @@ FootprintPad::FootprintPad(const SExpression& node, const Version& fileFormat)
         deserialize<UnsignedLength>(node.getChild("drill/@0"), fileFormat)),
     mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"), fileFormat)),
     mRegisteredGraphicsItem(nullptr) {
+  // In the file format 0.1, footprint pads did not have their own UUID, but
+  // only the UUID of the package pad they were connected to. To get a
+  // deterministic UUID when upgrading a v0.1 footprint pad to v0.2, we simply
+  // use the package pad UUID as the footprint pad UUID too (see initialization
+  // above). But when loading a 0.2 file format, we need to load the package
+  // pad from the new s-expression node.
+  // See https://github.com/LibrePCB/LibrePCB/issues/445
+  if (fileFormat >= Version::fromString("0.2")) {
+    mPackagePadUuid = deserialize<tl::optional<Uuid>>(
+        node.getChild("package_pad/@0"), fileFormat);
+  }
 }
 
 FootprintPad::~FootprintPad() noexcept {
@@ -159,7 +180,7 @@ bool FootprintPad::setPosition(const Point& pos) noexcept {
   return true;
 }
 
-bool FootprintPad::setPackagePadUuid(const Uuid& pad) noexcept {
+bool FootprintPad::setPackagePadUuid(const tl::optional<Uuid>& pad) noexcept {
   if (pad == mPackagePadUuid) {
     return false;
   }
@@ -262,7 +283,7 @@ void FootprintPad::unregisterGraphicsItem(
 }
 
 void FootprintPad::serialize(SExpression& root) const {
-  root.appendChild(mPackagePadUuid);
+  root.appendChild(mUuid);
   root.appendChild("side", mBoardSide, false);
   root.appendChild("shape", mShape, false);
   root.appendChild(mPosition.serializeToDomElement("position"), true);
@@ -270,6 +291,7 @@ void FootprintPad::serialize(SExpression& root) const {
   root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"),
                    false);
   root.appendChild("drill", mDrillDiameter, false);
+  root.appendChild("package_pad", mPackagePadUuid, true);
 }
 
 /*******************************************************************************
@@ -277,6 +299,7 @@ void FootprintPad::serialize(SExpression& root) const {
  ******************************************************************************/
 
 bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
+  if (mUuid != rhs.mUuid) return false;
   if (mPackagePadUuid != rhs.mPackagePadUuid) return false;
   if (mPosition != rhs.mPosition) return false;
   if (mRotation != rhs.mRotation) return false;
@@ -289,6 +312,10 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
 }
 
 FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
   setPackagePadUuid(rhs.mPackagePadUuid);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);

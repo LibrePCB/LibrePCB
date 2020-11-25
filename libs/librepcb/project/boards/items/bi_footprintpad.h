@@ -107,19 +107,25 @@ public:
   // Operator Overloadings
   BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
 
-private slots:
-
+private:  // Methods
   void footprintAttributesChanged();
   void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
-
-private:
   void updateGraphicsItemTransform() noexcept;
 
-  // General
+private:  // Data
   BI_Footprint& mFootprint;
   const library::FootprintPad* mFootprintPad;
+
+  /// The package pad where this footprint pad is connected to
+  ///
+  /// @attention This is `nullptr` if the footprint pad is not connected!
   const library::PackagePad* mPackagePad;
+
+  /// The net signal where this footprint pad is connected to
+  ///
+  /// @attention This is `nullptr` if the footprint pad is not connected!
   ComponentSignalInstance* mComponentSignalInstance;
+
   QMetaObject::Connection mHighlightChangedConnection;
   QMetaObject::Connection mNetSignalNameChangedConnection;
 

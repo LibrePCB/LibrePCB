@@ -479,8 +479,8 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
           dynamic_cast<FootprintPadGraphicsItem*>(item)) {
     Q_ASSERT(pad);
     FootprintPadPropertiesDialog dialog(
-        mContext.package, *mContext.currentFootprint, pad->getPad(),
-        mContext.undoStack, getDefaultLengthUnit(),
+        mContext.package, pad->getPad(), mContext.undoStack,
+        getDefaultLengthUnit(),
         "package_editor/footprint_pad_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
