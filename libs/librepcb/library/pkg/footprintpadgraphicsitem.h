@@ -69,7 +69,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setShape(const QPainterPath& shape) noexcept;
   void setLayerName(const QString& name) noexcept;
-  void setPackagePadUuid(const Uuid& uuid) noexcept;
+  void setPackagePadUuid(const tl::optional<Uuid>& uuid) noexcept;
   void setSelected(bool selected) noexcept;
 
   // Inherited from QGraphicsItem

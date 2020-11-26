@@ -64,8 +64,9 @@ FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(
 
   for (const FootprintPad& fptPad : footprint.getPads()) {
     const PackagePad* pkgPad = nullptr;
-    if (mPackage)
-      pkgPad = mPackage->getPads().find(fptPad.getPackagePadUuid()).get();
+    if (mPackage && fptPad.getPackagePadUuid()) {
+      pkgPad = mPackage->getPads().find(*fptPad.getPackagePadUuid()).get();
+    }
     FootprintPadPreviewGraphicsItem* item =
         new FootprintPadPreviewGraphicsItem(layerProvider, fptPad, pkgPad);
     item->setPos(fptPad.getPosition().toPxQPointF());

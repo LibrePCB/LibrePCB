@@ -61,8 +61,8 @@ public:
   FootprintPadPropertiesDialog() = delete;
   FootprintPadPropertiesDialog(const FootprintPadPropertiesDialog& other) =
       delete;
-  FootprintPadPropertiesDialog(const Package& pkg, const Footprint& fpt,
-                               FootprintPad& pad, UndoStack& undoStack,
+  FootprintPadPropertiesDialog(const Package& pkg, FootprintPad& pad,
+                               UndoStack& undoStack,
                                const LengthUnit& lengthUnit,
                                const QString& settingsPrefix,
                                QWidget* parent = nullptr) noexcept;

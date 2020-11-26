@@ -51,7 +51,8 @@ public:
   ~CmdFootprintPadEdit() noexcept;
 
   // Setters
-  void setPackagePadUuid(const Uuid& pad, bool immediate) noexcept;
+  void setPackagePadUuid(const tl::optional<Uuid>& pad,
+                         bool immediate) noexcept;
   void setBoardSide(FootprintPad::BoardSide side, bool immediate) noexcept;
   void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
@@ -86,8 +87,8 @@ private:
   FootprintPad& mPad;
 
   // General Attributes
-  Uuid mOldPackagePadUuid;
-  Uuid mNewPackagePadUuid;
+  tl::optional<Uuid> mOldPackagePadUuid;
+  tl::optional<Uuid> mNewPackagePadUuid;
   FootprintPad::BoardSide mOldBoardSide;
   FootprintPad::BoardSide mNewBoardSide;
   FootprintPad::Shape mOldShape;

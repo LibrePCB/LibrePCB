@@ -53,23 +53,27 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid)
     mComponentSignalInstance(nullptr) {
   mFootprintPad =
       mFootprint.getLibFootprint().getPads().get(padUuid).get();  // can throw
-  mPackagePad = mFootprint.getDeviceInstance()
-                    .getLibPackage()
-                    .getPads()
-                    .get(padUuid)
-                    .get();  // can throw
-  tl::optional<Uuid> cmpSignalUuid = mFootprint.getDeviceInstance()
-                                         .getLibDevice()
-                                         .getPadSignalMap()
-                                         .get(padUuid)
-                                         ->getSignalUuid();  // can throw
-  if (cmpSignalUuid) {
-    mComponentSignalInstance =
-        mFootprint.getDeviceInstance().getComponentInstance().getSignalInstance(
-            *cmpSignalUuid);
-    connect(mComponentSignalInstance,
-            &ComponentSignalInstance::netSignalChanged, this,
-            &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
+  if (mFootprintPad->getPackagePadUuid()) {
+    mPackagePad = mFootprint.getDeviceInstance()
+                      .getLibPackage()
+                      .getPads()
+                      .get(*mFootprintPad->getPackagePadUuid())
+                      .get();  // can throw
+
+    tl::optional<Uuid> cmpSignalUuid =
+        mFootprint.getDeviceInstance()
+            .getLibDevice()
+            .getPadSignalMap()
+            .get(*mFootprintPad->getPackagePadUuid())
+            ->getSignalUuid();  // can throw
+    if (cmpSignalUuid) {
+      mComponentSignalInstance = mFootprint.getDeviceInstance()
+                                     .getComponentInstance()
+                                     .getSignalInstance(*cmpSignalUuid);
+      connect(mComponentSignalInstance,
+              &ComponentSignalInstance::netSignalChanged, this,
+              &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
+    }
   }
 
   if (NetSignal* netsignal = getCompSigInstNetSignal()) {
@@ -99,15 +103,17 @@ BI_FootprintPad::~BI_FootprintPad() {
  ******************************************************************************/
 
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept {
-  return mFootprintPad->getPackagePadUuid();
+  return mFootprintPad->getUuid();
 }
 
 QString BI_FootprintPad::getDisplayText() const noexcept {
   NetSignal* signal = getCompSigInstNetSignal();
-  if (signal) {
+  if (signal && mPackagePad) {
     return QString("%1:\n%2").arg(*mPackagePad->getName(), *signal->getName());
-  } else {
+  } else if (mPackagePad) {
     return *mPackagePad->getName();
+  } else {
+    return QString();  // Unconnected pad, no name to display...
   }
 }
 
@@ -227,7 +233,7 @@ Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept {
 TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
   return TraceAnchor::pad(
       mFootprint.getDeviceInstance().getComponentInstanceUuid(),
-      mPackagePad->getUuid());
+      mFootprintPad->getUuid());
 }
 
 /*******************************************************************************

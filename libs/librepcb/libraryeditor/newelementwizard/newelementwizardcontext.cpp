@@ -194,7 +194,7 @@ void NewElementWizardContext::copyElement(ElementType type,
       const Package* package = dynamic_cast<Package*>(element.data());
       Q_ASSERT(package);
       // copy pads but generate new UUIDs
-      QHash<Uuid, Uuid> padUuidMap;
+      QHash<Uuid, tl::optional<Uuid>> padUuidMap;
       mPackagePads.clear();
       for (const PackagePad& pad : package->getPads()) {
         Uuid newUuid = Uuid::createRandom();
@@ -211,8 +211,12 @@ void NewElementWizardContext::copyElement(ElementType type,
             footprint.getDescriptions().getDefaultValue()));
         // copy pads but generate new UUIDs
         for (const FootprintPad& pad : footprint.getPads()) {
+          tl::optional<Uuid> pkgPad = pad.getPackagePadUuid();
+          if (pkgPad) {
+            pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
+          }
           newFootprint->getPads().append(std::make_shared<FootprintPad>(
-              *padUuidMap.find(pad.getUuid()), pad.getPosition(),
+              Uuid::createRandom(), pkgPad, pad.getPosition(),
               pad.getRotation(), pad.getShape(), pad.getWidth(),
               pad.getHeight(), pad.getDrillDiameter(), pad.getBoardSide()));
         }

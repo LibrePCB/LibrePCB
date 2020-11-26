@@ -79,24 +79,32 @@ void BI_Footprint::init() {
   updateGraphicsItemTransform();
 
   // load pads
+  const library::Package& libPkg = mDevice.getLibPackage();
   const library::Device& libDev = mDevice.getLibDevice();
   for (const library::FootprintPad& libPad : getLibFootprint().getPads()) {
-    BI_FootprintPad* pad =
-        new BI_FootprintPad(*this, libPad.getPackagePadUuid());
-    if (mPads.contains(libPad.getPackagePadUuid())) {
+    if (mPads.contains(libPad.getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("The footprint pad UUID \"%1\" is defined multiple times.")
-              .arg(libPad.getPackagePadUuid().toStr()));
+              .arg(libPad.getUuid().toStr()));
     }
-    if (!libDev.getPadSignalMap().contains(libPad.getPackagePadUuid())) {
+    if (libPad.getPackagePadUuid() &&
+        (!libPkg.getPads().contains(*libPad.getPackagePadUuid()))) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString("Footprint pad \"%1\" not found in "
+                         QString("Pad \"%1\" not found in package \"%2\".")
+                             .arg(libPad.getPackagePadUuid()->toStr(),
+                                  libPkg.getUuid().toStr()));
+    }
+    if (libPad.getPackagePadUuid() &&
+        (!libDev.getPadSignalMap().contains(*libPad.getPackagePadUuid()))) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Package pad \"%1\" not found in "
                                  "pad-signal-map of device \"%2\".")
-                             .arg(libPad.getPackagePadUuid().toStr(),
+                             .arg(libPad.getPackagePadUuid()->toStr(),
                                   libDev.getUuid().toStr()));
     }
-    mPads.insert(libPad.getPackagePadUuid(), pad);
+    BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad.getUuid());
+    mPads.insert(libPad.getUuid(), pad);
   }
 
   // connect to the "attributes changed" signal of device instance

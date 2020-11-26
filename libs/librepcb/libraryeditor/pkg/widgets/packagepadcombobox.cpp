@@ -37,10 +37,7 @@ namespace editor {
  ******************************************************************************/
 
 PackagePadComboBox::PackagePadComboBox(QWidget* parent) noexcept
-  : QWidget(parent),
-    mPackage(nullptr),
-    mFootprint(nullptr),
-    mComboBox(new QComboBox(this)) {
+  : QWidget(parent), mComboBox(new QComboBox(this)) {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mComboBox);
@@ -54,69 +51,45 @@ PackagePadComboBox::PackagePadComboBox(QWidget* parent) noexcept
 }
 
 PackagePadComboBox::~PackagePadComboBox() noexcept {
-  setPackage(nullptr);
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-PackagePad* PackagePadComboBox::getCurrentPad() const noexcept {
-  tl::optional<Uuid> uuid = Uuid::tryFromString(
-      mComboBox->itemData(mComboBox->currentIndex(), Qt::UserRole).toString());
-  if (mPackage && uuid) {
-    return mPackage->getPads().find(*uuid).get();
-  } else {
-    return nullptr;
-  }
+tl::optional<Uuid> PackagePadComboBox::getCurrentPad() const noexcept {
+  return getPadAtIndex(mComboBox->currentIndex());
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void PackagePadComboBox::setPackage(Package* package,
-                                    Footprint* footprint) noexcept {
-  mPackage = package;
-  mFootprint = footprint;
-  updatePads();
+void PackagePadComboBox::setPads(const PackagePadList& pads) noexcept {
+  mComboBox->clear();
+  mComboBox->addItem(tr("(unconnected)"), QString());
+  for (const PackagePad& pad : pads) {
+    mComboBox->addItem(*pad.getName(), pad.getUuid().toStr());
+  }
+  mComboBox->setCurrentIndex(-1);
 }
 
-void PackagePadComboBox::setCurrentPad(PackagePad* pad) noexcept {
-  if (mPackage && pad) {
-    mComboBox->setCurrentIndex(
-        mComboBox->findData(*pad->getName(), Qt::UserRole));
-  } else {
-    mComboBox->setCurrentIndex(0);
-  }
+void PackagePadComboBox::setCurrentPad(tl::optional<Uuid> pad) noexcept {
+  int index = pad ? mComboBox->findData(pad->toStr(), Qt::UserRole) : -1;
+  mComboBox->setCurrentIndex(std::max(index, 0));
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void PackagePadComboBox::currentIndexChanged(int index) noexcept {
-  Q_UNUSED(index);
-  emit currentPadChanged(getCurrentPad());
+tl::optional<Uuid> PackagePadComboBox::getPadAtIndex(int index) const noexcept {
+  return Uuid::tryFromString(
+      mComboBox->itemData(index, Qt::UserRole).toString());
 }
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void PackagePadComboBox::updatePads() noexcept {
-  mComboBox->clear();
-  mComboBox->addItem(tr("(unconnected)"), QString());
-
-  if (mPackage) {
-    for (const PackagePad& pad : mPackage->getPads()) {
-      if ((!mFootprint) || (!mFootprint->getPads().contains(pad.getUuid()))) {
-        mComboBox->addItem(*pad.getName(), pad.getUuid().toStr());
-      }
-    }
-  }
-
-  mComboBox->setCurrentIndex(mComboBox->count() > 1 ? 1 : 0);
+void PackagePadComboBox::currentIndexChanged(int index) noexcept {
+  emit currentPadChanged(getPadAtIndex(index));
 }
 
 /*******************************************************************************

@@ -105,10 +105,11 @@ void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
   mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
 }
 
-void FootprintPadGraphicsItem::setPackagePadUuid(const Uuid& uuid) noexcept {
+void FootprintPadGraphicsItem::setPackagePadUuid(
+    const tl::optional<Uuid>& uuid) noexcept {
   QString name;
-  if (mPackagePadList) {
-    if (std::shared_ptr<const PackagePad> pad = mPackagePadList->find(uuid)) {
+  if (mPackagePadList && uuid) {
+    if (std::shared_ptr<const PackagePad> pad = mPackagePadList->find(*uuid)) {
       name = *pad->getName();
     }
   }

@@ -52,27 +52,23 @@ public:
   ~PackagePadComboBox() noexcept;
 
   // Getters
-  PackagePad* getCurrentPad() const noexcept;
+  tl::optional<Uuid> getCurrentPad() const noexcept;
 
   // Setters
-  void setPackage(Package* package, Footprint* footprint = nullptr) noexcept;
-  void setCurrentPad(PackagePad* pad) noexcept;
-
-  // General Methods
-  void updatePads() noexcept;
+  void setPads(const PackagePadList& pads) noexcept;
+  void setCurrentPad(tl::optional<Uuid> pad) noexcept;
 
   // Operator Overloadings
   PackagePadComboBox& operator=(const PackagePadComboBox& rhs) = delete;
 
 signals:
-  void currentPadChanged(PackagePad* pad);
+  void currentPadChanged(tl::optional<Uuid> pad);
 
 private:  // Methods
+  tl::optional<Uuid> getPadAtIndex(int index) const noexcept;
   void currentIndexChanged(int index) noexcept;
 
 private:  // Data
-  Package* mPackage;
-  Footprint* mFootprint;
   QComboBox* mComboBox;
 };
 
@@ -84,4 +80,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEPADCOMBOBOX_H
+#endif
