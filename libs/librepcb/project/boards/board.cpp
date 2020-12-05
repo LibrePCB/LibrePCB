@@ -304,6 +304,8 @@ Board::Board(Project& project,
       // Load all planes
       foreach (const SExpression& node, root.getChildren("plane")) {
         BI_Plane* plane = new BI_Plane(*this, node, fileFormat);
+        // load visibility from user settings
+        plane->setVisible(mUserSettings->getPlaneVisibility(plane->getUuid()));
         mPlanes.append(plane);
       }
 
@@ -883,6 +885,10 @@ void Board::save() {
                       brdDoc.toByteArray());  // can throw
 
     // save user settings
+    mUserSettings->resetPlanesVisibility();
+    foreach (BI_Plane* plane, mPlanes) {
+      mUserSettings->setPlaneVisibility(plane->getUuid(), plane->isVisible());
+    }
     SExpression usrDoc(mUserSettings->serializeToDomElement(
         "librepcb_board_user_settings"));  // can throw
     mDirectory->write("settings.user.lp", usrDoc.toByteArray());  // can throw

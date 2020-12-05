@@ -45,13 +45,15 @@ BoardUserSettings::BoardUserSettings(Board& board) noexcept
   : QObject(&board),
     mBoard(board),
     mLayerSettings(
-        new GraphicsLayerStackAppearanceSettings(board.getLayerStack())) {
+        new GraphicsLayerStackAppearanceSettings(board.getLayerStack())),
+    mPlanesVisibility() {
 }
 
 BoardUserSettings::BoardUserSettings(Board& board,
                                      const BoardUserSettings& other) noexcept
   : BoardUserSettings(board) {
   *mLayerSettings = *other.mLayerSettings;
+  mPlanesVisibility = other.mPlanesVisibility;
 }
 
 BoardUserSettings::BoardUserSettings(Board& board, const SExpression& node,
@@ -59,7 +61,17 @@ BoardUserSettings::BoardUserSettings(Board& board, const SExpression& node,
   : QObject(&board),
     mBoard(board),
     mLayerSettings(new GraphicsLayerStackAppearanceSettings(
-        board.getLayerStack(), node, fileFormat)) {
+        board.getLayerStack(), node, fileFormat)),
+    mPlanesVisibility() {
+  // Load planes visibility.
+  // Note: Support for this was added in file format v0.2. However, there is
+  // no need to check the file format here - v0.1 simply doesn't contain these
+  // nodes.
+  foreach (const SExpression& node, node.getChildren("plane")) {
+    Uuid uuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
+    bool visible = deserialize<bool>(node.getChild("visible/@0"), fileFormat);
+    mPlanesVisibility[uuid] = visible;
+  }
 }
 
 BoardUserSettings::~BoardUserSettings() noexcept {
@@ -71,6 +83,14 @@ BoardUserSettings::~BoardUserSettings() noexcept {
 
 void BoardUserSettings::serialize(SExpression& root) const {
   mLayerSettings->serialize(root);
+
+  for (auto i = mPlanesVisibility.constBegin();
+       i != mPlanesVisibility.constEnd(); i++) {
+    SExpression node = SExpression::createList("plane");
+    node.appendChild(i.key());
+    node.appendChild("visible", i.value(), false);
+    root.appendChild(node, true);
+  }
 }
 
 /*******************************************************************************
