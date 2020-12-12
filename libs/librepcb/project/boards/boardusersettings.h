@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -58,7 +59,18 @@ public:
                     const Version& fileFormat);
   ~BoardUserSettings() noexcept;
 
+  // Getters
+  bool getPlaneVisibility(const Uuid& uuid) const noexcept {
+    return mPlanesVisibility.value(uuid, true);
+  }
+
+  // Setters
+  void setPlaneVisibility(const Uuid& uuid, bool visible) noexcept {
+    mPlanesVisibility[uuid] = visible;
+  }
+
   // General Methods
+  void resetPlanesVisibility() noexcept { mPlanesVisibility.clear(); }
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -70,6 +82,7 @@ private:  // Methods
   // General
   Board& mBoard;
   QScopedPointer<GraphicsLayerStackAppearanceSettings> mLayerSettings;
+  QMap<Uuid, bool> mPlanesVisibility;
 };
 
 /*******************************************************************************
