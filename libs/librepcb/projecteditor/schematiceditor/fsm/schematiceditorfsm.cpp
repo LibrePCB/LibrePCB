@@ -25,6 +25,7 @@
 #include "schematiceditorstate_addcomponent.h"
 #include "schematiceditorstate_addnetlabel.h"
 #include "schematiceditorstate_addtext.h"
+#include "schematiceditorstate_drawpolygon.h"
 #include "schematiceditorstate_drawwire.h"
 #include "schematiceditorstate_select.h"
 
@@ -54,6 +55,8 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
                  new SchematicEditorState_AddNetLabel(context));
   mStates.insert(State::ADD_COMPONENT,
                  new SchematicEditorState_AddComponent(context));
+  mStates.insert(State::DRAW_POLYGON,
+                 new SchematicEditorState_DrawPolygon(context));
   mStates.insert(State::ADD_TEXT, new SchematicEditorState_AddText(context));
   enterNextState(State::SELECT);
 }
@@ -103,6 +106,10 @@ bool SchematicEditorFsm::processAddComponent(const Uuid& cmp,
 
 bool SchematicEditorFsm::processAddNetLabel() noexcept {
   return setNextState(State::ADD_NETLABEL);
+}
+
+bool SchematicEditorFsm::processDrawPolygon() noexcept {
+  return setNextState(State::DRAW_POLYGON);
 }
 
 bool SchematicEditorFsm::processAddText() noexcept {

@@ -88,6 +88,7 @@ SOURCES += \
     schematiceditor/fsm/schematiceditorstate_addcomponent.cpp \
     schematiceditor/fsm/schematiceditorstate_addnetlabel.cpp \
     schematiceditor/fsm/schematiceditorstate_addtext.cpp \
+    schematiceditor/fsm/schematiceditorstate_drawpolygon.cpp \
     schematiceditor/fsm/schematiceditorstate_drawwire.cpp \
     schematiceditor/fsm/schematiceditorstate_select.cpp \
     schematiceditor/renamenetsegmentdialog.cpp \
@@ -162,6 +163,7 @@ HEADERS += \
     schematiceditor/fsm/schematiceditorstate_addcomponent.h \
     schematiceditor/fsm/schematiceditorstate_addnetlabel.h \
     schematiceditor/fsm/schematiceditorstate_addtext.h \
+    schematiceditor/fsm/schematiceditorstate_drawpolygon.h \
     schematiceditor/fsm/schematiceditorstate_drawwire.h \
     schematiceditor/fsm/schematiceditorstate_select.h \
     schematiceditor/renamenetsegmentdialog.h \

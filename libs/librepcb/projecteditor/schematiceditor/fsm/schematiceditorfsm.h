@@ -75,6 +75,8 @@ public:
     ADD_NETLABEL,
     /// ::librepcb::project::editor::SchematicEditorState_AddComponent
     ADD_COMPONENT,
+    /// ::librepcb::project::editor::SchematicEditorState_DrawPolygon
+    DRAW_POLYGON,
     /// ::librepcb::project::editor::SchematicEditorState_AddText
     ADD_TEXT,
   };
@@ -104,6 +106,7 @@ public:
   bool processAddComponent() noexcept;
   bool processAddComponent(const Uuid& cmp, const Uuid& symbVar) noexcept;
   bool processAddNetLabel() noexcept;
+  bool processDrawPolygon() noexcept;
   bool processAddText() noexcept;
   bool processDrawWire() noexcept;
   bool processAbortCommand() noexcept;

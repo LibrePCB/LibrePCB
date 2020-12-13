@@ -105,6 +105,7 @@
     <addaction name="actionToolSelect"/>
     <addaction name="actionToolDrawWire"/>
     <addaction name="actionToolAddNetLabel"/>
+    <addaction name="actionToolDrawPolygon"/>
     <addaction name="actionToolAddText"/>
     <addaction name="actionToolAddComponent"/>
    </widget>
@@ -235,6 +236,7 @@
    <addaction name="actionToolSelect"/>
    <addaction name="actionToolDrawWire"/>
    <addaction name="actionToolAddNetLabel"/>
+   <addaction name="actionToolDrawPolygon"/>
    <addaction name="actionToolAddText"/>
    <addaction name="actionToolAddComponent"/>
   </widget>
@@ -823,6 +825,18 @@
    </property>
    <property name="toolTip">
     <string>Add Text</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
+  </action>
+  <action name="actionToolDrawPolygon">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Polygon</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
