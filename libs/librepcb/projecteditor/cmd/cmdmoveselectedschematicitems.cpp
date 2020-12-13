@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdmoveselectedschematicitems.h"
 
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/project.h>
@@ -32,6 +33,7 @@
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
+#include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
 #include <librepcb/project/schematics/items/si_text.h>
@@ -64,6 +66,7 @@ CmdMoveSelectedSchematicItems::CmdMoveSelectedSchematicItems(
   query->addSelectedNetPoints();
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
+  query->addSelectedPolygons();
   query->addSelectedTexts();
   query->addNetPointsOfNetLines();
 
@@ -79,6 +82,10 @@ CmdMoveSelectedSchematicItems::CmdMoveSelectedSchematicItems(
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
     mNetLabelEditCmds.append(cmd);
+  }
+  foreach (SI_Polygon* polygon, query->getPolygons()) {
+    CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
+    mPolygonEditCmds.append(cmd);
   }
   foreach (SI_Text* text, query->getTexts()) {
     CmdTextEdit* cmd = new CmdTextEdit(text->getText());
@@ -109,6 +116,9 @@ void CmdMoveSelectedSchematicItems::setCurrentPosition(
     foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
+    foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+      cmd->translate(delta - mDeltaPos, true);
+    }
     foreach (CmdTextEdit* cmd, mTextEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
@@ -129,6 +139,8 @@ bool CmdMoveSelectedSchematicItems::performExecute() {
     mNetPointEditCmds.clear();
     qDeleteAll(mNetLabelEditCmds);
     mNetLabelEditCmds.clear();
+    qDeleteAll(mPolygonEditCmds);
+    mPolygonEditCmds.clear();
     qDeleteAll(mTextEditCmds);
     mTextEditCmds.clear();
     return false;
@@ -141,6 +153,9 @@ bool CmdMoveSelectedSchematicItems::performExecute() {
     appendChild(cmd);  // can throw
   }
   foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdTextEdit* cmd, mTextEditCmds) {

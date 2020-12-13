@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class CmdPolygonEdit;
 class CmdTextEdit;
 
 namespace project {
@@ -76,6 +77,7 @@ private:
   QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
   QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
   QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
+  QList<CmdPolygonEdit*> mPolygonEditCmds;
   QList<CmdTextEdit*> mTextEditCmds;
 };
 
