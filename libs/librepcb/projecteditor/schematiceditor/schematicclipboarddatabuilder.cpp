@@ -35,6 +35,7 @@
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
 #include <librepcb/project/schematics/items/si_text.h>
@@ -78,6 +79,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   query->addSelectedSymbols();
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
+  query->addSelectedPolygons();
   query->addSelectedTexts();
   query->addNetPointsOfNetLines();
 
@@ -146,6 +148,12 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
       newSegment->labels = segment.netlabels;
       data->getNetSegments().append(newSegment);
     }
+  }
+
+  // Add polygons
+  foreach (SI_Polygon* polygon, query->getPolygons()) {
+    data->getPolygons().append(
+        std::make_shared<Polygon>(polygon->getPolygon()));
   }
 
   // Add texts

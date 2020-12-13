@@ -64,6 +64,8 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataEmpty) {
   EXPECT_EQ(obj1.getComponentInstances(), obj2->getComponentInstances());
   EXPECT_EQ(obj1.getNetSegments(), obj2->getNetSegments());
   EXPECT_EQ(obj1.getSymbolInstances(), obj2->getSymbolInstances());
+  EXPECT_EQ(obj1.getPolygons(), obj2->getPolygons());
+  EXPECT_EQ(obj1.getTexts(), obj2->getTexts());
 }
 
 TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
@@ -140,6 +142,17 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   netSegment2->labels.append(std::make_shared<NetLabel>(
       Uuid::createRandom(), Point(1230, 4560), Angle(7890)));
 
+  std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
+      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,
+      true,
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
+
+  std::shared_ptr<Polygon> polygon2 =
+      std::make_shared<Polygon>(Uuid::createRandom(), GraphicsLayerName("bar"),
+                                UnsignedLength(10), true, false,
+                                Path({Vertex(Point(10, 20), Angle(30)),
+                                      Vertex(Point(40, 50), Angle(60))}));
+
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
       Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
       Angle(3), PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
@@ -157,6 +170,8 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getSymbolInstances().append(symbol2);
   obj1.getNetSegments().append(netSegment1);
   obj1.getNetSegments().append(netSegment2);
+  obj1.getPolygons().append(polygon1);
+  obj1.getPolygons().append(polygon2);
   obj1.getTexts().append(text1);
   obj1.getTexts().append(text2);
 
@@ -171,6 +186,7 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   EXPECT_EQ(obj1.getComponentInstances(), obj2->getComponentInstances());
   EXPECT_EQ(obj1.getNetSegments(), obj2->getNetSegments());
   EXPECT_EQ(obj1.getSymbolInstances(), obj2->getSymbolInstances());
+  EXPECT_EQ(obj1.getPolygons(), obj2->getPolygons());
   EXPECT_EQ(obj1.getTexts(), obj2->getTexts());
 }
 

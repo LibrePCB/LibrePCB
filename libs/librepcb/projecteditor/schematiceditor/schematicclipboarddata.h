@@ -28,6 +28,7 @@
 #include <librepcb/common/geometry/junction.h>
 #include <librepcb/common/geometry/netlabel.h>
 #include <librepcb/common/geometry/netline.h>
+#include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/geometry/text.h>
 #include <librepcb/project/circuit/componentinstance.h>
 
@@ -228,6 +229,7 @@ public:
   SerializableObjectList<NetSegment, NetSegment>& getNetSegments() noexcept {
     return mNetSegments;
   }
+  PolygonList& getPolygons() noexcept { return mPolygons; }
   TextList& getTexts() noexcept { return mTexts; }
 
   // General Methods
@@ -252,6 +254,7 @@ private:  // Data
       mComponentInstances;
   SerializableObjectList<SymbolInstance, SymbolInstance> mSymbolInstances;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
+  PolygonList mPolygons;
   TextList mTexts;
 };
 
