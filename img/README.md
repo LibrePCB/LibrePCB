@@ -5,3 +5,62 @@ This directory contains all images which are required in the LibrePCB applicatio
 - Most images are from the "Open Icon Library": http://openiconlibrary.sourceforge.net/
 - Some images are from https://www.iconfinder.com/
 - Some images are from https://icons8.com/ (we may use those icons under the free license since we attribute icons8 in the about dialog)
+
+The following files are from "Open Icon Library" (found in open_icon_library-standard-0.11.tar.bz2 with fdupes),
+wih format <filename> <filename in Open Icon Library> <license>
+```
+actions/add.png icons/png/64x64/actions/edit-add-4.png LGPL-2.1
+actions/apply.png icons/png/48x48/actions/dialog-accept.png LGPL-2.1
+actions/bookmark.png icons/png/48x48/actions/bookmark-4.png LGPL-2.1
+actions/cam_export.png icons/png/48x48/apps/gerbv.png unknown
+actions/cancel.png icons/png/48x48/actions/dialog-cancel-4.png LGPL-2.1
+actions/close.png icons/png/48x48/actions/application-exit-4.png CC-BY-SA 3.0 or LGPL
+actions/copy.png icons/png/48x48/actions/edit-copy-6.png CC-BY-SA 3.0 or LGPL
+actions/cut.png icons/png/48x48/actions/edit-cut-5.png LGPL-2.1
+actions/delete.png icons/png/48x48/actions/edit-delete-2.png GPLv2
+actions/download.png icons/png/48x48/actions/download-3.png CC-BY-SA 3.0 or LGPL
+actions/down.png icons/png/48x48/actions/go-down-5.png PD
+actions/draw_circle.png icons/png/32x32/actions/draw-circle-2.png CC-BY-SA 3.0 or LGPL
+actions/draw_polygon.png icons/png/32x32/actions/draw-polyline-2.png CC-BY-SA 3.0 or LGPL
+actions/draw_rectangle.png icons/png/48x48/actions/draw-rectangle-2.png CC-BY-SA 3.0 or LGPL
+actions/edit.png icons/png/48x48/actions/edit-4.png unknown
+actions/export_svg.png icons/png/48x48/mimetypes/oxygen-style/image-svg+xml.png unknown
+actions/flip_horizontal.png icons/png/48x48/actions/object-flip-horizontal-2.png CC-BY-SA 3.0 or LGPL
+actions/flip_vertical.png icons/png/48x48/actions/object-flip-vertical-2.png CC-BY-SA 3.0 or LGPL
+actions/generate_bom.png icons/png/64x64/mimetypes/gnome-style/x-office-spreadsheet-2.png unknown
+actions/help.png icons/png/48x48/actions/help-2.png LGPL-2.1
+actions/home.png icons/png/48x48/actions/go-home-4.png GPLv2
+actions/info.png icons/png/48x48/actions/help-about-3.png CC-BY-SA 3.0 or LGPL
+actions/move.png icons/png/48x48/actions/transform-move.png CC-BY-SA 3.0 or LGPL
+actions/new_2.png icons/png/48x48/actions/document-new-3.png GPLv2
+actions/new.png icons/png/48x48/actions/document-new-8.png LGPL-2.1
+actions/open.png icons/png/48x48/actions/document-open-7.png CC-BY-SA 3.0 or LGPL
+actions/paste.png icons/png/48x48/actions/edit-paste-3.png GPLv2
+actions/pdf.png icons/png/48x48/mimetypes/oxygen-style/application-pdf.png unknown
+actions/plus_2.png icons/png/48x48/actions/edit-add-4.png LGPL-2.1
+actions/plus.png icons/png/48x48/actions/dialog-more.png GPLv2
+actions/print.png icons/png/48x48/actions/document-print-5.png CC-BY-SA 3.0 or LGPL
+actions/print_preview.png icons/png/48x48/actions/document-print-preview-4.png unknown
+actions/quit.png icons/png/48x48/actions/system-exit.png unknown
+actions/recent.png icons/png/48x48/status/appointment-soon.png GPLv2
+actions/redo.png icons/png/48x48/actions/edit-redo-3.png GPLv2
+actions/refresh.png icons/png/48x48/actions/view-refresh-7.png CC-BY-SA 3.0 or LGPL
+actions/rotate_left.png icons/png/48x48/actions/object-rotate-left-3.png CC-BY-SA 3.0 or LGPL
+actions/rotate_right.png icons/png/48x48/actions/object-rotate-right-3.png CC-BY-SA 3.0 or LGPL
+actions/save.png icons/png/48x48/actions/document-save-2.png GPLv2
+actions/search.png icons/png/64x64/actions/edit-find-5.png unknown
+actions/select_all.png icons/png/64x64/actions/edit-select-all-2.png PD
+actions/select_rect.png icons/png/48x48/actions/select-rectangular.png CC-BY-SA 3.0 or LGPL
+actions/settings.png icons/png/48x48/actions/configure-2.png LGPL-2.1
+actions/stop.png icons/png/48x48/actions/process-stop.png GPLv2
+actions/up.png icons/png/48x48/actions/go-up-5.png PD
+actions/zoom_all.png icons/png/48x48/actions/zoom-fit-best-2.png GPLv2
+actions/zoom_in.png icons/png/48x48/actions/zoom-in-3.png GPLv2
+actions/zoom_out.png icons/png/48x48/actions/zoom-out-3.png GPLv2
+command_toolbars/align_horizontal_center.png icons/png/48x48/actions/align-horizontal-center-2.png CC-BY-SA 3.0 or LGPL
+command_toolbars/align_horizontal_left.png icons/png/48x48/actions/align-horizontal-left.png CC-BY-SA 3.0 or LGPL
+command_toolbars/align_horizontal_right.png icons/png/48x48/actions/align-horizontal-right-2.png CC-BY-SA 3.0 or LGPL
+command_toolbars/align_vertical_bottom.png icons/png/48x48/actions/align-vertical-bottom-2.png CC-BY-SA 3.0 or LGPL
+command_toolbars/align_vertical_center.png icons/png/48x48/actions/align-vertical-center-2.png CC-BY-SA 3.0 or LGPL
+command_toolbars/align_vertical_top.png icons/png/48x48/actions/align-vertical-top-2.png CC-BY-SA 3.0 or LGPL
+```
