@@ -60,6 +60,7 @@ public:
     NetLabel,  ///< ::librepcb::project::SI_NetLabel
     Symbol,  ///< ::librepcb::project::SI_Symbol
     SymbolPin,  ///< ::librepcb::project::SI_SymbolPin
+    Polygon,  ///< ::librepcb::project::SI_Polygon
     Text,  ///< ::librepcb::project::SI_Text
   };
 

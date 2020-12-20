@@ -39,6 +39,7 @@ class SI_NetSegment;
 class SI_NetLine;
 class SI_NetPoint;
 class SI_NetLabel;
+class SI_Polygon;
 class SI_Text;
 
 /*******************************************************************************
@@ -64,6 +65,7 @@ public:
   SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
   SchematicSelectionQuery(const QList<SI_Symbol*>& symbols,
                           const QList<SI_NetSegment*>& netsegments,
+                          const QList<SI_Polygon*>& polygons,
                           const QList<SI_Text*>& texts,
                           QObject* parent = nullptr);
   ~SchematicSelectionQuery() noexcept;
@@ -78,6 +80,9 @@ public:
   }
   const QSet<SI_NetLabel*>& getNetLabels() const noexcept {
     return mResultNetLabels;
+  }
+  const QSet<SI_Polygon*>& getPolygons() const noexcept {
+    return mResultPolygons;
   }
   const QSet<SI_Text*>& getTexts() const noexcept { return mResultTexts; }
 
@@ -99,6 +104,7 @@ public:
   void addSelectedNetPoints() noexcept;
   void addSelectedNetLines() noexcept;
   void addSelectedNetLabels() noexcept;
+  void addSelectedPolygons() noexcept;
   void addSelectedTexts() noexcept;
   /**
    * @brief Add net points of the selected net lines
@@ -120,6 +126,7 @@ private:
   // references to the Schematic object
   const QList<SI_Symbol*>& mSymbols;
   const QList<SI_NetSegment*>& mNetSegments;
+  const QList<SI_Polygon*>& mPolygons;
   const QList<SI_Text*>& mTexts;
 
   // query result
@@ -127,6 +134,7 @@ private:
   QSet<SI_NetPoint*> mResultNetPoints;
   QSet<SI_NetLine*> mResultNetLines;
   QSet<SI_NetLabel*> mResultNetLabels;
+  QSet<SI_Polygon*> mResultPolygons;
   QSet<SI_Text*> mResultTexts;
 };
 

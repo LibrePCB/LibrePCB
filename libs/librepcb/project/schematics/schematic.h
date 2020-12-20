@@ -58,6 +58,7 @@ class SI_NetSegment;
 class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLabel;
+class SI_Polygon;
 class SI_Text;
 class SchematicSelectionQuery;
 
@@ -77,7 +78,7 @@ class SchematicSelectionQuery;
  *      - netlabel:     ::librepcb::project::SI_NetLabel
  *  - symbol:           ::librepcb::project::SI_Symbol
  *      - symbol pin:   ::librepcb::project::SI_SymbolPin
- *  - polygon:          TODO
+ *  - polygon:          ::librepcb::project::SI_Polygon
  *  - circle:           TODO
  *  - text:             ::librepcb::project::SI_Text
  */
@@ -102,6 +103,7 @@ public:
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
     ZValue_Symbols,  ///< Z value for ::librepcb::project::SI_Symbol items
+    ZValue_Polygons,  ///< Z value for ::librepcb::project::SI_Polygon items
     ZValue_Texts,  ///< Z value for ::librepcb::project::SI_Text items
     ZValue_NetLabels,  ///< Z value for ::librepcb::project::SI_NetLabel items
     ZValue_NetLines,  ///< Z value for ::librepcb::project::SI_NetLine items
@@ -156,6 +158,12 @@ public:
   SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
   void addNetSegment(SI_NetSegment& netsegment);
   void removeNetSegment(SI_NetSegment& netsegment);
+
+  // Polygon Methods
+  const QList<SI_Polygon*>& getPolygons() const noexcept { return mPolygons; }
+  SI_Polygon* getPolygonByUuid(const Uuid& uuid) const noexcept;
+  void addPolygon(SI_Polygon& polygon);
+  void removePolygon(SI_Polygon& polygon);
 
   // Text Methods
   QList<SI_Text*> getTexts() const noexcept { return mTexts; }
@@ -225,6 +233,7 @@ private:
 
   QList<SI_Symbol*> mSymbols;
   QList<SI_NetSegment*> mNetSegments;
+  QList<SI_Polygon*> mPolygons;
   QList<SI_Text*> mTexts;
 };
 
