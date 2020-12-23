@@ -31,11 +31,15 @@
 #include "../schematicclipboarddatabuilder.h"
 #include "../symbolinstancepropertiesdialog.h"
 
+#include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/textpropertiesdialog.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/project.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
+#include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_text.h>
 #include <librepcb/project/schematics/schematiclayerprovider.h>
@@ -58,7 +62,10 @@ SchematicEditorState_Select::SchematicEditorState_Select(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mSubState(SubState::IDLE),
-    mCurrentSelectionIndex(0) {
+    mCurrentSelectionIndex(0),
+    mSelectedPolygon(nullptr),
+    mSelectedPolygonVertices(),
+    mCmdPolygonEdit() {
 }
 
 SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
@@ -84,6 +91,7 @@ bool SchematicEditorState_Select::exit() noexcept {
   }
 
   mSelectedItemsMoveCommand.reset();
+  mCmdPolygonEdit.reset();
   mSubState = SubState::IDLE;
   return true;
 }
@@ -192,6 +200,20 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
       return true;
     }
 
+    case SubState::MOVING_POLYGON_VERTICES: {
+      // Move polygon vertices
+      QVector<Vertex> vertices =
+          mSelectedPolygon->getPolygon().getPath().getVertices();
+      foreach (int i, mSelectedPolygonVertices) {
+        if ((i >= 0) && (i < vertices.count())) {
+          vertices[i].setPos(
+              Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+        }
+      }
+      mCmdPolygonEdit->setPath(Path(vertices), true);
+      return true;
+    }
+
     default:
       break;
   }
@@ -205,38 +227,45 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   if (!schematic) return false;
 
   if (mSubState == SubState::IDLE) {
-    // handle items selection
-    Point pos = Point::fromPx(mouseEvent.scenePos());
-    QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
-    if (items.isEmpty()) {
-      // no items under mouse --> start drawing a selection rectangle
-      schematic->clearSelection();
-      mStartPos = pos;
-      mSubState = SubState::SELECTING;
+    if (findPolygonVerticesAtPosition(Point::fromPx(mouseEvent.scenePos()))) {
+      // start moving polygon vertex
+      mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
+      mSubState = SubState::MOVING_POLYGON_VERTICES;
       return true;
-    }
+    } else {
+      // handle items selection
+      Point pos = Point::fromPx(mouseEvent.scenePos());
+      QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
+      if (items.isEmpty()) {
+        // no items under mouse --> start drawing a selection rectangle
+        schematic->clearSelection();
+        mStartPos = pos;
+        mSubState = SubState::SELECTING;
+        return true;
+      }
 
-    bool itemAlreadySelected = items.first()->isSelected();
+      bool itemAlreadySelected = items.first()->isSelected();
 
-    if (mouseEvent.modifiers() & Qt::ControlModifier) {
-      // Toggle selection when CTRL is pressed
-      items.first()->setSelected(!itemAlreadySelected);
-    } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
-      // Cycle Selection, when holding shift
-      mCurrentSelectionIndex += 1;
-      mCurrentSelectionIndex %= items.count();
-      schematic->clearSelection();
-      items[mCurrentSelectionIndex]->setSelected(true);
-    } else if (!itemAlreadySelected) {
-      // Only select the topmost item when clicking an unselected item
-      // without CTRL
-      schematic->clearSelection();
-      items.first()->setSelected(true);
-    }
+      if (mouseEvent.modifiers() & Qt::ControlModifier) {
+        // Toggle selection when CTRL is pressed
+        items.first()->setSelected(!itemAlreadySelected);
+      } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
+        // Cycle Selection, when holding shift
+        mCurrentSelectionIndex += 1;
+        mCurrentSelectionIndex %= items.count();
+        schematic->clearSelection();
+        items[mCurrentSelectionIndex]->setSelected(true);
+      } else if (!itemAlreadySelected) {
+        // Only select the topmost item when clicking an unselected item
+        // without CTRL
+        schematic->clearSelection();
+        items.first()->setSelected(true);
+      }
 
-    if (startMovingSelectedItems(*schematic,
-                                 Point::fromPx(mouseEvent.scenePos()))) {
-      return true;
+      if (startMovingSelectedItems(*schematic,
+                                   Point::fromPx(mouseEvent.scenePos()))) {
+        return true;
+      }
     }
   } else if (mSubState == SubState::PASTING) {
     // stop moving items (set position of all selected elements permanent)
@@ -279,6 +308,16 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     }
     mSelectedItemsMoveCommand.reset();
     mSubState = SubState::IDLE;
+  } else if (mSubState == SubState::MOVING_POLYGON_VERTICES) {
+    // Stop moving polygon vertices
+    try {
+      mContext.undoStack.execCmd(mCmdPolygonEdit.take());
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+    mSelectedPolygon = nullptr;
+    mSelectedPolygonVertices.clear();
+    mSubState = SubState::IDLE;
   }
 
   return false;
@@ -317,71 +356,93 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   if (!schematic) return false;
   if (mSubState != SubState::IDLE) return false;
 
-  // handle item selection
-  QList<SI_Base*> items =
-      schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-  if (items.isEmpty()) return false;
-  SI_Base* selectedItem = nullptr;
-  foreach (SI_Base* item, items) {
-    if (item->isSelected()) {
-      selectedItem = item;
-    }
-  }
-  if (!selectedItem) {
-    schematic->clearSelection();
-    selectedItem = items.first();
-    selectedItem->setSelected(true);
-  }
-  Q_ASSERT(selectedItem);
-  Q_ASSERT(selectedItem->isSelected());
-
-  // build the context menu
   QMenu menu;
-  switch (selectedItem->getType()) {
-    case SI_Base::Type_t::Symbol: {
-      SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(selectedItem);
-      Q_ASSERT(symbol);
-
-      addActionCut(menu);
-      addActionCopy(menu);
-      addActionRemove(menu, tr("Remove Symbol"));
-      menu.addSeparator();
-      addActionRotate(menu);
-      addActionMirror(menu);
-      menu.addSeparator();
-      addActionOpenProperties(menu, selectedItem);
-      break;
+  Point pos = Point::fromPx(e.scenePos());
+  if (findPolygonVerticesAtPosition(pos)) {
+    // special menu for polygon vertices
+    addActionRemoveVertex(menu, *mSelectedPolygon, mSelectedPolygonVertices);
+  } else {
+    // handle item selection
+    QList<SI_Base*> items =
+        schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+    if (items.isEmpty()) return false;
+    SI_Base* selectedItem = nullptr;
+    foreach (SI_Base* item, items) {
+      if (item->isSelected()) {
+        selectedItem = item;
+      }
     }
-
-    case SI_Base::Type_t::NetLabel: {
-      SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(selectedItem);
-      Q_ASSERT(netlabel);
-
-      addActionRotate(menu);
-      addActionRemove(menu, tr("Remove Net Label"));
-      menu.addSeparator();
-      addActionOpenProperties(menu, selectedItem, tr("Rename Net Segment"));
-      break;
+    if (!selectedItem) {
+      schematic->clearSelection();
+      selectedItem = items.first();
+      selectedItem->setSelected(true);
     }
+    Q_ASSERT(selectedItem);
+    Q_ASSERT(selectedItem->isSelected());
 
-    case SI_Base::Type_t::Text: {
-      SI_Text* text = dynamic_cast<SI_Text*>(selectedItem);
-      Q_ASSERT(text);
+    // build the context menu
+    switch (selectedItem->getType()) {
+      case SI_Base::Type_t::Symbol: {
+        SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(selectedItem);
+        Q_ASSERT(symbol);
 
-      addActionCut(menu);
-      addActionCopy(menu);
-      addActionRemove(menu);
-      menu.addSeparator();
-      addActionRotate(menu);
-      addActionMirror(menu);
-      menu.addSeparator();
-      addActionOpenProperties(menu, selectedItem);
-      break;
+        addActionCut(menu);
+        addActionCopy(menu);
+        addActionRemove(menu, tr("Remove Symbol"));
+        menu.addSeparator();
+        addActionRotate(menu);
+        addActionMirror(menu);
+        menu.addSeparator();
+        addActionOpenProperties(menu, selectedItem);
+        break;
+      }
+
+      case SI_Base::Type_t::NetLabel: {
+        SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(selectedItem);
+        Q_ASSERT(netlabel);
+
+        addActionRotate(menu);
+        addActionRemove(menu, tr("Remove Net Label"));
+        menu.addSeparator();
+        addActionOpenProperties(menu, selectedItem, tr("Rename Net Segment"));
+        break;
+      }
+
+      case SI_Base::Type_t::Polygon: {
+        SI_Polygon* polygon = dynamic_cast<SI_Polygon*>(selectedItem);
+        Q_ASSERT(polygon);
+
+        if (addActionAddVertex(menu, *polygon, pos)) {
+          menu.addSeparator();
+        }
+        addActionRotate(menu);
+        addActionMirror(menu);
+        addActionRemove(menu);
+        menu.addSeparator();
+        addActionOpenProperties(menu, selectedItem);
+        break;
+      }
+
+      case SI_Base::Type_t::Text: {
+        SI_Text* text = dynamic_cast<SI_Text*>(selectedItem);
+        Q_ASSERT(text);
+
+        addActionCut(menu);
+        addActionCopy(menu);
+        addActionRemove(menu);
+        menu.addSeparator();
+        addActionRotate(menu);
+        addActionMirror(menu);
+        menu.addSeparator();
+        addActionOpenProperties(menu, selectedItem);
+        break;
+      }
+
+      default:
+        return false;
     }
-
-    default:
-      return false;
   }
+
   // execute the context menu
   menu.exec(e.screenPos());
   return true;
@@ -455,6 +516,56 @@ bool SchematicEditorState_Select::removeSelectedItems() noexcept {
   }
 }
 
+void SchematicEditorState_Select::removeSelectedPolygonVertices() noexcept {
+  if ((!getActiveSchematic()) || (!mSelectedPolygon) ||
+      mSelectedPolygonVertices.isEmpty()) {
+    return;
+  }
+
+  try {
+    Path path;
+    Polygon& polygon = mSelectedPolygon->getPolygon();
+    for (int i = 0; i < polygon.getPath().getVertices().count(); ++i) {
+      if (!mSelectedPolygonVertices.contains(i)) {
+        path.getVertices().append(polygon.getPath().getVertices()[i]);
+      }
+    }
+    if (polygon.getPath().isClosed() && path.getVertices().count() > 2) {
+      path.close();
+    }
+    if (path.isClosed() && (path.getVertices().count() == 3)) {
+      path.getVertices().removeLast();  // Avoid overlapping lines
+    }
+    if (path.getVertices().count() < 2) {
+      return;  // Do not allow to create invalid polygons!
+    }
+    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
+    cmd->setPath(path, false);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
+void SchematicEditorState_Select::startAddingPolygonVertex(
+    SI_Polygon& polygon, int vertex, const Point& pos) noexcept {
+  try {
+    Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
+    Path path = polygon.getPolygon().getPath();
+    Point newPos = pos.mappedToGrid(getGridInterval());
+    Angle newAngle = path.getVertices()[vertex - 1].getAngle();
+    path.getVertices().insert(vertex, Vertex(newPos, newAngle));
+
+    mSelectedPolygon = &polygon;
+    mSelectedPolygonVertices = {vertex};
+    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon.getPolygon()));
+    mCmdPolygonEdit->setPath(path, true);
+    mSubState = SubState::MOVING_POLYGON_VERTICES;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
 bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
@@ -523,6 +634,26 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
   return false;
 }
 
+bool SchematicEditorState_Select::findPolygonVerticesAtPosition(
+    const Point& pos) noexcept {
+  if (Schematic* schematic = getActiveSchematic()) {
+    foreach (SI_Polygon* polygon, schematic->getPolygons()) {
+      if (polygon->isSelected()) {
+        mSelectedPolygonVertices =
+            polygon->getGraphicsItem().getVertexIndicesAtPosition(pos);
+        if (!mSelectedPolygonVertices.isEmpty()) {
+          mSelectedPolygon = polygon;
+          return true;
+        }
+      }
+    }
+  }
+
+  mSelectedPolygon = nullptr;
+  mSelectedPolygonVertices.clear();
+  return false;
+}
+
 void SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
   if (!item) return;
   switch (item->getType()) {
@@ -537,6 +668,13 @@ void SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
       SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item);
       Q_ASSERT(netlabel);
       openNetLabelPropertiesDialog(*netlabel);
+      break;
+    }
+
+    case SI_Base::Type_t::Polygon: {
+      SI_Polygon* polygon = dynamic_cast<SI_Polygon*>(item);
+      Q_ASSERT(polygon);
+      openPolygonPropertiesDialog(*polygon);
       break;
     }
 
@@ -566,6 +704,16 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
   RenameNetSegmentDialog dialog(mContext.undoStack, netlabel.getNetSegment(),
                                 parentWidget());
   dialog.exec();  // performs the rename, if needed
+}
+
+void SchematicEditorState_Select::openPolygonPropertiesDialog(
+    SI_Polygon& polygon) noexcept {
+  PolygonPropertiesDialog dialog(
+      polygon.getPolygon(), mContext.undoStack,
+      mContext.project.getLayers().getSchematicGeometryElementLayers(),
+      getDefaultLengthUnit(), "schematic_editor/polygon_properties_dialog",
+      parentWidget());
+  dialog.exec();
 }
 
 void SchematicEditorState_Select::openTextPropertiesDialog(
@@ -618,6 +766,32 @@ QAction* SchematicEditorState_Select::addActionRotate(
   connect(action, &QAction::triggered,
           [this]() { rotateSelectedItems(Angle::deg90()); });
   return action;
+}
+
+void SchematicEditorState_Select::addActionRemoveVertex(
+    QMenu& menu, SI_Polygon& polygon, const QVector<int>& verticesToRemove,
+    const QString& text) noexcept {
+  QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
+  connect(action, &QAction::triggered,
+          [this]() { removeSelectedPolygonVertices(); });
+  int remainingVertices = polygon.getPolygon().getPath().getVertices().count() -
+      verticesToRemove.count();
+  action->setEnabled(remainingVertices >= 2);
+}
+
+bool SchematicEditorState_Select::addActionAddVertex(
+    QMenu& menu, SI_Polygon& polygon, const Point& pos,
+    const QString& text) noexcept {
+  int index = polygon.getGraphicsItem().getLineIndexAtPosition(pos);
+
+  if (index >= 0) {
+    QAction* action = menu.addAction(QIcon(":/img/actions/add.png"), text);
+    connect(action, &QAction::triggered,
+            [=, &polygon]() { startAddingPolygonVertex(polygon, index, pos); });
+    return true;
+  }
+
+  return false;
 }
 
 QAction* SchematicEditorState_Select::addActionOpenProperties(

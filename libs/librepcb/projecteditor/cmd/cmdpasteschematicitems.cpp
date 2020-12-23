@@ -42,12 +42,14 @@
 #include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
+#include <librepcb/project/schematics/cmd/cmdschematicpolygonadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematictextadd.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceadd.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
 #include <librepcb/project/schematics/items/si_text.h>
@@ -279,6 +281,15 @@ bool CmdPasteSchematicItems::performExecute() {
         execNewChildCmd(cmd);
       }
     }
+  }
+
+  // Paste polygons
+  for (const Polygon& polygon : mData->getPolygons()) {
+    Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
+    copy.setPath(copy.getPath().translated(mPosOffset));  // move
+    SI_Polygon* item = new SI_Polygon(mSchematic, copy);
+    item->setSelected(true);
+    execNewChildCmd(new CmdSchematicPolygonAdd(*item));
   }
 
   // Paste texts

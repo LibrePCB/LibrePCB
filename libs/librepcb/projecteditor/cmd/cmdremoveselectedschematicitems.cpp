@@ -48,12 +48,14 @@
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
 #include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
+#include <librepcb/project/schematics/cmd/cmdschematicpolygonremove.h>
 #include <librepcb/project/schematics/cmd/cmdschematictextremove.h>
 #include <librepcb/project/schematics/cmd/cmdsymbolinstanceremove.h>
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
 #include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
 #include <librepcb/project/schematics/schematic.h>
@@ -94,6 +96,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   query->addSelectedSymbols();
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
+  query->addSelectedPolygons();
   query->addSelectedTexts();
   query->addNetPointsOfNetLines(true);
   query->addNetLinesOfSymbolPins();
@@ -114,6 +117,11 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   foreach (SI_Symbol* symbol, query->getSymbols()) {
     Q_ASSERT(symbol->isAddedToSchematic());
     removeSymbol(*symbol);  // can throw
+  }
+
+  // remove polygons
+  foreach (SI_Polygon* polygon, query->getPolygons()) {
+    execNewChildCmd(new CmdSchematicPolygonRemove(*polygon));  // can throw
   }
 
   // remove texts

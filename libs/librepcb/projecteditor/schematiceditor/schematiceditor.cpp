@@ -170,6 +170,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
                                mUi->actionToolAddNetLabel);
   mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
                                mUi->actionToolAddComponent);
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_POLYGON,
+                               mUi->actionToolDrawPolygon);
   mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_TEXT,
                                mUi->actionToolAddText);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
@@ -655,6 +657,9 @@ void SchematicEditor::toolActionGroupChangeTriggered(
       break;
     case SchematicEditorFsm::State::ADD_COMPONENT:
       mFsm->processAddComponent();
+      break;
+    case SchematicEditorFsm::State::DRAW_POLYGON:
+      mFsm->processDrawPolygon();
       break;
     case SchematicEditorFsm::State::ADD_TEXT:
       mFsm->processAddText();

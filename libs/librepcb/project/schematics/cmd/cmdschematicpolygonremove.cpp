@@ -17,76 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+#include "cmdschematicpolygonremove.h"
+
+#include "../items/si_polygon.h"
+#include "../schematic.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class CmdPolygonEdit;
-class CmdTextEdit;
-
 namespace project {
 
-class Schematic;
-class CmdSymbolInstanceEdit;
-class CmdSchematicNetPointEdit;
-class CmdSchematicNetLabelEdit;
-
-namespace editor {
-
 /*******************************************************************************
- *  Class CmdMoveSelectedSchematicItems
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The CmdMoveSelectedSchematicItems class
- */
-class CmdMoveSelectedSchematicItems final : public UndoCommandGroup {
-public:
-  // Constructors / Destructor
-  CmdMoveSelectedSchematicItems(Schematic& schematic,
-                                const Point& startPos) noexcept;
-  ~CmdMoveSelectedSchematicItems() noexcept;
+CmdSchematicPolygonRemove::CmdSchematicPolygonRemove(
+    SI_Polygon& polygon) noexcept
+  : UndoCommand(tr("Remove polygon from schematic")), mPolygon(polygon) {
+}
 
-  // General Methods
-  void setCurrentPosition(const Point& pos) noexcept;
+CmdSchematicPolygonRemove::~CmdSchematicPolygonRemove() noexcept {
+}
 
-private:
-  // Private Methods
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
 
-  /// @copydoc UndoCommand::performExecute()
-  bool performExecute() override;
+bool CmdSchematicPolygonRemove::performExecute() {
+  performRedo();  // can throw
 
-  // Private Member Variables
-  Schematic& mSchematic;
-  Point mStartPos;
-  Point mDeltaPos;
+  return true;
+}
 
-  // Move commands
-  QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
-  QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
-  QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
-  QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdTextEdit*> mTextEditCmds;
-};
+void CmdSchematicPolygonRemove::performUndo() {
+  mPolygon.getSchematic().addPolygon(mPolygon);  // can throw
+}
+
+void CmdSchematicPolygonRemove::performRedo() {
+  mPolygon.getSchematic().removePolygon(mPolygon);  // can throw
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace project
 }  // namespace librepcb
-
-#endif  // LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H

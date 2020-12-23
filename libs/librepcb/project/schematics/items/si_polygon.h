@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_PROJECT_SI_POLYGON_H
+#define LIBREPCB_PROJECT_SI_POLYGON_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
+#include "si_base.h"
+
+#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -33,60 +34,70 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdPolygonEdit;
-class CmdTextEdit;
+class Polygon;
+class PolygonGraphicsItem;
 
 namespace project {
 
 class Schematic;
-class CmdSymbolInstanceEdit;
-class CmdSchematicNetPointEdit;
-class CmdSchematicNetLabelEdit;
-
-namespace editor {
 
 /*******************************************************************************
- *  Class CmdMoveSelectedSchematicItems
+ *  Class SI_Polygon
  ******************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedSchematicItems class
+ * @brief The SI_Polygon class represents a polygon in a schematic
  */
-class CmdMoveSelectedSchematicItems final : public UndoCommandGroup {
+class SI_Polygon final : public SI_Base, public SerializableObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  CmdMoveSelectedSchematicItems(Schematic& schematic,
-                                const Point& startPos) noexcept;
-  ~CmdMoveSelectedSchematicItems() noexcept;
+  SI_Polygon() = delete;
+  SI_Polygon(const SI_Polygon& other) = delete;
+  SI_Polygon(Schematic& schematic, const SExpression& node,
+             const Version& fileFormat);
+  SI_Polygon(Schematic& schematic, const Polygon& polygon);
+  ~SI_Polygon() noexcept;
+
+  // Getters
+  const Uuid& getUuid() const noexcept;
+  Polygon& getPolygon() noexcept { return *mPolygon; }
+  const Polygon& getPolygon() const noexcept { return *mPolygon; }
+  PolygonGraphicsItem& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   // General Methods
-  void setCurrentPosition(const Point& pos) noexcept;
+  void addToSchematic() override;
+  void removeFromSchematic() override;
 
-private:
-  // Private Methods
+  /// @copydoc librepcb::SerializableObject::serialize()
+  void serialize(SExpression& root) const override;
 
-  /// @copydoc UndoCommand::performExecute()
-  bool performExecute() override;
+  // Inherited from SI_Base
+  Type_t getType() const noexcept override { return SI_Base::Type_t::Polygon; }
+  const Point& getPosition() const noexcept override {
+    static Point p(0, 0);
+    return p;
+  }
+  QPainterPath getGrabAreaScenePx() const noexcept override;
+  void setSelected(bool selected) noexcept override;
 
-  // Private Member Variables
-  Schematic& mSchematic;
-  Point mStartPos;
-  Point mDeltaPos;
+  // Operator Overloadings
+  SI_Polygon& operator=(const SI_Polygon& rhs) = delete;
 
-  // Move commands
-  QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
-  QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
-  QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
-  QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdTextEdit*> mTextEditCmds;
+private:  // Methods
+  void init();
+
+private:  // Attributes
+  QScopedPointer<Polygon> mPolygon;
+  QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
+#endif

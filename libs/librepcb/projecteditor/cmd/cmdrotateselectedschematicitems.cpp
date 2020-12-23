@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdrotateselectedschematicitems.h"
 
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/project/project.h>
@@ -32,6 +33,7 @@
 #include <librepcb/project/schematics/items/si_netlabel.h>
 #include <librepcb/project/schematics/items/si_netline.h>
 #include <librepcb/project/schematics/items/si_netpoint.h>
+#include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_symbolpin.h>
 #include <librepcb/project/schematics/items/si_text.h>
@@ -73,6 +75,7 @@ bool CmdRotateSelectedSchematicItems::performExecute() {
   query->addSelectedNetPoints();
   query->addNetPointsOfNetLines();
   query->addSelectedNetLabels();
+  query->addSelectedPolygons();
   query->addSelectedTexts();
 
   // find the center of all elements
@@ -89,6 +92,13 @@ bool CmdRotateSelectedSchematicItems::performExecute() {
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
     center += netlabel->getPosition();
     ++count;
+  }
+  foreach (SI_Polygon* polygon, query->getPolygons()) {
+    for (const Vertex& vertex : Toolbox::toSet(
+             polygon->getPolygon().getPath().getVertices().toList())) {
+      center += vertex.getPos();
+      ++count;
+    }
   }
   foreach (SI_Text* text, query->getTexts()) {
     center += text->getPosition();
@@ -115,6 +125,11 @@ bool CmdRotateSelectedSchematicItems::performExecute() {
   }
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
+    cmd->rotate(mAngle, center, false);
+    appendChild(cmd);
+  }
+  foreach (SI_Polygon* polygon, query->getPolygons()) {
+    CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
     cmd->rotate(mAngle, center, false);
     appendChild(cmd);
   }

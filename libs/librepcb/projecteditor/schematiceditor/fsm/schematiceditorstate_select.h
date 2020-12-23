@@ -34,12 +34,14 @@
 namespace librepcb {
 
 class Angle;
+class CmdPolygonEdit;
 
 namespace project {
 
 class SI_Base;
 class SI_Symbol;
 class SI_NetLabel;
+class SI_Polygon;
 class SI_Text;
 class Schematic;
 
@@ -101,11 +103,16 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
+  void removeSelectedPolygonVertices() noexcept;
+  void startAddingPolygonVertex(SI_Polygon& polygon, int vertex,
+                                const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
+  bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   void openPropertiesDialog(SI_Base* item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
+  void openPolygonPropertiesDialog(SI_Polygon& polygon) noexcept;
   void openTextPropertiesDialog(SI_Text& text) noexcept;
 
   // Right Click Menu
@@ -118,6 +125,11 @@ private:  // Methods
                            const QString& text = tr("Mirror")) noexcept;
   QAction* addActionRotate(QMenu& menu,
                            const QString& text = tr("Rotate")) noexcept;
+  void addActionRemoveVertex(
+      QMenu& menu, SI_Polygon& polygon, const QVector<int>& verticesToRemove,
+      const QString& text = tr("Remove Vertex")) noexcept;
+  bool addActionAddVertex(QMenu& menu, SI_Polygon& polygon, const Point& pos,
+                          const QString& text = tr("Add Vertex")) noexcept;
   QAction* addActionOpenProperties(
       QMenu& menu, SI_Base* item,
       const QString& text = tr("Properties")) noexcept;
@@ -128,6 +140,7 @@ private:  // Data
     IDLE,  ///< left mouse button is not pressed (default state)
     SELECTING,  ///< left mouse button pressed to draw selection rect
     MOVING,  ///< left mouse button pressed to move items
+    MOVING_POLYGON_VERTICES,  ///< left mouts butten pressed to move vertices
     PASTING,  ///< move pasted items
   };
 
@@ -135,6 +148,13 @@ private:  // Data
   Point mStartPos;
   QScopedPointer<CmdMoveSelectedSchematicItems> mSelectedItemsMoveCommand;
   int mCurrentSelectionIndex;
+
+  /// The current polygon selected for editing (nullptr if none)
+  SI_Polygon* mSelectedPolygon;
+  /// The polygon vertex indices selected for editing (empty if none)
+  QVector<int> mSelectedPolygonVertices;
+  /// The polygon edit command (nullptr if not editing)
+  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
 };
 
 /*******************************************************************************

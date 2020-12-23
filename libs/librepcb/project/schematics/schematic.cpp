@@ -27,6 +27,7 @@
 #include "items/si_netline.h"
 #include "items/si_netpoint.h"
 #include "items/si_netsegment.h"
+#include "items/si_polygon.h"
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
 #include "items/si_text.h"
@@ -111,6 +112,21 @@ Schematic::Schematic(Project& project,
         mNetSegments.append(netsegment);
       }
 
+      // Load all polygons
+      // Note: Support for polygons was added in file format v0.2. However,
+      // there is no need to check the file format here - v0.1 simply doesn't
+      // contain polygons.
+      foreach (const SExpression& node, root.getChildren("polygon")) {
+        SI_Polygon* polygon = new SI_Polygon(*this, node, fileFormat);
+        if (getPolygonByUuid(polygon->getUuid())) {
+          throw RuntimeError(
+              __FILE__, __LINE__,
+              QString("There is already a polygon with the UUID \"%1\"!")
+                  .arg(polygon->getUuid().toStr()));
+        }
+        mPolygons.append(polygon);
+      }
+
       // Load all texts
       // Note: Support for texts was added in file format v0.2. However, there
       // is no need to check the file format here - v0.1 simply doesn't contain
@@ -134,6 +150,8 @@ Schematic::Schematic(Project& project,
     // free the allocated memory in the reverse order of their allocation...
     qDeleteAll(mTexts);
     mTexts.clear();
+    qDeleteAll(mPolygons);
+    mPolygons.clear();
     qDeleteAll(mNetSegments);
     mNetSegments.clear();
     qDeleteAll(mSymbols);
@@ -150,6 +168,8 @@ Schematic::~Schematic() noexcept {
   // delete all items
   qDeleteAll(mTexts);
   mTexts.clear();
+  qDeleteAll(mPolygons);
+  mPolygons.clear();
   qDeleteAll(mNetSegments);
   mNetSegments.clear();
   qDeleteAll(mSymbols);
@@ -168,7 +188,8 @@ FilePath Schematic::getFilePath() const noexcept {
 }
 
 bool Schematic::isEmpty() const noexcept {
-  return (mSymbols.isEmpty() && mNetSegments.isEmpty() && mTexts.isEmpty());
+  return (mSymbols.isEmpty() && mNetSegments.isEmpty() && mPolygons.isEmpty() &&
+          mTexts.isEmpty());
 }
 
 QList<SI_Base*> Schematic::getItemsAtScenePos(const Point& pos) const noexcept {
@@ -204,6 +225,12 @@ QList<SI_Base*> Schematic::getItemsAtScenePos(const Point& pos) const noexcept {
       if (pin->getGrabAreaScenePx().contains(scenePosPx)) list.append(pin);
     }
     if (symbol->getGrabAreaScenePx().contains(scenePosPx)) list.append(symbol);
+  }
+  // polygons
+  foreach (SI_Polygon* polygon, mPolygons) {
+    if (polygon->getGrabAreaScenePx().contains(scenePosPx)) {
+      list.append(polygon);
+    }
   }
   // texts
   foreach (SI_Text* text, getTextsAtScenePos(pos)) { list.append(text); }
@@ -347,6 +374,43 @@ void Schematic::removeNetSegment(SI_NetSegment& netsegment) {
 }
 
 /*******************************************************************************
+ *  Polygon Methods
+ ******************************************************************************/
+
+SI_Polygon* Schematic::getPolygonByUuid(const Uuid& uuid) const noexcept {
+  foreach (SI_Polygon* polygon, mPolygons) {
+    if (polygon->getUuid() == uuid) return polygon;
+  }
+  return nullptr;
+}
+
+void Schematic::addPolygon(SI_Polygon& polygon) {
+  if ((!mIsAddedToProject) || (mPolygons.contains(&polygon)) ||
+      (&polygon.getSchematic() != this)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  // check if there is no text with the same uuid in the list
+  if (getPolygonByUuid(polygon.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already a polygon with the UUID \"%1\"!")
+            .arg(polygon.getUuid().toStr()));
+  }
+  // add to schematic
+  polygon.addToSchematic();  // can throw
+  mPolygons.append(&polygon);
+}
+
+void Schematic::removePolygon(SI_Polygon& polygon) {
+  if ((!mIsAddedToProject) || (!mPolygons.contains(&polygon))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  // remove from schematic
+  polygon.removeFromSchematic();  // can throw
+  mPolygons.removeOne(&polygon);
+}
+
+/*******************************************************************************
  *  Text Methods
  ******************************************************************************/
 
@@ -391,7 +455,8 @@ void Schematic::addToProject() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() + mTexts.count());
+  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() +
+                     mPolygons.count() + mTexts.count());
   foreach (SI_Symbol* symbol, mSymbols) {
     symbol->addToSchematic();  // can throw
     sgl.add([symbol]() { symbol->removeFromSchematic(); });
@@ -399,6 +464,10 @@ void Schematic::addToProject() {
   foreach (SI_NetSegment* segment, mNetSegments) {
     segment->addToSchematic();  // can throw
     sgl.add([segment]() { segment->removeFromSchematic(); });
+  }
+  foreach (SI_Polygon* polygon, mPolygons) {
+    polygon->addToSchematic();  // can throw
+    sgl.add([polygon]() { polygon->removeFromSchematic(); });
   }
   foreach (SI_Text* text, mTexts) {
     text->addToSchematic();  // can throw
@@ -415,10 +484,15 @@ void Schematic::removeFromProject() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() + mTexts.count());
+  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() +
+                     mPolygons.count() + mTexts.count());
   foreach (SI_Text* text, mTexts) {
     text->removeFromSchematic();  // can throw
     sgl.add([text]() { text->addToSchematic(); });
+  }
+  foreach (SI_Polygon* polygon, mPolygons) {
+    polygon->removeFromSchematic();  // can throw
+    sgl.add([polygon]() { polygon->addToSchematic(); });
   }
   foreach (SI_NetSegment* segment, mNetSegments) {
     segment->removeFromSchematic();  // can throw
@@ -451,6 +525,7 @@ void Schematic::showInView(GraphicsView& view) noexcept {
 void Schematic::selectAll() noexcept {
   foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(true); }
   foreach (SI_NetSegment* segment, mNetSegments) { segment->selectAll(); }
+  foreach (SI_Polygon* polygon, mPolygons) { polygon->setSelected(true); }
   foreach (SI_Text* text, mTexts) { text->setSelected(true); }
 }
 
@@ -470,6 +545,10 @@ void Schematic::setSelectionRect(const Point& p1, const Point& p2,
     foreach (SI_NetSegment* segment, mNetSegments) {
       segment->setSelectionRect(rectPx);
     }
+    foreach (SI_Polygon* polygon, mPolygons) {
+      bool select = polygon->getGrabAreaScenePx().intersects(rectPx);
+      polygon->setSelected(select);
+    }
     foreach (SI_Text* text, mTexts) {
       bool selectText = text->getGrabAreaScenePx().intersects(rectPx);
       text->setSelected(selectText);
@@ -480,6 +559,7 @@ void Schematic::setSelectionRect(const Point& p1, const Point& p2,
 void Schematic::clearSelection() const noexcept {
   foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(false); }
   foreach (SI_NetSegment* segment, mNetSegments) { segment->clearSelection(); }
+  foreach (SI_Polygon* polygon, mPolygons) { polygon->setSelected(false); }
   foreach (SI_Text* text, mTexts) { text->setSelected(false); }
 }
 
@@ -498,7 +578,7 @@ void Schematic::renderToQPainter(QPainter& painter) const noexcept {
 std::unique_ptr<SchematicSelectionQuery> Schematic::createSelectionQuery() const
     noexcept {
   return std::unique_ptr<SchematicSelectionQuery>(new SchematicSelectionQuery(
-      mSymbols, mNetSegments, mTexts, const_cast<Schematic*>(this)));
+      mSymbols, mNetSegments, mPolygons, mTexts, const_cast<Schematic*>(this)));
 }
 
 /*******************************************************************************
@@ -536,6 +616,8 @@ void Schematic::serialize(SExpression& root) const {
   serializePointerContainerUuidSorted(root, mSymbols, "symbol");
   root.appendLineBreak();
   serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
+  root.appendLineBreak();
+  serializePointerContainerUuidSorted(root, mPolygons, "polygon");
   root.appendLineBreak();
   serializePointerContainerUuidSorted(root, mTexts, "text");
 }
