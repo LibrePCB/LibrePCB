@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   Debug::instance();
 
   // Silence debug output, it's a command line tool
-  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
+  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Fatal);
 
   // Create Application instance
   Application app(argc, argv);
