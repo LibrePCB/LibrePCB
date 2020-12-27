@@ -95,8 +95,6 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   details << "LibrePCB Version: " + qApp->applicationVersion();
   details << "Git Revision:     " + qApp->getGitRevision();
   details << "Build Date:       " + qApp->getBuildDate().toString(Qt::ISODate);
-  details << "Linking type:     " + qApp->getLinkingType();
-  details << "Unbundled libs:   " + qApp->getUnbundledLibs();
   details << "Qt Version:       " + qt;
   details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
   details << "Operating System: " + QSysInfo::prettyProductName();
