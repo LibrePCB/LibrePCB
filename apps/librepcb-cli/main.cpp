@@ -41,8 +41,12 @@ int main(int argc, char* argv[]) {
   // done as early as possible.
   Debug::instance();
 
-  // Silence debug output, it's a command line tool
-  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
+  // Silence logging output, it's a command line tool where logging messages
+  // could lead to issues when parsing the CLI output. Real errors will be
+  // printed to stderr explicitly and logging output can optionally be enabled
+  // with the "--verbose" flag. But still print fatal errors since this is the
+  // only way to print any error to stderr before the application gets aborted.
+  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Fatal);
 
   // Create Application instance
   Application app(argc, argv);
