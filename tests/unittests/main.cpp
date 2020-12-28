@@ -37,6 +37,9 @@ using namespace librepcb;
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  // Initialize a common locale for all tests
+  QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+
   // many classes rely on a QApplication instance, so we create it here
   Application app(argc, argv);
   Application::setOrganizationName("LibrePCB");
