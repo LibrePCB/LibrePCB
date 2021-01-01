@@ -111,6 +111,10 @@ private:  // Methods
   void footprintAttributesChanged();
   void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
   void updateGraphicsItemTransform() noexcept;
+  QString getLibraryDeviceName() const noexcept;
+  QString getComponentInstanceName() const noexcept;
+  QString getPadNameOrUuid() const noexcept;
+  QString getNetSignalName() const noexcept;
 
 private:  // Data
   BI_Footprint& mFootprint;
