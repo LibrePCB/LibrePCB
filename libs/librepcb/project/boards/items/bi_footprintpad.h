@@ -114,6 +114,10 @@ private slots:
 
 private:
   void updateGraphicsItemTransform() noexcept;
+  QString getLibraryDeviceName() const noexcept;
+  QString getComponentInstanceName() const noexcept;
+  QString getPadNameOrUuid() const noexcept;
+  QString getNetSignalName() const noexcept;
 
   // General
   BI_Footprint& mFootprint;

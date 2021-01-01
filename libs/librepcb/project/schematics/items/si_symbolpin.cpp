@@ -181,13 +181,29 @@ void SI_SymbolPin::removeFromSchematic() {
 
 void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
   if ((!isAddedToSchematic()) || (mRegisteredNetLines.contains(&netline)) ||
-      (netline.getSchematic() != mSchematic) ||
-      (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal())) {
+      (netline.getSchematic() != mSchematic)) {
     throw LogicError(__FILE__, __LINE__);
+  }
+  if (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Line of net \"%1\" is not allowed to be connected to "
+                "pin \"%2\" of component \"%3\" (%4) since it is connected "
+                "to the net \"%5\".")
+            .arg(*netline.getNetSignalOfNetSegment().getName(),
+                 getComponentSignalNameOrPinUuid(),
+                 *mSymbol.getComponentInstance().getName(),
+                 getLibraryComponentName(), getNetSignalName()));
   }
   foreach (const SI_NetLine* l, mRegisteredNetLines) {
     if (&l->getNetSegment() != &netline.getNetSegment()) {
-      throw LogicError(__FILE__, __LINE__);
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("There are lines from multiple net segments connected to "
+                  "the pin \"%1\" of component \"%2\" (%3).")
+              .arg(getComponentSignalNameOrPinUuid(),
+                   *mSymbol.getComponentInstance().getName(),
+                   getLibraryComponentName()));
     }
   }
   mRegisteredNetLines.insert(&netline);
@@ -253,6 +269,27 @@ void SI_SymbolPin::updateGraphicsItemTransform() noexcept {
   if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mRotation.toDeg());
   mGraphicsItem->setTransform(t);
+}
+
+QString SI_SymbolPin::getLibraryComponentName() const noexcept {
+  return *mSymbol.getComponentInstance()
+              .getLibComponent()
+              .getNames()
+              .getDefaultValue();
+}
+
+QString SI_SymbolPin::getComponentSignalNameOrPinUuid() const noexcept {
+  return mComponentSignalInstance
+      ? *mComponentSignalInstance->getCompSignal().getName()
+      : mSymbolPin->getUuid().toStr();
+}
+
+QString SI_SymbolPin::getNetSignalName() const noexcept {
+  if (const NetSignal* signal = getCompSigInstNetSignal()) {
+    return *signal->getName();
+  } else {
+    return QString();
+  }
 }
 
 /*******************************************************************************

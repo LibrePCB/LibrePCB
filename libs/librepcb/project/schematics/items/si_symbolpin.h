@@ -113,6 +113,9 @@ private slots:
 
 private:
   void updateGraphicsItemTransform() noexcept;
+  QString getLibraryComponentName() const noexcept;
+  QString getComponentSignalNameOrPinUuid() const noexcept;
+  QString getNetSignalName() const noexcept;
 
   // General
   SI_Symbol& mSymbol;

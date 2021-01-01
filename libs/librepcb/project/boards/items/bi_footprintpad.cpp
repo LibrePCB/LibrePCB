@@ -163,14 +163,36 @@ void BI_FootprintPad::removeFromBoard() {
 
 void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
   if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline)) ||
-      (netline.getBoard() != mBoard) ||
-      (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()) ||
-      (!isOnLayer(netline.getLayer().getName()))) {
+      (netline.getBoard() != mBoard)) {
     throw LogicError(__FILE__, __LINE__);
+  }
+  if (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Trace of net \"%1\" is not allowed to be connected to "
+                "pad \"%2\" of device \"%3\" (%4) since it is connected to the "
+                "net \"%5\".")
+            .arg(*netline.getNetSignalOfNetSegment().getName(),
+                 getPadNameOrUuid(), getComponentInstanceName(),
+                 getLibraryDeviceName(), getNetSignalName()));
+  }
+  if (!isOnLayer(netline.getLayer().getName())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Trace on layer \"%1\" cannot be connected to the pad \"%2\" "
+                "of device \"%3\" (%4) since it is on layer \"%5\".")
+            .arg(netline.getLayer().getName(), getPadNameOrUuid(),
+                 getComponentInstanceName(), getLibraryDeviceName(),
+                 getLayerName()));
   }
   foreach (const BI_NetLine* l, mRegisteredNetLines) {
     if (&l->getNetSegment() != &netline.getNetSegment()) {
-      throw LogicError(__FILE__, __LINE__);
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("There are traces from multiple net segments connected to "
+                  "the pad \"%1\" of device \"%2\" (%3).")
+              .arg(getPadNameOrUuid(), getComponentInstanceName(),
+                   getLibraryDeviceName()));
     }
   }
   mRegisteredNetLines.insert(&netline);
@@ -270,6 +292,30 @@ void BI_FootprintPad::updateGraphicsItemTransform() noexcept {
   if (mFootprint.getIsMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mRotation.toDeg());
   mGraphicsItem->setTransform(t);
+}
+
+QString BI_FootprintPad::getLibraryDeviceName() const noexcept {
+  return *mFootprint.getDeviceInstance()
+              .getLibDevice()
+              .getNames()
+              .getDefaultValue();
+}
+
+QString BI_FootprintPad::getComponentInstanceName() const noexcept {
+  return *mFootprint.getDeviceInstance().getComponentInstance().getName();
+}
+
+QString BI_FootprintPad::getPadNameOrUuid() const noexcept {
+  return mPackagePad ? *mPackagePad->getName()
+                     : mFootprintPad->getUuid().toStr();
+}
+
+QString BI_FootprintPad::getNetSignalName() const noexcept {
+  if (const NetSignal* signal = getCompSigInstNetSignal()) {
+    return *signal->getName();
+  } else {
+    return QString();
+  }
 }
 
 /*******************************************************************************
