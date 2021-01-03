@@ -33,7 +33,6 @@
 #include "boardpickplacegeneratordialog.h"
 #include "fabricationoutputdialog.h"
 #include "fsm/boardeditorfsm.h"
-#include "ui_boardeditor.h"
 #include "unplacedcomponentsdock.h"
 
 #include <librepcb/common/application.h>

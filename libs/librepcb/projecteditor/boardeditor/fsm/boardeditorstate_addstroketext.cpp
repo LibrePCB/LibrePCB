@@ -23,7 +23,6 @@
 #include "boardeditorstate_addstroketext.h"
 
 #include "../boardeditor.h"
-#include "../ui_boardeditor.h"
 
 #include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/geometry/stroketext.h>

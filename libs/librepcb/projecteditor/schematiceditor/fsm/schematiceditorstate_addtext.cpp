@@ -23,7 +23,6 @@
 #include "schematiceditorstate_addtext.h"
 
 #include "../schematiceditor.h"
-#include "../ui_schematiceditor.h"
 
 #include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/graphics/graphicslayer.h>
