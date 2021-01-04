@@ -103,11 +103,15 @@ TEST_F(SystemInfoTest, testIsProcessRunning) {
      QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
   {
     QProcess process;
-    process.start(getTestProcessExePath().toStr());
+    QString sProgramName = getTestProcessExePath().toStr();
+    QStringList slArguments; // no args needed
+    process.start(sProgramName, slArguments);
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
+
     qint64 pid = process.processId();
     EXPECT_TRUE(SystemInfo::isProcessRunning(pid));
+
     process.kill();
     success = process.waitForFinished();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
@@ -132,11 +136,15 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
      QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
   {
     QProcess process;
-    process.start(getTestProcessExePath().toStr());
+    QString sProgramName = getTestProcessExePath().toStr();
+    QStringList slArguments; // no args needed
+    process.start(sProgramName, slArguments);
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
+
     qint64 pid = process.processId();
     ASSERT_NE(pid, qApp->applicationPid());
+
     // the next line is an ugly workaround for infrequent test failures on Mac
     // OS X
     QThread::msleep(200);
