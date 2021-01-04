@@ -143,13 +143,21 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
     QThread::yieldCurrentThread();
     QString processName = SystemInfo::getProcessNameByPid(pid);
     EXPECT_EQ(getTestProcessExeName(), processName) << qPrintable(processName);
+
     process.kill();
     success = process.waitForFinished();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
+
     // the next line is an ugly workaround for infrequent test failures on Mac
     // OS X
     QThread::msleep(200);
     QThread::yieldCurrentThread();
+    // this call failed on a Win7-64 dev-box because the killed process was
+    // still lurking around (for >10 sec) even though isProcessRunning(pid)
+    // returned false.
+    // -> Changed getProcessNameByPid() to return empty string immediately.
+    // This can also be the same cause for the ugly OS X problem described
+    // above with msleep(200) as a solution.
     processName = SystemInfo::getProcessNameByPid(pid);
     EXPECT_EQ(QString(), processName) << qPrintable(processName);
   }

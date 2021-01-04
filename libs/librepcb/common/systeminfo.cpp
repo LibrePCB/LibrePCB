@@ -189,6 +189,8 @@ bool SystemInfo::isProcessRunning(qint64 pid) {
     if ((success) && (exitCode == STILL_ACTIVE)) {
       return true;
     } else if (success) {
+      // the process handle is still available but the exitCode == 62097 (0xF291)
+      // is set after QProcess::kill() is executed. Consider this as not running
       return false;
     } else {
       qDebug() << "GetLastError():" << GetLastError();
@@ -197,6 +199,9 @@ bool SystemInfo::isProcessRunning(qint64 pid) {
           tr("Could not determine if another process is running."));
     }
   } else if (GetLastError() == ERROR_INVALID_PARAMETER) {
+    // ::OpenProcess returned a nullptr and the last error reports an invalid
+    // parameter (-> the pid?) this is the case when the process never existed or
+    // it finally disappeared after kill()
     return false;
   } else {
     qDebug() << "GetLastError():" << GetLastError();
@@ -279,6 +284,13 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   if (processName.endsWith(" (deleted)"))
     processName.chop(strlen(" (deleted)"));
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
+  if (!isProcessRunning(pid)) {
+    // early exit, it makes no sense to check a process that is not running
+    // even when OpenProcess() returns a handle != nullptr, the call of
+    // QueryFullProcessImageNameW() will fail when the process is going to disappear
+    return QString();
+  }
+
   // Originally from:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_win.cpp
   // But then saw this article:
