@@ -1,6 +1,6 @@
 # Applications
 
-This directory contains some qmake projects to build applications, like
+This directory contains some cmake projects to build applications, like
 
 - LibrePCB itself
 - the LibrePCB command line interface
