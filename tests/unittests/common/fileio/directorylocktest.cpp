@@ -263,9 +263,12 @@ TEST_F(DirectoryLockTest, testUnlockIfLockedOnLockedDir) {
      QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
 TEST_F(DirectoryLockTest, testStaleLock) {
   QProcess process;
-  process.start(getTestProcessExePath().toStr());
+  QString fullProgramName = getTestProcessExePath().toStr();
+  QStringList callArguments; // no args needed
+  process.start(fullProgramName, callArguments);
   bool success = process.waitForStarted();
   ASSERT_TRUE(success) << qPrintable(process.errorString());
+
   qint64 pid = process.processId();
   process.kill();
   success = process.waitForFinished();

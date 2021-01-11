@@ -103,9 +103,9 @@ TEST_F(SystemInfoTest, testIsProcessRunning) {
      QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
   {
     QProcess process;
-    QString sProgramName = getTestProcessExePath().toStr();
-    QStringList slArguments; // no args needed
-    process.start(sProgramName, slArguments);
+    QString fullProgramName = getTestProcessExePath().toStr();
+    QStringList callArguments; // no args needed
+    process.start(fullProgramName, callArguments);
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
 
@@ -136,9 +136,9 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
      QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
   {
     QProcess process;
-    QString sProgramName = getTestProcessExePath().toStr();
-    QStringList slArguments; // no args needed
-    process.start(sProgramName, slArguments);
+    QString fullProgramName = getTestProcessExePath().toStr();
+    QStringList callArguments; // no args needed
+    process.start(fullProgramName, callArguments);
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
 
@@ -160,13 +160,28 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
     // OS X
     QThread::msleep(200);
     QThread::yieldCurrentThread();
-    // this call failed on a Win7-64 dev-box because the killed process was
-    // still lurking around (for >10 sec) even though isProcessRunning(pid)
-    // returned false.
-    // -> Changed getProcessNameByPid() to return empty string immediately.
-    // This can also be the same cause for the ugly OS X problem described
-    // above with msleep(200) as a solution.
-    processName = SystemInfo::getProcessNameByPid(pid);
+
+    // the process has been killed, getProcessNameByPid() can:
+    // - return an empty string when the process does not exist anymore
+    // - throw a RuntimeError when it does exist but is not running
+    // -> test for both possible reactions
+    try {
+        processName = SystemInfo::getProcessNameByPid(pid);
+    }
+    catch(RuntimeError& exception) {
+        // check for a matching message inserted in the exception at throw
+        // the string is partially copied from systeminfo.cpp and may change
+        QString expectedMessage = "QueryFullProcessImageNameW() failed";
+
+        if (exception.getMsg().contains(expectedMessage)) {
+            processName = QString(); // to make the test pass
+        }
+        else {
+            // keep the exception message as the output of the test
+            processName = exception.getMsg();
+        }
+    }
+
     EXPECT_EQ(QString(), processName) << qPrintable(processName);
   }
 #endif

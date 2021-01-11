@@ -95,7 +95,10 @@ public:
    * @return  The name of the given process ID, or an empty string if no process
    *          with the given PID exists.
    *
-   * @throw  Exception    In case of an error.
+   * @throw  RuntimeError  when process with pid could not be opened
+   * @throw  RuntimeError  when process could be opened but the process name buffer could not be retrieved
+   * @throw  RuntimeError  when process name could not be extracted from the name buffer
+   *
    */
   static QString getProcessNameByPid(qint64 pid);
 
