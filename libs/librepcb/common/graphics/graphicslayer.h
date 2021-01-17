@@ -197,8 +197,6 @@ public:
   static int getInnerLayerNumber(const QString& name) noexcept;
   static QString getMirroredLayerName(const QString& name) noexcept;
   static QString getGrabAreaLayerName(const QString& outlineLayerName) noexcept;
-  static const QStringList& getSchematicGeometryElementLayerNames() noexcept;
-  static const QStringList& getBoardGeometryElementLayerNames() noexcept;
   static void getDefaultValues(const QString& name, QString& nameTr,
                                QColor& color, QColor& colorHl,
                                bool& visible) noexcept;
@@ -234,14 +232,6 @@ public:
   GraphicsLayer* getGrabAreaLayer(const QString outlineLayerName) const
       noexcept {
     return getLayer(GraphicsLayer::getGrabAreaLayerName(outlineLayerName));
-  }
-
-  QList<GraphicsLayer*> getSchematicGeometryElementLayers() const noexcept {
-    return getLayers(GraphicsLayer::getSchematicGeometryElementLayerNames());
-  }
-
-  QList<GraphicsLayer*> getBoardGeometryElementLayers() const noexcept {
-    return getLayers(GraphicsLayer::getBoardGeometryElementLayerNames());
   }
 
   QList<GraphicsLayer*> getLayers(const QStringList& layerNames) const

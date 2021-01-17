@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -57,6 +58,33 @@ const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
 
 const LengthUnit& SymbolEditorState::getDefaultLengthUnit() const noexcept {
   return mContext.workspace.getSettings().defaultLengthUnit.get();
+}
+
+QList<GraphicsLayer*> SymbolEditorState::getAllowedTextLayers() const noexcept {
+  return mContext.layerProvider.getLayers({
+      GraphicsLayer::sSymbolOutlines,
+      // GraphicsLayer::sSymbolHiddenGrabAreas, -> makes no sense for texts
+      GraphicsLayer::sSymbolNames,
+      GraphicsLayer::sSymbolValues,
+      GraphicsLayer::sSchematicSheetFrames,
+      GraphicsLayer::sSchematicDocumentation,
+      GraphicsLayer::sSchematicComments,
+      GraphicsLayer::sSchematicGuide,
+  });
+}
+
+QList<GraphicsLayer*> SymbolEditorState::getAllowedCircleAndPolygonLayers()
+    const noexcept {
+  return mContext.layerProvider.getLayers({
+      GraphicsLayer::sSymbolOutlines,
+      GraphicsLayer::sSymbolHiddenGrabAreas,
+      GraphicsLayer::sSymbolNames,
+      GraphicsLayer::sSymbolValues,
+      GraphicsLayer::sSchematicSheetFrames,
+      GraphicsLayer::sSchematicDocumentation,
+      GraphicsLayer::sSchematicComments,
+      GraphicsLayer::sSchematicGuide,
+  });
 }
 
 /*******************************************************************************

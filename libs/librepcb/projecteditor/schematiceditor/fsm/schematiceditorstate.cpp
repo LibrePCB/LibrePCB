@@ -24,9 +24,12 @@
 
 #include "../schematiceditor.h"
 
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/project/project.h>
+#include <librepcb/project/schematics/schematiclayerprovider.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -65,6 +68,20 @@ PositiveLength SchematicEditorState::getGridInterval() const noexcept {
 
 const LengthUnit& SchematicEditorState::getDefaultLengthUnit() const noexcept {
   return mContext.workspace.getSettings().defaultLengthUnit.get();
+}
+
+QList<GraphicsLayer*> SchematicEditorState::getAllowedGeometryLayers() const
+    noexcept {
+  return mContext.project.getLayers().getLayers({
+      GraphicsLayer::sSymbolOutlines,
+      // GraphicsLayer::sSymbolHiddenGrabAreas, -> makes no sense in schematics
+      GraphicsLayer::sSymbolNames,
+      GraphicsLayer::sSymbolValues,
+      GraphicsLayer::sSchematicSheetFrames,
+      GraphicsLayer::sSchematicDocumentation,
+      GraphicsLayer::sSchematicComments,
+      GraphicsLayer::sSchematicGuide,
+  });
 }
 
 bool SchematicEditorState::execCmd(UndoCommand* cmd) {

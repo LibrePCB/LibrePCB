@@ -78,8 +78,7 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
     mContext.commandToolBar.addLabel(tr("Layer:"));
     std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
         new GraphicsLayerComboBox());
-    layerComboBox->setLayers(
-        mContext.layerProvider.getSchematicGeometryElementLayers());
+    layerComboBox->setLayers(getAllowedTextLayers());
     layerComboBox->setCurrentLayer(mLastLayerName);
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &SymbolEditorState_DrawTextBase::layerComboBoxValueChanged);
