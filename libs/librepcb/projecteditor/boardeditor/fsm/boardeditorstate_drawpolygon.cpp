@@ -89,7 +89,7 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
 
   // Add the layers combobox to the toolbar
   mLayerComboBox.reset(new GraphicsLayerComboBox());
-  mLayerComboBox->setLayers(board->getLayerStack().getAllowedPolygonLayers());
+  mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
   mLayerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
   mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
   connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,

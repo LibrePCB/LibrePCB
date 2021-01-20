@@ -463,11 +463,10 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (TextGraphicsItem* text = dynamic_cast<TextGraphicsItem*>(item)) {
     Q_ASSERT(text);
-    TextPropertiesDialog dialog(
-        text->getText(), mContext.undoStack,
-        mContext.layerProvider.getSchematicGeometryElementLayers(),
-        getDefaultLengthUnit(), "symbol_editor/text_properties_dialog",
-        &mContext.editorWidget);
+    TextPropertiesDialog dialog(text->getText(), mContext.undoStack,
+                                getAllowedTextLayers(), getDefaultLengthUnit(),
+                                "symbol_editor/text_properties_dialog",
+                                &mContext.editorWidget);
     dialog.exec();
     return true;
   } else if (PolygonGraphicsItem* polygon =
@@ -475,9 +474,8 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     Q_ASSERT(polygon);
     PolygonPropertiesDialog dialog(
         polygon->getPolygon(), mContext.undoStack,
-        mContext.layerProvider.getSchematicGeometryElementLayers(),
-        getDefaultLengthUnit(), "symbol_editor/polygon_properties_dialog",
-        &mContext.editorWidget);
+        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
+        "symbol_editor/polygon_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
   } else if (CircleGraphicsItem* circle =
@@ -485,9 +483,8 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     Q_ASSERT(circle);
     CirclePropertiesDialog dialog(
         circle->getCircle(), mContext.undoStack,
-        mContext.layerProvider.getSchematicGeometryElementLayers(),
-        getDefaultLengthUnit(), "symbol_editor/circle_properties_dialog",
-        &mContext.editorWidget);
+        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
+        "symbol_editor/circle_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
   }

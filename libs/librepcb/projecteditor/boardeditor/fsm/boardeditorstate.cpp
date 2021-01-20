@@ -24,9 +24,11 @@
 
 #include "../boardeditor.h"
 
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 
@@ -65,6 +67,40 @@ PositiveLength BoardEditorState::getGridInterval() const noexcept {
 
 const LengthUnit& BoardEditorState::getDefaultLengthUnit() const noexcept {
   return mContext.workspace.getSettings().defaultLengthUnit.get();
+}
+
+QList<GraphicsLayer*> BoardEditorState::getAllowedGeometryLayers(
+    const Board& board) const noexcept {
+  return board.getLayerStack().getLayers({
+      GraphicsLayer::sBoardSheetFrames,
+      GraphicsLayer::sBoardOutlines,
+      GraphicsLayer::sBoardMillingPth,
+      GraphicsLayer::sBoardMeasures,
+      GraphicsLayer::sBoardAlignment,
+      GraphicsLayer::sBoardDocumentation,
+      GraphicsLayer::sBoardComments,
+      GraphicsLayer::sBoardGuide,
+      GraphicsLayer::sTopPlacement,
+      // GraphicsLayer::sTopHiddenGrabAreas, -> makes no sense in boards
+      GraphicsLayer::sTopDocumentation,
+      GraphicsLayer::sTopNames,
+      GraphicsLayer::sTopValues,
+      GraphicsLayer::sTopCopper,
+      GraphicsLayer::sTopCourtyard,
+      GraphicsLayer::sTopGlue,
+      GraphicsLayer::sTopSolderPaste,
+      GraphicsLayer::sTopStopMask,
+      GraphicsLayer::sBotPlacement,
+      // GraphicsLayer::sBotHiddenGrabAreas, -> makes no sense in boards
+      GraphicsLayer::sBotDocumentation,
+      GraphicsLayer::sBotNames,
+      GraphicsLayer::sBotValues,
+      GraphicsLayer::sBotCopper,
+      GraphicsLayer::sBotCourtyard,
+      GraphicsLayer::sBotGlue,
+      GraphicsLayer::sBotSolderPaste,
+      GraphicsLayer::sBotStopMask,
+  });
 }
 
 bool BoardEditorState::execCmd(UndoCommand* cmd) {

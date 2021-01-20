@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -57,6 +58,60 @@ const PositiveLength& PackageEditorState::getGridInterval() const noexcept {
 
 const LengthUnit& PackageEditorState::getDefaultLengthUnit() const noexcept {
   return mContext.workspace.getSettings().defaultLengthUnit.get();
+}
+
+QList<GraphicsLayer*> PackageEditorState::getAllowedTextLayers() const
+    noexcept {
+  return mContext.layerProvider.getLayers({
+      GraphicsLayer::sBoardSheetFrames,
+      GraphicsLayer::sBoardOutlines,
+      GraphicsLayer::sBoardMillingPth,
+      GraphicsLayer::sBoardMeasures,
+      GraphicsLayer::sBoardAlignment,
+      GraphicsLayer::sBoardDocumentation,
+      GraphicsLayer::sBoardComments,
+      GraphicsLayer::sBoardGuide,
+      GraphicsLayer::sTopPlacement,
+      // GraphicsLayer::sTopHiddenGrabAreas, -> makes no sense for texts
+      GraphicsLayer::sTopDocumentation,
+      GraphicsLayer::sTopNames,
+      GraphicsLayer::sTopValues,
+      GraphicsLayer::sTopCopper,
+      GraphicsLayer::sTopCourtyard,
+      GraphicsLayer::sTopGlue,
+      GraphicsLayer::sTopSolderPaste,
+      GraphicsLayer::sTopStopMask,
+      GraphicsLayer::sBotPlacement,
+      // GraphicsLayer::sBotHiddenGrabAreas, -> makes no sense for texts
+      GraphicsLayer::sBotDocumentation,
+      GraphicsLayer::sBotNames,
+      GraphicsLayer::sBotValues,
+      GraphicsLayer::sBotCopper,
+      GraphicsLayer::sBotCourtyard,
+      GraphicsLayer::sBotGlue,
+      GraphicsLayer::sBotSolderPaste,
+      GraphicsLayer::sBotStopMask,
+  });
+}
+
+QList<GraphicsLayer*> PackageEditorState::getAllowedCircleAndPolygonLayers()
+    const noexcept {
+  return mContext.layerProvider.getLayers({
+      GraphicsLayer::sBoardSheetFrames, GraphicsLayer::sBoardOutlines,
+      GraphicsLayer::sBoardMillingPth,  GraphicsLayer::sBoardMeasures,
+      GraphicsLayer::sBoardAlignment,   GraphicsLayer::sBoardDocumentation,
+      GraphicsLayer::sBoardComments,    GraphicsLayer::sBoardGuide,
+      GraphicsLayer::sTopPlacement,     GraphicsLayer::sTopHiddenGrabAreas,
+      GraphicsLayer::sTopDocumentation, GraphicsLayer::sTopNames,
+      GraphicsLayer::sTopValues,        GraphicsLayer::sTopCopper,
+      GraphicsLayer::sTopCourtyard,     GraphicsLayer::sTopGlue,
+      GraphicsLayer::sTopSolderPaste,   GraphicsLayer::sTopStopMask,
+      GraphicsLayer::sBotPlacement,     GraphicsLayer::sBotHiddenGrabAreas,
+      GraphicsLayer::sBotDocumentation, GraphicsLayer::sBotNames,
+      GraphicsLayer::sBotValues,        GraphicsLayer::sBotCopper,
+      GraphicsLayer::sBotCourtyard,     GraphicsLayer::sBotGlue,
+      GraphicsLayer::sBotSolderPaste,   GraphicsLayer::sBotStopMask,
+  });
 }
 
 /*******************************************************************************

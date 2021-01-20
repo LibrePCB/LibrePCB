@@ -63,7 +63,6 @@ public:
   // Getters
   Board& getBoard() const noexcept { return mBoard; }
   int getInnerLayerCount() const noexcept { return mInnerLayerCount; }
-  QList<GraphicsLayer*> getAllowedPolygonLayers() const noexcept;
 
   /// @copydoc ::librepcb::IF_GraphicsLayerProvider::getAllLayers()
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
