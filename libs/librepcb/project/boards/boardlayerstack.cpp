@@ -82,40 +82,6 @@ BoardLayerStack::~BoardLayerStack() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-QList<GraphicsLayer*> BoardLayerStack::getAllowedPolygonLayers() const
-    noexcept {
-  static QStringList names = {
-      GraphicsLayer::sBoardOutlines,
-      GraphicsLayer::sBoardMillingPth,
-      GraphicsLayer::sBoardDocumentation,
-      GraphicsLayer::sBoardComments,
-      GraphicsLayer::sBoardGuide,
-      GraphicsLayer::sTopCopper,
-      GraphicsLayer::sTopPlacement,
-      GraphicsLayer::sTopDocumentation,
-      GraphicsLayer::sTopNames,
-      GraphicsLayer::sTopValues,
-      GraphicsLayer::sTopCourtyard,
-      GraphicsLayer::sTopGlue,
-      GraphicsLayer::sTopSolderPaste,
-      GraphicsLayer::sTopStopMask,
-      GraphicsLayer::sBotCopper,
-      GraphicsLayer::sBotPlacement,
-      GraphicsLayer::sBotDocumentation,
-      GraphicsLayer::sBotNames,
-      GraphicsLayer::sBotValues,
-      GraphicsLayer::sBotCourtyard,
-      GraphicsLayer::sBotGlue,
-      GraphicsLayer::sBotSolderPaste,
-      GraphicsLayer::sBotStopMask,
-  };
-  return getLayers(names);
-}
-
-/*******************************************************************************
  *  Setters
  ******************************************************************************/
 

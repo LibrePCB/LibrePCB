@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class UndoCommand;
+class GraphicsLayer;
 
 namespace project {
 
@@ -121,6 +122,7 @@ protected:  // Methods
   Schematic* getActiveSchematic() noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getDefaultLengthUnit() const noexcept;
+  QList<GraphicsLayer*> getAllowedGeometryLayers() const noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
 

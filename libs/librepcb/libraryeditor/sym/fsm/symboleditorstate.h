@@ -35,6 +35,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class GraphicsLayer;
+
 namespace library {
 namespace editor {
 
@@ -104,6 +107,8 @@ public:
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;
   const LengthUnit& getDefaultLengthUnit() const noexcept;
+  QList<GraphicsLayer*> getAllowedTextLayers() const noexcept;
+  QList<GraphicsLayer*> getAllowedCircleAndPolygonLayers() const noexcept;
 
 protected:  // Data
   Context mContext;

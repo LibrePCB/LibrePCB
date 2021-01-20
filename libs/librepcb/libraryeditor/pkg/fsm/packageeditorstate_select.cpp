@@ -489,8 +489,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
                  dynamic_cast<StrokeTextGraphicsItem*>(item)) {
     Q_ASSERT(text);
     StrokeTextPropertiesDialog dialog(
-        text->getText(), mContext.undoStack,
-        mContext.layerProvider.getBoardGeometryElementLayers(),
+        text->getText(), mContext.undoStack, getAllowedTextLayers(),
         getDefaultLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
     dialog.exec();
@@ -500,9 +499,8 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     Q_ASSERT(polygon);
     PolygonPropertiesDialog dialog(
         polygon->getPolygon(), mContext.undoStack,
-        mContext.layerProvider.getBoardGeometryElementLayers(),
-        getDefaultLengthUnit(), "package_editor/polygon_properties_dialog",
-        &mContext.editorWidget);
+        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
+        "package_editor/polygon_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
   } else if (CircleGraphicsItem* circle =
@@ -510,9 +508,8 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     Q_ASSERT(circle);
     CirclePropertiesDialog dialog(
         circle->getCircle(), mContext.undoStack,
-        mContext.layerProvider.getBoardGeometryElementLayers(),
-        getDefaultLengthUnit(), "package_editor/circle_properties_dialog",
-        &mContext.editorWidget);
+        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
+        "package_editor/circle_properties_dialog", &mContext.editorWidget);
     dialog.exec();
     return true;
   } else if (HoleGraphicsItem* hole = dynamic_cast<HoleGraphicsItem*>(item)) {

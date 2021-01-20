@@ -99,8 +99,7 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
 
   // Add the layers combobox to the toolbar
   mLayerComboBox.reset(new GraphicsLayerComboBox());
-  mLayerComboBox->setLayers(
-      board->getLayerStack().getBoardGeometryElementLayers());
+  mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
   mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayerName());
   mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
   connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,

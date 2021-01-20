@@ -42,7 +42,6 @@
 #include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/items/si_symbol.h>
 #include <librepcb/project/schematics/items/si_text.h>
-#include <librepcb/project/schematics/schematiclayerprovider.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -709,8 +708,7 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
 void SchematicEditorState_Select::openPolygonPropertiesDialog(
     SI_Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
-      polygon.getPolygon(), mContext.undoStack,
-      mContext.project.getLayers().getSchematicGeometryElementLayers(),
+      polygon.getPolygon(), mContext.undoStack, getAllowedGeometryLayers(),
       getDefaultLengthUnit(), "schematic_editor/polygon_properties_dialog",
       parentWidget());
   dialog.exec();
@@ -719,8 +717,7 @@ void SchematicEditorState_Select::openPolygonPropertiesDialog(
 void SchematicEditorState_Select::openTextPropertiesDialog(
     SI_Text& text) noexcept {
   TextPropertiesDialog dialog(
-      text.getText(), mContext.undoStack,
-      mContext.project.getLayers().getSchematicGeometryElementLayers(),
+      text.getText(), mContext.undoStack, getAllowedGeometryLayers(),
       getDefaultLengthUnit(), "schematic_editor/text_properties_dialog",
       parentWidget());
   dialog.exec();  // performs the modifications

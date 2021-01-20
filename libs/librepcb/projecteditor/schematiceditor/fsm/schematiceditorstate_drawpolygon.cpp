@@ -35,7 +35,6 @@
 #include <librepcb/project/schematics/cmd/cmdschematicpolygonadd.h>
 #include <librepcb/project/schematics/items/si_polygon.h>
 #include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/schematics/schematiclayerprovider.h>
 
 #include <QtCore>
 
@@ -91,8 +90,7 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
 
   // Add the layers combobox to the toolbar
   mLayerComboBox.reset(new GraphicsLayerComboBox());
-  mLayerComboBox->setLayers(
-      mContext.project.getLayers().getSchematicGeometryElementLayers());
+  mLayerComboBox->setLayers(getAllowedGeometryLayers());
   mLayerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
   mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
   connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,

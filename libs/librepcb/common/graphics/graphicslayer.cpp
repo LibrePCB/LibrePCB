@@ -146,36 +146,6 @@ QString GraphicsLayer::getGrabAreaLayerName(
   }
 }
 
-const QStringList&
-    GraphicsLayer::getSchematicGeometryElementLayerNames() noexcept {
-  static QStringList names = {
-      sSymbolOutlines,    sSymbolHiddenGrabAreas, sSymbolNames,
-      sSymbolValues,      sSchematicSheetFrames,  sSchematicDocumentation,
-      sSchematicComments, sSchematicGuide,
-  };
-  return names;
-}
-
-const QStringList& GraphicsLayer::getBoardGeometryElementLayerNames() noexcept {
-  static QStringList names = {
-      sBoardSheetFrames, sBoardOutlines,
-      sBoardMillingPth,  sBoardMeasures,
-      sBoardAlignment,   sBoardDocumentation,
-      sBoardComments,    sBoardGuide,
-      sTopPlacement,     sTopHiddenGrabAreas,
-      sTopDocumentation, sTopNames,
-      sTopValues,        sTopCopper,
-      sTopCourtyard,     sTopGlue,
-      sTopSolderPaste,   sTopStopMask,
-      sBotPlacement,     sBotHiddenGrabAreas,
-      sBotDocumentation, sBotNames,
-      sBotValues,        sBotCopper,
-      sBotCourtyard,     sBotGlue,
-      sBotSolderPaste,   sBotStopMask,
-  };
-  return names;
-}
-
 void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
                                      QColor& color, QColor& colorHl,
                                      bool& visible) noexcept {

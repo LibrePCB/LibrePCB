@@ -46,7 +46,6 @@
 #include <librepcb/library/elements.h>
 #include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
 #include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 #include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
@@ -1232,16 +1231,16 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 void BoardEditorState_Select::openPolygonPropertiesDialog(
     Board& board, Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
-      polygon, mContext.undoStack,
-      board.getLayerStack().getAllowedPolygonLayers(), getDefaultLengthUnit(),
-      "board_editor/polygon_properties_dialog", parentWidget());
+      polygon, mContext.undoStack, getAllowedGeometryLayers(board),
+      getDefaultLengthUnit(), "board_editor/polygon_properties_dialog",
+      parentWidget());
   dialog.exec();
 }
 
 void BoardEditorState_Select::openStrokeTextPropertiesDialog(
     Board& board, StrokeText& text) noexcept {
   StrokeTextPropertiesDialog dialog(
-      text, mContext.undoStack, board.getLayerStack().getAllowedPolygonLayers(),
+      text, mContext.undoStack, getAllowedGeometryLayers(board),
       getDefaultLengthUnit(), "board_editor/stroke_text_properties_dialog",
       parentWidget());
   dialog.exec();
