@@ -331,7 +331,7 @@ void TransactionalFileSystem::save() {
   saveDiff("backup");  // can throw
 
   // modifications are now saved to the backup directory, so there is no risk
-  // of loosing a restored autosave backup, thus we can reset its flag
+  // of losing a restored autosave backup, thus we can reset its flag
   mRestoredFromAutosave = false;
 
   // remove autosave directory because it is now older than the backup content

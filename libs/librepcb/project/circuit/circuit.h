@@ -57,7 +57,7 @@ class ComponentInstance;
 
 /**
  * @brief   The Circuit class represents all electrical connections in a project
- * (drawed in the schematics)
+ * (drawn in the schematics)
  *
  * Each ::librepcb::project::Project object contains exactly one
  * ::librepcb::project::Circuit object which contains the whole electrical

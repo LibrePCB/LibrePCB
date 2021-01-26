@@ -172,7 +172,7 @@ void BI_Device::init() {
   }
 
   // Emit the "attributesChanged" signal when the board or component instance
-  // has emited it.
+  // has emitted it.
   connect(&mBoard, &Board::attributesChanged, this,
           &BI_Device::attributesChanged);
   connect(mCompInstance, &ComponentInstance::attributesChanged, this,

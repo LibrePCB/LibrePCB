@@ -208,7 +208,7 @@ protected:  // Data
   QString mName;  ///< Unique name which is used for serialization
   QString mNameTr;  ///< Layer name (translated into the user's language)
   QColor mColor;  ///< Color of graphics items on that layer
-  QColor mColorHighlighted;  ///< Color of hightlighted graphics items on that
+  QColor mColorHighlighted;  ///< Color of highlighted graphics items on that
                              ///< layer
   bool mIsVisible;  ///< Visibility of graphics items on that layer
   bool mIsEnabled;  ///< Visibility/availability of the layer itself

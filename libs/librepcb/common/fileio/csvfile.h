@@ -45,7 +45,7 @@ class FilePath;
  *  - Whenn adding a row with a wrong value count, #addValue() throws an
  *    exception.
  *  - Linebreaks inside values are replaced by spaces.
- *  - If a value contains the separator charactor (e.g. the comma), the value
+ *  - If a value contains the separator character (e.g. the comma), the value
  *    gets quoted.
  *  - Quotes inside values are escaped.
  *

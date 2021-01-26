@@ -84,7 +84,7 @@ void NewElementWizardPage_ComponentPinSignalMap::initializePage() noexcept {
 void NewElementWizardPage_ComponentPinSignalMap::cleanupPage() noexcept {
   QWizardPage::cleanupPage();
 
-  // References might become invalid, thus reseting them.
+  // References might become invalid, thus resetting them.
   mUi->pinSignalMapEditorWidget->resetReferences();
 }
 

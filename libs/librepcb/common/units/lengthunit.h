@@ -74,7 +74,7 @@ private:
    *
    * @warning The enum must begin with value 0 and end with _COUNT.
    *          Between these values the enum must not contain unused indexes!
-   *          This is neccessary for #getIndex() and #fromIndex().
+   *          This is necessary for #getIndex() and #fromIndex().
    */
   enum class LengthUnit_t {
     Millimeters = 0,
@@ -156,7 +156,7 @@ public:
    * the unit, this helper method is provided.
    *
    * @note  The returned number of decimals will *NOT* be enough to represent
-   *        all possiblle ::librepcb::Length values without loosing precision!
+   *        all possiblle ::librepcb::Length values without losing precision!
    *        So a value with truncated number of decimal places may not be
    *        converted back to a ::librepcb::Length object since this might lead
    *        to a different value!

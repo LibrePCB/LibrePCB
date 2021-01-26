@@ -89,7 +89,7 @@ TEST_F(LibraryDownloadTest, testDownloadInvalidLibrary) {
     qApp->processEvents();
   }
 
-  // check count and parameters of emited signals
+  // check count and parameters of emitted signals
   EXPECT_EQ(1, spyFinished.count());
   EXPECT_FALSE(spyFinished.first()[0].toBool());  // success
   EXPECT_FALSE(spyFinished.first()[1].toString().isEmpty())
@@ -124,7 +124,7 @@ TEST_F(LibraryDownloadTest, testDownloadValidLibrary) {
     qApp->processEvents();
   }
 
-  // check count and parameters of emited signals
+  // check count and parameters of emitted signals
   EXPECT_EQ(1, spyFinished.count());
   EXPECT_TRUE(spyFinished.first()[0].toBool());  // success
   EXPECT_TRUE(spyFinished.first()[1].toString().isNull())
@@ -162,7 +162,7 @@ TEST_F(LibraryDownloadTest, testDownloadValidNestedLibrary) {
     qApp->processEvents();
   }
 
-  // check count and parameters of emited signals
+  // check count and parameters of emitted signals
   EXPECT_EQ(1, spyFinished.count());
   EXPECT_TRUE(spyFinished.first()[0].toBool());  // success
   EXPECT_TRUE(spyFinished.first()[1].toString().isNull())
@@ -206,7 +206,7 @@ TEST_F(LibraryDownloadTest, testDownloadValidLibraryDestinationAlreadyExists) {
     qApp->processEvents();
   }
 
-  // check count and parameters of emited signals
+  // check count and parameters of emitted signals
   EXPECT_EQ(1, spyFinished.count());
   EXPECT_TRUE(spyFinished.first()[0].toBool());  // success
   EXPECT_TRUE(spyFinished.first()[1].toString().isNull())

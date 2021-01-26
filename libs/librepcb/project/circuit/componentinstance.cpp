@@ -146,7 +146,7 @@ void ComponentInstance::init() {
       ErcMsg::ErcMsgType_t::SchematicWarning));
   updateErcMessages();
 
-  // emit the "attributesChanged" signal when the project has emited it
+  // emit the "attributesChanged" signal when the project has emitted it
   connect(&mCircuit.getProject(), &Project::attributesChanged, this,
           &ComponentInstance::attributesChanged);
 

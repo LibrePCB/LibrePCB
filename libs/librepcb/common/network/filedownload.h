@@ -94,7 +94,7 @@ public:
 signals:
 
   /**
-   * @brief File successfully downloaded signal (emited right before
+   * @brief File successfully downloaded signal (emitted right before
    * #finished())
    *
    * @note The parameter type is specified with the full namespace, reason see
@@ -104,7 +104,7 @@ signals:
   void fileDownloaded(librepcb::FilePath filepath);
 
   /**
-   * @brief ZIP file successfully extracted signal (emited right before
+   * @brief ZIP file successfully extracted signal (emitted right before
    * #finished())
    *
    * @note The parameter type is specified with the full namespace, reason see

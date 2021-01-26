@@ -84,7 +84,7 @@ public:
 
 private:  // Methods
   /**
-   * @brief Enable the "Write-Ahead Logging" (WAL) featur of SQLite
+   * @brief Enable the "Write-Ahead Logging" (WAL) feature of SQLite
    *
    * @note LibrePCB requires to enable WAL to avoid blocking readers by writers.
    * If not enabled, the library scanner would also block all read-only accesses

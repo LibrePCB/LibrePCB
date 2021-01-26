@@ -86,7 +86,7 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept {
   Length dy = mY - center.getY();
   Angle angle0_360 = angle.mappedTo0_360deg();
 
-  // if angle is a multiple of 90 degrees, rotating can be done without loosing
+  // if angle is a multiple of 90 degrees, rotating can be done without losing
   // accuracy
   if (angle0_360 == Angle::deg90()) {
     setX(center.getX() - dy);
