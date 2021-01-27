@@ -42,7 +42,7 @@ class Schematic;
 /**
  * @brief The CmdSchematicNetLabelAnchorsUpdate class
  *
- * This is just a convenience undo cummand to update all netlabel anchors in a
+ * This is just a convenience undo command to update all netlabel anchors in a
  * schematic.
  */
 class CmdSchematicNetLabelAnchorsUpdate final : public UndoCommand {

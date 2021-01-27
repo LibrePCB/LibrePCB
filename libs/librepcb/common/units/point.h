@@ -336,7 +336,7 @@ public:
    * center
    *
    * @note If the angle is a multiple of (exactly!) 90 degrees, this method will
-   *       work without loosing accuracy (only integer operations). Otherwise,
+   *       work without losing accuracy (only integer operations). Otherwise,
    * the result may be not very accurate.
    *
    * @param angle     The angle to rotate (CCW)
@@ -354,7 +354,7 @@ public:
    * center
    *
    * @note If the angle is a multiple of (exactly!) 90 degrees, this method will
-   *       work without loosing accuracy (only integer operations). Otherwise,
+   *       work without losing accuracy (only integer operations). Otherwise,
    * the result may be not very accurate.
    *
    * @param angle     The angle to rotate (CCW)

@@ -40,7 +40,7 @@ class FilePath;
  * @brief The Exception class
  *
  * This is an exception base class. It inherits from the QException class, which
- * implements an exception class which can be transferred accross threads.
+ * implements an exception class which can be transferred across threads.
  * QException inherits from std::exception. There are several subclasses of the
  * class Exception, see inheritance diagram.
  *

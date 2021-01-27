@@ -45,7 +45,7 @@ class LibraryElementCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(LibraryElementCheckMessage)
 
 public:
-  /// Message severity type (higher numer = higher severity)
+  /// Message severity type (higher number = higher severity)
   enum class Severity {
     Hint = 0,
     Warning = 1,

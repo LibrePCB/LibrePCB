@@ -150,7 +150,7 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() {
   }
   Q_ASSERT(resultingNetSignal);
 
-  // combine all netsignals togehter
+  // combine all netsignals together
   foreach (NetSignal* netsignal, netSignalsUnderCursor) {
     if (netsignal != resultingNetSignal) {
       execNewChildCmd(

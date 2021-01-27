@@ -58,7 +58,7 @@ public:
 signals:
 
   /**
-   * @brief Data successfully received signal (emited right before #finished())
+   * @brief Data successfully received signal (emitted right before #finished())
    */
   void dataReceived(QByteArray data);
 

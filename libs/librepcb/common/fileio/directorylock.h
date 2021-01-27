@@ -324,7 +324,7 @@ private:  // Data
    * In other words: This attribute is true while this object has the ownership
    * over the lock file (between calling #lock() and #unlock()).
    *
-   * The only goal of this attrubute is to decide whether the destructor should
+   * The only goal of this attribute is to decide whether the destructor should
    * remove the lock or not. If the destructor is called while this attribute is
    * true, the destructor will call #unlock() to remove the file lock.
    */

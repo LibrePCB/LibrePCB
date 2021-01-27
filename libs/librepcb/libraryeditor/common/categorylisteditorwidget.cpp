@@ -98,7 +98,7 @@ void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
     delete item;
     updateColor();
     // Emit signals *after* removing the item to avoid critical issues if a
-    // signal handler modifies the UUID list befor removing was finished.
+    // signal handler modifies the UUID list before removing was finished.
     emit categoryRemoved(*uuid);
     emit edited();
   }

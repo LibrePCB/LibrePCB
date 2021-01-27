@@ -123,7 +123,7 @@ public:
    *
    * @note    You can use this method directly, but as the functions qDebug(),
    * qWarning() (and so on) are more flexible and do not need the file and line
-   * arguments, it's easier to use the Qt's debug funtions instead of this
+   * arguments, it's easier to use the Qt's debug functions instead of this
    * method.
    *
    * @param level     The debug level of the message (DO NOT USE "Nothing" and
