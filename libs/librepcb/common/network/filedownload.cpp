@@ -139,7 +139,7 @@ void FileDownload::finalizeRequest() {
     }
   }
 
-  // extract zip file if neccessary
+  // extract zip file if necessary
   if (mExtractZipToDir.isValid()) {
     emit progressState(tr("Extract files..."));
     QStringList files =

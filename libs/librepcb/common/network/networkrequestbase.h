@@ -146,17 +146,17 @@ signals:
   void progress(qint64 bytesReceived, qint64 bytesTotal, int percent);
 
   /**
-   * @brief Request aborted signal (emited right before #finished())
+   * @brief Request aborted signal (emitted right before #finished())
    */
   void aborted();
 
   /**
-   * @brief Request succeeded signal (emited right before #finished())
+   * @brief Request succeeded signal (emitted right before #finished())
    */
   void succeeded();
 
   /**
-   * @brief Request errored signal (emited right before #finished())
+   * @brief Request errored signal (emitted right before #finished())
    *
    * @param errorMsg              An error message
    */
@@ -165,7 +165,7 @@ signals:
   /**
    * @brief Request finished signal
    *
-   * This signal is emited right after #aborted(), #succeeded() or #errored().
+   * This signal is emitted right after #aborted(), #succeeded() or #errored().
    *
    * @param success               True if succeeded, false if aborted or errored
    */

@@ -128,9 +128,9 @@ private:
    * @brief Finalize the BI_NetLines and connect them to other
    * existing traces if necessary.
    * @param board On which board the drawing is finalized.
-   * @return True, when the trace is succesfully drawn. When the trace is
+   * @return True, when the trace is successfully drawn. When the trace is
    * continued, return the result of startPositioning(). False when canceled or
-   * an error occured
+   * an error occurred
    */
   bool addNextNetPoint(Board& board) noexcept;
 

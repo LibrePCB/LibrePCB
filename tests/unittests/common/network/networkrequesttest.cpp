@@ -112,7 +112,7 @@ TEST_P(NetworkRequestTest, testDownload) {
     qApp->processEvents();
   }
 
-  // check count and parameters of emited signals
+  // check count and parameters of emitted signals
   EXPECT_TRUE(mSignalReceiver.mDestroyed) << "Request timed out!";
   EXPECT_GT(mSignalReceiver.mProgressStateCallCount, 0);
   EXPECT_EQ(mSignalReceiver.mAdvancedProgressCallCount,

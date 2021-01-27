@@ -136,7 +136,7 @@ TEST_P(FileDownloadTest, testDownload) {
     qApp->processEvents();
   }
 
-  // check count and parameters of emited signals
+  // check count and parameters of emitted signals
   EXPECT_TRUE(mSignalReceiver.mDestroyed) << "Download timed out!";
   EXPECT_GT(mSignalReceiver.mProgressStateCallCount, 0);
   EXPECT_EQ(mSignalReceiver.mAdvancedProgressCallCount,

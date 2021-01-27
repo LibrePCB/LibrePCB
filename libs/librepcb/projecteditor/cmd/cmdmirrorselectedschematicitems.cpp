@@ -114,7 +114,7 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
     Angle labelRotation = netlabel->getRotation().mappedTo0_360deg();
     if (labelRotation == Angle::deg0() || labelRotation == Angle::deg180()) {
       // Since there is no right alignment (yet), coordinates need to be
-      // re-adjusted to accomodate left shift.
+      // re-adjusted to accommodate left shift.
       // New position = mirrored old position - label width
       newpos.setX(newpos.getX() - netlabel->getApproximateWidth());
       newpos.mapToGrid(mSchematic.getGridProperties().getInterval());

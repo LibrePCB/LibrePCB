@@ -123,7 +123,7 @@ private:
                                          const QString& name) noexcept;
   template <typename T>
   static QList<T*> sortedByUuid(const QList<T*>& list) noexcept {
-    // sort a list of objects by their UUID to get reproducable gerber files
+    // sort a list of objects by their UUID to get reproducible gerber files
     QList<T*> copy = list;
     std::sort(copy.begin(), copy.end(), [](const T* o1, const T* o2) {
       return o1->getUuid() < o2->getUuid();

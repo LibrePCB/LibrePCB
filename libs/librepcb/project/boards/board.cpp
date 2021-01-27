@@ -148,7 +148,7 @@ Board::Board(const Board& other,
     updateErcMessages();
     updateIcon();
 
-    // emit the "attributesChanged" signal when the project has emited it
+    // emit the "attributesChanged" signal when the project has emitted it
     connect(&mProject, &Project::attributesChanged, this,
             &Board::attributesChanged);
 
@@ -330,7 +330,7 @@ Board::Board(Project& project,
     updateErcMessages();
     updateIcon();
 
-    // emit the "attributesChanged" signal when the project has emited it
+    // emit the "attributesChanged" signal when the project has emitted it
     connect(&mProject, &Project::attributesChanged, this,
             &Board::attributesChanged);
 

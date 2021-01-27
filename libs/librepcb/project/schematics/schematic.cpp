@@ -111,7 +111,7 @@ Schematic::Schematic(Project& project,
       }
     }
 
-    // emit the "attributesChanged" signal when the project has emited it
+    // emit the "attributesChanged" signal when the project has emitted it
     connect(&mProject, &Project::attributesChanged, this,
             &Schematic::attributesChanged);
   } catch (...) {

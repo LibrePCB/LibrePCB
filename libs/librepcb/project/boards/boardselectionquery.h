@@ -96,7 +96,7 @@ public:
   const QSet<BI_Hole*>& getHoles() const noexcept { return mResultHoles; }
 
   /**
-   * @brief Get vias, net points and net lines grouped by net segement
+   * @brief Get vias, net points and net lines grouped by net segment
    *
    * Same as #getVias(), #getNetPoints() and #getNetLines(), but grouped
    * by their corresponding net segments. Only net segments containing selected

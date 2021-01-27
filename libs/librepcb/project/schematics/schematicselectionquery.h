@@ -79,7 +79,7 @@ public:
   }
 
   /**
-   * @brief Get net points, net lines and net labels grouped by net segement
+   * @brief Get net points, net lines and net labels grouped by net segment
    *
    * Same as #getNetPoints(), #getNetLines() and #getNetLabels(), but grouped
    * by their corresponding net segments. Only net segments containing selected

@@ -207,7 +207,7 @@ void WorkspaceLibraryScanner::getLibrariesOfDirectory(
         qCritical() << "Error:" << e.getMsg();
       }
     } else {
-      qWarning() << "Directory is not a valid libary:"
+      qWarning() << "Directory is not a valid library:"
                  << fs->getAbsPath(dirpath).toNative();
     }
   }

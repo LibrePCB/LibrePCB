@@ -56,7 +56,7 @@ EditNetClassesDialog::EditNetClassesDialog(Circuit& circuit,
   mUi->setupUi(this);
 
   // The next line tries to begin a new command on the project's undo stack.
-  // This will block all other commands (neccessary to avoid problems). If
+  // This will block all other commands (necessary to avoid problems). If
   // another command is active at the moment, this line throws an exception and
   // the constructor is exited.
   mUndoStack.beginCmdGroup(tr("Edit Netclasses"));

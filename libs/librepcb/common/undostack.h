@@ -48,7 +48,7 @@ class UndoCommandGroup;
  * exception safety easier. The functionality is as follows:
  * @li The ctor starts a new command group with
  * librepcb::UndoStack::beginCmdGroup().
- * @li If neccessary, the dtor aborts it with
+ * @li If necessary, the dtor aborts it with
  * librepcb::UndoStack::abortCmdGroup().
  * @li #append() redirects to librepcb::UndoStack::appendToCmdGroup().
  * @li #commit() redirects to librepcb::UndoStack::commitCmdGroup().
@@ -152,7 +152,7 @@ public:
    * @brief Check if the stack is in a clean state (the state of the last
    * #setClean())
    *
-   * This is used to detemine if the document/project/whatever has changed since
+   * This is used to determine if the document/project/whatever has changed since
    * the last time it was saved. You need to call #setClean() when you save it.
    *
    * @return true | false
@@ -193,7 +193,7 @@ public:
    *
    * @throw Exception If the command is not executed successfully, this method
    *                  throws an exception and tries to keep the state of the
-   * stack consistend (as the passed command did never exist).
+   * stack consistent (as the passed command did never exist).
    *
    * @note If you try to execute a command with that method while another
    * command is active (see #isCommandGroupActive()), this method will throw an
