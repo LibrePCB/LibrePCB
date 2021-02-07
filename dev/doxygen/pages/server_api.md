@@ -38,6 +38,12 @@ curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
 ~~~
 
 
+# Localization {#doc_server_api_localization}
+
+In order to get the response in the user's language, the client may set the
+HTTP header `Accept-Language` to the desired locale string (e.g. `de_DE`).
+
+
 # Pagination {#doc_server_api_pagination}
 
 The API uses pagination (i.e. splitting large responses across several shorter

@@ -47,6 +47,7 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept
 
   // set initial HTTP header fields
   mRequest.setHeader(QNetworkRequest::UserAgentHeader, getUserAgent());
+  mRequest.setRawHeader("Accept-Language", QLocale().name().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-AppVersion",
                         qApp->applicationVersion().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-GitRevision",
