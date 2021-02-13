@@ -26,6 +26,7 @@
 #include "fileio/sexpression.h"
 #include "toolbox.h"
 
+#include <optional/tl/optional.hpp>
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
@@ -128,6 +129,25 @@ inline CircuitIdentifier deserialize(const SExpression& sexpr,
                                      const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   return CircuitIdentifier(sexpr.getValue());  // can throw
+}
+
+template <>
+inline SExpression serialize(const tl::optional<CircuitIdentifier>& obj) {
+  if (obj) {
+    return serialize(*obj);
+  } else {
+    return SExpression::createString("");
+  }
+}
+
+template <>
+inline tl::optional<CircuitIdentifier> deserialize(const SExpression& sexpr,
+                                                   const Version& fileFormat) {
+  if (sexpr.getValue().isEmpty()) {
+    return tl::nullopt;
+  } else {
+    return deserialize<CircuitIdentifier>(sexpr, fileFormat);  // can throw
+  }
 }
 
 inline QDataStream& operator<<(QDataStream& stream,
