@@ -130,6 +130,7 @@ signals:
 
 private:
   void init();
+  void deinit() noexcept;
   void updateGraphicsItemTransform() noexcept;
 
   // General
