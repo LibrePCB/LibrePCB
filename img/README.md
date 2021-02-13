@@ -7,7 +7,7 @@ This directory contains all images which are required in the LibrePCB applicatio
 - Some images are from https://icons8.com/ (we may use those icons under the free license since we attribute icons8 in the about dialog)
 
 The following files are from "Open Icon Library" (found in open_icon_library-standard-0.11.tar.bz2 with fdupes),
-wih format <filename> <filename in Open Icon Library> <license>
+with format `<filename> <filename in Open Icon Library> <license>`
 ```
 actions/add.png icons/png/64x64/actions/edit-add-4.png LGPL-2.1
 actions/apply.png icons/png/48x48/actions/dialog-accept.png LGPL-2.1
@@ -63,4 +63,97 @@ command_toolbars/align_horizontal_right.png icons/png/48x48/actions/align-horizo
 command_toolbars/align_vertical_bottom.png icons/png/48x48/actions/align-vertical-bottom-2.png CC-BY-SA 3.0 or LGPL
 command_toolbars/align_vertical_center.png icons/png/48x48/actions/align-vertical-center-2.png CC-BY-SA 3.0 or LGPL
 command_toolbars/align_vertical_top.png icons/png/48x48/actions/align-vertical-top-2.png CC-BY-SA 3.0 or LGPL
+```
+
+Created by Urban Bruhin, released under CC0-1.0:
+
+```
+actions/add_hole.png
+actions/add_name.png
+actions/add_plane.png
+actions/add_smt_pad.png
+actions/add_symbol_pin.png
+actions/add_text.png
+actions/add_tht_pad.png
+actions/add_value.png
+actions/add_via.png
+actions/board_editor.png (at least I *guess* I created that one)
+actions/draw_line.png
+actions/draw_netlabel.png
+actions/draw_wire.png
+actions/grid.png
+actions/hide_planes.png
+actions/layers.png
+actions/rebuild_plane.png
+actions/schematic.png
+actions/show_planes.png
+command_toolbars/pad_bottom.png
+command_toolbars/pad_tht.png
+command_toolbars/pad_top.png
+command_toolbars/shape_octagon.png
+command_toolbars/shape_rect.png
+command_toolbars/shape_round.png
+command_toolbars/via_octagon.png
+command_toolbars/via_round.png
+command_toolbars/via_square.png
+command_toolbars/wire_45_90.png
+command_toolbars/wire_90_45.png
+command_toolbars/wire_h_v.png
+command_toolbars/wire_straight.png
+command_toolbars/wire_v_h.png
+empty.png
+library/bipolar_capacitor_eu.png
+library/bipolar_capacitor_us.png
+library/footprint.png
+library/gnd.png
+library/inductor_eu.png
+library/inductor_us.png
+library/resistor_eu.png
+library/resistor_us.png
+library/symbol.png
+library/unipolar_capacitor_eu.png
+library/unipolar_capacitor_us.png
+library/vcc.png
+norm/iec_60617.png
+norm/ieee_315.png
+wizards/watermark.jpg
+```
+
+Copied from "Open Icon Library" and modified:
+
+```
+actions/bookmark_gray.png copied from actions/bookmark.png LGPL-2.1
+library/package.png copied from library/device.png
+places/folder_gray.png copied from places/folder.png
+places/folder_green.png copied from places/folder.png
+places/folder_open_gray.png copied from places/folder_open.png
+places/folder_open_green.png copied from places/folder_open.png
+places/project_folder.png copied from places/folder.png
+```
+
+From Icons8:
+```
+actions/drc.png: Color →Programming → Testing→ Pass Fail
+actions/export_pick_place_file.png: Office L →Industry → Production Process→ Assembly Line
+actions/move_to.png: Color →Ecommerce → Buy and Sell→ Move Stock
+actions/ruler.png: Color →Editing → Image Editing→ Ruler
+actions/swap.png: Color →Arrows → Actions→ Swap
+```
+
+Created for LibrePCB by a 99designs designer:
+```
+app/librepcb.icns
+app/librepcb.ico
+app/librepcb.png
+app/librepcb.svg
+logo/32x32.png
+logo/48x48.png
+logo/64x64.png
+```
+
+Public Domain:
+```
+actions/working.png icons/png/48x48/symbols/pictograms-road_signs-workman_ahead_roadsign.png
+command_toolbars/cancel.png icons/png/48x48/actions/dialog-cancel-4.png
+status/success.png icons/png/48x48/actions/dialog-accept.png
 ```
