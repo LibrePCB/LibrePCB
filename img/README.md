@@ -69,6 +69,28 @@ command_toolbars/cancel.png icons/png/48x48/actions/dialog-cancel-4.png PD
 status/success.png icons/png/48x48/actions/dialog-accept.png PD
 ```
 
+Copied from "Open Icon Library" and modified:
+
+```
+actions/bookmark_gray.png copied from actions/bookmark.png LGPL-2.1
+library/package.png copied from library/device.png
+places/folder_gray.png copied from places/folder.png
+places/folder_green.png copied from places/folder.png
+places/folder_open_gray.png copied from places/folder_open.png
+places/folder_open_green.png copied from places/folder_open.png
+places/project_folder.png copied from places/folder.png
+```
+
+From Icons8:
+
+```
+actions/drc.png: Color →Programming → Testing→ Pass Fail
+actions/export_pick_place_file.png: Office L →Industry → Production Process→ Assembly Line
+actions/move_to.png: Color →Ecommerce → Buy and Sell→ Move Stock
+actions/ruler.png: Color →Editing → Image Editing→ Ruler
+actions/swap.png: Color →Arrows → Actions→ Swap
+```
+
 Created by LibrePCB developers, released under CC0-1.0:
 
 ```
@@ -121,27 +143,6 @@ library/vcc.png
 norm/iec_60617.png
 norm/ieee_315.png
 wizards/watermark.jpg
-```
-
-Copied from "Open Icon Library" and modified:
-
-```
-actions/bookmark_gray.png copied from actions/bookmark.png LGPL-2.1
-library/package.png copied from library/device.png
-places/folder_gray.png copied from places/folder.png
-places/folder_green.png copied from places/folder.png
-places/folder_open_gray.png copied from places/folder_open.png
-places/folder_open_green.png copied from places/folder_open.png
-places/project_folder.png copied from places/folder.png
-```
-
-From Icons8:
-```
-actions/drc.png: Color →Programming → Testing→ Pass Fail
-actions/export_pick_place_file.png: Office L →Industry → Production Process→ Assembly Line
-actions/move_to.png: Color →Ecommerce → Buy and Sell→ Move Stock
-actions/ruler.png: Color →Editing → Image Editing→ Ruler
-actions/swap.png: Color →Arrows → Actions→ Swap
 ```
 
 Created for LibrePCB by a 99designs designer:
