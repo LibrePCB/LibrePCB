@@ -99,7 +99,6 @@ public:
   BI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
   BI_NetLineAnchor* getOtherPoint(const BI_NetLineAnchor& firstPoint) const
       noexcept;
-  NetSignal& getNetSignalOfNetSegment() const noexcept;
   bool isSelectable() const noexcept override;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
   UnsignedLength getLength() const noexcept;
@@ -135,7 +134,7 @@ private:
   Trace mTrace;
   QScopedPointer<BGI_NetLine> mGraphicsItem;
   Point mPosition;  ///< the center of startpoint and endpoint
-  QMetaObject::Connection mHighlightChangedConnection;
+  QVector<QMetaObject::Connection> mConnections;
 
   // References
   BI_NetLineAnchor* mStartPoint;

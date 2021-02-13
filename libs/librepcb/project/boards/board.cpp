@@ -494,7 +494,7 @@ QList<BI_Via*> Board::getViasAtScenePos(
     const Point& pos, const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_Via*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
+    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
       segment->getViasAtScenePos(pos, list);
     }
   }
@@ -506,7 +506,7 @@ QList<BI_NetPoint*> Board::getNetPointsAtScenePos(
     const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_NetPoint*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
+    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
       segment->getNetPointsAtScenePos(pos, layer, list);
     }
   }
@@ -518,7 +518,7 @@ QList<BI_NetLine*> Board::getNetLinesAtScenePos(
     const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_NetLine*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
+    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
       segment->getNetLinesAtScenePos(pos, layer, list);
     }
   }
@@ -548,7 +548,7 @@ BI_NetPoint* Board::getNetPointNextToScenePos(
     const QSet<const NetSignal*>& netsignals) const {
   BI_NetPoint* bestMatch = nullptr;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
+    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
       BI_NetPoint* newMatch =
           segment->getNetPointNextToScenePos(pos, layer, maxDistance);
       if (newMatch) bestMatch = newMatch;
@@ -562,7 +562,7 @@ BI_Via* Board::getViaNextToScenePos(
     const QSet<const NetSignal*>& netsignals) const {
   BI_Via* bestMatch = nullptr;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
+    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
       BI_Via* newMatch = segment->getViaNextToScenePos(pos, maxDistance);
       if (newMatch) bestMatch = newMatch;
     }

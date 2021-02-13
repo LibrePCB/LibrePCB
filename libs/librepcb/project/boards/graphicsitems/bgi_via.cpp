@@ -26,6 +26,7 @@
 #include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
+#include "../items/bi_netsegment.h"
 #include "../items/bi_via.h"
 
 #include <librepcb/common/application.h>
@@ -77,7 +78,7 @@ bool BGI_Via::isSelectable() const noexcept {
 void BGI_Via::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
-  setToolTip(*mVia.getNetSignalOfNetSegment().getName());
+  setToolTip(mVia.getNetSegment().getNetNameToDisplay(true));
 
   mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
   mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
@@ -107,8 +108,9 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
-  NetSignal& netsignal = mVia.getNetSignalOfNetSegment();
-  bool highlight = mVia.isSelected() || (netsignal.isHighlighted());
+  const NetSignal* netsignal = mVia.getNetSegment().getNetSignal();
+  bool highlight =
+      mVia.isSelected() || (netsignal && netsignal->isHighlighted());
 
   if (mDrawStopMask && mBottomStopMaskLayer &&
       mBottomStopMaskLayer->isVisible()) {
@@ -125,10 +127,12 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->drawPath(mCopper);
 
     // draw netsignal name
-    painter->setFont(mFont);
-    painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-    painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
-                      *netsignal.getName());
+    if (netsignal) {
+      painter->setFont(mFont);
+      painter->setPen(mViaLayer->getColor(highlight).lighter(150));
+      painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
+                        *netsignal->getName());
+    }
   }
 
   if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {

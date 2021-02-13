@@ -26,6 +26,7 @@
 
 #include <librepcb/common/undostack.h>
 #include <librepcb/project/boards/cmd/cmdboardviaedit.h>
+#include <librepcb/project/boards/items/bi_netsegment.h>
 #include <librepcb/project/boards/items/bi_via.h>
 #include <librepcb/project/circuit/netsignal.h>
 
@@ -80,8 +81,8 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   // drill diameter spinbox
   mUi->edtDrillDiameter->setValue(mVia.getDrillDiameter());
 
-  // netsignal combobox
-  mUi->lblNetSignal->setText(*mVia.getNetSignalOfNetSegment().getName());
+  // netsignal name
+  mUi->lblNetSignal->setText(mVia.getNetSegment().getNetNameToDisplay(true));
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {

@@ -66,7 +66,6 @@ public:
   const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }
   const Junction& getJunction() const noexcept { return mJunction; }
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal& getNetSignalOfNetSegment() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   GraphicsLayer* getLayerOfLines() const noexcept;
   bool isSelectable() const noexcept override;

@@ -27,6 +27,7 @@
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_netpoint.h"
+#include "../items/bi_netsegment.h"
 
 #include <QPrinter>
 #include <QtCore>
@@ -64,7 +65,7 @@ bool BGI_NetPoint::isSelectable() const noexcept {
  ******************************************************************************/
 
 void BGI_NetPoint::updateCacheAndRepaint() noexcept {
-  setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
+  setToolTip(mNetPoint.getNetSegment().getNetNameToDisplay(true));
 
   prepareGeometryChange();
 
@@ -88,8 +89,9 @@ void BGI_NetPoint::paint(QPainter* painter,
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
-  bool highlight = mNetPoint.isSelected() ||
-      mNetPoint.getNetSignalOfNetSegment().isHighlighted();
+  const NetSignal* netsignal = mNetPoint.getNetSegment().getNetSignal();
+  bool highlight =
+      mNetPoint.isSelected() || (netsignal && netsignal->isHighlighted());
 
 #ifdef QT_DEBUG
   GraphicsLayer* layer =

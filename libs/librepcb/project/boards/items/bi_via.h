@@ -63,7 +63,6 @@ public:
 
   // Getters
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal& getNetSignalOfNetSegment() const noexcept;
   const Via& getVia() const noexcept { return mVia; }
   const Uuid& getUuid() const noexcept { return mVia.getUuid(); }
   Via::Shape getShape() const noexcept { return mVia.getShape(); }
@@ -118,7 +117,7 @@ private:
   Via mVia;
   BI_NetSegment& mNetSegment;
   QScopedPointer<BGI_Via> mGraphicsItem;
-  QMetaObject::Connection mHighlightChangedConnection;
+  QVector<QMetaObject::Connection> mConnections;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

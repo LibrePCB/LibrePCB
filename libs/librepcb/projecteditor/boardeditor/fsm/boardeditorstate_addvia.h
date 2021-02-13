@@ -26,6 +26,7 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/project/boards/items/bi_via.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
@@ -85,7 +86,9 @@ private:  // Methods
   void updateShapeActionsCheckedState() noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
-  NetSignal* getClosestNetSignal(Board& board, const Point& pos) noexcept;
+  void applySelectedNetSignal() noexcept;
+  void updateClosestNetSignal(Board& board, const Point& pos) noexcept;
+  NetSignal* getCurrentNetSignal() const noexcept;
   QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
                                            QSet<BI_Base*> except = {}) const
       noexcept;
@@ -103,11 +106,16 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  QString mAutoText;
-  bool mFindClosestNetSignal;
-  NetSignal* mLastClosestNetSignal;
   Via mLastViaProperties;
-  NetSignal* mLastNetSignal;
+
+  /// Whether the net signal is determined automatically or not
+  bool mUseAutoNetSignal;
+
+  /// The current net signal of the via
+  tl::optional<Uuid> mCurrentNetSignal;
+
+  /// Whether #mCurrentNetSignal contains an up-to-date closest net signal
+  bool mClosestNetSignalIsUpToDate;
 
   // Information about the current via to place. Only valid if
   // mIsUndoCmdActive == true.

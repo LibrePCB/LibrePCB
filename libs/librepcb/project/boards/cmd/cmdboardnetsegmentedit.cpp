@@ -40,7 +40,7 @@ CmdBoardNetSegmentEdit::CmdBoardNetSegmentEdit(
     BI_NetSegment& netsegment) noexcept
   : UndoCommand(tr("Edit net segment")),
     mNetSegment(netsegment),
-    mOldNetSignal(&netsegment.getNetSignal()),
+    mOldNetSignal(netsegment.getNetSignal()),
     mNewNetSignal(mOldNetSignal) {
 }
 
@@ -51,9 +51,9 @@ CmdBoardNetSegmentEdit::~CmdBoardNetSegmentEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdBoardNetSegmentEdit::setNetSignal(NetSignal& netsignal) noexcept {
+void CmdBoardNetSegmentEdit::setNetSignal(NetSignal* netsignal) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewNetSignal = &netsignal;
+  mNewNetSignal = netsignal;
 }
 
 /*******************************************************************************
@@ -67,11 +67,11 @@ bool CmdBoardNetSegmentEdit::performExecute() {
 }
 
 void CmdBoardNetSegmentEdit::performUndo() {
-  mNetSegment.setNetSignal(*mOldNetSignal);  // can throw
+  mNetSegment.setNetSignal(mOldNetSignal);  // can throw
 }
 
 void CmdBoardNetSegmentEdit::performRedo() {
-  mNetSegment.setNetSignal(*mNewNetSignal);  // can throw
+  mNetSegment.setNetSignal(mNewNetSignal);  // can throw
 }
 
 /*******************************************************************************

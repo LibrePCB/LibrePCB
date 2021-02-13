@@ -278,7 +278,7 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
   // net segment items
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
-    if (&netsegment->getNetSignal() != netsignal) {
+    if (netsegment->getNetSignal() != netsignal) {
       continue;
     }
 

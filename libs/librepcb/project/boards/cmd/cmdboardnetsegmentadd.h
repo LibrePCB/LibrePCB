@@ -48,7 +48,7 @@ class CmdBoardNetSegmentAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardNetSegmentAdd(BI_NetSegment& segment) noexcept;
-  CmdBoardNetSegmentAdd(Board& board, NetSignal& netsignal) noexcept;
+  CmdBoardNetSegmentAdd(Board& board, NetSignal* netsignal) noexcept;
   ~CmdBoardNetSegmentAdd() noexcept;
 
   // Getters
@@ -69,7 +69,7 @@ private:
   // Private Member Variables
 
   Board& mBoard;
-  NetSignal& mNetSignal;
+  NetSignal* mNetSignal;
   BI_NetSegment* mNetSegment;
 };
 

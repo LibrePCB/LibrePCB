@@ -50,7 +50,7 @@ public:
   ~CmdBoardNetSegmentEdit() noexcept;
 
   // Setters
-  void setNetSignal(NetSignal& netsignal) noexcept;
+  void setNetSignal(NetSignal* netsignal) noexcept;
 
 private:
   // Private Methods

@@ -63,16 +63,15 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mAutoText(tr("Auto")),
-    mFindClosestNetSignal(true),
-    mLastClosestNetSignal(nullptr),
     mLastViaProperties(Uuid::createRandom(),  // UUID is not relevant here
                        Point(),  // Position is not relevant here
                        Via::Shape::Round,  // Default shape
                        PositiveLength(700000),  // Default size
                        PositiveLength(300000)  // Default drill diameter
                        ),
-    mLastNetSignal(nullptr),
+    mUseAutoNetSignal(true),
+    mCurrentNetSignal(tl::nullopt),
+    mClosestNetSignalIsUpToDate(false),
     mCurrentViaToPlace(nullptr) {
 }
 
@@ -88,10 +87,6 @@ bool BoardEditorState_AddVia::entry() noexcept {
 
   Board* board = getActiveBoard();
   if (!board) return false;
-
-  mLastClosestNetSignal =
-      mContext.project.getCircuit().getNetSignalWithMostElements();
-  if (!mLastClosestNetSignal) return false;
 
   // Clear board selection because selection does not make sense in this state
   board->clearSelection();
@@ -166,23 +161,22 @@ bool BoardEditorState_AddVia::entry() noexcept {
                                 netsignal->getUuid().toStr());
   }
   mNetSignalComboBox->model()->sort(0);
-  while (mContext.project.getCircuit().getNetSignalByName(mAutoText)) {
-    mAutoText = "[" + mAutoText + "]";
+  mNetSignalComboBox->insertItem(0, "[" % tr("Auto") % "]", "auto");
+  mNetSignalComboBox->insertItem(1, "[" % tr("None") % "]", "none");
+  mNetSignalComboBox->insertSeparator(2);
+  if (mUseAutoNetSignal) {
+    mNetSignalComboBox->setCurrentIndex(0);  // Auto
+  } else if (const NetSignal* netsignal = getCurrentNetSignal()) {
+    mNetSignalComboBox->setCurrentText(*netsignal->getName());  // Existing net
+  } else {
+    mNetSignalComboBox->setCurrentIndex(1);  // No net
   }
-  mNetSignalComboBox->addItem(mAutoText);
-  mNetSignalComboBox->setCurrentText(mLastNetSignal ? *mLastNetSignal->getName()
-                                                    : mAutoText);
   mContext.editorUi.commandToolbar->addWidget(mNetSignalComboBox.data());
-  connect(mNetSignalComboBox.data(), &QComboBox::currentTextChanged,
-          [this](const QString& value) {
-            if (value == mAutoText) {
-              mLastNetSignal = nullptr;
-            } else {
-              mLastNetSignal =
-                  mContext.project.getCircuit().getNetSignalByName(value);
-              setNetSignal(mLastNetSignal);
-            }
-          });
+  connect(
+      mNetSignalComboBox.data(),
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &BoardEditorState_AddVia::applySelectedNetSignal,
+      Qt::QueuedConnection);
 
   return true;
 }
@@ -245,15 +239,8 @@ bool BoardEditorState_AddVia::addVia(Board& board, const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add via to board"));
     mIsUndoCmdActive = true;
-    CmdBoardNetSegmentAdd* cmdAddSeg = nullptr;
-    if (mLastNetSignal) {
-      cmdAddSeg = new CmdBoardNetSegmentAdd(board, *mLastNetSignal);
-    } else if (NetSignal* closestSignal = getClosestNetSignal(board, pos)) {
-      cmdAddSeg = new CmdBoardNetSegmentAdd(board, *closestSignal);
-    } else {
-      abortCommand(false);
-      return false;
-    }
+    CmdBoardNetSegmentAdd* cmdAddSeg =
+        new CmdBoardNetSegmentAdd(board, getCurrentNetSignal());
     mContext.undoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);
@@ -277,36 +264,14 @@ bool BoardEditorState_AddVia::updatePosition(Board& board,
                                              const Point& pos) noexcept {
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setPosition(pos, true);
-    if (!mLastNetSignal) {
-      setNetSignal(getClosestNetSignal(board, pos));
+    if (mUseAutoNetSignal) {
+      updateClosestNetSignal(board, pos);
+      applySelectedNetSignal();
     }
     board.triggerAirWiresRebuild();
     return true;
   } else {
     return false;
-  }
-}
-
-void BoardEditorState_AddVia::setNetSignal(NetSignal* netsignal) noexcept {
-  Q_ASSERT(mIsUndoCmdActive == true);
-
-  try {
-    if (!netsignal) {
-      throw LogicError(__FILE__, __LINE__);
-    }
-    if (netsignal == &mCurrentViaToPlace->getNetSignalOfNetSegment()) {
-      return;
-    }
-    mContext.undoStack.appendToCmdGroup(
-        new CmdBoardNetSegmentRemove(mCurrentViaToPlace->getNetSegment()));
-    QScopedPointer<CmdBoardNetSegmentEdit> cmdEdit(
-        new CmdBoardNetSegmentEdit(mCurrentViaToPlace->getNetSegment()));
-    cmdEdit->setNetSignal(*netsignal);
-    mContext.undoStack.appendToCmdGroup(cmdEdit.take());
-    mContext.undoStack.appendToCmdGroup(
-        new CmdBoardNetSegmentAdd(mCurrentViaToPlace->getNetSegment()));
-  } catch (const Exception& e) {
-    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
@@ -321,27 +286,11 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
       mCurrentViaEditCmd->setPosition(pos, false);
     }
 
-    NetSignal* netsignal = mLastNetSignal;
-    if (!netsignal) {
-      QSet<NetSignal*> netsignals =
-          getNetSignalsAtScenePos(board, pos, {mCurrentViaToPlace});
-      if (netsignals.count() > 1) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Multiple different signals at via position."));
-      } else if (netsignals.isEmpty()) {
-        netsignal = getClosestNetSignal(board, pos);
-      } else {
-        netsignal = netsignals.values().first();
-      }
-      Q_ASSERT(netsignal);
-      setNetSignal(netsignal);
-    }
-    Q_ASSERT(netsignal);
-
     // Find stuff at the via position
+    NetSignal* netsignal = mCurrentViaToPlace->getNetSegment().getNetSignal();
     QSet<BI_NetPoint*> otherNetAnchors = {};
     if (BI_Via* via = findVia(board, pos, {}, {mCurrentViaToPlace})) {
-      if (&via->getNetSignalOfNetSegment() != netsignal) {
+      if (via->getNetSegment().getNetSignal() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Via of a different signal already present at "
                               "target position."));
@@ -360,7 +309,7 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
       }
     }
     foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
-      if (&netpoint->getNetSignalOfNetSegment() != netsignal) {
+      if (netpoint->getNetSegment().getNetSignal() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Netpoint of a different signal already present "
                               "at target position."));
@@ -369,7 +318,7 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
       }
     }
     foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
-      if (&netline->getNetSignalOfNetSegment() != netsignal) {
+      if (netline->getNetSegment().getNetSignal() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Netline of a different signal already present "
                               "at target position."));
@@ -482,25 +431,63 @@ void BoardEditorState_AddVia::drillDiameterEditValueChanged(
   }
 }
 
-NetSignal* BoardEditorState_AddVia::getClosestNetSignal(
+void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
+  QString data = mNetSignalComboBox->currentData().toString();
+  mUseAutoNetSignal = (data == "auto");
+  if (!mUseAutoNetSignal) {
+    mCurrentNetSignal = Uuid::tryFromString(data);
+    mClosestNetSignalIsUpToDate = false;
+  }
+
+  NetSignal* netsignal = getCurrentNetSignal();
+  if ((mIsUndoCmdActive) && (mCurrentViaToPlace) &&
+      (netsignal != mCurrentViaToPlace->getNetSegment().getNetSignal())) {
+    try {
+      mContext.undoStack.appendToCmdGroup(
+          new CmdBoardNetSegmentRemove(mCurrentViaToPlace->getNetSegment()));
+      QScopedPointer<CmdBoardNetSegmentEdit> cmdEdit(
+          new CmdBoardNetSegmentEdit(mCurrentViaToPlace->getNetSegment()));
+      cmdEdit->setNetSignal(netsignal);
+      mContext.undoStack.appendToCmdGroup(cmdEdit.take());
+      mContext.undoStack.appendToCmdGroup(
+          new CmdBoardNetSegmentAdd(mCurrentViaToPlace->getNetSegment()));
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void BoardEditorState_AddVia::updateClosestNetSignal(
     Board& board, const Point& pos) noexcept {
   // TODO(5n8ke): Get the closest candidate, instead of the most used
   // for now a _closest_ NetSignal is only found, when it is at pos.
   // Otherwise the last candidate is returned.
-  if (mFindClosestNetSignal) {
+  if (!mClosestNetSignalIsUpToDate) {
+    const NetSignal* netsignal = getCurrentNetSignal();
     if (BI_NetLine* atPosition = findNetLine(board, pos)) {
-      mLastClosestNetSignal = &atPosition->getNetSignalOfNetSegment();
+      netsignal = atPosition->getNetSegment().getNetSignal();
+    } else if (!netsignal) {
+      // If there was and still is no "closest" net signal available, fall back
+      // to the net signal with the most elements since this is often something
+      // like "GND" where you need many vias.
+      netsignal = mContext.project.getCircuit().getNetSignalWithMostElements();
     }
-    mFindClosestNetSignal = false;
+    mCurrentNetSignal = netsignal ? netsignal->getUuid() : tl::optional<Uuid>();
+    mClosestNetSignalIsUpToDate = true;
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this, timer]() {
-      this->mFindClosestNetSignal = true;
+      mClosestNetSignalIsUpToDate = false;
       timer->deleteLater();
     });
     timer->setSingleShot(true);
     timer->start(500);
   }
-  return mLastClosestNetSignal;
+}
+
+NetSignal* BoardEditorState_AddVia::getCurrentNetSignal() const noexcept {
+  return mCurrentNetSignal
+      ? mContext.project.getCircuit().getNetSignalByUuid(*mCurrentNetSignal)
+      : nullptr;
 }
 
 QSet<NetSignal*> BoardEditorState_AddVia::getNetSignalsAtScenePos(
@@ -508,20 +495,20 @@ QSet<NetSignal*> BoardEditorState_AddVia::getNetSignalsAtScenePos(
   QSet<NetSignal*> result = QSet<NetSignal*>();
   foreach (BI_Via* via, board.getViasAtScenePos(pos)) {
     if (except.contains(via)) continue;
-    if (!result.contains(&via->getNetSignalOfNetSegment())) {
-      result.insert(&via->getNetSignalOfNetSegment());
+    if (!result.contains(via->getNetSegment().getNetSignal())) {
+      result.insert(via->getNetSegment().getNetSignal());
     }
   }
   foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
     if (except.contains(netpoint)) continue;
-    if (!result.contains(&netpoint->getNetSignalOfNetSegment())) {
-      result.insert(&netpoint->getNetSignalOfNetSegment());
+    if (!result.contains(netpoint->getNetSegment().getNetSignal())) {
+      result.insert(netpoint->getNetSegment().getNetSignal());
     }
   }
   foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
     if (except.contains(netline)) continue;
-    if (!result.contains(&netline->getNetSignalOfNetSegment())) {
-      result.insert(&netline->getNetSignalOfNetSegment());
+    if (!result.contains(netline->getNetSegment().getNetSignal())) {
+      result.insert(netline->getNetSegment().getNetSignal());
     }
   }
   foreach (BI_FootprintPad* pad, board.getPadsAtScenePos(pos)) {

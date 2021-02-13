@@ -431,9 +431,6 @@ bool BoardEditorState_DrawTrace::startPositioning(
     layer->setVisible(true);
 
     // determine the fixed anchor (create one if it doesn't exist already)
-    // if the selected item is not part of a NetSegment (e.g. device pads),
-    // netsignal must be set to a valid NetSignal, which is used to create the
-    // new NetSegment
     NetSignal* netsignal = nullptr;
     mCurrentNetSegment = nullptr;
     if (fixedPoint) {
@@ -456,6 +453,10 @@ bool BoardEditorState_DrawTrace::startPositioning(
       mCurrentNetSegment = pad->getNetSegmentOfLines();
       netsignal = pad->getCompSigInstNetSignal();
       if (!netsignal) {
+        // Note: We might remove this restriction some day, but then we should
+        // ensure that it's not possible to connect several pads together with
+        // a trace of no net. For now, we simply disallow connecting traces
+        // to pads of no net.
         throw Exception(__FILE__, __LINE__,
                         tr("Pad is not connected to any signal."));
       }
@@ -497,19 +498,20 @@ bool BoardEditorState_DrawTrace::startPositioning(
           mCurrentNetSegment = pad->getNetSegmentOfLines();
           netsignal = pad->getCompSigInstNetSignal();
           if (!netsignal) {
+            // Note: We might remove this restriction some day, but then we
+            // should ensure that it's not possible to connect several pads
+            // together with a trace of no net. For now, we simply disallow
+            // connecting traces to pads of no net.
             throw Exception(__FILE__, __LINE__,
                             tr("Pad is not connected to any signal."));
           }
         }
       }
-    } else {
-      throw Exception(__FILE__, __LINE__, tr("Nothing here to connect."));
     }
 
     // create new netsegment if none found
     if (!mCurrentNetSegment) {
-      Q_ASSERT(netsignal);
-      CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(board, *netsignal);
+      CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(board, netsignal);
       mContext.undoStack.appendToCmdGroup(cmd);  // can throw
       mCurrentNetSegment = cmd->getNetSegment();
     }
@@ -557,7 +559,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
     // NOTE(5n8ke): Use the NetSignal of the current NetSegment, since it is
     // only correctly set for device pads.
     mContext.project.getCircuit().setHighlightedNetSignal(
-        &mCurrentNetSegment->getNetSignal());
+        mCurrentNetSegment->getNetSignal());
 
     return true;
   } catch (const Exception& e) {
@@ -580,7 +582,8 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
 
   try {
     // find anchor under cursor use the target position as already determined
-    NetSignal* netsignal = &mPositioningNetPoint1->getNetSignalOfNetSegment();
+    const NetSignal* netsignal =
+        mPositioningNetPoint1->getNetSegment().getNetSignal();
     GraphicsLayer* layer = mPositioningNetPoint1->getLayerOfLines();
     Q_ASSERT(layer);
     QList<BI_NetLineAnchor*> otherAnchors = {};
@@ -669,10 +672,8 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
             otherNetSegment = &via->getNetSegment();
           } else if (BI_FootprintPad* pad =
                          dynamic_cast<BI_FootprintPad*>(otherAnchor)) {
-            NetSignal* componentSignal = pad->getCompSigInstNetSignal();
-            Q_ASSERT(componentSignal);
-            CmdBoardNetSegmentAdd* cmd =
-                new CmdBoardNetSegmentAdd(board, *componentSignal);
+            CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(
+                board, pad->getCompSigInstNetSignal());
             mContext.undoStack.appendToCmdGroup(cmd);  // can throw
             otherNetSegment = cmd->getNetSegment();
           }
@@ -838,10 +839,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     // find anchor under cursor
     GraphicsLayer* layer = mPositioningNetPoint1->getLayerOfLines();
     Q_ASSERT(layer);
-    NetSignal* netsignal = &mCurrentNetSegment->getNetSignal();
-    // NOTE(5n8ke): netsignal must not be nullptr, since a connection should
-    // only be made to the current NetSignal
-    Q_ASSERT(netsignal);
+    const NetSignal* netsignal = mCurrentNetSegment->getNetSignal();
 
     if (BI_Via* via = findVia(board, mCursorPos, {netsignal}, {mTempVia})) {
       mTargetPos = via->getPosition();
@@ -981,10 +979,10 @@ void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
   if ((mSubState == SubState_PositioningNetPoint) &&
       (newLayerName != mCurrentLayerName)) {
     Point startPos = mFixedStartAnchor->getPosition();
-    NetSignal& netsignal = mCurrentNetSegment->getNetSignal();
+    const NetSignal* netsignal = mCurrentNetSegment->getNetSignal();
     BI_FootprintPad* padAtStart =
-        findPad(*board, startPos, nullptr, {&netsignal});
-    if (findVia(*board, startPos, {&netsignal}) ||
+        findPad(*board, startPos, nullptr, {netsignal});
+    if (findVia(*board, startPos, {netsignal}) ||
         (padAtStart &&
          (padAtStart->getLibPad().getBoardSide() ==
           library::FootprintPad::BoardSide::THT))) {
