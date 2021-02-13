@@ -6,8 +6,9 @@ This directory contains all images which are required in the LibrePCB applicatio
 - Some images are from https://www.iconfinder.com/
 - Some images are from https://icons8.com/ (we may use those icons under the free license since we attribute icons8 in the about dialog)
 
-The following files are from "Open Icon Library" (found in open_icon_library-standard-0.11.tar.bz2 with fdupes),
+The following files are from "Open Icon Library" (found in open_icon_library-full-0.11.tar.bz2 with fdupes),
 with format `<filename> <filename in Open Icon Library> <license>`
+
 ```
 actions/add.png icons/png/64x64/actions/edit-add-4.png LGPL-2.1
 actions/apply.png icons/png/48x48/actions/dialog-accept.png LGPL-2.1
@@ -54,6 +55,7 @@ actions/select_rect.png icons/png/48x48/actions/select-rectangular.png CC-BY-SA 
 actions/settings.png icons/png/48x48/actions/configure-2.png LGPL-2.1
 actions/stop.png icons/png/48x48/actions/process-stop.png GPLv2
 actions/up.png icons/png/48x48/actions/go-up-5.png PD
+actions/working.png icons/png/48x48/symbols/pictograms-road_signs-workman_ahead_roadsign.png PD
 actions/zoom_all.png icons/png/48x48/actions/zoom-fit-best-2.png GPLv2
 actions/zoom_in.png icons/png/48x48/actions/zoom-in-3.png GPLv2
 actions/zoom_out.png icons/png/48x48/actions/zoom-out-3.png GPLv2
@@ -63,9 +65,11 @@ command_toolbars/align_horizontal_right.png icons/png/48x48/actions/align-horizo
 command_toolbars/align_vertical_bottom.png icons/png/48x48/actions/align-vertical-bottom-2.png CC-BY-SA 3.0 or LGPL
 command_toolbars/align_vertical_center.png icons/png/48x48/actions/align-vertical-center-2.png CC-BY-SA 3.0 or LGPL
 command_toolbars/align_vertical_top.png icons/png/48x48/actions/align-vertical-top-2.png CC-BY-SA 3.0 or LGPL
+command_toolbars/cancel.png icons/png/48x48/actions/dialog-cancel-4.png PD
+status/success.png icons/png/48x48/actions/dialog-accept.png PD
 ```
 
-Created by Urban Bruhin, released under CC0-1.0:
+Created by LibrePCB developers, released under CC0-1.0:
 
 ```
 actions/add_hole.png
@@ -77,7 +81,7 @@ actions/add_text.png
 actions/add_tht_pad.png
 actions/add_value.png
 actions/add_via.png
-actions/board_editor.png (at least I *guess* I created that one)
+actions/board_editor.png
 actions/draw_line.png
 actions/draw_netlabel.png
 actions/draw_wire.png
@@ -141,6 +145,7 @@ actions/swap.png: Color →Arrows → Actions→ Swap
 ```
 
 Created for LibrePCB by a 99designs designer:
+
 ```
 app/librepcb.icns
 app/librepcb.ico
@@ -149,11 +154,4 @@ app/librepcb.svg
 logo/32x32.png
 logo/48x48.png
 logo/64x64.png
-```
-
-Public Domain:
-```
-actions/working.png icons/png/48x48/symbols/pictograms-road_signs-workman_ahead_roadsign.png
-command_toolbars/cancel.png icons/png/48x48/actions/dialog-cancel-4.png
-status/success.png icons/png/48x48/actions/dialog-accept.png
 ```
