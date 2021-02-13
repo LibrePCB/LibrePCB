@@ -418,14 +418,13 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
       list;  // Note: The order of adding the items is very important (the
              // top most item must appear as the first item in the list)!
   // vias
-  foreach (BI_Via* via, getViasAtScenePos(pos, nullptr)) { list.append(via); }
+  foreach (BI_Via* via, getViasAtScenePos(pos)) { list.append(via); }
   // netpoints
-  foreach (BI_NetPoint* netpoint,
-           getNetPointsAtScenePos(pos, nullptr, nullptr)) {
+  foreach (BI_NetPoint* netpoint, getNetPointsAtScenePos(pos)) {
     list.append(netpoint);
   }
   // netlines
-  foreach (BI_NetLine* netline, getNetLinesAtScenePos(pos, nullptr, nullptr)) {
+  foreach (BI_NetLine* netline, getNetLinesAtScenePos(pos)) {
     list.append(netline);
   }
   // footprints & pads
@@ -491,12 +490,11 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
   return list;
 }
 
-QList<BI_Via*> Board::getViasAtScenePos(const Point& pos,
-                                        const NetSignal* netsignal) const
-    noexcept {
+QList<BI_Via*> Board::getViasAtScenePos(
+    const Point& pos, const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_Via*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
       segment->getViasAtScenePos(pos, list);
     }
   }
@@ -505,10 +503,10 @@ QList<BI_Via*> Board::getViasAtScenePos(const Point& pos,
 
 QList<BI_NetPoint*> Board::getNetPointsAtScenePos(
     const Point& pos, const GraphicsLayer* layer,
-    const NetSignal* netsignal) const noexcept {
+    const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_NetPoint*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
       segment->getNetPointsAtScenePos(pos, layer, list);
     }
   }
@@ -517,10 +515,10 @@ QList<BI_NetPoint*> Board::getNetPointsAtScenePos(
 
 QList<BI_NetLine*> Board::getNetLinesAtScenePos(
     const Point& pos, const GraphicsLayer* layer,
-    const NetSignal* netsignal) const noexcept {
+    const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_NetLine*> list;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
       segment->getNetLinesAtScenePos(pos, layer, list);
     }
   }
@@ -529,14 +527,15 @@ QList<BI_NetLine*> Board::getNetLinesAtScenePos(
 
 QList<BI_FootprintPad*> Board::getPadsAtScenePos(
     const Point& pos, const GraphicsLayer* layer,
-    const NetSignal* netsignal) const noexcept {
+    const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_FootprintPad*> list;
   foreach (BI_Device* device, mDeviceInstances) {
     foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
       if (pad->isSelectable() &&
           pad->getGrabAreaScenePx().contains(pos.toPxQPointF()) &&
           ((!layer) || (pad->isOnLayer(layer->getName()))) &&
-          ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal))) {
+          (netsignals.isEmpty() ||
+           netsignals.contains(pad->getCompSigInstNetSignal()))) {
         list.append(pad);
       }
     }
@@ -546,10 +545,10 @@ QList<BI_FootprintPad*> Board::getPadsAtScenePos(
 
 BI_NetPoint* Board::getNetPointNextToScenePos(
     const Point& pos, UnsignedLength& maxDistance, const GraphicsLayer* layer,
-    const NetSignal* netsignal) const {
+    const QSet<const NetSignal*>& netsignals) const {
   BI_NetPoint* bestMatch = nullptr;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
       BI_NetPoint* newMatch =
           segment->getNetPointNextToScenePos(pos, layer, maxDistance);
       if (newMatch) bestMatch = newMatch;
@@ -558,12 +557,12 @@ BI_NetPoint* Board::getNetPointNextToScenePos(
   return bestMatch;
 }
 
-BI_Via* Board::getViaNextToScenePos(const Point& pos,
-                                    UnsignedLength& maxDistance,
-                                    const NetSignal* netsignal) const {
+BI_Via* Board::getViaNextToScenePos(
+    const Point& pos, UnsignedLength& maxDistance,
+    const QSet<const NetSignal*>& netsignals) const {
   BI_Via* bestMatch = nullptr;
   foreach (BI_NetSegment* segment, mNetSegments) {
-    if ((!netsignal) || (&segment->getNetSignal() == netsignal)) {
+    if (netsignals.isEmpty() || netsignals.contains(&segment->getNetSignal())) {
       BI_Via* newMatch = segment->getViaNextToScenePos(pos, maxDistance);
       if (newMatch) bestMatch = newMatch;
     }
@@ -571,10 +570,9 @@ BI_Via* Board::getViaNextToScenePos(const Point& pos,
   return bestMatch;
 }
 
-BI_FootprintPad* Board::getPadNextToScenePos(const Point& pos,
-                                             UnsignedLength& maxDistance,
-                                             const GraphicsLayer* layer,
-                                             const NetSignal* netsignal) const {
+BI_FootprintPad* Board::getPadNextToScenePos(
+    const Point& pos, UnsignedLength& maxDistance, const GraphicsLayer* layer,
+    const QSet<const NetSignal*>& netsignals) const {
   BI_FootprintPad* bestMatch = nullptr;
   foreach (BI_Device* device, mDeviceInstances) {
     foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
@@ -583,7 +581,8 @@ BI_FootprintPad* Board::getPadNextToScenePos(const Point& pos,
                       maxDistance->toPx());
       if (pad->isSelectable() && pad->getGrabAreaScenePx().intersects(area) &&
           ((!layer) || (pad->isOnLayer(layer->getName()))) &&
-          ((!netsignal) || (pad->getCompSigInstNetSignal() == netsignal))) {
+          (netsignals.isEmpty() ||
+           netsignals.contains(pad->getCompSigInstNetSignal()))) {
         UnsignedLength distance = (pad->getPosition() - pos).getLength();
         if (distance < maxDistance) {
           bestMatch = pad;

@@ -89,14 +89,16 @@ private:  // Methods
   QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
                                            QSet<BI_Base*> except = {}) const
       noexcept;
-  BI_Via* findVia(Board& board, const Point pos, NetSignal* netsignal = nullptr,
+  BI_Via* findVia(Board& board, const Point pos,
+                  const QSet<const NetSignal*>& netsignals = {},
                   const QSet<BI_Via*>& except = {}) const noexcept;
   BI_FootprintPad* findPad(Board& board, const Point pos,
-                           NetSignal* netsignal = nullptr,
+                           const QSet<const NetSignal*>& netsignals = {},
                            const QSet<BI_FootprintPad*>& except = {}) const
       noexcept;
   BI_NetLine* findNetLine(Board& board, const Point pos,
-                          NetSignal* netsignal = nullptr) const noexcept;
+                          const QSet<const NetSignal*>& netsignals = {}) const
+      noexcept;
 
 private:  // Data
   // State
