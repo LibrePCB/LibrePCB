@@ -589,8 +589,9 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
     if (mTempVia) {
       mCurrentLayerName = mViaLayerName;
     } else {
-      foreach (BI_Via* via,
-               Toolbox::toSet(board.getViasAtScenePos(mTargetPos, netsignal))) {
+      foreach (
+          BI_Via* via,
+          Toolbox::toSet(board.getViasAtScenePos(mTargetPos, {netsignal}))) {
         if (mCurrentSnapActive || mTargetPos == via->getPosition()) {
           otherAnchors.append(via);
           if (mAddVia) {
@@ -598,7 +599,8 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
           }
         }
       }
-      if (BI_FootprintPad* pad = findPad(board, mTargetPos, layer, netsignal)) {
+      if (BI_FootprintPad* pad =
+              findPad(board, mTargetPos, layer, {netsignal})) {
         if (mCurrentSnapActive || mTargetPos == pad->getPosition()) {
           otherAnchors.append(pad);
           if (mAddVia &&
@@ -611,7 +613,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
     }
     foreach (BI_NetPoint* netpoint,
              Toolbox::toSet(board.getNetPointsAtScenePos(
-                 mTargetPos, mAddVia ? nullptr : layer, netsignal))) {
+                 mTargetPos, mAddVia ? nullptr : layer, {netsignal}))) {
       if (netpoint == mPositioningNetPoint1 ||
           netpoint == mPositioningNetPoint2)
         continue;
@@ -621,7 +623,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
     }
     foreach (BI_NetLine* netline,
              Toolbox::toSet(board.getNetLinesAtScenePos(
-                 mTargetPos, mAddVia ? nullptr : layer, netsignal))) {
+                 mTargetPos, mAddVia ? nullptr : layer, {netsignal}))) {
       if (netline == mPositioningNetLine1 || netline == mPositioningNetLine2)
         continue;
       if (otherAnchors.contains(&netline->getStartPoint()) ||
@@ -712,7 +714,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
         Q_ASSERT(mAddVia);
         foreach (BI_NetPoint* netpoint,
                  Toolbox::toSet(board.getNetPointsAtScenePos(
-                     mTargetPos, nullptr, netsignal))) {
+                     mTargetPos, nullptr, {netsignal}))) {
           combineAnchors(*mTempVia, *netpoint);
         }
       }
@@ -771,52 +773,53 @@ bool BoardEditorState_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
   }
 }
 
-BI_Via* BoardEditorState_DrawTrace::findVia(Board& board, const Point& pos,
-                                            NetSignal* netsignal,
-                                            const QSet<BI_Via*>& except) const
-    noexcept {
-  QSet<BI_Via*> items = Toolbox::toSet(board.getViasAtScenePos(pos, netsignal));
+BI_Via* BoardEditorState_DrawTrace::findVia(
+    Board& board, const Point& pos, const QSet<const NetSignal*>& netsignals,
+    const QSet<BI_Via*>& except) const noexcept {
+  QSet<BI_Via*> items =
+      Toolbox::toSet(board.getViasAtScenePos(pos, netsignals));
   items -= except;
   return items.count() ? *items.constBegin() : nullptr;
 }
 
-BI_FootprintPad* BoardEditorState_DrawTrace::findPad(Board& board,
-                                                     const Point& pos,
-                                                     GraphicsLayer* layer,
-                                                     NetSignal* netsignal) const
-    noexcept {
+BI_FootprintPad* BoardEditorState_DrawTrace::findPad(
+    Board& board, const Point& pos, GraphicsLayer* layer,
+    const QSet<const NetSignal*>& netsignals) const noexcept {
   QList<BI_FootprintPad*> items =
-      board.getPadsAtScenePos(pos, layer, netsignal);
+      board.getPadsAtScenePos(pos, layer, netsignals);
   return items.count() ? *items.constBegin() : nullptr;
 }
 
 BI_NetPoint* BoardEditorState_DrawTrace::findNetPoint(
-    Board& board, const Point& pos, GraphicsLayer* layer, NetSignal* netsignal,
+    Board& board, const Point& pos, GraphicsLayer* layer,
+    const QSet<const NetSignal*>& netsignals,
     const QSet<BI_NetPoint*>& except) const noexcept {
   QSet<BI_NetPoint*> items =
-      Toolbox::toSet(board.getNetPointsAtScenePos(pos, layer, netsignal));
+      Toolbox::toSet(board.getNetPointsAtScenePos(pos, layer, netsignals));
   items -= except;
   return items.count() ? *items.constBegin() : nullptr;
 }
 
 BI_NetLine* BoardEditorState_DrawTrace::findNetLine(
-    Board& board, const Point& pos, GraphicsLayer* layer, NetSignal* netsignal,
+    Board& board, const Point& pos, GraphicsLayer* layer,
+    const QSet<const NetSignal*>& netsignals,
     const QSet<BI_NetLine*>& except) const noexcept {
   QSet<BI_NetLine*> items =
-      Toolbox::toSet(board.getNetLinesAtScenePos(pos, layer, netsignal));
+      Toolbox::toSet(board.getNetLinesAtScenePos(pos, layer, netsignals));
   items -= except;
   return (items.count() ? *items.constBegin() : nullptr);
 }
 
 BI_NetLineAnchor* BoardEditorState_DrawTrace::findAnchorNextTo(
     Board& board, const Point& pos, const UnsignedLength& maxDistance,
-    GraphicsLayer* layer, NetSignal* netsignal) const noexcept {
+    GraphicsLayer* layer, const QSet<const NetSignal*>& netsignals) const
+    noexcept {
   UnsignedLength currentDistance = maxDistance;
   BI_NetPoint* point =
-      board.getNetPointNextToScenePos(pos, currentDistance, layer, netsignal);
-  BI_Via* via = board.getViaNextToScenePos(pos, currentDistance, netsignal);
+      board.getNetPointNextToScenePos(pos, currentDistance, layer, netsignals);
+  BI_Via* via = board.getViaNextToScenePos(pos, currentDistance, netsignals);
   BI_FootprintPad* pad =
-      board.getPadNextToScenePos(pos, currentDistance, layer, netsignal);
+      board.getPadNextToScenePos(pos, currentDistance, layer, netsignals);
   if (pad) return pad;
   if (via) return via;
   if (point) return point;
@@ -840,22 +843,22 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     // only be made to the current NetSignal
     Q_ASSERT(netsignal);
 
-    if (BI_Via* via = findVia(board, mCursorPos, netsignal, {mTempVia})) {
+    if (BI_Via* via = findVia(board, mCursorPos, {netsignal}, {mTempVia})) {
       mTargetPos = via->getPosition();
       isOnVia = true;
     } else if (BI_FootprintPad* pad =
-                   findPad(board, mCursorPos, layer, netsignal)) {
+                   findPad(board, mCursorPos, layer, {netsignal})) {
       mTargetPos = pad->getPosition();
       isOnVia = (pad->getLibPad().getBoardSide() ==
                  library::FootprintPad::BoardSide::THT);
     } else if (BI_NetPoint* netpoint = findNetPoint(
-                   board, mCursorPos, layer, netsignal,
+                   board, mCursorPos, layer, {netsignal},
                    {mPositioningNetPoint1, mPositioningNetPoint2})) {
       mTargetPos = netpoint->getPosition();
     } else if (BI_NetLine* netline =
-                   findNetLine(board, mCursorPos, layer, netsignal,
+                   findNetLine(board, mCursorPos, layer, {netsignal},
                                {mPositioningNetLine1, mPositioningNetLine2})) {
-      if (findNetLine(board, mTargetPos, layer, netsignal,
+      if (findNetLine(board, mTargetPos, layer, {netsignal},
                       {mPositioningNetLine1, mPositioningNetLine2}) ==
           netline) {
         mTargetPos = Toolbox::nearestPointOnLine(
@@ -980,8 +983,8 @@ void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
     Point startPos = mFixedStartAnchor->getPosition();
     NetSignal& netsignal = mCurrentNetSegment->getNetSignal();
     BI_FootprintPad* padAtStart =
-        findPad(*board, startPos, nullptr, &netsignal);
-    if (findVia(*board, startPos, &netsignal) ||
+        findPad(*board, startPos, nullptr, {&netsignal});
+    if (findVia(*board, startPos, {&netsignal}) ||
         (padAtStart &&
          (padAtStart->getLibPad().getBoardSide() ==
           library::FootprintPad::BoardSide::THT))) {

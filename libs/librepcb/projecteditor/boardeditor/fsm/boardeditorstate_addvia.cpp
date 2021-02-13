@@ -340,7 +340,7 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
 
     // Find stuff at the via position
     QSet<BI_NetPoint*> otherNetAnchors = {};
-    if (BI_Via* via = findVia(board, pos, nullptr, {mCurrentViaToPlace})) {
+    if (BI_Via* via = findVia(board, pos, {}, {mCurrentViaToPlace})) {
       if (&via->getNetSignalOfNetSegment() != netsignal) {
         throw RuntimeError(__FILE__, __LINE__,
                            tr("Via of a different signal already present at "
@@ -533,29 +533,29 @@ QSet<NetSignal*> BoardEditorState_AddVia::getNetSignalsAtScenePos(
   return result;
 }
 
-BI_Via* BoardEditorState_AddVia::findVia(Board& board, const Point pos,
-                                         NetSignal* netsignal,
-                                         const QSet<BI_Via*>& except) const
-    noexcept {
-  QSet<BI_Via*> items = Toolbox::toSet(board.getViasAtScenePos(pos, netsignal));
+BI_Via* BoardEditorState_AddVia::findVia(
+    Board& board, const Point pos, const QSet<const NetSignal*>& netsignals,
+    const QSet<BI_Via*>& except) const noexcept {
+  QSet<BI_Via*> items =
+      Toolbox::toSet(board.getViasAtScenePos(pos, netsignals));
   items -= except;
   return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
 BI_FootprintPad* BoardEditorState_AddVia::findPad(
-    Board& board, const Point pos, NetSignal* netsignal,
+    Board& board, const Point pos, const QSet<const NetSignal*>& netsignals,
     const QSet<BI_FootprintPad*>& except) const noexcept {
   QSet<BI_FootprintPad*> items =
-      Toolbox::toSet(board.getPadsAtScenePos(pos, nullptr, netsignal));
+      Toolbox::toSet(board.getPadsAtScenePos(pos, nullptr, netsignals));
   items -= except;
   return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
-BI_NetLine* BoardEditorState_AddVia::findNetLine(Board& board, const Point pos,
-                                                 NetSignal* netsignal) const
-    noexcept {
+BI_NetLine* BoardEditorState_AddVia::findNetLine(
+    Board& board, const Point pos,
+    const QSet<const NetSignal*>& netsignals) const noexcept {
   QSet<BI_NetLine*> items =
-      Toolbox::toSet(board.getNetLinesAtScenePos(pos, nullptr, netsignal));
+      Toolbox::toSet(board.getNetLinesAtScenePos(pos, nullptr, netsignals));
   return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 

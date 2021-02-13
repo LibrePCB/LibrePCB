@@ -144,14 +144,14 @@ private:
    * @brief Find a BI_Via at the given position on the board.
    * @param board The board on which to look.
    * @param pos The position at which to look.
-   * @param netsignal When specified only look for BI_Via which are part of that
-   * signal
+   * @param netsignals  When not empty, only look for vias which are part of
+   *                    one of these signals.
    * @param except A QSet of BI_Via that should be excluded when looking at the
    * target position.
    * @return A single BI_Via, if any. at the target position.
    */
   BI_Via* findVia(Board& board, const Point& pos,
-                  NetSignal* netsignal = nullptr,
+                  const QSet<const NetSignal*>& netsignals = {},
                   const QSet<BI_Via*>& except = {}) const noexcept;
 
   /**
@@ -160,13 +160,14 @@ private:
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_FootprintPad which are on that
    * layer
-   * @param netsignal When specified only look for BI_FootprintPad which are
-   * part of that signal
+   * @param netsignals  When not empty, only look for pads which are part of
+   *                    one of these signals.
    * @return A single BI_FootprintPad, if any. at the target position.
    */
   BI_FootprintPad* findPad(Board& board, const Point& pos,
                            GraphicsLayer* layer = nullptr,
-                           NetSignal* netsignal = nullptr) const noexcept;
+                           const QSet<const NetSignal*>& netsignals = {}) const
+      noexcept;
 
   /**
    * @brief Find a BI_NetPoint at the given position on the board.
@@ -174,15 +175,15 @@ private:
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_NetPoint which are on that
    * layer
-   * @param netsignal When specified only look for BI_NetPoint which are part of
-   * that signal
+   * @param netsignals  When not empty, only look for netpoints which are part
+   *                    of one of these signals.
    * @param except A QSet of BI_NetPoint that should be excluded when looking at
    * the target position.
    * @return A single BI_NetPoint, if any. at the target position.
    */
   BI_NetPoint* findNetPoint(Board& board, const Point& pos,
                             GraphicsLayer* layer = nullptr,
-                            NetSignal* netsignal = nullptr,
+                            const QSet<const NetSignal*>& netsignals = {},
                             const QSet<BI_NetPoint*>& except = {}) const
       noexcept;
 
@@ -192,22 +193,21 @@ private:
    * @param pos The position at which to look.
    * @param layer When specified only look for BI_NetLine which are on that
    * layer
-   * @param netsignal When specified only look for BI_NetLine which are part of
-   * that signal
+   * @param netsignals  When not empty, only look for netlines which are part
+   *                    of one of these signals.
    * @param except A QSet of BI_NetLine that should be excluded when looking at
    * the target position.
    * @return A single BI_NetLine, if any. at the target position.
    */
   BI_NetLine* findNetLine(Board& board, const Point& pos,
                           GraphicsLayer* layer = nullptr,
-                          NetSignal* netsignal = nullptr,
+                          const QSet<const NetSignal*>& netsignals = {},
                           const QSet<BI_NetLine*>& except = {}) const noexcept;
 
-  BI_NetLineAnchor* findAnchorNextTo(Board& board, const Point& pos,
-                                     const UnsignedLength& maxDistance,
-                                     GraphicsLayer* layer = nullptr,
-                                     NetSignal* netsignal = nullptr) const
-      noexcept;
+  BI_NetLineAnchor* findAnchorNextTo(
+      Board& board, const Point& pos, const UnsignedLength& maxDistance,
+      GraphicsLayer* layer = nullptr,
+      const QSet<const NetSignal*>& netsignals = {}) const noexcept;
 
   /**
    * @brief Update the currently active traces according

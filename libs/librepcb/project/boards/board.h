@@ -151,29 +151,30 @@ public:
   }
   bool isEmpty() const noexcept;
   QList<BI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
-  QList<BI_Via*> getViasAtScenePos(const Point& pos,
-                                   const NetSignal* netsignal = nullptr) const
+  QList<BI_Via*> getViasAtScenePos(
+      const Point& pos, const QSet<const NetSignal*>& netsignals = {}) const
       noexcept;
   QList<BI_NetPoint*> getNetPointsAtScenePos(
       const Point& pos, const GraphicsLayer* layer = nullptr,
-      const NetSignal* netsignal = nullptr) const noexcept;
+      const QSet<const NetSignal*>& netsignals = {}) const noexcept;
   QList<BI_NetLine*> getNetLinesAtScenePos(
       const Point& pos, const GraphicsLayer* layer = nullptr,
-      const NetSignal* netsignal = nullptr) const noexcept;
+      const QSet<const NetSignal*>& netsignals = {}) const noexcept;
   QList<BI_FootprintPad*> getPadsAtScenePos(
       const Point& pos, const GraphicsLayer* layer = nullptr,
-      const NetSignal* netsignal = nullptr) const noexcept;
+      const QSet<const NetSignal*>& netsignals = {}) const noexcept;
 
   BI_NetPoint* getNetPointNextToScenePos(
       const Point& pos, UnsignedLength& maxDistance,
       const GraphicsLayer* layer = nullptr,
-      const NetSignal* netsignal = nullptr) const;
-  BI_Via* getViaNextToScenePos(const Point& pos, UnsignedLength& maxDistance,
-                               const NetSignal* netsignal = nullptr) const;
+      const QSet<const NetSignal*>& netsignals = {}) const;
+  BI_Via* getViaNextToScenePos(
+      const Point& pos, UnsignedLength& maxDistance,
+      const QSet<const NetSignal*>& netsignals = {}) const;
   BI_FootprintPad* getPadNextToScenePos(
       const Point& pos, UnsignedLength& maxDistance,
       const GraphicsLayer* layer = nullptr,
-      const NetSignal* netsignal = nullptr) const;
+      const QSet<const NetSignal*>& netsignals = {}) const;
   QList<BI_Base*> getAllItems() const noexcept;
 
   // Setters: General
