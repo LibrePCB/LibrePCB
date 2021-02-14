@@ -100,16 +100,28 @@ Application::Application(int& argc, char** argv) noexcept
   Q_ASSERT(executableFilePath.isValid());
 
   // determine the path to the resources directory (e.g. /usr/share/librepcb)
-#ifdef SHARE_DIRECTORY_SOURCE
-  // This is a developer build and thus we use the "share" directory from the
-  // repository root.
-  mResourcesDir = FilePath(SHARE_DIRECTORY_SOURCE).getPathTo("librepcb");
-#else
-  // This is a non-developer build and thus we use the "share" directory
-  // which is bundled with the application (must be located at "../share"
-  // relative to the executable).
-  mResourcesDir = executableFilePath.getParentDir().getPathTo("../share/librepcb");
+#if defined(LIBREPCB_BINARY_DIR) && defined(LIBREPCB_SHARE_SOURCE)
+  // TODO: The following code checks for paths related to the application binary,
+  // even though this code is located in the library source. This is a bit of a
+  // layer violation and should be refactored.
+  FilePath buildOutputDirPath(LIBREPCB_BINARY_DIR);
+  bool runningFromBuildOutput =
+      executableFilePath.isLocatedInDir(buildOutputDirPath);
+  if (runningFromBuildOutput) {
+    // The executable is located inside the build output directory, so we assume
+    // this is a developer build and thus we use the "share" directory from the
+    // repository root.
+    mResourcesDir = FilePath(LIBREPCB_SHARE_SOURCE).getPathTo("librepcb");
+  }
 #endif
+  if (!mResourcesDir.isValid()) {
+    if (QDir::isAbsolutePath(LIBREPCB_SHARE)) {
+      mResourcesDir.setPath(LIBREPCB_SHARE);
+    } else {
+      mResourcesDir =
+          executableFilePath.getParentDir().getPathTo(LIBREPCB_SHARE);
+    }
+  }
 
   // warn if runtime resource files are not found
   if (!getResourcesFilePath("README.md").isExistingFile()) {
@@ -118,10 +130,12 @@ Application::Application(int& argc, char** argv) noexcept
     qCritical() << "Expected resources location:" << mResourcesDir.toNative();
     qCritical() << "Executable location:        "
                 << executableFilePath.toNative();
-#ifdef SHARE_DIRECTORY_SOURCE
-    qCritical() << "Source share directory:     " << QString(SHARE_DIRECTORY_SOURCE);
-#else
-    qCritical() << "Source share directory:      Not set";
+    qCritical() << "LIBREPCB_SHARE:             " << QString(LIBREPCB_SHARE);
+#ifdef LIBREPCB_BINARY_DIR
+    qCritical() << "LIBREPCB_BINARY_DIR:        " << QString(LIBREPCB_BINARY_DIR);
+#endif
+#ifdef LIBREPCB_SHARE_SOURCE
+    qCritical() << "LIBREPCB_SHARE_SOURCE:      " << QString(LIBREPCB_SHARE_SOURCE);
 #endif
   }
 

@@ -60,8 +60,8 @@ installing [ccache](https://ccache.dev/) and passing
 
 ## Changing the Install Prefix
 
-By passing in the `CMAKE_INSTALL_PREFIX` parameter, you can change the install prefix. For
-example, if you want to install LibrePCB to `/usr/local`, use
+By passing in the `CMAKE_INSTALL_PREFIX` parameter, you can change the install
+prefix. For example, if you want to install LibrePCB to `/usr/local`, use
 
     cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
 
@@ -88,6 +88,34 @@ you want to treat warnings as errors (advisable in CI, or before committing),
 pass the `BUILD_DISALLOW_WARNINGS` parameter to CMake:
 
   cmake .. -DBUILD_DISALLOW_WARNINGS=1
+
+## Shared Resources Path
+
+The share directory contains icons, fonts, templates and more resources that
+LibrePCB needs at runtime. On a Linux system, it is usually located at
+`/usr/share/librepcb`.
+
+By default (unless `LIBREPCB_REPRODUCIBLE` is set), the build process will
+embed the absolute path to the `share` directory located within the source tree
+into the binary. When starting LibrePCB, it will first check whether the binary
+is running from within `CMAKE_BINARY_DIR`. If that is the case, the `share`
+directory in the source tree will be used. Otherwise, LibrePCB will fall back
+to `../share/librepcb` relative to the application binary.
+
+This will work out-of-the-box in many cases. However, when packaging LibrePCB,
+you should explicitly set the share directory path (either an absolute or a
+relative path).
+
+    cmake .. -DLIBREPCB_SHARE=/usr/share/librepcb
+
+## Reproducible Builds
+
+So far, LibrePCB does not officially support reproducible builds. However, we
+allow turning off some features that make the binary non-reproducible (like
+embedded source directory paths, or embedded git commit hashes). This should
+make it easier to achieve reproducible builds in the future.
+
+    cmake .. -DLIBREPCB_REPRODUCIBLE=1
 
 # Dynamic Linking / Unbundling {#doc_building_unbundling}
 

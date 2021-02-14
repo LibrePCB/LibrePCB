@@ -3,16 +3,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC OFF)
 
-# By default, LibrePCB is built as a "dev build", meaning that the git commit hash is embedded
-# into the binary and that the binary uses the shared resources from the source tree (using
-# absolute paths embedded into the binary). If you are building a release build for distribution,
-# set this to false by passing `-DLIBREPCB_DEV_BUILD=0`.
-#
-# Note: This is independent from CMAKE_BUILD_TYPE!
-SET(LIBREPCB_DEV_BUILD YES CACHE BOOL "Whether this is a development build")
-if(LIBREPCB_DEV_BUILD)
-    message(STATUS "Creating a dev build")
+# Allow overriding the share directory path
+set(LIBREPCB_SHARE "../share/librepcb" CACHE STRING "Path to the LibrePCB share directory.")
 
+# Set this to YES to disable some features that make builds non-reproducible
+# (like embedding the git commit hash or the path to the source directory in the binary).
+set(LIBREPCB_REPRODUCIBLE NO CACHE BOOL "Disable feature that make builds non-reproducible")
+
+if(LIBREPCB_REPRODUCIBLE)
+    message(STATUS "Creating a potentially reproducible build")
+else()
     # Detect git commit hash
     find_package(Git)
     if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -27,11 +27,10 @@ if(LIBREPCB_DEV_BUILD)
     endif()
 
     # Detect path to source share directory
-    # Note: Unfortunately the SHELL_PATH generator expression is not yet supported on CMake 3.2.
-    file(TO_NATIVE_PATH "/" _path_separator)
-    set(SHARE_DIRECTORY_SOURCE "${CMAKE_SOURCE_DIR}${_path_separator}share")
-else()
-    message(STATUS "Creating a non-dev build")
+    set(LIBREPCB_SHARE_SOURCE "${CMAKE_SOURCE_DIR}/share")
+
+    # Detect path to binary output directory
+    set(LIBREPCB_BINARY_DIR "${CMAKE_BINARY_DIR}")
 endif()
 
 # Generate build_env.h file
