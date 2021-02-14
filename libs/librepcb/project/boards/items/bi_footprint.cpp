@@ -51,25 +51,40 @@ namespace project {
 
 BI_Footprint::BI_Footprint(BI_Device& device, const BI_Footprint& other)
   : BI_Base(device.getBoard()), mDevice(device) {
-  foreach (const BI_StrokeText* text, other.mStrokeTexts) {
-    addStrokeText(*new BI_StrokeText(mBoard, *text));
+  try {
+    foreach (const BI_StrokeText* text, other.mStrokeTexts) {
+      addStrokeText(*new BI_StrokeText(mBoard, *text));
+    }
+    init();
+  } catch (...) {
+    deinit();
+    throw;
   }
-  init();
 }
 
 BI_Footprint::BI_Footprint(BI_Device& device, const SExpression& node,
                            const Version& fileFormat)
   : BI_Base(device.getBoard()), mDevice(device) {
-  foreach (const SExpression& node, node.getChildren("stroke_text")) {
-    addStrokeText(*new BI_StrokeText(mBoard, node, fileFormat));  // can throw
+  try {
+    foreach (const SExpression& node, node.getChildren("stroke_text")) {
+      addStrokeText(*new BI_StrokeText(mBoard, node, fileFormat));  // can throw
+    }
+    init();
+  } catch (...) {
+    deinit();
+    throw;
   }
-  init();
 }
 
 BI_Footprint::BI_Footprint(BI_Device& device)
   : BI_Base(device.getBoard()), mDevice(device) {
-  resetStrokeTextsToLibraryFootprint();
-  init();
+  try {
+    resetStrokeTextsToLibraryFootprint();
+    init();
+  } catch (...) {
+    deinit();
+    throw;
+  }
 }
 
 void BI_Footprint::init() {
@@ -110,12 +125,16 @@ void BI_Footprint::init() {
           &BI_Footprint::deviceInstanceMirrored);
 }
 
-BI_Footprint::~BI_Footprint() noexcept {
+void BI_Footprint::deinit() noexcept {
   qDeleteAll(mPads);
   mPads.clear();
   qDeleteAll(mStrokeTexts);
   mStrokeTexts.clear();
   mGraphicsItem.reset();
+}
+
+BI_Footprint::~BI_Footprint() noexcept {
+  deinit();
 }
 
 /*******************************************************************************
