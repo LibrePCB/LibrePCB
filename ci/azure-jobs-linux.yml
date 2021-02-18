@@ -1,28 +1,28 @@
 jobs:
 - job: Linux
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-20.04'
   variables:
     OS: 'linux'
     ARCH: 'x86_64'
   strategy:
     matrix:
       Ubuntu_1404_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-14.04-2
+        IMAGE: librepcb/librepcb-dev:ubuntu-14.04-3
       Ubuntu_1604_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-2
+        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-3
       Ubuntu_1604_Qt_5_14_2_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.14.2-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.14.2-2
         DEPLOY: true
         NO_HOEDOWN: true
       Ubuntu_1804_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-2
+        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-3
         CC: clang
         CXX: clang++
       Ubuntu_2004_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-3
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-4
       Ubuntu_2004_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-3
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-4
         UNBUNDLE: "quazip polyclipping"
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
   container: $[ variables['IMAGE'] ]
