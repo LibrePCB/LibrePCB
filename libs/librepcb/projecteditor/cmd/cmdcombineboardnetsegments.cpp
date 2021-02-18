@@ -68,7 +68,7 @@ bool CmdCombineBoardNetSegments::performExecute() {
   if (&mOldSegment == &mNewSegment) throw LogicError(__FILE__, __LINE__);
   if (&mOldSegment.getBoard() != &mNewSegment.getBoard())
     throw LogicError(__FILE__, __LINE__);
-  if (&mOldSegment.getNetSignal() != &mNewSegment.getNetSignal())
+  if (mOldSegment.getNetSignal() != mNewSegment.getNetSignal())
     throw LogicError(__FILE__, __LINE__);
 
   // move all required vias/netpoints/netlines to the resulting netsegment

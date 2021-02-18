@@ -65,12 +65,33 @@ public:
                 const QHash<const BI_Device*, BI_Device*>& devMap);
   BI_NetSegment(Board& board, const SExpression& node,
                 const Version& fileFormat);
-  BI_NetSegment(Board& board, NetSignal& signal);
+  BI_NetSegment(Board& board, NetSignal* signal);
   ~BI_NetSegment() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
+
+  /// Get the net signal this segment belongs to
+  ///
+  /// @note If the net segment is not connected to any net (which is allowed),
+  ///       nullptr is returned.
+  ///
+  /// @return Pointer to the net signal (nullptr if unconnected)
+  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
+
+  /// Get the net name to display
+  ///
+  /// If connected to a net, the net name is returned. Otherwise a fallback
+  /// string is returned (either an empty string, or something like "(no net)"
+  /// in the user's locale). This is just for convenience to avoid implementing
+  /// exactly the same logic in many different modules.
+  ///
+  /// @param fallback   If the segment has no net, this determines whether an
+  ///                   empty string should be returned (false, default) or
+  ///                   something like "(no net)".
+  /// @return The net name or the fallback.
+  QString getNetNameToDisplay(bool fallback = false) const noexcept;
+
   bool isUsed() const noexcept;
   int getViasAtScenePos(const Point& pos, QList<BI_Via*>& vias) const noexcept;
   int getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
@@ -86,7 +107,7 @@ public:
                                UnsignedLength& maxDistance) const noexcept;
 
   // Setters
-  void setNetSignal(NetSignal& netsignal);
+  void setNetSignal(NetSignal* netsignal);
 
   // Via Methods
   const QList<BI_Via*>& getVias() const noexcept { return mVias; }
@@ -150,6 +171,10 @@ private:
 
   // Attributes
   Uuid mUuid;
+
+  /// The net signal this segment belongs to
+  ///
+  /// This is nullptr if not connected!
   NetSignal* mNetSignal;
 
   // Items

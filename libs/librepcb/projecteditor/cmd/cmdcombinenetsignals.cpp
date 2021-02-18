@@ -105,7 +105,7 @@ bool CmdCombineNetSignals::performExecute() {
   // re-add all board netsegments
   foreach (BI_NetSegment* netsegment, boardNetSegments) {
     CmdBoardNetSegmentEdit* cmd = new CmdBoardNetSegmentEdit(*netsegment);
-    cmd->setNetSignal(mResultingNetSignal);
+    cmd->setNetSignal(&mResultingNetSignal);
     execNewChildCmd(cmd);  // can throw
     execNewChildCmd(new CmdBoardNetSegmentAdd(*netsegment));  // can throw
   }

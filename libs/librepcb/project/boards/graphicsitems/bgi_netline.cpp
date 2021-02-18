@@ -28,6 +28,7 @@
 #include "../boardlayerstack.h"
 #include "../items/bi_netline.h"
 #include "../items/bi_netpoint.h"
+#include "../items/bi_netsegment.h"
 
 #include <QPrinter>
 #include <QtCore>
@@ -64,7 +65,7 @@ bool BGI_NetLine::isSelectable() const noexcept {
  ******************************************************************************/
 
 void BGI_NetLine::updateCacheAndRepaint() noexcept {
-  setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
+  setToolTip(mNetLine.getNetSegment().getNetNameToDisplay(true));
 
   prepareGeometryChange();
 
@@ -101,8 +102,9 @@ void BGI_NetLine::paint(QPainter* painter,
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
-  bool highlight = mNetLine.isSelected() ||
-      mNetLine.getNetSignalOfNetSegment().isHighlighted();
+  const NetSignal* netsignal = mNetLine.getNetSegment().getNetSignal();
+  bool highlight =
+      mNetLine.isSelected() || (netsignal && netsignal->isHighlighted());
 
   // draw line
   if (mLayer->isVisible()) {

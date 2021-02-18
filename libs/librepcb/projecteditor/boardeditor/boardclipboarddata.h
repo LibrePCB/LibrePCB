@@ -124,18 +124,18 @@ public:
   struct NetSegment : public SerializableObject {
     static constexpr const char* tagname = "netsegment";
 
-    CircuitIdentifier netName;
+    tl::optional<CircuitIdentifier> netName;
     ViaList vias;
     JunctionList junctions;
     TraceList traces;
     Signal<NetSegment> onEdited;  ///< Dummy event, not used
 
-    explicit NetSegment(const CircuitIdentifier& netName)
+    explicit NetSegment(const tl::optional<CircuitIdentifier>& netName)
       : netName(netName), vias(), junctions(), traces(), onEdited(*this) {}
 
     NetSegment(const SExpression& node, const Version& fileFormat)
-      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
-                                               fileFormat)),
+      : netName(deserialize<tl::optional<CircuitIdentifier>>(
+            node.getChild("net/@0"), fileFormat)),
         vias(node, fileFormat),
         junctions(node, fileFormat),
         traces(node, fileFormat),

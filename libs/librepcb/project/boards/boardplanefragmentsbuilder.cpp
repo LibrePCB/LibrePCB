@@ -184,7 +184,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
            mPlane.getBoard().getNetSegments()) {
     // subtract vias
     foreach (const BI_Via* via, netsegment->getVias()) {
-      if (&netsegment->getNetSignal() == &mPlane.getNetSignal()) {
+      if (netsegment->getNetSignal() == &mPlane.getNetSignal()) {
         ClipperLib::Path path = ClipperHelpers::convert(
             via->getVia().getSceneOutline(), maxArcTolerance());
         mConnectedNetSignalAreas.push_back(path);
@@ -195,7 +195,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
     // subtract netlines
     foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
       if (netline->getLayer().getName() != mPlane.getLayerName()) continue;
-      if (&netsegment->getNetSignal() == &mPlane.getNetSignal()) {
+      if (netsegment->getNetSignal() == &mPlane.getNetSignal()) {
         ClipperLib::Path path = ClipperHelpers::convert(
             netline->getSceneOutline(), maxArcTolerance());
         mConnectedNetSignalAreas.push_back(path);
@@ -266,7 +266,7 @@ ClipperLib::Path BoardPlaneFragmentsBuilder::createPadCutOut(
 ClipperLib::Path BoardPlaneFragmentsBuilder::createViaCutOut(
     const BI_Via& via) const noexcept {
   bool differentNetSignal =
-      (&via.getNetSignalOfNetSegment() != &mPlane.getNetSignal());
+      (via.getNetSegment().getNetSignal() != &mPlane.getNetSignal());
   if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
       differentNetSignal) {
     return ClipperHelpers::convert(

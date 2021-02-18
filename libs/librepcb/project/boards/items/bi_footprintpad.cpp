@@ -27,6 +27,7 @@
 #include "../../circuit/netsignal.h"
 #include "bi_device.h"
 #include "bi_footprint.h"
+#include "bi_netsegment.h"
 
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/library/dev/device.h>
@@ -172,13 +173,13 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
       (netline.getBoard() != mBoard)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()) {
+  if (netline.getNetSegment().getNetSignal() != getCompSigInstNetSignal()) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("Trace of net \"%1\" is not allowed to be connected to "
                 "pad \"%2\" of device \"%3\" (%4) since it is connected to the "
                 "net \"%5\".")
-            .arg(*netline.getNetSignalOfNetSegment().getName(),
+            .arg(netline.getNetSegment().getNetNameToDisplay(),
                  getPadNameOrUuid(), getComponentInstanceName(),
                  getLibraryDeviceName(), getNetSignalName()));
   }

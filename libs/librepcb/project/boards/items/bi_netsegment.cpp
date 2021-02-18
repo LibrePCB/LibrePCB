@@ -52,7 +52,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
                              const QHash<const BI_Device*, BI_Device*>& devMap)
   : BI_Base(board),
     mUuid(Uuid::createRandom()),
-    mNetSignal(&other.getNetSignal()) {
+    mNetSignal(other.getNetSignal()) {
   // determine new pad anchors
   QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorsMap;
   for (auto it = devMap.begin(); it != devMap.end(); ++it) {
@@ -93,13 +93,16 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node,
     mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mNetSignal(nullptr) {
   try {
-    Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
-    mNetSignal =
-        mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-    if (!mNetSignal) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Invalid net signal UUID: \"%1\"")
-                             .arg(netSignalUuid.toStr()));
+    // Note: Connection to a netsignal is optional since file format V0.2.
+    if (tl::optional<Uuid> netSignalUuid = deserialize<tl::optional<Uuid>>(
+            node.getChild("net/@0"), fileFormat)) {
+      mNetSignal =
+          mBoard.getProject().getCircuit().getNetSignalByUuid(*netSignalUuid);
+      if (!mNetSignal) {
+        throw RuntimeError(__FILE__, __LINE__,
+                           QString("Invalid net signal UUID: \"%1\"")
+                               .arg(netSignalUuid->toStr()));
+      }
     }
 
     // Load all vias
@@ -159,8 +162,8 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node,
   }
 }
 
-BI_NetSegment::BI_NetSegment(Board& board, NetSignal& signal)
-  : BI_Base(board), mUuid(Uuid::createRandom()), mNetSignal(&signal) {
+BI_NetSegment::BI_NetSegment(Board& board, NetSignal* signal)
+  : BI_Base(board), mUuid(Uuid::createRandom()), mNetSignal(signal) {
 }
 
 BI_NetSegment::~BI_NetSegment() noexcept {
@@ -176,6 +179,11 @@ BI_NetSegment::~BI_NetSegment() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+QString BI_NetSegment::getNetNameToDisplay(bool fallback) const noexcept {
+  return mNetSignal ? *mNetSignal->getName()
+                    : (fallback ? tr("(no net)") : QString());
+}
 
 bool BI_NetSegment::isUsed() const noexcept {
   return ((!mVias.isEmpty()) || (!mNetPoints.isEmpty()) ||
@@ -266,20 +274,25 @@ BI_Via* BI_NetSegment::getViaNextToScenePos(const Point& pos,
  *  Setters
  ******************************************************************************/
 
-void BI_NetSegment::setNetSignal(NetSignal& netsignal) {
-  if (&netsignal != mNetSignal) {
+void BI_NetSegment::setNetSignal(NetSignal* netsignal) {
+  if (netsignal != mNetSignal) {
     if ((isUsed() && isAddedToBoard()) ||
-        (netsignal.getCircuit() != getCircuit())) {
+        (netsignal && (netsignal->getCircuit() != getCircuit()))) {
       throw LogicError(__FILE__, __LINE__);
     }
     if (isAddedToBoard()) {
-      mNetSignal->unregisterBoardNetSegment(*this);  // can throw
-      auto sg =
-          scopeGuard([&]() { mNetSignal->registerBoardNetSegment(*this); });
-      netsignal.registerBoardNetSegment(*this);  // can throw
-      sg.dismiss();
+      ScopeGuardList sgl;
+      if (mNetSignal) {
+        mNetSignal->unregisterBoardNetSegment(*this);  // can throw
+        sgl.add([&]() { mNetSignal->registerBoardNetSegment(*this); });
+      }
+      if (netsignal) {
+        netsignal->registerBoardNetSegment(*this);  // can throw
+        sgl.add([&]() { netsignal->unregisterBoardNetSegment(*this); });
+      }
+      sgl.dismiss();
     }
-    mNetSignal = &netsignal;
+    mNetSignal = netsignal;
   }
 }
 
@@ -461,8 +474,10 @@ void BI_NetSegment::addToBoard() {
   }
 
   ScopeGuardList sgl(mNetPoints.count() + mNetLines.count() + 1);
-  mNetSignal->registerBoardNetSegment(*this);  // can throw
-  sgl.add([&]() { mNetSignal->unregisterBoardNetSegment(*this); });
+  if (mNetSignal) {
+    mNetSignal->registerBoardNetSegment(*this);  // can throw
+    sgl.add([&]() { mNetSignal->unregisterBoardNetSegment(*this); });
+  }
   foreach (BI_Via* via, mVias) {
     via->addToBoard();  // can throw
     sgl.add([via]() { via->removeFromBoard(); });
@@ -498,8 +513,10 @@ void BI_NetSegment::removeFromBoard() {
     via->removeFromBoard();  // can throw
     sgl.add([via]() { via->addToBoard(); });
   }
-  mNetSignal->unregisterBoardNetSegment(*this);  // can throw
-  sgl.add([&]() { mNetSignal->registerBoardNetSegment(*this); });
+  if (mNetSignal) {
+    mNetSignal->unregisterBoardNetSegment(*this);  // can throw
+    sgl.add([&]() { mNetSignal->registerBoardNetSegment(*this); });
+  }
 
   BI_Base::removeFromBoard(nullptr);
   sgl.dismiss();
@@ -539,7 +556,8 @@ void BI_NetSegment::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mUuid);
-  root.appendChild("net", mNetSignal->getUuid(), true);
+  root.appendChild(
+      "net", mNetSignal ? mNetSignal->getUuid() : tl::optional<Uuid>(), true);
   serializePointerContainerUuidSorted(root, mVias, "via");
   serializePointerContainerUuidSorted(root, mNetPoints, "junction");
   serializePointerContainerUuidSorted(root, mNetLines, "trace");
@@ -576,7 +594,6 @@ void BI_NetSegment::setSelected(bool selected) noexcept {
  ******************************************************************************/
 
 bool BI_NetSegment::checkAttributesValidity() const noexcept {
-  if (mNetSignal == nullptr) return false;
   if (!areAllNetPointsConnectedTogether()) return false;
   return true;
 }

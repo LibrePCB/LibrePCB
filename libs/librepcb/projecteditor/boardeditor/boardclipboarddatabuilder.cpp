@@ -147,9 +147,12 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
 
     foreach (const BoardNetSegmentSplitter::Segment& segment,
              splitter.split()) {
+      tl::optional<CircuitIdentifier> netName;
+      if (const NetSignal* netsignal = it.key()->getNetSignal()) {
+        netName = netsignal->getName();
+      }
       std::shared_ptr<BoardClipboardData::NetSegment> newSegment =
-          std::make_shared<BoardClipboardData::NetSegment>(
-              it.key()->getNetSignal().getName());
+          std::make_shared<BoardClipboardData::NetSegment>(netName);
       newSegment->vias = segment.vias;
       newSegment->junctions = segment.junctions;
       newSegment->traces = segment.traces;

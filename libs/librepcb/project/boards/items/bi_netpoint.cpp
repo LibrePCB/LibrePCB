@@ -75,10 +75,6 @@ BI_NetPoint::~BI_NetPoint() noexcept {
  *  Getters
  ******************************************************************************/
 
-NetSignal& BI_NetPoint::getNetSignalOfNetSegment() const noexcept {
-  return mNetSegment.getNetSignal();
-}
-
 GraphicsLayer* BI_NetPoint::getLayerOfLines() const noexcept {
   auto it = mRegisteredNetLines.constBegin();
   return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getLayer())
@@ -97,7 +93,9 @@ void BI_NetPoint::setPosition(const Point& position) noexcept {
   if (mJunction.setPosition(position)) {
     mGraphicsItem->setPos(position.toPxQPointF());
     foreach (BI_NetLine* line, mRegisteredNetLines) { line->updateLine(); }
-    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
+    if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
+      mBoard.scheduleAirWiresRebuild(netsignal);
+    }
   }
 }
 
@@ -112,12 +110,14 @@ void BI_NetPoint::addToBoard() {
   } else if (isUsed()) {
     throw LogicError(__FILE__, __LINE__, "NetPoint is currently in use.");
   }
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
+  if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
+    mHighlightChangedConnection =
+        connect(netsignal, &NetSignal::highlightedChanged,
+                [this]() { mGraphicsItem->update(); });
+    mBoard.scheduleAirWiresRebuild(netsignal);
+  }
   mErcMsgDeadNetPoint->setVisible(true);
   BI_Base::addToBoard(mGraphicsItem.data());
-  mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_NetPoint::removeFromBoard() {
@@ -127,10 +127,12 @@ void BI_NetPoint::removeFromBoard() {
   } else if (isUsed()) {
     throw LogicError(__FILE__, __LINE__, "NetPoint is currently in use.");
   }
-  disconnect(mHighlightChangedConnection);
+  if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
+    disconnect(mHighlightChangedConnection);
+    mBoard.scheduleAirWiresRebuild(netsignal);
+  }
   mErcMsgDeadNetPoint->setVisible(false);
   BI_Base::removeFromBoard(mGraphicsItem.data());
-  mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_NetPoint::registerNetLine(BI_NetLine& netline) {

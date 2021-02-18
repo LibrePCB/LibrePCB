@@ -66,11 +66,6 @@ void BI_Via::init() {
   // connect to the "attributes changed" signal of the board
   connect(&mBoard, &Board::attributesChanged, this,
           &BI_Via::boardOrNetAttributesChanged);
-
-  // Connect to the "name changed" signal of the net signal to enforce updating
-  // the displayed net signal name in the board.
-  connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged, this,
-          &BI_Via::boardOrNetAttributesChanged);
 }
 
 BI_Via::~BI_Via() noexcept {
@@ -80,10 +75,6 @@ BI_Via::~BI_Via() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
-
-NetSignal& BI_Via::getNetSignalOfNetSegment() const noexcept {
-  return mNetSegment.getNetSignal();
-}
 
 bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
   return GraphicsLayer::isCopperLayer(layerName);
@@ -103,7 +94,9 @@ void BI_Via::setPosition(const Point& position) noexcept {
     foreach (BI_NetLine* netline, mRegisteredNetLines) {
       netline->updateLine();
     }
-    mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
+    if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
+      mBoard.scheduleAirWiresRebuild(netsignal);
+    }
   }
 }
 
@@ -133,20 +126,27 @@ void BI_Via::addToBoard() {
   if (isAddedToBoard() || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
+  if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
+    mConnections.append(connect(netsignal, &NetSignal::nameChanged, this,
+                                &BI_Via::boardOrNetAttributesChanged));
+    mConnections.append(connect(netsignal, &NetSignal::highlightedChanged,
+                                [this]() { mGraphicsItem->update(); }));
+    mBoard.scheduleAirWiresRebuild(netsignal);
+  }
   BI_Base::addToBoard(mGraphicsItem.data());
-  mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_Via::removeFromBoard() {
   if ((!isAddedToBoard()) || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  disconnect(mHighlightChangedConnection);
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
+  if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
+    mBoard.scheduleAirWiresRebuild(netsignal);
+  }
   BI_Base::removeFromBoard(mGraphicsItem.data());
-  mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }
 
 void BI_Via::registerNetLine(BI_NetLine& netline) {

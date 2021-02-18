@@ -183,8 +183,9 @@ bool CmdPasteBoardItems::performExecute() {
     foreach (const BoardNetSegmentSplitter::Segment& segment,
              splitter.split()) {
       // Add new segment
-      BI_NetSegment* copy =
-          new BI_NetSegment(mBoard, *getOrCreateNetSignal(*seg.netName));
+      NetSignal* netsignal =
+          seg.netName ? getOrCreateNetSignal(**seg.netName) : nullptr;
+      BI_NetSegment* copy = new BI_NetSegment(mBoard, netsignal);
       copy->setSelected(true);
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 

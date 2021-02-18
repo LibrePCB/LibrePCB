@@ -384,7 +384,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
       if (restring < *mOptions.minPthRestring) {
         QString msg = tr("Min. via restring ('%1'): %2",
                          "Placeholders are net name + restring width")
-                          .arg(*netsegment->getNetSignal().getName(),
+                          .arg(netsegment->getNetNameToDisplay(true),
                                formatLength(restring));
         PositiveLength diameter = via->getDrillDiameter() +
             mOptions.minPthRestring + mOptions.minPthRestring;
@@ -433,7 +433,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
       if (via->getDrillDiameter() < mOptions.minPthDrillDiameter) {
         QString msg = tr("Min. via drill diameter ('%1'): %2",
                          "Placeholders are net name + drill diameter")
-                          .arg(*netsegment->getNetSignal().getName(),
+                          .arg(netsegment->getNetNameToDisplay(true),
                                formatLength(*via->getDrillDiameter()));
         Path location = Path::circle(via->getDrillDiameter())
                             .translated(via->getPosition());
