@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         Qt_5_15_0_MinGW_32bit:
-          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.0-32bit-1
+          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.2-32bit-1
           DEPLOY: true
     container: $[ variables['IMAGE'] ]
     steps:
