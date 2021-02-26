@@ -88,6 +88,11 @@ void CmdSymbolPinEdit::translate(const Point& deltaPos,
   if (immediate) mPin.setPosition(mNewPos);
 }
 
+void CmdSymbolPinEdit::snapToGrid(const PositiveLength& gridInterval,
+                                  bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdSymbolPinEdit::setRotation(const Angle& angle,
                                    bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

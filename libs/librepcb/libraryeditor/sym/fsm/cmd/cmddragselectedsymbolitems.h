@@ -61,7 +61,11 @@ public:
       const SymbolEditorState::Context& context) noexcept;
   ~CmdDragSelectedSymbolItems() noexcept;
 
+  // Getters
+  bool hasOffTheGridElements() const noexcept { return mHasOffTheGridElements; }
+
   // General Methods
+  void snapToGrid() noexcept;
   void setDeltaToStartPos(const Point& delta) noexcept;
   void translate(const Point& deltaPos) noexcept;
   void rotate(const Angle& angle) noexcept;
@@ -85,6 +89,8 @@ private:
   Point mDeltaPos;
   Angle mDeltaRot;
   bool mMirrored;
+  bool mSnappedToGrid;
+  bool mHasOffTheGridElements;
 
   // Move commands
   QList<CmdSymbolPinEdit*> mPinEditCmds;

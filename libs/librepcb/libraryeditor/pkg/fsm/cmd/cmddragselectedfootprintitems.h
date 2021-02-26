@@ -63,7 +63,11 @@ public:
       const PackageEditorState::Context& context) noexcept;
   ~CmdDragSelectedFootprintItems() noexcept;
 
+  // Getters
+  bool hasOffTheGridElements() const noexcept { return mHasOffTheGridElements; }
+
   // General Methods
+  void snapToGrid() noexcept;
   void setDeltaToStartPos(const Point& delta) noexcept;
   void translate(const Point& deltaPos) noexcept;
   void rotate(const Angle& angle) noexcept;
@@ -89,6 +93,8 @@ private:
   Angle mDeltaRot;
   bool mMirroredGeometry;
   bool mMirroredLayer;
+  bool mSnappedToGrid;
+  bool mHasOffTheGridElements;
 
   // Move commands
   QList<CmdFootprintPadEdit*> mPadEditCmds;

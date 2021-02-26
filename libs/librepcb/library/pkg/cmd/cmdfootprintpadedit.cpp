@@ -127,6 +127,11 @@ void CmdFootprintPadEdit::translate(const Point& deltaPos,
   if (immediate) mPad.setPosition(mNewPos);
 }
 
+void CmdFootprintPadEdit::snapToGrid(const PositiveLength& gridInterval,
+                                     bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdFootprintPadEdit::setRotation(const Angle& angle,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
