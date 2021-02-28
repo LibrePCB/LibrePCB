@@ -559,6 +559,8 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
     int index = mUi->tabWidget->addTab(widget, widget->windowIcon(),
                                        widget->windowTitle());
     mUi->tabWidget->setCurrentIndex(index);
+  } catch (const UserCanceled& e) {
+    // User requested to abort -> do nothing.
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Failed to open category"), e.getMsg());
   }

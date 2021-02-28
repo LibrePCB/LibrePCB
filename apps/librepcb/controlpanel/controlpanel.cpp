@@ -413,6 +413,8 @@ void ControlPanel::openLibraryEditor(const FilePath& libDir) noexcept {
       connect(editor, &LibraryEditor::destroyed, this,
               &ControlPanel::libraryEditorDestroyed);
       mOpenLibraryEditors.insert(libDir, editor);
+    } catch (const UserCanceled& e) {
+      // User requested to abort -> do nothing.
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Error"), e.getMsg());
     }
