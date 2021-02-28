@@ -29,6 +29,7 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/aboutdialog.h>
+#include <librepcb/common/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/fileio/fileutils.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
@@ -313,8 +314,9 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
     ProjectEditor* editor = getOpenProject(filepath);
     if (!editor) {
       std::shared_ptr<TransactionalFileSystem> fs =
-          TransactionalFileSystem::openRW(filepath.getParentDir(),
-                                          &askForRestoringBackup);
+          TransactionalFileSystem::openRW(
+              filepath.getParentDir(), &askForRestoringBackup,
+              DirectoryLockHandlerDialog::createDirectoryLockCallback());
       Project* project = new Project(std::unique_ptr<TransactionalDirectory>(
                                          new TransactionalDirectory(fs)),
                                      filepath.getFilename());

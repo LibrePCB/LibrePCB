@@ -55,7 +55,8 @@ namespace workspace {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Workspace::Workspace(const FilePath& wsPath)
+Workspace::Workspace(const FilePath& wsPath,
+                     DirectoryLock::LockHandlerCallback lockCallback)
   : QObject(nullptr),
     mPath(wsPath),
     mProjectsPath(mPath.getPathTo("projects")),
@@ -84,27 +85,8 @@ Workspace::Workspace(const FilePath& wsPath)
   FileUtils::makePath(mMetadataPath);  // can throw
   FileUtils::makePath(mLibrariesPath);  // can throw
 
-  // Check if the workspace is locked (already open or application crashed).
-  switch (mLock.getStatus()) {  // can throw
-    case DirectoryLock::LockStatus::Unlocked: {
-      // nothing to do here (the workspace will be locked later)
-      break;
-    }
-    case DirectoryLock::LockStatus::StaleLock: {
-      // ignore stale lock as there is nothing to restore
-      qWarning() << "There was a stale lock on the workspace:" << mPath;
-      break;
-    }
-    default: {
-      // the workspace is locked by another application instance
-      throw RuntimeError(__FILE__, __LINE__,
-                         tr("The workspace is already "
-                            "opened by another application instance or user!"));
-    }
-  }
-
   // the workspace can be opened by this application, so we will lock it
-  mLock.lock();  // can throw
+  mLock.tryLock(lockCallback);  // can throw
 
   // all OK, let's load the workspace stuff!
 
