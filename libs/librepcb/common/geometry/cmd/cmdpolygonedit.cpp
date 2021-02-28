@@ -96,6 +96,11 @@ void CmdPolygonEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   setPath(mNewPath.translated(deltaPos), immediate);
 }
 
+void CmdPolygonEdit::snapToGrid(const PositiveLength& gridInterval,
+                                bool immediate) noexcept {
+  setPath(mNewPath.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdPolygonEdit::rotate(const Angle& angle, const Point& center,
                             bool immediate) noexcept {
   setPath(mNewPath.rotated(angle, center), immediate);

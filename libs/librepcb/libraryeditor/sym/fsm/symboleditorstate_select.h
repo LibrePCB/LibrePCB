@@ -97,6 +97,7 @@ private:  // Methods
   bool pasteFromClipboard() noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
+  bool snapSelectedItemsToGrid() noexcept;
   bool removeSelectedItems() noexcept;
   void removeSelectedPolygonVertices() noexcept;
   void startAddingPolygonVertex(Polygon& polygon, int vertex,

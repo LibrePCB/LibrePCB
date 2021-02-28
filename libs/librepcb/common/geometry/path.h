@@ -74,6 +74,8 @@ public:
   // Transformations
   Path& translate(const Point& offset) noexcept;
   Path translated(const Point& offset) const noexcept;
+  Path& mapToGrid(const PositiveLength& gridInterval) noexcept;
+  Path mappedToGrid(const PositiveLength& gridInterval) const noexcept;
   Path& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
   Path rotated(const Angle& angle, const Point& center = Point(0, 0)) const
       noexcept;

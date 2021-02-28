@@ -425,7 +425,6 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     }
 
     // build the context menu
-    QMenu menu;
     QAction* aRotateCCW =
         menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("&Rotate"));
     connect(aRotateCCW, &QAction::triggered,
@@ -438,6 +437,13 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
         menu.addAction(QIcon(":/img/actions/delete.png"), tr("R&emove"));
     connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
     menu.addSeparator();
+    if (CmdDragSelectedSymbolItems(mContext).hasOffTheGridElements()) {
+      QAction* aSnapToGrid =
+          menu.addAction(QIcon(":/img/actions/grid.png"), tr("&Snap To Grid"));
+      connect(aSnapToGrid, &QAction::triggered, this,
+              &SymbolEditorState_Select::snapSelectedItemsToGrid);
+      menu.addSeparator();
+    }
     QAction* aProperties =
         menu.addAction(QIcon(":/img/actions/settings.png"), tr("&Properties"));
     connect(aProperties, &QAction::triggered, [this, &selectedItem]() {
@@ -601,6 +607,18 @@ bool SymbolEditorState_Select::mirrorSelectedItems(
       cmd->mirror(orientation);
       mContext.undoStack.execCmd(cmd.take());
     }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;  // TODO: return false if no items were selected
+}
+
+bool SymbolEditorState_Select::snapSelectedItemsToGrid() noexcept {
+  try {
+    QScopedPointer<CmdDragSelectedSymbolItems> cmdMove(
+        new CmdDragSelectedSymbolItems(mContext));
+    cmdMove->snapToGrid();
+    mContext.undoStack.execCmd(cmdMove.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }

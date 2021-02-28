@@ -459,6 +459,13 @@ bool PackageEditorState_Select::openContextMenuAtPos(
         menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
     connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
     menu.addSeparator();
+    if (CmdDragSelectedFootprintItems(mContext).hasOffTheGridElements()) {
+      QAction* aSnapToGrid =
+          menu.addAction(QIcon(":/img/actions/grid.png"), tr("Snap To Grid"));
+      connect(aSnapToGrid, &QAction::triggered, this,
+              &PackageEditorState_Select::snapSelectedItemsToGrid);
+      menu.addSeparator();
+    }
     QAction* aProperties =
         menu.addAction(QIcon(":/img/actions/settings.png"), tr("Properties"));
     connect(aProperties, &QAction::triggered, [this, &selectedItem]() {
@@ -660,6 +667,18 @@ bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
       }
       mContext.undoStack.execCmd(cmd.take());
     }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;  // TODO: return false if no items were selected
+}
+
+bool PackageEditorState_Select::snapSelectedItemsToGrid() noexcept {
+  try {
+    QScopedPointer<CmdDragSelectedFootprintItems> cmdMove(
+        new CmdDragSelectedFootprintItems(mContext));
+    cmdMove->snapToGrid();
+    mContext.undoStack.execCmd(cmdMove.take());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }

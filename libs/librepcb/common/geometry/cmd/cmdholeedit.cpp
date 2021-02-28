@@ -66,6 +66,11 @@ void CmdHoleEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   if (immediate) mHole.setPosition(mNewPosition);
 }
 
+void CmdHoleEdit::snapToGrid(const PositiveLength& gridInterval,
+                             bool immediate) noexcept {
+  setPosition(mNewPosition.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdHoleEdit::rotate(const Angle& angle, const Point& center,
                          bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

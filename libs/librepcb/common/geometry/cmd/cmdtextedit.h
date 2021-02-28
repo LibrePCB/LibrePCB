@@ -55,6 +55,7 @@ public:
   void setAlignment(const Alignment& align, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
+  void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirror(Qt::Orientation orientation, const Point& center,

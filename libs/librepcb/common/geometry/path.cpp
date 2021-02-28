@@ -126,6 +126,18 @@ Path Path::translated(const Point& offset) const noexcept {
   return Path(*this).translate(offset);
 }
 
+Path& Path::mapToGrid(const PositiveLength& gridInterval) noexcept {
+  for (Vertex& vertex : mVertices) {
+    vertex.setPos(vertex.getPos().mappedToGrid(gridInterval));
+  }
+  invalidatePainterPath();
+  return *this;
+}
+
+Path Path::mappedToGrid(const PositiveLength& gridInterval) const noexcept {
+  return Path(*this).mapToGrid(gridInterval);
+}
+
 Path& Path::rotate(const Angle& angle, const Point& center) noexcept {
   for (Vertex& vertex : mVertices) {
     vertex.setPos(vertex.getPos().rotated(angle, center));
