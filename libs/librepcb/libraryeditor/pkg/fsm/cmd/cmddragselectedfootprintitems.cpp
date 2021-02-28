@@ -57,10 +57,13 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     mDeltaPos(0, 0),
     mDeltaRot(0),
     mMirroredGeometry(false),
-    mMirroredLayer(false) {
+    mMirroredLayer(false),
+    mSnappedToGrid(false),
+    mHasOffTheGridElements(false) {
   Q_ASSERT(context.currentFootprint && context.currentGraphicsItem);
 
   int count = 0;
+  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
 
   QList<QSharedPointer<FootprintPadGraphicsItem>> pads =
       context.currentGraphicsItem->getSelectedPads();
@@ -68,6 +71,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     Q_ASSERT(pad);
     mPadEditCmds.append(new CmdFootprintPadEdit(pad->getPad()));
     mCenterPos += pad->getPad().getPosition();
+    if (!pad->getPad().getPosition().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
@@ -77,6 +83,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
     mCenterPos += circle->getCircle().getCenter();
+    if (!circle->getCircle().getCenter().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
@@ -88,6 +97,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     foreach (const Vertex& vertex,
              polygon->getPolygon().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
+      if (!vertex.getPos().isOnGrid(grid)) {
+        mHasOffTheGridElements = true;
+      }
       ++count;
     }
   }
@@ -98,6 +110,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdStrokeTextEdit(text->getText()));
     mCenterPos += text->getText().getPosition();
+    if (!text->getText().getPosition().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
@@ -109,11 +124,14 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     // way and is safe since here we know that we're allowed to modify the hole.
     mHoleEditCmds.append(new CmdHoleEdit(const_cast<Hole&>(hole->getHole())));
     mCenterPos += hole->getHole().getPosition();
+    if (!hole->getHole().getPosition().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
   mCenterPos /= qMax(count, 1);
-  mCenterPos.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
+  mCenterPos.mapToGrid(grid);
 }
 
 CmdDragSelectedFootprintItems::~CmdDragSelectedFootprintItems() noexcept {
@@ -123,6 +141,22 @@ CmdDragSelectedFootprintItems::~CmdDragSelectedFootprintItems() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void CmdDragSelectedFootprintItems::snapToGrid() noexcept {
+  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
+  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) { cmd->snapToGrid(grid, true); }
+  mSnappedToGrid = true;
+}
 
 void CmdDragSelectedFootprintItems::setDeltaToStartPos(
     const Point& delta) noexcept {
@@ -204,7 +238,7 @@ void CmdDragSelectedFootprintItems::mirrorLayer() noexcept {
 
 bool CmdDragSelectedFootprintItems::performExecute() {
   if (mDeltaPos.isOrigin() && (mDeltaRot == 0) && (!mMirroredGeometry) &&
-      (!mMirroredLayer)) {
+      (!mMirroredLayer) && (!mSnappedToGrid)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;

@@ -132,6 +132,11 @@ void CmdStrokeTextEdit::translate(const Point& delta, bool immediate) noexcept {
   if (immediate) mText.setPosition(mNewPosition);
 }
 
+void CmdStrokeTextEdit::snapToGrid(const PositiveLength& gridInterval,
+                                   bool immediate) noexcept {
+  setPosition(mNewPosition.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdStrokeTextEdit::setRotation(const Angle& angle,
                                     bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

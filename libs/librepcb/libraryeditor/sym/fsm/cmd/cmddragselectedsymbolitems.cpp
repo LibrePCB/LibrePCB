@@ -54,8 +54,11 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     mCenterPos(0, 0),
     mDeltaPos(0, 0),
     mDeltaRot(0),
-    mMirrored(false) {
+    mMirrored(false),
+    mSnappedToGrid(false),
+    mHasOffTheGridElements(false) {
   int count = 0;
+  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
 
   QList<QSharedPointer<SymbolPinGraphicsItem>> pins =
       context.symbolGraphicsItem.getSelectedPins();
@@ -63,6 +66,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     Q_ASSERT(pin);
     mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
     mCenterPos += pin->getPin().getPosition();
+    if (!pin->getPin().getPosition().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
@@ -72,6 +78,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
     mCenterPos += circle->getCircle().getCenter();
+    if (!circle->getCircle().getCenter().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
@@ -83,6 +92,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     foreach (const Vertex& vertex,
              polygon->getPolygon().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
+      if (!vertex.getPos().isOnGrid(grid)) {
+        mHasOffTheGridElements = true;
+      }
       ++count;
     }
   }
@@ -93,11 +105,14 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdTextEdit(text->getText()));
     mCenterPos += text->getText().getPosition();
+    if (!text->getText().getPosition().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
     ++count;
   }
 
   mCenterPos /= qMax(count, 1);
-  mCenterPos.mapToGrid(mContext.graphicsView.getGridProperties().getInterval());
+  mCenterPos.mapToGrid(grid);
 }
 
 CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
@@ -107,6 +122,17 @@ CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void CmdDragSelectedSymbolItems::snapToGrid() noexcept {
+  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
+  foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdTextEdit* cmd, mTextEditCmds) { cmd->snapToGrid(grid, true); }
+  mSnappedToGrid = true;
+}
 
 void CmdDragSelectedSymbolItems::setDeltaToStartPos(
     const Point& delta) noexcept {
@@ -169,7 +195,8 @@ void CmdDragSelectedSymbolItems::mirror(Qt::Orientation orientation) noexcept {
  ******************************************************************************/
 
 bool CmdDragSelectedSymbolItems::performExecute() {
-  if (mDeltaPos.isOrigin() && (mDeltaRot == 0) && (!mMirrored)) {
+  if (mDeltaPos.isOrigin() && (mDeltaRot == 0) && (!mMirrored) &&
+      (!mSnappedToGrid)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;

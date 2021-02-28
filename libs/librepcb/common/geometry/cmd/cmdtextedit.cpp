@@ -99,6 +99,11 @@ void CmdTextEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   if (immediate) mText.setPosition(mNewPosition);
 }
 
+void CmdTextEdit::snapToGrid(const PositiveLength& gridInterval,
+                             bool immediate) noexcept {
+  setPosition(mNewPosition.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdTextEdit::setRotation(const Angle& angle, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;

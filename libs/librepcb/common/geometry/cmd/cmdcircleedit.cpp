@@ -107,6 +107,11 @@ void CmdCircleEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   if (immediate) mCircle.setCenter(mNewCenter);
 }
 
+void CmdCircleEdit::snapToGrid(const PositiveLength& gridInterval,
+                               bool immediate) noexcept {
+  setCenter(mNewCenter.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdCircleEdit::rotate(const Angle& angle, const Point& center,
                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
