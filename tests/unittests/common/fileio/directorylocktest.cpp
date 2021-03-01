@@ -186,7 +186,7 @@ TEST_F(DirectoryLockTest, testSingleStatusLockUnlock) {
 
   // get lock
   lock.lock();
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock.getStatus());
   EXPECT_TRUE(mTempLockFilePath.isExistingFile());
 
   // release lock
@@ -203,14 +203,14 @@ TEST_F(DirectoryLockTest, testMultipleStatusLockUnlock) {
 
   // get lock1
   lock1.lock();
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock1.getStatus());
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock2.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock2.getStatus());
   EXPECT_TRUE(mTempLockFilePath.isExistingFile());
 
   // get lock2 (steals the lock from lock1)
   lock2.lock();
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock1.getStatus());
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock2.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock2.getStatus());
   EXPECT_TRUE(mTempLockFilePath.isExistingFile());
 
   // release lock2
@@ -223,14 +223,14 @@ TEST_F(DirectoryLockTest, testMultipleStatusLockUnlock) {
 TEST_F(DirectoryLockTest, testTryLockWithoutArgument) {
   DirectoryLock lock(mTempDir);
   lock.tryLock();
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock.getStatus());
 }
 
 TEST_F(DirectoryLockTest, testTryLockUnlockedDir) {
   bool wasStale = true;
   DirectoryLock lock(mTempDir);
   lock.tryLock(&wasStale);
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock.getStatus());
   EXPECT_FALSE(wasStale);
 }
 
@@ -239,7 +239,7 @@ TEST_F(DirectoryLockTest, testTryLockLockedDir) {
   DirectoryLock lock1(mTempDir);
   DirectoryLock lock2(mTempDir);
   lock1.tryLock(&wasStale);
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock1.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
   EXPECT_THROW(lock2.tryLock(), Exception);
   EXPECT_FALSE(wasStale);
 }
@@ -254,7 +254,7 @@ TEST_F(DirectoryLockTest, testUnlockIfLockedOnUnlockedDir) {
 TEST_F(DirectoryLockTest, testUnlockIfLockedOnLockedDir) {
   DirectoryLock lock(mTempDir);
   lock.lock();
-  EXPECT_EQ(DirectoryLock::LockStatus::Locked, lock.getStatus());
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock.getStatus());
   EXPECT_TRUE(lock.unlockIfLocked());
   EXPECT_EQ(DirectoryLock::LockStatus::Unlocked, lock.getStatus());
 }
@@ -290,6 +290,77 @@ TEST_F(DirectoryLockTest, testStaleLock) {
   ASSERT_TRUE(wasStale);
 }
 #endif
+
+#if (QT_VERSION >= \
+     QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
+TEST_F(DirectoryLockTest, testLockedByOtherApp) {
+  // Run a new process.
+  QProcess process;
+  process.start(getTestProcessExePath().toStr());
+  bool success = process.waitForStarted();
+  ASSERT_TRUE(success) << qPrintable(process.errorString());
+
+  // Get the lock, read the lock file content and release the lock.
+  DirectoryLock lock(mTempDir);
+  lock.lock();
+  QStringList lines =
+      QString(FileUtils::readFile(mTempLockFilePath)).split('\n');
+  lock.unlock();
+
+  // Create a lock file with the PID/name of the other process.
+  lines[3] = QString::number(process.processId());
+  lines[4] = SystemInfo::getProcessNameByPid(process.processId());
+  FileUtils::writeFile(mTempLockFilePath, lines.join('\n').toUtf8());
+
+  // Check lock status.
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByOtherApp, lock.getStatus());
+
+  // Try to get the lock. Should fail since the directory is already locked.
+  EXPECT_THROW(lock.tryLock(), Exception);
+
+  // Exit the other process.
+  process.kill();
+  success = process.waitForFinished();
+  ASSERT_TRUE(success) << qPrintable(process.errorString());
+}
+#endif
+
+TEST_F(DirectoryLockTest, testLockedByOtherUser) {
+  // Get the lock, read the lock file content and release the lock.
+  DirectoryLock lock(mTempDir);
+  lock.lock();
+  QStringList lines =
+      QString(FileUtils::readFile(mTempLockFilePath)).split('\n');
+  lock.unlock();
+
+  // Create a lock file with another user name.
+  lines[1] = "DirectoryLockTest_testLockedByOtherUser";
+  FileUtils::writeFile(mTempLockFilePath, lines.join('\n').toUtf8());
+
+  // Check lock status.
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByOtherUser, lock.getStatus());
+
+  // Try to get the lock. Should fail since the directory is already locked.
+  EXPECT_THROW(lock.tryLock(), Exception);
+}
+
+TEST_F(DirectoryLockTest, testLockedByUnknownApp) {
+  // Create a lock file, memorize its content and release the lock.
+  DirectoryLock lock(mTempDir);
+  lock.lock();
+  QByteArray content = FileUtils::readFile(mTempLockFilePath);
+  lock.unlock();
+
+  // Now create the lock file with the same content as before. So it looke like
+  // the lock is coming from this application instance, but it doesn't.
+  FileUtils::writeFile(mTempLockFilePath, content);
+
+  // Check lock status.
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByUnknownApp, lock.getStatus());
+
+  // Try to get the lock. Should fail since the path is considered as locked.
+  EXPECT_THROW(lock.tryLock(), Exception);
+}
 
 TEST_F(DirectoryLockTest, testLockFileContent) {
   // get the lock
