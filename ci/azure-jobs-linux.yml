@@ -62,7 +62,7 @@ jobs:
     displayName: Run LibrePCB Unittests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="build/install/opt/bin/librepcb" ./tests/funq
+  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="build/install/opt/bin/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
     displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts
