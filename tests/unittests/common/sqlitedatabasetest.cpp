@@ -56,75 +56,8 @@ protected:
     FileUtils::removeDirRecursively(mTempDir);  // can throw
   }
 
-  enum ThreadOption {
-    READING = (0 << 0),
-    WRITING = (1 << 0),
-    NO_TRANSACTION = (0 << 1),
-    TRANSACTION = (1 << 1),
-  };
-
-  struct WorkerResult {
-    qint64 rowCount;
-    QString errorMsg;
-  };
-
-  static WorkerResult threadWorker(FilePath fp, int options,
-                                   int duration) noexcept {
-    // increase thread priority because the multithreading tests are time
-    // critical
-    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
-
-    try {
-      qint64 count = 0;
-      SQLiteDatabase db(fp);
-      if (options & TRANSACTION) {
-        db.beginTransaction();
-      }
-      qint64 start = QDateTime::currentMSecsSinceEpoch();
-      while (QDateTime::currentMSecsSinceEpoch() < start + duration) {
-        if (options & WRITING) {
-          db.exec("INSERT INTO test (name) VALUES ('hello')");
-        } else {
-          db.exec("SELECT id, name FROM test WHERE id = 1");
-        }
-        ++count;
-      }
-      if (options & TRANSACTION) {
-        db.commitTransaction();
-      }
-      return WorkerResult{count, QString()};
-    } catch (const Exception& e) {
-      return WorkerResult{-1, e.getMsg()};
-    }
-  }
-
-  QFuture<WorkerResult> startWorkerThread(QThreadPool* pool, int options,
-                                          int duration) noexcept {
-    // QtConcurrent::run(QThreadPool*, ...) requires Qt>=5.4
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-    auto future = QtConcurrent::run(pool, threadWorker, mTempDbFilePath,
-                                    options, duration);
-#else
-    if (QThreadPool::globalInstance()->maxThreadCount() <
-        pool->maxThreadCount()) {
-      QThreadPool::globalInstance()->setMaxThreadCount(pool->maxThreadCount());
-    }
-    auto future =
-        QtConcurrent::run(threadWorker, mTempDbFilePath, options, duration);
-#endif
-    mWorkerThreads.append(future);
-    return future;
-  }
-
-  void waitUntilAllWorkersFinished() noexcept {
-    while (!mWorkerThreads.isEmpty()) {
-      mWorkerThreads.takeFirst().waitForFinished();
-    }
-  }
-
   FilePath mTempDir;
   FilePath mTempDbFilePath;
-  QList<QFuture<WorkerResult>> mWorkerThreads;
 };
 
 /*******************************************************************************
@@ -209,94 +142,60 @@ TEST_F(SQLiteDatabaseTest, testMultipleInstancesInSameThread) {
   EXPECT_NO_THROW(db1.clearTable("test1"));
 }
 
-TEST_F(SQLiteDatabaseTest, testConcurrentAccessFromMultipleThreads) {
-  // This is a flaky test because it depends on how long the threads are
-  // interrupted by the operating system. So we repeat it several times if it
-  // fails. As long as it succeeds at least once, everything is fine.
-  // EDIT: Increased to 30 times. The more, the higher the possibility that it
-  // even works on Windows.
-  for (int i = 0; i < 30; ++i) {
-    // create thread pool to ensure that every worker really runs in a separate
-    // thread
-    QThreadPool pool;
-    pool.setMaxThreadCount(8);
+TEST_F(SQLiteDatabaseTest, testConcurrentReadAccessWhileWriteTransaction) {
+  // Prepare database.
+  SQLiteDatabase db(mTempDbFilePath);
+  db.exec("CREATE TABLE test (`id` INTEGER PRIMARY KEY NOT NULL, `name` TEXT)");
 
-    // remove database before every run (ignore failures because on Windows it
-    // fails randomly - as usual...)
-    QFile::remove(mTempDbFilePath.toStr());
+  // Start worker thread which starts a transaction and writes to the database.
+  FilePath fp = mTempDbFilePath;
+  volatile int count = 0;
+  volatile bool cancel = false;
+  auto threadWorker = [fp, &count, &cancel]() {
+    std::cout << "Worker thread started." << std::endl;
+    SQLiteDatabase db(fp);
+    db.beginTransaction();
+    std::cout << "Transaction started." << std::endl;
+    qint64 timeout = QDateTime::currentMSecsSinceEpoch() + 120000;
+    while ((!cancel) && (QDateTime::currentMSecsSinceEpoch() < timeout)) {
+      db.exec("INSERT INTO test (name) VALUES ('hello')");
+      ++count;
+    }
+    db.commitTransaction();
+    std::cout << "Transaction committed." << std::endl;
+  };
+  auto future = QtConcurrent::run(threadWorker);
 
-    // prepare database
-    SQLiteDatabase db(mTempDbFilePath);
-    db.exec(
-        "CREATE TABLE test (`id` INTEGER PRIMARY KEY NOT NULL, `name` TEXT)");
+  // Wait until the thread has inserted the first values.
+  qint64 timeout = QDateTime::currentMSecsSinceEpoch() + 120000;
+  while ((count < 10) && (QDateTime::currentMSecsSinceEpoch() < timeout))
+    ;
+  ASSERT_GE(count, 10);
+  std::cout << "Thread inserted " << count << " values." << std::endl;
 
-    // increase thread priority because the multithreading tests are time
-    // critical
-    QThread::Priority originalThreadPriority =
-        QThread::currentThread()->priority();
-    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
-
-    // run worker threads (2 sequential writers and 3 or 4 parallel readers)
-    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
-    QFuture<WorkerResult> w1 =
-        startWorkerThread(&pool, WRITING | TRANSACTION, 5000);
-    QFuture<WorkerResult> r1 =
-        startWorkerThread(&pool, READING | TRANSACTION, 10000);
-    QFuture<WorkerResult> r2 =
-        startWorkerThread(&pool, READING | TRANSACTION, 10000);
-    QFuture<WorkerResult> r3 =
-        startWorkerThread(&pool, READING | NO_TRANSACTION, 10000);
-#if (!defined(Q_OS_WIN32)) && (!defined(Q_OS_WIN64))
-    // 4 threads seem to be too much for unreliable operating systems. Thus
-    // on unreliable, less known, rarely used niche operating systems we only
-    // use 3 reader threads...
-    QFuture<WorkerResult> r4 =
-        startWorkerThread(&pool, READING | NO_TRANSACTION, 10000);
-#endif
-    w1.waitForFinished();
-    QFuture<WorkerResult> w2 =
-        startWorkerThread(&pool, WRITING | NO_TRANSACTION, 5000);
-    waitUntilAllWorkersFinished();
-    qint64 duration = QDateTime::currentMSecsSinceEpoch() - startTime;
-
-    // restore thread priority
-    QThread::currentThread()->setPriority(originalThreadPriority);
-
-    // get row count
+  // Now we are sure the worker thread is continuously inserting new values.
+  // So let's try to read from the database now.
+  for (int i = 0; i < 10; ++i) {
     QSqlQuery query = db.prepareQuery("SELECT COUNT(*) FROM test");
     db.exec(query);
     ASSERT_TRUE(query.first());
     qint64 rowCount = query.value(0).toLongLong();
-
-    // validate results
-    EXPECT_GT(w1.result().rowCount, 0) << qPrintable(w1.result().errorMsg);
-    EXPECT_GT(w2.result().rowCount, 0) << qPrintable(w2.result().errorMsg);
-    EXPECT_GT(r1.result().rowCount, 0) << qPrintable(r1.result().errorMsg);
-    EXPECT_GT(r2.result().rowCount, 0) << qPrintable(r2.result().errorMsg);
-    EXPECT_GT(r3.result().rowCount, 0) << qPrintable(r3.result().errorMsg);
-#if (!defined(Q_OS_WIN32)) && (!defined(Q_OS_WIN64))
-    EXPECT_GT(r4.result().rowCount, 0) << qPrintable(r4.result().errorMsg);
-#endif
-    EXPECT_GT(rowCount, 0);
-    EXPECT_EQ(rowCount, w1.result().rowCount + w2.result().rowCount);
-    EXPECT_GE(duration, 10000);
-    if (duration < 14000) {  // this fails sometimes (if OS == Windows)...
-      return;  // success (even on Windows!!!)
-    } else {
-      std::cout << "Duration too long: " << duration << std::endl;
-
-      // Do some strange things to try to recover Windows, maybe it's then able
-      // to remove a file from the file system (other operating systems can
-      // remove files too, with some luck it even works on Windows).
-      QFile::remove(mTempDbFilePath.toStr());
-      QThread::msleep(200);
-      QFile::remove(mTempDbFilePath.toStr());
-      QThread::msleep(200);
-      QFile::remove(mTempDbFilePath.toStr());
-      QThread::msleep(200);
-    }
+    std::cout << "Reading thread reads " << rowCount << " rows." << std::endl;
+    EXPECT_EQ(rowCount, 0);  // Transaction not committed yet!
   }
-  FAIL();
+
+  // Terminate the worker thread.
+  cancel = true;
+  future.waitForFinished();
+  std::cout << "Worker thread exited." << std::endl;
+
+  // Transaction finished -> row count should now be updated.
+  QSqlQuery query = db.prepareQuery("SELECT COUNT(*) FROM test");
+  db.exec(query);
+  ASSERT_TRUE(query.first());
+  qint64 rowCount = query.value(0).toLongLong();
+  std::cout << "Reading thread reads " << rowCount << " rows." << std::endl;
+  EXPECT_EQ(rowCount, count);
 }
 
 /*******************************************************************************

@@ -1,3 +1,4 @@
 git+https://github.com/parkouss/funq.git@811a8b4fa510e5256b0a14fe93f5c331fd9dd6be#egg=funq-server&subdirectory=server
 git+https://github.com/parkouss/funq.git@811a8b4fa510e5256b0a14fe93f5c331fd9dd6be#egg=funq&subdirectory=client
-pytest~=3.6.3
+pytest~=3.10
+pytest-rerunfailures~=7.0
