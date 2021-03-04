@@ -28,6 +28,7 @@
 #include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
+#include "../alignment.h"
 
 #include <QtCore>
 
@@ -55,6 +56,7 @@ public:
     UuidChanged,
     PositionChanged,
     RotationChanged,
+    AlignmentChanged,
   };
   Signal<NetLabel, Event> onEdited;
   typedef Slot<NetLabel, Event> OnEditedSlot;
@@ -64,7 +66,7 @@ public:
   NetLabel(const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const Point& position,
-           const Angle& rotation) noexcept;
+           const Angle& rotation, const Alignment& alignment) noexcept;
   NetLabel(const SExpression& node, const Version& fileFormat);
   ~NetLabel() noexcept;
 
@@ -72,11 +74,13 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
+  const Alignment& getAlignment() const noexcept { return mAlignment; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
   bool setPosition(const Point& position) noexcept;
   bool setRotation(const Angle& rotation) noexcept;
+  bool setAlignment(const Alignment& alignment) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -92,6 +96,7 @@ private:  // Data
   Uuid mUuid;
   Point mPosition;
   Angle mRotation;
+  Alignment mAlignment;
 };
 
 /*******************************************************************************

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/alignment.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
 
@@ -55,6 +56,7 @@ public:
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirror(bool immediate) noexcept;
 
 private:
   // Private Methods
@@ -74,6 +76,8 @@ private:
   SI_NetLabel& mNetLabel;
 
   // Misc
+  Alignment mOldAlignment;
+  Alignment mNewAlignment;
   Point mOldPos;
   Point mNewPos;
   Angle mOldRotation;

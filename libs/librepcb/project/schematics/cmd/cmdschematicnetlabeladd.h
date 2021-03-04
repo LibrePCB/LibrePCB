@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/common/alignment.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
 
@@ -50,7 +51,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position,
-                          const Angle& rotation) noexcept;
+                          const Angle& rotation, const Alignment& alignment) noexcept;
   ~CmdSchematicNetLabelAdd() noexcept;
 
   // Getters
@@ -73,6 +74,7 @@ private:
   SI_NetSegment& mNetSegment;
   Point mPosition;
   Angle mRotation;
+  Alignment mAlignment;
   SI_NetLabel* mNetLabel;
 };
 

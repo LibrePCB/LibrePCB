@@ -118,9 +118,9 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       NetLineAnchor::junction(Uuid::createRandom()),
       NetLineAnchor::pin(Uuid::createRandom(), Uuid::createRandom())));
   netSegment1->labels.append(std::make_shared<NetLabel>(
-      Uuid::createRandom(), Point(12, 34), Angle(56)));
+      Uuid::createRandom(), Point(12, 34), Angle(56), Alignment()));
   netSegment1->labels.append(std::make_shared<NetLabel>(
-      Uuid::createRandom(), Point(123, 456), Angle(789)));
+      Uuid::createRandom(), Point(123, 456), Angle(789), Alignment()));
 
   std::shared_ptr<SchematicClipboardData::NetSegment> netSegment2 =
       std::make_shared<SchematicClipboardData::NetSegment>(
@@ -138,9 +138,9 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       NetLineAnchor::junction(Uuid::createRandom()),
       NetLineAnchor::pin(Uuid::createRandom(), Uuid::createRandom())));
   netSegment2->labels.append(std::make_shared<NetLabel>(
-      Uuid::createRandom(), Point(120, 340), Angle(560)));
+      Uuid::createRandom(), Point(120, 340), Angle(560), Alignment()));
   netSegment2->labels.append(std::make_shared<NetLabel>(
-      Uuid::createRandom(), Point(1230, 4560), Angle(7890)));
+      Uuid::createRandom(), Point(1230, 4560), Angle(7890), Alignment()));
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
       Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,

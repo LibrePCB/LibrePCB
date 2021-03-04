@@ -46,15 +46,16 @@ NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
 }
 
 NetLabel::NetLabel(const Uuid& uuid, const Point& position,
-                   const Angle& rotation) noexcept
-  : onEdited(*this), mUuid(uuid), mPosition(position), mRotation(rotation) {
+                   const Angle& rotation, const Alignment& alignment) noexcept
+  : onEdited(*this), mUuid(uuid), mPosition(position), mRotation(rotation), mAlignment(alignment) {
 }
 
 NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mPosition(node.getChild("position"), fileFormat),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)) {
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mAlignment(node.getChild("alignment"), fileFormat) {
 }
 
 NetLabel::~NetLabel() noexcept {
@@ -94,6 +95,16 @@ bool NetLabel::setRotation(const Angle& rotation) noexcept {
   return true;
 }
 
+bool NetLabel::setAlignment(const Alignment &alignment) noexcept {
+  if (alignment == mAlignment) {
+    return false;
+  }
+
+  mAlignment = alignment;
+  onEdited.notify(Event::AlignmentChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -102,6 +113,7 @@ void NetLabel::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild(mPosition.serializeToDomElement("position"), true);
   root.appendChild("rotation", mRotation, false);
+  root.appendChild(mAlignment.serializeToDomElement("alignment"), false);
 }
 
 /*******************************************************************************

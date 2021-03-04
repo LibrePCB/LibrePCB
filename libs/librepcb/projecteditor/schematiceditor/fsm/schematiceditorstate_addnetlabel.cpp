@@ -171,7 +171,7 @@ bool SchematicEditorState_AddNetLabel::addLabel(Schematic& schematic,
     mContext.undoStack.beginCmdGroup(tr("Add net label to schematic"));
     mUndoCmdActive = true;
     CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(
-        netsegment, pos.mappedToGrid(getGridInterval()), Angle::deg0());
+        netsegment, pos.mappedToGrid(getGridInterval()), Angle::deg0(), Alignment());
     mContext.undoStack.appendToCmdGroup(cmdAdd);
     mCurrentNetLabel = cmdAdd->getNetLabel();
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
