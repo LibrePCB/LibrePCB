@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <functional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -109,51 +111,45 @@ namespace librepcb {
  *
  * Code Example:
  * @code
- *  class MyDirectoryOpeningClass // a class which opens a directory and needs
- * to lock it
- *  {
- *      public:
- *          MyDirectoryOpeningClass() // constructor
- *              : myLock(FilePath("C:/myDirectory")) // variant 1 to set the
- * filepath
- *          {
- *              myLock.setDirToLock(FilePath("C:/myDirectory")); // variant 2
- *              switch (myLock.getStatus()) // Note: this line can throw an
- * exception!
- *              {
- *                  case Unlocked:
- *                      // No lock exists --> lock the directory now
- *                      myLock.lock(); // Note: this line can throw an
- * exception! break; case Locked:
- *                      // The directory is already locked by another instance!
- *                      throw Exception("Directory is locked!");
- *                      break;
- *                  case StaleLock:
- *                      // The application crashed while the lock was
- * active.
- *                      // Ask the user whether a backup should be restored or
- * not. break; default:
- *                      // Should not happen...
- *                      break;
- *              }
- *              // if you don't care about stale locks, you could just do this
- * instead:
- *              // myLock.tryLock(); // Note: this line can throw an exception!
+ * // a class which opens a directory and needs to lock it
+ * class MyDirectoryOpeningClass {
+ * public:
+ *   MyDirectoryOpeningClass()  // constructor
+ *     : mLock(FilePath("C:/myDirectory")) { // variant 1 to set the filepath
+ *     mLock.setDirToLock(FilePath("C:/myDirectory"));  // variant 2
+ *     switch (mLock.getStatus()) { // Note: this line can throw an exception!
+ *       case DirectoryLock::LockStatus::Unlocked:
+ *         // No lock exists --> lock the directory now
+ *         mLock.lock();  // Note: this line can throw an exception!
+ *         break;
+ *       case DirectoryLock::LockStatus::LockedByThisApp:
+ *       case DirectoryLock::LockStatus::LockedByOtherApp:
+ *       case DirectoryLock::LockStatus::LockedByOtherUser:
+ *       case DirectoryLock::LockStatus::LockedByUnknownApp:
+ *         // The directory is (probably) already locked by another instance!
+ *         throw Exception("Directory is locked!");
+ *       case DirectoryLock::LockStatus::StaleLock:
+ *         // The application crashed while the lock was active.
+ *         // Ask the user whether a backup should be restored or not.
+ *         break;
+ *       default:
+ *         // Should not happen...
+ *         break;
+ *     }
+ *     // if you don't care about stale locks, you could just do this instead:
+ *     // myLock.tryLock(); // Note: this line can throw an exception!
+ *   }
  *
- *          }
- *          ~MyDirectoryOpeningClass() // destructor
- *          {
- *              // You do not have to (but you could) call
- * myLock.unlockIfLocked(),
- *              // as it will be called automatically in the destructor of
- * myLock.
- *              // try { myLock.unlockIfLocked(); } catch (...) { }
- *          }
+ *   ~MyDirectoryOpeningClass() {
+ *     // You do not have to (but you could) call myLock.unlockIfLocked(),
+ *     // as it will be called automatically in the destructor of myLock.
+ *     // try { myLock.unlockIfLocked(); } catch (...) { }
+ *   }
  *
- *      private:
- *          DirectoryLock myLock; // an instance, not only a pointer (important
- * for RAII)!
- *  };
+ * private:
+ *   // an instance, not only a pointer (important for RAII)!
+ *   DirectoryLock mLock;
+ * };
  * @endcode
  */
 class DirectoryLock final {
@@ -166,10 +162,36 @@ public:
    * @brief The return type of #getStatus()
    */
   enum class LockStatus {
-    Unlocked,  ///< the directory is not locked (lock file does not exist)
-    Locked,  ///< the directory is locked by another application instance
-    StaleLock  ///< the directory is locked by a crashed application instance
+    /// The directory is not locked (lock file does not exist).
+    Unlocked,
+    /// The directory is locked by a crashed application instance.
+    StaleLock,
+    /// The directory is locked by this application instance.
+    LockedByThisApp,
+    /// The directory is locked by another application instance on this machine.
+    LockedByOtherApp,
+    /// The directory is locked by another user or machine.
+    LockedByOtherUser,
+    /// The directory is locked by an unknown application (may be stale).
+    LockedByUnknownApp,
   };
+
+  /**
+   * @brief Callback type used to determine whether a lock should be overridden
+   *        or not
+   *
+   * @param dir     The directory to be locked.
+   * @param status  The current status of the lock (see #getStatus()).
+   * @param user    Name of the user which currently holds the lock.
+   *
+   * @retval true   Override lock.
+   * @retval false  Do not override lock.
+   *
+   * @throw ::librepcb::UserCanceled to abort locking the directory.
+   */
+  typedef std::function<bool(const FilePath& dir, LockStatus status,
+                             const QString& user)>
+      LockHandlerCallback;
 
   // Constructors / Destructor
 
@@ -237,11 +259,14 @@ public:
   /**
    * @brief Get the lock status of the specified directory
    *
+   * @param lockedByUser  If not nullptr and the directory is locked, the
+   *                      username of the current lock is written into this
+   *                      string.
    * @return  The current lock status (see #LockStatus)
    *
    * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
    */
-  LockStatus getStatus() const;
+  LockStatus getStatus(QString* lockedByUser = nullptr) const;
 
   // General Methods
 
@@ -255,12 +280,14 @@ public:
    * - StaleLock: Set "wasStale = true" and get the lock (calling #lock())
    * - Locked:    Throw exception (something like "Directory already locked")
    *
-   * @param wasStale  This variable will be set to true if there was a stale
-   * lock, and to false if not (if a valid pointer was passed).
+   *@param lockHandler  If supplied and the directory is already locked, this
+   *                    callback gets called to determine whether the lock
+   *                    should be overridden or not. If not supplied and the
+   *                    directory is locked, an exception will be thrown.
    *
    * @throw   Exception on error (e.g. already locked, no access rights, ...)
    */
-  void tryLock(bool* wasStale = nullptr);
+  void tryLock(LockHandlerCallback lockHandler = nullptr);
 
   /**
    * @brief Unlock the specified directory if it was locked by this object
@@ -300,6 +327,14 @@ public:
 
   // Operator Overloadings
   DirectoryLock& operator=(const DirectoryLock& rhs) = delete;
+
+private:  // Methods
+  /**
+   * @brief Get the global set of filepaths locked by this application instance
+   *
+   * @return Set of directory filepaths currently locked by this instance.
+   */
+  static QSet<FilePath>& dirsLockedByThisAppInstance() noexcept;
 
 private:  // Data
   /**

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "editorwidgetbase.h"
 
+#include <librepcb/common/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/common/utils/toolbarproxy.h>
@@ -49,9 +50,10 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
   : QWidget(parent),
     mContext(context),
     mFilePath(fp),
-    mFileSystem(
-        TransactionalFileSystem::open(fp, !context.readOnly,
-                                      &askForRestoringBackup)),  // can throw
+    mFileSystem(TransactionalFileSystem::open(
+        fp, !context.readOnly, &askForRestoringBackup,
+        DirectoryLockHandlerDialog::createDirectoryLockCallback())),  // can
+                                                                      // throw
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
     mStatusBar(nullptr),

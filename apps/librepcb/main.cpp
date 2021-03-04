@@ -26,6 +26,7 @@
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/debug.h>
+#include <librepcb/common/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/network/networkaccessmanager.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -246,7 +247,10 @@ static int openWorkspace(const FilePath& path) noexcept {
       }
     }
 
-    Workspace ws(path);  // can throw
+    // Open the workspace (can throw). If it is locked, a dialog will show
+    // an error and possibly provides an option to override the lock.
+    Workspace ws(path,
+                 DirectoryLockHandlerDialog::createDirectoryLockCallback());
 
     // Now since workspace settings are loaded, switch to the locale defined
     // there (until now, the system locale was used).

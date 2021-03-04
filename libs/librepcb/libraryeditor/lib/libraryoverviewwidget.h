@@ -65,7 +65,7 @@ public:
   LibraryOverviewWidget() = delete;
   LibraryOverviewWidget(const LibraryOverviewWidget& other) = delete;
   LibraryOverviewWidget(const Context& context, const FilePath& fp,
-                        QWidget* parent = nullptr) noexcept;
+                        QWidget* parent = nullptr);
   ~LibraryOverviewWidget() noexcept;
 
   // Setters

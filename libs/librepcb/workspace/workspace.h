@@ -70,12 +70,16 @@ public:
   /**
    * @brief Constructor to open an existing workspace
    *
-   * @param wsPath    The filepath to the workspace directory
+   * @param wsPath        The filepath to the workspace directory
+   * @param lockCallback  A callback which gets called if the workspace
+   *                      directory is locked, to decide what to do in this
+   *                      case.
    *
    * @throw Exception If the workspace could not be opened, this constructor
    * throws an exception.
    */
-  explicit Workspace(const FilePath& wsPath);
+  explicit Workspace(const FilePath& wsPath,
+                     DirectoryLock::LockHandlerCallback lockCallback = nullptr);
 
   /**
    * The destructor
