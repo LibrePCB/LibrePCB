@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <functional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -174,6 +176,23 @@ public:
     LockedByUnknownApp,
   };
 
+  /**
+   * @brief Callback type used to determine whether a lock should be overridden
+   *        or not
+   *
+   * @param dir     The directory to be locked.
+   * @param status  The current status of the lock (see #getStatus()).
+   * @param user    Name of the user which currently holds the lock.
+   *
+   * @retval true   Override lock.
+   * @retval false  Do not override lock.
+   *
+   * @throw ::librepcb::UserCanceled to abort locking the directory.
+   */
+  typedef std::function<bool(const FilePath& dir, LockStatus status,
+                             const QString& user)>
+      LockHandlerCallback;
+
   // Constructors / Destructor
 
   /**
@@ -261,12 +280,14 @@ public:
    * - StaleLock: Set "wasStale = true" and get the lock (calling #lock())
    * - Locked:    Throw exception (something like "Directory already locked")
    *
-   * @param wasStale  This variable will be set to true if there was a stale
-   * lock, and to false if not (if a valid pointer was passed).
+   *@param lockHandler  If supplied and the directory is already locked, this
+   *                    callback gets called to determine whether the lock
+   *                    should be overridden or not. If not supplied and the
+   *                    directory is locked, an exception will be thrown.
    *
    * @throw   Exception on error (e.g. already locked, no access rights, ...)
    */
-  void tryLock(bool* wasStale = nullptr);
+  void tryLock(LockHandlerCallback lockHandler = nullptr);
 
   /**
    * @brief Unlock the specified directory if it was locked by this object

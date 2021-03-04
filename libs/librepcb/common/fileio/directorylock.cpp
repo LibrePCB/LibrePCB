@@ -146,21 +146,27 @@ DirectoryLock::LockStatus DirectoryLock::getStatus(
  *  General Methods
  ******************************************************************************/
 
-void DirectoryLock::tryLock(bool* wasStale) {
-  LockStatus status = getStatus();  // can throw
-  if (wasStale) {
-    *wasStale = (status == LockStatus::StaleLock);
-  }
+void DirectoryLock::tryLock(LockHandlerCallback lockHandler) {
+  QString user;
+  LockStatus status = getStatus(&user);  // can throw
   switch (status) {
-    case LockStatus::Unlocked:
     case LockStatus::StaleLock:
+      qWarning() << "Overriding stale lock on directory:" << mDirToLock;
+      // fallthrough
+    case LockStatus::Unlocked:
       lock();  // can throw
       break;
     default:  // Locked!
+      if (lockHandler && lockHandler(mDirToLock, status, user)) {
+        qInfo() << "Overriding lock on directory:" << mDirToLock;
+        lock();  // can throw
+        break;
+      }
       throw RuntimeError(__FILE__, __LINE__,
-                         tr("The directory is locked, "
-                            "check if it is already opened elsewhere: %1")
-                             .arg(mDirToLock.toNative()));
+                         tr("Could not lock the directory \"%1\" because it is "
+                            "already locked by \"%2\". Close any application "
+                            "accessing this directory and try again.")
+                             .arg(mDirToLock.toNative(), user));
   }
 }
 

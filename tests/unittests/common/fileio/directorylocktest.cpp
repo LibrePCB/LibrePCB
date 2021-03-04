@@ -220,28 +220,50 @@ TEST_F(DirectoryLockTest, testMultipleStatusLockUnlock) {
   EXPECT_FALSE(mTempLockFilePath.isExistingFile());
 }
 
-TEST_F(DirectoryLockTest, testTryLockWithoutArgument) {
+TEST_F(DirectoryLockTest, testTryLockUnlockedDir) {
   DirectoryLock lock(mTempDir);
   lock.tryLock();
   EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock.getStatus());
 }
 
-TEST_F(DirectoryLockTest, testTryLockUnlockedDir) {
-  bool wasStale = true;
-  DirectoryLock lock(mTempDir);
-  lock.tryLock(&wasStale);
-  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock.getStatus());
-  EXPECT_FALSE(wasStale);
-}
-
-TEST_F(DirectoryLockTest, testTryLockLockedDir) {
-  bool wasStale = true;
+TEST_F(DirectoryLockTest, testTryLockLockedDirWithoutCallback) {
   DirectoryLock lock1(mTempDir);
   DirectoryLock lock2(mTempDir);
-  lock1.tryLock(&wasStale);
+  lock1.tryLock();
   EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
   EXPECT_THROW(lock2.tryLock(), Exception);
-  EXPECT_FALSE(wasStale);
+}
+
+TEST_F(DirectoryLockTest, testTryLockLockedDirWithCallbackReturningFalse) {
+  DirectoryLock lock1(mTempDir);
+  DirectoryLock lock2(mTempDir);
+  lock1.tryLock();
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
+  auto callback = [](const FilePath&, DirectoryLock::LockStatus,
+                     const QString&) { return false; };
+  EXPECT_THROW(lock2.tryLock(callback), Exception);
+}
+
+TEST_F(DirectoryLockTest, testTryLockLockedDirWithCallbackReturningTrue) {
+  DirectoryLock lock1(mTempDir);
+  DirectoryLock lock2(mTempDir);
+  lock1.tryLock();
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
+  auto callback = [](const FilePath&, DirectoryLock::LockStatus,
+                     const QString&) { return true; };
+  EXPECT_NO_THROW(lock2.tryLock(callback));
+}
+
+TEST_F(DirectoryLockTest, testTryLockLockedDirWithCallbackThrowingException) {
+  DirectoryLock lock1(mTempDir);
+  DirectoryLock lock2(mTempDir);
+  lock1.tryLock();
+  EXPECT_EQ(DirectoryLock::LockStatus::LockedByThisApp, lock1.getStatus());
+  auto callback = [](const FilePath&, DirectoryLock::LockStatus,
+                     const QString&) -> bool {
+    throw UserCanceled(__FILE__, __LINE__);
+  };
+  EXPECT_THROW(lock2.tryLock(callback), UserCanceled);
 }
 
 TEST_F(DirectoryLockTest, testUnlockIfLockedOnUnlockedDir) {
@@ -285,9 +307,7 @@ TEST_F(DirectoryLockTest, testStaleLock) {
   EXPECT_EQ(DirectoryLock::LockStatus::StaleLock, lock.getStatus());
 
   // try to get the lock
-  bool wasStale = false;
-  lock.tryLock(&wasStale);
-  ASSERT_TRUE(wasStale);
+  lock.tryLock();
 }
 #endif
 
