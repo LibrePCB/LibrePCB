@@ -68,7 +68,8 @@ void DirectoryLock::setDirToLock(const FilePath& dir) noexcept {
  *  Getters
  ******************************************************************************/
 
-DirectoryLock::LockStatus DirectoryLock::getStatus() const {
+DirectoryLock::LockStatus DirectoryLock::getStatus(
+    QString* lockedByUser) const {
   // check if the directory to lock does exist
   if (!mDirToLock.isExistingDir()) {
     throw RuntimeError(
@@ -99,29 +100,44 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const {
   QString lockHost = lines.at(2);
   qint64 lockPid = lines.at(3).toLongLong();
   QString lockAppName = lines.at(4);
+  if (lockedByUser) {
+    *lockedByUser = lockUser % "@" % lockHost;
+  }
 
   // read metadata about this application instance
   QString thisUser = SystemInfo::getUsername();
   QString thisHost = SystemInfo::getHostname();
+  qint64 thisPid = QCoreApplication::applicationPid();
 
-  // check if the lock file was created with another computer or user
+  // Check if the lock file was created with another computer or user.
   if ((lockUser != thisUser) || (lockHost != thisHost)) {
-    return LockStatus::Locked;
+    return LockStatus::LockedByOtherUser;
   }
 
-  // the lock file was created with an application instance on this computer,
-  // now check if that process is still running (if not, the lock is considered
-  // as stale)
-  if (SystemInfo::isProcessRunning(lockPid)) {
-    if (SystemInfo::getProcessNameByPid(lockPid) == lockAppName) {
-      return LockStatus::Locked;  // the application which holds the lock is
-                                  // still running
+  // Check if the lock was created by this application instance.
+  if (lockPid == thisPid) {
+    if (dirsLockedByThisAppInstance().contains(mDirToLock)) {
+      return LockStatus::LockedByThisApp;
     } else {
-      return LockStatus::StaleLock;  // the process which holds the lock seems
-                                     // to be crashed
+      // If the lock was created by the same PID as this instance but the lock
+      // was not created by this instance, probably LibrePCB is running with a
+      // namespaced PID (i.e. the same PID is used by multiple application
+      // instances). This happens for example when running LibrePCB as a Flatpak
+      // (see https://github.com/LibrePCB/LibrePCB/issues/734). Unfortunately in
+      // this case we are not able to detect whether the lock is stale or not.
+      return LockStatus::LockedByUnknownApp;
     }
+  }
+
+  // the lock file was created with another application instance on this
+  // computer, now check if that process is still running (if not, the lock is
+  // considered as stale)
+  if (SystemInfo::isProcessRunning(lockPid) &&
+      (SystemInfo::getProcessNameByPid(lockPid) == lockAppName)) {
+    // The application which holds the lock is still running.
+    return LockStatus::LockedByOtherApp;
   } else {
-    // the process which holds the lock is no longer running
+    // The process which created the lock is no longer running.
     return LockStatus::StaleLock;
   }
 }
@@ -130,24 +146,27 @@ DirectoryLock::LockStatus DirectoryLock::getStatus() const {
  *  General Methods
  ******************************************************************************/
 
-void DirectoryLock::tryLock(bool* wasStale) {
-  LockStatus status = getStatus();  // can throw
-  if (wasStale) {
-    *wasStale = (status == LockStatus::StaleLock);
-  }
+void DirectoryLock::tryLock(LockHandlerCallback lockHandler) {
+  QString user;
+  LockStatus status = getStatus(&user);  // can throw
   switch (status) {
-    case LockStatus::Unlocked:
     case LockStatus::StaleLock:
+      qWarning() << "Overriding stale lock on directory:" << mDirToLock;
+      // fallthrough
+    case LockStatus::Unlocked:
       lock();  // can throw
       break;
-    case LockStatus::Locked:
+    default:  // Locked!
+      if (lockHandler && lockHandler(mDirToLock, status, user)) {
+        qInfo() << "Overriding lock on directory:" << mDirToLock;
+        lock();  // can throw
+        break;
+      }
       throw RuntimeError(__FILE__, __LINE__,
-                         tr("The directory is locked, "
-                            "check if it is already opened elsewhere: %1")
-                             .arg(mDirToLock.toNative()));
-    default:
-      Q_ASSERT(false);
-      throw LogicError(__FILE__, __LINE__);
+                         tr("Could not lock the directory \"%1\" because it is "
+                            "already locked by \"%2\". Close any application "
+                            "accessing this directory and try again.")
+                             .arg(mDirToLock.toNative(), user));
   }
 }
 
@@ -186,6 +205,7 @@ void DirectoryLock::lock() {
 
   // File Lock successfully created
   mLockedByThisObject = true;
+  dirsLockedByThisAppInstance().insert(mDirToLock);
 }
 
 void DirectoryLock::unlock() {
@@ -194,6 +214,16 @@ void DirectoryLock::unlock() {
 
   // File Lock successfully removed
   mLockedByThisObject = false;
+  dirsLockedByThisAppInstance().remove(mDirToLock);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+QSet<FilePath>& DirectoryLock::dirsLockedByThisAppInstance() noexcept {
+  static QSet<FilePath> set;
+  return set;
 }
 
 /*******************************************************************************

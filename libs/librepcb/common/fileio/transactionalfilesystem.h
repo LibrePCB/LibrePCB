@@ -127,9 +127,11 @@ public:
 
   // Constructors / Destructor
   TransactionalFileSystem() = delete;
-  TransactionalFileSystem(const FilePath& filepath, bool writable = false,
-                          RestoreCallback restoreCallback = RestoreCallback(),
-                          QObject* parent = nullptr);
+  TransactionalFileSystem(
+      const FilePath& filepath, bool writable = false,
+      RestoreCallback restoreCallback = RestoreCallback(),
+      DirectoryLock::LockHandlerCallback lockCallback = nullptr,
+      QObject* parent = nullptr);
   TransactionalFileSystem(const TransactionalFileSystem& other) = delete;
   virtual ~TransactionalFileSystem() noexcept;
 
@@ -163,21 +165,23 @@ public:
   static std::shared_ptr<TransactionalFileSystem> open(
       const FilePath& filepath, bool writable,
       RestoreCallback restoreCallback = &RestoreMode::no,
+      DirectoryLock::LockHandlerCallback lockCallback = nullptr,
       QObject* parent = nullptr) {
-    return std::make_shared<TransactionalFileSystem>(filepath, writable,
-                                                     restoreCallback, parent);
+    return std::make_shared<TransactionalFileSystem>(
+        filepath, writable, restoreCallback, lockCallback, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRO(
       const FilePath& filepath,
       RestoreCallback restoreCallback = &RestoreMode::no,
       QObject* parent = nullptr) {
-    return open(filepath, false, restoreCallback, parent);
+    return open(filepath, false, restoreCallback, nullptr, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRW(
       const FilePath& filepath,
       RestoreCallback restoreCallback = &RestoreMode::no,
+      DirectoryLock::LockHandlerCallback lockCallback = nullptr,
       QObject* parent = nullptr) {
-    return open(filepath, true, restoreCallback, parent);
+    return open(filepath, true, restoreCallback, lockCallback, parent);
   }
   static QString cleanPath(QString path) noexcept;
 

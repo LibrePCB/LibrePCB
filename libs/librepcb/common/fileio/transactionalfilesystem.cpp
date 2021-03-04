@@ -47,7 +47,7 @@ namespace librepcb {
 
 TransactionalFileSystem::TransactionalFileSystem(
     const FilePath& filepath, bool writable, RestoreCallback restoreCallback,
-    QObject* parent)
+    DirectoryLock::LockHandlerCallback lockCallback, QObject* parent)
   : FileSystem(parent),
     mFilePath(filepath),
     mIsWritable(writable),
@@ -63,7 +63,7 @@ TransactionalFileSystem::TransactionalFileSystem(
   // Lock directory if the file system is opened in R/W mode.
   if (mIsWritable) {
     FileUtils::makePath(mFilePath);  // can throw
-    mLock.tryLock();  // can throw
+    mLock.tryLock(lockCallback);  // can throw
   }
 
   // If there is an autosave backup, load it according the restore mode.

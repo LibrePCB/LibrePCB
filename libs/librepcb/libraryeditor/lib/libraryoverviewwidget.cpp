@@ -51,7 +51,7 @@ namespace editor {
 
 LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
                                              const FilePath& fp,
-                                             QWidget* parent) noexcept
+                                             QWidget* parent)
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::LibraryOverviewWidget),
     mCurrentFilter() {

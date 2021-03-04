@@ -60,6 +60,7 @@ SOURCES += \
     dialogs/aboutdialog.cpp \
     dialogs/boarddesignrulesdialog.cpp \
     dialogs/circlepropertiesdialog.cpp \
+    dialogs/directorylockhandlerdialog.cpp \
     dialogs/filedialog.cpp \
     dialogs/gridsettingsdialog.cpp \
     dialogs/holepropertiesdialog.cpp \
@@ -197,6 +198,7 @@ HEADERS += \
     dialogs/aboutdialog.h \
     dialogs/boarddesignrulesdialog.h \
     dialogs/circlepropertiesdialog.h \
+    dialogs/directorylockhandlerdialog.h \
     dialogs/filedialog.h \
     dialogs/gridsettingsdialog.h \
     dialogs/holepropertiesdialog.h \
@@ -323,6 +325,7 @@ FORMS += \
     dialogs/aboutdialog.ui \
     dialogs/boarddesignrulesdialog.ui \
     dialogs/circlepropertiesdialog.ui \
+    dialogs/directorylockhandlerdialog.ui \
     dialogs/gridsettingsdialog.ui \
     dialogs/holepropertiesdialog.ui \
     dialogs/polygonpropertiesdialog.ui \
