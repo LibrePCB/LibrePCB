@@ -203,6 +203,24 @@ bool SchematicEditorFsm::processRemove() noexcept {
   return false;
 }
 
+bool SchematicEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processKeyPressed(e)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool SchematicEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processKeyReleased(e)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool SchematicEditorFsm::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {

@@ -118,6 +118,8 @@ public:
   bool processRotateCcw() noexcept;
   bool processMirror() noexcept;
   bool processRemove() noexcept;
+  bool processKeyPressed(const QKeyEvent& e) noexcept;
+  bool processKeyReleased(const QKeyEvent& e) noexcept;
   bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonPressed(
       QGraphicsSceneMouseEvent& e) noexcept;
