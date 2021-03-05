@@ -175,14 +175,16 @@ QVariant ComponentSignalListModel::data(const QModelIndex& index,
       bool required = item ? item->isRequired() : mNewIsRequired;
       switch (role) {
         case Qt::DisplayRole:
-          return required ? tr("Required") : tr("Optional");
+          // See https://github.com/LibrePCB/LibrePCB/issues/475.
+          return QString();
         case Qt::CheckStateRole:
           return required ? Qt::Checked : Qt::Unchecked;
         case Qt::ToolTipRole:
-          return required ? tr("Leaving this signal unconnected in schematics "
-                               "produces an ERC error.")
-                          : tr("Leaving this signal unconnected in schematics "
-                               "is allowed.");
+          return tr("If checked, the signal needs to be connected in "
+                    "schematics, otherwise an ERC error is raised.") +
+              "\n" +
+              tr("If unchecked, it's allowed to leave the signal unconnected "
+                 "in schematics.");
         default:
           return QVariant();
       }
@@ -220,7 +222,7 @@ QVariant ComponentSignalListModel::headerData(int section,
         case COLUMN_NAME:
           return tr("Name");
         case COLUMN_ISREQUIRED:
-          return tr("Connection");
+          return tr("Required");
         case COLUMN_FORCEDNETNAME:
           return tr("Forced Net");
         default:
