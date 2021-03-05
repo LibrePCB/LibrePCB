@@ -80,7 +80,6 @@ private:  // Methods
   void diameterEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Data
-  Point mStartPos;
   QScopedPointer<CmdHoleEdit> mEditCmd;
   Hole* mCurrentHole;
   HoleGraphicsItem* mCurrentGraphicsItem;
