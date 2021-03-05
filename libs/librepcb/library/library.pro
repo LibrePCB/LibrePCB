@@ -78,6 +78,7 @@ SOURCES += \
     pkg/msg/msgmissingfootprint.cpp \
     pkg/msg/msgmissingfootprintname.cpp \
     pkg/msg/msgmissingfootprintvalue.cpp \
+    pkg/msg/msgpadclearanceviolation.cpp \
     pkg/msg/msgpadoverlapswithplacement.cpp \
     pkg/msg/msgwrongfootprinttextlayer.cpp \
     pkg/package.cpp \
@@ -154,6 +155,7 @@ HEADERS += \
     pkg/msg/msgmissingfootprint.h \
     pkg/msg/msgmissingfootprintname.h \
     pkg/msg/msgmissingfootprintvalue.h \
+    pkg/msg/msgpadclearanceviolation.h \
     pkg/msg/msgpadoverlapswithplacement.h \
     pkg/msg/msgwrongfootprinttextlayer.h \
     pkg/package.h \
