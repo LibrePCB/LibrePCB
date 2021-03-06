@@ -95,7 +95,6 @@ private:  // Methods
 
 private:  // Types / Data
   PadType mPadType;
-  Point mStartPos;
   QScopedPointer<CmdFootprintPadEdit> mEditCmd;
   std::shared_ptr<FootprintPad> mCurrentPad;
   FootprintPadGraphicsItem* mCurrentGraphicsItem;

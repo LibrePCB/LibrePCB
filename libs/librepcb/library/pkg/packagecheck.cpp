@@ -26,6 +26,7 @@
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
 #include "msg/msgmissingfootprintvalue.h"
+#include "msg/msgpadclearanceviolation.h"
 #include "msg/msgpadoverlapswithplacement.h"
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
@@ -62,7 +63,8 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkMissingFootprint(msgs);
   checkMissingTexts(msgs);
   checkWrongTextLayers(msgs);
-  checkPadsOverlapWithPlacement(msgs);
+  checkPadsClearanceToPads(msgs);
+  checkPadsClearanceToPlacement(msgs);
   return msgs;
 }
 
@@ -123,7 +125,58 @@ void PackageCheck::checkWrongTextLayers(MsgList& msgs) const {
   }
 }
 
-void PackageCheck::checkPadsOverlapWithPlacement(MsgList& msgs) const {
+void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
+  Length clearance(200000);  // 200 µm
+  Length tolerance(10);  // 0.01 µm, to avoid rounding issues
+
+  // Check all footprints.
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+
+    // Check all pads.
+    for (auto itPad1 = (*itFtp).getPads().begin();
+         itPad1 != (*itFtp).getPads().end(); ++itPad1) {
+      std::shared_ptr<const FootprintPad> pad1 = itPad1.ptr();
+      std::shared_ptr<const PackagePad> pkgPad1 =
+          mPackage.getPads().find(pad1->getPackagePadUuid());
+      Path pad1Path = pad1->getOutline(clearance - tolerance);
+      pad1Path.rotate(pad1->getRotation()).translate(pad1->getPosition());
+      const QPainterPath pad1PathPx = pad1Path.toQPainterPathPx();
+
+      // Compare with all pads *after* pad1 to avoid duplicate messages!
+      // So, don't initialize the iterator with begin() but with pad1 + 1.
+      auto itPad2 = itPad1;
+      for (++itPad2; itPad2 != (*itFtp).getPads().end(); ++itPad2) {
+        std::shared_ptr<const FootprintPad> pad2 = itPad2.ptr();
+        std::shared_ptr<const PackagePad> pkgPad2 =
+            mPackage.getPads().find(pad2->getPackagePadUuid());
+        Path pad2Path = pad2->getOutline();
+        pad2Path.rotate(pad2->getRotation()).translate(pad2->getPosition());
+        const QPainterPath pad2PathPx = pad2Path.toQPainterPathPx();
+
+        // Only warn if both pads have copper on the same board side.
+        if ((pad1->getBoardSide() == pad2->getBoardSide()) ||
+            (pad1->getBoardSide() == FootprintPad::BoardSide::THT) ||
+            (pad2->getBoardSide() == FootprintPad::BoardSide::THT)) {
+          // Only warn if both pads have different net signal, or one of them
+          // is unconnected (an unconnected pad is considered as a different
+          // net signal).
+          if (pad1->getPackagePadUuid() != pad2->getPackagePadUuid()) {
+            // Now check if the clearance is really too small.
+            if (pad1PathPx.intersects(pad2PathPx)) {
+              msgs.append(std::make_shared<MsgPadClearanceViolation>(
+                  footprint, pad1, pkgPad1 ? *pkgPad1->getName() : QString(),
+                  pad2, pkgPad2 ? *pkgPad2->getName() : QString(), clearance));
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
   for (auto itFtp = mPackage.getFootprints().begin();
        itFtp != mPackage.getFootprints().end(); ++itFtp) {
     std::shared_ptr<const Footprint> footprint = itFtp.ptr();
@@ -153,7 +206,7 @@ void PackageCheck::checkPadsOverlapWithPlacement(MsgList& msgs) const {
          ++it) {
       std::shared_ptr<const FootprintPad> pad = it.ptr();
       std::shared_ptr<const PackagePad> pkgPad =
-          mPackage.getPads().find(pad->getUuid());
+          mPackage.getPads().find(pad->getPackagePadUuid());
       Length clearance(150000);  // 150 µm
       Length tolerance(10);  // 0.01 µm, to avoid rounding issues
       Path stopMaskPath = pad->getOutline(clearance - tolerance);

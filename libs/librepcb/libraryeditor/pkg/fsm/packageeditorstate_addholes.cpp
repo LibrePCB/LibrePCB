@@ -131,7 +131,6 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 
 bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
   try {
-    mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add hole"));
     mCurrentHole = new Hole(Uuid::createRandom(), pos, mLastDiameter);
     mContext.undoStack.appendToCmdGroup(
@@ -153,10 +152,6 @@ bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
 }
 
 bool PackageEditorState_AddHoles::finishAddHole(const Point& pos) noexcept {
-  if (pos == mStartPos) {
-    return abortAddHole();
-  }
-
   try {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
