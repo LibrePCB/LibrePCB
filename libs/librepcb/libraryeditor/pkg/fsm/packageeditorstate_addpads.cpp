@@ -231,7 +231,6 @@ bool PackageEditorState_AddPads::processRotateCcw() noexcept {
 
 bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
   try {
-    mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add footprint pad"));
     mLastPad.setPosition(pos);
     mCurrentPad.reset(new FootprintPad(Uuid::createRandom(), mLastPad));
@@ -253,10 +252,6 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
 }
 
 bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
-  if (pos == mStartPos) {
-    return abortAddPad();
-  }
-
   try {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);

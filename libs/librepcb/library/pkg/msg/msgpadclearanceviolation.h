@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_PACKAGECHECK_H
-#define LIBREPCB_LIBRARY_PACKAGECHECK_H
+#ifndef LIBREPCB_LIBRARY_MSGPADCLEARANCEVIOLATION_H
+#define LIBREPCB_LIBRARY_MSGPADCLEARANCEVIOLATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementcheck.h"
+#include "../../msg/libraryelementcheckmessage.h"
+
+#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 
@@ -33,39 +35,46 @@
 namespace librepcb {
 namespace library {
 
-class Package;
+class Footprint;
+class FootprintPad;
 
 /*******************************************************************************
- *  Class PackageCheck
+ *  Class MsgPadClearanceViolation
  ******************************************************************************/
 
 /**
- * @brief The PackageCheck class
+ * @brief The MsgPadClearanceViolation class
  */
-class PackageCheck : public LibraryElementCheck {
+class MsgPadClearanceViolation final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadClearanceViolation)
+
 public:
   // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+  MsgPadClearanceViolation() = delete;
+  MsgPadClearanceViolation(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const FootprintPad> pad1,
+                           const QString& pkgPad1Name,
+                           std::shared_ptr<const FootprintPad> pad2,
+                           const QString& pkgPad2Name,
+                           const Length& clearance) noexcept;
+  MsgPadClearanceViolation(const MsgPadClearanceViolation& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPad1(other.mPad1),
+      mPad2(other.mPad2) {}
+  virtual ~MsgPadClearanceViolation() noexcept;
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad1() const noexcept { return mPad1; }
+  std::shared_ptr<const FootprintPad> getPad2() const noexcept { return mPad2; }
 
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad1;
+  std::shared_ptr<const FootprintPad> mPad2;
 };
 
 /*******************************************************************************
@@ -75,4 +84,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_PACKAGECHECK_H
+#endif

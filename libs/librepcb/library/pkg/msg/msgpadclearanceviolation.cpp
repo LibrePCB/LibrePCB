@@ -17,56 +17,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_PACKAGECHECK_H
-#define LIBREPCB_LIBRARY_PACKAGECHECK_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementcheck.h"
+#include "msgpadclearanceviolation.h"
 
-#include <QtCore>
+#include "../footprint.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace library {
 
-class Package;
-
 /*******************************************************************************
- *  Class PackageCheck
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The PackageCheck class
- */
-class PackageCheck : public LibraryElementCheck {
-public:
-  // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+MsgPadClearanceViolation::MsgPadClearanceViolation(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad1, const QString& pkgPad1Name,
+    std::shared_ptr<const FootprintPad> pad2, const QString& pkgPad2Name,
+    const Length& clearance) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning,
+        tr("Clearance of pad '%1' to pad '%2' in '%3'")
+            .arg(pkgPad1Name, pkgPad2Name,
+                 *footprint->getNames().getDefaultValue()),
+        tr("Pads should have at least %1 clearance between each other. In some "
+           "situations it might be needed to use smaller clearances but not "
+           "all PCB manufacturers are able to reliably produce such small "
+           "clearances, so usually this should be avoided.")
+            .arg(QString::number(clearance.toMm() * 1000) % "μm")),
+    mFootprint(footprint),
+    mPad1(pad1),
+    mPad2(pad2) {
+}
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
-
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
-};
+MsgPadClearanceViolation::~MsgPadClearanceViolation() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
@@ -74,5 +63,3 @@ private:  // Data
 
 }  // namespace library
 }  // namespace librepcb
-
-#endif  // LIBREPCB_LIBRARY_PACKAGECHECK_H
