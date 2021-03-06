@@ -464,8 +464,12 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
   // Otherwise the last candidate is returned.
   if (!mClosestNetSignalIsUpToDate) {
     const NetSignal* netsignal = getCurrentNetSignal();
-    if (BI_NetLine* atPosition = findNetLine(board, pos)) {
-      netsignal = atPosition->getNetSegment().getNetSignal();
+    if (BI_NetLine* netline = findNetLine(board, pos)) {
+      netsignal = netline->getNetSegment().getNetSignal();
+    } else if (BI_FootprintPad* pad = findPad(board, pos)) {
+      netsignal = pad->getCompSigInstNetSignal();
+    } else if (BI_Via* via = findVia(board, pos, {}, {mCurrentViaToPlace})) {
+      netsignal = via->getNetSegment().getNetSignal();
     } else if (!netsignal) {
       // If there was and still is no "closest" net signal available, fall back
       // to the net signal with the most elements since this is often something
@@ -488,36 +492,6 @@ NetSignal* BoardEditorState_AddVia::getCurrentNetSignal() const noexcept {
   return mCurrentNetSignal
       ? mContext.project.getCircuit().getNetSignalByUuid(*mCurrentNetSignal)
       : nullptr;
-}
-
-QSet<NetSignal*> BoardEditorState_AddVia::getNetSignalsAtScenePos(
-    Board& board, const Point& pos, QSet<BI_Base*> except) const noexcept {
-  QSet<NetSignal*> result = QSet<NetSignal*>();
-  foreach (BI_Via* via, board.getViasAtScenePos(pos)) {
-    if (except.contains(via)) continue;
-    if (!result.contains(via->getNetSegment().getNetSignal())) {
-      result.insert(via->getNetSegment().getNetSignal());
-    }
-  }
-  foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
-    if (except.contains(netpoint)) continue;
-    if (!result.contains(netpoint->getNetSegment().getNetSignal())) {
-      result.insert(netpoint->getNetSegment().getNetSignal());
-    }
-  }
-  foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
-    if (except.contains(netline)) continue;
-    if (!result.contains(netline->getNetSegment().getNetSignal())) {
-      result.insert(netline->getNetSegment().getNetSignal());
-    }
-  }
-  foreach (BI_FootprintPad* pad, board.getPadsAtScenePos(pos)) {
-    if (except.contains(pad)) continue;
-    if (!result.contains(pad->getCompSigInstNetSignal())) {
-      result.insert(pad->getCompSigInstNetSignal());
-    }
-  }
-  return result;
 }
 
 BI_Via* BoardEditorState_AddVia::findVia(
