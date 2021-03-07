@@ -290,51 +290,26 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
       mCurrentViaEditCmd->setPosition(pos, false);
     }
 
-    // Find stuff at the via position
-    NetSignal& netsignal = mCurrentViaToPlace->getNetSegment().getNetSignal();
-    QSet<BI_NetPoint*> otherNetAnchors = {};
-    if (BI_Via* via = findVia(board, pos, {}, {mCurrentViaToPlace})) {
-      if (via->getNetSegment().getNetSignal() != netsignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Via of a different signal already present at "
-                              "target position."));
-      } else {
-        abortCommand(false);
-        return true;
-      }
-    } else if (BI_FootprintPad* pad = findPad(board, pos)) {
-      if (pad->getCompSigInstNetSignal() != &netsignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Pad of a different signal already present at "
-                              "target position."));
-      } else {
-        abortCommand(false);
-        return true;
-      }
-    }
-    foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
-      if (netpoint->getNetSegment().getNetSignal() != netsignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Netpoint of a different signal already present "
-                              "at target position."));
-      } else {
-        otherNetAnchors.insert(netpoint);
-      }
-    }
-    foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
-      if (netline->getNetSegment().getNetSignal() != netsignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Netline of a different signal already present "
-                              "at target position."));
-      } else if (!otherNetAnchors.contains(
-                     dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
-                 !otherNetAnchors.contains(
-                     dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
-        // TODO(5n8ke) is this the best way to check whtether the NetLine should
-        // be split?
+    // Find stuff at the via position to determine what should be connected.
+    // Note: Do not reject placing the via if there are items of other net
+    // signals at the cursor position. It could be annoying usability if the
+    // tool rejects to place a via. Simply ignore all items of other net
+    // signals here. The DRC will raise an error if the user created a short
+    // circuit with this via.
+    NetSignal* netsignal = &mCurrentViaToPlace->getNetSegment().getNetSignal();
+    QList<BI_NetPoint*> otherNetAnchors =
+        board.getNetPointsAtScenePos(pos, nullptr, {netsignal});
+    foreach (BI_NetLine* netline,
+             board.getNetLinesAtScenePos(pos, nullptr, {netsignal})) {
+      if (!otherNetAnchors.contains(
+              dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
+          !otherNetAnchors.contains(
+              dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
+        // TODO(5n8ke) is this the best way to check whtether the NetLine
+        // should be split?
         QScopedPointer<CmdBoardSplitNetLine> cmdSplit(
             new CmdBoardSplitNetLine(*netline, pos));
-        otherNetAnchors.insert(cmdSplit->getSplitPoint());
+        otherNetAnchors.append(cmdSplit->getSplitPoint());
         mContext.undoStack.appendToCmdGroup(cmdSplit.take());
       }
     }
@@ -468,8 +443,12 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
   // Otherwise the last candidate is returned.
   if (!mClosestNetSignalIsUpToDate) {
     const NetSignal* netsignal = getCurrentNetSignal();
-    if (BI_NetLine* atPosition = findNetLine(board, pos)) {
-      netsignal = &atPosition->getNetSegment().getNetSignal();
+    if (BI_NetLine* netline = findNetLine(board, pos)) {
+      netsignal = &netline->getNetSegment().getNetSignal();
+    } else if (BI_FootprintPad* pad = findPad(board, pos)) {
+      netsignal = pad->getCompSigInstNetSignal();
+    } else if (BI_Via* via = findVia(board, pos, {}, {mCurrentViaToPlace})) {
+      netsignal = &via->getNetSegment().getNetSignal();
     } else if (!netsignal) {
       // If there was and still is no "closest" net signal available, fall back
       // to the net signal with the most elements since this is often something
@@ -492,36 +471,6 @@ NetSignal* BoardEditorState_AddVia::getCurrentNetSignal() const noexcept {
   return mCurrentNetSignal
       ? mContext.project.getCircuit().getNetSignalByUuid(*mCurrentNetSignal)
       : nullptr;
-}
-
-QSet<NetSignal*> BoardEditorState_AddVia::getNetSignalsAtScenePos(
-    Board& board, const Point& pos, QSet<BI_Base*> except) const noexcept {
-  QSet<NetSignal*> result = QSet<NetSignal*>();
-  foreach (BI_Via* via, board.getViasAtScenePos(pos)) {
-    if (except.contains(via)) continue;
-    if (!result.contains(&via->getNetSegment().getNetSignal())) {
-      result.insert(&via->getNetSegment().getNetSignal());
-    }
-  }
-  foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
-    if (except.contains(netpoint)) continue;
-    if (!result.contains(&netpoint->getNetSegment().getNetSignal())) {
-      result.insert(&netpoint->getNetSegment().getNetSignal());
-    }
-  }
-  foreach (BI_NetLine* netline, board.getNetLinesAtScenePos(pos)) {
-    if (except.contains(netline)) continue;
-    if (!result.contains(&netline->getNetSegment().getNetSignal())) {
-      result.insert(&netline->getNetSegment().getNetSignal());
-    }
-  }
-  foreach (BI_FootprintPad* pad, board.getPadsAtScenePos(pos)) {
-    if (except.contains(pad)) continue;
-    if (!result.contains(pad->getCompSigInstNetSignal())) {
-      result.insert(pad->getCompSigInstNetSignal());
-    }
-  }
-  return result;
 }
 
 BI_Via* BoardEditorState_AddVia::findVia(
