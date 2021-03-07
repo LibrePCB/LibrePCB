@@ -89,9 +89,6 @@ private:  // Methods
   void applySelectedNetSignal() noexcept;
   void updateClosestNetSignal(Board& board, const Point& pos) noexcept;
   NetSignal* getCurrentNetSignal() const noexcept;
-  QSet<NetSignal*> getNetSignalsAtScenePos(Board& board, const Point& pos,
-                                           QSet<BI_Base*> except = {}) const
-      noexcept;
   BI_Via* findVia(Board& board, const Point pos,
                   const QSet<const NetSignal*>& netsignals = {},
                   const QSet<BI_Via*>& except = {}) const noexcept;
