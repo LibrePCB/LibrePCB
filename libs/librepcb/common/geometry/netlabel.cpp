@@ -37,7 +37,8 @@ NetLabel::NetLabel(const NetLabel& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
     mPosition(other.mPosition),
-    mRotation(other.mRotation) {
+    mRotation(other.mRotation),
+    mAlignment(other.mAlignment) {
 }
 
 NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
@@ -47,7 +48,11 @@ NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
 
 NetLabel::NetLabel(const Uuid& uuid, const Point& position,
                    const Angle& rotation, const Alignment& alignment) noexcept
-  : onEdited(*this), mUuid(uuid), mPosition(position), mRotation(rotation), mAlignment(alignment) {
+  : onEdited(*this),
+    mUuid(uuid),
+    mPosition(position),
+    mRotation(rotation),
+    mAlignment(alignment) {
 }
 
 NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
@@ -55,7 +60,12 @@ NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
     mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mPosition(node.getChild("position"), fileFormat),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mAlignment(node.getChild("alignment"), fileFormat) {
+    mAlignment() {
+  auto parsedAlignment = node.tryGetChild("alignment");
+  if (parsedAlignment) {
+    Alignment tempAligment(*parsedAlignment, fileFormat);
+    mAlignment = tempAligment;
+  }
 }
 
 NetLabel::~NetLabel() noexcept {
@@ -95,7 +105,7 @@ bool NetLabel::setRotation(const Angle& rotation) noexcept {
   return true;
 }
 
-bool NetLabel::setAlignment(const Alignment &alignment) noexcept {
+bool NetLabel::setAlignment(const Alignment& alignment) noexcept {
   if (alignment == mAlignment) {
     return false;
   }
@@ -124,6 +134,7 @@ bool NetLabel::operator==(const NetLabel& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mPosition != rhs.mPosition) return false;
   if (mRotation != rhs.mRotation) return false;
+  if (mAlignment != rhs.mAlignment) return false;
   return true;
 }
 
@@ -131,6 +142,7 @@ NetLabel& NetLabel::operator=(const NetLabel& rhs) noexcept {
   setUuid(rhs.mUuid);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);
+  setAlignment(rhs.mAlignment);
   return *this;
 }
 

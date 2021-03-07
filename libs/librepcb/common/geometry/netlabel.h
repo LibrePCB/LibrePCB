@@ -23,12 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../alignment.h"
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
-#include "../alignment.h"
 
 #include <QtCore>
 
@@ -65,8 +65,8 @@ public:
   NetLabel() = delete;
   NetLabel(const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const NetLabel& other) noexcept;
-  NetLabel(const Uuid& uuid, const Point& position,
-           const Angle& rotation, const Alignment& alignment) noexcept;
+  NetLabel(const Uuid& uuid, const Point& position, const Angle& rotation,
+           const Alignment& alignment) noexcept;
   NetLabel(const SExpression& node, const Version& fileFormat);
   ~NetLabel() noexcept;
 

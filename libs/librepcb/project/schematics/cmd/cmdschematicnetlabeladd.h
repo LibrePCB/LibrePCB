@@ -51,7 +51,8 @@ class CmdSchematicNetLabelAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position,
-                          const Angle& rotation, const Alignment& alignment) noexcept;
+                          const Angle& rotation,
+                          const Alignment& alignment) noexcept;
   ~CmdSchematicNetLabelAdd() noexcept;
 
   // Getters

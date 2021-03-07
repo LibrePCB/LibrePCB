@@ -92,11 +92,10 @@ void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center,
   }
 }
 
-void CmdSchematicNetLabelEdit::mirror(bool immediate) noexcept{
+void CmdSchematicNetLabelEdit::mirror(bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewAlignment.mirrorH();
-  if (immediate)
-      mNetLabel.setAlignment(mNewAlignment);
+  if (immediate) mNetLabel.setAlignment(mNewAlignment);
 }
 
 /*******************************************************************************

@@ -104,7 +104,8 @@ bool CmdCombineSchematicNetSegments::performExecute() {
   // copy net labels
   foreach (SI_NetLabel* netlabel, mOldSegment.getNetLabels()) {
     QScopedPointer<CmdSchematicNetLabelAdd> cmd(new CmdSchematicNetLabelAdd(
-        mNewSegment, netlabel->getPosition(), netlabel->getRotation(), netlabel->getAlignment()));
+        mNewSegment, netlabel->getPosition(), netlabel->getRotation(),
+        netlabel->getAlignment()));
     execNewChildCmd(cmd.take());  // can throw
   }
 

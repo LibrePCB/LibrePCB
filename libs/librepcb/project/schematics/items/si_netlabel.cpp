@@ -101,7 +101,7 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept {
   }
 }
 
-void SI_NetLabel::setAlignment(const Alignment &alignment) noexcept {
+void SI_NetLabel::setAlignment(const Alignment& alignment) noexcept {
   if (mNetLabel.setAlignment(alignment)) {
     mGraphicsItem->updateCacheAndRepaint();
   }

@@ -64,7 +64,9 @@ public:
   // Getters
   const Uuid& getUuid() const noexcept { return mNetLabel.getUuid(); }
   const Angle& getRotation() const noexcept { return mNetLabel.getRotation(); }
-  const Alignment& getAlignment() const noexcept { return mNetLabel.getAlignment(); }
+  const Alignment& getAlignment() const noexcept {
+    return mNetLabel.getAlignment();
+  }
   const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   NetSignal& getNetSignalOfNetSegment() const noexcept;
