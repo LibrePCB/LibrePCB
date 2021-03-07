@@ -85,6 +85,14 @@ public:
   virtual bool processMirror() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
+  virtual bool processKeyPressed(const QKeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processKeyReleased(const QKeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);

@@ -86,6 +86,8 @@ public:
 
   // Event Handlers
   virtual bool processAbortCommand() noexcept override;
+  virtual bool processKeyPressed(const QKeyEvent& e) noexcept override;
+  virtual bool processKeyReleased(const QKeyEvent& e) noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
@@ -101,9 +103,9 @@ public:
       const SchematicEditorState_DrawWire& rhs) = delete;
 
 private:  //  Methods
-  bool startPositioning(Schematic& schematic, const Point& pos,
+  bool startPositioning(Schematic& schematic, bool snap,
                         SI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool addNextNetPoint(Schematic& schematic, const Point& pos) noexcept;
+  bool addNextNetPoint(Schematic& schematic, bool snap) noexcept;
   bool abortPositioning(bool showErrMsgBox) noexcept;
   SI_SymbolPin* findSymbolPin(Schematic& schematic, const Point& pos) const
       noexcept;
@@ -111,7 +113,7 @@ private:  //  Methods
                             SI_NetPoint* except = nullptr) const noexcept;
   SI_NetLine* findNetLine(Schematic& schematic, const Point& pos,
                           SI_NetLine* except = nullptr) const noexcept;
-  void updateNetpointPositions(const Point& cursorPos) noexcept;
+  Point updateNetpointPositions(Schematic& schematic, bool snap) noexcept;
   void updateWireModeActionsCheckedState() noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
@@ -120,6 +122,7 @@ private:  // Data
   Circuit& mCircuit;
   SubState mSubState;  ///< the current substate
   WireMode mWireMode;  ///< the current wire mode
+  Point mCursorPos;  ///< the current cursor position
   SI_NetLineAnchor*
       mFixedStartAnchor;  ///< the fixed anchor (start point of the line)
   SI_NetLine* mPositioningNetLine1;  ///< line between fixed point and p1
