@@ -591,6 +591,21 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
       }
       break;
     }
+
+    case QEvent::KeyPress: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      mFsm->processKeyPressed(*e);
+      break;
+    }
+
+    case QEvent::KeyRelease: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      mFsm->processKeyReleased(*e);
+      break;
+    }
+
     default: { break; }
   }
 
