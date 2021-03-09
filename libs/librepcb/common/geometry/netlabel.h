@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
 #include "../fileio/cmd/cmdlistelementinsert.h"
 #include "../fileio/cmd/cmdlistelementremove.h"
 #include "../fileio/cmd/cmdlistelementsswap.h"
@@ -56,7 +55,7 @@ public:
     UuidChanged,
     PositionChanged,
     RotationChanged,
-    AlignmentChanged,
+    MirroredChanged,
   };
   Signal<NetLabel, Event> onEdited;
   typedef Slot<NetLabel, Event> OnEditedSlot;
@@ -66,7 +65,7 @@ public:
   NetLabel(const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const Point& position, const Angle& rotation,
-           const Alignment& alignment) noexcept;
+           bool mirrored) noexcept;
   NetLabel(const SExpression& node, const Version& fileFormat);
   ~NetLabel() noexcept;
 
@@ -74,13 +73,13 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
-  const Alignment& getAlignment() const noexcept { return mAlignment; }
+  bool getMirrored() const noexcept { return mMirrored; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
   bool setPosition(const Point& position) noexcept;
   bool setRotation(const Angle& rotation) noexcept;
-  bool setAlignment(const Alignment& alignment) noexcept;
+  bool setMirrored(const bool mirrored) noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -96,7 +95,7 @@ private:  // Data
   Uuid mUuid;
   Point mPosition;
   Angle mRotation;
-  Alignment mAlignment;
+  bool mMirrored;
 };
 
 /*******************************************************************************

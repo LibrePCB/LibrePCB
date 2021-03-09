@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/alignment.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
 
@@ -76,8 +75,8 @@ private:
   SI_NetLabel& mNetLabel;
 
   // Misc
-  Alignment mOldAlignment;
-  Alignment mNewAlignment;
+  bool mOldMirrored;
+  bool mNewMirrored;
   Point mOldPos;
   Point mNewPos;
   Angle mOldRotation;

@@ -58,15 +58,13 @@ public:
   SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
               const Version& fileFormat);
   explicit SI_NetLabel(SI_NetSegment& segment, const Point& position,
-                       const Angle& rotation, const Alignment& alignment);
+                       const Angle& rotation, const bool mirrored);
   ~SI_NetLabel() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mNetLabel.getUuid(); }
   const Angle& getRotation() const noexcept { return mNetLabel.getRotation(); }
-  const Alignment& getAlignment() const noexcept {
-    return mNetLabel.getAlignment();
-  }
+  bool getMirrored() const noexcept { return mNetLabel.getMirrored(); }
   const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   NetSignal& getNetSignalOfNetSegment() const noexcept;
@@ -75,7 +73,7 @@ public:
   // Setters
   void setPosition(const Point& position) noexcept;
   void setRotation(const Angle& rotation) noexcept;
-  void setAlignment(const Alignment& alignment) noexcept;
+  void setMirrored(const bool mirrored) noexcept;
 
   // General Methods
   void updateAnchor() noexcept;

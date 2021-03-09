@@ -40,7 +40,7 @@ NetLabel::NetLabel(const NetLabel& other) noexcept
     mUuid(other.mUuid),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
-    mAlignment(other.mAlignment) {
+    mMirrored(other.mMirrored) {
 }
 
 NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
@@ -49,12 +49,12 @@ NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
 }
 
 NetLabel::NetLabel(const Uuid& uuid, const Point& position,
-                   const Angle& rotation, const Alignment& alignment) noexcept
+                   const Angle& rotation, bool mirrored) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mPosition(position),
     mRotation(rotation),
-    mAlignment(alignment) {
+    mMirrored(mirrored) {
 }
 
 NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
@@ -62,10 +62,9 @@ NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
     mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mPosition(node.getChild("position"), fileFormat),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mAlignment() {
-  if (fileFormat >= Version::fromString("0.2")) {
-    Alignment tempAligment(node.getChild("alignment"), fileFormat);
-    mAlignment = tempAligment;
+    mMirrored(false) {
+  if (fileFormat >= Version::fromString("0.2.1")) {
+    mMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
   }
 }
 
@@ -106,13 +105,13 @@ bool NetLabel::setRotation(const Angle& rotation) noexcept {
   return true;
 }
 
-bool NetLabel::setAlignment(const Alignment& alignment) noexcept {
-  if (alignment == mAlignment) {
+bool NetLabel::setMirrored(const bool mirrored) noexcept {
+  if (mirrored == mMirrored) {
     return false;
   }
 
-  mAlignment = alignment;
-  onEdited.notify(Event::AlignmentChanged);
+  mMirrored = mirrored;
+  onEdited.notify(Event::MirroredChanged);
   return true;
 }
 
@@ -124,7 +123,7 @@ void NetLabel::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild(mPosition.serializeToDomElement("position"), true);
   root.appendChild("rotation", mRotation, false);
-  root.appendChild(mAlignment.serializeToDomElement("alignment"), false);
+  root.appendChild("mirror", mMirrored, false);
 }
 
 /*******************************************************************************
@@ -135,7 +134,7 @@ bool NetLabel::operator==(const NetLabel& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mPosition != rhs.mPosition) return false;
   if (mRotation != rhs.mRotation) return false;
-  if (mAlignment != rhs.mAlignment) return false;
+  if (mMirrored != rhs.mMirrored) return false;
   return true;
 }
 
@@ -143,7 +142,7 @@ NetLabel& NetLabel::operator=(const NetLabel& rhs) noexcept {
   setUuid(rhs.mUuid);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);
-  setAlignment(rhs.mAlignment);
+  setMirrored(rhs.mMirrored);
   return *this;
 }
 

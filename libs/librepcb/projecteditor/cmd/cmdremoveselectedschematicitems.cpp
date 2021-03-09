@@ -246,7 +246,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
     for (const NetLabel& netlabel : segment.netlabels) {
       execNewChildCmd(new CmdSchematicNetLabelAdd(
           *newNetSegment, netlabel.getPosition(), netlabel.getRotation(),
-          netlabel.getAlignment()));
+          netlabel.getMirrored()));
     }
   }
 

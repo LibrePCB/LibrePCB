@@ -52,10 +52,10 @@ SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
 }
 
 SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const Point& position,
-                         const Angle& rotation, const Alignment& alignment)
+                         const Angle& rotation, const bool mirrored)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
-    mNetLabel(Uuid::createRandom(), position, rotation, alignment) {
+    mNetLabel(Uuid::createRandom(), position, rotation, mirrored) {
   init();
 }
 
@@ -101,8 +101,8 @@ void SI_NetLabel::setRotation(const Angle& rotation) noexcept {
   }
 }
 
-void SI_NetLabel::setAlignment(const Alignment& alignment) noexcept {
-  if (mNetLabel.setAlignment(alignment)) {
+void SI_NetLabel::setMirrored(const bool mirrored) noexcept {
+  if (mNetLabel.setMirrored(mirrored)) {
     mGraphicsItem->updateCacheAndRepaint();
   }
 }
