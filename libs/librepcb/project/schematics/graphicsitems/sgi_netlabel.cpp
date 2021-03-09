@@ -87,7 +87,6 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept {
 
   mStaticText.setText(*mNetLabel.getNetSignalOfNetSegment().getName());
   mStaticText.prepare(QTransform(), mFont);
-  // mTextOrigin.setX(mRotate180 ? -mStaticText.size().width() : 0);
   if ((mNetLabel.getAlignment().getH() == HAlign::right()) ^ mRotate180) {
     mTextOrigin.setX(-mStaticText.size().width());
   } else {

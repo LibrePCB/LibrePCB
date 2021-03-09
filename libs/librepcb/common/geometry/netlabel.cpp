@@ -24,6 +24,8 @@
 
 #include <QtCore>
 
+#include <version.h>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -61,9 +63,8 @@ NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
     mPosition(node.getChild("position"), fileFormat),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
     mAlignment() {
-  auto parsedAlignment = node.tryGetChild("alignment");
-  if (parsedAlignment) {
-    Alignment tempAligment(*parsedAlignment, fileFormat);
+  if (fileFormat >= Version::fromString("0.2")) {
+    Alignment tempAligment(node.getChild("alignment"), fileFormat);
     mAlignment = tempAligment;
   }
 }
