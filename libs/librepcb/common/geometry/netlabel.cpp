@@ -63,7 +63,7 @@ NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
     mPosition(node.getChild("position"), fileFormat),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
     mMirrored(false) {
-  if (fileFormat >= Version::fromString("0.2.1")) {
+  if (fileFormat >= Version::fromString("0.2")) {
     mMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
   }
 }
