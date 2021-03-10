@@ -126,10 +126,14 @@ bool CmdMirrorSelectedSchematicItems::performExecute() {
   }
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
     Point newpos = netlabel->getPosition().mirrored(mOrientation, center);
+    Angle rotation = netlabel->getRotation().mappedTo0_360deg();
 
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
     cmd->setPosition(newpos, false);
     cmd->mirror(false);
+    if ((rotation == Angle::deg90()) || (rotation == Angle::deg270())) {
+      cmd->rotate(Angle::deg180(), newpos, false);
+    }
     appendChild(cmd);
   }
   foreach (SI_Polygon* polygon, query->getPolygons()) {
