@@ -18,6 +18,7 @@ set -euo pipefail
 
 DOCKER=""
 DOCKER_CMD="docker"
+CLANGFORMAT=${CLANGFORMAT-clang-format}
 ALL=""
 for i in "$@"
 do
@@ -46,7 +47,7 @@ format_failed() {
   exit 7
 }
 
-echo "Formatting files with clang-format..."
+echo "Formatting files with $CLANGFORMAT..."
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
@@ -86,7 +87,7 @@ do
       # "make" to detect the files as changed every time, even if the content was
       # not modified! So we only overwrite the files if their content has changed.
       OLD_CONTENT=$(cat "$file")
-      NEW_CONTENT=$(clang-format -style=file "$file" || format_failed)
+      NEW_CONTENT=$($CLANGFORMAT -style=file "$file" || format_failed)
       if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
       then
         printf "%s\n" "$NEW_CONTENT" > "$file"
