@@ -154,6 +154,15 @@ bool SchematicEditorState_AddNetLabel::processSwitchToSchematicPage(
   return !mUndoCmdActive;
 }
 
+bool SchematicEditorState_AddNetLabel::processMirror() noexcept {
+  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
+    mEditCmd->mirror(true);
+    return true;
+  }
+
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

@@ -72,6 +72,7 @@ public:
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
+  virtual bool processMirror() noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_AddNetLabel& operator=(
