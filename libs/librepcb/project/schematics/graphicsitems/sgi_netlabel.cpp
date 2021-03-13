@@ -101,6 +101,9 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept {
   QRectF rect =
       QRectF(0, 0, mStaticText.size().width(), -mStaticText.size().height())
           .normalized();
+
+  if (mNetLabel.getMirrored()) rect.moveLeft(-mStaticText.size().width());
+
   qreal len = sOriginCrossLines[0].length();
   mBoundingRect =
       rect.united(QRectF(-len / 2, -len / 2, len, len)).normalized();
