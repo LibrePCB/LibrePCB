@@ -99,8 +99,14 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept {
     qWarning() << "Non-closed path was ignored in gerber output!";
     return;
   }
+  // Note: Actually G36/G37 regions do not have an aperture attached. But for
+  // compatibility reasons, it's better to still select an aperture as usual.
+  // We used an aperture of size 0, but this already caused some issues in
+  // the past (although not critical) and the Gerber specs recommends to not
+  // use zero-size apertures. So let's use an aperture size of 0.01mm (it has
+  // no impact on the rendered image anyway).
   setCurrentAperture(
-      mApertureList->setCircle(UnsignedLength(0), UnsignedLength(0)));
+      mApertureList->setCircle(UnsignedLength(10000), UnsignedLength(0)));
   setRegionModeOn();
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
