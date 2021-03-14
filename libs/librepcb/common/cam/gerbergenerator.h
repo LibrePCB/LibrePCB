@@ -105,8 +105,6 @@ private:
   void setCurrentAperture(int number) noexcept;
   void setRegionModeOn() noexcept;
   void setRegionModeOff() noexcept;
-  void setMultiQuadrantArcModeOn() noexcept;
-  void setMultiQuadrantArcModeOff() noexcept;
   void switchToLinearInterpolationModeG01() noexcept;
   void switchToCircularCwInterpolationModeG02() noexcept;
   void switchToCircularCcwInterpolationModeG03() noexcept;
@@ -135,7 +133,6 @@ private:
   QString mContent;
   QScopedPointer<GerberApertureList> mApertureList;
   int mCurrentApertureNumber;
-  bool mMultiQuadrantArcModeOn;
 };
 
 /*******************************************************************************

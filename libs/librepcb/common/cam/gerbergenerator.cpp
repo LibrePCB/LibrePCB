@@ -47,8 +47,7 @@ GerberGenerator::GerberGenerator(const QString& projName, const Uuid& projUuid,
     mOutput(),
     mContent(),
     mApertureList(new GerberApertureList()),
-    mCurrentApertureNumber(-1),
-    mMultiQuadrantArcModeOn(false) {
+    mCurrentApertureNumber(-1) {
 }
 
 GerberGenerator::~GerberGenerator() noexcept {
@@ -195,20 +194,6 @@ void GerberGenerator::setRegionModeOff() noexcept {
   mContent.append("G37*\n");
 }
 
-void GerberGenerator::setMultiQuadrantArcModeOn() noexcept {
-  if (!mMultiQuadrantArcModeOn) {
-    mContent.append("G75*\n");
-    mMultiQuadrantArcModeOn = true;
-  }
-}
-
-void GerberGenerator::setMultiQuadrantArcModeOff() noexcept {
-  if (mMultiQuadrantArcModeOn) {
-    mContent.append("G74*\n");
-    mMultiQuadrantArcModeOn = false;
-  }
-}
-
 void GerberGenerator::switchToLinearInterpolationModeG01() noexcept {
   mContent.append("G01*\n");
 }
@@ -235,9 +220,6 @@ void GerberGenerator::circularInterpolateToPosition(const Point& start,
                                                     const Point& center,
                                                     const Point& end) noexcept {
   Point diff = center - start;
-  if (!mMultiQuadrantArcModeOn) {
-    diff.makeAbs();  // no sign allowed in single quadrant mode!
-  }
   mContent.append(QString("X%1Y%2I%3J%4D01*\n")
                       .arg(end.getX().toNmString(), end.getY().toNmString(),
                            diff.getX().toNmString(), diff.getY().toNmString()));
@@ -250,10 +232,6 @@ void GerberGenerator::interpolateBetween(const Vertex& from,
     linearInterpolateToPosition(to.getPos());
   } else {
     // arc segment
-    // note: due to buggy clients when using single quadrant mode,
-    // we always use multi quadrant mode.
-    // see https://github.com/LibrePCB/LibrePCB/issues/247
-    setMultiQuadrantArcModeOn();
     if (from.getAngle() < 0) {
       switchToCircularCwInterpolationModeG02();
     } else {
@@ -301,8 +279,10 @@ void GerberGenerator::printHeader() noexcept {
   // start linear interpolation mode
   mOutput.append("G01*\n");
 
-  // use single quadrant arc mode
-  mOutput.append("G74*\n");
+  // Use multi quadrant arc mode (single quadrant mode is buggy in some CAM
+  // software and is now deprecated in the current Gerber specs).
+  // See https://github.com/LibrePCB/LibrePCB/issues/247.
+  mOutput.append("G75*\n");
 
   mOutput.append("G04 --- HEADER END --- *\n");
 }
