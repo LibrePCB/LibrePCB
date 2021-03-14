@@ -35,7 +35,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circle;
 class Path;
 class GerberApertureList;
 class Vertex;
@@ -75,8 +74,6 @@ public:
   void setLayerPolarity(LayerPolarity p) noexcept;
   void drawLine(const Point& start, const Point& end,
                 const UnsignedLength& width) noexcept;
-  void drawCircleOutline(const Circle& circle) noexcept;
-  void drawCircleArea(const Circle& circle) noexcept;
   void drawPathOutline(const Path& path,
                        const UnsignedLength& lineWidth) noexcept;
   void drawPathArea(const Path& path) noexcept;

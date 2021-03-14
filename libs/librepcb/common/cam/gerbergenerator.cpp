@@ -79,19 +79,6 @@ void GerberGenerator::drawLine(const Point& start, const Point& end,
   linearInterpolateToPosition(end);
 }
 
-void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept {
-  PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
-  Length innerDia = circle.getDiameter() - circle.getLineWidth();
-  if (innerDia < 0) innerDia = 0;
-  flashCircle(circle.getCenter(), positiveToUnsigned(outerDia),
-              UnsignedLength(innerDia));
-}
-
-void GerberGenerator::drawCircleArea(const Circle& circle) noexcept {
-  flashCircle(circle.getCenter(), positiveToUnsigned(circle.getDiameter()),
-              UnsignedLength(0));
-}
-
 void GerberGenerator::drawPathOutline(
     const Path& path, const UnsignedLength& lineWidth) noexcept {
   if (path.getVertices().count() < 2) {

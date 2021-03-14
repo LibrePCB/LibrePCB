@@ -482,16 +482,19 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
         ? GraphicsLayer::getMirroredLayerName(layerName)
         : layerName;
     if (layer == circle.getLayerName()) {
-      Circle copy = circle;
-      Point absolutePos = copy.getCenter();
+      Point absolutePos = circle.getCenter();
       absolutePos.rotate(footprint.getRotation());
       if (footprint.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
       absolutePos += footprint.getPosition();
-      copy.setCenter(absolutePos);
-      copy.setLineWidth(calcWidthOfLayer(copy.getLineWidth(), layer));
-      gen.drawCircleOutline(copy);
-      if (copy.isFilled()) {
-        gen.drawCircleArea(copy);
+      if (circle.isFilled()) {
+        PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
+        gen.drawPathArea(Path::circle(outerDia).translated(absolutePos));
+      } else {
+        UnsignedLength lineWidth =
+            calcWidthOfLayer(circle.getLineWidth(), layer);
+        gen.drawPathOutline(
+            Path::circle(circle.getDiameter()).translated(absolutePos),
+            lineWidth);
       }
     }
   }
