@@ -45,15 +45,10 @@ GerberApertureList::~GerberApertureList() noexcept {
 
 QString GerberApertureList::generateString() const noexcept {
   QString str;
-  str.append("G04 --- APERTURE LIST BEGIN --- *\n");
-  foreach (const QString& macro, mApertureMacros) {
-    str.append(QString("%AM%1*%\n").arg(macro));
+  for (auto it = mApertures.constBegin(); it != mApertures.constEnd(); ++it) {
+    // Replace placeholders "{}" by the aperture number.
+    str.append(QString(it.value()).replace("{}", QString::number(it.key())));
   }
-  foreach (int number, mApertures.keys()) {
-    str.append(
-        QString("%ADD%1%2*%\n").arg(number).arg(mApertures.value(number)));
-  }
-  str.append("G04 --- APERTURE LIST END --- *\n");
   return str;
 }
 
@@ -61,85 +56,136 @@ QString GerberApertureList::generateString() const noexcept {
  *  General Methods
  ******************************************************************************/
 
-int GerberApertureList::setCircle(const UnsignedLength& dia,
-                                  const UnsignedLength& hole) {
-  return setCurrentAperture(generateCircle(dia, hole));
+int GerberApertureList::addCircle(const UnsignedLength& dia) {
+  return addAperture(QString("%ADD{}C,%1*%\n").arg(dia->toMmString()));
 }
 
-int GerberApertureList::setRect(const UnsignedLength& w,
-                                const UnsignedLength& h, const Angle& rot,
-                                const UnsignedLength& hole) noexcept {
-  if (rot % Angle::deg180() == 0) {
-    return setCurrentAperture(generateRect(w, h, hole));
+int GerberApertureList::addObround(const PositiveLength& w,
+                                   const PositiveLength& h,
+                                   const Angle& rot) noexcept {
+  if (w == h) {
+    // For maximum compatibility, use a circle if width==height.
+    return addCircle(positiveToUnsigned(w));
+  } else if (rot % Angle::deg180() == 0) {
+    return addAperture(
+        QString("%ADD{}O,%1X%2*%\n").arg(w->toMmString(), h->toMmString()));
   } else if (rot % Angle::deg90() == 0) {
-    return setCurrentAperture(generateRect(h, w, hole));
+    return addAperture(
+        QString("%ADD{}O,%1X%2*%\n").arg(h->toMmString(), w->toMmString()));
+  } else if (w < h) {
+    // Same as condition below, but swap width and height and rotate by 90° to
+    // simplify calculations and to merge all combinations of parameters
+    // leading in the same image.
+    return addObround(h, w, rot + Angle::deg90());
   } else {
     // Rotation is not a multiple of 90 degrees --> we need to use an aperture
-    // macro
-    if (hole > 0) {
-      addMacro(generateRotatedRectMacroWithHole());
-    } else {
-      addMacro(generateRotatedRectMacro());
-    }
-    return setCurrentAperture(generateRotatedRect(w, h, rot, hole));
+    // macro.
+
+    // Normalize the rotation to a range of 0..180° to avoid generating
+    // multiple different apertures which represent exactly the same image.
+    Angle uniqueRotatation = rot.mappedTo0_360deg() % Angle::deg180();
+    QString s = "%AMROTATEDOBROUND{}";
+    Point start = Point(-w / 2 + h / 2, 0).rotated(uniqueRotatation);
+    Point end = Point(w / 2 - h / 2, 0).rotated(uniqueRotatation);
+    // ATTENTION: Don't use the optional rotation parameter in the circles!
+    // It causes critical issues with some crappy CAM software!
+    s += QString("*1,1,%1,%2,%3")
+             .arg(h->toMmString(), start.getX().toMmString(),
+                  start.getY().toMmString());
+    s += QString("*1,1,%1,%2,%3")
+             .arg(h->toMmString(), end.getX().toMmString(),
+                  end.getY().toMmString());
+    s += QString("*20,1,%1,%2,%3,%4,%5,0*%\n")
+             .arg(h->toMmString(), start.getX().toMmString(),
+                  start.getY().toMmString(), end.getX().toMmString(),
+                  end.getY().toMmString());
+    s += "%ADD{}ROTATEDOBROUND{}*%\n";
+    return addAperture(s);
   }
 }
 
-int GerberApertureList::setObround(const UnsignedLength& w,
-                                   const UnsignedLength& h, const Angle& rot,
-                                   const UnsignedLength& hole) noexcept {
+int GerberApertureList::addRect(const PositiveLength& w,
+                                const PositiveLength& h,
+                                const Angle& rot) noexcept {
   if (rot % Angle::deg180() == 0) {
-    return setCurrentAperture(generateObround(w, h, hole));
+    return addAperture(
+        QString("%ADD{}R,%1X%2*%\n").arg(w->toMmString(), h->toMmString()));
   } else if (rot % Angle::deg90() == 0) {
-    return setCurrentAperture(generateObround(h, w, hole));
+    return addAperture(
+        QString("%ADD{}R,%1X%2*%\n").arg(h->toMmString(), w->toMmString()));
+  } else if (w < h) {
+    // Same as condition below, but swap width and height and rotate by 90° to
+    // simplify calculations and to merge all combinations of parameters
+    // leading in the same image.
+    return addRect(h, w, rot + Angle::deg90());
   } else {
     // Rotation is not a multiple of 90 degrees --> we need to use an aperture
-    // macro
-    if (hole > 0) {
-      addMacro(generateRotatedObroundMacroWithHole());
-    } else {
-      addMacro(generateRotatedObroundMacro());
-    }
-    return setCurrentAperture(generateRotatedObround(w, h, rot, hole));
+    // macro. But don't use the "Center Line (Code 21)" since some Gerber
+    // parsers interpret the rotation parameter in the wrong way! See Gerber
+    // specs for details. Let's use the "Vector Line (Code 20)" macro instead.
+
+    // Normalize the rotation to a range of 0..180° to avoid generating
+    // multiple different apertures which represent exactly the same image.
+    Angle uniqueRotatation = rot.mappedTo0_360deg() % Angle::deg180();
+    QString s = "%AMROTATEDRECT{}";
+    s += QString("*20,1,%1,%2,0.0,%3,0.0,%4*%\n")
+             .arg(h->toMmString(), (-w / 2).toMmString(), (w / 2).toMmString(),
+                  uniqueRotatation.toDegString());
+    s += "%ADD{}ROTATEDRECT{}*%\n";
+    return addAperture(s);
   }
 }
 
-int GerberApertureList::setRegularPolygon(const UnsignedLength& dia, int n,
-                                          const Angle& rot,
-                                          const UnsignedLength& hole) noexcept {
-  if (n < 3 || n > 12) {
-    qWarning() << "Gerber Export: Specified number of vertices not supported "
-                  "by gerber specs:"
-               << n;
-  }
-  // Adjust rotation as its interpretation differs between LibrePCB and Gerber
-  // specs
-  Angle grbRot = rot + (Angle::deg180() / (n > 0 ? n : 1));
-  return setCurrentAperture(generateRegularPolygon(dia, n, grbRot, hole));
-}
+int GerberApertureList::addOctagon(const PositiveLength& w,
+                                   const PositiveLength& h,
+                                   const Angle& rot) noexcept {
+  // Note: If w==h, we could theoretically use the "Gegular Polygon (P)"
+  // aperture. However, it seems some CAM software render such polygons the
+  // wrong way. From the Gerber specs:
+  //
+  //     Some CAD systems incorrectly assume the parameter of a Regular Polygon
+  //     specifies the inside diameter. This is wrong: it specifies the outside
+  //     diameter.
+  //
+  // So let's always use an outline macro for octagons, probably this is more
+  // compatible with CAM software.
 
-int GerberApertureList::setOctagon(const UnsignedLength& w,
-                                   const UnsignedLength& h,
-                                   const UnsignedLength& edge, const Angle& rot,
-                                   const UnsignedLength& hole) noexcept {
-  if (hole > 0) {
-    addMacro(generateRotatedOctagonMacroWithHole());
+  if (w < h) {
+    // Same as condition below, but swap width and height and rotate by 90° to
+    // simplify calculations and to merge all combinations of parameters
+    // leading in the same image.
+    return addOctagon(h, w, rot + Angle::deg90());
   } else {
-    addMacro(generateRotatedOctagonMacro());
+    // Normalize the rotation to a range of 0..45° (w==h) resp. 0..180° (w!=h)
+    // to avoid generating multiple different apertures which represent exactly
+    // the same image.
+    Angle rotationModulo = (w == h) ? Angle::deg45() : Angle::deg180();
+    Angle uniqueRotatation = rot.mappedTo0_360deg() % rotationModulo;
+    return addOutline("ROTATEDOCTAGON", Path::octagon(w, h), uniqueRotatation);
   }
-  return setCurrentAperture(generateRotatedOctagon(w, h, edge, rot, hole));
-}
-
-void GerberApertureList::reset() noexcept {
-  // mApertureMacros.clear();
-  mApertures.clear();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-int GerberApertureList::setCurrentAperture(const QString& aperture) noexcept {
+int GerberApertureList::addOutline(const QString& name, Path path,
+                                   const Angle& rot) noexcept {
+  path.close();
+  Q_ASSERT(path.getVertices().count() >= 4);
+  QString s =
+      QString("%AM%1{}*4,1,%2,").arg(name).arg(path.getVertices().count() - 1);
+  foreach (const Vertex& v, path.getVertices()) {
+    Q_ASSERT(v.getAngle() == 0);
+    s += QString("%1,%2,").arg(v.getPos().getX().toMmString(),
+                               v.getPos().getY().toMmString());
+  }
+  s += QString("%1*%\n").arg(rot.toDegString());
+  s += QString("%ADD{}%1{}*%\n").arg(name);
+  return addAperture(s);
+}
+
+int GerberApertureList::addAperture(const QString& aperture) noexcept {
   int number = mApertures.key(aperture, -1);
   if (number < 0) {
     number = mApertures.count() + 10;  // 10 is the number of the first aperture
@@ -147,159 +193,6 @@ int GerberApertureList::setCurrentAperture(const QString& aperture) noexcept {
     mApertures.insert(number, aperture);
   }
   return number;
-}
-
-void GerberApertureList::addMacro(const QString& macro) noexcept {
-  if (!mApertureMacros.contains(macro)) {
-    mApertureMacros.append(macro);
-  }
-}
-
-/*******************************************************************************
- *  Aperture Generator Methods
- ******************************************************************************/
-
-QString GerberApertureList::generateCircle(
-    const UnsignedLength& dia, const UnsignedLength& hole) noexcept {
-  if (hole > 0) {
-    return QString("C,%1X%2").arg(dia->toMmString(), hole->toMmString());
-  } else {
-    return QString("C,%1").arg(dia->toMmString());
-  }
-}
-
-QString GerberApertureList::generateRect(const UnsignedLength& w,
-                                         const UnsignedLength& h,
-                                         const UnsignedLength& hole) noexcept {
-  if (hole > 0) {
-    return QString("R,%1X%2X%3")
-        .arg(w->toMmString(), h->toMmString(), hole->toMmString());
-  } else {
-    return QString("R,%1X%2").arg(w->toMmString(), h->toMmString());
-  }
-}
-
-QString GerberApertureList::generateObround(
-    const UnsignedLength& w, const UnsignedLength& h,
-    const UnsignedLength& hole) noexcept {
-  if (hole > 0) {
-    return QString("O,%1X%2X%3")
-        .arg(w->toMmString(), h->toMmString(), hole->toMmString());
-  } else {
-    return QString("O,%1X%2").arg(w->toMmString(), h->toMmString());
-  }
-}
-
-QString GerberApertureList::generateRegularPolygon(
-    const UnsignedLength& dia, int n, const Angle& rot,
-    const UnsignedLength& hole) noexcept {
-  QString str = QString("P,%1X%2").arg(dia->toMmString()).arg(n);
-  if (rot != 0 || hole > 0) str += QString("X%1").arg(rot.toDegString());
-  if (hole > 0) str += QString("X%1").arg(hole->toMmString());
-  return str;
-}
-
-QString GerberApertureList::generateRotatedRectMacro() {
-  // parameters: width, height, rotation
-  return QString("ROTATEDRECT*21,1,$1,$2,0,0,$3");
-}
-
-QString GerberApertureList::generateRotatedRectMacroWithHole() {
-  // parameters: width, height, rotation, hole
-  return QString("ROTATEDRECTWITHHOLE*21,1,$1,$2,0,0,$3*1,0,$4,0,0,$3");
-}
-
-QString GerberApertureList::generateRotatedObroundMacro() {
-  // parameters: x1, y1, x2, y2, width
-  return QString(
-      "ROTATEDOBROUND*1,1,$5,$1,$2,0*1,1,$5,$3,$4,0*20,1,$5,$1,$2,$3,$4,0");
-}
-
-QString GerberApertureList::generateRotatedObroundMacroWithHole() {
-  // parameters: x1, y1, x2, y2, width, hole
-  return QString(
-      "ROTATEDOBROUNDWITHHOLE*1,1,$5,$1,$2,0*1,1,$5,$3,$4,0*20,1,$5,$1,$2,$3,$"
-      "4,0*1,0,$6,0,0,0");
-}
-
-QString GerberApertureList::generateRotatedOctagonMacro() {
-  // parameters: width, height, edge, rotation
-  return QString(
-      "ROTATEDOCTAGON*4,1,8,"
-      "-($1/2),($2/2)-$3,"
-      "-($1/2)+$3,($2/2),"
-      "($1/2)-$3,($2/2),"
-      "($1/2),($2/2)-$3,"
-      "($1/2),-($2/2)+$3,"
-      "($1/2)-$3,-($2/2),"
-      "-($1/2)+$3,-($2/2),"
-      "-($1/2),-($2/2)+$3,"
-      "-($1/2),($2/2)-$3,"
-      "$4");
-}
-
-QString GerberApertureList::generateRotatedOctagonMacroWithHole() {
-  // parameters: width, height, edge, rotation, hole
-  return QString(
-      "ROTATEDOCTAGONWITHHOLE*4,1,8,"
-      "-($1/2),($2/2)-$3,"
-      "-($1/2)+$3,($2/2),"
-      "($1/2)-$3,($2/2),"
-      "($1/2),($2/2)-$3,"
-      "($1/2),-($2/2)+$3,"
-      "($1/2)-$3,-($2/2),"
-      "-($1/2)+$3,-($2/2),"
-      "-($1/2),-($2/2)+$3,"
-      "-($1/2),($2/2)-$3,"
-      "$4"
-      "*1,0,$5,0,0,0");
-}
-
-QString GerberApertureList::generateRotatedRect(
-    const UnsignedLength& w, const UnsignedLength& h, const Angle& rot,
-    const UnsignedLength& hole) noexcept {
-  if (hole > 0) {
-    return QString("ROTATEDRECTWITHHOLE,%1X%2X%3X%4")
-        .arg(w->toMmString(), h->toMmString(), rot.toDegString(),
-             hole->toMmString());
-  } else {
-    return QString("ROTATEDRECT,%1X%2X%3")
-        .arg(w->toMmString(), h->toMmString(), rot.toDegString());
-  }
-}
-
-QString GerberApertureList::generateRotatedObround(
-    const UnsignedLength& w, const UnsignedLength& h, const Angle& rot,
-    const UnsignedLength& hole) noexcept {
-  UnsignedLength width = (w < h ? w : h);
-  Point start = Point(-w / 2 + width / 2, 0).rotated(rot);
-  Point end = Point(w / 2 - width / 2, 0).rotated(rot);
-  if (hole > 0) {
-    return QString("ROTATEDOBROUNDWITHHOLE,%1X%2X%3X%4X%5X%6")
-        .arg(start.getX().toMmString(), start.getY().toMmString(),
-             end.getX().toMmString(), end.getY().toMmString(),
-             width->toMmString(), hole->toMmString());
-  } else {
-    return QString("ROTATEDOBROUND,%1X%2X%3X%4X%5")
-        .arg(start.getX().toMmString(), start.getY().toMmString(),
-             end.getX().toMmString(), end.getY().toMmString(),
-             width->toMmString());
-  }
-}
-
-QString GerberApertureList::generateRotatedOctagon(
-    const UnsignedLength& w, const UnsignedLength& h,
-    const UnsignedLength& edge, const Angle& rot,
-    const UnsignedLength& hole) noexcept {
-  if (hole > 0) {
-    return QString("ROTATEDOCTAGONWITHHOLE,%1X%2X%3X%4X%5")
-        .arg(w->toMmString(), h->toMmString(), edge->toMmString(),
-             rot.toDegString(), hole->toMmString());
-  } else {
-    return QString("ROTATEDOCTAGON,%1X%2X%3X%4")
-        .arg(w->toMmString(), h->toMmString(), edge->toMmString(),
-             rot.toDegString());
-  }
 }
 
 /*******************************************************************************

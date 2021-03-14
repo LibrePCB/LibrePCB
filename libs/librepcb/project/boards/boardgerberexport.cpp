@@ -421,24 +421,24 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
                        layerName == GraphicsLayer::sBotStopMask) &&
       mBoard.getDesignRules().doesViaRequireStopMask(*via.getDrillDiameter());
   if (drawCopper || drawStopMask) {
-    UnsignedLength outerDiameter = positiveToUnsigned(via.getSize());
+    PositiveLength outerDiameter = via.getSize();
     if (drawStopMask) {
       outerDiameter += UnsignedLength(
           mBoard.getDesignRules().calcStopMaskClearance(*via.getSize()) * 2);
     }
     switch (via.getShape()) {
       case Via::Shape::Round: {
-        gen.flashCircle(via.getPosition(), outerDiameter, UnsignedLength(0));
+        gen.flashCircle(via.getPosition(), outerDiameter);
         break;
       }
       case Via::Shape::Square: {
         gen.flashRect(via.getPosition(), outerDiameter, outerDiameter,
-                      Angle::deg0(), UnsignedLength(0));
+                      Angle::deg0());
         break;
       }
       case Via::Shape::Octagon: {
-        gen.flashRegularPolygon(via.getPosition(), outerDiameter, 8,
-                                Angle::deg0(), UnsignedLength(0));
+        gen.flashOctagon(via.getPosition(), outerDiameter, outerDiameter,
+                         Angle::deg0());
         break;
       }
       default: { throw LogicError(__FILE__, __LINE__); }
@@ -558,34 +558,20 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     return;
   }
 
-  UnsignedLength uWidth(width);
-  UnsignedLength uHeight(height);
+  PositiveLength pWidth(width);
+  PositiveLength pHeight(height);
 
   switch (libPad.getShape()) {
     case library::FootprintPad::Shape::ROUND: {
-      if (width == height) {
-        gen.flashCircle(pad.getPosition(), uWidth, UnsignedLength(0));
-      } else {
-        gen.flashObround(pad.getPosition(), uWidth, uHeight, rot,
-                         UnsignedLength(0));
-      }
+      gen.flashObround(pad.getPosition(), pWidth, pHeight, rot);
       break;
     }
     case library::FootprintPad::Shape::RECT: {
-      gen.flashRect(pad.getPosition(), uWidth, uHeight, rot, UnsignedLength(0));
+      gen.flashRect(pad.getPosition(), pWidth, pHeight, rot);
       break;
     }
     case library::FootprintPad::Shape::OCTAGON: {
-      if (width == height) {
-        gen.flashRegularPolygon(pad.getPosition(), uWidth, 8, rot,
-                                UnsignedLength(0));
-      } else {
-        // Calculate edge equal to Path::octagon()!
-        UnsignedLength edge(Length::fromMm(qMin(width / 2, height / 2).toMm() *
-                                           (2 - qSqrt(2))));
-        gen.flashOctagon(pad.getPosition(), uWidth, uHeight, edge, rot,
-                         UnsignedLength(0));
-      }
+      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, rot);
       break;
     }
     default: { throw LogicError(__FILE__, __LINE__); }

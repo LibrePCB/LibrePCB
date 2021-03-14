@@ -56,8 +56,6 @@ class GerberGenerator final {
 
 public:
   // Public Types
-  // enum class FileFunction {Copper, SolderMask, Glue, Paste, KeepOut, Plated,
-  //                         NonPlated, Profile, DrillMap};
   enum class LayerPolarity { Positive, Negative };
 
   // Constructors / Destructor
@@ -77,23 +75,15 @@ public:
   void drawPathOutline(const Path& path,
                        const UnsignedLength& lineWidth) noexcept;
   void drawPathArea(const Path& path) noexcept;
-  void flashCircle(const Point& pos, const UnsignedLength& dia,
-                   const UnsignedLength& hole) noexcept;
-  void flashRect(const Point& pos, const UnsignedLength& w,
-                 const UnsignedLength& h, const Angle& rot,
-                 const UnsignedLength& hole) noexcept;
-  void flashObround(const Point& pos, const UnsignedLength& w,
-                    const UnsignedLength& h, const Angle& rot,
-                    const UnsignedLength& hole) noexcept;
-  void flashRegularPolygon(const Point& pos, const UnsignedLength& dia, int n,
-                           const Angle& rot,
-                           const UnsignedLength& hole) noexcept;
-  void flashOctagon(const Point& pos, const UnsignedLength& w,
-                    const UnsignedLength& h, const UnsignedLength& edge,
-                    const Angle& rot, const UnsignedLength& hole) noexcept;
+  void flashCircle(const Point& pos, const PositiveLength& dia) noexcept;
+  void flashRect(const Point& pos, const PositiveLength& w,
+                 const PositiveLength& h, const Angle& rot) noexcept;
+  void flashObround(const Point& pos, const PositiveLength& w,
+                    const PositiveLength& h, const Angle& rot) noexcept;
+  void flashOctagon(const Point& pos, const PositiveLength& w,
+                    const PositiveLength& h, const Angle& rot) noexcept;
 
   // General Methods
-  void reset() noexcept;
   void generate();
   void saveToFile(const FilePath& filepath) const;
 
@@ -141,4 +131,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GERBERGENERATOR_H
+#endif

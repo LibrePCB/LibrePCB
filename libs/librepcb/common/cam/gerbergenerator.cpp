@@ -73,7 +73,7 @@ void GerberGenerator::setLayerPolarity(LayerPolarity p) noexcept {
 
 void GerberGenerator::drawLine(const Point& start, const Point& end,
                                const UnsignedLength& width) noexcept {
-  setCurrentAperture(mApertureList->setCircle(width, UnsignedLength(0)));
+  setCurrentAperture(mApertureList->addCircle(width));
   moveToPosition(start);
   linearInterpolateToPosition(end);
 }
@@ -84,7 +84,7 @@ void GerberGenerator::drawPathOutline(
     qWarning() << "Invalid path was ignored in gerber output!";
     return;
   }
-  setCurrentAperture(mApertureList->setCircle(lineWidth, UnsignedLength(0)));
+  setCurrentAperture(mApertureList->addCircle(lineWidth));
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
     const Vertex& v = path.getVertices().at(i);
@@ -104,8 +104,7 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept {
   // the past (although not critical) and the Gerber specs recommends to not
   // use zero-size apertures. So let's use an aperture size of 0.01mm (it has
   // no impact on the rendered image anyway).
-  setCurrentAperture(
-      mApertureList->setCircle(UnsignedLength(10000), UnsignedLength(0)));
+  setCurrentAperture(mApertureList->addCircle(UnsignedLength(10000)));
   setRegionModeOn();
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
@@ -116,52 +115,36 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept {
   setRegionModeOff();
 }
 
-void GerberGenerator::flashCircle(const Point& pos, const UnsignedLength& dia,
-                                  const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setCircle(dia, hole));
+void GerberGenerator::flashCircle(const Point& pos,
+                                  const PositiveLength& dia) noexcept {
+  setCurrentAperture(mApertureList->addCircle(positiveToUnsigned(dia)));
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRect(const Point& pos, const UnsignedLength& w,
-                                const UnsignedLength& h, const Angle& rot,
-                                const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setRect(w, h, rot, hole));
+void GerberGenerator::flashRect(const Point& pos, const PositiveLength& w,
+                                const PositiveLength& h,
+                                const Angle& rot) noexcept {
+  setCurrentAperture(mApertureList->addRect(w, h, rot));
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashObround(const Point& pos, const UnsignedLength& w,
-                                   const UnsignedLength& h, const Angle& rot,
-                                   const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setObround(w, h, rot, hole));
+void GerberGenerator::flashObround(const Point& pos, const PositiveLength& w,
+                                   const PositiveLength& h,
+                                   const Angle& rot) noexcept {
+  setCurrentAperture(mApertureList->addObround(w, h, rot));
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRegularPolygon(const Point& pos,
-                                          const UnsignedLength& dia, int n,
-                                          const Angle& rot,
-                                          const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setRegularPolygon(dia, n, rot, hole));
-  flashAtPosition(pos);
-}
-
-void GerberGenerator::flashOctagon(const Point& pos, const UnsignedLength& w,
-                                   const UnsignedLength& h,
-                                   const UnsignedLength& edge, const Angle& rot,
-                                   const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setOctagon(w, h, edge, rot, hole));
+void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
+                                   const PositiveLength& h,
+                                   const Angle& rot) noexcept {
+  setCurrentAperture(mApertureList->addOctagon(w, h, rot));
   flashAtPosition(pos);
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void GerberGenerator::reset() noexcept {
-  mOutput.clear();
-  mContent.clear();
-  mApertureList->reset();
-  mCurrentApertureNumber = -1;
-}
 
 void GerberGenerator::generate() {
   mOutput.clear();
@@ -288,7 +271,9 @@ void GerberGenerator::printHeader() noexcept {
 }
 
 void GerberGenerator::printApertureList() noexcept {
+  mOutput.append("G04 --- APERTURE LIST BEGIN --- *\n");
   mOutput.append(mApertureList->generateString());
+  mOutput.append("G04 --- APERTURE LIST END --- *\n");
 }
 
 void GerberGenerator::printContent() noexcept {
