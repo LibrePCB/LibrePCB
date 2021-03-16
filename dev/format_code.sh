@@ -18,7 +18,7 @@ set -euo pipefail
 
 DOCKER=""
 DOCKER_CMD="docker"
-CLANGFORMAT=${CLANGFORMAT-clang-format}
+CLANGFORMAT=${CLANGFORMAT:-clang-format}
 ALL=""
 for i in "$@"
 do
