@@ -254,8 +254,9 @@ bool CmdPasteSchematicItems::performExecute() {
 
     // Add netlabels
     for (const NetLabel& nl : seg.labels) {
-      CmdSchematicNetLabelAdd* cmd = new CmdSchematicNetLabelAdd(
-          *copy, nl.getPosition() + mPosOffset, nl.getRotation());
+      CmdSchematicNetLabelAdd* cmd =
+          new CmdSchematicNetLabelAdd(*copy, nl.getPosition() + mPosOffset,
+                                      nl.getRotation(), nl.getMirrored());
       execNewChildCmd(cmd);
       cmd->getNetLabel()->setSelected(true);
       if (!forcedNetName) {

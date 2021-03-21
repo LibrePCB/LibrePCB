@@ -40,6 +40,8 @@ CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(
     SI_NetLabel& netlabel) noexcept
   : UndoCommand(tr("Edit netlabel")),
     mNetLabel(netlabel),
+    mOldMirrored(netlabel.getMirrored()),
+    mNewMirrored(mOldMirrored),
     mOldPos(netlabel.getPosition()),
     mNewPos(mOldPos),
     mOldRotation(netlabel.getRotation()),
@@ -49,6 +51,7 @@ CmdSchematicNetLabelEdit::CmdSchematicNetLabelEdit(
 CmdSchematicNetLabelEdit::~CmdSchematicNetLabelEdit() noexcept {
   if (!wasEverExecuted()) {
     // revert temporary changes
+    mNetLabel.setMirrored(mOldMirrored);
     mNetLabel.setPosition(mOldPos);
     mNetLabel.setRotation(mOldRotation);
   }
@@ -90,6 +93,12 @@ void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center,
   }
 }
 
+void CmdSchematicNetLabelEdit::mirror(bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMirrored = !mNewMirrored;
+  if (immediate) mNetLabel.setMirrored(mNewMirrored);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -103,11 +112,13 @@ bool CmdSchematicNetLabelEdit::performExecute() {
 void CmdSchematicNetLabelEdit::performUndo() {
   mNetLabel.setPosition(mOldPos);
   mNetLabel.setRotation(mOldRotation);
+  mNetLabel.setMirrored(mOldMirrored);
 }
 
 void CmdSchematicNetLabelEdit::performRedo() {
   mNetLabel.setPosition(mNewPos);
   mNetLabel.setRotation(mNewRotation);
+  mNetLabel.setMirrored(mNewMirrored);
 }
 
 /*******************************************************************************

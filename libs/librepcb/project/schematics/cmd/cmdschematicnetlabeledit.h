@@ -55,6 +55,7 @@ public:
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirror(bool immediate) noexcept;
 
 private:
   // Private Methods
@@ -74,6 +75,8 @@ private:
   SI_NetLabel& mNetLabel;
 
   // Misc
+  bool mOldMirrored;
+  bool mNewMirrored;
   Point mOldPos;
   Point mNewPos;
   Angle mOldRotation;

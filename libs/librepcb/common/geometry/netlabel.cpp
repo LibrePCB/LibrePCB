@@ -24,6 +24,8 @@
 
 #include <QtCore>
 
+#include <version.h>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -37,7 +39,8 @@ NetLabel::NetLabel(const NetLabel& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
     mPosition(other.mPosition),
-    mRotation(other.mRotation) {
+    mRotation(other.mRotation),
+    mMirrored(other.mMirrored) {
 }
 
 NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
@@ -46,15 +49,23 @@ NetLabel::NetLabel(const Uuid& uuid, const NetLabel& other) noexcept
 }
 
 NetLabel::NetLabel(const Uuid& uuid, const Point& position,
-                   const Angle& rotation) noexcept
-  : onEdited(*this), mUuid(uuid), mPosition(position), mRotation(rotation) {
+                   const Angle& rotation, bool mirrored) noexcept
+  : onEdited(*this),
+    mUuid(uuid),
+    mPosition(position),
+    mRotation(rotation),
+    mMirrored(mirrored) {
 }
 
 NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mPosition(node.getChild("position"), fileFormat),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)) {
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mMirrored(false) {
+  if (fileFormat >= Version::fromString("0.2")) {
+    mMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
+  }
 }
 
 NetLabel::~NetLabel() noexcept {
@@ -94,6 +105,16 @@ bool NetLabel::setRotation(const Angle& rotation) noexcept {
   return true;
 }
 
+bool NetLabel::setMirrored(const bool mirrored) noexcept {
+  if (mirrored == mMirrored) {
+    return false;
+  }
+
+  mMirrored = mirrored;
+  onEdited.notify(Event::MirroredChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -102,6 +123,7 @@ void NetLabel::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild(mPosition.serializeToDomElement("position"), true);
   root.appendChild("rotation", mRotation, false);
+  root.appendChild("mirror", mMirrored, false);
 }
 
 /*******************************************************************************
@@ -112,6 +134,7 @@ bool NetLabel::operator==(const NetLabel& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mPosition != rhs.mPosition) return false;
   if (mRotation != rhs.mRotation) return false;
+  if (mMirrored != rhs.mMirrored) return false;
   return true;
 }
 
@@ -119,6 +142,7 @@ NetLabel& NetLabel::operator=(const NetLabel& rhs) noexcept {
   setUuid(rhs.mUuid);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);
+  setMirrored(rhs.mMirrored);
   return *this;
 }
 

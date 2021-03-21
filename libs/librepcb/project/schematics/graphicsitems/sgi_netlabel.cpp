@@ -87,7 +87,11 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept {
 
   mStaticText.setText(*mNetLabel.getNetSignalOfNetSegment().getName());
   mStaticText.prepare(QTransform(), mFont);
-  mTextOrigin.setX(mRotate180 ? -mStaticText.size().width() : 0);
+  if (mNetLabel.getMirrored() ^ mRotate180) {
+    mTextOrigin.setX(-mStaticText.size().width());
+  } else {
+    mTextOrigin.setX(0);
+  }
   mTextOrigin.setY(mRotate180 ? 0 : -mStaticText.size().height());
   mStaticText.prepare(QTransform()
                           .rotate(mRotate180 ? 180 : 0)
@@ -97,6 +101,9 @@ void SGI_NetLabel::updateCacheAndRepaint() noexcept {
   QRectF rect =
       QRectF(0, 0, mStaticText.size().width(), -mStaticText.size().height())
           .normalized();
+
+  if (mNetLabel.getMirrored()) rect.moveLeft(-mStaticText.size().width());
+
   qreal len = sOriginCrossLines[0].length();
   mBoundingRect =
       rect.united(QRectF(-len / 2, -len / 2, len, len)).normalized();
