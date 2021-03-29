@@ -56,6 +56,7 @@ SOURCES += \
     cam/excellongenerator.cpp \
     cam/gerberaperturelist.cpp \
     cam/gerberattribute.cpp \
+    cam/gerberattributewriter.cpp \
     cam/gerbergenerator.cpp \
     debug.cpp \
     dialogs/aboutdialog.cpp \
@@ -194,6 +195,7 @@ HEADERS += \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
     cam/gerberattribute.h \
+    cam/gerberattributewriter.h \
     cam/gerbergenerator.h \
     circuitidentifier.h \
     debug.h \

@@ -28,6 +28,9 @@
 #include "../geometry/path.h"
 #include "../units/all_length_units.h"
 #include "../uuid.h"
+#include "gerberattribute.h"
+
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
@@ -65,6 +68,9 @@ class GerberApertureList final {
   Q_DECLARE_TR_FUNCTIONS(GerberApertureList)
 
 public:
+  // Types
+  using Function = tl::optional<GerberAttribute::ApertureFunction>;
+
   // Constructors / Destructor
   GerberApertureList() noexcept;
   GerberApertureList(const GerberApertureList& other) = delete;
@@ -86,10 +92,11 @@ public:
    *
    * @param dia       Circle diameter. According Gerber specs, it's allowed to
    *                  create a circle with a diameter of zero.
+   * @param function  Function attribute.
    *
    * @return Aperture number.
    */
-  int addCircle(const UnsignedLength& dia);
+  int addCircle(const UnsignedLength& dia, Function function);
 
   /**
    * @brief Add an obround aperture
@@ -99,11 +106,12 @@ public:
    * @param w         Total width.
    * @param h         Total height.
    * @param rot       Rotation.
+   * @param function  Function attribute.
    *
    * @return Aperture number.
    */
   int addObround(const PositiveLength& w, const PositiveLength& h,
-                 const Angle& rot) noexcept;
+                 const Angle& rot, Function function) noexcept;
 
   /**
    * @brief Add a rectangular aperture
@@ -111,11 +119,12 @@ public:
    * @param w         Width.
    * @param h         Height.
    * @param rot       Rotation.
+   * @param function  Function attribute.
    *
    * @return Aperture number.
    */
   int addRect(const PositiveLength& w, const PositiveLength& h,
-              const Angle& rot) noexcept;
+              const Angle& rot, Function function) noexcept;
 
   /**
    * @brief Add an octagon aperture
@@ -123,11 +132,12 @@ public:
    * @param w         Width.
    * @param h         Height.
    * @param rot       Rotation.
+   * @param function  Function attribute.
    *
    * @return Aperture number.
    */
   int addOctagon(const PositiveLength& w, const PositiveLength& h,
-                 const Angle& rot) noexcept;
+                 const Angle& rot, Function function) noexcept;
 
   // Operator Overloadings
   GerberApertureList& operator=(const GerberApertureList& rhs) = delete;
@@ -146,10 +156,12 @@ private:  // Methods
    *                  contain at least 4 vertices and it must not contain any
    *                  arc segment (i.e. all angles must be zero)!!!
    * @param rot       Rotation.
+   * @param function  Function attribute.
    *
    * @return Aperture number.
    */
-  int addOutline(const QString& name, Path path, const Angle& rot) noexcept;
+  int addOutline(const QString& name, Path path, const Angle& rot,
+                 Function function) noexcept;
 
   /**
    * @brief Helper method to actually add a new or get an existing aperture
@@ -159,19 +171,20 @@ private:  // Methods
    *
    * @param aperture    The full content of the aperture to add (except the
    *                    X2 attributes).
+   * @param function    Function attribute.
    *
    * @return Aperture number.
    */
-  int addAperture(const QString& aperture) noexcept;
+  int addAperture(QString aperture, Function function) noexcept;
 
 private:  // Data
   /// Added apertures
   ///
   /// - key:    Aperture number (>= 10).
-  /// - value:  Aperture definition, with the placeholder "{}" instead of the
-  ///           aperture number. Needs to be substituted by the aperture number
-  ///           when serializing.
-  QMap<int, QString> mApertures;
+  /// - value:  Aperture function and definition, with the placeholder "{}"
+  ///           instead of the aperture number. Needs to be substituted by the
+  ///           aperture number when serializing.
+  QMap<int, std::pair<Function, QString>> mApertures;
 };
 
 /*******************************************************************************

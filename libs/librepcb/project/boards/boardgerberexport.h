@@ -110,7 +110,7 @@ private:
   int drawPthDrills(ExcellonGenerator& gen) const;
   void drawLayer(GerberGenerator& gen, const QString& layerName) const;
   void drawVia(GerberGenerator& gen, const BI_Via& via,
-               const QString& layerName) const;
+               const QString& layerName, const QString& netName) const;
   void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint,
                      const QString& layerName) const;
   void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
@@ -135,6 +135,8 @@ private:
   const Project& mProject;
   const Board& mBoard;
   QScopedPointer<const BoardFabricationOutputSettings> mSettings;
+  QDateTime mCreationDateTime;
+  QString mProjectName;
   mutable int mCurrentInnerCopperLayer;
   mutable QVector<FilePath> mWrittenFiles;
 };

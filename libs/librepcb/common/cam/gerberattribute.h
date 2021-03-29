@@ -45,6 +45,21 @@ class GerberAttribute final {
 public:
   // Types
   enum class Type { Invalid, File, Aperture, Object, Delete };
+  enum class Polarity { Positive, Negative };
+  enum class BoardSide { Top, Bottom };
+  enum class CopperSide { Top, Inner, Bottom };
+  enum class ApertureFunction {
+    // Available on all layers:
+    Profile,  ///< Board outline
+
+    // Available only on copper layers:
+    Conductor,  ///< Copper with electrical function
+    NonConductor,  ///< Copper without electrical function
+    ComponentPad,  ///< THT pad
+    SmdPadCopperDefined,  ///< SMT pad, copper-defined
+    SmdPadSolderMaskDefined,  ///< SMT pad, stopmask-defined
+    ViaPad,  ///< Via
+  };
 
   // Constructors / Destructor
   GerberAttribute() noexcept;
@@ -73,7 +88,21 @@ public:
   static GerberAttribute fileProjectId(const QString& name, const Uuid& uuid,
                                        const QString& revision) noexcept;
   static GerberAttribute filePartSingle() noexcept;
+  static GerberAttribute fileSameCoordinates(
+      const QString& identifier) noexcept;
+  static GerberAttribute fileFunctionProfile(bool plated) noexcept;
+  static GerberAttribute fileFunctionCopper(int layer,
+                                            CopperSide side) noexcept;
+  static GerberAttribute fileFunctionSolderMask(BoardSide side) noexcept;
+  static GerberAttribute fileFunctionLegend(BoardSide side) noexcept;
+  static GerberAttribute fileFunctionPaste(BoardSide side) noexcept;
+  static GerberAttribute filePolarity(Polarity polarity) noexcept;
   static GerberAttribute fileMd5(const QString& md5) noexcept;
+  static GerberAttribute apertureFunction(ApertureFunction function) noexcept;
+  static GerberAttribute objectNet(const QString& net) noexcept;
+  static GerberAttribute objectComponent(const QString& component) noexcept;
+  static GerberAttribute objectPin(const QString& component, const QString& pin,
+                                   const QString& signal) noexcept;
 
 private:  // Methods
   GerberAttribute(Type type, const QString& key,

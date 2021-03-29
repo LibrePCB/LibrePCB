@@ -147,8 +147,163 @@ GerberAttribute GerberAttribute::filePartSingle() noexcept {
   return GerberAttribute(Type::File, ".Part", {"Single"});
 }
 
+GerberAttribute GerberAttribute::fileSameCoordinates(
+    const QString& identifier) noexcept {
+  QStringList values;
+  if (!identifier.isEmpty()) {
+    values.append(identifier);
+  }
+  return GerberAttribute(Type::File, ".SameCoordinates", values);
+}
+
+GerberAttribute GerberAttribute::fileFunctionProfile(bool plated) noexcept {
+  return GerberAttribute(Type::File, ".FileFunction",
+                         {"Profile", plated ? "P" : "NP"});
+}
+
+GerberAttribute GerberAttribute::fileFunctionCopper(int layer,
+                                                    CopperSide side) noexcept {
+  QStringList values = {"Copper", "L" % QString::number(layer)};
+  switch (side) {
+    case CopperSide::Top: {
+      values.append("Top");
+      break;
+    }
+    case CopperSide::Inner: {
+      values.append("Inr");
+      break;
+    }
+    case CopperSide::Bottom: {
+      values.append("Bot");
+      break;
+    }
+    default: {
+      qCritical() << "Unknown Gerber copper side:" << static_cast<int>(side);
+      return GerberAttribute();
+    }
+  }
+  return GerberAttribute(Type::File, ".FileFunction", values);
+}
+
+GerberAttribute GerberAttribute::fileFunctionSolderMask(
+    BoardSide side) noexcept {
+  switch (side) {
+    case BoardSide::Top: {
+      return GerberAttribute(Type::File, ".FileFunction",
+                             {"Soldermask", "Top"});
+    }
+    case BoardSide::Bottom: {
+      return GerberAttribute(Type::File, ".FileFunction",
+                             {"Soldermask", "Bot"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      return GerberAttribute();
+    }
+  }
+}
+
+GerberAttribute GerberAttribute::fileFunctionLegend(BoardSide side) noexcept {
+  switch (side) {
+    case BoardSide::Top: {
+      return GerberAttribute(Type::File, ".FileFunction", {"Legend", "Top"});
+    }
+    case BoardSide::Bottom: {
+      return GerberAttribute(Type::File, ".FileFunction", {"Legend", "Bot"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      return GerberAttribute();
+    }
+  }
+}
+
+GerberAttribute GerberAttribute::fileFunctionPaste(BoardSide side) noexcept {
+  switch (side) {
+    case BoardSide::Top: {
+      return GerberAttribute(Type::File, ".FileFunction", {"Paste", "Top"});
+    }
+    case BoardSide::Bottom: {
+      return GerberAttribute(Type::File, ".FileFunction", {"Paste", "Bot"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      return GerberAttribute();
+    }
+  }
+}
+
+GerberAttribute GerberAttribute::filePolarity(Polarity polarity) noexcept {
+  switch (polarity) {
+    case Polarity::Positive: {
+      return GerberAttribute(Type::File, ".FilePolarity", {"Positive"});
+    }
+    case Polarity::Negative: {
+      return GerberAttribute(Type::File, ".FilePolarity", {"Negative"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber file polarity:"
+                  << static_cast<int>(polarity);
+      return GerberAttribute();
+    }
+  }
+}
+
 GerberAttribute GerberAttribute::fileMd5(const QString& md5) noexcept {
   return GerberAttribute(Type::File, ".MD5", {md5});
+}
+
+GerberAttribute GerberAttribute::apertureFunction(
+    ApertureFunction function) noexcept {
+  switch (function) {
+    case ApertureFunction::Profile: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"Profile"});
+    }
+    case ApertureFunction::Conductor: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"Conductor"});
+    }
+    case ApertureFunction::NonConductor: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"NonConductor"});
+    }
+    case ApertureFunction::ComponentPad: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"ComponentPad"});
+    }
+    case ApertureFunction::SmdPadCopperDefined: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"SMDPad", "CuDef"});
+    }
+    case ApertureFunction::SmdPadSolderMaskDefined: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"SMDPad", "SMDef"});
+    }
+    case ApertureFunction::ViaPad: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"ViaPad"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber aperture function attribute:"
+                  << static_cast<int>(function);
+      return GerberAttribute();
+    }
+  }
+}
+
+GerberAttribute GerberAttribute::objectNet(const QString& net) noexcept {
+  return GerberAttribute(Type::Object, ".N", {net});
+}
+
+GerberAttribute GerberAttribute::objectComponent(
+    const QString& component) noexcept {
+  return GerberAttribute(Type::Object, ".C", {component});
+}
+
+GerberAttribute GerberAttribute::objectPin(const QString& component,
+                                           const QString& pin,
+                                           const QString& signal) noexcept {
+  QStringList values = {component, pin};
+  if (!signal.isEmpty()) {
+    values.append(signal);
+  }
+  return GerberAttribute(Type::Object, ".P", values);
 }
 
 /*******************************************************************************
