@@ -55,6 +55,7 @@ SOURCES += \
     bom/bomcsvwriter.cpp \
     cam/excellongenerator.cpp \
     cam/gerberaperturelist.cpp \
+    cam/gerberattribute.cpp \
     cam/gerbergenerator.cpp \
     debug.cpp \
     dialogs/aboutdialog.cpp \
@@ -192,6 +193,7 @@ HEADERS += \
     bom/bomcsvwriter.h \
     cam/excellongenerator.h \
     cam/gerberaperturelist.h \
+    cam/gerberattribute.h \
     cam/gerbergenerator.h \
     circuitidentifier.h \
     debug.h \

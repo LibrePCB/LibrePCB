@@ -27,6 +27,7 @@
 #include "../geometry/path.h"
 #include "../toolbox.h"
 #include "gerberaperturelist.h"
+#include "gerberattribute.h"
 
 #include <QtCore>
 
@@ -41,9 +42,9 @@ namespace librepcb {
 
 GerberGenerator::GerberGenerator(const QString& projName, const Uuid& projUuid,
                                  const QString& projRevision) noexcept
-  : mProjectId(escapeString(projName)),
+  : mProjectId(projName),
     mProjectUuid(projUuid),
-    mProjectRevision(escapeString(projRevision)),
+    mProjectRevision(projRevision),
     mOutput(),
     mContent(),
     mApertureList(new GerberApertureList()),
@@ -235,19 +236,16 @@ void GerberGenerator::flashAtPosition(const Point& pos) noexcept {
 void GerberGenerator::printHeader() noexcept {
   mOutput.append("G04 --- HEADER BEGIN --- *\n");
 
-  // add some X2 attributes
-  QString appVersion = qApp->applicationVersion();
-  QString creationDate = QDateTime::currentDateTime().toString(Qt::ISODate);
-  QString projId = mProjectId.remove(',');
-  QString projUuid = mProjectUuid.toStr();
-  QString projRevision = mProjectRevision.remove(',');
-  mOutput.append(QString("%TF.GenerationSoftware,LibrePCB,LibrePCB,%1*%\n")
-                     .arg(appVersion));
-  mOutput.append(QString("%TF.CreationDate,%1*%\n").arg(creationDate));
-  mOutput.append(QString("%TF.ProjectId,%1,%2,%3*%\n")
-                     .arg(projId, projUuid, projRevision));
-  mOutput.append("%TF.Part,Single*%\n");  // "Single" means "this is a PCB"
-  // mOutput.append("%TF.FilePolarity,Positive*%\n");
+  // Add some file attributes.
+  mOutput.append(GerberAttribute::fileGenerationSoftware(
+                     "LibrePCB", "LibrePCB", qApp->applicationVersion())
+                     .toGerberString());
+  mOutput.append(GerberAttribute::fileCreationDate(QDateTime::currentDateTime())
+                     .toGerberString());
+  mOutput.append(
+      GerberAttribute::fileProjectId(mProjectId, mProjectUuid, mProjectRevision)
+          .toGerberString());
+  mOutput.append(GerberAttribute::filePartSingle().toGerberString());
 
   // coordinate format specification:
   //  - leading zeros omitted
@@ -284,7 +282,8 @@ void GerberGenerator::printContent() noexcept {
 
 void GerberGenerator::printFooter() noexcept {
   // MD5 checksum over content
-  mOutput.append(QString("%TF.MD5,%1*%\n").arg(calcOutputMd5Checksum()));
+  mOutput.append(
+      GerberAttribute::fileMd5(calcOutputMd5Checksum()).toGerberString());
 
   // end of file
   mOutput.append("M02*\n");
@@ -296,24 +295,6 @@ QString GerberGenerator::calcOutputMd5Checksum() const noexcept {
   QString data = QString(mOutput).remove(QChar('\n'));
   return QString(
       QCryptographicHash::hash(data.toUtf8(), QCryptographicHash::Md5).toHex());
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-QString GerberGenerator::escapeString(const QString& str) noexcept {
-  // perform compatibility decomposition (NFKD)
-  QString ret = str.normalized(QString::NormalizationForm_KD);
-  // remove all invalid characters
-  // Note: Even if backslashes are allowed, we will remove them because we
-  // haven't implemented proper escaping. Escaping of unicode characters is also
-  // missing here.
-  QString validChars("[a-zA-Z0-9_+-/!?<>”’(){}.|&@# ,;$:=]");
-  ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
-  // limit length to 65535 characters
-  ret.truncate(65535);
-  return ret;
 }
 
 /*******************************************************************************

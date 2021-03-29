@@ -46,9 +46,6 @@ class Vertex;
 /**
  * @brief The GerberGenerator class
  *
- * @todo Remove/Escape illegal characters in
- *       ::librepcb::GerberGenerator::mProjectId and
- *       ::librepcb::GerberGenerator::mProjectRevision!
  * @todo Use file/aperture attributes
  */
 class GerberGenerator final {
@@ -109,9 +106,6 @@ private:
   void printContent() noexcept;
   void printFooter() noexcept;
   QString calcOutputMd5Checksum() const noexcept;
-
-  // Static Methods
-  static QString escapeString(const QString& str) noexcept;
 
   // Metadata
   QString mProjectId;
