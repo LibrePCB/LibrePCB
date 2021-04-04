@@ -52,6 +52,11 @@ public:
     // Available on all layers:
     Profile,  ///< Board outline
 
+    // Available only on drill/rout layers:
+    ViaDrill,  ///< Drill of a via (usually plated)
+    ComponentDrill,  ///< Drill for component pads (usually plated)
+    MechanicalDrill,  ///< Drill for mechanical purpose (usually not plated)
+
     // Available only on copper layers:
     Conductor,  ///< Copper with electrical function
     NonConductor,  ///< Copper without electrical function
@@ -96,9 +101,17 @@ public:
   static GerberAttribute fileFunctionSolderMask(BoardSide side) noexcept;
   static GerberAttribute fileFunctionLegend(BoardSide side) noexcept;
   static GerberAttribute fileFunctionPaste(BoardSide side) noexcept;
+  static GerberAttribute fileFunctionPlatedThroughHole(int fromLayer,
+                                                       int toLayer) noexcept;
+  static GerberAttribute fileFunctionNonPlatedThroughHole(int fromLayer,
+                                                          int toLayer) noexcept;
+  static GerberAttribute fileFunctionMixedPlating(int fromLayer,
+                                                  int toLayer) noexcept;
   static GerberAttribute filePolarity(Polarity polarity) noexcept;
   static GerberAttribute fileMd5(const QString& md5) noexcept;
   static GerberAttribute apertureFunction(ApertureFunction function) noexcept;
+  static GerberAttribute apertureFunctionMixedPlatingDrill(
+      bool plated, ApertureFunction function) noexcept;
   static GerberAttribute objectNet(const QString& net) noexcept;
   static GerberAttribute objectComponent(const QString& component) noexcept;
   static GerberAttribute objectPin(const QString& component, const QString& pin,

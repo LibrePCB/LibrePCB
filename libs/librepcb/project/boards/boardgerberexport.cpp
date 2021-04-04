@@ -144,7 +144,10 @@ QVector<const AttributeProvider*>
 
 void BoardGerberExport::exportDrills() const {
   FilePath fp = getOutputFilePath(mSettings->getSuffixDrills());
-  ExcellonGenerator gen;
+  ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getMetadata().getVersion(),
+                        ExcellonGenerator::Plating::Mixed, 1,
+                        mBoard.getLayerStack().getInnerLayerCount() + 2);
   drawPthDrills(gen);
   drawNpthDrills(gen);
   gen.generate();
@@ -154,7 +157,10 @@ void BoardGerberExport::exportDrills() const {
 
 void BoardGerberExport::exportDrillsNpth() const {
   FilePath fp = getOutputFilePath(mSettings->getSuffixDrillsNpth());
-  ExcellonGenerator gen;
+  ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getMetadata().getVersion(),
+                        ExcellonGenerator::Plating::No, 1,
+                        mBoard.getLayerStack().getInnerLayerCount() + 2);
   int count = drawNpthDrills(gen);
   if (count > 0) {
     // Some PCB manufacturers don't like to have separate drill files for PTH
@@ -169,7 +175,10 @@ void BoardGerberExport::exportDrillsNpth() const {
 
 void BoardGerberExport::exportDrillsPth() const {
   FilePath fp = getOutputFilePath(mSettings->getSuffixDrillsPth());
-  ExcellonGenerator gen;
+  ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getMetadata().getVersion(),
+                        ExcellonGenerator::Plating::Yes, 1,
+                        mBoard.getLayerStack().getInnerLayerCount() + 2);
   drawPthDrills(gen);
   gen.generate();
   gen.saveToFile(fp);
@@ -319,14 +328,16 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const BI_Footprint& footprint = device->getFootprint();
     for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
-      gen.drill(footprint.mapToScene(hole.getPosition()), hole.getDiameter());
+      gen.drill(footprint.mapToScene(hole.getPosition()), hole.getDiameter(),
+                false, ExcellonGenerator::Function::MechanicalDrill);
       ++count;
     }
   }
 
   // board holes
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    gen.drill(hole->getHole().getPosition(), hole->getHole().getDiameter());
+    gen.drill(hole->getHole().getPosition(), hole->getHole().getDiameter(),
+              false, ExcellonGenerator::Function::MechanicalDrill);
     ++count;
   }
 
@@ -343,7 +354,8 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
       const library::FootprintPad& libPad = pad->getLibPad();
       if (libPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
         gen.drill(pad->getPosition(),
-                  PositiveLength(*libPad.getDrillDiameter()));  // can throw
+                  PositiveLength(*libPad.getDrillDiameter()), true,
+                  ExcellonGenerator::Function::ComponentDrill);  // can throw
         ++count;
       }
     }
@@ -353,7 +365,8 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
   foreach (const BI_NetSegment* netsegment,
            sortedByUuid(mBoard.getNetSegments())) {
     foreach (const BI_Via* via, sortedByUuid(netsegment->getVias())) {
-      gen.drill(via->getPosition(), via->getDrillDiameter());
+      gen.drill(via->getPosition(), via->getDrillDiameter(), true,
+                ExcellonGenerator::Function::ViaDrill);
       ++count;
     }
   }

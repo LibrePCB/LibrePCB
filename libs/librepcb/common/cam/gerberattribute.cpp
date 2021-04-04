@@ -233,6 +233,32 @@ GerberAttribute GerberAttribute::fileFunctionPaste(BoardSide side) noexcept {
   }
 }
 
+GerberAttribute GerberAttribute::fileFunctionPlatedThroughHole(
+    int fromLayer, int toLayer) noexcept {
+  return GerberAttribute(
+      Type::File, ".FileFunction",
+      {"Plated", QString::number(fromLayer), QString::number(toLayer), "PTH"});
+}
+
+GerberAttribute GerberAttribute::fileFunctionNonPlatedThroughHole(
+    int fromLayer, int toLayer) noexcept {
+  return GerberAttribute(Type::File, ".FileFunction",
+                         {"NonPlated", QString::number(fromLayer),
+                          QString::number(toLayer), "NPTH"});
+}
+
+GerberAttribute GerberAttribute::fileFunctionMixedPlating(
+    int fromLayer, int toLayer) noexcept {
+  // Note that "MixedPlating" is actually not an official Gerber attribute (yet)
+  // because Gerber specs say that NPTH and PTH must be separate files. However,
+  // some PCB fabricators require to send a single drill file with NPTH and PTH
+  // mixed (totally stupid), and in this case, Ucamco recommends to use the
+  // "FixedPlating" file function (not publicly documented, I guess).
+  return GerberAttribute(
+      Type::File, ".FileFunction",
+      {"MixedPlating", QString::number(fromLayer), QString::number(toLayer)});
+}
+
 GerberAttribute GerberAttribute::filePolarity(Polarity polarity) noexcept {
   switch (polarity) {
     case Polarity::Positive: {
@@ -258,6 +284,17 @@ GerberAttribute GerberAttribute::apertureFunction(
   switch (function) {
     case ApertureFunction::Profile: {
       return GerberAttribute(Type::Aperture, ".AperFunction", {"Profile"});
+    }
+    case ApertureFunction::ViaDrill: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"ViaDrill"});
+    }
+    case ApertureFunction::ComponentDrill: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"ComponentDrill"});
+    }
+    case ApertureFunction::MechanicalDrill: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"MechanicalDrill"});
     }
     case ApertureFunction::Conductor: {
       return GerberAttribute(Type::Aperture, ".AperFunction", {"Conductor"});
@@ -285,6 +322,21 @@ GerberAttribute GerberAttribute::apertureFunction(
       return GerberAttribute();
     }
   }
+}
+
+GerberAttribute GerberAttribute::apertureFunctionMixedPlatingDrill(
+    bool plated, ApertureFunction function) noexcept {
+  // Note: This function shall only be used in mixed-plating Excellon files!
+  // See comment in fileFunctionMixedPlating() for details.
+  GerberAttribute a = apertureFunction(function);
+  if (plated) {
+    a.mValues.prepend("PTH");
+    a.mValues.prepend("Plated");
+  } else {
+    a.mValues.prepend("NPTH");
+    a.mValues.prepend("NonPlated");
+  }
+  return a;
 }
 
 GerberAttribute GerberAttribute::objectNet(const QString& net) noexcept {

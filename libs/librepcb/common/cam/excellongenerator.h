@@ -26,6 +26,7 @@
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../units/all_length_units.h"
+#include "gerberattribute.h"
 
 #include <QtCore>
 
@@ -45,20 +46,26 @@ class ExcellonGenerator final {
   Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
 
 public:
+  // Types
+  enum class Plating { Yes, No, Mixed };
+  using Function = GerberAttribute::ApertureFunction;
+
   // Constructors / Destructor
-  // ExcellonGenerator() = delete;
+  ExcellonGenerator() = delete;
   ExcellonGenerator(const ExcellonGenerator& other) = delete;
-  ExcellonGenerator() noexcept;
+  ExcellonGenerator(const QDateTime& creationDate, const QString& projName,
+                    const Uuid& projUuid, const QString& projRevision,
+                    Plating plating, int fromLayer, int toLayer) noexcept;
   ~ExcellonGenerator() noexcept;
 
   // Getters
   const QString& toStr() const noexcept { return mOutput; }
 
   // General Methods
-  void drill(const Point& pos, const PositiveLength& dia) noexcept;
+  void drill(const Point& pos, const PositiveLength& dia, bool plated,
+             Function function) noexcept;
   void generate();
   void saveToFile(const FilePath& filepath) const;
-  void reset() noexcept;
 
   // Operator Overloadings
   ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
@@ -69,9 +76,13 @@ private:
   void printDrills() noexcept;
   void printFooter() noexcept;
 
+  // Metadata
+  Plating mPlating;
+  QVector<GerberAttribute> mFileAttributes;
+
   // Excellon Data
   QString mOutput;
-  QMultiMap<Length, Point> mDrillList;
+  QMultiMap<std::tuple<Length, bool, Function>, Point> mDrillList;
 };
 
 /*******************************************************************************
@@ -80,4 +91,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_EXCELLONGENERATOR_H
+#endif
