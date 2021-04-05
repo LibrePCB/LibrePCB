@@ -81,8 +81,8 @@ TEST(BoardGerberExportTest, test) {
   BoardFabricationOutputSettings config = board->getFabricationOutputSettings();
   config.setOutputBasePath(testDataDir.getPathTo("actual").toStr() %
                            "/{{PROJECT}}");
-  BoardGerberExport grbExport(*board, config);
-  grbExport.exportAllLayers();
+  BoardGerberExport grbExport(*board);
+  grbExport.exportPcbLayers(config);
 
   // replace volatile data in exported files with well-known, constant data
   foreach (const FilePath& fp, grbExport.getWrittenFiles()) {

@@ -173,16 +173,17 @@ void FabricationOutputDialog::on_btnGenerate_clicked() {
     }
 
     // generate files
-    BoardGerberExport grbExport(mBoard, mBoard.getFabricationOutputSettings());
-    grbExport.exportAllLayers();
+    BoardGerberExport grbExport(mBoard);
+    grbExport.exportPcbLayers(mBoard.getFabricationOutputSettings());
   } catch (Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 
 void FabricationOutputDialog::on_btnBrowseOutputDir_clicked() {
-  BoardGerberExport grbExport(mBoard, mBoard.getFabricationOutputSettings());
-  FilePath dir = grbExport.getOutputDirectory();
+  BoardGerberExport grbExport(mBoard);
+  FilePath dir =
+      grbExport.getOutputDirectory(mBoard.getFabricationOutputSettings());
   if (dir.isExistingDir()) {
     DesktopServices ds(mSettings, this);
     ds.openLocalPath(dir);

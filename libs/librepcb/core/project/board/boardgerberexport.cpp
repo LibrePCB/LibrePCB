@@ -64,11 +64,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardGerberExport::BoardGerberExport(
-    const Board& board, const BoardFabricationOutputSettings& settings) noexcept
+BoardGerberExport::BoardGerberExport(const Board& board) noexcept
   : mProject(board.getProject()),
     mBoard(board),
-    mSettings(new BoardFabricationOutputSettings(settings)),
     mCreationDateTime(QDateTime::currentDateTime()),
     mProjectName(*mProject.getMetadata().getName()),
     mCurrentInnerCopperLayer(0) {
@@ -86,36 +84,39 @@ BoardGerberExport::~BoardGerberExport() noexcept {
  *  Getters
  ******************************************************************************/
 
-FilePath BoardGerberExport::getOutputDirectory() const noexcept {
-  return getOutputFilePath("dummy").getParentDir();  // use dummy suffix
+FilePath BoardGerberExport::getOutputDirectory(
+    const BoardFabricationOutputSettings& settings) const noexcept {
+  return getOutputFilePath(settings.getOutputBasePath() + "dummy")
+      .getParentDir();  // use dummy suffix
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void BoardGerberExport::exportAllLayers() const {
+void BoardGerberExport::exportPcbLayers(
+    const BoardFabricationOutputSettings& settings) const {
   mWrittenFiles.clear();
 
-  if (mSettings->getMergeDrillFiles()) {
-    exportDrills();
+  if (settings.getMergeDrillFiles()) {
+    exportDrills(settings);
   } else {
-    exportDrillsNpth();
-    exportDrillsPth();
+    exportDrillsNpth(settings);
+    exportDrillsPth(settings);
   }
-  exportLayerBoardOutlines();
-  exportLayerTopCopper();
-  exportLayerInnerCopper();
-  exportLayerBottomCopper();
-  exportLayerTopSolderMask();
-  exportLayerBottomSolderMask();
-  exportLayerTopSilkscreen();
-  exportLayerBottomSilkscreen();
-  if (mSettings->getEnableSolderPasteTop()) {
-    exportLayerTopSolderPaste();
+  exportLayerBoardOutlines(settings);
+  exportLayerTopCopper(settings);
+  exportLayerInnerCopper(settings);
+  exportLayerBottomCopper(settings);
+  exportLayerTopSolderMask(settings);
+  exportLayerBottomSolderMask(settings);
+  exportLayerTopSilkscreen(settings);
+  exportLayerBottomSilkscreen(settings);
+  if (settings.getEnableSolderPasteTop()) {
+    exportLayerTopSolderPaste(settings);
   }
-  if (mSettings->getEnableSolderPasteBot()) {
-    exportLayerBottomSolderPaste();
+  if (settings.getEnableSolderPasteBot()) {
+    exportLayerBottomSolderPaste(settings);
   }
 }
 
@@ -141,8 +142,10 @@ QVector<const AttributeProvider*>
  *  Private Methods
  ******************************************************************************/
 
-void BoardGerberExport::exportDrills() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixDrills());
+void BoardGerberExport::exportDrills(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixDrills());
   ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getMetadata().getVersion(),
                         ExcellonGenerator::Plating::Mixed, 1,
@@ -154,8 +157,10 @@ void BoardGerberExport::exportDrills() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportDrillsNpth() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixDrillsNpth());
+void BoardGerberExport::exportDrillsNpth(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixDrillsNpth());
   ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getMetadata().getVersion(),
                         ExcellonGenerator::Plating::No, 1,
@@ -172,8 +177,10 @@ void BoardGerberExport::exportDrillsNpth() const {
   }
 }
 
-void BoardGerberExport::exportDrillsPth() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixDrillsPth());
+void BoardGerberExport::exportDrillsPth(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixDrillsPth());
   ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getMetadata().getVersion(),
                         ExcellonGenerator::Plating::Yes, 1,
@@ -184,8 +191,10 @@ void BoardGerberExport::exportDrillsPth() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerBoardOutlines() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixOutlines());
+void BoardGerberExport::exportLayerBoardOutlines(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixOutlines());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionOutlines(false);
@@ -195,8 +204,10 @@ void BoardGerberExport::exportLayerBoardOutlines() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerTopCopper() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixCopperTop());
+void BoardGerberExport::exportLayerTopCopper(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixCopperTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionCopper(1, GerberGenerator::CopperSide::Top,
@@ -207,8 +218,10 @@ void BoardGerberExport::exportLayerTopCopper() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerBottomCopper() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixCopperBot());
+void BoardGerberExport::exportLayerBottomCopper(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixCopperBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionCopper(mBoard.getLayerStack().getInnerLayerCount() + 2,
@@ -220,10 +233,12 @@ void BoardGerberExport::exportLayerBottomCopper() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerInnerCopper() const {
+void BoardGerberExport::exportLayerInnerCopper(
+    const BoardFabricationOutputSettings& settings) const {
   for (int i = 1; i <= mBoard.getLayerStack().getInnerLayerCount(); ++i) {
     mCurrentInnerCopperLayer = i;  // used for attribute provider
-    FilePath fp = getOutputFilePath(mSettings->getSuffixCopperInner());
+    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                    settings.getSuffixCopperInner());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getMetadata().getVersion());
     gen.setFileFunctionCopper(i + 1, GerberGenerator::CopperSide::Inner,
@@ -236,8 +251,10 @@ void BoardGerberExport::exportLayerInnerCopper() const {
   mCurrentInnerCopperLayer = 0;
 }
 
-void BoardGerberExport::exportLayerTopSolderMask() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderMaskTop());
+void BoardGerberExport::exportLayerTopSolderMask(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixSolderMaskTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
@@ -248,8 +265,10 @@ void BoardGerberExport::exportLayerTopSolderMask() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerBottomSolderMask() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderMaskBot());
+void BoardGerberExport::exportLayerBottomSolderMask(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixSolderMaskBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
@@ -260,11 +279,13 @@ void BoardGerberExport::exportLayerBottomSolderMask() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerTopSilkscreen() const {
-  QStringList layers = mSettings->getSilkscreenLayersTop();
+void BoardGerberExport::exportLayerTopSilkscreen(
+    const BoardFabricationOutputSettings& settings) const {
+  QStringList layers = settings.getSilkscreenLayersTop();
   if (layers.count() >
       0) {  // don't create silkscreen file if no layers selected
-    FilePath fp = getOutputFilePath(mSettings->getSuffixSilkscreenTop());
+    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                    settings.getSuffixSilkscreenTop());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getMetadata().getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Top,
@@ -278,11 +299,13 @@ void BoardGerberExport::exportLayerTopSilkscreen() const {
   }
 }
 
-void BoardGerberExport::exportLayerBottomSilkscreen() const {
-  QStringList layers = mSettings->getSilkscreenLayersBot();
+void BoardGerberExport::exportLayerBottomSilkscreen(
+    const BoardFabricationOutputSettings& settings) const {
+  QStringList layers = settings.getSilkscreenLayersBot();
   if (layers.count() >
       0) {  // don't create silkscreen file if no layers selected
-    FilePath fp = getOutputFilePath(mSettings->getSuffixSilkscreenBot());
+    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                    settings.getSuffixSilkscreenBot());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getMetadata().getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Bottom,
@@ -296,8 +319,10 @@ void BoardGerberExport::exportLayerBottomSilkscreen() const {
   }
 }
 
-void BoardGerberExport::exportLayerTopSolderPaste() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderPasteTop());
+void BoardGerberExport::exportLayerTopSolderPaste(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixSolderPasteTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionPaste(GerberGenerator::BoardSide::Top,
@@ -308,8 +333,10 @@ void BoardGerberExport::exportLayerTopSolderPaste() const {
   mWrittenFiles.append(fp);
 }
 
-void BoardGerberExport::exportLayerBottomSolderPaste() const {
-  FilePath fp = getOutputFilePath(mSettings->getSuffixSolderPasteBot());
+void BoardGerberExport::exportLayerBottomSolderPaste(
+    const BoardFabricationOutputSettings& settings) const {
+  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                  settings.getSuffixSolderPasteBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getMetadata().getVersion());
   gen.setFileFunctionPaste(GerberGenerator::BoardSide::Bottom,
@@ -669,9 +696,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
   }
 }
 
-FilePath BoardGerberExport::getOutputFilePath(const QString& suffix) const
-    noexcept {
-  QString path = mSettings->getOutputBasePath() + suffix;
+FilePath BoardGerberExport::getOutputFilePath(QString path) const noexcept {
   path = AttributeSubstitutor::substitute(path, this, [&](const QString& str) {
     return FilePath::cleanFileName(
         str, FilePath::ReplaceSpaces | FilePath::KeepCase);
