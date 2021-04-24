@@ -17,17 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EXCELLONGENERATOR_H
-#define LIBREPCB_EXCELLONGENERATOR_H
+#ifndef LIBREPCB_GERBERATTRIBUTEWRITER_H
+#define LIBREPCB_GERBERATTRIBUTEWRITER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-#include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
-#include "gerberattribute.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -35,54 +30,36 @@
  ******************************************************************************/
 namespace librepcb {
 
+class GerberAttribute;
+
 /*******************************************************************************
- *  Class GerberGenerator
+ *  Class GerberAttributeWriter
  ******************************************************************************/
 
 /**
- * @brief The ExcellonGenerator class
+ * @brief A helper class to generate Gerber X2 attributes
+ *
+ * This class works with a dictionary to keep track of all previously set
+ * attributes.
  */
-class ExcellonGenerator final {
-  Q_DECLARE_TR_FUNCTIONS(ExcellonGenerator)
+class GerberAttributeWriter final {
+  Q_DECLARE_TR_FUNCTIONS(GerberAttributeWriter)
 
 public:
-  // Types
-  enum class Plating { Yes, No, Mixed };
-  using Function = GerberAttribute::ApertureFunction;
-
   // Constructors / Destructor
-  ExcellonGenerator() = delete;
-  ExcellonGenerator(const ExcellonGenerator& other) = delete;
-  ExcellonGenerator(const QDateTime& creationDate, const QString& projName,
-                    const Uuid& projUuid, const QString& projRevision,
-                    Plating plating, int fromLayer, int toLayer) noexcept;
-  ~ExcellonGenerator() noexcept;
-
-  // Getters
-  const QString& toStr() const noexcept { return mOutput; }
+  GerberAttributeWriter() noexcept;
+  GerberAttributeWriter(const GerberAttributeWriter& other) = delete;
+  ~GerberAttributeWriter() noexcept;
 
   // General Methods
-  void drill(const Point& pos, const PositiveLength& dia, bool plated,
-             Function function) noexcept;
-  void generate();
-  void saveToFile(const FilePath& filepath) const;
+  QString setAttributes(const QList<GerberAttribute>& attributes) noexcept;
 
   // Operator Overloadings
-  ExcellonGenerator& operator=(const ExcellonGenerator& rhs) = delete;
+  GerberAttributeWriter& operator=(const GerberAttributeWriter& rhs) = delete;
 
-private:
-  void printHeader() noexcept;
-  void printToolList() noexcept;
-  void printDrills() noexcept;
-  void printFooter() noexcept;
-
-  // Metadata
-  Plating mPlating;
-  QVector<GerberAttribute> mFileAttributes;
-
-  // Excellon Data
-  QString mOutput;
-  QMultiMap<std::tuple<Length, bool, Function>, Point> mDrillList;
+private:  // Data
+  /// All currently set attributes, except file attributes
+  QVector<GerberAttribute> mDictionary;
 };
 
 /*******************************************************************************

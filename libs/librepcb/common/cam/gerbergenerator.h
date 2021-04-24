@@ -27,6 +27,8 @@
 #include "../fileio/filepath.h"
 #include "../units/all_length_units.h"
 #include "../uuid.h"
+#include "gerberaperturelist.h"
+#include "gerberattribute.h"
 
 #include <QtCore>
 
@@ -35,10 +37,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circle;
 class Path;
-class GerberApertureList;
-class Vertex;
+class GerberAttributeWriter;
 
 /*******************************************************************************
  *  Class GerberGenerator
@@ -46,57 +46,65 @@ class Vertex;
 
 /**
  * @brief The GerberGenerator class
- *
- * @todo Remove/Escape illegal characters in
- *       ::librepcb::GerberGenerator::mProjectId and
- *       ::librepcb::GerberGenerator::mProjectRevision!
- * @todo Use file/aperture attributes
  */
 class GerberGenerator final {
   Q_DECLARE_TR_FUNCTIONS(GerberGenerator)
 
 public:
   // Public Types
-  // enum class FileFunction {Copper, SolderMask, Glue, Paste, KeepOut, Plated,
-  //                         NonPlated, Profile, DrillMap};
-  enum class LayerPolarity { Positive, Negative };
+  using Polarity = GerberAttribute::Polarity;
+  using BoardSide = GerberAttribute::BoardSide;
+  using CopperSide = GerberAttribute::CopperSide;
+  using Function = GerberApertureList::Function;
 
   // Constructors / Destructor
   GerberGenerator() = delete;
   GerberGenerator(const GerberGenerator& other) = delete;
-  GerberGenerator(const QString& projName, const Uuid& projUuid,
-                  const QString& projRevision) noexcept;
+  GerberGenerator(const QDateTime& creationDate, const QString& projName,
+                  const Uuid& projUuid, const QString& projRevision) noexcept;
   ~GerberGenerator() noexcept;
 
   // Getters
   const QString& toStr() const noexcept { return mOutput; }
 
   // Plot Methods
-  void setLayerPolarity(LayerPolarity p) noexcept;
+  void setFileFunctionOutlines(bool plated) noexcept;
+  void setFileFunctionCopper(int layer, CopperSide side,
+                             Polarity polarity) noexcept;
+  void setFileFunctionSolderMask(BoardSide side, Polarity polarity) noexcept;
+  void setFileFunctionLegend(BoardSide side, Polarity polarity) noexcept;
+  void setFileFunctionPaste(BoardSide side, Polarity polarity) noexcept;
+  void setLayerPolarity(Polarity p) noexcept;
   void drawLine(const Point& start, const Point& end,
-                const UnsignedLength& width) noexcept;
-  void drawCircleOutline(const Circle& circle) noexcept;
-  void drawCircleArea(const Circle& circle) noexcept;
-  void drawPathOutline(const Path& path,
-                       const UnsignedLength& lineWidth) noexcept;
-  void drawPathArea(const Path& path) noexcept;
-  void flashCircle(const Point& pos, const UnsignedLength& dia,
-                   const UnsignedLength& hole) noexcept;
-  void flashRect(const Point& pos, const UnsignedLength& w,
-                 const UnsignedLength& h, const Angle& rot,
-                 const UnsignedLength& hole) noexcept;
-  void flashObround(const Point& pos, const UnsignedLength& w,
-                    const UnsignedLength& h, const Angle& rot,
-                    const UnsignedLength& hole) noexcept;
-  void flashRegularPolygon(const Point& pos, const UnsignedLength& dia, int n,
-                           const Angle& rot,
-                           const UnsignedLength& hole) noexcept;
-  void flashOctagon(const Point& pos, const UnsignedLength& w,
-                    const UnsignedLength& h, const UnsignedLength& edge,
-                    const Angle& rot, const UnsignedLength& hole) noexcept;
+                const UnsignedLength& width, Function function,
+                const tl::optional<QString>& net,
+                const QString& component) noexcept;
+  void drawPathOutline(const Path& path, const UnsignedLength& lineWidth,
+                       Function function, const tl::optional<QString>& net,
+                       const QString& component) noexcept;
+  void drawPathArea(const Path& path, Function function,
+                    const tl::optional<QString>& net,
+                    const QString& component) noexcept;
+  void flashCircle(const Point& pos, const PositiveLength& dia,
+                   Function function, const tl::optional<QString>& net,
+                   const QString& component, const QString& pin,
+                   const QString& signal) noexcept;
+  void flashRect(const Point& pos, const PositiveLength& w,
+                 const PositiveLength& h, const Angle& rot, Function function,
+                 const tl::optional<QString>& net, const QString& component,
+                 const QString& pin, const QString& signal) noexcept;
+  void flashObround(const Point& pos, const PositiveLength& w,
+                    const PositiveLength& h, const Angle& rot,
+                    Function function, const tl::optional<QString>& net,
+                    const QString& component, const QString& pin,
+                    const QString& signal) noexcept;
+  void flashOctagon(const Point& pos, const PositiveLength& w,
+                    const PositiveLength& h, const Angle& rot,
+                    Function function, const tl::optional<QString>& net,
+                    const QString& component, const QString& pin,
+                    const QString& signal) noexcept;
 
   // General Methods
-  void reset() noexcept;
   void generate();
   void saveToFile(const FilePath& filepath) const;
 
@@ -105,11 +113,14 @@ public:
 
 private:
   // Private Methods
+  void setCurrentAttributes(Function apertureFunction,
+                            const tl::optional<QString>& netName,
+                            const QString& componentDesignator,
+                            const QString& pinName,
+                            const QString& pinSignal) noexcept;
   void setCurrentAperture(int number) noexcept;
   void setRegionModeOn() noexcept;
   void setRegionModeOff() noexcept;
-  void setMultiQuadrantArcModeOn() noexcept;
-  void setMultiQuadrantArcModeOff() noexcept;
   void switchToLinearInterpolationModeG01() noexcept;
   void switchToCircularCwInterpolationModeG02() noexcept;
   void switchToCircularCcwInterpolationModeG03() noexcept;
@@ -125,20 +136,15 @@ private:
   void printFooter() noexcept;
   QString calcOutputMd5Checksum() const noexcept;
 
-  // Static Methods
-  static QString escapeString(const QString& str) noexcept;
-
   // Metadata
-  QString mProjectId;
-  Uuid mProjectUuid;
-  QString mProjectRevision;
+  QVector<GerberAttribute> mFileAttributes;
 
   // Gerber Data
   QString mOutput;
   QString mContent;
+  QScopedPointer<GerberAttributeWriter> mAttributeWriter;
   QScopedPointer<GerberApertureList> mApertureList;
   int mCurrentApertureNumber;
-  bool mMultiQuadrantArcModeOn;
 };
 
 /*******************************************************************************
@@ -147,4 +153,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GERBERGENERATOR_H
+#endif
