@@ -73,6 +73,9 @@ public:
   const library::FootprintPad& getLibPad() const noexcept {
     return *mFootprintPad;
   }
+  const library::PackagePad* getLibPackagePad() const noexcept {
+    return mPackagePad;
+  }
   ComponentSignalInstance* getComponentSignalInstance() const noexcept {
     return mComponentSignalInstance;
   }

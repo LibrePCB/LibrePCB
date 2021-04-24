@@ -11,6 +11,9 @@ This directory contains various resources for developers:
 
 Useful Links:
 
-- [Gerber File Format:](https://www.ucamco.com/en/guest/downloads) [Specifications](https://www.ucamco.com/files/downloads/file/81/the_gerber_file_format_specification.pdf) | [PCB Fabrication Data Guide](https://www.ucamco.com/files/downloads/file/130/pcb%20fabrication%20data%20-%20a%20guide.pdf)
+- [Gerber File Format:](https://www.ucamco.com/en/guest/downloads)
+  [Specifications 2021-02](https://www.ucamco.com/files/downloads/file_en/416/the-gerber-layer-format-specification-revision-2021-02_en.pdf)
+  | [PCB Fabrication Data Guide](https://www.ucamco.com/files/downloads/file/130/pcb%20fabrication%20data%20-%20a%20guide.pdf)
 - Excellon File Format: http://web.archive.org/web/20071030075236/http://www.excellon.com/manuals/program.htm
+- Official Reference Gerber Viewer: https://gerber.ucamco.com/index.html
 - Online 3D PCB Viewer: http://mayhewlabs.com/webGerber/

@@ -132,9 +132,9 @@ void FabricationOutputDialog::on_btnProtelSuffixes_clicked() {
   mUi->edtSuffixSoldermaskBot->setText(".gbs");
   mUi->edtSuffixSilkscreenTop->setText(".gto");
   mUi->edtSuffixSilkscreenBot->setText(".gbo");
-  mUi->edtSuffixDrillsNpth->setText("_NPTH.txt");
-  mUi->edtSuffixDrillsPth->setText("_PTH.txt");
-  mUi->edtSuffixDrills->setText(".txt");
+  mUi->edtSuffixDrillsNpth->setText("_NPTH.drl");
+  mUi->edtSuffixDrillsPth->setText("_PTH.drl");
+  mUi->edtSuffixDrills->setText(".drl");
   mUi->edtSuffixSolderPasteTop->setText(".gtp");
   mUi->edtSuffixSolderPasteBot->setText(".gbp");
   mUi->cbxDrillsMerge->setChecked(true);

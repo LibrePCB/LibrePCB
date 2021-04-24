@@ -27,6 +27,8 @@
 #include "../geometry/path.h"
 #include "../toolbox.h"
 #include "gerberaperturelist.h"
+#include "gerberattribute.h"
+#include "gerberattributewriter.h"
 
 #include <QtCore>
 
@@ -39,16 +41,21 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GerberGenerator::GerberGenerator(const QString& projName, const Uuid& projUuid,
+GerberGenerator::GerberGenerator(const QDateTime& creationDate,
+                                 const QString& projName, const Uuid& projUuid,
                                  const QString& projRevision) noexcept
-  : mProjectId(escapeString(projName)),
-    mProjectUuid(projUuid),
-    mProjectRevision(escapeString(projRevision)),
-    mOutput(),
+  : mOutput(),
     mContent(),
+    mAttributeWriter(new GerberAttributeWriter()),
     mApertureList(new GerberApertureList()),
-    mCurrentApertureNumber(-1),
-    mMultiQuadrantArcModeOn(false) {
+    mCurrentApertureNumber(-1) {
+  mFileAttributes.append(GerberAttribute::fileGenerationSoftware(
+      "LibrePCB", "LibrePCB", qApp->applicationVersion()));
+  mFileAttributes.append(GerberAttribute::fileCreationDate(creationDate));
+  mFileAttributes.append(
+      GerberAttribute::fileProjectId(projName, projUuid, projRevision));
+  mFileAttributes.append(GerberAttribute::filePartSingle());
+  mFileAttributes.append(GerberAttribute::fileSameCoordinates(QString()));
 }
 
 GerberGenerator::~GerberGenerator() noexcept {
@@ -58,12 +65,40 @@ GerberGenerator::~GerberGenerator() noexcept {
  *  Plot Methods
  ******************************************************************************/
 
-void GerberGenerator::setLayerPolarity(LayerPolarity p) noexcept {
+void GerberGenerator::setFileFunctionOutlines(bool plated) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionProfile(plated));
+}
+
+void GerberGenerator::setFileFunctionCopper(int layer, CopperSide side,
+                                            Polarity polarity) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionCopper(layer, side));
+  mFileAttributes.append(GerberAttribute::filePolarity(polarity));
+}
+
+void GerberGenerator::setFileFunctionSolderMask(BoardSide side,
+                                                Polarity polarity) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionSolderMask(side));
+  mFileAttributes.append(GerberAttribute::filePolarity(polarity));
+}
+
+void GerberGenerator::setFileFunctionLegend(BoardSide side,
+                                            Polarity polarity) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionLegend(side));
+  mFileAttributes.append(GerberAttribute::filePolarity(polarity));
+}
+
+void GerberGenerator::setFileFunctionPaste(BoardSide side,
+                                           Polarity polarity) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionPaste(side));
+  mFileAttributes.append(GerberAttribute::filePolarity(polarity));
+}
+
+void GerberGenerator::setLayerPolarity(Polarity p) noexcept {
   switch (p) {
-    case LayerPolarity::Positive:
+    case Polarity::Positive:
       mContent.append("%LPD*%\n");
       break;
-    case LayerPolarity::Negative:
+    case Polarity::Negative:
       mContent.append("%LPC*%\n");
       break;
     default:
@@ -73,32 +108,36 @@ void GerberGenerator::setLayerPolarity(LayerPolarity p) noexcept {
 }
 
 void GerberGenerator::drawLine(const Point& start, const Point& end,
-                               const UnsignedLength& width) noexcept {
-  setCurrentAperture(mApertureList->setCircle(width, UnsignedLength(0)));
+                               const UnsignedLength& width, Function function,
+                               const tl::optional<QString>& net,
+                               const QString& component) noexcept {
+  setCurrentAperture(mApertureList->addCircle(width, function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       QString(),  // Object: Pin number/name
+                       QString()  // Object: Pin signal
+  );
   moveToPosition(start);
   linearInterpolateToPosition(end);
 }
 
-void GerberGenerator::drawCircleOutline(const Circle& circle) noexcept {
-  PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
-  Length innerDia = circle.getDiameter() - circle.getLineWidth();
-  if (innerDia < 0) innerDia = 0;
-  flashCircle(circle.getCenter(), positiveToUnsigned(outerDia),
-              UnsignedLength(innerDia));
-}
-
-void GerberGenerator::drawCircleArea(const Circle& circle) noexcept {
-  flashCircle(circle.getCenter(), positiveToUnsigned(circle.getDiameter()),
-              UnsignedLength(0));
-}
-
-void GerberGenerator::drawPathOutline(
-    const Path& path, const UnsignedLength& lineWidth) noexcept {
+void GerberGenerator::drawPathOutline(const Path& path,
+                                      const UnsignedLength& lineWidth,
+                                      Function function,
+                                      const tl::optional<QString>& net,
+                                      const QString& component) noexcept {
   if (path.getVertices().count() < 2) {
     qWarning() << "Invalid path was ignored in gerber output!";
     return;
   }
-  setCurrentAperture(mApertureList->setCircle(lineWidth, UnsignedLength(0)));
+  setCurrentAperture(mApertureList->addCircle(lineWidth, function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       QString(),  // Object: Pin number/name
+                       QString()  // Object: Pin signal
+  );
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
     const Vertex& v = path.getVertices().at(i);
@@ -107,13 +146,26 @@ void GerberGenerator::drawPathOutline(
   }
 }
 
-void GerberGenerator::drawPathArea(const Path& path) noexcept {
+void GerberGenerator::drawPathArea(const Path& path, Function function,
+                                   const tl::optional<QString>& net,
+                                   const QString& component) noexcept {
   if (!path.isClosed()) {
     qWarning() << "Non-closed path was ignored in gerber output!";
     return;
   }
-  setCurrentAperture(
-      mApertureList->setCircle(UnsignedLength(0), UnsignedLength(0)));
+  // Note: Actually G36/G37 regions do not have an aperture attached. But for
+  // compatibility reasons, it's better to still select an aperture as usual.
+  // We used an aperture of size 0, but this already caused some issues in
+  // the past (although not critical) and the Gerber specs recommends to not
+  // use zero-size apertures. So let's use an aperture size of 0.01mm (it has
+  // no impact on the rendered image anyway).
+  setCurrentAperture(mApertureList->addCircle(UnsignedLength(10000), function));
+  setCurrentAttributes(function,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       QString(),  // Object: Pin number/name
+                       QString()  // Object: Pin signal
+  );
   setRegionModeOn();
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
@@ -124,52 +176,73 @@ void GerberGenerator::drawPathArea(const Path& path) noexcept {
   setRegionModeOff();
 }
 
-void GerberGenerator::flashCircle(const Point& pos, const UnsignedLength& dia,
-                                  const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setCircle(dia, hole));
+void GerberGenerator::flashCircle(const Point& pos, const PositiveLength& dia,
+                                  Function function,
+                                  const tl::optional<QString>& net,
+                                  const QString& component, const QString& pin,
+                                  const QString& signal) noexcept {
+  setCurrentAperture(
+      mApertureList->addCircle(positiveToUnsigned(dia), function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       pin,  // Object: Pin number/name
+                       signal  // Object: Pin signal
+  );
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRect(const Point& pos, const UnsignedLength& w,
-                                const UnsignedLength& h, const Angle& rot,
-                                const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setRect(w, h, rot, hole));
+void GerberGenerator::flashRect(const Point& pos, const PositiveLength& w,
+                                const PositiveLength& h, const Angle& rot,
+                                Function function,
+                                const tl::optional<QString>& net,
+                                const QString& component, const QString& pin,
+                                const QString& signal) noexcept {
+  setCurrentAperture(mApertureList->addRect(w, h, rot, function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       pin,  // Object: Pin number/name
+                       signal  // Object: Pin signal
+  );
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashObround(const Point& pos, const UnsignedLength& w,
-                                   const UnsignedLength& h, const Angle& rot,
-                                   const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setObround(w, h, rot, hole));
+void GerberGenerator::flashObround(const Point& pos, const PositiveLength& w,
+                                   const PositiveLength& h, const Angle& rot,
+                                   Function function,
+                                   const tl::optional<QString>& net,
+                                   const QString& component, const QString& pin,
+                                   const QString& signal) noexcept {
+  setCurrentAperture(mApertureList->addObround(w, h, rot, function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       pin,  // Object: Pin number/name
+                       signal  // Object: Pin signal
+  );
   flashAtPosition(pos);
 }
 
-void GerberGenerator::flashRegularPolygon(const Point& pos,
-                                          const UnsignedLength& dia, int n,
-                                          const Angle& rot,
-                                          const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setRegularPolygon(dia, n, rot, hole));
-  flashAtPosition(pos);
-}
-
-void GerberGenerator::flashOctagon(const Point& pos, const UnsignedLength& w,
-                                   const UnsignedLength& h,
-                                   const UnsignedLength& edge, const Angle& rot,
-                                   const UnsignedLength& hole) noexcept {
-  setCurrentAperture(mApertureList->setOctagon(w, h, edge, rot, hole));
+void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
+                                   const PositiveLength& h, const Angle& rot,
+                                   Function function,
+                                   const tl::optional<QString>& net,
+                                   const QString& component, const QString& pin,
+                                   const QString& signal) noexcept {
+  setCurrentAperture(mApertureList->addOctagon(w, h, rot, function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       pin,  // Object: Pin number/name
+                       signal  // Object: Pin signal
+  );
   flashAtPosition(pos);
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void GerberGenerator::reset() noexcept {
-  mOutput.clear();
-  mContent.clear();
-  mApertureList->reset();
-  mCurrentApertureNumber = -1;
-}
 
 void GerberGenerator::generate() {
   mOutput.clear();
@@ -187,6 +260,28 @@ void GerberGenerator::saveToFile(const FilePath& filepath) const {
  *  Private Methods
  ******************************************************************************/
 
+void GerberGenerator::setCurrentAttributes(Function apertureFunction,
+                                           const tl::optional<QString>& netName,
+                                           const QString& componentDesignator,
+                                           const QString& pinName,
+                                           const QString& pinSignal) noexcept {
+  QList<GerberAttribute> attributes;
+  if (apertureFunction) {
+    attributes.append(GerberAttribute::apertureFunction(*apertureFunction));
+  }
+  if (netName) {
+    attributes.append(GerberAttribute::objectNet(*netName));
+  }
+  if (!componentDesignator.isEmpty()) {
+    attributes.append(GerberAttribute::objectComponent(componentDesignator));
+  }
+  if (!componentDesignator.isEmpty() && !pinName.isEmpty()) {
+    attributes.append(
+        GerberAttribute::objectPin(componentDesignator, pinName, pinSignal));
+  }
+  mContent.append(mAttributeWriter->setAttributes(attributes));
+}
+
 void GerberGenerator::setCurrentAperture(int number) noexcept {
   if (number != mCurrentApertureNumber) {
     mContent.append(QString("D%1*\n").arg(number));
@@ -200,20 +295,6 @@ void GerberGenerator::setRegionModeOn() noexcept {
 
 void GerberGenerator::setRegionModeOff() noexcept {
   mContent.append("G37*\n");
-}
-
-void GerberGenerator::setMultiQuadrantArcModeOn() noexcept {
-  if (!mMultiQuadrantArcModeOn) {
-    mContent.append("G75*\n");
-    mMultiQuadrantArcModeOn = true;
-  }
-}
-
-void GerberGenerator::setMultiQuadrantArcModeOff() noexcept {
-  if (mMultiQuadrantArcModeOn) {
-    mContent.append("G74*\n");
-    mMultiQuadrantArcModeOn = false;
-  }
 }
 
 void GerberGenerator::switchToLinearInterpolationModeG01() noexcept {
@@ -242,9 +323,6 @@ void GerberGenerator::circularInterpolateToPosition(const Point& start,
                                                     const Point& center,
                                                     const Point& end) noexcept {
   Point diff = center - start;
-  if (!mMultiQuadrantArcModeOn) {
-    diff.makeAbs();  // no sign allowed in single quadrant mode!
-  }
   mContent.append(QString("X%1Y%2I%3J%4D01*\n")
                       .arg(end.getX().toNmString(), end.getY().toNmString(),
                            diff.getX().toNmString(), diff.getY().toNmString()));
@@ -257,10 +335,6 @@ void GerberGenerator::interpolateBetween(const Vertex& from,
     linearInterpolateToPosition(to.getPos());
   } else {
     // arc segment
-    // note: due to buggy clients when using single quadrant mode,
-    // we always use multi quadrant mode.
-    // see https://github.com/LibrePCB/LibrePCB/issues/247
-    setMultiQuadrantArcModeOn();
     if (from.getAngle() < 0) {
       switchToCircularCwInterpolationModeG02();
     } else {
@@ -281,19 +355,10 @@ void GerberGenerator::flashAtPosition(const Point& pos) noexcept {
 void GerberGenerator::printHeader() noexcept {
   mOutput.append("G04 --- HEADER BEGIN --- *\n");
 
-  // add some X2 attributes
-  QString appVersion = qApp->applicationVersion();
-  QString creationDate = QDateTime::currentDateTime().toString(Qt::ISODate);
-  QString projId = mProjectId.remove(',');
-  QString projUuid = mProjectUuid.toStr();
-  QString projRevision = mProjectRevision.remove(',');
-  mOutput.append(QString("%TF.GenerationSoftware,LibrePCB,LibrePCB,%1*%\n")
-                     .arg(appVersion));
-  mOutput.append(QString("%TF.CreationDate,%1*%\n").arg(creationDate));
-  mOutput.append(QString("%TF.ProjectId,%1,%2,%3*%\n")
-                     .arg(projId, projUuid, projRevision));
-  mOutput.append("%TF.Part,Single*%\n");  // "Single" means "this is a PCB"
-  // mOutput.append("%TF.FilePolarity,Positive*%\n");
+  // Add file attributes.
+  foreach (const GerberAttribute& a, mFileAttributes) {
+    mOutput.append(a.toGerberString());
+  }
 
   // coordinate format specification:
   //  - leading zeros omitted
@@ -308,14 +373,18 @@ void GerberGenerator::printHeader() noexcept {
   // start linear interpolation mode
   mOutput.append("G01*\n");
 
-  // use single quadrant arc mode
-  mOutput.append("G74*\n");
+  // Use multi quadrant arc mode (single quadrant mode is buggy in some CAM
+  // software and is now deprecated in the current Gerber specs).
+  // See https://github.com/LibrePCB/LibrePCB/issues/247.
+  mOutput.append("G75*\n");
 
   mOutput.append("G04 --- HEADER END --- *\n");
 }
 
 void GerberGenerator::printApertureList() noexcept {
+  mOutput.append("G04 --- APERTURE LIST BEGIN --- *\n");
   mOutput.append(mApertureList->generateString());
+  mOutput.append("G04 --- APERTURE LIST END --- *\n");
 }
 
 void GerberGenerator::printContent() noexcept {
@@ -326,7 +395,8 @@ void GerberGenerator::printContent() noexcept {
 
 void GerberGenerator::printFooter() noexcept {
   // MD5 checksum over content
-  mOutput.append(QString("%TF.MD5,%1*%\n").arg(calcOutputMd5Checksum()));
+  mOutput.append(
+      GerberAttribute::fileMd5(calcOutputMd5Checksum()).toGerberString());
 
   // end of file
   mOutput.append("M02*\n");
@@ -338,24 +408,6 @@ QString GerberGenerator::calcOutputMd5Checksum() const noexcept {
   QString data = QString(mOutput).remove(QChar('\n'));
   return QString(
       QCryptographicHash::hash(data.toUtf8(), QCryptographicHash::Md5).toHex());
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-QString GerberGenerator::escapeString(const QString& str) noexcept {
-  // perform compatibility decomposition (NFKD)
-  QString ret = str.normalized(QString::NormalizationForm_KD);
-  // remove all invalid characters
-  // Note: Even if backslashes are allowed, we will remove them because we
-  // haven't implemented proper escaping. Escaping of unicode characters is also
-  // missing here.
-  QString validChars("[a-zA-Z0-9_+-/!?<>”’(){}.|&@# ,;$:=]");
-  ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
-  // limit length to 65535 characters
-  ret.truncate(65535);
-  return ret;
 }
 
 /*******************************************************************************
