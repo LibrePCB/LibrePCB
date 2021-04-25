@@ -35,18 +35,17 @@ def test_edit_with_doubleclick(library_editor, helpers):
 
 
 def delete_action_helper(le, widget_name, valid, tabs):
+    tabwidget = le.widget('libraryEditorStackedWidget')
     widget = le.widget(widget_name)
     widget.activate_focus()
     le.action('libraryEditorActionRemove').trigger(blocking=False)
     if valid:
         le.widget('libraryEditorOverviewMsgBoxBtnCancel').click()
-        assert le.widget('libraryEditorStackedWidget').properties()['count'] == tabs + 1
-        assert le.widget('libraryEditorStackedWidget').properties()['currentIndex'] == 0
+        tabwidget.wait_for_properties({'count': tabs + 1, 'currentIndex': 0})
     le.action('libraryEditorActionRemove').trigger(blocking=False)
     if valid:
         le.widget('libraryEditorOverviewMsgBoxBtnYes').click()
-    assert le.widget('libraryEditorStackedWidget').properties()['count'] == tabs
-    assert le.widget('libraryEditorStackedWidget').properties()['currentIndex'] == 0
+    tabwidget.wait_for_properties({'count': tabs, 'currentIndex': 0})
 
 
 def test_delete_action(library_editor, helpers):
