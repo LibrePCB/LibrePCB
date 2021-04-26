@@ -13,10 +13,10 @@ SHARE_DIR_ABS = $$absolute_path("share", $${PWD})
 
 # is qt version sufficient
 lessThan(QT_MAJOR_VERSION, 5) {
-    error("Qt version $$[QT_VERSION] is too old, should be version 5.2 or newer!")
+    error("Qt version $$[QT_VERSION] is too old, should be version 5.5 or newer!")
 } else {
-    lessThan(QT_MINOR_VERSION, 2) {
-        error("Qt version $$[QT_VERSION] is too old, should be version 5.2 or newer!")
+    lessThan(QT_MINOR_VERSION, 5) {
+        error("Qt version $$[QT_VERSION] is too old, should be version 5.5 or newer!")
     }
 }
 
