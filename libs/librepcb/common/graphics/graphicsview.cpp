@@ -87,7 +87,6 @@ QRectF GraphicsView::getVisibleSceneRect() const noexcept {
 void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
   if (useOpenGl != mUseOpenGl) {
     if (useOpenGl) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
       // Try to make schematics/boards looking good by choosing reasonable
       // format options (with default options, it looks ugly).
       QSurfaceFormat format = QSurfaceFormat::defaultFormat();
@@ -98,10 +97,6 @@ void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
       QOpenGLWidget* viewport = new QOpenGLWidget();
       viewport->setFormat(format);
       setViewport(viewport);
-#else
-      setViewport(new QGLWidget(QGLFormat(
-          QGL::DoubleBuffer | QGL::AlphaChannel | QGL::SampleBuffers)));
-#endif
     } else {
       setViewport(nullptr);
     }
@@ -231,10 +226,8 @@ void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept {
  *  Inherited from QGraphicsView
  ******************************************************************************/
 
-// In Qt<5.5, do not specially handle trackpad events.
 // It is not possible to process the wheel event in the `eventFilter` because
 // `QGraphicsSceneWheelEvent` does not track the source of the wheel event.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 void GraphicsView::wheelEvent(QWheelEvent* event) {
   if (event->source() == Qt::MouseEventSynthesizedBySystem) {
     QAbstractScrollArea::wheelEvent(event);
@@ -242,11 +235,6 @@ void GraphicsView::wheelEvent(QWheelEvent* event) {
     QGraphicsView::wheelEvent(event);
   }
 }
-#else
-void GraphicsView::wheelEvent(QWheelEvent* event) {
-  QGraphicsView::wheelEvent(event);
-}
-#endif
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
   switch (event->type()) {

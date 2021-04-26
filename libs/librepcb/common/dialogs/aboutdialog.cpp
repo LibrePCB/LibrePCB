@@ -98,10 +98,8 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   details << "Linking type:     " + qApp->getLinkingType();
   details << "Unbundled libs:   " + qApp->getUnbundledLibs();
   details << "Qt Version:       " + qt;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
   details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
   details << "Operating System: " + QSysInfo::prettyProductName();
-#endif
   details << "Platform Plugin:  " + qApp->platformName();
   mUi->txtDetails->setPlainText(details.join("\n"));
 }

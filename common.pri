@@ -20,22 +20,6 @@ lessThan(QT_MAJOR_VERSION, 5) {
     }
 }
 
-# redirect qInfo to qDebug for Qt < 5.5 because qInfo was not yet available
-# https://doc.qt.io/qt-5/qtglobal.html#qInfo
-lessThan(QT_MINOR_VERSION, 5) {
-    DEFINES += qInfo=qDebug
-}
-
-# do not allow to use -Werror in release mode on Qt < 5.5 because Q_ASSERT() would lead
-# to warnings (resp. errors) if the argument of Q_ASSERT() is not used elsewhere.
-#   --> see: http://code.qt.io/cgit/qt/qtbase.git/tree/dist/changes-5.5.0
-CONFIG(release, debug|release) {
-    lessThan(QT_MINOR_VERSION, 5) {
-        QMAKE_CFLAGS -= -Werror
-        QMAKE_CXXFLAGS -= -Werror
-    }
-}
-
 # In Qt 5.15, a lot of things were marked as deprecated, without providing
 # alternatives available in previous Qt versions. It would require a lot of
 # preprocessor conditionals to avoid these deprecation warnings, so let's just

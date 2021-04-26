@@ -370,13 +370,6 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   Board* board = getActiveBoard();
   if (!board) return false;
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
-  if (mSelectedItemsDragCommand) {
-    // Abort moving and handle double click
-    abortCommand(false);
-  }
-#endif
-
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     // Check if there is an element under the mouse
     QList<BI_Base*> items =

@@ -175,11 +175,9 @@ void Debug::messageHandler(QtMsgType type, const QMessageLogContext& context,
       instance()->print(DebugLevel_t::DebugMsg, msg, context.file,
                         context.line);
       break;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
     case QtInfoMsg:
       instance()->print(DebugLevel_t::Info, msg, context.file, context.line);
       break;
-#endif
     case QtWarningMsg:
       instance()->print(DebugLevel_t::Warning, msg, context.file, context.line);
       break;
