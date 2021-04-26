@@ -7,8 +7,6 @@ jobs:
     ARCH: 'x86_64'
   strategy:
     matrix:
-      Ubuntu_1404_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-14.04-3
       Ubuntu_1604_GCC:
         IMAGE: librepcb/librepcb-dev:ubuntu-16.04-3
       Ubuntu_1604_Qt_5_14_2_GCC:
