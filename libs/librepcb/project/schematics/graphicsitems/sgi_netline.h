@@ -52,6 +52,10 @@ public:
   explicit SGI_NetLine(SI_NetLine& netline) noexcept;
   ~SGI_NetLine() noexcept;
 
+  // Prevent copies
+  SGI_NetLine(const SGI_NetLine& other) = delete;
+  SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
+
   // General Methods
   void updateCacheAndRepaint() noexcept;
 
@@ -62,11 +66,6 @@ public:
              QWidget* widget);
 
 private:
-  // make some methods inaccessible...
-  SGI_NetLine() = delete;
-  SGI_NetLine(const SGI_NetLine& other) = delete;
-  SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

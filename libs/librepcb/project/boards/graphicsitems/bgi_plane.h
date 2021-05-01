@@ -54,6 +54,10 @@ public:
   explicit BGI_Plane(BI_Plane& plane) noexcept;
   ~BGI_Plane() noexcept;
 
+  // Prevent copies
+  BGI_Plane(const BGI_Plane& other) = delete;
+  BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
+
   // Getters
   bool isSelectable() const noexcept;
 
@@ -82,11 +86,6 @@ public:
              QWidget* widget = 0);
 
 private:
-  // make some methods inaccessible...
-  BGI_Plane() = delete;
-  BGI_Plane(const BGI_Plane& other) = delete;
-  BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 

@@ -63,6 +63,11 @@ public:
       const tl::optional<Uuid>& symbVarItemUuid = tl::nullopt) noexcept;
   ~SymbolPreviewGraphicsItem() noexcept;
 
+  // Prevent copies
+  SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
+  SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
+      delete;
+
   // Setters
   void setDrawBoundingRect(bool enable) noexcept;
 
@@ -81,12 +86,6 @@ signals:
   void attributesChanged() override {}
 
 private:
-  // make some methods inaccessible...
-  SymbolPreviewGraphicsItem() = delete;
-  SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
-  SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
-      delete;
-
   // Inherited from AttributeProvider
   /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;

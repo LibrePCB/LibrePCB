@@ -74,6 +74,10 @@ public:
   explicit UnplacedComponentsDock(ProjectEditor& editor);
   ~UnplacedComponentsDock();
 
+  // Prevent copies
+  UnplacedComponentsDock(const UnplacedComponentsDock& other) = delete;
+  UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs) = delete;
+
   // Getters
   int getUnplacedComponentsCount() const noexcept;
 
@@ -97,11 +101,6 @@ private slots:
   void on_btnAddAll_clicked();
 
 private:
-  // make some methods inaccessible...
-  UnplacedComponentsDock();
-  UnplacedComponentsDock(const UnplacedComponentsDock& other);
-  UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs);
-
   // Private Methods
   void updateComponentsList() noexcept;
   void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;

@@ -70,6 +70,10 @@ public:
   explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
   ~SchematicEditor();
 
+  // Prevent copies
+  SchematicEditor(const SchematicEditor& other) = delete;
+  SchematicEditor& operator=(const SchematicEditor& rhs) = delete;
+
   // Getters
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project& getProject() const noexcept { return mProject; }
@@ -108,11 +112,6 @@ signals:
   void activeSchematicChanged(int index);
 
 private:
-  // make some methods inaccessible...
-  SchematicEditor();
-  SchematicEditor(const SchematicEditor& other);
-  SchematicEditor& operator=(const SchematicEditor& rhs);
-
   // Private Methods
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;

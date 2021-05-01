@@ -152,12 +152,14 @@ public:
     return &dbg;
   }
 
+  // Prevent copies
+  Debug(const Debug& other) = delete;
+  Debug& operator=(const Debug& rhs) = delete;
+
 private:
-  // make some methods inaccessible...
+  // Constructors / Destructor
   Debug();
-  Debug(const Debug& other);
   ~Debug();
-  Debug& operator=(const Debug& rhs);
 
   /**
    * @brief The message handler for qDebug(), qWarning(), qCritical() and

@@ -63,6 +63,10 @@ public:
                 const QString& typeNameTr) noexcept;
   virtual ~AttributeType() noexcept;
 
+  // Prevent copies
+  AttributeType(const AttributeType& other) = delete;
+  AttributeType& operator=(const AttributeType& rhs) = delete;
+
   // Getters
   Type_t getType() const noexcept { return mType; }
   const QString& getName() const noexcept { return mTypeName; }
@@ -85,11 +89,6 @@ public:
   static const AttributeType& fromString(const QString& type);
 
 protected:
-  // make some methods inaccessible...
-  AttributeType() = delete;
-  AttributeType(const AttributeType& other) = delete;
-  AttributeType& operator=(const AttributeType& rhs) = delete;
-
   // General Attributes
   Type_t mType;
   QString mTypeName;

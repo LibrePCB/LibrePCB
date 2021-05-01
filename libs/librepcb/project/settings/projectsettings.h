@@ -52,6 +52,10 @@ public:
                            bool create);
   ~ProjectSettings() noexcept;
 
+  // Prevent copies
+  ProjectSettings(const ProjectSettings& other) = delete;
+  ProjectSettings& operator=(const ProjectSettings& rhs) = delete;
+
   // Getters: General
   Project& getProject() const noexcept { return mProject; }
 
@@ -75,11 +79,6 @@ signals:
   void settingsChanged();
 
 private:
-  // make some methods inaccessible...
-  ProjectSettings();
-  ProjectSettings(const ProjectSettings& other);
-  ProjectSettings& operator=(const ProjectSettings& rhs);
-
   // Private Methods
 
   /// @copydoc librepcb::SerializableObject::serialize()

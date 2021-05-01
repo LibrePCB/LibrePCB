@@ -56,6 +56,10 @@ public:
   explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
   ~SGI_SymbolPin() noexcept;
 
+  // Prevent copies
+  SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
+  SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
+
   // General Methods
   void updateCacheAndRepaint() noexcept;
 
@@ -66,11 +70,6 @@ public:
              QWidget* widget = 0);
 
 private:
-  // make some methods inaccessible...
-  SGI_SymbolPin() = delete;
-  SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
-  SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

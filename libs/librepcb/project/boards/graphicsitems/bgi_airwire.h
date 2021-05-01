@@ -52,6 +52,10 @@ public:
   explicit BGI_AirWire(BI_AirWire& airwire) noexcept;
   ~BGI_AirWire() noexcept;
 
+  // Prevent copies
+  BGI_AirWire(const BGI_AirWire& other) = delete;
+  BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
+
   // Getters
   bool isSelectable() const noexcept;
 
@@ -65,11 +69,6 @@ public:
              QWidget* widget);
 
 private:
-  // make some methods inaccessible...
-  BGI_AirWire() = delete;
-  BGI_AirWire(const BGI_AirWire& other) = delete;
-  BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

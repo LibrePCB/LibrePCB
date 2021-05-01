@@ -47,9 +47,7 @@ public:
   explicit SGI_Base() noexcept;
   virtual ~SGI_Base() noexcept;
 
-private:
-  // make some methods inaccessible...
-  // SGI_Base() = delete;
+  // Prevent copies
   SGI_Base(const SGI_Base& other) = delete;
   SGI_Base& operator=(const SGI_Base& rhs) = delete;
 };

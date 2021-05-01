@@ -57,6 +57,10 @@ public:
   explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
   ~BGI_Footprint() noexcept;
 
+  // Prevent copies
+  BGI_Footprint(const BGI_Footprint& other) = delete;
+  BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
+
   // Getters
   bool isSelectable() const noexcept;
 
@@ -70,11 +74,6 @@ public:
              QWidget* widget = 0);
 
 private:
-  // make some methods inaccessible...
-  BGI_Footprint() = delete;
-  BGI_Footprint(const BGI_Footprint& other) = delete;
-  BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 

@@ -46,6 +46,10 @@ public:
                          const QStringList& userInputSuffixes) noexcept;
   ~AttributeUnit() noexcept;
 
+  // Prevent copies
+  AttributeUnit(const AttributeUnit& other) = delete;
+  AttributeUnit& operator=(const AttributeUnit& rhs) = delete;
+
   // Getters
   const QString& getName() const noexcept { return mName; }
   const QString& getSymbolTr() const noexcept { return mSymbolTr; }
@@ -54,11 +58,6 @@ public:
   }
 
 private:
-  // make some methods inaccessible...
-  AttributeUnit() = delete;
-  AttributeUnit(const AttributeUnit& other) = delete;
-  AttributeUnit& operator=(const AttributeUnit& rhs) = delete;
-
   // General Attributes
   QString mName;  ///< to convert from/to string, e.g. "millivolt"
   QString mSymbolTr;  ///< e.g. "mV"

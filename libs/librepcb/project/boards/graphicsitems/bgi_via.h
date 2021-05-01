@@ -52,6 +52,10 @@ public:
   explicit BGI_Via(BI_Via& via) noexcept;
   ~BGI_Via() noexcept;
 
+  // Prevent copies
+  BGI_Via(const BGI_Via& other) = delete;
+  BGI_Via& operator=(const BGI_Via& rhs) = delete;
+
   // Getters
   bool isSelectable() const noexcept;
 
@@ -65,11 +69,6 @@ public:
              QWidget* widget);
 
 private:
-  // make some methods inaccessible...
-  BGI_Via() = delete;
-  BGI_Via(const BGI_Via& other) = delete;
-  BGI_Via& operator=(const BGI_Via& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

@@ -64,6 +64,12 @@ public:
       const AttributeProvider* attrProvider = nullptr) noexcept;
   ~FootprintPreviewGraphicsItem() noexcept;
 
+  // Prevent copies
+  FootprintPreviewGraphicsItem(const FootprintPreviewGraphicsItem& other) =
+      delete;
+  FootprintPreviewGraphicsItem& operator=(
+      const FootprintPreviewGraphicsItem& rhs) = delete;
+
   // Setters
   void setDrawBoundingRect(bool enable) noexcept;
 
@@ -82,13 +88,6 @@ signals:
   void attributesChanged() override {}
 
 private:
-  // make some methods inaccessible...
-  FootprintPreviewGraphicsItem() = delete;
-  FootprintPreviewGraphicsItem(const FootprintPreviewGraphicsItem& other) =
-      delete;
-  FootprintPreviewGraphicsItem& operator=(
-      const FootprintPreviewGraphicsItem& rhs) = delete;
-
   // Inherited from AttributeProvider
   /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;

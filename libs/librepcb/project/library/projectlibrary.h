@@ -60,8 +60,12 @@ class ProjectLibrary final : public QObject {
 
 public:
   // Constructors / Destructor
-  ProjectLibrary(std::unique_ptr<TransactionalDirectory> directory);
+  explicit ProjectLibrary(std::unique_ptr<TransactionalDirectory> directory);
   ~ProjectLibrary() noexcept;
+
+  // Prevent copies
+  ProjectLibrary(const ProjectLibrary& other) = delete;
+  ProjectLibrary& operator=(const ProjectLibrary& rhs) = delete;
 
   // Getters: Library Elements
   const QHash<Uuid, library::Symbol*>& getSymbols() const noexcept {
@@ -107,11 +111,6 @@ public:
   void save();
 
 private:
-  // make some methods inaccessible...
-  ProjectLibrary();
-  ProjectLibrary(const ProjectLibrary& other);
-  ProjectLibrary& operator=(const ProjectLibrary& rhs);
-
   // Private Methods
   template <typename ElementType>
   void loadElements(const QString& dirname, const QString& type,

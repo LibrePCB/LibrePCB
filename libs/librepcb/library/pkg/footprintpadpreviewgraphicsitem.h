@@ -54,6 +54,12 @@ public:
       const PackagePad* pkgPad = nullptr) noexcept;
   ~FootprintPadPreviewGraphicsItem() noexcept;
 
+  // Prevent copies
+  FootprintPadPreviewGraphicsItem(
+      const FootprintPadPreviewGraphicsItem& other) = delete;
+  FootprintPadPreviewGraphicsItem& operator=(
+      const FootprintPadPreviewGraphicsItem& rhs) = delete;
+
   // Setters
   void setDrawBoundingRect(bool enable) noexcept { mDrawBoundingRect = enable; }
 
@@ -67,13 +73,6 @@ public:
              QWidget* widget = 0) noexcept override;
 
 private:
-  // make some methods inaccessible...
-  FootprintPadPreviewGraphicsItem() = delete;
-  FootprintPadPreviewGraphicsItem(
-      const FootprintPadPreviewGraphicsItem& other) = delete;
-  FootprintPadPreviewGraphicsItem& operator=(
-      const FootprintPadPreviewGraphicsItem& rhs) = delete;
-
   // General Attributes
   const FootprintPad& mFootprintPad;
   const PackagePad* mPackagePad;
