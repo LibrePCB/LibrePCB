@@ -25,7 +25,7 @@ This page describes the code style guide for LibrePCB developers.
 
 # General {#doc_code_style_guide_general}
 
-- Qt >= 5.2
+- Qt >= 5.5
 - C++11
 - Use strongly typed enums (`enum class`, C++11) whenever reasonable
 - Use `nullptr` instead of `NULL` or `0`

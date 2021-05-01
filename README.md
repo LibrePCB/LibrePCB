@@ -67,7 +67,7 @@ the AUR. The package clones and builds the latest (unstable!) version of the
 To compile LibrePCB, you need the following software components:
 
 - g++ >= 4.8, MinGW >= 4.8, or Clang >= 3.3 (C++11 support is required)
-- [Qt](http://www.qt.io/download-open-source/) >= 5.2
+- [Qt](http://www.qt.io/download-open-source/) >= 5.5
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
 

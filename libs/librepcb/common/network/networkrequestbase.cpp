@@ -296,10 +296,8 @@ QString NetworkRequestBase::getUserAgent() noexcept {
   static QString userAgent;
   if (userAgent.isEmpty()) {
     QStringList details;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
     details << QSysInfo::prettyProductName();
     details << QSysInfo::currentCpuArchitecture();
-#endif
     details << QLocale::system().name();
     userAgent =
         QString("LibrePCB/%1 (%2) Qt/%3")

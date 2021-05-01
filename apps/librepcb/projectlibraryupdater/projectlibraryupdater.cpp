@@ -137,13 +137,8 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
       mControlPanel.openProject(mProjectFilePath);
       // bring this window to front again (with some delay to make it working
       // properly)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
       QTimer::singleShot(500, this, &QMainWindow::raise);
       QTimer::singleShot(500, this, &QMainWindow::activateWindow);
-#else
-      QTimer::singleShot(500, this, SLOT(raise()));
-      // QTimer::singleShot(500, this, SLOT(activateWindow()));
-#endif
     }
   }
 

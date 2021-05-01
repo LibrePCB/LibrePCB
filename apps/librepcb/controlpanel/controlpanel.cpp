@@ -133,11 +133,7 @@ ControlPanel::ControlPanel(Workspace& workspace)
 
   // slightly delay opening projects to make sure the control panel window goes
   // to background (schematic editor should be the top most window)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
   QTimer::singleShot(10, this, &ControlPanel::openProjectsPassedByCommandLine);
-#else
-  QTimer::singleShot(10, this, SLOT(openProjectsPassedByCommandLine()));
-#endif
 
   // start scanning the workspace library (asynchronously)
   mWorkspace.getLibraryDb().startLibraryRescan();

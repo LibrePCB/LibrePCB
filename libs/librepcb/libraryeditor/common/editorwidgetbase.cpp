@@ -255,11 +255,7 @@ void EditorWidgetBase::scheduleLibraryElementChecks() noexcept {
   // results. Instead, just delay checks for some time to get more stable
   // messages. But also don't wait too long, otherwise it would feel like a
   // lagging user interface.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
   QTimer::singleShot(50, this, &EditorWidgetBase::updateCheckMessages);
-#else
-  QTimer::singleShot(50, this, SLOT(updateCheckMessages()));
-#endif
 }
 
 void EditorWidgetBase::updateCheckMessages() noexcept {

@@ -148,17 +148,7 @@ private:  // Data
  ******************************************************************************/
 
 inline uint qHash(const Path& key, uint seed = 0) noexcept {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
   return qHashRange(key.getVertices().begin(), key.getVertices().end(), seed);
-#else
-  uint hash = seed;
-  foreach (const Vertex& v, key.getVertices()) {
-    // from
-    // https://code.woboq.org/qt5/qtbase/src/corelib/tools/qhashfunctions.h.html
-    hash += seed ^ (qHash(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2));
-  }
-  return hash;
-#endif
 }
 
 /*******************************************************************************
