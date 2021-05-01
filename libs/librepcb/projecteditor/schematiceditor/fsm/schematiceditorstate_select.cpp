@@ -286,14 +286,6 @@ bool SchematicEditorState_Select::
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
-  // if in moving state, abort moving and handle double click (only needed
-  // on older qt versions)
-  if ((mSubState == SubState::MOVING) &&
-      (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))) {
-    mSelectedItemsMoveCommand.reset();
-    mSubState = SubState::IDLE;
-  }
-
   if (mSubState == SubState::IDLE) {
     // check if there is an element under the mouse
     QList<SI_Base*> items =

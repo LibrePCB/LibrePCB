@@ -281,8 +281,6 @@ TEST_F(DirectoryLockTest, testUnlockIfLockedOnLockedDir) {
   EXPECT_EQ(DirectoryLock::LockStatus::Unlocked, lock.getStatus());
 }
 
-#if (QT_VERSION >= \
-     QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
 TEST_F(DirectoryLockTest, testStaleLock) {
   QProcess process;
   process.start(getTestProcessExePath().toStr());
@@ -309,10 +307,7 @@ TEST_F(DirectoryLockTest, testStaleLock) {
   // try to get the lock
   lock.tryLock();
 }
-#endif
 
-#if (QT_VERSION >= \
-     QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
 TEST_F(DirectoryLockTest, testLockedByOtherApp) {
   // Run a new process.
   QProcess process;
@@ -343,7 +338,6 @@ TEST_F(DirectoryLockTest, testLockedByOtherApp) {
   success = process.waitForFinished();
   ASSERT_TRUE(success) << qPrintable(process.errorString());
 }
-#endif
 
 TEST_F(DirectoryLockTest, testLockedByOtherUser) {
   // Get the lock, read the lock file content and release the lock.

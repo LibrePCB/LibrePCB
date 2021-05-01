@@ -99,8 +99,6 @@ TEST_F(SystemInfoTest, testIsProcessRunning) {
   { EXPECT_TRUE(SystemInfo::isProcessRunning(qApp->applicationPid())); }
 
   // check another running process
-#if (QT_VERSION >= \
-     QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
   {
     QProcess process;
     process.start(getTestProcessExePath().toStr());
@@ -113,7 +111,6 @@ TEST_F(SystemInfoTest, testIsProcessRunning) {
     ASSERT_TRUE(success) << qPrintable(process.errorString());
     EXPECT_FALSE(SystemInfo::isProcessRunning(pid));
   }
-#endif
 
   // check an invalid process
   { EXPECT_FALSE(SystemInfo::isProcessRunning(999999)); }
@@ -128,8 +125,6 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
   }
 
   // check another running process
-#if (QT_VERSION >= \
-     QT_VERSION_CHECK(5, 3, 0))  // QProcess::processId() requires Qt>=5.3
   {
     QProcess process;
     process.start(getTestProcessExePath().toStr());
@@ -153,7 +148,6 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
     processName = SystemInfo::getProcessNameByPid(pid);
     EXPECT_EQ(QString(), processName) << qPrintable(processName);
   }
-#endif
 
   // check an invalid process
   {

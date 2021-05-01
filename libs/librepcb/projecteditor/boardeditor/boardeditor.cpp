@@ -271,11 +271,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
 
   // mGraphicsView->zoomAll(); does not work properly here, should be executed
   // later in the event loop (ugly, but seems to work...)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
   QTimer::singleShot(200, mGraphicsView, &GraphicsView::zoomAll);
-#else
-  QTimer::singleShot(200, mGraphicsView, SLOT(zoomAll()));
-#endif
 }
 
 BoardEditor::~BoardEditor() {

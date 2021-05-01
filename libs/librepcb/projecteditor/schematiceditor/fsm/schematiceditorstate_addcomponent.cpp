@@ -524,14 +524,9 @@ void SchematicEditorState_AddComponent::setFocusToToolbar() noexcept {
   }
   if (widget) {
     // Slightly delay it to make it working properly...
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
     QTimer::singleShot(0, widget, &QLineEdit::selectAll);
     QTimer::singleShot(
         0, widget, static_cast<void (QLineEdit::*)()>(&QLineEdit::setFocus));
-#else
-    QTimer::singleShot(0, widget, SLOT(selectAll()));
-    QTimer::singleShot(0, widget, SLOT(setFocus()));
-#endif
   }
 }
 
