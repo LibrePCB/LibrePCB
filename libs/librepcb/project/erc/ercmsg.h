@@ -82,7 +82,6 @@ public:
 
 private:
   // General
-  Project& mProject;
   ErcMsgList& mErcMsgList;
 
   // Attributes
