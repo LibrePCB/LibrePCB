@@ -29,8 +29,11 @@
 #include <librepcb/common/bom/bomcsvwriter.h>
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/fileio/csvfile.h>
+#include <librepcb/library/dev/device.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/items/bi_device.h>
 #include <librepcb/project/bomgenerator.h>
+#include <librepcb/project/circuit/componentinstance.h>
 #include <librepcb/project/project.h>
 
 #include <QtCore>
@@ -140,6 +143,50 @@ void BomGeneratorDialog::updateBom() noexcept {
   gen.setAdditionalAttributes(attributes);
   mBom = gen.generate(board);
   updateTable();
+
+  // Update status label to indicate whether the devices are in sync with the
+  // devices chosen in the schematic.
+  // See https://github.com/LibrePCB/LibrePCB/issues/584
+  if (board) {
+    QStringList differentDevices;
+    foreach (const BI_Device* device, board->getDeviceInstances()) {
+      tl::optional<Uuid> selectedDevice =
+          device->getComponentInstance().getDefaultDeviceUuid();
+      if (selectedDevice &&
+          (selectedDevice != device->getLibDevice().getUuid())) {
+        differentDevices.append(*device->getComponentInstance().getName());
+      }
+    }
+    differentDevices.sort(Qt::CaseInsensitive);
+    if (!differentDevices.isEmpty()) {
+      int max = 20;
+      QString designators = differentDevices.mid(0, max).join(", ");
+      if (differentDevices.count() > max) {
+        designators += ", ...";
+      }
+      mUi->lblMessage->setText(
+          "⚠️ " %
+          tr("Warning: %n device(s) from the selected board differ from their "
+             "pre-selected devices in the schematic: %1",
+             nullptr, differentDevices.count())
+              .arg(designators));
+      mUi->lblMessage->setStyleSheet(
+          "QLabel {background-color: darksalmon; color: black;};");
+    } else {
+      mUi->lblMessage->setText(
+          "✓ " %
+          tr("All devices of the selected board are in sync with their "
+             "pre-selected devices in the schematic."));
+      mUi->lblMessage->setStyleSheet(
+          "QLabel {background-color: yellowgreen; color: black;};");
+    }
+  } else {
+    mUi->lblMessage->setText(
+        "ℹ️ " %
+        tr("Devices are not exported because no board is selected."));
+    mUi->lblMessage->setStyleSheet(
+        "QLabel {background-color: yellow; color: black;};");
+  }
 }
 
 void BomGeneratorDialog::updateTable() noexcept {
