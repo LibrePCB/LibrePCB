@@ -14,7 +14,7 @@
    <string>Device Properties</string>
   </property>
   <property name="title">
-   <string>De&amp;vice Properties</string>
+   <string>Device Properties</string>
   </property>
   <property name="subTitle">
    <string>Set the component and the package of the new device.</string>
