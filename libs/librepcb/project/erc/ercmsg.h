@@ -62,6 +62,10 @@ public:
                   ErcMsg::ErcMsgType_t msgType, const QString& msg = QString());
   virtual ~ErcMsg() noexcept;
 
+  // Prevent copies
+  ErcMsg(const ErcMsg& other) = delete;
+  ErcMsg& operator=(const ErcMsg& rhs) = delete;
+
   // Getters
   const IF_ErcMsgProvider& getOwner() const noexcept { return mOwner; }
   const QString& getOwnerKey() const noexcept { return mOwnerKey; }
@@ -77,13 +81,7 @@ public:
   void setIgnored(bool ignored) noexcept;
 
 private:
-  // make some methods inaccessible...
-  ErcMsg();
-  ErcMsg(const ErcMsg& other);
-  ErcMsg& operator=(const ErcMsg& rhs);
-
   // General
-  Project& mProject;
   ErcMsgList& mErcMsgList;
 
   // Attributes

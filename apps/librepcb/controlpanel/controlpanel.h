@@ -85,6 +85,10 @@ public:
   explicit ControlPanel(workspace::Workspace& workspace);
   ~ControlPanel();
 
+  // Prevent copies
+  ControlPanel(const ControlPanel& other) = delete;
+  ControlPanel& operator=(const ControlPanel& rhs) = delete;
+
 public slots:
 
   void showControlPanel() noexcept;
@@ -120,11 +124,6 @@ private slots:
   void on_actionRescanLibraries_triggered();
 
 private:
-  // make some methods inaccessible...
-  ControlPanel();
-  ControlPanel(const ControlPanel& other);
-  ControlPanel& operator=(const ControlPanel& rhs);
-
   // General private methods
   void saveSettings();
   void loadSettings();

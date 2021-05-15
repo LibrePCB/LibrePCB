@@ -52,6 +52,10 @@ public:
   explicit BGI_NetLine(BI_NetLine& netline) noexcept;
   ~BGI_NetLine() noexcept;
 
+  // Prevent copies
+  BGI_NetLine(const BGI_NetLine& other) = delete;
+  BGI_NetLine& operator=(const BGI_NetLine& rhs) = delete;
+
   // Getters
   bool isSelectable() const noexcept;
 
@@ -65,11 +69,6 @@ public:
              QWidget* widget);
 
 private:
-  // make some methods inaccessible...
-  BGI_NetLine() = delete;
-  BGI_NetLine(const BGI_NetLine& other) = delete;
-  BGI_NetLine& operator=(const BGI_NetLine& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

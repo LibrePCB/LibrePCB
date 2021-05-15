@@ -74,6 +74,10 @@ public:
   explicit BoardEditor(ProjectEditor& projectEditor, Project& project);
   ~BoardEditor();
 
+  // Prevent copies
+  BoardEditor(const BoardEditor& other) = delete;
+  BoardEditor& operator=(const BoardEditor& rhs) = delete;
+
   // Getters
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project& getProject() const noexcept { return mProject; }
@@ -120,11 +124,6 @@ private slots:
   void boardListActionGroupTriggered(QAction* action);
 
 private:
-  // make some methods inaccessible...
-  BoardEditor() = delete;
-  BoardEditor(const BoardEditor& other) = delete;
-  BoardEditor& operator=(const BoardEditor& rhs) = delete;
-
   // Private Methods
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;

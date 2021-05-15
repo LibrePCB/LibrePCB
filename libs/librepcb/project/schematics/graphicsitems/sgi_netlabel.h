@@ -53,6 +53,10 @@ public:
   explicit SGI_NetLabel(SI_NetLabel& netlabel) noexcept;
   ~SGI_NetLabel() noexcept;
 
+  // Prevent copies
+  SGI_NetLabel(const SGI_NetLabel& other) = delete;
+  SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
+
   // General Methods
   void updateCacheAndRepaint() noexcept;
   void setAnchor(const Point& pos) noexcept;
@@ -63,11 +67,6 @@ public:
              QWidget* widget);
 
 private:
-  // make some methods inaccessible...
-  SGI_NetLabel() = delete;
-  SGI_NetLabel(const SGI_NetLabel& other) = delete;
-  SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

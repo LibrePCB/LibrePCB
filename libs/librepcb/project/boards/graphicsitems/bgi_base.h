@@ -47,14 +47,12 @@ public:
   explicit BGI_Base() noexcept;
   virtual ~BGI_Base() noexcept;
 
-protected:
-  static qreal getZValueOfCopperLayer(const QString& name) noexcept;
-
-private:
-  // make some methods inaccessible...
-  // BGI_Base() = delete;
+  // Prevent copies
   BGI_Base(const BGI_Base& other) = delete;
   BGI_Base& operator=(const BGI_Base& rhs) = delete;
+
+protected:
+  static qreal getZValueOfCopperLayer(const QString& name) noexcept;
 };
 
 /*******************************************************************************

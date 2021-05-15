@@ -57,6 +57,10 @@ public:
   explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
   ~BGI_FootprintPad() noexcept;
 
+  // Prevent copies
+  BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
+  BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
+
   // Getters
   bool isSelectable() const noexcept;
 
@@ -70,11 +74,6 @@ public:
              QWidget* widget = 0);
 
 private:
-  // make some methods inaccessible...
-  BGI_FootprintPad() = delete;
-  BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
-  BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
-
   // Private Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 

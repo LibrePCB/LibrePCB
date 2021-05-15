@@ -57,6 +57,10 @@ public:
   explicit ErcMsgDock(Project& project);
   ~ErcMsgDock();
 
+  // Prevent copies
+  ErcMsgDock(const ErcMsgDock& other) = delete;
+  ErcMsgDock& operator=(const ErcMsgDock& rhs) = delete;
+
 public slots:
 
   void ercMsgAdded(ErcMsg* ercMsg) noexcept;
@@ -72,11 +76,6 @@ private slots:
 private:
   // Private Methods
   void updateTopLevelItemTexts() noexcept;
-
-  // make some methods inaccessible...
-  ErcMsgDock();
-  ErcMsgDock(const ErcMsgDock& other);
-  ErcMsgDock& operator=(const ErcMsgDock& rhs);
 
   // General
   Project& mProject;

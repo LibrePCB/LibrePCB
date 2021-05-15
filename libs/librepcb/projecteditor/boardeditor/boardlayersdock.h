@@ -62,6 +62,10 @@ public:
   explicit BoardLayersDock(BoardEditor& editor) noexcept;
   ~BoardLayersDock() noexcept;
 
+  // Prevent copies
+  BoardLayersDock(const BoardLayersDock& other) = delete;
+  BoardLayersDock& operator=(const BoardLayersDock& rhs) = delete;
+
   // Setters
   void setActiveBoard(Board* board);
 
@@ -75,11 +79,6 @@ private slots:
   void on_btnNone_clicked();
 
 private:
-  // make some methods inaccessible...
-  BoardLayersDock();
-  BoardLayersDock(const BoardLayersDock& other);
-  BoardLayersDock& operator=(const BoardLayersDock& rhs);
-
   // Private Methods
   void updateListWidget() noexcept;
   void setVisibleLayers(const QList<QString>& layers) noexcept;

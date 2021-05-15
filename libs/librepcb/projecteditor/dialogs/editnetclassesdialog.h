@@ -61,6 +61,10 @@ public:
                                 QWidget* parent = 0);
   ~EditNetClassesDialog() noexcept;
 
+  // Prevent copies
+  EditNetClassesDialog(const EditNetClassesDialog& other) = delete;
+  EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs) = delete;
+
 private slots:
 
   void on_tableWidget_itemChanged(QTableWidgetItem* item);
@@ -68,11 +72,6 @@ private slots:
   void on_btnRemove_clicked();
 
 private:
-  // make some methods inaccessible...
-  EditNetClassesDialog();
-  EditNetClassesDialog(const EditNetClassesDialog& other);
-  EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs);
-
   // General Attributes
   Circuit& mCircuit;
   Ui::EditNetClassesDialog* mUi;

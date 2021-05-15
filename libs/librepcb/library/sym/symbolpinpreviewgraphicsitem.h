@@ -57,6 +57,12 @@ public:
       const CmpSigPinDisplayType& displayType) noexcept;
   ~SymbolPinPreviewGraphicsItem() noexcept;
 
+  // Prevent copies
+  SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) =
+      delete;
+  SymbolPinPreviewGraphicsItem& operator=(
+      const SymbolPinPreviewGraphicsItem& rhs) = delete;
+
   // Setters
   void setDrawBoundingRect(bool enable) noexcept { mDrawBoundingRect = enable; }
 
@@ -70,13 +76,6 @@ public:
              QWidget* widget = 0) noexcept override;
 
 private:
-  // make some methods inaccessible...
-  SymbolPinPreviewGraphicsItem() = delete;
-  SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) =
-      delete;
-  SymbolPinPreviewGraphicsItem& operator=(
-      const SymbolPinPreviewGraphicsItem& rhs) = delete;
-
   // General Attributes
   const SymbolPin& mPin;
   const ComponentSignal* mComponentSignal;

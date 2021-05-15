@@ -41,6 +41,10 @@ namespace librepcb {
  */
 class AttrTypeResistance final : public AttributeType {
 public:
+  // Prevent copies
+  AttrTypeResistance(const AttrTypeResistance& other) = delete;
+  AttrTypeResistance& operator=(const AttrTypeResistance& rhs) = delete;
+
   bool isValueValid(const QString& value) const noexcept;
   QString valueFromTr(const QString& value) const noexcept;
   QString printableValueTr(const QString& value,
@@ -51,10 +55,6 @@ public:
   }
 
 private:
-  // make some methods inaccessible...
-  AttrTypeResistance(const AttrTypeResistance& other) = delete;
-  AttrTypeResistance& operator=(const AttrTypeResistance& rhs) = delete;
-
   // Constructors / Destructor
   AttrTypeResistance() noexcept;
   ~AttrTypeResistance() noexcept;

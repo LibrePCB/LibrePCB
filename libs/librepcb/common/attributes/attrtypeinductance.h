@@ -41,6 +41,10 @@ namespace librepcb {
  */
 class AttrTypeInductance final : public AttributeType {
 public:
+  // Prevent copies
+  AttrTypeInductance(const AttrTypeInductance& other) = delete;
+  AttrTypeInductance& operator=(const AttrTypeInductance& rhs) = delete;
+
   bool isValueValid(const QString& value) const noexcept;
   QString valueFromTr(const QString& value) const noexcept;
   QString printableValueTr(const QString& value,
@@ -51,10 +55,6 @@ public:
   }
 
 private:
-  // make some methods inaccessible...
-  AttrTypeInductance(const AttrTypeInductance& other) = delete;
-  AttrTypeInductance& operator=(const AttrTypeInductance& rhs) = delete;
-
   // Constructors / Destructor
   AttrTypeInductance() noexcept;
   ~AttrTypeInductance() noexcept;

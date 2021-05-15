@@ -63,6 +63,10 @@ public:
                                  QWidget* parent = 0) noexcept;
   ~ProjectSettingsDialog() noexcept;
 
+  // Prevent copies
+  ProjectSettingsDialog(const ProjectSettingsDialog& other) = delete;
+  ProjectSettingsDialog& operator=(const ProjectSettingsDialog& rhs) = delete;
+
 private slots:
 
   // GUI Events
@@ -77,11 +81,6 @@ private slots:
   void on_btnNormDown_clicked();
 
 private:
-  // make some methods inaccessible...
-  ProjectSettingsDialog();
-  ProjectSettingsDialog(const ProjectSettingsDialog& other);
-  ProjectSettingsDialog& operator=(const ProjectSettingsDialog& rhs);
-
   // Private Methods
   void accept();
   void reject();
