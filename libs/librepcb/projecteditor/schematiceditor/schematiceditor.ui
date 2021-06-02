@@ -48,6 +48,7 @@
     </property>
     <addaction name="actionNew_Schematic_Page"/>
     <addaction name="actionSave_Project"/>
+    <addaction name="actionSave_Project_As"/>
     <addaction name="actionExportLppz"/>
     <addaction name="actionPDF_Export"/>
     <addaction name="actionExportAsSvg"/>
@@ -298,6 +299,15 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSave_Project_As">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/save.png</normaloff>:/img/actions/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save Project As</string>
    </property>
   </action>
   <action name="actionAbout">
