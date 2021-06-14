@@ -36,7 +36,6 @@ namespace librepcb {
 
 class GraphicsScene;
 class DefaultGraphicsLayerProvider;
-class UndoCommandGroup;
 
 namespace library {
 class Device;
@@ -69,10 +68,30 @@ class UnplacedComponentsDock;
 class UnplacedComponentsDock final : public QDockWidget {
   Q_OBJECT
 
+  struct DeviceMetadata {
+    /// Device library element UUID
+    Uuid deviceUuid;
+
+    /// Device library element name
+    QString deviceName;
+
+    /// Package library element UUID
+    Uuid packageUuid;
+
+    /// Package library element name
+    QString packageName;
+
+    /// Whether this device is pre-selected in schematics
+    bool selectedInSchematic;
+  };
+
 public:
   // Constructors / Destructor
-  explicit UnplacedComponentsDock(ProjectEditor& editor);
-  ~UnplacedComponentsDock();
+  UnplacedComponentsDock() = delete;
+  explicit UnplacedComponentsDock(ProjectEditor& editor,
+                                  QWidget* parent = nullptr) noexcept;
+  UnplacedComponentsDock(const UnplacedComponentsDock& other) = delete;
+  ~UnplacedComponentsDock() noexcept;
 
   // Getters
   int getUnplacedComponentsCount() const noexcept;
@@ -80,63 +99,71 @@ public:
   // Setters
   void setBoard(Board* board);
 
-signals:
+  // Operator Overloadings
+  UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs) = delete;
 
+signals:
   void unplacedComponentsCountChanged(int count);
   void addDeviceTriggered(ComponentInstance& cmp, const Uuid& deviceUuid,
                           Uuid footprintUuid);
 
-private slots:
-
-  void on_lstUnplacedComponents_currentItemChanged(QListWidgetItem* current,
-                                                   QListWidgetItem* previous);
-  void on_cbxSelectedDevice_currentIndexChanged(int index);
-  void on_cbxSelectedFootprint_currentIndexChanged(int index);
-  void on_btnAdd_clicked();
-  void on_pushButton_clicked();
-  void on_btnAddAll_clicked();
-
-private:
-  // make some methods inaccessible...
-  UnplacedComponentsDock();
-  UnplacedComponentsDock(const UnplacedComponentsDock& other);
-  UnplacedComponentsDock& operator=(const UnplacedComponentsDock& rhs);
-
-  // Private Methods
+private:  // Methods
   void updateComponentsList() noexcept;
+  void currentComponentListItemChanged(QListWidgetItem* current,
+                                       QListWidgetItem* previous) noexcept;
+  void currentDeviceIndexChanged(int index) noexcept;
+  void currentFootprintIndexChanged(int index) noexcept;
   void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
-  void setSelectedDeviceAndPackage(const library::Device* device,
-                                   const library::Package* package) noexcept;
+  void setSelectedDeviceAndPackage(const tl::optional<Uuid>& deviceUuid,
+                                   const library::Package* package,
+                                   bool packageOwned) noexcept;
   void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
-  void beginUndoCmdGroup() noexcept;
-  void addNextDeviceToCmdGroup(
-      ComponentInstance& cmp, const Uuid& deviceUuid,
-      const tl::optional<Uuid>& footprintUuid) noexcept;
-  void commitUndoCmdGroup() noexcept;
-  void addDeviceManually(ComponentInstance& cmp, const Uuid& deviceUuid,
-                         Uuid footprintUuid) noexcept;
+  void setSelectedDeviceAsDefault() noexcept;
+  void addSelectedDeviceToBoard() noexcept;
+  void addSimilarDevicesToBoard() noexcept;
+  void addPreSelectedDevicesToBoard() noexcept;
+  void addAllDevicesToBoard() noexcept;
+  void autoAddDevicesToBoard(
+      bool onlyWithPreSelectedDevice,
+      const tl::optional<Uuid>& libCmpUuidFilter) noexcept;
 
-  // General
+  /**
+   * @brief Get all available devices for a specific component instance
+   *
+   * @param cmp   The desired component instance.
+   *
+   * @return  Metadata of all available devices, and the list index of the
+   *          best match / most relevant device.
+   */
+  std::pair<QList<DeviceMetadata>, int> getAvailableDevices(
+      ComponentInstance& cmp) const noexcept;
+  tl::optional<Uuid> getSuggestedFootprint(const Uuid& libPkgUuid) const
+      noexcept;
+
+private:  // Data
   ProjectEditor& mProjectEditor;
   Project& mProject;
   Board* mBoard;
-  Ui::UnplacedComponentsDock* mUi;
-  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
-  GraphicsScene* mFootprintPreviewGraphicsScene;
-  library::FootprintPreviewGraphicsItem* mFootprintPreviewGraphicsItem;
-  ComponentInstance* mSelectedComponent;
-  const library::Device* mSelectedDevice;
-  const library::Package* mSelectedPackage;
-  tl::optional<Uuid> mSelectedFootprintUuid;
-  QMetaObject::Connection mCircuitConnection1;
-  QMetaObject::Connection mCircuitConnection2;
-  QMetaObject::Connection mBoardConnection1;
-  QMetaObject::Connection mBoardConnection2;
-  Point mNextPosition;
+  QScopedPointer<Ui::UnplacedComponentsDock> mUi;
+
+  // State
   bool mDisableListUpdate;
+  Point mNextPosition;
   QHash<Uuid, Uuid> mLastDeviceOfComponent;
-  QHash<Uuid, tl::optional<Uuid>> mLastFootprintOfDevice;
-  QScopedPointer<UndoCommandGroup> mCurrentUndoCmdGroup;
+  QHash<Uuid, Uuid> mLastFootprintOfPackage;
+  QList<DeviceMetadata> mCurrentDevices;
+
+  // Current selection
+  ComponentInstance* mSelectedComponent;
+  tl::optional<Uuid> mSelectedDeviceUuid;
+  const library::Package* mSelectedPackage;
+  bool mSelectedPackageOwned;
+  tl::optional<Uuid> mSelectedFootprintUuid;
+
+  // Preview graphics scene
+  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
+  QScopedPointer<GraphicsScene> mPreviewGraphicsScene;
+  QScopedPointer<library::FootprintPreviewGraphicsItem> mPreviewGraphicsItem;
 };
 
 /*******************************************************************************
