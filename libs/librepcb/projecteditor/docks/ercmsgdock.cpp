@@ -215,25 +215,32 @@ void ErcMsgDock::updateTopLevelItemTexts() noexcept {
   QTreeWidgetItem* item;
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitError)];
   item->setText(0, tr("Circuit Errors (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::CircuitWarning)];
   item->setText(0, tr("Circuit Warnings (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicError)];
   item->setText(0, tr("Schematic Errors (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item =
       mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning)];
   item->setText(0, tr("Schematic Warnings (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardError)];
   item->setText(0, tr("Board Errors (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning)];
   item->setText(0, tr("Board Warnings (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)];
   item->setText(0, tr("Approved (%1)").arg(item->childCount()));
+  item->setHidden(item->childCount() == 0);
 
   setWindowTitle(tr("ERC [%1]").arg(countOfNonIgnoredErcMessages));
 }
