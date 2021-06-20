@@ -173,11 +173,13 @@ bool LibraryOverviewWidget::remove() noexcept {
   if (QListWidget* list = dynamic_cast<QListWidget*>(focusWidget())) {
     QHash<QListWidgetItem*, FilePath> selectedItemPaths =
         getElementListItemFilePaths(list->selectedItems());
-    removeItems(selectedItemPaths);
-    return true;
-  } else {
-    return false;
+    if (!selectedItemPaths.empty()) {
+      removeItems(selectedItemPaths);
+      return true;
+    }
   }
+
+  return false;
 }
 
 /*******************************************************************************
