@@ -5,11 +5,32 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
+# WARNING: Read the release workflow documentation (at https://developers.librepcb.org)
+#          before making changes to the version numbers!
+
+# Application version:
+#  - Always three numbers (MAJOR.MINOR.PATCH)!
+#  - Unstable versions (non-release branches): Suffix "-unstable", e.g.
+#    "1.0.0-unstable"
+#  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
+#  - Releases (on release branches):           No suffix, e.g. "1.0.0"
+set(LIBREPCB_APP_VERSION "0.2.0-unstable")
+
+# File format version:
+#  - Must be equal to the major version of APP_VERSION!
+#  - If APP_VERSION < 1.0.0:   Two numbers, e.g. "0.2" for APP_VERSION=="0.2.x"
+#  - If APP_VERSION >= 1.0.0:  Only one number, e.g. "2" for APP_VERSION=="2.x.y"
+set(LIBREPCB_FILE_FORMAT_VERSION "0.2")
+
+# File format stable flag:
+#  - On all non-release branches: false
+#  - On release branches: true
+# Note: Do not use a CMake boolean (ON / TRUE), use a C++ style boolean
+# string instead ("true" / "false").
+set(LIBREPCB_FILE_FORMAT_STABLE "false")
+
 # Define project
-project(librepcb
-    VERSION 0.1.5
-    LANGUAGES CXX
-)
+project(librepcb LANGUAGES CXX)
 
 # Configure module path
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
