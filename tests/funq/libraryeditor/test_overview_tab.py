@@ -38,6 +38,9 @@ def delete_action_helper(le, widget_name, valid, tabs):
     tabwidget = le.widget('libraryEditorStackedWidget')
     widget = le.widget(widget_name)
     widget.activate_focus()
+    if valid:
+        # Select first item in the list
+        widget.click_item(widget.model().items().items[0])
     le.action('libraryEditorActionRemove').trigger(blocking=False)
     if valid:
         le.widget('libraryEditorOverviewMsgBoxBtnCancel').click()
