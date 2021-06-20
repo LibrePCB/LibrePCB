@@ -26,7 +26,7 @@ trap "git checkout ${HEAD} && test ${STASH} -ne 1 || git stash pop" EXIT
 readonly COMMITS=$(git log --pretty=oneline "${START}...${END}" | cut -d' ' -f1 | tac)
 for commit in ${COMMITS[@]}; do
   git checkout $commit
-  qmake -r ../librepcb.pro > "build_${commit}.log" 2>&1
+  cmake .. > "build_${commit}.log" 2>&1
   make -j$(nproc) >> "build_${commit}.log" 2>&1
 done
 

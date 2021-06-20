@@ -25,7 +25,7 @@
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../boardeditor.h"
-#include "ui_boardeditor.h"
+#include "../ui_boardeditor.h"
 
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/toolbox.h>

@@ -71,7 +71,8 @@ TEST(ApplicationTest, testGetResourcesDir) {
   // as the tests can't be installed, the resources must be located in the
   // repository root
   FilePath repoRoot = qApp->getResourcesDir().getParentDir().getParentDir();
-  EXPECT_TRUE(repoRoot.getPathTo("librepcb.pro").isExistingFile());
+  EXPECT_TRUE(repoRoot.getPathTo("LICENSE.txt").isExistingFile());
+  EXPECT_TRUE(repoRoot.getPathTo("CMakeLists.txt").isExistingFile());
 }
 
 TEST(ApplicationTest, testGetResourcesFilePath) {

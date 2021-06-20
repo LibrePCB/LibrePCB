@@ -21,7 +21,8 @@ jobs:
         IMAGE: librepcb/librepcb-dev:ubuntu-20.04-4
       Ubuntu_2004_Unbundled:
         IMAGE: librepcb/librepcb-dev:ubuntu-20.04-4
-        UNBUNDLE: "quazip polyclipping"
+        #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
+        UNBUNDLE_POLYCLIPPING: true
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
   container: $[ variables['IMAGE'] ]
   steps:
@@ -35,10 +36,10 @@ jobs:
     displayName: Install Dependencies
   - bash: rm -rf libs/quazip
     displayName: Remove bundled quazip lib
-    condition: and(succeeded(), contains(variables['UNBUNDLE'], 'quazip'))
+    condition: and(succeeded(), eq(variables['UNBUNDLE_QUAZIP'], 'true'))
   - bash: rm -rf libs/polyclipping
     displayName: Remove bundled polyclipping lib
-    condition: and(succeeded(), contains(variables['UNBUNDLE'], 'polyclipping'))
+    condition: and(succeeded(), eq(variables['UNBUNDLE_POLYCLIPPING'], 'true'))
   - bash: rm -rf libs/hoedown
     displayName: Remove bundled hoedown lib
     condition: and(succeeded(), eq(variables['NO_HOEDOWN'], 'true'))
@@ -53,10 +54,7 @@ jobs:
   - bash: ./ci/build_installer.sh
     displayName: Build Installer
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-  - bash: xvfb-run -a ./build/output/qztest
-    displayName: Run QuaZip Unittests
-    condition: and(succeeded(), not(contains(variables['UNBUNDLE'], 'quazip')))
-  - bash: xvfb-run -a ./build/output/librepcb-unittests
+  - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests

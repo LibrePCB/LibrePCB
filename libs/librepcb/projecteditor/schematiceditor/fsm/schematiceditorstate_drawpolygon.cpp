@@ -23,7 +23,7 @@
 #include "schematiceditorstate_drawpolygon.h"
 
 #include "../schematiceditor.h"
-#include "ui_schematiceditor.h"
+#include "../ui_schematiceditor.h"
 
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/graphics/graphicslayer.h>

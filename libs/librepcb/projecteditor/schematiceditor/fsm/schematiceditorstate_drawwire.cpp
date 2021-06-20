@@ -24,7 +24,7 @@
 
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../../cmd/cmdcombineschematicnetsegments.h"
-#include "ui_schematiceditor.h"
+#include "../ui_schematiceditor.h"
 
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/undostack.h>

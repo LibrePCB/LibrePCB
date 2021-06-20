@@ -21,9 +21,7 @@ jobs:
     displayName: Build Bundle
   - bash: ./ci/build_installer.sh
     displayName: Build Installer
-  - bash: ./build/output/qztest
-    displayName: Run QuaZip Unittests
-  - bash: ./build/output/librepcb-unittests
+  - bash: ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: pytest -v --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests

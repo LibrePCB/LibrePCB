@@ -23,7 +23,7 @@
 #include "boardeditorstate_addvia.h"
 
 #include "../boardeditor.h"
-#include "ui_boardeditor.h"
+#include "../ui_boardeditor.h"
 
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/undostack.h>

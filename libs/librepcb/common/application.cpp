@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "application.h"
 
+#include "build_env.h"
 #include "dialogs/aboutdialog.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
@@ -90,11 +91,6 @@ Application::Application(int& argc, char** argv) noexcept
   QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
   mBuildDate = QDateTime(buildDate, buildTime);
 
-  // check git revision
-  if (mGitRevision.isEmpty()) {
-    qWarning() << "Git revision not compiled into the executable!";
-  }
-
   // check file format version
   if (!mFileFormatVersion.isPrefixOf(mAppVersion)) {
     qFatal(
@@ -106,22 +102,16 @@ Application::Application(int& argc, char** argv) noexcept
   Q_ASSERT(executableFilePath.isValid());
 
   // determine the path to the resources directory (e.g. /usr/share/librepcb)
-  FilePath buildOutputDirPath(BUILD_OUTPUT_DIRECTORY);
-  bool runningFromBuildOutput =
-      executableFilePath.isLocatedInDir(buildOutputDirPath);
-  if (runningFromBuildOutput) {
-    // The executable is located inside the build output directory, so we assume
-    // this is a developer build and thus we use the "share" directory from the
-    // repository root.
-    mResourcesDir = FilePath(SHARE_DIRECTORY_SOURCE).getPathTo("librepcb");
-  } else {
-    // The executable is located outside the build output directory, so we
-    // assume this is a packaged build and thus we use the "share" directory
-    // which is bundled with the application (must be located at "../share"
-    // relative to the executable).
-    mResourcesDir =
-        executableFilePath.getParentDir().getPathTo("../share/librepcb");
-  }
+#ifdef SHARE_DIRECTORY_SOURCE
+  // This is a developer build and thus we use the "share" directory from the
+  // repository root.
+  mResourcesDir = FilePath(SHARE_DIRECTORY_SOURCE).getPathTo("librepcb");
+#else
+  // This is a non-developer build and thus we use the "share" directory
+  // which is bundled with the application (must be located at "../share"
+  // relative to the executable).
+  mResourcesDir = executableFilePath.getParentDir().getPathTo("../share/librepcb");
+#endif
 
   // warn if runtime resource files are not found
   if (!getResourcesFilePath("README.md").isExistingFile()) {
@@ -130,9 +120,11 @@ Application::Application(int& argc, char** argv) noexcept
     qCritical() << "Expected resources location:" << mResourcesDir.toNative();
     qCritical() << "Executable location:        "
                 << executableFilePath.toNative();
-    qCritical() << "Build output directory:     "
-                << buildOutputDirPath.toNative();
-    qCritical() << "Is developer build:         " << runningFromBuildOutput;
+#ifdef SHARE_DIRECTORY_SOURCE
+    qCritical() << "Source share directory:     " << QString(SHARE_DIRECTORY_SOURCE);
+#else
+    qCritical() << "Source share directory:      Not set";
+#endif
   }
 
   // load all bundled TrueType/OpenType fonts
