@@ -58,17 +58,13 @@ void AsyncCopyOperation::run() noexcept {
   emit started();
 
   try {
-    // if (!mSource.isExistingDir()) {
-    //  throw LogicError(__FILE__, __LINE__,
-    //                   tr("The directory \"%1\" does not exist.")
-    //                       .arg(mSource.toNative()));
-    //}
-    // if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
-    //  throw LogicError(
-    //      __FILE__, __LINE__,
-    //      tr("The file or directory \"%1\" exists already.")
-    //          .arg(mDestination.toNative()));
-    //}
+    // Abort if destination already exists. Otherwise it would be deleted
+    // during cleanup, which might not be intended.
+    if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
+      throw LogicError(__FILE__, __LINE__,
+                       tr("The file or directory \"%1\" exists already.")
+                           .arg(mDestination.toNative()));
+    }
 
     // First copy to a temporary directory and rename it afterwards to make
     // the operation "more atomic", i.e. avoiding half-copied destination in
@@ -76,6 +72,7 @@ void AsyncCopyOperation::run() noexcept {
     emit progressStatus(tr("Removing temporary directory..."));
     FilePath tmpDst(mDestination.toStr() % "~");
     FileUtils::removeDirRecursively(tmpDst);  // can throw
+    FileUtils::makePath(tmpDst);  // can throw
 
     // Get list of entries to copy
     emit progressStatus(tr("Looking for files to copy..."));
@@ -87,7 +84,7 @@ void AsyncCopyOperation::run() noexcept {
         FilePath src = files.at(i);
         QString srcRelative = src.toRelative(mSource);
         FilePath dst = tmpDst.getPathTo(srcRelative);
-        if (i % (files.count() / 100) == 0) {
+        if (i % ((files.count() / 100) + 1) == 0) {
           emit progressStatus(
               tr("Copy file %1 of %2...").arg(i + 1).arg(files.count()));
           emit progressPercent((95 * (i + 1)) / files.count());
@@ -104,9 +101,9 @@ void AsyncCopyOperation::run() noexcept {
       emit progressPercent(100);
       emit succeeded();
     } catch (const Exception& e) {
-      // clean up
-      FileUtils::removeDirRecursively(mDestination);  // can throw
-      FileUtils::removeDirRecursively(tmpDst);  // can throw
+      // clean up, but ignore failures to avoid misleading error messages
+      QDir(mDestination.toStr()).removeRecursively();
+      QDir(tmpDst.toStr()).removeRecursively();
       throw e;
     }
   } catch (const Exception& e) {
