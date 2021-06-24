@@ -199,6 +199,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->menuView->addAction(mDrcMessagesDock->toggleViewAction());
 
   // add all boards to the menu and connect to project signals
+  mUi->tabBar->setVisible(false);  // hide since there are no boards yet
   for (int i = 0; i < mProject.getBoards().count(); i++) boardAdded(i);
   connect(&mProject, &Project::boardAdded, this, &BoardEditor::boardAdded);
   connect(&mProject, &Project::boardRemoved, this, &BoardEditor::boardRemoved);
@@ -393,6 +394,9 @@ void BoardEditor::boardAdded(int newIndex) {
   mBoardListActionGroup.addAction(newAction);
 
   mUi->tabBar->insertTab(newIndex, *board->getName());
+
+  // To avoid wasting space, only show the tab bar if there are multiple boards.
+  mUi->tabBar->setVisible(mUi->tabBar->count() > 1);
 }
 
 void BoardEditor::boardRemoved(int oldIndex) {
@@ -402,6 +406,9 @@ void BoardEditor::boardRemoved(int oldIndex) {
   delete action;
 
   mUi->tabBar->removeTab(oldIndex);  // calls setActiveBoardIndex() if needed
+
+  // To avoid wasting space, only show the tab bar if there are multiple boards.
+  mUi->tabBar->setVisible(mUi->tabBar->count() > 1);
 }
 
 /*******************************************************************************
