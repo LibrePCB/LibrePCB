@@ -17,14 +17,12 @@ jobs:
     displayName: Install Dependencies
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
+  - bash: ./build/tests/unittests/librepcb-unittests
+    displayName: Run LibrePCB Unittests
   - bash: ./ci/build_mac_bundle.sh
     displayName: Build Bundle
   - bash: ./ci/build_installer.sh
     displayName: Build Installer
-  - bash: ./build/output/qztest
-    displayName: Run QuaZip Unittests
-  - bash: ./build/output/librepcb-unittests
-    displayName: Run LibrePCB Unittests
   - bash: pytest -v --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
   - bash: pytest -v --librepcb-executable="build/install/opt/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq

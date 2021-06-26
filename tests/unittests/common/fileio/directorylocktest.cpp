@@ -58,13 +58,10 @@ protected:
 
   FilePath getTestProcessExePath() const noexcept {
     FilePath generatedDir(qApp->applicationDirPath());
-#if defined(Q_OS_OSX)  // Mac OS X
-    return generatedDir.getPathTo(
-        "uuid-generator.app/Contents/MacOS/uuid-generator");
-#elif defined(Q_OS_UNIX)  // UNIX/Linux
-    return generatedDir.getPathTo("uuid-generator");
+#if defined(Q_OS_UNIX) || defined(Q_OS_OSX)  // UNIX/Linux or macOS
+    return generatedDir.getPathTo("dummy-binary");
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
-    return generatedDir.getPathTo("uuid-generator.exe");
+    return generatedDir.getPathTo("dummy-binary.exe");
 #else
 #error "Unknown operating system!"
 #endif

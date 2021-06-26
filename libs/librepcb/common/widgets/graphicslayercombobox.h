@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../graphics/graphicslayername.h"
 
-#include <optional/tl/optional.hpp>
+#include <optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>

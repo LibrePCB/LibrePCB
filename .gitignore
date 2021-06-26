@@ -35,3 +35,6 @@ i18n/*.qm
 .pytest_cache/
 __pycache__/
 *.pyc
+
+# CMake
+CMakeLists.txt.user

@@ -34,7 +34,6 @@
 #include "../boardplanepropertiesdialog.h"
 #include "../boardviapropertiesdialog.h"
 #include "../deviceinstancepropertiesdialog.h"
-#include "ui_boardeditor.h"
 
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>

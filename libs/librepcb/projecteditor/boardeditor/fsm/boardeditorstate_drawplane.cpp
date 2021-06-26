@@ -23,7 +23,6 @@
 #include "boardeditorstate_drawplane.h"
 
 #include "../boardeditor.h"
-#include "ui_boardeditor.h"
 
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsview.h>

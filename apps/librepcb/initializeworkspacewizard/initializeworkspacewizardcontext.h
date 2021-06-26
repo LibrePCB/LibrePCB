@@ -26,7 +26,7 @@
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/units/lengthunit.h>
 #include <librepcb/common/version.h>
-#include <optional/tl/optional.hpp>
+#include <optional.hpp>
 
 #include <QtCore>
 

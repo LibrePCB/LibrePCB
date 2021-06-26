@@ -27,7 +27,7 @@
 #include <QHostInfo>
 #include <QtCore>
 
-#if defined(Q_OS_OSX)  // Mac OS X
+#if defined(Q_OS_OSX)  // macOS
 #include <sys/types.h>
 #include <system_error>
 
@@ -100,7 +100,7 @@ const QString& SystemInfo::getUsername() noexcept {
 
 const QString& SystemInfo::getFullUsername() noexcept {
   if (sFullUsername.isNull()) {
-#if defined(Q_OS_OSX)  // Mac OS X
+#if defined(Q_OS_OSX)  // macOS
     QString command(
         "finger `whoami` | awk -F: '{ print $3 }' | head -n1 | sed 's/^ //'");
     QProcess process;
@@ -211,7 +211,7 @@ bool SystemInfo::isProcessRunning(qint64 pid) {
 
 QString SystemInfo::getProcessNameByPid(qint64 pid) {
   QString processName;
-#if defined(Q_OS_OSX)  // Mac OS X
+#if defined(Q_OS_OSX)  // macOS
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
   errno = 0;

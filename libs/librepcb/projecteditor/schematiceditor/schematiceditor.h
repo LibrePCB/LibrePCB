@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "ui_schematiceditor.h"
+
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 
 #include <QtCore>

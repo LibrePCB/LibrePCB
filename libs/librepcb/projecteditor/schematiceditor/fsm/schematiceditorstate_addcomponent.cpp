@@ -25,7 +25,7 @@
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"
 #include "../../dialogs/addcomponentdialog.h"
-#include "ui_schematiceditor.h"
+#include "../schematiceditor.h"
 
 #include <librepcb/common/attributes/attributetype.h>
 #include <librepcb/common/attributes/attributeunit.h>

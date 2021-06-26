@@ -9,9 +9,10 @@ jobs:
       CC: 'ccache gcc'
       CXX: 'ccache g++'
       CCACHE_DIR: $(Pipeline.Workspace)/.ccache
+      CMAKE_GENERATOR: 'MinGW Makefiles'
     strategy:
       matrix:
-        Qt_5_15_0_MinGW_32bit:
+        Qt_5_15_MinGW_32bit:
           IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.2-32bit-1
           DEPLOY: true
     container: $[ variables['IMAGE'] ]
@@ -34,9 +35,7 @@ jobs:
     - bash: ./ci/build_installer.sh
       displayName: Build Installer
       condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-    - script: build\\output\\qztest.exe
-      displayName: Run QuaZip Unittests
-    - script: build\\output\\librepcb-unittests.exe
+    - script: build\\tests\\unittests\\librepcb-unittests.exe
       displayName: Run LibrePCB Unittests
     - script: pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
       displayName: Run LibrePCB-CLI Functional Tests
