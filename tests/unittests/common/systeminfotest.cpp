@@ -101,11 +101,15 @@ TEST_F(SystemInfoTest, testIsProcessRunning) {
   // check another running process
   {
     QProcess process;
-    process.start(getTestProcessExePath().toStr());
+    QString fullProgramName = getTestProcessExePath().toStr();
+    QStringList callArguments; // no args needed
+    process.start(fullProgramName, callArguments);
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
+
     qint64 pid = process.processId();
     EXPECT_TRUE(SystemInfo::isProcessRunning(pid));
+
     process.kill();
     success = process.waitForFinished();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
@@ -127,25 +131,52 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
   // check another running process
   {
     QProcess process;
-    process.start(getTestProcessExePath().toStr());
+    QString fullProgramName = getTestProcessExePath().toStr();
+    QStringList callArguments; // no args needed
+    process.start(fullProgramName, callArguments);
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
+
     qint64 pid = process.processId();
     ASSERT_NE(pid, qApp->applicationPid());
+
     // the next line is an ugly workaround for infrequent test failures on Mac
     // OS X
     QThread::msleep(200);
     QThread::yieldCurrentThread();
     QString processName = SystemInfo::getProcessNameByPid(pid);
     EXPECT_EQ(getTestProcessExeName(), processName) << qPrintable(processName);
+
     process.kill();
     success = process.waitForFinished();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
+
     // the next line is an ugly workaround for infrequent test failures on Mac
     // OS X
     QThread::msleep(200);
     QThread::yieldCurrentThread();
-    processName = SystemInfo::getProcessNameByPid(pid);
+
+    // the process has been killed, getProcessNameByPid() can:
+    // - return an empty string when the process does not exist anymore
+    // - throw a RuntimeError when it does exist but is not running
+    // -> test for both possible reactions
+    try {
+        processName = SystemInfo::getProcessNameByPid(pid);
+    }
+    catch(RuntimeError& exception) {
+        // check for a matching message inserted in the exception at throw
+        // the string is partially copied from systeminfo.cpp and may change
+        QString expectedMessage = "QueryFullProcessImageNameW() failed";
+
+        if (exception.getMsg().contains(expectedMessage)) {
+            processName = QString(); // to make the test pass
+        }
+        else {
+            // keep the exception message as the output of the test
+            processName = exception.getMsg();
+        }
+    }
+
     EXPECT_EQ(QString(), processName) << qPrintable(processName);
   }
 
