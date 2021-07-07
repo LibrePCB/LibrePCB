@@ -4,6 +4,9 @@ exists(custom.pri):include(custom.pri)
 # set prefix for "make install"
 isEmpty(PREFIX):PREFIX = /usr/local
 
+# set installation path for libraries
+isEmpty(LIBDIR):LIBDIR = $${PREFIX}/lib
+
 # set destination path for generated files
 DESTDIR = $$relative_path($$shadowed("$$PWD/output"), $$OUT_PWD)
 

@@ -18,7 +18,7 @@ QT += core widgets xml opengl network sql printsupport
 isEmpty(UNBUNDLE) {
     CONFIG += staticlib
 } else {
-    target.path = $${PREFIX}/lib
+    target.path = $${LIBDIR}
     INSTALLS += target
 }
 
