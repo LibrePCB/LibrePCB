@@ -17,6 +17,8 @@ isEmpty(UNBUNDLE) {
     INSTALLS += target
 }
 
+LIBS += -L../../../output -llibrepcbcommon -llibrepcblibrary -lparseagle
+
 INCLUDEPATH += \
     ../../ \
     ../../parseagle \
