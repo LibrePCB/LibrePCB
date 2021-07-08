@@ -16,15 +16,19 @@ version can't be opened again with any other (stable or unstable) version!!!".
 So it's highly recommended to use a dedicated workspace for testing purposes,
 then the files in your productive workspace are safe. When working with real
 projects or libraries, make a backup first or at least use a version control
-system so any modifications can be reverted afterwards.
+system so any modifications can be reverted afterwards. This can also be achieved
+by setting the environment variable `LIBREPCB_WORKSPACE` to the workspace
+you want to use. If you use QtCreator, this variable can be set in the run
+configuration, so that this workspace is only used when starting LibrePCB from
+within QtCreator.
 
 Unstable application versions show a warning message box on every startup to
-protect users from (accidentylly) beaking their files (for example if they are
+protect users from (accidentally) beaking their files (for example if they are
 trying out a nightly build). For developers this message box is very annoying,
 so you can set the environment variable `LIBREPCB_DISABLE_UNSTABLE_WARNING=1` to
-disable it. If you use QtCreator, this variable can be set in the run
-configuration, so the warning is only disabled when starting LibrePCB from
-within QtCreator. But be careful with the disabled warning! :)
+disable it. This variable can also be set in the run configuration, so the
+warning is only disabled when starting LibrePCB from within QtCreator, similar
+to the one above. But be careful with the disabled warning! :)
 
 
 # Git {#doc_developers_git}

@@ -97,12 +97,33 @@ int main(int argc, char* argv[]) {
   // This warning *must* come that early to be really sure that no files are
   // overwritten with unstable content!
   if (isFileFormatStableOrAcceptUnstable()) {
-    // Get the path of the workspace to open (may show the first run wizard)
-    FilePath wsPath = determineWorkspacePath();
+    const char* WS_VAR_NAME("LIBREPCB_WORKSPACE");
+    QString wsEnvStr = qgetenv(WS_VAR_NAME);
 
-    // Open the workspace and catch the return value
-    if (wsPath.isValid()) {
-      retval = openWorkspace(wsPath);
+    if (wsEnvStr == "") {
+      // Get the path of the workspace to open (may show the first run wizard)
+      FilePath wsPath = determineWorkspacePath();
+
+      // Open the workspace and catch the return value
+      if (wsPath.isValid()) {
+        retval = openWorkspace(wsPath);
+      }
+    } else {
+      // The user has indicated they want to try to open a specific workspace
+      FilePath wsPath(wsEnvStr);
+      if (Workspace::isValidWorkspacePath(wsPath)) {
+        retval = openWorkspace(wsPath);
+      } else {
+        qCritical() << WS_VAR_NAME << "set to invalid workspace:" << wsEnvStr;
+        QMessageBox::critical(
+            0, Application::translate("Workspace", "Cannot open the workspace"),
+            QString(Application::translate("Workspace",
+                                           "The workspace \"%1\" cannot be "
+                                           "opened: Not a valid workspace.\n\n"
+                                           "Consider updating or clearing the "
+                                           "\"%2\" environment variable."))
+                .arg(wsEnvStr, WS_VAR_NAME));
+      }
     }
   }
 
