@@ -49,7 +49,7 @@ RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
       const QList<SExpression>& childs = root.getChildren("project");
       foreach (const SExpression& child, childs) {
-        QString path = child.getValueOfFirstChild<QString>(true);
+        QString path = child.getChild("@0").getValue();
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
         mAllProjects.append(absPath);
       }

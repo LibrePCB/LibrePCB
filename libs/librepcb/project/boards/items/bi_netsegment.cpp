@@ -87,12 +87,13 @@ BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
   }
 }
 
-BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
+BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node,
+                             const Version& fileFormat)
   : BI_Base(board),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mNetSignal(nullptr) {
   try {
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
+    Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
     mNetSignal =
         mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if (!mNetSignal) {
@@ -103,7 +104,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
 
     // Load all vias
     foreach (const SExpression& node, node.getChildren("via")) {
-      BI_Via* via = new BI_Via(*this, node);
+      BI_Via* via = new BI_Via(*this, node, fileFormat);
       if (getViaByUuid(via->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
@@ -115,7 +116,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
 
     // Load all netpoints
     foreach (const SExpression& child, node.getChildren("junction")) {
-      BI_NetPoint* netpoint = new BI_NetPoint(*this, child);
+      BI_NetPoint* netpoint = new BI_NetPoint(*this, child, fileFormat);
       if (getNetPointByUuid(netpoint->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
@@ -128,7 +129,7 @@ BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node)
     // Load all netlines
     foreach (const SExpression& node,
              node.getChildren("netline") + node.getChildren("trace")) {
-      BI_NetLine* netline = new BI_NetLine(*this, node);
+      BI_NetLine* netline = new BI_NetLine(*this, node, fileFormat);
       if (getNetLineByUuid(netline->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,

@@ -74,7 +74,7 @@ public:
   ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
                          const ElementName& name_en_US,
                          const QString& desc_en_US) noexcept;
-  explicit ComponentSymbolVariant(const SExpression& node);
+  ComponentSymbolVariant(const SExpression& node, const Version& fileFormat);
   ~ComponentSymbolVariant() noexcept;
 
   // Getters: Attributes

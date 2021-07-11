@@ -47,19 +47,22 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
+ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node,
+                                     const Version& fileFormat)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mName(node.getValueByPath<CircuitIdentifier>("name", true)),
-    mValue(node.getValueByPath<QString>("value")),
-    mDefaultDeviceUuid(node.getValueByPath<tl::optional<Uuid>>("lib_device")),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
+    mValue(node.getChild("value/@0").getValue()),
+    mDefaultDeviceUuid(deserialize<tl::optional<Uuid>>(
+        node.getChild("lib_device/@0"), fileFormat)),
     mLibComponent(nullptr),
     mCompSymbVar(nullptr),
     mAttributes() {
   // read general attributes
-  Uuid cmpUuid = node.getValueByPath<Uuid>("lib_component");
+  Uuid cmpUuid =
+      deserialize<Uuid>(node.getChild("lib_component/@0"), fileFormat);
   mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
   if (!mLibComponent) {
     throw RuntimeError(
@@ -68,18 +71,19 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node)
            "project's library!")
             .arg(cmpUuid.toStr()));
   }
-  Uuid symbVarUuid = node.getValueByPath<Uuid>("lib_variant");
+  Uuid symbVarUuid =
+      deserialize<Uuid>(node.getChild("lib_variant/@0"), fileFormat);
   mCompSymbVar =
       mLibComponent->getSymbolVariants().get(symbVarUuid).get();  // can throw
 
   // load all component attributes
-  mAttributes.reset(new AttributeList(node));  // can throw
+  mAttributes.reset(new AttributeList(node, fileFormat));  // can throw
 
   // load all signal instances
   foreach (const SExpression& node,
            node.getChildren("sig") + node.getChildren("signal")) {
     ComponentSignalInstance* signal =
-        new ComponentSignalInstance(mCircuit, *this, node);
+        new ComponentSignalInstance(mCircuit, *this, node, fileFormat);
     if (mSignals.contains(signal->getCompSignal().getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,

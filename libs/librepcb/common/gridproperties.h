@@ -49,7 +49,7 @@ public:
 
   // Constructors / Destructor
   GridProperties() noexcept;
-  explicit GridProperties(const SExpression& node);
+  GridProperties(const SExpression& node, const Version& fileFormat);
   GridProperties(Type_t type, const PositiveLength& interval,
                  const LengthUnit& unit) noexcept;
   GridProperties(const GridProperties& other) noexcept;
@@ -86,7 +86,7 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const GridProperties::Type_t& obj) {
+inline SExpression serialize(const GridProperties::Type_t& obj) {
   switch (obj) {
     case GridProperties::Type_t::Off:
       return SExpression::createToken("off");
@@ -100,9 +100,10 @@ inline SExpression serializeToSExpression(const GridProperties::Type_t& obj) {
 }
 
 template <>
-inline GridProperties::Type_t deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline GridProperties::Type_t deserialize(const SExpression& sexpr,
+                                          const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   if (str == "off")
     return GridProperties::Type_t::Off;
   else if (str == "lines")
@@ -112,7 +113,7 @@ inline GridProperties::Type_t deserializeFromSExpression(
   else
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString(GridProperties::tr("Unknown grid type: \"%1\"")).arg(str));
+        GridProperties::tr("Unknown grid type: \"%1\"").arg(str));
 }
 
 /*******************************************************************************

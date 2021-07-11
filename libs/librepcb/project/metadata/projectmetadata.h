@@ -52,7 +52,7 @@ public:
   ProjectMetadata(const Uuid& uuid, const ElementName& name,
                   const QString& author, const QString& version,
                   const QDateTime& created, const QDateTime& lastModified);
-  explicit ProjectMetadata(const SExpression& node);
+  ProjectMetadata(const SExpression& node, const Version& fileFormat);
   ~ProjectMetadata() noexcept;
 
   // Getters

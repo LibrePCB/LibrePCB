@@ -62,7 +62,8 @@ public:
   // Constructors / Destructor
   WorkspaceSettings() = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
-  explicit WorkspaceSettings(const FilePath& fp, QObject* parent = nullptr);
+  explicit WorkspaceSettings(const FilePath& fp, const Version& fileFormat,
+                             QObject* parent = nullptr);
   ~WorkspaceSettings() noexcept;
 
   /**

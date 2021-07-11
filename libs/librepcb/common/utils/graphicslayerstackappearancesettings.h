@@ -55,7 +55,8 @@ public:
       IF_GraphicsLayerProvider& layers,
       const GraphicsLayerStackAppearanceSettings& other) noexcept;
   GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
-                                       const SExpression& node);
+                                       const SExpression& node,
+                                       const Version& fileFormat);
   ~GraphicsLayerStackAppearanceSettings() noexcept;
 
   /// @copydoc librepcb::SerializableObject::serialize()

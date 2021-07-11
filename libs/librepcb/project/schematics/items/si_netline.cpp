@@ -45,10 +45,11 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node)
+SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node,
+                       const Version& fileFormat)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
-    mNetLine(node),
+    mNetLine(node, fileFormat),
     mPosition(),
     mStartPoint(getAnchor(mNetLine.getStartPoint())),
     mEndPoint(getAnchor(mNetLine.getEndPoint())) {

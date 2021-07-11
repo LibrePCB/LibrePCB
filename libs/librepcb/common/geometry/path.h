@@ -57,7 +57,7 @@ public:
   Path(const Path& other) noexcept;
   explicit Path(const QVector<Vertex>& vertices) noexcept
     : mVertices(vertices) {}
-  explicit Path(const SExpression& node);
+  Path(const SExpression& node, const Version& fileFormat);
   ~Path() noexcept {}
 
   // Getters

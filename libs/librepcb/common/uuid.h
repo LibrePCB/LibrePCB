@@ -165,33 +165,32 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Uuid& obj) {
+inline SExpression serialize(const Uuid& obj) {
   return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline Uuid deserializeFromSExpression(const SExpression& sexpr,
-                                       bool throwIfEmpty) {
-  return Uuid::fromString(sexpr.getStringOrToken(throwIfEmpty));
+inline Uuid deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return Uuid::fromString(sexpr.getValue());  // can throw
 }
 
 template <>
-inline SExpression serializeToSExpression(const tl::optional<Uuid>& obj) {
+inline SExpression serialize(const tl::optional<Uuid>& obj) {
   if (obj) {
-    return serializeToSExpression(*obj);
+    return serialize(*obj);
   } else {
     return SExpression::createToken("none");
   }
 }
 
 template <>
-inline tl::optional<Uuid> deserializeFromSExpression(const SExpression& sexpr,
-                                                     bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  if (str == "none") {
+inline tl::optional<Uuid> deserialize(const SExpression& sexpr,
+                                      const Version& fileFormat) {
+  if (sexpr.getValue() == "none") {
     return tl::nullopt;
   } else {
-    return deserializeFromSExpression<Uuid>(sexpr, throwIfEmpty);  // can throw
+    return deserialize<Uuid>(sexpr, fileFormat);  // can throw
   }
 }
 

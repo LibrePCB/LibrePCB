@@ -161,8 +161,8 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   foreach (BI_Plane* plane, query->getPlanes()) {
     std::shared_ptr<BoardClipboardData::Plane> newPlane =
         std::make_shared<BoardClipboardData::Plane>(
-            plane->getUuid(), *plane->getLayerName(),
-            *plane->getNetSignal().getName(), plane->getOutline(),
+            plane->getUuid(), plane->getLayerName(),
+            plane->getNetSignal().getName(), plane->getOutline(),
             plane->getMinWidth(), plane->getMinClearance(),
             plane->getKeepOrphans(), plane->getPriority(),
             plane->getConnectStyle());

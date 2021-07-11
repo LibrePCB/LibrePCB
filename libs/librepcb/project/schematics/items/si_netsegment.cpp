@@ -48,12 +48,13 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
+SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node,
+                             const Version& fileFormat)
   : SI_Base(schematic),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
     mNetSignal(nullptr) {
   try {
-    Uuid netSignalUuid = node.getValueByPath<Uuid>("net");
+    Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
     mNetSignal =
         mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
     if (!mNetSignal) {
@@ -64,7 +65,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
 
     // Load all netpoints
     foreach (const SExpression& child, node.getChildren("junction")) {
-      SI_NetPoint* netpoint = new SI_NetPoint(*this, child);
+      SI_NetPoint* netpoint = new SI_NetPoint(*this, child, fileFormat);
       if (getNetPointByUuid(netpoint->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
@@ -77,7 +78,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
     // Load all netlines
     foreach (const SExpression& child,
              node.getChildren("netline") + node.getChildren("line")) {
-      SI_NetLine* netline = new SI_NetLine(*this, child);
+      SI_NetLine* netline = new SI_NetLine(*this, child, fileFormat);
       if (getNetLineByUuid(netline->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,
@@ -90,7 +91,7 @@ SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node)
     // Load all netlabels
     foreach (const SExpression& child,
              node.getChildren("netlabel") + node.getChildren("label")) {
-      SI_NetLabel* netlabel = new SI_NetLabel(*this, child);
+      SI_NetLabel* netlabel = new SI_NetLabel(*this, child, fileFormat);
       if (getNetLabelByUuid(netlabel->getUuid())) {
         throw RuntimeError(
             __FILE__, __LINE__,

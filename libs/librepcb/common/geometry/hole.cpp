@@ -49,11 +49,12 @@ Hole::Hole(const Uuid& uuid, const Point& position,
   : onEdited(*this), mUuid(uuid), mPosition(position), mDiameter(diameter) {
 }
 
-Hole::Hole(const SExpression& node)
+Hole::Hole(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mDiameter(node.getValueByPath<PositiveLength>("diameter")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mPosition(node.getChild("position"), fileFormat),
+    mDiameter(
+        deserialize<PositiveLength>(node.getChild("diameter/@0"), fileFormat)) {
 }
 
 Hole::~Hole() noexcept {

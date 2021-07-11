@@ -68,7 +68,7 @@ public:
   Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
          const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
          const Point& center, const PositiveLength& diameter) noexcept;
-  explicit Circle(const SExpression& node);
+  Circle(const SExpression& node, const Version& fileFormat);
   virtual ~Circle() noexcept;
 
   // Getters

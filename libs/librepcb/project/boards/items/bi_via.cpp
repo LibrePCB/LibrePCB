@@ -50,8 +50,11 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
   init();
 }
 
-BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node)
-  : BI_Base(netsegment.getBoard()), mVia(node), mNetSegment(netsegment) {
+BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node,
+               const Version& fileFormat)
+  : BI_Base(netsegment.getBoard()),
+    mVia(node, fileFormat),
+    mNetSegment(netsegment) {
   init();
 }
 

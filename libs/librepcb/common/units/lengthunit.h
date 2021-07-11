@@ -330,15 +330,15 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const LengthUnit& obj) {
+inline SExpression serialize(const LengthUnit& obj) {
   return SExpression::createToken(obj.toStr());
 }
 
 template <>
-inline LengthUnit deserializeFromSExpression(const SExpression& sexpr,
-                                             bool throwIfEmpty) {
-  return LengthUnit::fromString(
-      sexpr.getStringOrToken(throwIfEmpty));  // can throw
+inline LengthUnit deserialize(const SExpression& sexpr,
+                              const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return LengthUnit::fromString(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {

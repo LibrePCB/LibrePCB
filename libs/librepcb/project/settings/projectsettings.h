@@ -48,7 +48,8 @@ class ProjectSettings final : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
-  explicit ProjectSettings(Project& project, bool create);
+  explicit ProjectSettings(Project& project, const Version& fileFormat,
+                           bool create);
   ~ProjectSettings() noexcept;
 
   // Getters: General

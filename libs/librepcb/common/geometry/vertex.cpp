@@ -33,10 +33,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Vertex::Vertex(const SExpression& node) {
+Vertex::Vertex(const SExpression& node, const Version& fileFormat) {
   try {
-    mPos = Point(node.getChildByPath("position"));
-    mAngle = node.getValueByPath<Angle>("angle");
+    mPos = Point(node.getChild("position"), fileFormat);
+    mAngle = deserialize<Angle>(node.getChild("angle/@0"), fileFormat);
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                          QString(), e.getMsg());

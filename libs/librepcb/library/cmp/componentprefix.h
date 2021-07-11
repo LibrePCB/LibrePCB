@@ -104,15 +104,15 @@ inline QString operator%(const QString& lhs,
 }
 
 template <>
-inline SExpression serializeToSExpression(const library::ComponentPrefix& obj) {
+inline SExpression serialize(const library::ComponentPrefix& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline library::ComponentPrefix deserializeFromSExpression(
-    const SExpression& sexpr, bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return library::ComponentPrefix(str);  // can throw
+inline library::ComponentPrefix deserialize(const SExpression& sexpr,
+                                            const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return library::ComponentPrefix(sexpr.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

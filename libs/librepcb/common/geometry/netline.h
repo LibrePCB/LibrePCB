@@ -60,7 +60,7 @@ public:
   // Constructors / Destructor
   NetLineAnchor() = delete;
   NetLineAnchor(const NetLineAnchor& other) noexcept;
-  explicit NetLineAnchor(const SExpression& node);
+  NetLineAnchor(const SExpression& node, const Version& fileFormat);
   ~NetLineAnchor() noexcept;
 
   // Getters
@@ -122,7 +122,7 @@ public:
   NetLine(const Uuid& uuid, const NetLine& other) noexcept;
   NetLine(const Uuid& uuid, const UnsignedLength& width,
           const NetLineAnchor& start, const NetLineAnchor& end) noexcept;
-  explicit NetLine(const SExpression& node);
+  NetLine(const SExpression& node, const Version& fileFormat);
   ~NetLine() noexcept;
 
   // Getters

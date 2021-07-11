@@ -23,6 +23,7 @@
 
 #include <gtest/gtest.h>
 #include <librepcb/common/alignment.h>
+#include <librepcb/common/application.h>
 
 /*******************************************************************************
  *  Namespace
@@ -35,11 +36,12 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  bool valid;
-  HAlign origHAling;
-  VAlign origVAling;
-  HAlign mirrHAling;
-  VAlign mirrVAling;
+  HAlign hAlign;
+  VAlign vAlign;
+  HAlign hMirrored;
+  VAlign vMirrored;
+  QByteArray serialized;
+  bool validSExpression;
 } AlignmentTestData;
 
 /*******************************************************************************
@@ -51,67 +53,94 @@ class AlignmentTest : public ::testing::TestWithParam<AlignmentTestData> {};
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
+
+TEST_P(AlignmentTest, testConstructFromSExpressionV01) {
+  const AlignmentTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
+
+  if (data.validSExpression) {
+    EXPECT_EQ(Alignment(data.hAlign, data.vAlign),
+              Alignment(sexpr, Version::fromString("0.1")));
+  } else {
+    EXPECT_THROW({ Alignment a(sexpr, Version::fromString("0.1")); },
+                 RuntimeError);
+  }
+}
+
+TEST_P(AlignmentTest, testConstructFromSExpressionCurrentVersion) {
+  const AlignmentTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
+
+  if (data.validSExpression) {
+    EXPECT_EQ(Alignment(data.hAlign, data.vAlign),
+              Alignment(sexpr, qApp->getFileFormatVersion()));
+  } else {
+    EXPECT_THROW({ Alignment a(sexpr, qApp->getFileFormatVersion()); },
+                 RuntimeError);
+  }
+}
+
+TEST_P(AlignmentTest, testSerialize) {
+  const AlignmentTestData& data = GetParam();
+
+  if (data.validSExpression) {
+    Alignment alignment(data.hAlign, data.vAlign);
+    SExpression sexpr = alignment.serializeToDomElement("align");
+    EXPECT_EQ(data.serialized, sexpr.toByteArray());
+  }
+}
+
 TEST_P(AlignmentTest, testMirror) {
   const AlignmentTestData& data = GetParam();
 
-  if (data.valid) {
-    Alignment alignment = Alignment(data.origHAling, data.origVAling);
-    alignment.mirror();
-    EXPECT_EQ(alignment, Alignment(data.mirrHAling, data.mirrVAling));
-  }
+  Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  alignment.mirror();
+  EXPECT_EQ(alignment, Alignment(data.hMirrored, data.vMirrored));
 }
 
 TEST_P(AlignmentTest, testMirrorH) {
   const AlignmentTestData& data = GetParam();
 
-  if (data.valid) {
-    Alignment alignment = Alignment(data.origHAling, data.origVAling);
-    alignment.mirrorH();
-    EXPECT_EQ(alignment, Alignment(data.mirrHAling, data.origVAling));
-  }
+  Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  alignment.mirrorH();
+  EXPECT_EQ(alignment, Alignment(data.hMirrored, data.vAlign));
 }
 
 TEST_P(AlignmentTest, testMirrorV) {
   const AlignmentTestData& data = GetParam();
 
-  if (data.valid) {
-    Alignment alignment = Alignment(data.origHAling, data.origVAling);
-    alignment.mirrorV();
-    EXPECT_EQ(alignment, Alignment(data.origHAling, data.mirrVAling));
-  }
+  Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  alignment.mirrorV();
+  EXPECT_EQ(alignment, Alignment(data.hAlign, data.vMirrored));
 }
 
 TEST_P(AlignmentTest, testMirrored) {
   const AlignmentTestData& data = GetParam();
 
-  if (data.valid) {
-    Alignment alignment = Alignment(data.origHAling, data.origVAling);
-    Alignment alignmentMirrored = alignment.mirrored();
-    EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
-    EXPECT_EQ(alignmentMirrored, Alignment(data.mirrHAling, data.mirrVAling));
-  }
+  Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  Alignment alignmentMirrored = alignment.mirrored();
+  EXPECT_EQ(alignment, Alignment(data.hAlign, data.vAlign));
+  EXPECT_EQ(alignmentMirrored, Alignment(data.hMirrored, data.vMirrored));
 }
 
 TEST_P(AlignmentTest, testMirroredH) {
   const AlignmentTestData& data = GetParam();
 
-  if (data.valid) {
-    Alignment alignment = Alignment(data.origHAling, data.origVAling);
-    Alignment alignmentMirroredH = alignment.mirroredH();
-    EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
-    EXPECT_EQ(alignmentMirroredH, Alignment(data.mirrHAling, data.origVAling));
-  }
+  Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  Alignment alignmentMirroredH = alignment.mirroredH();
+  EXPECT_EQ(alignment, Alignment(data.hAlign, data.vAlign));
+  EXPECT_EQ(alignmentMirroredH, Alignment(data.hMirrored, data.vAlign));
 }
 
 TEST_P(AlignmentTest, testMirroredV) {
   const AlignmentTestData& data = GetParam();
 
-  if (data.valid) {
-    Alignment alignment = Alignment(data.origHAling, data.origVAling);
-    Alignment alignmentMirroredV = alignment.mirroredV();
-    EXPECT_EQ(alignment, Alignment(data.origHAling, data.origVAling));
-    EXPECT_EQ(alignmentMirroredV, Alignment(data.origHAling, data.mirrVAling));
-  }
+  Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  Alignment alignmentMirroredV = alignment.mirroredV();
+  EXPECT_EQ(alignment, Alignment(data.hAlign, data.vAlign));
+  EXPECT_EQ(alignmentMirroredV, Alignment(data.hAlign, data.vMirrored));
 }
 
 /*******************************************************************************
@@ -120,13 +149,32 @@ TEST_P(AlignmentTest, testMirroredV) {
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(AlignmentTest, AlignmentTest, ::testing::Values(
-    // mirrored
-    AlignmentTestData({true, HAlign::left(),   VAlign::bottom(),
-                       HAlign::right(),  VAlign::top()}),
-    AlignmentTestData({true, HAlign::right(),  VAlign::top(),
-                       HAlign::left(),   VAlign::bottom()}),
-    AlignmentTestData({true, HAlign::center(), VAlign::center(),
-                       HAlign::center(), VAlign::center()})
+  // Invalid serialization
+  AlignmentTestData({HAlign::center(), VAlign::center(),
+                     HAlign::center(), VAlign::center(),
+                     "(align \"\" \"\")\n", false}),
+  AlignmentTestData({HAlign::center(), VAlign::center(),
+                     HAlign::center(), VAlign::center(),
+                     "(align center foo)\n", false}),
+  AlignmentTestData({HAlign::center(), VAlign::center(),
+                     HAlign::center(), VAlign::center(),
+                     "(align center)\n", false}),
+  AlignmentTestData({HAlign::center(), VAlign::center(),
+                     HAlign::center(), VAlign::center(),
+                     "(align)\n", false}),
+  AlignmentTestData({HAlign::center(), VAlign::center(),
+                     HAlign::center(), VAlign::center(),
+                     "center\n", false}),
+  // Valid serialization
+  AlignmentTestData({HAlign::left(),   VAlign::bottom(),
+                     HAlign::right(),  VAlign::top(),
+                     "(align left bottom)\n", true}),
+  AlignmentTestData({HAlign::right(),  VAlign::top(),
+                     HAlign::left(),   VAlign::bottom(),
+                     "(align right top)\n", true}),
+  AlignmentTestData({HAlign::center(), VAlign::center(),
+                     HAlign::center(), VAlign::center(),
+                     "(align center center)\n", true})
 ));
 // clang-format on
 

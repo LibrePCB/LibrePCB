@@ -58,7 +58,7 @@ public:
   SymbolClipboardData() = delete;
   SymbolClipboardData(const SymbolClipboardData& other) = delete;
   SymbolClipboardData(const Uuid& symbolUuid, const Point& cursorPos) noexcept;
-  explicit SymbolClipboardData(const SExpression& node);
+  SymbolClipboardData(const SExpression& node, const Version& fileFormat);
   ~SymbolClipboardData() noexcept;
 
   // Getters

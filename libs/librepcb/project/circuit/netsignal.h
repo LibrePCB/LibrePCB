@@ -63,7 +63,8 @@ public:
   // Constructors / Destructor
   NetSignal() = delete;
   NetSignal(const NetSignal& other) = delete;
-  explicit NetSignal(Circuit& circuit, const SExpression& node);
+  NetSignal(Circuit& circuit, const SExpression& node,
+            const Version& fileFormat);
   explicit NetSignal(Circuit& circuit, NetClass& netclass,
                      const CircuitIdentifier& name, bool autoName);
   ~NetSignal() noexcept;

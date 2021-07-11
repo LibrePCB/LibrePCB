@@ -79,7 +79,8 @@ public:
       const Uuid& uuid, const Uuid& symbolUuid, const Point& symbolPos,
       const Angle& symbolRotation, bool isRequired,
       const ComponentSymbolVariantItemSuffix& suffix) noexcept;
-  explicit ComponentSymbolVariantItem(const SExpression& node);
+  ComponentSymbolVariantItem(const SExpression& node,
+                             const Version& fileFormat);
   ~ComponentSymbolVariantItem() noexcept;
 
   // Getters: Attributes

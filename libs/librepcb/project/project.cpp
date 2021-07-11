@@ -67,6 +67,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
                        tr("The suffix of the project file must be \"lpp\"!"));
   }
 
+  Version fileFormat = qApp->getFileFormatVersion();
   if (create) {
     // Check if there isn't already a project in the selected directory
     if (mDirectory->fileExists(".librepcb-project") ||
@@ -92,16 +93,16 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
           tr("The file \"%1\" does not exist.").arg(getFilepath().toNative()));
     }
     // check the project's file format version
-    Version version =
+    fileFormat =
         VersionFile::fromByteArray(mDirectory->read(".librepcb-project"))
             .getVersion();
-    if (version > qApp->getFileFormatVersion()) {
+    if (fileFormat > qApp->getFileFormatVersion()) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString(
               tr("This project was created with a newer application version.\n"
                  "You need at least LibrePCB %1 to open it.\n\n%2"))
-              .arg(version.toPrettyStr(3))
+              .arg(fileFormat.toPrettyStr(3))
               .arg(getFilepath().toNative()));
     }
   }
@@ -141,18 +142,18 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
       QString fp = "project/metadata.lp";
       SExpression root =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-      mProjectMetadata.reset(new ProjectMetadata(root));
+      mProjectMetadata.reset(new ProjectMetadata(root, fileFormat));
     }
 
     // Create all needed objects
     connect(mProjectMetadata.data(), &ProjectMetadata::attributesChanged, this,
             &Project::attributesChanged);
-    mProjectSettings.reset(new ProjectSettings(*this, create));
+    mProjectSettings.reset(new ProjectSettings(*this, fileFormat, create));
     mProjectLibrary.reset(
         new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(*mDirectory, "library"))));
     mErcMsgList.reset(new ErcMsgList(*this));
-    mCircuit.reset(new Circuit(*this, create));
+    mCircuit.reset(new Circuit(*this, fileFormat, create));
 
     // Load all schematic layers
     mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
@@ -163,11 +164,11 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
       SExpression schRoot =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       foreach (const SExpression& node, schRoot.getChildren("schematic")) {
-        FilePath fp = FilePath::fromRelative(
-            getPath(), node.getValueOfFirstChild<QString>());
+        FilePath fp =
+            FilePath::fromRelative(getPath(), node.getChild("@0").getValue());
         std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
             *mDirectory, fp.getParentDir().toRelative(getPath())));
-        Schematic* schematic = new Schematic(*this, std::move(dir));
+        Schematic* schematic = new Schematic(*this, std::move(dir), fileFormat);
         addSchematic(*schematic);
       }
       qDebug() << mSchematics.count() << "schematics successfully loaded!";
@@ -179,11 +180,11 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
       SExpression brdRoot =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
       foreach (const SExpression& node, brdRoot.getChildren("board")) {
-        FilePath fp = FilePath::fromRelative(
-            getPath(), node.getValueOfFirstChild<QString>());
+        FilePath fp =
+            FilePath::fromRelative(getPath(), node.getChild("@0").getValue());
         std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
             *mDirectory, fp.getParentDir().toRelative(getPath())));
-        Board* board = new Board(*this, std::move(dir));
+        Board* board = new Board(*this, std::move(dir), fileFormat);
         addBoard(*board);
       }
       qDebug() << mBoards.count() << "boards successfully loaded!";

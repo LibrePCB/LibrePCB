@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
+#include <librepcb/common/application.h>
 #include <librepcb/common/units/angle.h>
 
 /*******************************************************************************
@@ -50,6 +51,7 @@ class AngleTest : public ::testing::TestWithParam<AngleTestData> {};
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
+
 TEST_P(AngleTest, testFromDeg) {
   const AngleTestData& data = GetParam();
 
@@ -65,6 +67,40 @@ TEST_P(AngleTest, testToDegString) {
 
   if (data.valid) {
     EXPECT_EQ(data.value.toDegString(), data.genStr);
+  }
+}
+
+TEST_P(AngleTest, testSerialize) {
+  const AngleTestData& data = GetParam();
+
+  if (data.valid) {
+    EXPECT_EQ(data.genStr % "\n", serialize(data.value).toByteArray());
+  }
+}
+
+TEST_P(AngleTest, testDeserializeV01) {
+  const AngleTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::createString(data.origStr);
+  if (data.valid) {
+    EXPECT_EQ(data.value,
+              deserialize<Angle>(sexpr, Version::fromString("0.1")));
+  } else {
+    EXPECT_THROW(deserialize<Angle>(sexpr, Version::fromString("0.1")),
+                 RuntimeError);
+  }
+}
+
+TEST_P(AngleTest, testDeserializeCurrentVersion) {
+  const AngleTestData& data = GetParam();
+
+  SExpression sexpr = SExpression::createString(data.origStr);
+  if (data.valid) {
+    EXPECT_EQ(data.value,
+              deserialize<Angle>(sexpr, qApp->getFileFormatVersion()));
+  } else {
+    EXPECT_THROW(deserialize<Angle>(sexpr, qApp->getFileFormatVersion()),
+                 RuntimeError);
   }
 }
 

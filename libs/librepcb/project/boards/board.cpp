@@ -185,8 +185,8 @@ Board::Board(const Board& other,
 }
 
 Board::Board(Project& project,
-             std::unique_ptr<TransactionalDirectory> directory, bool create,
-             const QString& newName)
+             std::unique_ptr<TransactionalDirectory> directory,
+             const Version& fileFormat, bool create, const QString& newName)
   : QObject(&project),
     mProject(project),
     mDirectory(std::move(directory)),
@@ -233,28 +233,29 @@ Board::Board(Project& project,
       // the board seems to be ready to open, so we will create all needed
       // objects
 
-      mUuid = root.getChildByIndex(0).getValue<Uuid>();
-      mName = root.getValueByPath<ElementName>("name");
-      if (const SExpression* child = root.tryGetChildByPath("default_font")) {
-        mDefaultFontFileName = child->getValueOfFirstChild<QString>(true);
+      mUuid = deserialize<Uuid>(root.getChild("@0"), fileFormat);
+      mName = deserialize<ElementName>(root.getChild("name/@0"), fileFormat);
+      if (const SExpression* child = root.tryGetChild("default_font")) {
+        mDefaultFontFileName = child->getChild("@0").getValue();
       } else {
         mDefaultFontFileName = qApp->getDefaultStrokeFontName();
       }
 
       // Load grid properties
-      mGridProperties.reset(new GridProperties(root.getChildByPath("grid")));
+      mGridProperties.reset(
+          new GridProperties(root.getChild("grid"), fileFormat));
 
       // Load layer stack
       mLayerStack.reset(
-          new BoardLayerStack(*this, root.getChildByPath("layers")));
+          new BoardLayerStack(*this, root.getChild("layers"), fileFormat));
 
       // load design rules
       mDesignRules.reset(
-          new BoardDesignRules(root.getChildByPath("design_rules")));
+          new BoardDesignRules(root.getChild("design_rules"), fileFormat));
 
       // load fabrication output settings
       mFabricationOutputSettings.reset(new BoardFabricationOutputSettings(
-          root.getChildByPath("fabrication_output_settings")));
+          root.getChild("fabrication_output_settings"), fileFormat));
 
       // load user settings
       try {
@@ -262,7 +263,8 @@ Board::Board(Project& project,
         SExpression userSettingsRoot =
             SExpression::parse(mDirectory->read(userSettingsFp),
                                mDirectory->getAbsPath(userSettingsFp));
-        mUserSettings.reset(new BoardUserSettings(*this, userSettingsRoot));
+        mUserSettings.reset(
+            new BoardUserSettings(*this, userSettingsRoot, fileFormat));
       } catch (const Exception&) {
         // Project user settings are normally not put under version control and
         // thus the likelyhood of parse errors is higher (e.g. when switching to
@@ -275,7 +277,7 @@ Board::Board(Project& project,
 
       // Load all device instances
       foreach (const SExpression& node, root.getChildren("device")) {
-        BI_Device* device = new BI_Device(*this, node);
+        BI_Device* device = new BI_Device(*this, node, fileFormat);
         if (getDeviceInstanceByComponentUuid(
                 device->getComponentInstanceUuid())) {
           throw RuntimeError(
@@ -289,7 +291,7 @@ Board::Board(Project& project,
 
       // Load all netsegments
       foreach (const SExpression& node, root.getChildren("netsegment")) {
-        BI_NetSegment* netsegment = new BI_NetSegment(*this, node);
+        BI_NetSegment* netsegment = new BI_NetSegment(*this, node, fileFormat);
         if (getNetSegmentByUuid(netsegment->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
@@ -301,25 +303,25 @@ Board::Board(Project& project,
 
       // Load all planes
       foreach (const SExpression& node, root.getChildren("plane")) {
-        BI_Plane* plane = new BI_Plane(*this, node);
+        BI_Plane* plane = new BI_Plane(*this, node, fileFormat);
         mPlanes.append(plane);
       }
 
       // Load all polygons
       foreach (const SExpression& node, root.getChildren("polygon")) {
-        BI_Polygon* polygon = new BI_Polygon(*this, node);
+        BI_Polygon* polygon = new BI_Polygon(*this, node, fileFormat);
         mPolygons.append(polygon);
       }
 
       // Load all stroke texts
       foreach (const SExpression& node, root.getChildren("stroke_text")) {
-        BI_StrokeText* text = new BI_StrokeText(*this, node);
+        BI_StrokeText* text = new BI_StrokeText(*this, node, fileFormat);
         mStrokeTexts.append(text);
       }
 
       // Load all holes
       foreach (const SExpression& node, root.getChildren("hole")) {
-        BI_Hole* hole = new BI_Hole(*this, node);
+        BI_Hole* hole = new BI_Hole(*this, node, fileFormat);
         mHoles.append(hole);
       }
     }
@@ -1094,7 +1096,8 @@ void Board::updateErcMessages() noexcept {
 Board* Board::create(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
                      const ElementName& name) {
-  return new Board(project, std::move(directory), true, *name);
+  return new Board(project, std::move(directory), qApp->getFileFormatVersion(),
+                   true, *name);
 }
 
 /*******************************************************************************

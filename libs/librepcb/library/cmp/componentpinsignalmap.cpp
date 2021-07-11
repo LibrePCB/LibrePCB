@@ -51,12 +51,14 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(
     mDisplayType(displayType) {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
+ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node,
+                                                     const Version& fileFormat)
   : onEdited(*this),
-    mPinUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSignalUuid(node.getValueByPath<tl::optional<Uuid>>("signal")),
-    mDisplayType(CmpSigPinDisplayType::fromString(
-        node.getValueByPath<QString>("text"))) {
+    mPinUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mSignalUuid(deserialize<tl::optional<Uuid>>(node.getChild("signal/@0"),
+                                                fileFormat)),
+    mDisplayType(deserialize<const CmpSigPinDisplayType&>(
+        node.getChild("text/@0"), fileFormat)) {
 }
 
 ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept {

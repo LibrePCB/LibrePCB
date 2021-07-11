@@ -70,7 +70,7 @@ public:
   ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
   ComponentPinSignalMapItem(const Uuid& pin, const tl::optional<Uuid>& signal,
                             const CmpSigPinDisplayType& displayType) noexcept;
-  explicit ComponentPinSignalMapItem(const SExpression& node);
+  ComponentPinSignalMapItem(const SExpression& node, const Version& fileFormat);
   ~ComponentPinSignalMapItem() noexcept;
 
   // Getters

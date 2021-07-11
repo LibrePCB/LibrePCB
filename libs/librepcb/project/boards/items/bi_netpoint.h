@@ -57,7 +57,8 @@ public:
   // Constructors / Destructor
   BI_NetPoint() = delete;
   BI_NetPoint(const BI_NetPoint& other) = delete;
-  BI_NetPoint(BI_NetSegment& segment, const SExpression& node);
+  BI_NetPoint(BI_NetSegment& segment, const SExpression& node,
+              const Version& fileFormat);
   BI_NetPoint(BI_NetSegment& segment, const Point& position);
   ~BI_NetPoint() noexcept;
 

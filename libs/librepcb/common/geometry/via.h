@@ -71,7 +71,7 @@ public:
   Via(const Uuid& uuid, const Via& other) noexcept;
   Via(const Uuid& uuid, const Point& position, Shape shape,
       const PositiveLength& size, const PositiveLength& drillDiameter) noexcept;
-  explicit Via(const SExpression& node);
+  Via(const SExpression& node, const Version& fileFormat);
   ~Via() noexcept;
 
   // Getters
@@ -127,7 +127,7 @@ using CmdViasSwap = CmdListElementsSwap<Via, ViaListNameProvider, Via::Event>;
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Via::Shape& obj) {
+inline SExpression serialize(const Via::Shape& obj) {
   switch (obj) {
     case Via::Shape::Round:
       return SExpression::createToken("round");
@@ -141,9 +141,10 @@ inline SExpression serializeToSExpression(const Via::Shape& obj) {
 }
 
 template <>
-inline Via::Shape deserializeFromSExpression(const SExpression& sexpr,
-                                             bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
+inline Via::Shape deserialize(const SExpression& sexpr,
+                              const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QString str = sexpr.getValue();
   if (str == "round")
     return Via::Shape::Round;
   else if (str == "square")
@@ -152,7 +153,7 @@ inline Via::Shape deserializeFromSExpression(const SExpression& sexpr,
     return Via::Shape::Octagon;
   else
     throw RuntimeError(__FILE__, __LINE__,
-                       QString(Via::tr("Unknown via shape: \"%1\"")).arg(str));
+                       Via::tr("Unknown via shape: \"%1\"").arg(str));
 }
 
 /*******************************************************************************

@@ -61,7 +61,8 @@ BI_Device::BI_Device(Board& board, const BI_Device& other)
   init();
 }
 
-BI_Device::BI_Device(Board& board, const SExpression& node)
+BI_Device::BI_Device(Board& board, const SExpression& node,
+                     const Version& fileFormat)
   : BI_Base(board),
     mCompInstance(nullptr),
     mLibDevice(nullptr),
@@ -69,7 +70,7 @@ BI_Device::BI_Device(Board& board, const SExpression& node)
     mLibFootprint(nullptr),
     mAttributes() {
   // get component instance
-  Uuid compInstUuid = node.getChildByIndex(0).getValue<Uuid>();
+  Uuid compInstUuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
   mCompInstance =
       mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
   if (!mCompInstance) {
@@ -79,20 +80,22 @@ BI_Device::BI_Device(Board& board, const SExpression& node)
             .arg(compInstUuid.toStr()));
   }
   // get device and footprint uuid
-  Uuid deviceUuid = node.getValueByPath<Uuid>("lib_device");
-  Uuid footprintUuid = node.getValueByPath<Uuid>("lib_footprint");
+  Uuid deviceUuid =
+      deserialize<Uuid>(node.getChild("lib_device/@0"), fileFormat);
+  Uuid footprintUuid =
+      deserialize<Uuid>(node.getChild("lib_footprint/@0"), fileFormat);
   initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
   // get position, rotation and mirrored
-  mPosition = Point(node.getChildByPath("position"));
-  mRotation = node.getValueByPath<Angle>("rotation");
-  mIsMirrored = node.getValueByPath<bool>("mirror");
+  mPosition = Point(node.getChild("position"), fileFormat);
+  mRotation = deserialize<Angle>(node.getChild("rotation/@0"), fileFormat);
+  mIsMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
 
   // load attributes
-  mAttributes.loadFromSExpression(node);  // can throw
+  mAttributes.loadFromSExpression(node, fileFormat);  // can throw
 
   // load footprint
-  mFootprint.reset(new BI_Footprint(*this, node));
+  mFootprint.reset(new BI_Footprint(*this, node, fileFormat));
 
   init();
 }

@@ -274,15 +274,14 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const Ratio& obj) {
+inline SExpression serialize(const Ratio& obj) {
   return SExpression::createToken(obj.toNormalizedString());
 }
 
 template <>
-inline Ratio deserializeFromSExpression(const SExpression& sexpr,
-                                        bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return Ratio::fromNormalized(str);
+inline Ratio deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return Ratio::fromNormalized(sexpr.getValue());
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const Ratio& ratio) {
@@ -330,15 +329,14 @@ using UnsignedRatio =
                                 UnsignedRatioVerifier>;
 
 template <>
-inline SExpression serializeToSExpression(const UnsignedRatio& obj) {
+inline SExpression serialize(const UnsignedRatio& obj) {
   return SExpression::createToken(obj->toNormalizedString());
 }
 
 template <>
-inline UnsignedRatio deserializeFromSExpression(const SExpression& sexpr,
-                                                bool throwIfEmpty) {
-  QString str = sexpr.getStringOrToken(throwIfEmpty);
-  return UnsignedRatio(Ratio::fromNormalized(str));
+inline UnsignedRatio deserialize(const SExpression& sexpr,
+                                 const Version& fileFormat) {
+  return UnsignedRatio(deserialize<Ratio>(sexpr, fileFormat));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

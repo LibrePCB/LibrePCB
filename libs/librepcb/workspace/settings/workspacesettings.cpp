@@ -37,7 +37,8 @@ namespace workspace {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(const FilePath& fp, QObject* parent)
+WorkspaceSettings::WorkspaceSettings(const FilePath& fp,
+                                     const Version& fileFormat, QObject* parent)
   : QObject(parent),
     mFilePath(fp),
     // Initialize settings items. Their constructor will register them as
@@ -58,7 +59,7 @@ WorkspaceSettings::WorkspaceSettings(const FilePath& fp, QObject* parent)
         SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
     foreach (WorkspaceSettingsItem* item, getAllItems()) {
       try {
-        item->load(root);  // can throw
+        item->load(root, fileFormat);  // can throw
       } catch (const Exception& e) {
         qCritical() << "Could not load workspace settings item:" << e.getMsg();
       }

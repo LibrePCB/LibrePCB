@@ -61,13 +61,14 @@ ComponentSymbolVariant::ComponentSymbolVariant(
   mSymbolItems.onEdited.attach(mOnItemsEditedSlot);
 }
 
-ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node)
+ComponentSymbolVariant::ComponentSymbolVariant(const SExpression& node,
+                                               const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mNorm(node.getValueByPath<QString>("norm")),
-    mNames(node),
-    mDescriptions(node),
-    mSymbolItems(node),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mNorm(node.getChild("norm/@0").getValue()),
+    mNames(node, fileFormat),
+    mDescriptions(node, fileFormat),
+    mSymbolItems(node, fileFormat),
     mOnItemsEditedSlot(*this, &ComponentSymbolVariant::itemsEdited) {
   mSymbolItems.onEdited.attach(mOnItemsEditedSlot);
 }

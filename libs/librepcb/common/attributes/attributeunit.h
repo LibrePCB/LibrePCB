@@ -70,7 +70,7 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const AttributeUnit& obj) {
+inline SExpression serialize(const AttributeUnit& obj) {
   return SExpression::createToken(obj.getName());
 }
 

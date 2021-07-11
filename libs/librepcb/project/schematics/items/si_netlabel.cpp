@@ -43,8 +43,11 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node)
-  : SI_Base(segment.getSchematic()), mNetSegment(segment), mNetLabel(node) {
+SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
+                         const Version& fileFormat)
+  : SI_Base(segment.getSchematic()),
+    mNetSegment(segment),
+    mNetLabel(node, fileFormat) {
   init();
 }
 

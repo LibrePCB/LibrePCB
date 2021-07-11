@@ -132,9 +132,16 @@ private:  // Data
 }  // namespace library
 
 template <>
-inline SExpression serializeToSExpression(
-    const library::CmpSigPinDisplayType& obj) {
+inline SExpression serialize(const library::CmpSigPinDisplayType& obj) {
   return SExpression::createToken(obj.toString());
+}
+
+template <>
+inline const library::CmpSigPinDisplayType& deserialize(
+    const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return library::CmpSigPinDisplayType::fromString(
+      sexpr.getValue());  // can throw
 }
 
 /*******************************************************************************

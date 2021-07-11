@@ -54,7 +54,8 @@ public:
   BoardUserSettings(const BoardUserSettings& other) = delete;
   explicit BoardUserSettings(Board& board) noexcept;
   BoardUserSettings(Board& board, const BoardUserSettings& other) noexcept;
-  BoardUserSettings(Board& board, const SExpression& node);
+  BoardUserSettings(Board& board, const SExpression& node,
+                    const Version& fileFormat);
   ~BoardUserSettings() noexcept;
 
   // General Methods

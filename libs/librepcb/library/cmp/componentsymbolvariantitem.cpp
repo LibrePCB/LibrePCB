@@ -69,15 +69,17 @@ ComponentSymbolVariantItem::ComponentSymbolVariantItem(
   mPinSignalMap.onEdited.attach(mOnPinSignalMapEditedSlot);
 }
 
-ComponentSymbolVariantItem::ComponentSymbolVariantItem(const SExpression& node)
+ComponentSymbolVariantItem::ComponentSymbolVariantItem(
+    const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mSymbolUuid(node.getValueByPath<Uuid>("symbol")),
-    mSymbolPos(node.getChildByPath("position")),
-    mSymbolRot(node.getValueByPath<Angle>("rotation")),
-    mIsRequired(node.getValueByPath<bool>("required")),
-    mSuffix(node.getValueByPath<ComponentSymbolVariantItemSuffix>("suffix")),
-    mPinSignalMap(node),
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mSymbolUuid(deserialize<Uuid>(node.getChild("symbol/@0"), fileFormat)),
+    mSymbolPos(node.getChild("position"), fileFormat),
+    mSymbolRot(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mIsRequired(deserialize<bool>(node.getChild("required/@0"), fileFormat)),
+    mSuffix(deserialize<ComponentSymbolVariantItemSuffix>(
+        node.getChild("suffix/@0"), fileFormat)),
+    mPinSignalMap(node, fileFormat),
     mOnPinSignalMapEditedSlot(*this,
                               &ComponentSymbolVariantItem::pinSignalMapEdited) {
   mPinSignalMap.onEdited.attach(mOnPinSignalMapEditedSlot);

@@ -75,10 +75,10 @@ VAlign& VAlign::mirror() noexcept {
  *  Class VAlign
  ******************************************************************************/
 
-Alignment::Alignment(const SExpression& node) {
+Alignment::Alignment(const SExpression& node, const Version& fileFormat) {
   try {
-    mH = node.getChildByIndex(0).getValue<HAlign>();
-    mV = node.getChildByIndex(1).getValue<VAlign>();
+    mH = deserialize<HAlign>(node.getChild("@0"), fileFormat);
+    mV = deserialize<VAlign>(node.getChild("@1"), fileFormat);
   } catch (const Exception& e) {
     throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
                          QString(), e.getMsg());

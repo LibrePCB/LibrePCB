@@ -43,7 +43,7 @@ namespace project {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Circuit::Circuit(Project& project, bool create)
+Circuit::Circuit(Project& project, const Version& fileFormat, bool create)
   : QObject(&project),
     mProject(project),
     mDirectory(new TransactionalDirectory(project.getDirectory(), "circuit")) {
@@ -61,19 +61,20 @@ Circuit::Circuit(Project& project, bool create)
 
       // Load all netclasses
       foreach (const SExpression& node, root.getChildren("netclass")) {
-        NetClass* netclass = new NetClass(*this, node);
+        NetClass* netclass = new NetClass(*this, node, fileFormat);
         addNetClass(*netclass);
       }
 
       // Load all netsignals
       foreach (const SExpression& node, root.getChildren("net")) {
-        NetSignal* netsignal = new NetSignal(*this, node);
+        NetSignal* netsignal = new NetSignal(*this, node, fileFormat);
         addNetSignal(*netsignal);
       }
 
       // Load all component instances
       foreach (const SExpression& node, root.getChildren("component")) {
-        ComponentInstance* component = new ComponentInstance(*this, node);
+        ComponentInstance* component =
+            new ComponentInstance(*this, node, fileFormat);
         addComponentInstance(*component);
       }
     }

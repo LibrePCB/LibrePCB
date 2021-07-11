@@ -35,13 +35,32 @@
 namespace librepcb {
 
 class SExpression;
+class Version;
 
+/**
+ * Serialize an object to a ::librepcb::SExpression
+ *
+ * @tparam T    Type of object to serialize.
+ * @param obj   Object to serialize.
+ * @return      Serialized S-Expression.
+ * @throws      ::librepcb::Exception in case of an error.
+ */
 template <typename T>
-SExpression serializeToSExpression(const T& obj);  // can throw
+SExpression serialize(const T& obj);
 
+/**
+ * Deserialize an ::librepcb::SExpression to an object
+ *
+ * @tparam T          Type of object to deserialize.
+ * @param sexpr       S-Expression to deserialize.
+ * @param fileFormat  The file format version of the passed S-Expression.
+ *                    If this is older than the latest file format version,
+ *                    a migration might need to be performed.
+ * @return            Deserialized object.
+ * @throws            ::librepcb::Exception in case of an error.
+ */
 template <typename T>
-T deserializeFromSExpression(const SExpression& sexpr,
-                             bool throwIfEmpty);  // can throw
+T deserialize(const SExpression& sexpr, const Version& fileFormat);
 
 /*******************************************************************************
  *  Class SExpression
@@ -76,37 +95,57 @@ public:
   bool isLineBreak() const noexcept { return mType == Type::LineBreak; }
   bool isMultiLineList() const noexcept;
   const QString& getName() const;
-  const QString& getStringOrToken(bool throwIfEmpty = false) const;
-  const QList<SExpression>& getChildren() const { return mChildren; }
+  const QString& getValue() const;
+  const QList<SExpression>& getChildren() const noexcept { return mChildren; }
   QList<SExpression> getChildren(const QString& name) const noexcept;
-  const SExpression& getChildByIndex(int index) const;
-  const SExpression* tryGetChildByPath(const QString& path) const noexcept;
-  const SExpression& getChildByPath(const QString& path) const;
 
-  template <typename T>
-  T getValue(bool throwIfEmpty = false) const {
-    try {
-      return deserializeFromSExpression<T>(*this, throwIfEmpty);
-    } catch (const Exception& e) {
-      throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue,
-                           e.getMsg());
-    }
-  }
+  /**
+   * @brief Get a child by path
+   *
+   * This method allows to get a specific child, even nested child.
+   * Consider this S-Expression:
+   *
+   * @verbatim
+   * (netsegment 3115f409-5e6c-4023-a8ab-06428ed0720a
+   *  (via 2cc45b07-1bef-4340-9292-b54b011c70c5
+   *   (position 35.91989 46.0375) (size 0.7) (drill 0.3) (shape round)
+   *  )
+   * )
+   * @endverbatim
+   *
+   * - To get the UUID of the net segment, use the path "@0" (first child).
+   * - To get the whole "via" element (incl. children), use the path "via".
+   * - To get the Y coordinate of the via, use the path "via/position/@1".
+   *
+   * @attention If there exist several childs with (the begin of) the specified
+   *            path, only the first match is returned! So if the example above
+   *            had more "via" elements, all after the first one would be
+   *            ignored. And for example if the first "via" element had no
+   *            "position" child, an exception is raised even if the following
+   *            "via" elements do have a "position" child.
+   *
+   * @param path    The path to the child to get, separated by forward slashes
+   *                '/'. To specify a child by index, use '@' followed by the
+   *                index (e.g. '@1' to get the second child).
+   *
+   * @return A reference to the child of the specified path.
+   *
+   * @throws ::librepcb::Exception if the specified child does not exist.
+   */
+  const SExpression& getChild(const QString& path) const;
 
-  template <typename T>
-  T getValueByPath(const QString& path, bool throwIfEmpty = false) const {
-    const SExpression& child = getChildByPath(path);
-    return child.getValueOfFirstChild<T>(throwIfEmpty);
-  }
-
-  template <typename T>
-  T getValueOfFirstChild(bool throwIfEmpty = false) const {
-    if (mChildren.count() < 1) {
-      throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                           tr("Node does not have children."));
-    }
-    return mChildren.at(0).getValue<T>(throwIfEmpty);
-  }
+  /**
+   * @brief Try get a child by path
+   *
+   * This is exactly the same as #getChild(), but returns `nullptr` if the
+   * specified child does not exist (instead of throwing an exception).
+   *
+   * @param path    See documentation of #getChild().
+   *
+   * @return  A pointer to the child of the specified path, if found. If no
+   *          such child exists, `nullptr` is returned.
+   */
+  const SExpression* tryGetChild(const QString& path) const noexcept;
 
   // General Methods
   SExpression& appendLineBreak();
@@ -114,7 +153,7 @@ public:
   SExpression& appendChild(const SExpression& child, bool linebreak);
   template <typename T>
   SExpression& appendChild(const T& obj) {
-    appendChild(serializeToSExpression(obj), false);
+    appendChild(serialize(obj), false);
     return *this;
   }
   template <typename T>
@@ -163,44 +202,44 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serializeToSExpression(const QString& obj) {
+inline SExpression serialize(const QString& obj) {
   return SExpression::createString(obj);
 }
 
 template <>
-inline SExpression serializeToSExpression(const bool& obj) {
+inline SExpression serialize(const bool& obj) {
   return SExpression::createToken(obj ? "true" : "false");
 }
 
 template <>
-inline SExpression serializeToSExpression(const int& obj) {
+inline SExpression serialize(const int& obj) {
   return SExpression::createToken(QString::number(obj));
 }
 
 template <>
-inline SExpression serializeToSExpression(const uint& obj) {
+inline SExpression serialize(const uint& obj) {
   return SExpression::createToken(QString::number(obj));
 }
 
 template <>
-inline SExpression serializeToSExpression(const QColor& obj) {
+inline SExpression serialize(const QColor& obj) {
   return SExpression::createString(obj.isValid() ? obj.name(QColor::HexArgb)
                                                  : "");
 }
 
 template <>
-inline SExpression serializeToSExpression(const QUrl& obj) {
+inline SExpression serialize(const QUrl& obj) {
   return SExpression::createString(
       obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "");
 }
 
 template <>
-inline SExpression serializeToSExpression(const QDateTime& obj) {
+inline SExpression serialize(const QDateTime& obj) {
   return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
 }
 
 template <>
-inline SExpression serializeToSExpression(const SExpression& obj) {
+inline SExpression serialize(const SExpression& obj) {
   return obj;
 }
 
@@ -209,17 +248,18 @@ inline SExpression serializeToSExpression(const SExpression& obj) {
  ******************************************************************************/
 
 template <>
-inline QString deserializeFromSExpression(const SExpression& sexpr,
-                                          bool throwIfEmpty) {
-  return sexpr.getStringOrToken(throwIfEmpty);  // can throw
+inline QString deserialize(const SExpression& sexpr,
+                           const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  return sexpr.getValue();  // can throw
 }
 
 template <>
-inline bool deserializeFromSExpression(const SExpression& sexpr,
-                                       bool throwIfEmpty) {
-  if (sexpr.getStringOrToken(throwIfEmpty) == "true") {
+inline bool deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  if (sexpr.getValue() == "true") {
     return true;
-  } else if (sexpr.getStringOrToken(throwIfEmpty) == "false") {
+  } else if (sexpr.getValue() == "false") {
     return false;
   } else
     throw RuntimeError(__FILE__, __LINE__,
@@ -227,10 +267,10 @@ inline bool deserializeFromSExpression(const SExpression& sexpr,
 }
 
 template <>
-inline int deserializeFromSExpression(const SExpression& sexpr,
-                                      bool throwIfEmpty) {
+inline int deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   bool ok = false;
-  int value = sexpr.getStringOrToken(throwIfEmpty).toInt(&ok);
+  int value = sexpr.getValue().toInt(&ok);
   if (ok) {
     return value;
   } else
@@ -239,10 +279,10 @@ inline int deserializeFromSExpression(const SExpression& sexpr,
 }
 
 template <>
-inline uint deserializeFromSExpression(const SExpression& sexpr,
-                                       bool throwIfEmpty) {
+inline uint deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   bool ok = false;
-  uint value = sexpr.getStringOrToken(throwIfEmpty).toUInt(&ok);
+  uint value = sexpr.getValue().toUInt(&ok);
   if (ok) {
     return value;
   } else
@@ -251,11 +291,11 @@ inline uint deserializeFromSExpression(const SExpression& sexpr,
 }
 
 template <>
-inline QDateTime deserializeFromSExpression(const SExpression& sexpr,
-                                            bool throwIfEmpty) {
+inline QDateTime deserialize(const SExpression& sexpr,
+                             const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
   QDateTime obj =
-      QDateTime::fromString(sexpr.getStringOrToken(throwIfEmpty), Qt::ISODate)
-          .toLocalTime();
+      QDateTime::fromString(sexpr.getValue(), Qt::ISODate).toLocalTime();
   if (obj.isValid())
     return obj;
   else
@@ -264,9 +304,9 @@ inline QDateTime deserializeFromSExpression(const SExpression& sexpr,
 }
 
 template <>
-inline QColor deserializeFromSExpression(const SExpression& sexpr,
-                                         bool throwIfEmpty) {
-  QColor obj(sexpr.getStringOrToken(throwIfEmpty));
+inline QColor deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QColor obj(sexpr.getValue());
   if (obj.isValid()) {
     return obj;
   } else
@@ -275,9 +315,9 @@ inline QColor deserializeFromSExpression(const SExpression& sexpr,
 }
 
 template <>
-inline QUrl deserializeFromSExpression(const SExpression& sexpr,
-                                       bool throwIfEmpty) {
-  QUrl obj(sexpr.getStringOrToken(throwIfEmpty), QUrl::StrictMode);
+inline QUrl deserialize(const SExpression& sexpr, const Version& fileFormat) {
+  Q_UNUSED(fileFormat);
+  QUrl obj(sexpr.getValue(), QUrl::StrictMode);
   if (obj.isValid()) {
     return obj;
   } else

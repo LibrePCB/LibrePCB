@@ -57,13 +57,14 @@ Via::Via(const Uuid& uuid, const Point& position, Shape shape,
     mDrillDiameter(drillDiameter) {
 }
 
-Via::Via(const SExpression& node)
+Via::Via(const SExpression& node, const Version& fileFormat)
   : onEdited(*this),
-    mUuid(node.getChildByIndex(0).getValue<Uuid>()),
-    mPosition(node.getChildByPath("position")),
-    mShape(node.getValueByPath<Shape>("shape")),
-    mSize(node.getValueByPath<PositiveLength>("size")),
-    mDrillDiameter(node.getValueByPath<PositiveLength>("drill")) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
+    mPosition(node.getChild("position"), fileFormat),
+    mShape(deserialize<Shape>(node.getChild("shape/@0"), fileFormat)),
+    mSize(deserialize<PositiveLength>(node.getChild("size/@0"), fileFormat)),
+    mDrillDiameter(
+        deserialize<PositiveLength>(node.getChild("drill/@0"), fileFormat)) {
 }
 
 Via::~Via() noexcept {
