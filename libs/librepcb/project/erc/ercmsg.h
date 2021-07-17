@@ -83,7 +83,6 @@ private:
   ErcMsg& operator=(const ErcMsg& rhs);
 
   // General
-  Project& mProject;
   ErcMsgList& mErcMsgList;
 
   // Attributes
