@@ -49,6 +49,8 @@ class BI_AirWire;
 class BGI_AirWire final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_AirWire() = delete;
+  BGI_AirWire(const BGI_AirWire& other) = delete;
   explicit BGI_AirWire(BI_AirWire& airwire) noexcept;
   ~BGI_AirWire() noexcept;
 
@@ -64,12 +66,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  BGI_AirWire() = delete;
-  BGI_AirWire(const BGI_AirWire& other) = delete;
+  // Operator Overloadings
   BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

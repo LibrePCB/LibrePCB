@@ -51,6 +51,8 @@ class BI_Plane;
 class BGI_Plane final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_Plane() = delete;
+  BGI_Plane(const BGI_Plane& other) = delete;
   explicit BGI_Plane(BI_Plane& plane) noexcept;
   ~BGI_Plane() noexcept;
 
@@ -81,12 +83,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
 
-private:
-  // make some methods inaccessible...
-  BGI_Plane() = delete;
-  BGI_Plane(const BGI_Plane& other) = delete;
+  // Operator Overloadings
   BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 

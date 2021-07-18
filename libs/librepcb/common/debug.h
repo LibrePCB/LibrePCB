@@ -76,6 +76,9 @@ public:
     All = 100,  ///< all
   };
 
+  // Constructors / Destructor
+  Debug(const Debug& other) = delete;
+
   // General methods
 
   /**
@@ -152,12 +155,13 @@ public:
     return &dbg;
   }
 
+  // Operator Overloadings
+  Debug& operator=(const Debug& rhs) = delete;
+
 private:
-  // make some methods inaccessible...
+  // Constructors / Destructor
   Debug();
-  Debug(const Debug& other);
   ~Debug();
-  Debug& operator=(const Debug& rhs);
 
   /**
    * @brief The message handler for qDebug(), qWarning(), qCritical() and

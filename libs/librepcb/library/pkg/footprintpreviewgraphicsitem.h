@@ -56,6 +56,9 @@ class FootprintPreviewGraphicsItem final : public QGraphicsItem,
                                            public AttributeProvider {
 public:
   // Constructors / Destructor
+  FootprintPreviewGraphicsItem() = delete;
+  FootprintPreviewGraphicsItem(const FootprintPreviewGraphicsItem& other) =
+      delete;
   explicit FootprintPreviewGraphicsItem(
       const IF_GraphicsLayerProvider& layerProvider,
       const QStringList& localeOrder, const Footprint& footprint,
@@ -76,19 +79,16 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
 
+  // Operator Overloadings
+  FootprintPreviewGraphicsItem& operator=(
+      const FootprintPreviewGraphicsItem& rhs) = delete;
+
 signals:
 
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override {}
 
 private:
-  // make some methods inaccessible...
-  FootprintPreviewGraphicsItem() = delete;
-  FootprintPreviewGraphicsItem(const FootprintPreviewGraphicsItem& other) =
-      delete;
-  FootprintPreviewGraphicsItem& operator=(
-      const FootprintPreviewGraphicsItem& rhs) = delete;
-
   // Inherited from AttributeProvider
   /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;

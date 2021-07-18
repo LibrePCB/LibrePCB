@@ -49,6 +49,7 @@ class GraphicsView final : public QGraphicsView {
 
 public:
   // Constructors / Destructor
+  GraphicsView(const GraphicsView& other) = delete;
   explicit GraphicsView(
       QWidget* parent = nullptr,
       IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
@@ -87,6 +88,9 @@ public:
                                bool mapToGrid) const noexcept;
   void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
+  // Operator Overloadings
+  GraphicsView& operator=(const GraphicsView& rhs) = delete;
+
 public slots:
 
   // Public Slots
@@ -109,10 +113,6 @@ private slots:
   void zoomAnimationValueChanged(const QVariant& value) noexcept;
 
 private:
-  // make some methods inaccessible...
-  GraphicsView(const GraphicsView& other) = delete;
-  GraphicsView& operator=(const GraphicsView& rhs) = delete;
-
   // Inherited Methods
   void wheelEvent(QWheelEvent* event);
   bool eventFilter(QObject* obj, QEvent* event);

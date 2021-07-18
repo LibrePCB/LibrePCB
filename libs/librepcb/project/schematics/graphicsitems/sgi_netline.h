@@ -49,6 +49,8 @@ class SI_NetLine;
 class SGI_NetLine final : public SGI_Base {
 public:
   // Constructors / Destructor
+  SGI_NetLine() = delete;
+  SGI_NetLine(const SGI_NetLine& other) = delete;
   explicit SGI_NetLine(SI_NetLine& netline) noexcept;
   ~SGI_NetLine() noexcept;
 
@@ -61,12 +63,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  SGI_NetLine() = delete;
-  SGI_NetLine(const SGI_NetLine& other) = delete;
+  // Operator Overloadings
   SGI_NetLine& operator=(const SGI_NetLine& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

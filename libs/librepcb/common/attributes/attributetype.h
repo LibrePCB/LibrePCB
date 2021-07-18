@@ -59,6 +59,8 @@ public:
   };
 
   // Constructors / Destructor
+  AttributeType() = delete;
+  AttributeType(const AttributeType& other) = delete;
   AttributeType(Type_t type, const QString& typeName,
                 const QString& typeNameTr) noexcept;
   virtual ~AttributeType() noexcept;
@@ -84,12 +86,10 @@ public:
   static QList<const AttributeType*> getAllTypes() noexcept;
   static const AttributeType& fromString(const QString& type);
 
-protected:
-  // make some methods inaccessible...
-  AttributeType() = delete;
-  AttributeType(const AttributeType& other) = delete;
+  // Operator Overloadings
   AttributeType& operator=(const AttributeType& rhs) = delete;
 
+protected:
   // General Attributes
   Type_t mType;
   QString mTypeName;

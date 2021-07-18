@@ -54,6 +54,8 @@ class BI_FootprintPad;
 class BGI_FootprintPad final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_FootprintPad() = delete;
+  BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
   explicit BGI_FootprintPad(BI_FootprintPad& pad) noexcept;
   ~BGI_FootprintPad() noexcept;
 
@@ -69,12 +71,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
 
-private:
-  // make some methods inaccessible...
-  BGI_FootprintPad() = delete;
-  BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
+  // Operator Overloadings
   BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 

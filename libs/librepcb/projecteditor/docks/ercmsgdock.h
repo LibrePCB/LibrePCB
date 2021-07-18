@@ -54,8 +54,13 @@ class ErcMsgDock final : public QDockWidget {
 
 public:
   // Constructors / Destructor
+  ErcMsgDock() = delete;
+  ErcMsgDock(const ErcMsgDock& other) = delete;
   explicit ErcMsgDock(Project& project);
   ~ErcMsgDock();
+
+  // Operator Overloadings
+  ErcMsgDock& operator=(const ErcMsgDock& rhs) = delete;
 
 public slots:
 
@@ -72,11 +77,6 @@ private slots:
 private:
   // Private Methods
   void updateTopLevelItemTexts() noexcept;
-
-  // make some methods inaccessible...
-  ErcMsgDock();
-  ErcMsgDock(const ErcMsgDock& other);
-  ErcMsgDock& operator=(const ErcMsgDock& rhs);
 
   // General
   Project& mProject;

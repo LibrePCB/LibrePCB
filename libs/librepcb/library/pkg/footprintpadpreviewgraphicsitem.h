@@ -49,6 +49,9 @@ class FootprintPad;
 class FootprintPadPreviewGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
+  FootprintPadPreviewGraphicsItem() = delete;
+  FootprintPadPreviewGraphicsItem(
+      const FootprintPadPreviewGraphicsItem& other) = delete;
   explicit FootprintPadPreviewGraphicsItem(
       const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
       const PackagePad* pkgPad = nullptr) noexcept;
@@ -66,14 +69,11 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
 
-private:
-  // make some methods inaccessible...
-  FootprintPadPreviewGraphicsItem() = delete;
-  FootprintPadPreviewGraphicsItem(
-      const FootprintPadPreviewGraphicsItem& other) = delete;
+  // Operator Overloadings
   FootprintPadPreviewGraphicsItem& operator=(
       const FootprintPadPreviewGraphicsItem& rhs) = delete;
 
+private:
   // General Attributes
   const FootprintPad& mFootprintPad;
   const PackagePad* mPackagePad;

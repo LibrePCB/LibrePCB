@@ -48,6 +48,8 @@ class ProjectSettings final : public QObject, public SerializableObject {
 
 public:
   // Constructors / Destructor
+  ProjectSettings() = delete;
+  ProjectSettings(const ProjectSettings& other) = delete;
   explicit ProjectSettings(Project& project, const Version& fileFormat,
                            bool create);
   ~ProjectSettings() noexcept;
@@ -70,16 +72,14 @@ public:
   void triggerSettingsChanged() noexcept;
   void save();
 
+  // Operator Overloadings
+  ProjectSettings& operator=(const ProjectSettings& rhs) = delete;
+
 signals:
 
   void settingsChanged();
 
 private:
-  // make some methods inaccessible...
-  ProjectSettings();
-  ProjectSettings(const ProjectSettings& other);
-  ProjectSettings& operator=(const ProjectSettings& rhs);
-
   // Private Methods
 
   /// @copydoc librepcb::SerializableObject::serialize()

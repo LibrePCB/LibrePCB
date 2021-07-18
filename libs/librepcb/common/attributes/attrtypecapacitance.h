@@ -41,6 +41,9 @@ namespace librepcb {
  */
 class AttrTypeCapacitance final : public AttributeType {
 public:
+  // Constructors / Destructor
+  AttrTypeCapacitance(const AttrTypeCapacitance& other) = delete;
+
   bool isValueValid(const QString& value) const noexcept;
   QString valueFromTr(const QString& value) const noexcept;
   QString printableValueTr(const QString& value,
@@ -50,11 +53,10 @@ public:
     return x;
   }
 
-private:
-  // make some methods inaccessible...
-  AttrTypeCapacitance(const AttrTypeCapacitance& other) = delete;
+  // Operator Overloadings
   AttrTypeCapacitance& operator=(const AttrTypeCapacitance& rhs) = delete;
 
+private:
   // Constructors / Destructor
   AttrTypeCapacitance() noexcept;
   ~AttrTypeCapacitance() noexcept;

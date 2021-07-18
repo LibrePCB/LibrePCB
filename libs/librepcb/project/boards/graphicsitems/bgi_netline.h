@@ -49,6 +49,8 @@ class BI_NetLine;
 class BGI_NetLine final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_NetLine() = delete;
+  BGI_NetLine(const BGI_NetLine& other) = delete;
   explicit BGI_NetLine(BI_NetLine& netline) noexcept;
   ~BGI_NetLine() noexcept;
 
@@ -64,12 +66,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  BGI_NetLine() = delete;
-  BGI_NetLine(const BGI_NetLine& other) = delete;
+  // Operator Overloadings
   BGI_NetLine& operator=(const BGI_NetLine& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

@@ -60,6 +60,8 @@ class ProjectLibrary final : public QObject {
 
 public:
   // Constructors / Destructor
+  ProjectLibrary() = delete;
+  ProjectLibrary(const ProjectLibrary& other) = delete;
   ProjectLibrary(std::unique_ptr<TransactionalDirectory> directory);
   ~ProjectLibrary() noexcept;
 
@@ -106,12 +108,10 @@ public:
   // General Methods
   void save();
 
-private:
-  // make some methods inaccessible...
-  ProjectLibrary();
-  ProjectLibrary(const ProjectLibrary& other);
-  ProjectLibrary& operator=(const ProjectLibrary& rhs);
+  // Operator Overloadings
+  ProjectLibrary& operator=(const ProjectLibrary& rhs) = delete;
 
+private:
   // Private Methods
   template <typename ElementType>
   void loadElements(const QString& dirname, const QString& type,
