@@ -71,6 +71,8 @@ class BoardEditor final : public QMainWindow,
 
 public:
   // Constructors / Destructor
+  BoardEditor() = delete;
+  BoardEditor(const BoardEditor& other) = delete;
   explicit BoardEditor(ProjectEditor& projectEditor, Project& project);
   ~BoardEditor();
 
@@ -84,6 +86,9 @@ public:
 
   // General Methods
   void abortAllCommands() noexcept;
+
+  // Operator Overloadings
+  BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
 protected:
   void closeEvent(QCloseEvent* event);
@@ -120,11 +125,6 @@ private slots:
   void boardListActionGroupTriggered(QAction* action);
 
 private:
-  // make some methods inaccessible...
-  BoardEditor() = delete;
-  BoardEditor(const BoardEditor& other) = delete;
-  BoardEditor& operator=(const BoardEditor& rhs) = delete;
-
   // Private Methods
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;

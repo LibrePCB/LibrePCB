@@ -57,6 +57,8 @@ public:
   };
 
   // Constructors / Destructor
+  ErcMsg() = delete;
+  ErcMsg(const ErcMsg& other) = delete;
   explicit ErcMsg(Project& project, const IF_ErcMsgProvider& owner,
                   const QString& ownerKey, const QString& msgKey,
                   ErcMsg::ErcMsgType_t msgType, const QString& msg = QString());
@@ -76,14 +78,11 @@ public:
   void setVisible(bool visible) noexcept;
   void setIgnored(bool ignored) noexcept;
 
-private:
-  // make some methods inaccessible...
-  ErcMsg();
-  ErcMsg(const ErcMsg& other);
-  ErcMsg& operator=(const ErcMsg& rhs);
+  // Operator Overloadings
+  ErcMsg& operator=(const ErcMsg& rhs) = delete;
 
+private:
   // General
-  Project& mProject;
   ErcMsgList& mErcMsgList;
 
   // Attributes

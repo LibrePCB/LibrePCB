@@ -49,6 +49,8 @@ class BI_Via;
 class BGI_Via final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_Via() = delete;
+  BGI_Via(const BGI_Via& other) = delete;
   explicit BGI_Via(BI_Via& via) noexcept;
   ~BGI_Via() noexcept;
 
@@ -64,12 +66,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  BGI_Via() = delete;
-  BGI_Via(const BGI_Via& other) = delete;
+  // Operator Overloadings
   BGI_Via& operator=(const BGI_Via& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

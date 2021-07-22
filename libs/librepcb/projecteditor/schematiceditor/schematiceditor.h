@@ -67,6 +67,8 @@ class SchematicEditor final : public QMainWindow,
 
 public:
   // Constructors / Destructor
+  SchematicEditor() = delete;
+  SchematicEditor(const SchematicEditor& other) = delete;
   explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
   ~SchematicEditor();
 
@@ -81,6 +83,9 @@ public:
 
   // General Methods
   void abortAllCommands() noexcept;
+
+  // Operator Overloadings
+  SchematicEditor& operator=(const SchematicEditor& rhs) = delete;
 
 protected:
   void closeEvent(QCloseEvent* event);
@@ -108,11 +113,6 @@ signals:
   void activeSchematicChanged(int index);
 
 private:
-  // make some methods inaccessible...
-  SchematicEditor();
-  SchematicEditor(const SchematicEditor& other);
-  SchematicEditor& operator=(const SchematicEditor& rhs);
-
   // Private Methods
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;

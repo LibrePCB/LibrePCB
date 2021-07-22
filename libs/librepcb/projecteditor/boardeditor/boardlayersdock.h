@@ -59,11 +59,16 @@ class BoardLayersDock final : public QDockWidget {
 
 public:
   // Constructors / Destructor
+  BoardLayersDock() = delete;
+  BoardLayersDock(const BoardLayersDock& other) = delete;
   explicit BoardLayersDock(BoardEditor& editor) noexcept;
   ~BoardLayersDock() noexcept;
 
   // Setters
   void setActiveBoard(Board* board);
+
+  // Operator Overloadings
+  BoardLayersDock& operator=(const BoardLayersDock& rhs) = delete;
 
 private slots:
 
@@ -75,11 +80,6 @@ private slots:
   void on_btnNone_clicked();
 
 private:
-  // make some methods inaccessible...
-  BoardLayersDock();
-  BoardLayersDock(const BoardLayersDock& other);
-  BoardLayersDock& operator=(const BoardLayersDock& rhs);
-
   // Private Methods
   void updateListWidget() noexcept;
   void setVisibleLayers(const QList<QString>& layers) noexcept;

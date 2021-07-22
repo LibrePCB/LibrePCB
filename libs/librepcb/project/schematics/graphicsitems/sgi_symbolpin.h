@@ -53,6 +53,8 @@ class SI_SymbolPin;
 class SGI_SymbolPin final : public SGI_Base {
 public:
   // Constructors / Destructor
+  SGI_SymbolPin() = delete;
+  SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
   explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
   ~SGI_SymbolPin() noexcept;
 
@@ -65,12 +67,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
 
-private:
-  // make some methods inaccessible...
-  SGI_SymbolPin() = delete;
-  SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
+  // Operator Overloadings
   SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

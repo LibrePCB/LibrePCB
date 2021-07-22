@@ -54,6 +54,8 @@ class SI_Symbol;
 class SGI_Symbol final : public SGI_Base {
 public:
   // Constructors / Destructor
+  SGI_Symbol() = delete;
+  SGI_Symbol(const SGI_Symbol& other) = delete;
   explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
   ~SGI_Symbol() noexcept;
 
@@ -66,12 +68,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
 
-private:
-  // make some methods inaccessible...
-  SGI_Symbol() = delete;
-  SGI_Symbol(const SGI_Symbol& other) = delete;
+  // Operator Overloadings
   SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

@@ -57,9 +57,14 @@ class EditNetClassesDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
+  EditNetClassesDialog() = delete;
+  EditNetClassesDialog(const EditNetClassesDialog& other) = delete;
   explicit EditNetClassesDialog(Circuit& circuit, UndoStack& undoStack,
                                 QWidget* parent = 0);
   ~EditNetClassesDialog() noexcept;
+
+  // Operator Overloadings
+  EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs) = delete;
 
 private slots:
 
@@ -68,11 +73,6 @@ private slots:
   void on_btnRemove_clicked();
 
 private:
-  // make some methods inaccessible...
-  EditNetClassesDialog();
-  EditNetClassesDialog(const EditNetClassesDialog& other);
-  EditNetClassesDialog& operator=(const EditNetClassesDialog& rhs);
-
   // General Attributes
   Circuit& mCircuit;
   Ui::EditNetClassesDialog* mUi;

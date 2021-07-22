@@ -49,6 +49,8 @@ class SI_NetPoint;
 class SGI_NetPoint final : public SGI_Base {
 public:
   // Constructors / Destructor
+  SGI_NetPoint() = delete;
+  SGI_NetPoint(const SGI_NetPoint& other) = delete;
   explicit SGI_NetPoint(SI_NetPoint& netpoint) noexcept;
   ~SGI_NetPoint() noexcept;
 
@@ -60,12 +62,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  SGI_NetPoint() = delete;
-  SGI_NetPoint(const SGI_NetPoint& other) = delete;
+  // Operator Overloadings
   SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

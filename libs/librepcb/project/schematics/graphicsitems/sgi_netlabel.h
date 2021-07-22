@@ -50,6 +50,8 @@ class SI_NetLabel;
 class SGI_NetLabel final : public SGI_Base {
 public:
   // Constructors / Destructor
+  SGI_NetLabel() = delete;
+  SGI_NetLabel(const SGI_NetLabel& other) = delete;
   explicit SGI_NetLabel(SI_NetLabel& netlabel) noexcept;
   ~SGI_NetLabel() noexcept;
 
@@ -62,12 +64,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  SGI_NetLabel() = delete;
-  SGI_NetLabel(const SGI_NetLabel& other) = delete;
+  // Operator Overloadings
   SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 

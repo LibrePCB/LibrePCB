@@ -45,12 +45,10 @@ class SGI_Base : public QGraphicsItem {
 public:
   // Constructors / Destructor
   explicit SGI_Base() noexcept;
+  SGI_Base(const SGI_Base& other) = delete;
   virtual ~SGI_Base() noexcept;
 
-private:
-  // make some methods inaccessible...
-  // SGI_Base() = delete;
-  SGI_Base(const SGI_Base& other) = delete;
+  // Operator Overloadings
   SGI_Base& operator=(const SGI_Base& rhs) = delete;
 };
 

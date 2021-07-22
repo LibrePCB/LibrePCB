@@ -42,6 +42,8 @@ namespace librepcb {
 class AttributeUnit final {
 public:
   // Constructors / Destructor
+  AttributeUnit() = delete;
+  AttributeUnit(const AttributeUnit& other) = delete;
   explicit AttributeUnit(const QString& name, const QString& symbolTr,
                          const QStringList& userInputSuffixes) noexcept;
   ~AttributeUnit() noexcept;
@@ -53,12 +55,10 @@ public:
     return mUserInputSuffixes;
   }
 
-private:
-  // make some methods inaccessible...
-  AttributeUnit() = delete;
-  AttributeUnit(const AttributeUnit& other) = delete;
+  // Operator Overloadings
   AttributeUnit& operator=(const AttributeUnit& rhs) = delete;
 
+private:
   // General Attributes
   QString mName;  ///< to convert from/to string, e.g. "millivolt"
   QString mSymbolTr;  ///< e.g. "mV"
