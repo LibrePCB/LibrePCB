@@ -41,6 +41,9 @@ namespace librepcb {
  */
 class AttrTypeString final : public AttributeType {
 public:
+  // Constructors / Destructor
+  AttrTypeString(const AttrTypeString& other) = delete;
+
   bool isValueValid(const QString& value) const noexcept;
   QString valueFromTr(const QString& value) const noexcept;
   QString printableValueTr(const QString& value,
@@ -50,11 +53,10 @@ public:
     return x;
   }
 
-private:
-  // make some methods inaccessible...
-  AttrTypeString(const AttrTypeString& other) = delete;
+  // Operator Overloadings
   AttrTypeString& operator=(const AttrTypeString& rhs) = delete;
 
+private:
   // Constructors / Destructor
   AttrTypeString() noexcept;
   ~AttrTypeString() noexcept;

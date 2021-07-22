@@ -54,6 +54,8 @@ class BI_Footprint;
 class BGI_Footprint final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_Footprint() = delete;
+  BGI_Footprint(const BGI_Footprint& other) = delete;
   explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
   ~BGI_Footprint() noexcept;
 
@@ -69,12 +71,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
 
-private:
-  // make some methods inaccessible...
-  BGI_Footprint() = delete;
-  BGI_Footprint(const BGI_Footprint& other) = delete;
+  // Operator Overloadings
   BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 

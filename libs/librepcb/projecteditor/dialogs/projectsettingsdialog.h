@@ -58,10 +58,15 @@ class ProjectSettingsDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
+  ProjectSettingsDialog() = delete;
+  ProjectSettingsDialog(const ProjectSettingsDialog& other) = delete;
   explicit ProjectSettingsDialog(ProjectSettings& settings,
                                  UndoStack& undoStack,
                                  QWidget* parent = 0) noexcept;
   ~ProjectSettingsDialog() noexcept;
+
+  // Operator Overloadings
+  ProjectSettingsDialog& operator=(const ProjectSettingsDialog& rhs) = delete;
 
 private slots:
 
@@ -77,11 +82,6 @@ private slots:
   void on_btnNormDown_clicked();
 
 private:
-  // make some methods inaccessible...
-  ProjectSettingsDialog();
-  ProjectSettingsDialog(const ProjectSettingsDialog& other);
-  ProjectSettingsDialog& operator=(const ProjectSettingsDialog& rhs);
-
   // Private Methods
   void accept();
   void reject();

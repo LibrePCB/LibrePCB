@@ -45,16 +45,14 @@ class BGI_Base : public QGraphicsItem {
 public:
   // Constructors / Destructor
   explicit BGI_Base() noexcept;
+  BGI_Base(const BGI_Base& other) = delete;
   virtual ~BGI_Base() noexcept;
+
+  // Operator Overloadings
+  BGI_Base& operator=(const BGI_Base& rhs) = delete;
 
 protected:
   static qreal getZValueOfCopperLayer(const QString& name) noexcept;
-
-private:
-  // make some methods inaccessible...
-  // BGI_Base() = delete;
-  BGI_Base(const BGI_Base& other) = delete;
-  BGI_Base& operator=(const BGI_Base& rhs) = delete;
 };
 
 /*******************************************************************************

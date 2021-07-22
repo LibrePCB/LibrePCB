@@ -51,6 +51,9 @@ class ComponentSignal;
 class SymbolPinPreviewGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
+  SymbolPinPreviewGraphicsItem() = delete;
+  SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) =
+      delete;
   explicit SymbolPinPreviewGraphicsItem(
       const IF_GraphicsLayerProvider& layerProvider, const SymbolPin& pin,
       const ComponentSignal* compSignal,
@@ -69,14 +72,11 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
 
-private:
-  // make some methods inaccessible...
-  SymbolPinPreviewGraphicsItem() = delete;
-  SymbolPinPreviewGraphicsItem(const SymbolPinPreviewGraphicsItem& other) =
-      delete;
+  // Operator Overloadings
   SymbolPinPreviewGraphicsItem& operator=(
       const SymbolPinPreviewGraphicsItem& rhs) = delete;
 
+private:
   // General Attributes
   const SymbolPin& mPin;
   const ComponentSignal* mComponentSignal;

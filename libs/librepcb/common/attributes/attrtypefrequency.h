@@ -41,6 +41,9 @@ namespace librepcb {
  */
 class AttrTypeFrequency final : public AttributeType {
 public:
+  // Constructors / Destructor
+  AttrTypeFrequency(const AttrTypeFrequency& other) = delete;
+
   bool isValueValid(const QString& value) const noexcept;
   QString valueFromTr(const QString& value) const noexcept;
   QString printableValueTr(const QString& value,
@@ -50,11 +53,10 @@ public:
     return x;
   }
 
-private:
-  // make some methods inaccessible...
-  AttrTypeFrequency(const AttrTypeFrequency& other) = delete;
+  // Operator Overloadings
   AttrTypeFrequency& operator=(const AttrTypeFrequency& rhs) = delete;
 
+private:
   // Constructors / Destructor
   AttrTypeFrequency() noexcept;
   ~AttrTypeFrequency() noexcept;

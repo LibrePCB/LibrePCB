@@ -55,6 +55,8 @@ class SymbolPreviewGraphicsItem final : public QGraphicsItem,
                                         public AttributeProvider {
 public:
   // Constructors / Destructor
+  SymbolPreviewGraphicsItem() = delete;
+  SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
   explicit SymbolPreviewGraphicsItem(
       const IF_GraphicsLayerProvider& layerProvider,
       const QStringList& localeOrder, const Symbol& symbol,
@@ -75,18 +77,16 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
 
+  // Operator Overloadings
+  SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
+      delete;
+
 signals:
 
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override {}
 
 private:
-  // make some methods inaccessible...
-  SymbolPreviewGraphicsItem() = delete;
-  SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
-  SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
-      delete;
-
   // Inherited from AttributeProvider
   /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;

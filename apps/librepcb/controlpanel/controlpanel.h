@@ -82,8 +82,13 @@ class ControlPanel final : public QMainWindow {
 
 public:
   // Constructors / Destructor
+  ControlPanel() = delete;
+  ControlPanel(const ControlPanel& other) = delete;
   explicit ControlPanel(workspace::Workspace& workspace);
   ~ControlPanel();
+
+  // Operator Overloadings
+  ControlPanel& operator=(const ControlPanel& rhs) = delete;
 
 public slots:
 
@@ -120,11 +125,6 @@ private slots:
   void on_actionRescanLibraries_triggered();
 
 private:
-  // make some methods inaccessible...
-  ControlPanel();
-  ControlPanel(const ControlPanel& other);
-  ControlPanel& operator=(const ControlPanel& rhs);
-
   // General private methods
   void saveSettings();
   void loadSettings();

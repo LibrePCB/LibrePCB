@@ -49,6 +49,8 @@ class BI_NetPoint;
 class BGI_NetPoint final : public BGI_Base {
 public:
   // Constructors / Destructor
+  BGI_NetPoint() = delete;
+  BGI_NetPoint(const BGI_NetPoint& other) = delete;
   explicit BGI_NetPoint(BI_NetPoint& netpoint) noexcept;
   ~BGI_NetPoint() noexcept;
 
@@ -63,12 +65,10 @@ public:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget);
 
-private:
-  // make some methods inaccessible...
-  BGI_NetPoint() = delete;
-  BGI_NetPoint(const BGI_NetPoint& other) = delete;
+  // Operator Overloadings
   BGI_NetPoint& operator=(const BGI_NetPoint& rhs) = delete;
 
+private:
   // Private Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
