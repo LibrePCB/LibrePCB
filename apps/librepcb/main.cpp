@@ -49,9 +49,9 @@ using namespace librepcb::application;
 static void setApplicationMetadata() noexcept;
 static void configureApplicationSettings() noexcept;
 static void writeLogHeader() noexcept;
+static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
-static FilePath determineWorkspacePath() noexcept;
-static int openWorkspace(const FilePath& path) noexcept;
+static int openWorkspace(FilePath& path);
 static int appExec() noexcept;
 
 /*******************************************************************************
@@ -60,8 +60,6 @@ static int appExec() noexcept;
 
 int main(int argc, char* argv[]) {
   Application app(argc, argv);
-
-  // ------------------------------ INITIALIZATION -----------------------------
 
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
@@ -89,24 +87,8 @@ int main(int argc, char* argv[]) {
   QScopedPointer<NetworkAccessManager> networkAccessManager(
       new NetworkAccessManager());
 
-  // ------------------------------ OPEN WORKSPACE -----------------------------
-
-  int retval = 0;
-
-  // If the file format is unstable (e.g. for nightly builds), ask to abort now.
-  // This warning *must* come that early to be really sure that no files are
-  // overwritten with unstable content!
-  if (isFileFormatStableOrAcceptUnstable()) {
-    // Get the path of the workspace to open (may show the first run wizard)
-    FilePath wsPath = determineWorkspacePath();
-
-    // Open the workspace and catch the return value
-    if (wsPath.isValid()) {
-      retval = openWorkspace(wsPath);
-    }
-  }
-
-  // ----------------------------- EXIT APPLICATION ----------------------------
+  // Run the actual application
+  int retval = runApplication();
 
   // Stop network access manager thread
   networkAccessManager.reset();
@@ -172,6 +154,40 @@ static void writeLogHeader() noexcept {
 }
 
 /*******************************************************************************
+ *  openWorkspace()
+ ******************************************************************************/
+
+static int runApplication() noexcept {
+  // If the file format is unstable (e.g. for nightly builds), ask to abort now.
+  // This warning *must* come that early to be really sure that no files are
+  // overwritten with unstable content!
+  if (!isFileFormatStableOrAcceptUnstable()) {
+    return 0;
+  }
+
+  // Get the path of the workspace to open. By default, open the recently used
+  // workspace stored in the user settings.
+  FilePath path = Workspace::getMostRecentlyUsedWorkspacePath();
+  qDebug() << "Recently used workspace:" << path.toNative();
+
+  // If creating or opening a workspace failed, allow to choose another
+  // workspace path until it succeeds or the user aborts.
+  try {
+    return openWorkspace(path);  // can throw
+  } catch (const UserCanceled& e) {
+    return 0;  // User canceled -> exit application.
+  } catch (const Exception& e) {
+    QMessageBox::critical(
+        nullptr, Application::translate("Workspace", "Error"),
+        QString(Application::translate("Workspace",
+                                       "Could not open the workspace \"%1\":"))
+                .arg(path.toNative()) %
+            "\n\n" % e.getMsg());
+    return 0;  // Failure -> exit application.
+  }
+}
+
+/*******************************************************************************
  *  isFileFormatStableOrAcceptUnstable()
  ******************************************************************************/
 
@@ -202,78 +218,51 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
 }
 
 /*******************************************************************************
- *  determineWorkspacePath()
- ******************************************************************************/
-
-static FilePath determineWorkspacePath() noexcept {
-  FilePath wsPath(Workspace::getMostRecentlyUsedWorkspacePath());
-  if (!Workspace::isValidWorkspacePath(wsPath)) {
-    FirstRunWizard wizard;
-    if (wizard.exec() == QDialog::Accepted) {
-      wsPath = wizard.getWorkspaceFilePath();
-      if (wizard.getCreateNewWorkspace()) {
-        try {
-          // create new workspace
-          Workspace::createNewWorkspace(wsPath);  // can throw
-        } catch (const Exception& e) {
-          QMessageBox::critical(0, Application::translate("Workspace", "Error"),
-                                e.getMsg());
-          return FilePath();  // TODO: Show the wizard again instead of closing
-                              // the application
-        }
-      }
-      Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
-    } else {
-      return FilePath();  // abort
-    }
-  }
-  return wsPath;
-}
-
-/*******************************************************************************
  *  openWorkspace()
  ******************************************************************************/
 
-static int openWorkspace(const FilePath& path) noexcept {
-  try {
-    // Migrate workspace to new major version, if needed. Note that this needs
-    // to be done *before* opening the workspace, otherwise the workspace would
-    // be default-initialized!
-    QList<Version> versions = Workspace::getFileFormatVersionsOfWorkspace(path);
-    if (!versions.contains(qApp->getFileFormatVersion())) {
-      InitializeWorkspaceWizard wizard(path);
-      if (wizard.exec() != QDialog::Accepted) {
-        return 0;  // Workspace not migrated, abort here!
+static int openWorkspace(FilePath& path) {
+  // If no valid workspace path is available, ask the user to choose it.
+  if (!Workspace::isValidWorkspacePath(path)) {
+    FirstRunWizard wizard;
+    if (wizard.exec() == QDialog::Accepted) {
+      path = wizard.getWorkspaceFilePath();
+      if (wizard.getCreateNewWorkspace()) {
+        Workspace::createNewWorkspace(path);  // can throw
       }
+      Workspace::setMostRecentlyUsedWorkspacePath(path);
+    } else {
+      throw UserCanceled(__FILE__, __LINE__);
     }
-
-    // Open the workspace (can throw). If it is locked, a dialog will show
-    // an error and possibly provides an option to override the lock.
-    Workspace ws(path,
-                 DirectoryLockHandlerDialog::createDirectoryLockCallback());
-
-    // Now since workspace settings are loaded, switch to the locale defined
-    // there (until now, the system locale was used).
-    if (!ws.getSettings().applicationLocale.get().isEmpty()) {
-      QLocale locale(ws.getSettings().applicationLocale.get());
-      QLocale::setDefault(locale);
-      qApp->setTranslationLocale(locale);
-    }
-
-    ControlPanel p(ws);
-    p.show();
-
-    return appExec();
-  } catch (UserCanceled& e) {
-    return 0;
-  } catch (Exception& e) {
-    QMessageBox::critical(
-        0, Application::translate("Workspace", "Cannot open the workspace"),
-        QString(Application::translate(
-                    "Workspace", "The workspace \"%1\" cannot be opened: %2"))
-            .arg(path.toNative(), e.getMsg()));
-    return 0;
   }
+
+  // Migrate workspace to new major version, if needed. Note that this needs
+  // to be done *before* opening the workspace, otherwise the workspace would
+  // be default-initialized!
+  QList<Version> versions = Workspace::getFileFormatVersionsOfWorkspace(path);
+  if (!versions.contains(qApp->getFileFormatVersion())) {
+    InitializeWorkspaceWizard wizard(path);
+    if (wizard.exec() != QDialog::Accepted) {
+      throw UserCanceled(__FILE__, __LINE__);
+    }
+  }
+
+  // Open the workspace (can throw). If it is locked, a dialog will show
+  // an error and possibly provides an option to override the lock.
+  Workspace ws(path, DirectoryLockHandlerDialog::createDirectoryLockCallback());
+
+  // Now since workspace settings are loaded, switch to the locale defined
+  // there (until now, the system locale was used).
+  if (!ws.getSettings().applicationLocale.get().isEmpty()) {
+    QLocale locale(ws.getSettings().applicationLocale.get());
+    QLocale::setDefault(locale);
+    qApp->setTranslationLocale(locale);
+  }
+
+  ControlPanel p(ws);
+  p.show();
+
+  return appExec();
 }
 
 /*******************************************************************************
