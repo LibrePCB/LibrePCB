@@ -172,18 +172,20 @@ static int runApplication() noexcept {
 
   // If creating or opening a workspace failed, allow to choose another
   // workspace path until it succeeds or the user aborts.
-  try {
-    return openWorkspace(path);  // can throw
-  } catch (const UserCanceled& e) {
-    return 0;  // User canceled -> exit application.
-  } catch (const Exception& e) {
-    QMessageBox::critical(
-        nullptr, Application::translate("Workspace", "Error"),
-        QString(Application::translate("Workspace",
-                                       "Could not open the workspace \"%1\":"))
-                .arg(path.toNative()) %
-            "\n\n" % e.getMsg());
-    return 0;  // Failure -> exit application.
+  while (true) {
+    try {
+      return openWorkspace(path);  // can throw
+    } catch (const UserCanceled& e) {
+      return 0;  // User canceled -> exit application.
+    } catch (const Exception& e) {
+      QMessageBox::critical(
+          nullptr, Application::translate("Workspace", "Error"),
+          QString(Application::translate(
+                      "Workspace", "Could not open the workspace \"%1\":"))
+                  .arg(path.toNative()) %
+              "\n\n" % e.getMsg());
+      path = FilePath();  // Make sure the workspace selector wizard is shown.
+    }
   }
 }
 
