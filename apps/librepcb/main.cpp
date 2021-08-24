@@ -223,7 +223,7 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
 
 static int openWorkspace(FilePath& path) {
   // If no valid workspace path is available, ask the user to choose it.
-  if (!Workspace::isValidWorkspacePath(path)) {
+  if (!path.isValid()) {
     FirstRunWizard wizard;
     if (wizard.exec() == QDialog::Accepted) {
       path = wizard.getWorkspaceFilePath();
@@ -234,6 +234,16 @@ static int openWorkspace(FilePath& path) {
     } else {
       throw UserCanceled(__FILE__, __LINE__);
     }
+  }
+
+  // If the selected directory is not a valid workspace, we need to abort here
+  // to avoid the InitializeWorkspaceWizard to silently/unintentielly creating
+  // new files within the specified directory.
+  if (!Workspace::isValidWorkspacePath(path)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        Application::translate(
+            "Workspace", "This directory is not a valid LibrePCB workspace."));
   }
 
   // Migrate workspace to new major version, if needed. Note that this needs
