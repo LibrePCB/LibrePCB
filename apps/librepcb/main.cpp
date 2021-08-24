@@ -170,6 +170,15 @@ static int runApplication() noexcept {
   FilePath path = Workspace::getMostRecentlyUsedWorkspacePath();
   qDebug() << "Recently used workspace:" << path.toNative();
 
+  // If the workspace path is specified by environment variable, use this one.
+  const char* wsEnvVarName = "LIBREPCB_WORKSPACE";
+  QString wsEnvStr = qgetenv(wsEnvVarName);
+  if (!wsEnvStr.isEmpty()) {
+    qInfo() << "Workspace path overridden by" << wsEnvVarName
+            << "environment variable:" << wsEnvStr;
+    path.setPath(wsEnvStr);
+  }
+
   // If creating or opening a workspace failed, allow to choose another
   // workspace path until it succeeds or the user aborts.
   while (true) {
