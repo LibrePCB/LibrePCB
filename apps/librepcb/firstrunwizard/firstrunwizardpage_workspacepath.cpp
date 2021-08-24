@@ -47,8 +47,16 @@ FirstRunWizardPage_WorkspacePath::FirstRunWizardPage_WorkspacePath(
   registerField("OpenWorkspace", mUi->rbtnOpenWs);
   registerField("OpenWorkspacePath", mUi->edtOpenWsPath);
 
-  FilePath defaultWsPath =
-      FilePath(QDir::homePath()).getPathTo("LibrePCB-Workspace");
+  // By default, the suggested workspace path is a subdirectory within the
+  // user's home folder. However, depending on the deployment method, the
+  // home folder might be some kind of sandboxed and/or even deleted when
+  // uninstalling LibrePCB (e.g. like Snap packages), which would be a horrible
+  // location to store the workspace. In these cases a more reasonable
+  // (persistent) path can be specified by an environment variable.
+  FilePath defaultWsPath(qgetenv("LIBREPCB_DEFAULT_WORKSPACE_PATH"));
+  if (!defaultWsPath.isValid()) {
+    defaultWsPath = FilePath(QDir::homePath()).getPathTo("LibrePCB-Workspace");
+  }
   mUi->edtCreateWsPath->setText(defaultWsPath.toNative());
   mUi->edtOpenWsPath->setText(defaultWsPath.toNative());
   if (workspace::Workspace::isValidWorkspacePath(defaultWsPath))
