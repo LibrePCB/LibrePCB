@@ -40,87 +40,121 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label">
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="cbxClearanceCopperCopper">
           <property name="text">
            <string>Clearance Copper to Copper:</string>
           </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperCopper" native="true"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Clearance Copper to Board Edge:</string>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperBoard" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperCopper" native="true"/>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_8">
+         <widget class="QCheckBox" name="cbxClearanceCopperBoard">
           <property name="text">
-           <string>Clearance Copper to NPTH Drills:</string>
+           <string>Clearance Copper to Board Edge:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperNpth" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperBoard" native="true"/>
         </item>
         <item row="4" column="0">
-         <widget class="QLabel" name="label_3">
+         <widget class="QCheckBox" name="cbxClearanceCopperNpth">
           <property name="text">
-           <string>Minimum Copper Width:</string>
+           <string>Clearance Copper to NPTH Drills:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinCopperWidth" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperNpth" native="true"/>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="label_6">
+         <widget class="QCheckBox" name="cbxMinCopperWidth">
           <property name="text">
-           <string>Minimum PTH Restring:</string>
+           <string>Minimum Copper Width:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="5" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthRestring" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinCopperWidth" native="true"/>
         </item>
         <item row="6" column="0">
-         <widget class="QLabel" name="label_4">
+         <widget class="QCheckBox" name="cbxMinPthRestring">
           <property name="text">
-           <string>Minimum PTH Drill Diameter:</string>
+           <string>Minimum PTH Restring:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="6" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthDrillDiameter" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthRestring" native="true"/>
         </item>
         <item row="7" column="0">
-         <widget class="QLabel" name="label_5">
+         <widget class="QCheckBox" name="cbxMinPthDrillDiameter">
           <property name="text">
-           <string>Minimum NPTH Drill Diameter:</string>
+           <string>Minimum PTH Drill Diameter:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="7" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinNpthDrillDiameter" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthDrillDiameter" native="true"/>
         </item>
         <item row="8" column="0">
-         <widget class="QLabel" name="label_9">
+         <widget class="QCheckBox" name="cbxMinNpthDrillDiameter">
           <property name="text">
-           <string>Additional Courtyard Offset:</string>
+           <string>Minimum NPTH Drill Diameter:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="8" column="1">
-         <widget class="librepcb::LengthEdit" name="edtCourtyardOffset" native="true"/>
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinNpthDrillDiameter" native="true"/>
         </item>
         <item row="9" column="0">
+         <widget class="QCheckBox" name="cbxCourtyardOffset">
+          <property name="text">
+           <string>Additional Courtyard Offset:</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="librepcb::LengthEdit" name="edtCourtyardOffset" native="true"/>
+        </item>
+        <item row="10" column="0">
+         <widget class="QCheckBox" name="cbxMissingConnections">
+          <property name="text">
+           <string>Check for missing connections</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -133,13 +167,36 @@
           </property>
          </spacer>
         </item>
-        <item row="10" column="0" colspan="2">
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="cbxRebuildPlanes">
+          <property name="text">
+           <string>Rebuild planes before running checks</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0" colspan="2">
          <widget class="QProgressBar" name="prgProgress">
           <property name="value">
            <number>0</number>
           </property>
           <property name="format">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QPushButton" name="btnSelectAll">
+          <property name="text">
+           <string>Select All/None</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

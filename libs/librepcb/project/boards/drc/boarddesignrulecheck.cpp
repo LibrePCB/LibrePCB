@@ -82,15 +82,33 @@ void BoardDesignRuleCheck::execute() {
   mProgressStatus.clear();
   mMessages.clear();
 
-  rebuildPlanes(5, 15);
-  checkCopperBoardClearances(15, 40);
-  checkCopperCopperClearances(40, 70);
-  checkMinimumCopperWidth(70, 72);
-  checkMinimumPthRestring(72, 74);
-  checkMinimumPthDrillDiameter(74, 76);
-  checkMinimumNpthDrillDiameter(76, 78);
-  checkCourtyardClearances(78, 88);
-  checkForMissingConnections(88, 90);
+  if (mOptions.rebuildPlanes) {
+    rebuildPlanes(5, 15);
+  }
+  if (mOptions.checkCopperBoardClearance || mOptions.checkCopperNpthClearance) {
+    checkCopperBoardClearances(15, 40);
+  }
+  if (mOptions.checkCopperCopperClearance) {
+    checkCopperCopperClearances(40, 70);
+  }
+  if (mOptions.checkCopperWidth) {
+    checkMinimumCopperWidth(70, 72);
+  }
+  if (mOptions.checkPthRestring) {
+    checkMinimumPthRestring(72, 74);
+  }
+  if (mOptions.checkPthDrillDiameter) {
+    checkMinimumPthDrillDiameter(74, 76);
+  }
+  if (mOptions.checkNpthDrillDiameter) {
+    checkMinimumNpthDrillDiameter(76, 78);
+  }
+  if (mOptions.checkCourtyardClearance) {
+    checkCourtyardClearances(78, 88);
+  }
+  if (mOptions.checkMissingConnections) {
+    checkForMissingConnections(88, 90);
+  }
 
   emitStatus(
       tr("Finished with %1 message(s)!", "Count of messages", mMessages.count())
@@ -140,7 +158,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
 
   // Board outline
   ClipperLib::Paths outlineRestrictedArea;
-  {
+  if (mOptions.checkCopperBoardClearance) {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
     gen.addBoardOutline();
     outlineRestrictedArea = gen.getPaths();
@@ -153,7 +171,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
   }
 
   // Holes
-  {
+  if (mOptions.checkCopperNpthClearance) {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
     gen.addHoles(*mOptions.minCopperNpthClearance - *maxArcTolerance());
     ClipperHelpers::unite(outlineRestrictedArea, gen.getPaths());

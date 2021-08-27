@@ -55,25 +55,53 @@ class BoardDesignRuleCheck final : public QObject {
 
 public:
   struct Options {
+    bool rebuildPlanes;
+
+    bool checkCopperWidth;
     UnsignedLength minCopperWidth;
+
+    bool checkCopperCopperClearance;
     UnsignedLength minCopperCopperClearance;
+
+    bool checkCopperBoardClearance;
     UnsignedLength minCopperBoardClearance;
+
+    bool checkCopperNpthClearance;
     UnsignedLength minCopperNpthClearance;
+
+    bool checkPthRestring;
     UnsignedLength minPthRestring;
+
+    bool checkNpthDrillDiameter;
     UnsignedLength minNpthDrillDiameter;
+
+    bool checkPthDrillDiameter;
     UnsignedLength minPthDrillDiameter;
+
+    bool checkCourtyardClearance;
     Length courtyardOffset;
 
+    bool checkMissingConnections;
+
     Options()
-      : minCopperWidth(200000),  // 200um
+      : rebuildPlanes(true),
+        checkCopperWidth(true),
+        minCopperWidth(200000),  // 200um
+        checkCopperCopperClearance(true),
         minCopperCopperClearance(200000),  // 200um
+        checkCopperBoardClearance(true),
         minCopperBoardClearance(300000),  // 300um
+        checkCopperNpthClearance(true),
         minCopperNpthClearance(200000),  // 200um
+        checkPthRestring(true),
         minPthRestring(150000),  // 150um
+        checkNpthDrillDiameter(true),
         minNpthDrillDiameter(250000),  // 250um
+        checkPthDrillDiameter(true),
         minPthDrillDiameter(250000),  // 250um
-        courtyardOffset(0)  // 0um
-    {}
+        checkCourtyardClearance(true),
+        courtyardOffset(0),  // 0um
+        checkMissingConnections(true) {}
   };
 
   // Constructors / Destructor

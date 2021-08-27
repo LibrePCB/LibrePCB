@@ -76,16 +76,46 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   btnRun->setDefault(true);  // Allow just pressing the return key to run DRC.
   connect(btnRun, &QPushButton::clicked, this,
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxRebuildPlanes,
+          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked,
+          mUi->cbxClearanceCopperCopper, &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked,
+          mUi->cbxClearanceCopperBoard, &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxClearanceCopperNpth,
+          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMinCopperWidth,
+          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMinPthRestring,
+          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMinPthDrillDiameter,
+          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked,
+          mUi->cbxMinNpthDrillDiameter, &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxCourtyardOffset,
+          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMissingConnections,
+          &QCheckBox::setChecked);
 
   // set options
+  mUi->cbxRebuildPlanes->setChecked(options.rebuildPlanes);
+  mUi->cbxClearanceCopperCopper->setChecked(options.checkCopperCopperClearance);
   mUi->edtClearanceCopperCopper->setValue(options.minCopperCopperClearance);
+  mUi->cbxClearanceCopperBoard->setChecked(options.checkCopperBoardClearance);
   mUi->edtClearanceCopperBoard->setValue(options.minCopperBoardClearance);
+  mUi->cbxClearanceCopperNpth->setChecked(options.checkCopperNpthClearance);
   mUi->edtClearanceCopperNpth->setValue(options.minCopperNpthClearance);
+  mUi->cbxMinCopperWidth->setChecked(options.checkCopperWidth);
   mUi->edtMinCopperWidth->setValue(options.minCopperWidth);
+  mUi->cbxMinPthRestring->setChecked(options.checkPthRestring);
   mUi->edtMinPthRestring->setValue(options.minPthRestring);
+  mUi->cbxMinPthDrillDiameter->setChecked(options.checkPthDrillDiameter);
   mUi->edtMinPthDrillDiameter->setValue(options.minPthDrillDiameter);
+  mUi->cbxMinNpthDrillDiameter->setChecked(options.checkNpthDrillDiameter);
   mUi->edtMinNpthDrillDiameter->setValue(options.minNpthDrillDiameter);
+  mUi->cbxCourtyardOffset->setChecked(options.checkCourtyardClearance);
   mUi->edtCourtyardOffset->setValue(options.courtyardOffset);
+  mUi->cbxMissingConnections->setChecked(options.checkMissingConnections);
 }
 
 BoardDesignRuleCheckDialog::~BoardDesignRuleCheckDialog() {
@@ -98,14 +128,25 @@ BoardDesignRuleCheckDialog::~BoardDesignRuleCheckDialog() {
 BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
     noexcept {
   BoardDesignRuleCheck::Options options;
+  options.rebuildPlanes = mUi->cbxRebuildPlanes->isChecked();
+  options.checkCopperCopperClearance =
+      mUi->cbxClearanceCopperCopper->isChecked();
   options.minCopperCopperClearance = mUi->edtClearanceCopperCopper->getValue();
+  options.checkCopperBoardClearance = mUi->cbxClearanceCopperBoard->isChecked();
   options.minCopperBoardClearance = mUi->edtClearanceCopperBoard->getValue();
+  options.checkCopperNpthClearance = mUi->cbxClearanceCopperNpth->isChecked();
   options.minCopperNpthClearance = mUi->edtClearanceCopperNpth->getValue();
+  options.checkCopperWidth = mUi->cbxMinCopperWidth->isChecked();
   options.minCopperWidth = mUi->edtMinCopperWidth->getValue();
+  options.checkPthRestring = mUi->cbxMinPthRestring->isChecked();
   options.minPthRestring = mUi->edtMinPthRestring->getValue();
+  options.checkPthDrillDiameter = mUi->cbxMinPthDrillDiameter->isChecked();
   options.minPthDrillDiameter = mUi->edtMinPthDrillDiameter->getValue();
+  options.checkNpthDrillDiameter = mUi->cbxMinNpthDrillDiameter->isChecked();
   options.minNpthDrillDiameter = mUi->edtMinNpthDrillDiameter->getValue();
+  options.checkCourtyardClearance = mUi->cbxCourtyardOffset->isChecked();
   options.courtyardOffset = mUi->edtCourtyardOffset->getValue();
+  options.checkMissingConnections = mUi->cbxMissingConnections->isChecked();
   return options;
 }
 
