@@ -57,6 +57,17 @@ public:
   ~BoardDesignRuleCheckMessagesDock() noexcept;
 
   // Setters
+  /**
+   * @brief Set whether the dock widget should be interactive or not
+   *
+   * @param interactive   True if enabled, false if disabled.
+   *
+   * @return  Whether the widget was interactive *before* calling this method.
+   *          Useful to temporarily disable widget & restore previous state.
+   */
+  bool setInteractive(bool interactive) noexcept;
+  void setProgressPercent(int percent) noexcept;
+  void setProgressStatus(const QString& status) noexcept;
   void setMessages(const QList<BoardDesignRuleCheckMessage>& messages) noexcept;
 
   // Operator Overloadings
@@ -64,6 +75,8 @@ public:
       const BoardDesignRuleCheckMessagesDock& rhs) = delete;
 
 signals:
+  void settingsDialogRequested();
+  void runDrcRequested();
   void messageSelected(const BoardDesignRuleCheckMessage& msg, bool zoomTo);
 
 private:  // Methods
