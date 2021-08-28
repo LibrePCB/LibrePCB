@@ -46,6 +46,7 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     QWidget* parent) noexcept
   : QDialog(parent), mBoard(board), mUi(new Ui::BoardDesignRuleCheckDialog) {
   mUi->setupUi(this);
+  mUi->prgProgress->hide();  // Somehow looks ugly as long as unused.
   mUi->edtClearanceCopperCopper->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
       settingsPrefix % "/clearance_copper_copper");
@@ -70,7 +71,10 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtCourtyardOffset->configure(lengthUnit,
                                      LengthEditBase::Steps::generic(),
                                      settingsPrefix % "/courtyard_offset");
-  connect(mUi->btnRun, &QPushButton::clicked, this,
+  QPushButton* btnRun =
+      mUi->buttonBox->addButton(tr("Run DRC"), QDialogButtonBox::ActionRole);
+  btnRun->setDefault(true);  // Allow just pressing the return key to run DRC.
+  connect(btnRun, &QPushButton::clicked, this,
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
 
   // set options
@@ -111,38 +115,34 @@ BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
 
 void BoardDesignRuleCheckDialog::btnRunDrcClicked() noexcept {
   mUi->grpOptions->setEnabled(false);
-  mUi->btnRun->setEnabled(false);
   mUi->buttonBox->setEnabled(false);
+  mUi->prgProgress->show();
 
   try {
     mUi->lstMessages->clear();
-    mUi->lstProgress->clear();
 
     BoardDesignRuleCheck drc(mBoard, getOptions());
     connect(&drc, &BoardDesignRuleCheck::progressPercent, mUi->prgProgress,
             &QProgressBar::setValue);
-    connect(&drc, &BoardDesignRuleCheck::progressStatus, mUi->lstProgress,
-            static_cast<void (QListWidget::*)(const QString&)>(
-                &QListWidget::addItem));
+    connect(&drc, &BoardDesignRuleCheck::progressStatus, mUi->prgProgress,
+            &QProgressBar::setFormat);
     connect(&drc, &BoardDesignRuleCheck::progressMessage, mUi->lstMessages,
             static_cast<void (QListWidget::*)(const QString&)>(
                 &QListWidget::addItem));
 
     // Use the progressStatus() signal (because it is not emitted too often
-    // which would lead to flickering) to update both list widgets.
-    connect(&drc, SIGNAL(progressStatus(QString)), mUi->lstProgress,
-            SLOT(repaint()));
+    // which would lead to flickering) to update the list widget(s).
     connect(&drc, SIGNAL(progressStatus(QString)), mUi->lstMessages,
             SLOT(repaint()));
 
     drc.execute();  // can throw
+    mUi->prgProgress->setToolTip(drc.getProgressStatus().join("\n"));
     mMessages = drc.getMessages();
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 
   mUi->grpOptions->setEnabled(true);
-  mUi->btnRun->setEnabled(true);
   mUi->buttonBox->setEnabled(true);
 }
 

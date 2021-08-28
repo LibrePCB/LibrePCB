@@ -61,7 +61,11 @@ namespace project {
 
 BoardDesignRuleCheck::BoardDesignRuleCheck(Board& board, const Options& options,
                                            QObject* parent) noexcept
-  : QObject(parent), mBoard(board), mOptions(options), mMessages() {
+  : QObject(parent),
+    mBoard(board),
+    mOptions(options),
+    mProgressStatus(),
+    mMessages() {
 }
 
 BoardDesignRuleCheck::~BoardDesignRuleCheck() noexcept {
@@ -75,6 +79,7 @@ void BoardDesignRuleCheck::execute() {
   emit started();
   emit progressPercent(5);
 
+  mProgressStatus.clear();
   mMessages.clear();
 
   rebuildPlanes(5, 15);
@@ -87,7 +92,7 @@ void BoardDesignRuleCheck::execute() {
   checkCourtyardClearances(78, 88);
   checkForMissingConnections(88, 90);
 
-  emit progressStatus(
+  emitStatus(
       tr("Finished with %1 message(s)!", "Count of messages", mMessages.count())
           .arg(mMessages.count()));
   emit progressPercent(100);
@@ -100,7 +105,7 @@ void BoardDesignRuleCheck::execute() {
 
 void BoardDesignRuleCheck::rebuildPlanes(int progressStart, int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Rebuild planes..."));
+  emitStatus(tr("Rebuild planes..."));
   mBoard.rebuildAllPlanes();
   emit progressPercent(progressEnd);
 }
@@ -108,7 +113,7 @@ void BoardDesignRuleCheck::rebuildPlanes(int progressStart, int progressEnd) {
 void BoardDesignRuleCheck::checkForMissingConnections(int progressStart,
                                                       int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Check for missing connections..."));
+  emitStatus(tr("Check for missing connections..."));
 
   // No check based on copper paths implemented yet -> return existing airwires
   // instead.
@@ -118,7 +123,7 @@ void BoardDesignRuleCheck::checkForMissingConnections(int progressStart,
                       .arg(*airwire->getNetSignal().getName());
     Path location = Path::obround(airwire->getP1(), airwire->getP2(),
                                   PositiveLength(50000));
-    addMessage(BoardDesignRuleCheckMessage(msg, location));
+    emitMessage(BoardDesignRuleCheckMessage(msg, location));
   }
 
   emit progressPercent(progressEnd);
@@ -126,7 +131,7 @@ void BoardDesignRuleCheck::checkForMissingConnections(int progressStart,
 
 void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
                                                       int progressEnd) {
-  emit progressStatus(tr("Check board clearances..."));
+  emitStatus(tr("Check board clearances..."));
 
   qreal progressSpan = progressEnd - progressStart;
   QList<NetSignal*> netsignals =
@@ -171,7 +176,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
                          "Placeholders are layer name + net name")
                           .arg(layer->getNameTr(), name1);
         Path location = ClipperHelpers::convert(path);
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
       qreal progress = progressSpan *
           qreal((layerIndex + 1) * netsignals.count() + i + 1) /
@@ -183,7 +188,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressStart,
 
 void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
                                                        int progressEnd) {
-  emit progressStatus(tr("Check copper clearances..."));
+  emitStatus(tr("Check copper clearances..."));
 
   qreal progressSpan = progressEnd - progressStart;
   QList<NetSignal*> netsignals =
@@ -217,7 +222,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
                            "Placeholders are layer name + net names")
                             .arg(layer->getNameTr(), name1, name2);
           Path location = ClipperHelpers::convert(path);
-          addMessage(BoardDesignRuleCheckMessage(msg, location));
+          emitMessage(BoardDesignRuleCheckMessage(msg, location));
         }
       }
       qreal progress = progressSpan *
@@ -231,7 +236,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressStart,
 void BoardDesignRuleCheck::checkCourtyardClearances(int progressStart,
                                                     int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Check courtyard clearances..."));
+  emitStatus(tr("Check courtyard clearances..."));
 
   auto layers = mBoard.getLayerStack().getLayers(
       {GraphicsLayer::sTopCourtyard, GraphicsLayer::sBotCourtyard});
@@ -264,7 +269,7 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressStart,
                            "Placeholders are layer name + component names")
                             .arg(layer->getNameTr(), name1, name2);
           Path location = ClipperHelpers::convert(path);
-          addMessage(BoardDesignRuleCheckMessage(msg, location));
+          emitMessage(BoardDesignRuleCheckMessage(msg, location));
         }
       }
     }
@@ -276,7 +281,7 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressStart,
 void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
                                                    int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Check minimum copper width..."));
+  emitStatus(tr("Check minimum copper width..."));
 
   // stroke texts
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
@@ -298,7 +303,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
         locations += path.toOutlineStrokes(PositiveLength(
             qMax(*text->getText().getStrokeWidth(), Length(50000))));
       }
-      addMessage(BoardDesignRuleCheckMessage(msg, locations));
+      emitMessage(BoardDesignRuleCheckMessage(msg, locations));
     }
   }
 
@@ -317,7 +322,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
       QVector<Path> locations =
           plane->getOutline().toClosedPath().toOutlineStrokes(
               PositiveLength(200000));
-      addMessage(BoardDesignRuleCheckMessage(msg, locations));
+      emitMessage(BoardDesignRuleCheckMessage(msg, locations));
     }
   }
 
@@ -344,7 +349,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
           locations += path.toOutlineStrokes(PositiveLength(
               qMax(*text->getText().getStrokeWidth(), Length(50000))));
         }
-        addMessage(BoardDesignRuleCheckMessage(msg, locations));
+        emitMessage(BoardDesignRuleCheckMessage(msg, locations));
       }
     }
   }
@@ -364,7 +369,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
         Path location = Path::obround(netline->getStartPoint().getPosition(),
                                       netline->getEndPoint().getPosition(),
                                       netline->getWidth());
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -375,7 +380,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
 void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
                                                    int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Check minimum PTH restrings..."));
+  emitStatus(tr("Check minimum PTH restrings..."));
 
   // vias
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
@@ -389,7 +394,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
         PositiveLength diameter = via->getDrillDiameter() +
             mOptions.minPthRestring + mOptions.minPthRestring;
         Path location = Path::circle(diameter).translated(via->getPosition());
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -414,7 +419,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
             PositiveLength(pad->getLibPad().getDrillDiameter() + 1) +
             mOptions.minPthRestring + mOptions.minPthRestring;
         Path location = Path::circle(diameter).translated(pad->getPosition());
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -425,7 +430,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
 void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
                                                         int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Check minimum PTH drill diameters..."));
+  emitStatus(tr("Check minimum PTH drill diameters..."));
 
   // vias
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
@@ -437,7 +442,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
                                formatLength(*via->getDrillDiameter()));
         Path location = Path::circle(via->getDrillDiameter())
                             .translated(via->getPosition());
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -459,7 +464,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
         PositiveLength diameter(
             qMax(*pad->getLibPad().getDrillDiameter(), Length(50000)));
         Path location = Path::circle(diameter).translated(pad->getPosition());
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -470,7 +475,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
 void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
                                                          int progressEnd) {
   Q_UNUSED(progressStart);
-  emit progressStatus(tr("Check minimum NPTH drill diameters..."));
+  emitStatus(tr("Check minimum NPTH drill diameters..."));
 
   QString msgTr = tr("Min. hole diameter: %1", "Placeholder is drill diameter");
 
@@ -480,7 +485,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
       QString msg = msgTr.arg(formatLength(*hole->getHole().getDiameter()));
       Path location = Path::circle(hole->getHole().getDiameter())
                           .translated(hole->getPosition());
-      addMessage(BoardDesignRuleCheckMessage(msg, location));
+      emitMessage(BoardDesignRuleCheckMessage(msg, location));
     }
   }
 
@@ -493,7 +498,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
         Path location =
             Path::circle(hole.getDiameter())
                 .translated(footprint.mapToScene(hole.getPosition()));
-        addMessage(BoardDesignRuleCheckMessage(msg, location));
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -549,7 +554,12 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
   return paths;
 }
 
-void BoardDesignRuleCheck::addMessage(
+void BoardDesignRuleCheck::emitStatus(const QString& status) noexcept {
+  mProgressStatus.append(status);
+  emit progressStatus(status);
+}
+
+void BoardDesignRuleCheck::emitMessage(
     const BoardDesignRuleCheckMessage& msg) noexcept {
   mMessages.append(msg);
   emit progressMessage(msg.getMessage());

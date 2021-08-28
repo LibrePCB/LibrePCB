@@ -7,148 +7,144 @@
     <x>0</x>
     <y>0</y>
     <width>780</width>
-    <height>677</height>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Design Rule Check</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
-       <item>
-        <widget class="QGroupBox" name="grpOptions">
-         <property name="title">
-          <string>Options</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="1" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Clearance Copper to Copper:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Clearance Copper to Board Edge:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Minimum Copper Width:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Minimum PTH Drill Diameter:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Minimum NPTH Drill Diameter:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Minimum PTH Restring:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperCopper" native="true"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperBoard" native="true"/>
-          </item>
-          <item row="4" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtMinCopperWidth" native="true"/>
-          </item>
-          <item row="5" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthRestring" native="true"/>
-          </item>
-          <item row="6" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthDrillDiameter" native="true"/>
-          </item>
-          <item row="7" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtMinNpthDrillDiameter" native="true"/>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="label_7">
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-	background-color: rgb(255, 255, 127);
-	color: rgb(170, 0, 0);
-};</string>
-            </property>
-            <property name="text">
-             <string>Note: These values are not (yet) stored permanently in the project files, so they will be reset when closing the project.</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Clearance Copper to NPTH Drills:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperNpth" native="true"/>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Additional Courtyard Offset:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="librepcb::LengthEdit" name="edtCourtyardOffset" native="true"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Execution</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QPushButton" name="btnRun">
-            <property name="text">
-             <string>Run DRC</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="lstProgress"/>
-          </item>
-          <item>
-           <widget class="QProgressBar" name="prgProgress"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QGroupBox" name="grpOptions">
+       <property name="title">
+        <string>Options</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Note: These values are not (yet) stored permanently in the project files, so they will be reset when closing the project.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="margin">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Clearance Copper to Copper:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperCopper" native="true"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Clearance Copper to Board Edge:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperBoard" native="true"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Clearance Copper to NPTH Drills:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperNpth" native="true"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Minimum Copper Width:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinCopperWidth" native="true"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Minimum PTH Restring:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthRestring" native="true"/>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Minimum PTH Drill Diameter:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthDrillDiameter" native="true"/>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Minimum NPTH Drill Diameter:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="librepcb::UnsignedLengthEdit" name="edtMinNpthDrillDiameter" native="true"/>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Additional Courtyard Offset:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="librepcb::LengthEdit" name="edtCourtyardOffset" native="true"/>
+        </item>
+        <item row="9" column="0">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="10" column="0" colspan="2">
+         <widget class="QProgressBar" name="prgProgress">
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="format">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox_2">
@@ -191,7 +187,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>btnRun</tabstop>
   <tabstop>edtClearanceCopperCopper</tabstop>
   <tabstop>edtClearanceCopperBoard</tabstop>
   <tabstop>edtClearanceCopperNpth</tabstop>

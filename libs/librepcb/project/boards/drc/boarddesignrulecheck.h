@@ -82,6 +82,9 @@ public:
   ~BoardDesignRuleCheck() noexcept;
 
   // Getters
+  const QStringList& getProgressStatus() const noexcept {
+    return mProgressStatus;
+  }
   const QList<BoardDesignRuleCheckMessage>& getMessages() const noexcept {
     return mMessages;
   }
@@ -110,7 +113,8 @@ private:  // Methods
                                           const NetSignal* netsignal);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
-  void addMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
+  void emitStatus(const QString& status) noexcept;
+  void emitMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;
 
   /**
@@ -123,6 +127,7 @@ private:  // Methods
 private:  // Data
   Board& mBoard;
   Options mOptions;
+  QStringList mProgressStatus;
   QList<BoardDesignRuleCheckMessage> mMessages;
   QHash<const GraphicsLayer*, QHash<const NetSignal*, ClipperLib::Paths>>
       mCachedPaths;
