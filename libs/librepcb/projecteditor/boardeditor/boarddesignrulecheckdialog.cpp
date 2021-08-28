@@ -116,9 +116,17 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->cbxCourtyardOffset->setChecked(options.checkCourtyardClearance);
   mUi->edtCourtyardOffset->setValue(options.courtyardOffset);
   mUi->cbxMissingConnections->setChecked(options.checkMissingConnections);
+
+  // Load the window geometry.
+  QSettings clientSettings;
+  restoreGeometry(
+      clientSettings.value("drc_dialog/window_geometry").toByteArray());
 }
 
 BoardDesignRuleCheckDialog::~BoardDesignRuleCheckDialog() {
+  // Save the window geometry.
+  QSettings clientSettings;
+  clientSettings.setValue("drc_dialog/window_geometry", saveGeometry());
 }
 
 /*******************************************************************************
