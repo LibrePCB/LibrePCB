@@ -59,6 +59,21 @@ TEST_F(AngleTest, testInverted) {
   EXPECT_EQ(Angle(180000000).inverted(), Angle(-180000000));
 }
 
+TEST_F(AngleTest, testRounded) {
+  EXPECT_EQ(Angle(54).rounded(Angle(-1)), Angle(54));  // Invalid -> ignored
+  EXPECT_EQ(Angle(54).rounded(Angle(0)), Angle(54));  // Invalid -> ignored
+  EXPECT_EQ(Angle(54).rounded(Angle(1)), Angle(54));  // already OK
+  EXPECT_EQ(Angle(1000000).rounded(Angle(10)), Angle(1000000));  // already OK
+  EXPECT_EQ(Angle(54).rounded(Angle(10)), Angle(50));  // rounded down
+  EXPECT_EQ(Angle(55).rounded(Angle(10)), Angle(60));  // rounded up
+  EXPECT_EQ(Angle(56).rounded(Angle(10)), Angle(60));  // rounded up
+  EXPECT_EQ(Angle(-54).rounded(Angle(10)), Angle(-50));  // rounded down
+  EXPECT_EQ(Angle(-55).rounded(Angle(10)), Angle(-60));  // rounded up
+  EXPECT_EQ(Angle(-56).rounded(Angle(10)), Angle(-60));  // rounded up
+  EXPECT_EQ(Angle(359999990).rounded(Angle(100)), Angle(0));  // overflow
+  EXPECT_EQ(Angle(-359999990).rounded(Angle(100)), Angle(0));  // underflow
+}
+
 TEST_P(AngleTest, testFromDeg) {
   const AngleTestData& data = GetParam();
 

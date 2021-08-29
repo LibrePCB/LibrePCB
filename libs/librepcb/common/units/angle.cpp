@@ -67,6 +67,24 @@ Angle& Angle::invert() noexcept {
   return *this;
 }
 
+Angle Angle::rounded(const Angle& interval) const noexcept {
+  Angle a(*this);
+  a.round(interval);
+  return a;
+}
+
+Angle& Angle::round(const Angle& interval) noexcept {
+  if (interval > 0) {
+    qint32 value = mMicrodegrees;
+    value += (value >= 0) ? (interval.mMicrodegrees / 2)
+                          : (-interval.mMicrodegrees / 2);
+    setAngleMicroDeg(interval.mMicrodegrees * (value / interval.mMicrodegrees));
+  } else {
+    qCritical() << "Invalid value passed to Angle::round():" << interval;
+  }
+  return *this;
+}
+
 Angle Angle::mappedTo0_360deg() const noexcept {
   Angle a(*this);
   a.mapTo0_360deg();
