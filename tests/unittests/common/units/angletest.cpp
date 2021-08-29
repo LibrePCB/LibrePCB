@@ -52,6 +52,13 @@ class AngleTest : public ::testing::TestWithParam<AngleTestData> {};
  *  Test Methods
  ******************************************************************************/
 
+TEST_F(AngleTest, testInverted) {
+  EXPECT_EQ(Angle(0).inverted(), Angle(0));
+  EXPECT_EQ(Angle(10000000).inverted(), Angle(-350000000));
+  EXPECT_EQ(Angle(-350000000).inverted(), Angle(10000000));
+  EXPECT_EQ(Angle(180000000).inverted(), Angle(-180000000));
+}
+
 TEST_P(AngleTest, testFromDeg) {
   const AngleTestData& data = GetParam();
 

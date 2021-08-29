@@ -52,6 +52,21 @@ Angle& Angle::makeAbs() noexcept {
   return *this;
 }
 
+Angle Angle::inverted() const noexcept {
+  Angle a(*this);
+  a.invert();
+  return a;
+}
+
+Angle& Angle::invert() noexcept {
+  if (mMicrodegrees > 0) {
+    mMicrodegrees -= 360000000;
+  } else if (mMicrodegrees < 0) {
+    mMicrodegrees += 360000000;
+  }
+  return *this;
+}
+
 Angle Angle::mappedTo0_360deg() const noexcept {
   Angle a(*this);
   a.mapTo0_360deg();

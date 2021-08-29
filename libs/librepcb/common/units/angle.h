@@ -222,6 +222,32 @@ public:
   Angle& makeAbs() noexcept;
 
   /**
+   * @brief Get an Angle object with inverted value
+   *
+   * Changes the sign while keeping the represented angle. For example, 270° is
+   * converted to -90° and vice versa. As a special case, an angle of 0° will
+   * be kept as-is.
+   *
+   * @return A new Angle object with inverted value
+   *
+   * @see ::librepcb::Angle::invert()
+   */
+  Angle inverted() const noexcept;
+
+  /**
+   * @brief Invert the angle
+   *
+   * Changes the sign while keeping the represented angle. For example, 270° is
+   * converted to -90° and vice versa. As a special case, an angle of 0° will
+   * be kept as-is.
+   *
+   * @return A reference to the modified object
+   *
+   * @see ::librepcb::Angle::inverted()
+   */
+  Angle& invert() noexcept;
+
+  /**
    * @brief Get an Angle object which is mapped to [0..360[ degrees
    *
    * @return A new Angle object which is mapped to [0..360[ degrees
