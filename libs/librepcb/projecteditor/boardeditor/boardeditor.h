@@ -129,6 +129,10 @@ private:
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
+  void runDrcNonInteractive() noexcept;
+  void updateBoardDrcMessages(
+      const Board& board,
+      const QList<BoardDesignRuleCheckMessage>& messages) noexcept;
   void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                            bool zoomTo) noexcept;
   void clearDrcMarker() noexcept;
