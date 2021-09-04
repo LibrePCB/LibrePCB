@@ -26,7 +26,6 @@
 #include "../../cmd/cmddragselectedboarditems.h"
 #include "../../cmd/cmdflipselectedboarditems.h"
 #include "../../cmd/cmdpasteboarditems.h"
-#include "../../cmd/cmdpastefootprintitems.h"
 #include "../../cmd/cmdremoveselectedboarditems.h"
 #include "../../cmd/cmdreplacedevice.h"
 #include "../boardclipboarddatabuilder.h"
@@ -947,6 +946,19 @@ bool BoardEditorState_Select::pasteFromClipboard() noexcept {
       return false;
     }
 
+    // merge footprint data into board data
+    if (footprintData) {
+      if (!boardData) {
+        boardData.reset(new BoardClipboardData(
+            footprintData->getFootprintUuid(), footprintData->getCursorPos()));
+      }
+      boardData->getPolygons().append(footprintData->getPolygons());
+      boardData->getStrokeTexts().append(footprintData->getStrokeTexts());
+      boardData->getHoles().append(footprintData->getHoles());
+      footprintData.reset();  // Not needed anymore.
+    }
+    Q_ASSERT(boardData);
+
     // memorize cursor position
     Point startPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, false);
@@ -957,20 +969,11 @@ bool BoardEditorState_Select::pasteFromClipboard() noexcept {
     mIsUndoCmdActive = true;
 
     // paste items from clipboard
-    bool addedSomething = false;
-    if (boardData) {
-      Point offset = (startPos - boardData->getCursorPos())
-                         .mappedToGrid(getGridInterval());
-      addedSomething =
-          mContext.undoStack.appendToCmdGroup(new CmdPasteBoardItems(
-              *board, std::move(boardData), offset));  // can throw
-    } else if (footprintData) {
-      Point offset = (startPos - footprintData->getCursorPos())
-                         .mappedToGrid(getGridInterval());
-      addedSomething =
-          mContext.undoStack.appendToCmdGroup(new CmdPasteFootprintItems(
-              *board, std::move(footprintData), offset));  // can throw
-    }
+    Point offset =
+        (startPos - boardData->getCursorPos()).mappedToGrid(getGridInterval());
+    bool addedSomething =
+        mContext.undoStack.appendToCmdGroup(new CmdPasteBoardItems(
+            *board, std::move(boardData), offset));  // can throw
 
     if (addedSomething) {  // can throw
       // start moving the selected items
