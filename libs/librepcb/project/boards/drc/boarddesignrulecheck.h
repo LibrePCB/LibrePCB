@@ -55,25 +55,53 @@ class BoardDesignRuleCheck final : public QObject {
 
 public:
   struct Options {
+    bool rebuildPlanes;
+
+    bool checkCopperWidth;
     UnsignedLength minCopperWidth;
+
+    bool checkCopperCopperClearance;
     UnsignedLength minCopperCopperClearance;
+
+    bool checkCopperBoardClearance;
     UnsignedLength minCopperBoardClearance;
+
+    bool checkCopperNpthClearance;
     UnsignedLength minCopperNpthClearance;
+
+    bool checkPthRestring;
     UnsignedLength minPthRestring;
+
+    bool checkNpthDrillDiameter;
     UnsignedLength minNpthDrillDiameter;
+
+    bool checkPthDrillDiameter;
     UnsignedLength minPthDrillDiameter;
+
+    bool checkCourtyardClearance;
     Length courtyardOffset;
 
+    bool checkMissingConnections;
+
     Options()
-      : minCopperWidth(200000),  // 200um
+      : rebuildPlanes(true),
+        checkCopperWidth(true),
+        minCopperWidth(200000),  // 200um
+        checkCopperCopperClearance(true),
         minCopperCopperClearance(200000),  // 200um
+        checkCopperBoardClearance(true),
         minCopperBoardClearance(300000),  // 300um
+        checkCopperNpthClearance(true),
         minCopperNpthClearance(200000),  // 200um
+        checkPthRestring(true),
         minPthRestring(150000),  // 150um
+        checkNpthDrillDiameter(true),
         minNpthDrillDiameter(250000),  // 250um
+        checkPthDrillDiameter(true),
         minPthDrillDiameter(250000),  // 250um
-        courtyardOffset(0)  // 0um
-    {}
+        checkCourtyardClearance(true),
+        courtyardOffset(0),  // 0um
+        checkMissingConnections(true) {}
   };
 
   // Constructors / Destructor
@@ -82,6 +110,9 @@ public:
   ~BoardDesignRuleCheck() noexcept;
 
   // Getters
+  const QStringList& getProgressStatus() const noexcept {
+    return mProgressStatus;
+  }
   const QList<BoardDesignRuleCheckMessage>& getMessages() const noexcept {
     return mMessages;
   }
@@ -110,7 +141,8 @@ private:  // Methods
                                           const NetSignal* netsignal);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
-  void addMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
+  void emitStatus(const QString& status) noexcept;
+  void emitMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;
 
   /**
@@ -123,6 +155,7 @@ private:  // Methods
 private:  // Data
   Board& mBoard;
   Options mOptions;
+  QStringList mProgressStatus;
   QList<BoardDesignRuleCheckMessage> mMessages;
   QHash<const GraphicsLayer*, QHash<const NetSignal*, ClipperLib::Paths>>
       mCachedPaths;

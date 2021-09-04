@@ -34,17 +34,59 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QListWidget" name="listWidget"/>
+     <widget class="QListWidget" name="lstMessages"/>
     </item>
     <item>
-     <widget class="QCheckBox" name="cbxCenterInView">
-      <property name="text">
-       <string>Center highlighted message in view</string>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
       </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
+      <item>
+       <widget class="QCheckBox" name="cbxCenterInView">
+        <property name="text">
+         <string>Zoom to location</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="prgProgress">
+        <property name="format">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnSettings">
+        <property name="toolTip">
+         <string>Open DRC Settings</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnRun">
+        <property name="toolTip">
+         <string>Run DRC</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

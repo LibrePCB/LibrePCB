@@ -185,6 +185,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   tabifyDockWidget(mBoardLayersDock, mErcMsgDock);
   mDrcMessagesDock.reset(new BoardDesignRuleCheckMessagesDock(this));
   connect(mDrcMessagesDock.data(),
+          &BoardDesignRuleCheckMessagesDock::settingsDialogRequested, this,
+          &BoardEditor::on_actionDesignRuleCheck_triggered);
+  connect(mDrcMessagesDock.data(),
+          &BoardDesignRuleCheckMessagesDock::runDrcRequested, this,
+          &BoardEditor::runDrcNonInteractive);
+  connect(mDrcMessagesDock.data(),
           &BoardDesignRuleCheckMessagesDock::messageSelected, this,
           &BoardEditor::highlightDrcMessage);
   addDockWidget(Qt::RightDockWidgetArea, mDrcMessagesDock.data());
@@ -338,6 +344,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     // update dock widgets
     mUnplacedComponentsDock->setBoard(mActiveBoard);
     mBoardLayersDock->setActiveBoard(mActiveBoard);
+    mDrcMessagesDock->setInteractive(mActiveBoard != nullptr);
     mDrcMessagesDock->setMessages(mActiveBoard
                                       ? mDrcMessages[mActiveBoard->getUuid()]
                                       : QList<BoardDesignRuleCheckMessage>());
@@ -683,11 +690,9 @@ void BoardEditor::on_actionDesignRuleCheck_triggered() {
                                     "board_editor/drc_dialog", this);
   dialog.exec();
   mDrcOptions = dialog.getOptions();
-  if (dialog.getMessages()) {
-    clearDrcMarker();
-    mDrcMessages.insert(board->getUuid(), *dialog.getMessages());
-    mDrcMessagesDock->setMessages(*dialog.getMessages());
-    if (dialog.getMessages()->count() > 0) {
+  if (auto messages = dialog.getMessages()) {
+    updateBoardDrcMessages(*board, *messages);
+    if (messages->count() > 0) {
       mDrcMessagesDock->show();
       mDrcMessagesDock->raise();
     }
@@ -847,6 +852,39 @@ void BoardEditor::toolActionGroupChangeTriggered(
 
 void BoardEditor::unplacedComponentsCountChanged(int count) noexcept {
   mUi->lblUnplacedComponentsNote->setVisible(count > 0);
+}
+
+void BoardEditor::runDrcNonInteractive() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  bool wasInteractive = mDrcMessagesDock->setInteractive(false);
+
+  try {
+    BoardDesignRuleCheck drc(*board, mDrcOptions);
+    connect(&drc, &BoardDesignRuleCheck::progressPercent,
+            mDrcMessagesDock.data(),
+            &BoardDesignRuleCheckMessagesDock::setProgressPercent);
+    connect(&drc, &BoardDesignRuleCheck::progressStatus,
+            mDrcMessagesDock.data(),
+            &BoardDesignRuleCheckMessagesDock::setProgressStatus);
+    drc.execute();  // can throw
+    updateBoardDrcMessages(*board, drc.getMessages());
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+
+  mDrcMessagesDock->setInteractive(wasInteractive);
+}
+
+void BoardEditor::updateBoardDrcMessages(
+    const Board& board,
+    const QList<BoardDesignRuleCheckMessage>& messages) noexcept {
+  clearDrcMarker();
+  mDrcMessages.insert(board.getUuid(), messages);
+  if (&board == getActiveBoard()) {
+    mDrcMessagesDock->setMessages(messages);
+  }
 }
 
 void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,

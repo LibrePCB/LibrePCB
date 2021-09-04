@@ -42,13 +42,25 @@ BoardDesignRuleCheckMessagesDock::BoardDesignRuleCheckMessagesDock(
     QWidget* parent) noexcept
   : QDockWidget(parent), mUi(new Ui::BoardDesignRuleCheckMessagesDock) {
   mUi->setupUi(this);
-  connect(mUi->listWidget, &QListWidget::currentRowChanged, this,
+  mUi->prgProgress->setFixedHeight(mUi->cbxCenterInView->height());
+  mUi->prgProgress->hide();
+  mUi->btnSettings->setFixedSize(mUi->cbxCenterInView->height(),
+                                 mUi->cbxCenterInView->height());
+  mUi->btnRun->setFixedSize(mUi->cbxCenterInView->height(),
+                            mUi->cbxCenterInView->height());
+  connect(mUi->btnSettings, &QToolButton::clicked, this,
+          &BoardDesignRuleCheckMessagesDock::settingsDialogRequested);
+  connect(mUi->btnRun, &QToolButton::clicked, this,
+          &BoardDesignRuleCheckMessagesDock::runDrcRequested);
+  connect(mUi->lstMessages, &QListWidget::currentRowChanged, this,
           &BoardDesignRuleCheckMessagesDock::listWidgetCurrentItemChanged);
-  connect(mUi->listWidget, &QListWidget::itemClicked, this,
+  connect(mUi->lstMessages, &QListWidget::itemClicked, this,
           &BoardDesignRuleCheckMessagesDock::listWidgetCurrentItemChanged);
   connect(
-      mUi->listWidget, &QListWidget::itemDoubleClicked, this,
+      mUi->lstMessages, &QListWidget::itemDoubleClicked, this,
       &BoardDesignRuleCheckMessagesDock::listWidgetCurrentItemDoubleClicked);
+
+  setInteractive(false);
 }
 
 BoardDesignRuleCheckMessagesDock::~BoardDesignRuleCheckMessagesDock() noexcept {
@@ -58,16 +70,43 @@ BoardDesignRuleCheckMessagesDock::~BoardDesignRuleCheckMessagesDock() noexcept {
  *  Public Methods
  ******************************************************************************/
 
+bool BoardDesignRuleCheckMessagesDock::setInteractive(
+    bool interactive) noexcept {
+  bool wasInteractive = mUi->btnRun->isEnabled();
+  mUi->lstMessages->setEnabled(interactive);
+  mUi->cbxCenterInView->setEnabled(interactive);
+  mUi->btnSettings->setEnabled(interactive);
+  mUi->btnRun->setEnabled(interactive);
+  return wasInteractive;
+}
+
+void BoardDesignRuleCheckMessagesDock::setProgressPercent(
+    int percent) noexcept {
+  mUi->cbxCenterInView->hide();
+  mUi->prgProgress->show();
+  mUi->prgProgress->setValue(percent);
+}
+
+void BoardDesignRuleCheckMessagesDock::setProgressStatus(
+    const QString& status) noexcept {
+  mUi->cbxCenterInView->hide();
+  mUi->prgProgress->show();
+  mUi->prgProgress->setFormat(status);
+}
+
 void BoardDesignRuleCheckMessagesDock::setMessages(
     const QList<BoardDesignRuleCheckMessage>& messages) noexcept {
   mMessages = messages;
 
-  bool signalsBlocked = mUi->listWidget->blockSignals(true);
-  mUi->listWidget->clear();
+  mUi->prgProgress->hide();
+  mUi->cbxCenterInView->show();
+
+  bool signalsBlocked = mUi->lstMessages->blockSignals(true);
+  mUi->lstMessages->clear();
   foreach (const BoardDesignRuleCheckMessage& message, mMessages) {
-    mUi->listWidget->addItem(message.getMessage());
+    mUi->lstMessages->addItem(message.getMessage());
   }
-  mUi->listWidget->blockSignals(signalsBlocked);
+  mUi->lstMessages->blockSignals(signalsBlocked);
 
   setWindowTitle(tr("DRC [%1]", "Number of messages").arg(mMessages.count()));
 }
@@ -77,7 +116,7 @@ void BoardDesignRuleCheckMessagesDock::setMessages(
  ******************************************************************************/
 
 void BoardDesignRuleCheckMessagesDock::listWidgetCurrentItemChanged() noexcept {
-  int index = mUi->listWidget->currentRow();
+  int index = mUi->lstMessages->currentRow();
   if ((index >= 0) && (index < mMessages.count())) {
     emit messageSelected(mMessages[index], mUi->cbxCenterInView->isChecked());
   }
@@ -85,7 +124,7 @@ void BoardDesignRuleCheckMessagesDock::listWidgetCurrentItemChanged() noexcept {
 
 void BoardDesignRuleCheckMessagesDock::
     listWidgetCurrentItemDoubleClicked() noexcept {
-  int index = mUi->listWidget->currentRow();
+  int index = mUi->lstMessages->currentRow();
   if ((index >= 0) && (index < mMessages.count())) {
     emit messageSelected(mMessages[index], true);
   }
