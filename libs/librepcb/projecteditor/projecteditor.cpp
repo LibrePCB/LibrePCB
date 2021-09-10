@@ -53,9 +53,11 @@ ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project)
     mProject(project),
     mUndoStack(nullptr),
     mSchematicEditor(nullptr),
-    mBoardEditor(nullptr) {
+    mBoardEditor(nullptr),
+    mLastAutosaveStateId(0) {
   try {
     mUndoStack = new UndoStack();
+    mLastAutosaveStateId = mUndoStack->getUniqueStateId();
 
     // create the whole schematic/board editor GUI inclusive FSM and so on
     mSchematicEditor = new SchematicEditor(*this, mProject);
@@ -199,6 +201,7 @@ bool ProjectEditor::saveProject() noexcept {
     qDebug() << "Save project...";
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->save();  // can throw
+    mLastAutosaveStateId = mUndoStack->getUniqueStateId();
 
     // saving was successful --> clean the undo stack
     mUndoStack->setClean();
@@ -212,8 +215,14 @@ bool ProjectEditor::saveProject() noexcept {
 }
 
 bool ProjectEditor::autosaveProject() noexcept {
-  if (mUndoStack->isClean())
-    return false;  // do not save if there are no changes
+  // Do not save if there are no changes since the last (auto)save.
+  // Note: mUndoStack->isClean() must not be considered here since the undo
+  // stack might be reverted to clean state by undoing commands. In that case,
+  // the last autosave backup would be outdated and lead to unexpected state
+  // when restoring.
+  if (mUndoStack->getUniqueStateId() == mLastAutosaveStateId) {
+    return false;
+  }
 
   if (mUndoStack->isCommandGroupActive()) {
     // the user is executing a command at the moment, so we should not save now,
@@ -226,6 +235,7 @@ bool ProjectEditor::autosaveProject() noexcept {
     qDebug() << "Autosave project...";
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->autosave();  // can throw
+    mLastAutosaveStateId = mUndoStack->getUniqueStateId();
     qDebug() << "Project successfully autosaved";
     return true;
   } catch (Exception& exc) {
