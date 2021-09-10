@@ -149,11 +149,22 @@ public:
   bool canRedo() const noexcept;
 
   /**
+   * @brief Get a unique identification of the current state
+   *
+   * Useful to detect if there were any changes made between to different
+   * points in time.
+   *
+   * @return The current state identification
+   */
+  uint getUniqueStateId() const noexcept;
+
+  /**
    * @brief Check if the stack is in a clean state (the state of the last
    * #setClean())
    *
-   * This is used to determine if the document/project/whatever has changed since
-   * the last time it was saved. You need to call #setClean() when you save it.
+   * This is used to determine if the document/project/whatever has changed
+   * since the last time it was saved. You need to call #setClean() when you
+   * save it.
    *
    * @return true | false
    */

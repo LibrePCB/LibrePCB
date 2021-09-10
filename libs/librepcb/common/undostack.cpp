@@ -110,6 +110,22 @@ bool UndoStack::canRedo() const noexcept {
   return (mCurrentIndex < mCommands.count());
 }
 
+uint UndoStack::getUniqueStateId() const noexcept {
+  // Just building a hash of all executed command pointers should be good
+  // enough to detect state changes. Future (undone) commands must be ignored
+  // since they are not relevant for the current state.
+  QList<UndoCommand*> commands = mCommands.mid(0, mCurrentIndex);
+  uint id = qHashRange(commands.constBegin(), commands.constEnd());
+
+  // If there is a command group currently active, we should take it into
+  // account as well to avoid ambiguous state IDs.
+  if (mActiveCommandGroup) {
+    id ^= qHash(mActiveCommandGroup) ^ mActiveCommandGroup->getChildCount();
+  }
+
+  return id;
+}
+
 bool UndoStack::isClean() const noexcept {
   return (mCurrentIndex == mCleanIndex);
 }
