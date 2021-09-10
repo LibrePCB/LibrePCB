@@ -222,6 +222,11 @@ private:  // Data
   UndoStack* mUndoStack;  ///< See @ref doc_project_undostack
   SchematicEditor* mSchematicEditor;  ///< The schematic editor (GUI)
   BoardEditor* mBoardEditor;  ///< The board editor (GUI)
+
+  /**
+   * The UndoStack state ID of the last successful project (auto)save
+   */
+  uint mLastAutosaveStateId;
 };
 
 /*******************************************************************************
