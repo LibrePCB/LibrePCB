@@ -124,8 +124,16 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
 
   // Load all library elements.
   updateElementLists();
+
+  // Update the library element lists each time the library scan succeeded,
+  // i.e. new information about the libraries is available. Attention: Use
+  // the "scanSucceeded" signal, not "scanFinished" since "scanFinished" is
+  // also called when a scan is aborted, i.e. *no* new information is available!
+  // This can cause wrong list items after removing or adding elements, since
+  // these operations are immediately applied on the list widgets (for immediate
+  // feedback) but will then be reverted if a scan was aborted.
   connect(&mContext.workspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanFinished, this,
+          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
           &LibraryOverviewWidget::updateElementLists);
 }
 
