@@ -127,9 +127,10 @@ private:  // Methods
   void duplicateItem(QListWidget* list, const FilePath& fp) noexcept;
   void removeItems(
       const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
-  void moveElementsToOtherLibrary(
+  void copyElementsToOtherLibrary(
       const QHash<QListWidgetItem*, FilePath>& selectedItemPaths,
-      const FilePath& libFp, const QString& libName) noexcept;
+      const FilePath& libFp, const QString& libName,
+      bool removeFromSource) noexcept;
   QList<LibraryMenuItem> getLocalLibraries() const noexcept;
 
   // Event Handlers

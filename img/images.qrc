@@ -17,6 +17,7 @@
         <file>actions/bookmark_gray.png</file>
         <file>actions/cam_export.png</file>
         <file>actions/cancel.png</file>
+        <file>actions/clone.png</file>
         <file>actions/close.png</file>
         <file>actions/copy.png</file>
         <file>actions/cut.png</file>
