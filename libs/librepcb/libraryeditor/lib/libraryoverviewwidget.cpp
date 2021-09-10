@@ -124,8 +124,16 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
 
   // Load all library elements.
   updateElementLists();
+
+  // Update the library element lists each time the library scan succeeded,
+  // i.e. new information about the libraries is available. Attention: Use
+  // the "scanSucceeded" signal, not "scanFinished" since "scanFinished" is
+  // also called when a scan is aborted, i.e. *no* new information is available!
+  // This can cause wrong list items after removing or adding elements, since
+  // these operations are immediately applied on the list widgets (for immediate
+  // feedback) but will then be reverted if a scan was aborted.
   connect(&mContext.workspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanFinished, this,
+          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
           &LibraryOverviewWidget::updateElementLists);
 }
 
@@ -376,6 +384,7 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   Q_ASSERT(list);
   QHash<QListWidgetItem*, FilePath> selectedItemPaths =
       getElementListItemFilePaths(list->selectedItems());
+  QHash<QAction*, FilePath> aCopyToLibChildren;
   QHash<QAction*, FilePath> aMoveToLibChildren;
 
   // Build the context menu
@@ -383,21 +392,26 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"), tr("Edit"));
   aEdit->setVisible(!selectedItemPaths.isEmpty());
   QAction* aDuplicate =
-      menu.addAction(QIcon(":/img/actions/copy.png"), tr("Duplicate"));
+      menu.addAction(QIcon(":/img/actions/clone.png"), tr("Duplicate"));
   aDuplicate->setVisible(selectedItemPaths.count() == 1);
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   aRemove->setVisible(!selectedItemPaths.isEmpty());
   if (!selectedItemPaths.isEmpty()) {
+    QMenu* menuCopyToLib = menu.addMenu(QIcon(":/img/actions/copy.png"),
+                                        tr("Copy to other library"));
     QMenu* menuMoveToLib = menu.addMenu(QIcon(":/img/actions/move_to.png"),
                                         tr("Move to other library"));
     foreach (const LibraryMenuItem& item, getLocalLibraries()) {
       if (item.filepath != mLibrary->getDirectory().getAbsPath()) {
-        QAction* action = menuMoveToLib->addAction(item.pixmap, item.name);
-        aMoveToLibChildren.insert(action, item.filepath);
+        QAction* actionCopy = menuCopyToLib->addAction(item.pixmap, item.name);
+        aCopyToLibChildren.insert(actionCopy, item.filepath);
+        QAction* actionMove = menuMoveToLib->addAction(item.pixmap, item.name);
+        aMoveToLibChildren.insert(actionMove, item.filepath);
       }
     }
     // Disable menu item if it doesn't contain children.
+    menuCopyToLib->setEnabled(!aCopyToLibChildren.isEmpty());
     menuMoveToLib->setEnabled(!aMoveToLibChildren.isEmpty());
   }
   QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
@@ -423,10 +437,14 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
     removeItems(selectedItemPaths);
   } else if (action == aNew) {
     newItem(list);
+  } else if (aCopyToLibChildren.contains(action)) {
+    Q_ASSERT(selectedItemPaths.count() > 0);
+    copyElementsToOtherLibrary(selectedItemPaths, aCopyToLibChildren[action],
+                               action->text(), false);
   } else if (aMoveToLibChildren.contains(action)) {
     Q_ASSERT(selectedItemPaths.count() > 0);
-    moveElementsToOtherLibrary(selectedItemPaths, aMoveToLibChildren[action],
-                               action->text());
+    copyElementsToOtherLibrary(selectedItemPaths, aMoveToLibChildren[action],
+                               action->text(), true);
   }
 }
 
@@ -526,15 +544,17 @@ void LibraryOverviewWidget::removeItems(
   }
 }
 
-void LibraryOverviewWidget::moveElementsToOtherLibrary(
+void LibraryOverviewWidget::copyElementsToOtherLibrary(
     const QHash<QListWidgetItem*, FilePath>& selectedItemPaths,
-    const FilePath& libFp, const QString& libName) noexcept {
+    const FilePath& libFp, const QString& libName,
+    bool removeFromSource) noexcept {
   // Build message (list only the first few elements to avoid a huge message
   // box)
-  QString msg =
-      tr("Are you sure to move the following elements into the library '%1'?")
-          .arg(libName) %
-      "\n\n";
+  QString msg = removeFromSource
+      ? tr("Are you sure to move the following elements into the library '%1'?")
+      : tr("Are you sure to copy the following elements into the library "
+           "'%1'?");
+  msg = msg.arg(libName) % "\n\n";
   QList<QListWidgetItem*> listedItems = selectedItemPaths.keys().mid(0, 10);
   foreach (QListWidgetItem* item, listedItems) {
     msg.append(" - " % item->text() % "\n");
@@ -545,20 +565,30 @@ void LibraryOverviewWidget::moveElementsToOtherLibrary(
   msg.append("\n" % tr("Note: This cannot be easily undone!"));
 
   // Show message box
-  int ret = QMessageBox::warning(
-      this, tr("Move %1 elements").arg(selectedItemPaths.count()), msg,
-      QMessageBox::Yes, QMessageBox::Cancel);
+  QString title =
+      removeFromSource ? tr("Move %1 elements") : tr("Copy %1 elements");
+  int ret = QMessageBox::warning(this, title.arg(selectedItemPaths.count()),
+                                 msg, QMessageBox::Yes, QMessageBox::Cancel);
   if (ret == QMessageBox::Yes) {
     foreach (QListWidgetItem* item, selectedItemPaths.keys()) {
       FilePath itemPath = selectedItemPaths.value(item);
       QString relativePath =
           itemPath.toRelative(itemPath.getParentDir().getParentDir());
+      FilePath destination = libFp.getPathTo(relativePath);
       try {
-        // Emit signal so that the library editor can close any tabs that have
-        // opened this item
-        emit removeElementTriggered(itemPath);
-        FileUtils::move(itemPath, libFp.getPathTo(relativePath));
-        delete item;  // Remove from list
+        if (removeFromSource) {
+          qInfo() << "Move library element from" << itemPath.toNative() << "to"
+                  << destination.toNative();
+          // Emit signal so that the library editor can close any tabs that have
+          // opened this item
+          emit removeElementTriggered(itemPath);
+          FileUtils::move(itemPath, destination);
+          delete item;  // Remove from list
+        } else {
+          qInfo() << "Copy library element from" << itemPath.toNative() << "to"
+                  << destination.toNative();
+          FileUtils::copyDirRecursively(itemPath, destination);
+        }
       } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
       }
