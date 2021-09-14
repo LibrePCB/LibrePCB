@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Formats files according our coding style with clang-format. And if Python is
-# available, *.pro project files will be sorted with sort_qmake_file_entries.py.
+# Formats files according our coding style with clang-format.
 #
 # Usage:
 #
@@ -101,8 +100,3 @@ do
 done
 
 echo "Finished: $COUNTER files modified."
-
-# Also run sort_qmake_file_entries.py if Python is available
-if [ -x "$(command -v python)" ]; then
-  python "$REPO_ROOT/dev/sort_qmake_file_entries.py"
-fi

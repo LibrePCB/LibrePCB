@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../units/point.h"
 
-#include <delaunay-triangulation/delaunay.h>
+#include <delaunay.h>
 
 #include <QtCore>
 

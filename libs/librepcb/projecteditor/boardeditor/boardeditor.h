@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "ui_boardeditor.h"
+
 #include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/project/boards/board.h>
