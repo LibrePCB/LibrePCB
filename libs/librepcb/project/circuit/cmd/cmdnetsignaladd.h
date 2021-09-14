@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/undocommand.h>
-#include <optional/tl/optional.hpp>
+#include <optional.hpp>
 
 #include <QtCore>
 

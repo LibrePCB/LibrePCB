@@ -15,52 +15,24 @@ fi
 if [ -z "${CC-}" ]; then CC="gcc"; fi
 if [ -z "${CXX-}" ]; then CXX="g++"; fi
 
-# make all warnings into errors
-CFLAGS="-Werror"
-CXXFLAGS="-Werror"
-
-# set special flag for clang (see https://github.com/travis-ci/travis-ci/issues/5383)
-if [ "$CC" = "clang" ]; then CFLAGS+=" -Qunused-arguments"; fi
-if [ "$CXX" = "clang++" ]; then CXXFLAGS+=" -Qunused-arguments"; fi
-
-# use libc++ for clang on Linux (see https://stackoverflow.com/questions/24692538/)
-if [ "$OS" = "linux" ] && [ "$CC" = "clang" ]; then
-  CFLAGS+=" -stdlib=libc++"
-  CXXFLAGS+=" -stdlib=libc++"
-  BUILDSPEC="-spec linux-clang-libc++"
-fi
-
-# additional qmake arguments
-if [ "${UNBUNDLE-}" != "" ]; then
-  read -ra arr <<<"$UNBUNDLE"
-  for target in "${arr[@]}"; do
-    ADDITIONAL_ARGS+="UNBUNDLE+=$target "
-  done
-else
-  ADDITIONAL_ARGS=""
-fi
-
 # download latest translation files (just pull the i18n submodule), except on
 # release branches as the translation files are already available there
 if [ ! -f ./i18n/librepcb.ts ]; then
   git -C ./i18n checkout master && git -C ./i18n pull origin master
 fi
 
+# show cmake and qt versions
+cmake --version
+qmake --version
+
 # build librepcb
+echo "Using CXX=$CXX"
+echo "Using CC=$CC"
 mkdir -p build && pushd build
-echo "QMAKE_CXX=$CXX"
-echo "QMAKE_CC=$CC"
-echo "QMAKE_CFLAGS=$CFLAGS"
-echo "QMAKE_CXXFLAGS=$CXXFLAGS"
-echo "ADDITIONAL_ARGS=$ADDITIONAL_ARGS"
-qmake ../librepcb.pro -r ${BUILDSPEC-} \
-  "QMAKE_CXX=$CXX" \
-  "QMAKE_CC=$CC" \
-  "QMAKE_CFLAGS=$CFLAGS" \
-  "QMAKE_CXXFLAGS=$CXXFLAGS" \
-  "PREFIX=$(pwd)/install/opt" \
-  $ADDITIONAL_ARGS
-$MAKE -j8
+cmake .. \
+  -DCMAKE_INSTALL_PREFIX=$(pwd)/install/opt \
+  -DBUILD_DISALLOW_WARNINGS=1
+VERBOSE=1 $MAKE -j8
 $MAKE install
 popd
 

@@ -70,6 +70,7 @@ To compile LibrePCB, you need the following software components:
 - [Qt](http://www.qt.io/download-open-source/) >= 5.5
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
+- [CMake](https://cmake.org/) 3.5 or newer
 
 #### Prepared Docker Image
 
@@ -82,14 +83,16 @@ actually used for CI, but are also useful to build LibrePCB locally.
 #### Installation on Debian/Ubuntu/Mint
 
 ```bash
-sudo apt-get install git build-essential qt5-default qttools5-dev-tools libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev libqt5svg5-dev
+sudo apt-get install git build-essential qt5-default qttools5-dev-tools qttools5-dev \
+     libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev libqt5svg5-dev cmake
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
 #### Installation on Arch Linux
 
 ```bash
-sudo pacman -S git base-devel qt5-base qt5-svg qt5-tools desktop-file-utils shared-mime-info openssl zlib
+sudo pacman -S git base-devel qt5-base qt5-svg qt5-tools desktop-file-utils shared-mime-info \
+     openssl zlib cmake
 sudo pacman -S qt5-doc qtcreator # optional
 ```
 
@@ -97,7 +100,7 @@ sudo pacman -S qt5-doc qtcreator # optional
 
 1. Install Xcode through the app store and start it at least once (for the license)
 2. Install [homebrew](https://github.com/Homebrew/brew) (**the** package manager)
-3. Install *qt5*: `brew update && brew install qt5`
+3. Install *qt5* and *cmake*: `brew update && brew install qt5 cmake`
 4. Make the toolchain available: `brew unlink qt && brew link --force qt5`
 
 #### Installation on Windows
@@ -109,6 +112,7 @@ with MSVC, so you must install following components with the Qt installer:
 
 - The MinGW compiler itself
 - The Qt libraries for MinGW
+- cmake
 
 ### Cloning
 
@@ -130,13 +134,15 @@ git submodule update --init --recursive
 ### Building
 
 You can either build LibrePCB using Qt Creator, or you can build on the command
-line using qmake. To build a debug version of LibrePCB with qmake/make:
+line using cmake. To build LibrePCB using cmake/make:
 
 ```bash
 mkdir build && cd build
-qmake -r ../librepcb.pro CONFIG+=debug
+cmake ..
 make -j8
 ```
+
+The binary can then be found in `build/apps/librepcb/`.
 
 For more detailed instructions (including how to set up Qt Creator), see
 https://developers.librepcb.org/d5/d96/doc_building.html

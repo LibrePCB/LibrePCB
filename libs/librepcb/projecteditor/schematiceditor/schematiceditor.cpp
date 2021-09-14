@@ -28,7 +28,6 @@
 #include "../projecteditor.h"
 #include "fsm/schematiceditorfsm.h"
 #include "schematicpagesdock.h"
-#include "ui_schematiceditor.h"
 
 #include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/aboutdialog.h>

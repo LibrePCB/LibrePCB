@@ -22,40 +22,13 @@
  ******************************************************************************/
 #include "application.h"
 
+#include "build_env.h"
 #include "dialogs/aboutdialog.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
 #include "units/all_length_units.h"
 
 #include <QtCore>
-
-/*******************************************************************************
- *  Version Information
- ******************************************************************************/
-
-// Read the release workflow documentation (at https://developers.librepcb.org)
-// before making changes here!!!
-
-// Application version:
-//  - Always three numbers (MAJOR.MINOR.PATCH)!
-//  - Unstable versions (non-release branches): Suffix "-unstable", e.g.
-//    "1.0.0-unstable"
-//  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
-//  - Releases (on release branches):           No suffix, e.g. "1.0.0"
-static const char* APP_VERSION = "0.1.5";
-
-// File format version:
-//  - Must be equal to the major version of APP_VERSION!
-//  - If APP_VERSION < 1.0.0:   Two numbers, e.g. "0.2" for APP_VERSION=="0.2.x"
-//  - If APP_VERSION >= 1.0.0:  Only one number, e.g. "2" for
-//    APP_VERSION=="2.x.y"
-static const char* FILE_FORMAT_VERSION = "0.1";
-
-// File format stable flag:
-//  - On all non-release branches: false
-//    TODO: set to "false" after the first release is published!
-//  - On release branches: true
-static const bool FILE_FORMAT_STABLE = true;
 
 /*******************************************************************************
  *  Namespace
@@ -68,13 +41,11 @@ namespace librepcb {
 
 Application::Application(int& argc, char** argv) noexcept
   : QApplication(argc, argv),
-    mAppVersion(Version::fromString(QString(APP_VERSION).section('-', 0, 0))),
-    mAppVersionLabel(QString(APP_VERSION).section('-', 1, 1)),
+    mAppVersion(Version::fromString(QString(LIBREPCB_APP_VERSION).section('-', 0, 0))),
+    mAppVersionLabel(QString(LIBREPCB_APP_VERSION).section('-', 1, 1)),
     mGitRevision(GIT_COMMIT_SHA),
-    mLinkingType(LINKING_TYPE),
-    mUnbundledLibs(UNBUNDLE),
-    mFileFormatVersion(Version::fromString(FILE_FORMAT_VERSION)),
-    mIsFileFormatStable(FILE_FORMAT_STABLE) {
+    mFileFormatVersion(Version::fromString(LIBREPCB_FILE_FORMAT_VERSION)),
+    mIsFileFormatStable(LIBREPCB_FILE_FORMAT_STABLE) {
   // register meta types
   qRegisterMetaType<FilePath>();
   qRegisterMetaType<Point>();
@@ -82,7 +53,7 @@ Application::Application(int& argc, char** argv) noexcept
   qRegisterMetaType<Angle>();
 
   // set application version
-  QApplication::setApplicationVersion(APP_VERSION);
+  QApplication::setApplicationVersion(LIBREPCB_APP_VERSION);
 
   // set build timestamp
   QDate buildDate =
@@ -90,11 +61,6 @@ Application::Application(int& argc, char** argv) noexcept
           .toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
   QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
   mBuildDate = QDateTime(buildDate, buildTime);
-
-  // check git revision
-  if (mGitRevision.isEmpty()) {
-    qWarning() << "Git revision not compiled into the executable!";
-  }
 
   // check file format version
   if (!mFileFormatVersion.isPrefixOf(mAppVersion)) {
@@ -107,21 +73,27 @@ Application::Application(int& argc, char** argv) noexcept
   Q_ASSERT(executableFilePath.isValid());
 
   // determine the path to the resources directory (e.g. /usr/share/librepcb)
-  FilePath buildOutputDirPath(BUILD_OUTPUT_DIRECTORY);
+#if defined(LIBREPCB_BINARY_DIR) && defined(LIBREPCB_SHARE_SOURCE)
+  // TODO: The following code checks for paths related to the application binary,
+  // even though this code is located in the library source. This is a bit of a
+  // layer violation and should be refactored.
+  FilePath buildOutputDirPath(LIBREPCB_BINARY_DIR);
   bool runningFromBuildOutput =
       executableFilePath.isLocatedInDir(buildOutputDirPath);
   if (runningFromBuildOutput) {
     // The executable is located inside the build output directory, so we assume
     // this is a developer build and thus we use the "share" directory from the
     // repository root.
-    mResourcesDir = FilePath(SHARE_DIRECTORY_SOURCE).getPathTo("librepcb");
-  } else {
-    // The executable is located outside the build output directory, so we
-    // assume this is a packaged build and thus we use the "share" directory
-    // which is bundled with the application (must be located at "../share"
-    // relative to the executable).
-    mResourcesDir =
-        executableFilePath.getParentDir().getPathTo("../share/librepcb");
+    mResourcesDir = FilePath(LIBREPCB_SHARE_SOURCE).getPathTo("librepcb");
+  }
+#endif
+  if (!mResourcesDir.isValid()) {
+    if (QDir::isAbsolutePath(LIBREPCB_SHARE)) {
+      mResourcesDir.setPath(LIBREPCB_SHARE);
+    } else {
+      mResourcesDir =
+          executableFilePath.getParentDir().getPathTo(LIBREPCB_SHARE);
+    }
   }
 
   // warn if runtime resource files are not found
@@ -131,9 +103,13 @@ Application::Application(int& argc, char** argv) noexcept
     qCritical() << "Expected resources location:" << mResourcesDir.toNative();
     qCritical() << "Executable location:        "
                 << executableFilePath.toNative();
-    qCritical() << "Build output directory:     "
-                << buildOutputDirPath.toNative();
-    qCritical() << "Is developer build:         " << runningFromBuildOutput;
+    qCritical() << "LIBREPCB_SHARE:             " << QString(LIBREPCB_SHARE);
+#ifdef LIBREPCB_BINARY_DIR
+    qCritical() << "LIBREPCB_BINARY_DIR:        " << QString(LIBREPCB_BINARY_DIR);
+#endif
+#ifdef LIBREPCB_SHARE_SOURCE
+    qCritical() << "LIBREPCB_SHARE_SOURCE:      " << QString(LIBREPCB_SHARE_SOURCE);
+#endif
   }
 
   // load all bundled TrueType/OpenType fonts
