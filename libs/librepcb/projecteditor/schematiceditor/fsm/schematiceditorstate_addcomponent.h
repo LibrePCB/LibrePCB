@@ -27,12 +27,12 @@
 
 #include <librepcb/common/units/angle.h>
 #include <librepcb/common/uuid.h>
-#include <optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

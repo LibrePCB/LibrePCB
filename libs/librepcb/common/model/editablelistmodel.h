@@ -27,10 +27,10 @@
 #include "../uuid.h"
 #include "comboboxdelegate.h"
 
-#include <optional.hpp>
-
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
