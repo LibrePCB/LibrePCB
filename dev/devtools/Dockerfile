@@ -8,6 +8,7 @@ RUN apt-get -q update \
   git \
   python3 \
   python3-pip \
+  libxml-filter-sort-perl \
  && apt-get clean
 
 RUN update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-6.0 50

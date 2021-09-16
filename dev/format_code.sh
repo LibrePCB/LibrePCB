@@ -13,8 +13,8 @@ set -euo pipefail
 #     "--docker" parameter. A docker image containing all required tools will
 #     then be created and used so you don't have to install any dependencies.
 #   - To run docker with sudo, use the "--sudo" parameter.
-#   - Without docker, make sure the executables "git", "clang-format" and
-#     "cmake-format" are available in PATH.
+#   - Without docker, make sure the executables "git", "clang-format",
+#     "cmake-format" and "xmlsort" are available in PATH.
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, usually you
 #     should not use this!
@@ -124,6 +124,40 @@ do
   if [ -f "$file" ]; then
     OLD_CONTENT=$(cat "$file")
     NEW_CONTENT=$(cmake-format "$file" || cmake_format_failed)
+    if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
+    then
+      printf "%s\n" "$NEW_CONTENT" > "$file"
+      echo "[M] $file"
+      COUNTER=$((COUNTER+1))
+    else
+      echo "[ ] $file"
+    fi
+  fi
+done
+
+# Format *.qrc files with xmlsort.
+xmlsort_failed() {
+  echo "" >&2
+  echo "ERROR: xmlsort failed!" >&2
+  echo "  Make sure that xmlsort is installed." >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+echo "Formatting resource files with xmlsort..."
+if [ "$ALL" == "--all" ]; then
+  TRACKED=$(git ls-files -- "**.qrc")
+else
+  # Only files which differ from the master branch
+  TRACKED=$(git diff --name-only master -- "**.qrc")
+fi
+UNTRACKED=$(git ls-files --others --exclude-standard -- "**.qrc")
+for file in $TRACKED $UNTRACKED
+do
+  if [ -f "$file" ]; then
+    OLD_CONTENT=$(cat "$file")
+    NEW_CONTENT=$(xmlsort -r "RCC/qresource/file" -i -s "$file" || xmlsort_failed)
+    NEW_CONTENT="${NEW_CONTENT//\'/\"}"
     if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
     then
       printf "%s\n" "$NEW_CONTENT" > "$file"
