@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Formats files according our coding style with clang-format.
+# Formats files according our coding style.
 #
 # Usage:
 #
 #   format_code.sh [--all] [--sudo] [--docker]
 #
 # Notes:
-#   - Make sure the executables "clang-format" and "git" are available in PATH.
 #   - Run the command "./dev/format_code.sh" in the root of the repository.
-#   - To run clang-format in a docker-container, use the "--docker" parameter.
+#   - If you have Docker installed (on Linux), it's recommended to pass the
+#     "--docker" parameter. A docker image containing all required tools will
+#     then be created and used so you don't have to install any dependencies.
 #   - To run docker with sudo, use the "--sudo" parameter.
+#   - Without docker, make sure the executables "git" and "clang-format" are
+#     available in PATH.
 #   - To format all files (instead of only modified ones), add the "--all"
-#     parameter. This is intended only for LibrePCB maintainers, don't use it!
+#     parameter. This is intended only for LibrePCB maintainers, usually you
+#     should not use this!
 
 DOCKER=""
 DOCKER_CMD="docker"
@@ -37,25 +41,14 @@ case $i in
 esac
 done
 
-format_failed() {
-  echo "" >&2
-  echo "ERROR: clang-format failed." >&2
-  echo "  Make sure that clang-format 6 is installed." >&2
-  echo "  You can also run clang-format in a docker container" >&2
-  echo "  by using the '--docker' argument when invoking this script." >&2
-  exit 7
-}
-
-echo "Formatting files with $CLANGFORMAT..."
-
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 if [ "$DOCKER" == "--docker" ]; then
-  DOCKER_IMAGE=librepcb/clang-format:6
+  DOCKER_IMAGE=librepcb/devtools:1.0.0
 
   if [ "$($DOCKER_CMD images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
-    echo "Building clang-format container..."
-    $DOCKER_CMD build "$REPO_ROOT/dev/clang-format" -t librepcb/clang-format:6
+    echo "Building devtools container..."
+    $DOCKER_CMD build "$REPO_ROOT/dev/devtools" -t librepcb/devtools:1.0.0
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
@@ -70,6 +63,16 @@ fi
 
 COUNTER=0
 
+# Format source files with clang-format.
+clang_format_failed() {
+  echo "" >&2
+  echo "ERROR: clang-format failed!" >&2
+  echo "  Make sure that clang-format 6 is installed." >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+echo "Formatting sources with $CLANGFORMAT..."
 for dir in apps/ libs/librepcb/ tests/unittests/
 do
   if [ "$ALL" == "--all" ]; then
@@ -86,7 +89,7 @@ do
       # "make" to detect the files as changed every time, even if the content was
       # not modified! So we only overwrite the files if their content has changed.
       OLD_CONTENT=$(cat "$file")
-      NEW_CONTENT=$($CLANGFORMAT -style=file "$file" || format_failed)
+      NEW_CONTENT=$($CLANGFORMAT -style=file "$file" || clang_format_failed)
       if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
       then
         printf "%s\n" "$NEW_CONTENT" > "$file"
