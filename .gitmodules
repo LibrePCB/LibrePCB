@@ -37,3 +37,6 @@
 [submodule "libs/muparser"]
     path = libs/muparser
     url = https://github.com/LibrePCB/muparser.git
+[submodule "libs/dxflib"]
+    path = libs/dxflib
+    url = https://github.com/LibrePCB/dxflib.git
