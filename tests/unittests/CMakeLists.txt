@@ -46,6 +46,7 @@ add_executable(
   common/geometry/vertextest.cpp
   common/geometry/viatest.cpp
   common/graphics/graphicslayernametest.cpp
+  common/import/dxfreadertest.cpp
   common/network/filedownloadtest.cpp
   common/network/networkrequestbasesignalreceiver.h
   common/network/networkrequesttest.cpp
