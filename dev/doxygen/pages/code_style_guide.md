@@ -14,13 +14,16 @@ This page describes the code style guide for LibrePCB developers.
 - In the repository root there is a `.clang-format` file with the exact rules.
   You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
   (version 6.0.0) to automatically format files according these rules. Use the
-  command `clang-format -style=file -i <FILE>` to format single files, or the
-  script `./dev/format_code.sh` to format all files which are modified compared
-  to the `master` branch (this avoids formatting of files other than the ones
-  you modified).
-- If your operating system does not ship clang-format version 6, you can also
-  run the formatter in a Docker container by using the `./dev/format_code.sh
-  --docker` command.
+  command `clang-format -style=file -i <FILE>` to format a single source file.
+- To automatically format all modified source, CMake and *.qrc files, please
+  run the script `./dev/format_code.sh`. It will format all files  which are
+  modified compared to the `master` branch (this avoids formatting of files
+  other than the ones you modified). For details, read the comment in that
+  script.
+- If you have Docker installed, it's recommended to invoke that script with
+  the `--docker` argument.
+- The script may not work on operating systems other than Linux. In that case,
+  please try to follow our coding style manually as good as possible.
 
 
 # General {#doc_code_style_guide_general}

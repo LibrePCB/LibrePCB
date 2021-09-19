@@ -26,11 +26,11 @@
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/units/lengthunit.h>
 #include <librepcb/common/version.h>
-#include <optional.hpp>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

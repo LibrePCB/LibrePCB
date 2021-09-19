@@ -41,7 +41,8 @@ namespace librepcb {
 
 Application::Application(int& argc, char** argv) noexcept
   : QApplication(argc, argv),
-    mAppVersion(Version::fromString(QString(LIBREPCB_APP_VERSION).section('-', 0, 0))),
+    mAppVersion(
+        Version::fromString(QString(LIBREPCB_APP_VERSION).section('-', 0, 0))),
     mAppVersionLabel(QString(LIBREPCB_APP_VERSION).section('-', 1, 1)),
     mGitRevision(GIT_COMMIT_SHA),
     mFileFormatVersion(Version::fromString(LIBREPCB_FILE_FORMAT_VERSION)),
@@ -74,9 +75,9 @@ Application::Application(int& argc, char** argv) noexcept
 
   // determine the path to the resources directory (e.g. /usr/share/librepcb)
 #if defined(LIBREPCB_BINARY_DIR) && defined(LIBREPCB_SHARE_SOURCE)
-  // TODO: The following code checks for paths related to the application binary,
-  // even though this code is located in the library source. This is a bit of a
-  // layer violation and should be refactored.
+  // TODO: The following code checks for paths related to the application
+  // binary, even though this code is located in the library source. This is a
+  // bit of a layer violation and should be refactored.
   FilePath buildOutputDirPath(LIBREPCB_BINARY_DIR);
   bool runningFromBuildOutput =
       executableFilePath.isLocatedInDir(buildOutputDirPath);
@@ -105,10 +106,12 @@ Application::Application(int& argc, char** argv) noexcept
                 << executableFilePath.toNative();
     qCritical() << "LIBREPCB_SHARE:             " << QString(LIBREPCB_SHARE);
 #ifdef LIBREPCB_BINARY_DIR
-    qCritical() << "LIBREPCB_BINARY_DIR:        " << QString(LIBREPCB_BINARY_DIR);
+    qCritical() << "LIBREPCB_BINARY_DIR:        "
+                << QString(LIBREPCB_BINARY_DIR);
 #endif
 #ifdef LIBREPCB_SHARE_SOURCE
-    qCritical() << "LIBREPCB_SHARE_SOURCE:      " << QString(LIBREPCB_SHARE_SOURCE);
+    qCritical() << "LIBREPCB_SHARE_SOURCE:      "
+                << QString(LIBREPCB_SHARE_SOURCE);
 #endif
   }
 

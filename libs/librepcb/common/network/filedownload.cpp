@@ -25,7 +25,6 @@
 #include "scopeguard.h"
 
 #include <QtCore>
-
 #include <quazip/JlCompress.h>
 
 /*******************************************************************************
