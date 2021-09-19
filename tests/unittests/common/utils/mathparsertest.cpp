@@ -23,7 +23,8 @@
 
 #include <gtest/gtest.h>
 #include <librepcb/common/utils/mathparser.h>
-#include <optional/tl/optional.hpp>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace

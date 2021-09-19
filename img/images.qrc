@@ -142,5 +142,4 @@
         <file>status/success.png</file>
         <file>wizards/watermark.jpg</file>
     </qresource>
-    <qresource prefix="/"/>
 </RCC>

@@ -26,10 +26,11 @@
 #include "../common/editorwidgetbase.h"
 
 #include <librepcb/common/uuid.h>
-#include <optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

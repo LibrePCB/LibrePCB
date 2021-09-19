@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "../units/point.h"
 
-#include <delaunay.h>
-
 #include <QtCore>
+
+#include <delaunay.h>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

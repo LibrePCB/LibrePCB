@@ -26,10 +26,11 @@
 #include "fileio/sexpression.h"
 #include "toolbox.h"
 
-#include <optional/tl/optional.hpp>
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

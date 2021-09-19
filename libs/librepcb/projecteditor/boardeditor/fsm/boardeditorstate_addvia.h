@@ -26,9 +26,10 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/project/boards/items/bi_via.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

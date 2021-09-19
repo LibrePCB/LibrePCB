@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "fileio/sexpression.h"
 
-#include <optional.hpp>
-
 #include <QtCore>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

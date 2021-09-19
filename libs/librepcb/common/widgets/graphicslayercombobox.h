@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include "../graphics/graphicslayername.h"
 
-#include <optional.hpp>
-
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
