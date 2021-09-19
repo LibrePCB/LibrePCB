@@ -7,6 +7,9 @@ RUN apt-get -q update \
   clang-format-6.0 \
   git \
   python3 \
+  python3-pip \
  && apt-get clean
 
 RUN update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-6.0 50
+
+RUN pip3 install cmakelang==0.6.13
