@@ -131,6 +131,7 @@ Right now, the following libraries can be unbundled:
 
 | Library | Parameter | Search Methods |
 |-|-|-|
+| [dxflib] | `UNBUNDLE_DXFLIB` | `pkg-config` |
 | [fontobene-qt5] | `UNBUNDLE_FONTOBENE_QT5` | `pkg-config`, `find_path` |
 | [googletest] | `UNBUNDLE_GTEST` | `cmake` |
 | [hoedown] ¹ | `UNBUNDLE_HOEDOWN` | `pkg-config` |
@@ -138,6 +139,7 @@ Right now, the following libraries can be unbundled:
 | [polyclipping] | `UNBUNDLE_POLYCLIPPING` | `pkg-config` |
 | [quazip] ² | `UNBUNDLE_QUAZIP` | `cmake` |
 
+[dxflib]: https://www.qcad.org/en/90-dxflib
 [fontobene-qt5]: https://github.com/fontobene/fontobene-qt5/
 [googletest]: https://github.com/google/googletest
 [hoedown]: https://github.com/hoedown/hoedown
