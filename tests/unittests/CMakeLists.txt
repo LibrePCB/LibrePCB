@@ -91,6 +91,8 @@ add_executable(
   project/projecttest.cpp
   projecteditor/boardeditor/boardclipboarddatatest.cpp
   projecteditor/schematiceditor/schematicclipboarddatatest.cpp
+  testhelpers.cpp
+  testhelpers.h
   workspace/settings/workspacesettingstest.cpp
   workspace/workspacetest.cpp
 )
