@@ -169,6 +169,17 @@ public slots:
   bool saveProject() noexcept;
 
   /**
+   * @brief Save the whole project as a copy to the harddisc
+   *
+   * @note The whole save procedere is described in @ref doc_project_save.
+   *
+   * @param parent    parent widget of the dialog (optional)
+   *
+   * @return true on success, false on failure
+   */
+  bool saveProjectAs(QWidget* parent = nullptr) noexcept;
+
+  /**
    * @brief Make a automatic backup of the project (save to temporary files)
    *
    * @note The whole save procedere is described in @ref doc_project_save.

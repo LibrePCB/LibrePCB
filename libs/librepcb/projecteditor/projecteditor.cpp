@@ -214,6 +214,46 @@ bool ProjectEditor::saveProject() noexcept {
   }
 }
 
+bool ProjectEditor::saveProjectAs(QWidget* parent) noexcept {
+  try {
+    qDebug() << "Saving project as...";
+
+    FilePath defaultDirectory = mProject.getPath().getParentDir(); // can throw
+    QString directoryName = FileDialog::getSaveFileName(
+        parent, tr("Save project as *"), defaultDirectory.toStr(), "*");
+    if (directoryName.isEmpty()) return false;
+
+    // Copy project directory to 'directoryName' directory
+    // create file system
+    FilePath chosenDir = FilePath(directoryName);
+    std::shared_ptr<TransactionalFileSystem> fs = TransactionalFileSystem::openRW(
+      chosenDir);
+    TransactionalDirectory transdir(fs);
+
+    // Create a new project
+    Project* project = Project::create(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        directoryName);
+
+    // Save project to its own transactional directory, and then copies it to the
+    // newly created transactional directory
+    mProject.save();
+    mProject.getDirectory().copyTo(transdir);
+
+    project->save();
+    fs->save();
+
+    // Do not clean the undo stack for saving as copy, could be useful?
+
+    qDebug() << "Project successfully saved";
+    return true;
+  } catch (Exception& exc) {
+      QMessageBox::critical(0, tr("Error while saving the project"),
+                            exc.getMsg());
+      return false;
+    }
+}
+
 bool ProjectEditor::autosaveProject() noexcept {
   // Do not save if there are no changes since the last (auto)save.
   // Note: mUndoStack->isClean() must not be considered here since the undo

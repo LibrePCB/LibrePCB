@@ -121,6 +121,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
           &SchematicEditor::addSchematic);
   connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor,
           &ProjectEditor::saveProject);
+  connect(mUi->actionSave_Project_As, &QAction::triggered,
+          [this]() { mProjectEditor.saveProjectAs(this); });
   connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
   connect(mUi->actionOpenWebsite, &QAction::triggered,
           []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
