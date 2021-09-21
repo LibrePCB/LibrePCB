@@ -115,6 +115,9 @@ add_library(
   dialogs/directorylockhandlerdialog.cpp
   dialogs/directorylockhandlerdialog.h
   dialogs/directorylockhandlerdialog.ui
+  dialogs/dxfimportdialog.cpp
+  dialogs/dxfimportdialog.h
+  dialogs/dxfimportdialog.ui
   dialogs/filedialog.cpp
   dialogs/filedialog.h
   dialogs/gridsettingsdialog.cpp

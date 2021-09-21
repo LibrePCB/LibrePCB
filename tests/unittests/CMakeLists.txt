@@ -28,6 +28,7 @@ add_executable(
   common/cam/gerberattributewritertest.cpp
   common/cam/gerbergeneratortest.cpp
   common/circuitidentifiertest.cpp
+  common/dialogs/dxfimportdialogtest.cpp
   common/fileio/asynccopyoperationtest.cpp
   common/fileio/csvfiletest.cpp
   common/fileio/directorylocktest.cpp
