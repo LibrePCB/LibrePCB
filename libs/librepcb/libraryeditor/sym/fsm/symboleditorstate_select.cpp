@@ -30,6 +30,7 @@
 #include "cmd/cmdremoveselectedsymbolitems.h"
 
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
+#include <librepcb/common/dialogs/dxfimportdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/textpropertiesdialog.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
@@ -38,6 +39,7 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/import/dxfreader.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
@@ -287,10 +289,24 @@ bool SymbolEditorState_Select::processCopy() noexcept {
 bool SymbolEditorState_Select::processPaste() noexcept {
   switch (mState) {
     case SubState::IDLE: {
-      return pasteFromClipboard();
+      try {
+        // Get footprint items from clipboard, if none provided.
+        std::unique_ptr<SymbolClipboardData> data =
+            SymbolClipboardData::fromMimeData(
+                qApp->clipboard()->mimeData());  // can throw
+        if (data) {
+          return startPaste(std::move(data), tl::nullopt);
+        }
+      } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        processAbortCommand();
+        return false;
+      }
     }
-    default: { return false; }
+    default: { break; }
   }
+
+  return false;
 }
 
 bool SymbolEditorState_Select::processRotateCw() noexcept {
@@ -332,6 +348,63 @@ bool SymbolEditorState_Select::processRemove() noexcept {
       return removeSelectedItems();
     }
     default: { return false; }
+  }
+}
+
+bool SymbolEditorState_Select::processImportDxf() noexcept {
+  try {
+    // Ask for file path and import options.
+    DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
+                           GraphicsLayerName(GraphicsLayer::sSymbolOutlines),
+                           false, getDefaultLengthUnit(),
+                           "symbol_editor/dxf_import_dialog",
+                           &mContext.editorWidget);
+    FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
+    if ((!fp.isValid()) || (dialog.exec() != QDialog::Accepted)) {
+      return false;  // Aborted.
+    }
+
+    // Read DXF file.
+    DxfReader import;
+    import.setScaleFactor(dialog.getScaleFactor());
+    import.parse(fp);  // can throw
+
+    // Build elements to import. ALthough this has nothing to do with the
+    // clipboard, we use SymbolClipboardData since it works very well :-)
+    std::unique_ptr<SymbolClipboardData> data(
+        new SymbolClipboardData(mContext.symbol.getUuid(), Point(0, 0)));
+    for (const auto& path : import.getPolygons()) {
+      data->getPolygons().append(
+          std::make_shared<Polygon>(Uuid::createRandom(), dialog.getLayerName(),
+                                    dialog.getLineWidth(), false, false, path));
+    }
+    for (const auto& circle : import.getCircles()) {
+      data->getPolygons().append(std::make_shared<Polygon>(
+          Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
+          false, false,
+          Path::circle(circle.diameter).translated(circle.position)));
+    }
+
+    // Abort with error if nothing was imported.
+    if (data->getItemCount() == 0) {
+      DxfImportDialog::throwNoObjectsImportedError();  // will throw
+    }
+
+    // Sanity check that the chosen layer is really visible, but this should
+    // always be the case anyway.
+    const GraphicsLayer* layer =
+        mContext.layerProvider.getLayer(*dialog.getLayerName());
+    if ((!layer) || (!layer->isVisible())) {
+      throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
+    }
+
+    // Start the paste tool.
+    return startPaste(std::move(data),
+                      dialog.getPlacementPosition());  // can throw
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    processAbortCommand();
+    return false;
   }
 }
 
@@ -532,43 +605,41 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
   return true;
 }
 
-bool SymbolEditorState_Select::pasteFromClipboard() noexcept {
-  try {
-    // update cursor position
-    mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                             true, false);
+bool SymbolEditorState_Select::startPaste(
+    std::unique_ptr<SymbolClipboardData> data,
+    const tl::optional<Point>& fixedPosition) {
+  Q_ASSERT(data);
 
-    // get symbol items and abort if there are no items
-    std::unique_ptr<SymbolClipboardData> data =
-        SymbolClipboardData::fromMimeData(
-            qApp->clipboard()->mimeData());  // can throw
-    if (!data) {
-      return false;
-    }
+  // Start undo command group.
+  clearSelectionRect(true);
+  mContext.undoStack.beginCmdGroup(tr("Paste Symbol Elements"));
+  mState = SubState::PASTING;
 
-    // start undo command group
-    clearSelectionRect(true);
-    mContext.undoStack.beginCmdGroup(tr("Paste Symbol Elements"));
-    mState = SubState::PASTING;
-
-    // paste items from clipboard
-    Point offset =
-        (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
-    QScopedPointer<CmdPasteSymbolItems> cmd(new CmdPasteSymbolItems(
-        mContext.symbol, mContext.symbolGraphicsItem, std::move(data), offset));
-    if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
-      // start moving the selected items
-      mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
-      return true;
-    } else {
-      // no items pasted -> abort
-      mContext.undoStack.abortCmdGroup();  // can throw
+  // Paste items.
+  mStartPos =
+      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, false);
+  Point offset = fixedPosition
+      ? (*fixedPosition)
+      : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
+  QScopedPointer<CmdPasteSymbolItems> cmd(new CmdPasteSymbolItems(
+      mContext.symbol, mContext.symbolGraphicsItem, std::move(data), offset));
+  if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
+    if (fixedPosition) {
+      // Fixed position provided (no interactive placement), finish tool.
+      mContext.undoStack.commitCmdGroup();
       mState = SubState::IDLE;
+      clearSelectionRect(true);
+    } else {
+      // Start moving the selected items.
+      mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
     }
-  } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    return true;
+  } else {
+    // No items pasted -> abort.
+    mContext.undoStack.abortCmdGroup();  // can throw
+    mState = SubState::IDLE;
+    return false;
   }
-  return false;
 }
 
 bool SymbolEditorState_Select::rotateSelectedItems(
