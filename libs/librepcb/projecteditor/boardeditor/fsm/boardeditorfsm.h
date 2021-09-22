@@ -116,6 +116,7 @@ public:
   bool processDrawPolygon() noexcept;
   bool processDrawPlane() noexcept;
   bool processDrawTrace() noexcept;
+  bool processImportDxf() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;
   bool processCut() noexcept;

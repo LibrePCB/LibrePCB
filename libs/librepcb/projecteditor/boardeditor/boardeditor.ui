@@ -78,12 +78,16 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionProjectSave"/>
+    <addaction name="separator"/>
     <addaction name="actionExportLppz"/>
     <addaction name="actionExportAsPdf"/>
     <addaction name="actionExportAsSvg"/>
     <addaction name="actionGenerateBom"/>
     <addaction name="actionGenerateFabricationData"/>
     <addaction name="actionGeneratePickPlace"/>
+    <addaction name="separator"/>
+    <addaction name="actionImportDxf"/>
+    <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionProjectClose"/>
@@ -915,6 +919,15 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionImportDxf">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/import.png</normaloff>:/img/actions/import.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import DXF</string>
    </property>
   </action>
  </widget>

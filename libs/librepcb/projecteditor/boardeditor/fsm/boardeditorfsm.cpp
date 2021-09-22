@@ -125,6 +125,16 @@ bool BoardEditorFsm::processDrawTrace() noexcept {
   return setNextState(State::DRAW_TRACE);
 }
 
+bool BoardEditorFsm::processImportDxf() noexcept {
+  setNextState(State::SELECT);
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    if (state->processImportDxf()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool BoardEditorFsm::processAbortCommand() noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processAbortCommand()) {

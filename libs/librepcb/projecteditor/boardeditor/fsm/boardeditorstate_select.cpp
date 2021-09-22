@@ -34,16 +34,19 @@
 #include "../boardviapropertiesdialog.h"
 #include "../deviceinstancepropertiesdialog.h"
 
+#include <librepcb/common/dialogs/dxfimportdialog.h>
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
 #include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
+#include <librepcb/common/import/dxfreader.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/elements.h>
 #include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
 #include <librepcb/project/boards/board.h>
+#include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/boardselectionquery.h>
 #include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
 #include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
@@ -118,6 +121,79 @@ bool BoardEditorState_Select::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
+bool BoardEditorState_Select::processImportDxf() noexcept {
+  Board* board = getActiveBoard();
+  if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (board)) {
+    try {
+      // Ask for file path and import options.
+      DxfImportDialog dialog(getAllowedGeometryLayers(*board),
+                             GraphicsLayerName(GraphicsLayer::sBoardOutlines),
+                             true, getDefaultLengthUnit(),
+                             "board_editor/dxf_import_dialog", parentWidget());
+      FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
+      if ((!fp.isValid()) || (dialog.exec() != QDialog::Accepted)) {
+        return false;  // Aborted.
+      }
+
+      // Read DXF file.
+      DxfReader import;
+      import.setScaleFactor(dialog.getScaleFactor());
+      import.parse(fp);  // can throw
+
+      // Build board elements to import. ALthough this has nothing to do with
+      // the clipboard, we use BoardClipboardData since it works very well :-)
+      std::unique_ptr<BoardClipboardData> data(
+          new BoardClipboardData(board->getUuid(), Point(0, 0)));
+      for (const auto& path : import.getPolygons()) {
+        data->getPolygons().append(std::make_shared<Polygon>(
+            Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
+            false, false, path));
+      }
+      for (const auto& circle : import.getCircles()) {
+        if (dialog.getImportCirclesAsDrills()) {
+          data->getHoles().append(std::make_shared<Hole>(
+              Uuid::createRandom(), circle.position, circle.diameter));
+        } else {
+          data->getPolygons().append(std::make_shared<Polygon>(
+              Uuid::createRandom(), dialog.getLayerName(),
+              dialog.getLineWidth(), false, false,
+              Path::circle(circle.diameter).translated(circle.position)));
+        }
+      }
+
+      // Abort with error if nothing was imported.
+      if (data->isEmpty()) {
+        DxfImportDialog::throwNoObjectsImportedError();  // will throw
+      }
+
+      // Shaw the layers of the imported objects, otherwise the user might
+      // not even see these objects.
+      if (!data->getHoles().isEmpty()) {
+        if (GraphicsLayer* layer = board->getLayerStack().getLayer(
+                GraphicsLayer::sBoardDrillsNpth)) {
+          layer->setVisible(true);
+        }
+      }
+      if (!data->getPolygons().isEmpty()) {
+        if (GraphicsLayer* layer =
+                board->getLayerStack().getLayer(*dialog.getLayerName())) {
+          layer->setVisible(true);
+        }
+      }
+
+      // Start the paste tool.
+      return startPaste(*board, std::move(data),
+                        dialog.getPlacementPosition());  // can throw
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+      abortCommand(false);
+    }
+  }
+
+  return false;
+}
+
 bool BoardEditorState_Select::processSelectAll() noexcept {
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
       mCmdPlaneEdit) {
@@ -154,9 +230,38 @@ bool BoardEditorState_Select::processCopy() noexcept {
 }
 
 bool BoardEditorState_Select::processPaste() noexcept {
+  Board* board = getActiveBoard();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
-    return pasteFromClipboard();
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (board)) {
+    try {
+      // Get board data from clipboard.
+      std::unique_ptr<BoardClipboardData> data =
+          BoardClipboardData::fromMimeData(
+              qApp->clipboard()->mimeData());  // can throw
+
+      // If there is no board data, get footprint data from clipboard to allow
+      // pasting graphical elements from the footprint editor.
+      if (!data) {
+        std::unique_ptr<library::editor::FootprintClipboardData> footprintData =
+            library::editor::FootprintClipboardData::fromMimeData(
+                qApp->clipboard()->mimeData());  // can throw
+        if (footprintData) {
+          data.reset(new BoardClipboardData(footprintData->getFootprintUuid(),
+                                            footprintData->getCursorPos()));
+          data->getPolygons().append(footprintData->getPolygons());
+          data->getStrokeTexts().append(footprintData->getStrokeTexts());
+          data->getHoles().append(footprintData->getHoles());
+        }
+      }
+
+      // If there is something to paste, start the paste tool.
+      if (data) {
+        return startPaste(*board, std::move(data), tl::nullopt);  // can throw
+      }
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+      abortCommand(false);
+    }
   }
 
   return false;
@@ -930,66 +1035,42 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
   return true;
 }
 
-bool BoardEditorState_Select::pasteFromClipboard() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+bool BoardEditorState_Select::startPaste(
+    Board& board, std::unique_ptr<BoardClipboardData> data,
+    const tl::optional<Point>& fixedPosition) {
+  Q_ASSERT(data);
 
-  try {
-    // get data from clipboard
-    std::unique_ptr<BoardClipboardData> boardData =
-        BoardClipboardData::fromMimeData(
-            qApp->clipboard()->mimeData());  // can throw
-    std::unique_ptr<library::editor::FootprintClipboardData> footprintData =
-        library::editor::FootprintClipboardData::fromMimeData(
-            qApp->clipboard()->mimeData());  // can throw
-    if ((!boardData) && (!footprintData)) {
-      return false;
-    }
+  // Start undo command group.
+  board.clearSelection();
+  mContext.undoStack.beginCmdGroup(tr("Paste board elements"));
+  mIsUndoCmdActive = true;
 
-    // merge footprint data into board data
-    if (footprintData) {
-      if (!boardData) {
-        boardData.reset(new BoardClipboardData(
-            footprintData->getFootprintUuid(), footprintData->getCursorPos()));
-      }
-      boardData->getPolygons().append(footprintData->getPolygons());
-      boardData->getStrokeTexts().append(footprintData->getStrokeTexts());
-      boardData->getHoles().append(footprintData->getHoles());
-      footprintData.reset();  // Not needed anymore.
-    }
-    Q_ASSERT(boardData);
+  // Paste items.
+  Point startPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
+      QCursor::pos(), true, false);
+  Point offset = fixedPosition
+      ? (*fixedPosition)
+      : (startPos - data->getCursorPos()).mappedToGrid(getGridInterval());
+  bool addedSomething = mContext.undoStack.appendToCmdGroup(
+      new CmdPasteBoardItems(board, std::move(data), offset));  // can throw
 
-    // memorize cursor position
-    Point startPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, false);
-
-    // start undo command group
-    board->clearSelection();
-    mContext.undoStack.beginCmdGroup(tr("Paste board elements"));
-    mIsUndoCmdActive = true;
-
-    // paste items from clipboard
-    Point offset =
-        (startPos - boardData->getCursorPos()).mappedToGrid(getGridInterval());
-    bool addedSomething =
-        mContext.undoStack.appendToCmdGroup(new CmdPasteBoardItems(
-            *board, std::move(boardData), offset));  // can throw
-
-    if (addedSomething) {  // can throw
-      // start moving the selected items
-      mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedBoardItems(*board, startPos));
-      return true;
-    } else {
-      // no items pasted -> abort
-      mContext.undoStack.abortCmdGroup();  // can throw
+  if (addedSomething) {
+    if (fixedPosition) {
+      // Fixed position provided (no interactive placement), finish tool.
+      mContext.undoStack.commitCmdGroup();  // can throw
       mIsUndoCmdActive = false;
+    } else {
+      // Start moving the selected items.
+      mSelectedItemsDragCommand.reset(
+          new CmdDragSelectedBoardItems(board, startPos));  // can throw
     }
-  } catch (const Exception& e) {
-    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    abortCommand(false);
+    return true;
+  } else {
+    // No items pasted -> abort.
+    mContext.undoStack.abortCmdGroup();  // can throw
+    mIsUndoCmdActive = false;
+    return false;
   }
-  return false;
 }
 
 bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {

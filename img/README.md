@@ -87,6 +87,7 @@ From Icons8:
 actions/clone.png: Color → Science → Natural Sciences → Clone
 actions/drc.png: Color →Programming → Testing→ Pass Fail
 actions/export_pick_place_file.png: Office L →Industry → Production Process→ Assembly Line
+actions/import.png: Color →Data→ Managing Data→ Import
 actions/move_to.png: Pastel → Arrows → Move Out
 actions/ruler.png: Color →Editing → Image Editing→ Ruler
 actions/swap.png: Color →Arrows → Actions→ Swap

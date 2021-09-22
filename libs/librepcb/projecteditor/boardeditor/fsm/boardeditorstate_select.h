@@ -29,6 +29,9 @@
 
 #include <QtCore>
 
+#include <memory>
+#include <optional.hpp>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -53,6 +56,7 @@ class CmdBoardPlaneEdit;
 
 namespace editor {
 
+class BoardClipboardData;
 class CmdDragSelectedBoardItems;
 
 /*******************************************************************************
@@ -83,6 +87,7 @@ public:
   virtual bool exit() noexcept override;
 
   // Event Handlers
+  virtual bool processImportDxf() noexcept override;
   virtual bool processSelectAll() noexcept override;
   virtual bool processCut() noexcept override;
   virtual bool processCopy() noexcept override;
@@ -147,7 +152,8 @@ private:  // Methods
   void startAddingPlaneVertex(BI_Plane& plane, int vertex,
                               const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
-  bool pasteFromClipboard() noexcept;
+  bool startPaste(Board& board, std::unique_ptr<BoardClipboardData> data,
+                  const tl::optional<Point>& fixedPosition);
   bool abortCommand(bool showErrMsgBox) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   bool findPlaneVerticesAtPosition(const Point& pos) noexcept;
