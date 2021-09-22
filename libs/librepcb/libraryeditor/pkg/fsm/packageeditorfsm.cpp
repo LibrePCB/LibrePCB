@@ -342,6 +342,16 @@ bool PackageEditorFsm::processStartAddingHoles() noexcept {
   return setNextState(State::ADD_HOLES);
 }
 
+bool PackageEditorFsm::processStartDxfImport() noexcept {
+  setNextState(State::SELECT);
+  if (PackageEditorState* state = getCurrentState()) {
+    if (state->processImportDxf()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

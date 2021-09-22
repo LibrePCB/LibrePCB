@@ -98,6 +98,7 @@ public slots:
   bool zoomOut() noexcept override;
   bool zoomAll() noexcept override;
   bool abortCommand() noexcept override;
+  bool importDxf() noexcept override;
   bool editGridProperties() noexcept override;
 
 private:  // Methods
