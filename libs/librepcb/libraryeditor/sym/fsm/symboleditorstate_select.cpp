@@ -123,7 +123,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
       QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
-      if (findPolygonVerticesAtPosition(mStartPos)) {
+      if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         mState = SubState::MOVING_POLYGON_VERTEX;
       } else if (items.isEmpty()) {
         // start selecting
@@ -168,9 +168,11 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           }
         }
 
-        // start moving
-        Q_ASSERT(!mCmdDragSelectedItems);
-        mState = SubState::MOVING;
+        // Start moving, if not read only.
+        if (!mContext.readOnly) {
+          Q_ASSERT(!mCmdDragSelectedItems);
+          mState = SubState::MOVING;
+        }
       }
       return true;
     }
@@ -451,7 +453,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
             [this]() { removeSelectedPolygonVertices(); });
     int remainingVertices = mSelectedPolygon->getPath().getVertices().count() -
         mSelectedPolygonVertices.count();
-    aRemove->setEnabled(remainingVertices >= 2);
+    aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
   } else {
     // handle item selection
     QGraphicsItem* selectedItem = nullptr;
@@ -483,6 +485,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
       if (index >= 0) {
         QAction* aAddVertex =
             menu.addAction(QIcon(":/img/actions/add.png"), tr("Add Vertex"));
+        aAddVertex->setEnabled(!mContext.readOnly);
         connect(aAddVertex, &QAction::triggered,
                 [=]() { startAddingPolygonVertex(*polygon, index, pos); });
         menu.addSeparator();
@@ -492,19 +495,23 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     // build the context menu
     QAction* aRotateCCW =
         menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("&Rotate"));
+    aRotateCCW->setEnabled(!mContext.readOnly);
     connect(aRotateCCW, &QAction::triggered,
             [this]() { rotateSelectedItems(Angle::deg90()); });
     QAction* aMirrorH = menu.addAction(
         QIcon(":/img/actions/flip_horizontal.png"), tr("&Mirror"));
+    aMirrorH->setEnabled(!mContext.readOnly);
     connect(aMirrorH, &QAction::triggered,
             [this]() { mirrorSelectedItems(Qt::Horizontal); });
     QAction* aRemove =
         menu.addAction(QIcon(":/img/actions/delete.png"), tr("R&emove"));
+    aRemove->setEnabled(!mContext.readOnly);
     connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
     menu.addSeparator();
     if (CmdDragSelectedSymbolItems(mContext).hasOffTheGridElements()) {
       QAction* aSnapToGrid =
           menu.addAction(QIcon(":/img/actions/grid.png"), tr("&Snap To Grid"));
+      aSnapToGrid->setEnabled(!mContext.readOnly);
       connect(aSnapToGrid, &QAction::triggered, this,
               &SymbolEditorState_Select::snapSelectedItemsToGrid);
       menu.addSeparator();
@@ -530,6 +537,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     SymbolPinPropertiesDialog dialog(
         pin->getPin(), mContext.undoStack, getDefaultLengthUnit(),
         "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (TextGraphicsItem* text = dynamic_cast<TextGraphicsItem*>(item)) {
@@ -538,6 +546,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
                                 getAllowedTextLayers(), getDefaultLengthUnit(),
                                 "symbol_editor/text_properties_dialog",
                                 &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (PolygonGraphicsItem* polygon =
@@ -547,6 +556,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
         polygon->getPolygon(), mContext.undoStack,
         getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
         "symbol_editor/polygon_properties_dialog", &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (CircleGraphicsItem* circle =
@@ -556,6 +566,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
         circle->getCircle(), mContext.undoStack,
         getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
         "symbol_editor/circle_properties_dialog", &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   }

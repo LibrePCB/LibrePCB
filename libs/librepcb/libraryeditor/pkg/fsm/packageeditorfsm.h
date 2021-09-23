@@ -84,6 +84,7 @@ public:  // Types
     workspace::Workspace& workspace;
     PackageEditorWidget& editorWidget;
     UndoStack& undoStack;
+    bool readOnly;
     GraphicsScene& graphicsScene;
     GraphicsView& graphicsView;
     const IF_GraphicsLayerProvider& layerProvider;
