@@ -54,6 +54,7 @@ public:
   ~AttributeListEditorWidget() noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(UndoStack* undoStack, AttributeList* list) noexcept;
 
   // Operator Overloadings

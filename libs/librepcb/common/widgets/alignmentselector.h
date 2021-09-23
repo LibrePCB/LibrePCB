@@ -54,6 +54,7 @@ public:
   ~AlignmentSelector() noexcept;
 
   // General Methods
+  void setReadOnly(bool readOnly) noexcept;
   Alignment getAlignment() const noexcept;
   void setAlignment(const Alignment& align) noexcept;
 

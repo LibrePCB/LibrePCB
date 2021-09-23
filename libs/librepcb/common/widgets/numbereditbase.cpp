@@ -61,6 +61,10 @@ NumberEditBase::~NumberEditBase() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void NumberEditBase::setReadOnly(bool readOnly) noexcept {
+  mSpinBox->setReadOnly(readOnly);
+}
+
 void NumberEditBase::setSingleStep(tl::optional<double> step) noexcept {
   if (step) {
     mSpinBox->setSingleStep(*step);

@@ -64,6 +64,7 @@ public:
   ~PadSignalMapEditorWidget() noexcept;
 
   // General Methods
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(UndoStack* undoStack, DevicePadSignalMap* map) noexcept;
   void setPadList(const PackagePadList& list) noexcept;
   void setSignalList(const ComponentSignalList& list) noexcept;

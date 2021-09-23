@@ -83,6 +83,10 @@ AttributeListEditorWidget::~AttributeListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void AttributeListEditorWidget::setReadOnly(bool readOnly) noexcept {
+  mView->setReadOnly(readOnly);
+}
+
 void AttributeListEditorWidget::setReferences(UndoStack* undoStack,
                                               AttributeList* list) noexcept {
   mModel->setAttributeList(list);

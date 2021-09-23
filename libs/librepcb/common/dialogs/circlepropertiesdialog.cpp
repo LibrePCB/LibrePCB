@@ -77,6 +77,28 @@ CirclePropertiesDialog::~CirclePropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void CirclePropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->cbxLayer->setDisabled(readOnly);
+  mUi->edtLineWidth->setReadOnly(readOnly);
+  mUi->cbxFillArea->setCheckable(!readOnly);
+  mUi->cbxIsGrabArea->setCheckable(!readOnly);
+  mUi->edtDiameter->setReadOnly(readOnly);
+  mUi->edtPosX->setReadOnly(readOnly);
+  mUi->edtPosY->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

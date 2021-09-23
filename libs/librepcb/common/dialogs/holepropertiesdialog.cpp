@@ -67,6 +67,24 @@ HolePropertiesDialog::~HolePropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void HolePropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->edtDiameter->setReadOnly(readOnly);
+  mUi->edtPosX->setReadOnly(readOnly);
+  mUi->edtPosY->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

@@ -68,6 +68,7 @@ public:
   const QSet<Uuid>& getUuids() const noexcept { return mUuids; }
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setRequiresMinimumOneEntry(bool v) noexcept;
   void setUuids(const QSet<Uuid>& uuids) noexcept;
 

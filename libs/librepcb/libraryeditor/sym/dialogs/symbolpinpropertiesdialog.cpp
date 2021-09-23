@@ -71,6 +71,26 @@ SymbolPinPropertiesDialog::~SymbolPinPropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void SymbolPinPropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->edtName->setReadOnly(readOnly);
+  mUi->edtPosX->setReadOnly(readOnly);
+  mUi->edtPosY->setReadOnly(readOnly);
+  mUi->edtRotation->setReadOnly(readOnly);
+  mUi->edtLength->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

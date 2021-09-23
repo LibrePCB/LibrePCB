@@ -59,6 +59,7 @@ public:
   ~PackagePadListEditorWidget() noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(PackagePadList& list, UndoStack* stack) noexcept;
 
   // Operator Overloadings

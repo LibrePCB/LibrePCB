@@ -64,6 +64,9 @@ public:
                             QWidget* parent = nullptr) noexcept;
   ~SymbolPinPropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   SymbolPinPropertiesDialog& operator=(const SymbolPinPropertiesDialog& rhs) =
       delete;

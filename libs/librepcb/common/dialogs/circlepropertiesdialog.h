@@ -61,6 +61,9 @@ public:
                          QWidget* parent = nullptr) noexcept;
   ~CirclePropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   CirclePropertiesDialog& operator=(const CirclePropertiesDialog& rhs) = delete;
 
