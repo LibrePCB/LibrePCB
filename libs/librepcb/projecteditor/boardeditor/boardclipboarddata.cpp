@@ -92,6 +92,11 @@ BoardClipboardData::~BoardClipboardData() noexcept {
  *  Getters
  ******************************************************************************/
 
+bool BoardClipboardData::isEmpty() const noexcept {
+  return mDevices.isEmpty() && mNetSegments.isEmpty() && mPlanes.isEmpty() &&
+      mPolygons.isEmpty() && mStrokeTexts.isEmpty() && mHoles.isEmpty();
+}
+
 std::unique_ptr<TransactionalDirectory> BoardClipboardData::getDirectory(
     const QString& path) noexcept {
   return std::unique_ptr<TransactionalDirectory>(

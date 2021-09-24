@@ -28,6 +28,7 @@ add_executable(
   common/cam/gerberattributewritertest.cpp
   common/cam/gerbergeneratortest.cpp
   common/circuitidentifiertest.cpp
+  common/dialogs/dxfimportdialogtest.cpp
   common/fileio/asynccopyoperationtest.cpp
   common/fileio/csvfiletest.cpp
   common/fileio/directorylocktest.cpp
@@ -46,6 +47,7 @@ add_executable(
   common/geometry/vertextest.cpp
   common/geometry/viatest.cpp
   common/graphics/graphicslayernametest.cpp
+  common/import/dxfreadertest.cpp
   common/network/filedownloadtest.cpp
   common/network/networkrequestbasesignalreceiver.h
   common/network/networkrequesttest.cpp
@@ -91,6 +93,8 @@ add_executable(
   project/projecttest.cpp
   projecteditor/boardeditor/boardclipboarddatatest.cpp
   projecteditor/schematiceditor/schematicclipboarddatatest.cpp
+  testhelpers.cpp
+  testhelpers.h
   workspace/settings/workspacesettingstest.cpp
   workspace/workspacetest.cpp
 )

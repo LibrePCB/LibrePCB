@@ -275,6 +275,10 @@ bool PackageEditorWidget::abortCommand() noexcept {
   return mFsm->processAbortCommand();
 }
 
+bool PackageEditorWidget::importDxf() noexcept {
+  return mFsm->processStartDxfImport();
+}
+
 bool PackageEditorWidget::editGridProperties() noexcept {
   GridSettingsDialog dialog(mUi->graphicsView->getGridProperties(), this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,

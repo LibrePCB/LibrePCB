@@ -91,8 +91,6 @@ add_library(
   cmd/cmdmoveselectedschematicitems.h
   cmd/cmdpasteboarditems.cpp
   cmd/cmdpasteboarditems.h
-  cmd/cmdpastefootprintitems.cpp
-  cmd/cmdpastefootprintitems.h
   cmd/cmdpasteschematicitems.cpp
   cmd/cmdpasteschematicitems.h
   cmd/cmdremoveboarditems.cpp

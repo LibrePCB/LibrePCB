@@ -232,6 +232,7 @@ public:
   ~BoardClipboardData() noexcept;
 
   // Getters
+  bool isEmpty() const noexcept;
   std::unique_ptr<TransactionalDirectory> getDirectory(
       const QString& path = "") noexcept;
   const Uuid& getBoardUuid() const noexcept { return mBoardUuid; }

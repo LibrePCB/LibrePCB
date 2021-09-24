@@ -115,6 +115,9 @@ add_library(
   dialogs/directorylockhandlerdialog.cpp
   dialogs/directorylockhandlerdialog.h
   dialogs/directorylockhandlerdialog.ui
+  dialogs/dxfimportdialog.cpp
+  dialogs/dxfimportdialog.h
+  dialogs/dxfimportdialog.ui
   dialogs/filedialog.cpp
   dialogs/filedialog.h
   dialogs/gridsettingsdialog.cpp
@@ -232,6 +235,8 @@ add_library(
   graphics/textgraphicsitem.h
   gridproperties.cpp
   gridproperties.h
+  import/dxfreader.cpp
+  import/dxfreader.h
   model/angledelegate.cpp
   model/angledelegate.h
   model/comboboxdelegate.cpp
@@ -354,7 +359,7 @@ target_include_directories(
 )
 target_link_libraries(
   librepcb_common
-  PRIVATE common
+  PRIVATE common Dxflib::Dxflib
 )
 target_link_libraries(
   librepcb_common

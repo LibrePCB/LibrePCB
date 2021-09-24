@@ -17,3 +17,4 @@ Useful Links:
 - Excellon File Format: http://web.archive.org/web/20071030075236/http://www.excellon.com/manuals/program.htm
 - Official Reference Gerber Viewer: https://gerber.ucamco.com/index.html
 - Online 3D PCB Viewer: http://mayhewlabs.com/webGerber/
+- [DXF Specifications](http://images.autodesk.com/adsk/files/autocad_2012_pdf_dxf-reference_enu.pdf)

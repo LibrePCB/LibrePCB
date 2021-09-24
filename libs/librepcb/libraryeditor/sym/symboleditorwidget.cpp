@@ -260,6 +260,10 @@ bool SymbolEditorWidget::abortCommand() noexcept {
   return mFsm->processAbortCommand();
 }
 
+bool SymbolEditorWidget::importDxf() noexcept {
+  return mFsm->processStartDxfImport();
+}
+
 bool SymbolEditorWidget::editGridProperties() noexcept {
   GridSettingsDialog dialog(mUi->graphicsView->getGridProperties(), this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,

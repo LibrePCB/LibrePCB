@@ -333,6 +333,12 @@ public:
   int append(const std::shared_ptr<T>& obj) noexcept {
     return insert(count(), obj);
   }
+  void append(SerializableObjectList& list) noexcept {  // shallow -> NOT const!
+    mObjects.reserve(mObjects.count() + list.count());
+    foreach (const std::shared_ptr<T>& ptr, list.mObjects) {
+      append(ptr);  // copy only the pointer, NOT the object
+    }
+  }
   std::shared_ptr<T> take(int index) noexcept {
     Q_ASSERT(contains(index));
     return takeElement(index);

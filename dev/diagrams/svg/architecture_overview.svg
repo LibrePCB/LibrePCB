@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="70cm" height="66cm" viewBox="457 -221 1385 1303" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="70cm" height="68cm" viewBox="457 -221 1385 1359" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1026.7" y1="921.003" x2="1507.01" y2="1069.96"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1498.11,1072.43 1509.15,1070.62 1501.08,1062.88 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1188.28" y1="908.284" x2="1506.89" y2="970.426"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1498.32,973.847 1509.09,970.854 1500.23,964.032 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="951.616" y1="920.989" x2="1247.26" y2="1069.25"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1238.08,1070.24 1249.26,1070.26 1242.56,1061.3 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1060.93" y1="921" x2="1246.96" y2="970.14"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1238.17,972.991 1249.12,970.711 1240.73,963.323 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="950.551" y1="920.939" x2="1021.85" y2="956.983"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1012.67,957.943 1023.85,957.992 1017.18,949.018 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="900.085" y1="921.005" x2="1055.24" y2="1056.06"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1046.11,1054.74 1056.93,1057.53 1052.67,1047.19 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="836.428" y1="920.939" x2="839.974" y2="954.553"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="834.187,947.357 840.208,956.777 844.132,946.308 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="833.737" y1="921.005" x2="841.917" y2="1054.54"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="836.451,1047.09 842.053,1056.77 846.433,1046.48 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="767.237" y1="921.005" x2="628.474" y2="1055.88"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="630.556,1046.89 626.87,1057.44 637.526,1054.06 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="721.782" y1="920.939" x2="658.087" y2="956.807"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="662.399,948.64 656.138,957.904 667.305,957.354 "/>
+  </g>
   <text xml:space="preserve" font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="680" y="-200">
     <tspan x="680" y="-200">Architecture Overview</tspan>
   </text>
@@ -19,12 +59,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="840" x2="1200" y2="880"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,880 A 40,40 0 0 0 500,920"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,920 A 40,40 0 0 0 1200,880"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="827.789">
-      <tspan x="830" y="827.789">LibrePCB Common</tspan>
-      <tspan x="830" y="846.133"></tspan>
-      <tspan x="830" y="864.478">Directory: libs/librepcb/common</tspan>
-      <tspan x="830" y="882.822">Namespace: librepcb</tspan>
-      <tspan x="830" y="901.167">Tests: librepcb::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="827.761">
+      <tspan x="830" y="827.761">LibrePCB Common</tspan>
+      <tspan x="830" y="846.106"></tspan>
+      <tspan x="830" y="864.45">Directory: libs/librepcb/common</tspan>
+      <tspan x="830" y="882.794">Namespace: librepcb</tspan>
+      <tspan x="830" y="901.139">Tests: librepcb::tests</tspan>
     </text>
   </g>
   <g>
@@ -42,12 +82,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="680" x2="1200" y2="720"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,720 A 40,40 0 0 0 500,760"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,760 A 40,40 0 0 0 1200,720"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="667.789">
-      <tspan x="830" y="667.789">LibrePCB Library</tspan>
-      <tspan x="830" y="686.133"></tspan>
-      <tspan x="830" y="704.478">Directory: libs/librepcb/library</tspan>
-      <tspan x="830" y="722.822">Namespace: librepcb::library</tspan>
-      <tspan x="830" y="741.167">Tests: librepcb::library::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="667.761">
+      <tspan x="830" y="667.761">LibrePCB Library</tspan>
+      <tspan x="830" y="686.106"></tspan>
+      <tspan x="830" y="704.45">Directory: libs/librepcb/library</tspan>
+      <tspan x="830" y="722.794">Namespace: librepcb::library</tspan>
+      <tspan x="830" y="741.139">Tests: librepcb::library::tests</tspan>
     </text>
   </g>
   <g>
@@ -65,12 +105,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="520" x2="1200" y2="564.588"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,564.588 A 40,40 0 0 0 500,604.588"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,604.588 A 40,40 0 0 0 1200,564.588"/>
-    <text xml:space="preserve" font-size="16.414" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="506.2">
-      <tspan x="830" y="506.2">LibrePCB Project</tspan>
-      <tspan x="830" y="526.718"></tspan>
-      <tspan x="830" y="547.235">Directory: libs/librepcb/project</tspan>
-      <tspan x="830" y="567.753">Namespace: librepcb::project</tspan>
-      <tspan x="830" y="588.27">Tests: librepcb::project::tests</tspan>
+    <text xml:space="preserve" font-size="16.414" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="506.236">
+      <tspan x="830" y="506.236">LibrePCB Project</tspan>
+      <tspan x="830" y="526.753"></tspan>
+      <tspan x="830" y="547.271">Directory: libs/librepcb/project</tspan>
+      <tspan x="830" y="567.789">Namespace: librepcb::project</tspan>
+      <tspan x="830" y="588.306">Tests: librepcb::project::tests</tspan>
     </text>
   </g>
   <g>
@@ -88,12 +128,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="360" x2="1200" y2="400"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,400 A 40,40 0 0 0 500,440"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,440 A 40,40 0 0 0 1200,400"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="347.789">
-      <tspan x="830" y="347.789">LibrePCB Workspace</tspan>
-      <tspan x="830" y="366.133"></tspan>
-      <tspan x="830" y="384.478">Directory: libs/librepcb/workspace</tspan>
-      <tspan x="830" y="402.822">Namespace: librepcb::workspace</tspan>
-      <tspan x="830" y="421.167">Tests: librepcb::workspace::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="347.761">
+      <tspan x="830" y="347.761">LibrePCB Workspace</tspan>
+      <tspan x="830" y="366.106"></tspan>
+      <tspan x="830" y="384.45">Directory: libs/librepcb/workspace</tspan>
+      <tspan x="830" y="402.794">Namespace: librepcb::workspace</tspan>
+      <tspan x="830" y="421.139">Tests: librepcb::workspace::tests</tspan>
     </text>
   </g>
   <g>
@@ -111,12 +151,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="-120" x2="1200" y2="-80"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,-80 A 40,40 0 0 0 500,-40"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,-40 A 40,40 0 0 0 1200,-80"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #ffffff;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="-132.211">
-      <tspan x="830" y="-132.211">LibrePCB Application</tspan>
-      <tspan x="830" y="-113.867"></tspan>
-      <tspan x="830" y="-95.5222">Directory: apps/librepcb</tspan>
-      <tspan x="830" y="-77.1778">Namespace: librepcb::application</tspan>
-      <tspan x="830" y="-58.8333">Tests: librepcb::application::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #ffffff;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="830" y="-132.239">
+      <tspan x="830" y="-132.239">LibrePCB Application</tspan>
+      <tspan x="830" y="-113.894"></tspan>
+      <tspan x="830" y="-95.5501">Directory: apps/librepcb</tspan>
+      <tspan x="830" y="-77.2056">Namespace: librepcb::application</tspan>
+      <tspan x="830" y="-58.8612">Tests: librepcb::application::tests</tspan>
     </text>
   </g>
   <g>
@@ -142,12 +182,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="200" x2="1200" y2="240"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 840,240 A 40,40 0 0 0 880,280"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,280 A 40,40 0 0 0 1200,240"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1020" y="187.789">
-      <tspan x="1020" y="187.789">LibrePCB Library Editor</tspan>
-      <tspan x="1020" y="206.133"></tspan>
-      <tspan x="1020" y="224.478">Directory: libs/librepcb/libraryeditor</tspan>
-      <tspan x="1020" y="242.822">Namespace: librepcb::library::editor</tspan>
-      <tspan x="1020" y="261.167">Tests: librepcb::library::editor::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1020" y="187.761">
+      <tspan x="1020" y="187.761">LibrePCB Library Editor</tspan>
+      <tspan x="1020" y="206.106"></tspan>
+      <tspan x="1020" y="224.45">Directory: libs/librepcb/libraryeditor</tspan>
+      <tspan x="1020" y="242.794">Namespace: librepcb::library::editor</tspan>
+      <tspan x="1020" y="261.139">Tests: librepcb::library::editor::tests</tspan>
     </text>
   </g>
   <g>
@@ -165,12 +205,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="820" y1="200" x2="820" y2="240"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,240 A 40,40 0 0 0 500,280"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 780,280 A 40,40 0 0 0 820,240"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="640" y="187.789">
-      <tspan x="640" y="187.789">LibrePCB Project Editor</tspan>
-      <tspan x="640" y="206.133"></tspan>
-      <tspan x="640" y="224.478">Directory: libs/librepcb/projecteditor</tspan>
-      <tspan x="640" y="242.822">Namespace: librepcb::project::editor</tspan>
-      <tspan x="640" y="261.167">Tests: librepcb::project::editor::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="640" y="187.761">
+      <tspan x="640" y="187.761">LibrePCB Project Editor</tspan>
+      <tspan x="640" y="206.106"></tspan>
+      <tspan x="640" y="224.45">Directory: libs/librepcb/projecteditor</tspan>
+      <tspan x="640" y="242.794">Namespace: librepcb::project::editor</tspan>
+      <tspan x="640" y="261.139">Tests: librepcb::project::editor::tests</tspan>
     </text>
   </g>
   <g>
@@ -243,12 +283,12 @@
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="40" x2="1200" y2="80"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 840,80 A 40,40 0 0 0 880,120"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,120 A 40,40 0 0 0 1200,80"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1020" y="27.7889">
-      <tspan x="1020" y="27.7889">LibrePCB Library Manager</tspan>
-      <tspan x="1020" y="46.1333"></tspan>
-      <tspan x="1020" y="64.4778">Directory: libs/librepcb/librarymanager</tspan>
-      <tspan x="1020" y="82.8222">Namespace: librepcb::library::manager</tspan>
-      <tspan x="1020" y="101.167">Tests: librepcb::library::manager::tests</tspan>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1020" y="27.7611">
+      <tspan x="1020" y="27.7611">LibrePCB Library Manager</tspan>
+      <tspan x="1020" y="46.1055"></tspan>
+      <tspan x="1020" y="64.4499">Directory: libs/librepcb/librarymanager</tspan>
+      <tspan x="1020" y="82.7944">Namespace: librepcb::library::manager</tspan>
+      <tspan x="1020" y="101.139">Tests: librepcb::library::manager::tests</tspan>
     </text>
   </g>
   <text xml:space="preserve" font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="20">
@@ -266,53 +306,47 @@
   </g>
   <line style="fill: none; fill-opacity:0; stroke-width: 4; stroke-dasharray: 20 8 4 8; stroke: #000000" x1="460" y1="940" x2="1840" y2="940"/>
   <g>
-    <rect style="fill: #e5e5e5" x="500" y="960" width="280" height="120"/>
-    <path style="fill: #e5e5e5" d="M 500,960 A 40,40 0 0 0 460,1000 L 500,1000 z"/>
-    <path style="fill: #e5e5e5" d="M 820,1000 A 40,40 0 0 0 780,960 L 780,1000 z"/>
-    <rect style="fill: #e5e5e5" x="460" y="1000" width="360" height="40"/>
-    <path style="fill: #e5e5e5" d="M 460,1040 A 40,40 0 0 0 500,1080 L 500,1040 z"/>
-    <path style="fill: #e5e5e5" d="M 780,1080 A 40,40 0 0 0 820,1040 L 780,1040 z"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="500" y1="960" x2="780" y2="960"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="500" y1="1080" x2="780" y2="1080"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 500,960 A 40,40 0 0 0 460,1000"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 820,1000 A 40,40 0 0 0 780,960"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="460" y1="1000" x2="460" y2="1040"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="820" y1="1000" x2="820" y2="1040"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,1040 A 40,40 0 0 0 500,1080"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 780,1080 A 40,40 0 0 0 820,1040"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="640" y="987.789">
-      <tspan x="640" y="987.789">hoedown</tspan>
-      <tspan x="640" y="1006.13"></tspan>
-      <tspan x="640" y="1024.48">Directory: libs/hoedown</tspan>
-      <tspan x="640" y="1042.82">Namespace: none</tspan>
-      <tspan x="640" y="1061.17">Tests: none</tspan>
+    <rect style="fill: #e5e5e5" x="1278.52" y="960" width="170.999" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 1278.52,960 A 38.5167,38.5167 0 0 0 1240,998.517 L 1278.52,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 1488.03,998.517 A 38.5167,38.5167 0 0 0 1449.52,960 L 1449.52,998.517 z"/>
+    <rect style="fill: #e5e5e5" x="1240" y="998.517" width="248.032" height="0"/>
+    <path style="fill: #e5e5e5" d="M 1240,998.517 A 38.5167,38.5167 0 0 0 1278.52,1037.03 L 1278.52,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 1449.52,1037.03 A 38.5167,38.5167 0 0 0 1488.03,998.517 L 1449.52,998.517 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1278.52" y1="960" x2="1449.52" y2="960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1278.52" y1="1037.03" x2="1449.52" y2="1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1278.52,960 A 38.5167,38.5167 0 0 0 1240,998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1488.03,998.517 A 38.5167,38.5167 0 0 0 1449.52,960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1240" y1="998.517" x2="1240" y2="998.517"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1488.03" y1="998.517" x2="1488.03" y2="998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1240,998.517 A 38.5167,38.5167 0 0 0 1278.52,1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1449.52,1037.03 A 38.5167,38.5167 0 0 0 1488.03,998.517"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1364.02" y="993.794">
+      <tspan x="1364.02" y="993.794">hoedown (if Qt &lt;5.14)</tspan>
+      <tspan x="1364.02" y="1012.14">libs/hoedown</tspan>
     </text>
   </g>
   <g>
-    <rect style="fill: #e5e5e5" x="880" y="960" width="280" height="120"/>
-    <path style="fill: #e5e5e5" d="M 880,960 A 40,40 0 0 0 840,1000 L 880,1000 z"/>
-    <path style="fill: #e5e5e5" d="M 1200,1000 A 40,40 0 0 0 1160,960 L 1160,1000 z"/>
-    <rect style="fill: #e5e5e5" x="840" y="1000" width="360" height="40"/>
-    <path style="fill: #e5e5e5" d="M 840,1040 A 40,40 0 0 0 880,1080 L 880,1040 z"/>
-    <path style="fill: #e5e5e5" d="M 1160,1080 A 40,40 0 0 0 1200,1040 L 1160,1040 z"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="880" y1="960" x2="1160" y2="960"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="880" y1="1080" x2="1160" y2="1080"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 880,960 A 40,40 0 0 0 840,1000"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1200,1000 A 40,40 0 0 0 1160,960"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="840" y1="1000" x2="840" y2="1040"/>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1200" y1="1000" x2="1200" y2="1040"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 840,1040 A 40,40 0 0 0 880,1080"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1160,1080 A 40,40 0 0 0 1200,1040"/>
-    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1020" y="987.789">
-      <tspan x="1020" y="987.789">quazip</tspan>
-      <tspan x="1020" y="1006.13"></tspan>
-      <tspan x="1020" y="1024.48">Directory: libs/quazip</tspan>
-      <tspan x="1020" y="1042.82">Namespace: none</tspan>
-      <tspan x="1020" y="1061.17">Tests: none</tspan>
+    <rect style="fill: #e5e5e5" x="1278.44" y="1060" width="172.35" height="76.8713"/>
+    <path style="fill: #e5e5e5" d="M 1278.44,1060 A 38.4356,38.4356 0 0 0 1240,1098.44 L 1278.44,1098.44 z"/>
+    <path style="fill: #e5e5e5" d="M 1489.22,1098.44 A 38.4356,38.4356 0 0 0 1450.79,1060 L 1450.79,1098.44 z"/>
+    <rect style="fill: #e5e5e5" x="1240" y="1098.44" width="249.222" height="0"/>
+    <path style="fill: #e5e5e5" d="M 1240,1098.44 A 38.4356,38.4356 0 0 0 1278.44,1136.87 L 1278.44,1098.44 z"/>
+    <path style="fill: #e5e5e5" d="M 1450.79,1136.87 A 38.4356,38.4356 0 0 0 1489.22,1098.44 L 1450.79,1098.44 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1278.44" y1="1060" x2="1450.79" y2="1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1278.44" y1="1136.87" x2="1450.79" y2="1136.87"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1278.44,1060 A 38.4356,38.4356 0 0 0 1240,1098.44"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1489.22,1098.44 A 38.4356,38.4356 0 0 0 1450.79,1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1240" y1="1098.44" x2="1240" y2="1098.44"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1489.22" y1="1098.44" x2="1489.22" y2="1098.44"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1240,1098.44 A 38.4356,38.4356 0 0 0 1278.44,1136.87"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1450.79,1136.87 A 38.4356,38.4356 0 0 0 1489.22,1098.44"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1364.61" y="1093.71">
+      <tspan x="1364.61" y="1093.71">quazip</tspan>
+      <tspan x="1364.61" y="1112.06">libs/quazip</tspan>
     </text>
   </g>
-  <text xml:space="preserve" font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1220" y="980">
-    <tspan x="1220" y="980">3rd-party libraries</tspan>
+  <text xml:space="preserve" font-size="13.5467" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1710.7" y="1052.86">
+    <tspan x="1710.7" y="1052.86">3rd-party libraries</tspan>
   </text>
   <g>
     <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="640" y1="280" x2="640" y2="315.528"/>
@@ -323,11 +357,163 @@
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1015,-12.2361 1020,-2.23607 1025,-12.2361 "/>
   </g>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1020.34" y1="920" x2="1020.34" y2="955.528"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1015.34,947.764 1020.34,957.764 1025.34,947.764 "/>
+    <rect style="fill: #e5e5e5" x="498.517" y="960" width="170.999" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 498.517,960 A 38.5167,38.5167 0 0 0 460,998.517 L 498.517,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 708.032,998.517 A 38.5167,38.5167 0 0 0 669.516,960 L 669.516,998.517 z"/>
+    <rect style="fill: #e5e5e5" x="460" y="998.517" width="248.032" height="0"/>
+    <path style="fill: #e5e5e5" d="M 460,998.517 A 38.5167,38.5167 0 0 0 498.517,1037.03 L 498.517,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 669.516,1037.03 A 38.5167,38.5167 0 0 0 708.032,998.517 L 669.516,998.517 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="498.517" y1="960" x2="669.516" y2="960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="498.517" y1="1037.03" x2="669.516" y2="1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 498.517,960 A 38.5167,38.5167 0 0 0 460,998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 708.032,998.517 A 38.5167,38.5167 0 0 0 669.516,960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="460" y1="998.517" x2="460" y2="998.517"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="708.032" y1="998.517" x2="708.032" y2="998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,998.517 A 38.5167,38.5167 0 0 0 498.517,1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 669.516,1037.03 A 38.5167,38.5167 0 0 0 708.032,998.517"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="584.016" y="993.794">
+      <tspan x="584.016" y="993.794">delaunay-triangulation</tspan>
+      <tspan x="584.016" y="1012.14">libs/delaunay-triangulation</tspan>
+    </text>
   </g>
   <g>
-    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="639.952" y1="920" x2="639.952" y2="955.528"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="634.952,947.764 639.952,957.764 644.952,947.764 "/>
+    <rect style="fill: #e5e5e5" x="1538.52" y="960" width="172.188" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 1538.52,960 A 38.5167,38.5167 0 0 0 1500,998.517 L 1538.52,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 1749.22,998.517 A 38.5167,38.5167 0 0 0 1710.7,960 L 1710.7,998.517 z"/>
+    <rect style="fill: #e5e5e5" x="1500" y="998.517" width="249.222" height="0"/>
+    <path style="fill: #e5e5e5" d="M 1500,998.517 A 38.5167,38.5167 0 0 0 1538.52,1037.03 L 1538.52,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 1710.7,1037.03 A 38.5167,38.5167 0 0 0 1749.22,998.517 L 1710.7,998.517 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1538.52" y1="960" x2="1710.7" y2="960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1538.52" y1="1037.03" x2="1710.7" y2="1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1538.52,960 A 38.5167,38.5167 0 0 0 1500,998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1749.22,998.517 A 38.5167,38.5167 0 0 0 1710.7,960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1500" y1="998.517" x2="1500" y2="998.517"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1749.22" y1="998.517" x2="1749.22" y2="998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1500,998.517 A 38.5167,38.5167 0 0 0 1538.52,1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1710.7,1037.03 A 38.5167,38.5167 0 0 0 1749.22,998.517"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1624.61" y="993.794">
+      <tspan x="1624.61" y="993.794">muparser</tspan>
+      <tspan x="1624.61" y="1012.14">libs/muparser</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e5e5e5" x="758.517" y="960" width="172.188" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 758.517,960 A 38.5167,38.5167 0 0 0 720,998.517 L 758.517,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 969.222,998.517 A 38.5167,38.5167 0 0 0 930.705,960 L 930.705,998.517 z"/>
+    <rect style="fill: #e5e5e5" x="720" y="998.517" width="249.222" height="0"/>
+    <path style="fill: #e5e5e5" d="M 720,998.517 A 38.5167,38.5167 0 0 0 758.517,1037.03 L 758.517,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 930.705,1037.03 A 38.5167,38.5167 0 0 0 969.222,998.517 L 930.705,998.517 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="758.517" y1="960" x2="930.705" y2="960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="758.517" y1="1037.03" x2="930.705" y2="1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 758.517,960 A 38.5167,38.5167 0 0 0 720,998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 969.222,998.517 A 38.5167,38.5167 0 0 0 930.705,960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="720" y1="998.517" x2="720" y2="998.517"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="969.222" y1="998.517" x2="969.222" y2="998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 720,998.517 A 38.5167,38.5167 0 0 0 758.517,1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 930.705,1037.03 A 38.5167,38.5167 0 0 0 969.222,998.517"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="844.611" y="993.794">
+      <tspan x="844.611" y="993.794">dxflib</tspan>
+      <tspan x="844.611" y="1012.14">libs/dxflib</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e5e5e5" x="1018.52" y="960" width="170.999" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 1018.52,960 A 38.5167,38.5167 0 0 0 980,998.517 L 1018.52,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 1228.03,998.517 A 38.5167,38.5167 0 0 0 1189.52,960 L 1189.52,998.517 z"/>
+    <rect style="fill: #e5e5e5" x="980" y="998.517" width="248.032" height="0"/>
+    <path style="fill: #e5e5e5" d="M 980,998.517 A 38.5167,38.5167 0 0 0 1018.52,1037.03 L 1018.52,998.517 z"/>
+    <path style="fill: #e5e5e5" d="M 1189.52,1037.03 A 38.5167,38.5167 0 0 0 1228.03,998.517 L 1189.52,998.517 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1018.52" y1="960" x2="1189.52" y2="960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1018.52" y1="1037.03" x2="1189.52" y2="1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1018.52,960 A 38.5167,38.5167 0 0 0 980,998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1228.03,998.517 A 38.5167,38.5167 0 0 0 1189.52,960"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="980" y1="998.517" x2="980" y2="998.517"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1228.03" y1="998.517" x2="1228.03" y2="998.517"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 980,998.517 A 38.5167,38.5167 0 0 0 1018.52,1037.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1189.52,1037.03 A 38.5167,38.5167 0 0 0 1228.03,998.517"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1104.02" y="993.794">
+      <tspan x="1104.02" y="993.794">fontobene-qt5</tspan>
+      <tspan x="1104.02" y="1012.14">libs/fontobene-qt5</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e5e5e5" x="498.517" y="1060" width="172.188" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 498.517,1060 A 38.5167,38.5167 0 0 0 460,1098.52 L 498.517,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 709.222,1098.52 A 38.5167,38.5167 0 0 0 670.705,1060 L 670.705,1098.52 z"/>
+    <rect style="fill: #e5e5e5" x="460" y="1098.52" width="249.222" height="0"/>
+    <path style="fill: #e5e5e5" d="M 460,1098.52 A 38.5167,38.5167 0 0 0 498.517,1137.03 L 498.517,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 670.705,1137.03 A 38.5167,38.5167 0 0 0 709.222,1098.52 L 670.705,1098.52 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="498.517" y1="1060" x2="670.705" y2="1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="498.517" y1="1137.03" x2="670.705" y2="1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 498.517,1060 A 38.5167,38.5167 0 0 0 460,1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 709.222,1098.52 A 38.5167,38.5167 0 0 0 670.705,1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="460" y1="1098.52" x2="460" y2="1098.52"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="709.222" y1="1098.52" x2="709.222" y2="1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 460,1098.52 A 38.5167,38.5167 0 0 0 498.517,1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 670.705,1137.03 A 38.5167,38.5167 0 0 0 709.222,1098.52"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="584.611" y="1093.79">
+      <tspan x="584.611" y="1093.79">optional</tspan>
+      <tspan x="584.611" y="1112.14">libs/optional</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e5e5e5" x="758.517" y="1060" width="172.188" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 758.517,1060 A 38.5167,38.5167 0 0 0 720,1098.52 L 758.517,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 969.222,1098.52 A 38.5167,38.5167 0 0 0 930.705,1060 L 930.705,1098.52 z"/>
+    <rect style="fill: #e5e5e5" x="720" y="1098.52" width="249.222" height="0"/>
+    <path style="fill: #e5e5e5" d="M 720,1098.52 A 38.5167,38.5167 0 0 0 758.517,1137.03 L 758.517,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 930.705,1137.03 A 38.5167,38.5167 0 0 0 969.222,1098.52 L 930.705,1098.52 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="758.517" y1="1060" x2="930.705" y2="1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="758.517" y1="1137.03" x2="930.705" y2="1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 758.517,1060 A 38.5167,38.5167 0 0 0 720,1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 969.222,1098.52 A 38.5167,38.5167 0 0 0 930.705,1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="720" y1="1098.52" x2="720" y2="1098.52"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="969.222" y1="1098.52" x2="969.222" y2="1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 720,1098.52 A 38.5167,38.5167 0 0 0 758.517,1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 930.705,1137.03 A 38.5167,38.5167 0 0 0 969.222,1098.52"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="844.611" y="1093.79">
+      <tspan x="844.611" y="1093.79">parseagle</tspan>
+      <tspan x="844.611" y="1112.14">libs/parseagle</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e5e5e5" x="1018.52" y="1060" width="170.999" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 1018.52,1060 A 38.5167,38.5167 0 0 0 980,1098.52 L 1018.52,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 1228.03,1098.52 A 38.5167,38.5167 0 0 0 1189.52,1060 L 1189.52,1098.52 z"/>
+    <rect style="fill: #e5e5e5" x="980" y="1098.52" width="248.032" height="0"/>
+    <path style="fill: #e5e5e5" d="M 980,1098.52 A 38.5167,38.5167 0 0 0 1018.52,1137.03 L 1018.52,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 1189.52,1137.03 A 38.5167,38.5167 0 0 0 1228.03,1098.52 L 1189.52,1098.52 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1018.52" y1="1060" x2="1189.52" y2="1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1018.52" y1="1137.03" x2="1189.52" y2="1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1018.52,1060 A 38.5167,38.5167 0 0 0 980,1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1228.03,1098.52 A 38.5167,38.5167 0 0 0 1189.52,1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="980" y1="1098.52" x2="980" y2="1098.52"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1228.03" y1="1098.52" x2="1228.03" y2="1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 980,1098.52 A 38.5167,38.5167 0 0 0 1018.52,1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1189.52,1137.03 A 38.5167,38.5167 0 0 0 1228.03,1098.52"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1104.02" y="1093.79">
+      <tspan x="1104.02" y="1093.79">polyclipping</tspan>
+      <tspan x="1104.02" y="1112.14">libs/polyclipping</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #e5e5e5" x="1538.52" y="1060" width="172.188" height="77.0333"/>
+    <path style="fill: #e5e5e5" d="M 1538.52,1060 A 38.5167,38.5167 0 0 0 1500,1098.52 L 1538.52,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 1749.22,1098.52 A 38.5167,38.5167 0 0 0 1710.7,1060 L 1710.7,1098.52 z"/>
+    <rect style="fill: #e5e5e5" x="1500" y="1098.52" width="249.222" height="0"/>
+    <path style="fill: #e5e5e5" d="M 1500,1098.52 A 38.5167,38.5167 0 0 0 1538.52,1137.03 L 1538.52,1098.52 z"/>
+    <path style="fill: #e5e5e5" d="M 1710.7,1137.03 A 38.5167,38.5167 0 0 0 1749.22,1098.52 L 1710.7,1098.52 z"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1538.52" y1="1060" x2="1710.7" y2="1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1538.52" y1="1137.03" x2="1710.7" y2="1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1538.52,1060 A 38.5167,38.5167 0 0 0 1500,1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1749.22,1098.52 A 38.5167,38.5167 0 0 0 1710.7,1060"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1500" y1="1098.52" x2="1500" y2="1098.52"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1749.22" y1="1098.52" x2="1749.22" y2="1098.52"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1500,1098.52 A 38.5167,38.5167 0 0 0 1538.52,1137.03"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 1710.7,1137.03 A 38.5167,38.5167 0 0 0 1749.22,1098.52"/>
+    <text xml:space="preserve" font-size="14.6756" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1624.61" y="1093.79">
+      <tspan x="1624.61" y="1093.79">type_safe</tspan>
+      <tspan x="1624.61" y="1112.14">libs/type_safe</tspan>
+    </text>
   </g>
 </svg>

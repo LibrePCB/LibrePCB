@@ -30,6 +30,7 @@
 #include "cmd/cmdremoveselectedfootprintitems.h"
 
 #include <librepcb/common/dialogs/circlepropertiesdialog.h>
+#include <librepcb/common/dialogs/dxfimportdialog.h>
 #include <librepcb/common/dialogs/holepropertiesdialog.h>
 #include <librepcb/common/dialogs/polygonpropertiesdialog.h>
 #include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
@@ -40,6 +41,7 @@
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
+#include <librepcb/common/import/dxfreader.h>
 #include <librepcb/common/undostack.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>
@@ -292,10 +294,24 @@ bool PackageEditorState_Select::processCopy() noexcept {
 bool PackageEditorState_Select::processPaste() noexcept {
   switch (mState) {
     case SubState::IDLE: {
-      return pasteFromClipboard();
+      try {
+        // Get footprint items from clipboard, if none provided.
+        std::unique_ptr<FootprintClipboardData> data =
+            FootprintClipboardData::fromMimeData(
+                qApp->clipboard()->mimeData());  // can throw
+        if (data) {
+          return startPaste(std::move(data), tl::nullopt);
+        }
+      } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        processAbortCommand();
+        return false;
+      }
     }
-    default: { return false; }
+    default: { break; }
   }
+
+  return false;
 }
 
 bool PackageEditorState_Select::processRotateCw() noexcept {
@@ -348,6 +364,76 @@ bool PackageEditorState_Select::processRemove() noexcept {
       return removeSelectedItems();
     }
     default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processImportDxf() noexcept {
+  try {
+    if (!mContext.currentFootprint) {
+      return false;
+    }
+
+    // Ask for file path and import options.
+    DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
+                           GraphicsLayerName(GraphicsLayer::sTopDocumentation),
+                           true, getDefaultLengthUnit(),
+                           "package_editor/dxf_import_dialog",
+                           &mContext.editorWidget);
+    FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
+    if ((!fp.isValid()) || (dialog.exec() != QDialog::Accepted)) {
+      return false;  // Aborted.
+    }
+
+    // Read DXF file.
+    DxfReader import;
+    import.setScaleFactor(dialog.getScaleFactor());
+    import.parse(fp);  // can throw
+
+    // Build elements to import. ALthough this has nothing to do with the
+    // clipboard, we use FootprintClipboardData since it works very well :-)
+    std::unique_ptr<FootprintClipboardData> data(
+        new FootprintClipboardData(mContext.currentFootprint->getUuid(),
+                                   mContext.package.getPads(), Point(0, 0)));
+    for (const auto& path : import.getPolygons()) {
+      data->getPolygons().append(
+          std::make_shared<Polygon>(Uuid::createRandom(), dialog.getLayerName(),
+                                    dialog.getLineWidth(), false, false, path));
+    }
+    for (const auto& circle : import.getCircles()) {
+      if (dialog.getImportCirclesAsDrills()) {
+        data->getHoles().append(std::make_shared<Hole>(
+            Uuid::createRandom(), circle.position, circle.diameter));
+      } else {
+        data->getPolygons().append(std::make_shared<Polygon>(
+            Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
+            false, false,
+            Path::circle(circle.diameter).translated(circle.position)));
+      }
+    }
+
+    // Abort with error if nothing was imported.
+    if (data->getItemCount() == 0) {
+      DxfImportDialog::throwNoObjectsImportedError();  // will throw
+    }
+
+    // Sanity check that the chosen layer is really visible, but this should
+    // always be the case anyway.
+    const GraphicsLayer* polygonLayer =
+        mContext.layerProvider.getLayer(*dialog.getLayerName());
+    const GraphicsLayer* holeLayer =
+        mContext.layerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth);
+    if ((!polygonLayer) || (!polygonLayer->isVisible()) || (!holeLayer) ||
+        (!holeLayer->isVisible())) {
+      throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
+    }
+
+    // Start the paste tool.
+    return startPaste(std::move(data),
+                      dialog.getPlacementPosition());  // can throw
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    processAbortCommand();
+    return false;
   }
 }
 
@@ -580,49 +666,47 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
   return true;
 }
 
-bool PackageEditorState_Select::pasteFromClipboard() noexcept {
-  try {
-    // abort if no footprint is selected
-    if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
-      return false;
-    }
+bool PackageEditorState_Select::startPaste(
+    std::unique_ptr<FootprintClipboardData> data,
+    const tl::optional<Point>& fixedPosition) {
+  Q_ASSERT(data);
 
-    // update cursor position
-    mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                             true, false);
-
-    // get footprint items and abort if there are no items
-    std::unique_ptr<FootprintClipboardData> data =
-        FootprintClipboardData::fromMimeData(
-            qApp->clipboard()->mimeData());  // can throw
-    if (!data) {
-      return false;
-    }
-
-    // start undo command group
-    clearSelectionRect(true);
-    mContext.undoStack.beginCmdGroup(tr("Paste Footprint Elements"));
-    mState = SubState::PASTING;
-
-    // paste items from clipboard
-    Point offset =
-        (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
-    QScopedPointer<CmdPasteFootprintItems> cmd(new CmdPasteFootprintItems(
-        mContext.package, *mContext.currentFootprint,
-        *mContext.currentGraphicsItem, std::move(data), offset));
-    if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
-      // start moving the selected items
-      mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(mContext));
-      return true;
-    } else {
-      // no items pasted -> abort
-      mContext.undoStack.abortCmdGroup();  // can throw
-      mState = SubState::IDLE;
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  // Abort if no footprint is selected.
+  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
+    return false;
   }
-  return false;
+
+  // Start undo command group.
+  clearSelectionRect(true);
+  mContext.undoStack.beginCmdGroup(tr("Paste Footprint Elements"));
+  mState = SubState::PASTING;
+
+  // Paste items.
+  mStartPos =
+      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, false);
+  Point offset = fixedPosition
+      ? (*fixedPosition)
+      : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
+  QScopedPointer<CmdPasteFootprintItems> cmd(new CmdPasteFootprintItems(
+      mContext.package, *mContext.currentFootprint,
+      *mContext.currentGraphicsItem, std::move(data), offset));
+  if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
+    if (fixedPosition) {
+      // Fixed position provided (no interactive placement), finish tool.
+      mContext.undoStack.commitCmdGroup();
+      mState = SubState::IDLE;
+      clearSelectionRect(true);
+    } else {
+      // Start moving the selected items.
+      mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(mContext));
+    }
+    return true;
+  } else {
+    // No items pasted -> abort.
+    mContext.undoStack.abortCmdGroup();  // can throw
+    mState = SubState::IDLE;
+    return false;
+  }
 }
 
 bool PackageEditorState_Select::rotateSelectedItems(

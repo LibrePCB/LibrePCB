@@ -87,6 +87,8 @@
     <addaction name="actionSave"/>
     <addaction name="actionShowElementInFileManager"/>
     <addaction name="separator"/>
+    <addaction name="actionImportDxf"/>
+    <addaction name="separator"/>
     <addaction name="actionRescanLibraries"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
@@ -713,6 +715,15 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionImportDxf">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/import.png</normaloff>:/img/actions/import.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import DXF</string>
    </property>
   </action>
  </widget>

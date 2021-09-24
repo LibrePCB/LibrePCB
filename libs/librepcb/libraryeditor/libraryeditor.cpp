@@ -72,6 +72,9 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
           &LibraryEditor::saveTriggered);
   connect(mUi->actionShowElementInFileManager, &QAction::triggered, this,
           &LibraryEditor::showElementInFileExplorerTriggered);
+  connect(mUi->actionImportDxf, &QAction::triggered, this, [this]() {
+    if (mCurrentEditorWidget) mCurrentEditorWidget->importDxf();
+  });
   connect(mUi->actionRescanLibraries, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
@@ -664,6 +667,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   if (isOverviewTab) {
     mUi->actionRemove->setEnabled(true);
   }
+  mUi->actionImportDxf->setEnabled(hasGraphicalEditor);
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }

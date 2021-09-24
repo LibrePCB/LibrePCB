@@ -28,6 +28,9 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+#include <optional.hpp>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -40,6 +43,7 @@ namespace library {
 namespace editor {
 
 class CmdDragSelectedFootprintItems;
+class FootprintClipboardData;
 
 /*******************************************************************************
  *  Class PackageEditorState_Select
@@ -84,6 +88,7 @@ public:
   bool processMirror() noexcept override;
   bool processFlip() noexcept override;
   bool processRemove() noexcept override;
+  bool processImportDxf() noexcept override;
   bool processAbortCommand() noexcept override;
 
   // Operator Overloadings
@@ -95,7 +100,8 @@ private:  // Methods
   bool openPropertiesDialogOfItem(QGraphicsItem* item) noexcept;
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
-  bool pasteFromClipboard() noexcept;
+  bool startPaste(std::unique_ptr<FootprintClipboardData> data,
+                  const tl::optional<Point>& fixedPosition);
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation,
                            bool flipLayers) noexcept;
