@@ -41,6 +41,7 @@ option(BUILD_TESTS "Build unit tests." ON)
 option(BUILD_DISALLOW_WARNINGS
        "Disallow compiler warnings during build (build with -Werror)." OFF
 )
+option(UNBUNDLE_DXFLIB "Don't use vendored dxflib library." OFF)
 option(UNBUNDLE_FONTOBENE_QT5 "Don't use vendored FontoBeneQt5 library." OFF)
 option(UNBUNDLE_GTEST "Don't use vendored GoogleTest library." OFF)
 option(UNBUNDLE_HOEDOWN "Don't use vendored Hoedown library." OFF)
@@ -129,6 +130,7 @@ endif()
 
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
+find_package(Dxflib REQUIRED)
 find_package(FontoBeneQt5 REQUIRED)
 find_package(MuParser REQUIRED)
 find_package(Optional REQUIRED)

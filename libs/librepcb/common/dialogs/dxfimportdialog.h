@@ -17,75 +17,80 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_CMDPASTEFOOTPRINTITEMS_H
-#define LIBREPCB_PROJECT_EDITOR_CMDPASTEFOOTPRINTITEMS_H
+#ifndef LIBREPCB_DXFIMPORTDIALOG_H
+#define LIBREPCB_DXFIMPORTDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/point.h>
+#include "../fileio/filepath.h"
+#include "../graphics/graphicslayername.h"
+#include "../units/length.h"
+#include "../units/point.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
-#include <memory>
+#include <optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
-namespace editor {
-class FootprintClipboardData;
+class GraphicsLayer;
+class LengthUnit;
+
+namespace Ui {
+class DxfImportDialog;
 }
-}  // namespace library
-
-namespace project {
-
-class Project;
-class Board;
-
-namespace editor {
 
 /*******************************************************************************
- *  Class CmdPasteFootprintItems
+ *  Class DxfImportDialog
  ******************************************************************************/
 
 /**
- * @brief The CmdPasteFootprintItems class
+ * @brief This class provides a Dialog (GUI) to change the grid settings of a
+ * ::librepcb::GraphicsView
  */
-class CmdPasteFootprintItems final : public UndoCommandGroup {
+class DxfImportDialog final : public QDialog {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  CmdPasteFootprintItems() = delete;
-  CmdPasteFootprintItems(const CmdPasteFootprintItems& other) = delete;
-  CmdPasteFootprintItems(
-      Board& board,
-      std::unique_ptr<library::editor::FootprintClipboardData> data,
-      const Point& posOffset) noexcept;
-  ~CmdPasteFootprintItems() noexcept;
+  DxfImportDialog() = delete;
+  DxfImportDialog(const DxfImportDialog& other) = delete;
+  explicit DxfImportDialog(QList<GraphicsLayer*> layers,
+                           const GraphicsLayerName& defaultLayer,
+                           bool supportHoles, const LengthUnit& lengthUnit,
+                           const QString& settingsPrefix,
+                           QWidget* parent = nullptr) noexcept;
+  ~DxfImportDialog() noexcept;
+
+  // Getters
+  GraphicsLayerName getLayerName() const noexcept;
+  bool getImportCirclesAsDrills() const noexcept;
+  UnsignedLength getLineWidth() const noexcept;
+  qreal getScaleFactor() const noexcept;
+  tl::optional<Point> getPlacementPosition() const noexcept;
+
+  // General Methods
+  FilePath chooseFile() const noexcept;
+  static void throwNoObjectsImportedError();
 
   // Operator Overloadings
-  CmdPasteFootprintItems& operator=(const CmdPasteFootprintItems& rhs) = delete;
-
-private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
-  bool performExecute() override;
+  DxfImportDialog& operator=(const DxfImportDialog& rhs) = delete;
 
 private:  // Data
-  Project& mProject;
-  Board& mBoard;
-  std::unique_ptr<library::editor::FootprintClipboardData> mData;
-  Point mPosOffset;
+  QScopedPointer<Ui::DxfImportDialog> mUi;
+  QString mSettingsPrefix;
+  GraphicsLayerName mDefaultLayer;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

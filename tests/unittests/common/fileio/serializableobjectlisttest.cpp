@@ -262,7 +262,7 @@ TEST_F(SerializableObjectListTest, testInsert) {
   EXPECT_EQ(mMocks[0], l[2]);
 }
 
-TEST_F(SerializableObjectListTest, testAppend) {
+TEST_F(SerializableObjectListTest, testAppendItem) {
   List l;
   l.append(mMocks[0]);
   l.append(mMocks[1]);
@@ -271,6 +271,16 @@ TEST_F(SerializableObjectListTest, testAppend) {
   EXPECT_EQ(mMocks[0], l[0]);
   EXPECT_EQ(mMocks[1], l[1]);
   EXPECT_EQ(mMocks[2], l[2]);
+}
+
+TEST_F(SerializableObjectListTest, testAppendList) {
+  List l1{mMocks[0]};
+  List l2{mMocks[1], mMocks[2]};
+  l1.append(l2);
+  EXPECT_EQ(3, l1.count());
+  EXPECT_EQ(mMocks[0], l1[0]);
+  EXPECT_EQ(mMocks[1], l1[1]);
+  EXPECT_EQ(mMocks[2], l1[2]);
 }
 
 TEST_F(SerializableObjectListTest, testRemove) {

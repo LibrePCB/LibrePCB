@@ -222,6 +222,60 @@ public:
   Angle& makeAbs() noexcept;
 
   /**
+   * @brief Get an Angle object with inverted value
+   *
+   * Changes the sign while keeping the represented angle. For example, 270° is
+   * converted to -90° and vice versa. As a special case, an angle of 0° will
+   * be kept as-is.
+   *
+   * @return A new Angle object with inverted value
+   *
+   * @see ::librepcb::Angle::invert()
+   */
+  Angle inverted() const noexcept;
+
+  /**
+   * @brief Invert the angle
+   *
+   * Changes the sign while keeping the represented angle. For example, 270° is
+   * converted to -90° and vice versa. As a special case, an angle of 0° will
+   * be kept as-is.
+   *
+   * @return A reference to the modified object
+   *
+   * @see ::librepcb::Angle::inverted()
+   */
+  Angle& invert() noexcept;
+
+  /**
+   * @brief Get an Angle object rounded to a given interval
+   *
+   * Especially useful to get rid of very odd angles (like 179.999999°) when
+   * constructed from some inaccurate/calculated floating point input.
+   *
+   * @param interval    The interval to round to (must be > 0)
+   *
+   * @return A new Angle object with rounded value
+   *
+   * @see ::librepcb::Angle::round()
+   */
+  Angle rounded(const Angle& interval) const noexcept;
+
+  /**
+   * @brief Round the angle to a given interval
+   *
+   * Especially useful to get rid of very odd angles (like 179.999999°) when
+   * constructed from some inaccurate/calculated floating point input.
+   *
+   * @param interval    The interval to round to (must be > 0)
+   *
+   * @return A reference to the modified object
+   *
+   * @see ::librepcb::Angle::rounded()
+   */
+  Angle& round(const Angle& interval) noexcept;
+
+  /**
    * @brief Get an Angle object which is mapped to [0..360[ degrees
    *
    * @return A new Angle object which is mapped to [0..360[ degrees

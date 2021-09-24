@@ -38,6 +38,7 @@ namespace librepcb {
 
 GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept
   : QWidget(parent), mComboBox(new QComboBox(this)) {
+  mComboBox->setObjectName("QComboBox");
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mComboBox.data());

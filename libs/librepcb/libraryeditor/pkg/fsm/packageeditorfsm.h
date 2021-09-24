@@ -136,6 +136,7 @@ public:
   bool processStartDrawCircles() noexcept;
   bool processStartDrawTexts() noexcept;
   bool processStartAddingHoles() noexcept;
+  bool processStartDxfImport() noexcept;
 
   // Operator Overloadings
   PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;

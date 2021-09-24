@@ -100,6 +100,7 @@ public:
   virtual bool processMirror() noexcept { return false; }
   virtual bool processFlip() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
+  virtual bool processImportDxf() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
 
   // Operator Overloadings

@@ -126,6 +126,7 @@ public:
   bool processStartDrawPolygons() noexcept;
   bool processStartDrawCircles() noexcept;
   bool processStartDrawTexts() noexcept;
+  bool processStartDxfImport() noexcept;
 
   // Operator Overloadings
   SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;

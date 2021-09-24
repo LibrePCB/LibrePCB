@@ -256,6 +256,16 @@ bool SymbolEditorFsm::processStartDrawTexts() noexcept {
   return setNextState(State::DRAW_TEXT);
 }
 
+bool SymbolEditorFsm::processStartDxfImport() noexcept {
+  setNextState(State::SELECT);
+  if (SymbolEditorState* state = getCurrentState()) {
+    if (state->processImportDxf()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

@@ -127,6 +127,7 @@ public slots:
   virtual bool zoomOut() noexcept { return false; }
   virtual bool zoomAll() noexcept { return false; }
   virtual bool abortCommand() noexcept { return false; }
+  virtual bool importDxf() noexcept { return false; }
   virtual bool editGridProperties() noexcept { return false; }
 
 protected:  // Methods
