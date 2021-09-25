@@ -55,6 +55,7 @@ public:
   virtual ~NumberEditBase() noexcept;
 
   // General Methods
+  void setReadOnly(bool readOnly) noexcept;
   void setSingleStep(tl::optional<double> step) noexcept;
   void setFrame(bool frame) noexcept;
   void selectAll() noexcept;

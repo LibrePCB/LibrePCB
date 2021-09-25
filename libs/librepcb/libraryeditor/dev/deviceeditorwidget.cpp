@@ -63,6 +63,16 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::DeviceEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
+  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->edtName->setReadOnly(mContext.readOnly);
+  mUi->edtDescription->setReadOnly(mContext.readOnly);
+  mUi->edtKeywords->setReadOnly(mContext.readOnly);
+  mUi->edtAuthor->setReadOnly(mContext.readOnly);
+  mUi->edtVersion->setReadOnly(mContext.readOnly);
+  mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->btnChoosePackage->setHidden(mContext.readOnly);
+  mUi->btnChooseComponent->setHidden(mContext.readOnly);
+  mUi->padSignalMapEditorWidget->setReadOnly(mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/device.png"));
 
@@ -77,6 +87,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
   QFormLayout::ItemRole role;

@@ -90,6 +90,25 @@ ComponentSymbolVariantEditDialog::~ComponentSymbolVariantEditDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void ComponentSymbolVariantEditDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->edtName->setReadOnly(readOnly);
+  mUi->edtDescription->setReadOnly(readOnly);
+  mUi->cbxNorm->setDisabled(readOnly);
+  mUi->symbolListWidget->setReadOnly(readOnly);
+  mUi->pinSignalMapEditorWidget->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

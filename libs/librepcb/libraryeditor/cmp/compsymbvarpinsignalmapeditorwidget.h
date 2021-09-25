@@ -64,6 +64,7 @@ public:
   ~CompSymbVarPinSignalMapEditorWidget() noexcept;
 
   // General Methods
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(
       ComponentSymbolVariant* variant,
       const std::shared_ptr<const LibraryElementCache>& symbolCache,
@@ -78,6 +79,7 @@ private:
   QScopedPointer<ComponentPinSignalMapModel> mModel;
   QScopedPointer<SortFilterProxyModel> mProxy;
   QScopedPointer<QTableView> mView;
+  QScopedPointer<QPushButton> mBtnAutoAssign;
 };
 
 /*******************************************************************************

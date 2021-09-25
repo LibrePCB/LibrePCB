@@ -71,6 +71,7 @@ public:
   QSet<Uuid> getUuids() const noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setUuids(const QSet<Uuid>& uuids) noexcept;
 
   // Operator Overloadings

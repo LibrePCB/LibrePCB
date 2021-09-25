@@ -45,7 +45,7 @@
 };</string>
       </property>
       <property name="text">
-       <string>WARNING: This is a remote library, so all modifications will be lost after updating the library the next time! You should use a local library to manage your own library elements.</string>
+       <string>This is a remote library and thus opened in read-only mode. Use a local library to manage your own library elements. To override remote library elements, copy them to a local library and set a higher version number.</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>

@@ -110,6 +110,35 @@ StrokeTextPropertiesDialog::~StrokeTextPropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void StrokeTextPropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->edtText->setReadOnly(readOnly);
+  mUi->cbxLayer->setDisabled(readOnly);
+  mUi->alignmentSelector->setReadOnly(readOnly);
+  mUi->edtHeight->setReadOnly(readOnly);
+  mUi->edtStrokeWidth->setReadOnly(readOnly);
+  mUi->edtLetterSpacingRatio->setReadOnly(readOnly);
+  mUi->cbxLetterSpacingAuto->setCheckable(!readOnly);
+  mUi->edtLineSpacingRatio->setReadOnly(readOnly);
+  mUi->cbxLineSpacingAuto->setCheckable(!readOnly);
+  mUi->edtPosX->setReadOnly(readOnly);
+  mUi->edtPosY->setReadOnly(readOnly);
+  mUi->edtRotation->setReadOnly(readOnly);
+  mUi->cbxMirrored->setCheckable(!readOnly);
+  mUi->cbxAutoRotate->setCheckable(!readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

@@ -64,6 +64,15 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
+  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->edtName->setReadOnly(mContext.readOnly);
+  mUi->edtDescription->setReadOnly(mContext.readOnly);
+  mUi->edtKeywords->setReadOnly(mContext.readOnly);
+  mUi->edtAuthor->setReadOnly(mContext.readOnly);
+  mUi->edtVersion->setReadOnly(mContext.readOnly);
+  mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->footprintEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->padListEditorWidget->setReadOnly(mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
@@ -85,6 +94,7 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new PackageCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
   QFormLayout::ItemRole role;
@@ -137,6 +147,7 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   PackageEditorFsm::Context fsmContext{mContext.workspace,
                                        *this,
                                        *mUndoStack,
+                                       mContext.readOnly,
                                        *mGraphicsScene,
                                        *mUi->graphicsView,
                                        mContext.layerProvider,
@@ -171,17 +182,18 @@ void PackageEditorWidget::setToolsActionGroup(
   EditorWidgetBase::setToolsActionGroup(group);
 
   if (mToolsActionGroup) {
+    bool enabled = !mContext.readOnly;
     mToolsActionGroup->setActionEnabled(Tool::SELECT, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_THT_PADS, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_SMT_PADS, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_NAMES, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_VALUES, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, true);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_THT_PADS, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_SMT_PADS, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_NAMES, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_VALUES, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, enabled);
     mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
     connect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
             &ExclusiveActionGroup::setCurrentAction);

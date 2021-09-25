@@ -68,6 +68,9 @@ public:
                                QWidget* parent = nullptr) noexcept;
   ~FootprintPadPropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   FootprintPadPropertiesDialog& operator=(
       const FootprintPadPropertiesDialog& rhs) = delete;

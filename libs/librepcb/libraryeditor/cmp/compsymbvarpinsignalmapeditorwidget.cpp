@@ -45,7 +45,9 @@ CompSymbVarPinSignalMapEditorWidget::CompSymbVarPinSignalMapEditorWidget(
   : QWidget(parent),
     mModel(new ComponentPinSignalMapModel(this)),
     mProxy(new SortFilterProxyModel(this)),
-    mView(new QTableView(this)) {
+    mView(new QTableView(this)),
+    mBtnAutoAssign(
+        new QPushButton(tr("Automatically assign all signals by name"), this)) {
   mProxy->setSourceModel(mModel.data());
   mView->setModel(mProxy.data());
   mView->setAlternatingRowColors(true);  // increase readability
@@ -77,11 +79,9 @@ CompSymbVarPinSignalMapEditorWidget::CompSymbVarPinSignalMapEditorWidget(
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(3);
   layout->addWidget(mView.data());
-  QPushButton* btn =
-      new QPushButton(tr("Automatically assign all signals by name"), this);
-  connect(btn, &QPushButton::clicked, mModel.data(),
+  connect(mBtnAutoAssign.data(), &QPushButton::clicked, mModel.data(),
           &ComponentPinSignalMapModel::autoAssignSignals);
-  layout->addWidget(btn);
+  layout->addWidget(mBtnAutoAssign.data());
 }
 
 CompSymbVarPinSignalMapEditorWidget::
@@ -91,6 +91,13 @@ CompSymbVarPinSignalMapEditorWidget::
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void CompSymbVarPinSignalMapEditorWidget::setReadOnly(bool readOnly) noexcept {
+  mView->setEditTriggers(readOnly
+                             ? QAbstractItemView::EditTrigger::NoEditTriggers
+                             : QAbstractItemView::AllEditTriggers);
+  mBtnAutoAssign->setHidden(readOnly);
+}
 
 void CompSymbVarPinSignalMapEditorWidget::setReferences(
     ComponentSymbolVariant* variant,

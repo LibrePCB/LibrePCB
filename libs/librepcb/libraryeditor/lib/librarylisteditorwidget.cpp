@@ -111,6 +111,10 @@ QSet<Uuid> LibraryListEditorWidget::getUuids() const noexcept {
  *  Setters
  ******************************************************************************/
 
+void LibraryListEditorWidget::setReadOnly(bool readOnly) noexcept {
+  mUi->tableView->setReadOnly(readOnly);
+}
+
 void LibraryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept {
   mModel->setValues(uuids.values());
 }

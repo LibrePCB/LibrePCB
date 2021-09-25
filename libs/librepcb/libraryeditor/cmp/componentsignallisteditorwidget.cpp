@@ -77,6 +77,10 @@ ComponentSignalListEditorWidget::~ComponentSignalListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void ComponentSignalListEditorWidget::setReadOnly(bool readOnly) noexcept {
+  mView->setReadOnly(readOnly);
+}
+
 void ComponentSignalListEditorWidget::setReferences(
     UndoStack* undoStack, ComponentSignalList* list) noexcept {
   mModel->setSignalList(list);

@@ -76,6 +76,12 @@ PadSignalMapEditorWidget::~PadSignalMapEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void PadSignalMapEditorWidget::setReadOnly(bool readOnly) noexcept {
+  mView->setEditTriggers(readOnly
+                             ? QAbstractItemView::EditTrigger::NoEditTriggers
+                             : QAbstractItemView::AllEditTriggers);
+}
+
 void PadSignalMapEditorWidget::setReferences(UndoStack* undoStack,
                                              DevicePadSignalMap* map) noexcept {
   mModel->setPadSignalMap(map);

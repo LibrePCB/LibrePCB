@@ -125,7 +125,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
       QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
-      if (findPolygonVerticesAtPosition(mStartPos)) {
+      if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         mState = SubState::MOVING_POLYGON_VERTEX;
       } else if (items.isEmpty()) {
         // start selecting
@@ -170,9 +170,11 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           }
         }
 
-        // start moving
-        Q_ASSERT(!mCmdDragSelectedItems);
-        mState = SubState::MOVING;
+        // Start moving, if not read only.
+        if (!mContext.readOnly) {
+          Q_ASSERT(!mCmdDragSelectedItems);
+          mState = SubState::MOVING;
+        }
       }
       return true;
     }
@@ -481,7 +483,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
             [this]() { removeSelectedPolygonVertices(); });
     int remainingVertices = mSelectedPolygon->getPath().getVertices().count() -
         mSelectedPolygonVertices.count();
-    aRemove->setEnabled(remainingVertices >= 2);
+    aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
   } else {
     // handle item selection
     QGraphicsItem* selectedItem = nullptr;
@@ -514,6 +516,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
       if (index >= 0) {
         QAction* aAddVertex =
             menu.addAction(QIcon(":/img/actions/add.png"), tr("Add Vertex"));
+        aAddVertex->setEnabled(!mContext.readOnly);
         connect(aAddVertex, &QAction::triggered,
                 [=]() { startAddingPolygonVertex(*polygon, index, pos); });
         menu.addSeparator();
@@ -523,23 +526,28 @@ bool PackageEditorState_Select::openContextMenuAtPos(
     // build the context menu
     QAction* aRotateCCW =
         menu.addAction(QIcon(":/img/actions/rotate_left.png"), tr("Rotate"));
+    aRotateCCW->setEnabled(!mContext.readOnly);
     connect(aRotateCCW, &QAction::triggered,
             [this]() { rotateSelectedItems(Angle::deg90()); });
     QAction* aMirrorH = menu.addAction(
         QIcon(":/img/actions/flip_horizontal.png"), tr("Mirror"));
+    aMirrorH->setEnabled(!mContext.readOnly);
     connect(aMirrorH, &QAction::triggered,
             [this]() { mirrorSelectedItems(Qt::Horizontal, false); });
     QAction* aFlipH =
         menu.addAction(QIcon(":/img/actions/swap.png"), tr("Flip"));
+    aFlipH->setEnabled(!mContext.readOnly);
     connect(aFlipH, &QAction::triggered,
             [this]() { mirrorSelectedItems(Qt::Horizontal, true); });
     QAction* aRemove =
         menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
+    aRemove->setEnabled(!mContext.readOnly);
     connect(aRemove, &QAction::triggered, [this]() { removeSelectedItems(); });
     menu.addSeparator();
     if (CmdDragSelectedFootprintItems(mContext).hasOffTheGridElements()) {
       QAction* aSnapToGrid =
           menu.addAction(QIcon(":/img/actions/grid.png"), tr("Snap To Grid"));
+      aSnapToGrid->setEnabled(!mContext.readOnly);
       connect(aSnapToGrid, &QAction::triggered, this,
               &PackageEditorState_Select::snapSelectedItemsToGrid);
       menu.addSeparator();
@@ -568,6 +576,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         getDefaultLengthUnit(),
         "package_editor/footprint_pad_properties_dialog",
         &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (StrokeTextGraphicsItem* text =
@@ -577,6 +586,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         text->getText(), mContext.undoStack, getAllowedTextLayers(),
         getDefaultLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (PolygonGraphicsItem* polygon =
@@ -586,6 +596,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         polygon->getPolygon(), mContext.undoStack,
         getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
         "package_editor/polygon_properties_dialog", &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (CircleGraphicsItem* circle =
@@ -595,6 +606,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         circle->getCircle(), mContext.undoStack,
         getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
         "package_editor/circle_properties_dialog", &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (HoleGraphicsItem* hole = dynamic_cast<HoleGraphicsItem*>(item)) {
@@ -605,6 +617,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
                                 mContext.undoStack, getDefaultLengthUnit(),
                                 "package_editor/hole_properties_dialog",
                                 &mContext.editorWidget);
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   }

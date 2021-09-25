@@ -58,6 +58,7 @@ public:
   ~FootprintListEditorWidget() noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(FootprintList& list, UndoStack& stack) noexcept;
 
   // Operator Overloadings

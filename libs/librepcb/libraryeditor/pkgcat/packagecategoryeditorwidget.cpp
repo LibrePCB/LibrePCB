@@ -53,6 +53,15 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
     mUi(new Ui::PackageCategoryEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
+  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->edtName->setReadOnly(mContext.readOnly);
+  mUi->edtDescription->setReadOnly(mContext.readOnly);
+  mUi->edtKeywords->setReadOnly(mContext.readOnly);
+  mUi->edtAuthor->setReadOnly(mContext.readOnly);
+  mUi->edtVersion->setReadOnly(mContext.readOnly);
+  mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->btnChooseParentCategory->setEnabled(!mContext.readOnly);
+  mUi->btnResetParentCategory->setEnabled(!mContext.readOnly);
   setWindowIcon(QIcon(":/img/places/folder_green.png"));
   connect(mUi->btnChooseParentCategory, &QToolButton::clicked, this,
           &PackageCategoryEditorWidget::btnChooseParentCategoryClicked);

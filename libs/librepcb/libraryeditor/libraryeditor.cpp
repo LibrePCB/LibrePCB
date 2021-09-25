@@ -65,6 +65,9 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
     mCurrentEditorWidget(nullptr),
     mLibrary(nullptr) {
   mUi->setupUi(this);
+  mUi->actionNew->setEnabled(!mIsOpenedReadOnly);
+  mUi->actionSave->setEnabled(!mIsOpenedReadOnly);
+  mUi->actionRemove->setEnabled(!mIsOpenedReadOnly);
   connect(mUi->actionClose, &QAction::triggered, this, &LibraryEditor::close);
   connect(mUi->actionNew, &QAction::triggered, this,
           &LibraryEditor::newElementTriggered);
@@ -660,18 +663,22 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     supportsFlip = mCurrentEditorWidget->supportsFlip();
   }
   foreach (QAction* action, mUi->editToolbar->actions()) {
-    action->setEnabled(hasGraphicalEditor);
+    bool enabled = hasGraphicalEditor;
+    if (action != mUi->actionCopy) {
+      enabled = enabled && (!mIsOpenedReadOnly);
+    }
+    action->setEnabled(enabled);
   }
   mUi->actionSelectAll->setEnabled(hasGraphicalEditor);
-  mUi->actionFlip->setEnabled(supportsFlip);
+  mUi->actionFlip->setEnabled(supportsFlip && (!mIsOpenedReadOnly));
   if (isOverviewTab) {
-    mUi->actionRemove->setEnabled(true);
+    mUi->actionRemove->setEnabled(!mIsOpenedReadOnly);
   }
-  mUi->actionImportDxf->setEnabled(hasGraphicalEditor);
+  mUi->actionImportDxf->setEnabled(hasGraphicalEditor && (!mIsOpenedReadOnly));
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
-  mUi->commandToolbar->setEnabled(hasGraphicalEditor);
+  mUi->commandToolbar->setEnabled(hasGraphicalEditor && (!mIsOpenedReadOnly));
   mUi->filterToolbar->setEnabled(isOverviewTab);
   updateTabTitles();  // force updating the "Save" action title
 }
@@ -740,7 +747,7 @@ void LibraryEditor::updateTabTitles() noexcept {
     }
   }
 
-  if (mCurrentEditorWidget) {
+  if (mCurrentEditorWidget && (!mIsOpenedReadOnly)) {
     mUi->actionSave->setEnabled(true);
     mUi->actionSave->setText(
         tr("&Save '%1'").arg(mCurrentEditorWidget->windowTitle()));

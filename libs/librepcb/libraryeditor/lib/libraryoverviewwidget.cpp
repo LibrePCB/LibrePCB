@@ -57,6 +57,13 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
     mCurrentFilter() {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
+  mUi->edtName->setReadOnly(mContext.readOnly);
+  mUi->edtDescription->setReadOnly(mContext.readOnly);
+  mUi->edtKeywords->setReadOnly(mContext.readOnly);
+  mUi->edtAuthor->setReadOnly(mContext.readOnly);
+  mUi->edtVersion->setReadOnly(mContext.readOnly);
+  mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->edtUrl->setReadOnly(mContext.readOnly);
   connect(mUi->btnIcon, &QPushButton::clicked, this,
           &LibraryOverviewWidget::btnIconClicked);
   connect(mUi->lstCmpCat, &QListWidget::doubleClicked, this,
@@ -75,6 +82,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
   // Insert dependencies editor widget.
   mDependenciesEditorWidget.reset(
       new LibraryListEditorWidget(mContext.workspace, this));
+  mDependenciesEditorWidget->setReadOnly(mContext.readOnly);
   int row;
   QFormLayout::ItemRole role;
   mUi->formLayout->getWidgetPosition(mUi->lblDependencies, &row, &role);
@@ -389,14 +397,17 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
 
   // Build the context menu
   QMenu menu;
-  QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"), tr("Edit"));
+  QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"),
+                                  mContext.readOnly ? tr("Open") : tr("Edit"));
   aEdit->setVisible(!selectedItemPaths.isEmpty());
   QAction* aDuplicate =
       menu.addAction(QIcon(":/img/actions/clone.png"), tr("Duplicate"));
   aDuplicate->setVisible(selectedItemPaths.count() == 1);
+  aDuplicate->setEnabled(!mContext.readOnly);
   QAction* aRemove =
       menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
   aRemove->setVisible(!selectedItemPaths.isEmpty());
+  aRemove->setEnabled(!mContext.readOnly);
   if (!selectedItemPaths.isEmpty()) {
     QMenu* menuCopyToLib = menu.addMenu(QIcon(":/img/actions/copy.png"),
                                         tr("Copy to other library"));
@@ -412,13 +423,15 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
     }
     // Disable menu item if it doesn't contain children.
     menuCopyToLib->setEnabled(!aCopyToLibChildren.isEmpty());
-    menuMoveToLib->setEnabled(!aMoveToLibChildren.isEmpty());
+    menuMoveToLib->setEnabled((!aMoveToLibChildren.isEmpty()) &&
+                              (!mContext.readOnly));
   }
   QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
   aNew->setVisible(selectedItemPaths.count() <= 1);
+  aNew->setEnabled(!mContext.readOnly);
 
   // Set default action
-  if (selectedItemPaths.isEmpty()) {
+  if (selectedItemPaths.isEmpty() && aNew->isVisible() && aNew->isEnabled()) {
     menu.setDefaultAction(aNew);
   } else {
     menu.setDefaultAction(aEdit);
@@ -632,6 +645,8 @@ QList<LibraryOverviewWidget::LibraryMenuItem>
  ******************************************************************************/
 
 void LibraryOverviewWidget::btnIconClicked() noexcept {
+  if (mContext.readOnly) return;
+
   QString fp = FileDialog::getOpenFileName(
       this, tr("Choose library icon"),
       mLibrary->getDirectory().getAbsPath().toNative(),

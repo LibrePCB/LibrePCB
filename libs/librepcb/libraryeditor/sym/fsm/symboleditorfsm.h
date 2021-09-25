@@ -80,6 +80,7 @@ public:  // Types
     workspace::Workspace& workspace;
     SymbolEditorWidget& editorWidget;
     UndoStack& undoStack;
+    bool readOnly;
     const IF_GraphicsLayerProvider& layerProvider;
     GraphicsScene& graphicsScene;
     GraphicsView& graphicsView;
