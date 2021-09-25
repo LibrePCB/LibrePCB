@@ -69,6 +69,13 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
+  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->edtName->setReadOnly(mContext.readOnly);
+  mUi->edtDescription->setReadOnly(mContext.readOnly);
+  mUi->edtKeywords->setReadOnly(mContext.readOnly);
+  mUi->edtAuthor->setReadOnly(mContext.readOnly);
+  mUi->edtVersion->setReadOnly(mContext.readOnly);
+  mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
@@ -87,6 +94,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
   QFormLayout::ItemRole role;
@@ -133,6 +141,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   SymbolEditorFsm::Context fsmContext{mContext.workspace,
                                       *this,
                                       *mUndoStack,
+                                      mContext.readOnly,
                                       mContext.layerProvider,
                                       *mGraphicsScene,
                                       *mUi->graphicsView,
@@ -162,15 +171,16 @@ void SymbolEditorWidget::setToolsActionGroup(
   EditorWidgetBase::setToolsActionGroup(group);
 
   if (mToolsActionGroup) {
+    bool enabled = !mContext.readOnly;
     mToolsActionGroup->setActionEnabled(Tool::SELECT, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_PINS, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_NAMES, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_VALUES, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, true);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, true);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_PINS, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_NAMES, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::ADD_VALUES, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
+    mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
     mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
     connect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
             &ExclusiveActionGroup::setCurrentAction);

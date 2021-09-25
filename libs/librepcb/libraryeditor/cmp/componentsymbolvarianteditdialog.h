@@ -76,6 +76,9 @@ public:
                                    QWidget* parent = nullptr) noexcept;
   ~ComponentSymbolVariantEditDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   ComponentSymbolVariantEditDialog& operator=(
       const ComponentSymbolVariantEditDialog& rhs) = delete;

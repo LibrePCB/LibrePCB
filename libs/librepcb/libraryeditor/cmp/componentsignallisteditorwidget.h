@@ -60,6 +60,7 @@ public:
   ~ComponentSignalListEditorWidget() noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(UndoStack* undoStack, ComponentSignalList* list) noexcept;
 
   // Operator Overloadings

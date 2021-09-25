@@ -151,6 +151,7 @@ public:
   ~LibraryElementCheckListWidget() noexcept;
 
   // Setters
+  void setProvideFixes(bool provideFixes) noexcept;
   void setHandler(IF_LibraryElementCheckHandler* handler) noexcept;
   void setMessages(LibraryElementCheckMessageList messages) noexcept;
 
@@ -172,6 +173,7 @@ private:  // Data
   QScopedPointer<QListWidget> mListWidget;
   IF_LibraryElementCheckHandler* mHandler;
   LibraryElementCheckMessageList mMessages;
+  bool mProvideFixes;
 };
 
 /*******************************************************************************

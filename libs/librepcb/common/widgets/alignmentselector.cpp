@@ -58,6 +58,18 @@ AlignmentSelector::~AlignmentSelector() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void AlignmentSelector::setReadOnly(bool readOnly) noexcept {
+  mUi->tl->setDisabled(readOnly);
+  mUi->tc->setDisabled(readOnly);
+  mUi->tr->setDisabled(readOnly);
+  mUi->cl->setDisabled(readOnly);
+  mUi->cc->setDisabled(readOnly);
+  mUi->cr->setDisabled(readOnly);
+  mUi->bl->setDisabled(readOnly);
+  mUi->bc->setDisabled(readOnly);
+  mUi->br->setDisabled(readOnly);
+}
+
 Alignment AlignmentSelector::getAlignment() const noexcept {
   foreach (QRadioButton* btn, mLookupTable.keys()) {
     if (btn->isChecked()) return mLookupTable.value(btn);

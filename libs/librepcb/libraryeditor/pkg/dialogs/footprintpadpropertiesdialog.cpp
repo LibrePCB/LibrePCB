@@ -121,6 +121,34 @@ FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->cbxPackagePad->setDisabled(readOnly);
+  mUi->rbtnBoardSideTht->setDisabled(readOnly);
+  mUi->rbtnBoardSideTop->setDisabled(readOnly);
+  mUi->rbtnBoardSideBottom->setDisabled(readOnly);
+  mUi->rbtnShapeRound->setDisabled(readOnly);
+  mUi->rbtnShapeRect->setDisabled(readOnly);
+  mUi->rbtnShapeOctagon->setDisabled(readOnly);
+  mUi->edtDrillDiameter->setReadOnly(readOnly);
+  mUi->edtWidth->setReadOnly(readOnly);
+  mUi->edtHeight->setReadOnly(readOnly);
+  mUi->edtPosX->setReadOnly(readOnly);
+  mUi->edtPosY->setReadOnly(readOnly);
+  mUi->edtRotation->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

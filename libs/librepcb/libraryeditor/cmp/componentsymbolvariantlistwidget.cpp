@@ -93,6 +93,10 @@ ComponentSymbolVariantListWidget::~ComponentSymbolVariantListWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void ComponentSymbolVariantListWidget::setReadOnly(bool readOnly) noexcept {
+  mView->setReadOnly(readOnly);
+}
+
 void ComponentSymbolVariantListWidget::setReferences(
     UndoStack* undoStack, ComponentSymbolVariantList* list,
     IF_ComponentSymbolVariantEditorProvider* editorProvider) noexcept {

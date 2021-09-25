@@ -37,7 +37,10 @@ namespace editor {
 
 LibraryElementCheckListWidget::LibraryElementCheckListWidget(
     QWidget* parent) noexcept
-  : QWidget(parent), mListWidget(new QListWidget(this)), mHandler(nullptr) {
+  : QWidget(parent),
+    mListWidget(new QListWidget(this)),
+    mHandler(nullptr),
+    mProvideFixes(true) {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mListWidget.data());
@@ -52,6 +55,14 @@ LibraryElementCheckListWidget::~LibraryElementCheckListWidget() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void LibraryElementCheckListWidget::setProvideFixes(
+    bool provideFixes) noexcept {
+  if (provideFixes != mProvideFixes) {
+    mProvideFixes = provideFixes;
+    updateList();
+  }
+}
 
 void LibraryElementCheckListWidget::setHandler(
     IF_LibraryElementCheckHandler* handler) noexcept {
@@ -112,7 +123,7 @@ void LibraryElementCheckListWidget::itemDoubleClicked(
   std::shared_ptr<const LibraryElementCheckMessage> msg =
       mMessages.value(mListWidget->row(item));
   if (msg && mHandler) {
-    if (mHandler->libraryElementCheckFixAvailable(msg)) {
+    if (mProvideFixes && mHandler->libraryElementCheckFixAvailable(msg)) {
       mHandler->libraryElementCheckFixRequested(msg);
     } else {
       mHandler->libraryElementCheckDescriptionRequested(msg);
@@ -122,7 +133,7 @@ void LibraryElementCheckListWidget::itemDoubleClicked(
 
 bool LibraryElementCheckListWidget::libraryElementCheckFixAvailable(
     std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
-  if (mHandler) {
+  if (mProvideFixes && mHandler) {
     return mHandler->libraryElementCheckFixAvailable(msg);
   } else {
     return false;
@@ -131,7 +142,7 @@ bool LibraryElementCheckListWidget::libraryElementCheckFixAvailable(
 
 void LibraryElementCheckListWidget::libraryElementCheckFixRequested(
     std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
-  if (mHandler) {
+  if (mProvideFixes && mHandler) {
     mHandler->libraryElementCheckFixRequested(msg);
   }
 }

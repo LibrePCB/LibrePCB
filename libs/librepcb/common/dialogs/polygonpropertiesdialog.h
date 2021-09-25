@@ -63,6 +63,9 @@ public:
                           QWidget* parent = nullptr) noexcept;
   ~PolygonPropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   PolygonPropertiesDialog& operator=(const PolygonPropertiesDialog& rhs) =
       delete;

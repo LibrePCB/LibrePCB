@@ -54,12 +54,26 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::ComponentEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
+  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->edtName->setReadOnly(mContext.readOnly);
+  mUi->edtDescription->setReadOnly(mContext.readOnly);
+  mUi->edtKeywords->setReadOnly(mContext.readOnly);
+  mUi->edtAuthor->setReadOnly(mContext.readOnly);
+  mUi->edtVersion->setReadOnly(mContext.readOnly);
+  mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->cbxSchematicOnly->setCheckable(!mContext.readOnly);
+  mUi->edtPrefix->setReadOnly(mContext.readOnly);
+  mUi->edtDefaultValue->setReadOnly(mContext.readOnly);
+  mUi->signalEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->symbolVariantsEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->attributesEditorWidget->setReadOnly(mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/component.png"));
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(
       new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
   QFormLayout::ItemRole role;
@@ -204,6 +218,7 @@ bool ComponentEditorWidget::openComponentSymbolVariantEditor(
     ComponentSymbolVariant& variant) noexcept {
   ComponentSymbolVariantEditDialog dialog(mContext.workspace, *mComponent,
                                           variant);
+  dialog.setReadOnly(mContext.readOnly);
   return (dialog.exec() == QDialog::Accepted);
 }
 

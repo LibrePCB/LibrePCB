@@ -63,6 +63,11 @@ CategoryListEditorWidgetBase::~CategoryListEditorWidgetBase() noexcept {
  *  Setters
  ******************************************************************************/
 
+void CategoryListEditorWidgetBase::setReadOnly(bool readOnly) noexcept {
+  mUi->btnAdd->setHidden(readOnly);
+  mUi->btnRemove->setHidden(readOnly);
+}
+
 void CategoryListEditorWidgetBase::setRequiresMinimumOneEntry(bool v) noexcept {
   mRequiresMinimumOneEntry = v;
   updateColor();

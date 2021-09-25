@@ -54,6 +54,7 @@ public:
   ~PathEditorWidget() noexcept;
 
   // General Methods
+  void setReadOnly(bool readOnly) noexcept;
   void setPath(const Path& path) noexcept;
   const Path& getPath() const noexcept;
   void setLengthUnit(const LengthUnit& unit) noexcept;

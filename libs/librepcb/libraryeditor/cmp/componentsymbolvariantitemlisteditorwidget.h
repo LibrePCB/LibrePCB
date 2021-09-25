@@ -66,6 +66,7 @@ public:
   ~ComponentSymbolVariantItemListEditorWidget() noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(
       const workspace::Workspace& ws,
       const IF_GraphicsLayerProvider& layerProvider,

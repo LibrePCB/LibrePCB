@@ -61,6 +61,9 @@ public:
                        QWidget* parent = nullptr) noexcept;
   ~TextPropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   TextPropertiesDialog& operator=(const TextPropertiesDialog& rhs) = delete;
 

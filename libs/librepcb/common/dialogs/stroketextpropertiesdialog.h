@@ -61,6 +61,9 @@ public:
                              QWidget* parent = nullptr) noexcept;
   ~StrokeTextPropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   StrokeTextPropertiesDialog& operator=(const StrokeTextPropertiesDialog& rhs) =
       delete;

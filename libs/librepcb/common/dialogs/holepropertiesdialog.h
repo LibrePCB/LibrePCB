@@ -59,6 +59,9 @@ public:
                        QWidget* parent = nullptr) noexcept;
   ~HolePropertiesDialog() noexcept;
 
+  // Setters
+  void setReadOnly(bool readOnly) noexcept;
+
   // Operator Overloadings
   HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
 

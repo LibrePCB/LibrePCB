@@ -177,11 +177,13 @@ QSize LengthEditBase::sizeHint() const {
 
 QAbstractSpinBox::StepEnabled LengthEditBase::stepEnabled() const {
   QAbstractSpinBox::StepEnabled enabled = QAbstractSpinBox::StepNone;
-  if ((mSingleStepUp > 0) && (mValue < mMaximum)) {
-    enabled |= QAbstractSpinBox::StepUpEnabled;
-  }
-  if ((mSingleStepDown > 0) && (mValue > mMinimum)) {
-    enabled |= QAbstractSpinBox::StepDownEnabled;
+  if (!isReadOnly()) {
+    if ((mSingleStepUp > 0) && (mValue < mMaximum)) {
+      enabled |= QAbstractSpinBox::StepUpEnabled;
+    }
+    if ((mSingleStepDown > 0) && (mValue > mMinimum)) {
+      enabled |= QAbstractSpinBox::StepDownEnabled;
+    }
   }
   return enabled;
 }

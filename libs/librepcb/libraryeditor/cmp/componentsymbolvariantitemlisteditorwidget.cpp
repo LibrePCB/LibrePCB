@@ -103,6 +103,11 @@ ComponentSymbolVariantItemListEditorWidget::
  *  Setters
  ******************************************************************************/
 
+void ComponentSymbolVariantItemListEditorWidget::setReadOnly(
+    bool readOnly) noexcept {
+  mView->setReadOnly(readOnly);
+}
+
 void ComponentSymbolVariantItemListEditorWidget::setReferences(
     const workspace::Workspace& ws,
     const IF_GraphicsLayerProvider& layerProvider,

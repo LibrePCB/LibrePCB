@@ -72,6 +72,26 @@ PolygonPropertiesDialog::~PolygonPropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void PolygonPropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->cbxLayer->setDisabled(readOnly);
+  mUi->edtLineWidth->setReadOnly(readOnly);
+  mUi->cbxFillArea->setCheckable(!readOnly);
+  mUi->cbxIsGrabArea->setCheckable(!readOnly);
+  mUi->pathEditorWidget->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

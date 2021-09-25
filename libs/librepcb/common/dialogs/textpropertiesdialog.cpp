@@ -79,6 +79,28 @@ TextPropertiesDialog::~TextPropertiesDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void TextPropertiesDialog::setReadOnly(bool readOnly) noexcept {
+  mUi->cbxLayer->setDisabled(readOnly);
+  mUi->edtText->setReadOnly(readOnly);
+  mUi->alignmentSelector->setReadOnly(readOnly);
+  mUi->edtHeight->setReadOnly(readOnly);
+  mUi->edtPosX->setReadOnly(readOnly);
+  mUi->edtPosY->setReadOnly(readOnly);
+  mUi->edtRotation->setReadOnly(readOnly);
+  if (readOnly) {
+    mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+  } else {
+    mUi->buttonBox->setStandardButtons(
+        QDialogButtonBox::StandardButton::Apply |
+        QDialogButtonBox::StandardButton::Cancel |
+        QDialogButtonBox::StandardButton::Ok);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

@@ -61,6 +61,7 @@ public:
   ~ComponentSymbolVariantListWidget() noexcept;
 
   // Setters
+  void setReadOnly(bool readOnly) noexcept;
   void setReferences(
       UndoStack* undoStack, ComponentSymbolVariantList* list,
       IF_ComponentSymbolVariantEditorProvider* editorProvider) noexcept;
