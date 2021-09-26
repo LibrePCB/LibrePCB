@@ -26,6 +26,8 @@
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/toolbox.h>
 
+#include <quazip/quazip.h>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -611,6 +613,20 @@ TEST_F(TransactionalFileSystemTest, testExportImportZipByFilePath) {
   }
 }
 
+TEST_F(TransactionalFileSystemTest, testExportZipByFilePathWithFilter) {
+  FilePath zipFp = mPopulatedDir.getPathTo("export to filter.zip");
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  auto filter = [](const QString& fp) {
+    return (fp == "1.txt") || (fp == "1/1a.txt");
+  };
+  fs.exportToZip(zipFp, filter);
+
+  QuaZip zip(zipFp.toStr());
+  ASSERT_TRUE(zip.open(QuaZip::mdUnzip));
+  EXPECT_EQ(2, zip.getEntriesCount());
+  zip.close();
+}
+
 TEST_F(TransactionalFileSystemTest, testExportImportZipByByteArray) {
   QByteArray content;
   {
@@ -622,6 +638,20 @@ TEST_F(TransactionalFileSystemTest, testExportImportZipByByteArray) {
     fs.loadFromZip(content);
     EXPECT_EQ("bar", fs.read("foo dir/bar dir.txt"));
   }
+}
+
+TEST_F(TransactionalFileSystemTest, testExportZipByByteArrayWithFilter) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  auto filter = [](const QString& fp) {
+    return (fp == "1.txt") || (fp == "1/1a.txt");
+  };
+  QByteArray content = fs.exportToZip(filter);
+
+  QBuffer buffer(&content);
+  QuaZip zip(&buffer);
+  ASSERT_TRUE(zip.open(QuaZip::mdUnzip));
+  EXPECT_EQ(2, zip.getEntriesCount());
+  zip.close();
 }
 
 TEST_F(TransactionalFileSystemTest, testDiscardChanges) {
