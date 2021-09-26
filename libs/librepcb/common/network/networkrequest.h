@@ -49,7 +49,8 @@ public:
   // Constructors / Destructor
   NetworkRequest() = delete;
   NetworkRequest(const NetworkRequest& other) = delete;
-  NetworkRequest(const QUrl& url) noexcept;
+  NetworkRequest(const QUrl& url,
+                 const QByteArray& postData = QByteArray()) noexcept;
   ~NetworkRequest() noexcept;
 
   // Operator Overloadings
