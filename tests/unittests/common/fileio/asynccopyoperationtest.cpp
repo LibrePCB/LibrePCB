@@ -25,7 +25,6 @@
 #include <librepcb/common/fileio/asynccopyoperation.h>
 #include <librepcb/common/fileio/fileutils.h>
 
-#include <QSignalSpy>
 #include <QtCore>
 
 /*******************************************************************************
@@ -46,28 +45,69 @@ protected:
   FilePath mPopulatedDir;
   FilePath mDestinationDir;
 
-  AsyncCopyOperationTest() {
-    // Temporary dir
-    mTmpDir = FilePath::getRandomTempPath();
+  int mSignalStarted;
+  QStringList mSignalProgressStatus;
+  QList<int> mSignalProgressPercent;
+  int mSignalSucceeded;
+  QStringList mSignalFailed;
+  int mSignalFinished;
+  QObject mContext;
 
-    // Non-existing dir
-    mNonExistingDir = mTmpDir.getPathTo("non existing");
-
-    // Empty dir
-    mEmptyDir = mTmpDir.getPathTo("empty directory");
+  AsyncCopyOperationTest()
+    : mTmpDir(FilePath::getRandomTempPath()),
+      mNonExistingDir(mTmpDir.getPathTo("non existing")),
+      mEmptyDir(mTmpDir.getPathTo("empty directory")),
+      mPopulatedDir(mTmpDir.getPathTo("populated directory")),
+      mDestinationDir(mTmpDir.getPathTo("destination directory")),
+      mSignalStarted(0),
+      mSignalProgressStatus(),
+      mSignalProgressPercent(),
+      mSignalSucceeded(0),
+      mSignalFailed(),
+      mSignalFinished(0),
+      mContext() {
     FileUtils::makePath(mEmptyDir);
-
-    // Populated dir
-    mPopulatedDir = mTmpDir.getPathTo("populated directory");
     FileUtils::writeFile(mPopulatedDir.getPathTo("foo/a dir/f"), "A");
     FileUtils::writeFile(mPopulatedDir.getPathTo(".dotfile"), "B");
-
-    // Destination dir
-    mDestinationDir = mTmpDir.getPathTo("destination directory");
   }
 
   virtual ~AsyncCopyOperationTest() {
     QDir(mTmpDir.toStr()).removeRecursively();
+  }
+
+  bool run(AsyncCopyOperation& copy, unsigned long timeout) {
+    // Connect all signals by hand because QSignalSpy is not threadsafe!
+    QObject::connect(&copy, &AsyncCopyOperation::started, &mContext,
+                     [this]() { ++mSignalStarted; }, Qt::QueuedConnection);
+    QObject::connect(&copy, &AsyncCopyOperation::progressStatus, &mContext,
+                     [this](const QString& status) {
+                       std::cout << "STATUS: " << status.toStdString()
+                                 << std::endl;
+                       mSignalProgressStatus.append(status);
+                     },
+                     Qt::QueuedConnection);
+    QObject::connect(&copy, &AsyncCopyOperation::progressPercent, &mContext,
+                     [this](int percent) {
+                       std::cout << "PROGRESS: " << percent << std::endl;
+                       mSignalProgressPercent.append(percent);
+                     },
+                     Qt::QueuedConnection);
+    QObject::connect(&copy, &AsyncCopyOperation::succeeded, &mContext,
+                     [this]() { ++mSignalSucceeded; }, Qt::QueuedConnection);
+    QObject::connect(&copy, &AsyncCopyOperation::failed, &mContext,
+                     [this](const QString& error) {
+                       std::cout << "ERROR: " << error.toStdString()
+                                 << std::endl;
+                       mSignalFailed.append(error);
+                     },
+                     Qt::QueuedConnection);
+    QObject::connect(&copy, &AsyncCopyOperation::finished, &mContext,
+                     [this]() { ++mSignalFinished; }, Qt::QueuedConnection);
+
+    copy.start();
+    bool success = copy.wait(timeout);
+    qApp->processEvents();  // Required to process the emitted signals.
+    return success;
   }
 };
 
@@ -76,70 +116,34 @@ protected:
  ******************************************************************************/
 
 TEST_F(AsyncCopyOperationTest, testEmptySourceDir) {
-  // Start copy operation.
+  // Perform copy operation.
   AsyncCopyOperation copy(mEmptyDir, mDestinationDir);
-  QSignalSpy spyStarted(&copy, &AsyncCopyOperation::started);
-  QSignalSpy spyProgressStatus(&copy, &AsyncCopyOperation::progressStatus);
-  QSignalSpy spyProgressPercent(&copy, &AsyncCopyOperation::progressPercent);
-  QSignalSpy spySucceeded(&copy, &AsyncCopyOperation::succeeded);
-  QSignalSpy spyFailed(&copy, &AsyncCopyOperation::failed);
-  QSignalSpy spyFinished(&copy, &AsyncCopyOperation::finished);
-  copy.start();
-
-  // Wait for completion.
-  EXPECT_TRUE(spyFinished.wait(5000));
-
-  // Print status and error messages.
-  for (const auto& arg : spyProgressStatus) {
-    std::cout << "STATUS: " << arg.first().toString().toStdString()
-              << std::endl;
-  }
-  for (const auto& arg : spyFailed) {
-    std::cout << "ERROR: " << arg.first().toString().toStdString() << std::endl;
-  }
+  EXPECT_TRUE(run(copy, 5000));
 
   // Verify emitted signals.
-  EXPECT_EQ(spyStarted.count(), 1);
-  EXPECT_GE(spyProgressStatus.count(), 1);
-  EXPECT_GE(spyProgressPercent.count(), 1);
-  EXPECT_EQ(spySucceeded.count(), 1);
-  EXPECT_EQ(spyFailed.count(), 0);
-  EXPECT_EQ(spyFinished.count(), 1);
+  EXPECT_EQ(mSignalStarted, 1);
+  EXPECT_GE(mSignalProgressStatus.count(), 1);
+  EXPECT_GE(mSignalProgressPercent.count(), 1);
+  EXPECT_EQ(mSignalSucceeded, 1);
+  EXPECT_EQ(mSignalFailed.count(), 0);
+  EXPECT_EQ(mSignalFinished, 1);
 
   // Verify copied directoy.
   EXPECT_TRUE(mDestinationDir.isEmptyDir());
 }
 
 TEST_F(AsyncCopyOperationTest, testPopulatedSourceDir) {
-  // Start copy operation.
+  // Perform copy operation.
   AsyncCopyOperation copy(mPopulatedDir, mDestinationDir);
-  QSignalSpy spyStarted(&copy, &AsyncCopyOperation::started);
-  QSignalSpy spyProgressStatus(&copy, &AsyncCopyOperation::progressStatus);
-  QSignalSpy spyProgressPercent(&copy, &AsyncCopyOperation::progressPercent);
-  QSignalSpy spySucceeded(&copy, &AsyncCopyOperation::succeeded);
-  QSignalSpy spyFailed(&copy, &AsyncCopyOperation::failed);
-  QSignalSpy spyFinished(&copy, &AsyncCopyOperation::finished);
-  copy.start();
-
-  // Wait for completion.
-  EXPECT_TRUE(spyFinished.wait(5000));
-
-  // Print status and error messages.
-  for (const auto& arg : spyProgressStatus) {
-    std::cout << "STATUS: " << arg.first().toString().toStdString()
-              << std::endl;
-  }
-  for (const auto& arg : spyFailed) {
-    std::cout << "ERROR: " << arg.first().toString().toStdString() << std::endl;
-  }
+  EXPECT_TRUE(run(copy, 5000));
 
   // Verify emitted signals.
-  EXPECT_EQ(spyStarted.count(), 1);
-  EXPECT_GE(spyProgressStatus.count(), 1);
-  EXPECT_GE(spyProgressPercent.count(), 1);
-  EXPECT_EQ(spySucceeded.count(), 1);
-  EXPECT_EQ(spyFailed.count(), 0);
-  EXPECT_EQ(spyFinished.count(), 1);
+  EXPECT_EQ(mSignalStarted, 1);
+  EXPECT_GE(mSignalProgressStatus.count(), 1);
+  EXPECT_GE(mSignalProgressPercent.count(), 1);
+  EXPECT_EQ(mSignalSucceeded, 1);
+  EXPECT_EQ(mSignalFailed.count(), 0);
+  EXPECT_EQ(mSignalFinished, 1);
 
   // Verify copied directoy.
   EXPECT_EQ(FileUtils::readFile(mDestinationDir.getPathTo("foo/a dir/f")), "A");
@@ -147,70 +151,34 @@ TEST_F(AsyncCopyOperationTest, testPopulatedSourceDir) {
 }
 
 TEST_F(AsyncCopyOperationTest, testNonExistentSourceDir) {
-  // Start copy operation.
+  // Perform copy operation.
   AsyncCopyOperation copy(mNonExistingDir, mDestinationDir);
-  QSignalSpy spyStarted(&copy, &AsyncCopyOperation::started);
-  QSignalSpy spyProgressStatus(&copy, &AsyncCopyOperation::progressStatus);
-  QSignalSpy spyProgressPercent(&copy, &AsyncCopyOperation::progressPercent);
-  QSignalSpy spySucceeded(&copy, &AsyncCopyOperation::succeeded);
-  QSignalSpy spyFailed(&copy, &AsyncCopyOperation::failed);
-  QSignalSpy spyFinished(&copy, &AsyncCopyOperation::finished);
-  copy.start();
-
-  // Wait for completion.
-  EXPECT_TRUE(spyFinished.wait(5000));
-
-  // Print status and error messages.
-  for (const auto& arg : spyProgressStatus) {
-    std::cout << "STATUS: " << arg.first().toString().toStdString()
-              << std::endl;
-  }
-  for (const auto& arg : spyFailed) {
-    std::cout << "ERROR: " << arg.first().toString().toStdString() << std::endl;
-  }
+  EXPECT_TRUE(run(copy, 5000));
 
   // Verify emitted signals.
-  EXPECT_EQ(spyStarted.count(), 1);
-  EXPECT_GE(spyProgressStatus.count(), 1);
-  EXPECT_GE(spyProgressPercent.count(), 0);
-  EXPECT_EQ(spySucceeded.count(), 0);
-  EXPECT_EQ(spyFailed.count(), 1);
-  EXPECT_EQ(spyFinished.count(), 1);
+  EXPECT_EQ(mSignalStarted, 1);
+  EXPECT_GE(mSignalProgressStatus.count(), 1);
+  EXPECT_GE(mSignalProgressPercent.count(), 0);
+  EXPECT_EQ(mSignalSucceeded, 0);
+  EXPECT_EQ(mSignalFailed.count(), 1);
+  EXPECT_EQ(mSignalFinished, 1);
 
   // Verify copied directoy.
   EXPECT_FALSE(mDestinationDir.isExistingDir());
 }
 
 TEST_F(AsyncCopyOperationTest, testExistingDestinationDir) {
-  // Start copy operation.
+  // Perform copy operation.
   AsyncCopyOperation copy(mEmptyDir, mPopulatedDir);
-  QSignalSpy spyStarted(&copy, &AsyncCopyOperation::started);
-  QSignalSpy spyProgressStatus(&copy, &AsyncCopyOperation::progressStatus);
-  QSignalSpy spyProgressPercent(&copy, &AsyncCopyOperation::progressPercent);
-  QSignalSpy spySucceeded(&copy, &AsyncCopyOperation::succeeded);
-  QSignalSpy spyFailed(&copy, &AsyncCopyOperation::failed);
-  QSignalSpy spyFinished(&copy, &AsyncCopyOperation::finished);
-  copy.start();
-
-  // Wait for completion.
-  EXPECT_TRUE(spyFinished.wait(5000));
-
-  // Print status and error messages.
-  for (const auto& arg : spyProgressStatus) {
-    std::cout << "STATUS: " << arg.first().toString().toStdString()
-              << std::endl;
-  }
-  for (const auto& arg : spyFailed) {
-    std::cout << "ERROR: " << arg.first().toString().toStdString() << std::endl;
-  }
+  EXPECT_TRUE(run(copy, 5000));
 
   // Verify emitted signals.
-  EXPECT_EQ(spyStarted.count(), 1);
-  EXPECT_GE(spyProgressStatus.count(), 1);
-  EXPECT_GE(spyProgressPercent.count(), 0);
-  EXPECT_EQ(spySucceeded.count(), 0);
-  EXPECT_EQ(spyFailed.count(), 1);
-  EXPECT_EQ(spyFinished.count(), 1);
+  EXPECT_EQ(mSignalStarted, 1);
+  EXPECT_GE(mSignalProgressStatus.count(), 1);
+  EXPECT_GE(mSignalProgressPercent.count(), 0);
+  EXPECT_EQ(mSignalSucceeded, 0);
+  EXPECT_EQ(mSignalFailed.count(), 1);
+  EXPECT_EQ(mSignalFinished, 1);
 
   // Verify that the already existing destination is not removed.
   EXPECT_TRUE(mPopulatedDir.getPathTo("foo/a dir/f").isExistingFile());
