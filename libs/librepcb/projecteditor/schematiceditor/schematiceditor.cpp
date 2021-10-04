@@ -109,6 +109,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mGraphicsView = new GraphicsView(nullptr, this);
   mGraphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
+  mGraphicsView->setBackgroundBrush(Qt::white);
   setCentralWidget(mGraphicsView);
 
   // Add actions to toggle visibility of dock widgets
