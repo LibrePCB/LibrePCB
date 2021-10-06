@@ -57,6 +57,8 @@ GraphicsView::GraphicsView(QWidget* parent,
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
   setSceneRect(-2000, -2000, 4000, 4000);
+  setBackgroundBrush(Qt::white);
+  setForegroundBrush(Qt::black);
 
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
