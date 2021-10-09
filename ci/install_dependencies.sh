@@ -39,7 +39,6 @@ then
   brew link --force qt5
 
   # Install Python packages
-  pip3 install --user future "flake8==3.7.7"
   pip3 install --user -r ./tests/cli/requirements.txt
   pip3 install --user -r ./tests/funq/requirements.txt
   export PATH="$PATH:`python3 -m site --user-base`/bin"
@@ -58,7 +57,6 @@ then
 
   # python packages
   export FUNQ_MAKE_PATH="mingw32-make"
-  pip install future "flake8==3.7.7"
   pip install -r ./tests/cli/requirements.txt
   pip install -r ./tests/funq/requirements.txt
 
