@@ -4,5 +4,7 @@ jobs:
     vmImage: 'ubuntu-20.04'
   container: librepcb/librepcb-dev:ubuntu-18.04-3
   steps:
+  - bash: ./ci/print_environment.sh
+    displayName: Print Environment
   - bash: ./ci/stylecheck.sh
     displayName: Run Stylecheck

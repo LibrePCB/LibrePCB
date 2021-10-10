@@ -20,6 +20,8 @@ jobs:
     - checkout: self
       clean: true
       submodules: recursive
+    - bash: ./ci/print_environment.sh
+      displayName: Print Environment
     - bash: ./ci/install_dependencies.sh
       displayName: Install Dependencies
     - task: Cache@2
@@ -27,6 +29,8 @@ jobs:
         key: 'ccache | "$(System.JobName)"'
         path: $(CCACHE_DIR)
       displayName: Setup ccache
+    - bash: ./ci/print_environment.sh
+      displayName: Print New Environment  # Print again since it has been modified
     - bash: ./ci/build_librepcb.sh
       displayName: Build LibrePCB
     - bash: ./ci/build_windows_archive.sh
