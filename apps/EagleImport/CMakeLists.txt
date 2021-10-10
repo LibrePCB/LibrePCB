@@ -5,6 +5,8 @@ set(CMAKE_AUTOUIC ON)
 # Executable
 add_executable(
   eagle_import
+  # When building on Windows, mark this as a GUI application to hide cmd.exe
+  WIN32
   main.cpp mainwindow.cpp mainwindow.h mainwindow.ui polygonsimplifier.cpp
   polygonsimplifier.h
 )
