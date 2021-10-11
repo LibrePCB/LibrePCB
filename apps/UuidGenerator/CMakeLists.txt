@@ -5,6 +5,8 @@ set(CMAKE_AUTOUIC ON)
 # Executable
 add_executable(
   uuid_generator
+  # When building on Windows, mark this as a GUI application to hide cmd.exe
+  WIN32
   main.cpp mainwindow.cpp mainwindow.h mainwindow.ui
 )
 target_include_directories(
