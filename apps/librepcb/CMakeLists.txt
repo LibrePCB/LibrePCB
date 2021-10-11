@@ -5,7 +5,11 @@ set(CMAKE_AUTORCC ON)
 
 # Executable
 add_executable(
-  librepcb MACOSX_BUNDLE # When building on macOS, create a bundle
+  librepcb
+  # When building on Windows, mark this as a GUI application to hide cmd.exe
+  WIN32
+  # When building on macOS, create a bundle
+  MACOSX_BUNDLE
   ../../img/images.qrc
   controlpanel/controlpanel.cpp
   controlpanel/controlpanel.h
