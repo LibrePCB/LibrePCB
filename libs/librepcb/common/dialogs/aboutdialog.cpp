@@ -26,6 +26,8 @@
 
 #include <librepcb/common/application.h>
 
+#include <QtNetwork>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -99,6 +101,7 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
   details << "Operating System: " + QSysInfo::prettyProductName();
   details << "Platform Plugin:  " + qApp->platformName();
+  details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
   mUi->txtDetails->setPlainText(details.join("\n"));
 }
 
