@@ -53,11 +53,8 @@ jobs:
     condition: and(succeeded(), eq(variables['NO_HOEDOWN'], 'true'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
-  - bash: ./ci/build_linux_appimage.sh
-    displayName: Build AppImage
-    condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-  - bash: ./ci/build_linux_archive.sh
-    displayName: Build Archive
+  - bash: ./ci/build_linux_portables.sh
+    displayName: Build Portable Packages
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
   - bash: ./ci/build_installer.sh
     displayName: Build Installer
