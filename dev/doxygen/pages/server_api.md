@@ -80,9 +80,10 @@ curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
 
 Following resources are available:
 
-| Path         | Description                       |
-|--------------|-----------------------------------|
-| [/libraries] | Fetch list of available libraries |
+| Path         | Description                           |
+|--------------|---------------------------------------|
+| [/libraries] | Fetch list of available libraries     |
+| [/order]     | Upload a project to start ordering it |
 
 
 ## Libraries {#doc_server_api_resources_libraries}
@@ -174,5 +175,80 @@ curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
 ]
 ~~~
 
+## Order PCB {#doc_server_api_resources_order}
+
+The resource path `/order` is used to upload a LibrePCB project to start
+ordering the PCB. After the project has been uploaded, the order process
+needs to be continued in the web browser.
+
+The client has to initiate the order with a GET request to the path `/order`.
+The response is a JSON object with the following data (no pagination used):
+
+| Name       | Type    | Description                                               |
+|------------|---------|-----------------------------------------------------------|
+| info_url   | string  | URL pointing to service information (e.g. privacy policy) |
+| upload_url | string  | URL where the project has to be uploaded                  |
+| max_size   | integer | Maximum allowed size (in bytes) of the uploaded project   |
+
+*Notes:*
+- *The `info_url` should be short and descriptive to allow displaying it as-is
+  in the LibrePCB GUI.*
+- *If the service is (temporarily) not available, `upload_url` can be set to
+  an empty string or `null`. LibrePCB shall then display a message like
+  "Service is currently not available, please try again later".*
+- *The `max_size` applies to the raw \*.lppz file **without** base64 encoding,
+  so the actually uploaded JSON object can be much larger. LibrePCB shall not
+  start the upload if the project is larger than this value.*
+
+Afterwards, the client has to make a POST request to the received `upload_url`
+with a JSON object containing the following data:
+
+| Name    | Type   | Description                                                 |
+|---------|--------|-------------------------------------------------------------|
+| project | string | The whole project as a Base64 encoded `*.lppz` archive      |
+| board   | string | The filepath of the board to be ordered (`null` if unknown) |
+
+The response is a JSON object with the following data (no pagination used):
+
+| Name         | Type    | Description                                          |
+|--------------|---------|------------------------------------------------------|
+| redirect_url | string  | URL to continue the order process in the web browser |
+
+### Example
+
+**Initial Request:**
+
+~~~{.sh}
+curl -H "Content-Type: application/json" \
+     'https://api.librepcb.org/api/v1/order'
+~~~
+
+**Initial Response:**
+
+~~~{.json}
+{
+  "info_url": "https://fab.librepcb.org/about",
+  "upload_url": "https://fab.librepcb.org/upload",
+  "max_size": 100000000
+}
+~~~
+
+**Upload Request:**
+
+~~~{.sh}
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"project": "...", "board": "boards/default/board.lp"}' \
+     'https://fab.librepcb.org/upload'
+~~~
+
+**Upload Response:**
+
+~~~{.json}
+{
+  "redirect_url": "https://fab.librepcb.org/nnwyw55pA0Z0sw/"
+}
+~~~
+
 [/libraries]: @ref doc_server_api_resources_libraries
+[/order]: @ref doc_server_api_resources_order
 [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601
