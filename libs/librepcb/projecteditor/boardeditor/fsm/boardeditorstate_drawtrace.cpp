@@ -409,8 +409,10 @@ bool BoardEditorState_DrawTrace::processSwitchToBoard(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawTrace::startPositioning(
-    Board& board, const Point& pos, BI_NetPoint* fixedPoint) noexcept {
+bool BoardEditorState_DrawTrace::startPositioning(Board& board,
+                                                  const Point& pos,
+                                                  BI_NetPoint* fixedPoint,
+                                                  BI_Via* fixedVia) noexcept {
   Point posOnGrid = pos.mappedToGrid(getGridInterval());
   mTargetPos = mCursorPos.mappedToGrid(getGridInterval());
 
@@ -427,7 +429,6 @@ bool BoardEditorState_DrawTrace::startPositioning(
     if (!layer) {
       throw RuntimeError(__FILE__, __LINE__, tr("No layer selected."));
     }
-    layer->setVisible(true);
 
     // determine the fixed anchor (create one if it doesn't exist already)
     NetSignal* netsignal = nullptr;
@@ -438,6 +439,9 @@ bool BoardEditorState_DrawTrace::startPositioning(
       if (GraphicsLayer* linesLayer = fixedPoint->getLayerOfLines()) {
         layer = linesLayer;
       }
+    } else if (fixedVia) {
+      mFixedStartAnchor = fixedVia;
+      mCurrentNetSegment = &fixedVia->getNetSegment();
     } else if (BI_NetPoint* netpoint = findNetPoint(board, pos)) {
       mFixedStartAnchor = netpoint;
       mCurrentNetSegment = &netpoint->getNetSegment();
@@ -527,6 +531,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
 
     // update layer
     Q_ASSERT(layer);
+    layer->setVisible(true);
     mCurrentLayerName = layer->getName();
     mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(layer->getName()));
 
@@ -726,7 +731,6 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
     abortPositioning(false);
     return false;
   }
-  mTempVia = nullptr;
 
   try {
     // finish the current command
@@ -737,8 +741,10 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
       abortPositioning(true);
       return true;
     } else {
+      BI_NetPoint* nextStartPoint = mPositioningNetPoint2;
+      BI_Via* nextStartVia = mTempVia;
       abortPositioning(false);
-      return startPositioning(board, mTargetPos);
+      return startPositioning(board, mTargetPos, nextStartPoint, nextStartVia);
     }
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
