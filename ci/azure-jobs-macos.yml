@@ -10,11 +10,15 @@ jobs:
   - checkout: self
     clean: true
     submodules: recursive
+  - bash: ./ci/print_environment.sh
+    displayName: Print Environment
   - bash: |
       source ./ci/install_dependencies.sh
       # Pass modified PATH to following steps:
       echo "##vso[task.setvariable variable=PATH]$PATH"
     displayName: Install Dependencies
+  - bash: ./ci/print_environment.sh
+    displayName: Print New Environment  # Print again since it has been modified
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_mac_bundle.sh

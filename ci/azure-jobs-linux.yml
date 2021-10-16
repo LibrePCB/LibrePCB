@@ -8,13 +8,13 @@ jobs:
   strategy:
     matrix:
       Ubuntu_1604_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-3
-      Ubuntu_1604_Qt_5_14_2_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.14.2-2
+        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-4
+      Ubuntu_1604_Qt_5_15_GCC:
+        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.15.2-1
         DEPLOY: true
         NO_HOEDOWN: true
       Ubuntu_1804_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-3
+        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-4
         CC: clang
         CXX: clang++
       Ubuntu_2004_GCC:
@@ -30,11 +30,15 @@ jobs:
   - checkout: self
     clean: true
     submodules: recursive
+  - bash: ./ci/print_environment.sh
+    displayName: Print Environment
   - bash: |
       source ./ci/install_dependencies.sh
       # Pass modified PATH to following steps:
       echo "##vso[task.setvariable variable=PATH]$PATH"
     displayName: Install Dependencies
+  - bash: ./ci/print_environment.sh
+    displayName: Print New Environment  # Print again since it has been modified
   - bash: rm -rf libs/dxflib
     displayName: Remove bundled dxflib lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_DXFLIB'], 'true'))
@@ -49,11 +53,8 @@ jobs:
     condition: and(succeeded(), eq(variables['NO_HOEDOWN'], 'true'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
-  - bash: ./ci/build_linux_appimage.sh
-    displayName: Build AppImage
-    condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-  - bash: ./ci/build_linux_archive.sh
-    displayName: Build Archive
+  - bash: ./ci/build_linux_portables.sh
+    displayName: Build Portable Packages
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
   - bash: ./ci/build_installer.sh
     displayName: Build Installer
