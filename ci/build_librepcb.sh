@@ -21,10 +21,6 @@ if [ ! -f ./i18n/librepcb.ts ]; then
   git -C ./i18n checkout master && git -C ./i18n pull origin master
 fi
 
-# show cmake and qt versions
-cmake --version
-qmake --version
-
 # build librepcb
 echo "Using CXX=$CXX"
 echo "Using CC=$CC"

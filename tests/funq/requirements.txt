@@ -1,4 +1,4 @@
-git+https://github.com/parkouss/funq.git@811a8b4fa510e5256b0a14fe93f5c331fd9dd6be#egg=funq-server&subdirectory=server
-git+https://github.com/parkouss/funq.git@811a8b4fa510e5256b0a14fe93f5c331fd9dd6be#egg=funq&subdirectory=client
-pytest~=3.10
-pytest-rerunfailures~=7.0
+git+https://github.com/LibrePCB/funq.git@7f341a48ca8eaa2fa3e5e00fa007151b16a66b5a#egg=funq-server&subdirectory=server
+git+https://github.com/LibrePCB/funq.git@7f341a48ca8eaa2fa3e5e00fa007151b16a66b5a#egg=funq&subdirectory=client
+pytest==6.2.5
+pytest-rerunfailures==10.2
