@@ -121,11 +121,14 @@ private:
    *                          beginning a new trace.
    * @param fixedVia          The BI_Via used as the start anchor, when
    *                          beginning a new trace.
+   * @param fixedPad          The BI_FootprintPad used as the start anchor,
+   *                          when beginning a new trace.
    * @return True, when the tracing is successfully started.
    */
   bool startPositioning(Board& board, const Point& pos,
                         BI_NetPoint* fixedPoint = nullptr,
-                        BI_Via* fixedVia = nullptr) noexcept;
+                        BI_Via* fixedVia = nullptr,
+                        BI_FootprintPad* fixedPad = nullptr) noexcept;
 
   /**
    * @brief Finalize the BI_NetLines and connect them to other
