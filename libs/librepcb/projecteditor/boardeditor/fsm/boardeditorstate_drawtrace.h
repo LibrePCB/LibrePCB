@@ -114,15 +114,21 @@ private:
   /**
    * @brief Begin drawing the next BI_NetLine
    *
-   * @param board On which board the new traces are drawn.
-   * @param pos The position, where the tracing should begin. If necessary a new
-   * BI_NetPoint is created.
-   * @param fixedPoint the BI_NetPoint used as the start anchor, when beginning
-   * a new trace
+   * @param board             On which board the new traces are drawn.
+   * @param pos               The position, where the tracing should begin. If
+   *                          necessary, a new BI_NetPoint is created.
+   * @param fixedPoint        The BI_NetPoint used as the start anchor, when
+   *                          beginning a new trace.
+   * @param fixedVia          The BI_Via used as the start anchor, when
+   *                          beginning a new trace.
+   * @param fixedPad          The BI_FootprintPad used as the start anchor,
+   *                          when beginning a new trace.
    * @return True, when the tracing is successfully started.
    */
   bool startPositioning(Board& board, const Point& pos,
-                        BI_NetPoint* fixedPoint = nullptr) noexcept;
+                        BI_NetPoint* fixedPoint = nullptr,
+                        BI_Via* fixedVia = nullptr,
+                        BI_FootprintPad* fixedPad = nullptr) noexcept;
 
   /**
    * @brief Finalize the BI_NetLines and connect them to other

@@ -410,7 +410,8 @@ bool BoardEditorState_DrawTrace::processSwitchToBoard(int index) noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_DrawTrace::startPositioning(
-    Board& board, const Point& pos, BI_NetPoint* fixedPoint) noexcept {
+    Board& board, const Point& pos, BI_NetPoint* fixedPoint, BI_Via* fixedVia,
+    BI_FootprintPad* fixedPad) noexcept {
   Point posOnGrid = pos.mappedToGrid(getGridInterval());
   mTargetPos = mCursorPos.mappedToGrid(getGridInterval());
 
@@ -427,7 +428,12 @@ bool BoardEditorState_DrawTrace::startPositioning(
     if (!layer) {
       throw RuntimeError(__FILE__, __LINE__, tr("No layer selected."));
     }
-    layer->setVisible(true);
+
+    // helper to avoid defining the translation string multiple times
+    auto throwPadNotConnectedException = []() {
+      throw Exception(__FILE__, __LINE__,
+                      tr("Pad is not connected to any signal."));
+    };
 
     // determine the fixed anchor (create one if it doesn't exist already)
     // if the selected item is not part of a NetSegment (e.g. device pads),
@@ -440,6 +446,24 @@ bool BoardEditorState_DrawTrace::startPositioning(
       mCurrentNetSegment = &fixedPoint->getNetSegment();
       if (GraphicsLayer* linesLayer = fixedPoint->getLayerOfLines()) {
         layer = linesLayer;
+      }
+    } else if (fixedVia) {
+      mFixedStartAnchor = fixedVia;
+      mCurrentNetSegment = &fixedVia->getNetSegment();
+    } else if (fixedPad) {
+      mFixedStartAnchor = fixedPad;
+      if (BI_NetSegment* segment = fixedPad->getNetSegmentOfLines()) {
+        mCurrentNetSegment = segment;
+      }
+      if (!fixedPad->isOnLayer(layer->getName())) {
+        if (GraphicsLayer* padLayer =
+                board.getLayerStack().getLayer(fixedPad->getLayerName())) {
+          layer = padLayer;
+        }
+      }
+      netsignal = fixedPad->getCompSigInstNetSignal();
+      if (!netsignal) {
+        throwPadNotConnectedException();
       }
     } else if (BI_NetPoint* netpoint = findNetPoint(board, pos)) {
       mFixedStartAnchor = netpoint;
@@ -455,8 +479,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
       mCurrentNetSegment = pad->getNetSegmentOfLines();
       netsignal = pad->getCompSigInstNetSignal();
       if (!netsignal) {
-        throw Exception(__FILE__, __LINE__,
-                        tr("Pad is not connected to any signal."));
+        throwPadNotConnectedException();
       }
       if (pad->getLibPad().getBoardSide() !=
           library::FootprintPad::BoardSide::THT) {
@@ -496,8 +519,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
           mCurrentNetSegment = pad->getNetSegmentOfLines();
           netsignal = pad->getCompSigInstNetSignal();
           if (!netsignal) {
-            throw Exception(__FILE__, __LINE__,
-                            tr("Pad is not connected to any signal."));
+            throwPadNotConnectedException();
           }
         }
       }
@@ -525,6 +547,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
 
     // update layer
     Q_ASSERT(layer);
+    layer->setVisible(true);
     mCurrentLayerName = layer->getName();
     mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(layer->getName()));
 
@@ -725,7 +748,6 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
     abortPositioning(false);
     return false;
   }
-  mTempVia = nullptr;
 
   try {
     // finish the current command
@@ -736,8 +758,10 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
       abortPositioning(true);
       return true;
     } else {
+      BI_NetPoint* nextStartPoint = mPositioningNetPoint2;
+      BI_Via* nextStartVia = mTempVia;
       abortPositioning(false);
-      return startPositioning(board, mTargetPos);
+      return startPositioning(board, mTargetPos, nextStartPoint, nextStartVia);
     }
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -979,17 +1003,21 @@ void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
   layer->setVisible(true);
   if ((mSubState == SubState_PositioningNetPoint) &&
       (newLayerName != mCurrentLayerName)) {
+    // If the start anchor is a via or THT pad, delete current trace segment
+    // and start a new one on the selected layer. Otherwise, just add a via
+    // at the current position, i.e. at the end of the current trace segment.
     Point startPos = mFixedStartAnchor->getPosition();
-    NetSignal& netsignal = mCurrentNetSegment->getNetSignal();
-    BI_FootprintPad* padAtStart =
-        findPad(*board, startPos, nullptr, {&netsignal});
-    if (findVia(*board, startPos, {&netsignal}) ||
-        (padAtStart &&
-         (padAtStart->getLibPad().getBoardSide() ==
-          library::FootprintPad::BoardSide::THT))) {
+    BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
+    BI_FootprintPad* pad = dynamic_cast<BI_FootprintPad*>(mFixedStartAnchor);
+    if (pad &&
+        (pad->getLibPad().getBoardSide() !=
+         library::FootprintPad::BoardSide::THT)) {
+      pad = nullptr;
+    }
+    if (via || pad) {
       abortPositioning(false);
       mCurrentLayerName = newLayerName;
-      startPositioning(*board, startPos);
+      startPositioning(*board, startPos, nullptr, via, pad);
       updateNetpointPositions();
     } else {
       mAddVia = true;
