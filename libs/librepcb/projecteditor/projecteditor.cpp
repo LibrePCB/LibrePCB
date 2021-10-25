@@ -27,6 +27,7 @@
 #include "dialogs/projectsettingsdialog.h"
 #include "schematiceditor/schematiceditor.h"
 
+#include <librepcb/common/application.h>
 #include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/undostack.h>
@@ -188,7 +189,19 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     if (!filename.endsWith(".lppz")) filename.append(".lppz");
     FilePath fp(filename);
     qDebug() << "Export project to *.lppz:" << fp.toNative();
-    mProject.save();  // can throw
+
+    // Usually we save the project to the transactional file system (but not to
+    // the disk!) before exporting the *.lppz since the user probably expects
+    // that the current state of the project gets exported. However, if the
+    // file format is unstable (i.e. on development branches), this would lead
+    // in a *.lppz of an unstable file format, which is not really useful (most
+    // *.lppz readers will not support an unstable file format). Therefore we
+    // don't save the project on development branches. Note that unfortunately
+    // this doesn't work if there are any changes in the project and an autosave
+    // was already performed, but it is almost impossible to fix this issue :-(
+    if (qApp->isFileFormatStable()) {
+      mProject.save();  // can throw
+    }
 
     // Export project to ZIP, but without the output directory since this can
     // be quite large and usually does not make sense, especially since *.lppz
