@@ -189,7 +189,16 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     FilePath fp(filename);
     qDebug() << "Export project to *.lppz:" << fp.toNative();
     mProject.save();  // can throw
-    mProject.getDirectory().getFileSystem()->exportToZip(fp);  // can throw
+
+    // Export project to ZIP, but without the output directory since this can
+    // be quite large and usually does not make sense, especially since *.lppz
+    // files might even be stored in this directory as well because they are
+    // output files.
+    auto filter = [](const QString& filePath) {
+      return !filePath.startsWith("output/");
+    };
+    mProject.getDirectory().getFileSystem()->exportToZip(fp,
+                                                         filter);  // can throw
     qDebug() << "Project successfully exported.";
   } catch (const Exception& e) {
     QMessageBox::critical(parent, tr("Error"), e.getMsg());
