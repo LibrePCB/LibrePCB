@@ -239,7 +239,7 @@ void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
   zip.close();
 }
 
-QByteArray TransactionalFileSystem::exportToZip() const {
+QByteArray TransactionalFileSystem::exportToZip(FilterFunction filter) const {
   FilePath fp = FilePath::getRandomTempPath();
   QBuffer buffer;
   QuaZip zip(&buffer);
@@ -248,7 +248,7 @@ QByteArray TransactionalFileSystem::exportToZip() const {
   }
   try {
     QuaZipFile file(&zip);
-    exportDirToZip(file, fp, "");
+    exportDirToZip(file, fp, "", filter);
     zip.close();
   } catch (const Exception& e) {
     // Remove ZIP file because it is not complete
@@ -259,7 +259,8 @@ QByteArray TransactionalFileSystem::exportToZip() const {
   return buffer.buffer();
 }
 
-void TransactionalFileSystem::exportToZip(const FilePath& fp) const {
+void TransactionalFileSystem::exportToZip(const FilePath& fp,
+                                          FilterFunction filter) const {
   QuaZip zip(fp.toStr());
   if (!zip.open(QuaZip::mdCreate)) {
     throw RuntimeError(
@@ -268,7 +269,7 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp) const {
   }
   try {
     QuaZipFile file(&zip);
-    exportDirToZip(file, fp, "");
+    exportDirToZip(file, fp, "", filter);
     zip.close();
   } catch (const Exception& e) {
     // Remove ZIP file because it is not complete
@@ -393,14 +394,15 @@ bool TransactionalFileSystem::isRemoved(const QString& path) const noexcept {
 
 void TransactionalFileSystem::exportDirToZip(QuaZipFile& file,
                                              const FilePath& zipFp,
-                                             const QString& dir) const {
+                                             const QString& dir,
+                                             FilterFunction filter) const {
   QString path = dir.isEmpty() ? dir : dir % "/";
 
   // export directories
   foreach (const QString& dirname, getDirs(dir)) {
     // skip dotdirs, e.g. ".git", ".svn", ".autosave", ".backup"
     if (dirname.startsWith('.')) continue;
-    exportDirToZip(file, zipFp, path % dirname);
+    exportDirToZip(file, zipFp, path % dirname, filter);
   }
 
   // export files
@@ -413,6 +415,8 @@ void TransactionalFileSystem::exportDirToZip(QuaZipFile& file,
     }
     // skip lock file
     if (filename == ".lock") continue;
+    // apply custom filter
+    if (filter && (!filter(filepath))) continue;
     // read file content and add it to the ZIP archive
     const QByteArray& content = read(filepath);  // can throw
     QuaZipNewInfo newFileInfo(filepath);

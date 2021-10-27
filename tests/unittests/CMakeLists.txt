@@ -115,6 +115,7 @@ target_link_libraries(
           LibrePCB::Common
           # Third party
           ParsEagle::ParsEagle
+          QuaZip::QuaZip
           GTest::GTest
           GTest::GMock
           # Qt

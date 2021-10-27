@@ -65,6 +65,16 @@ class TransactionalFileSystem final : public FileSystem {
 
 public:
   /**
+   * @brief Function to filter files
+   *
+   * @param filePath    The relative file path to filter.
+   *
+   * @retval true   Include file.
+   * @retval false  Do not include file.
+   */
+  typedef std::function<bool(const QString& filePath)> FilterFunction;
+
+  /**
    * @brief Callback type used to determine whether a backup should be restored
    *        or not
    *
@@ -154,8 +164,8 @@ public:
   // General Methods
   void loadFromZip(QByteArray content);
   void loadFromZip(const FilePath& fp);
-  QByteArray exportToZip() const;
-  void exportToZip(const FilePath& fp) const;
+  QByteArray exportToZip(FilterFunction filter = nullptr) const;
+  void exportToZip(const FilePath& fp, FilterFunction filter = nullptr) const;
   void discardChanges() noexcept;
   QStringList checkForModifications() const;
   void autosave();
@@ -188,7 +198,7 @@ public:
 private:  // Methods
   bool isRemoved(const QString& path) const noexcept;
   void exportDirToZip(QuaZipFile& file, const FilePath& zipFp,
-                      const QString& dir) const;
+                      const QString& dir, FilterFunction filter) const;
   void saveDiff(const QString& type) const;
   void loadDiff(const FilePath& fp);
   void removeDiff(const QString& type);
