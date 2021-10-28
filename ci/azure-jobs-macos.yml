@@ -2,6 +2,7 @@ jobs:
 - job: macOS
   pool:
     vmImage: 'macOS-10.14'
+  timeoutInMinutes: 180
   variables:
     OS: 'mac'
     ARCH: 'x86_64'
