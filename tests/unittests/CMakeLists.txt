@@ -91,6 +91,7 @@ add_executable(
   project/library/projectlibrarytest.cpp
   project/projecttest.cpp
   projecteditor/boardeditor/boardclipboarddatatest.cpp
+  projecteditor/dialog/orderpcbdialogtest.cpp
   projecteditor/schematiceditor/schematicclipboarddatatest.cpp
   testhelpers.cpp
   testhelpers.h

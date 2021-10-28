@@ -241,6 +241,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           [this]() { mProjectEditor.execLppzExportDialog(this); });
   connect(mUi->actionImportDxf, &QAction::triggered, mFsm.data(),
           &BoardEditorFsm::processImportDxf);
+  connect(mUi->actionOrderPcb, &QAction::triggered, this,
+          [this]() { mProjectEditor.execOrderPcbDialog(nullptr, this); });
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(

@@ -47,6 +47,7 @@ class Workspace;
 namespace project {
 
 class Project;
+class Board;
 
 namespace editor {
 
@@ -158,6 +159,15 @@ public slots:
    * @param parent    parent widget of the dialog (optional)
    */
   void execLppzExportDialog(QWidget* parent = nullptr) noexcept;
+
+  /**
+   * @brief Execute the PCB order dialog (blocking!)
+   *
+   * @param board     The board to order. Pass nullptr if unknown.
+   * @param parent    Parent widget of the dialog (optional)
+   */
+  void execOrderPcbDialog(const Board* board,
+                          QWidget* parent = nullptr) noexcept;
 
   /**
    * @brief Save the whole project to the harddisc

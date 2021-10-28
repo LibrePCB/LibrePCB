@@ -254,6 +254,8 @@ add_library(
   network/networkrequest.h
   network/networkrequestbase.cpp
   network/networkrequestbase.h
+  network/orderpcbapirequest.cpp
+  network/orderpcbapirequest.h
   network/repository.cpp
   network/repository.h
   norms.h

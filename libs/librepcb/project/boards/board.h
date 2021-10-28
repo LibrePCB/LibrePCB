@@ -132,6 +132,7 @@ public:
   // Getters: General
   Project& getProject() const noexcept { return mProject; }
   FilePath getFilePath() const noexcept;
+  QString getRelativePath() const noexcept;
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }

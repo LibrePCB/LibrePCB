@@ -33,8 +33,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetworkRequest::NetworkRequest(const QUrl& url) noexcept
-  : NetworkRequestBase(url), mReceivedData() {
+NetworkRequest::NetworkRequest(const QUrl& url,
+                               const QByteArray& postData) noexcept
+  : NetworkRequestBase(url, postData), mReceivedData() {
 }
 
 NetworkRequest::~NetworkRequest() noexcept {

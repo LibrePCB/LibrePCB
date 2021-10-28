@@ -80,6 +80,18 @@ QNetworkReply* NetworkAccessManager::get(
   }
 }
 
+QNetworkReply* NetworkAccessManager::post(const QNetworkRequest& request,
+                                          const QByteArray& data) noexcept {
+  Q_ASSERT(QThread::currentThread() == this);
+
+  if (mManager) {
+    return mManager->post(request, data);
+  } else {
+    qCritical() << "No network access manager available! Thread not running?!";
+    return nullptr;
+  }
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/

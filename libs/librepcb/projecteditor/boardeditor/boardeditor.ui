@@ -90,6 +90,8 @@
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
+    <addaction name="actionOrderPcb"/>
+    <addaction name="separator"/>
     <addaction name="actionProjectClose"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -199,6 +201,7 @@
    <addaction name="actionProjectSave"/>
    <addaction name="actionPrint"/>
    <addaction name="actionExportAsPdf"/>
+   <addaction name="actionOrderPcb"/>
    <addaction name="separator"/>
    <addaction name="actionShowControlPanel"/>
    <addaction name="actionShowSchematicEditor"/>
@@ -928,6 +931,18 @@
    </property>
    <property name="text">
     <string>Import DXF</string>
+   </property>
+  </action>
+  <action name="actionOrderPcb">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/order_pcb.png</normaloff>:/img/actions/order_pcb.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order PCB</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
  </widget>

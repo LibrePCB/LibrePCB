@@ -404,6 +404,10 @@ FilePath Board::getFilePath() const noexcept {
   return mDirectory->getAbsPath("board.lp");
 }
 
+QString Board::getRelativePath() const noexcept {
+  return getFilePath().toRelative(mProject.getPath());
+}
+
 bool Board::isEmpty() const noexcept {
   return (mDeviceInstances.isEmpty() && mNetSegments.isEmpty() &&
           mPlanes.isEmpty() && mPolygons.isEmpty() && mStrokeTexts.isEmpty() &&
