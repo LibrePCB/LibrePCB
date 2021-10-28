@@ -17,66 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NETWORKREQUEST_H
-#define LIBREPCB_NETWORKREQUEST_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "networkrequestbase.h"
 
-#include <QtCore>
+#include "../../testhelpers.h"
+
+#include <gtest/gtest.h>
+#include <librepcb/projecteditor/dialogs/orderpcbdialog.h>
+
+#include <QtTest>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace project {
+namespace editor {
+namespace tests {
+
+using ::librepcb::tests::TestHelpers;
 
 /*******************************************************************************
- *  Class NetworkRequest
+ *  Test Class
  ******************************************************************************/
 
-/**
- * @brief This class is used to process general purpose network requests (up to
- * 100MB)
- *
- * @see librepcb::NetworkRequestBase, librepcb::NetworkAccessManager
- */
-class NetworkRequest final : public NetworkRequestBase {
-  Q_OBJECT
-
-public:
-  // Constructors / Destructor
-  NetworkRequest() = delete;
-  NetworkRequest(const NetworkRequest& other) = delete;
-  NetworkRequest(const QUrl& url,
-                 const QByteArray& postData = QByteArray()) noexcept;
-  ~NetworkRequest() noexcept;
-
-  // Operator Overloadings
-  NetworkRequest& operator=(const NetworkRequest& rhs) = delete;
-
-signals:
-
-  /**
-   * @brief Data successfully received signal (emitted right before #finished())
-   */
-  void dataReceived(QByteArray data);
-
-private:  // Methods
-  void prepareRequest() override;
-  void finalizeRequest() override;
-  void emitSuccessfullyFinishedSignals() noexcept override;
-  void fetchNewData() noexcept override;
-
-private:  // Data
-  QByteArray mReceivedData;
+class OrderPcbDialogTest : public ::testing::Test {
+protected:
+  OrderPcbDialogTest() { QSettings().clear(); }
 };
+
+/*******************************************************************************
+ *  Test Methods
+ ******************************************************************************/
+
+TEST_F(OrderPcbDialogTest, testAutoOpenBrowser) {
+  const bool defaultValue = true;
+  const bool newValue = false;
+
+  {
+    OrderPcbDialog dialog(QList<QUrl>(), nullptr);
+
+    // Check the default value.
+    QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxOpenBrowser");
+    EXPECT_EQ(defaultValue, cbx.isChecked());
+
+    // Check if the value can be changed.
+    cbx.setChecked(newValue);
+  }
+
+  // Check if the setting is saved and restored automatically.
+  {
+    OrderPcbDialog dialog(QList<QUrl>(), nullptr);
+    QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxOpenBrowser");
+    EXPECT_EQ(newValue, cbx.isChecked());
+  }
+}
+
+TEST_F(OrderPcbDialogTest, testTabOrder) {
+  OrderPcbDialog dialog(QList<QUrl>(), nullptr);
+  TestHelpers::testTabOrder(dialog);
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
+}  // namespace editor
+}  // namespace project
 }  // namespace librepcb
-
-#endif  // LIBREPCB_NETWORKREQUEST_H

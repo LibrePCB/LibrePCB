@@ -36,8 +36,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept
+NetworkRequestBase::NetworkRequestBase(const QUrl& url,
+                                       const QByteArray& postData) noexcept
   : mUrl(url),
+    mPostData(postData),
     mExpectedContentSize(-1),
     mStarted(false),
     mAborted(false),
@@ -47,6 +49,7 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url) noexcept
 
   // set initial HTTP header fields
   mRequest.setHeader(QNetworkRequest::UserAgentHeader, getUserAgent());
+  mRequest.setRawHeader("Accept-Language", QLocale().name().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-AppVersion",
                         qApp->applicationVersion().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-GitRevision",
@@ -134,14 +137,24 @@ void NetworkRequestBase::executeRequest() noexcept {
 
   // start request
   mRequest.setUrl(mUrl);
-  mReply.reset(nam->get(mRequest));
+  if (!mPostData.isNull()) {
+    mReply.reset(nam->post(mRequest, mPostData));
+  } else {
+    mReply.reset(nam->get(mRequest));
+  }
   if (mReply.isNull()) {
-    finalize(
-        tr("GET request failed! Network access manager thread not running?!"));
+    finalize("Network request failed with unknown error!");  // No tr() needed.
     return;
   }
 
   // connect to signals of reply
+  if (!mPostData.isNull()) {
+    connect(mReply.data(), &QNetworkReply::uploadProgress, this,
+            &NetworkRequestBase::uploadProgressSlot);
+  } else {
+    connect(mReply.data(), &QNetworkReply::downloadProgress, this,
+            &NetworkRequestBase::replyDownloadProgressSlot);
+  }
   connect(mReply.data(), &QNetworkReply::readyRead, this,
           &NetworkRequestBase::replyReadyReadSlot);
   connect(mReply.data(),
@@ -150,10 +163,45 @@ void NetworkRequestBase::executeRequest() noexcept {
           this, &NetworkRequestBase::replyErrorSlot);
   connect(mReply.data(), &QNetworkReply::sslErrors, this,
           &NetworkRequestBase::replySslErrorsSlot);
-  connect(mReply.data(), &QNetworkReply::downloadProgress, this,
-          &NetworkRequestBase::replyDownloadProgressSlot);
   connect(mReply.data(), &QNetworkReply::finished, this,
           &NetworkRequestBase::replyFinishedSlot);
+}
+
+void NetworkRequestBase::uploadProgressSlot(qint64 bytesSent,
+                                            qint64 bytesTotal) noexcept {
+  Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
+  if (mAborted || mErrored || mFinished) return;
+  if (mReply->attribute(QNetworkRequest::RedirectionTargetAttribute).isValid())
+    return;
+
+  if (bytesTotal < bytesSent) {
+    bytesTotal = bytesSent + 10e6;
+  }
+  int estimatedPercent = (100 * bytesSent) / qMax(bytesTotal, qint64(1));
+  if (bytesSent == bytesTotal) {
+    estimatedPercent = 100;
+  }
+  emit progressState(tr("Send data: %1").arg(formatFileSize(bytesSent)));
+  emit progressPercent(estimatedPercent);
+  emit progress(bytesSent, bytesTotal, estimatedPercent);
+}
+
+void NetworkRequestBase::replyDownloadProgressSlot(qint64 bytesReceived,
+                                                   qint64 bytesTotal) noexcept {
+  Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
+  if (mAborted || mErrored || mFinished) return;
+  if (mReply->attribute(QNetworkRequest::RedirectionTargetAttribute).isValid())
+    return;
+
+  qint64 estimatedTotal = (bytesTotal > 0) ? bytesTotal : mExpectedContentSize;
+  if (estimatedTotal < bytesReceived) {
+    estimatedTotal = bytesReceived + 10e6;
+  }
+  int estimatedPercent =
+      (100 * bytesReceived) / qMax(estimatedTotal, qint64(1));
+  emit progressState(tr("Receive data: %1").arg(formatFileSize(bytesReceived)));
+  emit progressPercent(estimatedPercent);
+  emit progress(bytesReceived, bytesTotal, estimatedPercent);
 }
 
 void NetworkRequestBase::replyReadyReadSlot() noexcept {
@@ -175,24 +223,6 @@ void NetworkRequestBase::replySslErrorsSlot(
   QStringList errorsList;
   foreach (const QSslError& e, errors) { errorsList.append(e.errorString()); }
   finalize(tr("SSL errors occurred:\n\n%1").arg(errorsList.join("\n")));
-}
-
-void NetworkRequestBase::replyDownloadProgressSlot(qint64 bytesReceived,
-                                                   qint64 bytesTotal) noexcept {
-  Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
-  if (mAborted || mErrored || mFinished) return;
-  if (mReply->attribute(QNetworkRequest::RedirectionTargetAttribute).isValid())
-    return;
-
-  qint64 estimatedTotal = (bytesTotal > 0) ? bytesTotal : mExpectedContentSize;
-  if (estimatedTotal < bytesReceived) {
-    estimatedTotal = bytesReceived + 10e6;
-  }
-  int estimatedPercent =
-      (100 * bytesReceived) / qMax(estimatedTotal, qint64(1));
-  emit progressState(tr("Receive data: %1").arg(formatFileSize(bytesReceived)));
-  emit progressPercent(estimatedPercent);
-  emit progress(bytesReceived, bytesTotal, estimatedPercent);
 }
 
 void NetworkRequestBase::replyFinishedSlot() noexcept {

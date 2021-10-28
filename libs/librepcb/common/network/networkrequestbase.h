@@ -61,7 +61,8 @@ public:
   // Constructors / Destructor
   NetworkRequestBase() = delete;
   NetworkRequestBase(const NetworkRequestBase& other) = delete;
-  NetworkRequestBase(const QUrl& url) noexcept;
+  NetworkRequestBase(const QUrl& url,
+                     const QByteArray& postData = QByteArray()) noexcept;
   virtual ~NetworkRequestBase() noexcept;
 
   // Setters
@@ -179,11 +180,12 @@ public:  // Methods
 
 private:  // Methods
   void executeRequest() noexcept;
+  void uploadProgressSlot(qint64 bytesSent, qint64 bytesTotal) noexcept;
+  void replyDownloadProgressSlot(qint64 bytesReceived,
+                                 qint64 bytesTotal) noexcept;
   void replyReadyReadSlot() noexcept;
   void replyErrorSlot(QNetworkReply::NetworkError code) noexcept;
   void replySslErrorsSlot(const QList<QSslError>& errors) noexcept;
-  void replyDownloadProgressSlot(qint64 bytesReceived,
-                                 qint64 bytesTotal) noexcept;
   void replyFinishedSlot() noexcept;
   void finalize(const QString& errorMsg = QString()) noexcept;
   static QString formatFileSize(qint64 bytes) noexcept;
@@ -192,6 +194,7 @@ private:  // Methods
 protected:  // Data
   // from constructor
   QUrl mUrl;
+  QByteArray mPostData;
   qint64 mExpectedContentSize;
 
   // internal data

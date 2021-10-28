@@ -40,6 +40,12 @@ namespace tests {
  ******************************************************************************/
 
 void TestHelpers::testTabOrder(QWidget& widget) {
+  // Skip test on systems other than Linux and Windows (details in function
+  // documentation).
+#if (!defined(Q_OS_LINUX)) && (!defined(Q_OS_WIN32)) && (!defined(Q_OS_WIN64))
+  GTEST_SKIP();
+#endif
+
   // Show and enable all child widgets to avoid skipping them in the tab order.
   foreach (QWidget* child, widget.findChildren<QWidget*>()) {
     child->setVisible(true);

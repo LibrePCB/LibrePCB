@@ -54,6 +54,8 @@
     <addaction name="actionGenerateBom"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
+    <addaction name="actionOrderPcb"/>
+    <addaction name="separator"/>
     <addaction name="actionClose_Project"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -152,6 +154,7 @@
    <addaction name="actionSave_Project"/>
    <addaction name="actionPrint"/>
    <addaction name="actionPDF_Export"/>
+   <addaction name="actionOrderPcb"/>
    <addaction name="separator"/>
    <addaction name="actionShow_Control_Panel"/>
    <addaction name="actionShow_Board_Editor"/>
@@ -837,6 +840,18 @@
    </property>
    <property name="text">
     <string>Draw Polygon</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
+  </action>
+  <action name="actionOrderPcb">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/order_pcb.png</normaloff>:/img/actions/order_pcb.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order PCB</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>

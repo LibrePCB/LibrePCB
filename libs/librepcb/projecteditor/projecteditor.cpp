@@ -24,6 +24,7 @@
 
 #include "boardeditor/boardeditor.h"
 #include "dialogs/editnetclassesdialog.h"
+#include "dialogs/orderpcbdialog.h"
 #include "dialogs/projectsettingsdialog.h"
 #include "schematiceditor/schematiceditor.h"
 
@@ -216,6 +217,27 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(parent, tr("Error"), e.getMsg());
   }
+}
+
+void ProjectEditor::execOrderPcbDialog(const Board* board,
+                                       QWidget* parent) noexcept {
+  auto callback = [this]() {
+    if (qApp->isFileFormatStable()) {
+      // See explanation in execLppzExportDialog().
+      mProject.save();  // can throw
+    }
+    // Export project to ZIP, but without the output directory since this can
+    // be quite large and does not make sense to upload to the API server.
+    auto filter = [](const QString& filePath) {
+      return !filePath.startsWith("output/");
+    };
+    return mProject.getDirectory().getFileSystem()->exportToZip(
+        filter);  // can throw
+  };
+
+  OrderPcbDialog dialog(mWorkspace.getSettings().repositoryUrls.get(), callback,
+                        board ? board->getRelativePath() : QString(), parent);
+  dialog.exec();
 }
 
 bool ProjectEditor::saveProject() noexcept {

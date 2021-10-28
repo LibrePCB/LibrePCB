@@ -17,66 +17,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NETWORKREQUEST_H
-#define LIBREPCB_NETWORKREQUEST_H
+#ifndef LIBREPCB_PROJECT_EDITOR_ORDERPCBDIALOG_H
+#define LIBREPCB_PROJECT_EDITOR_ORDERPCBDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "networkrequestbase.h"
-
 #include <QtCore>
+#include <QtWidgets>
+
+#include <functional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class OrderPcbApiRequest;
+
+namespace project {
+namespace editor {
+
+namespace Ui {
+class OrderPcbDialog;
+}
+
 /*******************************************************************************
- *  Class NetworkRequest
+ *  Class OrderPcbDialog
  ******************************************************************************/
 
 /**
- * @brief This class is used to process general purpose network requests (up to
- * 100MB)
- *
- * @see librepcb::NetworkRequestBase, librepcb::NetworkAccessManager
+ * @brief The OrderPcbDialog class
  */
-class NetworkRequest final : public NetworkRequestBase {
+class OrderPcbDialog final : public QDialog {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  NetworkRequest() = delete;
-  NetworkRequest(const NetworkRequest& other) = delete;
-  NetworkRequest(const QUrl& url,
-                 const QByteArray& postData = QByteArray()) noexcept;
-  ~NetworkRequest() noexcept;
+  OrderPcbDialog() = delete;
+  OrderPcbDialog(const OrderPcbDialog& other) = delete;
+  explicit OrderPcbDialog(const QList<QUrl>& repositories,
+                          std::function<QByteArray()> createLppzCallback,
+                          const QString& boardRelativePath = QString(),
+                          QWidget* parent = nullptr) noexcept;
+  ~OrderPcbDialog() noexcept;
 
-  // Operator Overloadings
-  NetworkRequest& operator=(const NetworkRequest& rhs) = delete;
-
-signals:
-
-  /**
-   * @brief Data successfully received signal (emitted right before #finished())
-   */
-  void dataReceived(QByteArray data);
+  // Operator Overloads
+  OrderPcbDialog& operator=(const OrderPcbDialog& rhs) = delete;
 
 private:  // Methods
-  void prepareRequest() override;
-  void finalizeRequest() override;
-  void emitSuccessfullyFinishedSignals() noexcept override;
-  void fetchNewData() noexcept override;
+  void infoRequestSucceeded(QUrl infoUrl, int maxFileSize) noexcept;
+  void infoRequestFailed(QString errorMsg) noexcept;
+  void uploadButtonClicked() noexcept;
+  void startUpload() noexcept;
+  void uploadProgressPercent(int percent) noexcept;
+  void uploadSucceeded(const QUrl& redirectUrl) noexcept;
+  void uploadFailed(const QString& errorMsg) noexcept;
+  void setStatus(const QString msg) noexcept;
+  void setError(const QString& msg) noexcept;
 
 private:  // Data
-  QByteArray mReceivedData;
+  QScopedPointer<OrderPcbApiRequest> mRequest;
+  std::function<QByteArray()> mCreateLppzCallback;
+  QString mBoardRelativePath;
+  QScopedPointer<Ui::OrderPcbDialog> mUi;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
+}  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NETWORKREQUEST_H
+#endif  // LIBREPCB_PROJECT_EDITOR_ORDERPCBDIALOG_H

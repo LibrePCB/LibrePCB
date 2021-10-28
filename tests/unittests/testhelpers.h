@@ -103,6 +103,15 @@ public:
    * verify the results. So this method must only be called from within unit
    * tests.
    *
+   * @note  The tab order feature depends on the operating system resp. desktop
+   *        environment on which the application is run. So far it turned out
+   *        that on Windows and Linux this test works, while on macOS it does
+   *        something different. To avoid test failures on specific
+   *        environments, this function calls GTEST_SKIP() to skip the unit
+   *        test on operating systems other than Windows and Linux. This is
+   *        totally fine, since the test basically only verifies the configured
+   *        tab order, which is independent of the runtime environment.
+   *
    * @param widget    The parent widget to check the tab order of.
    */
   static void testTabOrder(QWidget& widget);

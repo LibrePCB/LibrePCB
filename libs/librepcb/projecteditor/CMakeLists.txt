@@ -116,6 +116,9 @@ add_library(
   dialogs/editnetclassesdialog.cpp
   dialogs/editnetclassesdialog.h
   dialogs/editnetclassesdialog.ui
+  dialogs/orderpcbdialog.cpp
+  dialogs/orderpcbdialog.h
+  dialogs/orderpcbdialog.ui
   dialogs/projectpropertieseditordialog.cpp
   dialogs/projectpropertieseditordialog.h
   dialogs/projectpropertieseditordialog.ui

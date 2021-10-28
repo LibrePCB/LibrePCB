@@ -70,6 +70,8 @@ public:
 
   // General Methods
   QNetworkReply* get(const QNetworkRequest& request) noexcept;
+  QNetworkReply* post(const QNetworkRequest& request,
+                      const QByteArray& data) noexcept;
 
   // Operator Overloadings
   NetworkAccessManager& operator=(const NetworkAccessManager& rhs) = delete;
