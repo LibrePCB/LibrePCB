@@ -87,7 +87,7 @@ void PackagePadComboBox::setCurrentPad(PackagePad* pad) noexcept {
     mComboBox->setCurrentIndex(
         mComboBox->findData(*pad->getName(), Qt::UserRole));
   } else {
-    mComboBox->setCurrentIndex(0);
+    mComboBox->setCurrentIndex(-1);
   }
 }
 
@@ -106,7 +106,6 @@ void PackagePadComboBox::currentIndexChanged(int index) noexcept {
 
 void PackagePadComboBox::updatePads() noexcept {
   mComboBox->clear();
-  mComboBox->addItem(tr("(unconnected)"), QString());
 
   if (mPackage) {
     for (const PackagePad& pad : mPackage->getPads()) {
@@ -116,7 +115,7 @@ void PackagePadComboBox::updatePads() noexcept {
     }
   }
 
-  mComboBox->setCurrentIndex(mComboBox->count() > 1 ? 1 : 0);
+  mComboBox->setCurrentIndex(mComboBox->count() > 0 ? 0 : -1);
 }
 
 /*******************************************************************************

@@ -64,8 +64,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 
   // load pad attributes
-  int currentPadIndex = 0;
-  mUi->cbxPackagePad->addItem(tr("(not connected)"), "");
+  int currentPadIndex = -1;
   for (const PackagePad& p : pkg.getPads()) {
     if ((p.getUuid() == mPad.getUuid()) ||
         (!fpt.getPads().contains(p.getUuid()))) {

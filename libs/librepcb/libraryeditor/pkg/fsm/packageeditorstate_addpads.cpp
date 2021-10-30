@@ -196,7 +196,9 @@ bool PackageEditorState_AddPads::processGraphicsSceneLeftMouseButtonPressed(
   Point currentPos =
       Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   if (mCurrentPad) {
-    finishAddPad(currentPos);
+    if (!finishAddPad(currentPos)) {
+      return false;
+    }
   }
   return startAddPad(currentPos);
 }
@@ -255,6 +257,25 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
 
 bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
   try {
+    // In LibrePCB 0.1.x, it's not allowed to add unconnected pads or multiple
+    // footprint pads connected to the same package pad!
+    QString note = tr("Note that each pad can only be added once.");
+    auto pkgPad =
+        mContext.package.getPads().find(mCurrentPad->getPackagePadUuid());
+    if (!pkgPad) {
+      throw LogicError(__FILE__, __LINE__,
+                       tr("No package pad selected.") % " " % note);
+    }
+    for (const FootprintPad& pad : mContext.currentFootprint->getPads()) {
+      if ((pad.getPackagePadUuid() == pkgPad->getUuid()) &&
+          (&pad != mCurrentPad.get())) {
+        throw RuntimeError(__FILE__, __LINE__,
+                           tr("The pad \"%1\" has been added already.")
+                                   .arg(*pkgPad->getName()) %
+                               " " % note);
+      }
+    }
+
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem = nullptr;
