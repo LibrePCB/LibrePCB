@@ -60,6 +60,9 @@
       <property name="currentIndex">
        <number>-1</number>
       </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
       <property name="tabsClosable">
        <bool>true</bool>
       </property>
