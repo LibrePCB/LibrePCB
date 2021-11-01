@@ -95,6 +95,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mDrcMessagesDock(),
     mFsm(nullptr) {
   mUi->setupUi(this);
+  mUi->tabBar->setDocumentMode(true);  // For MacOS
   mUi->lblUnplacedComponentsNote->hide();
   mUi->actionProjectSave->setEnabled(mProject.getDirectory().isWritable());
 
