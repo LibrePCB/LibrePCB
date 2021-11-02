@@ -56,6 +56,18 @@
   </provides>
 
   <releases>
+    <release version="0.1.6" date="2021-11-02" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Start the PCB order process with LibrePCB Fab</li>
+          <li>DXF import</li>
+          <li>Many usability improvements</li>
+          <li>Various bugfixes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2021-11-02_release_0.1.6/</url>
+    </release>
     <release version="0.1.5" date="2020-10-04" type="stable">
       <description>
         <p>Highlights:</p>
