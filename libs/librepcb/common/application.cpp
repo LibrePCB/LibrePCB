@@ -23,7 +23,6 @@
 #include "application.h"
 
 #include "build_env.h"
-#include "dialogs/aboutdialog.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
 #include "units/all_length_units.h"
@@ -242,16 +241,6 @@ Application* Application::instance() noexcept {
   Application* app = dynamic_cast<Application*>(QCoreApplication::instance());
   Q_ASSERT(app);
   return app;
-}
-
-/*******************************************************************************
- *  Slots
- ******************************************************************************/
-
-void Application::about() noexcept {
-  QWidget* parent = QApplication::activeWindow();
-  AboutDialog aboutDialog(parent);
-  aboutDialog.exec();
 }
 
 /*******************************************************************************

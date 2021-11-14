@@ -221,7 +221,10 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   connect(mUi->actionOnlineDocumentation, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
   });
-  connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
+  connect(mUi->actionAbout, &QAction::triggered, this, [this]() {
+    AboutDialog aboutDialog(this);
+    aboutDialog.exec();
+  });
   connect(mUi->actionAboutQt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
   connect(mUi->actionZoomIn, &QAction::triggered, mGraphicsView,

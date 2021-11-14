@@ -112,7 +112,10 @@ ControlPanel::ControlPanel(Workspace& workspace)
   });
   connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
           &QApplication::aboutQt);
-  connect(mUi->actionAbout, &QAction::triggered, qApp, &Application::about);
+  connect(mUi->actionAbout, &QAction::triggered, this, [this]() {
+    AboutDialog aboutDialog(this);
+    aboutDialog.exec();
+  });
   connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
           this, &ControlPanel::openLibraryEditor);
 

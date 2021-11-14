@@ -104,9 +104,6 @@ public:
   // Static Methods
   static Application* instance() noexcept;
 
-public slots:
-  static void about() noexcept;
-
 private:  // Methods
   void removeAllTranslators() noexcept;
 
