@@ -363,13 +363,15 @@ target_include_directories(
 )
 target_link_libraries(
   librepcb_common
-  PRIVATE common Dxflib::Dxflib
+  PRIVATE common
+          # Third party
+          DelaunayTriangulation::DelaunayTriangulation
+          Dxflib::Dxflib
 )
 target_link_libraries(
   librepcb_common
   PUBLIC # Third party
          TypeSafe::TypeSafe
-         DelaunayTriangulation::DelaunayTriangulation
          Optional::Optional
          QuaZip::QuaZip
          MuParser::MuParser

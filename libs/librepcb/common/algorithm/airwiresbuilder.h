@@ -27,12 +27,12 @@
 
 #include <QtCore>
 
-#include <delaunay.h>
-
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class AirWiresBuilderImpl;
 
 /*******************************************************************************
  *  Class AirWiresBuilder
@@ -95,12 +95,13 @@ public:
   // Operator overloadings
   AirWiresBuilder& operator=(const AirWiresBuilder& rhs) = delete;
 
-private:  // Methods
-  AirWires kruskalMst() noexcept;
-
 private:  // Data
-  std::vector<delaunay::Vector2<qreal>> mPoints;
-  std::vector<delaunay::Edge<qreal>> mEdges;
+  /**
+   * The actual implementation is in the *.cpp file to make the dependency to
+   * the delaunay triangulation library a private implementation detail. So
+   * all other libraries do not need this dependency.
+   */
+  QScopedPointer<AirWiresBuilderImpl> mImpl;
 };
 
 /*******************************************************************************
