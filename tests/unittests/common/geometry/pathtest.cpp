@@ -49,6 +49,17 @@ TEST_F(PathTest, testDefaultConstructorCreatesEmptyPath) {
   EXPECT_EQ(0, path.getVertices().count());
 }
 
+TEST_F(PathTest, testGetTotalStraightLength) {
+  QVector<Vertex> vertices;
+  EXPECT_EQ(UnsignedLength(0), Path(vertices).getTotalStraightLength());
+  vertices.append(Vertex(Point(10, 0)));
+  EXPECT_EQ(UnsignedLength(0), Path(vertices).getTotalStraightLength());
+  vertices.append(Vertex(Point(10, 10)));
+  EXPECT_EQ(UnsignedLength(10), Path(vertices).getTotalStraightLength());
+  vertices.append(Vertex(Point(10, 0)));
+  EXPECT_EQ(UnsignedLength(20), Path(vertices).getTotalStraightLength());
+}
+
 TEST_F(PathTest, testLine) {
   Point p1(Length(12), Length(34));
   Point p2(Length(56), Length(78));

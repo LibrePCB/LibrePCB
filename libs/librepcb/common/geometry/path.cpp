@@ -57,6 +57,19 @@ bool Path::isClosed() const noexcept {
   }
 }
 
+UnsignedLength Path::getTotalStraightLength() const noexcept {
+  UnsignedLength length(0);
+  if (mVertices.count() >= 2) {
+    Point lastPos = mVertices.first().getPos();
+    for (int i = 1; i < mVertices.count(); ++i) {
+      const Point& pos = mVertices.at(i).getPos();
+      length += (pos - lastPos).getLength();
+      lastPos = pos;
+    }
+  }
+  return length;
+}
+
 Path Path::toClosedPath() const noexcept {
   Path p(*this);
   p.close();
