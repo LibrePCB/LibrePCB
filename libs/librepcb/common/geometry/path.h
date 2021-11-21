@@ -84,6 +84,8 @@ public:
                const Point& center = Point(0, 0)) noexcept;
   Path mirrored(Qt::Orientation orientation,
                 const Point& center = Point(0, 0)) const noexcept;
+  Path& reverse() noexcept;
+  Path reversed() const noexcept;
 
   // General Methods
   void addVertex(const Vertex& vertex) noexcept;

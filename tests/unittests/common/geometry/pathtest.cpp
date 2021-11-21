@@ -36,8 +36,9 @@ namespace tests {
 
 class PathTest : public ::testing::Test {
 protected:
-  PathTest() {}
-  virtual ~PathTest() {}
+  std::string str(const Path& path) const {
+    return path.serializeToDomElement("path").toByteArray().toStdString();
+  }
 };
 
 /*******************************************************************************
@@ -58,6 +59,60 @@ TEST_F(PathTest, testGetTotalStraightLength) {
   EXPECT_EQ(UnsignedLength(10), Path(vertices).getTotalStraightLength());
   vertices.append(Vertex(Point(10, 0)));
   EXPECT_EQ(UnsignedLength(20), Path(vertices).getTotalStraightLength());
+}
+
+TEST_F(PathTest, testReverseEmptyPath) {
+  Path input = Path();
+  Path expected = Path();
+  Path actual = input.reverse();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_EQ(str(expected), str(input));
+}
+
+TEST_F(PathTest, testReverseOneVertex) {
+  Path input = Path({Vertex(Point(1, 2), Angle::deg90())});
+  Path expected = Path({Vertex(Point(1, 2))});
+  Path actual = input.reverse();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_EQ(str(expected), str(input));
+}
+
+TEST_F(PathTest, testReverseMultipleVertices) {
+  const Path input = Path({
+      Vertex(Point(1, 2), Angle::deg90()),
+      Vertex(Point(3, 4), Angle::deg180()),
+      Vertex(Point(5, 6), Angle::deg270()),
+      Vertex(Point(7, 8)),
+  });
+  Path expected = Path({
+      Vertex(Point(7, 8), -Angle::deg270()),
+      Vertex(Point(5, 6), -Angle::deg180()),
+      Vertex(Point(3, 4), -Angle::deg90()),
+      Vertex(Point(1, 2)),
+  });
+  Path actual = Path(input).reverse();
+  EXPECT_EQ(str(expected), str(actual));
+
+  // Sanity check that reversing again restores the original path.
+  actual.reverse();
+  EXPECT_EQ(str(input), str(actual));
+}
+
+TEST_F(PathTest, testReversed) {
+  const Path input = Path({
+      Vertex(Point(1, 2), Angle::deg90()),
+      Vertex(Point(3, 4), Angle::deg180()),
+      Vertex(Point(5, 6), Angle::deg270()),
+      Vertex(Point(7, 8)),
+  });
+  Path expected = Path({
+      Vertex(Point(7, 8), -Angle::deg270()),
+      Vertex(Point(5, 6), -Angle::deg180()),
+      Vertex(Point(3, 4), -Angle::deg90()),
+      Vertex(Point(1, 2)),
+  });
+  Path actual = input.reversed();
+  EXPECT_EQ(str(expected), str(actual));
 }
 
 TEST_F(PathTest, testLine) {

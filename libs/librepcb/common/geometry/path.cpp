@@ -177,6 +177,22 @@ Path Path::mirrored(Qt::Orientation orientation, const Point& center) const
   return Path(*this).mirror(orientation, center);
 }
 
+Path& Path::reverse() noexcept {
+  QVector<Vertex> vertices;
+  vertices.reserve(mVertices.count());
+  for (int i = mVertices.count() - 1; i >= 0; --i) {
+    vertices.append(
+        Vertex(mVertices.at(i).getPos(), -mVertices.value(i - 1).getAngle()));
+  }
+  mVertices = vertices;
+  invalidatePainterPath();
+  return *this;
+}
+
+Path Path::reversed() const noexcept {
+  return Path(*this).reverse();
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
