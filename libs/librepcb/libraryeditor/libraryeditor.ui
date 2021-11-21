@@ -86,11 +86,22 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>&amp;Import</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/import.png</normaloff>:/img/actions/import.png</iconset>
+     </property>
+     <addaction name="actionImportDxf"/>
+     <addaction name="actionImportEagleLibrary"/>
+    </widget>
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionShowElementInFileManager"/>
     <addaction name="separator"/>
-    <addaction name="actionImportDxf"/>
+    <addaction name="menuImport"/>
     <addaction name="separator"/>
     <addaction name="actionRescanLibraries"/>
     <addaction name="separator"/>
@@ -721,12 +732,19 @@
    </property>
   </action>
   <action name="actionImportDxf">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/img/actions/import.png</normaloff>:/img/actions/import.png</iconset>
-   </property>
    <property name="text">
-    <string>Import DXF</string>
+    <string>2D Drawing (&amp;DXF)</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
+  </action>
+  <action name="actionImportEagleLibrary">
+   <property name="text">
+    <string>&amp;EAGLE Library</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
  </widget>
