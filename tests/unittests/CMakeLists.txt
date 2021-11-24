@@ -64,6 +64,7 @@ add_executable(
   common/units/pointtest.cpp
   common/units/ratiotest.cpp
   common/utils/mathparsertest.cpp
+  common/utils/tangentpathjoinertest.cpp
   common/uuidtest.cpp
   common/versiontest.cpp
   common/widgets/editabletablewidgetreceiver.h
