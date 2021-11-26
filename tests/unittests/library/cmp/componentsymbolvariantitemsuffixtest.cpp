@@ -61,6 +61,17 @@ TEST_P(ComponentSymbolVariantItemSuffixTest, testConstructor) {
   }
 }
 
+TEST_P(ComponentSymbolVariantItemSuffixTest, testClean) {
+  const ComponentSymbolVariantItemSuffixTestData& data = GetParam();
+
+  if (data.valid) {
+    EXPECT_EQ(data.input, cleanComponentSymbolVariantItemSuffix(data.input));
+  } else {
+    QString cleaned = cleanComponentSymbolVariantItemSuffix(data.input);
+    ComponentSymbolVariantItemSuffix suffix(cleaned);  // must not throw
+  }
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/

@@ -26,6 +26,7 @@
 #include "cmp/componenteditorwidget.h"
 #include "cmpcat/componentcategoryeditorwidget.h"
 #include "dev/deviceeditorwidget.h"
+#include "eagleimport/eaglelibraryimportwizard.h"
 #include "lib/libraryoverviewwidget.h"
 #include "pkg/packageeditorwidget.h"
 #include "pkgcat/packagecategoryeditorwidget.h"
@@ -78,6 +79,11 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   connect(mUi->actionImportDxf, &QAction::triggered, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->importDxf();
   });
+  connect(mUi->actionImportEagleLibrary, &QAction::triggered, this,
+          [this, libFp]() {
+            EagleLibraryImportWizard wizard(mWorkspace, libFp, this);
+            wizard.exec();
+          });
   connect(mUi->actionRescanLibraries, &QAction::triggered,
           &mWorkspace.getLibraryDb(),
           &workspace::WorkspaceLibraryDb::startLibraryRescan);
@@ -674,7 +680,9 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   if (isOverviewTab) {
     mUi->actionRemove->setEnabled(!mIsOpenedReadOnly);
   }
-  mUi->actionImportDxf->setEnabled(hasGraphicalEditor && (!mIsOpenedReadOnly));
+  mUi->menuImport->setEnabled(!mIsOpenedReadOnly);
+  mUi->actionImportDxf->setEnabled((!mIsOpenedReadOnly) && hasGraphicalEditor);
+  mUi->actionImportEagleLibrary->setEnabled(!mIsOpenedReadOnly);
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }

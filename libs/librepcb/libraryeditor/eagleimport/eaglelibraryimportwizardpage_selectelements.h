@@ -17,68 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H
-#define LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SELECTELEMENTS_H
+#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SELECTELEMENTS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
 
 #include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
-namespace parseagle {
-class DeviceSet;
-}
-
 namespace librepcb {
-
 namespace library {
-class Component;
+namespace editor {
+
+class EagleLibraryImportWizardContext;
+
+namespace Ui {
+class EagleLibraryImportWizardPage_SelectElements;
 }
-
-namespace eagleimport {
-
-class ConverterDb;
 
 /*******************************************************************************
- *  Class DeviceSetConverter
+ *  Class EagleLibraryImportWizardPage_SelectElements
  ******************************************************************************/
 
 /**
- * @brief The DeviceSetConverter class
+ * @brief The EagleLibraryImportWizardPage_SelectElements class
  */
-class DeviceSetConverter final {
+class EagleLibraryImportWizardPage_SelectElements final : public QWizardPage {
+  Q_OBJECT
+
+  enum ElementType {
+    _Unknown = 0,
+    Device,
+    Component,
+    Symbol,
+    Package,
+  };
+
 public:
   // Constructors / Destructor
-  DeviceSetConverter() = delete;
-  DeviceSetConverter(const DeviceSetConverter& other) = delete;
-  DeviceSetConverter(const parseagle::DeviceSet& deviceSet,
-                     ConverterDb& db) noexcept;
-  ~DeviceSetConverter() noexcept;
+  EagleLibraryImportWizardPage_SelectElements() = delete;
+  EagleLibraryImportWizardPage_SelectElements(
+      const EagleLibraryImportWizardPage_SelectElements& other) = delete;
+  EagleLibraryImportWizardPage_SelectElements(
+      std::shared_ptr<EagleLibraryImportWizardContext> context,
+      QWidget* parent = nullptr) noexcept;
+  ~EagleLibraryImportWizardPage_SelectElements() noexcept;
 
   // General Methods
-  std::unique_ptr<library::Component> generate() const;
+  virtual void initializePage() override;
+  virtual bool isComplete() const override;
 
   // Operator Overloadings
-  DeviceSetConverter& operator=(const DeviceSetConverter& rhs) = delete;
+  EagleLibraryImportWizardPage_SelectElements& operator=(
+      const EagleLibraryImportWizardPage_SelectElements& rhs) = delete;
 
-private:
-  QString createDescription() const noexcept;
+private:  // Methods
+  void treeItemChanged(QTreeWidgetItem* item) noexcept;
+  void updateItemCheckState(ElementType elementType, const QString& name,
+                            Qt::CheckState state) noexcept;
+  void updateRootNodes() noexcept;
 
-  const parseagle::DeviceSet& mDeviceSet;
-  ConverterDb& mDb;
+private:  // Data
+  QScopedPointer<Ui::EagleLibraryImportWizardPage_SelectElements> mUi;
+  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_EAGLEIMPORT_DEVICESETCONVERTER_H
+#endif

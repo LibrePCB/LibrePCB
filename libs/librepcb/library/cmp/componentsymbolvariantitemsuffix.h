@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/common/toolbox.h>
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
@@ -37,6 +38,13 @@ namespace library {
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemSuffix
  ******************************************************************************/
+
+inline static QString cleanComponentSymbolVariantItemSuffix(
+    const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(userInput,
+                                       QRegularExpression("[^0-9a-zA-Z_]"),
+                                       true, false, false, "_", 16);
+}
 
 struct ComponentSymbolVariantItemSuffixVerifier {
   template <typename Value, typename Predicate>

@@ -63,6 +63,9 @@ class LibrePcbFixture(object):
     def abspath(self, relpath):
         return os.path.join(self.tmpdir, relpath)
 
+    def get_data_path(self, relpath):
+        return os.path.join(DATA_DIR, relpath)
+
     def set_workspace(self, path):
         if not os.path.isabs(path):
             path = self.abspath(path)

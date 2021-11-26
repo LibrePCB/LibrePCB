@@ -64,6 +64,7 @@ add_executable(
   common/units/pointtest.cpp
   common/units/ratiotest.cpp
   common/utils/mathparsertest.cpp
+  common/utils/tangentpathjoinertest.cpp
   common/uuidtest.cpp
   common/versiontest.cpp
   common/widgets/editabletablewidgetreceiver.h
@@ -71,10 +72,8 @@ add_executable(
   common/widgets/lengthedittest.cpp
   common/widgets/positivelengthedittest.cpp
   common/widgets/unsignedlengthedittest.cpp
-  eagleimport/deviceconvertertest.cpp
-  eagleimport/devicesetconvertertest.cpp
-  eagleimport/packageconvertertest.cpp
-  eagleimport/symbolconvertertest.cpp
+  eagleimport/eaglelibraryimporttest.cpp
+  eagleimport/eagletypeconvertertest.cpp
   library/cmp/componentprefixtest.cpp
   library/cmp/componentsymbolvariantitemsuffixtest.cpp
   library/cmp/componentsymbolvariantitemtest.cpp

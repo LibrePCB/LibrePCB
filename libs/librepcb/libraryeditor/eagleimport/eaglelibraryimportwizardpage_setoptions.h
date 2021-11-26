@@ -17,55 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SETOPTIONS_H
+#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SETOPTIONS_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <gtest/gtest.h>
-#include <librepcb/eagleimport/converterdb.h>
-#include <librepcb/eagleimport/packageconverter.h>
-#include <librepcb/library/pkg/package.h>
-#include <parseagle/library.h>
-
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace eagleimport {
-namespace tests {
+namespace library {
+namespace editor {
 
-/*******************************************************************************
- *  Test Class
- ******************************************************************************/
+class EagleLibraryImportWizardContext;
 
-class PackageConverterTest : public ::testing::Test {};
-
-/*******************************************************************************
- *  Test Methods
- ******************************************************************************/
-
-TEST_F(PackageConverterTest, testConversion) {
-  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
-
-  // load eagle package
-  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-  parseagle::Library eagleLibrary(eagleLibFp.toStr());
-  ASSERT_EQ(1, eagleLibrary.getPackages().count());
-  const parseagle::Package& eaglePackage = eagleLibrary.getPackages().first();
-
-  // load converter database
-  ConverterDb db(testDataDir.getPathTo("db.ini"));
-
-  // convert package
-  PackageConverter converter(eaglePackage, db);
-  std::unique_ptr<library::Package> package = converter.generate();
+namespace Ui {
+class EagleLibraryImportWizardPage_SetOptions;
 }
+
+/*******************************************************************************
+ *  Class EagleLibraryImportWizardPage_SetOptions
+ ******************************************************************************/
+
+/**
+ * @brief The EagleLibraryImportWizardPage_SetOptions class
+ */
+class EagleLibraryImportWizardPage_SetOptions final : public QWizardPage {
+  Q_OBJECT
+
+public:
+  // Constructors / Destructor
+  EagleLibraryImportWizardPage_SetOptions() = delete;
+  EagleLibraryImportWizardPage_SetOptions(
+      const EagleLibraryImportWizardPage_SetOptions& other) = delete;
+  EagleLibraryImportWizardPage_SetOptions(
+      std::shared_ptr<EagleLibraryImportWizardContext> context,
+      QWidget* parent = nullptr) noexcept;
+  ~EagleLibraryImportWizardPage_SetOptions() noexcept;
+
+  // General Methods
+  virtual void initializePage() override;
+
+  // Operator Overloadings
+  EagleLibraryImportWizardPage_SetOptions& operator=(
+      const EagleLibraryImportWizardPage_SetOptions& rhs) = delete;
+
+private:  // Methods
+  void updateComponentCategoryTreeLabel() noexcept;
+  void updatePackageCategoryTreeLabel() noexcept;
+
+private:  // Data
+  QScopedPointer<Ui::EagleLibraryImportWizardPage_SetOptions> mUi;
+  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace tests
-}  // namespace eagleimport
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb
+
+#endif

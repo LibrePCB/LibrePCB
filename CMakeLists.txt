@@ -152,7 +152,6 @@ add_subdirectory(libs/parseagle)
 add_subdirectory(apps/librepcb)
 add_subdirectory(apps/librepcb-cli)
 add_subdirectory(apps/UuidGenerator)
-add_subdirectory(apps/EagleImport)
 
 # Add unittests
 if(BUILD_TESTS)

@@ -299,6 +299,8 @@ add_library(
   utils/graphicslayerstackappearancesettings.h
   utils/mathparser.cpp
   utils/mathparser.h
+  utils/tangentpathjoiner.cpp
+  utils/tangentpathjoiner.h
   utils/toolbarproxy.cpp
   utils/toolbarproxy.h
   utils/undostackactiongroup.cpp

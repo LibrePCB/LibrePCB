@@ -97,6 +97,7 @@ libraryEditorWidget = {libraryEditor}::centralWidget
 # Actions
 libraryEditorActionNewElement = {libraryEditor}::actionNew
 libraryEditorActionRemove = {libraryEditor}::actionRemove
+libraryEditorActionImportEagleLibrary = {libraryEditor}::actionImportEagleLibrary
 
 # Tab widget
 libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
@@ -234,6 +235,24 @@ libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog = {libraryEdito
 libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogCategoriesTree = {libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog}::treeCategories
 libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogPackagesList = {libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog}::listPackages
 libraryEditorNewElementWizardDevicePropertiesChoosePackageDialogAcceptButton = {libraryEditorNewElementWizardDevicePropertiesChoosePackageDialog}::buttonBox_2::QPushButton
+
+# EAGLE library import wizard
+libraryEditorEagleLibraryImportWizard = librepcb__library__editor__EagleLibraryImportWizard
+libraryEditorEagleLibraryImportWizardWidget = {libraryEditorEagleLibraryImportWizard}::QWidget
+libraryEditorEagleLibraryImportWizardBackButton = {libraryEditorEagleLibraryImportWizardWidget}::__qt__passive_wizardbutton0
+libraryEditorEagleLibraryImportWizardNextButton = {libraryEditorEagleLibraryImportWizardWidget}::__qt__passive_wizardbutton1
+libraryEditorEagleLibraryImportWizardImportButton = {libraryEditorEagleLibraryImportWizardWidget}::qt_wizard_commit
+libraryEditorEagleLibraryImportWizardFinishButton = {libraryEditorEagleLibraryImportWizardWidget}::qt_wizard_finish
+libraryEditorEagleLibraryImportWizardFrame = {libraryEditorEagleLibraryImportWizardWidget}::QFrame
+libraryEditorEagleLibraryImportWizardChooseLibraryPage = {libraryEditorEagleLibraryImportWizardFrame}::librepcb__library__editor__EagleLibraryImportWizardPage_ChooseLibrary
+libraryEditorEagleLibraryImportWizardChooseLibraryFilePathEdit = {libraryEditorEagleLibraryImportWizardChooseLibraryPage}::edtFilePath
+libraryEditorEagleLibraryImportWizardSelectElementsPage = {libraryEditorEagleLibraryImportWizardFrame}::librepcb__library__editor__EagleLibraryImportWizardPage_SelectElements
+libraryEditorEagleLibraryImportWizardSelectElementsTreeWidget = {libraryEditorEagleLibraryImportWizardSelectElementsPage}::treeWidget
+libraryEditorEagleLibraryImportWizardSetOptionsPage = {libraryEditorEagleLibraryImportWizardFrame}::librepcb__library__editor__EagleLibraryImportWizardPage_SetOptions
+libraryEditorEagleLibraryImportWizardSetOptionsPrefixCheckBox = {libraryEditorEagleLibraryImportWizardSetOptionsPage}::groupBox_3::cbxAddNamePrefix
+libraryEditorEagleLibraryImportWizardSetOptionsComponentCategoryChooseButton = {libraryEditorEagleLibraryImportWizardSetOptionsPage}::gbxComponentCategory::btnChooseComponentCategory
+libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryDialog = {libraryEditorEagleLibraryImportWizardSetOptionsPage}::librepcb__library__editor__CategoryChooserDialog
+libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryTree = {libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryDialog}::treeView
 
 
 ################################################################################
