@@ -62,6 +62,26 @@ add_library(
   dev/devicepadsignalmapmodel.h
   dev/padsignalmapeditorwidget.cpp
   dev/padsignalmapeditorwidget.h
+  eagleimport/eaglelibraryimportwizard.cpp
+  eagleimport/eaglelibraryimportwizard.h
+  eagleimport/eaglelibraryimportwizard.ui
+  eagleimport/eaglelibraryimportwizardcontext.cpp
+  eagleimport/eaglelibraryimportwizardcontext.h
+  eagleimport/eaglelibraryimportwizardpage_chooselibrary.cpp
+  eagleimport/eaglelibraryimportwizardpage_chooselibrary.h
+  eagleimport/eaglelibraryimportwizardpage_chooselibrary.ui
+  eagleimport/eaglelibraryimportwizardpage_result.cpp
+  eagleimport/eaglelibraryimportwizardpage_result.h
+  eagleimport/eaglelibraryimportwizardpage_result.ui
+  eagleimport/eaglelibraryimportwizardpage_selectelements.cpp
+  eagleimport/eaglelibraryimportwizardpage_selectelements.h
+  eagleimport/eaglelibraryimportwizardpage_selectelements.ui
+  eagleimport/eaglelibraryimportwizardpage_setoptions.cpp
+  eagleimport/eaglelibraryimportwizardpage_setoptions.h
+  eagleimport/eaglelibraryimportwizardpage_setoptions.ui
+  eagleimport/eaglelibraryimportwizardpage_start.cpp
+  eagleimport/eaglelibraryimportwizardpage_start.h
+  eagleimport/eaglelibraryimportwizardpage_start.ui
   lib/librarylisteditorwidget.cpp
   lib/librarylisteditorwidget.h
   lib/librarylisteditorwidget.ui
@@ -212,6 +232,8 @@ target_include_directories(
 target_link_libraries(
   librepcb_libraryeditor
   PRIVATE common
+          # LibrePCB
+          LibrePCB::EagleImport
 )
 target_link_libraries(
   librepcb_libraryeditor

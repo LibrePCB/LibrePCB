@@ -17,77 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EAGLEIMPORT_CONVERTERDB_H
-#define LIBREPCB_EAGLEIMPORT_CONVERTERDB_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_CHOOSELIBRARY_H
+#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_CHOOSELIBRARY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
-
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace library {
+namespace editor {
 
-class FilePath;
+class EagleLibraryImportWizardContext;
 
-namespace eagleimport {
+namespace Ui {
+class EagleLibraryImportWizardPage_ChooseLibrary;
+}
 
 /*******************************************************************************
- *  Class ConverterDb
+ *  Class EagleLibraryImportWizardPage_ChooseLibrary
  ******************************************************************************/
 
 /**
- * @brief The ConverterDb class
+ * @brief The EagleLibraryImportWizardPage_ChooseLibrary class
  */
-class ConverterDb final {
+class EagleLibraryImportWizardPage_ChooseLibrary final : public QWizardPage {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  ConverterDb() = delete;
-  ConverterDb(const ConverterDb& other) = delete;
-  ConverterDb(const FilePath& ini) noexcept;
-  ~ConverterDb() noexcept;
+  EagleLibraryImportWizardPage_ChooseLibrary() = delete;
+  EagleLibraryImportWizardPage_ChooseLibrary(
+      const EagleLibraryImportWizardPage_ChooseLibrary& other) = delete;
+  EagleLibraryImportWizardPage_ChooseLibrary(
+      std::shared_ptr<EagleLibraryImportWizardContext> context,
+      QWidget* parent = nullptr) noexcept;
+  ~EagleLibraryImportWizardPage_ChooseLibrary() noexcept;
 
   // General Methods
-  void setCurrentLibraryFilePath(const FilePath& fp) noexcept {
-    mLibFilePath = fp;
-  }
-  const FilePath& getCurrentLibraryFilePath() const noexcept {
-    return mLibFilePath;
-  }
-  Uuid getSymbolUuid(const QString& symbolName);
-  Uuid getSymbolPinUuid(const Uuid& symbolUuid, const QString& pinName);
-  Uuid getFootprintUuid(const QString& packageName);
-  Uuid getPackageUuid(const QString& packageName);
-  Uuid getPackagePadUuid(const Uuid& footprintUuid, const QString& padName);
-  Uuid getComponentUuid(const QString& deviceSetName);
-  Uuid getComponentSignalUuid(const Uuid& componentUuid,
-                              const QString& gateName, const QString& pinName);
-  Uuid getSymbolVariantUuid(const Uuid& componentUuid);
-  Uuid getSymbolVariantItemUuid(const Uuid& componentUuid,
-                                const QString& gateName);
-  Uuid getDeviceUuid(const QString& deviceSetName, const QString& deviceName);
+  virtual void initializePage() override;
+  virtual bool isComplete() const override;
 
   // Operator Overloadings
-  ConverterDb& operator=(const ConverterDb& rhs) = delete;
+  EagleLibraryImportWizardPage_ChooseLibrary& operator=(
+      const EagleLibraryImportWizardPage_ChooseLibrary& rhs) = delete;
 
-private:
-  Uuid getOrCreateUuid(const QString& cat, const QString& key1,
-                       const QString& key2 = QString());
-
-  QSettings mIniFile;
-  FilePath mLibFilePath;
+private:  // Data
+  QScopedPointer<Ui::EagleLibraryImportWizardPage_ChooseLibrary> mUi;
+  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_EAGLEIMPORT_CONVERTERDB_H
+#endif

@@ -17,56 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARD_H
+#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARD_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <gtest/gtest.h>
-#include <librepcb/eagleimport/converterdb.h>
-#include <librepcb/eagleimport/devicesetconverter.h>
-#include <librepcb/library/cmp/component.h>
-#include <parseagle/library.h>
-
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace eagleimport {
-namespace tests {
 
-/*******************************************************************************
- *  Test Class
- ******************************************************************************/
+class FilePath;
 
-class DeviceSetConverterTest : public ::testing::Test {};
-
-/*******************************************************************************
- *  Test Methods
- ******************************************************************************/
-
-TEST_F(DeviceSetConverterTest, testConversion) {
-  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
-
-  // load eagle device set
-  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-  parseagle::Library eagleLibrary(eagleLibFp.toStr());
-  ASSERT_EQ(1, eagleLibrary.getDeviceSets().count());
-  const parseagle::DeviceSet& eagleDeviceSet =
-      eagleLibrary.getDeviceSets().first();
-
-  // load converter database
-  ConverterDb db(testDataDir.getPathTo("db.ini"));
-
-  // convert device set
-  DeviceSetConverter converter(eagleDeviceSet, db);
-  std::unique_ptr<library::Component> component = converter.generate();
+namespace workspace {
+class Workspace;
 }
+
+namespace library {
+namespace editor {
+
+class EagleLibraryImportWizardContext;
+
+namespace Ui {
+class EagleLibraryImportWizard;
+}
+
+/*******************************************************************************
+ *  Class EagleLibraryImportWizard
+ ******************************************************************************/
+
+/**
+ * @brief The EagleLibraryImportWizard class
+ */
+class EagleLibraryImportWizard final : public QWizard {
+  Q_OBJECT
+
+public:
+  // Constructors / Destructor
+  EagleLibraryImportWizard(const EagleLibraryImportWizard& other) = delete;
+  EagleLibraryImportWizard(workspace::Workspace& workspace,
+                           const FilePath& dstLibFp,
+                           QWidget* parent = nullptr) noexcept;
+  ~EagleLibraryImportWizard() noexcept;
+
+  // General Methods
+  void reject() noexcept override;
+
+  // Operator Overloadings
+  EagleLibraryImportWizard& operator=(const EagleLibraryImportWizard& rhs) =
+      delete;
+
+private:  // Data
+  QScopedPointer<Ui::EagleLibraryImportWizard> mUi;
+  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace tests
-}  // namespace eagleimport
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb
+
+#endif

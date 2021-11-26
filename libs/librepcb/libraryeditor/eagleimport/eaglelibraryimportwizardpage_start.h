@@ -17,58 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_START_H
+#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_START_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <gtest/gtest.h>
-#include <librepcb/eagleimport/converterdb.h>
-#include <librepcb/eagleimport/deviceconverter.h>
-#include <librepcb/library/dev/device.h>
-#include <parseagle/library.h>
-
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace eagleimport {
-namespace tests {
+namespace library {
+namespace editor {
 
-/*******************************************************************************
- *  Test Class
- ******************************************************************************/
+class EagleLibraryImportWizardContext;
 
-class DeviceConverterTest : public ::testing::Test {};
-
-/*******************************************************************************
- *  Test Methods
- ******************************************************************************/
-
-TEST_F(DeviceConverterTest, testConversion) {
-  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
-
-  // load eagle device
-  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-  parseagle::Library eagleLibrary(eagleLibFp.toStr());
-  ASSERT_EQ(1, eagleLibrary.getDeviceSets().count());
-  const parseagle::DeviceSet& eagleDeviceSet =
-      eagleLibrary.getDeviceSets().first();
-  ASSERT_EQ(1, eagleDeviceSet.getDevices().count());
-  const parseagle::Device& eagleDevice = eagleDeviceSet.getDevices().first();
-
-  // load converter database
-  ConverterDb db(testDataDir.getPathTo("db.ini"));
-
-  // convert device set
-  DeviceConverter converter(eagleDeviceSet, eagleDevice, db);
-  std::unique_ptr<library::Device> device = converter.generate();
+namespace Ui {
+class EagleLibraryImportWizardPage_Start;
 }
+
+/*******************************************************************************
+ *  Class EagleLibraryImportWizardPage_Start
+ ******************************************************************************/
+
+/**
+ * @brief The EagleLibraryImportWizardPage_Start class
+ */
+class EagleLibraryImportWizardPage_Start final : public QWizardPage {
+  Q_OBJECT
+
+public:
+  // Constructors / Destructor
+  EagleLibraryImportWizardPage_Start() = delete;
+  EagleLibraryImportWizardPage_Start(
+      const EagleLibraryImportWizardPage_Start& other) = delete;
+  EagleLibraryImportWizardPage_Start(
+      std::shared_ptr<EagleLibraryImportWizardContext> context,
+      QWidget* parent = nullptr) noexcept;
+  ~EagleLibraryImportWizardPage_Start() noexcept;
+
+  // Operator Overloadings
+  EagleLibraryImportWizardPage_Start& operator=(
+      const EagleLibraryImportWizardPage_Start& rhs) = delete;
+
+private:  // Data
+  QScopedPointer<Ui::EagleLibraryImportWizardPage_Start> mUi;
+  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace tests
-}  // namespace eagleimport
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb
+
+#endif

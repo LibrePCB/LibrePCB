@@ -1,21 +1,12 @@
 # Enable Qt MOC/UIC/RCC
-set(CMAKE_AUTOMOC OFF)
+set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTORCC OFF)
 
 # Export library
 add_library(
-  librepcb_eagleimport STATIC
-  converterdb.cpp
-  converterdb.h
-  deviceconverter.cpp
-  deviceconverter.h
-  devicesetconverter.cpp
-  devicesetconverter.h
-  packageconverter.cpp
-  packageconverter.h
-  symbolconverter.cpp
-  symbolconverter.h
+  librepcb_eagleimport STATIC eaglelibraryimport.cpp eaglelibraryimport.h
+                              eagletypeconverter.cpp eagletypeconverter.h
 )
 target_include_directories(
   librepcb_eagleimport
@@ -24,14 +15,14 @@ target_include_directories(
 target_link_libraries(
   librepcb_eagleimport
   PRIVATE common
+          # Third party
+          ParsEagle::ParsEagle
 )
 target_link_libraries(
   librepcb_eagleimport
   PUBLIC # LibrePCB
          LibrePCB::Library
          LibrePCB::Common
-         # Third party
-         ParsEagle::ParsEagle
          # Qt
          Qt5::Core
 )

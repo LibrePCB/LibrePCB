@@ -20,52 +20,42 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <gtest/gtest.h>
-#include <librepcb/eagleimport/converterdb.h>
-#include <librepcb/eagleimport/symbolconverter.h>
-#include <librepcb/library/sym/symbol.h>
-#include <parseagle/library.h>
+#include "eaglelibraryimportwizardpage_start.h"
+
+#include "eaglelibraryimportwizardcontext.h"
+#include "ui_eaglelibraryimportwizardpage_start.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace eagleimport {
-namespace tests {
+namespace library {
+namespace editor {
 
 /*******************************************************************************
- *  Test Class
+ *  Constructors / Destructor
  ******************************************************************************/
 
-class SymbolConverterTest : public ::testing::Test {};
+EagleLibraryImportWizardPage_Start::EagleLibraryImportWizardPage_Start(
+    std::shared_ptr<EagleLibraryImportWizardContext> context,
+    QWidget* parent) noexcept
+  : QWizardPage(parent),
+    mUi(new Ui::EagleLibraryImportWizardPage_Start),
+    mContext(context) {
+  mUi->setupUi(this);
+}
 
-/*******************************************************************************
- *  Test Methods
- ******************************************************************************/
-
-TEST_F(SymbolConverterTest, testConversion) {
-  FilePath testDataDir(TEST_DATA_DIR "/unittests/eagleimport");
-
-  // load eagle symbol
-  FilePath eagleLibFp = testDataDir.getPathTo("resistor.lbr");
-  parseagle::Library eagleLibrary(eagleLibFp.toStr());
-  ASSERT_EQ(1, eagleLibrary.getSymbols().count());
-  const parseagle::Symbol& eagleSymbol = eagleLibrary.getSymbols().first();
-
-  // load converter database
-  ConverterDb db(testDataDir.getPathTo("db.ini"));
-
-  // convert symbol
-  SymbolConverter converter(eagleSymbol, db);
-  std::unique_ptr<library::Symbol> symbol = converter.generate();
+EagleLibraryImportWizardPage_Start::
+    ~EagleLibraryImportWizardPage_Start() noexcept {
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace tests
-}  // namespace eagleimport
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb

@@ -94,6 +94,12 @@ actions/ruler.png: Color →Editing → Image Editing→ Ruler
 actions/swap.png: Color →Arrows → Actions→ Swap
 ```
 
+From [publicdomainvectors.org](https://publicdomainvectors.org/):
+
+```
+wizards/eagle_watermark.png: "Eagle in flight" (manually modified) CC0-1.0
+```
+
 Created by LibrePCB developers, released under CC0-1.0:
 
 ```

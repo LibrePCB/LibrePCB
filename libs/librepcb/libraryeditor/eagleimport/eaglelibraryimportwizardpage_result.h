@@ -17,55 +17,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POLYGONSIMPLIFIER_H
-#define POLYGONSIMPLIFIER_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_RESULT_H
+#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_RESULT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
-#include <librepcb/common/geometry/polygon.h>
-
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace library {
+namespace editor {
+
+class EagleLibraryImportWizardContext;
+
+namespace Ui {
+class EagleLibraryImportWizardPage_Result;
+}
 
 /*******************************************************************************
- *  Class PolygonSimplifier
+ *  Class EagleLibraryImportWizardPage_Result
  ******************************************************************************/
 
 /**
- * @brief The PolygonSimplifier class
+ * @brief The EagleLibraryImportWizardPage_Result class
  */
-template <typename LibElemType>
-class PolygonSimplifier {
+class EagleLibraryImportWizardPage_Result final : public QWizardPage {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  PolygonSimplifier(LibElemType& libraryElement);
-  ~PolygonSimplifier();
+  EagleLibraryImportWizardPage_Result() = delete;
+  EagleLibraryImportWizardPage_Result(
+      const EagleLibraryImportWizardPage_Result& other) = delete;
+  EagleLibraryImportWizardPage_Result(
+      std::shared_ptr<EagleLibraryImportWizardContext> context,
+      QWidget* parent = nullptr) noexcept;
+  ~EagleLibraryImportWizardPage_Result() noexcept;
 
   // General Methods
-  void convertLineRectsToPolygonRects(bool fillArea, bool isGrabArea) noexcept;
+  virtual void initializePage() override;
+  virtual bool isComplete() const override;
 
-private:
-  // Private Methods
-  bool findLineRectangle(QList<librepcb::Polygon*>& lines) noexcept;
-  bool findHLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                 UnsignedLength* width, librepcb::Polygon** line) noexcept;
-  bool findVLine(const QList<Polygon*>& lines, librepcb::Point& p,
-                 UnsignedLength* width, librepcb::Polygon** line) noexcept;
+  // Operator Overloadings
+  EagleLibraryImportWizardPage_Result& operator=(
+      const EagleLibraryImportWizardPage_Result& rhs) = delete;
 
-  // Attributes
-  LibElemType& mLibraryElement;
+private:  // Methods
+  void importFinished(const QStringList& errors) noexcept;
+
+private:  // Data
+  QScopedPointer<Ui::EagleLibraryImportWizardPage_Result> mUi;
+  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
+  QVector<QMetaObject::Connection> mProgressBarConnections;
+  bool mIsCompleted;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
+}  // namespace library
 }  // namespace librepcb
 
-#endif  // POLYGONSIMPLIFIER_H
+#endif

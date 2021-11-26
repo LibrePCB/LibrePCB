@@ -57,6 +57,19 @@ bool Path::isClosed() const noexcept {
   }
 }
 
+UnsignedLength Path::getTotalStraightLength() const noexcept {
+  UnsignedLength length(0);
+  if (mVertices.count() >= 2) {
+    Point lastPos = mVertices.first().getPos();
+    for (int i = 1; i < mVertices.count(); ++i) {
+      const Point& pos = mVertices.at(i).getPos();
+      length += (pos - lastPos).getLength();
+      lastPos = pos;
+    }
+  }
+  return length;
+}
+
 Path Path::toClosedPath() const noexcept {
   Path p(*this);
   p.close();
@@ -162,6 +175,22 @@ Path& Path::mirror(Qt::Orientation orientation, const Point& center) noexcept {
 Path Path::mirrored(Qt::Orientation orientation, const Point& center) const
     noexcept {
   return Path(*this).mirror(orientation, center);
+}
+
+Path& Path::reverse() noexcept {
+  QVector<Vertex> vertices;
+  vertices.reserve(mVertices.count());
+  for (int i = mVertices.count() - 1; i >= 0; --i) {
+    vertices.append(
+        Vertex(mVertices.at(i).getPos(), -mVertices.value(i - 1).getAngle()));
+  }
+  mVertices = vertices;
+  invalidatePainterPath();
+  return *this;
+}
+
+Path Path::reversed() const noexcept {
+  return Path(*this).reverse();
 }
 
 /*******************************************************************************

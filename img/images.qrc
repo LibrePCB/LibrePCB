@@ -142,6 +142,7 @@
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
         <file>status/success.png</file>
+        <file>wizards/eagle_watermark.png</file>
         <file>wizards/watermark.jpg</file>
     </qresource>
 </RCC>

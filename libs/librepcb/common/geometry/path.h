@@ -67,6 +67,7 @@ public:
     return mVertices;
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
+  UnsignedLength getTotalStraightLength() const noexcept;
   Path toClosedPath() const noexcept;
   QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
   const QPainterPath& toQPainterPathPx() const noexcept;
@@ -83,6 +84,8 @@ public:
                const Point& center = Point(0, 0)) noexcept;
   Path mirrored(Qt::Orientation orientation,
                 const Point& center = Point(0, 0)) const noexcept;
+  Path& reverse() noexcept;
+  Path reversed() const noexcept;
 
   // General Methods
   void addVertex(const Vertex& vertex) noexcept;

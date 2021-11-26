@@ -17,70 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H
-#define LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/graphics/graphicslayername.h>
+#include <gtest/gtest.h>
+#include <librepcb/eagleimport/eaglelibraryimport.h>
 
 #include <QtCore>
 
-#include <memory>
-
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
-
-namespace parseagle {
-class Package;
-}
-
 namespace librepcb {
-
-namespace library {
-class Package;
-}
-
 namespace eagleimport {
-
-class ConverterDb;
+namespace tests {
 
 /*******************************************************************************
- *  Class PackageConverter
+ *  Test Class
  ******************************************************************************/
 
-/**
- * @brief The PackageConverter class
- */
-class PackageConverter final {
-public:
-  // Constructors / Destructor
-  PackageConverter() = delete;
-  PackageConverter(const PackageConverter& other) = delete;
-  PackageConverter(const parseagle::Package& package, ConverterDb& db) noexcept;
-  ~PackageConverter() noexcept;
+class EagleLibraryImportTest : public ::testing::Test {};
 
-  // General Methods
-  std::unique_ptr<library::Package> generate() const;
+/*******************************************************************************
+ *  Test Methods
+ ******************************************************************************/
 
-  // Operator Overloadings
-  PackageConverter& operator=(const PackageConverter& rhs) = delete;
+TEST_F(EagleLibraryImportTest, testImport) {
+  FilePath src(TEST_DATA_DIR "/unittests/eagleimport/resistor.lbr");
+  FilePath dst = FilePath::getRandomTempPath();
 
-private:
-  QString createDescription() const noexcept;
-  static GraphicsLayerName convertBoardLayer(int eagleLayerId);
+  EagleLibraryImport import(dst);
 
-  const parseagle::Package& mPackage;
-  ConverterDb& mDb;
-};
+  // Connect signals by hand because QSignalSpy is not threadsafe!
+  int signalFinished = 0;
+  QStringList importErrors;
+  QObject::connect(&import, &EagleLibraryImport::finished,
+                   [&signalFinished, &importErrors](const QStringList& e) {
+                     ++signalFinished;
+                     importErrors = e;
+                   });
+
+  QStringList parseErrors = import.open(src);
+  EXPECT_EQ(1, import.getSymbols().count());
+  EXPECT_EQ(1, import.getPackages().count());
+  EXPECT_EQ(1, import.getComponents().count());
+  EXPECT_EQ(1, import.getDevices().count());
+  EXPECT_EQ(0, parseErrors.count());
+
+  import.start();
+  EXPECT_TRUE(import.wait(10000));
+  EXPECT_EQ(1, signalFinished);
+  EXPECT_EQ(0, importErrors.count());
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace eagleimport
 }  // namespace librepcb
-
-#endif  // LIBREPCB_EAGLEIMPORT_PACKAGECONVERTER_H
