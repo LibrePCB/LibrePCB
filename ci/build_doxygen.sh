@@ -4,7 +4,7 @@
 set -euv -o pipefail
 
 pushd ./dev/doxygen
-doxygen Doxyfile
+./make.sh -Werror
 popd
 
 mkdir -p ./artifacts
