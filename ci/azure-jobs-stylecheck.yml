@@ -2,7 +2,7 @@ jobs:
 - job: Stylecheck
   pool:
     vmImage: 'ubuntu-20.04'
-  container: librepcb/librepcb-dev:ubuntu-20.04-5
+  container: librepcb/librepcb-dev:ubuntu-20.04-6
   steps:
   - bash: ./ci/print_environment.sh
     displayName: Print Environment
