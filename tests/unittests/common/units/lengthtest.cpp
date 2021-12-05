@@ -117,6 +117,46 @@ INSTANTIATE_TEST_SUITE_P(LengthTest, LengthTest, ::testing::Values(
 // clang-format on
 
 /*******************************************************************************
+ *  Tests for mappedToGrid()
+ ******************************************************************************/
+
+typedef struct {
+  Length value;
+  Length gridInterval;
+  Length mappedToGrid;
+} LengthMappedToGridData;
+
+class LengthMappedToGrid
+  : public ::testing::TestWithParam<LengthMappedToGridData> {};
+
+TEST_P(LengthMappedToGrid, testSnapToGrid) {
+  const LengthMappedToGridData& data = GetParam();
+  EXPECT_EQ(data.value.mappedToGrid(data.gridInterval), data.mappedToGrid);
+}
+
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(LengthMappedToGrid, LengthMappedToGrid, ::testing::Values(
+    LengthMappedToGridData({Length(0),   Length(10), Length(0)  }),
+    LengthMappedToGridData({Length(10),  Length(0),  Length(10) }),
+    LengthMappedToGridData({Length(-10), Length(0),  Length(-10)}),
+    LengthMappedToGridData({Length(10),  Length(1),  Length(10) }),
+    LengthMappedToGridData({Length(-10), Length(1),  Length(-10)}),
+    LengthMappedToGridData({Length(8),   Length(10), Length(10) }),
+    LengthMappedToGridData({Length(2),   Length(10), Length(0)  }),
+    LengthMappedToGridData({Length(-8),  Length(10), Length(-10)}),
+    LengthMappedToGridData({Length(-2),  Length(10), Length(0)  }),
+    LengthMappedToGridData({Length(18),  Length(10), Length(20) }),
+    LengthMappedToGridData({Length(12),  Length(10), Length(10) }),
+    LengthMappedToGridData({Length(-18), Length(10), Length(-20)}),
+    LengthMappedToGridData({Length(-12), Length(10), Length(-10)}),
+    LengthMappedToGridData({Length(10),  Length(10), Length(10) }),
+    LengthMappedToGridData({Length(-10), Length(10), Length(-10)}),
+    LengthMappedToGridData({Length(20),  Length(10), Length(20) }),
+    LengthMappedToGridData({Length(-20), Length(10), Length(-20)})
+));
+// clang-format on
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

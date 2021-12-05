@@ -59,7 +59,6 @@ add_executable(
   common/systeminfotest.cpp
   common/toolboxtest.cpp
   common/units/angletest.cpp
-  common/units/lengthsnaptest.cpp
   common/units/lengthtest.cpp
   common/units/pointtest.cpp
   common/units/ratiotest.cpp
