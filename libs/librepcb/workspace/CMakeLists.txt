@@ -33,7 +33,6 @@ add_library(
   settings/workspacesettingsitem_genericvaluelist.h
   workspace.cpp
   workspace.h
-  workspacechooserdialog.ui
 )
 target_include_directories(
   librepcb_workspace
