@@ -81,4 +81,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSCHEMATICEDIT_H
+#endif

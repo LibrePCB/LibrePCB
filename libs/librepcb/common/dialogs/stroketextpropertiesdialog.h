@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_STROKETEXTPROPERTIESDIALOG_H
-#define LIBREPCB_STROKETEXTPROPERTIESDIALOG_H
+#ifndef LIBREPCB_COMMON_STROKETEXTPROPERTIESDIALOG_H
+#define LIBREPCB_COMMON_STROKETEXTPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,10 +31,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-class StrokeText;
 class GraphicsLayer;
 class LengthUnit;
+class StrokeText;
+class UndoStack;
 
 namespace Ui {
 class StrokeTextPropertiesDialog;
@@ -86,4 +86,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_STROKETEXTPROPERTIESDIALOG_H
+#endif

@@ -102,4 +102,4 @@ typedef QVector<std::shared_ptr<const LibraryElementCheckMessage>>
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_LIBRARYELEMENTCHECKMESSAGE_H
+#endif

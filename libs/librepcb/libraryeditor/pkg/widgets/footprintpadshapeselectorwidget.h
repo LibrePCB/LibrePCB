@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -84,4 +84,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
+#endif

@@ -85,4 +85,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDNETSIGNALADD_H
+#endif

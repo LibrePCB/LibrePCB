@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_RECENTPROJECTSMODEL_H
-#define LIBREPCB_RECENTPROJECTSMODEL_H
+#ifndef LIBREPCB_WORKSPACE_RECENTPROJECTSMODEL_H
+#define LIBREPCB_WORKSPACE_RECENTPROJECTSMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -81,4 +81,4 @@ private:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_RECENTPROJECTSMODEL_H
+#endif

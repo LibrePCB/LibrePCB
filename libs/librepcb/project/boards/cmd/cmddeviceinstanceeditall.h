@@ -73,4 +73,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H
+#endif

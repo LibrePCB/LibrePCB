@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_STROKETEXT_H
-#define LIBREPCB_STROKETEXT_H
+#ifndef LIBREPCB_COMMON_STROKETEXT_H
+#define LIBREPCB_COMMON_STROKETEXT_H
 
 /*******************************************************************************
  *  Includes
@@ -251,4 +251,4 @@ using CmdStrokeTextsSwap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_STROKETEXT_H
+#endif

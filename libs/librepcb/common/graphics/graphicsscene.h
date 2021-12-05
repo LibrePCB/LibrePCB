@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GRAPHICSSCENE_H
-#define LIBREPCB_GRAPHICSSCENE_H
+#ifndef LIBREPCB_COMMON_GRAPHICSSCENE_H
+#define LIBREPCB_COMMON_GRAPHICSSCENE_H
 
 /*******************************************************************************
  *  Includes
@@ -67,4 +67,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GRAPHICSSCENE_H
+#endif

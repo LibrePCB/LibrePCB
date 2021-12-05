@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
-#define LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICPAGESDOCK_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICPAGESDOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -93,4 +93,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SCHEMATICPAGESDOCK_H
+#endif

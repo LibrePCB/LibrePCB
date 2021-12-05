@@ -37,14 +37,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class StrokeTextGraphicsItem;
 class LineGraphicsItem;
+class StrokeTextGraphicsItem;
 
 namespace project {
 
-class Project;
-class Board;
 class BI_Footprint;
+class Board;
+class Project;
 
 /*******************************************************************************
  *  Class BI_StrokeText
@@ -121,4 +121,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_STROKETEXT_H
+#endif

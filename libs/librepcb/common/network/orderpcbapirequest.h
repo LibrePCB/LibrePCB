@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ORDERPCBAPIREQUEST_H
-#define LIBREPCB_ORDERPCBAPIREQUEST_H
+#ifndef LIBREPCB_COMMON_ORDERPCBAPIREQUEST_H
+#define LIBREPCB_COMMON_ORDERPCBAPIREQUEST_H
 
 /*******************************************************************************
  *  Includes

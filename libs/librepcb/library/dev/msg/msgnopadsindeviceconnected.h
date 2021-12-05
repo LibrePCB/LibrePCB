@@ -58,4 +58,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGNOPADSINDEVICECONNECTED_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDEDITOR_H
-#define LIBREPCB_PROJECT_BOARDEDITOR_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITOR_H
+#define LIBREPCB_PROJECTEDITOR_BOARDEDITOR_H
 
 /*******************************************************************************
  *  Includes
@@ -38,23 +38,23 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ExclusiveActionGroup;
 class GraphicsView;
 class UndoStackActionGroup;
-class ExclusiveActionGroup;
 
 namespace project {
 
-class Project;
 class ComponentInstance;
+class Project;
 
 namespace editor {
 
-class ProjectEditor;
-class ErcMsgDock;
-class UnplacedComponentsDock;
-class BoardLayersDock;
 class BoardDesignRuleCheckMessagesDock;
 class BoardEditorFsm;
+class BoardLayersDock;
+class ErcMsgDock;
+class ProjectEditor;
+class UnplacedComponentsDock;
 
 namespace Ui {
 class BoardEditor;
@@ -179,4 +179,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDEDITOR_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTELISTEDITORWIDGET_H
-#define LIBREPCB_ATTRIBUTELISTEDITORWIDGET_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTELISTEDITORWIDGET_H
+#define LIBREPCB_COMMON_ATTRIBUTELISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -33,9 +33,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-class EditableTableWidget;
 class AttributeListModel;
+class EditableTableWidget;
+class UndoStack;
 
 /*******************************************************************************
  *  Class AttributeListEditorWidget
@@ -72,4 +72,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTELISTEDITORWIDGET_H
+#endif

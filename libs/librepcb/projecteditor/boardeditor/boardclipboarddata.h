@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOARDCLIPBOARDDATA_H
-#define LIBREPCB_PROJECT_EDITOR_BOARDCLIPBOARDDATA_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDCLIPBOARDDATA_H
+#define LIBREPCB_PROJECTEDITOR_BOARDCLIPBOARDDATA_H
 
 /*******************************************************************************
  *  Includes
@@ -48,8 +48,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class TransactionalFileSystem;
 class TransactionalDirectory;
+class TransactionalFileSystem;
 
 namespace project {
 namespace editor {

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TANGENTPATHJOINER_H
-#define LIBREPCB_TANGENTPATHJOINER_H
+#ifndef LIBREPCB_COMMON_TANGENTPATHJOINER_H
+#define LIBREPCB_COMMON_TANGENTPATHJOINER_H
 
 /*******************************************************************************
  *  Includes

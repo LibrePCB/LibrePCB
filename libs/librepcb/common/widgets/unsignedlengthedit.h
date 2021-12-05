@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_UNSIGNEDLENGTHEDIT_H
-#define LIBREPCB_UNSIGNEDLENGTHEDIT_H
+#ifndef LIBREPCB_COMMON_UNSIGNEDLENGTHEDIT_H
+#define LIBREPCB_COMMON_UNSIGNEDLENGTHEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -70,4 +70,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_UNSIGNEDLENGTHEDIT_H
+#endif

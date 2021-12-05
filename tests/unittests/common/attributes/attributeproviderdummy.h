@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ATTRIBUTEPROVIDERDUMMY_H
-#define ATTRIBUTEPROVIDERDUMMY_H
+#ifndef UNITTESTS_COMMON_ATTRIBUTEPROVIDERDUMMY_H
+#define UNITTESTS_COMMON_ATTRIBUTEPROVIDERDUMMY_H
 
 /*******************************************************************************
  *  Includes
@@ -69,4 +69,4 @@ signals:
 }  // namespace tests
 }  // namespace librepcb
 
-#endif  // ATTRIBUTEPROVIDERDUMMY_H
+#endif

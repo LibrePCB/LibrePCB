@@ -115,4 +115,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDLAYERSTACK_H
+#endif

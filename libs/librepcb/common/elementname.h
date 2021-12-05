@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ELEMENTNAME_H
-#define LIBREPCB_ELEMENTNAME_H
+#ifndef LIBREPCB_COMMON_ELEMENTNAME_H
+#define LIBREPCB_COMMON_ELEMENTNAME_H
 
 /*******************************************************************************
  *  Includes
@@ -146,4 +146,4 @@ inline uint qHash(const ElementName& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ELEMENTNAME_H
+#endif

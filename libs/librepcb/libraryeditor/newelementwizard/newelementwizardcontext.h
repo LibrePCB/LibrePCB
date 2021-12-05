@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H
-#define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H
+#ifndef LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDCONTEXT_H
+#define LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDCONTEXT_H
 
 /*******************************************************************************
  *  Includes
@@ -163,4 +163,4 @@ public:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDCONTEXT_H
+#endif

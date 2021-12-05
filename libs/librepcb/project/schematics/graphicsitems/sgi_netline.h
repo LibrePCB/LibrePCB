@@ -87,4 +87,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SGI_NETLINE_H
+#endif

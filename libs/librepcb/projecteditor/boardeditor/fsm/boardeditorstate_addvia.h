@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_ADDVIA_H
-#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_ADDVIA_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDVIA_H
+#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDVIA_H
 
 /*******************************************************************************
  *  Includes

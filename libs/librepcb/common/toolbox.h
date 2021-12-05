@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TOOLBOX_H
-#define LIBREPCB_TOOLBOX_H
+#ifndef LIBREPCB_COMMON_TOOLBOX_H
+#define LIBREPCB_COMMON_TOOLBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -554,4 +554,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TOOLBOX_H
+#endif

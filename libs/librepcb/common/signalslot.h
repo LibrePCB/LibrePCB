@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SIGNALSLOT_H
-#define LIBREPCB_SIGNALSLOT_H
+#ifndef LIBREPCB_COMMON_SIGNALSLOT_H
+#define LIBREPCB_COMMON_SIGNALSLOT_H
 
 /*******************************************************************************
  *  Includes
@@ -241,4 +241,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SIGNALSLOT_H
+#endif

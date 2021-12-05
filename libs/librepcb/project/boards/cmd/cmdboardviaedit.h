@@ -95,4 +95,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDVIAEDIT_H
+#endif

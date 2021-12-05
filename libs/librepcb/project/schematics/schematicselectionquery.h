@@ -33,13 +33,13 @@
 namespace librepcb {
 namespace project {
 
-class SI_Symbol;
-class SI_SymbolPin;
-class SI_NetSegment;
+class SI_NetLabel;
 class SI_NetLine;
 class SI_NetPoint;
-class SI_NetLabel;
+class SI_NetSegment;
 class SI_Polygon;
+class SI_Symbol;
+class SI_SymbolPin;
 class SI_Text;
 
 /*******************************************************************************
@@ -145,4 +145,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H
+#endif

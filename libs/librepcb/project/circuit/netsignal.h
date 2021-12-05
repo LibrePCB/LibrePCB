@@ -38,13 +38,13 @@
 namespace librepcb {
 namespace project {
 
-class Circuit;
-class NetClass;
-class ComponentSignalInstance;
-class SI_NetSegment;
 class BI_NetSegment;
 class BI_Plane;
+class Circuit;
+class ComponentSignalInstance;
 class ErcMsg;
+class NetClass;
+class SI_NetSegment;
 
 /*******************************************************************************
  *  Class NetSignal
@@ -160,4 +160,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_NETSIGNAL_H
+#endif

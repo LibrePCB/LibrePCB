@@ -58,4 +58,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGMISSINGCATEGORIES_H
+#endif

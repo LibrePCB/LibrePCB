@@ -33,9 +33,9 @@
 namespace librepcb {
 namespace project {
 
-class SI_NetSegment;
-class SI_NetPoint;
 class SI_NetLine;
+class SI_NetPoint;
+class SI_NetSegment;
 
 /*******************************************************************************
  *  Class CmdSchematicNetSegmentRemoveElements
@@ -80,4 +80,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTREMOVEELEMENTS_H
+#endif

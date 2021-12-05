@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SERIALIZABLEOBJECTMOCK_H
-#define SERIALIZABLEOBJECTMOCK_H
+#ifndef UNITTESTS_COMMON_SERIALIZABLEOBJECTMOCK_H
+#define UNITTESTS_COMMON_SERIALIZABLEOBJECTMOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -121,4 +121,4 @@ public:
 }  // namespace tests
 }  // namespace librepcb
 
-#endif  // SERIALIZABLEOBJECTMOCK_H
+#endif

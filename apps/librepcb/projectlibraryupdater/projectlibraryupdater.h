@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTLIBRARYUPDATER_H
-#define LIBREPCB_PROJECTLIBRARYUPDATER_H
+#ifndef LIBREPCB_PROJECTLIBRARYUPDATER_PROJECTLIBRARYUPDATER_H
+#define LIBREPCB_PROJECTLIBRARYUPDATER_PROJECTLIBRARYUPDATER_H
 
 /*******************************************************************************
  *  Includes
@@ -95,4 +95,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECTLIBRARYUPDATER_H
+#endif

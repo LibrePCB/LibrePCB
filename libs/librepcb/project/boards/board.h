@@ -45,32 +45,32 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GridProperties;
-class GraphicsView;
-class GraphicsScene;
-class GraphicsLayer;
 class BoardDesignRules;
+class GraphicsLayer;
+class GraphicsScene;
+class GraphicsView;
+class GridProperties;
 
 namespace project {
 
-class NetSignal;
-class Project;
-class BI_Device;
+class BI_AirWire;
 class BI_Base;
+class BI_Device;
 class BI_FootprintPad;
-class BI_Via;
-class BI_NetSegment;
-class BI_NetPoint;
+class BI_Hole;
 class BI_NetLine;
+class BI_NetPoint;
+class BI_NetSegment;
+class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
-class BI_Hole;
-class BI_Plane;
-class BI_AirWire;
-class BoardLayerStack;
+class BI_Via;
 class BoardFabricationOutputSettings;
-class BoardUserSettings;
+class BoardLayerStack;
 class BoardSelectionQuery;
+class BoardUserSettings;
+class NetSignal;
+class Project;
 
 /*******************************************************************************
  *  Class Board
@@ -340,4 +340,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARD_H
+#endif

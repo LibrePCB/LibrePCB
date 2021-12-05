@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LENGTHUNIT_H
-#define LIBREPCB_LENGTHUNIT_H
+#ifndef LIBREPCB_COMMON_LENGTHUNIT_H
+#define LIBREPCB_COMMON_LENGTHUNIT_H
 
 /*******************************************************************************
  *  Includes
@@ -357,4 +357,4 @@ inline QDebug operator<<(QDebug stream, const LengthUnit& unit) {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LENGTHUNIT_H
+#endif

@@ -33,9 +33,9 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
 class SI_NetLabel;
 class SI_NetSegment;
+class Schematic;
 
 /*******************************************************************************
  *  Class CmdSchematicNetLabelRemove
@@ -75,4 +75,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETLABELREMOVE_H
+#endif

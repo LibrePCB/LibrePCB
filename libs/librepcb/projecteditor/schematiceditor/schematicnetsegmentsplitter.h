@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICNETSEGMENTSPLITTER_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICNETSEGMENTSPLITTER_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICNETSEGMENTSPLITTER_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICNETSEGMENTSPLITTER_H
 
 /*******************************************************************************
  *  Includes

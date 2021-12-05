@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_POINT_H
-#define LIBREPCB_POINT_H
+#ifndef LIBREPCB_COMMON_POINT_H
+#define LIBREPCB_COMMON_POINT_H
 
 /*******************************************************************************
  *  Includes
@@ -527,4 +527,4 @@ inline uint qHash(const Point& key, uint seed = 0) noexcept {
 
 Q_DECLARE_METATYPE(librepcb::Point)
 
-#endif  // LIBREPCB_POINT_H
+#endif

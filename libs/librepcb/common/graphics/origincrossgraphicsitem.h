@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ORIGINCROSSGRAPHICSITEM_H
-#define LIBREPCB_ORIGINCROSSGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_ORIGINCROSSGRAPHICSITEM_H
+#define LIBREPCB_COMMON_ORIGINCROSSGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -92,4 +92,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ORIGINCROSSGRAPHICSITEM_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#ifndef LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#define LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -36,9 +36,9 @@
 namespace librepcb {
 
 class CmdCircleEdit;
-class CmdStrokeTextEdit;
-class CmdPolygonEdit;
 class CmdHoleEdit;
+class CmdPolygonEdit;
+class CmdStrokeTextEdit;
 
 namespace library {
 
@@ -112,4 +112,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#endif

@@ -34,9 +34,9 @@
 namespace librepcb {
 namespace project {
 
+class BI_FootprintPad;
 class BI_Plane;
 class BI_Via;
-class BI_FootprintPad;
 
 /*******************************************************************************
  *  Class BoardPlaneFragmentsBuilder
@@ -94,4 +94,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H
+#endif

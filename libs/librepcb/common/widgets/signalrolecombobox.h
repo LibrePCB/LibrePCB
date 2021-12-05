@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SIGNALROLECOMBOBOX_H
-#define LIBREPCB_SIGNALROLECOMBOBOX_H
+#ifndef LIBREPCB_COMMON_SIGNALROLECOMBOBOX_H
+#define LIBREPCB_COMMON_SIGNALROLECOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -74,4 +74,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SIGNALROLECOMBOBOX_H
+#endif

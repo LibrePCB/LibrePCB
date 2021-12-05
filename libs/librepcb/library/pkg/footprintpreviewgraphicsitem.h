@@ -41,6 +41,7 @@ class IF_GraphicsLayerProvider;
 namespace library {
 
 class Component;
+
 // class Device;
 class Package;
 class Footprint;
@@ -116,4 +117,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H
+#endif

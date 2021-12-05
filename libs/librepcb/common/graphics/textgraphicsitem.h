@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TEXTGRAPHICSITEM_H
-#define LIBREPCB_TEXTGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_TEXTGRAPHICSITEM_H
+#define LIBREPCB_COMMON_TEXTGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -34,9 +34,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class OriginCrossGraphicsItem;
-class IF_GraphicsLayerProvider;
 class AttributeProvider;
+class IF_GraphicsLayerProvider;
+class OriginCrossGraphicsItem;
 
 /*******************************************************************************
  *  Class TextGraphicsItem
@@ -86,4 +86,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TEXTGRAPHICSITEM_H
+#endif

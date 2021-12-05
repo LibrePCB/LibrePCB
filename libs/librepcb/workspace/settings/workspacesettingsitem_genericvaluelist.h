@@ -129,4 +129,4 @@ private:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_GENERICVALUELIST_H
+#endif

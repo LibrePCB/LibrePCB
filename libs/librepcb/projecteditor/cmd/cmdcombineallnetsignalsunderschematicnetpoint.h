@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
-#define LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
+#define LIBREPCB_PROJECTEDITOR_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
 
 /*******************************************************************************
  *  Includes
@@ -35,8 +35,8 @@ namespace librepcb {
 namespace project {
 
 class Circuit;
-class Schematic;
 class SI_NetPoint;
+class Schematic;
 
 namespace editor {
 
@@ -80,4 +80,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
+#endif

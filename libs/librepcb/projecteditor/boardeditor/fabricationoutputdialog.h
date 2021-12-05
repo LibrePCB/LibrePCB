@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H
-#define LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_FABRICATIONOUTPUTDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_FABRICATIONOUTPUTDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -32,8 +32,8 @@
 namespace librepcb {
 namespace project {
 
-class Project;
 class Board;
+class Project;
 
 namespace editor {
 
@@ -81,4 +81,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_FABRICATIONOUTPUTDIALOG_H
+#endif

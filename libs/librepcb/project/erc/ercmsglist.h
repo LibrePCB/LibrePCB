@@ -35,8 +35,8 @@
 namespace librepcb {
 namespace project {
 
-class Project;
 class ErcMsg;
+class Project;
 
 /*******************************************************************************
  *  Class ErcMsgList
@@ -93,4 +93,4 @@ private:  // Methods
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_ERCMSGLIST_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTETYPE_H
-#define LIBREPCB_ATTRIBUTETYPE_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTETYPE_H
+#define LIBREPCB_COMMON_ATTRIBUTETYPE_H
 
 /*******************************************************************************
  *  Includes
@@ -120,4 +120,4 @@ inline const AttributeType& deserialize(const SExpression& sexpr,
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTETYPE_H
+#endif

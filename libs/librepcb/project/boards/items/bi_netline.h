@@ -41,8 +41,8 @@ class GraphicsLayer;
 
 namespace project {
 
-class NetSignal;
 class BI_NetSegment;
+class NetSignal;
 
 /*******************************************************************************
  *  Class BI_NetLineAnchor
@@ -149,4 +149,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_NETLINE_H
+#endif

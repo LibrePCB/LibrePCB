@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SCOPEGUARD_H
-#define LIBREPCB_SCOPEGUARD_H
+#ifndef LIBREPCB_COMMON_SCOPEGUARD_H
+#define LIBREPCB_COMMON_SCOPEGUARD_H
 
 /*******************************************************************************
  *  Includes
@@ -111,4 +111,4 @@ ScopeGuard<Fun> scopeGuard(Fun f) {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SCOPEGUARD_H
+#endif

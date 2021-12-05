@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CIRCLE_H
-#define LIBREPCB_CIRCLE_H
+#ifndef LIBREPCB_COMMON_CIRCLE_H
+#define LIBREPCB_COMMON_CIRCLE_H
 
 /*******************************************************************************
  *  Includes
@@ -128,4 +128,4 @@ using CmdCirclesSwap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CIRCLE_H
+#endif

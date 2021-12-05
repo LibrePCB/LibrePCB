@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
-#define LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
+#ifndef LIBREPCB_COMMON_DEFAULTGRAPHICSLAYERPROVIDER_H
+#define LIBREPCB_COMMON_DEFAULTGRAPHICSLAYERPROVIDER_H
 
 /*******************************************************************************
  *  Includes
@@ -63,4 +63,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_DEFAULTGRAPHICSLAYERPROVIDER_H
+#endif

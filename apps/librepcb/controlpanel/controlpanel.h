@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CONTROLPANEL_H
-#define LIBREPCB_CONTROLPANEL_H
+#ifndef LIBREPCB_CONTROLPANEL_CONTROLPANEL_H
+#define LIBREPCB_CONTROLPANEL_CONTROLPANEL_H
 
 /*******************************************************************************
  *  Includes
@@ -36,6 +36,7 @@ namespace librepcb {
 class FilePath;
 
 namespace library {
+
 class Library;
 
 namespace editor {
@@ -48,6 +49,7 @@ class LibraryManager;
 }  // namespace library
 
 namespace project {
+
 class Project;
 
 namespace editor {
@@ -246,4 +248,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CONTROLPANEL_H
+#endif

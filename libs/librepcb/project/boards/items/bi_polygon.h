@@ -42,9 +42,9 @@ class PolygonGraphicsItem;
 
 namespace project {
 
-class Project;
-class Board;
 class BGI_Polygon;
+class Board;
+class Project;
 
 /*******************************************************************************
  *  Class BI_Polygon
@@ -115,4 +115,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_POLYGON_H
+#endif

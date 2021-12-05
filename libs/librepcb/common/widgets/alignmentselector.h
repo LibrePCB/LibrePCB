@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ALIGNMENTSELECTOR_H
-#define LIBREPCB_ALIGNMENTSELECTOR_H
+#ifndef LIBREPCB_COMMON_ALIGNMENTSELECTOR_H
+#define LIBREPCB_COMMON_ALIGNMENTSELECTOR_H
 
 /*******************************************************************************
  *  Includes
@@ -72,4 +72,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ALIGNMENTSELECTOR_H
+#endif

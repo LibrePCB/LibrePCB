@@ -38,10 +38,10 @@
 namespace librepcb {
 namespace project {
 
-class Project;
-class NetSignal;
-class Board;
 class BGI_Plane;
+class Board;
+class NetSignal;
+class Project;
 
 /*******************************************************************************
  *  Class BI_Plane
@@ -192,4 +192,4 @@ inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_PLANE_H
+#endif

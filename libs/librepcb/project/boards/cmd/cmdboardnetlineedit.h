@@ -77,4 +77,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDNETLINEEDIT_H
+#endif

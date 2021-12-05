@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PRIMITIVEPATHGRAPHICSITEM_H
-#define LIBREPCB_PRIMITIVEPATHGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_PRIMITIVEPATHGRAPHICSITEM_H
+#define LIBREPCB_COMMON_PRIMITIVEPATHGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -107,4 +107,4 @@ protected:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PRIMITIVEPATHGRAPHICSITEM_H
+#endif

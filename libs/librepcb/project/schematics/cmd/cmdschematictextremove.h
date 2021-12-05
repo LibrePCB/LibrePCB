@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
 class SI_Text;
+class Schematic;
 
 /*******************************************************************************
  *  Class CmdSchematicTextRemove

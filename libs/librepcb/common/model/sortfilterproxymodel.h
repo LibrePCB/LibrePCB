@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SORTFILTERPROXYMODEL_H
-#define LIBREPCB_LIBRARY_SORTFILTERPROXYMODEL_H
+#ifndef LIBREPCB_COMMON_SORTFILTERPROXYMODEL_H
+#define LIBREPCB_COMMON_SORTFILTERPROXYMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -75,4 +75,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SORTFILTERPROXYMODEL_H
+#endif

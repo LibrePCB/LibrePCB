@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HOLEPROPERTIESDIALOG_H
-#define LIBREPCB_HOLEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_COMMON_HOLEPROPERTIESDIALOG_H
+#define LIBREPCB_COMMON_HOLEPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,9 +31,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class Hole;
 class LengthUnit;
+class UndoStack;
 
 namespace Ui {
 class HolePropertiesDialog;
@@ -81,4 +81,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_HOLEPROPERTIESDIALOG_H
+#endif

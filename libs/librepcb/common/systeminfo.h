@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SYSTEMINFO_H
-#define LIBREPCB_SYSTEMINFO_H
+#ifndef LIBREPCB_COMMON_SYSTEMINFO_H
+#define LIBREPCB_COMMON_SYSTEMINFO_H
 
 /*******************************************************************************
  *  Includes
@@ -112,4 +112,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SYSTEMINFO_H
+#endif

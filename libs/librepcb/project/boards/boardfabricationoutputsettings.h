@@ -180,4 +180,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H
+#endif

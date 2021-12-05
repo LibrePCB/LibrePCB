@@ -34,8 +34,8 @@
 namespace librepcb {
 namespace project {
 
-class Project;
 class Board;
+class Project;
 
 /*******************************************************************************
  *  Class CmdBoardAdd
@@ -83,4 +83,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDADD_H
+#endif

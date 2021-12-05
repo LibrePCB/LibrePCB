@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
-#define LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDADDDEVICETOBOARD_H
+#define LIBREPCB_PROJECTEDITOR_CMDADDDEVICETOBOARD_H
 
 /*******************************************************************************
  *  Includes
@@ -44,9 +44,9 @@ class Device;
 
 namespace project {
 
+class BI_Device;
 class Board;
 class ComponentInstance;
-class BI_Device;
 
 namespace editor {
 
@@ -101,4 +101,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDADDDEVICETOBOARD_H
+#endif

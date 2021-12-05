@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_REPOSITORYLIBRARYLISTWIDGETITEM_H
-#define LIBREPCB_WORKSPACE_REPOSITORYLIBRARYLISTWIDGETITEM_H
+#ifndef LIBREPCB_LIBRARYMANAGER_REPOSITORYLIBRARYLISTWIDGETITEM_H
+#define LIBREPCB_LIBRARYMANAGER_REPOSITORYLIBRARYLISTWIDGETITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -110,4 +110,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_REPOSITORYLIBRARYLISTWIDGETITEM_H
+#endif

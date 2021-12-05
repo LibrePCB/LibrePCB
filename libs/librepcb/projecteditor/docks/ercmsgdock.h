@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_ERCMSGDOCK_H
-#define LIBREPCB_PROJECT_ERCMSGDOCK_H
+#ifndef LIBREPCB_PROJECTEDITOR_ERCMSGDOCK_H
+#define LIBREPCB_PROJECTEDITOR_ERCMSGDOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -32,9 +32,9 @@
 namespace librepcb {
 namespace project {
 
-class Project;
 class ErcMsg;
 class ErcMsgList;
+class Project;
 
 namespace editor {
 
@@ -94,4 +94,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_ERCMSGDOCK_H
+#endif

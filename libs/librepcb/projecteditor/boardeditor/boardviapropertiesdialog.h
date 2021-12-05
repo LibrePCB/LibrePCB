@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H
-#define LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDVIAPROPERTIESDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_BOARDVIAPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,14 +31,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-class UndoCommand;
 class LengthUnit;
+class UndoCommand;
+class UndoStack;
 
 namespace project {
 
-class Project;
 class BI_Via;
+class Project;
 
 namespace editor {
 
@@ -88,4 +88,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDVIAPROPERTIESDIALOG_H
+#endif

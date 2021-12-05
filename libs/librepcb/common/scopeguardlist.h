@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SCOPEGUARDLIST_H
-#define LIBREPCB_SCOPEGUARDLIST_H
+#ifndef LIBREPCB_COMMON_SCOPEGUARDLIST_H
+#define LIBREPCB_COMMON_SCOPEGUARDLIST_H
 
 /*******************************************************************************
  *  Includes
@@ -90,4 +90,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SCOPEGUARDLIST_H
+#endif

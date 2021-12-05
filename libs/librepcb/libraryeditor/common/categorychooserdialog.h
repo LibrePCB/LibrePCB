@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H
-#define LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H
+#ifndef LIBREPCB_LIBRARYEDITOR_CATEGORYCHOOSERDIALOG_H
+#define LIBREPCB_LIBRARYEDITOR_CATEGORYCHOOSERDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -86,4 +86,4 @@ typedef CategoryChooserDialog<library::PackageCategory>
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CATEGORYCHOOSERDIALOG_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CIRCUITIDENTIFIER_H
-#define LIBREPCB_CIRCUITIDENTIFIER_H
+#ifndef LIBREPCB_COMMON_CIRCUITIDENTIFIER_H
+#define LIBREPCB_COMMON_CIRCUITIDENTIFIER_H
 
 /*******************************************************************************
  *  Includes
@@ -172,4 +172,4 @@ inline uint qHash(const CircuitIdentifier& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CIRCUITIDENTIFIER_H
+#endif

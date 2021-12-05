@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_SELECT_H
-#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_SELECT_H
+#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
@@ -37,21 +37,21 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoCommandGroup;
 class CmdPolygonEdit;
+class Hole;
 class Polygon;
 class StrokeText;
-class Hole;
+class UndoCommandGroup;
 
 namespace project {
 
 class BI_Base;
 class BI_Device;
-class BI_Via;
-class BI_Plane;
-class BI_NetSegment;
 class BI_NetLine;
+class BI_NetSegment;
+class BI_Plane;
 class BI_Polygon;
+class BI_Via;
 class CmdBoardPlaneEdit;
 
 namespace editor {

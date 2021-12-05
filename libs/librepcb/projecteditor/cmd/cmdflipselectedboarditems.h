@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDFLIPSELECTEDBOARDITEMS_H
+#define LIBREPCB_PROJECTEDITOR_CMDFLIPSELECTEDBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -34,8 +34,8 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_Device;
+class Board;
 
 namespace editor {
 
@@ -73,4 +73,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDFLIPSELECTEDBOARDITEMS_H
+#endif

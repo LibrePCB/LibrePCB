@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
 
 /*******************************************************************************
  *  Includes
@@ -41,8 +41,8 @@ class UnsignedLengthEdit;
 
 namespace project {
 
-class Schematic;
 class SI_Polygon;
+class Schematic;
 
 namespace editor {
 

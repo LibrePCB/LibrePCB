@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_UNDOSTACK_H
-#define LIBREPCB_UNDOSTACK_H
+#ifndef LIBREPCB_COMMON_UNDOSTACK_H
+#define LIBREPCB_COMMON_UNDOSTACK_H
 
 /*******************************************************************************
  *  Includes
@@ -32,9 +32,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class UndoCommand;
 class UndoCommandGroup;
+class UndoStack;
 
 /*******************************************************************************
  *  Class UndoStackTransaction
@@ -343,4 +343,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_UNDOSTACK_H
+#endif

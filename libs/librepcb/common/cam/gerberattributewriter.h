@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GERBERATTRIBUTEWRITER_H
-#define LIBREPCB_GERBERATTRIBUTEWRITER_H
+#ifndef LIBREPCB_COMMON_GERBERATTRIBUTEWRITER_H
+#define LIBREPCB_COMMON_GERBERATTRIBUTEWRITER_H
 
 /*******************************************************************************
  *  Includes

@@ -34,8 +34,8 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
 class SI_Polygon;
+class Schematic;
 
 /*******************************************************************************
  *  Class CmdSchematicPolygonAdd

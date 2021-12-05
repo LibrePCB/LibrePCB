@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTEPROVIDER_H
-#define LIBREPCB_ATTRIBUTEPROVIDER_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTEPROVIDER_H
+#define LIBREPCB_COMMON_ATTRIBUTEPROVIDER_H
 
 /*******************************************************************************
  *  Includes
@@ -139,4 +139,4 @@ static_assert(sizeof(AttributeProvider) == sizeof(void*),
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTEPROVIDER_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TRANSACTIONALDIRECTORY_H
-#define LIBREPCB_TRANSACTIONALDIRECTORY_H
+#ifndef LIBREPCB_COMMON_TRANSACTIONALDIRECTORY_H
+#define LIBREPCB_COMMON_TRANSACTIONALDIRECTORY_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
 namespace librepcb {
 
 class TransactionalFileSystem;
@@ -113,4 +112,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TRANSACTIONALDIRECTORY_H
+#endif

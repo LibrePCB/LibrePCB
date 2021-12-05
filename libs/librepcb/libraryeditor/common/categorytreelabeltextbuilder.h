@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
-#define LIBREPCB_LIBRARY_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
+#ifndef LIBREPCB_LIBRARYEDITOR_CATEGORYTREELABELTEXTBUILDER_H
+#define LIBREPCB_LIBRARYEDITOR_CATEGORYTREELABELTEXTBUILDER_H
 
 /*******************************************************************************
  *  Includes
@@ -110,4 +110,4 @@ typedef CategoryTreeLabelTextBuilder<library::PackageCategory>
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
+#endif

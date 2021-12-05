@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_UUID_H
-#define LIBREPCB_UUID_H
+#ifndef LIBREPCB_COMMON_UUID_H
+#define LIBREPCB_COMMON_UUID_H
 
 /*******************************************************************************
  *  Includes
@@ -214,4 +214,4 @@ inline uint qHash(const Uuid& key, uint seed) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_UUID_H
+#endif

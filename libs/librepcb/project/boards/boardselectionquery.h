@@ -37,14 +37,14 @@ namespace project {
 class BI_Device;
 class BI_Footprint;
 class BI_FootprintPad;
-class BI_Via;
-class BI_NetSegment;
+class BI_Hole;
 class BI_NetLine;
 class BI_NetPoint;
+class BI_NetSegment;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
-class BI_Hole;
+class BI_Via;
 
 /*******************************************************************************
  *  Class BoardSelectionQuery
@@ -159,4 +159,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H
+#endif

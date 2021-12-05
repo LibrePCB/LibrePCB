@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORFSM_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORFSM_H
+#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORFSM_H
+#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORFSM_H
 
 /*******************************************************************************
  *  Includes
@@ -34,11 +34,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class GraphicsScene;
 class GraphicsView;
 class GridProperties;
 class IF_GraphicsLayerProvider;
+class UndoStack;
 
 namespace library {
 
@@ -154,4 +154,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORFSM_H
+#endif

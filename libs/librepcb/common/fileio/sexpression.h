@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SEXPRESSION_H
-#define LIBREPCB_SEXPRESSION_H
+#ifndef LIBREPCB_COMMON_SEXPRESSION_H
+#define LIBREPCB_COMMON_SEXPRESSION_H
 
 /*******************************************************************************
  *  Includes
@@ -330,4 +330,4 @@ inline QUrl deserialize(const SExpression& sexpr, const Version& fileFormat) {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SEXPRESSION_H
+#endif

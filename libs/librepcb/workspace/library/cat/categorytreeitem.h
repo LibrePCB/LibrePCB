@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
-#define LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
+#ifndef LIBREPCB_WORKSPACE_CATEGORYTREEITEM_H
+#define LIBREPCB_WORKSPACE_CATEGORYTREEITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -32,6 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
 namespace library {
 class ComponentCategory;
 class PackageCategory;
@@ -125,4 +126,4 @@ typedef CategoryTreeItem<library::PackageCategory> PackageCategoryTreeItem;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::workspace::CategoryTreeFilter::Flags)
 
-#endif  // LIBREPCB_LIBRARY_CATEGORYTREEITEM_H
+#endif

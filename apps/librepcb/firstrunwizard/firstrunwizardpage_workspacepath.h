@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
-#define LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+#ifndef LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+#define LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
 
 /*******************************************************************************
  *  Includes
@@ -77,4 +77,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FIRSTRUNWIZARDPAGE_WORKSPACEPATH_H
+#endif

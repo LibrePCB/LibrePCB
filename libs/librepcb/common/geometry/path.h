@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PATH_H
-#define LIBREPCB_PATH_H
+#ifndef LIBREPCB_COMMON_PATH_H
+#define LIBREPCB_COMMON_PATH_H
 
 /*******************************************************************************
  *  Includes
@@ -160,4 +160,4 @@ inline uint qHash(const Path& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PATH_H
+#endif

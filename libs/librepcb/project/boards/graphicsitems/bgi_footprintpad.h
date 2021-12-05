@@ -103,4 +103,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#endif

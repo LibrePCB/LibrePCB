@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LIBREPCB_MARKDOWNCONVERTER_H
-#define LIBREPCB_MARKDOWNCONVERTER_H
+#ifndef LIBREPCB_MARKDOWN_MARKDOWNCONVERTER_H
+#define LIBREPCB_MARKDOWN_MARKDOWNCONVERTER_H
 
 /*******************************************************************************
  *  Includes
@@ -59,4 +59,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_MARKDOWNCONVERTER_H
+#endif

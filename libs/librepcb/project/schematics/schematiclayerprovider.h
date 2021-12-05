@@ -88,4 +88,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
+#endif

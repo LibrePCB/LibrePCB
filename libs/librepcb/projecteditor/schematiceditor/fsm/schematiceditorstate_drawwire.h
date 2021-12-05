@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
 
 /*******************************************************************************
  *  Includes
@@ -35,10 +35,10 @@ namespace librepcb {
 namespace project {
 
 class Circuit;
-class SI_NetPoint;
 class SI_NetLine;
-class SI_SymbolPin;
 class SI_NetLineAnchor;
+class SI_NetPoint;
+class SI_SymbolPin;
 
 namespace editor {
 

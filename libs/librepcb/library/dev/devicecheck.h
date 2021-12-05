@@ -70,4 +70,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_DEVICECHECK_H
+#endif

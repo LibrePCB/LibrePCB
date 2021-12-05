@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDATTRIBUTEEDIT_H
-#define LIBREPCB_CMDATTRIBUTEEDIT_H
+#ifndef LIBREPCB_COMMON_CMDATTRIBUTEEDIT_H
+#define LIBREPCB_COMMON_CMDATTRIBUTEEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -91,4 +91,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CMDATTRIBUTEEDIT_H
+#endif

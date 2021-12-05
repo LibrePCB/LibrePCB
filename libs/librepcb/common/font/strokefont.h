@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_STROKEFONT_H
-#define LIBREPCB_STROKEFONT_H
+#ifndef LIBREPCB_COMMON_STROKEFONT_H
+#define LIBREPCB_COMMON_STROKEFONT_H
 
 /*******************************************************************************
  *  Includes
@@ -33,11 +33,11 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace fontobene {
-struct Vertex;
-struct Polyline;
-struct Font;
-class GlyphListCache;
 class GlyphListAccessor;
+class GlyphListCache;
+struct Font;
+struct Polyline;
+struct Vertex;
 }  // namespace fontobene
 
 namespace librepcb {
@@ -109,4 +109,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_STROKEFONT_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_H
-#define LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_H
+#ifndef LIBREPCB_INITIALIZEWORKSPACEWIZARD_INITIALIZEWORKSPACEWIZARD_H
+#define LIBREPCB_INITIALIZEWORKSPACEWIZARD_INITIALIZEWORKSPACEWIZARD_H
 
 /*******************************************************************************
  *  Includes
@@ -76,4 +76,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_APPLICATION_INITIALIZEWORKSPACEWIZARD_H
+#endif

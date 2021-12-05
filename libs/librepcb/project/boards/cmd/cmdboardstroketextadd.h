@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_StrokeText;
+class Board;
 
 /*******************************************************************************
  *  Class CmdBoardStrokeTextAdd
@@ -76,4 +76,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDSTROKETEXTADD_H
+#endif

@@ -74,4 +74,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOLCHECK_H
+#endif

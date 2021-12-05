@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOARDDESIGNRULECHECKMESSAGESDOCK_H
-#define BOARDDESIGNRULECHECKMESSAGESDOCK_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDDESIGNRULECHECKMESSAGESDOCK_H
+#define LIBREPCB_PROJECTEDITOR_BOARDDESIGNRULECHECKMESSAGESDOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -96,4 +96,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // BOARDDESIGNRULECHECKMESSAGESDOCK_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H
-#define LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H
+#ifndef LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARDPAGE_WELCOME_H
+#define LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARDPAGE_WELCOME_H
 
 /*******************************************************************************
  *  Includes
@@ -66,4 +66,4 @@ private:
 }  // namespace application
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FIRSTRUNWIZARDPAGE_WELCOME_H
+#endif

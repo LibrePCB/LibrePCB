@@ -99,4 +99,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SGI_SYMBOLPIN_H
+#endif

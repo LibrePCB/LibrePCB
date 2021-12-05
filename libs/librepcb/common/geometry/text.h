@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TEXT_H
-#define LIBREPCB_TEXT_H
+#ifndef LIBREPCB_COMMON_TEXT_H
+#define LIBREPCB_COMMON_TEXT_H
 
 /*******************************************************************************
  *  Includes
@@ -129,4 +129,4 @@ using CmdTextsSwap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TEXT_H
+#endif

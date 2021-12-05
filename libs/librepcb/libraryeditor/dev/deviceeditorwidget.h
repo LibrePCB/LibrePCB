@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_DEVICEEDITORWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_DEVICEEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -36,17 +36,17 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
 class DefaultGraphicsLayerProvider;
+class GraphicsScene;
 
 namespace library {
 
-class Symbol;
-class Device;
 class Component;
-class Package;
-class SymbolPreviewGraphicsItem;
+class Device;
 class FootprintPreviewGraphicsItem;
+class Package;
+class Symbol;
+class SymbolPreviewGraphicsItem;
 
 namespace editor {
 
@@ -133,4 +133,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_DEVICEEDITORWIDGET_H
+#endif

@@ -113,4 +113,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDFOOTPRINTPADEDIT_H
+#endif

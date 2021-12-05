@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_TRANSACTIONALFILESYSTEM_H
-#define LIBREPCB_TRANSACTIONALFILESYSTEM_H
+#ifndef LIBREPCB_COMMON_TRANSACTIONALFILESYSTEM_H
+#define LIBREPCB_COMMON_TRANSACTIONALFILESYSTEM_H
 
 /*******************************************************************************
  *  Includes
@@ -221,4 +221,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_TRANSACTIONALFILESYSTEM_H
+#endif

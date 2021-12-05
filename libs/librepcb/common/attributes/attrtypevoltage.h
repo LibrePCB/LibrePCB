@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRTYPEVOLTAGE_H
-#define LIBREPCB_ATTRTYPEVOLTAGE_H
+#ifndef LIBREPCB_COMMON_ATTRTYPEVOLTAGE_H
+#define LIBREPCB_COMMON_ATTRTYPEVOLTAGE_H
 
 /*******************************************************************************
  *  Includes
@@ -68,4 +68,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRTYPEVOLTAGE_H
+#endif

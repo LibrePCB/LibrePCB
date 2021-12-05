@@ -45,14 +45,14 @@ class StrokeFontPool;
 
 namespace project {
 
+class Board;
+class Circuit;
+class ErcMsgList;
+class ProjectLibrary;
 class ProjectMetadata;
 class ProjectSettings;
-class ProjectLibrary;
-class Circuit;
 class Schematic;
 class SchematicLayerProvider;
-class ErcMsgList;
-class Board;
 
 /*******************************************************************************
  *  Class Project
@@ -499,4 +499,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_PROJECT_H
+#endif

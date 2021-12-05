@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTEKEY_H
-#define LIBREPCB_ATTRIBUTEKEY_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTEKEY_H
+#define LIBREPCB_COMMON_ATTRIBUTEKEY_H
 
 /*******************************************************************************
  *  Includes
@@ -127,4 +127,4 @@ inline uint qHash(const AttributeKey& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTEKEY_H
+#endif

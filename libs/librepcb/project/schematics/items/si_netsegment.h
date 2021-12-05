@@ -37,10 +37,10 @@ namespace librepcb {
 namespace project {
 
 class NetSignal;
-class SI_NetPoint;
-class SI_NetLine;
 class SI_NetLabel;
+class SI_NetLine;
 class SI_NetLineAnchor;
+class SI_NetPoint;
 class SI_SymbolPin;
 
 /*******************************************************************************
@@ -159,4 +159,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SI_NETSEGMENT_H
+#endif

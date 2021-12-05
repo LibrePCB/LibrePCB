@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
+#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
+#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
 
 /*******************************************************************************
  *  Includes
@@ -106,4 +106,4 @@ private:  // Types / Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_DRAWCIRCLE_H
+#endif

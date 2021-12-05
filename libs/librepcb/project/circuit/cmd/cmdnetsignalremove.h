@@ -74,4 +74,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDNETSIGNALREMOVE_H
+#endif

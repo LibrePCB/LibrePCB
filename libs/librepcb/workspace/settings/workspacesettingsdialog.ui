@@ -438,7 +438,7 @@
                <string>Pick</string>
               </property>
               <property name="icon">
-               <iconset resource="../../../../img/images.qrc">
+               <iconset>
                 <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
               </property>
              </widget>
@@ -471,20 +471,7 @@
    <header location="global">librepcb/common/widgets/editabletablewidget.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
-  <include location="../../../../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
  <buttongroups>
   <buttongroup name="pdfOpenGroup"/>
