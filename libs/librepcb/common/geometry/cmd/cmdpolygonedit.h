@@ -23,6 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../fileio/cmd/cmdlistelementinsert.h"
+#include "../../fileio/cmd/cmdlistelementremove.h"
+#include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 #include "../polygon.h"
 
@@ -93,6 +96,17 @@ private:
   Path mOldPath;
   Path mNewPath;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdPolygonInsert =
+    CmdListElementInsert<Polygon, PolygonListNameProvider, Polygon::Event>;
+using CmdPolygonRemove =
+    CmdListElementRemove<Polygon, PolygonListNameProvider, Polygon::Event>;
+using CmdPolygonsSwap =
+    CmdListElementsSwap<Polygon, PolygonListNameProvider, Polygon::Event>;
 
 /*******************************************************************************
  *  End of File

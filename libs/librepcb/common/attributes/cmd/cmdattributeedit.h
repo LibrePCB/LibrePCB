@@ -23,6 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../fileio/cmd/cmdlistelementinsert.h"
+#include "../../fileio/cmd/cmdlistelementremove.h"
+#include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 #include "../attribute.h"
 
@@ -84,6 +87,19 @@ private:
   const AttributeUnit* mOldUnit;
   const AttributeUnit* mNewUnit;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdAttributeInsert =
+    CmdListElementInsert<Attribute, AttributeListNameProvider,
+                         Attribute::Event>;
+using CmdAttributeRemove =
+    CmdListElementRemove<Attribute, AttributeListNameProvider,
+                         Attribute::Event>;
+using CmdAttributesSwap =
+    CmdListElementsSwap<Attribute, AttributeListNameProvider, Attribute::Event>;
 
 /*******************************************************************************
  *  End of File

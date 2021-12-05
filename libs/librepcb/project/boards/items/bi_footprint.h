@@ -84,6 +84,7 @@ public:
   BGI_Footprint& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   // StrokeText Methods
+  StrokeTextList getDefaultStrokeTexts() const noexcept;
   const QList<BI_StrokeText*>& getStrokeTexts() const noexcept {
     return mStrokeTexts;
   }
@@ -91,7 +92,6 @@ public:
   void removeStrokeText(BI_StrokeText& text);
 
   // General Methods
-  void resetStrokeTextsToLibraryFootprint();
   void addToBoard() override;
   void removeFromBoard() override;
 

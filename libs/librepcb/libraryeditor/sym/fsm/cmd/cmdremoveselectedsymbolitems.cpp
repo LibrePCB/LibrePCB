@@ -22,9 +22,13 @@
  ******************************************************************************/
 #include "cmdremoveselectedsymbolitems.h"
 
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
+#include <librepcb/common/geometry/cmd/cmdtextedit.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
 #include <librepcb/library/sym/symbol.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>

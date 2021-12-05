@@ -22,13 +22,9 @@
  ******************************************************************************/
 #include "cmdfootprintstroketextsreset.h"
 
-#include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
 #include "cmdfootprintstroketextadd.h"
 #include "cmdfootprintstroketextremove.h"
-
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
-#include <librepcb/library/pkg/footprint.h>
 
 #include <QtCore>
 
@@ -60,23 +56,10 @@ bool CmdFootprintStrokeTextsReset::performExecute() {
     appendChild(new CmdFootprintStrokeTextRemove(mFootprint, *text));
   }
 
-  // Copy all footprint texts and transform them to the global coordinate system
-  // (not relative to the footprint). The original UUIDs are kept for future
-  // identification.
-  for (const StrokeText& text :
-       mFootprint.getDeviceInstance().getLibFootprint().getStrokeTexts()) {
-    QScopedPointer<BI_StrokeText> newText(
-        new BI_StrokeText(mFootprint.getBoard(), text));
-    CmdStrokeTextEdit cmd(newText->getText());
-    cmd.rotate(mFootprint.getRotation(), Point(0, 0), true);
-    if (mFootprint.getIsMirrored()) {
-      cmd.mirrorGeometry(Qt::Horizontal, Point(0, 0), true);
-      cmd.mirrorLayer(true);
-    }
-    cmd.setPosition(newText->getText().getPosition() + mFootprint.getPosition(),
-                    true);
-    cmd.execute();  // can throw
-    appendChild(new CmdFootprintStrokeTextAdd(mFootprint, *newText.take()));
+  // Create new texts
+  for (const StrokeText& text : mFootprint.getDefaultStrokeTexts()) {
+    appendChild(new CmdFootprintStrokeTextAdd(
+        mFootprint, *new BI_StrokeText(mFootprint.getBoard(), text)));
   }
 
   // execute all child commands

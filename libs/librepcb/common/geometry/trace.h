@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
@@ -169,12 +166,6 @@ struct TraceListNameProvider {
 };
 using TraceList =
     SerializableObjectList<Trace, TraceListNameProvider, Trace::Event>;
-using CmdTraceInsert =
-    CmdListElementInsert<Trace, TraceListNameProvider, Trace::Event>;
-using CmdTraceRemove =
-    CmdListElementRemove<Trace, TraceListNameProvider, Trace::Event>;
-using CmdTracesSwap =
-    CmdListElementsSwap<Trace, TraceListNameProvider, Trace::Event>;
 
 /*******************************************************************************
  *  Non-Member Functions

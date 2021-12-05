@@ -26,11 +26,11 @@
 #include "../../library/projectlibrary.h"
 #include "../../project.h"
 #include "../board.h"
-#include "../cmd/cmdfootprintstroketextsreset.h"
 #include "bi_device.h"
 #include "bi_footprintpad.h"
 
 #include <librepcb/common/font/strokefontpool.h>
+#include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/library/dev/device.h>
@@ -79,7 +79,9 @@ BI_Footprint::BI_Footprint(BI_Device& device, const SExpression& node,
 BI_Footprint::BI_Footprint(BI_Device& device)
   : BI_Base(device.getBoard()), mDevice(device) {
   try {
-    resetStrokeTextsToLibraryFootprint();
+    for (const StrokeText& text : getDefaultStrokeTexts()) {
+      addStrokeText(*new BI_StrokeText(mBoard, text));
+    }
     init();
   } catch (...) {
     deinit();
@@ -176,6 +178,31 @@ QRectF BI_Footprint::getBoundingRect() const noexcept {
  *  StrokeText Methods
  ******************************************************************************/
 
+StrokeTextList BI_Footprint::getDefaultStrokeTexts() const noexcept {
+  // Copy all footprint texts and transform them to the global coordinate system
+  // (not relative to the footprint). The original UUIDs are kept for future
+  // identification.
+  StrokeTextList texts = mDevice.getLibFootprint().getStrokeTexts();
+  for (StrokeText& text : texts) {
+    if (getIsMirrored()) {
+      text.setLayerName(GraphicsLayerName(
+          GraphicsLayer::getMirroredLayerName(*text.getLayerName())));
+      text.setRotation(text.getRotation() +
+                       (text.getMirrored() ? -getRotation() : getRotation()));
+      text.setMirrored(!text.getMirrored());
+      text.setPosition(
+          getPosition() +
+          text.getPosition().rotated(getRotation()).mirrored(Qt::Horizontal));
+    } else {
+      text.setRotation(text.getRotation() +
+                       (text.getMirrored() ? -getRotation() : getRotation()));
+      text.setPosition(getPosition() +
+                       text.getPosition().rotated(getRotation()));
+    }
+  }
+  return texts;
+}
+
 void BI_Footprint::addStrokeText(BI_StrokeText& text) {
   if ((mStrokeTexts.contains(&text)) || (&text.getBoard() != &mBoard)) {
     throw LogicError(__FILE__, __LINE__);
@@ -207,11 +234,6 @@ void BI_Footprint::removeStrokeText(BI_StrokeText& text) {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void BI_Footprint::resetStrokeTextsToLibraryFootprint() {
-  CmdFootprintStrokeTextsReset cmd(*this);
-  cmd.execute();  // can throw
-}
 
 void BI_Footprint::addToBoard() {
   if (isAddedToBoard()) {

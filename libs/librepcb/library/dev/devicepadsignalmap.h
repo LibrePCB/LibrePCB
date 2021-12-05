@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 
 #include <QtCore>
@@ -99,15 +96,6 @@ using DevicePadSignalMap =
     SerializableObjectList<DevicePadSignalMapItem,
                            DevicePadSignalMapNameProvider,
                            DevicePadSignalMapItem::Event>;
-using CmdDevicePadSignalMapItemInsert =
-    CmdListElementInsert<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
-                         DevicePadSignalMapItem::Event>;
-using CmdDevicePadSignalMapItemRemove =
-    CmdListElementRemove<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
-                         DevicePadSignalMapItem::Event>;
-using CmdDevicePadSignalMapItemsSwap =
-    CmdListElementsSwap<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
-                        DevicePadSignalMapItem::Event>;
 
 /*******************************************************************************
  *  Class DevicePadSignalMapHelpers

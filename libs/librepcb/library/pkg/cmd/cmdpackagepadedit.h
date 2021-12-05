@@ -25,6 +25,9 @@
  ******************************************************************************/
 #include "../packagepad.h"
 
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 
 #include <QtCore>
@@ -77,6 +80,20 @@ private:
   CircuitIdentifier mOldName;
   CircuitIdentifier mNewName;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdPackagePadInsert =
+    CmdListElementInsert<PackagePad, PackagePadListNameProvider,
+                         PackagePad::Event>;
+using CmdPackagePadRemove =
+    CmdListElementRemove<PackagePad, PackagePadListNameProvider,
+                         PackagePad::Event>;
+using CmdPackagePadsSwap =
+    CmdListElementsSwap<PackagePad, PackagePadListNameProvider,
+                        PackagePad::Event>;
 
 /*******************************************************************************
  *  End of File

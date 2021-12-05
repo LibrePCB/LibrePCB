@@ -23,6 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../fileio/cmd/cmdlistelementinsert.h"
+#include "../../fileio/cmd/cmdlistelementremove.h"
+#include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 #include "../stroketext.h"
 
@@ -32,8 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class StrokeText;
 
 /*******************************************************************************
  *  Class CmdStrokeTextEdit
@@ -116,6 +117,20 @@ private:
   bool mOldAutoRotate;
   bool mNewAutoRotate;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdStrokeTextInsert =
+    CmdListElementInsert<StrokeText, StrokeTextListNameProvider,
+                         StrokeText::Event>;
+using CmdStrokeTextRemove =
+    CmdListElementRemove<StrokeText, StrokeTextListNameProvider,
+                         StrokeText::Event>;
+using CmdStrokeTextsSwap =
+    CmdListElementsSwap<StrokeText, StrokeTextListNameProvider,
+                        StrokeText::Event>;
 
 /*******************************************************************************
  *  End of File

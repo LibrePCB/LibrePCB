@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
 
@@ -107,12 +104,6 @@ struct NetLabelListNameProvider {
 };
 using NetLabelList =
     SerializableObjectList<NetLabel, NetLabelListNameProvider, NetLabel::Event>;
-using CmdNetLabelInsert =
-    CmdListElementInsert<NetLabel, NetLabelListNameProvider, NetLabel::Event>;
-using CmdNetLabelRemove =
-    CmdListElementRemove<NetLabel, NetLabelListNameProvider, NetLabel::Event>;
-using CmdNetLabelsSwap =
-    CmdListElementsSwap<NetLabel, NetLabelListNameProvider, NetLabel::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -23,8 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../fileio/cmd/cmdlistelementinsert.h"
+#include "../../fileio/cmd/cmdlistelementremove.h"
+#include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 #include "../../units/all_length_units.h"
+#include "../hole.h"
 
 #include <QtCore>
 
@@ -32,8 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Hole;
 
 /*******************************************************************************
  *  Class CmdHoleEdit
@@ -85,6 +87,17 @@ private:
   PositiveLength mOldDiameter;
   PositiveLength mNewDiameter;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdHoleInsert =
+    CmdListElementInsert<Hole, HoleListNameProvider, Hole::Event>;
+using CmdHoleRemove =
+    CmdListElementRemove<Hole, HoleListNameProvider, Hole::Event>;
+using CmdHolesSwap =
+    CmdListElementsSwap<Hole, HoleListNameProvider, Hole::Event>;
 
 /*******************************************************************************
  *  End of File

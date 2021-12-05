@@ -23,6 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../fileio/cmd/cmdlistelementinsert.h"
+#include "../../fileio/cmd/cmdlistelementremove.h"
+#include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 #include "../circle.h"
 
@@ -96,6 +99,17 @@ private:
   Point mOldCenter;
   Point mNewCenter;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdCircleInsert =
+    CmdListElementInsert<Circle, CircleListNameProvider, Circle::Event>;
+using CmdCircleRemove =
+    CmdListElementRemove<Circle, CircleListNameProvider, Circle::Event>;
+using CmdCirclesSwap =
+    CmdListElementsSwap<Circle, CircleListNameProvider, Circle::Event>;
 
 /*******************************************************************************
  *  End of File

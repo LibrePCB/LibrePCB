@@ -121,8 +121,6 @@ public:
    * ::librepcb::project::Circuit::setComponentInstanceName().
    *
    * @param name  The new name of this component in the circuit
-   *         *
-   * @undocmd{::librepcb::project::CmdComponentInstanceEdit}
    */
   void setName(const CircuitIdentifier& name) noexcept;
 
@@ -130,8 +128,6 @@ public:
    * @brief Set the value of this component instance in the circuit
    *
    * @param value  The new value
-   *
-   * @undocmd{::librepcb::project::CmdComponentInstanceEdit}
    */
   void setValue(const QString& value) noexcept;
 
@@ -141,8 +137,6 @@ public:
    * @brief Set the default device of the component
    *
    * @param device  The new device UUID
-   *
-   * @undocmd{::librepcb::project::CmdComponentInstanceEdit}
    */
   void setDefaultDeviceUuid(const tl::optional<Uuid>& device) noexcept;
 

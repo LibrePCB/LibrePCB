@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
@@ -113,12 +110,6 @@ struct PolygonListNameProvider {
 };
 using PolygonList =
     SerializableObjectList<Polygon, PolygonListNameProvider, Polygon::Event>;
-using CmdPolygonInsert =
-    CmdListElementInsert<Polygon, PolygonListNameProvider, Polygon::Event>;
-using CmdPolygonRemove =
-    CmdListElementRemove<Polygon, PolygonListNameProvider, Polygon::Event>;
-using CmdPolygonsSwap =
-    CmdListElementsSwap<Polygon, PolygonListNameProvider, Polygon::Event>;
 
 /*******************************************************************************
  *  End of File

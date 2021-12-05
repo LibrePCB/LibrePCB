@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
 #include "path.h"
@@ -118,9 +115,6 @@ struct ViaListNameProvider {
   static constexpr const char* tagname = "via";
 };
 using ViaList = SerializableObjectList<Via, ViaListNameProvider, Via::Event>;
-using CmdViaInsert = CmdListElementInsert<Via, ViaListNameProvider, Via::Event>;
-using CmdViaRemove = CmdListElementRemove<Via, ViaListNameProvider, Via::Event>;
-using CmdViasSwap = CmdListElementsSwap<Via, ViaListNameProvider, Via::Event>;
 
 /*******************************************************************************
  *  Non-Member Functions

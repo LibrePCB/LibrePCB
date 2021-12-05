@@ -25,9 +25,6 @@
  ******************************************************************************/
 #include "componentsymbolvariantitem.h"
 
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializablekeyvaluemap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 
@@ -147,18 +144,6 @@ using ComponentSymbolVariantList =
     SerializableObjectList<ComponentSymbolVariant,
                            ComponentSymbolVariantListNameProvider,
                            ComponentSymbolVariant::Event>;
-using CmdComponentSymbolVariantInsert =
-    CmdListElementInsert<ComponentSymbolVariant,
-                         ComponentSymbolVariantListNameProvider,
-                         ComponentSymbolVariant::Event>;
-using CmdComponentSymbolVariantRemove =
-    CmdListElementRemove<ComponentSymbolVariant,
-                         ComponentSymbolVariantListNameProvider,
-                         ComponentSymbolVariant::Event>;
-using CmdComponentSymbolVariantsSwap =
-    CmdListElementsSwap<ComponentSymbolVariant,
-                        ComponentSymbolVariantListNameProvider,
-                        ComponentSymbolVariant::Event>;
 
 /*******************************************************************************
  *  End of File

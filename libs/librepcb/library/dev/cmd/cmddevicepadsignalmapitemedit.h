@@ -23,6 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../devicepadsignalmap.h"
+
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 #include <librepcb/common/uuid.h>
 
@@ -33,8 +38,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace library {
-
-class DevicePadSignalMapItem;
 
 /*******************************************************************************
  *  Class CmdDevicePadSignalMapItemEdit
@@ -75,6 +78,20 @@ private:  // Data
   tl::optional<Uuid> mOldSignalUuid;
   tl::optional<Uuid> mNewSignalUuid;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdDevicePadSignalMapItemInsert =
+    CmdListElementInsert<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
+                         DevicePadSignalMapItem::Event>;
+using CmdDevicePadSignalMapItemRemove =
+    CmdListElementRemove<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
+                         DevicePadSignalMapItem::Event>;
+using CmdDevicePadSignalMapItemsSwap =
+    CmdListElementsSwap<DevicePadSignalMapItem, DevicePadSignalMapNameProvider,
+                        DevicePadSignalMapItem::Event>;
 
 /*******************************************************************************
  *  End of File

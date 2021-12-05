@@ -23,7 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../footprint.h"
+
 #include <librepcb/common/elementname.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 
 #include <QtCore>
@@ -33,8 +38,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace library {
-
-class Footprint;
 
 /*******************************************************************************
  *  Class CmdFootprintEdit
@@ -78,6 +81,19 @@ private:
   ElementName mOldName;
   ElementName mNewName;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdFootprintInsert =
+    CmdListElementInsert<Footprint, FootprintListNameProvider,
+                         Footprint::Event>;
+using CmdFootprintRemove =
+    CmdListElementRemove<Footprint, FootprintListNameProvider,
+                         Footprint::Event>;
+using CmdFootprintsSwap =
+    CmdListElementsSwap<Footprint, FootprintListNameProvider, Footprint::Event>;
 
 /*******************************************************************************
  *  End of File

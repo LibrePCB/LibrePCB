@@ -24,9 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../alignment.h"
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
@@ -116,12 +113,6 @@ struct TextListNameProvider {
 };
 using TextList =
     SerializableObjectList<Text, TextListNameProvider, Text::Event>;
-using CmdTextInsert =
-    CmdListElementInsert<Text, TextListNameProvider, Text::Event>;
-using CmdTextRemove =
-    CmdListElementRemove<Text, TextListNameProvider, Text::Event>;
-using CmdTextsSwap =
-    CmdListElementsSwap<Text, TextListNameProvider, Text::Event>;
 
 /*******************************************************************************
  *  End of File

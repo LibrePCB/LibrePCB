@@ -22,10 +22,15 @@
  ******************************************************************************/
 #include "cmdremoveselectedfootprintitems.h"
 
+#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
+#include <librepcb/common/geometry/cmd/cmdholeedit.h>
+#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
+#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
+#include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
 #include <librepcb/library/pkg/footprint.h>
 #include <librepcb/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/library/pkg/footprintpadgraphicsitem.h>

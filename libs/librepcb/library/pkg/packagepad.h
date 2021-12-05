@@ -24,9 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 
 #include <QtCore>
@@ -101,15 +98,6 @@ struct PackagePadListNameProvider {
 using PackagePadList =
     SerializableObjectList<PackagePad, PackagePadListNameProvider,
                            PackagePad::Event>;
-using CmdPackagePadInsert =
-    CmdListElementInsert<PackagePad, PackagePadListNameProvider,
-                         PackagePad::Event>;
-using CmdPackagePadRemove =
-    CmdListElementRemove<PackagePad, PackagePadListNameProvider,
-                         PackagePad::Event>;
-using CmdPackagePadsSwap =
-    CmdListElementsSwap<PackagePad, PackagePadListNameProvider,
-                        PackagePad::Event>;
 
 /*******************************************************************************
  *  End of File

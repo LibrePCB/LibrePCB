@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "attributekey.h"
 
@@ -113,14 +110,6 @@ struct AttributeListNameProvider {
 using AttributeList =
     SerializableObjectList<Attribute, AttributeListNameProvider,
                            Attribute::Event>;
-using CmdAttributeInsert =
-    CmdListElementInsert<Attribute, AttributeListNameProvider,
-                         Attribute::Event>;
-using CmdAttributeRemove =
-    CmdListElementRemove<Attribute, AttributeListNameProvider,
-                         Attribute::Event>;
-using CmdAttributesSwap =
-    CmdListElementsSwap<Attribute, AttributeListNameProvider, Attribute::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -26,9 +26,6 @@
 #include "componentpinsignalmap.h"
 #include "componentsymbolvariantitemsuffix.h"
 
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
@@ -147,18 +144,6 @@ using ComponentSymbolVariantItemList =
     SerializableObjectList<ComponentSymbolVariantItem,
                            ComponentSymbolVariantItemListNameProvider,
                            ComponentSymbolVariantItem::Event>;
-using CmdComponentSymbolVariantItemInsert =
-    CmdListElementInsert<ComponentSymbolVariantItem,
-                         ComponentSymbolVariantItemListNameProvider,
-                         ComponentSymbolVariantItem::Event>;
-using CmdComponentSymbolVariantItemRemove =
-    CmdListElementRemove<ComponentSymbolVariantItem,
-                         ComponentSymbolVariantItemListNameProvider,
-                         ComponentSymbolVariantItem::Event>;
-using CmdComponentSymbolVariantItemsSwap =
-    CmdListElementsSwap<ComponentSymbolVariantItem,
-                        ComponentSymbolVariantItemListNameProvider,
-                        ComponentSymbolVariantItem::Event>;
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemListHelpers

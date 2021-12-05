@@ -25,6 +25,9 @@
  ******************************************************************************/
 #include "../componentsignal.h"
 
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 
 #include <QtCore>
@@ -87,6 +90,20 @@ private:  // Data
   bool mOldIsClock;
   bool mNewIsClock;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdComponentSignalInsert =
+    CmdListElementInsert<ComponentSignal, ComponentSignalListNameProvider,
+                         ComponentSignal::Event>;
+using CmdComponentSignalRemove =
+    CmdListElementRemove<ComponentSignal, ComponentSignalListNameProvider,
+                         ComponentSignal::Event>;
+using CmdComponentSignalsSwap =
+    CmdListElementsSwap<ComponentSignal, ComponentSignalListNameProvider,
+                        ComponentSignal::Event>;
 
 /*******************************************************************************
  *  End of File

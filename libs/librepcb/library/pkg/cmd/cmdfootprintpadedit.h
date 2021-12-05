@@ -25,6 +25,9 @@
  ******************************************************************************/
 #include "../footprintpad.h"
 
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 
 #include <QtCore>
@@ -105,6 +108,20 @@ private:
   UnsignedLength mOldDrillDiameter;
   UnsignedLength mNewDrillDiameter;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdFootprintPadInsert =
+    CmdListElementInsert<FootprintPad, FootprintPadListNameProvider,
+                         FootprintPad::Event>;
+using CmdFootprintPadRemove =
+    CmdListElementRemove<FootprintPad, FootprintPadListNameProvider,
+                         FootprintPad::Event>;
+using CmdFootprintPadsSwap =
+    CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider,
+                        FootprintPad::Event>;
 
 /*******************************************************************************
  *  End of File

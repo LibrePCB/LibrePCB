@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
 
@@ -99,12 +96,6 @@ struct JunctionListNameProvider {
 };
 using JunctionList =
     SerializableObjectList<Junction, JunctionListNameProvider, Junction::Event>;
-using CmdJunctionInsert =
-    CmdListElementInsert<Junction, JunctionListNameProvider, Junction::Event>;
-using CmdJunctionRemove =
-    CmdListElementRemove<Junction, JunctionListNameProvider, Junction::Event>;
-using CmdJunctionsSwap =
-    CmdListElementsSwap<Junction, JunctionListNameProvider, Junction::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
 #include "../units/all_length_units.h"
@@ -115,12 +112,6 @@ struct CircleListNameProvider {
 };
 using CircleList =
     SerializableObjectList<Circle, CircleListNameProvider, Circle::Event>;
-using CmdCircleInsert =
-    CmdListElementInsert<Circle, CircleListNameProvider, Circle::Event>;
-using CmdCircleRemove =
-    CmdListElementRemove<Circle, CircleListNameProvider, Circle::Event>;
-using CmdCirclesSwap =
-    CmdListElementsSwap<Circle, CircleListNameProvider, Circle::Event>;
 
 /*******************************************************************************
  *  End of File

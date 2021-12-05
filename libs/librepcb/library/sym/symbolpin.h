@@ -24,9 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/units/all_length_units.h>
 
@@ -122,14 +119,6 @@ struct SymbolPinListNameProvider {
 using SymbolPinList =
     SerializableObjectList<SymbolPin, SymbolPinListNameProvider,
                            SymbolPin::Event>;
-using CmdSymbolPinInsert =
-    CmdListElementInsert<SymbolPin, SymbolPinListNameProvider,
-                         SymbolPin::Event>;
-using CmdSymbolPinRemove =
-    CmdListElementRemove<SymbolPin, SymbolPinListNameProvider,
-                         SymbolPin::Event>;
-using CmdSymbolPinsSwap =
-    CmdListElementsSwap<SymbolPin, SymbolPinListNameProvider, SymbolPin::Event>;
 
 /*******************************************************************************
  *  End of File

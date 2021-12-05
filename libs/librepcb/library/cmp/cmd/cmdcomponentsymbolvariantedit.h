@@ -25,6 +25,9 @@
  ******************************************************************************/
 #include "../componentsymbolvariant.h"
 
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 
 #include <QtCore>
@@ -84,6 +87,23 @@ private:  // Data
   ComponentSymbolVariantItemList mOldSymbolItems;
   ComponentSymbolVariantItemList mNewSymbolItems;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdComponentSymbolVariantInsert =
+    CmdListElementInsert<ComponentSymbolVariant,
+                         ComponentSymbolVariantListNameProvider,
+                         ComponentSymbolVariant::Event>;
+using CmdComponentSymbolVariantRemove =
+    CmdListElementRemove<ComponentSymbolVariant,
+                         ComponentSymbolVariantListNameProvider,
+                         ComponentSymbolVariant::Event>;
+using CmdComponentSymbolVariantsSwap =
+    CmdListElementsSwap<ComponentSymbolVariant,
+                        ComponentSymbolVariantListNameProvider,
+                        ComponentSymbolVariant::Event>;
 
 /*******************************************************************************
  *  End of File

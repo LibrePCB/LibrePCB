@@ -35,6 +35,7 @@
 #include <librepcb/library/msg/msgmissingauthor.h>
 #include <librepcb/library/msg/msgmissingcategories.h>
 #include <librepcb/library/msg/msgnamenottitlecase.h>
+#include <librepcb/library/pkg/cmd/cmdfootprintedit.h>
 #include <librepcb/library/pkg/msg/msgmissingfootprint.h>
 #include <librepcb/library/pkg/msg/msgmissingfootprintname.h>
 #include <librepcb/library/pkg/msg/msgmissingfootprintvalue.h>

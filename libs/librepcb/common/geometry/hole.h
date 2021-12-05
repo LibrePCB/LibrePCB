@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
 
@@ -97,12 +94,6 @@ struct HoleListNameProvider {
 };
 using HoleList =
     SerializableObjectList<Hole, HoleListNameProvider, Hole::Event>;
-using CmdHoleInsert =
-    CmdListElementInsert<Hole, HoleListNameProvider, Hole::Event>;
-using CmdHoleRemove =
-    CmdListElementRemove<Hole, HoleListNameProvider, Hole::Event>;
-using CmdHolesSwap =
-    CmdListElementsSwap<Hole, HoleListNameProvider, Hole::Event>;
 
 /*******************************************************************************
  *  End of File

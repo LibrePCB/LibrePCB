@@ -23,6 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../fileio/cmd/cmdlistelementinsert.h"
+#include "../../fileio/cmd/cmdlistelementremove.h"
+#include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 #include "../text.h"
 
@@ -95,6 +98,17 @@ private:
   Alignment mOldAlign;
   Alignment mNewAlign;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdTextInsert =
+    CmdListElementInsert<Text, TextListNameProvider, Text::Event>;
+using CmdTextRemove =
+    CmdListElementRemove<Text, TextListNameProvider, Text::Event>;
+using CmdTextsSwap =
+    CmdListElementsSwap<Text, TextListNameProvider, Text::Event>;
 
 /*******************************************************************************
  *  End of File

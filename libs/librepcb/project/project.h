@@ -243,8 +243,6 @@ public:
    * @param newIndex      The desired index in the list (after inserting it)
    *
    * @throw Exception     On error
-   *
-   * @undocmd{::librepcb::project::CmdSchematicAdd}
    */
   void addSchematic(Schematic& schematic, int newIndex = -1);
 
@@ -257,8 +255,6 @@ public:
    * dtor!!)
    *
    * @throw Exception     On error
-   *
-   * @undocmd{::librepcb::project::CmdSchematicRemove}
    */
   void removeSchematic(Schematic& schematic, bool deleteSchematic = false);
 
@@ -358,8 +354,6 @@ public:
    * @param newIndex      The desired index in the list (after inserting it)
    *
    * @throw Exception     On error
-   *
-   * @undocmd{::librepcb::project::CmdBoardAdd}
    */
   void addBoard(Board& board, int newIndex = -1);
 
@@ -372,8 +366,6 @@ public:
    * dtor!!)
    *
    * @throw Exception     On error
-   *
-   * @undocmd{::librepcb::project::CmdBoardRemove}
    */
   void removeBoard(Board& board, bool deleteBoard = false);
 

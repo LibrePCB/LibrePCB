@@ -24,9 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../alignment.h"
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../geometry/path.h"
 #include "../graphics/graphicslayername.h"
@@ -235,15 +232,6 @@ struct StrokeTextListNameProvider {
 using StrokeTextList =
     SerializableObjectList<StrokeText, StrokeTextListNameProvider,
                            StrokeText::Event>;
-using CmdStrokeTextInsert =
-    CmdListElementInsert<StrokeText, StrokeTextListNameProvider,
-                         StrokeText::Event>;
-using CmdStrokeTextRemove =
-    CmdListElementRemove<StrokeText, StrokeTextListNameProvider,
-                         StrokeText::Event>;
-using CmdStrokeTextsSwap =
-    CmdListElementsSwap<StrokeText, StrokeTextListNameProvider,
-                        StrokeText::Event>;
 
 /*******************************************************************************
  *  End of File

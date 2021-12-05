@@ -25,6 +25,9 @@
  ******************************************************************************/
 #include "../symbolpin.h"
 
+#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
+#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/undocommand.h>
 
 #include <QtCore>
@@ -91,6 +94,19 @@ private:
   Angle mOldRotation;
   Angle mNewRotation;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdSymbolPinInsert =
+    CmdListElementInsert<SymbolPin, SymbolPinListNameProvider,
+                         SymbolPin::Event>;
+using CmdSymbolPinRemove =
+    CmdListElementRemove<SymbolPin, SymbolPinListNameProvider,
+                         SymbolPin::Event>;
+using CmdSymbolPinsSwap =
+    CmdListElementsSwap<SymbolPin, SymbolPinListNameProvider, SymbolPin::Event>;
 
 /*******************************************************************************
  *  End of File

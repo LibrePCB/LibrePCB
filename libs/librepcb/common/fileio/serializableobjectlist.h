@@ -57,8 +57,8 @@ namespace librepcb {
  * - Method #sortedByUuid() to create a copy of the list with elements sorted by
  *   UUID.
  * - Signals to get notified about added, removed and modified elements.
- * - Undo commands librepcb::CmdListElementInsert,
- *   librepcb::CmdListElementRemove and ibrepcb::CmdListElementsSwap.
+ * - Undo commands ::librepcb::CmdListElementInsert,
+ *   ::librepcb::CmdListElementRemove and ::librepcb::CmdListElementsSwap.
  * - Const correctness: A const list always returns pointers/references to const
  *   elements.
  *

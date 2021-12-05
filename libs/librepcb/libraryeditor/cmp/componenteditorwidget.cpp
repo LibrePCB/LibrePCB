@@ -27,6 +27,7 @@
 
 #include <librepcb/common/widgets/signalrolecombobox.h>
 #include <librepcb/library/cmp/cmd/cmdcomponentedit.h>
+#include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantedit.h>
 #include <librepcb/library/cmp/component.h>
 #include <librepcb/library/cmp/msg/msgmissingcomponentdefaultvalue.h>
 #include <librepcb/library/cmp/msg/msgmissingsymbolvariant.h>

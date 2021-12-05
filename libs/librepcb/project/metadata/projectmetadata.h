@@ -109,8 +109,6 @@ public:
    * @brief Set the name of the project
    *
    * @param newName           The new name
-   *
-   * @undocmd{librepcb::project::CmdProjectMetadataEdit}
    */
   void setName(const ElementName& newName) noexcept;
 
@@ -118,8 +116,6 @@ public:
    * @brief Set the author of the project
    *
    * @param newAuthor         The new author
-   *
-   * @undocmd{librepcb::project::CmdProjectMetadataEdit}
    */
   void setAuthor(const QString& newAuthor) noexcept;
 
@@ -127,8 +123,6 @@ public:
    * @brief Set the version of the project
    *
    * @param newVersion        The new version (can be an arbitrary string)
-   *
-   * @undocmd{librepcb::project::CmdProjectMetadataEdit}
    */
   void setVersion(const QString& newVersion) noexcept;
 
@@ -136,8 +130,6 @@ public:
    * @brief Set all project attributes
    *
    * @param newAttributes     The new list of attributes
-   *
-   * @undocmd{librepcb::project::CmdProjectMetadataEdit}
    */
   void setAttributes(const AttributeList& newAttributes) noexcept;
 

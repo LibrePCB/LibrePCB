@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/geometry/path.h>
 #include <librepcb/common/units/all_length_units.h>
@@ -156,15 +153,6 @@ struct FootprintPadListNameProvider {
 using FootprintPadList =
     SerializableObjectList<FootprintPad, FootprintPadListNameProvider,
                            FootprintPad::Event>;
-using CmdFootprintPadInsert =
-    CmdListElementInsert<FootprintPad, FootprintPadListNameProvider,
-                         FootprintPad::Event>;
-using CmdFootprintPadRemove =
-    CmdListElementRemove<FootprintPad, FootprintPadListNameProvider,
-                         FootprintPad::Event>;
-using CmdFootprintPadsSwap =
-    CmdListElementsSwap<FootprintPad, FootprintPadListNameProvider,
-                        FootprintPad::Event>;
 
 /*******************************************************************************
  *  Non-Member Functions

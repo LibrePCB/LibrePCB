@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/cmd/cmdlistelementinsert.h"
-#include "../fileio/cmd/cmdlistelementremove.h"
-#include "../fileio/cmd/cmdlistelementsswap.h"
 #include "../fileio/serializableobjectlist.h"
 #include "../units/all_length_units.h"
 
@@ -161,12 +158,6 @@ struct NetLineListNameProvider {
 };
 using NetLineList =
     SerializableObjectList<NetLine, NetLineListNameProvider, NetLine::Event>;
-using CmdNetLineInsert =
-    CmdListElementInsert<NetLine, NetLineListNameProvider, NetLine::Event>;
-using CmdNetLineRemove =
-    CmdListElementRemove<NetLine, NetLineListNameProvider, NetLine::Event>;
-using CmdNetLinesSwap =
-    CmdListElementsSwap<NetLine, NetLineListNameProvider, NetLine::Event>;
 
 /*******************************************************************************
  *  Non-Member Functions

@@ -25,9 +25,6 @@
  ******************************************************************************/
 #include "cmpsigpindisplaytype.h"
 
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
 #include <librepcb/common/uuid.h>
 
@@ -117,18 +114,6 @@ using ComponentPinSignalMap =
     SerializableObjectList<ComponentPinSignalMapItem,
                            ComponentPinSignalMapNameProvider,
                            ComponentPinSignalMapItem::Event>;
-using CmdComponentPinSignalMapItemInsert =
-    CmdListElementInsert<ComponentPinSignalMapItem,
-                         ComponentPinSignalMapNameProvider,
-                         ComponentPinSignalMapItem::Event>;
-using CmdComponentPinSignalMapItemRemove =
-    CmdListElementRemove<ComponentPinSignalMapItem,
-                         ComponentPinSignalMapNameProvider,
-                         ComponentPinSignalMapItem::Event>;
-using CmdComponentPinSignalMapItemsSwap =
-    CmdListElementsSwap<ComponentPinSignalMapItem,
-                        ComponentPinSignalMapNameProvider,
-                        ComponentPinSignalMapItem::Event>;
 
 /*******************************************************************************
  *  Class ComponentPinSignalMapHelpers
