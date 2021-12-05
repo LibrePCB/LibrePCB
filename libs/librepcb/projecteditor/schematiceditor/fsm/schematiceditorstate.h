@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "schematiceditorfsm.h"
 
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class GraphicsLayer;
+class LengthUnit;
 class UndoCommand;
 
 namespace project {

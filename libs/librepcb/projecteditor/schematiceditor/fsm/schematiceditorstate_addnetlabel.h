@@ -32,6 +32,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Point;
+
 namespace project {
 
 class CmdSchematicNetLabelEdit;

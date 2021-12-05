@@ -33,6 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class LengthUnit;
+
 namespace Ui {
 class BoardDesignRulesDialog;
 }

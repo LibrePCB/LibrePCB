@@ -26,7 +26,8 @@
 #include "elementname.h"
 #include "exceptions.h"
 #include "fileio/serializableobject.h"
-#include "units/all_length_units.h"
+#include "units/length.h"
+#include "units/ratio.h"
 
 #include <QtCore>
 

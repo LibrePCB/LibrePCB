@@ -35,6 +35,7 @@ namespace librepcb {
 
 class EditableTableWidget;
 class LengthDelegate;
+class LengthUnit;
 class PathModel;
 
 /*******************************************************************************

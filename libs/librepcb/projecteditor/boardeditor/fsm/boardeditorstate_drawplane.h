@@ -26,6 +26,7 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/common/graphics/graphicslayername.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>

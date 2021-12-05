@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
+#include <librepcb/common/units/point.h>
+
 #include <QtCore>
 #include <QtWidgets>
 

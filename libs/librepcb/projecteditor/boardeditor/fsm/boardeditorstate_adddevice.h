@@ -31,6 +31,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Angle;
+
 namespace project {
 
 class BI_Device;

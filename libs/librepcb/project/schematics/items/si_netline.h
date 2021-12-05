@@ -26,6 +26,7 @@
 #include "../graphicsitems/sgi_netline.h"
 #include "si_base.h"
 
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/netline.h>
 
 #include <QtCore>

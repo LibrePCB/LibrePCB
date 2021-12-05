@@ -23,7 +23,13 @@
 #include "newelementwizardcontext.h"
 
 #include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cat/componentcategory.h>
+#include <librepcb/library/cat/packagecategory.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/library.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/sym/symbol.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 #include <librepcb/workspace/workspace.h>
 

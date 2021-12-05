@@ -25,7 +25,6 @@
 #include "ui_newelementwizardpage_copyfrom.h"
 
 #include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/elements.h>
 #include <librepcb/workspace/library/cat/categorytreemodel.h>
 #include <librepcb/workspace/library/workspacelibrarydb.h>
 #include <librepcb/workspace/workspace.h>

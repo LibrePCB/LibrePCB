@@ -24,7 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include "fileio/serializableobject.h"
-#include "units/all_length_units.h"
+#include "units/length.h"
+#include "units/lengthunit.h"
 
 #include <QtCore>
 

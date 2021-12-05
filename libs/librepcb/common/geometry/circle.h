@@ -25,7 +25,8 @@
  ******************************************************************************/
 #include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
-#include "../units/all_length_units.h"
+#include "../units/length.h"
+#include "../units/point.h"
 
 #include <QtCore>
 

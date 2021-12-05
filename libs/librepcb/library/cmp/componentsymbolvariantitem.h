@@ -27,7 +27,8 @@
 #include "componentsymbolvariantitemsuffix.h"
 
 #include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/point.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>

@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>

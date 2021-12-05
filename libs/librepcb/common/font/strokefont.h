@@ -26,6 +26,8 @@
 #include "../alignment.h"
 #include "../fileio/filepath.h"
 #include "../geometry/path.h"
+#include "../units/length.h"
+#include "../units/ratio.h"
 
 #include <QtCore>
 

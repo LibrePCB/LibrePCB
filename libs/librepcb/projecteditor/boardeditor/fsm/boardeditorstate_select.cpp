@@ -43,7 +43,9 @@
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/import/dxfreader.h>
 #include <librepcb/common/undostack.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
 #include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>

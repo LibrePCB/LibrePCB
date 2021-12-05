@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "si_base.h"
 
+#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/common/units/point.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>

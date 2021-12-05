@@ -27,7 +27,10 @@
 #include "../fileio/serializableobjectlist.h"
 #include "../geometry/path.h"
 #include "../graphics/graphicslayername.h"
-#include "../units/all_length_units.h"
+#include "../units/angle.h"
+#include "../units/length.h"
+#include "../units/point.h"
+#include "../units/ratio.h"
 
 #include <QtCore>
 

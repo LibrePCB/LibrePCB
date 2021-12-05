@@ -68,7 +68,6 @@ add_library(
   dev/devicepadsignalmap.h
   dev/msg/msgnopadsindeviceconnected.cpp
   dev/msg/msgnopadsindeviceconnected.h
-  elements.h
   library.cpp
   library.h
   librarybaseelement.cpp

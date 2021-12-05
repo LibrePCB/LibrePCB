@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class LengthUnit;
 class UndoCommand;
 class UndoStack;
 

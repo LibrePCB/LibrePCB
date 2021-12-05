@@ -33,7 +33,7 @@
 #include <librepcb/common/geometry/trace.h>
 #include <librepcb/common/geometry/via.h>
 #include <librepcb/common/signalslot.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/length.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/project/boards/items/bi_plane.h>
 #include <librepcb/project/circuit/circuit.h>

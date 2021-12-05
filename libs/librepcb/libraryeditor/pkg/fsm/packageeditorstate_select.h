@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
+#include <librepcb/common/units/point.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -36,6 +38,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class CmdPolygonEdit;
 class Polygon;
 

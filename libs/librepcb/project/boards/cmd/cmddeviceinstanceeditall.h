@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
 
@@ -33,7 +32,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class CmdStrokeTextEdit;
+class Point;
 
 namespace project {
 

@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
+#include "../units/length.h"
 #include "../uuid.h"
 #include "gerberaperturelist.h"
 #include "gerberattribute.h"
@@ -37,8 +37,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class GerberAttributeWriter;
 class Path;
+class Point;
 
 /*******************************************************************************
  *  Class GerberGenerator

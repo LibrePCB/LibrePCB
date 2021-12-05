@@ -32,7 +32,9 @@
 #include "bi_footprint.h"
 
 #include <librepcb/common/scopeguard.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
 
 #include <QtCore>
 

@@ -27,7 +27,13 @@
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/sqlitedatabase.h>
 #include <librepcb/common/toolbox.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cat/componentcategory.h>
+#include <librepcb/library/cat/packagecategory.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/library.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/sym/symbol.h>
 
 #include <QtCore>
 

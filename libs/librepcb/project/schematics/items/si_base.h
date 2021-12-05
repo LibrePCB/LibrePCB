@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/units/all_length_units.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -34,6 +32,7 @@
 namespace librepcb {
 
 class GraphicsScene;
+class Point;
 
 namespace project {
 

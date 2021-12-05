@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/units/all_length_units.h>
 #include <librepcb/eagleimport/eagletypeconverter.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/library/pkg/packagepad.h>

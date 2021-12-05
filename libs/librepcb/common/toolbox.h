@@ -23,7 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "units/all_length_units.h"
+#include "units/angle.h"
+#include "units/length.h"
+#include "units/point.h"
 
 #include <type_traits>
 

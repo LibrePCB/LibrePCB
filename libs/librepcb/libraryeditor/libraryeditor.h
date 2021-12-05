@@ -28,7 +28,6 @@
 #include <librepcb/common/exceptions.h>
 #include <librepcb/common/fileio/directorylock.h>
 #include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
 #include <QtWidgets>

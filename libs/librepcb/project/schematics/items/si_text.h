@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "si_base.h"
 
+#include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/geometry/text.h>
 
 #include <QtCore>

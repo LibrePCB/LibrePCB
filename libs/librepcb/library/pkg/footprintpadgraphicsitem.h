@@ -25,8 +25,6 @@
  ******************************************************************************/
 #include "../pkg/packagepad.h"
 
-#include <librepcb/common/units/all_length_units.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -35,7 +33,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class IF_GraphicsLayerProvider;
+class Point;
 class PrimitivePathGraphicsItem;
 class PrimitiveTextGraphicsItem;
 

@@ -32,7 +32,9 @@
 #include <librepcb/common/geometry/stroketext.h>
 #include <librepcb/common/geometry/text.h>
 #include <librepcb/common/graphics/graphicslayername.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/length.h>
+#include <librepcb/common/units/point.h>
 #include <librepcb/library/cmp/componentsymbolvariantitemsuffix.h>
 #include <librepcb/library/pkg/footprintpad.h>
 #include <librepcb/library/pkg/packagepad.h>

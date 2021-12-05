@@ -25,7 +25,8 @@
  ******************************************************************************/
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
-#include "../units/all_length_units.h"
+#include "../units/length.h"
+#include "../units/point.h"
 #include "gerberattribute.h"
 
 #include <QtCore>

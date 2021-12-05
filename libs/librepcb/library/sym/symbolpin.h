@@ -25,7 +25,9 @@
  ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
 #include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/length.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 

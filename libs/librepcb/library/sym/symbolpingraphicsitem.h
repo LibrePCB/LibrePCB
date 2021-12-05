@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,8 +34,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
+class Point;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
 

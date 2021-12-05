@@ -27,6 +27,9 @@
 
 #include <librepcb/common/alignment.h>
 #include <librepcb/common/graphics/graphicslayername.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/length.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>

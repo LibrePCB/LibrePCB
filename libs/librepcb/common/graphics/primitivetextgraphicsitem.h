@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../alignment.h"
 #include "../graphics/graphicslayer.h"
-#include "../units/all_length_units.h"
+#include "../units/length.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,6 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Angle;
+class Point;
 
 /*******************************************************************************
  *  Class PrimitiveTextGraphicsItem

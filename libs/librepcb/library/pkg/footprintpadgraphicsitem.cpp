@@ -27,6 +27,9 @@
 #include <librepcb/common/graphics/graphicslayer.h>
 #include <librepcb/common/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/common/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/length.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>

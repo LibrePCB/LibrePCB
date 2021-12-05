@@ -29,7 +29,6 @@
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>
@@ -44,6 +43,7 @@ namespace librepcb {
 
 class GraphicsScene;
 class GridProperties;
+class Point;
 
 namespace project {
 

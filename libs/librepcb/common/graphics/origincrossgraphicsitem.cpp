@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "origincrossgraphicsitem.h"
 
+#include "../units/angle.h"
+#include "../units/point.h"
+
 #include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>

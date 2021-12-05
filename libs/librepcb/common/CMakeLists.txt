@@ -280,7 +280,6 @@ add_library(
   undocommandgroup.h
   undostack.cpp
   undostack.h
-  units/all_length_units.h
   units/angle.cpp
   units/angle.h
   units/length.cpp

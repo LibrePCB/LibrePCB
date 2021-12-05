@@ -26,6 +26,8 @@
 
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/common/graphics/graphicsview.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/point.h>
 #include <librepcb/common/widgets/unsignedlengthedit.h>
 #include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
 #include <librepcb/library/sym/symbol.h>

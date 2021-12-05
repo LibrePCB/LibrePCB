@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
+#include <librepcb/common/units/length.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -32,6 +34,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Angle;
+class Point;
+
 namespace library {
 
 class CmdSymbolPinEdit;

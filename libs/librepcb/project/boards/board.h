@@ -31,7 +31,7 @@
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/fileio/serializableobject.h>
 #include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/length.h>
 #include <librepcb/common/uuid.h>
 
 #include <QPrinter>
@@ -49,6 +49,7 @@ class BoardDesignRules;
 class GraphicsLayer;
 class GraphicsScene;
 class GridProperties;
+class Point;
 
 namespace project {
 

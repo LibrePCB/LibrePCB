@@ -34,6 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+
 namespace project {
 
 class Board;

@@ -27,7 +27,8 @@
 #include "../../fileio/cmd/cmdlistelementremove.h"
 #include "../../fileio/cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
-#include "../../units/all_length_units.h"
+#include "../../units/length.h"
+#include "../../units/point.h"
 #include "../hole.h"
 
 #include <QtCore>
@@ -36,6 +37,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Angle;
 
 /*******************************************************************************
  *  Class CmdHoleEdit

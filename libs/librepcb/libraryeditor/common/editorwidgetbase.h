@@ -27,7 +27,6 @@
 
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/undostack.h>
-#include <librepcb/common/units/all_length_units.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,6 +38,7 @@ namespace librepcb {
 
 class ExclusiveActionGroup;
 class IF_GraphicsLayerProvider;
+class Point;
 class StatusBar;
 class ToolBarProxy;
 class UndoStackActionGroup;

@@ -32,8 +32,10 @@
 #include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/undostack.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
 #include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
+#include <librepcb/library/pkg/package.h>
 #include <librepcb/project/boards/board.h>
 #include <librepcb/project/boards/boardlayerstack.h>
 #include <librepcb/project/boards/items/bi_device.h>

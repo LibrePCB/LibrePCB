@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../geometry/vertex.h"
-#include "../units/all_length_units.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,6 +34,7 @@
 namespace librepcb {
 
 class GraphicsLayer;
+class LengthUnit;
 class Polygon;
 class UndoStack;
 

@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <librepcb/common/attributes/attributeprovider.h>
 #include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 

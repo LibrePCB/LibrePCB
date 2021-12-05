@@ -28,7 +28,10 @@
 #include <librepcb/common/fileio/filepath.h>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/version.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/sym/symbol.h>
 
 #include <QtCore>
 #include <QtWidgets>

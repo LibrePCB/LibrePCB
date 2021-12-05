@@ -29,6 +29,8 @@
 #include <librepcb/common/graphics/holegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/stroketextgraphicsitem.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>

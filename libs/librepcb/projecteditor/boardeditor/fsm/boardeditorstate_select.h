@@ -37,8 +37,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class CmdPolygonEdit;
 class Hole;
+class Point;
 class Polygon;
 class StrokeText;
 class UndoCommandGroup;

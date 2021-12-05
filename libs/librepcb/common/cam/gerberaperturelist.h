@@ -26,7 +26,7 @@
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../geometry/path.h"
-#include "../units/all_length_units.h"
+#include "../units/length.h"
 #include "../uuid.h"
 #include "gerberattribute.h"
 
@@ -38,6 +38,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Angle;
 
 /*******************************************************************************
  *  Class GerberApertureList

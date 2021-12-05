@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "packageeditorfsm.h"
 
-#include <librepcb/common/units/all_length_units.h>
+#include <librepcb/common/units/length.h>
 #include <librepcb/common/utils/toolbarproxy.h>
 
 #include <QtCore>
@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class GraphicsLayer;
+class LengthUnit;
 
 namespace library {
 namespace editor {

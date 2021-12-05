@@ -28,7 +28,10 @@
 #include <librepcb/common/fileio/transactionaldirectory.h>
 #include <librepcb/common/fileio/transactionalfilesystem.h>
 #include <librepcb/common/utils/tangentpathjoiner.h>
-#include <librepcb/library/elements.h>
+#include <librepcb/library/cmp/component.h>
+#include <librepcb/library/dev/device.h>
+#include <librepcb/library/pkg/package.h>
+#include <librepcb/library/sym/symbol.h>
 #include <parseagle/library.h>
 
 #include <QtCore>

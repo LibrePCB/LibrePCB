@@ -28,6 +28,8 @@
 #include <librepcb/common/graphics/circlegraphicsitem.h>
 #include <librepcb/common/graphics/polygongraphicsitem.h>
 #include <librepcb/common/graphics/textgraphicsitem.h>
+#include <librepcb/common/units/angle.h>
+#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>

@@ -23,6 +23,8 @@
 #include "primitivetextgraphicsitem.h"
 
 #include "../application.h"
+#include "../units/angle.h"
+#include "../units/point.h"
 
 #include <QtCore>
 #include <QtWidgets>

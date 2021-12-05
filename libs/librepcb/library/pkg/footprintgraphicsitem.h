@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../pkg/packagepad.h"
 
-#include <librepcb/common/units/all_length_units.h>
 #include <librepcb/common/uuid.h>
 
 #include <QtCore>
@@ -36,11 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class Circle;
 class CircleGraphicsItem;
 class Hole;
 class HoleGraphicsItem;
 class IF_GraphicsLayerProvider;
+class Point;
 class Polygon;
 class PolygonGraphicsItem;
 class StrokeText;
