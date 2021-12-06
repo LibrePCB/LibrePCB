@@ -120,17 +120,20 @@ ControlPanel::ControlPanel(Workspace& workspace)
           this, &ControlPanel::openLibraryEditor);
 
   // build projects file tree
-  mUi->projectTreeView->setModel(&mWorkspace.getProjectTreeModel());
-  mUi->projectTreeView->setRootIndex(mWorkspace.getProjectTreeModel().index(
-      mWorkspace.getProjectsPath().toStr()));
+  mProjectTreeModel.reset(new workspace::ProjectTreeModel(mWorkspace));
+  mUi->projectTreeView->setModel(mProjectTreeModel.data());
+  mUi->projectTreeView->setRootIndex(
+      mProjectTreeModel->index(mWorkspace.getProjectsPath().toStr()));
   for (int i = 1; i < mUi->projectTreeView->header()->count(); ++i) {
     mUi->projectTreeView->hideColumn(i);
   }
 
   // load recent and favorite project models
-  mUi->recentProjectsListView->setModel(&mWorkspace.getRecentProjectsModel());
-  mUi->favoriteProjectsListView->setModel(
-      &mWorkspace.getFavoriteProjectsModel());
+  mRecentProjectsModel.reset(new workspace::RecentProjectsModel(mWorkspace));
+  mUi->recentProjectsListView->setModel(mRecentProjectsModel.data());
+  mFavoriteProjectsModel.reset(
+      new workspace::FavoriteProjectsModel(mWorkspace));
+  mUi->favoriteProjectsListView->setModel(mFavoriteProjectsModel.data());
 
   loadSettings();
 
@@ -295,7 +298,7 @@ ProjectEditor* ControlPanel::openProject(Project& project) noexcept {
               &ControlPanel::openProjectLibraryUpdater);
       mOpenProjectEditors.insert(project.getFilepath().toUnique().toStr(),
                                  editor);
-      mWorkspace.setLastRecentlyUsedProject(project.getFilepath());
+      mRecentProjectsModel->setLastRecentProject(project.getFilepath());
     }
     editor->showAllRequiredEditors();
     return editor;
@@ -327,7 +330,7 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
       connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
               &ControlPanel::openProjectLibraryUpdater);
       mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-      mWorkspace.setLastRecentlyUsedProject(filepath);
+      mRecentProjectsModel->setLastRecentProject(filepath);
     }
     editor->showAllRequiredEditors();
     return editor;
@@ -541,7 +544,7 @@ void ControlPanel::on_actionWorkspace_Settings_triggered() {
 }
 
 void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index) {
-  FilePath fp(mWorkspace.getProjectTreeModel().filePath(index));
+  FilePath fp(mProjectTreeModel->filePath(index));
   if ((fp.getSuffix() == "lpp") || (fp.getFilename() == "README.md")) {
     showProjectReadmeInBrowser(fp.getParentDir());
   } else {
@@ -550,7 +553,7 @@ void ControlPanel::on_projectTreeView_clicked(const QModelIndex& index) {
 }
 
 void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index) {
-  FilePath fp(mWorkspace.getProjectTreeModel().filePath(index));
+  FilePath fp(mProjectTreeModel->filePath(index));
   if (fp.isExistingDir()) {
     mUi->projectTreeView->setExpanded(index,
                                       !mUi->projectTreeView->isExpanded(index));
@@ -565,9 +568,8 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
     const QPoint& pos) {
   // get clicked tree item filepath
   QModelIndex index = mUi->projectTreeView->indexAt(pos);
-  FilePath fp = index.isValid()
-      ? FilePath(mWorkspace.getProjectTreeModel().filePath(index))
-      : mWorkspace.getProjectsPath();
+  FilePath fp = index.isValid() ? FilePath(mProjectTreeModel->filePath(index))
+                                : mWorkspace.getProjectsPath();
   bool isProjectFile = Project::isProjectFile(fp);
   bool isProjectDir = Project::isProjectDirectory(fp);
   bool isInProjectDir = Project::isFilePathInsideProjectDirectory(fp);
@@ -595,7 +597,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
           ->setData(CloseProject);
     }
     menu.addSeparator();
-    if (mWorkspace.isFavoriteProject(fp)) {
+    if (mFavoriteProjectsModel->isFavoriteProject(fp)) {
       menu.addAction(QIcon(":/img/actions/bookmark.png"),
                      tr("Remove from favorites"))
           ->setData(RemoveFavorite);
@@ -638,10 +640,10 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
       closeProject(fp, true);
       break;
     case AddFavorite:
-      mWorkspace.addFavoriteProject(fp);
+      mFavoriteProjectsModel->addFavoriteProject(fp);
       break;
     case RemoveFavorite:
-      mWorkspace.removeFavoriteProject(fp);
+      mFavoriteProjectsModel->removeFavoriteProject(fp);
       break;
     case UpdateLibrary:
       openProjectLibraryUpdater(fp);
@@ -674,8 +676,8 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
           QMessageBox::critical(this, tr("Error"), e.getMsg());
         }
         // something was removed -> update lists of recent and favorite projects
-        mWorkspace.getRecentProjectsModel().updateVisibleProjects();
-        mWorkspace.getFavoriteProjectsModel().updateVisibleProjects();
+        mRecentProjectsModel->updateVisibleProjects();
+        mFavoriteProjectsModel->updateVisibleProjects();
       }
       break;
     }
@@ -712,7 +714,7 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(
   QModelIndex index = mUi->recentProjectsListView->indexAt(pos);
   if (!index.isValid()) return;
 
-  bool isFavorite = mWorkspace.isFavoriteProject(
+  bool isFavorite = mFavoriteProjectsModel->isFavoriteProject(
       FilePath(index.data(Qt::UserRole).toString()));
 
   FilePath fp = FilePath(index.data(Qt::UserRole).toString());
@@ -733,9 +735,9 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(
   QAction* result = menu.exec(QCursor::pos());
   if (result == action) {
     if (isFavorite)
-      mWorkspace.removeFavoriteProject(fp);
+      mFavoriteProjectsModel->removeFavoriteProject(fp);
     else
-      mWorkspace.addFavoriteProject(fp);
+      mFavoriteProjectsModel->addFavoriteProject(fp);
   } else if (result == libraryUpdaterAction) {
     openProjectLibraryUpdater(fp);
   }
@@ -757,7 +759,7 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(
 
   QAction* result = menu.exec(QCursor::pos());
   if (result == removeAction) {
-    mWorkspace.removeFavoriteProject(fp);
+    mFavoriteProjectsModel->removeFavoriteProject(fp);
   } else if (result == libraryUpdaterAction) {
     openProjectLibraryUpdater(fp);
   }

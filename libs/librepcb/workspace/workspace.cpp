@@ -22,10 +22,7 @@
  ******************************************************************************/
 #include "workspace.h"
 
-#include "favoriteprojectsmodel.h"
 #include "library/workspacelibrarydb.h"
-#include "projecttreemodel.h"
-#include "recentprojectsmodel.h"
 #include "settings/workspacesettings.h"
 
 #include <librepcb/common/application.h>
@@ -97,50 +94,9 @@ Workspace::Workspace(const FilePath& wsPath,
 
   // load library database
   mLibraryDb.reset(new WorkspaceLibraryDb(*this));  // can throw
-
-  // load project models
-  mRecentProjectsModel.reset(new RecentProjectsModel(*this));
-  mFavoriteProjectsModel.reset(new FavoriteProjectsModel(*this));
-  mProjectTreeModel.reset(new ProjectTreeModel(*this));
 }
 
 Workspace::~Workspace() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-ProjectTreeModel& Workspace::getProjectTreeModel() const noexcept {
-  return *mProjectTreeModel;
-}
-
-RecentProjectsModel& Workspace::getRecentProjectsModel() const noexcept {
-  return *mRecentProjectsModel;
-}
-
-FavoriteProjectsModel& Workspace::getFavoriteProjectsModel() const noexcept {
-  return *mFavoriteProjectsModel;
-}
-
-/*******************************************************************************
- *  Project Management
- ******************************************************************************/
-
-void Workspace::setLastRecentlyUsedProject(const FilePath& filepath) noexcept {
-  mRecentProjectsModel->setLastRecentProject(filepath);
-}
-
-bool Workspace::isFavoriteProject(const FilePath& filepath) const noexcept {
-  return mFavoriteProjectsModel->isFavoriteProject(filepath);
-}
-
-void Workspace::addFavoriteProject(const FilePath& filepath) noexcept {
-  mFavoriteProjectsModel->addFavoriteProject(filepath);
-}
-
-void Workspace::removeFavoriteProject(const FilePath& filepath) noexcept {
-  mFavoriteProjectsModel->removeFavoriteProject(filepath);
 }
 
 /*******************************************************************************

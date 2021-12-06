@@ -58,8 +58,11 @@ class ProjectEditor;
 }  // namespace project
 
 namespace workspace {
+class FavoriteProjectsModel;
+class ProjectTreeModel;
+class RecentProjectsModel;
 class Workspace;
-}
+}  // namespace workspace
 
 namespace application {
 
@@ -235,6 +238,9 @@ private:
   // Attributes
   workspace::Workspace& mWorkspace;
   QScopedPointer<Ui::ControlPanel> mUi;
+  QScopedPointer<workspace::ProjectTreeModel> mProjectTreeModel;
+  QScopedPointer<workspace::RecentProjectsModel> mRecentProjectsModel;
+  QScopedPointer<workspace::FavoriteProjectsModel> mFavoriteProjectsModel;
   QScopedPointer<library::manager::LibraryManager> mLibraryManager;
   QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
   QHash<FilePath, library::editor::LibraryEditor*> mOpenLibraryEditors;

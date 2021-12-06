@@ -43,9 +43,6 @@ class Project;
 
 namespace workspace {
 
-class FavoriteProjectsModel;
-class ProjectTreeModel;
-class RecentProjectsModel;
 class WorkspaceLibraryDb;
 class WorkspaceSettings;
 
@@ -122,10 +119,6 @@ public:
     return mLibrariesPath.getPathTo("remote");
   }
 
-  ProjectTreeModel& getProjectTreeModel() const noexcept;
-  RecentProjectsModel& getRecentProjectsModel() const noexcept;
-  FavoriteProjectsModel& getFavoriteProjectsModel() const noexcept;
-
   /**
    * @brief Get the workspace settings
    */
@@ -137,38 +130,6 @@ public:
    * @brief Get the workspace library database
    */
   WorkspaceLibraryDb& getLibraryDb() const { return *mLibraryDb; }
-
-  // Project Management
-
-  /**
-   * @brief setLastRecentlyUsedProject
-   * @param filepath
-   */
-  void setLastRecentlyUsedProject(const FilePath& filepath) noexcept;
-
-  /**
-   * @brief Check whether a project is in the favorite project list or not
-   *
-   * @param filepath  The filepath to a *.lpp project file
-   *
-   * @return True if the specified project is in the favorites list, false
-   * otherwise
-   */
-  bool isFavoriteProject(const FilePath& filepath) const noexcept;
-
-  /**
-   * @brief Add a project to the favorite projects list
-   *
-   * @param filepath  The filepath to a *.lpp project file
-   */
-  void addFavoriteProject(const FilePath& filepath) noexcept;
-
-  /**
-   * @brief Remove a project from the favorite projects list
-   *
-   * @param filepath  The filepath to a *.lpp project file
-   */
-  void removeFavoriteProject(const FilePath& filepath) noexcept;
 
   // Operator Overloadings
   Workspace& operator=(const Workspace& rhs) = delete;
@@ -256,15 +217,6 @@ private:  // Data
 
   /// the library database
   QScopedPointer<WorkspaceLibraryDb> mLibraryDb;
-
-  /// a tree model for the whole projects directory
-  QScopedPointer<ProjectTreeModel> mProjectTreeModel;
-
-  /// a list model of all recent projects
-  QScopedPointer<RecentProjectsModel> mRecentProjectsModel;
-
-  /// a list model of all favorite projects
-  QScopedPointer<FavoriteProjectsModel> mFavoriteProjectsModel;
 };
 
 /*******************************************************************************
