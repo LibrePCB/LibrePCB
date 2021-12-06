@@ -48,7 +48,6 @@ namespace librepcb {
 class BoardDesignRules;
 class GraphicsLayer;
 class GraphicsScene;
-class GraphicsView;
 class GridProperties;
 
 namespace project {
@@ -257,7 +256,6 @@ public:
    */
   void print(QPrinter& printer);
   void renderToQPainter(QPainter& painter, int dpi) const;
-  void showInView(GraphicsView& view) noexcept;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
   void selectAll() noexcept;

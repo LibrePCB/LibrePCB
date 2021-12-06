@@ -36,7 +36,6 @@
 #include <librepcb/common/application.h>
 #include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/library/sym/symbolpin.h>
@@ -516,10 +515,6 @@ void Schematic::save() {
   } else {
     mDirectory->removeDirRecursively();  // can throw
   }
-}
-
-void Schematic::showInView(GraphicsView& view) noexcept {
-  view.setScene(mGraphicsScene.data());
 }
 
 void Schematic::selectAll() noexcept {

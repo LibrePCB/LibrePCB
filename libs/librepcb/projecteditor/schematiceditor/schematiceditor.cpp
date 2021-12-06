@@ -297,7 +297,7 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   schematic = mProject.getSchematicByIndex(index);
   if (schematic) {
     // show scene, restore view scene rect, set grid properties
-    schematic->showInView(*mGraphicsView);
+    mGraphicsView->setScene(&schematic->getGraphicsScene());
     mGraphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
     mGraphicsView->setGridProperties(schematic->getGridProperties());
     mUi->statusbar->setLengthUnit(schematic->getGridProperties().getUnit());

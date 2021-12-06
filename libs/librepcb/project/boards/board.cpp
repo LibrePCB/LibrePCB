@@ -50,7 +50,6 @@
 #include <librepcb/common/fileio/sexpression.h>
 #include <librepcb/common/geometry/polygon.h>
 #include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/scopeguardlist.h>
 #include <librepcb/common/toolbox.h>
@@ -927,10 +926,6 @@ void Board::renderToQPainter(QPainter& painter, int dpi) const {
       Length::fromPx(sceneRect.height()).toInch() * dpi);  // can throw
   mGraphicsScene->render(&painter, printerRect, sceneRect,
                          Qt::IgnoreAspectRatio);
-}
-
-void Board::showInView(GraphicsView& view) noexcept {
-  view.setScene(mGraphicsScene.data());
 }
 
 void Board::selectAll() noexcept {

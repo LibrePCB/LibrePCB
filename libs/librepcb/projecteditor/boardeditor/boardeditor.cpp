@@ -335,7 +335,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mActiveBoard = newBoard;
     if (mActiveBoard) {
       // show scene, restore view scene rect, set grid properties
-      mActiveBoard->showInView(*mGraphicsView);
+      mGraphicsView->setScene(&mActiveBoard->getGraphicsScene());
       mGraphicsView->setVisibleSceneRect(mActiveBoard->restoreViewSceneRect());
       mGraphicsView->setGridProperties(mActiveBoard->getGridProperties());
       mUi->statusbar->setLengthUnit(

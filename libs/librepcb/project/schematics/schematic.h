@@ -43,7 +43,6 @@
 namespace librepcb {
 
 class GraphicsScene;
-class GraphicsView;
 class GridProperties;
 
 namespace project {
@@ -175,7 +174,6 @@ public:
   void addToProject();
   void removeFromProject();
   void save();
-  void showInView(GraphicsView& view) noexcept;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
   void selectAll() noexcept;
