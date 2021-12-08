@@ -14,7 +14,7 @@ set -euo pipefail
 #     then be created and used so you don't have to install any dependencies.
 #   - To run docker with sudo, use the "--sudo" parameter.
 #   - Without docker, make sure the executables "git", "clang-format",
-#     "cmake-format" and "xmlsort" are available in PATH.
+#     "cmake-format", "python3" and "xmlsort" are available in PATH.
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, usually you
 #     should not use this!
@@ -63,16 +63,16 @@ fi
 
 COUNTER=0
 
-# Format source files with clang-format.
+# Format source files with clang-format and Python 3.
 clang_format_failed() {
   echo "" >&2
   echo "ERROR: clang-format failed!" >&2
-  echo "  Make sure that clang-format 6 is installed." >&2
+  echo "  Make sure that clang-format 6 and Python 3 are installed." >&2
   echo "  On Linux, you can also run this script in a docker" >&2
   echo "  container by using the '--docker' argument." >&2
   exit 7
 }
-echo "Formatting sources with $CLANGFORMAT..."
+echo "Formatting sources with $CLANGFORMAT and Python..."
 for dir in apps/ libs/librepcb/ tests/unittests/
 do
   if [ "$ALL" == "--all" ]; then
@@ -90,6 +90,43 @@ do
       # not modified! So we only overwrite the files if their content has changed.
       OLD_CONTENT=$(cat "$file")
       NEW_CONTENT=$($CLANGFORMAT -style=file "$file" || clang_format_failed)
+      NEW_CONTENT=$(echo "$NEW_CONTENT" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || clang_format_failed)
+      if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
+      then
+        printf "%s\n" "$NEW_CONTENT" > "$file"
+        echo "[M] $file"
+        COUNTER=$((COUNTER+1))
+      else
+        echo "[ ] $file"
+      fi
+    fi
+  done
+done
+
+# Format *.ui files with Python 3.
+ui_format_failed() {
+  echo "" >&2
+  echo "ERROR: Python failed!" >&2
+  echo "  Make sure that Python 3 is installed." >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+echo "Formatting UI files with Python..."
+for dir in apps/ libs/librepcb/ tests/unittests/
+do
+  if [ "$ALL" == "--all" ]; then
+    TRACKED=$(git ls-files -- "${dir}**.ui")
+  else
+    # Only files which differ from the master branch
+    TRACKED=$(git diff --name-only master -- "${dir}**.ui")
+  fi
+  UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.ui")
+  for file in $TRACKED $UNTRACKED
+  do
+    if [ -f "$file" ]; then
+      OLD_CONTENT=$(cat "$file")
+      NEW_CONTENT=$(echo "$OLD_CONTENT" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || ui_format_failed)
       if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
       then
         printf "%s\n" "$NEW_CONTENT" > "$file"
