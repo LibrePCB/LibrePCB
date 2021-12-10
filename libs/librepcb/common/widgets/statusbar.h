@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_STATUSBAR_H
-#define LIBREPCB_STATUSBAR_H
+#ifndef LIBREPCB_COMMON_STATUSBAR_H
+#define LIBREPCB_COMMON_STATUSBAR_H
 
 /*******************************************************************************
  *  Includes
@@ -92,4 +92,4 @@ private:  // Data
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::StatusBar::Fields)
 
-#endif  // LIBREPCB_STATUSBAR_H
+#endif

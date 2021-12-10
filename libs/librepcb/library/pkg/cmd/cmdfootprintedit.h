@@ -86,4 +86,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDFOOTPRINTEDIT_H
+#endif

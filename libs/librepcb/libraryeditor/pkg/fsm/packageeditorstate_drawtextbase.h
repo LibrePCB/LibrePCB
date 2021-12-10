@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
-#define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
+#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
+#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
 
 /*******************************************************************************
  *  Includes
@@ -36,12 +36,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+class CmdStrokeTextEdit;
 class StrokeText;
 class StrokeTextGraphicsItem;
-class CmdStrokeTextEdit;
 
 namespace library {
-
 namespace editor {
 
 /*******************************************************************************
@@ -121,4 +120,4 @@ private:  // Types / Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
+#endif

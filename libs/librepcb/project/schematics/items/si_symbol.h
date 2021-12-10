@@ -37,15 +37,15 @@
 namespace librepcb {
 
 namespace library {
-class Symbol;
 class ComponentSymbolVariantItem;
+class Symbol;
 }  // namespace library
 
 namespace project {
 
-class Schematic;
 class ComponentInstance;
 class SI_SymbolPin;
+class Schematic;
 
 /*******************************************************************************
  *  Class SI_Symbol
@@ -155,4 +155,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SI_SYMBOL_H
+#endif

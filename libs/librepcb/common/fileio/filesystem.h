@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FILESYSTEM_H
-#define LIBREPCB_FILESYSTEM_H
+#ifndef LIBREPCB_COMMON_FILESYSTEM_H
+#define LIBREPCB_COMMON_FILESYSTEM_H
 
 /*******************************************************************************
  *  Includes
@@ -30,7 +30,6 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
 namespace librepcb {
 
 /*******************************************************************************
@@ -65,4 +64,4 @@ public:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FILESYSTEM_H
+#endif

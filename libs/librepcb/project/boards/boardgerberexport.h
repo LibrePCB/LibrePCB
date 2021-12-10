@@ -36,19 +36,19 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Polygon;
 class Circle;
 class ExcellonGenerator;
 class GerberGenerator;
+class Polygon;
 
 namespace project {
 
-class Project;
-class Board;
-class BI_Via;
 class BI_Footprint;
 class BI_FootprintPad;
+class BI_Via;
+class Board;
 class BoardFabricationOutputSettings;
+class Project;
 
 /*******************************************************************************
  *  Class BoardGerberExport
@@ -148,4 +148,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDGERBEREXPORT_H
+#endif

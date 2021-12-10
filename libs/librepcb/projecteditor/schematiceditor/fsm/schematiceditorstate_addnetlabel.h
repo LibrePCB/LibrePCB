@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
 
 /*******************************************************************************
  *  Includes
@@ -34,9 +34,9 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
-class SI_NetLabel;
 class CmdSchematicNetLabelEdit;
+class SI_NetLabel;
+class Schematic;
 
 namespace editor {
 

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRTYPEINDUCTANCE_H
-#define LIBREPCB_ATTRTYPEINDUCTANCE_H
+#ifndef LIBREPCB_COMMON_ATTRTYPEINDUCTANCE_H
+#define LIBREPCB_COMMON_ATTRTYPEINDUCTANCE_H
 
 /*******************************************************************************
  *  Includes
@@ -68,4 +68,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRTYPEINDUCTANCE_H
+#endif

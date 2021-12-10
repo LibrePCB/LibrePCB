@@ -79,4 +79,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDLIBRARYCATEGORYEDIT_H
+#endif

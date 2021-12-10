@@ -70,4 +70,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGNAMENOTTITLECASE_H
+#endif

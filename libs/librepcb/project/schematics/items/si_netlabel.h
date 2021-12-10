@@ -37,9 +37,9 @@ namespace librepcb {
 namespace project {
 
 class Circuit;
-class Schematic;
 class NetSignal;
 class SI_NetSegment;
+class Schematic;
 
 /*******************************************************************************
  *  Class SI_NetLabel
@@ -112,4 +112,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SI_NETLABEL_H
+#endif

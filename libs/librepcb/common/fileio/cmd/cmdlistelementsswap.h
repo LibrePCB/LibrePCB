@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDLISTELEMENTSSWAP_H
-#define LIBREPCB_CMDLISTELEMENTSSWAP_H
+#ifndef LIBREPCB_COMMON_CMDLISTELEMENTSSWAP_H
+#define LIBREPCB_COMMON_CMDLISTELEMENTSSWAP_H
 
 /*******************************************************************************
  *  Includes
@@ -79,4 +79,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CMDLISTELEMENTSSWAP_H
+#endif

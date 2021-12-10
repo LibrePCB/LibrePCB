@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CLIPPERHELPERS_H
-#define LIBREPCB_CLIPPERHELPERS_H
+#ifndef LIBREPCB_COMMON_CLIPPERHELPERS_H
+#define LIBREPCB_COMMON_CLIPPERHELPERS_H
 
 /*******************************************************************************
  *  Includes
@@ -98,4 +98,4 @@ private:  // Internal Helper Methods
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CLIPPERHELPERS_H
+#endif

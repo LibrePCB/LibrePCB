@@ -37,10 +37,10 @@ class GraphicsScene;
 
 namespace project {
 
-class Project;
 class Circuit;
-class Schematic;
+class Project;
 class SGI_Base;
+class Schematic;
 
 /*******************************************************************************
  *  Class SI_Base
@@ -112,4 +112,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SI_BASE_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_POLYGONGRAPHICSITEM_H
-#define LIBREPCB_POLYGONGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_POLYGONGRAPHICSITEM_H
+#define LIBREPCB_COMMON_POLYGONGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -99,4 +99,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_POLYGONGRAPHICSITEM_H
+#endif

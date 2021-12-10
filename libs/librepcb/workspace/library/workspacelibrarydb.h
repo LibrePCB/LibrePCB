@@ -34,8 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Version;
 class SQLiteDatabase;
+class Version;
 
 namespace workspace {
 
@@ -201,4 +201,4 @@ private:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
+#endif

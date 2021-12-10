@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -184,4 +184,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
+#endif

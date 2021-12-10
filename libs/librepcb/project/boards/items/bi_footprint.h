@@ -43,9 +43,9 @@ class Footprint;
 
 namespace project {
 
-class Board;
 class BI_Device;
 class BI_FootprintPad;
+class Board;
 
 /*******************************************************************************
  *  Class BI_Footprint
@@ -147,4 +147,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_FOOTPRINT_H
+#endif

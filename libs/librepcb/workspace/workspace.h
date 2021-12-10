@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_H
-#define LIBREPCB_WORKSPACE_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACE_H
+#define LIBREPCB_WORKSPACE_WORKSPACE_H
 
 /*******************************************************************************
  *  Includes
@@ -43,11 +43,11 @@ class Project;
 
 namespace workspace {
 
+class FavoriteProjectsModel;
 class ProjectTreeModel;
 class RecentProjectsModel;
-class FavoriteProjectsModel;
-class WorkspaceSettings;
 class WorkspaceLibraryDb;
+class WorkspaceSettings;
 
 /*******************************************************************************
  *  Class Workspace
@@ -274,4 +274,4 @@ private:  // Data
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_H
+#endif

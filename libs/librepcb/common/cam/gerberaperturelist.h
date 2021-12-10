@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GERBERAPERTURELIST_H
-#define LIBREPCB_GERBERAPERTURELIST_H
+#ifndef LIBREPCB_COMMON_GERBERAPERTURELIST_H
+#define LIBREPCB_COMMON_GERBERAPERTURELIST_H
 
 /*******************************************************************************
  *  Includes

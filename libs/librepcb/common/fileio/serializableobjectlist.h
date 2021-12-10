@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SERIALIZABLEOBJECTLIST_H
-#define LIBREPCB_SERIALIZABLEOBJECTLIST_H
+#ifndef LIBREPCB_COMMON_SERIALIZABLEOBJECTLIST_H
+#define LIBREPCB_COMMON_SERIALIZABLEOBJECTLIST_H
 
 /*******************************************************************************
  *  Includes
@@ -508,4 +508,4 @@ public:
  *  End of File
  ******************************************************************************/
 
-#endif  // LIBREPCB_SERIALIZABLEOBJECTLIST_H
+#endif

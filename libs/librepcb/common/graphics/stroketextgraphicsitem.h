@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_STROKETEXTGRAPHICSITEM_H
-#define LIBREPCB_STROKETEXTGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_STROKETEXTGRAPHICSITEM_H
+#define LIBREPCB_COMMON_STROKETEXTGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -34,8 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class OriginCrossGraphicsItem;
 class IF_GraphicsLayerProvider;
+class OriginCrossGraphicsItem;
 
 /*******************************************************************************
  *  Class StrokeTextGraphicsItem
@@ -86,4 +86,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_STROKETEXTGRAPHICSITEM_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FILEDIALOG_H
-#define LIBREPCB_FILEDIALOG_H
+#ifndef LIBREPCB_COMMON_FILEDIALOG_H
+#define LIBREPCB_COMMON_FILEDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -85,4 +85,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FILEDIALOG_H
+#endif

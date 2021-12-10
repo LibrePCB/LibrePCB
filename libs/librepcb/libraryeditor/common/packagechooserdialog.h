@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H
-#define LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H
+#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGECHOOSERDIALOG_H
+#define LIBREPCB_LIBRARYEDITOR_PACKAGECHOOSERDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -43,8 +43,8 @@ class Workspace;
 
 namespace library {
 
-class Package;
 class FootprintPreviewGraphicsItem;
+class Package;
 
 namespace editor {
 
@@ -115,4 +115,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGECHOOSERDIALOG_H
+#endif

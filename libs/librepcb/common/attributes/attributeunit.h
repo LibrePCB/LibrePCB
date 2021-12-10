@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTEUNIT_H
-#define LIBREPCB_ATTRIBUTEUNIT_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTEUNIT_H
+#define LIBREPCB_COMMON_ATTRIBUTEUNIT_H
 
 /*******************************************************************************
  *  Includes
@@ -80,4 +80,4 @@ inline SExpression serialize(const AttributeUnit& obj) {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTEUNIT_H
+#endif

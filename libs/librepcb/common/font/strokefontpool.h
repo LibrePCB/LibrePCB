@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_STROKEFONTPOOL_H
-#define LIBREPCB_STROKEFONTPOOL_H
+#ifndef LIBREPCB_COMMON_STROKEFONTPOOL_H
+#define LIBREPCB_COMMON_STROKEFONTPOOL_H
 
 /*******************************************************************************
  *  Includes
@@ -68,4 +68,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_STROKEFONTPOOL_H
+#endif

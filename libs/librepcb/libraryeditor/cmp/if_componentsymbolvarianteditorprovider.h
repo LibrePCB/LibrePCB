@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER
-#define IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER
+#ifndef LIBREPCB_LIBRARYEDITOR_IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER_H
+#define LIBREPCB_LIBRARYEDITOR_IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER_H
 
 /*******************************************************************************
  *  Includes
@@ -67,4 +67,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER
+#endif

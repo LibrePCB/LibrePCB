@@ -96,4 +96,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BGI_VIA_H
+#endif

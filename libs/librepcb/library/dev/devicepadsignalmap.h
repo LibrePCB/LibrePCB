@@ -147,4 +147,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_DEVICEPADSIGNALMAP_H
+#endif

@@ -38,8 +38,8 @@ class GraphicsLayer;
 
 namespace project {
 
-class Board;
 class BI_Device;
+class Board;
 class NetSignal;
 
 /*******************************************************************************
@@ -168,4 +168,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDDESIGNRULECHECK_H
+#endif

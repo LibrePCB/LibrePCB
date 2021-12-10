@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGMISSINGVALUE_H
-#define LIBREPCB_LIBRARY_MSGMISSINGVALUE_H
+#ifndef LIBREPCB_LIBRARY_MSGMISSINGSYMBOLVALUE_H
+#define LIBREPCB_LIBRARY_MSGMISSINGSYMBOLVALUE_H
 
 /*******************************************************************************
  *  Includes
@@ -58,4 +58,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGMISSINGVALUE_H
+#endif

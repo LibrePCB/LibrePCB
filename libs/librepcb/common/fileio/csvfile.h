@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CSVFILE_H
-#define LIBREPCB_CSVFILE_H
+#ifndef LIBREPCB_COMMON_CSVFILE_H
+#define LIBREPCB_COMMON_CSVFILE_H
 
 /*******************************************************************************
  *  Includes
@@ -147,4 +147,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CSVFILE_H
+#endif

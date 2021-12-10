@@ -100,4 +100,4 @@ signals:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
+#endif

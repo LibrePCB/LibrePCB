@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GERBERGENERATOR_H
-#define LIBREPCB_GERBERGENERATOR_H
+#ifndef LIBREPCB_COMMON_GERBERGENERATOR_H
+#define LIBREPCB_COMMON_GERBERGENERATOR_H
 
 /*******************************************************************************
  *  Includes
@@ -37,8 +37,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Path;
 class GerberAttributeWriter;
+class Path;
 
 /*******************************************************************************
  *  Class GerberGenerator

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_MATHPARSER_H
-#define LIBREPCB_MATHPARSER_H
+#ifndef LIBREPCB_COMMON_MATHPARSER_H
+#define LIBREPCB_COMMON_MATHPARSER_H
 
 /*******************************************************************************
  *  Includes
@@ -94,4 +94,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_MATHPARSER_H
+#endif

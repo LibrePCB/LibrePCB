@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HALIGNACTIONGROUP_H
-#define LIBREPCB_HALIGNACTIONGROUP_H
+#ifndef LIBREPCB_COMMON_HALIGNACTIONGROUP_H
+#define LIBREPCB_COMMON_HALIGNACTIONGROUP_H
 
 /*******************************************************************************
  *  Includes
@@ -78,4 +78,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_HALIGNACTIONGROUP_H
+#endif

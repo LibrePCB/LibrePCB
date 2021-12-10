@@ -227,4 +227,4 @@ inline library::FootprintPad::Shape deserialize(const SExpression& sexpr,
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_FOOTPRINTPAD_H
+#endif

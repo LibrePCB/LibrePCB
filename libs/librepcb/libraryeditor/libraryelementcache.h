@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCACHE_H
-#define LIBREPCB_LIBRARY_EDITOR_LIBRARYELEMENTCACHE_H
+#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCACHE_H
+#define LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCACHE_H
 
 /*******************************************************************************
  *  Includes
@@ -41,12 +41,12 @@ class WorkspaceLibraryDb;
 
 namespace library {
 
+class Component;
 class ComponentCategory;
+class Device;
+class Package;
 class PackageCategory;
 class Symbol;
-class Package;
-class Component;
-class Device;
 
 namespace editor {
 

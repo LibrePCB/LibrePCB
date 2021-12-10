@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
-#define LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
+#ifndef LIBREPCB_COMMON_IF_GRAPHICSVIEWEVENTHANDLER_H
+#define LIBREPCB_COMMON_IF_GRAPHICSVIEWEVENTHANDLER_H
 
 /*******************************************************************************
  *  Includes
@@ -53,4 +53,4 @@ public:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_IF_GRAPHICSVIEWEVENTHANDLER_H
+#endif

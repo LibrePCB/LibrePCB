@@ -78,4 +78,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGSYMBOLPINNOTONGRID_H
+#endif

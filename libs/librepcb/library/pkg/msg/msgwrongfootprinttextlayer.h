@@ -81,4 +81,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGWRONGFOOTPRINTTEXTLAYER_H
+#endif

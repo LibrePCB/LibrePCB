@@ -66,4 +66,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDDESIGNRULECHECKMESSAGE_H
+#endif

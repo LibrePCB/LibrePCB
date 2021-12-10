@@ -79,4 +79,4 @@ private:  // Methods
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
+#endif

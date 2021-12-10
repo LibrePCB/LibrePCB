@@ -37,11 +37,11 @@
 namespace librepcb {
 
 namespace library {
-class LibraryBaseElement;
-class Symbol;
-class Package;
 class Component;
 class Device;
+class LibraryBaseElement;
+class Package;
+class Symbol;
 }  // namespace library
 
 namespace project {
@@ -142,4 +142,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_PROJECTLIBRARY_H
+#endif

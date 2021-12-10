@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EDITABLETABLEWIDGETRECEIVER_H
-#define EDITABLETABLEWIDGETRECEIVER_H
+#ifndef UNITTESTS_COMMON_EDITABLETABLEWIDGETRECEIVER_H
+#define UNITTESTS_COMMON_EDITABLETABLEWIDGETRECEIVER_H
 
 /*******************************************************************************
  *  Includes
@@ -65,4 +65,4 @@ public:
 }  // namespace tests
 }  // namespace librepcb
 
-#endif  // EDITABLETABLEWIDGETRECEIVER_H
+#endif

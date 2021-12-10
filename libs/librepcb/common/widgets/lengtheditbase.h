@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LENGTHEDITBASE_H
-#define LIBREPCB_LENGTHEDITBASE_H
+#ifndef LIBREPCB_COMMON_LENGTHEDITBASE_H
+#define LIBREPCB_COMMON_LENGTHEDITBASE_H
 
 /*******************************************************************************
  *  Includes
@@ -170,4 +170,4 @@ protected:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LENGTHEDITBASE_H
+#endif

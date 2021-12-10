@@ -40,9 +40,9 @@ class Device;
 
 namespace project {
 
+class BI_Device;
 class Board;
 class ComponentInstance;
-class BI_Device;
 
 /*******************************************************************************
  *  Class CmdDeviceInstanceAdd
@@ -78,4 +78,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDDEVICEINSTANCEADD_H
+#endif

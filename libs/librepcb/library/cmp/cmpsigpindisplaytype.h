@@ -150,4 +150,4 @@ inline const library::CmpSigPinDisplayType& deserialize(
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H
+#endif

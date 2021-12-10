@@ -36,10 +36,10 @@
 namespace librepcb {
 namespace project {
 
-class BI_NetSegment;
-class BI_NetPoint;
 class BI_NetLine;
 class BI_NetLineAnchor;
+class BI_NetPoint;
+class BI_NetSegment;
 
 /*******************************************************************************
  *  Class CmdBoardNetSegmentAddElements
@@ -90,4 +90,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADDELEMENTS_H
+#endif

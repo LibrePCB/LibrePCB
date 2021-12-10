@@ -83,4 +83,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDNETCLASSEDIT_H
+#endif

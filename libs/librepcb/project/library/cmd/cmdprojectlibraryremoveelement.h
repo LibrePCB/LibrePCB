@@ -78,4 +78,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDPROJECTLIBRARYREMOVEELEMENT_H
+#endif

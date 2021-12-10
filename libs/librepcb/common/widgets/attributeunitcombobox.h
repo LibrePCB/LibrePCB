@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTEUNITCOMBOBOX_H
-#define LIBREPCB_ATTRIBUTEUNITCOMBOBOX_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTEUNITCOMBOBOX_H
+#define LIBREPCB_COMMON_ATTRIBUTEUNITCOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -77,4 +77,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTEUNITCOMBOBOX_H
+#endif

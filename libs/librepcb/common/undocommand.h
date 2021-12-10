@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_UNDOCOMMAND_H
-#define LIBREPCB_UNDOCOMMAND_H
+#ifndef LIBREPCB_COMMON_UNDOCOMMAND_H
+#define LIBREPCB_COMMON_UNDOCOMMAND_H
 
 /*******************************************************************************
  *  Includes
@@ -140,4 +140,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_UNDOCOMMAND_H
+#endif

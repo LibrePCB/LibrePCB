@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_DOUBLESPINBOX_H
-#define LIBREPCB_DOUBLESPINBOX_H
+#ifndef LIBREPCB_COMMON_DOUBLESPINBOX_H
+#define LIBREPCB_COMMON_DOUBLESPINBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -63,4 +63,4 @@ public:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_DOUBLESPINBOX_H
+#endif

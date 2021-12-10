@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CIRCLEGRAPHICSITEM_H
-#define LIBREPCB_CIRCLEGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_CIRCLEGRAPHICSITEM_H
+#define LIBREPCB_COMMON_CIRCLEGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -76,4 +76,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CIRCLEGRAPHICSITEM_H
+#endif

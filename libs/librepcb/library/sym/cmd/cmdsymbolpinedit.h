@@ -99,4 +99,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
+#endif

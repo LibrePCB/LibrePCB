@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GRIDPROPERTIES_H
-#define LIBREPCB_GRIDPROPERTIES_H
+#ifndef LIBREPCB_COMMON_GRIDPROPERTIES_H
+#define LIBREPCB_COMMON_GRIDPROPERTIES_H
 
 /*******************************************************************************
  *  Includes
@@ -122,4 +122,4 @@ inline GridProperties::Type_t deserialize(const SExpression& sexpr,
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GRIDPROPERTIES_H
+#endif

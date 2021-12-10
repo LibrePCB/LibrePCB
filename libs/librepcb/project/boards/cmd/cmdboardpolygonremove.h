@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_Polygon;
+class Board;
 
 /*******************************************************************************
  *  Class CmdBoardPolygonRemove
@@ -74,4 +74,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDPOLYGONREMOVE_H
+#endif

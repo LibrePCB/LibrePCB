@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMBOBOXDELEGATE_H
-#define LIBREPCB_COMBOBOXDELEGATE_H
+#ifndef LIBREPCB_COMMON_COMBOBOXDELEGATE_H
+#define LIBREPCB_COMMON_COMBOBOXDELEGATE_H
 
 /*******************************************************************************
  *  Includes
@@ -92,4 +92,4 @@ private:  // Data
 
 Q_DECLARE_METATYPE(librepcb::ComboBoxDelegate::Items)
 
-#endif  // LIBREPCB_COMBOBOXDELEGATE_H
+#endif

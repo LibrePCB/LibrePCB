@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_DRAWTRACE_H
-#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORSTATE_DRAWTRACE_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_DRAWTRACE_H
+#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_DRAWTRACE_H
 
 /*******************************************************************************
  *  Includes
@@ -40,13 +40,13 @@ class PositiveLengthEdit;
 
 namespace project {
 
-class NetSignal;
 class BI_FootprintPad;
-class BI_NetPoint;
 class BI_NetLine;
 class BI_NetLineAnchor;
-class BI_Via;
+class BI_NetPoint;
 class BI_NetSegment;
+class BI_Via;
+class NetSignal;
 
 namespace editor {
 

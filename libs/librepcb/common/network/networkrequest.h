@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NETWORKREQUEST_H
-#define LIBREPCB_NETWORKREQUEST_H
+#ifndef LIBREPCB_COMMON_NETWORKREQUEST_H
+#define LIBREPCB_COMMON_NETWORKREQUEST_H
 
 /*******************************************************************************
  *  Includes
@@ -79,4 +79,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NETWORKREQUEST_H
+#endif

@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class SI_NetSegment;
 class NetSignal;
+class SI_NetSegment;
 
 /*******************************************************************************
  *  Class CmdSchematicNetSegmentEdit
@@ -81,4 +81,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTEDIT_H
+#endif

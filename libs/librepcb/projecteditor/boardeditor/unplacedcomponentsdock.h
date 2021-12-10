@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
-#define LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
+#ifndef LIBREPCB_PROJECTEDITOR_UNPLACEDCOMPONENTSDOCK_H
+#define LIBREPCB_PROJECTEDITOR_UNPLACEDCOMPONENTSDOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -34,21 +34,21 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
 class DefaultGraphicsLayerProvider;
+class GraphicsScene;
 
 namespace library {
 class Device;
-class Package;
 class Footprint;
 class FootprintPreviewGraphicsItem;
+class Package;
 }  // namespace library
 
 namespace project {
 
-class Project;
 class Board;
 class ComponentInstance;
+class Project;
 
 namespace editor {
 
@@ -174,4 +174,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_UNPLACEDCOMPONENTSDOCK_H
+#endif

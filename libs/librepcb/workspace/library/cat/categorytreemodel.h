@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
-#define LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
+#ifndef LIBREPCB_WORKSPACE_CATEGORYTREEMODEL_H
+#define LIBREPCB_WORKSPACE_CATEGORYTREEMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -86,4 +86,4 @@ typedef CategoryTreeModel<library::PackageCategory> PackageCategoryTreeModel;
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CATEGORYTREEMODEL_H
+#endif

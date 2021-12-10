@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_SELECT_H
+#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
@@ -36,8 +36,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Polygon;
 class CmdPolygonEdit;
+class Polygon;
 
 namespace library {
 namespace editor {
@@ -143,4 +143,4 @@ private:  // Types / Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
+#endif

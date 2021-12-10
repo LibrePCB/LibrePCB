@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_SELECT_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_SELECT_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
@@ -38,8 +38,8 @@ class Angle;
 namespace project {
 
 class SI_Base;
-class SI_Symbol;
 class SI_NetLabel;
+class SI_Symbol;
 class Schematic;
 
 namespace editor {

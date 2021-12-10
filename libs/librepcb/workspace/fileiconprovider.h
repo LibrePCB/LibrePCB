@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
-#define LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
+#ifndef LIBREPCB_WORKSPACE_FILEICONPROVIDER_H
+#define LIBREPCB_WORKSPACE_FILEICONPROVIDER_H
 
 /*******************************************************************************
  *  Includes
@@ -57,4 +57,4 @@ public:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_LIBREPCBFILEICONPROVIDER_H
+#endif

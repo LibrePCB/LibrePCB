@@ -33,9 +33,9 @@
 namespace librepcb {
 namespace project {
 
-class NetSignal;
-class Board;
 class BI_NetSegment;
+class Board;
+class NetSignal;
 
 /*******************************************************************************
  *  Class CmdBoardNetSegmentAdd
@@ -80,4 +80,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTADD_H
+#endif

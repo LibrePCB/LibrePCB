@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LENGTH_H
-#define LIBREPCB_LENGTH_H
+#ifndef LIBREPCB_COMMON_LENGTH_H
+#define LIBREPCB_COMMON_LENGTH_H
 
 /*******************************************************************************
  *  Includes
@@ -966,4 +966,4 @@ inline uint qHash(const PositiveLength& key, uint seed = 0) noexcept {
 
 Q_DECLARE_METATYPE(librepcb::Length)
 
-#endif  // LIBREPCB_LENGTH_H
+#endif

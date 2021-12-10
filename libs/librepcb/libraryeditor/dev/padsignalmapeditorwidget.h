@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_PADSIGNALMAPEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_PADSIGNALMAPEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_PADSIGNALMAPEDITORWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_PADSIGNALMAPEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -35,8 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class SortFilterProxyModel;
+class UndoStack;
 
 namespace workspace {
 class Workspace;
@@ -87,4 +87,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_PADSIGNALMAPEDITORWIDGET_H
+#endif

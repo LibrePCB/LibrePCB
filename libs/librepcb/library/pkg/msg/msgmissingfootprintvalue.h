@@ -62,4 +62,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGMISSINGFOOTPRINTVALUE_H
+#endif

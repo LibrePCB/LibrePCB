@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CIRCLEPROPERTIESDIALOG_H
-#define LIBREPCB_CIRCLEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_COMMON_CIRCLEPROPERTIESDIALOG_H
+#define LIBREPCB_COMMON_CIRCLEPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,10 +31,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class Circle;
 class GraphicsLayer;
 class LengthUnit;
+class UndoStack;
 
 namespace Ui {
 class CirclePropertiesDialog;
@@ -86,4 +86,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CIRCLEPROPERTIESDIALOG_H
+#endif

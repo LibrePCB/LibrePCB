@@ -100,4 +100,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDLIBRARYBASEELEMENTEDIT_H
+#endif

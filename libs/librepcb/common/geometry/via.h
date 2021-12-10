@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_VIA_H
-#define LIBREPCB_VIA_H
+#ifndef LIBREPCB_COMMON_VIA_H
+#define LIBREPCB_COMMON_VIA_H
 
 /*******************************************************************************
  *  Includes

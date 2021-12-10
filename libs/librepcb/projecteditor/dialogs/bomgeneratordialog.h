@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOMGENERATORDIALOG_H
-#define LIBREPCB_PROJECT_EDITOR_BOMGENERATORDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOMGENERATORDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_BOMGENERATORDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -40,8 +40,8 @@ class Bom;
 
 namespace project {
 
-class Project;
 class Board;
+class Project;
 
 namespace editor {
 
@@ -96,4 +96,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_EDITOR_BOMGENERATORDIALOG_H
+#endif

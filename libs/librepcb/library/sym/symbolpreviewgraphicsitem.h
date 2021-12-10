@@ -34,15 +34,15 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Text;
 class GraphicsLayer;
 class IF_GraphicsLayerProvider;
+class Text;
 
 namespace library {
 
-class Symbol;
 class Component;
 class ComponentSymbolVariantItem;
+class Symbol;
 
 /*******************************************************************************
  *  Class SymbolPreviewGraphicsItem
@@ -123,4 +123,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H
+#endif

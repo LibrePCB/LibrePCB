@@ -102,4 +102,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_PACKAGE_H
+#endif

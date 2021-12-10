@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_BOM_H
-#define LIBREPCB_BOM_H
+#ifndef LIBREPCB_COMMON_BOM_H
+#define LIBREPCB_COMMON_BOM_H
 
 /*******************************************************************************
  *  Includes
@@ -119,4 +119,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_BOM_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICEDITOR_H
-#define LIBREPCB_PROJECT_SCHEMATICEDITOR_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITOR_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITOR_H
 
 /*******************************************************************************
  *  Includes
@@ -35,22 +35,22 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ExclusiveActionGroup;
 class GraphicsView;
 class UndoStackActionGroup;
-class ExclusiveActionGroup;
 
 namespace project {
 
 class Project;
-class Schematic;
 class SI_Symbol;
+class Schematic;
 
 namespace editor {
 
-class ProjectEditor;
-class SchematicPagesDock;
 class ErcMsgDock;
+class ProjectEditor;
 class SchematicEditorFsm;
+class SchematicPagesDock;
 
 namespace Ui {
 class SchematicEditor;
@@ -153,4 +153,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SCHEMATICEDITOR_H
+#endif

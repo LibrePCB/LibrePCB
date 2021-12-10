@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICCLIPBOARDDATA_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICCLIPBOARDDATA_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICCLIPBOARDDATA_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICCLIPBOARDDATA_H
 
 /*******************************************************************************
  *  Includes
@@ -40,8 +40,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class TransactionalFileSystem;
 class TransactionalDirectory;
+class TransactionalFileSystem;
 
 namespace project {
 namespace editor {
@@ -260,4 +260,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_EDITOR_SCHEMATICCLIPBOARDDATA_H
+#endif

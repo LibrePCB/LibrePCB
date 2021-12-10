@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDDRAGSELECTEDBOARDITEMS_H
+#define LIBREPCB_PROJECTEDITOR_CMDDRAGSELECTEDBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -33,17 +33,17 @@
  ******************************************************************************/
 namespace librepcb {
 
+class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
-class CmdHoleEdit;
 
 namespace project {
 
 class Board;
-class CmdDeviceInstanceEdit;
-class CmdBoardViaEdit;
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
+class CmdBoardViaEdit;
+class CmdDeviceInstanceEdit;
 
 namespace editor {
 
@@ -97,4 +97,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDDRAGSELECTEDBOARDITEMS_H
+#endif

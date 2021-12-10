@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_CATEGORYLISTEDITORWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_CATEGORYLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -148,4 +148,4 @@ typedef CategoryListEditorWidget<library::PackageCategory>
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CATEGORYLISTEDITORWIDGET_H
+#endif

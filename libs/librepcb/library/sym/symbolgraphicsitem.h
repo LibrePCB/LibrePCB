@@ -35,11 +35,11 @@
 namespace librepcb {
 
 class Circle;
-class Polygon;
-class Text;
-class IF_GraphicsLayerProvider;
-class PolygonGraphicsItem;
 class CircleGraphicsItem;
+class IF_GraphicsLayerProvider;
+class Polygon;
+class PolygonGraphicsItem;
+class Text;
 class TextGraphicsItem;
 
 namespace library {
@@ -120,4 +120,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOLGRAPHICSITEM_H
+#endif

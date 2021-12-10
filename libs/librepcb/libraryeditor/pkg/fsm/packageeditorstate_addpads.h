@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
-#define LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
+#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_ADDPADS_H
+#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_ADDPADS_H
 
 /*******************************************************************************
  *  Includes
@@ -36,8 +36,8 @@
 namespace librepcb {
 namespace library {
 
-class PackagePad;
 class CmdFootprintPadEdit;
+class PackagePad;
 
 namespace editor {
 
@@ -160,4 +160,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
+#endif

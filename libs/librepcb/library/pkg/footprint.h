@@ -193,4 +193,4 @@ using CmdFootprintsSwap =
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_FOOTPRINT_H
+#endif

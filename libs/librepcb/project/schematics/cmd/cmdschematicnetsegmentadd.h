@@ -34,8 +34,8 @@ namespace librepcb {
 namespace project {
 
 class NetSignal;
-class Schematic;
 class SI_NetSegment;
+class Schematic;
 
 /*******************************************************************************
  *  Class CmdSchematicNetSegmentAdd
@@ -81,4 +81,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADD_H
+#endif

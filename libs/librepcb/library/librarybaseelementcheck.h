@@ -73,4 +73,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_LIBRARYBASEELEMENTCHECK_H
+#endif

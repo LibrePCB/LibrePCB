@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_Hole;
+class Board;
 
 /*******************************************************************************
  *  Class CmdBoardHoleRemove
@@ -74,4 +74,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDHOLEREMOVE_H
+#endif

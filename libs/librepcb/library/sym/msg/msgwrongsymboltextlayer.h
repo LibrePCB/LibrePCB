@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
-#define LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
+#ifndef LIBREPCB_LIBRARY_MSGWRONGSYMBOLTEXTLAYER_H
+#define LIBREPCB_LIBRARY_MSGWRONGSYMBOLTEXTLAYER_H
 
 /*******************************************************************************
  *  Includes
@@ -73,4 +73,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGWRONGSYMBOLNAMELAYER_H
+#endif

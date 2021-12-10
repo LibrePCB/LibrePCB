@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H
-#define LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H
+#ifndef LIBREPCB_LIBRARYMANAGER_ADDLIBRARYWIDGET_H
+#define LIBREPCB_LIBRARYMANAGER_ADDLIBRARYWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -107,4 +107,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_ADDLIBRARYWIDGET_H
+#endif

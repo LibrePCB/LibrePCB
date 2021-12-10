@@ -38,8 +38,8 @@ class IF_GraphicsLayerProvider;
 
 namespace library {
 
-class SymbolPin;
 class ComponentSignal;
+class SymbolPin;
 
 /*******************************************************************************
  *  Class SymbolPinPreviewGraphicsItem
@@ -104,4 +104,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
+#endif

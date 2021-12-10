@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
-#define LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_SYMBOLINSTANCEPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -33,8 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class UndoCommand;
+class UndoStack;
 
 namespace workspace {
 class Workspace;
@@ -42,8 +42,8 @@ class Workspace;
 
 namespace project {
 
-class Project;
 class ComponentInstance;
+class Project;
 class SI_Symbol;
 
 namespace editor {
@@ -102,4 +102,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#endif

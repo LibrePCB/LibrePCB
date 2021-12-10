@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTEDITORWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_COMPONENTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -110,4 +110,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
+#endif

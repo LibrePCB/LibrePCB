@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_Polygon;
+class Board;
 
 /*******************************************************************************
  *  Class CmdBoardPolygonAdd
@@ -76,4 +76,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDPOLYGONADD_H
+#endif

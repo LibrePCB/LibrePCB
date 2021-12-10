@@ -41,16 +41,16 @@ namespace librepcb {
 
 namespace library {
 class Device;
-class Package;
 class Footprint;
+class Package;
 }  // namespace library
 
 namespace project {
 
-class Project;
+class BI_Footprint;
 class Board;
 class ComponentInstance;
-class BI_Footprint;
+class Project;
 
 /*******************************************************************************
  *  Class BI_Device
@@ -165,4 +165,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_DEVICE_H
+#endif

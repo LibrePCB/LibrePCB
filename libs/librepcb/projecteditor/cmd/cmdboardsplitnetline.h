@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDSPLITNETLINE_H
-#define LIBREPCB_PROJECT_CMDSPLITNETLINE_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDBOARDSPLITNETLINE_H
+#define LIBREPCB_PROJECTEDITOR_CMDBOARDSPLITNETLINE_H
 
 /*******************************************************************************
  *  Includes
@@ -78,4 +78,4 @@ private:  // Methods
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSPLITNETLINE_H
+#endif

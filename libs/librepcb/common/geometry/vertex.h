@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_VERTEX_H
-#define LIBREPCB_VERTEX_H
+#ifndef LIBREPCB_COMMON_VERTEX_H
+#define LIBREPCB_COMMON_VERTEX_H
 
 /*******************************************************************************
  *  Includes
@@ -90,4 +90,4 @@ inline uint qHash(const Vertex& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_VERTEX_H
+#endif

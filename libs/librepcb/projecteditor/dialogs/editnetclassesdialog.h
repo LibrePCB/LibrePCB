@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
-#define LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_EDITNETCLASSESDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_EDITNETCLASSESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -87,4 +87,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_EDITNETCLASSESDIALOG_H
+#endif

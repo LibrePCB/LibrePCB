@@ -84,4 +84,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDDEVICEEDIT_H
+#endif

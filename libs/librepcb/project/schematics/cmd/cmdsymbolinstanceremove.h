@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
 class SI_Symbol;
+class Schematic;
 
 /*******************************************************************************
  *  Class CmdSymbolInstanceRemove
@@ -74,4 +74,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEREMOVE_H
+#endif

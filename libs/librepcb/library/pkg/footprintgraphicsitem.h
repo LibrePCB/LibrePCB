@@ -37,14 +37,14 @@
 namespace librepcb {
 
 class Circle;
-class Polygon;
-class StrokeText;
-class Hole;
-class IF_GraphicsLayerProvider;
-class PolygonGraphicsItem;
 class CircleGraphicsItem;
-class StrokeTextGraphicsItem;
+class Hole;
 class HoleGraphicsItem;
+class IF_GraphicsLayerProvider;
+class Polygon;
+class PolygonGraphicsItem;
+class StrokeText;
+class StrokeTextGraphicsItem;
 
 namespace library {
 
@@ -136,4 +136,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_FOOTPRINTGRAPHICSITEM_H
+#endif

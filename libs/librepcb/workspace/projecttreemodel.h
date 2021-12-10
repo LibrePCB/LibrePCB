@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTTREEMODEL_H
-#define LIBREPCB_PROJECTTREEMODEL_H
+#ifndef LIBREPCB_WORKSPACE_PROJECTTREEMODEL_H
+#define LIBREPCB_WORKSPACE_PROJECTTREEMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -68,4 +68,4 @@ public:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECTTREEMODEL_H
+#endif

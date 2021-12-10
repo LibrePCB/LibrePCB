@@ -91,4 +91,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEEDIT_H
+#endif

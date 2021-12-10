@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_RATIOEDIT_H
-#define LIBREPCB_RATIOEDIT_H
+#ifndef LIBREPCB_COMMON_RATIOEDIT_H
+#define LIBREPCB_COMMON_RATIOEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -78,4 +78,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_RATIOEDIT_H
+#endif

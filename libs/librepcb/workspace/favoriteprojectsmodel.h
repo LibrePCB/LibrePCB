@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FAVORITEPROJECTSMODEL_H
-#define LIBREPCB_FAVORITEPROJECTSMODEL_H
+#ifndef LIBREPCB_WORKSPACE_FAVORITEPROJECTSMODEL_H
+#define LIBREPCB_WORKSPACE_FAVORITEPROJECTSMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -83,4 +83,4 @@ private:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FAVORITEPROJECTSMODEL_H
+#endif

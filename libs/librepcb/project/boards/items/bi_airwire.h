@@ -88,4 +88,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_AIRWIRE_H
+#endif

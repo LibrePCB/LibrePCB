@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_PROJECTEDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -33,13 +33,13 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
-class SI_NetSegment;
-class SI_NetPoint;
-class SI_NetLine;
-class SI_NetLabel;
-class SI_Symbol;
 class ComponentSignalInstance;
+class SI_NetLabel;
+class SI_NetLine;
+class SI_NetPoint;
+class SI_NetSegment;
+class SI_Symbol;
+class Schematic;
 
 namespace editor {
 
@@ -81,4 +81,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#endif

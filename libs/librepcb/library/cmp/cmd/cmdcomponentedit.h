@@ -86,4 +86,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDCOMPONENTEDIT_H
+#endif

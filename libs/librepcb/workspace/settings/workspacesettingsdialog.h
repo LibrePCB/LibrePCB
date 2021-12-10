@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACESETTINGSDIALOG_H
-#define LIBREPCB_WORKSPACESETTINGSDIALOG_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGSDIALOG_H
+#define LIBREPCB_WORKSPACE_WORKSPACESETTINGSDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -87,4 +87,4 @@ private:
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACESETTINGSDIALOG_H
+#endif

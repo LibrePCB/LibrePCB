@@ -35,8 +35,8 @@
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
-class PrimitiveCircleGraphicsItem;
 class LineGraphicsItem;
+class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
 
 namespace library {
@@ -95,4 +95,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
+#endif

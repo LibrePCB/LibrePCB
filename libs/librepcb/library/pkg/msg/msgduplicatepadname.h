@@ -61,4 +61,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGDUPLICATEPADNAME_H
+#endif
