@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_BOARDDESIGNRULESDIALOG_H
-#define LIBREPCB_BOARDDESIGNRULESDIALOG_H
+#ifndef LIBREPCB_COMMON_BOARDDESIGNRULESDIALOG_H
+#define LIBREPCB_COMMON_BOARDDESIGNRULESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -86,4 +86,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_BOARDDESIGNRULESDIALOG_H
+#endif

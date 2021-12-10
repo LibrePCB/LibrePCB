@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef UUIDGENERATOR_MAINWINDOW_H
+#define UUIDGENERATOR_MAINWINDOW_H
 
 #include <QMainWindow>
 
@@ -25,4 +25,4 @@ private:
   QTimer* timer;
 };
 
-#endif  // MAINWINDOW_H
+#endif

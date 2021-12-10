@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FILEPATH_H
-#define LIBREPCB_FILEPATH_H
+#ifndef LIBREPCB_COMMON_FILEPATH_H
+#define LIBREPCB_COMMON_FILEPATH_H
 
 /*******************************************************************************
  *  Includes
@@ -482,4 +482,4 @@ inline uint qHash(const FilePath& key, uint seed) noexcept {
 Q_DECLARE_METATYPE(librepcb::FilePath)
 Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::FilePath::CleanFileNameOptions)
 
-#endif  // LIBREPCB_FILEPATH_H
+#endif

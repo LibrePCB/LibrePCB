@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ANGLE_H
-#define LIBREPCB_ANGLE_H
+#ifndef LIBREPCB_COMMON_ANGLE_H
+#define LIBREPCB_COMMON_ANGLE_H
 
 /*******************************************************************************
  *  Includes
@@ -475,4 +475,4 @@ inline uint qHash(const Angle& key, uint seed = 0) noexcept {
 
 Q_DECLARE_METATYPE(librepcb::Angle)
 
-#endif  // LIBREPCB_ANGLE_H
+#endif

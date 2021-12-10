@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NETWORKACCESSMANAGER_H
-#define LIBREPCB_NETWORKACCESSMANAGER_H
+#ifndef LIBREPCB_COMMON_NETWORKACCESSMANAGER_H
+#define LIBREPCB_COMMON_NETWORKACCESSMANAGER_H
 
 /*******************************************************************************
  *  Includes
@@ -91,4 +91,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NETWORKACCESSMANAGER_H
+#endif

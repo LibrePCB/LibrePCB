@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GRAPHICSLAYER_H
-#define LIBREPCB_GRAPHICSLAYER_H
+#ifndef LIBREPCB_COMMON_GRAPHICSLAYER_H
+#define LIBREPCB_COMMON_GRAPHICSLAYER_H
 
 /*******************************************************************************
  *  Includes
@@ -251,4 +251,4 @@ public:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GRAPHICSLAYER_H
+#endif

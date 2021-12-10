@@ -89,4 +89,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_CMDCOMPONENTPINSIGNALMAPITEMEDIT_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_DIRECTORYLOCKHANDLERDIALOG_H
-#define LIBREPCB_DIRECTORYLOCKHANDLERDIALOG_H
+#ifndef LIBREPCB_COMMON_DIRECTORYLOCKHANDLERDIALOG_H
+#define LIBREPCB_COMMON_DIRECTORYLOCKHANDLERDIALOG_H
 
 /*******************************************************************************
  *  Includes

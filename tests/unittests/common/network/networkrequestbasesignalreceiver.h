@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NETWORKREQUESTBASESIGNALRECEIVER_H
-#define NETWORKREQUESTBASESIGNALRECEIVER_H
+#ifndef UNITTESTS_COMMON_NETWORKREQUESTBASESIGNALRECEIVER_H
+#define UNITTESTS_COMMON_NETWORKREQUESTBASESIGNALRECEIVER_H
 
 /*******************************************************************************
  *  Includes
@@ -151,4 +151,4 @@ public:
 }  // namespace tests
 }  // namespace librepcb
 
-#endif  // NETWORKREQUESTBASESIGNALRECEIVER_H
+#endif

@@ -93,4 +93,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDIT_H
+#endif

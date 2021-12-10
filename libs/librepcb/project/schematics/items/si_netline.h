@@ -132,4 +132,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SI_NETLINE_H
+#endif

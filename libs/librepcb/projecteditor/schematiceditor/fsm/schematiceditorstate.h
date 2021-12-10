@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_H
 
 /*******************************************************************************
  *  Includes
@@ -35,8 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoCommand;
 class GraphicsLayer;
+class UndoCommand;
 
 namespace project {
 

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACESETTINGS_H
-#define LIBREPCB_WORKSPACESETTINGS_H
+#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGS_H
+#define LIBREPCB_WORKSPACE_WORKSPACESETTINGS_H
 
 /*******************************************************************************
  *  Includes
@@ -247,4 +247,4 @@ inline workspace::WorkspaceSettings::PdfOpenBehavior deserialize(
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACESETTINGS_H
+#endif

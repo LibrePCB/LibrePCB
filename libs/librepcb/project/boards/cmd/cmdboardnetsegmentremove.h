@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_NetSegment;
+class Board;
 
 /*******************************************************************************
  *  Class CmdBoardNetSegmentRemove
@@ -74,4 +74,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVE_H
+#endif

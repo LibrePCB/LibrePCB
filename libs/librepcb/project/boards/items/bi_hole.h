@@ -39,8 +39,8 @@ class HoleGraphicsItem;
 
 namespace project {
 
-class Project;
 class Board;
+class Project;
 
 /*******************************************************************************
  *  Class BI_Hole
@@ -100,4 +100,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_HOLE_H
+#endif

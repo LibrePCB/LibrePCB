@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SERIALIZABLEKEYVALUEMAP_H
-#define LIBREPCB_SERIALIZABLEKEYVALUEMAP_H
+#ifndef LIBREPCB_COMMON_SERIALIZABLEKEYVALUEMAP_H
+#define LIBREPCB_COMMON_SERIALIZABLEKEYVALUEMAP_H
 
 /*******************************************************************************
  *  Includes
@@ -232,4 +232,4 @@ using LocalizedKeywordsMap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SERIALIZABLEKEYVALUEMAP_H
+#endif

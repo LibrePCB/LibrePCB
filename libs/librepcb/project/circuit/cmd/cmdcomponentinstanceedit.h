@@ -99,4 +99,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEEDIT_H
+#endif

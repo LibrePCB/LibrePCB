@@ -34,10 +34,10 @@
 namespace librepcb {
 namespace project {
 
-class SI_NetSegment;
-class SI_NetPoint;
 class SI_NetLine;
 class SI_NetLineAnchor;
+class SI_NetPoint;
+class SI_NetSegment;
 
 /*******************************************************************************
  *  Class CmdSchematicNetSegmentAddElements
@@ -85,4 +85,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSCHEMATICNETSEGMENTADDELEMENTS_H
+#endif

@@ -36,17 +36,17 @@
 namespace librepcb {
 
 namespace library {
-class SymbolPin;
-class ComponentSignal;
 class ComponentPinSignalMapItem;
+class ComponentSignal;
+class SymbolPin;
 }  // namespace library
 
 namespace project {
 
 class Circuit;
 class ComponentSignalInstance;
-class SI_Symbol;
 class ErcMsg;
+class SI_Symbol;
 
 /*******************************************************************************
  *  Class SI_SymbolPin
@@ -143,4 +143,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SI_SYMBOLPIN_H
+#endif

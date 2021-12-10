@@ -59,4 +59,4 @@ public:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SGI_BASE_H
+#endif

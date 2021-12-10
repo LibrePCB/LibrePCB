@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PLAINTEXTEDIT_H
-#define LIBREPCB_PLAINTEXTEDIT_H
+#ifndef LIBREPCB_COMMON_PLAINTEXTEDIT_H
+#define LIBREPCB_COMMON_PLAINTEXTEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -70,4 +70,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PLAINTEXTEDIT_H
+#endif

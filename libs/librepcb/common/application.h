@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPLICATION_H
-#define LIBREPCB_APPLICATION_H
+#ifndef LIBREPCB_COMMON_APPLICATION_H
+#define LIBREPCB_COMMON_APPLICATION_H
 
 /*******************************************************************************
  *  Includes
@@ -138,4 +138,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_APPLICATION_H
+#endif

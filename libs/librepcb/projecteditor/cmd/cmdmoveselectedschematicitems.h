@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_PROJECTEDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -38,10 +38,10 @@ class CmdTextEdit;
 
 namespace project {
 
-class Schematic;
-class CmdSymbolInstanceEdit;
-class CmdSchematicNetPointEdit;
 class CmdSchematicNetLabelEdit;
+class CmdSchematicNetPointEdit;
+class CmdSymbolInstanceEdit;
+class Schematic;
 
 namespace editor {
 
@@ -89,4 +89,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDMOVESELECTEDSCHEMATICITEMS_H
+#endif

@@ -60,4 +60,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGMISSINGCOMPONENTDEFAULTVALUE_H
+#endif

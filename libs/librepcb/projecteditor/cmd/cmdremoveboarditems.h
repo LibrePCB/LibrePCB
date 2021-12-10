@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDREMOVEBOARDITEMS_H
-#define LIBREPCB_PROJECT_CMDREMOVEBOARDITEMS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDREMOVEBOARDITEMS_H
+#define LIBREPCB_PROJECTEDITOR_CMDREMOVEBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -33,17 +33,17 @@
 namespace librepcb {
 namespace project {
 
-class Board;
 class BI_Device;
-class BI_NetSegment;
-class BI_Via;
-class BI_NetPoint;
+class BI_FootprintPad;
+class BI_Hole;
 class BI_NetLine;
+class BI_NetPoint;
+class BI_NetSegment;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
-class BI_Hole;
-class BI_FootprintPad;
+class BI_Via;
+class Board;
 
 namespace editor {
 
@@ -146,4 +146,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDREMOVEBOARDITEMS_H
+#endif

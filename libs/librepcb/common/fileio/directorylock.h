@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_DIRECTORYLOCK_H
-#define LIBREPCB_DIRECTORYLOCK_H
+#ifndef LIBREPCB_COMMON_DIRECTORYLOCK_H
+#define LIBREPCB_COMMON_DIRECTORYLOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -372,4 +372,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_DIRECTORYLOCK_H
+#endif

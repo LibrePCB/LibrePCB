@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
-#define LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
+#ifndef LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
+#define LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
 
 /*******************************************************************************
  *  Includes
@@ -90,4 +90,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_NEWELEMENTWIZARDPAGE_CHOOSETYPE_H
+#endif

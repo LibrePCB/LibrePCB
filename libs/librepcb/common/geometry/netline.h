@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NETLINE_H
-#define LIBREPCB_NETLINE_H
+#ifndef LIBREPCB_COMMON_NETLINE_H
+#define LIBREPCB_COMMON_NETLINE_H
 
 /*******************************************************************************
  *  Includes

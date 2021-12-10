@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDLISTELEMENTREMOVE_H
-#define LIBREPCB_CMDLISTELEMENTREMOVE_H
+#ifndef LIBREPCB_COMMON_CMDLISTELEMENTREMOVE_H
+#define LIBREPCB_COMMON_CMDLISTELEMENTREMOVE_H
 
 /*******************************************************************************
  *  Includes
@@ -88,4 +88,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CMDLISTELEMENTREMOVE_H
+#endif

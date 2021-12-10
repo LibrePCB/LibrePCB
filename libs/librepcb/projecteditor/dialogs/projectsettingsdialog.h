@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
-#define LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_PROJECTSETTINGSDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_PROJECTSETTINGSDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -37,8 +37,8 @@ class UndoStack;
 
 namespace project {
 
-class ProjectSettings;
 class CmdProjectSettingsChange;
+class ProjectSettings;
 
 namespace editor {
 
@@ -103,4 +103,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_PROJECTSETTINGSDIALOG_H
+#endif

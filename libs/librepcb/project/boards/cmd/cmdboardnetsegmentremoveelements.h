@@ -33,10 +33,10 @@
 namespace librepcb {
 namespace project {
 
+class BI_NetLine;
+class BI_NetPoint;
 class BI_NetSegment;
 class BI_Via;
-class BI_NetPoint;
-class BI_NetLine;
 
 /*******************************************************************************
  *  Class CmdBoardNetSegmentRemoveElements
@@ -82,4 +82,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
+#endif

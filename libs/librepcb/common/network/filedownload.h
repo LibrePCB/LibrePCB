@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FILEDOWNLOAD_H
-#define LIBREPCB_FILEDOWNLOAD_H
+#ifndef LIBREPCB_COMMON_FILEDOWNLOAD_H
+#define LIBREPCB_COMMON_FILEDOWNLOAD_H
 
 /*******************************************************************************
  *  Includes
@@ -133,4 +133,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_FILEDOWNLOAD_H
+#endif

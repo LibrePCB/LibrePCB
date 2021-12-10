@@ -163,4 +163,4 @@ protected:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_LIBRARYBASEELEMENT_H
+#endif

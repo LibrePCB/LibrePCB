@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
-#define LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDLAYERSTACKSETUPDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_BOARDLAYERSTACKSETUPDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -84,4 +84,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
+#endif

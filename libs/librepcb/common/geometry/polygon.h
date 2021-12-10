@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_POLYGON_H
-#define LIBREPCB_POLYGON_H
+#ifndef LIBREPCB_COMMON_POLYGON_H
+#define LIBREPCB_COMMON_POLYGON_H
 
 /*******************************************************************************
  *  Includes
@@ -126,4 +126,4 @@ using CmdPolygonsSwap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_POLYGON_H
+#endif

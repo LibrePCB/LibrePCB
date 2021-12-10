@@ -89,4 +89,4 @@ protected:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_LIBRARYELEMENT_H
+#endif

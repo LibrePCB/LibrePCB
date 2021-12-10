@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H
-#define LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDCOMBINESCHEMATICNETSEGMENTS_H
+#define LIBREPCB_PROJECTEDITOR_CMDCOMBINESCHEMATICNETSEGMENTS_H
 
 /*******************************************************************************
  *  Includes
@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class SI_NetSegment;
 class SI_NetLineAnchor;
+class SI_NetSegment;
 
 namespace editor {
 
@@ -82,4 +82,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCOMBINESCHEMATICNETSEGMENTS_H
+#endif

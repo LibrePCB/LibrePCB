@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITABLELISTMODEL_H
-#define LIBREPCB_EDITABLELISTMODEL_H
+#ifndef LIBREPCB_COMMON_EDITABLELISTMODEL_H
+#define LIBREPCB_COMMON_EDITABLELISTMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -367,4 +367,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_EDITABLELISTMODEL_H
+#endif

@@ -70,4 +70,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGMISSINGSYMBOLVARIANTITEM_H
+#endif

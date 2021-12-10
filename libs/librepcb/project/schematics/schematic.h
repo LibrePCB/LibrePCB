@@ -42,23 +42,23 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GridProperties;
-class GraphicsView;
 class GraphicsScene;
+class GraphicsView;
+class GridProperties;
 
 namespace project {
 
-class Project;
-class NetSignal;
 class ComponentInstance;
+class NetSignal;
+class Project;
 class SI_Base;
+class SI_NetLabel;
+class SI_NetLine;
+class SI_NetPoint;
+class SI_NetSegment;
+class SI_Polygon;
 class SI_Symbol;
 class SI_SymbolPin;
-class SI_NetSegment;
-class SI_NetPoint;
-class SI_NetLine;
-class SI_NetLabel;
-class SI_Polygon;
 class SI_Text;
 class SchematicSelectionQuery;
 
@@ -244,4 +244,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SCHEMATIC_H
+#endif

@@ -36,8 +36,8 @@ class IF_GraphicsLayerProvider;
 
 namespace library {
 
-class PackagePad;
 class FootprintPad;
+class PackagePad;
 
 /*******************************************************************************
  *  Class FootprintPadPreviewGraphicsItem
@@ -93,4 +93,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ANGLEEDIT_H
-#define LIBREPCB_ANGLEEDIT_H
+#ifndef LIBREPCB_COMMON_ANGLEEDIT_H
+#define LIBREPCB_COMMON_ANGLEEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -76,4 +76,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ANGLEEDIT_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_PROJECTEDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -73,4 +73,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDROTATESELECTEDSCHEMATICITEMS_H
+#endif

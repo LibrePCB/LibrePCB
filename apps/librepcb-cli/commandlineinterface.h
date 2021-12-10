@@ -90,4 +90,4 @@ private:  // Data
 }  // namespace cli
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CLI_COMMANDLINEINTERFACE_H
+#endif

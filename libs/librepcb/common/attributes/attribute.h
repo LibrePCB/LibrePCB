@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTE_H
-#define LIBREPCB_ATTRIBUTE_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTE_H
+#define LIBREPCB_COMMON_ATTRIBUTE_H
 
 /*******************************************************************************
  *  Includes
@@ -128,4 +128,4 @@ using CmdAttributesSwap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTE_H
+#endif

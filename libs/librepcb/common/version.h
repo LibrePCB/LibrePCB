@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_VERSION_H
-#define LIBREPCB_VERSION_H
+#ifndef LIBREPCB_COMMON_VERSION_H
+#define LIBREPCB_COMMON_VERSION_H
 
 /*******************************************************************************
  *  Includes
@@ -240,4 +240,4 @@ inline Version deserialize(const SExpression& sexpr,
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_VERSION_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
-#define LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#ifndef LIBREPCB_COMMON_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#define LIBREPCB_COMMON_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
 
 /*******************************************************************************
  *  Includes
@@ -76,4 +76,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
-#define LIBREPCB_PROJECT_EDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
+#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
+#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
 
 /*******************************************************************************
  *  Includes
@@ -44,9 +44,9 @@ class AttributeUnitComboBox;
 
 namespace project {
 
+class CmdSymbolInstanceEdit;
 class ComponentInstance;
 class SI_Symbol;
-class CmdSymbolInstanceEdit;
 
 namespace editor {
 

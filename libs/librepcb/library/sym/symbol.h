@@ -141,4 +141,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOL_H
+#endif

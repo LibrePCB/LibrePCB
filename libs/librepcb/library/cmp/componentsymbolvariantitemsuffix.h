@@ -153,4 +153,4 @@ inline uint qHash(const library::ComponentSymbolVariantItemSuffix& key,
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
+#endif

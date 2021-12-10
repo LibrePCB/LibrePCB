@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LINEGRAPHICSITEM_H
-#define LIBREPCB_LINEGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_LINEGRAPHICSITEM_H
+#define LIBREPCB_COMMON_LINEGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -88,4 +88,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LINEGRAPHICSITEM_H
+#endif

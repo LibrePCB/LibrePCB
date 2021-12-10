@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
-#define LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDADDSYMBOLTOSCHEMATIC_H
+#define LIBREPCB_PROJECTEDITOR_CMDADDSYMBOLTOSCHEMATIC_H
 
 /*******************************************************************************
  *  Includes
@@ -44,9 +44,9 @@ class Symbol;
 
 namespace project {
 
-class Schematic;
 class ComponentInstance;
 class SI_Symbol;
+class Schematic;
 
 namespace editor {
 
@@ -97,4 +97,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDADDSYMBOLTOSCHEMATIC_H
+#endif

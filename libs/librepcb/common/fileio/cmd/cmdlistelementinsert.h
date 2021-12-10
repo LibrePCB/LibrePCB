@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDLISTELEMENTINSERT
-#define LIBREPCB_CMDLISTELEMENTINSERT
+#ifndef LIBREPCB_COMMON_CMDLISTELEMENTINSERT_H
+#define LIBREPCB_COMMON_CMDLISTELEMENTINSERT_H
 
 /*******************************************************************************
  *  Includes
@@ -84,4 +84,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CMDLISTELEMENTINSERT
+#endif

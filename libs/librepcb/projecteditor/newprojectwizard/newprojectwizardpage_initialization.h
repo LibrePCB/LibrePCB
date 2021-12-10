@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
-#define LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
+#ifndef LIBREPCB_PROJECTEDITOR_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
+#define LIBREPCB_PROJECTEDITOR_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
 
 /*******************************************************************************
  *  Includes
@@ -29,7 +29,6 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
 namespace librepcb {
 namespace project {
 namespace editor {
@@ -88,4 +87,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_NEWPROJECTWIZARDPAGE_INITIALIZATION_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H
-#define LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDADDCOMPONENTTOCIRCUIT_H
+#define LIBREPCB_PROJECTEDITOR_CMDADDCOMPONENTTOCIRCUIT_H
 
 /*******************************************************************************
  *  Includes
@@ -43,9 +43,9 @@ class Component;
 
 namespace project {
 
-class Project;
-class ComponentInstance;
 class CmdComponentInstanceAdd;
+class ComponentInstance;
+class Project;
 
 namespace editor {
 
@@ -95,4 +95,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDADDCOMPONENTTOCIRCUIT_H
+#endif

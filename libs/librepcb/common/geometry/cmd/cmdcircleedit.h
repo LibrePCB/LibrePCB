@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDCIRCLEEDIT_H
-#define LIBREPCB_CMDCIRCLEEDIT_H
+#ifndef LIBREPCB_COMMON_CMDCIRCLEEDIT_H
+#define LIBREPCB_COMMON_CMDCIRCLEEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -103,4 +103,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CMDCIRCLEEDIT_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
-#define LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_PROJECTEDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
+#define LIBREPCB_PROJECTEDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -33,13 +33,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class UndoCommand;
+class UndoStack;
 
 namespace project {
 
-class Project;
 class BI_Device;
+class Project;
 
 namespace editor {
 
@@ -95,4 +95,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_EDITOR_DEVICEINSTANCEPROPERTIESDIALOG_H
+#endif

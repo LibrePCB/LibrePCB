@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EXCELLONGENERATOR_H
-#define LIBREPCB_EXCELLONGENERATOR_H
+#ifndef LIBREPCB_COMMON_EXCELLONGENERATOR_H
+#define LIBREPCB_COMMON_EXCELLONGENERATOR_H
 
 /*******************************************************************************
  *  Includes

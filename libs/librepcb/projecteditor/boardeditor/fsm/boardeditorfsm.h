@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_EDITOR_BOARDEDITORFSM_H
-#define LIBREPCB_PROJECT_EDITOR_BOARDEDITORFSM_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORFSM_H
+#define LIBREPCB_PROJECTEDITOR_BOARDEDITORFSM_H
 
 /*******************************************************************************
  *  Includes
@@ -41,8 +41,8 @@ class Workspace;
 
 namespace project {
 
-class Project;
 class ComponentInstance;
+class Project;
 
 namespace editor {
 

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HOLE_H
-#define LIBREPCB_HOLE_H
+#ifndef LIBREPCB_COMMON_HOLE_H
+#define LIBREPCB_COMMON_HOLE_H
 
 /*******************************************************************************
  *  Includes
@@ -110,4 +110,4 @@ using CmdHolesSwap =
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_HOLE_H
+#endif

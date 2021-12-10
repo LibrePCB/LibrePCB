@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PATHMODEL_H
-#define LIBREPCB_PATHMODEL_H
+#ifndef LIBREPCB_COMMON_PATHMODEL_H
+#define LIBREPCB_COMMON_PATHMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -93,4 +93,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PATHMODEL_H
+#endif

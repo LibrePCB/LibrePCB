@@ -75,4 +75,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEREMOVE_H
+#endif

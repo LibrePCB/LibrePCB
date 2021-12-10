@@ -79,4 +79,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_MSGPADOVERLAPSWITHPLACEMENT_H
+#endif

@@ -138,4 +138,4 @@ using CmdSymbolPinsSwap =
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_SYMBOLPIN_H
+#endif

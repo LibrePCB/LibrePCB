@@ -185,4 +185,4 @@ public:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
+#endif

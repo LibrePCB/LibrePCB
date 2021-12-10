@@ -39,13 +39,13 @@ class GraphicsLayer;
 
 namespace project {
 
-class NetSignal;
 class BI_Device;
-class BI_Via;
 class BI_FootprintPad;
-class BI_NetPoint;
 class BI_NetLine;
 class BI_NetLineAnchor;
+class BI_NetPoint;
+class BI_Via;
+class NetSignal;
 
 /*******************************************************************************
  *  Class BI_NetSegment
@@ -190,4 +190,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_NETSEGMENT_H
+#endif

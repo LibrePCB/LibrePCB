@@ -136,4 +136,4 @@ inline uint qHash(const library::ComponentPrefix& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTPREFIX_H
+#endif

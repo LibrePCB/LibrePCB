@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PATHEDITORWIDGET_H
-#define LIBREPCB_PATHEDITORWIDGET_H
+#ifndef LIBREPCB_COMMON_PATHEDITORWIDGET_H
+#define LIBREPCB_COMMON_PATHEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -34,8 +34,8 @@
 namespace librepcb {
 
 class EditableTableWidget;
-class PathModel;
 class LengthDelegate;
+class PathModel;
 
 /*******************************************************************************
  *  Class PathEditorWidget
@@ -75,4 +75,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PATHEDITORWIDGET_H
+#endif

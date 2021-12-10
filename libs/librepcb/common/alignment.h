@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ALIGNMENT_H
-#define LIBREPCB_ALIGNMENT_H
+#ifndef LIBREPCB_COMMON_ALIGNMENT_H
+#define LIBREPCB_COMMON_ALIGNMENT_H
 
 /*******************************************************************************
  *  Includes
@@ -233,4 +233,4 @@ private:
 Q_DECLARE_METATYPE(librepcb::HAlign)
 Q_DECLARE_METATYPE(librepcb::VAlign)
 
-#endif  // LIBREPCB_ALIGNMENT_H
+#endif

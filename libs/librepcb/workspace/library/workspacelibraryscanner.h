@@ -32,12 +32,11 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
 namespace librepcb {
 
-class Uuid;
 class SQLiteDatabase;
 class TransactionalFileSystem;
+class Uuid;
 
 namespace library {
 class Library;
@@ -131,4 +130,4 @@ private:  // Data
 }  // namespace workspace
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_WORKSPACELIBRARYSCANNER_H
+#endif

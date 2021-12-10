@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NORMS_H
-#define LIBREPCB_NORMS_H
+#ifndef LIBREPCB_COMMON_NORMS_H
+#define LIBREPCB_COMMON_NORMS_H
 
 /*******************************************************************************
  *  Includes
@@ -57,4 +57,4 @@ inline QIcon getNormIcon(const QString& norm) noexcept {
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NORMS_H
+#endif

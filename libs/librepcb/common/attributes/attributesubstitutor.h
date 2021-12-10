@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_ATTRIBUTESUBSTITUTOR_H
-#define LIBREPCB_ATTRIBUTESUBSTITUTOR_H
+#ifndef LIBREPCB_COMMON_ATTRIBUTESUBSTITUTOR_H
+#define LIBREPCB_COMMON_ATTRIBUTESUBSTITUTOR_H
 
 /*******************************************************************************
  *  Includes
@@ -118,4 +118,4 @@ private:  // Methods
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_ATTRIBUTESUBSTITUTOR_H
+#endif

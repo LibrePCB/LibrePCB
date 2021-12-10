@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_SQLITEDATABASE_H
-#define LIBREPCB_SQLITEDATABASE_H
+#ifndef LIBREPCB_COMMON_SQLITEDATABASE_H
+#define LIBREPCB_COMMON_SQLITEDATABASE_H
 
 /*******************************************************************************
  *  Includes
@@ -114,4 +114,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_SQLITEDATABASE_H
+#endif

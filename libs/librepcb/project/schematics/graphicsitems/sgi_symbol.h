@@ -33,8 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Text;
 class GraphicsLayer;
+class Text;
 
 namespace library {
 class Symbol;
@@ -105,4 +105,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_SGI_SYMBOL_H
+#endif

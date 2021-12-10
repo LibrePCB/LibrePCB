@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
+#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTPINSIGNALMAPMODEL_H
+#define LIBREPCB_LIBRARYEDITOR_COMPONENTPINSIGNALMAPMODEL_H
 
 /*******************************************************************************
  *  Includes

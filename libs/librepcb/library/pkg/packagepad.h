@@ -118,4 +118,4 @@ using CmdPackagePadsSwap =
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_PACKAGEPAD_H
+#endif

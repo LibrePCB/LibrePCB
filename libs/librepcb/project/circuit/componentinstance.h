@@ -48,11 +48,11 @@ class ComponentSymbolVariant;
 
 namespace project {
 
+class BI_Device;
 class Circuit;
 class ComponentSignalInstance;
-class BI_Device;
-class SI_Symbol;
 class ErcMsg;
+class SI_Symbol;
 
 /*******************************************************************************
  *  Class ComponentInstance
@@ -249,4 +249,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_COMPONENTINSTANCE_H
+#endif

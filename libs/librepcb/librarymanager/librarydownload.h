@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H
-#define LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H
+#ifndef LIBREPCB_LIBRARYMANAGER_LIBRARYDOWNLOAD_H
+#define LIBREPCB_LIBRARYMANAGER_LIBRARYDOWNLOAD_H
 
 /*******************************************************************************
  *  Includes
@@ -113,4 +113,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_WORKSPACE_LIBRARYDOWNLOAD_H
+#endif

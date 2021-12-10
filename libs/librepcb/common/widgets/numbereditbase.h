@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_NUMBEREDITBASE_H
-#define LIBREPCB_NUMBEREDITBASE_H
+#ifndef LIBREPCB_COMMON_NUMBEREDITBASE_H
+#define LIBREPCB_COMMON_NUMBEREDITBASE_H
 
 /*******************************************************************************
  *  Includes
@@ -80,4 +80,4 @@ protected:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_NUMBEREDITBASE_H
+#endif

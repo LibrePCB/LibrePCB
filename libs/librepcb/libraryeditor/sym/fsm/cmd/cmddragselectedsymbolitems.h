@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#define LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
 
 /*******************************************************************************
  *  Includes
@@ -36,8 +36,8 @@
 namespace librepcb {
 
 class CmdCircleEdit;
-class CmdTextEdit;
 class CmdPolygonEdit;
+class CmdTextEdit;
 
 namespace library {
 
@@ -107,4 +107,4 @@ private:
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
+#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
+#define LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
 
 /*******************************************************************************
  *  Includes
@@ -35,8 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
 class EditableTableWidget;
+class UndoStack;
 
 namespace library {
 namespace editor {
@@ -91,4 +91,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
+#endif

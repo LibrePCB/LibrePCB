@@ -44,12 +44,12 @@ class ComponentSignal;
 
 namespace project {
 
-class ComponentInstance;
-class SI_SymbolPin;
 class BI_FootprintPad;
-class NetSignal;
 class Circuit;
+class ComponentInstance;
 class ErcMsg;
+class NetSignal;
+class SI_SymbolPin;
 
 /*******************************************************************************
  *  Class ComponentSignalInstance
@@ -166,4 +166,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
+#endif

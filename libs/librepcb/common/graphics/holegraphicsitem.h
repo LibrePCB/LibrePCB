@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_HOLEGRAPHICSITEM_H
-#define LIBREPCB_HOLEGRAPHICSITEM_H
+#ifndef LIBREPCB_COMMON_HOLEGRAPHICSITEM_H
+#define LIBREPCB_COMMON_HOLEGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -34,8 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class OriginCrossGraphicsItem;
 class IF_GraphicsLayerProvider;
+class OriginCrossGraphicsItem;
 
 /*******************************************************************************
  *  Class HoleGraphicsItem
@@ -83,4 +83,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_HOLEGRAPHICSITEM_H
+#endif

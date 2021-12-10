@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
-#define LIBREPCB_LIBRARY_EDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
+#ifndef LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
+#define LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
 
 /*******************************************************************************
  *  Includes

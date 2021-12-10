@@ -39,8 +39,8 @@ namespace librepcb {
 namespace project {
 
 class Circuit;
-class NetSignal;
 class ErcMsg;
+class NetSignal;
 
 /*******************************************************************************
  *  Class NetClass
@@ -115,4 +115,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_NETCLASS_H
+#endif

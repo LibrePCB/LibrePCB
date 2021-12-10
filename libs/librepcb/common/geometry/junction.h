@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_JUNCTION_H
-#define LIBREPCB_JUNCTION_H
+#ifndef LIBREPCB_COMMON_JUNCTION_H
+#define LIBREPCB_COMMON_JUNCTION_H
 
 /*******************************************************************************
  *  Includes

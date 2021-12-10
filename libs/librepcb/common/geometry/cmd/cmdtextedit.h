@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CMDTEXTEDIT_H
-#define LIBREPCB_CMDTEXTEDIT_H
+#ifndef LIBREPCB_COMMON_CMDTEXTEDIT_H
+#define LIBREPCB_COMMON_CMDTEXTEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -102,4 +102,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_CMDTEXTEDIT_H
+#endif

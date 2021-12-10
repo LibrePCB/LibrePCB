@@ -33,9 +33,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class GraphicsLayer;
 class Path;
 class Polygon;
-class GraphicsLayer;
 
 namespace project {
 
@@ -110,4 +110,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BGI_PLANE_H
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GRAPHICSVIEW_H
-#define LIBREPCB_GRAPHICSVIEW_H
+#ifndef LIBREPCB_COMMON_GRAPHICSVIEW_H
+#define LIBREPCB_COMMON_GRAPHICSVIEW_H
 
 /*******************************************************************************
  *  Includes
@@ -33,9 +33,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsViewEventHandler;
 class GraphicsScene;
 class GridProperties;
+class IF_GraphicsViewEventHandler;
 
 /*******************************************************************************
  *  Class GraphicsView
@@ -140,4 +140,4 @@ private:
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_GRAPHICSVIEW_H
+#endif

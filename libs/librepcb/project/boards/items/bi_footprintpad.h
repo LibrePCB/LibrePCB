@@ -37,8 +37,8 @@
 namespace librepcb {
 
 namespace library {
-class FootprintPad;
 class ComponentSignal;
+class FootprintPad;
 }  // namespace library
 
 namespace project {
@@ -152,4 +152,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
+#endif

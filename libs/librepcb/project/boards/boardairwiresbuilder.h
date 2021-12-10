@@ -33,8 +33,8 @@
 namespace librepcb {
 namespace project {
 
-class NetSignal;
 class Board;
+class NetSignal;
 
 /*******************************************************************************
  *  Class BoardAirWiresBuilder
@@ -69,4 +69,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H
+#endif

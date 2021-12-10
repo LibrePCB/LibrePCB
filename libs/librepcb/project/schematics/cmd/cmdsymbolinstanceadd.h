@@ -35,9 +35,9 @@
 namespace librepcb {
 namespace project {
 
-class Schematic;
 class ComponentInstance;
 class SI_Symbol;
+class Schematic;
 
 /*******************************************************************************
  *  Class CmdSymbolInstanceAdd
@@ -73,4 +73,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDSYMBOLINSTANCEADD_H
+#endif

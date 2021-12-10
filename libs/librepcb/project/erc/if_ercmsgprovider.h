@@ -73,4 +73,4 @@ public:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
+#endif

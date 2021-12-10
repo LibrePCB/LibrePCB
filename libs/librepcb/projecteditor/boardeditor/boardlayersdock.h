@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDLAYERDOCK_H
-#define LIBREPCB_PROJECT_BOARDLAYERDOCK_H
+#ifndef LIBREPCB_PROJECTEDITOR_BOARDLAYERSDOCK_H
+#define LIBREPCB_PROJECTEDITOR_BOARDLAYERSDOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -35,9 +35,9 @@ class GraphicsLayer;
 
 namespace project {
 
-class Project;
 class Board;
 class ComponentInstance;
+class Project;
 
 namespace editor {
 
@@ -103,4 +103,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BOARDLAYERDOCK_H
+#endif

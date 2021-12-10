@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_EDITORWIDGETBASE_H
-#define LIBREPCB_LIBRARY_EDITOR_EDITORWIDGETBASE_H
+#ifndef LIBREPCB_LIBRARYEDITOR_EDITORWIDGETBASE_H
+#define LIBREPCB_LIBRARYEDITOR_EDITORWIDGETBASE_H
 
 /*******************************************************************************
  *  Includes
@@ -38,10 +38,10 @@
 namespace librepcb {
 
 class ExclusiveActionGroup;
-class UndoStackActionGroup;
-class ToolBarProxy;
-class StatusBar;
 class IF_GraphicsLayerProvider;
+class StatusBar;
+class ToolBarProxy;
+class UndoStackActionGroup;
 
 namespace workspace {
 class Workspace;
@@ -197,4 +197,4 @@ protected:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_EDITOR_EDITORWIDGETBASE_H
+#endif

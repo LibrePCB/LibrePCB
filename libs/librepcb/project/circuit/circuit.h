@@ -46,10 +46,10 @@ class Component;
 
 namespace project {
 
-class Project;
+class ComponentInstance;
 class NetClass;
 class NetSignal;
-class ComponentInstance;
+class Project;
 
 /*******************************************************************************
  *  Class Circuit
@@ -159,4 +159,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CIRCUIT_H
+#endif

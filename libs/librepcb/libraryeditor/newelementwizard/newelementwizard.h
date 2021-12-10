@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NEWELEMENTWIZARD_H
-#define NEWELEMENTWIZARD_H
+#ifndef LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARD_H
+#define LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARD_H
 
 /*******************************************************************************
  *  Includes
@@ -101,4 +101,4 @@ private:  // Data
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // NEWELEMENTWIZARD_H
+#endif

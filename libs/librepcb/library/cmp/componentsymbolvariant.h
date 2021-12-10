@@ -167,4 +167,4 @@ using CmdComponentSymbolVariantsSwap =
 }  // namespace library
 }  // namespace librepcb
 
-#endif  // LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANT_H
+#endif

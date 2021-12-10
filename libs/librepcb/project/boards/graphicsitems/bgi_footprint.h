@@ -33,8 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class StrokeText;
 class GraphicsLayer;
+class StrokeText;
 
 namespace library {
 class Footprint;
@@ -94,4 +94,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_BGI_FOOTPRINT_H
+#endif

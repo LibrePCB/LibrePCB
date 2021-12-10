@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_POLYGONPROPERTIESDIALOG_H
-#define LIBREPCB_POLYGONPROPERTIESDIALOG_H
+#ifndef LIBREPCB_COMMON_POLYGONPROPERTIESDIALOG_H
+#define LIBREPCB_COMMON_POLYGONPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -34,9 +34,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-class Polygon;
 class GraphicsLayer;
+class Polygon;
+class UndoStack;
 
 namespace Ui {
 class PolygonPropertiesDialog;
@@ -89,4 +89,4 @@ private:  // Data
 
 }  // namespace librepcb
 
-#endif  // LIBREPCB_POLYGONPROPERTIESDIALOG_H
+#endif

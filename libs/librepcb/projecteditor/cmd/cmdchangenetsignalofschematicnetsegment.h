@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
-#define LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#ifndef LIBREPCB_PROJECTEDITOR_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#define LIBREPCB_PROJECTEDITOR_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
 
 /*******************************************************************************
  *  Includes
@@ -35,8 +35,8 @@
 namespace librepcb {
 namespace project {
 
-class NetSignal;
 class ComponentSignalInstance;
+class NetSignal;
 class SI_NetSegment;
 
 namespace editor {
@@ -82,4 +82,4 @@ private:
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#endif

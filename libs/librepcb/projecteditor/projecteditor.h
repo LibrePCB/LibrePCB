@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTEDITOR_H
-#define LIBREPCB_PROJECT_PROJECTEDITOR_H
+#ifndef LIBREPCB_PROJECTEDITOR_PROJECTEDITOR_H
+#define LIBREPCB_PROJECTEDITOR_PROJECTEDITOR_H
 
 /*******************************************************************************
  *  Includes
@@ -37,8 +37,8 @@ class QMainWindow;
 
 namespace librepcb {
 
-class UndoStack;
 class LengthUnit;
+class UndoStack;
 
 namespace workspace {
 class Workspace;
@@ -46,13 +46,13 @@ class Workspace;
 
 namespace project {
 
-class Project;
 class Board;
+class Project;
 
 namespace editor {
 
-class SchematicEditor;
 class BoardEditor;
+class SchematicEditor;
 
 /*******************************************************************************
  *  Class ProjectEditor
@@ -247,4 +247,4 @@ private:  // Data
 }  // namespace project
 }  // namespace librepcb
 
-#endif  // LIBREPCB_PROJECT_PROJECTEDITOR_H
+#endif
