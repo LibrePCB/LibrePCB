@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_POINT_H
-#define LIBREPCB_COMMON_POINT_H
+#ifndef LIBREPCB_CORE_POINT_H
+#define LIBREPCB_CORE_POINT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobject.h"
+#include "../serialization/serializableobject.h"
 #include "length.h"
 
 #include <QtCore>
@@ -395,7 +395,7 @@ public:
   Point& mirror(Qt::Orientation orientation,
                 const Point& center = Point(0, 0)) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Static Functions

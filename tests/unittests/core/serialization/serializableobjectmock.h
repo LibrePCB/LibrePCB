@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNITTESTS_COMMON_SERIALIZABLEOBJECTMOCK_H
-#define UNITTESTS_COMMON_SERIALIZABLEOBJECTMOCK_H
+#ifndef UNITTESTS_CORE_SERIALIZABLEOBJECTMOCK_H
+#define UNITTESTS_CORE_SERIALIZABLEOBJECTMOCK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 
 #include <gmock/gmock.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/signalslot.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/serialization/serializableobject.h>
+#include <librepcb/core/types/uuid.h>
+#include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
 

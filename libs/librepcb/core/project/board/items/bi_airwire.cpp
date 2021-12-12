@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -88,5 +87,4 @@ bool BI_AirWire::isSelectable() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

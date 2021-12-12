@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "symboleditorstate_drawcircle.h"
 
+#include "../../../cmd/cmdcircleedit.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/unsignedlengthedit.h"
 #include "../symboleditorwidget.h"
 
-#include <librepcb/common/geometry/circle.h>
-#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -263,5 +262,4 @@ void SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

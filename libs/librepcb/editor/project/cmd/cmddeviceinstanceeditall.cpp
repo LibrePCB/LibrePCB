@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "cmddeviceinstanceeditall.h"
 
-#include "../items/bi_device.h"
-#include "../items/bi_footprint.h"
-#include "../items/bi_stroketext.h"
+#include "../../cmd/cmdstroketextedit.h"
 #include "cmddeviceinstanceedit.h"
 
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
 
 #include <QtCore>
 
@@ -35,7 +35,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -112,5 +112,5 @@ void CmdDeviceInstanceEditAll::mirror(const Point& center,
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

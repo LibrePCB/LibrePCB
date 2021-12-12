@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
-#define LIBREPCB_PROJECT_IF_ERCMSGPROVIDER_H
+#ifndef LIBREPCB_CORE_IF_ERCMSGPROVIDER_H
+#define LIBREPCB_CORE_IF_ERCMSGPROVIDER_H
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class ErcMsg;  // all classes which implement IF_ErcMsgProvider will need this
                // declaration
@@ -34,9 +33,9 @@ class ErcMsg;  // all classes which implement IF_ErcMsgProvider will need this
  ******************************************************************************/
 
 /**
- * @note    The specified class name should be unique only in the namespace
- * ::librepcb::project, so we won't use the namespace as a prefix. Simple use
- * the class name.
+ * @note    The specified class name should be unique within the whole core
+ *          library, so we won't use the namespace as a prefix. Simple use
+ *          the class name.
  *
  * @warning Do not change the name of an existing class if you don't know what
  * you're doing!
@@ -70,7 +69,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

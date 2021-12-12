@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYOVERVIEWWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_LIBRARYOVERVIEWWIDGET_H
+#ifndef LIBREPCB_EDITOR_LIBRARYOVERVIEWWIDGET_H
+#define LIBREPCB_EDITOR_LIBRARYOVERVIEWWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/editorwidgetbase.h"
+#include "../editorwidgetbase.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class Library;
 
@@ -150,7 +149,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

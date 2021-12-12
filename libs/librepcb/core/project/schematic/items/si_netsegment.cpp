@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "si_netsegment.h"
 
+#include "../../../utils/scopeguardlist.h"
+#include "../../../utils/toolbox.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -33,16 +35,12 @@
 #include "si_symbol.h"
 #include "si_symbolpin.h"
 
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/common/toolbox.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -605,5 +603,4 @@ void SI_NetSegment::findAllConnectedNetPoints(
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

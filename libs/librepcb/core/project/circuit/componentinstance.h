@@ -17,20 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_COMPONENTINSTANCE_H
-#define LIBREPCB_PROJECT_COMPONENTINSTANCE_H
+#ifndef LIBREPCB_CORE_COMPONENTINSTANCE_H
+#define LIBREPCB_CORE_COMPONENTINSTANCE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../attribute/attribute.h"
+#include "../../attribute/attributeprovider.h"
+#include "../../serialization/serializableobject.h"
+#include "../../types/circuitidentifier.h"
+#include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
-
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -39,18 +37,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class DomElement;
-
-namespace library {
-class Component;
-class ComponentSymbolVariant;
-}  // namespace library
-
-namespace project {
-
 class BI_Device;
 class Circuit;
+class Component;
 class ComponentSignalInstance;
+class ComponentSymbolVariant;
 class ErcMsg;
 class SI_Symbol;
 
@@ -75,7 +66,7 @@ public:
   ComponentInstance(Circuit& circuit, const SExpression& node,
                     const Version& fileFormat);
   explicit ComponentInstance(
-      Circuit& circuit, const library::Component& cmp, const Uuid& symbVar,
+      Circuit& circuit, const Component& cmp, const Uuid& symbVar,
       const CircuitIdentifier& name,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt);
   ~ComponentInstance() noexcept;
@@ -87,10 +78,8 @@ public:
   const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {
     return mDefaultDeviceUuid;
   }
-  const library::Component& getLibComponent() const noexcept {
-    return *mLibComponent;
-  }
-  const library::ComponentSymbolVariant& getSymbolVariant() const noexcept {
+  const Component& getLibComponent() const noexcept { return *mLibComponent; }
+  const ComponentSymbolVariant& getSymbolVariant() const noexcept {
     return *mCompSymbVar;
   }
   ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const
@@ -118,7 +107,7 @@ public:
    * @warning You have to check if there is no other component with the same
    * name in the whole circuit! This method will not check if the name is
    * unique. The best way to do this is to call
-   * ::librepcb::project::Circuit::setComponentInstanceName().
+   * ::librepcb::Circuit::setComponentInstanceName().
    *
    * @param name  The new name of this component in the circuit
    */
@@ -148,16 +137,16 @@ public:
   void registerDevice(BI_Device& device);
   void unregisterDevice(BI_Device& device);
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
   QString getUserDefinedAttributeValue(const QString& key) const
       noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -196,10 +185,10 @@ private:
   tl::optional<Uuid> mDefaultDeviceUuid;
 
   /// @brief Pointer to the component in the project's library
-  const library::Component* mLibComponent;
+  const Component* mLibComponent;
 
   /// @brief Pointer to the used symbol variant of #mLibComponent
-  const library::ComponentSymbolVariant* mCompSymbVar;
+  const ComponentSymbolVariant* mCompSymbVar;
 
   /// @brief All attributes of this component
   QScopedPointer<AttributeList> mAttributes;
@@ -213,7 +202,7 @@ private:
    * @brief All registered symbols
    *
    * - Key:   UUID of the symbol variant item
-   * (::librepcb::library::ComponentSymbolVariantItem)
+   * (::librepcb::ComponentSymbolVariantItem)
    * - Value: Pointer to the registered symbol
    *
    * @see #registerSymbol(), #unregisterSymbol()
@@ -240,7 +229,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNITTESTS_COMMON_ATTRIBUTEPROVIDERDUMMY_H
-#define UNITTESTS_COMMON_ATTRIBUTEPROVIDERDUMMY_H
+#ifndef UNITTESTS_CORE_ATTRIBUTEPROVIDERDUMMY_H
+#define UNITTESTS_CORE_ATTRIBUTEPROVIDERDUMMY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
+#include <librepcb/core/attribute/attributeprovider.h>
 
 #include <QtCore>
 

@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H
-#define LIBREPCB_PROJECT_BOARDSELECTIONQUERY_H
+#ifndef LIBREPCB_CORE_BOARDSELECTIONQUERY_H
+#define LIBREPCB_CORE_BOARDSELECTIONQUERY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/uuid.h>
+#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -32,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_Device;
 class BI_Footprint;
@@ -156,7 +154,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

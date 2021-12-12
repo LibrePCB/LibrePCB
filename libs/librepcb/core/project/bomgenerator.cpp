@@ -22,16 +22,15 @@
  ******************************************************************************/
 #include "bomgenerator.h"
 
-#include "boards/board.h"
-#include "boards/items/bi_device.h"
+#include "../export/bom.h"
+#include "../library/cmp/component.h"
+#include "../library/dev/device.h"
+#include "../library/pkg/package.h"
+#include "board/board.h"
+#include "board/items/bi_device.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "project.h"
-
-#include <librepcb/common/bom/bom.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -93,5 +91,4 @@ std::shared_ptr<Bom> BomGenerator::generate(const Board* board) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

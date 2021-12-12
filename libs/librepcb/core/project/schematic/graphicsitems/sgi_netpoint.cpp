@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 QRectF SGI_NetPoint::sBoundingRect;
 
@@ -137,5 +136,4 @@ GraphicsLayer* SGI_NetPoint::getLayer(const QString& name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

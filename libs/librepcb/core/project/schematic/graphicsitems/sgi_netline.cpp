@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "sgi_netline.h"
 
+#include "../../../application.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../items/si_netline.h"
 #include "../items/si_netpoint.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-
-#include <librepcb/common/application.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -139,5 +137,4 @@ GraphicsLayer* SGI_NetLine::getLayer(const QString& name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

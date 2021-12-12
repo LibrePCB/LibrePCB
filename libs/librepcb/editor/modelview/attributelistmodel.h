@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ATTRIBUTELISTMODEL_H
-#define LIBREPCB_COMMON_ATTRIBUTELISTMODEL_H
+#ifndef LIBREPCB_EDITOR_ATTRIBUTELISTMODEL_H
+#define LIBREPCB_EDITOR_ATTRIBUTELISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../model/comboboxdelegate.h"
-#include "attribute.h"
+#include "../modelview/comboboxdelegate.h"
+
+#include <librepcb/core/attribute/attribute.h>
 
 #include <QtCore>
 
@@ -32,6 +33,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class UndoCommand;
 class UndoStack;
@@ -112,6 +114,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "librarydownload.h"
 
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/network/filedownload.h>
-#include <librepcb/library/library.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/network/filedownload.h>
 
 #include <QtCore>
 
@@ -32,8 +32,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -194,8 +193,7 @@ void LibraryDownload::downloadSucceeded() noexcept {
 }
 
 FilePath LibraryDownload::getPathToLibDir() noexcept {
-  if (library::Library::isValidElementDirectory<library::Library>(
-          mTempDestDir)) {
+  if (Library::isValidElementDirectory<Library>(mTempDestDir)) {
     return mTempDestDir;
   }
 
@@ -206,7 +204,7 @@ FilePath LibraryDownload::getPathToLibDir() noexcept {
   }
 
   FilePath subdir = mTempDestDir.getPathTo(subdirs.first());
-  if (library::Library::isValidElementDirectory<library::Library>(subdir)) {
+  if (Library::isValidElementDirectory<Library>(subdir)) {
     return subdir;
   } else {
     return FilePath();
@@ -217,6 +215,5 @@ FilePath LibraryDownload::getPathToLibDir() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

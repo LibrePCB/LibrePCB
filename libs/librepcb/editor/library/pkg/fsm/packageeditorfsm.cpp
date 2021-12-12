@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorfsm.h"
 
+#include "../../../widgets/graphicsview.h"
 #include "packageeditorstate_addholes.h"
 #include "packageeditorstate_addnames.h"
 #include "packageeditorstate_addpads.h"
@@ -33,13 +34,12 @@
 #include "packageeditorstate_drawtext.h"
 #include "packageeditorstate_select.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/primitivetextgraphicsitem.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/library/pkg/package.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -47,7 +47,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -399,5 +398,4 @@ bool PackageEditorFsm::enterNextState(State state) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "projectsettingsdialog.h"
 
+#include "../undostack.h"
+#include "cmd/cmdprojectsettingschange.h"
 #include "ui_projectsettingsdialog.h"
 
-#include <librepcb/common/norms.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/settings/cmd/cmdprojectsettingschange.h>
-#include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/norms.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectsettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -249,5 +249,4 @@ void ProjectSettingsDialog::updateGuiFromSettings() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_SYMBOLEDITORWIDGET_H
+#define LIBREPCB_EDITOR_SYMBOLEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/categorylisteditorwidget.h"
-#include "../common/editorwidgetbase.h"
-
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
+#include "../../widgets/if_graphicsvieweventhandler.h"
+#include "../cat/categorylisteditorwidget.h"
+#include "../editorwidgetbase.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,9 +37,6 @@ namespace librepcb {
 
 class GraphicsScene;
 class GridProperties;
-
-namespace library {
-
 class Symbol;
 class SymbolGraphicsItem;
 
@@ -101,7 +97,7 @@ public slots:
 private:  // Methods
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
-  /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
+  /// @see ::librepcb::editor::IF_GraphicsViewEventHandler
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
   bool toolChangeRequested(Tool newTool) noexcept override;
   bool isInterfaceBroken() const noexcept override;
@@ -132,7 +128,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

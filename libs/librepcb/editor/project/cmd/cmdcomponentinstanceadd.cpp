@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "cmdcomponentinstanceadd.h"
 
-#include "../../library/projectlibrary.h"
-#include "../../project.h"
-#include "../../settings/projectsettings.h"
-#include "../circuit.h"
-#include "../componentinstance.h"
-
-#include <librepcb/library/cmp/component.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/projectsettings.h>
 
 #include <QtCore>
 
@@ -36,7 +35,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -72,7 +71,7 @@ CmdComponentInstanceAdd::~CmdComponentInstanceAdd() noexcept {
 
 bool CmdComponentInstanceAdd::performExecute() {
   if (!mComponentInstance) {
-    library::Component* cmp =
+    Component* cmp =
         mCircuit.getProject().getLibrary().getComponent(mComponentUuid);
     if (!cmp) {
       throw RuntimeError(
@@ -107,5 +106,5 @@ void CmdComponentInstanceAdd::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

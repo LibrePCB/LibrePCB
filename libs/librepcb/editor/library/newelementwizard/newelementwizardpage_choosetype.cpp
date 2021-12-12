@@ -28,7 +28,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -127,5 +126,4 @@ void NewElementWizardPage_ChooseType::setElementType(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_ERCMSGLIST_H
-#define LIBREPCB_PROJECT_ERCMSGLIST_H
+#ifndef LIBREPCB_CORE_ERCMSGLIST_H
+#define LIBREPCB_CORE_ERCMSGLIST_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/serializableobject.h>
+#include "../../fileio/filepath.h"
+#include "../../serialization/serializableobject.h"
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class ErcMsg;
 class Project;
@@ -76,7 +74,7 @@ signals:
   void ercMsgChanged(ErcMsg* ercMsg);
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // General
@@ -90,7 +88,6 @@ private:  // Methods
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

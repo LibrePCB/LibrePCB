@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "directorylock.h"
 
+#include "../exceptions.h"
 #include "../systeminfo.h"
 #include "fileutils.h"
 

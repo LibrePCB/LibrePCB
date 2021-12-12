@@ -26,7 +26,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -55,5 +54,4 @@ MsgMissingComponentDefaultValue::~MsgMissingComponentDefaultValue() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

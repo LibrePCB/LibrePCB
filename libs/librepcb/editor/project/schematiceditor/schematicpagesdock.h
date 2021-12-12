@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICPAGESDOCK_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICPAGESDOCK_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICPAGESDOCK_H
+#define LIBREPCB_EDITOR_SCHEMATICPAGESDOCK_H
 
 /*******************************************************************************
  *  Includes
@@ -30,7 +30,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Project;
 
@@ -90,7 +89,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

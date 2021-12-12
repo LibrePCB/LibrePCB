@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "eagletypeconverter.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/point.h>
 #include <parseagle/common/polygon.h>
@@ -64,14 +64,14 @@ QString EagleTypeConverter::convertElementDescription(const QString& d) {
       .join("\n");
 }
 
-library::ComponentSymbolVariantItemSuffix EagleTypeConverter::convertGateName(
+ComponentSymbolVariantItemSuffix EagleTypeConverter::convertGateName(
     const QString& n) {
   QString suffix = n.trimmed();
   if (suffix.startsWith("G$")) {
     suffix = "";  // Convert EAGLE default name to LibrePCB default name.
   }
-  suffix = library::cleanComponentSymbolVariantItemSuffix(suffix);
-  return library::ComponentSymbolVariantItemSuffix(suffix);
+  suffix = cleanComponentSymbolVariantItemSuffix(suffix);
+  return ComponentSymbolVariantItemSuffix(suffix);
 }
 
 CircuitIdentifier EagleTypeConverter::convertPinOrPadName(const QString& n) {
@@ -358,9 +358,9 @@ std::shared_ptr<StrokeText> EagleTypeConverter::convertBoardText(
   );
 }
 
-std::shared_ptr<library::SymbolPin> EagleTypeConverter::convertSymbolPin(
+std::shared_ptr<SymbolPin> EagleTypeConverter::convertSymbolPin(
     const parseagle::Pin& p) {
-  return std::make_shared<library::SymbolPin>(
+  return std::make_shared<SymbolPin>(
       Uuid::createRandom(),  // UUID
       convertPinOrPadName(p.getName()),  // Name
       convertPoint(p.getPosition()),  // Position
@@ -369,8 +369,7 @@ std::shared_ptr<library::SymbolPin> EagleTypeConverter::convertSymbolPin(
   );
 }
 
-std::pair<std::shared_ptr<library::PackagePad>,
-          std::shared_ptr<library::FootprintPad> >
+std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
     EagleTypeConverter::convertThtPad(const parseagle::ThtPad& p) {
   Uuid uuid = Uuid::createRandom();
   Length size = convertLength(p.getOuterDiameter());
@@ -380,19 +379,19 @@ std::pair<std::shared_ptr<library::PackagePad>,
   }
   PositiveLength width(size);
   PositiveLength height(size);
-  library::FootprintPad::Shape shape;
+  FootprintPad::Shape shape;
   switch (p.getShape()) {
     case parseagle::ThtPad::Shape::Square:
-      shape = library::FootprintPad::Shape::RECT;
+      shape = FootprintPad::Shape::RECT;
       break;
     case parseagle::ThtPad::Shape::Octagon:
-      shape = library::FootprintPad::Shape::OCTAGON;
+      shape = FootprintPad::Shape::OCTAGON;
       break;
     case parseagle::ThtPad::Shape::Round:
-      shape = library::FootprintPad::Shape::ROUND;
+      shape = FootprintPad::Shape::ROUND;
       break;
     case parseagle::ThtPad::Shape::Long:
-      shape = library::FootprintPad::Shape::ROUND;
+      shape = FootprintPad::Shape::ROUND;
       width = PositiveLength(size * 2);
       break;
     default:
@@ -401,11 +400,10 @@ std::pair<std::shared_ptr<library::PackagePad>,
           QString("Unknown pad shape: %1").arg(static_cast<int>(p.getShape())));
   }
   return std::make_pair(
-      std::make_shared<library::PackagePad>(
-          uuid,  // UUID
-          convertPinOrPadName(p.getName())  // Name
-          ),
-      std::make_shared<library::FootprintPad>(
+      std::make_shared<PackagePad>(uuid,  // UUID
+                                   convertPinOrPadName(p.getName())  // Name
+                                   ),
+      std::make_shared<FootprintPad>(
           uuid,  // UUID
           uuid,  // Package pad UUID
           convertPoint(p.getPosition()),  // Position
@@ -415,35 +413,33 @@ std::pair<std::shared_ptr<library::PackagePad>,
           height,  // Height
           UnsignedLength(
               convertLength(p.getDrillDiameter())),  // Drill diameter
-          library::FootprintPad::BoardSide::THT  // Side
+          FootprintPad::BoardSide::THT  // Side
           ));
 }
 
-std::pair<std::shared_ptr<library::PackagePad>,
-          std::shared_ptr<library::FootprintPad> >
+std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
     EagleTypeConverter::convertSmtPad(const parseagle::SmtPad& p) {
   Uuid uuid = Uuid::createRandom();
   GraphicsLayerName layer = convertLayer(p.getLayer());
-  library::FootprintPad::BoardSide side;
+  FootprintPad::BoardSide side;
   if (layer == GraphicsLayer::sTopCopper) {
-    side = library::FootprintPad::BoardSide::TOP;
+    side = FootprintPad::BoardSide::TOP;
   } else if (layer == GraphicsLayer::sBotCopper) {
-    side = library::FootprintPad::BoardSide::BOTTOM;
+    side = FootprintPad::BoardSide::BOTTOM;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Invalid pad layer: %1").arg(*layer));
   }
   return std::make_pair(
-      std::make_shared<library::PackagePad>(
-          uuid,  // UUID
-          convertPinOrPadName(p.getName())  // Name
-          ),
-      std::make_shared<library::FootprintPad>(
+      std::make_shared<PackagePad>(uuid,  // UUID
+                                   convertPinOrPadName(p.getName())  // Name
+                                   ),
+      std::make_shared<FootprintPad>(
           uuid,  // UUID
           uuid,  // Package pad UUID
           convertPoint(p.getPosition()),  // Position
           convertAngle(p.getRotation().getAngle()),  // Rotation
-          library::FootprintPad::Shape::RECT,  // Shape
+          FootprintPad::Shape::RECT,  // Shape
           PositiveLength(convertLength(p.getWidth())),  // Width
           PositiveLength(convertLength(p.getHeight())),  // Height
           UnsignedLength(0),  // Drill diameter

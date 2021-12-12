@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_VIA_H
-#define LIBREPCB_PROJECT_BGI_VIA_H
+#ifndef LIBREPCB_CORE_BGI_VIA_H
+#define LIBREPCB_CORE_BGI_VIA_H
 
 /*******************************************************************************
  *  Includes
@@ -33,11 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-
-namespace project {
-
 class BI_Via;
+class GraphicsLayer;
 
 /*******************************************************************************
  *  Class BGI_Via
@@ -93,7 +90,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::application::FirstRunWizard</class>
- <widget class="QWizard" name="librepcb::application::FirstRunWizard">
+ <class>librepcb::editor::FirstRunWizard</class>
+ <widget class="QWizard" name="librepcb::editor::FirstRunWizard">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_VERSIONFILE_H
-#define LIBREPCB_COMMON_VERSIONFILE_H
+#ifndef LIBREPCB_CORE_VERSIONFILE_H
+#define LIBREPCB_CORE_VERSIONFILE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../version.h"
+#include "../types/version.h"
 
 #include <QtCore>
 

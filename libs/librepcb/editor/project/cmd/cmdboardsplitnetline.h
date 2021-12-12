@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDBOARDSPLITNETLINE_H
-#define LIBREPCB_PROJECTEDITOR_CMDBOARDSPLITNETLINE_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDSPLITNETLINE_H
+#define LIBREPCB_EDITOR_CMDBOARDSPLITNETLINE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -32,13 +32,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Point;
-
-namespace project {
-
 class BI_NetLine;
 class BI_NetPoint;
 class CmdBoardNetSegmentAddElements;
+class Point;
 
 namespace editor {
 
@@ -47,10 +44,10 @@ namespace editor {
  ******************************************************************************/
 
 /**
- * @brief Undo command to split a ::librepcb::project::BI_NetLine
+ * @brief Undo command to split a ::librepcb::BI_NetLine
  *
  * Splits the BI_NetLine at the given position and creates a new
- * ::librepcb::project::BI_NetPoint. It is not checked, whether the split
+ * ::librepcb::BI_NetPoint. It is not checked, whether the split
  * position lies on the BI_NetLine or not.
  */
 class CmdBoardSplitNetLine : public UndoCommandGroup {
@@ -62,7 +59,7 @@ public:
   BI_NetPoint* getSplitPoint() noexcept { return mSplitPoint; };
 
 private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
@@ -75,7 +72,6 @@ private:  // Methods
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

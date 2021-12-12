@@ -22,17 +22,15 @@
  ******************************************************************************/
 #include "workspace.h"
 
-#include "library/workspacelibrarydb.h"
-#include "settings/workspacesettings.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/versionfile.h>
-#include <librepcb/library/library.h>
-#include <librepcb/libraryeditor/libraryeditor.h>
-#include <librepcb/project/project.h>
+#include "../application.h"
+#include "../exceptions.h"
+#include "../fileio/filepath.h"
+#include "../fileio/fileutils.h"
+#include "../fileio/versionfile.h"
+#include "../library/library.h"
+#include "../project/project.h"
+#include "workspacelibrarydb.h"
+#include "workspacesettings.h"
 
 #include <QtCore>
 
@@ -42,11 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-using namespace library;
-using namespace project;
-
-namespace workspace {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -159,5 +152,4 @@ void Workspace::setMostRecentlyUsedWorkspacePath(
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb

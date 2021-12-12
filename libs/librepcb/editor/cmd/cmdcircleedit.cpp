@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdcircleedit.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 
@@ -30,6 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -175,4 +176,5 @@ void CmdCircleEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

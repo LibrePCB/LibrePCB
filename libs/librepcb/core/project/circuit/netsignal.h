@@ -17,18 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_NETSIGNAL_H
-#define LIBREPCB_PROJECT_NETSIGNAL_H
+#ifndef LIBREPCB_CORE_NETSIGNAL_H
+#define LIBREPCB_CORE_NETSIGNAL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/serializableobject.h"
+#include "../../types/circuitidentifier.h"
+#include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
-
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -36,7 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_NetSegment;
 class BI_Plane;
@@ -111,7 +108,7 @@ public:
   void registerBoardPlane(BI_Plane& plane);
   void unregisterBoardPlane(BI_Plane& plane);
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -157,7 +154,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "bgi_plane.h"
 
+#include "../../../geometry/polygon.h"
+#include "../../../graphics/primitivepathgraphicsitem.h"
+#include "../../../utils/toolbox.h"
 #include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_plane.h"
-
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/graphics/primitivepathgraphicsitem.h>
-#include <librepcb/common/toolbox.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -197,5 +195,4 @@ GraphicsLayer* BGI_Plane::getLayer(QString name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

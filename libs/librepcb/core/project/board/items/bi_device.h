@@ -17,20 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_DEVICE_H
-#define LIBREPCB_PROJECT_BI_DEVICE_H
+#ifndef LIBREPCB_CORE_BI_DEVICE_H
+#define LIBREPCB_CORE_BI_DEVICE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../attribute/attribute.h"
+#include "../../../attribute/attributeprovider.h"
+#include "../../../serialization/serializableobject.h"
+#include "../../../types/uuid.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_footprint.h"
 #include "bi_base.h"
-
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -39,17 +38,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Device;
-class Footprint;
-class Package;
-}  // namespace library
-
-namespace project {
-
 class BI_Footprint;
 class Board;
 class ComponentInstance;
+class Device;
+class Footprint;
+class Package;
 class Project;
 
 /*******************************************************************************
@@ -82,13 +76,9 @@ public:
   ComponentInstance& getComponentInstance() const noexcept {
     return *mCompInstance;
   }
-  const library::Device& getLibDevice() const noexcept { return *mLibDevice; }
-  const library::Package& getLibPackage() const noexcept {
-    return *mLibPackage;
-  }
-  const library::Footprint& getLibFootprint() const noexcept {
-    return *mLibFootprint;
-  }
+  const Device& getLibDevice() const noexcept { return *mLibDevice; }
+  const Package& getLibPackage() const noexcept { return *mLibPackage; }
+  const Footprint& getLibFootprint() const noexcept { return *mLibFootprint; }
   BI_Footprint& getFootprint() const noexcept { return *mFootprint; }
   const Angle& getRotation() const noexcept { return mRotation; }
   bool isSelectable() const noexcept override;
@@ -103,16 +93,16 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
   QString getUserDefinedAttributeValue(const QString& key) const
       noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -145,9 +135,9 @@ private:
 
   // General
   ComponentInstance* mCompInstance;
-  const library::Device* mLibDevice;
-  const library::Package* mLibPackage;
-  const library::Footprint* mLibFootprint;
+  const Device* mLibDevice;
+  const Package* mLibPackage;
+  const Footprint* mLibFootprint;
   QScopedPointer<BI_Footprint> mFootprint;
 
   // Attributes
@@ -162,7 +152,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

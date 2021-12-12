@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
-#define LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
+#ifndef LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
+#define LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARDCONTEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 #include <optional/tl/optional.hpp>
 
 #include <QtCore>
@@ -34,15 +34,12 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Workspace;
+
 namespace eagleimport {
 class EagleLibraryImport;
 }
 
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -62,13 +59,13 @@ public:
   EagleLibraryImportWizardContext() = delete;
   EagleLibraryImportWizardContext(
       const EagleLibraryImportWizardContext& other) = delete;
-  EagleLibraryImportWizardContext(workspace::Workspace& workspace,
+  EagleLibraryImportWizardContext(Workspace& workspace,
                                   const FilePath& dstLibFp,
                                   QObject* parent = nullptr) noexcept;
   ~EagleLibraryImportWizardContext() noexcept;
 
   // Getters
-  workspace::Workspace& getWorkspace() const noexcept { return mWorkspace; }
+  Workspace& getWorkspace() const noexcept { return mWorkspace; }
   eagleimport::EagleLibraryImport& getImport() noexcept { return *mImport; }
   const FilePath& getLbrFilePath() const noexcept { return mLbrFilePath; }
   bool getAddNamePrefix() const noexcept { return mAddNamePrefix; }
@@ -93,7 +90,7 @@ signals:
   void parseCompleted(const QString& messages);
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   QScopedPointer<eagleimport::EagleLibraryImport> mImport;
   FilePath mLbrFilePath;
   bool mAddNamePrefix;
@@ -106,7 +103,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

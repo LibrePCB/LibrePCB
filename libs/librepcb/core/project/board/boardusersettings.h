@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
-#define LIBREPCB_PROJECT_BOARDUSERSETTINGS_H
+#ifndef LIBREPCB_CORE_BOARDUSERSETTINGS_H
+#define LIBREPCB_CORE_BOARDUSERSETTINGS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/uuid.h>
+#include "../../serialization/serializableobject.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -33,11 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayerStackAppearanceSettings;
-
-namespace project {
-
 class Board;
+class GraphicsLayerStackAppearanceSettings;
 
 /*******************************************************************************
  *  Class BoardUserSettings
@@ -72,7 +69,7 @@ public:
   // General Methods
   void resetPlanesVisibility() noexcept { mPlanesVisibility.clear(); }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -89,7 +86,6 @@ private:  // Methods
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

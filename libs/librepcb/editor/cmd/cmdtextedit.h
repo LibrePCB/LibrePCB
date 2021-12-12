@@ -17,17 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_CMDTEXTEDIT_H
-#define LIBREPCB_COMMON_CMDTEXTEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDTEXTEDIT_H
+#define LIBREPCB_EDITOR_CMDTEXTEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../fileio/cmd/cmdlistelementinsert.h"
-#include "../../fileio/cmd/cmdlistelementremove.h"
-#include "../../fileio/cmd/cmdlistelementsswap.h"
-#include "../../undocommand.h"
-#include "../text.h"
+#include "../undocommand.h"
+#include "cmdlistelementinsert.h"
+#include "cmdlistelementremove.h"
+#include "cmdlistelementsswap.h"
+
+#include <librepcb/core/geometry/text.h>
 
 #include <QtCore>
 
@@ -35,6 +36,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdTextEdit
@@ -70,13 +72,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
   // Private Member Variables
@@ -114,6 +116,7 @@ using CmdTextsSwap =
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

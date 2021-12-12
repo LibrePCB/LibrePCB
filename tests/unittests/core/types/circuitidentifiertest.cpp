@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/circuitidentifier.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/types/circuitidentifier.h>
 
 /*******************************************************************************
  *  Namespace

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "path.h"
 
-#include "../toolbox.h"
+#include "../utils/toolbox.h"
 
 #include <QtCore>
 

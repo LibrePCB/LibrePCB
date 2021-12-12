@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "schematiceditorstate_drawpolygon.h"
 
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/unsignedlengthedit.h"
+#include "../../cmd/cmdschematicpolygonadd.h"
 #include "../schematiceditor.h"
 
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicpolygonadd.h>
-#include <librepcb/project/schematics/items/si_polygon.h>
-#include <librepcb/project/schematics/schematic.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -342,5 +341,4 @@ void SchematicEditorState_DrawPolygon::filledCheckBoxCheckedChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

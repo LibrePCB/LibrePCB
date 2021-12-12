@@ -22,10 +22,11 @@
  ******************************************************************************/
 #include "graphicsview.h"
 
-#include "../gridproperties.h"
 #include "QtOpenGL"
-#include "graphicsscene.h"
 #include "if_graphicsvieweventhandler.h"
+
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,6 +35,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -393,4 +395,5 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

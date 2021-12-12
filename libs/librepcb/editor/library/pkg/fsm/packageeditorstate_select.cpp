@@ -22,30 +22,30 @@
  ******************************************************************************/
 #include "packageeditorstate_select.h"
 
-#include "../dialogs/footprintpadpropertiesdialog.h"
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../dialogs/circlepropertiesdialog.h"
+#include "../../../dialogs/dxfimportdialog.h"
+#include "../../../dialogs/holepropertiesdialog.h"
+#include "../../../dialogs/polygonpropertiesdialog.h"
+#include "../../../dialogs/stroketextpropertiesdialog.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../cmd/cmddragselectedfootprintitems.h"
+#include "../../cmd/cmdpastefootprintitems.h"
+#include "../../cmd/cmdremoveselectedfootprintitems.h"
 #include "../footprintclipboarddata.h"
+#include "../footprintpadpropertiesdialog.h"
 #include "../packageeditorwidget.h"
-#include "cmd/cmddragselectedfootprintitems.h"
-#include "cmd/cmdpastefootprintitems.h"
-#include "cmd/cmdremoveselectedfootprintitems.h"
 
-#include <librepcb/common/dialogs/circlepropertiesdialog.h>
-#include <librepcb/common/dialogs/dxfimportdialog.h>
-#include <librepcb/common/dialogs/holepropertiesdialog.h>
-#include <librepcb/common/dialogs/polygonpropertiesdialog.h>
-#include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/common/import/dxfreader.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/library/pkg/footprintpadgraphicsitem.h>
-#include <librepcb/library/pkg/package.h>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/holegraphicsitem.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/import/dxfreader.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -53,7 +53,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -908,5 +907,4 @@ bool PackageEditorState_Select::findPolygonVerticesAtPosition(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

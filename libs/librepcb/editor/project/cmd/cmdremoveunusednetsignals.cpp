@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "cmdremoveunusednetsignals.h"
 
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
-#include <librepcb/project/circuit/netsignal.h>
+#include "../../project/cmd/cmdboardnetsegmentremove.h"
+#include "../../project/cmd/cmdboardplaneremove.h"
+#include "../../project/cmd/cmdnetsignalremove.h"
+
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 
 #include <QtCore>
 
@@ -34,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -77,5 +77,4 @@ bool CmdRemoveUnusedNetSignals::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

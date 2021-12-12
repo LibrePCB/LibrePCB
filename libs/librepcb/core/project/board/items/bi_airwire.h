@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_AIRWIRE_H
-#define LIBREPCB_PROJECT_BI_AIRWIRE_H
+#ifndef LIBREPCB_CORE_BI_AIRWIRE_H
+#define LIBREPCB_CORE_BI_AIRWIRE_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class BI_AirWire
@@ -85,7 +84,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

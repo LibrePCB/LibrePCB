@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDGERBEREXPORT_H
-#define LIBREPCB_PROJECT_BOARDGERBEREXPORT_H
+#ifndef LIBREPCB_CORE_BOARDGERBEREXPORT_H
+#define LIBREPCB_CORE_BOARDGERBEREXPORT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/units/length.h>
+#include "../../attribute/attributeprovider.h"
+#include "../../fileio/filepath.h"
+#include "../../types/length.h"
 
 #include <QtCore>
 
@@ -36,18 +36,15 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circle;
-class ExcellonGenerator;
-class GerberGenerator;
-class Polygon;
-
-namespace project {
-
 class BI_Footprint;
 class BI_FootprintPad;
 class BI_Via;
 class Board;
 class BoardFabricationOutputSettings;
+class Circle;
+class ExcellonGenerator;
+class GerberGenerator;
+class Polygon;
 class Project;
 
 /*******************************************************************************
@@ -78,9 +75,9 @@ public:
   void exportAllLayers() const;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -145,7 +142,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

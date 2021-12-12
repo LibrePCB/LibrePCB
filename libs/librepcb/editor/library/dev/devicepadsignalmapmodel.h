@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_DEVICEPADSIGNALMAPMODEL_H
-#define LIBREPCB_LIBRARYEDITOR_DEVICEPADSIGNALMAPMODEL_H
+#ifndef LIBREPCB_EDITOR_DEVICEPADSIGNALMAPMODEL_H
+#define LIBREPCB_EDITOR_DEVICEPADSIGNALMAPMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/model/comboboxdelegate.h>
-#include <librepcb/library/cmp/componentsignal.h>
-#include <librepcb/library/dev/devicepadsignalmap.h>
-#include <librepcb/library/pkg/packagepad.h>
+#include "../../modelview/comboboxdelegate.h"
+
+#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/library/dev/devicepadsignalmap.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
 
@@ -34,12 +35,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class UndoCommand;
 class UndoStack;
-
-namespace library {
-namespace editor {
 
 /*******************************************************************************
  *  Class DevicePadSignalMapModel
@@ -105,7 +104,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

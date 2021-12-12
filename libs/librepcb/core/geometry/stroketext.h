@@ -17,20 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_STROKETEXT_H
-#define LIBREPCB_COMMON_STROKETEXT_H
+#ifndef LIBREPCB_CORE_STROKETEXT_H
+#define LIBREPCB_CORE_STROKETEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
-#include "../fileio/serializableobjectlist.h"
 #include "../geometry/path.h"
 #include "../graphics/graphicslayername.h"
-#include "../units/angle.h"
-#include "../units/length.h"
-#include "../units/point.h"
-#include "../units/ratio.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/alignment.h"
+#include "../types/angle.h"
+#include "../types/length.h"
+#include "../types/point.h"
+#include "../types/ratio.h"
 
 #include <QtCore>
 
@@ -192,7 +192,7 @@ public:
   const StrokeFont* getCurrentFont() const noexcept { return mFont; }
   void updatePaths() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

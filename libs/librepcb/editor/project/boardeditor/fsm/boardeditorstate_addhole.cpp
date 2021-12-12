@@ -22,16 +22,16 @@
  ******************************************************************************/
 #include "boardeditorstate_addhole.h"
 
+#include "../../../cmd/cmdholeedit.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../cmd/cmdboardholeadd.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/geometry/cmd/cmdholeedit.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardholeadd.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
 
 #include <QtCore>
 
@@ -39,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -230,5 +229,4 @@ void BoardEditorState_AddHole::makeLayerVisible() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

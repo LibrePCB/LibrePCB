@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "gerberattribute.h"
 
-#include "../uuid.h"
+#include "../types/uuid.h"
 
 #include <QtCore>
 

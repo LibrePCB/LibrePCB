@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::NewProjectWizardPage_Metadata</class>
- <widget class="QWizardPage" name="librepcb::project::editor::NewProjectWizardPage_Metadata">
+ <class>librepcb::editor::NewProjectWizardPage_Metadata</class>
+ <widget class="QWizardPage" name="librepcb::editor::NewProjectWizardPage_Metadata">
   <property name="geometry">
    <rect>
     <x>0</x>

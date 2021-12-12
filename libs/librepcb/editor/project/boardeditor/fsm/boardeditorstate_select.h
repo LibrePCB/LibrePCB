@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_SELECT_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_SELECT_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -38,15 +38,6 @@
 namespace librepcb {
 
 class Angle;
-class CmdPolygonEdit;
-class Hole;
-class Point;
-class Polygon;
-class StrokeText;
-class UndoCommandGroup;
-
-namespace project {
-
 class BI_Base;
 class BI_Device;
 class BI_NetLine;
@@ -54,12 +45,18 @@ class BI_NetSegment;
 class BI_Plane;
 class BI_Polygon;
 class BI_Via;
-class CmdBoardPlaneEdit;
+class Hole;
+class Point;
+class Polygon;
+class StrokeText;
 
 namespace editor {
 
 class BoardClipboardData;
+class CmdBoardPlaneEdit;
 class CmdDragSelectedBoardItems;
+class CmdPolygonEdit;
+class UndoCommandGroup;
 
 /*******************************************************************************
  *  Class BoardEditorState_Select
@@ -226,7 +223,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

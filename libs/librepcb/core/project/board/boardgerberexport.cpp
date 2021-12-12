@@ -22,12 +22,22 @@
  ******************************************************************************/
 #include "boardgerberexport.h"
 
+#include "../../attribute/attributesubstitutor.h"
+#include "../../export/excellongenerator.h"
+#include "../../export/gerbergenerator.h"
+#include "../../geometry/hole.h"
+#include "../../graphics/graphicslayer.h"
+#include "../../library/cmp/componentsignal.h"
+#include "../../library/pkg/footprint.h"
+#include "../../library/pkg/footprintpad.h"
+#include "../../library/pkg/packagepad.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netsignal.h"
-#include "../metadata/projectmetadata.h"
 #include "../project.h"
+#include "../projectmetadata.h"
 #include "board.h"
+#include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
 #include "boardlayerstack.h"
 #include "items/bi_device.h"
@@ -42,24 +52,12 @@
 #include "items/bi_stroketext.h"
 #include "items/bi_via.h"
 
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/boarddesignrules.h>
-#include <librepcb/common/cam/excellongenerator.h>
-#include <librepcb/common/cam/gerbergenerator.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/library/cmp/componentsignal.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintpad.h>
-#include <librepcb/library/pkg/packagepad.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -351,8 +349,8 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const BI_Footprint& footprint = device->getFootprint();
     foreach (const BI_FootprintPad* pad, footprint.getPads()) {
-      const library::FootprintPad& libPad = pad->getLibPad();
-      if (libPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
+      const FootprintPad& libPad = pad->getLibPad();
+      if (libPad.getBoardSide() == FootprintPad::BoardSide::THT) {
         gen.drill(pad->getPosition(),
                   PositiveLength(*libPad.getDrillDiameter()), true,
                   ExcellonGenerator::Function::ComponentDrill);  // can throw
@@ -598,8 +596,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const QString& layerName) const {
-  bool isSmt =
-      pad.getLibPad().getBoardSide() != library::FootprintPad::BoardSide::THT;
+  bool isSmt = pad.getLibPad().getBoardSide() != FootprintPad::BoardSide::THT;
   bool isOnCopperLayer = pad.isOnLayer(layerName);
   bool isOnSolderMaskTop = pad.isOnLayer(GraphicsLayer::sTopCopper) &&
       (layerName == GraphicsLayer::sTopStopMask);
@@ -616,7 +613,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
   }
 
   Angle rot = pad.getIsMirrored() ? -pad.getRotation() : pad.getRotation();
-  const library::FootprintPad& libPad = pad.getLibPad();
+  const FootprintPad& libPad = pad.getLibPad();
   Length width = *libPad.getWidth();
   Length height = *libPad.getHeight();
   if (isOnSolderMaskTop || isOnSolderMaskBottom) {
@@ -656,7 +653,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     net = pad.getCompSigInstNetSignal()
         ? *pad.getCompSigInstNetSignal()->getName()  // Named net.
         : "N/C";  // Anonymous net (reserved name by Gerber specs).
-    if (const library::PackagePad* pkgPad = pad.getLibPackagePad()) {
+    if (const PackagePad* pkgPad = pad.getLibPackagePad()) {
       pin = *pkgPad->getName();
     }
     if (ComponentSignalInstance* cmpSig = pad.getComponentSignalInstance()) {
@@ -665,17 +662,17 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
   }
 
   switch (libPad.getShape()) {
-    case library::FootprintPad::Shape::ROUND: {
+    case FootprintPad::Shape::ROUND: {
       gen.flashObround(pad.getPosition(), pWidth, pHeight, rot, function, net,
                        component, pin, signal);
       break;
     }
-    case library::FootprintPad::Shape::RECT: {
+    case FootprintPad::Shape::RECT: {
       gen.flashRect(pad.getPosition(), pWidth, pHeight, rot, function, net,
                     component, pin, signal);
       break;
     }
-    case library::FootprintPad::Shape::OCTAGON: {
+    case FootprintPad::Shape::OCTAGON: {
       gen.flashOctagon(pad.getPosition(), pWidth, pHeight, rot, function, net,
                        component, pin, signal);
       break;
@@ -717,5 +714,4 @@ UnsignedLength BoardGerberExport::calcWidthOfLayer(
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

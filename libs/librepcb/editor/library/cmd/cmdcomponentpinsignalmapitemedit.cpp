@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdcomponentpinsignalmapitemedit.h"
 
-#include "../componentpinsignalmap.h"
+#include <librepcb/core/library/cmp/componentpinsignalmap.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -91,5 +91,5 @@ void CmdComponentPinSignalMapItemEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

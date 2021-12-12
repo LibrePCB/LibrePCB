@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_BOARDDESIGNRULESDIALOG_H
-#define LIBREPCB_COMMON_BOARDDESIGNRULESDIALOG_H
+#ifndef LIBREPCB_EDITOR_BOARDDESIGNRULESDIALOG_H
+#define LIBREPCB_EDITOR_BOARDDESIGNRULESDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../boarddesignrules.h"
+#include <librepcb/core/project/board/boarddesignrules.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,6 +34,8 @@
 namespace librepcb {
 
 class LengthUnit;
+
+namespace editor {
 
 namespace Ui {
 class BoardDesignRulesDialog;
@@ -86,6 +88,7 @@ private:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -17,22 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARD_H
-#define LIBREPCB_PROJECT_BOARD_H
+#ifndef LIBREPCB_CORE_BOARD_H
+#define LIBREPCB_CORE_BOARD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../attribute/attributeprovider.h"
+#include "../../fileio/filepath.h"
+#include "../../fileio/transactionaldirectory.h"
+#include "../../serialization/serializableobject.h"
+#include "../../types/elementname.h"
+#include "../../types/length.h"
+#include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
-
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/uuid.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -44,14 +42,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class BoardDesignRules;
-class GraphicsLayer;
-class GraphicsScene;
-class GridProperties;
-class Point;
-
-namespace project {
 
 class BI_AirWire;
 class BI_Base;
@@ -65,10 +55,14 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class BoardLayerStack;
 class BoardSelectionQuery;
 class BoardUserSettings;
+class GraphicsLayer;
+class GraphicsScene;
+class GridProperties;
 class NetSignal;
 class Project;
 
@@ -102,21 +96,21 @@ public:
    */
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
-    ZValue_TextsBottom,  ///< Z value for librepcb::project::BI_StrokeText items
-    ZValue_FootprintsBottom,  ///< Z value for librepcb::project::BI_Footprint
+    ZValue_TextsBottom,  ///< Z value for librepcb::BI_StrokeText items
+    ZValue_FootprintsBottom,  ///< Z value for librepcb::BI_Footprint
                               ///< items
     ZValue_FootprintPadsBottom,  ///< Z value for
-                                 ///< librepcb::project::BI_FootprintPad items
+                                 ///< librepcb::BI_FootprintPad items
     ZValue_CopperBottom,
     ZValue_CopperTop,
     ZValue_FootprintPadsTop,  ///< Z value for
-                              ///< librepcb::project::BI_FootprintPad items
-    ZValue_FootprintsTop,  ///< Z value for librepcb::project::BI_Footprint
+                              ///< librepcb::BI_FootprintPad items
+    ZValue_FootprintsTop,  ///< Z value for librepcb::BI_Footprint
                            ///< items
-    ZValue_TextsTop,  ///< Z value for librepcb::project::BI_StrokeText items
-    ZValue_Vias,  ///< Z value for librepcb::project::BI_Via items
-    ZValue_Texts,  ///< Z value for librepcb::project::BI_StrokeText items
-    ZValue_AirWires,  ///< Z value for librepcb::project::BI_AirWire items
+    ZValue_TextsTop,  ///< Z value for librepcb::BI_StrokeText items
+    ZValue_Vias,  ///< Z value for librepcb::BI_Via items
+    ZValue_Texts,  ///< Z value for librepcb::BI_StrokeText items
+    ZValue_AirWires,  ///< Z value for librepcb::BI_AirWire items
   };
 
   // Constructors / Destructor
@@ -266,9 +260,9 @@ public:
   std::unique_ptr<BoardSelectionQuery> createSelectionQuery() const noexcept;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -296,7 +290,7 @@ private:
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // General
@@ -336,7 +330,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

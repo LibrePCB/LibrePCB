@@ -22,19 +22,19 @@
  ******************************************************************************/
 #include "cmdchangenetsignalofschematicnetsegment.h"
 
+#include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
+#include "../../project/cmd/cmdschematicnetsegmentadd.h"
+#include "../../project/cmd/cmdschematicnetsegmentedit.h"
+#include "../../project/cmd/cmdschematicnetsegmentremove.h"
 #include "cmdcombinenetsignals.h"
 #include "cmdremoveboarditems.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentedit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -42,7 +42,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -143,5 +142,4 @@ void CmdChangeNetSignalOfSchematicNetSegment::updateCompSigInstNetSignal(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

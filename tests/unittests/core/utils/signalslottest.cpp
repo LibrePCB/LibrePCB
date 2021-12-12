@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <librepcb/common/signalslot.h>
+#include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
 

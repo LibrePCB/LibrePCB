@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "categorytreeitem.h"
 
-#include "../workspacelibrarydb.h"
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 
@@ -32,7 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -154,31 +155,31 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept {
  ******************************************************************************/
 
 template <>
-FilePath CategoryTreeItem<library::ComponentCategory>::getLatestCategory(
+FilePath CategoryTreeItem<ComponentCategory>::getLatestCategory(
     const WorkspaceLibraryDb& lib) const {
   return lib.getLatestComponentCategory(*mUuid);
 }
 
 template <>
-FilePath CategoryTreeItem<library::PackageCategory>::getLatestCategory(
+FilePath CategoryTreeItem<PackageCategory>::getLatestCategory(
     const WorkspaceLibraryDb& lib) const {
   return lib.getLatestPackageCategory(*mUuid);
 }
 
 template <>
-QSet<Uuid> CategoryTreeItem<library::ComponentCategory>::getCategoryChilds(
+QSet<Uuid> CategoryTreeItem<ComponentCategory>::getCategoryChilds(
     const WorkspaceLibraryDb& lib) const {
   return lib.getComponentCategoryChilds(mUuid);
 }
 
 template <>
-QSet<Uuid> CategoryTreeItem<library::PackageCategory>::getCategoryChilds(
+QSet<Uuid> CategoryTreeItem<PackageCategory>::getCategoryChilds(
     const WorkspaceLibraryDb& lib) const {
   return lib.getPackageCategoryChilds(mUuid);
 }
 
 template <>
-bool CategoryTreeItem<library::ComponentCategory>::matchesFilter(
+bool CategoryTreeItem<ComponentCategory>::matchesFilter(
     const WorkspaceLibraryDb& lib, CategoryTreeFilter::Flags filter) const {
   if (filter.testFlag(CategoryTreeFilter::ALL)) {
     return true;
@@ -199,7 +200,7 @@ bool CategoryTreeItem<library::ComponentCategory>::matchesFilter(
 }
 
 template <>
-bool CategoryTreeItem<library::PackageCategory>::matchesFilter(
+bool CategoryTreeItem<PackageCategory>::matchesFilter(
     const WorkspaceLibraryDb& lib, CategoryTreeFilter::Flags filter) const {
   if (filter.testFlag(CategoryTreeFilter::ALL)) {
     return true;
@@ -215,12 +216,12 @@ bool CategoryTreeItem<library::PackageCategory>::matchesFilter(
 /*******************************************************************************
  *  Explicit template instantiations
  ******************************************************************************/
-template class CategoryTreeItem<library::ComponentCategory>;
-template class CategoryTreeItem<library::PackageCategory>;
+template class CategoryTreeItem<ComponentCategory>;
+template class CategoryTreeItem<PackageCategory>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb

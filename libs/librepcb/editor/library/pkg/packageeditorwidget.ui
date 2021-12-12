@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::PackageEditorWidget</class>
- <widget class="QWidget" name="librepcb::library::editor::PackageEditorWidget">
+ <class>librepcb::editor::PackageEditorWidget</class>
+ <widget class="QWidget" name="librepcb::editor::PackageEditorWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -60,7 +60,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="librepcb::GraphicsView" name="graphicsView"/>
+        <widget class="librepcb::editor::GraphicsView" name="graphicsView"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -98,7 +98,7 @@
              <number>3</number>
             </property>
             <item>
-             <widget class="librepcb::library::editor::FootprintListEditorWidget" name="footprintEditorWidget" native="true"/>
+             <widget class="librepcb::editor::FootprintListEditorWidget" name="footprintEditorWidget" native="true"/>
             </item>
            </layout>
           </widget>
@@ -122,7 +122,7 @@
              <number>3</number>
             </property>
             <item>
-             <widget class="librepcb::library::editor::PackagePadListEditorWidget" name="padListEditorWidget" native="true"/>
+             <widget class="librepcb::editor::PackagePadListEditorWidget" name="padListEditorWidget" native="true"/>
             </item>
            </layout>
           </widget>
@@ -183,7 +183,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="librepcb::PlainTextEdit" name="edtDescription">
+        <widget class="librepcb::editor::PlainTextEdit" name="edtDescription">
          <property name="tabChangesFocus">
           <bool>true</bool>
          </property>
@@ -273,7 +273,7 @@
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="librepcb::library::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
+        <widget class="librepcb::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -290,31 +290,31 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::PlainTextEdit</class>
+   <class>librepcb::editor::PlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header location="global">librepcb/common/widgets/plaintextedit.h</header>
+   <header location="global">librepcb/editor/widgets/plaintextedit.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::GraphicsView</class>
+   <class>librepcb::editor::GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">librepcb/common/graphics/graphicsview.h</header>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::LibraryElementCheckListWidget</class>
+   <class>librepcb::editor::LibraryElementCheckListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/common/libraryelementchecklistwidget.h</header>
+   <header location="global">librepcb/editor/library/libraryelementchecklistwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::PackagePadListEditorWidget</class>
+   <class>librepcb::editor::PackagePadListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/pkg/packagepadlisteditorwidget.h</header>
+   <header location="global">librepcb/editor/library/pkg/packagepadlisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::FootprintListEditorWidget</class>
+   <class>librepcb::editor::FootprintListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/pkg/footprintlisteditorwidget.h</header>
+   <header location="global">librepcb/editor/library/pkg/footprintlisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -22,17 +22,16 @@
  ******************************************************************************/
 #include "newelementwizardpage_componentsymbols.h"
 
+#include "../../library/libraryelementcache.h"
 #include "ui_newelementwizardpage_componentsymbols.h"
 
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/libraryeditor/libraryelementcache.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -102,5 +101,4 @@ void NewElementWizardPage_ComponentSymbols::cleanupPage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

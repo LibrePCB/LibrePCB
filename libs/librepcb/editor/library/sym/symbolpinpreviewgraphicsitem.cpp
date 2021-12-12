@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "symbolpinpreviewgraphicsitem.h"
 
-#include "../cmp/component.h"
-#include "symbolpin.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -36,7 +35,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -185,5 +184,5 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter,
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

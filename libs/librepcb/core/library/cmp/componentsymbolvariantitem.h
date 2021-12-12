@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
-#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEM_H
+#ifndef LIBREPCB_CORE_COMPONENTSYMBOLVARIANTITEM_H
+#define LIBREPCB_CORE_COMPONENTSYMBOLVARIANTITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/serializableobjectlist.h"
+#include "../../types/angle.h"
+#include "../../types/point.h"
+#include "../../types/uuid.h"
 #include "componentpinsignalmap.h"
 #include "componentsymbolvariantitemsuffix.h"
-
-#include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -37,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantItem
@@ -104,7 +102,7 @@ public:
     return mPinSignalMap;
   }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -168,7 +166,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

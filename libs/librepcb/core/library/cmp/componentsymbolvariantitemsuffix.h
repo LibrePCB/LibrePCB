@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
-#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
+#ifndef LIBREPCB_CORE_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
+#define LIBREPCB_CORE_COMPONENTSYMBOLVARIANTITEMSUFFIX_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/toolbox.h>
+#include "../../exceptions.h"
+#include "../../serialization/sexpression.h"
+#include "../../utils/toolbox.h"
+
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
@@ -33,7 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemSuffix
@@ -72,7 +73,7 @@ struct ComponentSymbolVariantItemSuffixConstraint {
 /**
  * ComponentSymbolVariantItemSuffix is a wrapper around QString which guarantees
  * to contain a valid suffix used for
- * librepcb::library::ComponentSymbolVariantItem
+ * librepcb::ComponentSymbolVariantItem
  *
  * Such a suffix is considered as valid if it:
  *   - contains only the characters [0-9a-zA-Z_-]
@@ -86,63 +87,56 @@ using ComponentSymbolVariantItemSuffix =
                                 ComponentSymbolVariantItemSuffixConstraint,
                                 ComponentSymbolVariantItemSuffixVerifier>;
 
-}  // namespace library
-
-inline bool operator==(const library::ComponentSymbolVariantItemSuffix& lhs,
+inline bool operator==(const ComponentSymbolVariantItemSuffix& lhs,
                        const QString& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(
-    const QString& lhs,
-    const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
+inline bool operator==(const QString& lhs,
+                       const ComponentSymbolVariantItemSuffix& rhs) noexcept {
   return lhs == (*rhs);
 }
-inline bool operator!=(const library::ComponentSymbolVariantItemSuffix& lhs,
+inline bool operator!=(const ComponentSymbolVariantItemSuffix& lhs,
                        const QString& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(
-    const QString& lhs,
-    const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
+inline bool operator!=(const QString& lhs,
+                       const ComponentSymbolVariantItemSuffix& rhs) noexcept {
   return lhs != (*rhs);
 }
-inline QString operator%(const library::ComponentSymbolVariantItemSuffix& lhs,
+inline QString operator%(const ComponentSymbolVariantItemSuffix& lhs,
                          const QString& rhs) noexcept {
   return (*lhs) % rhs;
 }
-inline QString operator%(
-    const QString& lhs,
-    const library::ComponentSymbolVariantItemSuffix& rhs) noexcept {
+inline QString operator%(const QString& lhs,
+                         const ComponentSymbolVariantItemSuffix& rhs) noexcept {
   return lhs % (*rhs);
 }
 
 template <>
-inline SExpression serialize(
-    const library::ComponentSymbolVariantItemSuffix& obj) {
+inline SExpression serialize(const ComponentSymbolVariantItemSuffix& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline library::ComponentSymbolVariantItemSuffix deserialize(
-    const SExpression& sexpr, const Version& fileFormat) {
+inline ComponentSymbolVariantItemSuffix deserialize(const SExpression& sexpr,
+                                                    const Version& fileFormat) {
   Q_UNUSED(fileFormat);
-  return library::ComponentSymbolVariantItemSuffix(
-      sexpr.getValue());  // can throw
+  return ComponentSymbolVariantItemSuffix(sexpr.getValue());  // can throw
 }
 
-inline QDataStream& operator<<(
-    QDataStream& stream, const library::ComponentSymbolVariantItemSuffix& obj) {
+inline QDataStream& operator<<(QDataStream& stream,
+                               const ComponentSymbolVariantItemSuffix& obj) {
   stream << *obj;
   return stream;
 }
 
 inline QDebug operator<<(QDebug stream,
-                         const library::ComponentSymbolVariantItemSuffix& obj) {
+                         const ComponentSymbolVariantItemSuffix& obj) {
   stream << QString("ComponentSymbolVariantItemSuffix('%1'')").arg(*obj);
   return stream;
 }
 
-inline uint qHash(const library::ComponentSymbolVariantItemSuffix& key,
+inline uint qHash(const ComponentSymbolVariantItemSuffix& key,
                   uint seed = 0) noexcept {
   return ::qHash(*key, seed);
 }

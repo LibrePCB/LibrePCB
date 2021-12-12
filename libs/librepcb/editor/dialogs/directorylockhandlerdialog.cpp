@@ -24,6 +24,8 @@
 
 #include "ui_directorylockhandlerdialog.h"
 
+#include <librepcb/core/exceptions.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -31,6 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -89,4 +92,5 @@ DirectoryLock::LockHandlerCallback
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

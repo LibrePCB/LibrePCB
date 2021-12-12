@@ -24,8 +24,8 @@
 #include "serializableobjectmock.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/serialization/serializableobjectlist.h>
 
 #include <QtCore>
 

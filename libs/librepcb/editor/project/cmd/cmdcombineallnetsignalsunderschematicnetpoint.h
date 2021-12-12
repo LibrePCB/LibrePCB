@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
-#define LIBREPCB_PROJECTEDITOR_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
+#ifndef LIBREPCB_EDITOR_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
+#define LIBREPCB_EDITOR_CMDCOMBINEALLNETSIGNALSUNDERSCHEMATICNETPOINT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/undocommandgroup.h>
 
 #include <QtCore>
 
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Circuit;
 class SI_NetPoint;
@@ -60,7 +59,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Attributes from the constructor
@@ -77,7 +76,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

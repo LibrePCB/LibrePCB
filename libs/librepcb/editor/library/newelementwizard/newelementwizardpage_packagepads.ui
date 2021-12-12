@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::NewElementWizardPage_PackagePads</class>
- <widget class="QWizardPage" name="librepcb::library::editor::NewElementWizardPage_PackagePads">
+ <class>librepcb::editor::NewElementWizardPage_PackagePads</class>
+ <widget class="QWizardPage" name="librepcb::editor::NewElementWizardPage_PackagePads">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="librepcb::library::editor::PackagePadListEditorWidget" name="padListEditorWidget" native="true"/>
+    <widget class="librepcb::editor::PackagePadListEditorWidget" name="padListEditorWidget" native="true"/>
    </item>
    <item>
     <widget class="QLabel" name="label">
@@ -67,9 +67,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::library::editor::PackagePadListEditorWidget</class>
+   <class>librepcb::editor::PackagePadListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/pkg/packagepadlisteditorwidget.h</header>
+   <header location="global">librepcb/editor/library/pkg/packagepadlisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

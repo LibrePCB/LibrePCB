@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_CLIPPERHELPERS_H
-#define LIBREPCB_COMMON_CLIPPERHELPERS_H
+#ifndef LIBREPCB_CORE_CLIPPERHELPERS_H
+#define LIBREPCB_CORE_CLIPPERHELPERS_H
 
 /*******************************************************************************
  *  Includes

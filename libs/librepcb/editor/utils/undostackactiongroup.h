@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_UNDOSTACKACTIONGROUP_H
-#define LIBREPCB_COMMON_UNDOSTACKACTIONGROUP_H
+#ifndef LIBREPCB_EDITOR_UNDOSTACKACTIONGROUP_H
+#define LIBREPCB_EDITOR_UNDOSTACKACTIONGROUP_H
 
 /*******************************************************************************
  *  Includes
@@ -30,6 +30,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class UndoStack;
 
@@ -39,7 +40,7 @@ class UndoStack;
 
 /**
  * @brief The UndoStackActionGroup class groups an undo-QAction and redo-QAction
- * together and optionally connects them with a librepcb::UndoStack
+ * together and optionally connects them with an ::librepcb::editor::UndoStack
  */
 class UndoStackActionGroup final : public QObject {
   Q_OBJECT
@@ -77,6 +78,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

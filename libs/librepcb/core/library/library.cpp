@@ -22,16 +22,15 @@
  ******************************************************************************/
 #include "library.h"
 
+#include "../fileio/transactionalfilesystem.h"
+#include "../serialization/sexpression.h"
+#include "../utils/toolbox.h"
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "cmp/component.h"
 #include "dev/device.h"
 #include "pkg/package.h"
 #include "sym/symbol.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -184,5 +182,4 @@ void Library::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

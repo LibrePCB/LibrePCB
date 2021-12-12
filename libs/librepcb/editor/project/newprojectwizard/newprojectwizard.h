@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_NEWPROJECTWIZARD_H
-#define LIBREPCB_PROJECTEDITOR_NEWPROJECTWIZARD_H
+#ifndef LIBREPCB_EDITOR_NEWPROJECTWIZARD_H
+#define LIBREPCB_EDITOR_NEWPROJECTWIZARD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,20 +33,17 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class Project;
+class Workspace;
 
 namespace editor {
 
 class NewProjectWizardPage_Initialization;
 class NewProjectWizardPage_Metadata;
 
-// class NewProjectWizardPage_VersionControl;
+//
+
+class NewProjectWizardPage_VersionControl;
 
 namespace Ui {
 class NewProjectWizard;
@@ -67,7 +63,7 @@ public:
   // Constructors / Destructor
   NewProjectWizard() = delete;
   NewProjectWizard(const NewProjectWizard& other) = delete;
-  explicit NewProjectWizard(const workspace::Workspace& ws,
+  explicit NewProjectWizard(const Workspace& ws,
                             QWidget* parent = nullptr) noexcept;
   ~NewProjectWizard() noexcept;
 
@@ -81,7 +77,7 @@ public:
   NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;
 
 private:  // Data
-  const workspace::Workspace& mWorkspace;
+  const Workspace& mWorkspace;
   QScopedPointer<Ui::NewProjectWizard> mUi;
   NewProjectWizardPage_Metadata* mPageMetadata;
   NewProjectWizardPage_Initialization* mPageInitialization;
@@ -93,7 +89,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

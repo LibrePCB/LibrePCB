@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORFSM_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORFSM_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORFSM_H
+#define LIBREPCB_EDITOR_BOARDEDITORFSM_H
 
 /*******************************************************************************
  *  Includes
@@ -31,27 +31,21 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsView;
-class UndoStack;
-class Uuid;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class ComponentInstance;
 class Project;
+class Uuid;
+class Workspace;
 
 namespace editor {
+
+class BoardEditor;
+class BoardEditorState;
+class GraphicsView;
+class UndoStack;
 
 namespace Ui {
 class BoardEditor;
 }
-
-class BoardEditor;
-class BoardEditorState;
 
 /*******************************************************************************
  *  Class BoardEditorFsm
@@ -68,27 +62,27 @@ public:
   enum State {
     /// No state active
     IDLE,
-    /// ::librepcb::project::editor::BoardEditorState_Select
+    /// ::librepcb::editor::BoardEditorState_Select
     SELECT,
-    /// ::librepcb::project::editor::BoardEditorState_AddHole
+    /// ::librepcb::editor::BoardEditorState_AddHole
     ADD_HOLE,
-    /// ::librepcb::project::editor::BoardEditorState_AddStrokeText
+    /// ::librepcb::editor::BoardEditorState_AddStrokeText
     ADD_STROKE_TEXT,
-    /// ::librepcb::project::editor::BoardEditorState_AddVia
+    /// ::librepcb::editor::BoardEditorState_AddVia
     ADD_VIA,
-    /// ::librepcb::project::editor::BoardEditorState_AddDevice
+    /// ::librepcb::editor::BoardEditorState_AddDevice
     ADD_DEVICE,
-    /// ::librepcb::project::editor::BoardEditorState_DrawPolygon
+    /// ::librepcb::editor::BoardEditorState_DrawPolygon
     DRAW_POLYGON,
-    /// ::librepcb::project::editor::BoardEditorState_DrawPlane
+    /// ::librepcb::editor::BoardEditorState_DrawPlane
     DRAW_PLANE,
-    /// ::librepcb::project::editor::BoardEditorState_DrawTrace
+    /// ::librepcb::editor::BoardEditorState_DrawTrace
     DRAW_TRACE,
   };
 
   /// FSM Context
   struct Context {
-    workspace::Workspace& workspace;
+    Workspace& workspace;
     Project& project;
     BoardEditor& editor;
     Ui::BoardEditor& editorUi;
@@ -180,7 +174,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

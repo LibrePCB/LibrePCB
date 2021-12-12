@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::BoardPlanePropertiesDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::BoardPlanePropertiesDialog">
+ <class>librepcb::editor::BoardPlanePropertiesDialog</class>
+ <widget class="QDialog" name="librepcb::editor::BoardPlanePropertiesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -94,15 +94,15 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="librepcb::UnsignedLengthEdit" name="edtMinWidth" native="true"/>
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinWidth" native="true"/>
      </item>
      <item row="3" column="1">
-      <widget class="librepcb::UnsignedLengthEdit" name="edtMinClearance" native="true"/>
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinClearance" native="true"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="librepcb::PathEditorWidget" name="pathEditorWidget" native="true">
+    <widget class="librepcb::editor::PathEditorWidget" name="pathEditorWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -125,15 +125,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::PathEditorWidget</class>
+   <class>librepcb::editor::PathEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/patheditorwidget.h</header>
+   <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::UnsignedLengthEdit</class>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

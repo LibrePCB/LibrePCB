@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
-#define LIBREPCB_PROJECTEDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
+#ifndef LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
+#define LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,11 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
 class Workspace;
-}
 
-namespace project {
 namespace editor {
 
 namespace Ui {
@@ -56,7 +53,7 @@ class NewProjectWizardPage_Metadata final : public QWizardPage {
 
 public:
   // Constructors / Destructor
-  explicit NewProjectWizardPage_Metadata(const workspace::Workspace& ws,
+  explicit NewProjectWizardPage_Metadata(const Workspace& ws,
                                          QWidget* parent = nullptr) noexcept;
   NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) =
       delete;
@@ -96,7 +93,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

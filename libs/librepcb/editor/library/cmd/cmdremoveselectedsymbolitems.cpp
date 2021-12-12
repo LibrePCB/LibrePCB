@@ -22,16 +22,17 @@
  ******************************************************************************/
 #include "cmdremoveselectedsymbolitems.h"
 
-#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include "../../cmd/cmdcircleedit.h"
+#include "../../cmd/cmdpolygonedit.h"
+#include "../../cmd/cmdtextedit.h"
+#include "cmdsymbolpinedit.h"
+
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/textgraphicsitem.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 
@@ -39,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -94,5 +94,4 @@ bool CmdRemoveSelectedSymbolItems::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

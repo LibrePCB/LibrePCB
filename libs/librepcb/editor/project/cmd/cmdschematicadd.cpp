@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdschematicadd.h"
 
-#include "../../project.h"
-#include "../schematic.h"
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -31,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -73,5 +73,5 @@ void CmdSchematicAdd::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

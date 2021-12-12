@@ -22,9 +22,10 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/systeminfo.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/directorylock.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/systeminfo.h>
 
 #include <QtCore>
 

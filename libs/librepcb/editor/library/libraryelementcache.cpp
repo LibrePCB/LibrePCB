@@ -22,14 +22,15 @@
  ******************************************************************************/
 #include "libraryelementcache.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 
@@ -37,15 +38,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryElementCache::LibraryElementCache(
-    const workspace::WorkspaceLibraryDb& db) noexcept
+LibraryElementCache::LibraryElementCache(const WorkspaceLibraryDb& db) noexcept
   : mDb(&db) {
 }
 
@@ -58,38 +57,34 @@ LibraryElementCache::~LibraryElementCache() noexcept {
 
 std::shared_ptr<const ComponentCategory>
     LibraryElementCache::getComponentCategory(const Uuid& uuid) const noexcept {
-  return getElement(&workspace::WorkspaceLibraryDb::getLatestComponentCategory,
-                    mCmpCat, uuid);
+  return getElement(&WorkspaceLibraryDb::getLatestComponentCategory, mCmpCat,
+                    uuid);
 }
 
 std::shared_ptr<const PackageCategory> LibraryElementCache::getPackageCategory(
     const Uuid& uuid) const noexcept {
-  return getElement(&workspace::WorkspaceLibraryDb::getLatestPackageCategory,
-                    mPkgCat, uuid);
+  return getElement(&WorkspaceLibraryDb::getLatestPackageCategory, mPkgCat,
+                    uuid);
 }
 
 std::shared_ptr<const Symbol> LibraryElementCache::getSymbol(
     const Uuid& uuid) const noexcept {
-  return getElement(&workspace::WorkspaceLibraryDb::getLatestSymbol, mSym,
-                    uuid);
+  return getElement(&WorkspaceLibraryDb::getLatestSymbol, mSym, uuid);
 }
 
 std::shared_ptr<const Package> LibraryElementCache::getPackage(
     const Uuid& uuid) const noexcept {
-  return getElement(&workspace::WorkspaceLibraryDb::getLatestPackage, mPkg,
-                    uuid);
+  return getElement(&WorkspaceLibraryDb::getLatestPackage, mPkg, uuid);
 }
 
 std::shared_ptr<const Component> LibraryElementCache::getComponent(
     const Uuid& uuid) const noexcept {
-  return getElement(&workspace::WorkspaceLibraryDb::getLatestComponent, mCmp,
-                    uuid);
+  return getElement(&WorkspaceLibraryDb::getLatestComponent, mCmp, uuid);
 }
 
 std::shared_ptr<const Device> LibraryElementCache::getDevice(
     const Uuid& uuid) const noexcept {
-  return getElement(&workspace::WorkspaceLibraryDb::getLatestDevice, mDev,
-                    uuid);
+  return getElement(&WorkspaceLibraryDb::getLatestDevice, mDev, uuid);
 }
 
 /*******************************************************************************
@@ -98,7 +93,7 @@ std::shared_ptr<const Device> LibraryElementCache::getDevice(
 
 template <typename T>
 std::shared_ptr<const T> LibraryElementCache::getElement(
-    FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const,
+    FilePath (WorkspaceLibraryDb::*getter)(const Uuid&) const,
     QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
     noexcept {
   std::shared_ptr<const T> element = container.value(uuid);
@@ -120,5 +115,4 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGOVERLAPPINGSYMBOLPINS_H
-#define LIBREPCB_LIBRARY_MSGOVERLAPPINGSYMBOLPINS_H
+#ifndef LIBREPCB_CORE_MSGOVERLAPPINGSYMBOLPINS_H
+#define LIBREPCB_CORE_MSGOVERLAPPINGSYMBOLPINS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../types/length.h"
 #include "../../msg/libraryelementcheckmessage.h"
-
-#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class SymbolPin;
 
@@ -73,7 +71,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

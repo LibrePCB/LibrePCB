@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_PACKAGEPAD_H
-#define LIBREPCB_LIBRARY_PACKAGEPAD_H
+#ifndef LIBREPCB_CORE_PACKAGEPAD_H
+#define LIBREPCB_CORE_PACKAGEPAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
+#include "../../serialization/serializableobjectlist.h"
+#include "../../types/circuitidentifier.h"
 
 #include <QtCore>
 
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class PackagePad
@@ -73,7 +72,7 @@ public:
 
   // General Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -103,7 +102,6 @@ using PackagePadList =
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

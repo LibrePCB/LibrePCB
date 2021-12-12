@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDCLIPPERPATHGENERATOR_H
-#define LIBREPCB_PROJECT_BOARDCLIPPERPATHGENERATOR_H
+#ifndef LIBREPCB_CORE_BOARDCLIPPERPATHGENERATOR_H
+#define LIBREPCB_CORE_BOARDCLIPPERPATHGENERATOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/units/length.h>
+#include "../../../types/length.h"
+
 #include <polyclipping/clipper.hpp>
 
 #include <QtCore>
@@ -33,11 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-
-namespace project {
-
 class Board;
+class GraphicsLayer;
 class NetSignal;
 
 /*******************************************************************************
@@ -46,7 +44,7 @@ class NetSignal;
 
 /**
  * @brief The BoardClipperPathGenerator class creates a Clipper path from
- *        a ::librepcb::project::Board
+ *        a ::librepcb::Board
  */
 class BoardClipperPathGenerator final {
 public:
@@ -73,7 +71,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

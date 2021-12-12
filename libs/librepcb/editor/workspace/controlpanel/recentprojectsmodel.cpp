@@ -22,10 +22,8 @@
  ******************************************************************************/
 #include "recentprojectsmodel.h"
 
-#include "settings/workspacesettings.h"
-#include "workspace.h"
-
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +32,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -143,5 +141,5 @@ QVariant RecentProjectsModel::data(const QModelIndex& index, int role) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb

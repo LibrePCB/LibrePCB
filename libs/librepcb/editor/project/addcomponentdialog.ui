@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::AddComponentDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::AddComponentDialog">
+ <class>librepcb::editor::AddComponentDialog</class>
+ <widget class="QDialog" name="librepcb::editor::AddComponentDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -117,7 +117,7 @@
     </layout>
    </item>
    <item row="1" column="2">
-    <widget class="GraphicsView" name="viewComponent">
+    <widget class="librepcb::editor::GraphicsView" name="viewComponent">
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
@@ -144,7 +144,7 @@
     </widget>
    </item>
    <item row="3" column="2">
-    <widget class="GraphicsView" name="viewDevice">
+    <widget class="librepcb::editor::GraphicsView" name="viewDevice">
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
@@ -169,7 +169,7 @@
   <customwidget>
    <class>GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">librepcb/common/graphics/graphicsview.h</header>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -181,7 +181,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::AddComponentDialog</receiver>
+   <receiver>librepcb::editor::AddComponentDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -197,7 +197,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::AddComponentDialog</receiver>
+   <receiver>librepcb::editor::AddComponentDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -213,7 +213,7 @@
   <connection>
    <sender>treeComponents</sender>
    <signal>itemDoubleClicked(QTreeWidgetItem*,int)</signal>
-   <receiver>librepcb::project::editor::AddComponentDialog</receiver>
+   <receiver>librepcb::editor::AddComponentDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

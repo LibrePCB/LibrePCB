@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CONTROLPANEL_CONTROLPANEL_H
-#define LIBREPCB_CONTROLPANEL_CONTROLPANEL_H
+#ifndef LIBREPCB_EDITOR_CONTROLPANEL_H
+#define LIBREPCB_EDITOR_CONTROLPANEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -34,39 +32,19 @@
 namespace librepcb {
 
 class FilePath;
-
-namespace library {
-
 class Library;
-
-namespace editor {
-class LibraryEditor;
-}
-
-namespace manager {
-class LibraryManager;
-}
-}  // namespace library
-
-namespace project {
-
 class Project;
+class Workspace;
 
 namespace editor {
-class ProjectEditor;
-}
-}  // namespace project
 
-namespace workspace {
 class FavoriteProjectsModel;
+class LibraryEditor;
+class LibraryManager;
+class ProjectEditor;
+class ProjectLibraryUpdater;
 class ProjectTreeModel;
 class RecentProjectsModel;
-class Workspace;
-}  // namespace workspace
-
-namespace application {
-
-class ProjectLibraryUpdater;
 
 namespace Ui {
 class ControlPanel;
@@ -82,14 +60,18 @@ class ControlPanel;
 class ControlPanel final : public QMainWindow {
   Q_OBJECT
 
-  friend class ProjectLibraryUpdater;  // needs access to openProject() and
-                                       // getOpenProject()
+  friend
+
+      class ProjectLibraryUpdater;
+
+  // needs access to openProject() and
+  // getOpenProject()
 
 public:
   // Constructors / Destructor
   ControlPanel() = delete;
   ControlPanel(const ControlPanel& other) = delete;
-  explicit ControlPanel(workspace::Workspace& workspace);
+  explicit ControlPanel(Workspace& workspace);
   ~ControlPanel();
 
   // Operator Overloadings
@@ -138,8 +120,7 @@ private:
 
   // Project Management
 
-  project::editor::ProjectEditor* newProject(
-      const FilePath& parentDir) noexcept;
+  ProjectEditor* newProject(const FilePath& parentDir) noexcept;
 
   /**
    * @brief Open a project with the editor (or bring an already opened editor to
@@ -149,8 +130,7 @@ private:
    *
    * @return The pointer to the opened project editor (nullptr on error)
    */
-  project::editor::ProjectEditor* openProject(
-      project::Project& project) noexcept;
+  ProjectEditor* openProject(Project& project) noexcept;
 
   /**
    * @brief Open a project with the editor (or bring an already opened editor to
@@ -160,8 +140,7 @@ private:
    *
    * @return The pointer to the opened project editor (nullptr on error)
    */
-  project::editor::ProjectEditor* openProject(
-      const FilePath& filepath) noexcept;
+  ProjectEditor* openProject(const FilePath& filepath) noexcept;
 
   /**
    * @brief Close an opened project editor
@@ -171,8 +150,7 @@ private:
    *
    * @retval  true if the project was successfully closed, false otherwise
    */
-  bool closeProject(project::editor::ProjectEditor& editor,
-                    bool askForSave) noexcept;
+  bool closeProject(ProjectEditor& editor, bool askForSave) noexcept;
 
   /**
    * @brief Close an opened project editor
@@ -206,8 +184,7 @@ private:
    * @return The pointer to the open project editor, or nullptr if the project
    * is not open
    */
-  project::editor::ProjectEditor* getOpenProject(const FilePath& filepath) const
-      noexcept;
+  ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
 
   /**
    * @brief Ask the user whether to restore a backup of a project
@@ -236,14 +213,14 @@ private:
   bool closeAllLibraryEditors(bool askForSave) noexcept;
 
   // Attributes
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   QScopedPointer<Ui::ControlPanel> mUi;
-  QScopedPointer<workspace::ProjectTreeModel> mProjectTreeModel;
-  QScopedPointer<workspace::RecentProjectsModel> mRecentProjectsModel;
-  QScopedPointer<workspace::FavoriteProjectsModel> mFavoriteProjectsModel;
-  QScopedPointer<library::manager::LibraryManager> mLibraryManager;
-  QHash<QString, project::editor::ProjectEditor*> mOpenProjectEditors;
-  QHash<FilePath, library::editor::LibraryEditor*> mOpenLibraryEditors;
+  QScopedPointer<ProjectTreeModel> mProjectTreeModel;
+  QScopedPointer<RecentProjectsModel> mRecentProjectsModel;
+  QScopedPointer<FavoriteProjectsModel> mFavoriteProjectsModel;
+  QScopedPointer<LibraryManager> mLibraryManager;
+  QHash<QString, ProjectEditor*> mOpenProjectEditors;
+  QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
   QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;
 };
 
@@ -251,7 +228,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

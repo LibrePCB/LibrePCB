@@ -17,18 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_NETLINE_H
-#define LIBREPCB_PROJECT_BI_NETLINE_H
+#ifndef LIBREPCB_CORE_BI_NETLINE_H
+#define LIBREPCB_CORE_BI_NETLINE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/path.h"
+#include "../../../geometry/trace.h"
+#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/geometry/trace.h>
 
 #include <QtCore>
 
@@ -37,11 +36,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-
-namespace project {
-
 class BI_NetSegment;
+class GraphicsLayer;
 class NetSignal;
 
 /*******************************************************************************
@@ -112,7 +108,7 @@ public:
   void removeFromBoard() override;
   void updateLine() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
@@ -146,7 +142,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

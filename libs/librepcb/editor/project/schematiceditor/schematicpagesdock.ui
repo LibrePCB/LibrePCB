@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::SchematicPagesDock</class>
- <widget class="QDockWidget" name="librepcb::project::editor::SchematicPagesDock">
+ <class>librepcb::editor::SchematicPagesDock</class>
+ <widget class="QDockWidget" name="librepcb::editor::SchematicPagesDock">
   <property name="geometry">
    <rect>
     <x>0</x>

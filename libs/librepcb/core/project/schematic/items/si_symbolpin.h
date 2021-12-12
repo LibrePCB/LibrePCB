@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_SYMBOLPIN_H
-#define LIBREPCB_PROJECT_SI_SYMBOLPIN_H
+#ifndef LIBREPCB_CORE_SI_SYMBOLPIN_H
+#define LIBREPCB_CORE_SI_SYMBOLPIN_H
 
 /*******************************************************************************
  *  Includes
@@ -35,18 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
+class Circuit;
 class ComponentPinSignalMapItem;
 class ComponentSignal;
-class SymbolPin;
-}  // namespace library
-
-namespace project {
-
-class Circuit;
 class ComponentSignalInstance;
 class ErcMsg;
 class SI_Symbol;
+class SymbolPin;
 
 /*******************************************************************************
  *  Class SI_SymbolPin
@@ -73,7 +68,7 @@ public:
   QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
                          bool returnPinNameIfEmpty = false) const noexcept;
   SI_Symbol& getSymbol() const noexcept { return mSymbol; }
-  const library::SymbolPin& getLibPin() const noexcept { return *mSymbolPin; }
+  const SymbolPin& getLibPin() const noexcept { return *mSymbolPin; }
   ComponentSignalInstance* getComponentSignalInstance() const noexcept {
     return mComponentSignalInstance;
   }
@@ -119,8 +114,8 @@ private:
 
   // General
   SI_Symbol& mSymbol;
-  const library::SymbolPin* mSymbolPin;
-  const library::ComponentPinSignalMapItem* mPinSignalMapItem;
+  const SymbolPin* mSymbolPin;
+  const ComponentPinSignalMapItem* mPinSignalMapItem;
   ComponentSignalInstance* mComponentSignalInstance;
   QMetaObject::Connection mHighlightChangedConnection;
 
@@ -140,7 +135,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::EagleLibraryImportWizardPage_SelectElements</class>
- <widget class="QWizardPage" name="librepcb::library::editor::EagleLibraryImportWizardPage_SelectElements">
+ <class>librepcb::editor::EagleLibraryImportWizardPage_SelectElements</class>
+ <widget class="QWizardPage" name="librepcb::editor::EagleLibraryImportWizardPage_SelectElements">
   <property name="geometry">
    <rect>
     <x>0</x>

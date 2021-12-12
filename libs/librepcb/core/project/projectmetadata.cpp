@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "projectmetadata.h"
 
-#include <librepcb/common/fileio/sexpression.h>
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -124,5 +123,4 @@ void ProjectMetadata::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

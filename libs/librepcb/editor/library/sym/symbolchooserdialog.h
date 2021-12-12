@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLCHOOSERDIALOG_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLCHOOSERDIALOG_H
+#ifndef LIBREPCB_EDITOR_SYMBOLCHOOSERDIALOG_H
+#define LIBREPCB_EDITOR_SYMBOLCHOOSERDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,15 +36,9 @@ namespace librepcb {
 
 class GraphicsScene;
 class IF_GraphicsLayerProvider;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
 class Symbol;
 class SymbolGraphicsItem;
+class Workspace;
 
 namespace editor {
 
@@ -66,7 +60,7 @@ public:
   // Constructors / Destructor
   SymbolChooserDialog() = delete;
   SymbolChooserDialog(const SymbolChooserDialog& other) = delete;
-  SymbolChooserDialog(const workspace::Workspace& ws,
+  SymbolChooserDialog(const Workspace& ws,
                       const IF_GraphicsLayerProvider& layerProvider,
                       QWidget* parent = nullptr) noexcept;
   ~SymbolChooserDialog() noexcept;
@@ -93,7 +87,7 @@ private:  // Methods
   const QStringList& localeOrder() const noexcept;
 
 private:  // Data
-  const workspace::Workspace& mWorkspace;
+  const Workspace& mWorkspace;
   const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<Ui::SymbolChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
@@ -108,7 +102,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

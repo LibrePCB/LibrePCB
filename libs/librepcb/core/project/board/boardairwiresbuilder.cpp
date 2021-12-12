@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "boardairwiresbuilder.h"
 
+#include "../../algorithm/airwiresbuilder.h"
+#include "../../graphics/graphicslayer.h"
+#include "../../library/pkg/footprintpad.h"
 #include "../circuit/circuit.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netsignal.h"
@@ -34,17 +37,12 @@
 #include "items/bi_plane.h"
 #include "items/bi_via.h"
 
-#include <librepcb/common/algorithm/airwiresbuilder.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/library/pkg/footprintpad.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -74,11 +72,11 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
       if (&pad->getBoard() != &mBoard) continue;
       const Point& pos = pad->getPosition();
       int id = builder.addPoint(pos);
-      pointLayerMap[id] = std::make_pair(pos,
-                                         (pad->getLibPad().getBoardSide() ==
-                                          library::FootprintPad::BoardSide::THT)
-                                             ? QString()  // on all layers
-                                             : pad->getLayerName());
+      pointLayerMap[id] = std::make_pair(
+          pos,
+          (pad->getLibPad().getBoardSide() == FootprintPad::BoardSide::THT)
+              ? QString()  // on all layers
+              : pad->getLayerName());
       anchorMap[pad] = id;
     }
   }
@@ -142,5 +140,4 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

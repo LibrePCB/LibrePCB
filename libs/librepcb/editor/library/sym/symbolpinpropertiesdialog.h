@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLPINPROPERTIESDIALOG_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLPINPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_SYMBOLPINPROPERTIESDIALOG_H
+#define LIBREPCB_EDITOR_SYMBOLPINPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -32,13 +32,11 @@
 namespace librepcb {
 
 class LengthUnit;
-class UndoStack;
-
-namespace library {
-
 class SymbolPin;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class SymbolPinPropertiesDialog;
@@ -86,7 +84,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

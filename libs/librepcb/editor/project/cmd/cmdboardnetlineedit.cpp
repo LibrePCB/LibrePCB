@@ -28,7 +28,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -84,5 +84,5 @@ void CmdBoardNetLineEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

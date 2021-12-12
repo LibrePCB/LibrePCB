@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDDESIGNRULECHECKMESSAGESDOCK_H
-#define LIBREPCB_PROJECTEDITOR_BOARDDESIGNRULECHECKMESSAGESDOCK_H
+#ifndef LIBREPCB_EDITOR_BOARDDESIGNRULECHECKMESSAGESDOCK_H
+#define LIBREPCB_EDITOR_BOARDDESIGNRULECHECKMESSAGESDOCK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/project/boards/drc/boarddesignrulecheckmessage.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheckmessage.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 namespace Ui {
@@ -93,7 +92,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

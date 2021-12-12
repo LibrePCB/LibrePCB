@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/attributes/attrtypevoltage.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/attribute/attrtypevoltage.h>
 
 /*******************************************************************************
  *  Namespace

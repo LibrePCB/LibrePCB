@@ -22,25 +22,25 @@
  ******************************************************************************/
 #include "symbolinstancepropertiesdialog.h"
 
+#include "../../project/cmd/cmdcomponentinstanceedit.h"
+#include "../../project/cmd/cmdsymbolinstanceedit.h"
+#include "../../undocommand.h"
+#include "../../undostack.h"
 #include "ui_symbolinstancepropertiesdialog.h"
 
-#include <librepcb/common/attributes/attributetype.h>
-#include <librepcb/common/attributes/attributeunit.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/circuit/cmd/cmdcomponentinstanceedit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/settings/projectsettings.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,7 +49,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -57,8 +56,8 @@ namespace editor {
  ******************************************************************************/
 
 SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
-    workspace::Workspace& ws, Project& project, ComponentInstance& cmp,
-    SI_Symbol& symbol, UndoStack& undoStack, const LengthUnit& lengthUnit,
+    Workspace& ws, Project& project, ComponentInstance& cmp, SI_Symbol& symbol,
+    UndoStack& undoStack, const LengthUnit& lengthUnit,
     const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
@@ -126,10 +125,10 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   try {
     tl::optional<Uuid> device = mComponentInstance.getDefaultDeviceUuid();
     // Add devices from project library first (higher priority)
-    QHash<Uuid, library::Device*> prjLibDevices =
+    QHash<Uuid, Device*> prjLibDevices =
         mProject.getLibrary().getDevicesOfComponent(
             mComponentInstance.getLibComponent().getUuid());
-    foreach (const library::Device* device, prjLibDevices) {
+    foreach (const Device* device, prjLibDevices) {
       Q_ASSERT(device);
       QString name = *device->getNames().value(localeOrder);
       mUi->cbxPreselectedDevice->addItem(name, device->getUuid().toStr());
@@ -143,7 +142,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);  // can throw
       if (devFp.isValid()) {
         QString name;
-        mWorkspace.getLibraryDb().getElementTranslations<library::Device>(
+        mWorkspace.getLibraryDb().getElementTranslations<Device>(
             devFp, localeOrder, &name);  // can throw
         mUi->cbxPreselectedDevice->addItem(name, deviceUuid.toStr());
       }
@@ -239,5 +238,4 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

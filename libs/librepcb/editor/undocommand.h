@@ -17,20 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_UNDOCOMMAND_H
-#define LIBREPCB_COMMON_UNDOCOMMAND_H
+#ifndef LIBREPCB_EDITOR_UNDOCOMMAND_H
+#define LIBREPCB_EDITOR_UNDOCOMMAND_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "exceptions.h"
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class UndoCommand
@@ -39,10 +38,10 @@ namespace librepcb {
 /**
  * @brief The UndoCommand class represents a command which you can undo/redo
  *
- * See description of librepcb::UndoStack for more details about the whole
- * concept.
+ * See description of ::librepcb::editor::UndoStack for more details about the
+ * whole concept.
  *
- * @see librepcb::UndoStack
+ * @see ::librepcb::editor::UndoStack
  */
 class UndoCommand {
   Q_DECLARE_TR_FUNCTIONS(UndoCommand)
@@ -105,7 +104,8 @@ protected:
    *
    * @note This method must be implemented in all derived classes. If the first
    * time execution is exactly identical to an "redo" action, you can simple
-   * call #performRedo() in the implementation of this method.
+   * call ::librepcb::editor::UndoCommand::performRedo() in the implementation
+   * of this method.
    *
    * @retval true     If the command has done some changes
    * @retval false    If the command has done nothing (the command can be
@@ -138,6 +138,7 @@ private:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

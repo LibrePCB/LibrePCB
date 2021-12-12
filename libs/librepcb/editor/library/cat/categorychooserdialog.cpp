@@ -24,8 +24,8 @@
 
 #include "ui_categorychooserdialog.h"
 
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -43,15 +42,15 @@ namespace editor {
 
 template <typename ElementType>
 CategoryChooserDialog<ElementType>::CategoryChooserDialog(
-    const workspace::Workspace& ws, QWidget* parent) noexcept
+    const Workspace& ws, QWidget* parent) noexcept
   : QDialog(parent), mUi(new Ui::CategoryChooserDialog) {
   mUi->setupUi(this);
   connect(mUi->treeView, &QTreeView::doubleClicked, this,
           &CategoryChooserDialog<ElementType>::accept);
 
-  mModel.reset(new workspace::CategoryTreeModel<ElementType>(
+  mModel.reset(new CategoryTreeModel<ElementType>(
       ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(),
-      workspace::CategoryTreeFilter::ALL));
+      CategoryTreeFilter::ALL));
   mUi->treeView->setModel(mModel.data());
   mUi->treeView->setRootIndex(QModelIndex());
 }
@@ -69,7 +68,7 @@ tl::optional<Uuid> CategoryChooserDialog<ElementType>::getSelectedCategoryUuid()
     const noexcept {
   QModelIndex index = mUi->treeView->currentIndex();
   if (index.isValid() && index.internalPointer()) {
-    workspace::CategoryTreeItem<ElementType>* item = mModel->getItem(index);
+    CategoryTreeItem<ElementType>* item = mModel->getItem(index);
     return item ? item->getUuid() : tl::nullopt;
   } else {
     return tl::nullopt;
@@ -79,13 +78,12 @@ tl::optional<Uuid> CategoryChooserDialog<ElementType>::getSelectedCategoryUuid()
 /*******************************************************************************
  *  Explicit template instantiations
  ******************************************************************************/
-template class CategoryChooserDialog<library::ComponentCategory>;
-template class CategoryChooserDialog<library::PackageCategory>;
+template class CategoryChooserDialog<ComponentCategory>;
+template class CategoryChooserDialog<PackageCategory>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

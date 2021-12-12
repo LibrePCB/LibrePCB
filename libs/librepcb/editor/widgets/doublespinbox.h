@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_DOUBLESPINBOX_H
-#define LIBREPCB_COMMON_DOUBLESPINBOX_H
+#ifndef LIBREPCB_EDITOR_DOUBLESPINBOX_H
+#define LIBREPCB_EDITOR_DOUBLESPINBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -30,6 +30,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class DoubleSpinBox
@@ -61,6 +62,7 @@ public:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

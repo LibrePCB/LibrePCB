@@ -24,12 +24,12 @@
 
 #include "ui_fabricationoutputdialog.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardfabricationoutputsettings.h>
-#include <librepcb/project/boards/boardgerberexport.h>
-#include <librepcb/project/metadata/projectmetadata.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardfabricationoutputsettings.h>
+#include <librepcb/core/project/board/boardgerberexport.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectmetadata.h>
 
 #include <QtCore>
 
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -225,5 +224,4 @@ QStringList FabricationOutputDialog::getBotSilkscreenLayers() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

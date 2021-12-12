@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SYMBOLPIN_H
-#define LIBREPCB_LIBRARY_SYMBOLPIN_H
+#ifndef LIBREPCB_CORE_SYMBOLPIN_H
+#define LIBREPCB_CORE_SYMBOLPIN_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/units/point.h>
+#include "../../serialization/serializableobjectlist.h"
+#include "../../types/angle.h"
+#include "../../types/circuitidentifier.h"
+#include "../../types/length.h"
+#include "../../types/point.h"
 
 #include <QtCore>
 
@@ -35,7 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class SymbolPinGraphicsItem;
 
@@ -91,7 +90,7 @@ public:
   void registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
   void unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -126,7 +125,6 @@ using SymbolPinList =
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

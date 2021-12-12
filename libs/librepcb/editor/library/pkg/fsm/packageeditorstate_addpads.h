@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_ADDPADS_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_ADDPADS_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORSTATE_ADDPADS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,13 +34,12 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
-class CmdFootprintPadEdit;
 class PackagePad;
 
 namespace editor {
 
+class CmdFootprintPadEdit;
 class PackagePadComboBox;
 
 /*******************************************************************************
@@ -158,7 +157,6 @@ public:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

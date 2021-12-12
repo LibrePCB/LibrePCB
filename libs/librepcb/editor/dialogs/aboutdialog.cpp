@@ -24,7 +24,7 @@
 
 #include "ui_aboutdialog.h"
 
-#include <librepcb/common/application.h>
+#include <librepcb/core/application.h>
 
 #include <QtNetwork>
 
@@ -32,6 +32,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 AboutDialog::AboutDialog(QWidget* parent) noexcept
   : QDialog(parent), mUi(new Ui::AboutDialog) {
@@ -140,4 +141,5 @@ AboutDialog::~AboutDialog() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

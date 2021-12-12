@@ -22,24 +22,25 @@
  ******************************************************************************/
 #include "cmddragselectedboarditems.h"
 
-#include <librepcb/common/geometry/cmd/cmdholeedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardselectionquery.h>
-#include <librepcb/project/boards/cmd/cmdboardnetpointedit.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
-#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceedit.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_hole.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/items/bi_stroketext.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/project.h>
+#include "../../cmd/cmdholeedit.h"
+#include "../../cmd/cmdpolygonedit.h"
+#include "../../cmd/cmdstroketextedit.h"
+#include "../../project/cmd/cmdboardnetpointedit.h"
+#include "../../project/cmd/cmdboardplaneedit.h"
+#include "../../project/cmd/cmdboardviaedit.h"
+#include "../../project/cmd/cmddeviceinstanceedit.h"
+
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardselectionquery.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -47,7 +48,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -275,5 +275,4 @@ bool CmdDragSelectedBoardItems::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -22,6 +22,10 @@
  ******************************************************************************/
 #include "bi_footprintpad.h"
 
+#include "../../../graphics/graphicslayer.h"
+#include "../../../library/dev/device.h"
+#include "../../../library/pkg/footprint.h"
+#include "../../../library/pkg/package.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -29,18 +33,12 @@
 #include "bi_footprint.h"
 #include "bi_netsegment.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/package.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -329,5 +327,4 @@ QString BI_FootprintPad::getNetSignalName() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

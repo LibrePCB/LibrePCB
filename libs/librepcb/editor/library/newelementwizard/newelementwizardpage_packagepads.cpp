@@ -28,7 +28,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -80,5 +79,4 @@ void NewElementWizardPage_PackagePads::cleanupPage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

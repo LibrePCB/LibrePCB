@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "componentcategory.h"
 
-#include <librepcb/common/fileio/sexpression.h>
+#include "../../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -59,5 +58,4 @@ ComponentCategory::~ComponentCategory() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

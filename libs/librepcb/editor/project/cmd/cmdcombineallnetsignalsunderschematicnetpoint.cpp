@@ -26,22 +26,22 @@
 #include "cmdcombineschematicnetpoints.h"
 #include "cmdremoveunusednetsignals.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/netclass.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlineremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/schematic.h>
+#include <librepcb/core/common/scopeguard.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
+#include <librepcb/core/project/circuit/cmd/cmdnetsignaledit.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/cmd/cmdschematicnetlineadd.h>
+#include <librepcb/core/project/schematic/cmd/cmdschematicnetlineremove.h>
+#include <librepcb/core/project/schematic/cmd/cmdschematicnetpointadd.h>
+#include <librepcb/core/project/schematic/cmd/cmdschematicnetpointedit.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -49,7 +49,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -262,5 +261,4 @@ bool CmdCombineAllNetSignalsUnderSchematicNetPoint::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

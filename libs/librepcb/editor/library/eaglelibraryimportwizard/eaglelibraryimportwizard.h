@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARD_H
-#define LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARD_H
+#ifndef LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARD_H
+#define LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARD_H
 
 /*******************************************************************************
  *  Includes
@@ -34,12 +34,8 @@
 namespace librepcb {
 
 class FilePath;
-
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
 namespace editor {
 
 class EagleLibraryImportWizardContext;
@@ -61,8 +57,7 @@ class EagleLibraryImportWizard final : public QWizard {
 public:
   // Constructors / Destructor
   EagleLibraryImportWizard(const EagleLibraryImportWizard& other) = delete;
-  EagleLibraryImportWizard(workspace::Workspace& workspace,
-                           const FilePath& dstLibFp,
+  EagleLibraryImportWizard(Workspace& workspace, const FilePath& dstLibFp,
                            QWidget* parent = nullptr) noexcept;
   ~EagleLibraryImportWizard() noexcept;
 
@@ -83,7 +78,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

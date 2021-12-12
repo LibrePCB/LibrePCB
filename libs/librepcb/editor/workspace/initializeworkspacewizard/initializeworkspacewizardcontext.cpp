@@ -22,17 +22,17 @@
  ******************************************************************************/
 #include "initializeworkspacewizardcontext.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/asynccopyoperation.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/asynccopyoperation.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -65,7 +65,7 @@ std::unique_ptr<AsyncCopyOperation>
 }
 
 void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
-  workspace::Workspace ws(mWorkspacePath);  // can throw
+  Workspace ws(mWorkspacePath);  // can throw
   ws.getSettings().applicationLocale.set(mAppLocale);
   ws.getSettings().defaultLengthUnit.set(mLengthUnit);
   ws.getSettings().libraryNormOrder.set(mLibraryNormOrder);
@@ -77,5 +77,5 @@ void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

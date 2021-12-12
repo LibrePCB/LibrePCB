@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_DEFAULTGRAPHICSLAYERPROVIDER_H
-#define LIBREPCB_COMMON_DEFAULTGRAPHICSLAYERPROVIDER_H
+#ifndef LIBREPCB_CORE_DEFAULTGRAPHICSLAYERPROVIDER_H
+#define LIBREPCB_CORE_DEFAULTGRAPHICSLAYERPROVIDER_H
 
 /*******************************************************************************
  *  Includes

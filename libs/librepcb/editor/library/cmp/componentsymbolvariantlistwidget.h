@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
+#define LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTLISTWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "if_componentsymbolvarianteditorprovider.h"
 
-#include <librepcb/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,14 +34,11 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class EditableTableWidget;
-class UndoStack;
-
-namespace library {
 namespace editor {
 
 class ComponentSymbolVariantListModel;
+class EditableTableWidget;
+class UndoStack;
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantListWidget
@@ -88,7 +85,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

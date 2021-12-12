@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_ADDPINS_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_ADDPINS_H
+#ifndef LIBREPCB_EDITOR_SYMBOLEDITORSTATE_ADDPINS_H
+#define LIBREPCB_EDITOR_SYMBOLEDITORSTATE_ADDPINS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "symboleditorstate.h"
 
-#include <librepcb/common/units/length.h>
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,14 +37,12 @@ namespace librepcb {
 
 class Angle;
 class Point;
-
-namespace library {
-
-class CmdSymbolPinEdit;
 class SymbolPin;
 class SymbolPinGraphicsItem;
 
 namespace editor {
+
+class CmdSymbolPinEdit;
 
 /*******************************************************************************
  *  Class SymbolEditorState_AddPins
@@ -103,7 +101,6 @@ private:  // Types / Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

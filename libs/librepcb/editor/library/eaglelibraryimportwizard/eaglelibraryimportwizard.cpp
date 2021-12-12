@@ -39,16 +39,15 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-EagleLibraryImportWizard::EagleLibraryImportWizard(
-    workspace::Workspace& workspace, const FilePath& dstLibFp,
-    QWidget* parent) noexcept
+EagleLibraryImportWizard::EagleLibraryImportWizard(Workspace& workspace,
+                                                   const FilePath& dstLibFp,
+                                                   QWidget* parent) noexcept
   : QWizard(parent),
     mUi(new Ui::EagleLibraryImportWizard),
     mContext(new EagleLibraryImportWizardContext(workspace, dstLibFp, this)) {
@@ -115,5 +114,4 @@ void EagleLibraryImportWizard::reject() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

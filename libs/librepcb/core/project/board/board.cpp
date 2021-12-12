@@ -22,12 +22,24 @@
  ******************************************************************************/
 #include "board.h"
 
+#include "../../application.h"
+#include "../../exceptions.h"
+#include "../../geometry/polygon.h"
+#include "../../graphics/graphicsscene.h"
+#include "../../library/cmp/component.h"
+#include "../../library/pkg/footprint.h"
+#include "../../serialization/sexpression.h"
+#include "../../types/gridproperties.h"
+#include "../../types/lengthunit.h"
+#include "../../utils/scopeguardlist.h"
+#include "../../utils/toolbox.h"
 #include "../circuit/circuit.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/netsignal.h"
 #include "../erc/ercmsg.h"
 #include "../project.h"
 #include "boardairwiresbuilder.h"
+#include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
 #include "boardlayerstack.h"
 #include "boardselectionquery.h"
@@ -45,17 +57,6 @@
 #include "items/bi_stroketext.h"
 #include "items/bi_via.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/boarddesignrules.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/pkg/footprint.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -65,7 +66,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -1108,5 +1108,4 @@ Board* Board::create(Project& project,
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

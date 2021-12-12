@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "cmdschematicnetlabelremove.h"
 
-#include "../items/si_netlabel.h"
-#include "../items/si_netsegment.h"
-#include "../schematic.h"
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -32,7 +32,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -70,5 +70,5 @@ void CmdSchematicNetLabelRemove::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

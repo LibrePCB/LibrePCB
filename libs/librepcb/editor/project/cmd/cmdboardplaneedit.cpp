@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "cmdboardplaneedit.h"
 
-#include "../board.h"
-
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/project/board/board.h>
 
 #include <QtCore>
 
@@ -32,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -189,5 +188,5 @@ void CmdBoardPlaneEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

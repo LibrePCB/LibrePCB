@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_TOOLBOX_H
-#define LIBREPCB_COMMON_TOOLBOX_H
+#ifndef LIBREPCB_CORE_TOOLBOX_H
+#define LIBREPCB_CORE_TOOLBOX_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/point.h"
+#include "../exceptions.h"
+#include "../types/angle.h"
+#include "../types/length.h"
+#include "../types/point.h"
 
 #include <type_traits>
 

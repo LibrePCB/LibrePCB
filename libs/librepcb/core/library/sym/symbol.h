@@ -17,18 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SYMBOL_H
-#define LIBREPCB_LIBRARY_SYMBOL_H
+#ifndef LIBREPCB_CORE_SYMBOL_H
+#define LIBREPCB_CORE_SYMBOL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../geometry/circle.h"
+#include "../../geometry/polygon.h"
+#include "../../geometry/text.h"
 #include "../libraryelement.h"
 #include "symbolpin.h"
-
-#include <librepcb/common/geometry/circle.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/text.h>
 
 #include <QtCore>
 
@@ -36,7 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class SymbolGraphicsItem;
 
@@ -116,7 +114,7 @@ private:  // Methods
   void textsEdited(const TextList& list, int index,
                    const std::shared_ptr<const Text>& text,
                    TextList::Event event) noexcept;
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
 private:  // Data
@@ -138,7 +136,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

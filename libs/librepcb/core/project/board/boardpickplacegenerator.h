@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDPICKPLACEGENERATOR_H
-#define LIBREPCB_PROJECT_BOARDPICKPLACEGENERATOR_H
+#ifndef LIBREPCB_CORE_BOARDPICKPLACEGENERATOR_H
+#define LIBREPCB_CORE_BOARDPICKPLACEGENERATOR_H
 
 /*******************************************************************************
  *  Includes
@@ -32,11 +32,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class PickPlaceData;
-
-namespace project {
-
 class Board;
+class PickPlaceData;
 
 /*******************************************************************************
  *  Class BoardPickPlaceGenerator
@@ -70,7 +67,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

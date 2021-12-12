@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -38,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -116,5 +115,4 @@ QWidget* BoardEditorState::parentWidget() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

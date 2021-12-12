@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "component.h"
 
+#include "../../serialization/sexpression.h"
 #include "componentcheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
 
@@ -32,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -156,5 +154,4 @@ QString Component::cleanNorm(QString norm) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

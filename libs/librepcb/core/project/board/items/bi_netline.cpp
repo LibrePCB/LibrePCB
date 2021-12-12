@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bi_netline.h"
 
+#include "../../../utils/scopeguard.h"
 #include "../../circuit/netsignal.h"
 #include "../boardlayerstack.h"
 #include "bi_device.h"
@@ -31,15 +32,12 @@
 #include "bi_netsegment.h"
 #include "bi_via.h"
 
-#include <librepcb/common/scopeguard.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class BI_NetLineAnchor
@@ -297,5 +295,4 @@ void BI_NetLine::setSelected(bool selected) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

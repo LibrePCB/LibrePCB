@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "boardnetsegmentsplitter.h"
 
-#include <librepcb/common/toolbox.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -160,5 +159,4 @@ void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H
-#define LIBREPCB_PROJECT_BOARDAIRWIRESBUILDER_H
+#ifndef LIBREPCB_CORE_BOARDAIRWIRESBUILDER_H
+#define LIBREPCB_CORE_BOARDAIRWIRESBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/units/point.h>
+#include "../../types/point.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Board;
 class NetSignal;
@@ -66,7 +65,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

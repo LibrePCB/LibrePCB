@@ -22,36 +22,36 @@
  ******************************************************************************/
 #include "schematiceditor.h"
 
-#include "../dialogs/bomgeneratordialog.h"
-#include "../dialogs/projectpropertieseditordialog.h"
-#include "../docks/ercmsgdock.h"
+#include "../../dialogs/aboutdialog.h"
+#include "../../dialogs/filedialog.h"
+#include "../../dialogs/gridsettingsdialog.h"
+#include "../../project/cmd/cmdschematicadd.h"
+#include "../../project/cmd/cmdschematicedit.h"
+#include "../../project/cmd/cmdschematicremove.h"
+#include "../../undostack.h"
+#include "../../utils/exclusiveactiongroup.h"
+#include "../../utils/undostackactiongroup.h"
+#include "../../widgets/graphicsview.h"
+#include "../bomgeneratordialog.h"
+#include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
+#include "../projectpropertieseditordialog.h"
 #include "fsm/schematiceditorfsm.h"
 #include "schematicpagesdock.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/aboutdialog.h>
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/dialogs/gridsettingsdialog.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/utils/exclusiveactiongroup.h>
-#include <librepcb/common/utils/undostackactiongroup.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/metadata/projectmetadata.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicedit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicremove.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/settings/projectsettings.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QSvgGenerator>
 #include <QtCore>
@@ -62,7 +62,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -219,7 +218,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
+          &WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
   connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
           mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
@@ -429,24 +428,23 @@ void SchematicEditor::on_actionPDF_Export_triggered() {
 
     // Open PDF
     {
-      namespace ws = ::librepcb::workspace;
-      const ws::WorkspaceSettings& workspaceSettings =
+      const WorkspaceSettings& workspaceSettings =
           mProjectEditor.getWorkspace().getSettings();
 
-      ws::WorkspaceSettings::PdfOpenBehavior bhv =
+      WorkspaceSettings::PdfOpenBehavior bhv =
           workspaceSettings.pdfOpenBehavior.get();
 
-      if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::NEVER) {
+      if (bhv == WorkspaceSettings::PdfOpenBehavior::NEVER) {
         // do nothing
       } else {
         bool doOpenPdf = true;
-        if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::ASK) {
+        if (bhv == WorkspaceSettings::PdfOpenBehavior::ASK) {
           int openPdf = QMessageBox::information(
               this, tr("PDF Export"), tr("PDF exported successfully"),
               QMessageBox::Ok | QMessageBox::Open);
 
           if (openPdf == QMessageBox::Ok) doOpenPdf = false;
-        } else if (bhv != ws::WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
+        } else if (bhv != WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
           throw LogicError(__FILE__, __LINE__);
         }
 
@@ -808,5 +806,4 @@ bool SchematicEditor::useIeee315Symbols() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

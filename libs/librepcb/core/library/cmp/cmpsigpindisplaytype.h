@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H
-#define LIBREPCB_LIBRARY_CMPSIGPINDISPLAYTYPE_H
+#ifndef LIBREPCB_CORE_CMPSIGPINDISPLAYTYPE_H
+#define LIBREPCB_CORE_CMPSIGPINDISPLAYTYPE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/sexpression.h>
+#include "../../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class CmpSigPinDisplayType
@@ -129,19 +128,16 @@ private:  // Data
  *  Non-Member Functions
  ******************************************************************************/
 
-}  // namespace library
-
 template <>
-inline SExpression serialize(const library::CmpSigPinDisplayType& obj) {
+inline SExpression serialize(const CmpSigPinDisplayType& obj) {
   return SExpression::createToken(obj.toString());
 }
 
 template <>
-inline const library::CmpSigPinDisplayType& deserialize(
-    const SExpression& sexpr, const Version& fileFormat) {
+inline const CmpSigPinDisplayType& deserialize(const SExpression& sexpr,
+                                               const Version& fileFormat) {
   Q_UNUSED(fileFormat);
-  return library::CmpSigPinDisplayType::fromString(
-      sexpr.getValue());  // can throw
+  return CmpSigPinDisplayType::fromString(sexpr.getValue());  // can throw
 }
 
 /*******************************************************************************

@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "boardplanepropertiesdialog.h"
 
+#include "../../project/cmd/cmdboardplaneedit.h"
+#include "../../undostack.h"
 #include "ui_boardplanepropertiesdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -189,5 +188,4 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

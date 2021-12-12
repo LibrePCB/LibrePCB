@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "textpropertiesdialog.h"
 
-#include "../geometry/cmd/cmdtextedit.h"
-#include "../geometry/text.h"
-#include "../graphics/graphicslayer.h"
+#include "../cmd/cmdtextedit.h"
 #include "../undostack.h"
 #include "ui_textpropertiesdialog.h"
+
+#include <librepcb/core/geometry/text.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,6 +36,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
                                            QList<GraphicsLayer*> layers,
@@ -155,4 +157,5 @@ void TextPropertiesDialog::selectLayerNameInCombobox(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

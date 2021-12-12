@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_STATUSBAR_H
-#define LIBREPCB_COMMON_STATUSBAR_H
+#ifndef LIBREPCB_EDITOR_STATUSBAR_H
+#define LIBREPCB_EDITOR_STATUSBAR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/lengthunit.h"
-#include "../units/point.h"
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,6 +33,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class StatusBar
@@ -88,8 +89,9 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::StatusBar::Fields)
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::StatusBar::Fields)
 
 #endif

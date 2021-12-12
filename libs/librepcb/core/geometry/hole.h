@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_HOLE_H
-#define LIBREPCB_COMMON_HOLE_H
+#ifndef LIBREPCB_CORE_HOLE_H
+#define LIBREPCB_CORE_HOLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
-#include "../units/length.h"
-#include "../units/point.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/length.h"
+#include "../types/point.h"
 
 #include <QtCore>
 
@@ -72,7 +72,7 @@ public:
   bool setPosition(const Point& position) noexcept;
   bool setDiameter(const PositiveLength& diameter) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

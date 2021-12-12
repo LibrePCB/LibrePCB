@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "filedownload.h"
 
-#include "scopeguard.h"
+#include "../exceptions.h"
+#include "../utils/scopeguard.h"
 
 #include <QtCore>
 #include <quazip/JlCompress.h>

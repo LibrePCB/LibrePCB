@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_NETWORKREQUESTBASE_H
-#define LIBREPCB_COMMON_NETWORKREQUESTBASE_H
+#ifndef LIBREPCB_CORE_NETWORKREQUESTBASE_H
+#define LIBREPCB_CORE_NETWORKREQUESTBASE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-
 #include <QtCore>
 #include <QtNetwork>
 

@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "undocommandgroup.h"
 
-#include "scopeguardlist.h"
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/utils/scopeguardlist.h>
 
 #include <QtCore>
 
@@ -30,6 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -134,4 +136,5 @@ void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

@@ -22,12 +22,11 @@
  ******************************************************************************/
 #include "cmdprojectlibraryremoveelement.h"
 
-#include "../projectlibrary.h"
-
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/projectlibrary.h>
 
 #include <QtCore>
 
@@ -35,7 +34,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -80,42 +79,42 @@ void CmdProjectLibraryRemoveElement<ElementType>::performRedo() {
  ******************************************************************************/
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Symbol>::addElement() {
+void CmdProjectLibraryRemoveElement<Symbol>::addElement() {
   mLibrary.addSymbol(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Package>::addElement() {
+void CmdProjectLibraryRemoveElement<Package>::addElement() {
   mLibrary.addPackage(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Component>::addElement() {
+void CmdProjectLibraryRemoveElement<Component>::addElement() {
   mLibrary.addComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Device>::addElement() {
+void CmdProjectLibraryRemoveElement<Device>::addElement() {
   mLibrary.addDevice(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Symbol>::removeElement() {
+void CmdProjectLibraryRemoveElement<Symbol>::removeElement() {
   mLibrary.removeSymbol(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Package>::removeElement() {
+void CmdProjectLibraryRemoveElement<Package>::removeElement() {
   mLibrary.removePackage(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Component>::removeElement() {
+void CmdProjectLibraryRemoveElement<Component>::removeElement() {
   mLibrary.removeComponent(mElement);
 }
 
 template <>
-void CmdProjectLibraryRemoveElement<library::Device>::removeElement() {
+void CmdProjectLibraryRemoveElement<Device>::removeElement() {
   mLibrary.removeDevice(mElement);
 }
 
@@ -123,14 +122,14 @@ void CmdProjectLibraryRemoveElement<library::Device>::removeElement() {
  *  Explicit Template Instantiation
  ******************************************************************************/
 
-template class CmdProjectLibraryRemoveElement<library::Symbol>;
-template class CmdProjectLibraryRemoveElement<library::Package>;
-template class CmdProjectLibraryRemoveElement<library::Component>;
-template class CmdProjectLibraryRemoveElement<library::Device>;
+template class CmdProjectLibraryRemoveElement<Symbol>;
+template class CmdProjectLibraryRemoveElement<Package>;
+template class CmdProjectLibraryRemoveElement<Component>;
+template class CmdProjectLibraryRemoveElement<Device>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

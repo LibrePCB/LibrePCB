@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::ComponentSymbolVariantEditDialog</class>
- <widget class="QDialog" name="librepcb::library::editor::ComponentSymbolVariantEditDialog">
+ <class>librepcb::editor::ComponentSymbolVariantEditDialog</class>
+ <widget class="QDialog" name="librepcb::editor::ComponentSymbolVariantEditDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -114,7 +114,7 @@
        <number>3</number>
       </property>
       <item>
-       <widget class="librepcb::library::editor::ComponentSymbolVariantItemListEditorWidget" name="symbolListWidget" native="true"/>
+       <widget class="librepcb::editor::ComponentSymbolVariantItemListEditorWidget" name="symbolListWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -140,7 +140,7 @@
          <number>3</number>
         </property>
         <item>
-         <widget class="librepcb::GraphicsView" name="graphicsView"/>
+         <widget class="librepcb::editor::GraphicsView" name="graphicsView"/>
         </item>
        </layout>
       </widget>
@@ -164,7 +164,7 @@
          <number>3</number>
         </property>
         <item>
-         <widget class="librepcb::library::editor::CompSymbVarPinSignalMapEditorWidget" name="pinSignalMapEditorWidget" native="true"/>
+         <widget class="librepcb::editor::CompSymbVarPinSignalMapEditorWidget" name="pinSignalMapEditorWidget" native="true"/>
         </item>
        </layout>
       </widget>
@@ -185,21 +185,21 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::library::editor::ComponentSymbolVariantItemListEditorWidget</class>
+   <class>librepcb::editor::ComponentSymbolVariantItemListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/cmp/componentsymbolvariantitemlisteditorwidget.h</header>
+   <header location="global">librepcb/editor/library/cmp/componentsymbolvariantitemlisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::CompSymbVarPinSignalMapEditorWidget</class>
+   <class>librepcb::editor::CompSymbVarPinSignalMapEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/cmp/compsymbvarpinsignalmapeditorwidget.h</header>
+   <header location="global">librepcb/editor/library/cmp/compsymbvarpinsignalmapeditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::GraphicsView</class>
+   <class>librepcb::editor::GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">librepcb/common/graphics/graphicsview.h</header>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -207,7 +207,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::library::editor::ComponentSymbolVariantEditDialog</receiver>
+   <receiver>librepcb::editor::ComponentSymbolVariantEditDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -223,7 +223,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::library::editor::ComponentSymbolVariantEditDialog</receiver>
+   <receiver>librepcb::editor::ComponentSymbolVariantEditDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

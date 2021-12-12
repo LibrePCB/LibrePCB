@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::workspace::WorkspaceSettingsDialog</class>
- <widget class="QDialog" name="librepcb::workspace::WorkspaceSettingsDialog">
+ <class>librepcb::editor::WorkspaceSettingsDialog</class>
+ <widget class="QDialog" name="librepcb::editor::WorkspaceSettingsDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -223,7 +223,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="librepcb::EditableTableWidget" name="tblLibLocaleOrder">
+        <widget class="librepcb::editor::EditableTableWidget" name="tblLibLocaleOrder">
          <property name="editTriggers">
           <set>QAbstractItemView::AllEditTriggers</set>
          </property>
@@ -236,7 +236,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="librepcb::EditableTableWidget" name="tblLibNormOrder">
+        <widget class="librepcb::editor::EditableTableWidget" name="tblLibNormOrder">
          <property name="editTriggers">
           <set>QAbstractItemView::AllEditTriggers</set>
          </property>
@@ -266,7 +266,7 @@
         </widget>
        </item>
        <item>
-        <widget class="librepcb::EditableTableWidget" name="tblRepositoryUrls">
+        <widget class="librepcb::editor::EditableTableWidget" name="tblRepositoryUrls">
          <property name="editTriggers">
           <set>QAbstractItemView::AllEditTriggers</set>
          </property>
@@ -466,9 +466,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::EditableTableWidget</class>
+   <class>librepcb::editor::EditableTableWidget</class>
    <extends>QTableView</extends>
-   <header location="global">librepcb/common/widgets/editabletablewidget.h</header>
+   <header location="global">librepcb/editor/widgets/editabletablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

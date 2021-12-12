@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCACHE_H
-#define LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCACHE_H
+#ifndef LIBREPCB_EDITOR_LIBRARYELEMENTCACHE_H
+#define LIBREPCB_EDITOR_LIBRARYELEMENTCACHE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -35,18 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class WorkspaceLibraryDb;
-}
-
-namespace library {
-
 class Component;
 class ComponentCategory;
 class Device;
 class Package;
 class PackageCategory;
 class Symbol;
+class WorkspaceLibraryDb;
 
 namespace editor {
 
@@ -64,8 +59,7 @@ public:
   // Constructors / Destructor
   LibraryElementCache() = delete;
   LibraryElementCache(const LibraryElementCache& other) = delete;
-  explicit LibraryElementCache(
-      const workspace::WorkspaceLibraryDb& db) noexcept;
+  explicit LibraryElementCache(const WorkspaceLibraryDb& db) noexcept;
   ~LibraryElementCache() noexcept;
 
   // Getters
@@ -85,12 +79,12 @@ public:
 private:  // Methods
   template <typename T>
   std::shared_ptr<const T> getElement(
-      FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const,
+      FilePath (WorkspaceLibraryDb::*getter)(const Uuid&) const,
       QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
       noexcept;
 
 private:  // Data
-  QPointer<const workspace::WorkspaceLibraryDb> mDb;
+  QPointer<const WorkspaceLibraryDb> mDb;
   mutable QHash<Uuid, std::shared_ptr<const ComponentCategory>> mCmpCat;
   mutable QHash<Uuid, std::shared_ptr<const PackageCategory>> mPkgCat;
   mutable QHash<Uuid, std::shared_ptr<const Symbol>> mSym;
@@ -104,7 +98,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

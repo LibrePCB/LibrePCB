@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDPASTEBOARDITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDPASTEBOARDITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDPASTEBOARDITEMS_H
+#define LIBREPCB_EDITOR_CMDPASTEBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/point.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -34,7 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Board;
 class NetSignal;
@@ -64,7 +64,7 @@ public:
   CmdPasteBoardItems& operator=(const CmdPasteBoardItems& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   NetSignal* getOrCreateNetSignal(const QString& name);
@@ -81,7 +81,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

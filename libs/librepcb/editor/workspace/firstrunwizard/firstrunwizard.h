@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARD_H
-#define LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARD_H
+#ifndef LIBREPCB_EDITOR_FIRSTRUNWIZARD_H
+#define LIBREPCB_EDITOR_FIRSTRUNWIZARD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 namespace Ui {
 class FirstRunWizard;
@@ -80,7 +80,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

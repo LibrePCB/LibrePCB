@@ -28,7 +28,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -159,5 +158,4 @@ void LibraryElementCheckListWidget::libraryElementCheckDescriptionRequested(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -22,20 +22,19 @@
  ******************************************************************************/
 #include "bi_footprint.h"
 
+#include "../../../font/strokefontpool.h"
+#include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicsscene.h"
+#include "../../../library/dev/device.h"
+#include "../../../library/pkg/footprint.h"
+#include "../../../library/pkg/package.h"
+#include "../../../utils/scopeguardlist.h"
 #include "../../circuit/circuit.h"
-#include "../../library/projectlibrary.h"
 #include "../../project.h"
+#include "../../projectlibrary.h"
 #include "../board.h"
 #include "bi_device.h"
 #include "bi_footprintpad.h"
-
-#include <librepcb/common/font/strokefontpool.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -43,7 +42,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -96,9 +94,9 @@ void BI_Footprint::init() {
   updateGraphicsItemTransform();
 
   // load pads
-  const library::Package& libPkg = mDevice.getLibPackage();
-  const library::Device& libDev = mDevice.getLibDevice();
-  for (const library::FootprintPad& libPad : getLibFootprint().getPads()) {
+  const Package& libPkg = mDevice.getLibPackage();
+  const Device& libDev = mDevice.getLibDevice();
+  for (const FootprintPad& libPad : getLibFootprint().getPads()) {
     if (mPads.contains(libPad.getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -155,7 +153,7 @@ const Uuid& BI_Footprint::getComponentInstanceUuid() const noexcept {
   return mDevice.getComponentInstanceUuid();
 }
 
-const library::Footprint& BI_Footprint::getLibFootprint() const noexcept {
+const Footprint& BI_Footprint::getLibFootprint() const noexcept {
   return mDevice.getLibFootprint();
 }
 
@@ -380,5 +378,4 @@ void BI_Footprint::updateGraphicsItemTransform() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 
 /*******************************************************************************
  *  Namespace

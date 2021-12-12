@@ -22,28 +22,28 @@
  ******************************************************************************/
 #include "commandlineinterface.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/bom/bom.h>
-#include <librepcb/common/bom/bomcsvwriter.h>
-#include <librepcb/common/debug.h>
-#include <librepcb/common/fileio/csvfile.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/library.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardfabricationoutputsettings.h>
-#include <librepcb/project/boards/boardgerberexport.h>
-#include <librepcb/project/bomgenerator.h>
-#include <librepcb/project/erc/ercmsg.h>
-#include <librepcb/project/erc/ercmsglist.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/debug.h>
+#include <librepcb/core/export/bom.h>
+#include <librepcb/core/export/bomcsvwriter.h>
+#include <librepcb/core/fileio/csvfile.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardfabricationoutputsettings.h>
+#include <librepcb/core/project/board/boardgerberexport.h>
+#include <librepcb/core/project/bomgenerator.h>
+#include <librepcb/core/project/erc/ercmsg.h>
+#include <librepcb/core/project/erc/ercmsglist.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -54,9 +54,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace cli {
-
-using namespace librepcb::library;
-using namespace librepcb::project;
 
 /*******************************************************************************
  *  Constructors / Destructor

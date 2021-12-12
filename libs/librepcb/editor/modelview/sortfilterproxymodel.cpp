@@ -28,6 +28,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -65,4 +66,5 @@ bool SortFilterProxyModel::lessThan(const QModelIndex& source_left,
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

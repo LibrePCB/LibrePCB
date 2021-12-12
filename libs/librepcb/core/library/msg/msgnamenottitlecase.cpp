@@ -26,7 +26,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -83,5 +82,4 @@ ElementName MsgNameNotTitleCase::getFixedName(
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

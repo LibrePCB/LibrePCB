@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTMETADATA_H
-#define LIBREPCB_PROJECT_PROJECTMETADATA_H
+#ifndef LIBREPCB_CORE_PROJECTMETADATA_H
+#define LIBREPCB_CORE_PROJECTMETADATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/fileio/serializableobject.h>
+#include "../attribute/attribute.h"
+#include "../serialization/serializableobject.h"
+#include "../types/elementname.h"
 
 #include <QtCore>
 
@@ -33,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class ProjectMetadata
@@ -140,7 +139,7 @@ public:
 
   // General Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -163,7 +162,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

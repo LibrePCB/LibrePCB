@@ -22,27 +22,27 @@
  ******************************************************************************/
 #include "deviceeditorwidget.h"
 
-#include "../common/componentchooserdialog.h"
-#include "../common/packagechooserdialog.h"
+#include "../../library/cmd/cmdlibraryelementedit.h"
+#include "../../undocommandgroup.h"
+#include "../cmd/cmddeviceedit.h"
+#include "../cmd/cmddevicepadsignalmapitemedit.h"
+#include "../cmp/componentchooserdialog.h"
+#include "../pkg/footprintpreviewgraphicsitem.h"
+#include "../pkg/packagechooserdialog.h"
+#include "../sym/symbolpreviewgraphicsitem.h"
 #include "ui_deviceeditorwidget.h"
 
-#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/library/cmd/cmdlibraryelementedit.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/cmd/cmddeviceedit.h>
-#include <librepcb/library/dev/cmd/cmddevicepadsignalmapitemedit.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgmissingcategories.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
-#include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolpreviewgraphicsitem.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgmissingcategories.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,7 +51,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -473,5 +472,4 @@ bool DeviceEditorWidget::processCheckMessage(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

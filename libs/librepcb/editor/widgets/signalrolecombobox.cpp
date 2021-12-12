@@ -29,6 +29,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -88,4 +89,5 @@ void SignalRoleComboBox::currentIndexChanged(int index) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

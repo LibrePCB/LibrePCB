@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ATTRIBUTEUNITCOMBOBOX_H
-#define LIBREPCB_COMMON_ATTRIBUTEUNITCOMBOBOX_H
+#ifndef LIBREPCB_EDITOR_ATTRIBUTEUNITCOMBOBOX_H
+#define LIBREPCB_EDITOR_ATTRIBUTEUNITCOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -33,6 +33,8 @@ namespace librepcb {
 
 class AttributeType;
 class AttributeUnit;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class AttributeUnitComboBox
@@ -75,6 +77,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

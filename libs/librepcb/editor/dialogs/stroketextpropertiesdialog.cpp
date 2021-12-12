@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "stroketextpropertiesdialog.h"
 
-#include "../font/strokefont.h"
-#include "../geometry/cmd/cmdstroketextedit.h"
-#include "../geometry/stroketext.h"
-#include "../graphics/graphicslayer.h"
+#include "../cmd/cmdstroketextedit.h"
 #include "../undostack.h"
 #include "ui_stroketextpropertiesdialog.h"
+
+#include <librepcb/core/font/strokefont.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,6 +37,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
     StrokeText& text, UndoStack& undoStack, QList<GraphicsLayer*> layers,
@@ -208,4 +210,5 @@ void StrokeTextPropertiesDialog::selectLayerNameInCombobox(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

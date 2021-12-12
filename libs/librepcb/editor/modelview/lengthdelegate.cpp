@@ -22,9 +22,10 @@
  ******************************************************************************/
 #include "lengthdelegate.h"
 
-#include "../toolbox.h"
-#include "../units/length.h"
 #include "../widgets/lengthedit.h"
+
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -32,6 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -119,4 +121,5 @@ void LengthDelegate::editingFinished() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

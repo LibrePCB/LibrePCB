@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGPADCLEARANCEVIOLATION_H
-#define LIBREPCB_LIBRARY_MSGPADCLEARANCEVIOLATION_H
+#ifndef LIBREPCB_CORE_MSGPADCLEARANCEVIOLATION_H
+#define LIBREPCB_CORE_MSGPADCLEARANCEVIOLATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../types/length.h"
 #include "../../msg/libraryelementcheckmessage.h"
-
-#include <librepcb/common/units/length.h>
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class Footprint;
 class FootprintPad;
@@ -81,7 +79,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

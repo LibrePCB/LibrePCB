@@ -22,12 +22,11 @@
  ******************************************************************************/
 #include "boardusersettings.h"
 
+#include "../../graphics/graphicslayerstackappearancesettings.h"
+#include "../../serialization/sexpression.h"
 #include "../project.h"
 #include "board.h"
 #include "boardlayerstack.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/utils/graphicslayerstackappearancesettings.h>
 
 #include <QtCore>
 
@@ -35,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -97,5 +95,4 @@ void BoardUserSettings::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

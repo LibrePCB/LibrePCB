@@ -17,18 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_STROKETEXT_H
-#define LIBREPCB_PROJECT_BI_STROKETEXT_H
+#ifndef LIBREPCB_CORE_BI_STROKETEXT_H
+#define LIBREPCB_CORE_BI_STROKETEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/path.h"
+#include "../../../geometry/stroketext.h"
+#include "../../../serialization/serializableobject.h"
+#include "../../../types/uuid.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -37,14 +36,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class LineGraphicsItem;
-class StrokeTextGraphicsItem;
-
-namespace project {
-
 class BI_Footprint;
 class Board;
+class LineGraphicsItem;
 class Project;
+class StrokeTextGraphicsItem;
 
 /*******************************************************************************
  *  Class BI_StrokeText
@@ -80,7 +76,7 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
@@ -118,7 +114,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

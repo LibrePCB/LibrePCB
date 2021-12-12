@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_DRAWRECT_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORSTATE_DRAWRECT_H
+#ifndef LIBREPCB_EDITOR_SYMBOLEDITORSTATE_DRAWRECT_H
+#define LIBREPCB_EDITOR_SYMBOLEDITORSTATE_DRAWRECT_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -63,7 +62,6 @@ public:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

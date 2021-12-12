@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_EXCELLONGENERATOR_H
-#define LIBREPCB_COMMON_EXCELLONGENERATOR_H
+#ifndef LIBREPCB_CORE_EXCELLONGENERATOR_H
+#define LIBREPCB_CORE_EXCELLONGENERATOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
 #include "../fileio/filepath.h"
-#include "../units/length.h"
-#include "../units/point.h"
+#include "../types/length.h"
+#include "../types/point.h"
 #include "gerberattribute.h"
 
 #include <QtCore>

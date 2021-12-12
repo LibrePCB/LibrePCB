@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_POLYGON_H
-#define LIBREPCB_PROJECT_BI_POLYGON_H
+#ifndef LIBREPCB_CORE_BI_POLYGON_H
+#define LIBREPCB_CORE_BI_POLYGON_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayername.h"
+#include "../../../serialization/serializableobject.h"
+#include "../../../types/length.h"
+#include "../../../types/point.h"
+#include "../../../types/uuid.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/graphics/graphicslayername.h>
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -38,14 +37,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BGI_Polygon;
+class Board;
 class Path;
 class Polygon;
 class PolygonGraphicsItem;
-
-namespace project {
-
-class BGI_Polygon;
-class Board;
 class Project;
 
 /*******************************************************************************
@@ -82,7 +78,7 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
@@ -114,7 +110,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_COMBOBOXDELEGATE_H
-#define LIBREPCB_COMMON_COMBOBOXDELEGATE_H
+#ifndef LIBREPCB_EDITOR_COMBOBOXDELEGATE_H
+#define LIBREPCB_EDITOR_COMBOBOXDELEGATE_H
 
 /*******************************************************************************
  *  Includes
@@ -32,6 +32,8 @@
 namespace librepcb {
 
 class GraphicsLayer;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class ComboBoxDelegate
@@ -88,8 +90,9 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
-Q_DECLARE_METATYPE(librepcb::ComboBoxDelegate::Items)
+Q_DECLARE_METATYPE(librepcb::editor::ComboBoxDelegate::Items)
 
 #endif

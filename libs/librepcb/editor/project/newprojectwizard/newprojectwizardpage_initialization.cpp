@@ -24,7 +24,7 @@
 
 #include "ui_newprojectwizardpage_initialization.h"
 
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -147,5 +146,4 @@ bool NewProjectWizardPage_Initialization::isComplete() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "ercmsglist.h"
 
+#include "../../serialization/sexpression.h"
 #include "../project.h"
 #include "ercmsg.h"
 #include "if_ercmsgprovider.h"
-
-#include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -127,5 +125,4 @@ void ErcMsgList::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

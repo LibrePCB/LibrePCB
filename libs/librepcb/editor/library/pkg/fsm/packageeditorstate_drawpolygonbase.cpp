@@ -22,19 +22,19 @@
  ******************************************************************************/
 #include "packageeditorstate_drawpolygonbase.h"
 
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../widgets/angleedit.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/unsignedlengthedit.h"
 #include "../packageeditorwidget.h"
 
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/widgets/angleedit.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
 
 #include <QtCore>
 
@@ -42,7 +42,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -330,5 +329,4 @@ void PackageEditorState_DrawPolygonBase::grabAreaCheckBoxCheckedChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

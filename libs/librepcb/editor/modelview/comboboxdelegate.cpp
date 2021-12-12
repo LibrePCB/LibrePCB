@@ -28,6 +28,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -93,4 +94,5 @@ void ComboBoxDelegate::updateEditorGeometry(QWidget* editor,
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

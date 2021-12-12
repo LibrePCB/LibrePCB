@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_NETPOINT_H
-#define LIBREPCB_PROJECT_SI_NETPOINT_H
+#ifndef LIBREPCB_CORE_SI_NETPOINT_H
+#define LIBREPCB_CORE_SI_NETPOINT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/junction.h"
+#include "../../../serialization/serializableobject.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_netpoint.h"
 #include "./si_netline.h"
 #include "si_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/junction.h>
 
 #include <QtCore>
 
@@ -37,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class SI_NetPoint
@@ -80,7 +78,7 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
@@ -126,7 +124,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

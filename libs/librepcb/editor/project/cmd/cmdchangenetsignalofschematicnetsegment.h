@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
-#define LIBREPCB_PROJECTEDITOR_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#ifndef LIBREPCB_EDITOR_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
+#define LIBREPCB_EDITOR_CMDCHANGENETSIGNALOFSCHEMATICNETSEGMENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/uuid.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -32,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class ComponentSignalInstance;
 class NetSignal;
@@ -60,7 +60,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   void changeNetSignalOfNetSegment();
@@ -78,7 +78,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

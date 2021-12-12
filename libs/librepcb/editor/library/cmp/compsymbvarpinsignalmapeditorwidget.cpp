@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "compsymbvarpinsignalmapeditorwidget.h"
 
-#include <librepcb/common/model/comboboxdelegate.h>
-#include <librepcb/common/model/sortfilterproxymodel.h>
-#include <librepcb/libraryeditor/cmp/componentpinsignalmapmodel.h>
+#include "../../library/cmp/componentpinsignalmapmodel.h"
+#include "../../modelview/comboboxdelegate.h"
+#include "../../modelview/sortfilterproxymodel.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -121,5 +120,4 @@ void CompSymbVarPinSignalMapEditorWidget::resetReferences() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGNOPADSINDEVICECONNECTED_H
-#define LIBREPCB_LIBRARY_MSGNOPADSINDEVICECONNECTED_H
+#ifndef LIBREPCB_CORE_MSGNOPADSINDEVICECONNECTED_H
+#define LIBREPCB_CORE_MSGNOPADSINDEVICECONNECTED_H
 
 /*******************************************************************************
  *  Includes
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class MsgNoPadsInDeviceConnected
@@ -55,7 +54,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

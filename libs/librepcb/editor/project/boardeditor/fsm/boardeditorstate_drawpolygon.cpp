@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "boardeditorstate_drawpolygon.h"
 
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/unsignedlengthedit.h"
+#include "../../cmd/cmdboardpolygonadd.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardpolygonadd.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -348,5 +347,4 @@ void BoardEditorState_DrawPolygon::makeSelectedLayerVisible() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

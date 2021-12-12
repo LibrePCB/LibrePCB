@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
-#define LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
+#ifndef LIBREPCB_EDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
+#define LIBREPCB_EDITOR_NEWELEMENTWIZARDPAGE_COPYFROM_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class LibraryBaseElement;
 
@@ -100,7 +99,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

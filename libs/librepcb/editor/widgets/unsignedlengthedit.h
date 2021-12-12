@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_UNSIGNEDLENGTHEDIT_H
-#define LIBREPCB_COMMON_UNSIGNEDLENGTHEDIT_H
+#ifndef LIBREPCB_EDITOR_UNSIGNEDLENGTHEDIT_H
+#define LIBREPCB_EDITOR_UNSIGNEDLENGTHEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -29,6 +29,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class UnsignedLengthEdit
@@ -68,6 +69,7 @@ private:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

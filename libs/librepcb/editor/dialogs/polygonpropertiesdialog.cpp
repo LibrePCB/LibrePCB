@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "polygonpropertiesdialog.h"
 
-#include "../geometry/cmd/cmdpolygonedit.h"
-#include "../geometry/polygon.h"
-#include "../graphics/graphicslayer.h"
+#include "../cmd/cmdpolygonedit.h"
 #include "../undostack.h"
 #include "ui_polygonpropertiesdialog.h"
+
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,6 +36,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
                                                  UndoStack& undoStack,
@@ -145,4 +147,5 @@ void PolygonPropertiesDialog::selectLayerNameInCombobox(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

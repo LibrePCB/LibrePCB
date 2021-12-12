@@ -28,7 +28,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -51,5 +50,4 @@ BoardDesignRuleCheckMessage::~BoardDesignRuleCheckMessage() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

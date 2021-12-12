@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SEARCHTOOLBAR_H
-#define LIBREPCB_PROJECTEDITOR_SEARCHTOOLBAR_H
+#ifndef LIBREPCB_EDITOR_SEARCHTOOLBAR_H
+#define LIBREPCB_EDITOR_SEARCHTOOLBAR_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -83,7 +82,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

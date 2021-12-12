@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -326,5 +325,4 @@ void Footprint::holesEdited(const HoleList& list, int index,
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

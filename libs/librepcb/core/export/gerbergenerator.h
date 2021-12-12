@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GERBERGENERATOR_H
-#define LIBREPCB_COMMON_GERBERGENERATOR_H
+#ifndef LIBREPCB_CORE_GERBERGENERATOR_H
+#define LIBREPCB_CORE_GERBERGENERATOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
 #include "../fileio/filepath.h"
-#include "../units/length.h"
-#include "../uuid.h"
+#include "../types/length.h"
+#include "../types/uuid.h"
 #include "gerberaperturelist.h"
 #include "gerberattribute.h"
 

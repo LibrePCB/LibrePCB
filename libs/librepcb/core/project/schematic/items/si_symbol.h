@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_SYMBOL_H
-#define LIBREPCB_PROJECT_SI_SYMBOL_H
+#ifndef LIBREPCB_CORE_SI_SYMBOL_H
+#define LIBREPCB_CORE_SI_SYMBOL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../attribute/attributeprovider.h"
+#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "si_base.h"
-
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
 
@@ -36,16 +35,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
-class ComponentSymbolVariantItem;
-class Symbol;
-}  // namespace library
-
-namespace project {
-
 class ComponentInstance;
+class ComponentSymbolVariantItem;
 class SI_SymbolPin;
 class Schematic;
+class Symbol;
 
 /*******************************************************************************
  *  Class SI_Symbol
@@ -82,9 +76,8 @@ public:
   ComponentInstance& getComponentInstance() const noexcept {
     return *mComponentInstance;
   }
-  const library::Symbol& getLibSymbol() const noexcept { return *mSymbol; }
-  const library::ComponentSymbolVariantItem& getCompSymbVarItem() const
-      noexcept {
+  const Symbol& getLibSymbol() const noexcept { return *mSymbol; }
+  const ComponentSymbolVariantItem& getCompSymbVarItem() const noexcept {
     return *mSymbVarItem;
   }
   QRectF getBoundingRect() const noexcept;
@@ -98,16 +91,16 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Helper Methods
   Point mapToScene(const Point& relativePos) const noexcept;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -136,8 +129,8 @@ private:
 
   // General
   ComponentInstance* mComponentInstance;
-  const library::ComponentSymbolVariantItem* mSymbVarItem;
-  const library::Symbol* mSymbol;
+  const ComponentSymbolVariantItem* mSymbVarItem;
+  const Symbol* mSymbol;
   QHash<Uuid, SI_SymbolPin*> mPins;  ///< key: symbol pin UUID
   QScopedPointer<SGI_Symbol> mGraphicsItem;
 
@@ -152,7 +145,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

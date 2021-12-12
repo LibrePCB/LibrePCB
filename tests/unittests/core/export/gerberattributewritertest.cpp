@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/cam/gerberattribute.h>
-#include <librepcb/common/cam/gerberattributewriter.h>
+#include <librepcb/core/export/gerberattribute.h>
+#include <librepcb/core/export/gerberattributewriter.h>
 
 #include <QtCore>
 

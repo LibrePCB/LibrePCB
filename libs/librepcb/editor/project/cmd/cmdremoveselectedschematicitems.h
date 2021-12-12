@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_EDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class ComponentSignalInstance;
 class SI_NetLabel;
@@ -59,7 +58,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   void removeNetSegmentItems(SI_NetSegment& netsegment,
@@ -78,7 +77,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

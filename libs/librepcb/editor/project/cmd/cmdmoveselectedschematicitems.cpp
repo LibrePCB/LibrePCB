@@ -22,23 +22,24 @@
  ******************************************************************************/
 #include "cmdmoveselectedschematicitems.h"
 
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabelanchorsupdate.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetpointedit.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_polygon.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/items/si_text.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/schematics/schematicselectionquery.h>
+#include "../../cmd/cmdpolygonedit.h"
+#include "../../cmd/cmdtextedit.h"
+#include "../../project/cmd/cmdschematicnetlabelanchorsupdate.h"
+#include "../../project/cmd/cmdschematicnetlabeledit.h"
+#include "../../project/cmd/cmdschematicnetpointedit.h"
+#include "../../project/cmd/cmdsymbolinstanceedit.h"
+
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicselectionquery.h>
+#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -46,7 +47,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -176,5 +176,4 @@ bool CmdMoveSelectedSchematicItems::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

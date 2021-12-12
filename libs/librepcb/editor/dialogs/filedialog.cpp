@@ -26,6 +26,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Public Methods
@@ -84,4 +85,5 @@ void FileDialog::patchOptions(QFileDialog::Options& options) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

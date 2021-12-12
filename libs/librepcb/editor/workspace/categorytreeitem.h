@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_CATEGORYTREEITEM_H
-#define LIBREPCB_WORKSPACE_CATEGORYTREEITEM_H
+#ifndef LIBREPCB_EDITOR_CATEGORYTREEITEM_H
+#define LIBREPCB_EDITOR_CATEGORYTREEITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -33,14 +32,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
 class ComponentCategory;
 class PackageCategory;
-}  // namespace library
-
-namespace workspace {
-
 class WorkspaceLibraryDb;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class CategoryTreeFilter
@@ -114,16 +110,16 @@ private:
   QList<ChildType> mChilds;
 };
 
-typedef CategoryTreeItem<library::ComponentCategory> ComponentCategoryTreeItem;
-typedef CategoryTreeItem<library::PackageCategory> PackageCategoryTreeItem;
+typedef CategoryTreeItem<ComponentCategory> ComponentCategoryTreeItem;
+typedef CategoryTreeItem<PackageCategory> PackageCategoryTreeItem;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::workspace::CategoryTreeFilter::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::CategoryTreeFilter::Flags)
 
 #endif

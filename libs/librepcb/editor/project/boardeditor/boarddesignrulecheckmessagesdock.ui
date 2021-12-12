@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::BoardDesignRuleCheckMessagesDock</class>
- <widget class="QDockWidget" name="librepcb::project::editor::BoardDesignRuleCheckMessagesDock">
+ <class>librepcb::editor::BoardDesignRuleCheckMessagesDock</class>
+ <widget class="QDockWidget" name="librepcb::editor::BoardDesignRuleCheckMessagesDock">
   <property name="geometry">
    <rect>
     <x>0</x>

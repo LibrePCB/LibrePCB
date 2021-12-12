@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "symbolpinpropertiesdialog.h"
 
+#include "../../undostack.h"
+#include "../cmd/cmdsymbolpinedit.h"
 #include "ui_symbolpinpropertiesdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
-#include <librepcb/library/sym/symbolpin.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(
@@ -135,5 +134,4 @@ bool SymbolPinPropertiesDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

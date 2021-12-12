@@ -26,7 +26,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -95,5 +94,4 @@ bool LibraryElementCheckMessage::operator<(
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

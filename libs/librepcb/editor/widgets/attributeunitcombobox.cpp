@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "attributeunitcombobox.h"
 
-#include "../attributes/attributetype.h"
-#include "../attributes/attributeunit.h"
-#include "../attributes/attrtypestring.h"
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/attribute/attrtypestring.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,6 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -115,4 +116,5 @@ void AttributeUnitComboBox::currentIndexChanged(int index) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

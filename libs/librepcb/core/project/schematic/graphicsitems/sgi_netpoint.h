@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_NETPOINT_H
-#define LIBREPCB_PROJECT_SGI_NETPOINT_H
+#ifndef LIBREPCB_CORE_SGI_NETPOINT_H
+#define LIBREPCB_CORE_SGI_NETPOINT_H
 
 /*******************************************************************************
  *  Includes
@@ -34,9 +34,6 @@
 namespace librepcb {
 
 class GraphicsLayer;
-
-namespace project {
-
 class SI_NetPoint;
 
 /*******************************************************************************
@@ -85,7 +82,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

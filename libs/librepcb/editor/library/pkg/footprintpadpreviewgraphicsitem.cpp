@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "footprintpadpreviewgraphicsitem.h"
 
-#include "footprintpad.h"
-#include "packagepad.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -36,7 +35,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -117,5 +116,5 @@ void FootprintPadPreviewGraphicsItem::paint(
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

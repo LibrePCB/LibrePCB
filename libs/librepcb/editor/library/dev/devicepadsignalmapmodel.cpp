@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "devicepadsignalmapmodel.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/dev/cmd/cmddevicepadsignalmapitemedit.h>
+#include "../../undostack.h"
+#include "../cmd/cmddevicepadsignalmapitemedit.h"
 
 #include <QtCore>
 
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -282,5 +281,4 @@ void DevicePadSignalMapModel::updateComboBoxItems() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

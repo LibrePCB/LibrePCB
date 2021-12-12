@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDDESIGNRULECHECKDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_BOARDDESIGNRULECHECKDIALOG_H
+#ifndef LIBREPCB_EDITOR_BOARDDESIGNRULECHECKDIALOG_H
+#define LIBREPCB_EDITOR_BOARDDESIGNRULECHECKDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/project/boards/drc/boarddesignrulecheck.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,11 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
-
-namespace project {
-
 class Board;
+class LengthUnit;
 
 namespace editor {
 
@@ -89,7 +86,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,19 +22,19 @@
  ******************************************************************************/
 #include "bomgeneratordialog.h"
 
+#include "../dialogs/filedialog.h"
 #include "ui_bomgeneratordialog.h"
 
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/bom/bom.h>
-#include <librepcb/common/bom/bomcsvwriter.h>
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/fileio/csvfile.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/bomgenerator.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/export/bom.h>
+#include <librepcb/core/export/bomcsvwriter.h>
+#include <librepcb/core/fileio/csvfile.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/bomgenerator.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -235,5 +234,4 @@ FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

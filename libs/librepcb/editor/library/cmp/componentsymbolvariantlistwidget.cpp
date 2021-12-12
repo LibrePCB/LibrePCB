@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "componentsymbolvariantlistwidget.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantedit.h>
-#include <librepcb/libraryeditor/cmp/componentsymbolvariantlistmodel.h>
+#include "../../library/cmp/componentsymbolvariantlistmodel.h"
+#include "../../undostack.h"
+#include "../../widgets/editabletablewidget.h"
+#include "../cmd/cmdcomponentsymbolvariantedit.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -155,5 +154,4 @@ void ComponentSymbolVariantListWidget::editVariant(const Uuid& uuid) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

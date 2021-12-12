@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "attributelistmodel.h"
 
-#include "attributeunit.h"
-#include "attrtypestring.h"
+#include "../undostack.h"
 #include "cmd/cmdattributeedit.h"
 
-#include <librepcb/common/undostack.h>
+#include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/attribute/attrtypestring.h>
 
 #include <QtCore>
 
@@ -36,6 +36,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -452,4 +453,5 @@ ComboBoxDelegate::Items AttributeListModel::buildUnitComboBoxData(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

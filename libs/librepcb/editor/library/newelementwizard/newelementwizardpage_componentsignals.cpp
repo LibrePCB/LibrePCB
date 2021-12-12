@@ -24,17 +24,16 @@
 
 #include "ui_newelementwizardpage_componentsignals.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -127,5 +126,4 @@ void NewElementWizardPage_ComponentSignals::cleanupPage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

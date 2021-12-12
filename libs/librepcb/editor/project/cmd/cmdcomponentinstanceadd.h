@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
-#define LIBREPCB_PROJECT_CMDCOMPONENTINSTANCEADD_H
+#ifndef LIBREPCB_EDITOR_CMDCOMPONENTINSTANCEADD_H
+#define LIBREPCB_EDITOR_CMDCOMPONENTINSTANCEADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommand.h>
-#include <librepcb/common/uuid.h>
+#include "../../undocommand.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -33,14 +34,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Component;
-}
-
-namespace project {
-
 class Circuit;
+class Component;
 class ComponentInstance;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdComponentInstanceAdd
@@ -67,13 +65,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
   // Private Member Variables
@@ -92,7 +90,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
-#define LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDSYMBOLPINEDIT_H
+#define LIBREPCB_EDITOR_CMDSYMBOLPINEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../symbolpin.h"
+#include "../../cmd/cmdlistelementinsert.h"
+#include "../../cmd/cmdlistelementremove.h"
+#include "../../cmd/cmdlistelementsswap.h"
+#include "../../undocommand.h"
 
-#include <librepcb/common/fileio/cmd/cmdlistelementinsert.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementremove.h>
-#include <librepcb/common/fileio/cmd/cmdlistelementsswap.h>
-#include <librepcb/common/undocommand.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 
@@ -36,7 +36,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdSymbolPinEdit
@@ -70,13 +70,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
   // Private Member Variables
@@ -112,7 +112,7 @@ using CmdSymbolPinsSwap =
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

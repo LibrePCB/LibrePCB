@@ -24,12 +24,12 @@
 
 #include "ui_boardpickplacegeneratordialog.h"
 
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/fileio/csvfile.h>
-#include <librepcb/common/pnp/pickplacecsvwriter.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardpickplacegenerator.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/export/pickplacecsvwriter.h>
+#include <librepcb/core/fileio/csvfile.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardpickplacegenerator.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -145,5 +144,4 @@ FilePath BoardPickPlaceGeneratorDialog::getOutputFilePath(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

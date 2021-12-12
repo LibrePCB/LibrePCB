@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "workspacesettings.h"
 
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/sexpression.h>
+#include "../fileio/fileutils.h"
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -109,5 +108,4 @@ void WorkspaceSettings::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb

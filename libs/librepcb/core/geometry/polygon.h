@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_POLYGON_H
-#define LIBREPCB_COMMON_POLYGON_H
+#ifndef LIBREPCB_CORE_POLYGON_H
+#define LIBREPCB_CORE_POLYGON_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
-#include "../units/length.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/length.h"
 #include "path.h"
 
 #include <QtCore>
@@ -84,7 +84,7 @@ public:
   bool setIsGrabArea(bool isGrabArea) noexcept;
   bool setPath(const Path& path) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

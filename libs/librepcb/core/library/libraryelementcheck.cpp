@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -68,5 +67,4 @@ void LibraryElementCheck::checkMissingCategories(MsgList& msgs) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

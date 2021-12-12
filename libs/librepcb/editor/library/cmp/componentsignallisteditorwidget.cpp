@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "componentsignallisteditorwidget.h"
 
-#include <librepcb/common/model/sortfilterproxymodel.h>
-#include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/libraryeditor/cmp/componentsignallistmodel.h>
+#include "../../library/cmp/componentsignallistmodel.h"
+#include "../../modelview/sortfilterproxymodel.h"
+#include "../../widgets/editabletablewidget.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -92,5 +91,4 @@ void ComponentSignalListEditorWidget::setReferences(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

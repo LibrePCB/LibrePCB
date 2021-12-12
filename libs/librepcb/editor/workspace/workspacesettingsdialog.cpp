@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "workspacesettingsdialog.h"
 
-#include "../workspace.h"
+#include "../modelview/comboboxdelegate.h"
+#include "../modelview/editablelistmodel.h"
 #include "ui_workspacesettingsdialog.h"
-#include "workspacesettings.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/model/comboboxdelegate.h>
-#include <librepcb/common/model/editablelistmodel.h>
-#include <librepcb/common/norms.h>
-#include <librepcb/common/toolbox.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/norms.h>
+#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +39,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -340,5 +340,5 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb

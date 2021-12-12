@@ -25,8 +25,8 @@
 #include "boardeditor.h"
 #include "ui_boardlayersdock.h"
 
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -218,5 +217,4 @@ QList<QString> BoardLayersDock::getAllLayers() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

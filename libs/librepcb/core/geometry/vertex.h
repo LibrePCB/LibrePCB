@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_VERTEX_H
-#define LIBREPCB_COMMON_VERTEX_H
+#ifndef LIBREPCB_CORE_VERTEX_H
+#define LIBREPCB_CORE_VERTEX_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobject.h"
-#include "../units/angle.h"
-#include "../units/point.h"
+#include "../serialization/serializableobject.h"
+#include "../types/angle.h"
+#include "../types/point.h"
 
 #include <QtCore>
 
@@ -61,7 +61,7 @@ public:
   void setAngle(const Angle& angle) noexcept { mAngle = angle; }
 
   // General Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

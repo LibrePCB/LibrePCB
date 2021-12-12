@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_EDITNETCLASSESDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_EDITNETCLASSESDIALOG_H
+#ifndef LIBREPCB_EDITOR_EDITNETCLASSESDIALOG_H
+#define LIBREPCB_EDITOR_EDITNETCLASSESDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -33,13 +31,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-
-namespace project {
-
 class Circuit;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class EditNetClassesDialog;
@@ -84,7 +80,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

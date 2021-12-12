@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "cmdreplacedevice.h"
 
+#include "../../project/cmd/cmdboardnetsegmentaddelements.h"
+#include "../../project/cmd/cmddeviceinstanceremove.h"
 #include "cmdadddevicetoboard.h"
 #include "cmdremoveboarditems.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -49,7 +48,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdReplaceDevice::CmdReplaceDevice(
-    workspace::Workspace& workspace, Board& board, BI_Device& device,
+    Workspace& workspace, Board& board, BI_Device& device,
     const Uuid& newDeviceUuid,
     const tl::optional<Uuid>& newFootprintUuid) noexcept
   : UndoCommandGroup(tr("Change Device")),
@@ -119,5 +118,4 @@ bool CmdReplaceDevice::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

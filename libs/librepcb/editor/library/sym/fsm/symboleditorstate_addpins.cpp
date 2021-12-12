@@ -22,18 +22,16 @@
  ******************************************************************************/
 #include "symboleditorstate_addpins.h"
 
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/unsignedlengthedit.h"
+#include "../../cmd/cmdsymbolpinedit.h"
 #include "../symboleditorwidget.h"
 
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/library/sym/symbolpin.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 
@@ -41,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -228,5 +225,4 @@ bool SymbolEditorState_AddPins::hasPin(const QString& name) const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

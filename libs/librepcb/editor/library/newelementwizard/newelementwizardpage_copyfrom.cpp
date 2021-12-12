@@ -22,18 +22,17 @@
  ******************************************************************************/
 #include "newelementwizardpage_copyfrom.h"
 
+#include "../../workspace/categorytreemodel.h"
 #include "ui_newelementwizardpage_copyfrom.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/workspace/library/cat/categorytreemodel.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -248,40 +247,40 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory: {
       mIsCategoryElement = true;
-      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+      setCategoryTreeModel(new ComponentCategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          workspace::CategoryTreeFilter::ALL));
+          CategoryTreeFilter::ALL));
       break;
     }
     case NewElementWizardContext::ElementType::Symbol: {
-      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+      setCategoryTreeModel(new ComponentCategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          workspace::CategoryTreeFilter::SYMBOLS));
+          CategoryTreeFilter::SYMBOLS));
       break;
     }
     case NewElementWizardContext::ElementType::Component: {
-      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+      setCategoryTreeModel(new ComponentCategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          workspace::CategoryTreeFilter::COMPONENTS));
+          CategoryTreeFilter::COMPONENTS));
       break;
     }
     case NewElementWizardContext::ElementType::Device: {
-      setCategoryTreeModel(new workspace::ComponentCategoryTreeModel(
+      setCategoryTreeModel(new ComponentCategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          workspace::CategoryTreeFilter::DEVICES));
+          CategoryTreeFilter::DEVICES));
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory: {
       mIsCategoryElement = true;
-      setCategoryTreeModel(new workspace::PackageCategoryTreeModel(
+      setCategoryTreeModel(new PackageCategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          workspace::CategoryTreeFilter::ALL));
+          CategoryTreeFilter::ALL));
       break;
     }
     case NewElementWizardContext::ElementType::Package: {
-      setCategoryTreeModel(new workspace::PackageCategoryTreeModel(
+      setCategoryTreeModel(new PackageCategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          workspace::CategoryTreeFilter::PACKAGES));
+          CategoryTreeFilter::PACKAGES));
       break;
     }
     default: {
@@ -304,5 +303,4 @@ void NewElementWizardPage_CopyFrom::cleanupPage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

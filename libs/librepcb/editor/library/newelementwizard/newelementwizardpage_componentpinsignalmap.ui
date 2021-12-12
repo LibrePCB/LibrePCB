@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::NewElementWizardPage_ComponentPinSignalMap</class>
- <widget class="QWizardPage" name="librepcb::library::editor::NewElementWizardPage_ComponentPinSignalMap">
+ <class>librepcb::editor::NewElementWizardPage_ComponentPinSignalMap</class>
+ <widget class="QWizardPage" name="librepcb::editor::NewElementWizardPage_ComponentPinSignalMap">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,15 +36,15 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="librepcb::library::editor::CompSymbVarPinSignalMapEditorWidget" name="pinSignalMapEditorWidget" native="true"/>
+    <widget class="librepcb::editor::CompSymbVarPinSignalMapEditorWidget" name="pinSignalMapEditorWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::library::editor::CompSymbVarPinSignalMapEditorWidget</class>
+   <class>librepcb::editor::CompSymbVarPinSignalMapEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/cmp/compsymbvarpinsignalmapeditorwidget.h</header>
+   <header location="global">librepcb/editor/library/cmp/compsymbvarpinsignalmapeditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/asynccopyoperation.h>
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/core/fileio/asynccopyoperation.h>
+#include <librepcb/core/fileio/fileutils.h>
 
 #include <QtCore>
 

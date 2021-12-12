@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdprojectsettingschange.h"
 
-#include "../projectsettings.h"
+#include <librepcb/core/project/projectsettings.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -112,5 +112,5 @@ void CmdProjectSettingsChange::applyOldSettings() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

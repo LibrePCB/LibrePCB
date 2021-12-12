@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "circlepropertiesdialog.h"
 
-#include "../geometry/circle.h"
-#include "../geometry/cmd/cmdcircleedit.h"
-#include "../graphics/graphicslayer.h"
+#include "../cmd/cmdcircleedit.h"
 #include "../undostack.h"
 #include "ui_circlepropertiesdialog.h"
+
+#include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,6 +36,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle,
                                                UndoStack& undoStack,
@@ -154,4 +156,5 @@ void CirclePropertiesDialog::selectLayerNameInCombobox(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

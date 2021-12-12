@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_RENAMENETSEGMENTDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_RENAMENETSEGMENTDIALOG_H
+#ifndef LIBREPCB_EDITOR_RENAMENETSEGMENTDIALOG_H
+#define LIBREPCB_EDITOR_RENAMENETSEGMENTDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,14 +31,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-
-namespace project {
-
 class NetSignal;
 class SI_NetSegment;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class RenameNetSegmentDialog;
@@ -94,7 +92,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

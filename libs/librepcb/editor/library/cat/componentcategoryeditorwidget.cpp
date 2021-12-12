@@ -22,16 +22,16 @@
  ******************************************************************************/
 #include "componentcategoryeditorwidget.h"
 
-#include "../common/categorychooserdialog.h"
-#include "../common/categorytreelabeltextbuilder.h"
+#include "../cmd/cmdlibrarybaseelementedit.h"
+#include "../cmd/cmdlibrarycategoryedit.h"
+#include "categorychooserdialog.h"
+#include "categorytreelabeltextbuilder.h"
 #include "ui_componentcategoryeditorwidget.h"
 
-#include <librepcb/library/cat/cmd/cmdlibrarycategoryedit.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cmd/cmdlibrarybaseelementedit.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -219,7 +218,7 @@ void ComponentCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
 }
 
 void ComponentCategoryEditorWidget::updateCategoryLabel() noexcept {
-  const workspace::WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
+  const WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
   ComponentCategoryTreeLabelTextBuilder textBuilder(db, getLibLocaleOrder(),
                                                     *mUi->lblParentCategories);
   textBuilder.setEndlessRecursionUuid(mCategory->getUuid());
@@ -232,5 +231,4 @@ void ComponentCategoryEditorWidget::updateCategoryLabel() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

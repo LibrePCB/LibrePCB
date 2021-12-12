@@ -20,17 +20,16 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "controlpanel/controlpanel.h"
-#include "firstrunwizard/firstrunwizard.h"
-#include "initializeworkspacewizard/initializeworkspacewizard.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/debug.h>
-#include <librepcb/common/dialogs/directorylockhandlerdialog.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/network/networkaccessmanager.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/debug.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
+#include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
+#include <librepcb/editor/workspace/controlpanel/controlpanel.h>
+#include <librepcb/editor/workspace/firstrunwizard/firstrunwizard.h>
+#include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,8 +38,7 @@
  *  Namespace
  ******************************************************************************/
 using namespace librepcb;
-using namespace librepcb::workspace;
-using namespace librepcb::application;
+using namespace librepcb::editor;
 
 /*******************************************************************************
  *  Function Prototypes

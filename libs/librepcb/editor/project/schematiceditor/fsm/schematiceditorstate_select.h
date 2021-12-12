@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_SELECT_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_SELECT_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,10 +36,6 @@
 namespace librepcb {
 
 class Angle;
-class CmdPolygonEdit;
-
-namespace project {
-
 class SI_Base;
 class SI_NetLabel;
 class SI_Polygon;
@@ -50,6 +46,7 @@ class Schematic;
 namespace editor {
 
 class CmdMoveSelectedSchematicItems;
+class CmdPolygonEdit;
 
 /*******************************************************************************
  *  Class SchematicEditorState_Select
@@ -164,7 +161,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -23,7 +23,7 @@
 #include "holegraphicsitem.h"
 
 #include "../graphics/graphicslayer.h"
-#include "../units/angle.h"
+#include "../types/angle.h"
 #include "origincrossgraphicsitem.h"
 
 #include <QtCore>

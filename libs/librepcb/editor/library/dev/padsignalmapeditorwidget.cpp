@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "padsignalmapeditorwidget.h"
 
-#include <librepcb/common/model/comboboxdelegate.h>
-#include <librepcb/common/model/sortfilterproxymodel.h>
-#include <librepcb/libraryeditor/dev/devicepadsignalmapmodel.h>
+#include "../../library/dev/devicepadsignalmapmodel.h"
+#include "../../modelview/comboboxdelegate.h"
+#include "../../modelview/sortfilterproxymodel.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -102,5 +101,4 @@ void PadSignalMapEditorWidget::setSignalList(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -22,6 +22,10 @@
  ******************************************************************************/
 #include "boardclipperpathgenerator.h"
 
+#include "../../../geometry/polygon.h"
+#include "../../../graphics/graphicslayer.h"
+#include "../../../library/pkg/footprint.h"
+#include "../../../utils/clipperhelpers.h"
 #include "../board.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
@@ -33,18 +37,12 @@
 #include "../items/bi_polygon.h"
 #include "../items/bi_via.h"
 
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/utils/clipperhelpers.h>
-#include <librepcb/library/pkg/footprint.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -309,5 +307,4 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

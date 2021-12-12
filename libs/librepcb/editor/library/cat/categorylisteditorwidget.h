@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CATEGORYLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_CATEGORYLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_CATEGORYLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_CATEGORYLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,11 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
 namespace editor {
 
 namespace Ui {
@@ -58,7 +55,7 @@ class CategoryListEditorWidgetBase : public QWidget {
 public:
   // Constructors / Destructor
   CategoryListEditorWidgetBase() = delete;
-  explicit CategoryListEditorWidgetBase(const workspace::Workspace& ws,
+  explicit CategoryListEditorWidgetBase(const Workspace& ws,
                                         QWidget* parent = nullptr) noexcept;
   CategoryListEditorWidgetBase(const CategoryListEditorWidgetBase& other) =
       delete;
@@ -101,7 +98,7 @@ signals:
   void categoryRemoved(const Uuid& category);
 
 protected:  // Data
-  const workspace::Workspace& mWorkspace;
+  const Workspace& mWorkspace;
   QScopedPointer<Ui::CategoryListEditorWidget> mUi;
   bool mRequiresMinimumOneEntry;
   QSet<Uuid> mUuids;
@@ -119,7 +116,7 @@ class CategoryListEditorWidget final : public CategoryListEditorWidgetBase {
 public:
   // Constructors / Destructor
   CategoryListEditorWidget() = delete;
-  explicit CategoryListEditorWidget(const workspace::Workspace& ws,
+  explicit CategoryListEditorWidget(const Workspace& ws,
                                     QWidget* parent = nullptr) noexcept;
   CategoryListEditorWidget(const CategoryListEditorWidget& other) = delete;
   ~CategoryListEditorWidget() noexcept;
@@ -135,9 +132,9 @@ private:
   QString getCategoryName(const FilePath& fp) const override;
 };
 
-typedef CategoryListEditorWidget<library::ComponentCategory>
+typedef CategoryListEditorWidget<ComponentCategory>
     ComponentCategoryListEditorWidget;
-typedef CategoryListEditorWidget<library::PackageCategory>
+typedef CategoryListEditorWidget<PackageCategory>
     PackageCategoryListEditorWidget;
 
 /*******************************************************************************
@@ -145,7 +142,6 @@ typedef CategoryListEditorWidget<library::PackageCategory>
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

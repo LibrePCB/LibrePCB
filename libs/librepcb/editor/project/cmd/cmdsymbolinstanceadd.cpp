@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "cmdsymbolinstanceadd.h"
 
-#include "../../circuit/circuit.h"
-#include "../../circuit/componentinstance.h"
-#include "../items/si_symbol.h"
-#include "../schematic.h"
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -33,7 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -67,5 +67,5 @@ void CmdSymbolInstanceAdd::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

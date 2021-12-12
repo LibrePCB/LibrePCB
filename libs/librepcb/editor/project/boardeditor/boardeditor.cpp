@@ -22,12 +22,23 @@
  ******************************************************************************/
 #include "boardeditor.h"
 
-#include "../dialogs/bomgeneratordialog.h"
-#include "../dialogs/projectpropertieseditordialog.h"
-#include "../docks/ercmsgdock.h"
+#include "../../dialogs/aboutdialog.h"
+#include "../../dialogs/filedialog.h"
+#include "../../dialogs/gridsettingsdialog.h"
+#include "../../project/cmd/cmdboardadd.h"
+#include "../../project/cmd/cmdboarddesignrulesmodify.h"
+#include "../../project/cmd/cmdboardremove.h"
+#include "../../undostack.h"
+#include "../../utils/exclusiveactiongroup.h"
+#include "../../utils/undostackactiongroup.h"
+#include "../../widgets/graphicsview.h"
+#include "../bomgeneratordialog.h"
+#include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
+#include "../projectpropertieseditordialog.h"
 #include "boarddesignrulecheckdialog.h"
 #include "boarddesignrulecheckmessagesdock.h"
+#include "boarddesignrulesdialog.h"
 #include "boardlayersdock.h"
 #include "boardlayerstacksetupdialog.h"
 #include "boardpickplacegeneratordialog.h"
@@ -35,35 +46,24 @@
 #include "fsm/boardeditorfsm.h"
 #include "unplacedcomponentsdock.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/aboutdialog.h>
-#include <librepcb/common/dialogs/boarddesignrulesdialog.h>
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/dialogs/gridsettingsdialog.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/primitivepathgraphicsitem.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/utils/exclusiveactiongroup.h>
-#include <librepcb/common/utils/undostackactiongroup.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardadd.h>
-#include <librepcb/project/boards/cmd/cmdboarddesignrulesmodify.h>
-#include <librepcb/project/boards/cmd/cmdboardremove.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/metadata/projectmetadata.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/settings/projectsettings.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/primitivepathgraphicsitem.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QSvgGenerator>
 #include <QtCore>
@@ -74,7 +74,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -265,7 +264,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
+          &WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
   connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
           mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
@@ -566,27 +565,26 @@ void BoardEditor::on_actionExportAsPdf_triggered() {
 
     // Open PDF
     {
-      namespace ws = ::librepcb::workspace;
-      const ws::WorkspaceSettings& workspaceSettings =
+      const WorkspaceSettings& workspaceSettings =
           mProjectEditor.getWorkspace().getSettings();
 
-      ws::WorkspaceSettings::PdfOpenBehavior bhv =
+      WorkspaceSettings::PdfOpenBehavior bhv =
           workspaceSettings.pdfOpenBehavior.get();
 
-      if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::NEVER) {
+      if (bhv == WorkspaceSettings::PdfOpenBehavior::NEVER) {
         // do nothing
       } else {
         // TODO: refractor into FileUtils::askUserAndOpen or something similar
         //       to avoid duplicated code in SchematicEditor
 
         bool doOpenPdf = true;
-        if (bhv == ws::WorkspaceSettings::PdfOpenBehavior::ASK) {
+        if (bhv == WorkspaceSettings::PdfOpenBehavior::ASK) {
           int openPdf = QMessageBox::information(
               this, tr("PDF Export"), tr("PDF exported successfully"),
               QMessageBox::Ok | QMessageBox::Open);
 
           if (openPdf == QMessageBox::Ok) doOpenPdf = false;
-        } else if (bhv != ws::WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
+        } else if (bhv != WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
           // this is the last possible state, otherwise there is an error
           throw LogicError(__FILE__, __LINE__);
         }
@@ -1010,5 +1008,4 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

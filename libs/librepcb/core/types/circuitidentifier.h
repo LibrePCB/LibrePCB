@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_CIRCUITIDENTIFIER_H
-#define LIBREPCB_COMMON_CIRCUITIDENTIFIER_H
+#ifndef LIBREPCB_CORE_CIRCUITIDENTIFIER_H
+#define LIBREPCB_CORE_CIRCUITIDENTIFIER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "fileio/sexpression.h"
-#include "toolbox.h"
+#include "../exceptions.h"
+#include "../serialization/sexpression.h"
+#include "../utils/toolbox.h"
 
 #include <type_safe/constrained_type.hpp>
 

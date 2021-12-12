@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_TANGENTPATHJOINER_H
-#define LIBREPCB_COMMON_TANGENTPATHJOINER_H
+#ifndef LIBREPCB_CORE_TANGENTPATHJOINER_H
+#define LIBREPCB_CORE_TANGENTPATHJOINER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/geometry/path.h>
+#include "../geometry/path.h"
+
 #include <optional/tl/optional.hpp>
 
 #include <QtCore>

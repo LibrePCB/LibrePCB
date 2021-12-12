@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEPADCOMBOBOX_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEPADCOMBOBOX_H
+#ifndef LIBREPCB_EDITOR_PACKAGEPADCOMBOBOX_H
+#define LIBREPCB_EDITOR_PACKAGEPADCOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/pkg/package.h>
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -77,7 +76,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYMANAGER_ADDLIBRARYWIDGET_H
-#define LIBREPCB_LIBRARYMANAGER_ADDLIBRARYWIDGET_H
+#ifndef LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
+#define LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,13 +36,9 @@
 namespace librepcb {
 
 class Repository;
-
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
-namespace manager {
+namespace editor {
 
 class LibraryDownload;
 
@@ -65,7 +60,7 @@ public:
   // Constructors / Destructor
   AddLibraryWidget() noexcept;
   AddLibraryWidget(const AddLibraryWidget& other) = delete;
-  explicit AddLibraryWidget(workspace::Workspace& ws) noexcept;
+  explicit AddLibraryWidget(Workspace& ws) noexcept;
   ~AddLibraryWidget() noexcept;
 
   // General Methods
@@ -93,7 +88,7 @@ private:  // Methods
                                                    bool isFilename) noexcept;
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   QScopedPointer<Ui::AddLibraryWidget> mUi;
   QScopedPointer<LibraryDownload> mManualLibraryDownload;
   QList<std::shared_ptr<Repository>> mRepositories;
@@ -103,8 +98,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

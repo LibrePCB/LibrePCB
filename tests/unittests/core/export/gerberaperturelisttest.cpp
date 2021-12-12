@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/cam/gerberaperturelist.h>
+#include <librepcb/core/export/gerberaperturelist.h>
 
 #include <QRegularExpression>
 #include <QtCore>

@@ -28,6 +28,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -277,4 +278,5 @@ bool PathModel::setData(const QModelIndex& index, const QVariant& value,
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

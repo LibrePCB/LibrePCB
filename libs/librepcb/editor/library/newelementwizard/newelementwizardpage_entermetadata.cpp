@@ -22,18 +22,17 @@
  ******************************************************************************/
 #include "newelementwizardpage_entermetadata.h"
 
-#include "../common/categorychooserdialog.h"
-#include "../common/categorytreelabeltextbuilder.h"
+#include "../cat/categorychooserdialog.h"
+#include "../cat/categorytreelabeltextbuilder.h"
 #include "ui_newelementwizardpage_entermetadata.h"
 
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -230,5 +229,4 @@ void NewElementWizardPage_EnterMetadata::cleanupPage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

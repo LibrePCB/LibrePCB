@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGWRONGSYMBOLTEXTLAYER_H
-#define LIBREPCB_LIBRARY_MSGWRONGSYMBOLTEXTLAYER_H
+#ifndef LIBREPCB_CORE_MSGWRONGSYMBOLTEXTLAYER_H
+#define LIBREPCB_CORE_MSGWRONGSYMBOLTEXTLAYER_H
 
 /*******************************************************************************
  *  Includes
@@ -33,8 +33,6 @@
 namespace librepcb {
 
 class Text;
-
-namespace library {
 
 /*******************************************************************************
  *  Class MsgWrongSymbolTextLayer
@@ -70,7 +68,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/projecteditor/boardeditor/boardclipboarddata.h>
+#include <librepcb/editor/project/boardeditor/boardclipboarddata.h>
 
 #include <QtCore>
 
@@ -29,7 +29,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 namespace tests {
 
@@ -217,5 +216,4 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
 
 }  // namespace tests
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

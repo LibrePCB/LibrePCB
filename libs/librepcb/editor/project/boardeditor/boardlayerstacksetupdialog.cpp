@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "boardlayerstacksetupdialog.h"
 
+#include "../../project/cmd/cmdboardlayerstackedit.h"
+#include "../../undostack.h"
 #include "ui_boardlayerstacksetupdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardlayerstackedit.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -102,5 +101,4 @@ bool BoardLayerStackSetupDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

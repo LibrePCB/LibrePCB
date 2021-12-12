@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLCLIPBOARDDATA_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLCLIPBOARDDATA_H
+#ifndef LIBREPCB_EDITOR_SYMBOLCLIPBOARDDATA_H
+#define LIBREPCB_EDITOR_SYMBOLCLIPBOARDDATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/circle.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/text.h>
-#include <librepcb/library/sym/symbolpin.h>
+#include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/geometry/text.h>
+#include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,7 +42,6 @@ namespace librepcb {
 
 class IF_GraphicsLayerProvider;
 
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -86,7 +85,7 @@ public:
   SymbolClipboardData& operator=(const SymbolClipboardData& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
@@ -106,7 +105,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

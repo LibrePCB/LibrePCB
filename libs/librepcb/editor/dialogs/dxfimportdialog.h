@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_DXFIMPORTDIALOG_H
-#define LIBREPCB_COMMON_DXFIMPORTDIALOG_H
+#ifndef LIBREPCB_EDITOR_DXFIMPORTDIALOG_H
+#define LIBREPCB_EDITOR_DXFIMPORTDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/filepath.h"
-#include "../graphics/graphicslayername.h"
-#include "../units/length.h"
-#include "../units/point.h"
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/graphics/graphicslayername.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,6 +41,8 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 
+namespace editor {
+
 namespace Ui {
 class DxfImportDialog;
 }
@@ -50,8 +52,7 @@ class DxfImportDialog;
  ******************************************************************************/
 
 /**
- * @brief This class provides a Dialog (GUI) to change the grid settings of a
- * ::librepcb::GraphicsView
+ * @brief This class provides a Dialog (GUI) to choose DXF import settings
  */
 class DxfImportDialog final : public QDialog {
   Q_OBJECT
@@ -91,6 +92,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

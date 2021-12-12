@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "boardviapropertiesdialog.h"
 
+#include "../../project/cmd/cmdboardviaedit.h"
+#include "../../undostack.h"
 #include "ui_boardviapropertiesdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -135,5 +134,4 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_EDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/angle.h>
 
 #include <QtCore>
 
@@ -32,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Schematic;
 
@@ -55,7 +55,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
@@ -70,7 +70,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

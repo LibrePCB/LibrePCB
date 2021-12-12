@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "librarycategory.h"
 
-#include <librepcb/common/fileio/sexpression.h>
+#include "../../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -72,5 +71,4 @@ void LibraryCategory::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

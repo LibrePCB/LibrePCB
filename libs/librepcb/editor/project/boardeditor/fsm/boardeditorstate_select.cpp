@@ -22,9 +22,20 @@
  ******************************************************************************/
 #include "boardeditorstate_select.h"
 
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../dialogs/dxfimportdialog.h"
+#include "../../../dialogs/holepropertiesdialog.h"
+#include "../../../dialogs/polygonpropertiesdialog.h"
+#include "../../../dialogs/stroketextpropertiesdialog.h"
+#include "../../../library/pkg/footprintclipboarddata.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdadddevicetoboard.h"
+#include "../../cmd/cmdboardplaneedit.h"
+#include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../../cmd/cmddragselectedboarditems.h"
 #include "../../cmd/cmdflipselectedboarditems.h"
+#include "../../cmd/cmdfootprintstroketextsreset.h"
 #include "../../cmd/cmdpasteboarditems.h"
 #include "../../cmd/cmdremoveselectedboarditems.h"
 #include "../../cmd/cmdreplacedevice.h"
@@ -34,42 +45,32 @@
 #include "../boardviapropertiesdialog.h"
 #include "../deviceinstancepropertiesdialog.h"
 
-#include <librepcb/common/dialogs/dxfimportdialog.h>
-#include <librepcb/common/dialogs/holepropertiesdialog.h>
-#include <librepcb/common/dialogs/polygonpropertiesdialog.h>
-#include <librepcb/common/dialogs/stroketextpropertiesdialog.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/import/dxfreader.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/boardselectionquery.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
-#include <librepcb/project/boards/cmd/cmdfootprintstroketextsreset.h>
-#include <librepcb/project/boards/graphicsitems/bgi_plane.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_hole.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/items/bi_stroketext.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/settings/projectsettings.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/import/dxfreader.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/boardselectionquery.h>
+#include <librepcb/core/project/board/graphicsitems/bgi_plane.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 
@@ -77,7 +78,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -244,8 +244,8 @@ bool BoardEditorState_Select::processPaste() noexcept {
       // If there is no board data, get footprint data from clipboard to allow
       // pasting graphical elements from the footprint editor.
       if (!data) {
-        std::unique_ptr<library::editor::FootprintClipboardData> footprintData =
-            library::editor::FootprintClipboardData::fromMimeData(
+        std::unique_ptr<FootprintClipboardData> footprintData =
+            FootprintClipboardData::fromMimeData(
                 qApp->clipboard()->mimeData());  // can throw
         if (footprintData) {
           data.reset(new BoardClipboardData(footprintData->getFootprintUuid(),
@@ -583,7 +583,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           QMenu* aChangeFootprintMenu = menu.addMenu(
               QIcon(":/img/library/footprint.png"), tr("Change Footprint"));
           QIcon footprintIcon(":/img/library/footprint.png");
-          for (const library::Footprint& footprint :
+          for (const Footprint& footprint :
                devInst.getLibPackage().getFootprints()) {
             QAction* a = aChangeFootprintMenu->addAction(
                 footprintIcon,
@@ -1346,15 +1346,14 @@ QList<BoardEditorState_Select::DeviceMenuItem>
       QString devName, pkgName;
       FilePath devFp =
           mContext.workspace.getLibraryDb().getLatestDevice(deviceUuid);
-      mContext.workspace.getLibraryDb().getElementTranslations<library::Device>(
+      mContext.workspace.getLibraryDb().getElementTranslations<Device>(
           devFp, mContext.project.getSettings().getLocaleOrder(), &devName);
       Uuid pkgUuid = Uuid::createRandom();  // only for initialization...
       mContext.workspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
       FilePath pkgFp =
           mContext.workspace.getLibraryDb().getLatestPackage(pkgUuid);
-      mContext.workspace.getLibraryDb()
-          .getElementTranslations<library::Package>(
-              pkgFp, mContext.project.getSettings().getLocaleOrder(), &pkgName);
+      mContext.workspace.getLibraryDb().getElementTranslations<Package>(
+          pkgFp, mContext.project.getSettings().getLocaleOrder(), &pkgName);
       items.append(DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName),
                                   icon, deviceUuid});
     }
@@ -1380,5 +1379,4 @@ QList<BoardEditorState_Select::DeviceMenuItem>
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

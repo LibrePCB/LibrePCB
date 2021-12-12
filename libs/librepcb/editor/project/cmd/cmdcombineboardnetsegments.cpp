@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "cmdcombineboardnetsegments.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
+#include "../../project/cmd/cmdboardnetsegmentaddelements.h"
+#include "../../project/cmd/cmdboardnetsegmentremove.h"
+#include "../../project/cmd/cmdboardnetsegmentremoveelements.h"
+
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -36,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -115,5 +115,4 @@ bool CmdCombineBoardNetSegments::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

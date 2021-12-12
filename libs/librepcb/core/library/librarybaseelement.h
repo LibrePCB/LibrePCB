@@ -17,20 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_LIBRARYBASEELEMENT_H
-#define LIBREPCB_LIBRARY_LIBRARYBASEELEMENT_H
+#ifndef LIBREPCB_CORE_LIBRARYBASEELEMENT_H
+#define LIBREPCB_CORE_LIBRARYBASEELEMENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../fileio/transactionaldirectory.h"
+#include "../serialization/serializablekeyvaluemap.h"
+#include "../serialization/serializableobject.h"
+#include "../serialization/sexpression.h"
+#include "../types/uuid.h"
+#include "../types/version.h"
 #include "./msg/libraryelementcheckmessage.h"
-
-#include <librepcb/common/fileio/serializablekeyvaluemap.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/version.h>
 
 #include <QObject>
 
@@ -40,7 +39,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class LibraryBaseElement
@@ -132,7 +130,7 @@ protected:
   // Protected Methods
   virtual void cleanupAfterLoadingElementFromFile() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
   // General Attributes
@@ -160,7 +158,6 @@ protected:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

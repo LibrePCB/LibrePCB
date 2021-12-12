@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ABOUTDIALOG_H
-#define LIBREPCB_COMMON_ABOUTDIALOG_H
+#ifndef LIBREPCB_EDITOR_ABOUTDIALOG_H
+#define LIBREPCB_EDITOR_ABOUTDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../version.h"
+#include <librepcb/core/types/version.h>
 
 #include <QAbstractButton>
 #include <QDialog>
@@ -33,6 +33,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 namespace Ui {
 class AboutDialog;
@@ -71,6 +72,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

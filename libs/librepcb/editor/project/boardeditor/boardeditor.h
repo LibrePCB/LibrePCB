@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITOR_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITOR_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITOR_H
+#define LIBREPCB_EDITOR_BOARDEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_boardeditor.h"
 
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/drc/boarddesignrulecheck.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,12 +37,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class ExclusiveActionGroup;
-class GraphicsView;
-class UndoStackActionGroup;
-
-namespace project {
 
 class ComponentInstance;
 class Project;
@@ -53,7 +47,10 @@ class BoardDesignRuleCheckMessagesDock;
 class BoardEditorFsm;
 class BoardLayersDock;
 class ErcMsgDock;
+class ExclusiveActionGroup;
+class GraphicsView;
 class ProjectEditor;
+class UndoStackActionGroup;
 class UnplacedComponentsDock;
 
 namespace Ui {
@@ -176,7 +173,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

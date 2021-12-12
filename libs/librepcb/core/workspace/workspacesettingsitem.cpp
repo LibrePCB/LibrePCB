@@ -28,7 +28,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -45,5 +44,4 @@ WorkspaceSettingsItem::~WorkspaceSettingsItem() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb

@@ -24,23 +24,23 @@
 
 #include "boardnetsegmentsplitter.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardselectionquery.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_hole.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/items/bi_stroketext.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/circuit/netsignal.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardselectionquery.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,7 +49,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -197,5 +196,4 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_JUNCTION_H
-#define LIBREPCB_COMMON_JUNCTION_H
+#ifndef LIBREPCB_CORE_JUNCTION_H
+#define LIBREPCB_CORE_JUNCTION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
-#include "../units/point.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/point.h"
 
 #include <QtCore>
 
@@ -72,7 +72,7 @@ public:
   bool setUuid(const Uuid& uuid) noexcept;
   bool setPosition(const Point& position) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

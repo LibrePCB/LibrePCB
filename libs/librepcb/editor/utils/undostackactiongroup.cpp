@@ -24,6 +24,8 @@
 
 #include "../undostack.h"
 
+#include <librepcb/core/exceptions.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -31,6 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -131,4 +134,5 @@ void UndoStackActionGroup::registerToStack(UndoStack* stack) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

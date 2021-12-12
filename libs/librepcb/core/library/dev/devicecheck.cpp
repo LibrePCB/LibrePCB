@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -74,5 +73,4 @@ void DeviceCheck::checkNoPadsConnected(MsgList& msgs) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

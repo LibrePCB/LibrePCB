@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdnetsignaledit.h"
 
-#include "../circuit.h"
-#include "../netsignal.h"
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 
 #include <QtCore>
 
@@ -31,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -84,5 +84,5 @@ void CmdNetSignalEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

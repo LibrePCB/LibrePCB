@@ -22,26 +22,26 @@
  ******************************************************************************/
 #include "schematiceditorstate_drawwire.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../../cmd/cmdcombineschematicnetsegments.h"
+#include "../../cmd/cmdcompsiginstsetnetsignal.h"
+#include "../../cmd/cmdnetclassadd.h"
+#include "../../cmd/cmdnetsignaladd.h"
+#include "../../cmd/cmdnetsignaledit.h"
+#include "../../cmd/cmdschematicnetsegmentadd.h"
+#include "../../cmd/cmdschematicnetsegmentaddelements.h"
+#include "../../cmd/cmdschematicnetsegmentremoveelements.h"
 #include "../schematiceditor.h"
 
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -50,7 +50,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -732,5 +731,4 @@ Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

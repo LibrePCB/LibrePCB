@@ -25,7 +25,7 @@
 #include "../fileio/fileutils.h"
 #include "../geometry/circle.h"
 #include "../geometry/path.h"
-#include "../toolbox.h"
+#include "../utils/toolbox.h"
 #include "gerberaperturelist.h"
 #include "gerberattribute.h"
 #include "gerberattributewriter.h"

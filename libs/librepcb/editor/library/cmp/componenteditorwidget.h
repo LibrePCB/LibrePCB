@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_COMPONENTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/categorylisteditorwidget.h"
-#include "../common/editorwidgetbase.h"
+#include "../cat/categorylisteditorwidget.h"
+#include "../editorwidgetbase.h"
 #include "if_componentsymbolvarianteditorprovider.h"
 
-#include <librepcb/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class Component;
 
@@ -107,7 +106,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

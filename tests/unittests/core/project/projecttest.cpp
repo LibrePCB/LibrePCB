@@ -21,9 +21,9 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/project/metadata/projectmetadata.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectmetadata.h>
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace tests {
 
 /*******************************************************************************
@@ -196,5 +195,4 @@ TEST_F(ProjectTest, testSettersGetters) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace project
 }  // namespace librepcb

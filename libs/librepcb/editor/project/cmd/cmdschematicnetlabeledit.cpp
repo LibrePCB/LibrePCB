@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdschematicnetlabeledit.h"
 
-#include "../items/si_netlabel.h"
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -125,5 +125,5 @@ void CmdSchematicNetLabelEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

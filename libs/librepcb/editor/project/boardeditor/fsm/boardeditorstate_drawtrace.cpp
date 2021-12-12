@@ -22,27 +22,27 @@
  ******************************************************************************/
 #include "boardeditorstate_drawtrace.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../cmd/cmdboardnetsegmentadd.h"
+#include "../../cmd/cmdboardnetsegmentaddelements.h"
+#include "../../cmd/cmdboardnetsegmentremoveelements.h"
 #include "../../cmd/cmdboardsplitnetline.h"
+#include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/library/pkg/footprintpad.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
-#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -50,7 +50,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -486,8 +485,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
         // to pads of no net.
         throwPadNotConnectedException();
       }
-      if (pad->getLibPad().getBoardSide() !=
-          library::FootprintPad::BoardSide::THT) {
+      if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
         layer = board.getLayerStack().getLayer(pad->getLayerName());
       }
     } else if (BI_NetLine* netline = findNetLine(board, pos)) {
@@ -633,8 +631,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
         if (mCurrentSnapActive || mTargetPos == pad->getPosition()) {
           otherAnchors.append(pad);
           if (mAddVia &&
-              pad->getLibPad().getBoardSide() ==
-                  library::FootprintPad::BoardSide::THT) {
+              pad->getLibPad().getBoardSide() == FootprintPad::BoardSide::THT) {
             mCurrentLayerName = mViaLayerName;
           }
         }
@@ -874,8 +871,8 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     } else if (BI_FootprintPad* pad =
                    findPad(board, mCursorPos, layer, {netsignal})) {
       mTargetPos = pad->getPosition();
-      isOnVia = (pad->getLibPad().getBoardSide() ==
-                 library::FootprintPad::BoardSide::THT);
+      isOnVia =
+          (pad->getLibPad().getBoardSide() == FootprintPad::BoardSide::THT);
     } else if (BI_NetPoint* netpoint = findNetPoint(
                    board, mCursorPos, layer, {netsignal},
                    {mPositioningNetPoint1, mPositioningNetPoint2})) {
@@ -1012,8 +1009,7 @@ void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
     BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
     BI_FootprintPad* pad = dynamic_cast<BI_FootprintPad*>(mFixedStartAnchor);
     if (pad &&
-        (pad->getLibPad().getBoardSide() !=
-         library::FootprintPad::BoardSide::THT)) {
+        (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT)) {
       pad = nullptr;
     }
     if (via || pad) {
@@ -1110,5 +1106,4 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(const Point& p1,
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

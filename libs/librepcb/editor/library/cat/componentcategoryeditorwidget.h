@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTCATEGORYEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
+#define LIBREPCB_EDITOR_COMPONENTCATEGORYEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/editorwidgetbase.h"
+#include "../editorwidgetbase.h"
 
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class ComponentCategory;
 
@@ -100,7 +99,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

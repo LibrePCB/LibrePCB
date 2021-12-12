@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "symbolpingraphicsitem.h"
 
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/graphicslayer.h"
+#include "../../graphics/linegraphicsitem.h"
+#include "../../graphics/primitivetextgraphicsitem.h"
+#include "../../types/angle.h"
+#include "../../types/point.h"
 #include "symbolpin.h"
-
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/linegraphicsitem.h>
-#include <librepcb/common/graphics/primitivetextgraphicsitem.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -138,5 +136,4 @@ void SymbolPinGraphicsItem::paint(QPainter* painter,
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

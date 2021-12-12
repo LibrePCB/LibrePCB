@@ -22,9 +22,10 @@
  ******************************************************************************/
 #include "cmdfootprintstroketextsreset.h"
 
-#include "../items/bi_footprint.h"
 #include "cmdfootprintstroketextadd.h"
 #include "cmdfootprintstroketextremove.h"
+
+#include <librepcb/core/project/board/items/bi_footprint.h>
 
 #include <QtCore>
 
@@ -32,7 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -70,5 +71,5 @@ bool CmdFootprintStrokeTextsReset::performExecute() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

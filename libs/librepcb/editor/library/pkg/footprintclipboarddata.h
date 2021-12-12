@@ -17,20 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_FOOTPRINTCLIPBOARDDATA_H
-#define LIBREPCB_LIBRARYEDITOR_FOOTPRINTCLIPBOARDDATA_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTCLIPBOARDDATA_H
+#define LIBREPCB_EDITOR_FOOTPRINTCLIPBOARDDATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/circle.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/library/pkg/footprintpad.h>
-#include <librepcb/library/pkg/packagepad.h>
+#include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/packagepad.h>
+#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,7 +44,6 @@ namespace librepcb {
 
 class IF_GraphicsLayerProvider;
 
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -96,7 +95,7 @@ public:
   FootprintClipboardData& operator=(const FootprintClipboardData& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
@@ -118,7 +117,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "footprintlisteditorwidget.h"
 
-#include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/libraryeditor/pkg/footprintlistmodel.h>
+#include "../../library/pkg/footprintlistmodel.h"
+#include "../../widgets/editabletablewidget.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -90,5 +89,4 @@ void FootprintListEditorWidget::setReferences(FootprintList& list,
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

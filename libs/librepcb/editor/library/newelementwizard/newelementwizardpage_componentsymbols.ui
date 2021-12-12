@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::NewElementWizardPage_ComponentSymbols</class>
- <widget class="QWizardPage" name="librepcb::library::editor::NewElementWizardPage_ComponentSymbols">
+ <class>librepcb::editor::NewElementWizardPage_ComponentSymbols</class>
+ <widget class="QWizardPage" name="librepcb::editor::NewElementWizardPage_ComponentSymbols">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,15 +36,15 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="librepcb::library::editor::ComponentSymbolVariantItemListEditorWidget" name="symbolListEditorWidget" native="true"/>
+    <widget class="librepcb::editor::ComponentSymbolVariantItemListEditorWidget" name="symbolListEditorWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::library::editor::ComponentSymbolVariantItemListEditorWidget</class>
+   <class>librepcb::editor::ComponentSymbolVariantItemListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/cmp/componentsymbolvariantitemlisteditorwidget.h</header>
+   <header location="global">librepcb/editor/library/cmp/componentsymbolvariantitemlisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

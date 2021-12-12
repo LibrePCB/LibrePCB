@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNITTESTS_COMMON_NETWORKREQUESTBASESIGNALRECEIVER_H
-#define UNITTESTS_COMMON_NETWORKREQUESTBASESIGNALRECEIVER_H
+#ifndef UNITTESTS_CORE_NETWORKREQUESTBASESIGNALRECEIVER_H
+#define UNITTESTS_CORE_NETWORKREQUESTBASESIGNALRECEIVER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 

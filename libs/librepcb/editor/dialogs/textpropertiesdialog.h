@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_TEXTPROPERTIESDIALOG_H
-#define LIBREPCB_COMMON_TEXTPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_TEXTPROPERTIESDIALOG_H
+#define LIBREPCB_EDITOR_TEXTPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -34,6 +34,9 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 class Text;
+
+namespace editor {
+
 class UndoStack;
 
 namespace Ui {
@@ -83,6 +86,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

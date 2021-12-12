@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/toolbox.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <quazip/quazip.h>
 

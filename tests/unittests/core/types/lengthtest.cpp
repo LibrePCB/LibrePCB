@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/units/length.h>
+#include <librepcb/core/types/length.h>
 
 /*******************************************************************************
  *  Namespace

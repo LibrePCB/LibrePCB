@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "sqlitedatabase.h"
 
-#include "uuid.h"
+#include "exceptions.h"
+#include "types/uuid.h"
 
 #include <QtCore>
 

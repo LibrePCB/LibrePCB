@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -197,5 +196,4 @@ void BoardSelectionQuery::addNetPointsOfNetLines(
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

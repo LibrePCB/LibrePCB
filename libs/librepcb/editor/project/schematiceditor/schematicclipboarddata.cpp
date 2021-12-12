@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "schematicclipboarddata.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/librarybaseelement.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/librarybaseelement.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -139,5 +138,4 @@ QString SchematicClipboardData::getMimeType() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

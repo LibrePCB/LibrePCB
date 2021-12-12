@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::StrokeTextPropertiesDialog</class>
- <widget class="QDialog" name="librepcb::StrokeTextPropertiesDialog">
+ <class>librepcb::editor::StrokeTextPropertiesDialog</class>
+ <widget class="QDialog" name="librepcb::editor::StrokeTextPropertiesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="librepcb::AlignmentSelector" name="alignmentSelector" native="true"/>
+      <widget class="librepcb::editor::AlignmentSelector" name="alignmentSelector" native="true"/>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_6">
@@ -64,7 +64,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="librepcb::PositiveLengthEdit" name="edtHeight" native="true"/>
+      <widget class="librepcb::editor::PositiveLengthEdit" name="edtHeight" native="true"/>
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_3">
@@ -74,7 +74,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="librepcb::UnsignedLengthEdit" name="edtStrokeWidth" native="true"/>
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStrokeWidth" native="true"/>
      </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_10">
@@ -86,7 +86,7 @@
      <item row="5" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
        <item>
-        <widget class="librepcb::RatioEdit" name="edtLetterSpacingRatio" native="true"/>
+        <widget class="librepcb::editor::RatioEdit" name="edtLetterSpacingRatio" native="true"/>
        </item>
        <item>
         <widget class="QCheckBox" name="cbxLetterSpacingAuto">
@@ -107,7 +107,7 @@
      <item row="6" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
        <item>
-        <widget class="librepcb::RatioEdit" name="edtLineSpacingRatio" native="true"/>
+        <widget class="librepcb::editor::RatioEdit" name="edtLineSpacingRatio" native="true"/>
        </item>
        <item>
         <widget class="QCheckBox" name="cbxLineSpacingAuto">
@@ -128,10 +128,10 @@
      <item row="7" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="librepcb::LengthEdit" name="edtPosX" native="true"/>
+        <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
        </item>
        <item>
-        <widget class="librepcb::LengthEdit" name="edtPosY" native="true"/>
+        <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true"/>
        </item>
       </layout>
      </item>
@@ -143,7 +143,7 @@
       </widget>
      </item>
      <item row="8" column="1">
-      <widget class="librepcb::AngleEdit" name="edtRotation" native="true"/>
+      <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
      </item>
      <item row="9" column="0">
       <widget class="QLabel" name="label_9">
@@ -186,39 +186,39 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::LengthEdit</class>
+   <class>librepcb::editor::LengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/lengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::AngleEdit</class>
+   <class>librepcb::editor::AngleEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/angleedit.h</header>
+   <header location="global">librepcb/editor/widgets/angleedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::UnsignedLengthEdit</class>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::PositiveLengthEdit</class>
+   <class>librepcb::editor::PositiveLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/positivelengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::AlignmentSelector</class>
+   <class>librepcb::editor::AlignmentSelector</class>
    <extends>QWidget</extends>
-   <header>widgets/alignmentselector.h</header>
+   <header location="global">librepcb/editor/widgets/alignmentselector.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::RatioEdit</class>
+   <class>librepcb::editor::RatioEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/ratioedit.h</header>
+   <header location="global">librepcb/editor/widgets/ratioedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_BOMCSVWRITER_H
-#define LIBREPCB_COMMON_BOMCSVWRITER_H
+#ifndef LIBREPCB_CORE_BOMCSVWRITER_H
+#define LIBREPCB_CORE_BOMCSVWRITER_H
 
 /*******************************************************************************
  *  Includes

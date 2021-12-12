@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/library/sym/symbolpin.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace tests {
 
 /*******************************************************************************
@@ -89,5 +88,4 @@ TEST_F(SymbolPinTest, testSerializeAndDeserialize) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace library
 }  // namespace librepcb

@@ -22,14 +22,14 @@
  ******************************************************************************/
 #include "circuit.h"
 
+#include "../../exceptions.h"
+#include "../../library/cmp/component.h"
+#include "../../serialization/sexpression.h"
 #include "../project.h"
-#include "../settings/projectsettings.h"
+#include "../projectsettings.h"
 #include "componentinstance.h"
 #include "netclass.h"
 #include "netsignal.h"
-
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
 
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -297,7 +296,7 @@ void Circuit::setHighlightedNetSignal(NetSignal* signal) noexcept {
  ******************************************************************************/
 
 QString Circuit::generateAutoComponentInstanceName(
-    const library::ComponentPrefix& cmpPrefix) const noexcept {
+    const ComponentPrefix& cmpPrefix) const noexcept {
   QString name;
   int i = 1;
   do {
@@ -397,5 +396,4 @@ void Circuit::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

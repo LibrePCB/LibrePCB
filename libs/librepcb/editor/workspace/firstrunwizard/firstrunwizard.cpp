@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -94,5 +94,5 @@ int FirstRunWizard::nextId() const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

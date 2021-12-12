@@ -22,17 +22,16 @@
  ******************************************************************************/
 #include "si_symbol.h"
 
+#include "../../../graphics/graphicsscene.h"
+#include "../../../library/cmp/component.h"
+#include "../../../library/sym/symbol.h"
+#include "../../../utils/scopeguardlist.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
-#include "../../library/projectlibrary.h"
 #include "../../project.h"
+#include "../../projectlibrary.h"
 #include "../schematic.h"
 #include "si_symbolpin.h"
-
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
 
 #include <QtCore>
 
@@ -40,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -102,7 +100,7 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) {
   mGraphicsItem->setPos(mPosition.toPxQPointF());
   updateGraphicsItemTransform();
 
-  for (const library::SymbolPin& libPin : mSymbol->getPins()) {
+  for (const SymbolPin& libPin : mSymbol->getPins()) {
     SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid());  // can throw
     if (mPins.contains(libPin.getUuid())) {
       throw RuntimeError(
@@ -301,5 +299,4 @@ bool SI_Symbol::checkAttributesValidity() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

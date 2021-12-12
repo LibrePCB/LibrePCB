@@ -24,8 +24,8 @@
 
 #include "ui_boarddesignrulecheckdialog.h"
 
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/drc/boarddesignrulecheck.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 
 #include <QtCore>
 
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -200,5 +199,4 @@ void BoardDesignRuleCheckDialog::btnRunDrcClicked() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

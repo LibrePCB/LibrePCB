@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "unsignedratioedit.h"
 
-#include "doublespinbox.h"
+#include "../widgets/doublespinbox.h"
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -88,4 +89,5 @@ void UnsignedRatioEdit::spinBoxValueChanged(double value) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

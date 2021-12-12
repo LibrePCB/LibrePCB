@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_SYMBOLPINPREVIEWGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_SYMBOLPINPREVIEWGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_SYMBOLPINPREVIEWGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../cmp/cmpsigpindisplaytype.h"
+#include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,13 +33,12 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ComponentSignal;
 class GraphicsLayer;
 class IF_GraphicsLayerProvider;
-
-namespace library {
-
-class ComponentSignal;
 class SymbolPin;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class SymbolPinPreviewGraphicsItem
@@ -101,7 +100,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

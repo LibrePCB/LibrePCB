@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_FILEPATH_H
-#define LIBREPCB_COMMON_FILEPATH_H
+#ifndef LIBREPCB_CORE_FILEPATH_H
+#define LIBREPCB_CORE_FILEPATH_H
 
 /*******************************************************************************
  *  Includes

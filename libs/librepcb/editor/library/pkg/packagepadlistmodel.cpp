@@ -22,10 +22,11 @@
  ******************************************************************************/
 #include "packagepadlistmodel.h"
 
-#include <librepcb/common/toolbox.h>
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/pkg/cmd/cmdpackagepadedit.h>
+#include "../../undocommandgroup.h"
+#include "../../undostack.h"
+#include "../cmd/cmdpackagepadedit.h"
+
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -33,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -324,5 +324,4 @@ QString PackagePadListModel::getNextPadNameProposal() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

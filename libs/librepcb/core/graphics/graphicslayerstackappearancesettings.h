@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
-#define LIBREPCB_COMMON_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#ifndef LIBREPCB_CORE_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#define LIBREPCB_CORE_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobject.h"
+#include "../serialization/serializableobject.h"
 
 #include <QtCore>
 
@@ -59,7 +59,7 @@ public:
                                        const Version& fileFormat);
   ~GraphicsLayerStackAppearanceSettings() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

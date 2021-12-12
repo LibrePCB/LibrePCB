@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_LIBRARYLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_LIBRARYLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_LIBRARYLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/model/editablelistmodel.h>
-#include <librepcb/common/uuid.h>
+#include "../../modelview/editablelistmodel.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,14 +35,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SortFilterProxyModel;
-
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
 namespace editor {
+
+class SortFilterProxyModel;
 
 namespace Ui {
 class LibraryListEditorWidget;
@@ -62,7 +60,7 @@ class LibraryListEditorWidget final : public QWidget {
 public:
   // Constructors / Destructor
   LibraryListEditorWidget() = delete;
-  explicit LibraryListEditorWidget(const workspace::Workspace& ws,
+  explicit LibraryListEditorWidget(const Workspace& ws,
                                    QWidget* parent = nullptr) noexcept;
   LibraryListEditorWidget(const LibraryListEditorWidget& other) = delete;
   ~LibraryListEditorWidget() noexcept;
@@ -92,7 +90,6 @@ protected:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

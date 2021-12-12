@@ -22,16 +22,16 @@
  ******************************************************************************/
 #include "renamenetsegmentdialog.h"
 
+#include "../../project/cmd/cmdnetsignaladd.h"
+#include "../../project/cmd/cmdnetsignaledit.h"
+#include "../../undostack.h"
 #include "../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../cmd/cmdcombinenetsignals.h"
 #include "ui_renamenetsegmentdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -211,5 +210,4 @@ void RenameNetSegmentDialog::updateAction() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

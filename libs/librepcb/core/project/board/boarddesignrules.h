@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_BOARDDESIGNRULES_H
-#define LIBREPCB_COMMON_BOARDDESIGNRULES_H
+#ifndef LIBREPCB_CORE_BOARDDESIGNRULES_H
+#define LIBREPCB_CORE_BOARDDESIGNRULES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "elementname.h"
-#include "exceptions.h"
-#include "fileio/serializableobject.h"
-#include "units/length.h"
-#include "units/ratio.h"
+#include "../../serialization/serializableobject.h"
+#include "../../types/elementname.h"
+#include "../../types/length.h"
+#include "../../types/ratio.h"
 
 #include <QtCore>
 
@@ -138,7 +137,7 @@ public:
   // General Methods
   void restoreDefaults() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Helper Methods

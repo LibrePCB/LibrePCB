@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SETOPTIONS_H
-#define LIBREPCB_LIBRARYEDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SETOPTIONS_H
+#ifndef LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SETOPTIONS_H
+#define LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARDPAGE_SETOPTIONS_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 class EagleLibraryImportWizardContext;
@@ -82,7 +81,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

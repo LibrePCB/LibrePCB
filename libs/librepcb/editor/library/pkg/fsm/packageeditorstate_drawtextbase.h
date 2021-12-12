@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORSTATE_DRAWTEXTBASE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/common/alignment.h>
-#include <librepcb/common/graphics/graphicslayername.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/graphics/graphicslayername.h>
+#include <librepcb/core/types/alignment.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,12 +39,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdStrokeTextEdit;
 class StrokeText;
 class StrokeTextGraphicsItem;
 
-namespace library {
 namespace editor {
+
+class CmdStrokeTextEdit;
 
 /*******************************************************************************
  *  Class PackageEditorState_DrawTextBase
@@ -120,7 +120,6 @@ private:  // Types / Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

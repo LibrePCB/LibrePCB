@@ -29,6 +29,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -215,4 +216,5 @@ void EditableTableWidget::buttonClickedHandler(
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

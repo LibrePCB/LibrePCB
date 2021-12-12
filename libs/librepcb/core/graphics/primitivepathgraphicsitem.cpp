@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "primitivepathgraphicsitem.h"
 
-#include "../toolbox.h"
+#include "../utils/toolbox.h"
 
 #include <QPrinter>
 #include <QtCore>

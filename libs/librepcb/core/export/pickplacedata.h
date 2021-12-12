@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_PICKPLACEDATA_H
-#define LIBREPCB_COMMON_PICKPLACEDATA_H
+#ifndef LIBREPCB_CORE_PICKPLACEDATA_H
+#define LIBREPCB_CORE_PICKPLACEDATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/angle.h"
-#include "../units/point.h"
+#include "../types/angle.h"
+#include "../types/point.h"
 
 #include <QtCore>
 

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
+#define LIBREPCB_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/cmp/componentsignal.h>
+#include <librepcb/core/library/cmp/componentsignal.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,17 +33,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SortFilterProxyModel;
-class UndoStack;
-
-namespace library {
-
 class ComponentSymbolVariant;
 
 namespace editor {
 
 class ComponentPinSignalMapModel;
 class LibraryElementCache;
+class SortFilterProxyModel;
+class UndoStack;
 
 /*******************************************************************************
  *  Class CompSymbVarPinSignalMapEditorWidget
@@ -87,7 +84,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

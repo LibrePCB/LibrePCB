@@ -22,30 +22,30 @@
  ******************************************************************************/
 #include "cmdremoveboarditems.h"
 
+#include "../../project/cmd/cmdboardholeremove.h"
+#include "../../project/cmd/cmdboardnetsegmentadd.h"
+#include "../../project/cmd/cmdboardnetsegmentaddelements.h"
+#include "../../project/cmd/cmdboardnetsegmentremove.h"
+#include "../../project/cmd/cmdboardplaneremove.h"
+#include "../../project/cmd/cmdboardpolygonremove.h"
+#include "../../project/cmd/cmdboardstroketextremove.h"
+#include "../../project/cmd/cmddeviceinstanceremove.h"
+#include "../../project/cmd/cmdfootprintstroketextremove.h"
 #include "../boardeditor/boardnetsegmentsplitter.h"
 #include "cmdremoveunusedlibraryelements.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardholeremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
-#include <librepcb/project/boards/cmd/cmdboardpolygonremove.h>
-#include <librepcb/project/boards/cmd/cmdboardstroketextremove.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceremove.h>
-#include <librepcb/project/boards/cmd/cmdfootprintstroketextremove.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_hole.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -53,7 +53,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -253,5 +252,4 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_TEXT_H
-#define LIBREPCB_COMMON_TEXT_H
+#ifndef LIBREPCB_CORE_TEXT_H
+#define LIBREPCB_CORE_TEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
-#include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
-#include "../units/angle.h"
-#include "../units/length.h"
-#include "../units/point.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/alignment.h"
+#include "../types/angle.h"
+#include "../types/length.h"
+#include "../types/point.h"
 
 #include <QtCore>
 
@@ -88,7 +88,7 @@ public:
   bool setHeight(const PositiveLength& height) noexcept;
   bool setAlign(const Alignment& align) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

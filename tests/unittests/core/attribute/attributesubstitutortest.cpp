@@ -24,7 +24,7 @@
 #include "attributeproviderdummy.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/common/attributes/attributesubstitutor.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
 
 #include <QtCore>
 

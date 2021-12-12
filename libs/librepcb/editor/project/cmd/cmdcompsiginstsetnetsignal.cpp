@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdcompsiginstsetnetsignal.h"
 
-#include "../componentsignalinstance.h"
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -69,5 +69,5 @@ void CmdCompSigInstSetNetSignal::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

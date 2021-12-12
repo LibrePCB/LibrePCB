@@ -22,40 +22,40 @@
  ******************************************************************************/
 #include "cmdpasteboarditems.h"
 
+#include "../../project/cmd/cmdboardholeadd.h"
+#include "../../project/cmd/cmdboardnetsegmentadd.h"
+#include "../../project/cmd/cmdboardnetsegmentaddelements.h"
+#include "../../project/cmd/cmdboardplaneadd.h"
+#include "../../project/cmd/cmdboardpolygonadd.h"
+#include "../../project/cmd/cmdboardstroketextadd.h"
+#include "../../project/cmd/cmddeviceinstanceadd.h"
+#include "../../project/cmd/cmdnetclassadd.h"
+#include "../../project/cmd/cmdnetsignaladd.h"
+#include "../../project/cmd/cmdprojectlibraryaddelement.h"
 #include "../boardeditor/boardclipboarddata.h"
 #include "../boardeditor/boardnetsegmentsplitter.h"
 #include "cmdremoveboarditems.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardholeadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneadd.h>
-#include <librepcb/project/boards/cmd/cmdboardpolygonadd.h>
-#include <librepcb/project/boards/cmd/cmdboardstroketextadd.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceadd.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_hole.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/boards/items/bi_polygon.h>
-#include <librepcb/project/boards/items/bi_stroketext.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -63,7 +63,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -118,23 +117,23 @@ bool CmdPasteBoardItems::performExecute() {
 
     // Copy new device to project library, if not existing already
     tl::optional<Uuid> pgkUuid;
-    if (const library::Device* libDev =
+    if (const Device* libDev =
             mProject.getLibrary().getDevice(dev.libDeviceUuid)) {
       pgkUuid = libDev->getPackageUuid();
     } else {
-      QScopedPointer<library::Device> newLibDev(new library::Device(
-          mData->getDirectory("dev/" % dev.libDeviceUuid.toStr())));
+      QScopedPointer<Device> newLibDev(
+          new Device(mData->getDirectory("dev/" % dev.libDeviceUuid.toStr())));
       pgkUuid = newLibDev->getPackageUuid();
-      execNewChildCmd(new CmdProjectLibraryAddElement<library::Device>(
+      execNewChildCmd(new CmdProjectLibraryAddElement<Device>(
           mProject.getLibrary(), *newLibDev.take()));
     }
     Q_ASSERT(pgkUuid);
 
     // Copy new package to project library, if not existing already
     if (!mProject.getLibrary().getPackage(*pgkUuid)) {
-      QScopedPointer<library::Package> newLibPgk(
-          new library::Package(mData->getDirectory("pkg/" % pgkUuid->toStr())));
-      execNewChildCmd(new CmdProjectLibraryAddElement<library::Package>(
+      QScopedPointer<Package> newLibPgk(
+          new Package(mData->getDirectory("pkg/" % pgkUuid->toStr())));
+      execNewChildCmd(new CmdProjectLibraryAddElement<Package>(
           mProject.getLibrary(), *newLibPgk.take()));
     }
 
@@ -325,5 +324,4 @@ NetSignal* CmdPasteBoardItems::getOrCreateNetSignal(const QString& name) {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

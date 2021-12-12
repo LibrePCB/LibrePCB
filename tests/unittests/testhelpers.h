@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
+#include <librepcb/core/exceptions.h>
 
 #include <QtCore>
 

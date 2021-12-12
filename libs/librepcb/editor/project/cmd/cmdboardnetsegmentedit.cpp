@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdboardnetsegmentedit.h"
 
-#include "../items/bi_netsegment.h"
+#include <librepcb/core/project/board/items/bi_netsegment.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -78,5 +78,5 @@ void CmdBoardNetSegmentEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

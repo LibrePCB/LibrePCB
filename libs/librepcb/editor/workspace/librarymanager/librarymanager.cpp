@@ -27,10 +27,10 @@
 #include "librarylistwidgetitem.h"
 #include "ui_librarymanager.h"
 
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,15 +41,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryManager::LibraryManager(workspace::Workspace& ws,
-                               QWidget* parent) noexcept
+LibraryManager::LibraryManager(Workspace& ws, QWidget* parent) noexcept
   : QMainWindow(parent),
     mWorkspace(ws),
     mUi(new Ui::LibraryManager),
@@ -67,7 +65,7 @@ LibraryManager::LibraryManager(workspace::Workspace& ws,
 
   updateLibraryList();
   connect(&mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanLibraryListUpdated, this,
+          &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &LibraryManager::updateLibraryList);
 
   // Restore Window Geometry
@@ -238,6 +236,5 @@ bool LibraryManager::widgetsLessThan(const LibraryListWidgetItem* a,
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

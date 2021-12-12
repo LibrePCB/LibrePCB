@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "dxfimportdialog.h"
 
-#include "../graphics/graphicslayer.h"
 #include "../widgets/lengtheditbase.h"
+#include "filedialog.h"
 #include "ui_dxfimportdialog.h"
 
-#include <librepcb/common/dialogs/filedialog.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 
@@ -34,6 +34,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -169,4 +170,5 @@ void DxfImportDialog::throwNoObjectsImportedError() {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

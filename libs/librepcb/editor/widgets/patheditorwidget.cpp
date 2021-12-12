@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "patheditorwidget.h"
 
-#include "../geometry/pathmodel.h"
-#include "../model/angledelegate.h"
-#include "../model/lengthdelegate.h"
-#include "editabletablewidget.h"
+#include "../modelview/angledelegate.h"
+#include "../modelview/lengthdelegate.h"
+#include "../modelview/pathmodel.h"
+#include "../widgets/editabletablewidget.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,6 +34,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -104,4 +105,5 @@ void PathEditorWidget::setLengthUnit(const LengthUnit& unit) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

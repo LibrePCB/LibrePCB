@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_SQLITEDATABASE_H
-#define LIBREPCB_COMMON_SQLITEDATABASE_H
+#ifndef LIBREPCB_CORE_SQLITEDATABASE_H
+#define LIBREPCB_CORE_SQLITEDATABASE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "exceptions.h"
 #include "fileio/filepath.h"
 
 #include <QtCore>

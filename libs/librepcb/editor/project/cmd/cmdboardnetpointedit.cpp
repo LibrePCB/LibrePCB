@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdboardnetpointedit.h"
 
-#include "../items/bi_netpoint.h"
+#include <librepcb/core/project/board/items/bi_netpoint.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -96,5 +96,5 @@ void CmdBoardNetPointEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER_H
-#define LIBREPCB_LIBRARYEDITOR_IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER_H
+#ifndef LIBREPCB_EDITOR_IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER_H
+#define LIBREPCB_EDITOR_IF_COMPONENTSYMBOLVARIANTEDITORPROVIDER_H
 
 /*******************************************************************************
  *  Includes
@@ -29,7 +29,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class ComponentSymbolVariant;
 
@@ -64,7 +63,6 @@ public:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

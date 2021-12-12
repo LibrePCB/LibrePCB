@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "si_netlabel.h"
 
+#include "../../../graphics/graphicsscene.h"
+#include "../../../utils/scopeguard.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../schematic.h"
 #include "si_netsegment.h"
-
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/scopeguard.h>
 
 #include <QtCore>
 
@@ -37,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -161,5 +159,4 @@ void SI_NetLabel::setSelected(bool selected) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

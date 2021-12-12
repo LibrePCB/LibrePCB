@@ -22,22 +22,21 @@
  ******************************************************************************/
 #include "project.h"
 
-#include "boards/board.h"
+#include "../application.h"
+#include "../exceptions.h"
+#include "../fileio/directorylock.h"
+#include "../fileio/fileutils.h"
+#include "../fileio/versionfile.h"
+#include "../font/strokefontpool.h"
+#include "../serialization/sexpression.h"
+#include "board/board.h"
 #include "circuit/circuit.h"
 #include "erc/ercmsglist.h"
-#include "library/projectlibrary.h"
-#include "metadata/projectmetadata.h"
-#include "schematics/schematic.h"
-#include "schematics/schematiclayerprovider.h"
-#include "settings/projectsettings.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/versionfile.h>
-#include <librepcb/common/font/strokefontpool.h>
+#include "projectlibrary.h"
+#include "projectmetadata.h"
+#include "projectsettings.h"
+#include "schematic/schematic.h"
+#include "schematic/schematiclayerprovider.h"
 
 #include <QPrinter>
 #include <QtCore>
@@ -46,7 +45,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -641,5 +639,4 @@ Version Project::getProjectFileFormatVersion(const FilePath& dir) {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

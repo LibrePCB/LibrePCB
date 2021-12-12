@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_STROKEFONT_H
-#define LIBREPCB_COMMON_STROKEFONT_H
+#ifndef LIBREPCB_CORE_STROKEFONT_H
+#define LIBREPCB_CORE_STROKEFONT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
 #include "../fileio/filepath.h"
 #include "../geometry/path.h"
-#include "../units/length.h"
-#include "../units/ratio.h"
+#include "../types/alignment.h"
+#include "../types/length.h"
+#include "../types/ratio.h"
 
 #include <QtCore>
 

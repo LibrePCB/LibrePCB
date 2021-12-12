@@ -23,7 +23,7 @@
 #include "editabletablewidgetreceiver.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/common/widgets/editabletablewidget.h>
+#include <librepcb/editor/widgets/editabletablewidget.h>
 
 #include <QtCore>
 
@@ -31,6 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 namespace tests {
 
 /*******************************************************************************
@@ -95,4 +96,5 @@ TEST_F(EditableTableWidgetTest, testIfDataGetsUpdated) {
  ******************************************************************************/
 
 }  // namespace tests
+}  // namespace editor
 }  // namespace librepcb

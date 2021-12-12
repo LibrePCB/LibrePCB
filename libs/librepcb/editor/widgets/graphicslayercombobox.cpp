@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "graphicslayercombobox.h"
 
-#include "../graphics/graphicslayer.h"
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -31,6 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -117,4 +118,5 @@ void GraphicsLayerComboBox::currentIndexChanged(int index) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

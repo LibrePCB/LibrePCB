@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDCOMPONENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,17 +40,14 @@
 namespace librepcb {
 
 class Attribute;
-class AttributeUnitComboBox;
-
-namespace project {
-
-class CmdSymbolInstanceEdit;
 class ComponentInstance;
 class SI_Symbol;
 
 namespace editor {
 
 class AddComponentDialog;
+class AttributeUnitComboBox;
+class CmdSymbolInstanceEdit;
 
 /*******************************************************************************
  *  Class SchematicEditorState_AddComponent
@@ -134,7 +131,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

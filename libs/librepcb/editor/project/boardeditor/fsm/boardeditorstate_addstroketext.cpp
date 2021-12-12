@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "boardeditorstate_addstroketext.h"
 
+#include "../../../cmd/cmdstroketextedit.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../cmd/cmdboardstroketextadd.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardstroketextadd.h>
-#include <librepcb/project/boards/items/bi_stroketext.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -380,5 +379,4 @@ void BoardEditorState_AddStrokeText::makeLayerVisible() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

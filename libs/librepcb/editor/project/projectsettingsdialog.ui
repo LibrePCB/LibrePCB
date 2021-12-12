@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::ProjectSettingsDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::ProjectSettingsDialog">
+ <class>librepcb::editor::ProjectSettingsDialog</class>
+ <widget class="QDialog" name="librepcb::editor::ProjectSettingsDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -181,7 +181,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::ProjectSettingsDialog</receiver>
+   <receiver>librepcb::editor::ProjectSettingsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -197,7 +197,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::ProjectSettingsDialog</receiver>
+   <receiver>librepcb::editor::ProjectSettingsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

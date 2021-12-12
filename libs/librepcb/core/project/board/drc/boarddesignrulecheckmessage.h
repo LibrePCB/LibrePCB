@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDDESIGNRULECHECKMESSAGE_H
-#define LIBREPCB_PROJECT_BOARDDESIGNRULECHECKMESSAGE_H
+#ifndef LIBREPCB_CORE_BOARDDESIGNRULECHECKMESSAGE_H
+#define LIBREPCB_CORE_BOARDDESIGNRULECHECKMESSAGE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/geometry/path.h>
+#include "../../../geometry/path.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class BoardDesignRuleCheckMessage
@@ -63,7 +62,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

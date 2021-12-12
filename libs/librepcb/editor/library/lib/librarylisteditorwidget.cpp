@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "librarylisteditorwidget.h"
 
+#include "../../modelview/comboboxdelegate.h"
+#include "../../modelview/sortfilterproxymodel.h"
 #include "ui_librarylisteditorwidget.h"
 
-#include <librepcb/common/model/comboboxdelegate.h>
-#include <librepcb/common/model/sortfilterproxymodel.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,14 +39,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryListEditorWidget::LibraryListEditorWidget(const workspace::Workspace& ws,
+LibraryListEditorWidget::LibraryListEditorWidget(const Workspace& ws,
                                                  QWidget* parent) noexcept
   : QWidget(parent),
     mModel(new Model(this)),
@@ -124,5 +123,4 @@ void LibraryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

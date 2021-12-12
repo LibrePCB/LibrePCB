@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -109,5 +108,4 @@ void ComponentCheck::checkMissingSymbolVariantItems(MsgList& msgs) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

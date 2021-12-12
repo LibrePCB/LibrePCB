@@ -22,28 +22,28 @@
  ******************************************************************************/
 #include "boardeditorstate_addvia.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../cmd/cmdboardnetsegmentadd.h"
+#include "../../cmd/cmdboardnetsegmentaddelements.h"
+#include "../../cmd/cmdboardnetsegmentedit.h"
+#include "../../cmd/cmdboardnetsegmentremove.h"
+#include "../../cmd/cmdboardnetsegmentremoveelements.h"
+#include "../../cmd/cmdboardsplitnetline.h"
+#include "../../cmd/cmdboardviaedit.h"
+#include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentaddelements.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremoveelements.h>
-#include <librepcb/project/boards/cmd/cmdboardviaedit.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/boards/items/bi_netsegment.h>
-#include <librepcb/project/boards/items/bi_via.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/project.h>
-#include <librepcb/projecteditor/cmd/cmdboardsplitnetline.h>
-#include <librepcb/projecteditor/cmd/cmdcombineboardnetsegments.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -51,7 +51,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -499,5 +498,4 @@ BI_NetLine* BoardEditorState_AddVia::findNetLine(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

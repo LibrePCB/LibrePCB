@@ -22,15 +22,14 @@
  ******************************************************************************/
 #include "si_symbolpin.h"
 
+#include "../../../library/cmp/component.h"
+#include "../../../library/sym/symbol.h"
+#include "../../../library/sym/symbolpin.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
 #include "../../erc/ercmsg.h"
 #include "si_symbol.h"
-
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolpin.h>
 
 #include <QtCore>
 
@@ -38,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -91,21 +89,20 @@ const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept {
 QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept {
   QString text;
-  library::CmpSigPinDisplayType displayType =
-      mPinSignalMapItem->getDisplayType();
-  if (displayType == library::CmpSigPinDisplayType::pinName()) {
+  CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
+  if (displayType == CmpSigPinDisplayType::pinName()) {
     text = *mSymbolPin->getName();
-  } else if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
+  } else if (displayType == CmpSigPinDisplayType::componentSignal()) {
     if (mComponentSignalInstance) {
       text = *mComponentSignalInstance->getCompSignal().getName();
     }
-  } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
+  } else if (displayType == CmpSigPinDisplayType::netSignal()) {
     if (mComponentSignalInstance) {
       if (mComponentSignalInstance->getNetSignal()) {
         text = *mComponentSignalInstance->getNetSignal()->getName();
       }
     }
-  } else if (displayType != library::CmpSigPinDisplayType::none()) {
+  } else if (displayType != CmpSigPinDisplayType::none()) {
     Q_ASSERT(false);
   }
   if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
@@ -296,5 +293,4 @@ QString SI_SymbolPin::getNetSignalName() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

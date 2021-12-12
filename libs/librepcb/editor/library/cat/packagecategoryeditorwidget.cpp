@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "packagecategoryeditorwidget.h"
 
-#include "../common/categorychooserdialog.h"
-#include "../common/categorytreelabeltextbuilder.h"
+#include "../cmd/cmdlibrarycategoryedit.h"
+#include "categorychooserdialog.h"
+#include "categorytreelabeltextbuilder.h"
 #include "ui_packagecategoryeditorwidget.h"
 
-#include <librepcb/library/cat/cmd/cmdlibrarycategoryedit.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -219,7 +218,7 @@ void PackageCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
 }
 
 void PackageCategoryEditorWidget::updateCategoryLabel() noexcept {
-  const workspace::WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
+  const WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
   PackageCategoryTreeLabelTextBuilder textBuilder(db, getLibLocaleOrder(),
                                                   *mUi->lblParentCategories);
   textBuilder.setEndlessRecursionUuid(mCategory->getUuid());
@@ -232,5 +231,4 @@ void PackageCategoryEditorWidget::updateCategoryLabel() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 using eagleimport::EagleLibraryImport;
@@ -41,8 +40,7 @@ using eagleimport::EagleLibraryImport;
  ******************************************************************************/
 
 EagleLibraryImportWizardContext::EagleLibraryImportWizardContext(
-    workspace::Workspace& workspace, const FilePath& dstLibFp,
-    QObject* parent) noexcept
+    Workspace& workspace, const FilePath& dstLibFp, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(workspace),
     mImport(new EagleLibraryImport(dstLibFp, parent)),
@@ -141,5 +139,4 @@ void EagleLibraryImportWizardContext::setPackageCategory(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

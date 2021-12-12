@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORFSM_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORFSM_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORFSM_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORFSM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../common/editorwidgetbase.h"
+#include "../../editorwidgetbase.h"
 
 #include <QtCore>
 
@@ -34,23 +34,20 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
-class GraphicsView;
-class GridProperties;
-class IF_GraphicsLayerProvider;
-class PrimitiveTextGraphicsItem;
-class UndoStack;
-
-namespace library {
-
 class Footprint;
 class FootprintGraphicsItem;
+class GraphicsScene;
+class GridProperties;
+class IF_GraphicsLayerProvider;
 class Package;
+class PrimitiveTextGraphicsItem;
 
 namespace editor {
 
+class GraphicsView;
 class PackageEditorState;
 class PackageEditorWidget;
+class UndoStack;
 
 /*******************************************************************************
  *  Class PackageEditorFsm
@@ -81,7 +78,7 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    workspace::Workspace& workspace;
+    Workspace& workspace;
     PackageEditorWidget& editorWidget;
     UndoStack& undoStack;
     bool readOnly;
@@ -163,7 +160,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

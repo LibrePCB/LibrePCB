@@ -22,17 +22,17 @@
  ******************************************************************************/
 #include "deviceinstancepropertiesdialog.h"
 
+#include "../../project/cmd/cmdcomponentinstanceedit.h"
+#include "../../project/cmd/cmddeviceinstanceeditall.h"
+#include "../../undostack.h"
 #include "ui_deviceinstancepropertiesdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/circuit/cmd/cmdcomponentinstanceedit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectsettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -194,5 +193,4 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

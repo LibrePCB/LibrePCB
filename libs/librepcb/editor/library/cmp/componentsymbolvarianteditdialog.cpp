@@ -22,19 +22,20 @@
  ******************************************************************************/
 #include "componentsymbolvarianteditdialog.h"
 
+#include "../../library/libraryelementcache.h"
 #include "ui_componentsymbolvarianteditdialog.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/norms.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/cmp/componentsymbolvariant.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/libraryeditor/libraryelementcache.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/norms.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,7 +44,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -51,8 +51,8 @@ namespace editor {
  ******************************************************************************/
 
 ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
-    const workspace::Workspace& ws, const Component& cmp,
-    ComponentSymbolVariant& symbVar, QWidget* parent) noexcept
+    const Workspace& ws, const Component& cmp, ComponentSymbolVariant& symbVar,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
     mComponent(cmp),
@@ -155,5 +155,4 @@ void ComponentSymbolVariantEditDialog::updateGraphicsItems() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

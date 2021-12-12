@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_VIA_H
-#define LIBREPCB_PROJECT_BI_VIA_H
+#ifndef LIBREPCB_CORE_BI_VIA_H
+#define LIBREPCB_CORE_BI_VIA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/path.h"
+#include "../../../geometry/via.h"
+#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/bgi_via.h"
 #include "./bi_netline.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/geometry/via.h>
 
 #include <QtCore>
 
@@ -37,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class BI_Via
@@ -85,7 +83,7 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
@@ -127,7 +125,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::ComponentEditorWidget</class>
- <widget class="QWidget" name="librepcb::library::editor::ComponentEditorWidget">
+ <class>librepcb::editor::ComponentEditorWidget</class>
+ <widget class="QWidget" name="librepcb::editor::ComponentEditorWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -90,7 +90,7 @@
            <number>3</number>
           </property>
           <item>
-           <widget class="librepcb::library::editor::ComponentSignalListEditorWidget" name="signalEditorWidget" native="true"/>
+           <widget class="librepcb::editor::ComponentSignalListEditorWidget" name="signalEditorWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -117,7 +117,7 @@
            <number>3</number>
           </property>
           <item>
-           <widget class="librepcb::library::editor::ComponentSymbolVariantListWidget" name="symbolVariantsEditorWidget" native="true"/>
+           <widget class="librepcb::editor::ComponentSymbolVariantListWidget" name="symbolVariantsEditorWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -144,7 +144,7 @@
            <number>3</number>
           </property>
           <item>
-           <widget class="librepcb::AttributeListEditorWidget" name="attributesEditorWidget" native="true"/>
+           <widget class="librepcb::editor::AttributeListEditorWidget" name="attributesEditorWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -203,7 +203,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="librepcb::PlainTextEdit" name="edtDescription">
+        <widget class="librepcb::editor::PlainTextEdit" name="edtDescription">
          <property name="tabChangesFocus">
           <bool>true</bool>
          </property>
@@ -321,7 +321,7 @@
         </widget>
        </item>
        <item row="10" column="1">
-        <widget class="librepcb::PlainTextEdit" name="edtDefaultValue">
+        <widget class="librepcb::editor::PlainTextEdit" name="edtDefaultValue">
          <property name="tabChangesFocus">
           <bool>true</bool>
          </property>
@@ -342,7 +342,7 @@
         </widget>
        </item>
        <item row="12" column="1">
-        <widget class="librepcb::library::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
+        <widget class="librepcb::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -359,32 +359,32 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::PlainTextEdit</class>
+   <class>librepcb::editor::PlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header location="global">librepcb/common/widgets/plaintextedit.h</header>
+   <header location="global">librepcb/editor/widgets/plaintextedit.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::LibraryElementCheckListWidget</class>
+   <class>librepcb::editor::LibraryElementCheckListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/common/libraryelementchecklistwidget.h</header>
+   <header location="global">librepcb/editor/library/libraryelementchecklistwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::AttributeListEditorWidget</class>
+   <class>librepcb::editor::AttributeListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/attributelisteditorwidget.h</header>
+   <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::ComponentSignalListEditorWidget</class>
+   <class>librepcb::editor::ComponentSignalListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/cmp/componentsignallisteditorwidget.h</header>
+   <header location="global">librepcb/editor/library/cmp/componentsignallisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::ComponentSymbolVariantListWidget</class>
+   <class>librepcb::editor::ComponentSymbolVariantListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/cmp/componentsymbolvariantlistwidget.h</header>
+   <header location="global">librepcb/editor/library/cmp/componentsymbolvariantlistwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

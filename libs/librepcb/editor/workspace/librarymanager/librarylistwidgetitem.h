@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYMANAGER_LIBRARYLISTWIDGETITEM_H
-#define LIBREPCB_LIBRARYMANAGER_LIBRARYLISTWIDGETITEM_H
+#ifndef LIBREPCB_EDITOR_LIBRARYLISTWIDGETITEM_H
+#define LIBREPCB_EDITOR_LIBRARYLISTWIDGETITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,12 +33,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
-namespace manager {
+namespace editor {
 
 namespace Ui {
 class LibraryListWidgetItem;
@@ -58,7 +55,7 @@ public:
   // Constructors / Destructor
   LibraryListWidgetItem() noexcept;
   LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
-  LibraryListWidgetItem(workspace::Workspace& ws, const FilePath& libDir,
+  LibraryListWidgetItem(Workspace& ws, const FilePath& libDir,
                         const QString& name = "",
                         const QString& description = "",
                         const QPixmap& icon = QPixmap()) noexcept;
@@ -88,8 +85,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LIBREPCB_MARKDOWN_MARKDOWNCONVERTER_H
-#define LIBREPCB_MARKDOWN_MARKDOWNCONVERTER_H
+#ifndef LIBREPCB_EDITOR_MARKDOWNCONVERTER_H
+#define LIBREPCB_EDITOR_MARKDOWNCONVERTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Class MarkdownConverter
@@ -56,7 +56,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

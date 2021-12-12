@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_DEVICE_H
-#define LIBREPCB_LIBRARY_DEVICE_H
+#ifndef LIBREPCB_CORE_DEVICE_H
+#define LIBREPCB_CORE_DEVICE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../attribute/attribute.h"
 #include "../libraryelement.h"
 #include "devicepadsignalmap.h"
-
-#include <librepcb/common/attributes/attribute.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class Device
@@ -97,7 +95,7 @@ signals:
   void packageUuidChanged(const Uuid& uuid);
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
 private:  // Data
@@ -112,7 +110,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

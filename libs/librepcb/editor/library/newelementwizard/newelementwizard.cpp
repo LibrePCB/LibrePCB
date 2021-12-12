@@ -37,14 +37,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-NewElementWizard::NewElementWizard(const workspace::Workspace& ws, Library& lib,
+NewElementWizard::NewElementWizard(const Workspace& ws, Library& lib,
                                    const IF_GraphicsLayerProvider& lp,
                                    QWidget* parent) noexcept
   : QWizard(parent), mUi(new Ui::NewElementWizard) {
@@ -133,5 +132,4 @@ void NewElementWizard::insertPage(int index, QWizardPage* page) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

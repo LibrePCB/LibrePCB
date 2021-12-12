@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGS_H
-#define LIBREPCB_WORKSPACE_WORKSPACESETTINGS_H
+#ifndef LIBREPCB_CORE_WORKSPACESETTINGS_H
+#define LIBREPCB_CORE_WORKSPACESETTINGS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../exceptions.h"
+#include "../fileio/filepath.h"
+#include "../serialization/serializableobject.h"
+#include "../types/lengthunit.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
-
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/units/lengthunit.h>
 
 #include <QtCore>
 
@@ -36,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 /*******************************************************************************
  *  Class WorkspaceSettings
@@ -47,13 +46,13 @@ namespace workspace {
  *
  * The "settings.lp" file in a workspace is used to store workspace related
  * settings. This class is an interface to those settings. A
- * ::librepcb::workspace::WorkspaceSettings object is created in the
- * constructor of the ::librepcb::workspace::Workspace object.
+ * ::librepcb::WorkspaceSettings object is created in the
+ * constructor of the ::librepcb::Workspace object.
  *
  * Each settings item is represented by an instance of a
- * ::librepcb::workspace::WorkspaceSettingsItem subclass.
+ * ::librepcb::WorkspaceSettingsItem subclass.
  *
- * @see ::librepcb::workspace::WorkspaceSettingsItem
+ * @see ::librepcb::WorkspaceSettingsItem
  */
 class WorkspaceSettings final : public QObject, public SerializableObject {
   Q_OBJECT
@@ -61,7 +60,7 @@ class WorkspaceSettings final : public QObject, public SerializableObject {
 public:
   // Enums for n-state settings
 
-  /// @see ::librepcb::workspace::WorkspaceSettings::pdfOpenBehavior
+  /// @see ::librepcb::WorkspaceSettings::pdfOpenBehavior
   // The underlying type int is needed to map QButtonGroup IDs
   // to values in this enum. See for ex. WorkspaceSettingsDialog::loadSettings()
   enum class PdfOpenBehavior : int {
@@ -92,9 +91,9 @@ public:
 
 private:  // Methods
   /**
-   * @brief Get all ::librepcb::workspace::WorkspaceSettingsItem objects
+   * @brief Get all ::librepcb::WorkspaceSettingsItem objects
    *
-   * @return List of ::librepcb::workspace::WorkspaceSettingsItem objects
+   * @return List of ::librepcb::WorkspaceSettingsItem objects
    */
   QList<WorkspaceSettingsItem*> getAllItems() const noexcept;
 
@@ -210,13 +209,9 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
-
 // Serialize settings values
 template <>
-inline SExpression serialize(
-    const workspace::WorkspaceSettings::PdfOpenBehavior& b) {
-  using namespace workspace;
+inline SExpression serialize(const WorkspaceSettings::PdfOpenBehavior& b) {
   switch (b) {
     case WorkspaceSettings::PdfOpenBehavior::ALWAYS:
       return SExpression::createToken("always");
@@ -230,10 +225,9 @@ inline SExpression serialize(
 }
 
 template <>
-inline workspace::WorkspaceSettings::PdfOpenBehavior deserialize(
+inline WorkspaceSettings::PdfOpenBehavior deserialize(
     const SExpression& sexpr, const Version& fileFormat) {
   Q_UNUSED(fileFormat);
-  using namespace workspace;
   QString str = sexpr.getValue();
   if (str == QLatin1String("always"))
     return WorkspaceSettings::PdfOpenBehavior::ALWAYS;

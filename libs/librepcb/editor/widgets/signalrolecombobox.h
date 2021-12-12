@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_SIGNALROLECOMBOBOX_H
-#define LIBREPCB_COMMON_SIGNALROLECOMBOBOX_H
+#ifndef LIBREPCB_EDITOR_SIGNALROLECOMBOBOX_H
+#define LIBREPCB_EDITOR_SIGNALROLECOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../signalrole.h"
+#include <librepcb/core/types/signalrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,6 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class SignalRoleComboBox
@@ -72,6 +73,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

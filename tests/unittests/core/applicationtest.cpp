@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
+#include <librepcb/core/application.h>
 
 #include <QtCore>
 

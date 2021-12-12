@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
+#ifndef LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
+#define LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,18 +33,12 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class DefaultGraphicsLayerProvider;
 class GraphicsScene;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
-class Component;
 class Symbol;
 class SymbolGraphicsItem;
+class Workspace;
 
 namespace editor {
 
@@ -70,8 +63,7 @@ public:
   ComponentSymbolVariantEditDialog() = delete;
   ComponentSymbolVariantEditDialog(
       const ComponentSymbolVariantEditDialog& other) = delete;
-  ComponentSymbolVariantEditDialog(const workspace::Workspace& ws,
-                                   const Component& cmp,
+  ComponentSymbolVariantEditDialog(const Workspace& ws, const Component& cmp,
                                    ComponentSymbolVariant& symbVar,
                                    QWidget* parent = nullptr) noexcept;
   ~ComponentSymbolVariantEditDialog() noexcept;
@@ -88,7 +80,7 @@ private:  // Methods
   void updateGraphicsItems() noexcept;
 
 private:  // Data
-  const workspace::Workspace& mWorkspace;
+  const Workspace& mWorkspace;
   const Component& mComponent;
   ComponentSymbolVariant& mOriginalSymbVar;
   ComponentSymbolVariant mSymbVar;
@@ -106,7 +98,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

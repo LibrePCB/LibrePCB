@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDADDCOMPONENTTOCIRCUIT_H
-#define LIBREPCB_PROJECTEDITOR_CMDADDCOMPONENTTOCIRCUIT_H
+#ifndef LIBREPCB_EDITOR_CMDADDCOMPONENTTOCIRCUIT_H
+#define LIBREPCB_EDITOR_CMDADDCOMPONENTTOCIRCUIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/uuid.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -33,21 +34,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
 class Component;
-}
-
-namespace project {
-
-class CmdComponentInstanceAdd;
 class ComponentInstance;
 class Project;
+class Workspace;
 
 namespace editor {
+
+class CmdComponentInstanceAdd;
 
 /*******************************************************************************
  *  Class CmdAddComponentToCircuit
@@ -60,7 +54,7 @@ class CmdAddComponentToCircuit final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdAddComponentToCircuit(
-      workspace::Workspace& workspace, Project& project, const Uuid& component,
+      Workspace& workspace, Project& project, const Uuid& component,
       const Uuid& symbolVariant,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
   ~CmdAddComponentToCircuit() noexcept;
@@ -71,13 +65,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
 
   // Attributes from the constructor
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Project& mProject;
   Uuid mComponentUuid;
   Uuid mSymbVarUuid;
@@ -92,7 +86,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

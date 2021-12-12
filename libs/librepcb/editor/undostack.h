@@ -17,20 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_UNDOSTACK_H
-#define LIBREPCB_COMMON_UNDOSTACK_H
+#ifndef LIBREPCB_EDITOR_UNDOSTACK_H
+#define LIBREPCB_EDITOR_UNDOSTACK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "exceptions.h"
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class UndoCommand;
 class UndoCommandGroup;
@@ -44,15 +43,15 @@ class UndoStack;
  * @brief The UndoStackTransaction class helps to execute transactions on an
  * UndoStack
  *
- * This class allows to use RAII on a librepcb::UndoStack object to make its
- * exception safety easier. The functionality is as follows:
+ * This class allows to use RAII on a ::librepcb::editor::UndoStack object to
+ * make its exception safety easier. The functionality is as follows:
  * @li The ctor starts a new command group with
- * librepcb::UndoStack::beginCmdGroup().
+ * ::librepcb::editor::UndoStack::beginCmdGroup().
  * @li If necessary, the dtor aborts it with
- * librepcb::UndoStack::abortCmdGroup().
- * @li #append() redirects to librepcb::UndoStack::appendToCmdGroup().
- * @li #commit() redirects to librepcb::UndoStack::commitCmdGroup().
- * @li #abort() redirects to librepcb::UndoStack::abortCmdGroup().
+ * ::librepcb::editor::UndoStack::abortCmdGroup().
+ * @li #append() redirects to ::librepcb::editor::UndoStack::appendToCmdGroup().
+ * @li #commit() redirects to ::librepcb::editor::UndoStack::commitCmdGroup().
+ * @li #abort() redirects to ::librepcb::editor::UndoStack::abortCmdGroup().
  */
 class UndoStackTransaction final {
 public:
@@ -84,8 +83,8 @@ private:
  * commands
  *
  * Instead of the Qt classes QUndoStack and QUndoCommand we use our own undo
- * classes ::librepcb::UndoStack and ::librepcb::UndoCommand because of the
- * better exception handling and more flexibility.
+ * classes ::librepcb::editor::UndoStack and ::librepcb::editor::UndoCommand
+ * because of the better exception handling and more flexibility.
  *
  * @note Our classes work very similar to the equivalent classes of Qt, so
  * please read the documentation of "Qt's Undo Framework" and classes QUndoStack
@@ -94,15 +93,15 @@ private:
  *
  * Compared with QUndoStack, the biggest differences are the following:
  *  - <b>Support for exceptions:</b> If an exception is thrown in an
- * ::librepcb::UndoCommand object, this undo stack always tries to keep the
- * whole stack consistent (update the index only if the last undo/redo was
+ * ::librepcb::editor::UndoCommand object, this undo stack always tries to keep
+ * the whole stack consistent (update the index only if the last undo/redo was
  * successful, try to rollback failed changes, ...).
  *  - <b>Removed support for nested macros (QUndoStack#beginMacro() and
  *    QUndoStack#endMacro())</b>: I think we do need this feature (but we have a
  * similar mechanism, see next line)...
  *  - <b>Added support for exclusive macro command creation:</b>
  *
- * @see ::librepcb::UndoCommand, ::librepcb::UndoCommandGroup
+ * @see ::librepcb::editor::UndoCommand, ::librepcb::editor::UndoCommandGroup
  */
 class UndoStack final : public QObject {
   Q_OBJECT
@@ -341,6 +340,7 @@ private:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

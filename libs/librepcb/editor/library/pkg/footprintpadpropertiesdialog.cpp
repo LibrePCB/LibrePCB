@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "footprintpadpropertiesdialog.h"
 
+#include "../../undostack.h"
+#include "../cmd/cmdfootprintpadedit.h"
 #include "ui_footprintpadpropertiesdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
-#include <librepcb/library/pkg/footprintpad.h>
-#include <librepcb/library/pkg/package.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
@@ -212,5 +211,4 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

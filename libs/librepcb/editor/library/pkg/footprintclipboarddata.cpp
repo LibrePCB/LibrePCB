@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "footprintclipboarddata.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/library/pkg/footprintpadgraphicsitem.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/holegraphicsitem.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -146,5 +145,4 @@ QString FootprintClipboardData::getMimeType() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

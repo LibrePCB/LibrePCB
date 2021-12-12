@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDDRAGSELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDDRAGSELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDBOARDITEMS_H
+#define LIBREPCB_EDITOR_CMDDRAGSELECTEDBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -34,19 +35,17 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdHoleEdit;
-class CmdPolygonEdit;
-class CmdStrokeTextEdit;
-
-namespace project {
-
 class Board;
+
+namespace editor {
+
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardViaEdit;
 class CmdDeviceInstanceEdit;
-
-namespace editor {
+class CmdHoleEdit;
+class CmdPolygonEdit;
+class CmdStrokeTextEdit;
 
 /*******************************************************************************
  *  Class CmdDragSelectedBoardItems
@@ -70,7 +69,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
@@ -95,7 +94,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

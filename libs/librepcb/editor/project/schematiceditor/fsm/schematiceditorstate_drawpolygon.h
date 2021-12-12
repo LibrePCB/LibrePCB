@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_DRAWPOLYGON_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
-#include <librepcb/common/geometry/polygon.h>
+#include <librepcb/core/geometry/polygon.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,16 +35,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdPolygonEdit;
-class GraphicsLayerComboBox;
-class UnsignedLengthEdit;
-
-namespace project {
-
 class SI_Polygon;
 class Schematic;
 
 namespace editor {
+
+class CmdPolygonEdit;
+class GraphicsLayerComboBox;
+class UnsignedLengthEdit;
 
 /*******************************************************************************
  *  Class SchematicEditorState_DrawPolygon
@@ -119,7 +117,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

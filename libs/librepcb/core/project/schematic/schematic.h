@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATIC_H
-#define LIBREPCB_PROJECT_SCHEMATIC_H
+#ifndef LIBREPCB_CORE_SCHEMATIC_H
+#define LIBREPCB_CORE_SCHEMATIC_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/uuid.h>
+#include "../../attribute/attributeprovider.h"
+#include "../../fileio/filepath.h"
+#include "../../fileio/transactionaldirectory.h"
+#include "../../serialization/serializableobject.h"
+#include "../../types/elementname.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,14 +40,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ComponentInstance;
 class GraphicsScene;
 class GridProperties;
-class Point;
-
-namespace project {
-
-class ComponentInstance;
 class NetSignal;
+class Point;
 class Project;
 class SI_Base;
 class SI_NetLabel;
@@ -69,17 +65,17 @@ class SchematicSelectionQuery;
  * @brief The Schematic class represents one schematic page of a project and is
  * always part of a circuit
  *
- * A schematic can contain following items (see ::librepcb::project::SI_Base and
- * ::librepcb::project::SGI_Base):
- *  - netsegment:       ::librepcb::project::SI_NetSegment
- *      - netpoint:     ::librepcb::project::SI_NetPoint
- *      - netline:      ::librepcb::project::SI_NetLine
- *      - netlabel:     ::librepcb::project::SI_NetLabel
- *  - symbol:           ::librepcb::project::SI_Symbol
- *      - symbol pin:   ::librepcb::project::SI_SymbolPin
- *  - polygon:          ::librepcb::project::SI_Polygon
+ * A schematic can contain following items (see ::librepcb::SI_Base and
+ * ::librepcb::SGI_Base):
+ *  - netsegment:       ::librepcb::SI_NetSegment
+ *      - netpoint:     ::librepcb::SI_NetPoint
+ *      - netline:      ::librepcb::SI_NetLine
+ *      - netlabel:     ::librepcb::SI_NetLabel
+ *  - symbol:           ::librepcb::SI_Symbol
+ *      - symbol pin:   ::librepcb::SI_SymbolPin
+ *  - polygon:          ::librepcb::SI_Polygon
  *  - circle:           TODO
- *  - text:             ::librepcb::project::SI_Text
+ *  - text:             ::librepcb::SI_Text
  */
 class Schematic final : public QObject,
                         public AttributeProvider,
@@ -101,15 +97,15 @@ public:
    */
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
-    ZValue_Symbols,  ///< Z value for ::librepcb::project::SI_Symbol items
-    ZValue_Polygons,  ///< Z value for ::librepcb::project::SI_Polygon items
-    ZValue_Texts,  ///< Z value for ::librepcb::project::SI_Text items
-    ZValue_NetLabels,  ///< Z value for ::librepcb::project::SI_NetLabel items
-    ZValue_NetLines,  ///< Z value for ::librepcb::project::SI_NetLine items
+    ZValue_Symbols,  ///< Z value for ::librepcb::SI_Symbol items
+    ZValue_Polygons,  ///< Z value for ::librepcb::SI_Polygon items
+    ZValue_Texts,  ///< Z value for ::librepcb::SI_Text items
+    ZValue_NetLabels,  ///< Z value for ::librepcb::SI_NetLabel items
+    ZValue_NetLines,  ///< Z value for ::librepcb::SI_NetLine items
     ZValue_HiddenNetPoints,  ///< Z value for hidden
-                             ///< ::librepcb::project::SI_NetPoint items
+                             ///< ::librepcb::SI_NetPoint items
     ZValue_VisibleNetPoints,  ///< Z value for visible
-                              ///< ::librepcb::project::SI_NetPoint items
+                              ///< ::librepcb::SI_NetPoint items
   };
 
   // Constructors / Destructor
@@ -186,9 +182,9 @@ public:
       noexcept;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -212,7 +208,7 @@ private:
             const Version& fileFormat, bool create, const QString& newName);
   void updateIcon() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // General
@@ -239,7 +235,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

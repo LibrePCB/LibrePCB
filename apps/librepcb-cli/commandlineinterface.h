@@ -32,11 +32,8 @@ namespace librepcb {
 
 class Application;
 class FilePath;
-class TransactionalFileSystem;
-
-namespace library {
 class LibraryBaseElement;
-}
+class TransactionalFileSystem;
 
 namespace cli {
 
@@ -71,7 +68,7 @@ private:  // Methods
   bool openLibrary(const QString& libDir, bool all, bool save,
                    bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
-                             library::LibraryBaseElement& element, bool save,
+                             LibraryBaseElement& element, bool save,
                              bool strict, bool& success) const;
   static QString prettyPath(const FilePath& path,
                             const QString& style) noexcept;

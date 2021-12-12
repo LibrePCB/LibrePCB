@@ -17,18 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_NETCLASS_H
-#define LIBREPCB_PROJECT_NETCLASS_H
+#ifndef LIBREPCB_CORE_NETCLASS_H
+#define LIBREPCB_CORE_NETCLASS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/serializableobject.h"
+#include "../../types/elementname.h"
+#include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
-
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -36,7 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Circuit;
 class ErcMsg;
@@ -82,7 +79,7 @@ public:
   void registerNetSignal(NetSignal& signal);
   void unregisterNetSignal(NetSignal& signal);
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -112,7 +109,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

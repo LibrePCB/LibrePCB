@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ATTRTYPECAPACITANCE_H
-#define LIBREPCB_COMMON_ATTRTYPECAPACITANCE_H
+#ifndef LIBREPCB_CORE_ATTRTYPECAPACITANCE_H
+#define LIBREPCB_CORE_ATTRTYPECAPACITANCE_H
 
 /*******************************************************************************
  *  Includes

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
-#define LIBREPCB_PROJECT_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
+#define LIBREPCB_EDITOR_CMDBOARDNETSEGMENTREMOVEELEMENTS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommand.h>
+#include "../../undocommand.h"
 
 #include <QtCore>
 
@@ -31,12 +31,13 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
 class BI_Via;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdBoardNetSegmentRemoveElements
@@ -59,13 +60,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
   // Private Member Variables
@@ -79,7 +80,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

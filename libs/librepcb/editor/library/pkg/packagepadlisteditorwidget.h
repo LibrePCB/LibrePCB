@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEPADLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEPADLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_PACKAGEPADLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_PACKAGEPADLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/pkg/packagepad.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,15 +32,12 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class EditableTableWidget;
-class SortFilterProxyModel;
-class UndoStack;
-
-namespace library {
 namespace editor {
 
+class EditableTableWidget;
 class PackagePadListModel;
+class SortFilterProxyModel;
+class UndoStack;
 
 /*******************************************************************************
  *  Class PackagePadListEditorWidget
@@ -77,7 +74,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

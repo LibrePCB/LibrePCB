@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_NETLABEL_H
-#define LIBREPCB_PROJECT_SI_NETLABEL_H
+#ifndef LIBREPCB_CORE_SI_NETLABEL_H
+#define LIBREPCB_CORE_SI_NETLABEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/netlabel.h"
+#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "si_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/netlabel.h>
 
 #include <QtCore>
 
@@ -35,7 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Circuit;
 class NetSignal;
@@ -81,7 +79,7 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
@@ -112,7 +110,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

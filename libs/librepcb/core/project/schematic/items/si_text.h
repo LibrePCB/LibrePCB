@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_TEXT_H
-#define LIBREPCB_PROJECT_SI_TEXT_H
+#ifndef LIBREPCB_CORE_SI_TEXT_H
+#define LIBREPCB_CORE_SI_TEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/text.h"
+#include "../../../serialization/serializableobject.h"
 #include "si_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/text.h>
 
 #include <QtCore>
 
@@ -35,11 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class TextGraphicsItem;
-
-namespace project {
-
 class Schematic;
+class TextGraphicsItem;
 
 /*******************************************************************************
  *  Class SI_Text
@@ -70,7 +66,7 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
@@ -97,7 +93,6 @@ private:  // Attributes
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -26,14 +26,15 @@
 #include "newprojectwizardpage_metadata.h"
 #include "ui_newprojectwizard.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/project/metadata/projectmetadata.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/settings/projectsettings.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,14 +44,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-NewProjectWizard::NewProjectWizard(const workspace::Workspace& ws,
+NewProjectWizard::NewProjectWizard(const Workspace& ws,
                                    QWidget* parent) noexcept
   : QWizard(parent), mWorkspace(ws), mUi(new Ui::NewProjectWizard) {
   mUi->setupUi(this);
@@ -166,5 +166,4 @@ Project* NewProjectWizard::createProject() const {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

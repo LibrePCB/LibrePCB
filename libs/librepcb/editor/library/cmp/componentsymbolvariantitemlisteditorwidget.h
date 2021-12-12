@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTITEMLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTSYMBOLVARIANTITEMLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTITEMLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTITEMLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/cmp/componentsymbolvariantitem.h>
+#include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,19 +33,15 @@
  ******************************************************************************/
 namespace librepcb {
 
-class EditableTableWidget;
 class IF_GraphicsLayerProvider;
-class UndoStack;
-
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
 namespace editor {
 
 class ComponentSymbolVariantItemListModel;
+class EditableTableWidget;
 class LibraryElementCache;
+class UndoStack;
 
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemListEditorWidget
@@ -68,8 +64,7 @@ public:
   // Setters
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(
-      const workspace::Workspace& ws,
-      const IF_GraphicsLayerProvider& layerProvider,
+      const Workspace& ws, const IF_GraphicsLayerProvider& layerProvider,
       ComponentSymbolVariantItemList& items,
       const std::shared_ptr<const LibraryElementCache>& symbolCache,
       UndoStack* undoStack) noexcept;
@@ -96,7 +91,7 @@ private:  // Methods
 private:  // Data
   QScopedPointer<ComponentSymbolVariantItemListModel> mModel;
   QScopedPointer<EditableTableWidget> mView;
-  const workspace::Workspace* mWorkspace;
+  const Workspace* mWorkspace;
   const IF_GraphicsLayerProvider* mLayerProvider;
 
   // Slots
@@ -109,7 +104,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

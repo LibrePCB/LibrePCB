@@ -25,10 +25,11 @@
 #include "librarydownload.h"
 #include "ui_repositorylibrarylistwidgetitem.h"
 
-#include <librepcb/common/network/networkrequest.h>
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/network/networkrequest.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,15 +38,14 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
-    workspace::Workspace& ws, const QJsonObject& obj) noexcept
+    Workspace& ws, const QJsonObject& obj) noexcept
   : QWidget(nullptr),
     mWorkspace(ws),
     mJsonObject(obj),
@@ -88,7 +88,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
   // check if this library is already installed
   updateInstalledStatus();
   connect(&mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanLibraryListUpdated, this,
+          &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &RepositoryLibraryListWidgetItem::updateInstalledStatus);
 }
 
@@ -239,6 +239,5 @@ void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

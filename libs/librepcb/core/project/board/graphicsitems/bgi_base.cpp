@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "bgi_base.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../board.h"
-
-#include <librepcb/common/graphics/graphicslayer.h>
 
 #include <QtCore>
 
@@ -32,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -67,5 +65,4 @@ qreal BGI_Base::getZValueOfCopperLayer(const QString& name) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

@@ -22,10 +22,9 @@
  ******************************************************************************/
 #include "componentsymbolvariantitemlisteditorwidget.h"
 
-#include "../common/symbolchooserdialog.h"
-
-#include <librepcb/common/widgets/editabletablewidget.h>
-#include <librepcb/libraryeditor/cmp/componentsymbolvariantitemlistmodel.h>
+#include "../../library/cmp/componentsymbolvariantitemlistmodel.h"
+#include "../../widgets/editabletablewidget.h"
+#include "../sym/symbolchooserdialog.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -109,8 +107,7 @@ void ComponentSymbolVariantItemListEditorWidget::setReadOnly(
 }
 
 void ComponentSymbolVariantItemListEditorWidget::setReferences(
-    const workspace::Workspace& ws,
-    const IF_GraphicsLayerProvider& layerProvider,
+    const Workspace& ws, const IF_GraphicsLayerProvider& layerProvider,
     ComponentSymbolVariantItemList& items,
     const std::shared_ptr<const LibraryElementCache>& symbolCache,
     UndoStack* undoStack) noexcept {
@@ -192,5 +189,4 @@ void ComponentSymbolVariantItemListEditorWidget::btnSymbolBrowseClicked(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

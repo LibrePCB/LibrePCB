@@ -22,20 +22,19 @@
  ******************************************************************************/
 #include "newelementwizardpage_deviceproperties.h"
 
-#include "../common/componentchooserdialog.h"
-#include "../common/packagechooserdialog.h"
+#include "../cmp/componentchooserdialog.h"
+#include "../pkg/packagechooserdialog.h"
 #include "ui_newelementwizardpage_deviceproperties.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -161,5 +160,4 @@ void NewElementWizardPage_DeviceProperties::cleanupPage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

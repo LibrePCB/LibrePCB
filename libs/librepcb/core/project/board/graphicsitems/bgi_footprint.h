@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_FOOTPRINT_H
-#define LIBREPCB_PROJECT_BGI_FOOTPRINT_H
+#ifndef LIBREPCB_CORE_BGI_FOOTPRINT_H
+#define LIBREPCB_CORE_BGI_FOOTPRINT_H
 
 /*******************************************************************************
  *  Includes
@@ -33,16 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_Footprint;
+class Footprint;
 class GraphicsLayer;
 class StrokeText;
-
-namespace library {
-class Footprint;
-}
-
-namespace project {
-
-class BI_Footprint;
 
 /*******************************************************************************
  *  Class BGI_Footprint
@@ -80,7 +74,7 @@ private:
 
   // General Attributes
   BI_Footprint& mFootprint;
-  const library::Footprint& mLibFootprint;
+  const Footprint& mLibFootprint;
 
   // Cached Attributes
   QRectF mBoundingRect;
@@ -91,7 +85,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

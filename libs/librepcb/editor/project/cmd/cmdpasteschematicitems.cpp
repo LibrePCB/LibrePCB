@@ -22,39 +22,39 @@
  ******************************************************************************/
 #include "cmdpasteschematicitems.h"
 
+#include "../../project/cmd/cmdcomponentinstanceadd.h"
+#include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
+#include "../../project/cmd/cmdnetclassadd.h"
+#include "../../project/cmd/cmdnetsignaladd.h"
+#include "../../project/cmd/cmdnetsignaledit.h"
+#include "../../project/cmd/cmdprojectlibraryaddelement.h"
+#include "../../project/cmd/cmdschematicnetlabeladd.h"
+#include "../../project/cmd/cmdschematicnetsegmentadd.h"
+#include "../../project/cmd/cmdschematicnetsegmentaddelements.h"
+#include "../../project/cmd/cmdschematicpolygonadd.h"
+#include "../../project/cmd/cmdschematictextadd.h"
+#include "../../project/cmd/cmdsymbolinstanceadd.h"
 #include "../schematiceditor/schematicclipboarddata.h"
 #include "cmdchangenetsignalofschematicnetsegment.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdcomponentinstanceadd.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaledit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
-#include <librepcb/project/schematics/cmd/cmdschematicpolygonadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematictextadd.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceadd.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_polygon.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/items/si_text.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/settings/projectsettings.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -62,7 +62,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -102,10 +101,10 @@ bool CmdPasteSchematicItems::performExecute() {
   std::unique_ptr<TransactionalDirectory> cmpDir = mData->getDirectory("cmp");
   foreach (const QString& dirname, cmpDir->getDirs()) {
     if (!mProject.getLibrary().getComponent(Uuid::fromString(dirname))) {
-      QScopedPointer<library::Component> cmp(
-          new library::Component(std::unique_ptr<TransactionalDirectory>(
+      QScopedPointer<Component> cmp(
+          new Component(std::unique_ptr<TransactionalDirectory>(
               new TransactionalDirectory(*cmpDir, dirname))));
-      execNewChildCmd(new CmdProjectLibraryAddElement<library::Component>(
+      execNewChildCmd(new CmdProjectLibraryAddElement<Component>(
           mProject.getLibrary(), *cmp.take()));
     }
   }
@@ -114,10 +113,10 @@ bool CmdPasteSchematicItems::performExecute() {
   std::unique_ptr<TransactionalDirectory> symDir = mData->getDirectory("sym");
   foreach (const QString& dirname, symDir->getDirs()) {
     if (!mProject.getLibrary().getSymbol(Uuid::fromString(dirname))) {
-      QScopedPointer<library::Symbol> cmp(
-          new library::Symbol(std::unique_ptr<TransactionalDirectory>(
+      QScopedPointer<Symbol> cmp(
+          new Symbol(std::unique_ptr<TransactionalDirectory>(
               new TransactionalDirectory(*symDir, dirname))));
-      execNewChildCmd(new CmdProjectLibraryAddElement<library::Symbol>(
+      execNewChildCmd(new CmdProjectLibraryAddElement<Symbol>(
           mProject.getLibrary(), *cmp.take()));
     }
   }
@@ -126,7 +125,7 @@ bool CmdPasteSchematicItems::performExecute() {
   QHash<Uuid, Uuid> componentInstanceMap;
   for (const SchematicClipboardData::ComponentInstance& cmp :
        mData->getComponentInstances()) {
-    const library::Component* libCmp =
+    const Component* libCmp =
         mProject.getLibrary().getComponent(cmp.libComponentUuid);
     if (!libCmp) throw LogicError(__FILE__, __LINE__);
 
@@ -311,5 +310,4 @@ bool CmdPasteSchematicItems::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTLIBRARY_H
-#define LIBREPCB_PROJECT_PROJECTLIBRARY_H
+#ifndef LIBREPCB_CORE_PROJECTLIBRARY_H
+#define LIBREPCB_CORE_PROJECTLIBRARY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/uuid.h>
+#include "../fileio/transactionaldirectory.h"
+#include "../types/uuid.h"
 
 #include <QtCore>
 
@@ -36,17 +35,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
 class Component;
 class Device;
 class LibraryBaseElement;
 class Package;
-class Symbol;
-}  // namespace library
-
-namespace project {
-
 class Project;
+class Symbol;
 
 /*******************************************************************************
  *  Class ProjectLibrary
@@ -66,44 +60,40 @@ public:
   ~ProjectLibrary() noexcept;
 
   // Getters: Library Elements
-  const QHash<Uuid, library::Symbol*>& getSymbols() const noexcept {
-    return mSymbols;
-  }
-  const QHash<Uuid, library::Package*>& getPackages() const noexcept {
+  const QHash<Uuid, Symbol*>& getSymbols() const noexcept { return mSymbols; }
+  const QHash<Uuid, Package*>& getPackages() const noexcept {
     return mPackages;
   }
-  const QHash<Uuid, library::Component*>& getComponents() const noexcept {
+  const QHash<Uuid, Component*>& getComponents() const noexcept {
     return mComponents;
   }
-  const QHash<Uuid, library::Device*>& getDevices() const noexcept {
-    return mDevices;
-  }
-  library::Symbol* getSymbol(const Uuid& uuid) const noexcept {
+  const QHash<Uuid, Device*>& getDevices() const noexcept { return mDevices; }
+  Symbol* getSymbol(const Uuid& uuid) const noexcept {
     return mSymbols.value(uuid);
   }
-  library::Package* getPackage(const Uuid& uuid) const noexcept {
+  Package* getPackage(const Uuid& uuid) const noexcept {
     return mPackages.value(uuid);
   }
-  library::Component* getComponent(const Uuid& uuid) const noexcept {
+  Component* getComponent(const Uuid& uuid) const noexcept {
     return mComponents.value(uuid);
   }
-  library::Device* getDevice(const Uuid& uuid) const noexcept {
+  Device* getDevice(const Uuid& uuid) const noexcept {
     return mDevices.value(uuid);
   }
 
   // Getters: Special Queries
-  QHash<Uuid, library::Device*> getDevicesOfComponent(
-      const Uuid& compUuid) const noexcept;
+  QHash<Uuid, Device*> getDevicesOfComponent(const Uuid& compUuid) const
+      noexcept;
 
   // Add/Remove Methods
-  void addSymbol(library::Symbol& s);
-  void addPackage(library::Package& p);
-  void addComponent(library::Component& c);
-  void addDevice(library::Device& d);
-  void removeSymbol(library::Symbol& s);
-  void removePackage(library::Package& p);
-  void removeComponent(library::Component& c);
-  void removeDevice(library::Device& d);
+  void addSymbol(Symbol& s);
+  void addPackage(Package& p);
+  void addComponent(Component& c);
+  void addDevice(Device& d);
+  void removeSymbol(Symbol& s);
+  void removePackage(Package& p);
+  void removeComponent(Component& c);
+  void removeDevice(Device& d);
 
   // General Methods
   void save();
@@ -126,20 +116,19 @@ private:
   std::unique_ptr<TransactionalDirectory> mDirectory;
 
   // The currently added library elements
-  QHash<Uuid, library::Symbol*> mSymbols;
-  QHash<Uuid, library::Package*> mPackages;
-  QHash<Uuid, library::Component*> mComponents;
-  QHash<Uuid, library::Device*> mDevices;
+  QHash<Uuid, Symbol*> mSymbols;
+  QHash<Uuid, Package*> mPackages;
+  QHash<Uuid, Component*> mComponents;
+  QHash<Uuid, Device*> mDevices;
 
-  QSet<library::LibraryBaseElement*> mAllElements;
-  QSet<library::LibraryBaseElement*> mElementsToUpgrade;
+  QSet<LibraryBaseElement*> mAllElements;
+  QSet<LibraryBaseElement*> mElementsToUpgrade;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

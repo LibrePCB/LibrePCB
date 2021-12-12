@@ -21,9 +21,9 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/librarybaseelement.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/librarybaseelement.h>
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace tests {
 
 /*******************************************************************************
@@ -108,5 +107,4 @@ TEST_F(LibraryBaseElementTest, testMoveToEmptyDirectory) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace library
 }  // namespace librepcb

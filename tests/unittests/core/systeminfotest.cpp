@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/systeminfo.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/systeminfo.h>
 
 #include <QtCore>
 

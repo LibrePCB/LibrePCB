@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::ErcMsgDock</class>
- <widget class="QDockWidget" name="librepcb::project::editor::ErcMsgDock">
+ <class>librepcb::editor::ErcMsgDock</class>
+ <widget class="QDockWidget" name="librepcb::editor::ErcMsgDock">
   <property name="geometry">
    <rect>
     <x>0</x>

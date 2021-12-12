@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_DEVICECHECK_H
-#define LIBREPCB_LIBRARY_DEVICECHECK_H
+#ifndef LIBREPCB_CORE_DEVICECHECK_H
+#define LIBREPCB_CORE_DEVICECHECK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementcheck.h"
+#include "../libraryelementcheck.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class Device;
 
@@ -67,7 +66,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

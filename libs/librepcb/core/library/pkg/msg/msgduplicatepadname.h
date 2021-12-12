@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGDUPLICATEPADNAME_H
-#define LIBREPCB_LIBRARY_MSGDUPLICATEPADNAME_H
+#ifndef LIBREPCB_CORE_MSGDUPLICATEPADNAME_H
+#define LIBREPCB_CORE_MSGDUPLICATEPADNAME_H
 
 /*******************************************************************************
  *  Includes
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class PackagePad;
 
@@ -58,7 +57,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::application::ControlPanel</class>
- <widget class="QMainWindow" name="librepcb::application::ControlPanel">
+ <class>librepcb::editor::ControlPanel</class>
+ <widget class="QMainWindow" name="librepcb::editor::ControlPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -467,7 +467,7 @@ QListView::item
    <addaction name="menuExtras"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="librepcb::StatusBar" name="statusBar"/>
+  <widget class="librepcb::editor::StatusBar" name="statusBar"/>
   <action name="actionQuit">
    <property name="icon">
     <iconset>
@@ -623,9 +623,9 @@ QListView::item
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>librepcb::StatusBar</class>
+   <class>librepcb::editor::StatusBar</class>
    <extends>QStatusBar</extends>
-   <header location="global">librepcb/common/widgets/statusbar.h</header>
+   <header location="global">librepcb/editor/widgets/statusbar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

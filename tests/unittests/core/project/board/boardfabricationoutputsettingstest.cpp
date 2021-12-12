@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/project/boards/boardfabricationoutputsettings.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace tests {
 
 /*******************************************************************************
@@ -77,5 +76,4 @@ TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace project
 }  // namespace librepcb

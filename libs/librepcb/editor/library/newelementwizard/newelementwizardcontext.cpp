@@ -22,22 +22,22 @@
  ******************************************************************************/
 #include "newelementwizardcontext.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/library.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -45,8 +45,8 @@ namespace editor {
  ******************************************************************************/
 
 NewElementWizardContext::NewElementWizardContext(
-    const workspace::Workspace& ws, Library& lib,
-    const IF_GraphicsLayerProvider& lp, QObject* parent) noexcept
+    const Workspace& ws, Library& lib, const IF_GraphicsLayerProvider& lp,
+    QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
     mLibrary(lib),
@@ -430,5 +430,4 @@ void NewElementWizardContext::createLibraryElement() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

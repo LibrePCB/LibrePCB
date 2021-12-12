@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "si_base.h"
 
+#include "../../../graphics/graphicsscene.h"
 #include "../../project.h"
 #include "../graphicsitems/sgi_base.h"
 #include "../schematic.h"
-
-#include <librepcb/common/graphics/graphicsscene.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -95,5 +93,4 @@ void SI_Base::removeFromSchematic(QGraphicsItem* item) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

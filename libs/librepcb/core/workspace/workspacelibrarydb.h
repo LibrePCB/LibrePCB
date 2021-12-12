@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
-#define LIBREPCB_WORKSPACE_WORKSPACELIBRARYDB_H
+#ifndef LIBREPCB_CORE_WORKSPACELIBRARYDB_H
+#define LIBREPCB_CORE_WORKSPACELIBRARYDB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
+#include "../fileio/filepath.h"
+#include "../types/uuid.h"
 
 #include <QtCore>
 
@@ -36,9 +35,6 @@ namespace librepcb {
 
 class SQLiteDatabase;
 class Version;
-
-namespace workspace {
-
 class Workspace;
 class WorkspaceLibraryScanner;
 
@@ -198,7 +194,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb
 
 #endif

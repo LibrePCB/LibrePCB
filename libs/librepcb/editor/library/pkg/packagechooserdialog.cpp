@@ -22,16 +22,16 @@
  ******************************************************************************/
 #include "packagechooserdialog.h"
 
+#include "../../workspace/categorytreemodel.h"
+#include "footprintpreviewgraphicsitem.h"
 #include "ui_packagechooserdialog.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/workspace/library/cat/categorytreemodel.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -48,8 +47,8 @@ namespace editor {
  ******************************************************************************/
 
 PackageChooserDialog::PackageChooserDialog(
-    const workspace::Workspace& ws,
-    const IF_GraphicsLayerProvider* layerProvider, QWidget* parent) noexcept
+    const Workspace& ws, const IF_GraphicsLayerProvider* layerProvider,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
     mLayerProvider(layerProvider),
@@ -60,9 +59,8 @@ PackageChooserDialog::PackageChooserDialog(
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
-  mCategoryTreeModel.reset(new workspace::PackageCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder(),
-      workspace::CategoryTreeFilter::PACKAGES));
+  mCategoryTreeModel.reset(new PackageCategoryTreeModel(
+      mWorkspace.getLibraryDb(), localeOrder(), CategoryTreeFilter::PACKAGES));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,
@@ -242,5 +240,4 @@ const QStringList& PackageChooserDialog::localeOrder() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

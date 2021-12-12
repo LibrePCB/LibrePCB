@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_APPLICATION_H
-#define LIBREPCB_COMMON_APPLICATION_H
+#ifndef LIBREPCB_CORE_APPLICATION_H
+#define LIBREPCB_CORE_APPLICATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "fileio/filepath.h"
-#include "version.h"
+#include "types/version.h"
 
 #include <QApplication>
 #include <QFont>

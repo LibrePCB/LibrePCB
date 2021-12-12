@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_SELECT_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORSTATE_SELECT_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORSTATE_SELECT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,13 +39,12 @@
 namespace librepcb {
 
 class Angle;
-class CmdPolygonEdit;
 class Polygon;
 
-namespace library {
 namespace editor {
 
 class CmdDragSelectedFootprintItems;
+class CmdPolygonEdit;
 class FootprintClipboardData;
 
 /*******************************************************************************
@@ -145,7 +144,6 @@ private:  // Types / Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

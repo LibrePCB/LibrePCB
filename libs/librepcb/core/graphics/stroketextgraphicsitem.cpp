@@ -25,7 +25,7 @@
 #include "../application.h"
 #include "../font/strokefontpool.h"
 #include "../graphics/graphicslayer.h"
-#include "../toolbox.h"
+#include "../utils/toolbox.h"
 #include "origincrossgraphicsitem.h"
 
 #include <QtCore>

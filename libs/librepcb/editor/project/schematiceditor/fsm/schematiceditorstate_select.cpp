@@ -22,6 +22,11 @@
  ******************************************************************************/
 #include "schematiceditorstate_select.h"
 
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../dialogs/polygonpropertiesdialog.h"
+#include "../../../dialogs/textpropertiesdialog.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdmirrorselectedschematicitems.h"
 #include "../../cmd/cmdmoveselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
@@ -31,17 +36,12 @@
 #include "../schematicclipboarddatabuilder.h"
 #include "../symbolinstancepropertiesdialog.h"
 
-#include <librepcb/common/dialogs/polygonpropertiesdialog.h>
-#include <librepcb/common/dialogs/textpropertiesdialog.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_polygon.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/items/si_text.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -50,7 +50,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -796,5 +795,4 @@ QAction* SchematicEditorState_Select::addActionOpenProperties(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

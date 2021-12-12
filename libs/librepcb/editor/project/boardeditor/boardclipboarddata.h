@@ -17,26 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDCLIPBOARDDATA_H
-#define LIBREPCB_PROJECTEDITOR_BOARDCLIPBOARDDATA_H
+#ifndef LIBREPCB_EDITOR_BOARDCLIPBOARDDATA_H
+#define LIBREPCB_EDITOR_BOARDCLIPBOARDDATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/geometry/junction.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/geometry/trace.h>
-#include <librepcb/common/geometry/via.h>
-#include <librepcb/common/signalslot.h>
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/circuit/circuit.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/geometry/junction.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/geometry/trace.h>
+#include <librepcb/core/geometry/via.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/serialization/serializableobject.h>
+#include <librepcb/core/serialization/serializableobjectlist.h>
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/types/uuid.h>
+#include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,7 +51,6 @@ namespace librepcb {
 class TransactionalDirectory;
 class TransactionalFileSystem;
 
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -283,7 +282,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PADSIGNALMAPEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_PADSIGNALMAPEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_PADSIGNALMAPEDITORWIDGET_H
+#define LIBREPCB_EDITOR_PADSIGNALMAPEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/cmp/componentsignal.h>
-#include <librepcb/library/dev/devicepadsignalmap.h>
-#include <librepcb/library/pkg/packagepad.h>
+#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/library/dev/devicepadsignalmap.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,17 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SortFilterProxyModel;
-class UndoStack;
-
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
 namespace editor {
 
 class DevicePadSignalMapModel;
+class SortFilterProxyModel;
+class UndoStack;
 
 /*******************************************************************************
  *  Class PadSignalMapEditorWidget
@@ -84,7 +80,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

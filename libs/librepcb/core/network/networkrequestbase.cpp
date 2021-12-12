@@ -23,6 +23,7 @@
 #include "networkrequestbase.h"
 
 #include "../application.h"
+#include "../exceptions.h"
 #include "networkaccessmanager.h"
 
 #include <QtCore>

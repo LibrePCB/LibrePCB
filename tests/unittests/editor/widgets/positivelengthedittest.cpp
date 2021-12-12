@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
+#include <librepcb/editor/widgets/positivelengthedit.h>
 
 #include <QtTest/QtTest>
 
@@ -29,6 +29,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 namespace tests {
 
 /*******************************************************************************
@@ -162,4 +163,5 @@ TEST_F(PositiveLengthEditTest, testTooSmallValue) {
  ******************************************************************************/
 
 }  // namespace tests
+}  // namespace editor
 }  // namespace librepcb

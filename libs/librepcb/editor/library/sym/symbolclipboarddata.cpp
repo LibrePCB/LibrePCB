@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "symbolclipboarddata.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/textgraphicsitem.h>
+#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -131,5 +130,4 @@ QString SymbolClipboardData::getMimeType() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

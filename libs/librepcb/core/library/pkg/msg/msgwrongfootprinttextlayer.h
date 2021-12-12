@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGWRONGFOOTPRINTTEXTLAYER_H
-#define LIBREPCB_LIBRARY_MSGWRONGFOOTPRINTTEXTLAYER_H
+#ifndef LIBREPCB_CORE_MSGWRONGFOOTPRINTTEXTLAYER_H
+#define LIBREPCB_CORE_MSGWRONGFOOTPRINTTEXTLAYER_H
 
 /*******************************************************************************
  *  Includes
@@ -32,11 +32,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class StrokeText;
-
-namespace library {
-
 class Footprint;
+class StrokeText;
 
 /*******************************************************************************
  *  Class MsgWrongFootprintTextLayer
@@ -78,7 +75,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

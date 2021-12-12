@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
-#define LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
+#define LIBREPCB_EDITOR_CMDDRAGSELECTEDFOOTPRINTITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../packageeditorstate.h"
+#include "../../undocommandgroup.h"
+#include "../pkg/fsm/packageeditorstate.h"
 
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -35,17 +35,13 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class CmdCircleEdit;
+class CmdFootprintPadEdit;
 class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
-
-namespace library {
-
-class CmdFootprintPadEdit;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class CmdDragSelectedFootprintItems
@@ -82,7 +78,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   void deleteAllCommands() noexcept;
@@ -110,7 +106,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

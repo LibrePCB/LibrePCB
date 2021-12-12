@@ -24,17 +24,17 @@
 
 #include "ui_initializeworkspacewizard_choosesettings.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/norms.h>
-#include <librepcb/common/systeminfo.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/common/units/lengthunit.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/norms.h>
+#include <librepcb/core/systeminfo.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/utils/toolbox.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -119,5 +119,5 @@ int InitializeWorkspaceWizard_ChooseSettings::nextId() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

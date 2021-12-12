@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CMDPASTESYMBOLITEMS_H
-#define LIBREPCB_LIBRARYEDITOR_CMDPASTESYMBOLITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDPASTESYMBOLITEMS_H
+#define LIBREPCB_EDITOR_CMDPASTESYMBOLITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/point.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -34,7 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class Symbol;
 class SymbolGraphicsItem;
@@ -64,7 +64,7 @@ public:
   CmdPasteSymbolItems& operator=(const CmdPasteSymbolItems& rhs) = delete;
 
 protected:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
 private:  // Data
@@ -79,7 +79,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

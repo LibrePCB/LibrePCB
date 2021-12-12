@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_NETLINE_H
-#define LIBREPCB_COMMON_NETLINE_H
+#ifndef LIBREPCB_CORE_NETLINE_H
+#define LIBREPCB_CORE_NETLINE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
-#include "../units/length.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/length.h"
 
 #include <QtCore>
 
@@ -66,7 +66,7 @@ public:
   }
   const tl::optional<PinAnchor>& tryGetPin() const noexcept { return mPin; }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -134,7 +134,7 @@ public:
   bool setStartPoint(const NetLineAnchor& start) noexcept;
   bool setEndPoint(const NetLineAnchor& end) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

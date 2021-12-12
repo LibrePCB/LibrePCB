@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDADDDEVICETOBOARD_H
-#define LIBREPCB_PROJECTEDITOR_CMDADDDEVICETOBOARD_H
+#ifndef LIBREPCB_EDITOR_CMDADDDEVICETOBOARD_H
+#define LIBREPCB_EDITOR_CMDADDDEVICETOBOARD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -35,19 +36,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-class Device;
-}
-
-namespace project {
-
 class BI_Device;
 class Board;
 class ComponentInstance;
+class Device;
+class Workspace;
 
 namespace editor {
 
@@ -61,7 +54,7 @@ namespace editor {
 class CmdAddDeviceToBoard final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdAddDeviceToBoard(workspace::Workspace& workspace, Board& board,
+  CmdAddDeviceToBoard(Workspace& workspace, Board& board,
                       ComponentInstance& cmpInstance, const Uuid& deviceUuid,
                       const tl::optional<Uuid>& footprintUuid,
                       const Point& position = Point(),
@@ -75,13 +68,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
 
   // Attributes from the constructor
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Board& mBoard;
   ComponentInstance& mComponentInstance;
   Uuid mDeviceUuid;
@@ -99,7 +92,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

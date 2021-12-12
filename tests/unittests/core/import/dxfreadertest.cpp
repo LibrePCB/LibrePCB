@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/import/dxfreader.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/import/dxfreader.h>
 
 /*******************************************************************************
  *  Namespace

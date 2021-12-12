@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
-#define LIBREPCB_PROJECTEDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
+#ifndef LIBREPCB_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
+#define LIBREPCB_EDITOR_CMDCOMBINEBOARDNETSEGMENTS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_NetLineAnchor;
 class BI_NetSegment;
@@ -62,7 +61,7 @@ public:
       delete;
 
 private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
 private:  // Data
@@ -77,7 +76,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

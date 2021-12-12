@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_TRACE_H
-#define LIBREPCB_COMMON_TRACE_H
+#ifndef LIBREPCB_CORE_TRACE_H
+#define LIBREPCB_CORE_TRACE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
 #include "../graphics/graphicslayername.h"
-#include "../units/length.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/length.h"
 
 #include <QtCore>
 
@@ -68,7 +68,7 @@ public:
   const tl::optional<Uuid>& tryGetVia() const noexcept { return mVia; }
   const tl::optional<PadAnchor>& tryGetPad() const noexcept { return mPad; }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -141,7 +141,7 @@ public:
   bool setStartPoint(const TraceAnchor& start) noexcept;
   bool setEndPoint(const TraceAnchor& end) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

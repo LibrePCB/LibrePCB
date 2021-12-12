@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARDPAGE_WELCOME_H
-#define LIBREPCB_FIRSTRUNWIZARD_FIRSTRUNWIZARDPAGE_WELCOME_H
+#ifndef LIBREPCB_EDITOR_FIRSTRUNWIZARDPAGE_WELCOME_H
+#define LIBREPCB_EDITOR_FIRSTRUNWIZARDPAGE_WELCOME_H
 
 /*******************************************************************************
  *  Includes
@@ -30,7 +30,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 namespace Ui {
 class FirstRunWizardPage_Welcome;
@@ -63,7 +63,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

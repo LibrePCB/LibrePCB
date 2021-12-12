@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ANGLEEDIT_H
-#define LIBREPCB_COMMON_ANGLEEDIT_H
+#ifndef LIBREPCB_EDITOR_ANGLEEDIT_H
+#define LIBREPCB_EDITOR_ANGLEEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/angle.h"
-#include "numbereditbase.h"
+#include "../widgets/numbereditbase.h"
+
+#include <librepcb/core/types/angle.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,6 +34,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class AngleEdit
@@ -74,6 +76,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

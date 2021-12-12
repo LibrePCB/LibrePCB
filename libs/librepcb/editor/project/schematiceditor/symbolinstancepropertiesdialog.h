@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SYMBOLINSTANCEPROPERTIESDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_SYMBOLINSTANCEPROPERTIESDIALOG_H
+#define LIBREPCB_EDITOR_SYMBOLINSTANCEPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attribute.h>
+#include <librepcb/core/attribute/attribute.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,21 +33,16 @@
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
-class UndoCommand;
-class UndoStack;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class ComponentInstance;
+class LengthUnit;
 class Project;
 class SI_Symbol;
+class Workspace;
 
 namespace editor {
+
+class UndoCommand;
+class UndoStack;
 
 namespace Ui {
 class SymbolInstancePropertiesDialog;
@@ -68,7 +63,7 @@ public:
   SymbolInstancePropertiesDialog() = delete;
   SymbolInstancePropertiesDialog(const SymbolInstancePropertiesDialog& other) =
       delete;
-  SymbolInstancePropertiesDialog(workspace::Workspace& ws, Project& project,
+  SymbolInstancePropertiesDialog(Workspace& ws, Project& project,
                                  ComponentInstance& cmp, SI_Symbol& symbol,
                                  UndoStack& undoStack,
                                  const LengthUnit& lengthUnit,
@@ -86,7 +81,7 @@ private:  // Methods
   bool applyChanges() noexcept;
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Project& mProject;
   ComponentInstance& mComponentInstance;
   SI_Symbol& mSymbol;
@@ -100,7 +95,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

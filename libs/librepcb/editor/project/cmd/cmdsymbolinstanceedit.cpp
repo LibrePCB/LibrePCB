@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdsymbolinstanceedit.h"
 
-#include "../items/si_symbol.h"
+#include <librepcb/core/project/schematic/items/si_symbol.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -163,5 +163,5 @@ void CmdSymbolInstanceEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

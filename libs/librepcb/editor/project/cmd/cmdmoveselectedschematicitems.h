@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_EDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/point.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -33,17 +34,15 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdPolygonEdit;
-class CmdTextEdit;
-
-namespace project {
-
-class CmdSchematicNetLabelEdit;
-class CmdSchematicNetPointEdit;
-class CmdSymbolInstanceEdit;
 class Schematic;
 
 namespace editor {
+
+class CmdPolygonEdit;
+class CmdSchematicNetLabelEdit;
+class CmdSchematicNetPointEdit;
+class CmdSymbolInstanceEdit;
+class CmdTextEdit;
 
 /*******************************************************************************
  *  Class CmdMoveSelectedSchematicItems
@@ -65,7 +64,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
@@ -86,7 +85,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

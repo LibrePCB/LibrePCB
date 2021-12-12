@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/geometry/path.h>
+#include <librepcb/core/geometry/path.h>
 
 /*******************************************************************************
  *  Namespace

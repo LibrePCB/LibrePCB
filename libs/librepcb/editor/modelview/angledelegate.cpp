@@ -22,9 +22,10 @@
  ******************************************************************************/
 #include "angledelegate.h"
 
-#include "../toolbox.h"
-#include "../units/angle.h"
 #include "../widgets/angleedit.h"
+
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -32,6 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -105,4 +107,5 @@ void AngleDelegate::editingFinished() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

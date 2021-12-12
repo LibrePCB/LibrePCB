@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_DRAWTRACE_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_DRAWTRACE_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_DRAWTRACE_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_DRAWTRACE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/common/geometry/via.h>
+#include <librepcb/core/geometry/via.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,20 +35,18 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-class PositiveLengthEdit;
-
-namespace project {
-
 class BI_FootprintPad;
 class BI_NetLine;
 class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_NetSegment;
 class BI_Via;
+class GraphicsLayer;
 class NetSignal;
 
 namespace editor {
+
+class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_DrawTrace
@@ -309,7 +307,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

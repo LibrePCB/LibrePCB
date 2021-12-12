@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/alignment.h>
-#include <librepcb/common/application.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/types/alignment.h>
 
 /*******************************************************************************
  *  Namespace

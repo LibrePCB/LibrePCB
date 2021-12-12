@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDSTROKETEXT_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDSTROKETEXT_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDSTROKETEXT_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDSTROKETEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/project/boards/items/bi_stroketext.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
 
 #include <QtCore>
 
@@ -34,15 +34,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdStrokeTextEdit;
-class GraphicsLayerComboBox;
-class PositiveLengthEdit;
-
-namespace project {
-
 class Board;
 
 namespace editor {
+
+class CmdStrokeTextEdit;
+class GraphicsLayerComboBox;
+class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddStrokeText
@@ -123,7 +121,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

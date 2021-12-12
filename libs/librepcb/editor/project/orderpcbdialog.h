@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_ORDERPCBDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_ORDERPCBDIALOG_H
+#ifndef LIBREPCB_EDITOR_ORDERPCBDIALOG_H
+#define LIBREPCB_EDITOR_ORDERPCBDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -35,7 +35,6 @@ namespace librepcb {
 
 class OrderPcbApiRequest;
 
-namespace project {
 namespace editor {
 
 namespace Ui {
@@ -88,7 +87,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

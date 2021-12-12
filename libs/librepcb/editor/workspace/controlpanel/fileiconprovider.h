@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_FILEICONPROVIDER_H
-#define LIBREPCB_WORKSPACE_FILEICONPROVIDER_H
+#ifndef LIBREPCB_EDITOR_FILEICONPROVIDER_H
+#define LIBREPCB_EDITOR_FILEICONPROVIDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -32,7 +30,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Class FileIconProvider
@@ -54,7 +52,7 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

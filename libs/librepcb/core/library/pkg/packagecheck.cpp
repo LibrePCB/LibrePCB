@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "packagecheck.h"
 
+#include "../../graphics/graphicslayer.h"
+#include "../../utils/toolbox.h"
 #include "msg/msgduplicatepadname.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
@@ -31,16 +33,12 @@
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/toolbox.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -235,5 +233,4 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

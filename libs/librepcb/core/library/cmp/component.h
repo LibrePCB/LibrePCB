@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENT_H
-#define LIBREPCB_LIBRARY_COMPONENT_H
+#ifndef LIBREPCB_CORE_COMPONENT_H
+#define LIBREPCB_CORE_COMPONENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../attribute/attribute.h"
+#include "../../serialization/serializablekeyvaluemap.h"
 #include "../libraryelement.h"
 #include "componentprefix.h"
 #include "componentsignal.h"
 #include "componentsymbolvariant.h"
-
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/fileio/serializablekeyvaluemap.h>
 
 #include <QtCore>
 
@@ -37,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class NormDependentPrefixMap
@@ -145,7 +143,7 @@ public:
   }
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   static QString cleanNorm(QString norm) noexcept;
@@ -164,7 +162,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,19 +22,19 @@
  ******************************************************************************/
 #include "projecteditor.h"
 
+#include "../dialogs/filedialog.h"
+#include "../undostack.h"
 #include "boardeditor/boardeditor.h"
-#include "dialogs/editnetclassesdialog.h"
-#include "dialogs/orderpcbdialog.h"
-#include "dialogs/projectsettingsdialog.h"
+#include "circuit/editnetclassesdialog.h"
+#include "orderpcbdialog.h"
+#include "projectsettingsdialog.h"
 #include "schematiceditor/schematiceditor.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/project.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -42,14 +42,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectEditor::ProjectEditor(workspace::Workspace& workspace, Project& project)
+ProjectEditor::ProjectEditor(Workspace& workspace, Project& project)
   : QObject(nullptr),
     mWorkspace(workspace),
     mProject(project),
@@ -344,5 +343,4 @@ int ProjectEditor::getCountOfVisibleEditorWindows() const noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

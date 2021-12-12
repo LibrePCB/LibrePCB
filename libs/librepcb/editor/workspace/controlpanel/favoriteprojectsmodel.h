@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_FAVORITEPROJECTSMODEL_H
-#define LIBREPCB_WORKSPACE_FAVORITEPROJECTSMODEL_H
+#ifndef LIBREPCB_EDITOR_FAVORITEPROJECTSMODEL_H
+#define LIBREPCB_EDITOR_FAVORITEPROJECTSMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 
@@ -33,10 +33,9 @@
 namespace librepcb {
 
 class Version;
-
-namespace workspace {
-
 class Workspace;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class FavoriteProjectsModel
@@ -80,7 +79,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

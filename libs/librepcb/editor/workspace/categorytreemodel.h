@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_CATEGORYTREEMODEL_H
-#define LIBREPCB_WORKSPACE_CATEGORYTREEMODEL_H
+#ifndef LIBREPCB_EDITOR_CATEGORYTREEMODEL_H
+#define LIBREPCB_EDITOR_CATEGORYTREEMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -31,9 +31,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 class WorkspaceLibraryDb;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class CategoryTreeModel
@@ -75,15 +76,14 @@ private:
   QScopedPointer<CategoryTreeItem<ElementType>> mRootItem;
 };
 
-typedef CategoryTreeModel<library::ComponentCategory>
-    ComponentCategoryTreeModel;
-typedef CategoryTreeModel<library::PackageCategory> PackageCategoryTreeModel;
+typedef CategoryTreeModel<ComponentCategory> ComponentCategoryTreeModel;
+typedef CategoryTreeModel<PackageCategory> PackageCategoryTreeModel;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

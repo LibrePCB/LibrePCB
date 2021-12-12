@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_NETSEGMENT_H
-#define LIBREPCB_PROJECT_BI_NETSEGMENT_H
+#ifndef LIBREPCB_CORE_BI_NETSEGMENT_H
+#define LIBREPCB_CORE_BI_NETSEGMENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../serialization/serializableobject.h"
+#include "../../../types/point.h"
+#include "../../../types/uuid.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -36,16 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-
-namespace project {
-
 class BI_Device;
 class BI_FootprintPad;
 class BI_NetLine;
 class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_Via;
+class GraphicsLayer;
 class NetSignal;
 
 /*******************************************************************************
@@ -139,7 +135,7 @@ public:
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
@@ -188,7 +184,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

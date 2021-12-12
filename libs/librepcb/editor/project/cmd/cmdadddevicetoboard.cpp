@@ -22,20 +22,21 @@
  ******************************************************************************/
 #include "cmdadddevicetoboard.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceadd.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include "../../project/cmd/cmddeviceinstanceadd.h"
+#include "../../project/cmd/cmdprojectlibraryaddelement.h"
+
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 
@@ -43,7 +44,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -51,10 +51,9 @@ namespace editor {
  ******************************************************************************/
 
 CmdAddDeviceToBoard::CmdAddDeviceToBoard(
-    workspace::Workspace& workspace, Board& board,
-    ComponentInstance& cmpInstance, const Uuid& deviceUuid,
-    const tl::optional<Uuid>& footprintUuid, const Point& position,
-    const Angle& rotation, bool mirror) noexcept
+    Workspace& workspace, Board& board, ComponentInstance& cmpInstance,
+    const Uuid& deviceUuid, const tl::optional<Uuid>& footprintUuid,
+    const Point& position, const Angle& rotation, bool mirror) noexcept
   : UndoCommandGroup(tr("Add device to board")),
     mWorkspace(workspace),
     mBoard(board),
@@ -80,8 +79,7 @@ bool CmdAddDeviceToBoard::performExecute() {
 
   // if there is no such device in the project's library, copy it from the
   // workspace library to the project's library
-  library::Device* dev =
-      mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
+  Device* dev = mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
   if (!dev) {
     FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(mDeviceUuid);
     if (!devFp.isValid()) {
@@ -91,10 +89,10 @@ bool CmdAddDeviceToBoard::performExecute() {
              "workspace library!")
               .arg(mDeviceUuid.toStr()));
     }
-    dev = new library::Device(std::unique_ptr<TransactionalDirectory>(
+    dev = new Device(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(TransactionalFileSystem::openRO(devFp))));
-    CmdProjectLibraryAddElement<library::Device>* cmdAddToLibrary =
-        new CmdProjectLibraryAddElement<library::Device>(
+    CmdProjectLibraryAddElement<Device>* cmdAddToLibrary =
+        new CmdProjectLibraryAddElement<Device>(
             mBoard.getProject().getLibrary(), *dev);
     execNewChildCmd(cmdAddToLibrary);  // can throw
   }
@@ -103,7 +101,7 @@ bool CmdAddDeviceToBoard::performExecute() {
   // if there is no such package in the project's library, copy it from the
   // workspace library to the project's library
   Uuid pkgUuid = dev->getPackageUuid();
-  library::Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
+  Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
   if (!pkg) {
     FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
     if (!pkgFp.isValid()) {
@@ -113,10 +111,10 @@ bool CmdAddDeviceToBoard::performExecute() {
              "workspace library!")
               .arg(pkgUuid.toStr()));
     }
-    pkg = new library::Package(std::unique_ptr<TransactionalDirectory>(
+    pkg = new Package(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(TransactionalFileSystem::openRO(pkgFp))));
-    CmdProjectLibraryAddElement<library::Package>* cmdAddToLibrary =
-        new CmdProjectLibraryAddElement<library::Package>(
+    CmdProjectLibraryAddElement<Package>* cmdAddToLibrary =
+        new CmdProjectLibraryAddElement<Package>(
             mBoard.getProject().getLibrary(), *pkg);
     execNewChildCmd(cmdAddToLibrary);  // can throw
   }
@@ -149,5 +147,4 @@ bool CmdAddDeviceToBoard::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYMANAGER_LIBRARYMANAGER_H
-#define LIBREPCB_LIBRARYMANAGER_LIBRARYMANAGER_H
+#ifndef LIBREPCB_EDITOR_LIBRARYMANAGER_H
+#define LIBREPCB_EDITOR_LIBRARYMANAGER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,15 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
 class Library;
+class Workspace;
 
-namespace manager {
+namespace editor {
 
 class AddLibraryWidget;
 class LibraryListWidgetItem;
@@ -64,7 +59,7 @@ public:
   // Constructors / Destructor
   LibraryManager() = delete;
   LibraryManager(const LibraryManager& other) = delete;
-  LibraryManager(workspace::Workspace& ws, QWidget* parent = nullptr) noexcept;
+  LibraryManager(Workspace& ws, QWidget* parent = nullptr) noexcept;
   ~LibraryManager() noexcept;
 
   // General Methods
@@ -88,7 +83,7 @@ signals:
   void openLibraryEditorTriggered(const FilePath& libDir);
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   QScopedPointer<Ui::LibraryManager> mUi;
   QScopedPointer<AddLibraryWidget> mAddLibraryWidget;
   QWidget* mCurrentWidget;
@@ -99,8 +94,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

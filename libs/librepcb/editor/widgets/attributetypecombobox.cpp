@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "attributetypecombobox.h"
 
-#include "../attributes/attributetype.h"
+#include <librepcb/core/attribute/attributetype.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -31,6 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -91,4 +92,5 @@ void AttributeTypeComboBox::currentIndexChanged(int index) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_HALIGNACTIONGROUP_H
-#define LIBREPCB_COMMON_HALIGNACTIONGROUP_H
+#ifndef LIBREPCB_EDITOR_HALIGNACTIONGROUP_H
+#define LIBREPCB_EDITOR_HALIGNACTIONGROUP_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
+#include <librepcb/core/types/alignment.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,6 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class HAlignActionGroup
@@ -41,7 +42,7 @@ namespace librepcb {
  * @brief The HAlignActionGroup class is a helper to add ::librepcb::HAlign
  *        chooser toolbuttons to a toolbar
  *
- * @see ::librepcb::VAlignActionGroup
+ * @see ::librepcb::editor::VAlignActionGroup
  */
 class HAlignActionGroup final : public QActionGroup {
   Q_OBJECT
@@ -76,6 +77,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

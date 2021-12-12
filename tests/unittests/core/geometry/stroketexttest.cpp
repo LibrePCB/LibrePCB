@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/geometry/stroketext.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/geometry/stroketext.h>
 
 /*******************************************************************************
  *  Namespace

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmddeviceedit.h"
 
-#include "../device.h"
+#include <librepcb/core/library/dev/device.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -88,5 +88,5 @@ void CmdDeviceEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

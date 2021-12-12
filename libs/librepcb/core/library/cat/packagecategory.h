@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_PACKAGECATEGORY_H
-#define LIBREPCB_LIBRARY_PACKAGECATEGORY_H
+#ifndef LIBREPCB_CORE_PACKAGECATEGORY_H
+#define LIBREPCB_CORE_PACKAGECATEGORY_H
 
 /*******************************************************************************
  *  Includes
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class PackageCategory
@@ -70,7 +69,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

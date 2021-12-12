@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDVIA_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDVIA_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDVIA_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDVIA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/project/boards/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_via.h>
 
 #include <QtCore>
 
@@ -36,14 +36,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class PositiveLengthEdit;
-
-namespace project {
-
 class BI_Via;
-class CmdBoardViaEdit;
 
 namespace editor {
+
+class CmdBoardViaEdit;
+class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddVia
@@ -136,7 +134,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

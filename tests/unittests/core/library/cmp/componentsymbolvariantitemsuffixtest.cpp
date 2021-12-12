@@ -21,13 +21,12 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/library/cmp/componentsymbolvariantitemsuffix.h>
+#include <librepcb/core/library/cmp/componentsymbolvariantitemsuffix.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace tests {
 
 /*******************************************************************************
@@ -108,5 +107,4 @@ INSTANTIATE_TEST_SUITE_P(ComponentSymbolVariantItemSuffixTest,ComponentSymbolVar
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace library
 }  // namespace librepcb

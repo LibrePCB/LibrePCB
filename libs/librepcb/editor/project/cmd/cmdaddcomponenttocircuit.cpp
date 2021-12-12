@@ -22,14 +22,15 @@
  ******************************************************************************/
 #include "cmdaddcomponenttocircuit.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/project/circuit/cmd/cmdcomponentinstanceadd.h>
-#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include "../../project/cmd/cmdcomponentinstanceadd.h"
+#include "../../project/cmd/cmdprojectlibraryaddelement.h"
+
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 
@@ -37,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdAddComponentToCircuit::CmdAddComponentToCircuit(
-    workspace::Workspace& workspace, Project& project, const Uuid& component,
+    Workspace& workspace, Project& project, const Uuid& component,
     const Uuid& symbolVariant, const tl::optional<Uuid>& defaultDevice) noexcept
   : UndoCommandGroup(tr("Add component")),
     mWorkspace(workspace),
@@ -86,12 +86,10 @@ bool CmdAddComponentToCircuit::performExecute() {
              "workspace library!")
               .arg(mComponentUuid.toStr()));
     }
-    library::Component* cmp = new library::Component(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-            TransactionalFileSystem::openRO(cmpFp))));
-    CmdProjectLibraryAddElement<library::Component>* cmdAddToLibrary =
-        new CmdProjectLibraryAddElement<library::Component>(
-            mProject.getLibrary(), *cmp);
+    Component* cmp = new Component(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(TransactionalFileSystem::openRO(cmpFp))));
+    CmdProjectLibraryAddElement<Component>* cmdAddToLibrary =
+        new CmdProjectLibraryAddElement<Component>(mProject.getLibrary(), *cmp);
     appendChild(cmdAddToLibrary);  // can throw
   }
 
@@ -109,5 +107,4 @@ bool CmdAddComponentToCircuit::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

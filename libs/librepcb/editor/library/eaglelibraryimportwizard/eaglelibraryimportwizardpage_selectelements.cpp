@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 using eagleimport::EagleLibraryImport;
@@ -274,5 +273,4 @@ void EagleLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

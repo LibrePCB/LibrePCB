@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "componentinstance.h"
 
-#include "../boards/items/bi_device.h"
+#include "../../attribute/attributesubstitutor.h"
+#include "../../exceptions.h"
+#include "../../library/cmp/component.h"
+#include "../../utils/scopeguardlist.h"
+#include "../board/items/bi_device.h"
 #include "../erc/ercmsg.h"
-#include "../library/projectlibrary.h"
 #include "../project.h"
-#include "../schematics/items/si_symbol.h"
-#include "../settings/projectsettings.h"
+#include "../projectlibrary.h"
+#include "../projectsettings.h"
+#include "../schematic/items/si_symbol.h"
 #include "circuit.h"
 #include "componentsignalinstance.h"
-
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -105,8 +104,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node,
   init();
 }
 
-ComponentInstance::ComponentInstance(Circuit& circuit,
-                                     const library::Component& cmp,
+ComponentInstance::ComponentInstance(Circuit& circuit, const Component& cmp,
                                      const Uuid& symbVar,
                                      const CircuitIdentifier& name,
                                      const tl::optional<Uuid>& defaultDevice)
@@ -127,7 +125,7 @@ ComponentInstance::ComponentInstance(Circuit& circuit,
   mAttributes.reset(new AttributeList(cmp.getAttributes()));
 
   // add signal map
-  for (const library::ComponentSignal& signal : cmp.getSignals()) {
+  for (const ComponentSignal& signal : cmp.getSignals()) {
     ComponentSignalInstance* signalInstance =
         new ComponentSignalInstance(mCircuit, *this, signal, nullptr);
     mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
@@ -179,7 +177,7 @@ int ComponentInstance::getUnplacedSymbolsCount() const noexcept {
 
 int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept {
   int count = 0;
-  for (const library::ComponentSymbolVariantItem& item :
+  for (const ComponentSymbolVariantItem& item :
        mCompSymbVar->getSymbolItems()) {
     if ((item.isRequired()) && (!mRegisteredSymbols.contains(item.getUuid()))) {
       count++;
@@ -190,7 +188,7 @@ int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept {
 
 int ComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept {
   int count = 0;
-  for (const library::ComponentSymbolVariantItem& item :
+  for (const ComponentSymbolVariantItem& item :
        mCompSymbVar->getSymbolItems()) {
     if ((!item.isRequired()) &&
         (!mRegisteredSymbols.contains(item.getUuid()))) {
@@ -437,5 +435,4 @@ const QStringList& ComponentInstance::getLocaleOrder() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

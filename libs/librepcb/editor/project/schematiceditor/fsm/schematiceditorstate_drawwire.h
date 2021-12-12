@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_DRAWWIRE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Circuit;
 class SI_NetLine;
@@ -142,7 +141,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

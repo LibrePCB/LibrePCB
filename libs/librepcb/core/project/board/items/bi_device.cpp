@@ -22,19 +22,19 @@
  ******************************************************************************/
 #include "bi_device.h"
 
+#include "../../../library/cmp/component.h"
+#include "../../../library/dev/device.h"
+#include "../../../library/pkg/package.h"
+#include "../../../library/sym/symbol.h"
+#include "../../../utils/scopeguard.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../erc/ercmsg.h"
-#include "../../library/projectlibrary.h"
 #include "../../project.h"
-#include "../../settings/projectsettings.h"
+#include "../../projectlibrary.h"
+#include "../../projectsettings.h"
 #include "../board.h"
 #include "bi_footprint.h"
-
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -42,7 +42,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -162,8 +161,7 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
 
 void BI_Device::init() {
   // check pad-signal-map
-  for (const library::DevicePadSignalMapItem& item :
-       mLibDevice->getPadSignalMap()) {
+  for (const DevicePadSignalMapItem& item : mLibDevice->getPadSignalMap()) {
     tl::optional<Uuid> signalUuid = item.getSignalUuid();
     if ((signalUuid) && (!mCompInstance->getSignalInstance(*signalUuid))) {
       throw RuntimeError(
@@ -333,5 +331,4 @@ const QStringList& BI_Device::getLocaleOrder() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

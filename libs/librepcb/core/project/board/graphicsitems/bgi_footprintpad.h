@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
-#define LIBREPCB_PROJECT_BGI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_CORE_BGI_FOOTPRINTPAD_H
+#define LIBREPCB_CORE_BGI_FOOTPRINTPAD_H
 
 /*******************************************************************************
  *  Includes
@@ -33,16 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-
-namespace library {
-class FootprintPad;
-class PackagePad;
-}  // namespace library
-
-namespace project {
-
 class BI_FootprintPad;
+class FootprintPad;
+class GraphicsLayer;
+class PackagePad;
 
 /*******************************************************************************
  *  Class BGI_FootprintPad
@@ -80,7 +74,7 @@ private:
 
   // General Attributes
   BI_FootprintPad& mPad;
-  const library::FootprintPad& mLibPad;
+  const FootprintPad& mLibPad;
 
   // Cached Attributes
   GraphicsLayer* mPadLayer;
@@ -100,7 +94,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

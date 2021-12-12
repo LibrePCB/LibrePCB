@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_PROJECTTREEMODEL_H
-#define LIBREPCB_WORKSPACE_PROJECTTREEMODEL_H
+#ifndef LIBREPCB_EDITOR_PROJECTTREEMODEL_H
+#define LIBREPCB_EDITOR_PROJECTTREEMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -30,9 +30,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 class Workspace;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class ProjectTreeModel
@@ -65,7 +66,7 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

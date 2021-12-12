@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_NETLABEL_H
-#define LIBREPCB_COMMON_NETLABEL_H
+#ifndef LIBREPCB_CORE_NETLABEL_H
+#define LIBREPCB_CORE_NETLABEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
-#include "../units/angle.h"
-#include "../units/point.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/angle.h"
+#include "../types/point.h"
 
 #include <QtCore>
 
@@ -79,7 +79,7 @@ public:
   bool setRotation(const Angle& rotation) noexcept;
   bool setMirrored(const bool mirrored) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

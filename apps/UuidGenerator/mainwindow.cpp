@@ -2,7 +2,7 @@
 
 #include "ui_mainwindow.h"
 
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QClipboard>
 #include <QtCore>

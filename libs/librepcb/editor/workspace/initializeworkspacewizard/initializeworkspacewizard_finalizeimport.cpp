@@ -24,14 +24,14 @@
 
 #include "ui_initializeworkspacewizard_finalizeimport.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/asynccopyoperation.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/asynccopyoperation.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -119,5 +119,5 @@ void InitializeWorkspaceWizard_FinalizeImport::importSucceeded() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

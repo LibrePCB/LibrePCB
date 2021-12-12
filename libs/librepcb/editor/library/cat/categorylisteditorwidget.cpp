@@ -25,9 +25,9 @@
 #include "categorychooserdialog.h"
 #include "ui_categorylisteditorwidget.h"
 
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -44,7 +43,7 @@ namespace editor {
  ******************************************************************************/
 
 CategoryListEditorWidgetBase::CategoryListEditorWidgetBase(
-    const workspace::Workspace& ws, QWidget* parent) noexcept
+    const Workspace& ws, QWidget* parent) noexcept
   : QWidget(parent),
     mWorkspace(ws),
     mUi(new Ui::CategoryListEditorWidget),
@@ -164,7 +163,7 @@ void CategoryListEditorWidgetBase::updateColor() noexcept {
 
 template <typename ElementType>
 CategoryListEditorWidget<ElementType>::CategoryListEditorWidget(
-    const workspace::Workspace& ws, QWidget* parent) noexcept
+    const Workspace& ws, QWidget* parent) noexcept
   : CategoryListEditorWidgetBase(ws, parent) {
 }
 
@@ -217,13 +216,12 @@ QString CategoryListEditorWidget<ElementType>::getCategoryName(
   return name;
 }
 
-template class CategoryListEditorWidget<library::ComponentCategory>;
-template class CategoryListEditorWidget<library::PackageCategory>;
+template class CategoryListEditorWidget<ComponentCategory>;
+template class CategoryListEditorWidget<PackageCategory>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

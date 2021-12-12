@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::RenameNetSegmentDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::RenameNetSegmentDialog">
+ <class>librepcb::editor::RenameNetSegmentDialog</class>
+ <widget class="QDialog" name="librepcb::editor::RenameNetSegmentDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -101,7 +101,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::RenameNetSegmentDialog</receiver>
+   <receiver>librepcb::editor::RenameNetSegmentDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -117,7 +117,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::RenameNetSegmentDialog</receiver>
+   <receiver>librepcb::editor::RenameNetSegmentDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

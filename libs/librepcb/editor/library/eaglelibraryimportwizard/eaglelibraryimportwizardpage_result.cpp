@@ -25,9 +25,9 @@
 #include "eaglelibraryimportwizardcontext.h"
 #include "ui_eaglelibraryimportwizardpage_result.h"
 
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/eagleimport/eaglelibraryimport.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 using eagleimport::EagleLibraryImport;
@@ -61,7 +60,7 @@ EagleLibraryImportWizardPage_Result::EagleLibraryImportWizardPage_Result(
   // even when closing this wizard while the import is still in progress.
   connect(&mContext->getImport(), &EagleLibraryImport::finished,
           &mContext->getWorkspace().getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::startLibraryRescan);
+          &WorkspaceLibraryDb::startLibraryRescan);
 }
 
 EagleLibraryImportWizardPage_Result::
@@ -107,8 +106,8 @@ void EagleLibraryImportWizardPage_Result::importFinished(
   }
   mProgressBarConnections.append(
       connect(&mContext->getWorkspace().getLibraryDb(),
-              &workspace::WorkspaceLibraryDb::scanProgressUpdate,
-              mUi->prgImport, &QProgressBar::setValue, Qt::QueuedConnection));
+              &WorkspaceLibraryDb::scanProgressUpdate, mUi->prgImport,
+              &QProgressBar::setValue, Qt::QueuedConnection));
 
   mUi->lblMessages->setText(errors.join("\n"));
   mUi->prgImport->setFormat(tr("Scanning libraries") % " (%p%)");
@@ -126,5 +125,4 @@ void EagleLibraryImportWizardPage_Result::importFinished(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

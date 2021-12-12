@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDREPLACEDEVICE_H
-#define LIBREPCB_PROJECTEDITOR_CMDREPLACEDEVICE_H
+#ifndef LIBREPCB_EDITOR_CMDREPLACEDEVICE_H
+#define LIBREPCB_EDITOR_CMDREPLACEDEVICE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/uuid.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -33,14 +34,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class BI_Device;
 class Board;
+class Workspace;
 
 namespace editor {
 
@@ -54,21 +50,21 @@ namespace editor {
 class CmdReplaceDevice final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdReplaceDevice(workspace::Workspace& workspace, Board& board,
-                   BI_Device& device, const Uuid& newDeviceUuid,
+  CmdReplaceDevice(Workspace& workspace, Board& board, BI_Device& device,
+                   const Uuid& newDeviceUuid,
                    const tl::optional<Uuid>& newFootprintUuid) noexcept;
   ~CmdReplaceDevice() noexcept;
 
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
 
   // Attributes from the constructor
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Board& mBoard;
   BI_Device& mDeviceInstance;
   Uuid mNewDeviceUuid;
@@ -80,7 +76,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

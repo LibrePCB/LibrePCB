@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/cam/gerbergenerator.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/geometry/path.h>
+#include <librepcb/core/export/gerbergenerator.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/geometry/path.h>
 
 #include <QtCore>
 

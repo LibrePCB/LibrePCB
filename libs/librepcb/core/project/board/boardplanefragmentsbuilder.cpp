@@ -22,6 +22,10 @@
  ******************************************************************************/
 #include "boardplanefragmentsbuilder.h"
 
+#include "../../graphics/graphicslayer.h"
+#include "../../library/pkg/footprint.h"
+#include "../../library/pkg/footprintpad.h"
+#include "../../utils/clipperhelpers.h"
 #include "items/bi_device.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
@@ -33,18 +37,12 @@
 #include "items/bi_polygon.h"
 #include "items/bi_via.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/utils/clipperhelpers.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintpad.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -281,5 +279,4 @@ ClipperLib::Path BoardPlaneFragmentsBuilder::createViaCutOut(
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

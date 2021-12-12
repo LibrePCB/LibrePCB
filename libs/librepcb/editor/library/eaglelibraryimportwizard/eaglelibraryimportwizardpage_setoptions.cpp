@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "eaglelibraryimportwizardpage_setoptions.h"
 
-#include "../common/categorychooserdialog.h"
-#include "../common/categorytreelabeltextbuilder.h"
+#include "../cat/categorychooserdialog.h"
+#include "../cat/categorytreelabeltextbuilder.h"
 #include "eaglelibraryimportwizardcontext.h"
 #include "ui_eaglelibraryimportwizardpage_setoptions.h"
 
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/eagleimport/eaglelibraryimport.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,10 +39,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
-
-using eagleimport::EagleLibraryImport;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -139,5 +136,4 @@ void EagleLibraryImportWizardPage_SetOptions::
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

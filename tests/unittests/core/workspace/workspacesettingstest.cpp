@@ -21,9 +21,9 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 namespace tests {
 
 /*******************************************************************************
@@ -160,5 +159,4 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace workspace
 }  // namespace librepcb

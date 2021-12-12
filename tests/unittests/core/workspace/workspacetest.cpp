@@ -21,10 +21,10 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/versionfile.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/versionfile.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 
@@ -32,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 namespace tests {
 
 /*******************************************************************************
@@ -139,5 +138,4 @@ TEST_F(WorkspaceTest, testGetHighestFileFormatVersionOfWorkspace) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace workspace
 }  // namespace librepcb

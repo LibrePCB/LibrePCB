@@ -22,31 +22,32 @@
  ******************************************************************************/
 #include "unplacedcomponentsdock.h"
 
+#include "../../library/pkg/footprintpreviewgraphicsitem.h"
+#include "../../project/cmd/cmdcomponentinstanceedit.h"
+#include "../../undostack.h"
+#include "../../widgets/graphicsview.h"
 #include "../cmd/cmdadddevicetoboard.h"
 #include "../projecteditor.h"
 #include "ui_unplacedcomponentsdock.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/footprintpreviewgraphicsitem.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdcomponentinstanceedit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/settings/projectsettings.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -55,7 +56,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -278,7 +278,7 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
     //  - Allow adding devices even if package not found in workspace library
     //  - Use correct package (version) for preview
     //  - Better performance than loading workspace library elements
-    const library::Package* package =
+    const Package* package =
         mProject.getLibrary().getPackage(device.packageUuid);
     if (!package) {
       // If package does not exist in project library, use workspace library.
@@ -286,7 +286,7 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
           mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(
               device.packageUuid);
       if (pkgFp.isValid()) {
-        package = new library::Package(
+        package = new Package(
             std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
                 TransactionalFileSystem::openRO(pkgFp))));
         packageOwned = true;
@@ -347,7 +347,7 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
 }
 
 void UnplacedComponentsDock::setSelectedDeviceAndPackage(
-    const tl::optional<Uuid>& deviceUuid, const library::Package* package,
+    const tl::optional<Uuid>& deviceUuid, const Package* package,
     bool packageOwned) noexcept {
   setSelectedFootprintUuid(tl::nullopt);
   mUi->lblNoDeviceFound->setVisible(deviceUuid && (!package));
@@ -370,7 +370,7 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
       mUi->cbxIsDefaultDevice->setCheckState(Qt::PartiallyChecked);
     }
     QStringList localeOrder = mProject.getSettings().getLocaleOrder();
-    for (const library::Footprint& fpt : mSelectedPackage->getFootprints()) {
+    for (const Footprint& fpt : mSelectedPackage->getFootprints()) {
       mUi->cbxSelectedFootprint->addItem(*fpt.getNames().value(localeOrder),
                                          fpt.getUuid().toStr());
     }
@@ -406,10 +406,10 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
 
   if (mBoard && mSelectedComponent && mSelectedDeviceUuid && mSelectedPackage &&
       mSelectedFootprintUuid) {
-    const library::Footprint* fpt =
+    const Footprint* fpt =
         mSelectedPackage->getFootprints().find(*mSelectedFootprintUuid).get();
     if (fpt) {
-      mPreviewGraphicsItem.reset(new library::FootprintPreviewGraphicsItem(
+      mPreviewGraphicsItem.reset(new FootprintPreviewGraphicsItem(
           *mGraphicsLayerProvider.data(),
           mProject.getSettings().getLocaleOrder(), *fpt, mSelectedPackage,
           &mSelectedComponent->getLibComponent(), mSelectedComponent));
@@ -536,7 +536,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
   QStringList localeOrder = mProject.getSettings().getLocaleOrder();
 
   // Get matching devices in project library.
-  QHash<Uuid, library::Device*> prjLibDev =
+  QHash<Uuid, Device*> prjLibDev =
       mProject.getLibrary().getDevicesOfComponent(cmpUuid);
   for (auto i = prjLibDev.constBegin(); i != prjLibDev.constEnd(); ++i) {
     devices.append(
@@ -559,8 +559,8 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
       QString devName;
       mProjectEditor.getWorkspace()
           .getLibraryDb()
-          .getElementTranslations<library::Device>(devFp, localeOrder,
-                                                   &devName);  // can throw
+          .getElementTranslations<Device>(devFp, localeOrder,
+                                          &devName);  // can throw
       Uuid pkgUuid = Uuid::createRandom();  // Temporary.
       mProjectEditor.getWorkspace().getLibraryDb().getDeviceMetadata(
           devFp,
@@ -576,7 +576,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
 
   // Determine missing metadata.
   for (DeviceMetadata& device : devices) {
-    if (const library::Package* package =
+    if (const Package* package =
             mProjectEditor.getProject().getLibrary().getPackage(
                 device.packageUuid)) {
       device.packageName = *package->getNames().value(localeOrder);
@@ -588,9 +588,8 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
         if (!pkgFp.isValid()) continue;
         mProjectEditor.getWorkspace()
             .getLibraryDb()
-            .getElementTranslations<library::Package>(
-                pkgFp, localeOrder,
-                &device.packageName);  // can throw
+            .getElementTranslations<Package>(pkgFp, localeOrder,
+                                             &device.packageName);  // can throw
       } catch (const Exception& e) {
         qCritical()
             << "Error while querying packages in unplaced components dock:"
@@ -698,5 +697,4 @@ tl::optional<Uuid> UnplacedComponentsDock::getSuggestedFootprint(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

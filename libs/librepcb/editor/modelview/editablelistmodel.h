@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_EDITABLELISTMODEL_H
-#define LIBREPCB_COMMON_EDITABLELISTMODEL_H
+#ifndef LIBREPCB_EDITOR_EDITABLELISTMODEL_H
+#define LIBREPCB_EDITOR_EDITABLELISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../toolbox.h"
-#include "../uuid.h"
 #include "comboboxdelegate.h"
+
+#include <librepcb/core/types/uuid.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,6 +37,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Types
@@ -56,7 +58,7 @@ enum class EditableListModelType { DEFAULT, LOCALE };
  *
  * Special Features:
  *   - Adds an additional column and row to allow modifying the model with
- *     ::librepcb::EditableTableWidget.
+ *     ::librepcb::editor::EditableTableWidget.
  *   - Automatic pretty printing and input validation for various data types:
  *     - Locales, e.g. "de_DE" -> "Deutsch (Deutschland)"
  *     - URLs
@@ -365,6 +367,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -22,10 +22,9 @@
  ******************************************************************************/
 #include "symbol.h"
 
+#include "../../serialization/sexpression.h"
 #include "symbolcheck.h"
 #include "symbolgraphicsitem.h"
-
-#include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -207,5 +205,4 @@ void Symbol::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

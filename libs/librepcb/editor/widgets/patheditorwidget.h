@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_PATHEDITORWIDGET_H
-#define LIBREPCB_COMMON_PATHEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_PATHEDITORWIDGET_H
+#define LIBREPCB_EDITOR_PATHEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/path.h"
+#include <librepcb/core/geometry/path.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,9 +33,12 @@
  ******************************************************************************/
 namespace librepcb {
 
+class LengthUnit;
+
+namespace editor {
+
 class EditableTableWidget;
 class LengthDelegate;
-class LengthUnit;
 class PathModel;
 
 /*******************************************************************************
@@ -74,6 +77,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

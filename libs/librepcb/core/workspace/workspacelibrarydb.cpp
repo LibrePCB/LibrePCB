@@ -22,19 +22,19 @@
  ******************************************************************************/
 #include "workspacelibrarydb.h"
 
-#include "../workspace.h"
+#include "../exceptions.h"
+#include "../fileio/filepath.h"
+#include "../library/cat/componentcategory.h"
+#include "../library/cat/packagecategory.h"
+#include "../library/cmp/component.h"
+#include "../library/dev/device.h"
+#include "../library/library.h"
+#include "../library/pkg/package.h"
+#include "../library/sym/symbol.h"
+#include "../serialization/sexpression.h"
+#include "../sqlitedatabase.h"
+#include "workspace.h"
 #include "workspacelibraryscanner.h"
-
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/sqlitedatabase.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/library.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
 
 #include <QtCore>
 #include <QtSql>
@@ -43,9 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
-
-using namespace library;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -995,5 +992,4 @@ void WorkspaceLibraryDb::setDbVersion(int version) {
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb

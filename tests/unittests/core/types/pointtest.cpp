@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 

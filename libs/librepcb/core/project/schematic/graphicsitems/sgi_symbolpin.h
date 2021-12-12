@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_SYMBOLPIN_H
-#define LIBREPCB_PROJECT_SGI_SYMBOLPIN_H
+#ifndef LIBREPCB_CORE_SGI_SYMBOLPIN_H
+#define LIBREPCB_CORE_SGI_SYMBOLPIN_H
 
 /*******************************************************************************
  *  Includes
@@ -34,14 +34,8 @@
 namespace librepcb {
 
 class GraphicsLayer;
-
-namespace library {
-class SymbolPin;
-}
-
-namespace project {
-
 class SI_SymbolPin;
+class SymbolPin;
 
 /*******************************************************************************
  *  Class SGI_SymbolPin
@@ -76,7 +70,7 @@ private:
 
   // General Attributes
   SI_SymbolPin& mPin;
-  const library::SymbolPin& mLibPin;
+  const SymbolPin& mLibPin;
   QFont mFont;
   qreal mRadiusPx;
 
@@ -96,7 +90,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

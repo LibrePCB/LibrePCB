@@ -17,33 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECT_H
-#define LIBREPCB_PROJECT_PROJECT_H
+#ifndef LIBREPCB_CORE_PROJECT_H
+#define LIBREPCB_CORE_PROJECT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/version.h>
+#include "../attribute/attribute.h"
+#include "../attribute/attributeprovider.h"
+#include "../fileio/directorylock.h"
+#include "../fileio/transactionaldirectory.h"
+#include "../types/elementname.h"
+#include "../types/uuid.h"
+#include "../types/version.h"
 
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
+
 class QPrinter;
 
 namespace librepcb {
-
-class StrokeFontPool;
-
-namespace project {
 
 class Board;
 class Circuit;
@@ -53,6 +49,7 @@ class ProjectMetadata;
 class ProjectSettings;
 class Schematic;
 class SchematicLayerProvider;
+class StrokeFontPool;
 
 /*******************************************************************************
  *  Class Project
@@ -68,7 +65,7 @@ class SchematicLayerProvider;
  *  - project settings
  *  - and much more...
  *
- * The constructor of the ::librepcb::project::Project class needs the filepath
+ * The constructor of the ::librepcb::Project class needs the filepath
  * to a project file. Then the project will be opened. A new project can be
  * created with the static method #create(). The destructor will close the
  * project (without saving). Use the method #save() to write the whole project
@@ -379,10 +376,10 @@ public:
   void save();
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getUserDefinedAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
   QString getUserDefinedAttributeValue(const QString& key) const
       noexcept override;
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
   // Operator Overloadings
@@ -488,7 +485,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

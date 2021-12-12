@@ -22,17 +22,17 @@
  ******************************************************************************/
 #include "firstrunwizardpage_workspacepath.h"
 
+#include "../../dialogs/filedialog.h"
 #include "ui_firstrunwizardpage_workspacepath.h"
 
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -59,7 +59,7 @@ FirstRunWizardPage_WorkspacePath::FirstRunWizardPage_WorkspacePath(
   }
   mUi->edtCreateWsPath->setText(defaultWsPath.toNative());
   mUi->edtOpenWsPath->setText(defaultWsPath.toNative());
-  if (workspace::Workspace::isValidWorkspacePath(defaultWsPath))
+  if (Workspace::isValidWorkspacePath(defaultWsPath))
     mUi->rbtnOpenWs->setChecked(true);
 }
 
@@ -82,7 +82,7 @@ bool FirstRunWizardPage_WorkspacePath::validatePage() noexcept {
       return true;
   } else if (field("OpenWorkspace").toBool()) {
     FilePath path(field("OpenWorkspacePath").toString());
-    if (!workspace::Workspace::isValidWorkspacePath(path)) {
+    if (!Workspace::isValidWorkspacePath(path)) {
       QMessageBox::critical(
           this, tr("Invalid Directory"),
           tr("The selected directory is not a valid workspace."));
@@ -131,5 +131,5 @@ void FirstRunWizardPage_WorkspacePath::on_btnOpenWsBrowse_clicked() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

@@ -22,17 +22,17 @@
  ******************************************************************************/
 #include "packageeditorstate_addholes.h"
 
+#include "../../../cmd/cmdholeedit.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
 #include "../packageeditorwidget.h"
 
-#include <librepcb/common/geometry/cmd/cmdholeedit.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/holegraphicsitem.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
 
 #include <QtCore>
 
@@ -40,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -193,5 +192,4 @@ void PackageEditorState_AddHoles::diameterEditValueChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDDEVICE_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDDEVICE_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDDEVICE_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDDEVICE_H
 
 /*******************************************************************************
  *  Includes
@@ -33,15 +33,13 @@
 namespace librepcb {
 
 class Angle;
-
-namespace project {
-
 class BI_Device;
 class Board;
-class CmdDeviceInstanceEditAll;
 class ComponentInstance;
 
 namespace editor {
+
+class CmdDeviceInstanceEditAll;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddDevice
@@ -107,7 +105,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

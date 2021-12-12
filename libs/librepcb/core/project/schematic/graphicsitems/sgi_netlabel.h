@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_NETLABEL_H
-#define LIBREPCB_PROJECT_SGI_NETLABEL_H
+#ifndef LIBREPCB_CORE_SGI_NETLABEL_H
+#define LIBREPCB_CORE_SGI_NETLABEL_H
 
 /*******************************************************************************
  *  Includes
@@ -35,9 +35,6 @@ namespace librepcb {
 
 class GraphicsLayer;
 class LineGraphicsItem;
-
-namespace project {
-
 class SI_NetLabel;
 
 /*******************************************************************************
@@ -90,7 +87,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

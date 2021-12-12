@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_SERIALIZABLEOBJECTLIST_H
-#define LIBREPCB_COMMON_SERIALIZABLEOBJECTLIST_H
+#ifndef LIBREPCB_CORE_SERIALIZABLEOBJECTLIST_H
+#define LIBREPCB_CORE_SERIALIZABLEOBJECTLIST_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../signalslot.h"
-#include "../uuid.h"
+#include "../exceptions.h"
+#include "../types/uuid.h"
+#include "../utils/signalslot.h"
 #include "serializableobject.h"
 
 #include <QtCore>
@@ -57,8 +58,9 @@ namespace librepcb {
  * - Method #sortedByUuid() to create a copy of the list with elements sorted by
  *   UUID.
  * - Signals to get notified about added, removed and modified elements.
- * - Undo commands ::librepcb::CmdListElementInsert,
- *   ::librepcb::CmdListElementRemove and ::librepcb::CmdListElementsSwap.
+ * - Undo commands ::librepcb::editor::CmdListElementInsert,
+ *   ::librepcb::editor::CmdListElementRemove and
+ *   ::librepcb::editor::CmdListElementsSwap.
  * - Const correctness: A const list always returns pointers/references to const
  *   elements.
  *
@@ -361,7 +363,7 @@ public:
     }
     Q_ASSERT(isEmpty() && mObjects.isEmpty());
   }
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override {
     serializePointerContainer(root, mObjects, P::tagname);  // can throw
   }

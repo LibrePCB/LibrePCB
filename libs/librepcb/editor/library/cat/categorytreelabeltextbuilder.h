@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CATEGORYTREELABELTEXTBUILDER_H
-#define LIBREPCB_LIBRARYEDITOR_CATEGORYTREELABELTEXTBUILDER_H
+#ifndef LIBREPCB_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
+#define LIBREPCB_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/uuid.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,11 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
 class WorkspaceLibraryDb;
-}
 
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -58,7 +55,7 @@ public:
   CategoryTreeLabelTextBuilder() = delete;
   CategoryTreeLabelTextBuilder(const CategoryTreeLabelTextBuilder& other) =
       delete;
-  CategoryTreeLabelTextBuilder(const workspace::WorkspaceLibraryDb& db,
+  CategoryTreeLabelTextBuilder(const WorkspaceLibraryDb& db,
                                const QStringList& localeOrder,
                                QLabel& label) noexcept;
   ~CategoryTreeLabelTextBuilder() noexcept;
@@ -89,7 +86,7 @@ private:  // Methods
   QList<Uuid> getCategoryParents(const Uuid& category) const;
 
 private:  // Data
-  const workspace::WorkspaceLibraryDb& mDb;
+  const WorkspaceLibraryDb& mDb;
   const QStringList& mLocaleOrder;
   QLabel& mLabel;
   bool mHighlightLastLine;
@@ -97,9 +94,9 @@ private:  // Data
   bool mOneLine;
 };
 
-typedef CategoryTreeLabelTextBuilder<library::ComponentCategory>
+typedef CategoryTreeLabelTextBuilder<ComponentCategory>
     ComponentCategoryTreeLabelTextBuilder;
-typedef CategoryTreeLabelTextBuilder<library::PackageCategory>
+typedef CategoryTreeLabelTextBuilder<PackageCategory>
     PackageCategoryTreeLabelTextBuilder;
 
 /*******************************************************************************
@@ -107,7 +104,6 @@ typedef CategoryTreeLabelTextBuilder<library::PackageCategory>
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

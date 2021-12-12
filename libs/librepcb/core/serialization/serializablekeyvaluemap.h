@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_SERIALIZABLEKEYVALUEMAP_H
-#define LIBREPCB_COMMON_SERIALIZABLEKEYVALUEMAP_H
+#ifndef LIBREPCB_CORE_SERIALIZABLEKEYVALUEMAP_H
+#define LIBREPCB_CORE_SERIALIZABLEKEYVALUEMAP_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../elementname.h"
-#include "../signalslot.h"
+#include "../exceptions.h"
+#include "../types/elementname.h"
+#include "../utils/signalslot.h"
 #include "serializableobject.h"
 
 #include <QtCore>
@@ -154,7 +155,7 @@ public:
     }
   }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override {
     for (auto i = mValues.constBegin(); i != mValues.constEnd(); ++i) {
       SExpression& child = root.appendList(T::tagname, true);

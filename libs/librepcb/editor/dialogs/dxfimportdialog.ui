@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::DxfImportDialog</class>
- <widget class="QDialog" name="librepcb::DxfImportDialog">
+ <class>librepcb::editor::DxfImportDialog</class>
+ <widget class="QDialog" name="librepcb::editor::DxfImportDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -24,7 +24,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="librepcb::GraphicsLayerComboBox" name="cbxLayer" native="true">
+      <widget class="librepcb::editor::GraphicsLayerComboBox" name="cbxLayer" native="true">
        <property name="toolTip">
         <string>The layer to set on the imported objects.</string>
        </property>
@@ -49,7 +49,7 @@ If unchecked (the default), circles will be imported as polygons.</string>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="librepcb::UnsignedLengthEdit" name="edtLineWidth" native="true">
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtLineWidth" native="true">
        <property name="toolTip">
         <string>The line width to set on the imported objects.</string>
        </property>
@@ -83,14 +83,14 @@ If unchecked, you need to specify exact coordinates where the point (0,0) of the
      <item row="5" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="librepcb::LengthEdit" name="edtPosX" native="true">
+        <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true">
          <property name="toolTip">
           <string>X-coordinate.</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="librepcb::LengthEdit" name="edtPosY" native="true">
+        <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true">
          <property name="toolTip">
           <string>Y-coordinate.</string>
          </property>
@@ -99,7 +99,7 @@ If unchecked, you need to specify exact coordinates where the point (0,0) of the
       </layout>
      </item>
      <item row="3" column="1">
-      <widget class="librepcb::DoubleSpinBox" name="spbxScaleFactor">
+      <widget class="librepcb::editor::DoubleSpinBox" name="spbxScaleFactor">
        <property name="toolTip">
         <string>Additional scale factor, in case the DXF is not scaled properly.
 Note: If you have issues with scaling, make sure to configure the measuring unit of the DXF in your MCAD.</string>
@@ -147,27 +147,27 @@ Note: If you have issues with scaling, make sure to configure the measuring unit
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::LengthEdit</class>
+   <class>librepcb::editor::LengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/lengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::UnsignedLengthEdit</class>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::GraphicsLayerComboBox</class>
+   <class>librepcb::editor::GraphicsLayerComboBox</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/graphicslayercombobox.h</header>
+   <header location="global">librepcb/editor/widgets/graphicslayercombobox.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::DoubleSpinBox</class>
+   <class>librepcb::editor::DoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">librepcb/common/widgets/doublespinbox.h</header>
+   <header location="global">librepcb/editor/widgets/doublespinbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -186,7 +186,7 @@ Note: If you have issues with scaling, make sure to configure the measuring unit
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::DxfImportDialog</receiver>
+   <receiver>librepcb::editor::DxfImportDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -202,7 +202,7 @@ Note: If you have issues with scaling, make sure to configure the measuring unit
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::DxfImportDialog</receiver>
+   <receiver>librepcb::editor::DxfImportDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

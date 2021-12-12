@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
-#define LIBREPCB_PROJECT_CMDFOOTPRINTSTROKETEXTSRESET_H
+#ifndef LIBREPCB_EDITOR_CMDFOOTPRINTSTROKETEXTSRESET_H
+#define LIBREPCB_EDITOR_CMDFOOTPRINTSTROKETEXTSRESET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -31,9 +31,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_Footprint;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdFootprintStrokeTextsReset
@@ -51,7 +52,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
@@ -62,7 +63,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

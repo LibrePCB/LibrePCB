@@ -22,28 +22,28 @@
  ******************************************************************************/
 #include "symboleditorstate_select.h"
 
-#include "../dialogs/symbolpinpropertiesdialog.h"
+#include "../../../cmd/cmdpolygonedit.h"
+#include "../../../dialogs/circlepropertiesdialog.h"
+#include "../../../dialogs/dxfimportdialog.h"
+#include "../../../dialogs/polygonpropertiesdialog.h"
+#include "../../../dialogs/textpropertiesdialog.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../cmd/cmddragselectedsymbolitems.h"
+#include "../../cmd/cmdpastesymbolitems.h"
+#include "../../cmd/cmdremoveselectedsymbolitems.h"
 #include "../symbolclipboarddata.h"
 #include "../symboleditorwidget.h"
-#include "cmd/cmddragselectedsymbolitems.h"
-#include "cmd/cmdpastesymbolitems.h"
-#include "cmd/cmdremoveselectedsymbolitems.h"
+#include "../symbolpinpropertiesdialog.h"
 
-#include <librepcb/common/dialogs/circlepropertiesdialog.h>
-#include <librepcb/common/dialogs/dxfimportdialog.h>
-#include <librepcb/common/dialogs/polygonpropertiesdialog.h>
-#include <librepcb/common/dialogs/textpropertiesdialog.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
-#include <librepcb/common/import/dxfreader.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/textgraphicsitem.h>
+#include <librepcb/core/import/dxfreader.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 
@@ -51,7 +51,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -826,5 +825,4 @@ bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

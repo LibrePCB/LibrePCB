@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/library/pkg/footprintpad.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace tests {
 
 /*******************************************************************************
@@ -151,5 +150,4 @@ TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace library
 }  // namespace librepcb

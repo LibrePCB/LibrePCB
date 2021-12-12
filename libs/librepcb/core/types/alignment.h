@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ALIGNMENT_H
-#define LIBREPCB_COMMON_ALIGNMENT_H
+#ifndef LIBREPCB_CORE_ALIGNMENT_H
+#define LIBREPCB_CORE_ALIGNMENT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "fileio/serializableobject.h"
+#include "../exceptions.h"
+#include "../serialization/serializableobject.h"
 
 #include <QtCore>
 
@@ -204,7 +205,7 @@ public:
   Alignment mirroredH() const noexcept { return Alignment(*this).mirrorH(); }
   Alignment mirroredV() const noexcept { return Alignment(*this).mirrorV(); }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   Alignment& operator=(const Alignment& rhs) noexcept {

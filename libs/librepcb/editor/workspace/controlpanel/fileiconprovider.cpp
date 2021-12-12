@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "fileiconprovider.h"
 
-#include <librepcb/project/project.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -54,8 +54,7 @@ QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept {
       return QIcon(":/img/places/file.png");
     }
   } else if (info.isDir()) {
-    if (project::Project::isProjectDirectory(
-            FilePath(info.absoluteFilePath()))) {
+    if (Project::isProjectDirectory(FilePath(info.absoluteFilePath()))) {
       return QIcon(":/img/places/project_folder.png");
     } else if (info.isDir()) {
       return QIcon(":/img/places/folder.png");
@@ -69,5 +68,5 @@ QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb

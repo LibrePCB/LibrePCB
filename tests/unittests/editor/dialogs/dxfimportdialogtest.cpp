@@ -24,12 +24,12 @@
 #include "../../testhelpers.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/common/dialogs/dxfimportdialog.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/units/lengthunit.h>
-#include <librepcb/common/widgets/doublespinbox.h>
-#include <librepcb/common/widgets/lengthedit.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/editor/dialogs/dxfimportdialog.h>
+#include <librepcb/editor/widgets/doublespinbox.h>
+#include <librepcb/editor/widgets/lengthedit.h>
+#include <librepcb/editor/widgets/unsignedlengthedit.h>
 
 #include <QtTest>
 
@@ -37,7 +37,10 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 namespace tests {
+
+using librepcb::tests::TestHelpers;
 
 /*******************************************************************************
  *  Test Class
@@ -267,4 +270,5 @@ TEST_F(DxfImportDialogTest, testThrowNoObjectsImportedError) {
  ******************************************************************************/
 
 }  // namespace tests
+}  // namespace editor
 }  // namespace librepcb

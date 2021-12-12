@@ -22,15 +22,14 @@
  ******************************************************************************/
 #include "footprintgraphicsitem.h"
 
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/holegraphicsitem.h"
+#include "../../graphics/polygongraphicsitem.h"
+#include "../../graphics/stroketextgraphicsitem.h"
+#include "../../types/angle.h"
+#include "../../types/point.h"
 #include "footprint.h"
 #include "footprintpadgraphicsitem.h"
-
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -339,5 +337,4 @@ void FootprintGraphicsItem::paint(QPainter* painter,
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

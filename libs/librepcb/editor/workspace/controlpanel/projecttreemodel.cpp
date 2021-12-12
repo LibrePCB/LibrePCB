@@ -23,7 +23,8 @@
 #include "projecttreemodel.h"
 
 #include "fileiconprovider.h"
-#include "workspace.h"
+
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -66,5 +67,5 @@ QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation,
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb

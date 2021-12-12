@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_FOOTPRINTLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_FOOTPRINTLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_FOOTPRINTLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,14 +32,11 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class EditableTableWidget;
-class UndoStack;
-
-namespace library {
 namespace editor {
 
+class EditableTableWidget;
 class FootprintListModel;
+class UndoStack;
 
 /*******************************************************************************
  *  Class FootprintListEditorWidget
@@ -78,7 +75,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

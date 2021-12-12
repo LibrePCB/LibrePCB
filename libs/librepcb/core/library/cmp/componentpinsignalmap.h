@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAP_H
-#define LIBREPCB_LIBRARY_COMPONENTPINSIGNALMAP_H
+#ifndef LIBREPCB_CORE_COMPONENTPINSIGNALMAP_H
+#define LIBREPCB_CORE_COMPONENTPINSIGNALMAP_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/serializableobjectlist.h"
+#include "../../types/uuid.h"
 #include "cmpsigpindisplaytype.h"
-
-#include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class ComponentPinSignalMapItem
@@ -86,7 +84,7 @@ public:
   bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
   bool setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -140,7 +138,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "schematiceditorfsm.h"
 
-#include <librepcb/common/units/length.h>
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,13 +37,11 @@ namespace librepcb {
 
 class GraphicsLayer;
 class LengthUnit;
-class UndoCommand;
-
-namespace project {
-
 class Schematic;
 
 namespace editor {
+
+class UndoCommand;
 
 /*******************************************************************************
  *  Class SchematicEditorState
@@ -144,7 +142,6 @@ protected:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

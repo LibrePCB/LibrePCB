@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_UNPLACEDCOMPONENTSDOCK_H
-#define LIBREPCB_PROJECTEDITOR_UNPLACEDCOMPONENTSDOCK_H
+#ifndef LIBREPCB_EDITOR_UNPLACEDCOMPONENTSDOCK_H
+#define LIBREPCB_EDITOR_UNPLACEDCOMPONENTSDOCK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,24 +34,18 @@
  ******************************************************************************/
 namespace librepcb {
 
-class DefaultGraphicsLayerProvider;
-class GraphicsScene;
-
-namespace library {
-class Device;
-class Footprint;
-class FootprintPreviewGraphicsItem;
-class Package;
-}  // namespace library
-
-namespace project {
-
 class Board;
 class ComponentInstance;
+class DefaultGraphicsLayerProvider;
+class Device;
+class Footprint;
+class GraphicsScene;
+class Package;
 class Project;
 
 namespace editor {
 
+class FootprintPreviewGraphicsItem;
 class ProjectEditor;
 
 namespace Ui {
@@ -115,7 +109,7 @@ private:  // Methods
   void currentFootprintIndexChanged(int index) noexcept;
   void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
   void setSelectedDeviceAndPackage(const tl::optional<Uuid>& deviceUuid,
-                                   const library::Package* package,
+                                   const Package* package,
                                    bool packageOwned) noexcept;
   void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
   void setSelectedDeviceAsDefault() noexcept;
@@ -156,14 +150,14 @@ private:  // Data
   // Current selection
   ComponentInstance* mSelectedComponent;
   tl::optional<Uuid> mSelectedDeviceUuid;
-  const library::Package* mSelectedPackage;
+  const Package* mSelectedPackage;
   bool mSelectedPackageOwned;
   tl::optional<Uuid> mSelectedFootprintUuid;
 
   // Preview graphics scene
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
   QScopedPointer<GraphicsScene> mPreviewGraphicsScene;
-  QScopedPointer<library::FootprintPreviewGraphicsItem> mPreviewGraphicsItem;
+  QScopedPointer<FootprintPreviewGraphicsItem> mPreviewGraphicsItem;
 };
 
 /*******************************************************************************
@@ -171,7 +165,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

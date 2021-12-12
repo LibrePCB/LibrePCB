@@ -24,8 +24,8 @@
 
 #include "cmdremoveboarditems.h"
 
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardselectionquery.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardselectionquery.h>
 
 #include <QtCore>
 
@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -94,5 +93,4 @@ void CmdRemoveSelectedBoardItems::performRedo() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_FOOTPRINTPADPREVIEWGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -31,13 +31,12 @@
  ******************************************************************************/
 namespace librepcb {
 
+class FootprintPad;
 class GraphicsLayer;
 class IF_GraphicsLayerProvider;
-
-namespace library {
-
-class FootprintPad;
 class PackagePad;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class FootprintPadPreviewGraphicsItem
@@ -90,7 +89,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

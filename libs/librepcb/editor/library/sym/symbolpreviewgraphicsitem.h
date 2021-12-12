@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_SYMBOLPREVIEWGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_SYMBOLPREVIEWGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_SYMBOLPREVIEWGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,15 +34,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-class IF_GraphicsLayerProvider;
-class Text;
-
-namespace library {
-
 class Component;
 class ComponentSymbolVariantItem;
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 class Symbol;
+class Text;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class SymbolPreviewGraphicsItem
@@ -88,7 +87,7 @@ signals:
 
 private:
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
   // Types
@@ -120,7 +119,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

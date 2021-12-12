@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
+#ifndef LIBREPCB_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
+#define LIBREPCB_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/msg/libraryelementcheckmessage.h>
+#include <librepcb/core/library/msg/libraryelementcheckmessage.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -181,7 +180,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/cam/gerberattribute.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/export/gerberattribute.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 

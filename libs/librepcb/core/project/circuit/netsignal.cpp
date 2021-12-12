@@ -22,17 +22,16 @@
  ******************************************************************************/
 #include "netsignal.h"
 
-#include "../boards/items/bi_netsegment.h"
-#include "../boards/items/bi_plane.h"
+#include "../../exceptions.h"
+#include "../../library/cmp/component.h"
+#include "../board/items/bi_netsegment.h"
+#include "../board/items/bi_plane.h"
 #include "../erc/ercmsg.h"
-#include "../schematics/items/si_netsegment.h"
+#include "../schematic/items/si_netsegment.h"
 #include "circuit.h"
 #include "componentinstance.h"
 #include "componentsignalinstance.h"
 #include "netclass.h"
-
-#include <librepcb/common/exceptions.h>
-#include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
 
@@ -40,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -298,5 +296,4 @@ void NetSignal::updateErcMessages() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

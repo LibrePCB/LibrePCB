@@ -22,19 +22,20 @@
  ******************************************************************************/
 #include "cmddragselectedfootprintitems.h"
 
-#include <librepcb/common/geometry/cmd/cmdcircleedit.h>
-#include <librepcb/common/geometry/cmd/cmdholeedit.h>
-#include <librepcb/common/geometry/cmd/cmdpolygonedit.h>
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/library/pkg/footprintpadgraphicsitem.h>
+#include "../../cmd/cmdcircleedit.h"
+#include "../../cmd/cmdholeedit.h"
+#include "../../cmd/cmdpolygonedit.h"
+#include "../../cmd/cmdstroketextedit.h"
+#include "../../widgets/graphicsview.h"
+#include "cmdfootprintpadedit.h"
+
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/holegraphicsitem.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
+#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -42,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -287,5 +287,4 @@ void CmdDragSelectedFootprintItems::deleteAllCommands() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

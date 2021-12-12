@@ -22,16 +22,14 @@
  ******************************************************************************/
 #include "msgwrongfootprinttextlayer.h"
 
+#include "../../../geometry/stroketext.h"
+#include "../../../graphics/graphicslayer.h"
 #include "../footprint.h"
-
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/graphics/graphicslayer.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -61,5 +59,4 @@ MsgWrongFootprintTextLayer::~MsgWrongFootprintTextLayer() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

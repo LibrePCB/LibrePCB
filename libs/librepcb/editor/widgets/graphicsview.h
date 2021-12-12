@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GRAPHICSVIEW_H
-#define LIBREPCB_COMMON_GRAPHICSVIEW_H
+#ifndef LIBREPCB_EDITOR_GRAPHICSVIEW_H
+#define LIBREPCB_EDITOR_GRAPHICSVIEW_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/point.h"
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,6 +35,9 @@ namespace librepcb {
 
 class GraphicsScene;
 class GridProperties;
+
+namespace editor {
+
 class IF_GraphicsViewEventHandler;
 
 /*******************************************************************************
@@ -138,6 +141,7 @@ private:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

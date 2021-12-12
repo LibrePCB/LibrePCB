@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::NewElementWizard</class>
- <widget class="QWizard" name="librepcb::library::editor::NewElementWizard">
+ <class>librepcb::editor::NewElementWizard</class>
+ <widget class="QWizard" name="librepcb::editor::NewElementWizard">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>

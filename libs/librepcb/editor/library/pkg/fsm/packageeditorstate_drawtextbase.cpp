@@ -22,21 +22,21 @@
  ******************************************************************************/
 #include "packageeditorstate_drawtextbase.h"
 
+#include "../../../cmd/cmdstroketextedit.h"
+#include "../../../utils/halignactiongroup.h"
+#include "../../../utils/valignactiongroup.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../../widgets/unsignedlengthedit.h"
 #include "../packageeditorwidget.h"
 
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/halignactiongroup.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/common/widgets/valignactiongroup.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
 
 #include <QtCore>
 
@@ -44,7 +44,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -366,5 +365,4 @@ void PackageEditorState_DrawTextBase::vAlignActionGroupValueChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

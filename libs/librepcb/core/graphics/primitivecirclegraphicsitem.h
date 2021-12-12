@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_PRIMITIVECIRCLEGRAPHICSITEM_H
-#define LIBREPCB_COMMON_PRIMITIVECIRCLEGRAPHICSITEM_H
+#ifndef LIBREPCB_CORE_PRIMITIVECIRCLEGRAPHICSITEM_H
+#define LIBREPCB_CORE_PRIMITIVECIRCLEGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../graphics/graphicslayer.h"
-#include "../units/length.h"
+#include "../types/length.h"
 
 #include <QtCore>
 #include <QtWidgets>

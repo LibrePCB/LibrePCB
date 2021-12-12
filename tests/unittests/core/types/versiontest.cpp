@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/version.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 

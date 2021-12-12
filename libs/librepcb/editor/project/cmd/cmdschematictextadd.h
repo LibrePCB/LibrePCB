@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDSCHEMATICTEXTADD_H
-#define LIBREPCB_PROJECT_CMDSCHEMATICTEXTADD_H
+#ifndef LIBREPCB_EDITOR_CMDSCHEMATICTEXTADD_H
+#define LIBREPCB_EDITOR_CMDSCHEMATICTEXTADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommand.h>
+#include "../../undocommand.h"
 
 #include <QtCore>
 
@@ -31,9 +31,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class SI_Text;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdSchematicTextAdd
@@ -54,13 +55,13 @@ public:
   CmdSchematicTextAdd& operator=(const CmdSchematicTextAdd& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc ::librepcb::UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc ::librepcb::UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override;
 
-  /// @copydoc ::librepcb::UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
 private:  // Data
@@ -71,7 +72,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_BASE_H
-#define LIBREPCB_PROJECT_BI_BASE_H
+#ifndef LIBREPCB_CORE_BI_BASE_H
+#define LIBREPCB_CORE_BI_BASE_H
 
 /*******************************************************************************
  *  Includes
@@ -31,14 +31,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
-class Point;
-
-namespace project {
-
 class BGI_Base;
 class Board;
 class Circuit;
+class GraphicsScene;
+class Point;
 class Project;
 
 /*******************************************************************************
@@ -54,18 +51,18 @@ class BI_Base : public QObject {
 public:
   // Types
   enum class Type_t {
-    NetSegment,  ///< ::librepcb::project::BI_NetSegment
-    NetPoint,  ///< ::librepcb::project::BI_NetPoint
-    NetLine,  ///< ::librepcb::project::BI_NetLine
-    Via,  ///< ::librepcb::project::BI_Via
-    Device,  ///< ::librepcb::project::BI_Device
-    Footprint,  ///< ::librepcb::project::BI_Footprint
-    FootprintPad,  ///< ::librepcb::project::BI_FootprintPad
-    Polygon,  ///< ::librepcb::project::BI_Polygon
-    StrokeText,  ///< ::librepcb::project::BI_StrokeText
-    Hole,  ///< ::librepcb::project::BI_Hole
-    Plane,  ///< ::librepcb::project::BI_Plane
-    AirWire,  ///< ::librepcb::project::BI_AirWire
+    NetSegment,  ///< ::librepcb::BI_NetSegment
+    NetPoint,  ///< ::librepcb::BI_NetPoint
+    NetLine,  ///< ::librepcb::BI_NetLine
+    Via,  ///< ::librepcb::BI_Via
+    Device,  ///< ::librepcb::BI_Device
+    Footprint,  ///< ::librepcb::BI_Footprint
+    FootprintPad,  ///< ::librepcb::BI_FootprintPad
+    Polygon,  ///< ::librepcb::BI_Polygon
+    StrokeText,  ///< ::librepcb::BI_StrokeText
+    Hole,  ///< ::librepcb::BI_Hole
+    Plane,  ///< ::librepcb::BI_Plane
+    AirWire,  ///< ::librepcb::BI_AirWire
   };
 
   // Constructors / Destructor
@@ -114,7 +111,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

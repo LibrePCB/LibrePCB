@@ -22,20 +22,20 @@
  ******************************************************************************/
 #include "projectlibraryupdater.h"
 
+#include "../../project/projecteditor.h"
 #include "../controlpanel/controlpanel.h"
 #include "ui_projectlibraryupdater.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/project.h>
-#include <librepcb/projecteditor/projecteditor.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,16 +44,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
-
-using project::Project;
-using workspace::WorkspaceLibraryDb;
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectLibraryUpdater::ProjectLibraryUpdater(workspace::Workspace& ws,
+ProjectLibraryUpdater::ProjectLibraryUpdater(Workspace& ws,
                                              const FilePath& project,
                                              ControlPanel& cp) noexcept
   : QMainWindow(nullptr),
@@ -81,8 +78,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
 
   // close project if it is currently open
   bool abort = false;
-  project::editor::ProjectEditor* editor =
-      mControlPanel.getOpenProject(mProjectFilePath);
+  ProjectEditor* editor = mControlPanel.getOpenProject(mProjectFilePath);
   if (editor) {
     log(tr("Ask to close project (confirm message box!)"));
     bool close = editor->closeAndDestroy(true, this);
@@ -157,7 +153,7 @@ QString ProjectLibraryUpdater::prettyPath(const FilePath& fp) const noexcept {
 
 void ProjectLibraryUpdater::updateElements(
     std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
-    FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const) {
+    FilePath (WorkspaceLibraryDb::*getter)(const Uuid&) const) {
   QString dirpath = "library/" % type;
   foreach (const QString& dirname, fs->getDirs(dirpath)) {
     tl::optional<Uuid> uuid = Uuid::tryFromString(dirname);
@@ -182,5 +178,5 @@ void ProjectLibraryUpdater::updateElements(
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

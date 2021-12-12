@@ -22,16 +22,16 @@
  ******************************************************************************/
 #include "footprintpreviewgraphicsitem.h"
 
-#include "../cmp/component.h"
-#include "footprint.h"
 #include "footprintpadpreviewgraphicsitem.h"
-#include "package.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/holegraphicsitem.h>
+#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -41,7 +41,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -243,5 +243,5 @@ QString FootprintPreviewGraphicsItem::getBuiltInAttributeValue(
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

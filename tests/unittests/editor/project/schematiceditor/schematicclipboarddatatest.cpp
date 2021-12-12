@@ -21,9 +21,9 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/attributes/attrtypestring.h>
-#include <librepcb/common/attributes/attrtypevoltage.h>
-#include <librepcb/projecteditor/schematiceditor/schematicclipboarddata.h>
+#include <librepcb/core/attribute/attrtypestring.h>
+#include <librepcb/core/attribute/attrtypevoltage.h>
+#include <librepcb/editor/project/schematiceditor/schematicclipboarddata.h>
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 namespace tests {
 
@@ -196,5 +195,4 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
 
 }  // namespace tests
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

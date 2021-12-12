@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTSETTINGS_H
-#define LIBREPCB_PROJECT_PROJECTSETTINGS_H
+#ifndef LIBREPCB_CORE_PROJECTSETTINGS_H
+#define LIBREPCB_CORE_PROJECTSETTINGS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/serializableobject.h>
+#include "../fileio/filepath.h"
+#include "../serialization/serializableobject.h"
 
 #include <QtCore>
 
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Project;
 
@@ -82,7 +81,7 @@ signals:
 private:
   // Private Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // General
@@ -98,7 +97,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

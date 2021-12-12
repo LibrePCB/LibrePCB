@@ -22,15 +22,16 @@
  ******************************************************************************/
 #include "cmdremoveunusedlibraryelements.h"
 
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/library/cmd/cmdprojectlibraryremoveelement.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/schematic.h>
+#include "../../project/cmd/cmdprojectlibraryremoveelement.h"
+
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -38,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -59,10 +59,10 @@ CmdRemoveUnusedLibraryElements::~CmdRemoveUnusedLibraryElements() noexcept {
 
 bool CmdRemoveUnusedLibraryElements::performExecute() {
   // get all used elements
-  QSet<const library::Component*> usedComponents;
-  QSet<const library::Device*> usedDevices;
-  QSet<const library::Package*> usedPackages;
-  QSet<const library::Symbol*> usedSymbols;
+  QSet<const Component*> usedComponents;
+  QSet<const Device*> usedDevices;
+  QSet<const Package*> usedPackages;
+  QSet<const Symbol*> usedSymbols;
   foreach (const ComponentInstance* ci,
            mProject.getCircuit().getComponentInstances()) {
     Q_ASSERT(ci);
@@ -85,33 +85,33 @@ bool CmdRemoveUnusedLibraryElements::performExecute() {
   }
 
   // remove unused symbols
-  foreach (library::Symbol* element, mProject.getLibrary().getSymbols()) {
+  foreach (Symbol* element, mProject.getLibrary().getSymbols()) {
     if (!usedSymbols.contains(element)) {
-      appendChild(new CmdProjectLibraryRemoveElement<library::Symbol>(
+      appendChild(new CmdProjectLibraryRemoveElement<Symbol>(
           mProject.getLibrary(), *element));
     }
   }
 
   // remove unused packages
-  foreach (library::Package* element, mProject.getLibrary().getPackages()) {
+  foreach (Package* element, mProject.getLibrary().getPackages()) {
     if (!usedPackages.contains(element)) {
-      appendChild(new CmdProjectLibraryRemoveElement<library::Package>(
+      appendChild(new CmdProjectLibraryRemoveElement<Package>(
           mProject.getLibrary(), *element));
     }
   }
 
   // remove unused devices
-  foreach (library::Device* element, mProject.getLibrary().getDevices()) {
+  foreach (Device* element, mProject.getLibrary().getDevices()) {
     if (!usedDevices.contains(element)) {
-      appendChild(new CmdProjectLibraryRemoveElement<library::Device>(
+      appendChild(new CmdProjectLibraryRemoveElement<Device>(
           mProject.getLibrary(), *element));
     }
   }
 
   // remove unused components
-  foreach (library::Component* element, mProject.getLibrary().getComponents()) {
+  foreach (Component* element, mProject.getLibrary().getComponents()) {
     if (!usedComponents.contains(element)) {
-      appendChild(new CmdProjectLibraryRemoveElement<library::Component>(
+      appendChild(new CmdProjectLibraryRemoveElement<Component>(
           mProject.getLibrary(), *element));
     }
   }
@@ -125,5 +125,4 @@ bool CmdRemoveUnusedLibraryElements::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

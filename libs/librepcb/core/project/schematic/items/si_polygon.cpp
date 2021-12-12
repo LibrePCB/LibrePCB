@@ -22,12 +22,11 @@
  ******************************************************************************/
 #include "si_polygon.h"
 
+#include "../../../geometry/polygon.h"
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../project.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/graphics/polygongraphicsitem.h>
 
 #include <QtCore>
 
@@ -35,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -111,5 +109,4 @@ void SI_Polygon::setSelected(bool selected) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

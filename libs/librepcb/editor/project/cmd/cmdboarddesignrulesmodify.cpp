@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdboarddesignrulesmodify.h"
 
-#include "../board.h"
+#include <librepcb/core/project/board/board.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -73,5 +73,5 @@ void CmdBoardDesignRulesModify::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

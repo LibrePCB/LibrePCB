@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "asynccopyoperation.h"
 
+#include "../exceptions.h"
 #include "fileutils.h"
 
 #include <QtCore>

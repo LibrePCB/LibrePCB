@@ -25,6 +25,8 @@
 #include "undocommand.h"
 #include "undocommandgroup.h"
 
+#include <librepcb/core/exceptions.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -32,6 +34,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class UndoStackTransaction
@@ -366,4 +369,5 @@ void UndoStack::clear() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

@@ -22,6 +22,13 @@
  ******************************************************************************/
 #include "schematic.h"
 
+#include "../../application.h"
+#include "../../exceptions.h"
+#include "../../graphics/graphicsscene.h"
+#include "../../library/sym/symbolpin.h"
+#include "../../serialization/sexpression.h"
+#include "../../types/gridproperties.h"
+#include "../../utils/scopeguardlist.h"
 #include "../project.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
@@ -33,20 +40,12 @@
 #include "items/si_text.h"
 #include "schematicselectionquery.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/library/sym/symbolpin.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -632,5 +631,4 @@ Schematic* Schematic::create(Project& project,
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

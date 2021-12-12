@@ -22,19 +22,20 @@
  ******************************************************************************/
 #include "cmdaddsymboltoschematic.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/library/cmd/cmdprojectlibraryaddelement.h>
-#include <librepcb/project/library/projectlibrary.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceadd.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/workspace.h>
+#include "../../project/cmd/cmdprojectlibraryaddelement.h"
+#include "../../project/cmd/cmdsymbolinstanceadd.h"
+
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 
@@ -42,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -50,9 +50,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdAddSymbolToSchematic::CmdAddSymbolToSchematic(
-    workspace::Workspace& workspace, Schematic& schematic,
-    ComponentInstance& cmpInstance, const Uuid& symbolItem,
-    const Point& position, const Angle& angle) noexcept
+    Workspace& workspace, Schematic& schematic, ComponentInstance& cmpInstance,
+    const Uuid& symbolItem, const Point& position, const Angle& angle) noexcept
   : UndoCommandGroup(tr("Add symbol")),
     mWorkspace(workspace),
     mSchematic(schematic),
@@ -75,7 +74,7 @@ bool CmdAddSymbolToSchematic::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   // get the symbol UUID
-  const library::ComponentSymbolVariantItem& item =
+  const ComponentSymbolVariantItem& item =
       *mComponentInstance.getSymbolVariant().getSymbolItems().get(
           mSymbolItemUuid);  // can throw
   Uuid symbolUuid = item.getSymbolUuid();
@@ -91,11 +90,10 @@ bool CmdAddSymbolToSchematic::performExecute() {
              "workspace library!")
               .arg(symbolUuid.toStr()));
     }
-    library::Symbol* sym = new library::Symbol(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-            TransactionalFileSystem::openRO(symFp))));
-    CmdProjectLibraryAddElement<library::Symbol>* cmdAddToLibrary =
-        new CmdProjectLibraryAddElement<library::Symbol>(
+    Symbol* sym = new Symbol(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(TransactionalFileSystem::openRO(symFp))));
+    CmdProjectLibraryAddElement<Symbol>* cmdAddToLibrary =
+        new CmdProjectLibraryAddElement<Symbol>(
             mSchematic.getProject().getLibrary(), *sym);
     execNewChildCmd(cmdAddToLibrary);  // can throw
   }
@@ -117,5 +115,4 @@ bool CmdAddSymbolToSchematic::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

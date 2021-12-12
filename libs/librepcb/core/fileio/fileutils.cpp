@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "fileutils.h"
 
+#include "../exceptions.h"
 #include "filepath.h"
 
 #include <QtCore>

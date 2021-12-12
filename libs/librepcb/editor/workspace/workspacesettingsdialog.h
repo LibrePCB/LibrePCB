@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGSDIALOG_H
-#define LIBREPCB_WORKSPACE_WORKSPACESETTINGSDIALOG_H
+#ifndef LIBREPCB_EDITOR_WORKSPACESETTINGSDIALOG_H
+#define LIBREPCB_EDITOR_WORKSPACESETTINGSDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/model/editablelistmodel.h>
+#include "../modelview/editablelistmodel.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,13 +32,14 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+
+class WorkspaceSettings;
+
+namespace editor {
 
 namespace Ui {
 class WorkspaceSettingsDialog;
 }
-
-class WorkspaceSettings;
 
 /*******************************************************************************
  *  Class WorkspaceSettingsDialog
@@ -84,7 +85,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

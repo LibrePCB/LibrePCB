@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOMGENERATOR_H
-#define LIBREPCB_PROJECT_BOMGENERATOR_H
+#ifndef LIBREPCB_CORE_BOMGENERATOR_H
+#define LIBREPCB_CORE_BOMGENERATOR_H
 
 /*******************************************************************************
  *  Includes
@@ -32,11 +32,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Bom;
-
-namespace project {
-
 class Board;
+class Bom;
 class Project;
 
 /*******************************************************************************
@@ -76,7 +73,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "attributelisteditorwidget.h"
 
-#include "../attributes/attributelistmodel.h"
-#include "../model/comboboxdelegate.h"
-#include "editabletablewidget.h"
+#include "../modelview/attributelistmodel.h"
+#include "../modelview/comboboxdelegate.h"
+#include "../widgets/editabletablewidget.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,6 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -97,4 +98,5 @@ void AttributeListEditorWidget::setReferences(UndoStack* undoStack,
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

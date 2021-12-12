@@ -17,21 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDCONTEXT_H
-#define LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARDCONTEXT_H
+#ifndef LIBREPCB_EDITOR_NEWELEMENTWIZARDCONTEXT_H
+#define LIBREPCB_EDITOR_NEWELEMENTWIZARDCONTEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attribute.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/version.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
+#include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/types/uuid.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,14 +41,8 @@
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
 class Library;
+class Workspace;
 
 namespace editor {
 
@@ -92,7 +85,7 @@ public:
   // Constructors / Destructor
   NewElementWizardContext() = delete;
   NewElementWizardContext(const NewElementWizardContext& other) = delete;
-  NewElementWizardContext(const workspace::Workspace& ws, Library& lib,
+  NewElementWizardContext(const Workspace& ws, Library& lib,
                           const IF_GraphicsLayerProvider& lp,
                           QObject* parent = nullptr) noexcept;
   ~NewElementWizardContext() noexcept;
@@ -101,9 +94,7 @@ public:
   const FilePath& getOutputDirectory() const noexcept {
     return mOutputDirectory;
   }
-  const workspace::Workspace& getWorkspace() const noexcept {
-    return mWorkspace;
-  }
+  const Workspace& getWorkspace() const noexcept { return mWorkspace; }
   const IF_GraphicsLayerProvider& getLayerProvider() const noexcept {
     return mLayerProvider;
   }
@@ -119,8 +110,8 @@ public:
       delete;
 
 private:  // Data
-  const workspace::Workspace& mWorkspace;
-  library::Library& mLibrary;
+  const Workspace& mWorkspace;
+  Library& mLibrary;
   const IF_GraphicsLayerProvider& mLayerProvider;
   FilePath mOutputDirectory;
 
@@ -163,7 +154,6 @@ public:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

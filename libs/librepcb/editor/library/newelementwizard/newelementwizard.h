@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARD_H
-#define LIBREPCB_LIBRARYEDITOR_NEWELEMENTWIZARD_H
+#ifndef LIBREPCB_EDITOR_NEWELEMENTWIZARD_H
+#define LIBREPCB_EDITOR_NEWELEMENTWIZARD_H
 
 /*******************************************************************************
  *  Includes
@@ -34,14 +34,8 @@
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
 class Library;
+class Workspace;
 
 namespace editor {
 
@@ -65,7 +59,7 @@ public:
   // Constructors / Destructor
   NewElementWizard() = delete;
   NewElementWizard(const NewElementWizard& other) = delete;
-  NewElementWizard(const workspace::Workspace& ws, Library& lib,
+  NewElementWizard(const Workspace& ws, Library& lib,
                    const IF_GraphicsLayerProvider& lp,
                    QWidget* parent = 0) noexcept;
   ~NewElementWizard() noexcept;
@@ -98,7 +92,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,20 +22,20 @@
  ******************************************************************************/
 #include "boardeditorstate_drawplane.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../cmd/cmdboardplaneadd.h"
+#include "../../cmd/cmdboardplaneedit.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardlayerstack.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneadd.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
-#include <librepcb/project/boards/items/bi_plane.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -43,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -338,5 +337,4 @@ void BoardEditorState_DrawPlane::makeSelectedLayerVisible() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

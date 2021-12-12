@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNITTESTS_COMMON_EDITABLETABLEWIDGETRECEIVER_H
-#define UNITTESTS_COMMON_EDITABLETABLEWIDGETRECEIVER_H
+#ifndef UNITTESTS_EDITOR_EDITABLETABLEWIDGETRECEIVER_H
+#define UNITTESTS_EDITOR_EDITABLETABLEWIDGETRECEIVER_H
 
 /*******************************************************************************
  *  Includes
@@ -29,6 +29,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 namespace tests {
 
 /*******************************************************************************
@@ -63,6 +64,7 @@ public:
  ******************************************************************************/
 
 }  // namespace tests
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

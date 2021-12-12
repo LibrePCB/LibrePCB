@@ -27,15 +27,13 @@
 #include "initializeworkspacewizard_finalizeimport.h"
 #include "ui_initializeworkspacewizard.h"
 
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
-
-using namespace workspace;
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -72,5 +70,5 @@ InitializeWorkspaceWizard::~InitializeWorkspaceWizard() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

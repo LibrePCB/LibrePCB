@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdboardremove.h"
 
-#include "../../project.h"
-#include "../board.h"
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -31,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -71,5 +71,5 @@ void CmdBoardRemove::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

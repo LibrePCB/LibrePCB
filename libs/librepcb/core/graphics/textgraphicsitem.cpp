@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "textgraphicsitem.h"
 
-#include "../attributes/attributesubstitutor.h"
+#include "../attribute/attributesubstitutor.h"
 #include "../graphics/graphicslayer.h"
 #include "origincrossgraphicsitem.h"
 

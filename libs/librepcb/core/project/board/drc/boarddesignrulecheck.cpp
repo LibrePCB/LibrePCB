@@ -22,6 +22,12 @@
  ******************************************************************************/
 #include "boarddesignrulecheck.h"
 
+#include "../../../geometry/hole.h"
+#include "../../../geometry/stroketext.h"
+#include "../../../library/pkg/footprint.h"
+#include "../../../library/pkg/footprintpad.h"
+#include "../../../utils/clipperhelpers.h"
+#include "../../../utils/toolbox.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
@@ -40,20 +46,12 @@
 #include "../items/bi_via.h"
 #include "boardclipperpathgenerator.h"
 
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/common/utils/clipperhelpers.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintpad.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -421,8 +419,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const BI_Footprint& footprint = device->getFootprint();
     foreach (const BI_FootprintPad* pad, footprint.getPads()) {
-      if (pad->getLibPad().getBoardSide() !=
-          library::FootprintPad::BoardSide::THT) {
+      if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
         continue;  // skip SMT pads
       }
       PositiveLength size =
@@ -469,8 +466,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const BI_Footprint& footprint = device->getFootprint();
     foreach (const BI_FootprintPad* pad, footprint.getPads()) {
-      if (pad->getLibPad().getBoardSide() !=
-          library::FootprintPad::BoardSide::THT) {
+      if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
         continue;  // skip SMT pads
       }
       if (pad->getLibPad().getDrillDiameter() < *mOptions.minPthDrillDiameter) {
@@ -592,5 +588,4 @@ QString BoardDesignRuleCheck::formatLength(const Length& length) const
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

@@ -22,8 +22,9 @@
  ******************************************************************************/
 #include "categorytreemodel.h"
 
-#include "../workspacelibrarydb.h"
 #include "categorytreeitem.h"
+
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,7 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -133,12 +134,12 @@ QVariant CategoryTreeModel<ElementType>::data(const QModelIndex& index,
 /*******************************************************************************
  *  Explicit template instantiations
  ******************************************************************************/
-template class CategoryTreeModel<library::ComponentCategory>;
-template class CategoryTreeModel<library::PackageCategory>;
+template class CategoryTreeModel<ComponentCategory>;
+template class CategoryTreeModel<PackageCategory>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
+}  // namespace editor
 }  // namespace librepcb

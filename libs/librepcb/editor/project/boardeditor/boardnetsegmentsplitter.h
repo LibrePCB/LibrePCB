@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDNETSEGMENTSPLITTER_H
-#define LIBREPCB_PROJECTEDITOR_BOARDNETSEGMENTSPLITTER_H
+#ifndef LIBREPCB_EDITOR_BOARDNETSEGMENTSPLITTER_H
+#define LIBREPCB_EDITOR_BOARDNETSEGMENTSPLITTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/geometry/junction.h>
-#include <librepcb/common/geometry/trace.h>
-#include <librepcb/common/geometry/via.h>
+#include <librepcb/core/geometry/junction.h>
+#include <librepcb/core/geometry/trace.h>
+#include <librepcb/core/geometry/via.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,7 +37,6 @@ namespace librepcb {
 
 class GraphicsLayer;
 
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -96,7 +95,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

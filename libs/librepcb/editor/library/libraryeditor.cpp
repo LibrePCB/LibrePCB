@@ -23,25 +23,26 @@
 
 #include "libraryeditor.h"
 
+#include "../dialogs/aboutdialog.h"
+#include "../utils/exclusiveactiongroup.h"
+#include "../utils/undostackactiongroup.h"
+#include "cat/componentcategoryeditorwidget.h"
+#include "cat/packagecategoryeditorwidget.h"
 #include "cmp/componenteditorwidget.h"
-#include "cmpcat/componentcategoryeditorwidget.h"
 #include "dev/deviceeditorwidget.h"
-#include "eagleimport/eaglelibraryimportwizard.h"
+#include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "lib/libraryoverviewwidget.h"
 #include "pkg/packageeditorwidget.h"
-#include "pkgcat/packagecategoryeditorwidget.h"
 #include "sym/symboleditorwidget.h"
 #include "ui_libraryeditor.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/aboutdialog.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/utils/exclusiveactiongroup.h>
-#include <librepcb/common/utils/undostackactiongroup.h>
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -50,14 +51,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
+LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
                              bool readOnly)
   : QMainWindow(nullptr),
     mWorkspace(ws),
@@ -85,8 +85,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
             wizard.exec();
           });
   connect(mUi->actionRescanLibraries, &QAction::triggered,
-          &mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::startLibraryRescan);
+          &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::startLibraryRescan);
   connect(mUi->actionSelectAll, &QAction::triggered, this,
           &LibraryEditor::selectAllTriggered);
   connect(mUi->actionCut, &QAction::triggered, this,
@@ -141,8 +140,7 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
           &LibraryEditor::updateTabTitles);
   connect(overviewWidget, &EditorWidgetBase::elementEdited,
-          &mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::startLibraryRescan);
+          &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::startLibraryRescan);
 
   // set window title and icon
   const QStringList localeOrder =
@@ -165,9 +163,9 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, const FilePath& libFp,
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
-  connect(&mWorkspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanProgressUpdate, mUi->statusBar,
-          &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
+  connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
+          mUi->statusBar, &StatusBar::setProgressBarPercent,
+          Qt::QueuedConnection);
 
   // if the library was opened in read-only mode, we guess that it's a remote
   // library and thus show a warning that all modifications are lost after the
@@ -570,7 +568,7 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
             &LibraryEditor::updateTabTitles);
     connect(widget, &EditorWidgetBase::elementEdited,
             &mWorkspace.getLibraryDb(),
-            &workspace::WorkspaceLibraryDb::startLibraryRescan);
+            &WorkspaceLibraryDb::startLibraryRescan);
     int index = mUi->tabWidget->addTab(widget, widget->windowIcon(),
                                        widget->windowTitle());
     mUi->tabWidget->setCurrentIndex(index);
@@ -786,5 +784,4 @@ void LibraryEditor::addLayer(const QString& name, bool forceVisible) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

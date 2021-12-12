@@ -24,14 +24,14 @@
 
 #include "eagletypeconverter.cpp"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/utils/tangentpathjoiner.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/utils/tangentpathjoiner.h>
 #include <parseagle/library.h>
 
 #include <QtCore>
@@ -365,7 +365,7 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(sym.displayName);
-      auto symbol = std::make_shared<library::Symbol>(
+      auto symbol = std::make_shared<librepcb::Symbol>(
           Uuid::createRandom(), mVersion, mAuthor,
           EagleTypeConverter::convertElementName(mNamePrefix + sym.displayName),
           EagleTypeConverter::convertElementDescription(sym.description),
@@ -411,7 +411,7 @@ void EagleLibraryImport::run() noexcept {
       }
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
-              .getPathTo(library::Symbol::getShortElementName())
+              .getPathTo(librepcb::Symbol::getShortElementName())
               .getPathTo(symbol->getUuid().toStr())));
       symbol->saveTo(dir);
       dir.getFileSystem()->save();
@@ -435,13 +435,13 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(pkg.displayName);
-      auto package = std::make_shared<library::Package>(
+      auto package = std::make_shared<librepcb::Package>(
           Uuid::createRandom(), mVersion, mAuthor,
           EagleTypeConverter::convertElementName(mNamePrefix + pkg.displayName),
           EagleTypeConverter::convertElementDescription(pkg.description),
           mKeywords);
       package->setCategories(mPackageCategories);
-      auto footprint = std::make_shared<library::Footprint>(
+      auto footprint = std::make_shared<Footprint>(
           Uuid::createRandom(), ElementName("default"), mKeywords);
       package->getFootprints().append(footprint);
       foreach (const auto& obj,
@@ -497,7 +497,7 @@ void EagleLibraryImport::run() noexcept {
       }
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
-              .getPathTo(library::Package::getShortElementName())
+              .getPathTo(librepcb::Package::getShortElementName())
               .getPathTo(package->getUuid().toStr())));
       package->saveTo(dir);
       dir.getFileSystem()->save();
@@ -522,16 +522,16 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(cmp.displayName);
-      auto component = std::make_shared<library::Component>(
+      auto component = std::make_shared<librepcb::Component>(
           Uuid::createRandom(), mVersion, mAuthor,
           EagleTypeConverter::convertElementName(mNamePrefix + cmp.displayName),
           EagleTypeConverter::convertElementDescription(cmp.description),
           mKeywords);
       component->setCategories(mComponentCategories);
-      component->setPrefixes(library::NormDependentPrefixMap(
-          library::ComponentPrefix(cmp.deviceSet->getPrefix().trimmed())));
+      component->setPrefixes(NormDependentPrefixMap(
+          ComponentPrefix(cmp.deviceSet->getPrefix().trimmed())));
       component->setDefaultValue("{{ PARTNUMBER or DEVICE }}");
-      auto symbolVariant = std::make_shared<library::ComponentSymbolVariant>(
+      auto symbolVariant = std::make_shared<ComponentSymbolVariant>(
           Uuid::createRandom(), "", ElementName("default"), "");
       component->getSymbolVariants().append(symbolVariant);
       QHash<QString, int> pinCount;
@@ -548,7 +548,7 @@ void EagleLibraryImport::run() noexcept {
                              tr("Dependent symbol \"%1\" not imported.")
                                  .arg(gate.getSymbol()));
         }
-        auto item = std::make_shared<library::ComponentSymbolVariantItem>(
+        auto item = std::make_shared<ComponentSymbolVariantItem>(
             Uuid::createRandom(), *symbolUuid,
             EagleTypeConverter::convertPoint(gate.getPosition()), Angle(0),
             true, EagleTypeConverter::convertGateName(gate.getName()));
@@ -562,22 +562,20 @@ void EagleLibraryImport::run() noexcept {
             // Name conflict -> add prefix to ensure unique signal names.
             signalName.prepend(*item->getSuffix() % "_");
           }
-          component->getSignals().append(
-              std::make_shared<library::ComponentSignal>(
-                  signalUuid,
-                  EagleTypeConverter::convertPinOrPadName(signalName),
-                  SignalRole::passive(), QString(), false, false, false));
+          component->getSignals().append(std::make_shared<ComponentSignal>(
+              signalUuid, EagleTypeConverter::convertPinOrPadName(signalName),
+              SignalRole::passive(), QString(), false, false, false));
           item->getPinSignalMap().append(
-              std::make_shared<library::ComponentPinSignalMapItem>(
+              std::make_shared<ComponentPinSignalMapItem>(
                   pinIt->value(), signalUuid,
-                  library::CmpSigPinDisplayType::componentSignal()));
+                  CmpSigPinDisplayType::componentSignal()));
           componentSignalMap[cmp.deviceSet->getName()][gate.getName()]
                             [pinIt.key()] = signalUuid;
         }
       }
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
-              .getPathTo(library::Component::getShortElementName())
+              .getPathTo(librepcb::Component::getShortElementName())
               .getPathTo(component->getUuid().toStr())));
       component->saveTo(dir);
       dir.getFileSystem()->save();
@@ -612,7 +610,7 @@ void EagleLibraryImport::run() noexcept {
                            tr("Dependent package \"%1\" not imported.")
                                .arg(dev.packageDisplayName));
       }
-      std::unique_ptr<library::Device> device(new library::Device(
+      std::unique_ptr<librepcb::Device> device(new librepcb::Device(
           Uuid::createRandom(), mVersion, mAuthor,
           EagleTypeConverter::convertElementName(mNamePrefix + dev.displayName),
           EagleTypeConverter::convertElementDescription(dev.description),
@@ -630,12 +628,12 @@ void EagleLibraryImport::run() noexcept {
           }
         }
         device->getPadSignalMap().append(
-            std::make_shared<library::DevicePadSignalMapItem>(padIt->value(),
-                                                              signalUuid));
+            std::make_shared<DevicePadSignalMapItem>(padIt->value(),
+                                                     signalUuid));
       }
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
-              .getPathTo(library::Device::getShortElementName())
+              .getPathTo(librepcb::Device::getShortElementName())
               .getPathTo(device->getUuid().toStr())));
       device->saveTo(dir);
       dir.getFileSystem()->save();

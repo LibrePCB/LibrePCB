@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDCOMBINENETSIGNALS_H
-#define LIBREPCB_PROJECTEDITOR_CMDCOMBINENETSIGNALS_H
+#ifndef LIBREPCB_EDITOR_CMDCOMBINENETSIGNALS_H
+#define LIBREPCB_EDITOR_CMDCOMBINENETSIGNALS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Circuit;
 class NetSignal;
@@ -55,7 +54,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Attributes from the constructor
@@ -69,7 +68,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

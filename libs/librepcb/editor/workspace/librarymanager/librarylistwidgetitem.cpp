@@ -24,7 +24,7 @@
 
 #include "ui_librarylistwidgetitem.h"
 
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,14 +33,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryListWidgetItem::LibraryListWidgetItem(workspace::Workspace& ws,
+LibraryListWidgetItem::LibraryListWidgetItem(Workspace& ws,
                                              const FilePath& libDir,
                                              const QString& name,
                                              const QString& description,
@@ -103,6 +102,5 @@ void LibraryListWidgetItem::mouseDoubleClickEvent(QMouseEvent* e) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

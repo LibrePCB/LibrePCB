@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "symbolcheck.h"
 
+#include "../../graphics/graphicslayer.h"
 #include "msg/msgduplicatepinname.h"
 #include "msg/msgmissingsymbolname.h"
 #include "msg/msgmissingsymbolvalue.h"
@@ -30,15 +31,12 @@
 #include "msg/msgwrongsymboltextlayer.h"
 #include "symbol.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -136,5 +134,4 @@ void SymbolCheck::checkWrongTextLayers(MsgList& msgs) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

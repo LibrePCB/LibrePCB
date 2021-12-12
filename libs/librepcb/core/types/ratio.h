@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_RATIO_H
-#define LIBREPCB_COMMON_RATIO_H
+#ifndef LIBREPCB_CORE_RATIO_H
+#define LIBREPCB_CORE_RATIO_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/sexpression.h"
+#include "../exceptions.h"
+#include "../serialization/sexpression.h"
 
 #include <type_safe/constrained_type.hpp>
 

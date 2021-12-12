@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_IF_GRAPHICSVIEWEVENTHANDLER_H
-#define LIBREPCB_COMMON_IF_GRAPHICSVIEWEVENTHANDLER_H
+#ifndef LIBREPCB_EDITOR_IF_GRAPHICSVIEWEVENTHANDLER_H
+#define LIBREPCB_EDITOR_IF_GRAPHICSVIEWEVENTHANDLER_H
 
 /*******************************************************************************
  *  Includes
@@ -29,6 +29,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Interface IF_GraphicsViewEventHandler
@@ -51,6 +52,7 @@ public:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

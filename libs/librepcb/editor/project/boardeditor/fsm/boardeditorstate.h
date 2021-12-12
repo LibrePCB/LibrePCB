@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "boardeditorfsm.h"
 
-#include <librepcb/common/units/length.h>
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,15 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Board;
 class GraphicsLayer;
 class LengthUnit;
-class UndoCommand;
-
-namespace project {
-
-class Board;
 
 namespace editor {
+
+class UndoCommand;
 
 /*******************************************************************************
  *  Class BoardEditorState
@@ -157,7 +155,6 @@ protected:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

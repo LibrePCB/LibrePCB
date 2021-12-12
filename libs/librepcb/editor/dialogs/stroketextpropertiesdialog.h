@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_STROKETEXTPROPERTIESDIALOG_H
-#define LIBREPCB_COMMON_STROKETEXTPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_STROKETEXTPROPERTIESDIALOG_H
+#define LIBREPCB_EDITOR_STROKETEXTPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -34,6 +34,9 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 class StrokeText;
+
+namespace editor {
+
 class UndoStack;
 
 namespace Ui {
@@ -84,6 +87,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

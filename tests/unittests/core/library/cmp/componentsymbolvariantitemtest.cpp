@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/library/cmp/componentsymbolvariantitem.h>
+#include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 
 #include <QtCore>
 
@@ -29,7 +29,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace tests {
 
 /*******************************************************************************
@@ -127,5 +126,4 @@ TEST_F(ComponentSymbolVariantItemTest, testOperatorEqualOnDifferentSuffix) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace library
 }  // namespace librepcb

@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "lengthedit.h"
 
-#include "doublespinbox.h"
+#include "../widgets/doublespinbox.h"
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -68,4 +69,5 @@ void LengthEdit::valueChangedImpl() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

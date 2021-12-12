@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/sexpression.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
 

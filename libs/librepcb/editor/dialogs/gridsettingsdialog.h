@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GRIDSETTINGSDIALOG_H
-#define LIBREPCB_COMMON_GRIDSETTINGSDIALOG_H
+#ifndef LIBREPCB_EDITOR_GRIDSETTINGSDIALOG_H
+#define LIBREPCB_EDITOR_GRIDSETTINGSDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../gridproperties.h"
+#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,6 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 namespace Ui {
 class GridSettingsDialog;
@@ -43,7 +44,7 @@ class GridSettingsDialog;
 
 /**
  * @brief This class provides a Dialog (GUI) to change the grid settings of a
- * ::librepcb::GraphicsView
+ * ::librepcb::editor::GraphicsView
  */
 class GridSettingsDialog final : public QDialog {
   Q_OBJECT
@@ -81,6 +82,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
-#define LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_H
+#ifndef LIBREPCB_CORE_WORKSPACESETTINGSITEM_H
+#define LIBREPCB_CORE_WORKSPACESETTINGSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/sexpression.h>
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 /*******************************************************************************
  *  Class WorkspaceSettingsItem
@@ -41,11 +40,11 @@ namespace workspace {
  * @brief Base class for all workspace settings items
  *
  * For simple settings, see
- * ::librepcb::workspace::WorkspaceSettingsItem_GenericValue and
- * ::librepcb::workspace::WorkspaceSettingsItem_GenericValueList.
+ * ::librepcb::WorkspaceSettingsItem_GenericValue and
+ * ::librepcb::WorkspaceSettingsItem_GenericValueList.
  *
- * @see ::librepcb::workspace::WorkspaceSettingsItem_GenericValue
- * @see ::librepcb::workspace::WorkspaceSettingsItem_GenericValueList
+ * @see ::librepcb::WorkspaceSettingsItem_GenericValue
+ * @see ::librepcb::WorkspaceSettingsItem_GenericValueList
  */
 class WorkspaceSettingsItem : public QObject {
   Q_OBJECT
@@ -97,7 +96,6 @@ signals:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb
 
 #endif

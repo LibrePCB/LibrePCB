@@ -22,14 +22,14 @@
  ******************************************************************************/
 #include "symbolpreviewgraphicsitem.h"
 
-#include "../cmp/component.h"
-#include "symbol.h"
 #include "symbolpinpreviewgraphicsitem.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/geometry/text.h>
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/geometry/text.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/sym/symbol.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -39,7 +39,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -357,5 +357,5 @@ QString SymbolPreviewGraphicsItem::getBuiltInAttributeValue(
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANT_H
-#define LIBREPCB_LIBRARY_COMPONENTSYMBOLVARIANT_H
+#ifndef LIBREPCB_CORE_COMPONENTSYMBOLVARIANT_H
+#define LIBREPCB_CORE_COMPONENTSYMBOLVARIANT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/serializablekeyvaluemap.h"
+#include "../../serialization/serializableobjectlist.h"
 #include "componentsymbolvariantitem.h"
-
-#include <librepcb/common/fileio/serializablekeyvaluemap.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class ComponentSymbolVariant
@@ -106,7 +104,7 @@ public:
 
   // General Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -149,7 +147,6 @@ using ComponentSymbolVariantList =
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

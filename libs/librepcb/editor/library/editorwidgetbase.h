@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_EDITORWIDGETBASE_H
-#define LIBREPCB_LIBRARYEDITOR_EDITORWIDGETBASE_H
+#ifndef LIBREPCB_EDITOR_EDITORWIDGETBASE_H
+#define LIBREPCB_EDITOR_EDITORWIDGETBASE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/libraryelementchecklistwidget.h"
+#include "../undostack.h"
+#include "libraryelementchecklistwidget.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/undostack.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,22 +36,17 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ExclusiveActionGroup;
 class IF_GraphicsLayerProvider;
+class LibraryBaseElement;
 class Point;
+class Workspace;
+
+namespace editor {
+
+class ExclusiveActionGroup;
 class StatusBar;
 class ToolBarProxy;
 class UndoStackActionGroup;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
-class LibraryBaseElement;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class EditorWidgetBase
@@ -68,7 +63,7 @@ public:
   // Types
 
   struct Context {
-    workspace::Workspace& workspace;
+    Workspace& workspace;
     const IF_GraphicsLayerProvider& layerProvider;
     bool elementIsNewlyCreated;
     bool readOnly;
@@ -194,7 +189,6 @@ protected:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

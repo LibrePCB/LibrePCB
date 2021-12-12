@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORSTATE_DRAWCIRCLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/common/graphics/graphicslayername.h>
+#include <librepcb/core/graphics/graphicslayername.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,10 +37,10 @@ namespace librepcb {
 
 class Circle;
 class CircleGraphicsItem;
-class CmdCircleEdit;
 
-namespace library {
 namespace editor {
+
+class CmdCircleEdit;
 
 /*******************************************************************************
  *  Class PackageEditorState_DrawCircle
@@ -103,7 +103,6 @@ private:  // Types / Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

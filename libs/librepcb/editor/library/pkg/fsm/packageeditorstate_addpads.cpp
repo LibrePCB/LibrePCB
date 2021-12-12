@@ -22,20 +22,20 @@
  ******************************************************************************/
 #include "packageeditorstate_addpads.h"
 
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../../widgets/unsignedlengthedit.h"
+#include "../../cmd/cmdfootprintpadedit.h"
+#include "../boardsideselectorwidget.h"
+#include "../footprintpadshapeselectorwidget.h"
 #include "../packageeditorwidget.h"
-#include "../widgets/boardsideselectorwidget.h"
-#include "../widgets/footprintpadshapeselectorwidget.h"
-#include "../widgets/packagepadcombobox.h"
+#include "../packagepadcombobox.h"
 
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/common/widgets/unsignedlengthedit.h>
-#include <librepcb/library/pkg/cmd/cmdfootprintpadedit.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/library/pkg/footprintpadgraphicsitem.h>
-#include <librepcb/library/pkg/package.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
+#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -43,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -355,5 +354,4 @@ void PackageEditorState_AddPads::drillDiameterEditValueChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

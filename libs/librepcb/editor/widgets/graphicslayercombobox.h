@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GRAPHICSLAYERCOMBOBOX_H
-#define LIBREPCB_COMMON_GRAPHICSLAYERCOMBOBOX_H
+#ifndef LIBREPCB_EDITOR_GRAPHICSLAYERCOMBOBOX_H
+#define LIBREPCB_EDITOR_GRAPHICSLAYERCOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayername.h"
+#include <librepcb/core/graphics/graphicslayername.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,6 +36,8 @@
 namespace librepcb {
 
 class GraphicsLayer;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class GraphicsLayerComboBox
@@ -77,6 +79,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

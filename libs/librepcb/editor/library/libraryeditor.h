@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_LIBRARYEDITOR_H
-#define LIBREPCB_LIBRARYEDITOR_LIBRARYEDITOR_H
+#ifndef LIBREPCB_EDITOR_LIBRARYEDITOR_H
+#define LIBREPCB_EDITOR_LIBRARYEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "newelementwizard/newelementwizard.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/graphics/graphicslayer.h>
+#include <librepcb/core/fileio/directorylock.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,22 +38,16 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ExclusiveActionGroup;
-class TransactionalFileSystem;
-class UndoStackActionGroup;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
 class Library;
+class TransactionalFileSystem;
+class Workspace;
 
 namespace editor {
 
 class EditorWidgetBase;
+class ExclusiveActionGroup;
 class LibraryOverviewWidget;
+class UndoStackActionGroup;
 
 namespace Ui {
 class LibraryEditor;
@@ -75,11 +68,11 @@ public:
   // Constructors / Destructor
   LibraryEditor() = delete;
   LibraryEditor(const LibraryEditor& other) = delete;
-  LibraryEditor(workspace::Workspace& ws, const FilePath& libFp, bool readOnly);
+  LibraryEditor(Workspace& ws, const FilePath& libFp, bool readOnly);
   ~LibraryEditor() noexcept;
 
   /**
-   * @copydoc librepcb::IF_GraphicsLayerProvider::getLayer()
+   * @copydoc ::librepcb::IF_GraphicsLayerProvider::getLayer()
    */
   GraphicsLayer* getLayer(const QString& name) const noexcept override {
     foreach (GraphicsLayer* layer, mLayers) {
@@ -91,7 +84,7 @@ public:
   }
 
   /**
-   * @copydoc librepcb::IF_GraphicsLayerProvider::getAllLayers()
+   * @copydoc ::librepcb::IF_GraphicsLayerProvider::getAllLayers()
    */
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
     return mLayers;
@@ -108,11 +101,10 @@ public:
    * Qt's event loop.
    *
    * @warning This method can be called both from within this class and from
-   * outside this class (for example from the
-   * ::librepcb::application::ControlPanel). But if you call this method from
-   * outside this class, you may have to delete the object yourself afterwards!
-   * In special cases, the deleteLater() mechanism could lead in fatal errors
-   * otherwise!
+   * outside this class (for example from the control panel). But if you call
+   * this method from outside this class, you may have to delete the object
+   * yourself afterwards! In special cases, the deleteLater() mechanism could
+   * lead in fatal errors otherwise!
    *
    * @param askForSave    If true and there are unsaved changes, this method
    * shows a message box to ask whether the library should be saved or not. If
@@ -182,7 +174,7 @@ private:  // Methods
   void addLayer(const QString& name, bool forceVisible = false) noexcept;
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   bool mIsOpenedReadOnly;
   QScopedPointer<Ui::LibraryEditor> mUi;
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
@@ -197,7 +189,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

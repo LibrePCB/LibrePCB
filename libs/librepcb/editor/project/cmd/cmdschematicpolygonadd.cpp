@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdschematicpolygonadd.h"
 
-#include "../items/si_polygon.h"
-#include "../schematic.h"
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -31,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -65,5 +65,5 @@ void CmdSchematicPolygonAdd::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

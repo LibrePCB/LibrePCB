@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_POLYGON_H
-#define LIBREPCB_PROJECT_SI_POLYGON_H
+#ifndef LIBREPCB_CORE_SI_POLYGON_H
+#define LIBREPCB_CORE_SI_POLYGON_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../serialization/serializableobject.h"
+#include "../../../types/point.h"
+#include "../../../types/uuid.h"
 #include "si_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -38,9 +37,6 @@ namespace librepcb {
 
 class Polygon;
 class PolygonGraphicsItem;
-
-namespace project {
-
 class Schematic;
 
 /*******************************************************************************
@@ -72,7 +68,7 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
@@ -99,7 +95,6 @@ private:  // Attributes
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

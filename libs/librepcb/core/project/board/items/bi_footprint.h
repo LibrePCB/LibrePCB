@@ -17,18 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_FOOTPRINT_H
-#define LIBREPCB_PROJECT_BI_FOOTPRINT_H
+#ifndef LIBREPCB_CORE_BI_FOOTPRINT_H
+#define LIBREPCB_CORE_BI_FOOTPRINT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../attribute/attributeprovider.h"
+#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/bgi_footprint.h"
 #include "bi_base.h"
 #include "bi_stroketext.h"
-
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
 
@@ -37,15 +36,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
-class Footprint;
-}
-
-namespace project {
-
 class BI_Device;
 class BI_FootprintPad;
 class Board;
+class Footprint;
 
 /*******************************************************************************
  *  Class BI_Footprint
@@ -76,7 +70,7 @@ public:
     return mPads.value(padUuid);
   }
   const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
-  const library::Footprint& getLibFootprint() const noexcept;
+  const Footprint& getLibFootprint() const noexcept;
   const Angle& getRotation() const noexcept;
   bool isSelectable() const noexcept override;
   bool isUsed() const noexcept;
@@ -95,14 +89,14 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Helper Methods
   Point mapToScene(const Point& relativePos) const noexcept;
 
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getAttributeProviderParents()
+  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
@@ -144,7 +138,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

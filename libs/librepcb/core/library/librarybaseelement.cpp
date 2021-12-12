@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "librarybaseelement.h"
 
+#include "../application.h"
+#include "../fileio/versionfile.h"
+#include "../serialization/sexpression.h"
 #include "librarybaseelementcheck.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/fileio/versionfile.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -227,5 +225,4 @@ void LibraryBaseElement::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

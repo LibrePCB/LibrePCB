@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORSTATE_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORSTATE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../utils/toolbarproxy.h"
 #include "packageeditorfsm.h"
 
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/utils/toolbarproxy.h>
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +39,6 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -122,7 +121,6 @@ protected:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

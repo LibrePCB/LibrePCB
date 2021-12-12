@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "schematiceditorstate_addnetlabel.h"
 
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeledit.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/schematic.h>
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../cmd/cmdschematicnetlabeladd.h"
+#include "../../cmd/cmdschematicnetlabeledit.h"
+
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -234,5 +234,4 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

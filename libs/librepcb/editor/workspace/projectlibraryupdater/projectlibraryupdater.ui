@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::application::ProjectLibraryUpdater</class>
- <widget class="QMainWindow" name="librepcb::application::ProjectLibraryUpdater">
+ <class>librepcb::editor::ProjectLibraryUpdater</class>
+ <widget class="QMainWindow" name="librepcb::editor::ProjectLibraryUpdater">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -79,7 +79,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::application::ProjectLibraryUpdater</receiver>
+   <receiver>librepcb::editor::ProjectLibraryUpdater</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

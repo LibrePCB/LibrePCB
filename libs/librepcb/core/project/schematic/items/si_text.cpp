@@ -22,12 +22,11 @@
  ******************************************************************************/
 #include "si_text.h"
 
+#include "../../../graphics/origincrossgraphicsitem.h"
+#include "../../../graphics/textgraphicsitem.h"
 #include "../../project.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-
-#include <librepcb/common/graphics/origincrossgraphicsitem.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
 
 #include <QtCore>
 
@@ -35,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -116,5 +114,4 @@ void SI_Text::schematicAttributesChanged() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

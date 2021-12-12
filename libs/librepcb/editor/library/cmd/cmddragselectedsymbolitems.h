@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARYEDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#define LIBREPCB_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../symboleditorstate.h"
+#include "../../undocommandgroup.h"
+#include "../sym/fsm/symboleditorstate.h"
 
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -35,16 +35,12 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class CmdCircleEdit;
 class CmdPolygonEdit;
-class CmdTextEdit;
-
-namespace library {
-
 class CmdSymbolPinEdit;
-
-namespace editor {
+class CmdTextEdit;
 
 /*******************************************************************************
  *  Class CmdDragSelectedSymbolItems
@@ -79,7 +75,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   void deleteAllCommands() noexcept;
@@ -105,7 +101,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/attributes/attributekey.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributekey.h>
 
 /*******************************************************************************
  *  Namespace

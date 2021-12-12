@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDLAYERSTACKSETUPDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_BOARDLAYERSTACKSETUPDIALOG_H
+#ifndef LIBREPCB_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
+#define LIBREPCB_EDITOR_BOARDLAYERSTACKSETUPDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,13 +31,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-
-namespace project {
-
 class BoardLayerStack;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class BoardLayerStackSetupDialog;
@@ -81,7 +79,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

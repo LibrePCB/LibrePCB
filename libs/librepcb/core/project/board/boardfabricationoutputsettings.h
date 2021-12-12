@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H
-#define LIBREPCB_PROJECT_BOARDFABRICATIONOUTPUTSETTINGS_H
+#ifndef LIBREPCB_CORE_BOARDFABRICATIONOUTPUTSETTINGS_H
+#define LIBREPCB_CORE_BOARDFABRICATIONOUTPUTSETTINGS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/serializableobject.h>
+#include "../../serialization/serializableobject.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class BoardFabricationOutputSettings
@@ -140,7 +139,7 @@ public:
   void setEnableSolderPasteTop(bool e) noexcept { mEnableSolderPasteTop = e; }
   void setEnableSolderPasteBot(bool e) noexcept { mEnableSolderPasteBot = e; }
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -177,7 +176,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,15 +22,14 @@
  ******************************************************************************/
 #include "sgi_netlabel.h"
 
+#include "../../../application.h"
+#include "../../../graphics/linegraphicsitem.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../items/si_netlabel.h"
 #include "../items/si_netsegment.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/graphics/linegraphicsitem.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -40,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
 
@@ -191,5 +189,4 @@ GraphicsLayer* SGI_NetLabel::getLayer(const QString& name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

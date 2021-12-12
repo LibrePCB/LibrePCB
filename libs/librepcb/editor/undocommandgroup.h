@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_UNDOCOMMANDGROUP_H
-#define LIBREPCB_COMMON_UNDOCOMMANDGROUP_H
+#ifndef LIBREPCB_EDITOR_UNDOCOMMANDGROUP_H
+#define LIBREPCB_EDITOR_UNDOCOMMANDGROUP_H
 
 /*******************************************************************************
  *  Includes
@@ -31,6 +31,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class UndoCommandGroup
@@ -76,13 +77,13 @@ public:
   UndoCommandGroup& operator=(const UndoCommandGroup& rhs) = delete;
 
 protected:
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   virtual bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   virtual void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   virtual void performRedo() override;
 
   /**
@@ -108,6 +109,7 @@ private:
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

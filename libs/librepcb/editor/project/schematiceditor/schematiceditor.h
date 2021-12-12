@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITOR_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITOR_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITOR_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_schematiceditor.h"
-
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,12 +34,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ExclusiveActionGroup;
-class GraphicsView;
-class UndoStackActionGroup;
-
-namespace project {
-
 class Project;
 class SI_Symbol;
 class Schematic;
@@ -48,9 +41,12 @@ class Schematic;
 namespace editor {
 
 class ErcMsgDock;
+class ExclusiveActionGroup;
+class GraphicsView;
 class ProjectEditor;
 class SchematicEditorFsm;
 class SchematicPagesDock;
+class UndoStackActionGroup;
 
 namespace Ui {
 class SchematicEditor;
@@ -150,7 +146,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

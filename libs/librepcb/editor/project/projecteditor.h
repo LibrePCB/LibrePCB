@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_PROJECTEDITOR_H
-#define LIBREPCB_PROJECTEDITOR_PROJECTEDITOR_H
+#ifndef LIBREPCB_EDITOR_PROJECTEDITOR_H
+#define LIBREPCB_EDITOR_PROJECTEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/serializableobject.h>
+#include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 
@@ -33,26 +33,21 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
+
 class QMainWindow;
 
 namespace librepcb {
 
-class LengthUnit;
-class UndoStack;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class Board;
+class LengthUnit;
 class Project;
+class Workspace;
 
 namespace editor {
 
 class BoardEditor;
 class SchematicEditor;
+class UndoStack;
 
 /*******************************************************************************
  *  Class ProjectEditor
@@ -72,7 +67,7 @@ public:
   /**
    * @brief The constructor
    */
-  ProjectEditor(workspace::Workspace& workspace, Project& project);
+  ProjectEditor(Workspace& workspace, Project& project);
 
   /**
    * @brief The destructor
@@ -81,7 +76,7 @@ public:
 
   // Getters: General
 
-  workspace::Workspace& getWorkspace() const noexcept { return mWorkspace; }
+  Workspace& getWorkspace() const noexcept { return mWorkspace; }
   Project& getProject() const noexcept { return mProject; }
   const LengthUnit& getDefaultLengthUnit() const noexcept;
 
@@ -100,7 +95,7 @@ public:
    * The project must be closed and destroyed automatically after the last
    * opened window of the project is closed, because without a window the user
    * is no longer able to close the project himself. So, every project related
-   * window have to "ask" the ::librepcb::project::editor::ProjectEditor object
+   * window have to "ask" the ::librepcb::editor::ProjectEditor object
    * whether it is allowed to close or not. If the last opened window wants to
    * close, the editor will first ask the user if unsaved changes should be
    * written to the harddisc. Only if the user accepts this question and the
@@ -198,11 +193,11 @@ public slots:
    * Qt's event loop.
    *
    * @warning This method can be called both from within this class and from
-   *          outside this class (for example from the
-   *          ::librepcb::application::ControlPanel). But if you call this
-   *          method from outside this class, you may have to delete the object
-   *          yourself afterwards! In special cases, the deleteLater() mechanism
-   *          could lead in fatal errors otherwise!
+   *          outside this class (for example from the control panel). But
+   *          if you call this method from outside this class, you may have
+   *          to delete the object yourself afterwards! In special cases,
+   *          the deleteLater() mechanism could lead in fatal errors
+   *          otherwise!
    *
    * @param askForSave    If true and there are unsaved changes, this method
    * shows a message box to ask whether the project should be saved or not. If
@@ -225,7 +220,7 @@ private:  // Methods
   int getCountOfVisibleEditorWindows() const noexcept;
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Project& mProject;
   QTimer mAutoSaveTimer;  ///< the timer for the periodically automatic saving
                           ///< functionality (see also @ref doc_project_save)
@@ -244,7 +239,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

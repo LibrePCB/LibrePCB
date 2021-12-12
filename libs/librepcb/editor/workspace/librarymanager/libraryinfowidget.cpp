@@ -24,12 +24,12 @@
 
 #include "ui_libraryinfowidget.h"
 
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,15 +38,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws,
-                                     const FilePath& libDir)
+LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
   : QWidget(nullptr),
     mUi(new Ui::LibraryInfoWidget),
     mWorkspace(ws),
@@ -148,6 +146,5 @@ bool LibraryInfoWidget::isRemoteLibrary() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

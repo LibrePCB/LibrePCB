@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "bgi_footprint.h"
 
+#include "../../../graphics/stroketextgraphicsitem.h"
+#include "../../../library/pkg/footprint.h"
 #include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
-
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
-#include <librepcb/library/pkg/footprint.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -253,5 +251,4 @@ GraphicsLayer* BGI_Footprint::getLayer(QString name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

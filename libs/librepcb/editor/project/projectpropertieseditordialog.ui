@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::ProjectPropertiesEditorDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::ProjectPropertiesEditorDialog">
+ <class>librepcb::editor::ProjectPropertiesEditorDialog</class>
+ <widget class="QDialog" name="librepcb::editor::ProjectPropertiesEditorDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -103,7 +103,7 @@
        <number>3</number>
       </property>
       <item>
-       <widget class="librepcb::AttributeListEditorWidget" name="attributeListEditorWidget" native="true"/>
+       <widget class="librepcb::editor::AttributeListEditorWidget" name="attributeListEditorWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -122,9 +122,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::AttributeListEditorWidget</class>
+   <class>librepcb::editor::AttributeListEditorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/attributelisteditorwidget.h</header>
+   <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -139,7 +139,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::ProjectPropertiesEditorDialog</receiver>
+   <receiver>librepcb::editor::ProjectPropertiesEditorDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -155,7 +155,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::ProjectPropertiesEditorDialog</receiver>
+   <receiver>librepcb::editor::ProjectPropertiesEditorDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

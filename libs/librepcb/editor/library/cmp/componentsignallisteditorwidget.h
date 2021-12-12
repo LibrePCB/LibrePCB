@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/library/cmp/componentsignal.h>
+#include <librepcb/core/library/cmp/componentsignal.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,15 +32,12 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class EditableTableWidget;
-class SortFilterProxyModel;
-class UndoStack;
-
-namespace library {
 namespace editor {
 
 class ComponentSignalListModel;
+class EditableTableWidget;
+class SortFilterProxyModel;
+class UndoStack;
 
 /*******************************************************************************
  *  Class ComponentSignalListEditorWidget
@@ -78,7 +75,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

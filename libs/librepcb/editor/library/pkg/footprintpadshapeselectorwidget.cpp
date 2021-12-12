@@ -29,7 +29,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -123,5 +122,4 @@ void FootprintPadShapeSelectorWidget::btnOctagonToggled(bool checked) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

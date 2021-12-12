@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::application::InitializeWorkspaceWizard_FinalizeImport</class>
- <widget class="QWizardPage" name="librepcb::application::InitializeWorkspaceWizard_FinalizeImport">
+ <class>librepcb::editor::InitializeWorkspaceWizard_FinalizeImport</class>
+ <widget class="QWizardPage" name="librepcb::editor::InitializeWorkspaceWizard_FinalizeImport">
   <property name="geometry">
    <rect>
     <x>0</x>

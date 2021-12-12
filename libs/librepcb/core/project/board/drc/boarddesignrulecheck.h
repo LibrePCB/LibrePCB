@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDDESIGNRULECHECK_H
-#define LIBREPCB_PROJECT_BOARDDESIGNRULECHECK_H
+#ifndef LIBREPCB_CORE_BOARDDESIGNRULECHECK_H
+#define LIBREPCB_CORE_BOARDDESIGNRULECHECK_H
 
 /*******************************************************************************
  *  Includes
@@ -34,12 +34,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
-
-namespace project {
-
 class BI_Device;
 class Board;
+class GraphicsLayer;
 class NetSignal;
 
 /*******************************************************************************
@@ -47,7 +44,7 @@ class NetSignal;
  ******************************************************************************/
 
 /**
- * @brief The BoardDesignRuleCheck class checks a ::librepcb::project::Board for
+ * @brief The BoardDesignRuleCheck class checks a ::librepcb::Board for
  *        design rule violations
  */
 class BoardDesignRuleCheck final : public QObject {
@@ -165,7 +162,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

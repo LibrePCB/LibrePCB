@@ -22,10 +22,9 @@
  ******************************************************************************/
 #include "footprintpad.h"
 
+#include "../../graphics/graphicslayer.h"
+#include "../../types/version.h"
 #include "footprintpadgraphicsitem.h"
-
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/version.h>
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -331,5 +329,4 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

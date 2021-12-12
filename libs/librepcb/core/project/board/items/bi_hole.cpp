@@ -22,12 +22,11 @@
  ******************************************************************************/
 #include "bi_hole.h"
 
+#include "../../../graphics/graphicsscene.h"
+#include "../../../graphics/holegraphicsitem.h"
 #include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
-
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/holegraphicsitem.h>
 
 #include <QtCore>
 
@@ -35,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -120,5 +118,4 @@ void BI_Hole::setSelected(bool selected) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

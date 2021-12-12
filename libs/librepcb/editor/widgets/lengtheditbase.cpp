@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "lengtheditbase.h"
 
-#include "../toolbox.h"
-#include "../utils/mathparser.h"
+#include <librepcb/core/utils/mathparser.h>
+#include <librepcb/core/utils/toolbox.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -368,4 +369,5 @@ QString LengthEditBase::getValueStr(const LengthUnit& unit) const noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

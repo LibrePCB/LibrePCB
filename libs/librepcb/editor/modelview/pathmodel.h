@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_PATHMODEL_H
-#define LIBREPCB_COMMON_PATHMODEL_H
+#ifndef LIBREPCB_EDITOR_PATHMODEL_H
+#define LIBREPCB_EDITOR_PATHMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "path.h"
+#include <librepcb/core/geometry/path.h>
 
 #include <QtCore>
 
@@ -31,6 +31,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class PathModel
@@ -91,6 +92,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

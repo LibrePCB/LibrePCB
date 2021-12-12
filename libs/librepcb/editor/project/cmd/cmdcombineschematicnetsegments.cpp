@@ -22,17 +22,17 @@
  ******************************************************************************/
 #include "cmdcombineschematicnetsegments.h"
 
+#include "../../project/cmd/cmdschematicnetlabeladd.h"
+#include "../../project/cmd/cmdschematicnetsegmentaddelements.h"
+#include "../../project/cmd/cmdschematicnetsegmentremove.h"
+#include "../../project/cmd/cmdschematicnetsegmentremoveelements.h"
 #include "cmdremoveunusednetsignals.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremoveelements.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -40,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -122,5 +121,4 @@ bool CmdCombineSchematicNetSegments::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

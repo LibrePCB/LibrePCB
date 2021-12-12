@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOMGENERATORDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_BOMGENERATORDIALOG_H
+#ifndef LIBREPCB_EDITOR_BOMGENERATORDIALOG_H
+#define LIBREPCB_EDITOR_BOMGENERATORDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,11 +36,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Bom;
-
-namespace project {
-
 class Board;
+class Bom;
 class Project;
 
 namespace editor {
@@ -93,7 +90,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

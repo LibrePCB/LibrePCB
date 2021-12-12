@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "bi_plane.h"
 
+#include "../../../utils/scopeguard.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../boardplanefragmentsbuilder.h"
 #include "../graphicsitems/bgi_plane.h"
-
-#include <librepcb/common/scopeguard.h>
 
 #include <QtCore>
 
@@ -36,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -292,5 +290,4 @@ void BI_Plane::boardAttributesChanged() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

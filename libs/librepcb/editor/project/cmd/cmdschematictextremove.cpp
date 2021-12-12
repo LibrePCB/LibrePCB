@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdschematictextremove.h"
 
-#include "../items/si_text.h"
-#include "../schematic.h"
+#include <librepcb/core/project/schematic/items/si_text.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -31,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -66,5 +66,5 @@ void CmdSchematicTextRemove::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

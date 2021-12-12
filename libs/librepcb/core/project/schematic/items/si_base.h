@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SI_BASE_H
-#define LIBREPCB_PROJECT_SI_BASE_H
+#ifndef LIBREPCB_CORE_SI_BASE_H
+#define LIBREPCB_CORE_SI_BASE_H
 
 /*******************************************************************************
  *  Includes
@@ -31,12 +31,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Circuit;
 class GraphicsScene;
 class Point;
-
-namespace project {
-
-class Circuit;
 class Project;
 class Schematic;
 
@@ -53,14 +50,14 @@ class SI_Base : public QObject {
 public:
   // Types
   enum class Type_t {
-    NetSegment,  ///< ::librepcb::project::SI_NetSegment
-    NetPoint,  ///< ::librepcb::project::SI_NetPoint
-    NetLine,  ///< ::librepcb::project::SI_NetLine
-    NetLabel,  ///< ::librepcb::project::SI_NetLabel
-    Symbol,  ///< ::librepcb::project::SI_Symbol
-    SymbolPin,  ///< ::librepcb::project::SI_SymbolPin
-    Polygon,  ///< ::librepcb::project::SI_Polygon
-    Text,  ///< ::librepcb::project::SI_Text
+    NetSegment,  ///< ::librepcb::SI_NetSegment
+    NetPoint,  ///< ::librepcb::SI_NetPoint
+    NetLine,  ///< ::librepcb::SI_NetLine
+    NetLabel,  ///< ::librepcb::SI_NetLabel
+    Symbol,  ///< ::librepcb::SI_Symbol
+    SymbolPin,  ///< ::librepcb::SI_SymbolPin
+    Polygon,  ///< ::librepcb::SI_Polygon
+    Text,  ///< ::librepcb::SI_Text
   };
 
   // Constructors / Destructor
@@ -109,7 +106,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "msgwrongsymboltextlayer.h"
 
-#include <librepcb/common/geometry/text.h>
-#include <librepcb/common/graphics/graphicslayer.h>
+#include "../../../geometry/text.h"
+#include "../../../graphics/graphicslayer.h"
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -55,5 +54,4 @@ MsgWrongSymbolTextLayer::~MsgWrongSymbolTextLayer() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

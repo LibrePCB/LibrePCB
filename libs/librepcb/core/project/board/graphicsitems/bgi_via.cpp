@@ -22,15 +22,14 @@
  ******************************************************************************/
 #include "bgi_via.h"
 
+#include "../../../application.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
+#include "../boarddesignrules.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_netsegment.h"
 #include "../items/bi_via.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/boarddesignrules.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -40,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -167,5 +165,4 @@ GraphicsLayer* BGI_Via::getLayer(const QString& name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

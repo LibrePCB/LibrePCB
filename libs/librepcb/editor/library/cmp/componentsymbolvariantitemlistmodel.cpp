@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "componentsymbolvariantitemlistmodel.h"
 
+#include "../../undostack.h"
+#include "../cmd/cmdcomponentsymbolvariantedit.h"
+#include "../cmd/cmdcomponentsymbolvariantitemedit.h"
 #include "../libraryelementcache.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantedit.h>
-#include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantitemedit.h>
-#include <librepcb/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>
 
@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -516,5 +515,4 @@ void ComponentSymbolVariantItemListModel::execCmd(UndoCommand* cmd) {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,18 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTPAD_H
-#define LIBREPCB_LIBRARY_FOOTPRINTPAD_H
+#ifndef LIBREPCB_CORE_FOOTPRINTPAD_H
+#define LIBREPCB_CORE_FOOTPRINTPAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/length.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
+#include "../../exceptions.h"
+#include "../../geometry/path.h"
+#include "../../serialization/serializableobjectlist.h"
+#include "../../types/angle.h"
+#include "../../types/length.h"
+#include "../../types/point.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,7 +38,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class FootprintPadGraphicsItem;
 
@@ -116,7 +116,7 @@ public:
   void registerGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
   void unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -160,16 +160,14 @@ using FootprintPadList =
  *  Non-Member Functions
  ******************************************************************************/
 
-}  // namespace library
-
 template <>
-inline SExpression serialize(const library::FootprintPad::BoardSide& obj) {
+inline SExpression serialize(const FootprintPad::BoardSide& obj) {
   switch (obj) {
-    case library::FootprintPad::BoardSide::TOP:
+    case FootprintPad::BoardSide::TOP:
       return SExpression::createToken("top");
-    case library::FootprintPad::BoardSide::BOTTOM:
+    case FootprintPad::BoardSide::BOTTOM:
       return SExpression::createToken("bottom");
-    case library::FootprintPad::BoardSide::THT:
+    case FootprintPad::BoardSide::THT:
       return SExpression::createToken("tht");
     default:
       throw LogicError(__FILE__, __LINE__);
@@ -177,28 +175,28 @@ inline SExpression serialize(const library::FootprintPad::BoardSide& obj) {
 }
 
 template <>
-inline library::FootprintPad::BoardSide deserialize(const SExpression& sexpr,
-                                                    const Version& fileFormat) {
+inline FootprintPad::BoardSide deserialize(const SExpression& sexpr,
+                                           const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == QLatin1String("top"))
-    return library::FootprintPad::BoardSide::TOP;
+    return FootprintPad::BoardSide::TOP;
   else if (str == QLatin1String("bottom"))
-    return library::FootprintPad::BoardSide::BOTTOM;
+    return FootprintPad::BoardSide::BOTTOM;
   else if (str == QLatin1String("tht"))
-    return library::FootprintPad::BoardSide::THT;
+    return FootprintPad::BoardSide::THT;
   else
     throw RuntimeError(__FILE__, __LINE__, str);
 }
 
 template <>
-inline SExpression serialize(const library::FootprintPad::Shape& obj) {
+inline SExpression serialize(const FootprintPad::Shape& obj) {
   switch (obj) {
-    case library::FootprintPad::Shape::ROUND:
+    case FootprintPad::Shape::ROUND:
       return SExpression::createToken("round");
-    case library::FootprintPad::Shape::RECT:
+    case FootprintPad::Shape::RECT:
       return SExpression::createToken("rect");
-    case library::FootprintPad::Shape::OCTAGON:
+    case FootprintPad::Shape::OCTAGON:
       return SExpression::createToken("octagon");
     default:
       throw LogicError(__FILE__, __LINE__);
@@ -206,16 +204,16 @@ inline SExpression serialize(const library::FootprintPad::Shape& obj) {
 }
 
 template <>
-inline library::FootprintPad::Shape deserialize(const SExpression& sexpr,
-                                                const Version& fileFormat) {
+inline FootprintPad::Shape deserialize(const SExpression& sexpr,
+                                       const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
   if (str == QLatin1String("round"))
-    return library::FootprintPad::Shape::ROUND;
+    return FootprintPad::Shape::ROUND;
   else if (str == QLatin1String("rect"))
-    return library::FootprintPad::Shape::RECT;
+    return FootprintPad::Shape::RECT;
   else if (str == QLatin1String("octagon"))
-    return library::FootprintPad::Shape::OCTAGON;
+    return FootprintPad::Shape::OCTAGON;
   else
     throw RuntimeError(__FILE__, __LINE__, str);
 }

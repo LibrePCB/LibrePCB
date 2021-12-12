@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_LIBRARYELEMENTCHECK_H
-#define LIBREPCB_LIBRARY_LIBRARYELEMENTCHECK_H
+#ifndef LIBREPCB_CORE_LIBRARYELEMENTCHECK_H
+#define LIBREPCB_CORE_LIBRARYELEMENTCHECK_H
 
 /*******************************************************************************
  *  Includes
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class LibraryElement;
 
@@ -67,7 +66,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

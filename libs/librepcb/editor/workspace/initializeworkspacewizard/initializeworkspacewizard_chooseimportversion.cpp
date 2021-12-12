@@ -22,18 +22,16 @@
  ******************************************************************************/
 #include "initializeworkspacewizard_chooseimportversion.h"
 
-#include "librepcb/workspace/workspace.h"
+#include "librepcb/core/workspace/workspace.h"
 #include "ui_initializeworkspacewizard_chooseimportversion.h"
 
-#include <librepcb/common/application.h>
+#include <librepcb/core/application.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
-
-using namespace workspace;
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -85,5 +83,5 @@ int InitializeWorkspaceWizard_ChooseImportVersion::nextId() const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

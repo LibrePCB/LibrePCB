@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_DEVICEPADSIGNALMAP_H
-#define LIBREPCB_LIBRARY_DEVICEPADSIGNALMAP_H
+#ifndef LIBREPCB_CORE_DEVICEPADSIGNALMAP_H
+#define LIBREPCB_CORE_DEVICEPADSIGNALMAP_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/serializableobjectlist.h>
+#include "../../serialization/serializableobjectlist.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class DevicePadSignalMapItem
@@ -70,7 +69,7 @@ public:
   // Setters
   bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -132,7 +131,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

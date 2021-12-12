@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "package.h"
 
+#include "../../serialization/sexpression.h"
 #include "packagecheck.h"
-
-#include <librepcb/common/fileio/sexpression.h>
 
 #include <QtCore>
 
@@ -32,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -81,5 +79,4 @@ void Package::serialize(SExpression& root) const {
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

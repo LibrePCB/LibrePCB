@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "systeminfo.h"
 
+#include "exceptions.h"
 #include "fileio/filepath.h"
 
 #include <QHostInfo>

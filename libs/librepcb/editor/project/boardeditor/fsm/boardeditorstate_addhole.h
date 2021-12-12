@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDHOLE_H
-#define LIBREPCB_PROJECTEDITOR_BOARDEDITORSTATE_ADDHOLE_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDHOLE_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_ADDHOLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/project/boards/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
 
 #include <QtCore>
 
@@ -34,14 +34,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdHoleEdit;
-class PositiveLengthEdit;
-
-namespace project {
-
 class Board;
 
 namespace editor {
+
+class CmdHoleEdit;
+class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddHole
@@ -104,7 +102,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

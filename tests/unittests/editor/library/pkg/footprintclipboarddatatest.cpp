@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/libraryeditor/pkg/footprintclipboarddata.h>
+#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/editor/library/pkg/footprintclipboarddata.h>
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 namespace tests {
 
@@ -167,5 +166,4 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
 
 }  // namespace tests
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

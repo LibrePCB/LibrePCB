@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CATEGORYCHOOSERDIALOG_H
-#define LIBREPCB_LIBRARYEDITOR_CATEGORYCHOOSERDIALOG_H
+#ifndef LIBREPCB_EDITOR_CATEGORYCHOOSERDIALOG_H
+#define LIBREPCB_EDITOR_CATEGORYCHOOSERDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/uuid.h>
-#include <librepcb/workspace/library/cat/categorytreemodel.h>
+#include "../../workspace/categorytreemodel.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,11 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
 namespace editor {
 
 namespace Ui {
@@ -58,7 +56,7 @@ public:
   // Constructors / Destructor
   CategoryChooserDialog() = delete;
   CategoryChooserDialog(const CategoryChooserDialog& other) = delete;
-  explicit CategoryChooserDialog(const workspace::Workspace& ws,
+  explicit CategoryChooserDialog(const Workspace& ws,
                                  QWidget* parent = 0) noexcept;
   ~CategoryChooserDialog() noexcept;
 
@@ -70,20 +68,17 @@ public:
 
 private:  // Data
   QScopedPointer<Ui::CategoryChooserDialog> mUi;
-  QScopedPointer<workspace::CategoryTreeModel<ElementType>> mModel;
+  QScopedPointer<CategoryTreeModel<ElementType>> mModel;
 };
 
-typedef CategoryChooserDialog<library::ComponentCategory>
-    ComponentCategoryChooserDialog;
-typedef CategoryChooserDialog<library::PackageCategory>
-    PackageCategoryChooserDialog;
+typedef CategoryChooserDialog<ComponentCategory> ComponentCategoryChooserDialog;
+typedef CategoryChooserDialog<PackageCategory> PackageCategoryChooserDialog;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

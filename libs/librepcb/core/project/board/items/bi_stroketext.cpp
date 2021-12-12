@@ -22,16 +22,15 @@
  ******************************************************************************/
 #include "bi_stroketext.h"
 
+#include "../../../font/strokefontpool.h"
+#include "../../../geometry/stroketext.h"
+#include "../../../graphics/graphicsscene.h"
+#include "../../../graphics/linegraphicsitem.h"
+#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "./bi_footprint.h"
-
-#include <librepcb/common/font/strokefontpool.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/linegraphicsitem.h>
-#include <librepcb/common/graphics/stroketextgraphicsitem.h>
 
 #include <QtCore>
 
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -208,5 +206,4 @@ void BI_StrokeText::strokeTextEdited(const StrokeText& text,
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

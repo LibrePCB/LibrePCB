@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_PRIMITIVETEXTGRAPHICSITEM_H
-#define LIBREPCB_COMMON_PRIMITIVETEXTGRAPHICSITEM_H
+#ifndef LIBREPCB_CORE_PRIMITIVETEXTGRAPHICSITEM_H
+#define LIBREPCB_CORE_PRIMITIVETEXTGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
 #include "../graphics/graphicslayer.h"
-#include "../units/length.h"
+#include "../types/alignment.h"
+#include "../types/length.h"
 
 #include <QtCore>
 #include <QtWidgets>

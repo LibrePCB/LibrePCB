@@ -21,10 +21,10 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/library/projectlibrary.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/projectlibrary.h>
 
 #include <QtCore>
 
@@ -32,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace tests {
 
 /*******************************************************************************
@@ -47,7 +46,7 @@ protected:
   std::shared_ptr<TransactionalFileSystem> mLibFs;
   QFileInfo mExistingSymbolFile;
   qint64 mExistingSymbolCreationSize;
-  QScopedPointer<library::Symbol> mNewSymbol;
+  QScopedPointer<Symbol> mNewSymbol;
   QFileInfo mNewSymbolFile;
 
   ProjectLibraryTest() {
@@ -57,8 +56,8 @@ protected:
     mLibFs = TransactionalFileSystem::openRW(mLibDir);
 
     // create symbol inside project library
-    library::Symbol sym(Uuid::createRandom(), Version::fromString("1"), "",
-                        ElementName("Existing Symbol"), "", "");
+    Symbol sym(Uuid::createRandom(), Version::fromString("1"), "",
+               ElementName("Existing Symbol"), "", "");
     TransactionalDirectory libSymDir(mLibFs, "sym");
     sym.saveIntoParentDirectory(libSymDir);
     mLibFs->save();
@@ -69,9 +68,8 @@ protected:
     modifyExistingSymbol();  // modify file to detect when it gets overwritten
 
     // create symbol outside the project library (emulating workspace library)
-    mNewSymbol.reset(new library::Symbol(Uuid::createRandom(),
-                                         Version::fromString("1"), "",
-                                         ElementName("New Symbol"), "", ""));
+    mNewSymbol.reset(new Symbol(Uuid::createRandom(), Version::fromString("1"),
+                                "", ElementName("New Symbol"), "", ""));
     TransactionalDirectory tempSymDir(mTempFs);
     mNewSymbol->saveIntoParentDirectory(tempSymDir);
     mTempFs->save();
@@ -88,7 +86,7 @@ protected:
 
   virtual ~ProjectLibraryTest() { QDir(mTempDir.toStr()).removeRecursively(); }
 
-  library::Symbol* getFirstSymbol(ProjectLibrary& lib) {
+  Symbol* getFirstSymbol(ProjectLibrary& lib) {
     if (lib.getSymbols().isEmpty()) throw LogicError(__FILE__, __LINE__);
     return lib.getSymbols().values().first();
   }
@@ -223,7 +221,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    library::Symbol* sym = getFirstSymbol(lib);
+    Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
     EXPECT_EQ(1, lib.getSymbols().count());
@@ -238,7 +236,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    library::Symbol* sym = getFirstSymbol(lib);
+    Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
     save(lib);
@@ -285,5 +283,4 @@ TEST_F(ProjectLibraryTest, testIfExistingSymbolIsUpgradedOnlyOnce) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace project
 }  // namespace librepcb

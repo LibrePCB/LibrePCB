@@ -22,15 +22,16 @@
  ******************************************************************************/
 #include "editnetclassesdialog.h"
 
+#include "../../project/cmd/cmdnetclassadd.h"
+#include "../../project/cmd/cmdnetclassedit.h"
+#include "../../project/cmd/cmdnetclassremove.h"
+#include "../../undostack.h"
 #include "ui_editnetclassesdialog.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdnetclassadd.h>
-#include <librepcb/project/circuit/cmd/cmdnetclassedit.h>
-#include <librepcb/project/circuit/cmd/cmdnetclassremove.h>
-#include <librepcb/project/circuit/netclass.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -178,5 +178,4 @@ void EditNetClassesDialog::on_btnRemove_clicked() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

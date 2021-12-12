@@ -36,7 +36,7 @@ extern "C" {
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Static Methods
@@ -103,5 +103,5 @@ QString MarkdownConverter::convertMarkdownToHtml(
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

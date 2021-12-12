@@ -22,24 +22,24 @@
  ******************************************************************************/
 #include "libraryoverviewwidget.h"
 
+#include "../../dialogs/filedialog.h"
+#include "../../library/cmd/cmdlibraryedit.h"
 #include "librarylisteditorwidget.h"
 #include "ui_libraryoverviewwidget.h"
 
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/library/cmd/cmdlibraryedit.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/library.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -48,7 +48,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -147,7 +146,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
   // these operations are immediately applied on the list widgets (for immediate
   // feedback) but will then be reverted if a scan was aborted.
   connect(&mContext.workspace.getLibraryDb(),
-          &workspace::WorkspaceLibraryDb::scanSucceeded, this,
+          &WorkspaceLibraryDb::scanSucceeded, this,
           &LibraryOverviewWidget::updateElementLists);
 }
 
@@ -685,5 +684,4 @@ void LibraryOverviewWidget::lstDoubleClicked(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

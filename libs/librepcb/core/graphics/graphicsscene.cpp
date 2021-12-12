@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "graphicsscene.h"
 
-#include "../units/point.h"
+#include "../types/point.h"
 
 #include <QtCore>
 #include <QtWidgets>

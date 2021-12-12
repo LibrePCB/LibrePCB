@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGECHOOSERDIALOG_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGECHOOSERDIALOG_H
+#ifndef LIBREPCB_EDITOR_PACKAGECHOOSERDIALOG_H
+#define LIBREPCB_EDITOR_PACKAGECHOOSERDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,17 +36,12 @@ namespace librepcb {
 
 class GraphicsScene;
 class IF_GraphicsLayerProvider;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
-class FootprintPreviewGraphicsItem;
 class Package;
+class Workspace;
 
 namespace editor {
+
+class FootprintPreviewGraphicsItem;
 
 namespace Ui {
 class PackageChooserDialog;
@@ -66,7 +61,7 @@ public:
   // Constructors / Destructor
   PackageChooserDialog() = delete;
   PackageChooserDialog(const PackageChooserDialog& other) = delete;
-  PackageChooserDialog(const workspace::Workspace& ws,
+  PackageChooserDialog(const Workspace& ws,
                        const IF_GraphicsLayerProvider* layerProvider,
                        QWidget* parent = nullptr) noexcept;
   ~PackageChooserDialog() noexcept;
@@ -94,7 +89,7 @@ private:  // Methods
   const QStringList& localeOrder() const noexcept;
 
 private:  // Data
-  const workspace::Workspace& mWorkspace;
+  const Workspace& mWorkspace;
   const IF_GraphicsLayerProvider* mLayerProvider;
   QScopedPointer<Ui::PackageChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
@@ -112,7 +107,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

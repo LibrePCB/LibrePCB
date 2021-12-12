@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ATTRIBUTEUNIT_H
-#define LIBREPCB_COMMON_ATTRIBUTEUNIT_H
+#ifndef LIBREPCB_CORE_ATTRIBUTEUNIT_H
+#define LIBREPCB_CORE_ATTRIBUTEUNIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/sexpression.h"
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 

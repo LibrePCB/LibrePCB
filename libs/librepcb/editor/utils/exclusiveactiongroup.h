@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_EXCLUSIVEACTIONGROUP_H
-#define LIBREPCB_COMMON_EXCLUSIVEACTIONGROUP_H
+#ifndef LIBREPCB_EDITOR_EXCLUSIVEACTIONGROUP_H
+#define LIBREPCB_EDITOR_EXCLUSIVEACTIONGROUP_H
 
 /*******************************************************************************
  *  Includes
@@ -30,6 +30,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class ExclusiveActionGroup
@@ -82,6 +83,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

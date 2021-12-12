@@ -25,9 +25,9 @@
 #include "build_env.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/point.h"
+#include "types/angle.h"
+#include "types/length.h"
+#include "types/point.h"
 
 #include <QtCore>
 

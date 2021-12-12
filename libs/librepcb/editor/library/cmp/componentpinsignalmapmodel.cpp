@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "componentpinsignalmapmodel.h"
 
+#include "../../undostack.h"
+#include "../cmd/cmdcomponentpinsignalmapitemedit.h"
 #include "../libraryelementcache.h"
 
-#include <librepcb/common/undostack.h>
-#include <librepcb/library/cmp/cmd/cmdcomponentpinsignalmapitemedit.h>
-#include <librepcb/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>
 
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -417,5 +416,4 @@ void ComponentPinSignalMapModel::getRowItem(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

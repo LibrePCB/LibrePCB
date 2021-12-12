@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CIRCUIT_H
-#define LIBREPCB_PROJECT_CIRCUIT_H
+#ifndef LIBREPCB_CORE_CIRCUIT_H
+#define LIBREPCB_CORE_CIRCUIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/library/cmp/componentprefix.h>
+#include "../../fileio/filepath.h"
+#include "../../library/cmp/componentprefix.h"
+#include "../../serialization/serializableobject.h"
+#include "../../types/circuitidentifier.h"
+#include "../../types/elementname.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -38,18 +37,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class TransactionalDirectory;
-
-namespace library {
 class Component;
-}
-
-namespace project {
-
 class ComponentInstance;
 class NetClass;
 class NetSignal;
 class Project;
+class TransactionalDirectory;
 
 /*******************************************************************************
  *  Class Circuit
@@ -59,16 +52,16 @@ class Project;
  * @brief   The Circuit class represents all electrical connections in a project
  * (drawn in the schematics)
  *
- * Each ::librepcb::project::Project object contains exactly one
- * ::librepcb::project::Circuit object which contains the whole electrical
+ * Each ::librepcb::Project object contains exactly one
+ * ::librepcb::Circuit object which contains the whole electrical
  * components and connections. They are created with the schematic editor and
  * used by the board editor. The whole circuit is saved in the file
  * "circuit.lp" in the project's "circuit" directory.
  *
  * Each #Circuit object contains:
- *  - All net classes (::librepcb::project::NetClass objects)
- *  - All net signals (::librepcb::project::NetSignal objects)
- *  - All component instances (::librepcb::project::ComponentInstance objects)
+ *  - All net classes (::librepcb::NetClass objects)
+ *  - All net signals (::librepcb::NetSignal objects)
+ *  - All component instances (::librepcb::ComponentInstance objects)
  */
 class Circuit final : public QObject, public SerializableObject {
   Q_OBJECT
@@ -109,7 +102,7 @@ public:
 
   // ComponentInstance Methods
   QString generateAutoComponentInstanceName(
-      const library::ComponentPrefix& cmpPrefix) const noexcept;
+      const ComponentPrefix& cmpPrefix) const noexcept;
   const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {
     return mComponentInstances;
   }
@@ -140,7 +133,7 @@ signals:
   void componentRemoved(ComponentInstance& cmp);
 
 private:
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // General
@@ -156,7 +149,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

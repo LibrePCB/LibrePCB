@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::OrderPcbDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::OrderPcbDialog">
+ <class>librepcb::editor::OrderPcbDialog</class>
+ <widget class="QDialog" name="librepcb::editor::OrderPcbDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -214,7 +214,7 @@
   <connection>
    <sender>btnBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::OrderPcbDialog</receiver>
+   <receiver>librepcb::editor::OrderPcbDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -230,7 +230,7 @@
   <connection>
    <sender>btnBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::OrderPcbDialog</receiver>
+   <receiver>librepcb::editor::OrderPcbDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

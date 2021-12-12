@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDADDSYMBOLTOSCHEMATIC_H
-#define LIBREPCB_PROJECTEDITOR_CMDADDSYMBOLTOSCHEMATIC_H
+#ifndef LIBREPCB_EDITOR_CMDADDSYMBOLTOSCHEMATIC_H
+#define LIBREPCB_EDITOR_CMDADDSYMBOLTOSCHEMATIC_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
-#include <librepcb/common/units/angle.h>
-#include <librepcb/common/units/point.h>
-#include <librepcb/common/uuid.h>
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -35,19 +36,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-class Symbol;
-}
-
-namespace project {
-
 class ComponentInstance;
 class SI_Symbol;
 class Schematic;
+class Symbol;
+class Workspace;
 
 namespace editor {
 
@@ -61,7 +54,7 @@ namespace editor {
 class CmdAddSymbolToSchematic final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdAddSymbolToSchematic(workspace::Workspace& workspace, Schematic& schematic,
+  CmdAddSymbolToSchematic(Workspace& workspace, Schematic& schematic,
                           ComponentInstance& cmpInstance,
                           const Uuid& symbolItem,
                           const Point& position = Point(),
@@ -74,13 +67,13 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
 
   // Attributes from the constructor
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Schematic& mSchematic;
   ComponentInstance& mComponentInstance;
   Uuid mSymbolItemUuid;
@@ -95,7 +88,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

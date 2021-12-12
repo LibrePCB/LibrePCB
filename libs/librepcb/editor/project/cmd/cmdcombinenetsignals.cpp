@@ -22,23 +22,24 @@
  ******************************************************************************/
 #include "cmdcombinenetsignals.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentadd.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentedit.h>
-#include <librepcb/project/boards/cmd/cmdboardnetsegmentremove.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneadd.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneedit.h>
-#include <librepcb/project/boards/cmd/cmdboardplaneremove.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignalremove.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentedit.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
+#include "../../project/cmd/cmdboardnetsegmentadd.h"
+#include "../../project/cmd/cmdboardnetsegmentedit.h"
+#include "../../project/cmd/cmdboardnetsegmentremove.h"
+#include "../../project/cmd/cmdboardplaneadd.h"
+#include "../../project/cmd/cmdboardplaneedit.h"
+#include "../../project/cmd/cmdboardplaneremove.h"
+#include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
+#include "../../project/cmd/cmdnetsignalremove.h"
+#include "../../project/cmd/cmdschematicnetsegmentadd.h"
+#include "../../project/cmd/cmdschematicnetsegmentedit.h"
+#include "../../project/cmd/cmdschematicnetsegmentremove.h"
+
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -46,7 +47,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -139,5 +139,4 @@ bool CmdCombineNetSignals::performExecute() {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

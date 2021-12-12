@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/common/scopeguardlist.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/scopeguardlist.h>
 
 #include <chrono>
 

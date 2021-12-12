@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDREMOVEBOARDITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDREMOVEBOARDITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDREMOVEBOARDITEMS_H
+#define LIBREPCB_EDITOR_CMDREMOVEBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_Device;
 class BI_FootprintPad;
@@ -114,7 +113,7 @@ public:
   CmdRemoveBoardItems& operator=(const CmdRemoveBoardItems& other) = delete;
 
 private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   void removeNetSegmentItems(BI_NetSegment& netsegment,
@@ -143,7 +142,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

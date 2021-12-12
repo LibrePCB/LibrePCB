@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_PACKAGE_H
-#define LIBREPCB_LIBRARY_PACKAGE_H
+#ifndef LIBREPCB_CORE_PACKAGE_H
+#define LIBREPCB_CORE_PACKAGE_H
 
 /*******************************************************************************
  *  Includes
@@ -33,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class Package
@@ -87,7 +86,7 @@ public:
   }
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
 private:  // Data
@@ -99,7 +98,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

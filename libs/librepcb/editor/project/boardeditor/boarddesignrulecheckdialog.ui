@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::BoardDesignRuleCheckDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::BoardDesignRuleCheckDialog">
+ <class>librepcb::editor::BoardDesignRuleCheckDialog</class>
+ <widget class="QDialog" name="librepcb::editor::BoardDesignRuleCheckDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -51,7 +51,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperCopper" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtClearanceCopperCopper" native="true"/>
         </item>
         <item row="3" column="0">
          <widget class="QCheckBox" name="cbxClearanceCopperBoard">
@@ -64,7 +64,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperBoard" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtClearanceCopperBoard" native="true"/>
         </item>
         <item row="4" column="0">
          <widget class="QCheckBox" name="cbxClearanceCopperNpth">
@@ -77,7 +77,7 @@
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtClearanceCopperNpth" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtClearanceCopperNpth" native="true"/>
         </item>
         <item row="5" column="0">
          <widget class="QCheckBox" name="cbxMinCopperWidth">
@@ -90,7 +90,7 @@
          </widget>
         </item>
         <item row="5" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinCopperWidth" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinCopperWidth" native="true"/>
         </item>
         <item row="6" column="0">
          <widget class="QCheckBox" name="cbxMinPthRestring">
@@ -103,7 +103,7 @@
          </widget>
         </item>
         <item row="6" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthRestring" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinPthRestring" native="true"/>
         </item>
         <item row="7" column="0">
          <widget class="QCheckBox" name="cbxMinPthDrillDiameter">
@@ -116,7 +116,7 @@
          </widget>
         </item>
         <item row="7" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinPthDrillDiameter" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinPthDrillDiameter" native="true"/>
         </item>
         <item row="8" column="0">
          <widget class="QCheckBox" name="cbxMinNpthDrillDiameter">
@@ -129,7 +129,7 @@
          </widget>
         </item>
         <item row="8" column="1">
-         <widget class="librepcb::UnsignedLengthEdit" name="edtMinNpthDrillDiameter" native="true"/>
+         <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinNpthDrillDiameter" native="true"/>
         </item>
         <item row="9" column="0">
          <widget class="QCheckBox" name="cbxCourtyardOffset">
@@ -142,7 +142,7 @@
          </widget>
         </item>
         <item row="9" column="1">
-         <widget class="librepcb::LengthEdit" name="edtCourtyardOffset" native="true"/>
+         <widget class="librepcb::editor::LengthEdit" name="edtCourtyardOffset" native="true"/>
         </item>
         <item row="10" column="0">
          <widget class="QCheckBox" name="cbxMissingConnections">
@@ -231,15 +231,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::UnsignedLengthEdit</class>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::LengthEdit</class>
+   <class>librepcb::editor::LengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/lengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -258,7 +258,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::BoardDesignRuleCheckDialog</receiver>
+   <receiver>librepcb::editor::BoardDesignRuleCheckDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -274,7 +274,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::BoardDesignRuleCheckDialog</receiver>
+   <receiver>librepcb::editor::BoardDesignRuleCheckDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

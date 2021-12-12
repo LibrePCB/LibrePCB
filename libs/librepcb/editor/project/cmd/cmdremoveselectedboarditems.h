@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_CMDREMOVESELECTEDBOARDITEMS_H
-#define LIBREPCB_PROJECTEDITOR_CMDREMOVESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDREMOVESELECTEDBOARDITEMS_H
+#define LIBREPCB_EDITOR_CMDREMOVESELECTEDBOARDITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommand.h>
+#include "../../undocommand.h"
 
 #include <QtCore>
 
@@ -31,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_NetLine;
 class BI_NetPoint;
@@ -57,13 +56,13 @@ public:
   ~CmdRemoveSelectedBoardItems() noexcept;
 
 private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
 private:  // Data
@@ -76,7 +75,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

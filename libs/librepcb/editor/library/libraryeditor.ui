@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::LibraryEditor</class>
- <widget class="QMainWindow" name="librepcb::library::editor::LibraryEditor">
+ <class>librepcb::editor::LibraryEditor</class>
+ <widget class="QMainWindow" name="librepcb::editor::LibraryEditor">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -56,7 +56,7 @@
      </widget>
     </item>
     <item>
-     <widget class="librepcb::TabWidget" name="tabWidget">
+     <widget class="librepcb::editor::TabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>-1</number>
       </property>
@@ -167,7 +167,7 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="librepcb::StatusBar" name="statusBar"/>
+  <widget class="librepcb::editor::StatusBar" name="statusBar"/>
   <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
     <string>File</string>
@@ -751,14 +751,14 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>librepcb::StatusBar</class>
+   <class>librepcb::editor::StatusBar</class>
    <extends>QStatusBar</extends>
-   <header location="global">librepcb/common/widgets/statusbar.h</header>
+   <header location="global">librepcb/editor/widgets/statusbar.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::TabWidget</class>
+   <class>librepcb::editor::TabWidget</class>
    <extends>QTabWidget</extends>
-   <header location="global">librepcb/common/widgets/tabwidget.h</header>
+   <header location="global">librepcb/editor/widgets/tabwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

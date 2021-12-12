@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
+#ifndef LIBREPCB_CORE_SYMBOLPINGRAPHICSITEM_H
+#define LIBREPCB_CORE_SYMBOLPINGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/units/length.h>
+#include "../../types/circuitidentifier.h"
+#include "../../types/length.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,9 +40,6 @@ class LineGraphicsItem;
 class Point;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
-
-namespace library {
-
 class SymbolPin;
 
 /*******************************************************************************
@@ -94,7 +91,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

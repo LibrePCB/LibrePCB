@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "newprojectwizardpage_metadata.h"
 
+#include "../../dialogs/filedialog.h"
 #include "ui_newprojectwizardpage_metadata.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -44,7 +43,7 @@ namespace editor {
  ******************************************************************************/
 
 NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
-    const workspace::Workspace& ws, QWidget* parent) noexcept
+    const Workspace& ws, QWidget* parent) noexcept
   : QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_Metadata) {
   mUi->setupUi(this);
   setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
@@ -214,5 +213,4 @@ bool NewProjectWizardPage_Metadata::validatePage() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYMANAGER_LIBRARYDOWNLOAD_H
-#define LIBREPCB_LIBRARYMANAGER_LIBRARYDOWNLOAD_H
+#ifndef LIBREPCB_EDITOR_LIBRARYDOWNLOAD_H
+#define LIBREPCB_EDITOR_LIBRARYDOWNLOAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 
@@ -34,8 +34,7 @@ namespace librepcb {
 
 class FileDownload;
 
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Class LibraryDownload
@@ -109,8 +108,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

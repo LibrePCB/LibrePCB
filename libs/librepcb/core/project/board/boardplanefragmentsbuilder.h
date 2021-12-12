@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H
-#define LIBREPCB_PROJECT_BOARDPLANEFRAGMENTSBUILDER_H
+#ifndef LIBREPCB_CORE_BOARDPLANEFRAGMENTSBUILDER_H
+#define LIBREPCB_CORE_BOARDPLANEFRAGMENTSBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/geometry/path.h>
+#include "../../geometry/path.h"
+
 #include <polyclipping/clipper.hpp>
 
 #include <QtCore>
@@ -32,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BI_FootprintPad;
 class BI_Plane;
@@ -91,7 +91,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H
-#define LIBREPCB_PROJECT_CMDDEVICEINSTANCEEDITALL_H
+#ifndef LIBREPCB_EDITOR_CMDDEVICEINSTANCEEDITALL_H
+#define LIBREPCB_EDITOR_CMDDEVICEINSTANCEEDITALL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
@@ -33,13 +33,13 @@
 namespace librepcb {
 
 class Angle;
-class CmdStrokeTextEdit;
+class BI_Device;
 class Point;
 
-namespace project {
+namespace editor {
 
-class BI_Device;
 class CmdDeviceInstanceEdit;
+class CmdStrokeTextEdit;
 
 /*******************************************************************************
  *  Class CmdDeviceInstanceEditAll
@@ -71,7 +71,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

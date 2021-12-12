@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/algorithm/airwiresbuilder.h>
+#include <librepcb/core/algorithm/airwiresbuilder.h>
 
 #include <QtCore>
 

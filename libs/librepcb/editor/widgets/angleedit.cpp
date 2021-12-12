@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "angleedit.h"
 
-#include "doublespinbox.h"
+#include "../widgets/doublespinbox.h"
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -77,4 +78,5 @@ void AngleEdit::spinBoxValueChanged(double value) noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

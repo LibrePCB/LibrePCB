@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "symboleditorstate_drawtextbase.h"
 
+#include "../../../cmd/cmdtextedit.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
 #include "../symboleditorwidget.h"
 
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/geometry/text.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/graphics/textgraphicsitem.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/geometry/text.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/graphics/textgraphicsitem.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -303,5 +302,4 @@ void SymbolEditorState_DrawTextBase::textComboBoxValueChanged(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

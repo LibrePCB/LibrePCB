@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORFSM_H
-#define LIBREPCB_LIBRARYEDITOR_SYMBOLEDITORFSM_H
+#ifndef LIBREPCB_EDITOR_SYMBOLEDITORFSM_H
+#define LIBREPCB_EDITOR_SYMBOLEDITORFSM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../common/editorwidgetbase.h"
+#include "../../editorwidgetbase.h"
 
 #include <QtCore>
 
@@ -35,20 +35,17 @@
 namespace librepcb {
 
 class GraphicsScene;
-class GraphicsView;
 class GridProperties;
 class IF_GraphicsLayerProvider;
-class UndoStack;
-
-namespace library {
-
 class Symbol;
 class SymbolGraphicsItem;
 
 namespace editor {
 
+class GraphicsView;
 class SymbolEditorState;
 class SymbolEditorWidget;
+class UndoStack;
 
 /*******************************************************************************
  *  Class SymbolEditorFsm
@@ -77,7 +74,7 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    workspace::Workspace& workspace;
+    Workspace& workspace;
     SymbolEditorWidget& editorWidget;
     UndoStack& undoStack;
     bool readOnly;
@@ -151,7 +148,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

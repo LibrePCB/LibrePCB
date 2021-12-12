@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::AlignmentSelector</class>
- <widget class="QWidget" name="librepcb::AlignmentSelector">
+ <class>librepcb::editor::AlignmentSelector</class>
+ <widget class="QWidget" name="librepcb::editor::AlignmentSelector">
   <property name="geometry">
    <rect>
     <x>0</x>

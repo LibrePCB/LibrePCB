@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GRAPHICSLAYER_H
-#define LIBREPCB_COMMON_GRAPHICSLAYER_H
+#ifndef LIBREPCB_CORE_GRAPHICSLAYER_H
+#define LIBREPCB_CORE_GRAPHICSLAYER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../signalslot.h"
+#include "../utils/signalslot.h"
 #include "graphicslayername.h"
 
 #include <QtCore>
@@ -58,9 +58,9 @@ public:
   //static constexpr const char* sSchematicSelection      = "sch_selection";          ///< Primary: outline    | Secondary: area
   static constexpr const char* sSchematicReferences     = "sch_references";         ///< origin crosses of symbols, texts, ...
   static constexpr const char* sSchematicSheetFrames    = "sch_scheet_frames";      ///< e.g. A4 sheet frame + text boxes
-  static constexpr const char* sSchematicNetLines       = "sch_net_lines";          ///< librepcb::project::SI_NetLine
-  static constexpr const char* sSchematicNetLabels      = "sch_net_labels";         ///< librepcb::project::SI_NetLabel
-  static constexpr const char* sSchematicNetLabelAnchors= "sch_net_label_anchors";  ///< anchor line of librepcb::project::SI_NetLabel
+  static constexpr const char* sSchematicNetLines       = "sch_net_lines";          ///< librepcb::SI_NetLine
+  static constexpr const char* sSchematicNetLabels      = "sch_net_labels";         ///< librepcb::SI_NetLabel
+  static constexpr const char* sSchematicNetLabelAnchors= "sch_net_label_anchors";  ///< anchor line of librepcb::SI_NetLabel
   static constexpr const char* sSchematicDocumentation  = "sch_documentation";      ///< for documentation purposes, e.g. text
   static constexpr const char* sSchematicComments       = "sch_comments";           ///< for personal comments, e.g. text
   static constexpr const char* sSchematicGuide          = "sch_guide";              ///< e.g. for boxes around circuits

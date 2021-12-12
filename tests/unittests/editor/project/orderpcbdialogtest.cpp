@@ -24,7 +24,7 @@
 #include "../../testhelpers.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/projecteditor/dialogs/orderpcbdialog.h>
+#include <librepcb/editor/project/orderpcbdialog.h>
 
 #include <QtTest>
 
@@ -32,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 namespace tests {
 
@@ -85,5 +84,4 @@ TEST_F(OrderPcbDialogTest, testTabOrder) {
 
 }  // namespace tests
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

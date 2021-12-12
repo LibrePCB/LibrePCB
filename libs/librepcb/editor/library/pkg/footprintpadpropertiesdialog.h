@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
-#define LIBREPCB_LIBRARYEDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
+#define LIBREPCB_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -31,16 +31,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
-class UndoStack;
-
-namespace library {
-
 class Footprint;
 class FootprintPad;
+class LengthUnit;
 class Package;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class FootprintPadPropertiesDialog;
@@ -90,7 +88,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

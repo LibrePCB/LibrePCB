@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_PLANE_H
-#define LIBREPCB_PROJECT_BI_PLANE_H
+#ifndef LIBREPCB_CORE_BI_PLANE_H
+#define LIBREPCB_CORE_BI_PLANE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../exceptions.h"
+#include "../../../geometry/path.h"
+#include "../../../graphics/graphicslayername.h"
+#include "../../../serialization/serializableobject.h"
+#include "../../../types/uuid.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/graphics/graphicslayername.h>
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 
@@ -36,7 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class BGI_Plane;
 class Board;
@@ -107,7 +106,7 @@ public:
   void clear() noexcept;
   void rebuild() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
@@ -154,16 +153,14 @@ private:  // Data
  *  Non-Member Functions
  ******************************************************************************/
 
-}  // namespace project
-
 template <>
-inline SExpression serialize(const project::BI_Plane::ConnectStyle& obj) {
+inline SExpression serialize(const BI_Plane::ConnectStyle& obj) {
   switch (obj) {
-    case project::BI_Plane::ConnectStyle::None:
+    case BI_Plane::ConnectStyle::None:
       return SExpression::createToken("none");
-    // case project::BI_Plane::ConnectStyle::Thermal:  return
+    // case BI_Plane::ConnectStyle::Thermal:  return
     // SExpression::createToken("thermal");
-    case project::BI_Plane::ConnectStyle::Solid:
+    case BI_Plane::ConnectStyle::Solid:
       return SExpression::createToken("solid");
     default:
       throw LogicError(__FILE__, __LINE__);
@@ -171,19 +168,19 @@ inline SExpression serialize(const project::BI_Plane::ConnectStyle& obj) {
 }
 
 template <>
-inline project::BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
-                                                   const Version& fileFormat) {
+inline BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
+                                          const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
-  if (str == "none") return project::BI_Plane::ConnectStyle::None;
+  if (str == "none") return BI_Plane::ConnectStyle::None;
   // else if (str == "thermal")  return
-  // project::BI_Plane::ConnectStyle::Thermal;
+  // BI_Plane::ConnectStyle::Thermal;
   else if (str == "solid")
-    return project::BI_Plane::ConnectStyle::Solid;
+    return BI_Plane::ConnectStyle::Solid;
   else
     throw RuntimeError(
         __FILE__, __LINE__,
-        project::BI_Plane::tr("Unknown plane connect style: \"%1\"").arg(str));
+        BI_Plane::tr("Unknown plane connect style: \"%1\"").arg(str));
 }
 
 /*******************************************************************************

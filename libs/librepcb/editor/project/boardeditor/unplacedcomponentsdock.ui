@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::UnplacedComponentsDock</class>
- <widget class="QDockWidget" name="librepcb::project::editor::UnplacedComponentsDock">
+ <class>librepcb::editor::UnplacedComponentsDock</class>
+ <widget class="QDockWidget" name="librepcb::editor::UnplacedComponentsDock">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -102,7 +102,7 @@
          </widget>
         </item>
         <item>
-         <widget class="GraphicsView" name="graphicsView">
+         <widget class="librepcb::editor::GraphicsView" name="graphicsView">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -175,7 +175,7 @@
   <customwidget>
    <class>GraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">librepcb/common/graphics/graphicsview.h</header>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

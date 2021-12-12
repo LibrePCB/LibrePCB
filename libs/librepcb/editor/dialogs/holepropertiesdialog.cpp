@@ -22,10 +22,11 @@
  ******************************************************************************/
 #include "holepropertiesdialog.h"
 
-#include "../geometry/cmd/cmdholeedit.h"
-#include "../geometry/hole.h"
+#include "../cmd/cmdholeedit.h"
 #include "../undostack.h"
 #include "ui_holepropertiesdialog.h"
+
+#include <librepcb/core/geometry/hole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,6 +35,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
                                            const LengthUnit& lengthUnit,
@@ -125,4 +127,5 @@ bool HolePropertiesDialog::applyChanges() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

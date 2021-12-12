@@ -21,13 +21,12 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/library/cmp/componentprefix.h>
+#include <librepcb/core/library/cmp/componentprefix.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace tests {
 
 /*******************************************************************************
@@ -96,5 +95,4 @@ INSTANTIATE_TEST_SUITE_P(ComponentPrefixTest, ComponentPrefixTest, ::testing::Va
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace library
 }  // namespace librepcb

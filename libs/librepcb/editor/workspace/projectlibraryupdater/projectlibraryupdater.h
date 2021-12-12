@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTLIBRARYUPDATER_PROJECTLIBRARYUPDATER_H
-#define LIBREPCB_PROJECTLIBRARYUPDATER_PROJECTLIBRARYUPDATER_H
+#ifndef LIBREPCB_EDITOR_PROJECTLIBRARYUPDATER_H
+#define LIBREPCB_EDITOR_PROJECTLIBRARYUPDATER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,13 +37,10 @@
 namespace librepcb {
 
 class TransactionalFileSystem;
-
-namespace workspace {
 class Workspace;
 class WorkspaceLibraryDb;
-}  // namespace workspace
 
-namespace application {
+namespace editor {
 
 class ControlPanel;
 
@@ -66,8 +63,7 @@ class ProjectLibraryUpdater : public QMainWindow {
   Q_OBJECT
 
 public:
-  explicit ProjectLibraryUpdater(workspace::Workspace& ws,
-                                 const FilePath& project,
+  explicit ProjectLibraryUpdater(Workspace& ws, const FilePath& project,
                                  ControlPanel& cp) noexcept;
   ~ProjectLibraryUpdater();
 
@@ -77,12 +73,13 @@ private slots:
 private:
   void log(const QString& msg) noexcept;
   QString prettyPath(const FilePath& fp) const noexcept;
-  void updateElements(
-      std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
-      FilePath (workspace::WorkspaceLibraryDb::*getter)(const Uuid&) const);
+  void updateElements(std::shared_ptr<TransactionalFileSystem> fs,
+                      const QString& type,
+                      FilePath (WorkspaceLibraryDb::*getter)(const Uuid&)
+                          const);
 
 private:
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   FilePath mProjectFilePath;
   ControlPanel& mControlPanel;
   QScopedPointer<Ui::ProjectLibraryUpdater> mUi;
@@ -92,7 +89,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

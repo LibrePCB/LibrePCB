@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "categorytreelabeltextbuilder.h"
 
-#include <librepcb/library/cat/componentcategory.h>
-#include <librepcb/library/cat/packagecategory.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -42,7 +41,7 @@ namespace editor {
 
 template <typename ElementType>
 CategoryTreeLabelTextBuilder<ElementType>::CategoryTreeLabelTextBuilder(
-    const workspace::WorkspaceLibraryDb& db, const QStringList& localeOrder,
+    const WorkspaceLibraryDb& db, const QStringList& localeOrder,
     QLabel& label) noexcept
   : mDb(db),
     mLocaleOrder(localeOrder),
@@ -174,13 +173,12 @@ QList<Uuid> CategoryTreeLabelTextBuilder<PackageCategory>::getCategoryParents(
 /*******************************************************************************
  *  Explicit template instantiations
  ******************************************************************************/
-template class CategoryTreeLabelTextBuilder<library::ComponentCategory>;
-template class CategoryTreeLabelTextBuilder<library::PackageCategory>;
+template class CategoryTreeLabelTextBuilder<ComponentCategory>;
+template class CategoryTreeLabelTextBuilder<PackageCategory>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_COMPONENTPINSIGNALMAPMODEL_H
-#define LIBREPCB_LIBRARYEDITOR_COMPONENTPINSIGNALMAPMODEL_H
+#ifndef LIBREPCB_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
+#define LIBREPCB_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/model/comboboxdelegate.h>
-#include <librepcb/library/cmp/componentsignal.h>
-#include <librepcb/library/cmp/componentsymbolvariant.h>
+#include "../../modelview/comboboxdelegate.h"
+
+#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/library/cmp/componentsymbolvariant.h>
 
 #include <QtCore>
 
@@ -33,14 +34,11 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class UndoCommand;
-class UndoStack;
-
-namespace library {
 namespace editor {
 
 class LibraryElementCache;
+class UndoCommand;
+class UndoStack;
 
 /*******************************************************************************
  *  Class ComponentPinSignalMapModel
@@ -125,7 +123,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

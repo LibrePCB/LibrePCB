@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_GENERICVALUE_H
-#define LIBREPCB_WORKSPACE_WORKSPACESETTINGSITEM_GENERICVALUE_H
+#ifndef LIBREPCB_CORE_WORKSPACESETTINGSITEM_GENERICVALUE_H
+#define LIBREPCB_CORE_WORKSPACESETTINGSITEM_GENERICVALUE_H
 
 /*******************************************************************************
  *  Includes
@@ -31,14 +31,13 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace workspace {
 
 /*******************************************************************************
  *  Class WorkspaceSettingsItem_GenericValue
  ******************************************************************************/
 
 /**
- * @brief Generic implementation of ::librepcb::workspace::WorkspaceSettingsItem
+ * @brief Generic implementation of ::librepcb::WorkspaceSettingsItem
  *        for simple, value-type settings
  */
 template <typename T>
@@ -82,19 +81,19 @@ public:
   const T& getDefault() const noexcept { return mDefaultValue; }
 
   /**
-   * @copydoc ::librepcb::workspace::WorkspaceSettingsItem::restoreDefault()
+   * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefault()
    */
   virtual void restoreDefault() noexcept override { set(mDefaultValue); }
 
   /**
-   * @copydoc ::librepcb::workspace::WorkspaceSettingsItem::load()
+   * @copydoc ::librepcb::WorkspaceSettingsItem::load()
    */
   void load(const SExpression& root, const Version& fileFormat) override {
     set(deserialize<T>(root.getChild(mKey % "/@0"), fileFormat));  // can throw
   }
 
   /**
-   * @copydoc ::librepcb::workspace::WorkspaceSettingsItem::serialize()
+   * @copydoc ::librepcb::WorkspaceSettingsItem::serialize()
    */
   void serialize(SExpression& root) const override {
     root.appendChild(mKey, mCurrentValue, true);
@@ -114,7 +113,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb
 
 #endif

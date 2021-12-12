@@ -22,27 +22,27 @@
  ******************************************************************************/
 #include "packageeditorwidget.h"
 
+#include "../../cmd/cmdstroketextedit.h"
+#include "../../dialogs/gridsettingsdialog.h"
+#include "../../library/cmd/cmdlibraryelementedit.h"
+#include "../../utils/exclusiveactiongroup.h"
+#include "../../widgets/statusbar.h"
+#include "../cmd/cmdfootprintedit.h"
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
 
-#include <librepcb/common/dialogs/gridsettingsdialog.h>
-#include <librepcb/common/geometry/cmd/cmdstroketextedit.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/utils/exclusiveactiongroup.h>
-#include <librepcb/common/widgets/statusbar.h>
-#include <librepcb/library/cmd/cmdlibraryelementedit.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgmissingcategories.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
-#include <librepcb/library/pkg/cmd/cmdfootprintedit.h>
-#include <librepcb/library/pkg/msg/msgmissingfootprint.h>
-#include <librepcb/library/pkg/msg/msgmissingfootprintname.h>
-#include <librepcb/library/pkg/msg/msgmissingfootprintvalue.h>
-#include <librepcb/library/pkg/msg/msgwrongfootprinttextlayer.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgmissingcategories.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/pkg/msg/msgmissingfootprint.h>
+#include <librepcb/core/library/pkg/msg/msgmissingfootprintname.h>
+#include <librepcb/core/library/pkg/msg/msgmissingfootprintvalue.h>
+#include <librepcb/core/library/pkg/msg/msgwrongfootprinttextlayer.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,7 +51,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -539,5 +538,4 @@ bool PackageEditorWidget::processCheckMessage(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

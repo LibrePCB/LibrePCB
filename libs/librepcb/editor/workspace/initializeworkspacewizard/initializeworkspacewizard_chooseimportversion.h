@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_INITIALIZEWORKSPACEWIZARD_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
-#define LIBREPCB_INITIALIZEWORKSPACEWIZARD_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_CHOOSEIMPORTVERSION_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace application {
+namespace editor {
 
 namespace Ui {
 class InitializeWorkspaceWizard_ChooseImportVersion;
@@ -76,7 +76,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

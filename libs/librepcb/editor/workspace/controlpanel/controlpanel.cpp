@@ -22,30 +22,30 @@
  ******************************************************************************/
 #include "controlpanel.h"
 
+#include "../../dialogs/aboutdialog.h"
+#include "../../dialogs/directorylockhandlerdialog.h"
+#include "../../dialogs/filedialog.h"
+#include "../../library/libraryeditor.h"
+#include "../../project/newprojectwizard/newprojectwizard.h"
+#include "../../project/projecteditor.h"
+#include "../../workspace/librarymanager/librarymanager.h"
 #include "../firstrunwizard/firstrunwizard.h"
-#include "../markdown/markdownconverter.h"
-#include "projectlibraryupdater/projectlibraryupdater.h"
+#include "../projectlibraryupdater/projectlibraryupdater.h"
+#include "../workspacesettingsdialog.h"
+#include "favoriteprojectsmodel.h"
+#include "markdownconverter.h"
+#include "projecttreemodel.h"
+#include "recentprojectsmodel.h"
 #include "ui_controlpanel.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/dialogs/aboutdialog.h>
-#include <librepcb/common/dialogs/directorylockhandlerdialog.h>
-#include <librepcb/common/dialogs/filedialog.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/library.h>
-#include <librepcb/libraryeditor/libraryeditor.h>
-#include <librepcb/librarymanager/librarymanager.h>
-#include <librepcb/project/project.h>
-#include <librepcb/projecteditor/newprojectwizard/newprojectwizard.h>
-#include <librepcb/projecteditor/projecteditor.h>
-#include <librepcb/workspace/favoriteprojectsmodel.h>
-#include <librepcb/workspace/library/workspacelibrarydb.h>
-#include <librepcb/workspace/projecttreemodel.h>
-#include <librepcb/workspace/recentprojectsmodel.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/settings/workspacesettingsdialog.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -54,12 +54,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace application {
-
-using namespace project;
-using namespace project::editor;
-using namespace library::manager;
-using namespace workspace;
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -119,8 +114,12 @@ ControlPanel::ControlPanel(Workspace& workspace)
   connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
           this, &ControlPanel::openLibraryEditor);
 
+  // load project models
+  mRecentProjectsModel.reset(new RecentProjectsModel(mWorkspace));
+  mFavoriteProjectsModel.reset(new FavoriteProjectsModel(mWorkspace));
+  mProjectTreeModel.reset(new ProjectTreeModel(mWorkspace));
+
   // build projects file tree
-  mProjectTreeModel.reset(new workspace::ProjectTreeModel(mWorkspace));
   mUi->projectTreeView->setModel(mProjectTreeModel.data());
   mUi->projectTreeView->setRootIndex(
       mProjectTreeModel->index(mWorkspace.getProjectsPath().toStr()));
@@ -129,10 +128,7 @@ ControlPanel::ControlPanel(Workspace& workspace)
   }
 
   // load recent and favorite project models
-  mRecentProjectsModel.reset(new workspace::RecentProjectsModel(mWorkspace));
   mUi->recentProjectsListView->setModel(mRecentProjectsModel.data());
-  mFavoriteProjectsModel.reset(
-      new workspace::FavoriteProjectsModel(mWorkspace));
   mUi->favoriteProjectsListView->setModel(mFavoriteProjectsModel.data());
 
   loadSettings();
@@ -405,8 +401,6 @@ bool ControlPanel::askForRestoringBackup(const FilePath& dir) {
  ******************************************************************************/
 
 void ControlPanel::openLibraryEditor(const FilePath& libDir) noexcept {
-  using library::Library;
-  using library::editor::LibraryEditor;
   LibraryEditor* editor = mOpenLibraryEditors.value(libDir);
   if (!editor) {
     try {
@@ -429,7 +423,6 @@ void ControlPanel::openLibraryEditor(const FilePath& libDir) noexcept {
 }
 
 void ControlPanel::libraryEditorDestroyed() noexcept {
-  using library::editor::LibraryEditor;
   // Note: Actually we should dynamic_cast the QObject* to LibraryEditor*, but
   // as this slot is called in the destructor of QObject (base class of
   // LibraryEditor), the dynamic_cast does no longer work at this point, so a
@@ -442,7 +435,6 @@ void ControlPanel::libraryEditorDestroyed() noexcept {
 }
 
 bool ControlPanel::closeAllLibraryEditors(bool askForSave) noexcept {
-  using library::editor::LibraryEditor;
   bool success = true;
   foreach (LibraryEditor* editor, mOpenLibraryEditors) {
     if (editor->closeAndDestroy(askForSave)) {
@@ -773,5 +765,5 @@ void ControlPanel::on_actionRescanLibraries_triggered() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb

@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include "../../../widgets/graphicsview.h"
+
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -34,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -119,5 +119,4 @@ QList<GraphicsLayer*> PackageEditorState::getAllowedCircleAndPolygonLayers()
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACE_H
-#define LIBREPCB_WORKSPACE_WORKSPACE_H
+#ifndef LIBREPCB_CORE_WORKSPACE_H
+#define LIBREPCB_CORE_WORKSPACE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/directorylock.h>
-#include <librepcb/common/version.h>
+#include "../fileio/directorylock.h"
+#include "../types/version.h"
 
 #include <QtCore>
 
@@ -33,16 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
 class Library;
-}
-
-namespace project {
 class Project;
-}
-
-namespace workspace {
-
 class WorkspaceLibraryDb;
 class WorkspaceSettings;
 
@@ -223,7 +215,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb
 
 #endif

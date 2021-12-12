@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARYEDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
+#define LIBREPCB_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../symboleditorstate.h"
-
-#include <librepcb/common/undocommandgroup.h>
+#include "../../undocommandgroup.h"
+#include "../sym/fsm/symboleditorstate.h"
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -60,7 +58,7 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
   // Private Member Variables
@@ -72,7 +70,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "componentsignalinstance.h"
 
-#include "../boards/items/bi_footprintpad.h"
+#include "../../attribute/attributesubstitutor.h"
+#include "../../exceptions.h"
+#include "../../library/cmp/component.h"
+#include "../../utils/scopeguardlist.h"
+#include "../board/items/bi_footprintpad.h"
 #include "../erc/ercmsg.h"
 #include "../project.h"
-#include "../schematics/items/si_symbolpin.h"
-#include "../settings/projectsettings.h"
+#include "../projectsettings.h"
+#include "../schematic/items/si_symbolpin.h"
 #include "circuit.h"
 #include "componentinstance.h"
 #include "netsignal.h"
-
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/common/scopeguardlist.h>
-#include <librepcb/library/cmp/component.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -79,7 +78,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
 
 ComponentSignalInstance::ComponentSignalInstance(
     Circuit& circuit, ComponentInstance& cmpInstance,
-    const library::ComponentSignal& cmpSignal, NetSignal* netsignal)
+    const ComponentSignal& cmpSignal, NetSignal* netsignal)
   : QObject(&cmpInstance),
     mCircuit(circuit),
     mComponentInstance(cmpInstance),
@@ -320,5 +319,4 @@ void ComponentSignalInstance::updateErcMessages() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

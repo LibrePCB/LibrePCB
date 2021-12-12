@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdschematicnetsegmentadd.h"
 
-#include "../items/si_netsegment.h"
-#include "../schematic.h"
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -31,7 +31,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -83,5 +83,5 @@ void CmdSchematicNetSegmentAdd::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

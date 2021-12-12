@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_SYMBOL_H
-#define LIBREPCB_PROJECT_SGI_SYMBOL_H
+#ifndef LIBREPCB_CORE_SGI_SYMBOL_H
+#define LIBREPCB_CORE_SGI_SYMBOL_H
 
 /*******************************************************************************
  *  Includes
@@ -34,15 +34,9 @@
 namespace librepcb {
 
 class GraphicsLayer;
-class Text;
-
-namespace library {
-class Symbol;
-}
-
-namespace project {
-
 class SI_Symbol;
+class Symbol;
+class Text;
 
 /*******************************************************************************
  *  Class SGI_Symbol
@@ -89,7 +83,7 @@ private:
 
   // General Attributes
   SI_Symbol& mSymbol;
-  const library::Symbol& mLibSymbol;
+  const Symbol& mLibSymbol;
   QFont mFont;
 
   // Cached Attributes
@@ -102,7 +96,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/csvfile.h>
-#include <librepcb/common/pnp/pickplacecsvwriter.h>
-#include <librepcb/common/pnp/pickplacedata.h>
+#include <librepcb/core/export/pickplacecsvwriter.h>
+#include <librepcb/core/export/pickplacedata.h>
+#include <librepcb/core/fileio/csvfile.h>
 
 #include <QtCore>
 

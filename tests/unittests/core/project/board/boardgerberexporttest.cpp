@@ -21,12 +21,12 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/boardfabricationoutputsettings.h>
-#include <librepcb/project/boards/boardgerberexport.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardfabricationoutputsettings.h>
+#include <librepcb/core/project/board/boardgerberexport.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace tests {
 
 /*******************************************************************************
@@ -118,5 +117,4 @@ TEST(BoardGerberExportTest, test) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace project
 }  // namespace librepcb

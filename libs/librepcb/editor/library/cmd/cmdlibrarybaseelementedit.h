@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_CMDLIBRARYBASEELEMENTEDIT_H
-#define LIBREPCB_LIBRARY_CMDLIBRARYBASEELEMENTEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDLIBRARYBASEELEMENTEDIT_H
+#define LIBREPCB_EDITOR_CMDLIBRARYBASEELEMENTEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../librarybaseelement.h"
+#include "../../undocommand.h"
 
-#include <librepcb/common/undocommand.h>
+#include <librepcb/core/library/librarybaseelement.h>
 
 #include <QtCore>
 
@@ -33,7 +33,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdLibraryBaseElementEdit
@@ -67,13 +67,13 @@ public:
       delete;
 
 protected:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   virtual bool performExecute() override;
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   virtual void performUndo() override;
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   virtual void performRedo() override;
 
 private:  // Data
@@ -97,7 +97,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

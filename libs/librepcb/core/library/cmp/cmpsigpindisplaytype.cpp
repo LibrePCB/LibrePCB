@@ -28,7 +28,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -98,5 +97,4 @@ const QList<CmpSigPinDisplayType>&
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb

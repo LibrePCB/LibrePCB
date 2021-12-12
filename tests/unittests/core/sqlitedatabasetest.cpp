@@ -22,8 +22,9 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/sqlitedatabase.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/sqlitedatabase.h>
 
 #include <QtConcurrent>
 #include <QtCore>

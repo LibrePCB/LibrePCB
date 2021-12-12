@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORFSM_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORFSM_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORFSM_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORFSM_H
 
 /*******************************************************************************
  *  Includes
@@ -31,26 +31,20 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsView;
-class UndoStack;
-class Uuid;
-
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class Project;
+class Uuid;
+class Workspace;
 
 namespace editor {
+
+class GraphicsView;
+class SchematicEditor;
+class SchematicEditorState;
+class UndoStack;
 
 namespace Ui {
 class SchematicEditor;
 }
-
-class SchematicEditor;
-class SchematicEditorState;
 
 /*******************************************************************************
  *  Class SchematicEditorFsm
@@ -67,23 +61,23 @@ public:
   enum State {
     /// no state active
     IDLE,
-    /// ::librepcb::project::editor::SchematicEditorState_Select
+    /// ::librepcb::editor::SchematicEditorState_Select
     SELECT,
-    /// ::librepcb::project::editor::SchematicEditorState_DrawWire
+    /// ::librepcb::editor::SchematicEditorState_DrawWire
     DRAW_WIRE,
-    /// ::librepcb::project::editor::SchematicEditorState_AddNetLabel
+    /// ::librepcb::editor::SchematicEditorState_AddNetLabel
     ADD_NETLABEL,
-    /// ::librepcb::project::editor::SchematicEditorState_AddComponent
+    /// ::librepcb::editor::SchematicEditorState_AddComponent
     ADD_COMPONENT,
-    /// ::librepcb::project::editor::SchematicEditorState_DrawPolygon
+    /// ::librepcb::editor::SchematicEditorState_DrawPolygon
     DRAW_POLYGON,
-    /// ::librepcb::project::editor::SchematicEditorState_AddText
+    /// ::librepcb::editor::SchematicEditorState_AddText
     ADD_TEXT,
   };
 
   /// FSM Context
   struct Context {
-    workspace::Workspace& workspace;
+    Workspace& workspace;
     Project& project;
     SchematicEditor& editor;
     Ui::SchematicEditor& editorUi;
@@ -172,9 +166,8 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
-Q_DECLARE_METATYPE(librepcb::project::editor::SchematicEditorFsm::State)
+Q_DECLARE_METATYPE(librepcb::editor::SchematicEditorFsm::State)
 
 #endif

@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/sexpression.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/utils/tangentpathjoiner.h>
+#include <librepcb/core/geometry/path.h>
+#include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/utils/tangentpathjoiner.h>
 
 /*******************************************************************************
  *  Namespace

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BGI_PLANE_H
-#define LIBREPCB_PROJECT_BGI_PLANE_H
+#ifndef LIBREPCB_CORE_BGI_PLANE_H
+#define LIBREPCB_CORE_BGI_PLANE_H
 
 /*******************************************************************************
  *  Includes
@@ -33,13 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_Plane;
 class GraphicsLayer;
 class Path;
 class Polygon;
-
-namespace project {
-
-class BI_Plane;
 
 /*******************************************************************************
  *  Class BGI_Plane
@@ -107,7 +104,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

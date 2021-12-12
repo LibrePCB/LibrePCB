@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/utils/mathparser.h>
+#include <librepcb/core/utils/mathparser.h>
 
 #include <optional.hpp>
 

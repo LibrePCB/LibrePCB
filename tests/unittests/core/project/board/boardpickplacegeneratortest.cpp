@@ -22,14 +22,14 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/csvfile.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionaldirectory.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/pnp/pickplacecsvwriter.h>
-#include <librepcb/common/pnp/pickplacedata.h>
-#include <librepcb/project/boards/boardpickplacegenerator.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/export/pickplacecsvwriter.h>
+#include <librepcb/core/export/pickplacedata.h>
+#include <librepcb/core/fileio/csvfile.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/board/boardpickplacegenerator.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace tests {
 
 /*******************************************************************************
@@ -121,5 +120,4 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace project
 }  // namespace librepcb

@@ -22,19 +22,18 @@
  ******************************************************************************/
 #include "sgi_symbolpin.h"
 
+#include "../../../application.h"
+#include "../../../library/cmp/component.h"
+#include "../../../library/sym/symbolpin.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../../settings/projectsettings.h"
+#include "../../projectsettings.h"
 #include "../items/si_symbol.h"
 #include "../items/si_symbolpin.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbolpin.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -44,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -251,5 +249,4 @@ GraphicsLayer* SGI_SymbolPin::getLayer(const QString& name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

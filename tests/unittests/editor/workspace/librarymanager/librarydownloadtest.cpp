@@ -21,10 +21,10 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/network/networkaccessmanager.h>
-#include <librepcb/librarymanager/librarydownload.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/editor/workspace/librarymanager/librarydownload.h>
 
 #include <QSignalSpy>
 #include <QtCore>
@@ -33,8 +33,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 namespace tests {
 
 /*******************************************************************************
@@ -222,6 +221,5 @@ TEST_F(LibraryDownloadTest, testDownloadValidLibraryDestinationAlreadyExists) {
  ******************************************************************************/
 
 }  // namespace tests
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

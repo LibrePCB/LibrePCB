@@ -17,17 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
-#define LIBREPCB_PROJECT_COMPONENTSIGNALINSTANCE_H
+#ifndef LIBREPCB_CORE_COMPONENTSIGNALINSTANCE_H
+#define LIBREPCB_CORE_COMPONENTSIGNALINSTANCE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/serializableobject.h"
+#include "../../types/circuitidentifier.h"
 #include "../erc/if_ercmsgprovider.h"
-
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/serializableobject.h>
 
 #include <QtCore>
 
@@ -36,17 +34,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-class DomElement;
-
-namespace library {
-class ComponentSignal;
-}
-
-namespace project {
-
 class BI_FootprintPad;
 class Circuit;
 class ComponentInstance;
+class ComponentSignal;
 class ErcMsg;
 class NetSignal;
 class SI_SymbolPin;
@@ -72,13 +63,13 @@ public:
                           const SExpression& node, const Version& fileFormat);
   explicit ComponentSignalInstance(Circuit& circuit,
                                    ComponentInstance& cmpInstance,
-                                   const library::ComponentSignal& cmpSignal,
+                                   const ComponentSignal& cmpSignal,
                                    NetSignal* netsignal = nullptr);
   ~ComponentSignalInstance() noexcept;
 
   // Getters
   Circuit& getCircuit() const noexcept { return mCircuit; }
-  const library::ComponentSignal& getCompSignal() const noexcept {
+  const ComponentSignal& getCompSignal() const noexcept {
     return *mComponentSignal;
   }
   NetSignal* getNetSignal() const noexcept { return mNetSignal; }
@@ -120,7 +111,7 @@ public:
   void registerFootprintPad(BI_FootprintPad& pad);
   void unregisterFootprintPad(BI_FootprintPad& pad);
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -142,7 +133,7 @@ private:
   // General
   Circuit& mCircuit;
   ComponentInstance& mComponentInstance;
-  const library::ComponentSignal* mComponentSignal;
+  const ComponentSignal* mComponentSignal;
   bool mIsAddedToCircuit;
 
   // Attributes
@@ -163,7 +154,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "csvfile.h"
 
+#include "../exceptions.h"
 #include "../fileio/fileutils.h"
 
 #include <QtCore>

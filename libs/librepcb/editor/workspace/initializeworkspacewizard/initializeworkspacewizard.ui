@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::application::InitializeWorkspaceWizard</class>
- <widget class="QWizard" name="librepcb::application::InitializeWorkspaceWizard">
+ <class>librepcb::editor::InitializeWorkspaceWizard</class>
+ <widget class="QWizard" name="librepcb::editor::InitializeWorkspaceWizard">
   <property name="geometry">
    <rect>
     <x>0</x>

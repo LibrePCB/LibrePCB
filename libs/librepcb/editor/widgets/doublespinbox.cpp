@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "doublespinbox.h"
 
-#include "../toolbox.h"
+#include <librepcb/core/utils/toolbox.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -52,4 +53,5 @@ QString DoubleSpinBox::textFromValue(double val) const {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

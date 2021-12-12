@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_WORKSPACELIBRARYSCANNER_H
-#define LIBREPCB_WORKSPACE_WORKSPACELIBRARYSCANNER_H
+#ifndef LIBREPCB_CORE_WORKSPACELIBRARYSCANNER_H
+#define LIBREPCB_CORE_WORKSPACELIBRARYSCANNER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include "../fileio/filepath.h"
 
 #include <QtCore>
 
@@ -34,16 +34,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Library;
 class SQLiteDatabase;
 class TransactionalFileSystem;
 class Uuid;
-
-namespace library {
-class Library;
-}
-
-namespace workspace {
-
 class Workspace;
 
 /*******************************************************************************
@@ -85,12 +79,11 @@ private:  // Methods
   void run() noexcept override;
   void scan() noexcept;
   QHash<QString, int> updateLibraries(
-      SQLiteDatabase& db,
-      const QHash<QString, std::shared_ptr<library::Library>>& libs);
+      SQLiteDatabase& db, const QHash<QString, std::shared_ptr<Library>>& libs);
   void clearAllTables(SQLiteDatabase& db);
   void getLibrariesOfDirectory(
       std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
-      QHash<QString, std::shared_ptr<library::Library>>& libs) noexcept;
+      QHash<QString, std::shared_ptr<Library>>& libs) noexcept;
   template <typename ElementType>
   int addCategoriesToDb(SQLiteDatabase& db,
                         std::shared_ptr<TransactionalFileSystem> fs,
@@ -127,7 +120,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace workspace
 }  // namespace librepcb
 
 #endif

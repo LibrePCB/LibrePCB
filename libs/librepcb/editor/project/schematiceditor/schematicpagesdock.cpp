@@ -24,8 +24,8 @@
 
 #include "ui_schematicpagesdock.h"
 
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/schematic.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -155,5 +154,4 @@ void SchematicPagesDock::updateSchematicNames() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

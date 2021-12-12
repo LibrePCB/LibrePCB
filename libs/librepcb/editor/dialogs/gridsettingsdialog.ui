@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::GridSettingsDialog</class>
- <widget class="QDialog" name="librepcb::GridSettingsDialog">
+ <class>librepcb::editor::GridSettingsDialog</class>
+ <widget class="QDialog" name="librepcb::editor::GridSettingsDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="librepcb::PositiveLengthEdit" name="edtInterval" native="true"/>
+    <widget class="librepcb::editor::PositiveLengthEdit" name="edtInterval" native="true"/>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_2">
@@ -91,9 +91,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::PositiveLengthEdit</class>
+   <class>librepcb::editor::PositiveLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/positivelengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

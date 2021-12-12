@@ -17,21 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H
-#define LIBREPCB_PROJECT_SCHEMATICSELECTIONQUERY_H
+#ifndef LIBREPCB_CORE_SCHEMATICSELECTIONQUERY_H
+#define LIBREPCB_CORE_SCHEMATICSELECTIONQUERY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class SI_NetLabel;
 class SI_NetLine;
@@ -142,7 +139,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

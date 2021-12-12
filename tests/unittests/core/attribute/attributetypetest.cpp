@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/attributes/attrtypevoltage.h>
+#include <librepcb/core/attribute/attrtypevoltage.h>
 
 /*******************************************************************************
  *  Namespace

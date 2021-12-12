@@ -22,14 +22,15 @@
  ******************************************************************************/
 #include "editorwidgetbase.h"
 
-#include <librepcb/common/dialogs/directorylockhandlerdialog.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/utils/exclusiveactiongroup.h>
-#include <librepcb/common/utils/toolbarproxy.h>
-#include <librepcb/common/utils/undostackactiongroup.h>
-#include <librepcb/common/widgets/statusbar.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include "../dialogs/directorylockhandlerdialog.h"
+#include "../undostack.h"
+#include "../utils/exclusiveactiongroup.h"
+#include "../utils/toolbarproxy.h"
+#include "../utils/undostackactiongroup.h"
+#include "../widgets/statusbar.h"
+
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,7 +39,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -309,5 +309,4 @@ void EditorWidgetBase::libraryElementCheckDescriptionRequested(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

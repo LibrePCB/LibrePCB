@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
-#define LIBREPCB_PROJECT_SCHEMATICLAYERPROVIDER_H
+#ifndef LIBREPCB_CORE_SCHEMATICLAYERPROVIDER_H
+#define LIBREPCB_CORE_SCHEMATICLAYERPROVIDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/graphics/graphicslayer.h>
+#include "../../graphics/graphicslayer.h"
 
 #include <QtCore>
 
@@ -32,7 +31,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Project;
 
@@ -43,7 +41,7 @@ class Project;
 /**
  * @brief The SchematicLayerProvider class provides and manages all available
  * schematic layers which are used in the
- * ::librepcb::project::editor::SchematicEditor class
+ * ::librepcb::editor::SchematicEditor class
  */
 class SchematicLayerProvider final : public IF_GraphicsLayerProvider {
 public:
@@ -85,7 +83,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

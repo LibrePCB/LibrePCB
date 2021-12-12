@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_ADDCOMPONENTDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_ADDCOMPONENTDIALOG_H
+#ifndef LIBREPCB_EDITOR_ADDCOMPONENTDIALOG_H
+#define LIBREPCB_EDITOR_ADDCOMPONENTDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/workspace/library/cat/categorytreemodel.h>
+#include "../workspace/categorytreemodel.h"
+
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,29 +36,21 @@
  ******************************************************************************/
 namespace librepcb {
 
-class DefaultGraphicsLayerProvider;
-class GraphicsScene;
-
-namespace library {
 class Component;
 class ComponentCategory;
 class ComponentSymbolVariant;
+class DefaultGraphicsLayerProvider;
 class Device;
-class FootprintPreviewGraphicsItem;
+class GraphicsScene;
 class Package;
-class Symbol;
-class SymbolPreviewGraphicsItem;
-}  // namespace library
-
-namespace workspace {
-class Workspace;
-}
-
-namespace project {
-
 class Project;
+class Symbol;
+class Workspace;
 
 namespace editor {
+
+class FootprintPreviewGraphicsItem;
+class SymbolPreviewGraphicsItem;
 
 namespace Ui {
 class AddComponentDialog;
@@ -92,7 +84,7 @@ class AddComponentDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  explicit AddComponentDialog(workspace::Workspace& workspace, Project& project,
+  explicit AddComponentDialog(Workspace& workspace, Project& project,
                               QWidget* parent = nullptr);
   ~AddComponentDialog() noexcept;
 
@@ -116,28 +108,28 @@ private:
   void searchComponents(const QString& input);
   SearchResult searchComponentsAndDevices(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
-  void setSelectedComponent(const library::Component* cmp);
-  void setSelectedSymbVar(const library::ComponentSymbolVariant* symbVar);
-  void setSelectedDevice(const library::Device* dev);
+  void setSelectedComponent(const Component* cmp);
+  void setSelectedSymbVar(const ComponentSymbolVariant* symbVar);
+  void setSelectedDevice(const Device* dev);
   void accept() noexcept;
 
   // General
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   Project& mProject;
   Ui::AddComponentDialog* mUi;
   GraphicsScene* mComponentPreviewScene;
   GraphicsScene* mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
-  workspace::ComponentCategoryTreeModel* mCategoryTreeModel;
+  ComponentCategoryTreeModel* mCategoryTreeModel;
 
   // Attributes
   tl::optional<Uuid> mSelectedCategoryUuid;
-  const library::Component* mSelectedComponent;
-  const library::ComponentSymbolVariant* mSelectedSymbVar;
-  const library::Device* mSelectedDevice;
-  const library::Package* mSelectedPackage;
-  QList<library::SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
-  library::FootprintPreviewGraphicsItem* mPreviewFootprintGraphicsItem;
+  const Component* mSelectedComponent;
+  const ComponentSymbolVariant* mSelectedSymbVar;
+  const Device* mSelectedDevice;
+  const Package* mSelectedPackage;
+  QList<SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
+  FootprintPreviewGraphicsItem* mPreviewFootprintGraphicsItem;
 };
 
 /*******************************************************************************
@@ -145,7 +137,6 @@ private:
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "schematiceditorstate_addtext.h"
 
+#include "../../../cmd/cmdtextedit.h"
+#include "../../../undostack.h"
+#include "../../../widgets/graphicslayercombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
+#include "../../cmd/cmdschematictextadd.h"
 #include "../schematiceditor.h"
 
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/graphicslayercombobox.h>
-#include <librepcb/common/widgets/positivelengthedit.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematictextadd.h>
-#include <librepcb/project/schematics/items/si_text.h>
-#include <librepcb/project/schematics/schematic.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -41,7 +41,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -338,5 +337,4 @@ void SchematicEditorState_AddText::setFocusToTextEdit() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

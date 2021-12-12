@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDTEXT_H
-#define LIBREPCB_PROJECTEDITOR_SCHEMATICEDITORSTATE_ADDTEXT_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDTEXT_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDTEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
-#include <librepcb/common/geometry/text.h>
+#include <librepcb/core/geometry/text.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,16 +35,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdTextEdit;
-class GraphicsLayerComboBox;
-class PositiveLengthEdit;
-
-namespace project {
-
 class SI_Text;
 class Schematic;
 
 namespace editor {
+
+class CmdTextEdit;
+class GraphicsLayerComboBox;
+class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class SchematicEditorState_AddText
@@ -120,7 +118,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

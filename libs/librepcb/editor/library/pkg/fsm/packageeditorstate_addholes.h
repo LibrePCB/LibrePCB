@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORSTATE_ADDHOLES_H
 
 /*******************************************************************************
  *  Includes
@@ -33,12 +33,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CmdHoleEdit;
 class Hole;
 class HoleGraphicsItem;
 
-namespace library {
 namespace editor {
+
+class CmdHoleEdit;
 
 /*******************************************************************************
  *  Class PackageEditorState_AddHoles
@@ -92,7 +92,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

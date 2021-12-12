@@ -26,13 +26,14 @@
 #include "repositorylibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
 
-#include <librepcb/common/application.h>
-#include <librepcb/common/fileio/fileutils.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/common/network/repository.h>
-#include <librepcb/library/library.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/network/repository.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,14 +42,13 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
-namespace manager {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-AddLibraryWidget::AddLibraryWidget(workspace::Workspace& ws) noexcept
+AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
   : QWidget(nullptr), mWorkspace(ws), mUi(new Ui::AddLibraryWidget) {
   mUi->setupUi(this);
   connect(mUi->btnDownloadZip, &QPushButton::clicked, this,
@@ -470,6 +470,5 @@ QString AddLibraryWidget::getTextOrPlaceholderFromQLineEdit(
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb

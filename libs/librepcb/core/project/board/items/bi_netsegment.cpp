@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bi_netsegment.h"
 
+#include "../../../utils/scopeguardlist.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -34,15 +35,12 @@
 #include "bi_netpoint.h"
 #include "bi_via.h"
 
-#include <librepcb/common/scopeguardlist.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -664,5 +662,4 @@ void BI_NetSegment::findAllConnectedNetPoints(
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

@@ -22,14 +22,14 @@
  ******************************************************************************/
 #include "boardeditorstate_adddevice.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdadddevicetoboard.h"
+#include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../boardeditor.h"
 
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/cmd/cmddeviceinstanceeditall.h>
-#include <librepcb/project/boards/items/bi_device.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_device.h>
 
 #include <QtCore>
 
@@ -37,7 +37,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -240,5 +239,4 @@ bool BoardEditorState_AddDevice::abortCommand(bool showErrMsgBox) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_BOARDCLIPBOARDDATABUILDER_H
-#define LIBREPCB_PROJECTEDITOR_BOARDCLIPBOARDDATABUILDER_H
+#ifndef LIBREPCB_EDITOR_BOARDCLIPBOARDDATABUILDER_H
+#define LIBREPCB_EDITOR_BOARDCLIPBOARDDATABUILDER_H
 
 /*******************************************************************************
  *  Includes
@@ -35,7 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 class Board;
 
@@ -73,7 +72,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

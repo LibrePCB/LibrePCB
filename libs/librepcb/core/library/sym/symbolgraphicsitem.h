@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_SYMBOLGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_SYMBOLGRAPHICSITEM_H
+#ifndef LIBREPCB_CORE_SYMBOLGRAPHICSITEM_H
+#define LIBREPCB_CORE_SYMBOLGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/uuid.h>
+#include "../../types/uuid.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,14 +40,11 @@ class IF_GraphicsLayerProvider;
 class Point;
 class Polygon;
 class PolygonGraphicsItem;
-class Text;
-class TextGraphicsItem;
-
-namespace library {
-
 class Symbol;
 class SymbolPin;
 class SymbolPinGraphicsItem;
+class Text;
+class TextGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolGraphicsItem
@@ -118,7 +115,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

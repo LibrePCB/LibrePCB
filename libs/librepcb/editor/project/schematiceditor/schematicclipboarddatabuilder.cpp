@@ -24,23 +24,23 @@
 
 #include "schematicnetsegmentsplitter.h"
 
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_polygon.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/items/si_text.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/schematics/schematicselectionquery.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicselectionquery.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,7 +49,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -169,5 +168,4 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

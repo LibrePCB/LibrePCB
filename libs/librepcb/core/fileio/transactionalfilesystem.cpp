@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "transactionalfilesystem.h"
 
-#include "../toolbox.h"
+#include "../serialization/sexpression.h"
+#include "../utils/toolbox.h"
 #include "fileutils.h"
-#include "sexpression.h"
 
 #include <quazip/quazip.h>
 #include <quazip/quazipdir.h>

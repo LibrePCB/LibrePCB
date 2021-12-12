@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_AIRWIRESBUILDER_H
-#define LIBREPCB_COMMON_AIRWIRESBUILDER_H
+#ifndef LIBREPCB_CORE_AIRWIRESBUILDER_H
+#define LIBREPCB_CORE_AIRWIRESBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../units/point.h"
+#include "../types/point.h"
 
 #include <QtCore>
 

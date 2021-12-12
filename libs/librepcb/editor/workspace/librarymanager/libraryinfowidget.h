@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYMANAGER_LIBRARYINFOWIDGET_H
-#define LIBREPCB_LIBRARYMANAGER_LIBRARYINFOWIDGET_H
+#ifndef LIBREPCB_EDITOR_LIBRARYINFOWIDGET_H
+#define LIBREPCB_EDITOR_LIBRARYINFOWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,15 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
-class Workspace;
-}
-
-namespace library {
-
 class Library;
+class Workspace;
 
-namespace manager {
+namespace editor {
 
 namespace Ui {
 class LibraryInfoWidget;
@@ -61,7 +56,7 @@ public:
   // Constructors / Destructor
   LibraryInfoWidget() noexcept;
   LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
-  LibraryInfoWidget(workspace::Workspace& ws, const FilePath& libDir);
+  LibraryInfoWidget(Workspace& ws, const FilePath& libDir);
   ~LibraryInfoWidget() noexcept;
 
   // Getters
@@ -80,7 +75,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::LibraryInfoWidget> mUi;
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   FilePath mLibDir;
 };
 
@@ -88,8 +83,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

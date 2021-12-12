@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_MSGNAMENOTTITLECASE_H
-#define LIBREPCB_LIBRARY_MSGNAMENOTTITLECASE_H
+#ifndef LIBREPCB_CORE_MSGNAMENOTTITLECASE_H
+#define LIBREPCB_CORE_MSGNAMENOTTITLECASE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../types/elementname.h"
 #include "libraryelementcheckmessage.h"
-
-#include <librepcb/common/elementname.h>
 
 #include <QtCore>
 
@@ -33,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class MsgNameNotTitleCase
@@ -67,7 +65,6 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

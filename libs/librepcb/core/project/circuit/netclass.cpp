@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "netclass.h"
 
+#include "../../exceptions.h"
 #include "../erc/ercmsg.h"
 #include "circuit.h"
 #include "netsignal.h"
-
-#include <librepcb/common/exceptions.h>
 
 #include <QtCore>
 
@@ -34,7 +33,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -146,5 +144,4 @@ void NetClass::updateErcMessages() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

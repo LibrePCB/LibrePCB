@@ -22,31 +22,31 @@
  ******************************************************************************/
 #include "symboleditorwidget.h"
 
+#include "../../cmd/cmdtextedit.h"
+#include "../../dialogs/gridsettingsdialog.h"
+#include "../../library/cmd/cmdlibraryelementedit.h"
+#include "../../utils/exclusiveactiongroup.h"
+#include "../../widgets/statusbar.h"
+#include "../cmd/cmdsymbolpinedit.h"
 #include "fsm/symboleditorfsm.h"
 #include "ui_symboleditorwidget.h"
 
-#include <librepcb/common/dialogs/gridsettingsdialog.h>
-#include <librepcb/common/geometry/cmd/cmdtextedit.h>
-#include <librepcb/common/graphics/circlegraphicsitem.h>
-#include <librepcb/common/graphics/graphicslayer.h>
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/common/utils/exclusiveactiongroup.h>
-#include <librepcb/common/widgets/statusbar.h>
-#include <librepcb/library/cmd/cmdlibraryelementedit.h>
-#include <librepcb/library/cmp/cmpsigpindisplaytype.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgmissingcategories.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
-#include <librepcb/library/sym/msg/msgmissingsymbolname.h>
-#include <librepcb/library/sym/msg/msgmissingsymbolvalue.h>
-#include <librepcb/library/sym/msg/msgsymbolpinnotongrid.h>
-#include <librepcb/library/sym/msg/msgwrongsymboltextlayer.h>
-#include <librepcb/library/sym/symbol.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/workspace/settings/workspacesettings.h>
-#include <librepcb/workspace/workspace.h>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgmissingcategories.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/sym/msg/msgmissingsymbolname.h>
+#include <librepcb/core/library/sym/msg/msgmissingsymbolvalue.h>
+#include <librepcb/core/library/sym/msg/msgsymbolpinnotongrid.h>
+#include <librepcb/core/library/sym/msg/msgwrongsymboltextlayer.h>
+#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -55,7 +55,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -497,5 +496,4 @@ bool SymbolEditorWidget::processCheckMessage(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

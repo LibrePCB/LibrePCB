@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_POLYGONPROPERTIESDIALOG_H
-#define LIBREPCB_COMMON_POLYGONPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_POLYGONPROPERTIESDIALOG_H
+#define LIBREPCB_EDITOR_POLYGONPROPERTIESDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/vertex.h"
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -36,6 +34,9 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 class Polygon;
+
+namespace editor {
+
 class UndoStack;
 
 namespace Ui {
@@ -87,6 +88,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

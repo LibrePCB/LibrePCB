@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/common/graphics/graphicslayername.h>
+#include <librepcb/core/graphics/graphicslayername.h>
 
 /*******************************************************************************
  *  Namespace

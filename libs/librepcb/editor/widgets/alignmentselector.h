@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ALIGNMENTSELECTOR_H
-#define LIBREPCB_COMMON_ALIGNMENTSELECTOR_H
+#ifndef LIBREPCB_EDITOR_ALIGNMENTSELECTOR_H
+#define LIBREPCB_EDITOR_ALIGNMENTSELECTOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../alignment.h"
+#include <librepcb/core/types/alignment.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,6 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 namespace Ui {
 class AlignmentSelector;
@@ -70,6 +71,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

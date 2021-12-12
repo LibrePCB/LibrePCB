@@ -28,6 +28,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -104,4 +105,5 @@ void CmdAttributeEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

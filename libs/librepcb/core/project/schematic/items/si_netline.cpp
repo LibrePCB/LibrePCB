@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "si_netline.h"
 
+#include "../../../graphics/graphicsscene.h"
+#include "../../../utils/scopeguard.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../schematic.h"
@@ -30,16 +32,12 @@
 #include "si_symbol.h"
 #include "si_symbolpin.h"
 
-#include <librepcb/common/graphics/graphicsscene.h>
-#include <librepcb/common/scopeguard.h>
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -188,5 +186,4 @@ void SI_NetLine::setSelected(bool selected) noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

@@ -32,7 +32,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -201,5 +200,4 @@ void BI_Via::boardOrNetAttributesChanged() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

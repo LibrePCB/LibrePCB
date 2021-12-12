@@ -22,44 +22,44 @@
  ******************************************************************************/
 #include "cmdremoveselectedschematicitems.h"
 
+#include "../../project/cmd/cmdcomponentinstanceremove.h"
+#include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
+#include "../../project/cmd/cmdnetsignaladd.h"
+#include "../../project/cmd/cmdschematicnetlabeladd.h"
+#include "../../project/cmd/cmdschematicnetsegmentadd.h"
+#include "../../project/cmd/cmdschematicnetsegmentaddelements.h"
+#include "../../project/cmd/cmdschematicnetsegmentremove.h"
+#include "../../project/cmd/cmdschematicpolygonremove.h"
+#include "../../project/cmd/cmdschematictextremove.h"
+#include "../../project/cmd/cmdsymbolinstanceremove.h"
 #include "../schematiceditor/schematicnetsegmentsplitter.h"
 #include "cmdchangenetsignalofschematicnetsegment.h"
 #include "cmdremoveboarditems.h"
 #include "cmdremoveunusedlibraryelements.h"
 #include "cmdremoveunusednetsignals.h"
 
-#include <librepcb/common/scopeguard.h>
-#include <librepcb/common/toolbox.h>
-#include <librepcb/project/boards/board.h>
-#include <librepcb/project/boards/items/bi_device.h>
-#include <librepcb/project/boards/items/bi_footprint.h>
-#include <librepcb/project/boards/items/bi_footprintpad.h>
-#include <librepcb/project/boards/items/bi_netline.h>
-#include <librepcb/project/boards/items/bi_netpoint.h>
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/circuit/cmd/cmdcomponentinstanceremove.h>
-#include <librepcb/project/circuit/cmd/cmdcompsiginstsetnetsignal.h>
-#include <librepcb/project/circuit/cmd/cmdnetsignaladd.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/circuit/componentsignalinstance.h>
-#include <librepcb/project/circuit/netsignal.h>
-#include <librepcb/project/project.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetlabeladd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentadd.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentaddelements.h>
-#include <librepcb/project/schematics/cmd/cmdschematicnetsegmentremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematicpolygonremove.h>
-#include <librepcb/project/schematics/cmd/cmdschematictextremove.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceremove.h>
-#include <librepcb/project/schematics/items/si_netlabel.h>
-#include <librepcb/project/schematics/items/si_netline.h>
-#include <librepcb/project/schematics/items/si_netpoint.h>
-#include <librepcb/project/schematics/items/si_netsegment.h>
-#include <librepcb/project/schematics/items/si_polygon.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
-#include <librepcb/project/schematics/items/si_symbolpin.h>
-#include <librepcb/project/schematics/schematic.h>
-#include <librepcb/project/schematics/schematicselectionquery.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprint.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/project/schematic/items/si_polygon.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicselectionquery.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -67,7 +67,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -336,5 +335,4 @@ void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_HOLE_H
-#define LIBREPCB_PROJECT_BI_HOLE_H
+#ifndef LIBREPCB_CORE_BI_HOLE_H
+#define LIBREPCB_CORE_BI_HOLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/hole.h"
+#include "../../../serialization/serializableobject.h"
 #include "bi_base.h"
-
-#include <librepcb/common/fileio/serializableobject.h>
-#include <librepcb/common/geometry/hole.h>
 
 #include <QtCore>
 
@@ -35,11 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class HoleGraphicsItem;
-
-namespace project {
-
 class Board;
+class HoleGraphicsItem;
 class Project;
 
 /*******************************************************************************
@@ -72,7 +68,7 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
@@ -97,7 +93,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

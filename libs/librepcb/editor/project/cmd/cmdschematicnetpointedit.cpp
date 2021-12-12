@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdschematicnetpointedit.h"
 
-#include "../items/si_netpoint.h"
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -89,5 +89,5 @@ void CmdSchematicNetPointEdit::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

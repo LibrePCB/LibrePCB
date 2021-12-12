@@ -22,16 +22,15 @@
  ******************************************************************************/
 #include "boardpickplacegenerator.h"
 
+#include "../../export/pickplacedata.h"
+#include "../../library/dev/device.h"
+#include "../../library/pkg/package.h"
 #include "../circuit/componentinstance.h"
-#include "../metadata/projectmetadata.h"
-#include "../project/project.h"
-#include "../project/settings/projectsettings.h"
+#include "../project.h"
+#include "../projectmetadata.h"
+#include "../projectsettings.h"
 #include "board.h"
 #include "items/bi_device.h"
-
-#include <librepcb/common/pnp/pickplacedata.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -39,7 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -84,5 +82,4 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

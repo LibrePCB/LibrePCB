@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_FOOTPRINTPREVIEWGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTPREVIEWGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_FOOTPRINTPREVIEWGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attributeprovider.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/uuid.h>
+#include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,16 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
+class Footprint;
 class GraphicsLayer;
 class IF_GraphicsLayerProvider;
-
-namespace library {
-
-class Component;
-
-// class Device;
 class Package;
-class Footprint;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class FootprintPreviewGraphicsItem
@@ -91,7 +88,7 @@ signals:
 
 private:
   // Inherited from AttributeProvider
-  /// @copydoc librepcb::AttributeProvider::getBuiltInAttributeValue()
+  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
   // General Attributes
@@ -114,7 +111,7 @@ private:
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

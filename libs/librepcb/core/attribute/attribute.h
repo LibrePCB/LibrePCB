@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_ATTRIBUTE_H
-#define LIBREPCB_COMMON_ATTRIBUTE_H
+#ifndef LIBREPCB_CORE_ATTRIBUTE_H
+#define LIBREPCB_CORE_ATTRIBUTE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/serializableobjectlist.h"
+#include "../serialization/serializableobjectlist.h"
 #include "attributekey.h"
 
 #include <QtCore>
@@ -80,7 +80,7 @@ public:
 
   // General Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

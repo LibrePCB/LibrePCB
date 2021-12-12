@@ -22,10 +22,10 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/csvfile.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/fileutils.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/csvfile.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/fileio/fileutils.h>
 
 #include <QtCore>
 

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "boardfabricationoutputsettings.h"
 
-#include <librepcb/common/graphics/graphicslayer.h>
+#include "../../graphics/graphicslayer.h"
 
 #include <QtCore>
 
@@ -30,7 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -212,5 +211,4 @@ bool BoardFabricationOutputSettings::operator==(
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

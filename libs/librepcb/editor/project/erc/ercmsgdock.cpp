@@ -24,10 +24,10 @@
 
 #include "ui_ercmsgdock.h"
 
-#include <librepcb/project/circuit/circuit.h>
-#include <librepcb/project/erc/ercmsg.h>
-#include <librepcb/project/erc/ercmsglist.h>
-#include <librepcb/project/project.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/erc/ercmsg.h>
+#include <librepcb/core/project/erc/ercmsglist.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -250,5 +249,4 @@ void ErcMsgDock::updateTopLevelItemTexts() noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

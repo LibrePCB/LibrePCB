@@ -22,12 +22,13 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/common/geometry/pathmodel.h>
+#include <librepcb/editor/modelview/pathmodel.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 namespace tests {
 
 /*******************************************************************************
@@ -83,4 +84,5 @@ TEST_F(PathModelTest, testSetData) {
  ******************************************************************************/
 
 }  // namespace tests
+}  // namespace editor
 }  // namespace librepcb

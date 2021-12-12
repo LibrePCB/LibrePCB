@@ -29,6 +29,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -65,4 +66,5 @@ bool TabWidget::eventFilter(QObject* o, QEvent* e) {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

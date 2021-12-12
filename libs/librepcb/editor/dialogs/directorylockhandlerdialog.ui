@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::DirectoryLockHandlerDialog</class>
- <widget class="QDialog" name="librepcb::DirectoryLockHandlerDialog">
+ <class>librepcb::editor::DirectoryLockHandlerDialog</class>
+ <widget class="QDialog" name="librepcb::editor::DirectoryLockHandlerDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -73,7 +73,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::DirectoryLockHandlerDialog</receiver>
+   <receiver>librepcb::editor::DirectoryLockHandlerDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -89,7 +89,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::DirectoryLockHandlerDialog</receiver>
+   <receiver>librepcb::editor::DirectoryLockHandlerDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

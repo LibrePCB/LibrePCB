@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_CMDLISTELEMENTSSWAP_H
-#define LIBREPCB_COMMON_CMDLISTELEMENTSSWAP_H
+#ifndef LIBREPCB_EDITOR_CMDLISTELEMENTSSWAP_H
+#define LIBREPCB_EDITOR_CMDLISTELEMENTSSWAP_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommand.h"
-#include "../serializableobjectlist.h"
+#include "../undocommand.h"
+
+#include <librepcb/core/serialization/serializableobjectlist.h>
 
 #include <QtCore>
 
@@ -32,6 +33,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Class CmdListElementsSwap
@@ -55,16 +57,16 @@ public:
   CmdListElementsSwap& operator=(const CmdListElementsSwap& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc UndoCommand::performExecute()
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override {
     performRedo();  // can throw
     return true;
   }
 
-  /// @copydoc UndoCommand::performUndo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
   void performUndo() override { mList.swap(mJ, mI); }
 
-  /// @copydoc UndoCommand::performRedo()
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override { mList.swap(mI, mJ); }
 
 private:  // Data
@@ -77,6 +79,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

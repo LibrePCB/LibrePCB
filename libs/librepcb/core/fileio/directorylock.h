@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_DIRECTORYLOCK_H
-#define LIBREPCB_COMMON_DIRECTORYLOCK_H
+#ifndef LIBREPCB_CORE_DIRECTORYLOCK_H
+#define LIBREPCB_CORE_DIRECTORYLOCK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
 #include "filepath.h"
 
 #include <QtCore>

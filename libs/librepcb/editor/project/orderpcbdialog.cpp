@@ -24,8 +24,8 @@
 
 #include "ui_orderpcbdialog.h"
 
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/network/orderpcbapirequest.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/network/orderpcbapirequest.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -224,5 +223,4 @@ void OrderPcbDialog::setError(const QString& msg) noexcept {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdfootprintstroketextadd.h"
 
-#include "../items/bi_footprint.h"
+#include <librepcb/core/project/board/items/bi_footprint.h>
 
 #include <QtCore>
 
@@ -30,7 +30,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -66,5 +66,5 @@ void CmdFootprintStrokeTextAdd::performRedo() {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
+}  // namespace editor
 }  // namespace librepcb

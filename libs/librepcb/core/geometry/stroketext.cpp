@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "stroketext.h"
 
-#include "../attributes/attributesubstitutor.h"
+#include "../attribute/attributesubstitutor.h"
 #include "../font/strokefont.h"
 
 #include <QtCore>

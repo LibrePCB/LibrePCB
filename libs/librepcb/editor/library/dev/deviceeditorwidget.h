@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_DEVICEEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_DEVICEEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_DEVICEEDITORWIDGET_H
+#define LIBREPCB_EDITOR_DEVICEEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/categorylisteditorwidget.h"
-#include "../common/editorwidgetbase.h"
+#include "../cat/categorylisteditorwidget.h"
+#include "../editorwidgetbase.h"
 
-#include <librepcb/library/dev/devicepadsignalmap.h>
+#include <librepcb/core/library/dev/devicepadsignalmap.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,19 +36,17 @@
  ******************************************************************************/
 namespace librepcb {
 
-class DefaultGraphicsLayerProvider;
-class GraphicsScene;
-
-namespace library {
-
 class Component;
+class DefaultGraphicsLayerProvider;
 class Device;
-class FootprintPreviewGraphicsItem;
+class GraphicsScene;
 class Package;
 class Symbol;
-class SymbolPreviewGraphicsItem;
 
 namespace editor {
+
+class FootprintPreviewGraphicsItem;
+class SymbolPreviewGraphicsItem;
 
 namespace Ui {
 class DeviceEditorWidget;
@@ -130,7 +128,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,19 +22,18 @@
  ******************************************************************************/
 #include "bgi_footprintpad.h"
 
+#include "../../../application.h"
+#include "../../../library/pkg/footprint.h"
+#include "../../../library/pkg/package.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../../settings/projectsettings.h"
+#include "../../projectsettings.h"
 #include "../board.h"
+#include "../boarddesignrules.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
 #include "../items/bi_footprintpad.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/boarddesignrules.h>
-#include <librepcb/library/pkg/footprint.h>
-#include <librepcb/library/pkg/package.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -44,7 +43,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -86,7 +84,7 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   setToolTip(mPad.getDisplayText());
 
   // set Z value
-  if ((mLibPad.getBoardSide() == library::FootprintPad::BoardSide::BOTTOM) !=
+  if ((mLibPad.getBoardSide() == FootprintPad::BoardSide::BOTTOM) !=
       mPad.getIsMirrored()) {
     setZValue(Board::ZValue_FootprintPadsBottom);
   } else {
@@ -95,13 +93,12 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
 
   // set layers
   mPadLayer = getLayer(mLibPad.getLayerName());
-  if (mLibPad.getBoardSide() == library::FootprintPad::BoardSide::THT) {
+  if (mLibPad.getBoardSide() == FootprintPad::BoardSide::THT) {
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
     mTopCreamMaskLayer = nullptr;
     mBottomCreamMaskLayer = nullptr;
-  } else if (mLibPad.getBoardSide() ==
-             library::FootprintPad::BoardSide::BOTTOM) {
+  } else if (mLibPad.getBoardSide() == FootprintPad::BoardSide::BOTTOM) {
     mTopStopMaskLayer = nullptr;
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
     mTopCreamMaskLayer = nullptr;
@@ -218,5 +215,4 @@ GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

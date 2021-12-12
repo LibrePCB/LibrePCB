@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORWIDGET_H
-#define LIBREPCB_LIBRARYEDITOR_PACKAGEEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_PACKAGEEDITORWIDGET_H
+#define LIBREPCB_EDITOR_PACKAGEEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../common/categorylisteditorwidget.h"
-#include "../common/editorwidgetbase.h"
+#include "../../widgets/if_graphicsvieweventhandler.h"
+#include "../cat/categorylisteditorwidget.h"
+#include "../editorwidgetbase.h"
 
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
-#include <librepcb/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,12 +37,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class FootprintGraphicsItem;
 class GraphicsScene;
 class GridProperties;
-
-namespace library {
-
-class FootprintGraphicsItem;
 class Package;
 
 namespace editor {
@@ -104,7 +101,7 @@ public slots:
 private:  // Methods
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
-  /// @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
+  /// @see ::librepcb::editor::IF_GraphicsViewEventHandler
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
   bool toolChangeRequested(Tool newTool) noexcept override;
   void currentFootprintChanged(int index) noexcept;
@@ -137,7 +134,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
 
 #endif

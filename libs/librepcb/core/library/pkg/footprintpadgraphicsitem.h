@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINTPADGRAPHICSITEM_H
-#define LIBREPCB_LIBRARY_FOOTPRINTPADGRAPHICSITEM_H
+#ifndef LIBREPCB_CORE_FOOTPRINTPADGRAPHICSITEM_H
+#define LIBREPCB_CORE_FOOTPRINTPADGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -34,14 +34,11 @@
 namespace librepcb {
 
 class Angle;
+class FootprintPad;
 class IF_GraphicsLayerProvider;
 class Point;
 class PrimitivePathGraphicsItem;
 class PrimitiveTextGraphicsItem;
-
-namespace library {
-
-class FootprintPad;
 
 /*******************************************************************************
  *  Class FootprintPadGraphicsItem
@@ -103,7 +100,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

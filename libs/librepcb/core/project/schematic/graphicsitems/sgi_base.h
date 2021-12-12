@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SGI_BASE_H
-#define LIBREPCB_PROJECT_SGI_BASE_H
+#ifndef LIBREPCB_CORE_SGI_BASE_H
+#define LIBREPCB_CORE_SGI_BASE_H
 
 /*******************************************************************************
  *  Includes
@@ -32,7 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Class SGI_Base
@@ -56,7 +55,6 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_INITIALIZEWORKSPACEWIZARD_INITIALIZEWORKSPACEWIZARDCONTEXT_H
-#define LIBREPCB_INITIALIZEWORKSPACEWIZARD_INITIALIZEWORKSPACEWIZARDCONTEXT_H
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARDCONTEXT_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARDCONTEXT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/units/lengthunit.h>
-#include <librepcb/common/version.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 
@@ -39,7 +39,7 @@ namespace librepcb {
 
 class AsyncCopyOperation;
 
-namespace application {
+namespace editor {
 
 /*******************************************************************************
  *  Class InitializeWorkspaceWizardContext
@@ -114,7 +114,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace application
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

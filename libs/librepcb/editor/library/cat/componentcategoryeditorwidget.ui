@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::library::editor::ComponentCategoryEditorWidget</class>
- <widget class="QWidget" name="librepcb::library::editor::ComponentCategoryEditorWidget">
+ <class>librepcb::editor::ComponentCategoryEditorWidget</class>
+ <widget class="QWidget" name="librepcb::editor::ComponentCategoryEditorWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -51,7 +51,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="librepcb::PlainTextEdit" name="edtDescription">
+    <widget class="librepcb::editor::PlainTextEdit" name="edtDescription">
      <property name="tabChangesFocus">
       <bool>true</bool>
      </property>
@@ -215,7 +215,7 @@
     </widget>
    </item>
    <item row="9" column="1">
-    <widget class="librepcb::library::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
+    <widget class="librepcb::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -228,14 +228,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::PlainTextEdit</class>
+   <class>librepcb::editor::PlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header location="global">librepcb/common/widgets/plaintextedit.h</header>
+   <header location="global">librepcb/editor/widgets/plaintextedit.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::library::editor::LibraryElementCheckListWidget</class>
+   <class>librepcb::editor::LibraryElementCheckListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/libraryeditor/common/libraryelementchecklistwidget.h</header>
+   <header location="global">librepcb/editor/library/libraryelementchecklistwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

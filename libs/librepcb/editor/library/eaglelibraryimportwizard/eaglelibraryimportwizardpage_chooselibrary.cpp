@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "eaglelibraryimportwizardpage_chooselibrary.h"
 
+#include "../../dialogs/filedialog.h"
 #include "eaglelibraryimportwizardcontext.h"
 #include "ui_eaglelibraryimportwizardpage_chooselibrary.h"
 
-#include <librepcb/common/dialogs/filedialog.h>
 #include <librepcb/eagleimport/eaglelibraryimport.h>
 
 #include <QtCore>
@@ -35,7 +35,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -91,5 +90,4 @@ bool EagleLibraryImportWizardPage_ChooseLibrary::isComplete() const {
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb

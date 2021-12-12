@@ -22,20 +22,20 @@
  ******************************************************************************/
 #include "schematiceditorstate_addcomponent.h"
 
+#include "../../../undostack.h"
+#include "../../../widgets/attributeunitcombobox.h"
+#include "../../../widgets/graphicsview.h"
+#include "../../addcomponentdialog.h"
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"
-#include "../../dialogs/addcomponentdialog.h"
+#include "../../cmd/cmdsymbolinstanceedit.h"
 #include "../schematiceditor.h"
 
-#include <librepcb/common/attributes/attributetype.h>
-#include <librepcb/common/attributes/attributeunit.h>
-#include <librepcb/common/graphics/graphicsview.h>
-#include <librepcb/common/undostack.h>
-#include <librepcb/common/widgets/attributeunitcombobox.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/project/circuit/componentinstance.h>
-#include <librepcb/project/schematics/cmd/cmdsymbolinstanceedit.h>
-#include <librepcb/project/schematics/items/si_symbol.h>
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,7 +44,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 namespace editor {
 
 /*******************************************************************************
@@ -243,7 +242,7 @@ bool SchematicEditorState_AddComponent::
 
     // check if there is a next symbol to add
     mCurrentSymbVarItemIndex++;
-    const library::ComponentSymbolVariantItem* currentSymbVarItem =
+    const ComponentSymbolVariantItem* currentSymbVarItem =
         mCurrentComponent->getSymbolVariant()
             .getSymbolItems()
             .value(mCurrentSymbVarItemIndex)
@@ -368,7 +367,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
 
     // create the first symbol instance and add it to the schematic
     mCurrentSymbVarItemIndex = 0;
-    const library::ComponentSymbolVariantItem* currentSymbVarItem =
+    const ComponentSymbolVariantItem* currentSymbVarItem =
         mCurrentComponent->getSymbolVariant()
             .getSymbolItems()
             .value(mCurrentSymbVarItemIndex)
@@ -545,5 +544,4 @@ QString SchematicEditorState_AddComponent::toMultiLine(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb

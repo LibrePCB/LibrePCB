@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
-#define LIBREPCB_PROJECT_BI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_CORE_BI_FOOTPRINTPAD_H
+#define LIBREPCB_CORE_BI_FOOTPRINTPAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/path.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 #include "./bi_netline.h"
 #include "bi_base.h"
-
-#include <librepcb/common/geometry/path.h>
 
 #include <QtCore>
 
@@ -36,15 +35,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace library {
-class ComponentSignal;
-class FootprintPad;
-}  // namespace library
-
-namespace project {
-
 class BI_Footprint;
+class ComponentSignal;
 class ComponentSignalInstance;
+class FootprintPad;
 
 /*******************************************************************************
  *  Class BI_FootprintPad
@@ -70,12 +64,8 @@ public:
   BI_Footprint& getFootprint() const noexcept { return mFootprint; }
   QString getLayerName() const noexcept;
   bool isOnLayer(const QString& layerName) const noexcept;
-  const library::FootprintPad& getLibPad() const noexcept {
-    return *mFootprintPad;
-  }
-  const library::PackagePad* getLibPackagePad() const noexcept {
-    return mPackagePad;
-  }
+  const FootprintPad& getLibPad() const noexcept { return *mFootprintPad; }
+  const PackagePad* getLibPackagePad() const noexcept { return mPackagePad; }
   ComponentSignalInstance* getComponentSignalInstance() const noexcept {
     return mComponentSignalInstance;
   }
@@ -121,12 +111,12 @@ private:  // Methods
 
 private:  // Data
   BI_Footprint& mFootprint;
-  const library::FootprintPad* mFootprintPad;
+  const FootprintPad* mFootprintPad;
 
   /// The package pad where this footprint pad is connected to
   ///
   /// @attention This is `nullptr` if the footprint pad is not connected!
-  const library::PackagePad* mPackagePad;
+  const PackagePad* mPackagePad;
 
   /// The net signal where this footprint pad is connected to
   ///
@@ -149,7 +139,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb
 
 #endif

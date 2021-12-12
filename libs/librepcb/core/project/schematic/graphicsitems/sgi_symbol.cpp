@@ -22,16 +22,15 @@
  ******************************************************************************/
 #include "sgi_symbol.h"
 
+#include "../../../application.h"
+#include "../../../attribute/attributesubstitutor.h"
+#include "../../../library/cmp/component.h"
+#include "../../../library/sym/symbol.h"
 #include "../../circuit/componentinstance.h"
 #include "../../project.h"
 #include "../items/si_symbol.h"
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/attributes/attributesubstitutor.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/sym/symbol.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -41,7 +40,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -357,5 +355,4 @@ GraphicsLayer* SGI_Symbol::getLayer(const QString& name) const noexcept {
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

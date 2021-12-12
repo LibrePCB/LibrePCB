@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_PATH_H
-#define LIBREPCB_COMMON_PATH_H
+#ifndef LIBREPCB_CORE_PATH_H
+#define LIBREPCB_CORE_PATH_H
 
 /*******************************************************************************
  *  Includes
@@ -95,7 +95,7 @@ public:
                     const Angle& angle = Angle::deg0()) noexcept;
   bool close() noexcept;
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings

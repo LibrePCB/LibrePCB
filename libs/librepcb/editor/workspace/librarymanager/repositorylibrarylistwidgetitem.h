@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARYMANAGER_REPOSITORYLIBRARYLISTWIDGETITEM_H
-#define LIBREPCB_LIBRARYMANAGER_REPOSITORYLIBRARYLISTWIDGETITEM_H
+#ifndef LIBREPCB_EDITOR_REPOSITORYLIBRARYLISTWIDGETITEM_H
+#define LIBREPCB_EDITOR_REPOSITORYLIBRARYLISTWIDGETITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/uuid.h>
-#include <librepcb/common/version.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,12 +35,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace workspace {
 class Workspace;
-}
 
-namespace library {
-namespace manager {
+namespace editor {
 
 class LibraryDownload;
 
@@ -64,7 +60,7 @@ public:
   RepositoryLibraryListWidgetItem() = delete;
   RepositoryLibraryListWidgetItem(
       const RepositoryLibraryListWidgetItem& other) = delete;
-  RepositoryLibraryListWidgetItem(workspace::Workspace& ws,
+  RepositoryLibraryListWidgetItem(Workspace& ws,
                                   const QJsonObject& obj) noexcept;
   ~RepositoryLibraryListWidgetItem() noexcept;
 
@@ -92,7 +88,7 @@ private:  // Methods
   void updateInstalledStatus() noexcept;
 
 private:  // Data
-  workspace::Workspace& mWorkspace;
+  Workspace& mWorkspace;
   QJsonObject mJsonObject;
   tl::optional<Uuid> mUuid;
   tl::optional<Version> mVersion;
@@ -106,8 +102,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace manager
-}  // namespace library
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

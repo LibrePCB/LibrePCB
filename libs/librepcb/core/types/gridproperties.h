@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_COMMON_GRIDPROPERTIES_H
-#define LIBREPCB_COMMON_GRIDPROPERTIES_H
+#ifndef LIBREPCB_CORE_GRIDPROPERTIES_H
+#define LIBREPCB_CORE_GRIDPROPERTIES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "fileio/serializableobject.h"
-#include "units/length.h"
-#include "units/lengthunit.h"
+#include "../exceptions.h"
+#include "../serialization/serializableobject.h"
+#include "length.h"
+#include "lengthunit.h"
 
 #include <QtCore>
 
@@ -70,7 +71,7 @@ public:
 
   // General Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operators

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::application::FirstRunWizardPage_Welcome</class>
- <widget class="QWizardPage" name="librepcb::application::FirstRunWizardPage_Welcome">
+ <class>librepcb::editor::FirstRunWizardPage_Welcome</class>
+ <widget class="QWizardPage" name="librepcb::editor::FirstRunWizardPage_Welcome">
   <property name="geometry">
    <rect>
     <x>0</x>

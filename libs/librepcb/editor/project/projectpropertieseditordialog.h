@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECTEDITOR_PROJECTPROPERTIESEDITORDIALOG_H
-#define LIBREPCB_PROJECTEDITOR_PROJECTPROPERTIESEDITORDIALOG_H
+#ifndef LIBREPCB_EDITOR_PROJECTPROPERTIESEDITORDIALOG_H
+#define LIBREPCB_EDITOR_PROJECTPROPERTIESEDITORDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/attributes/attribute.h>
+#include <librepcb/core/attribute/attribute.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,13 +33,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class UndoStack;
-
-namespace project {
-
 class ProjectMetadata;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class ProjectPropertiesEditorDialog;
@@ -85,7 +83,6 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace project
 }  // namespace librepcb
 
 #endif

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::BoardDesignRulesDialog</class>
- <widget class="QDialog" name="librepcb::BoardDesignRulesDialog">
+ <class>librepcb::editor::BoardDesignRulesDialog</class>
+ <widget class="QDialog" name="librepcb::editor::BoardDesignRulesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -105,57 +105,57 @@
     <widget class="QLineEdit" name="edtName"/>
    </item>
    <item row="3" column="3">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtStopMaskMaxViaDia" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskMaxViaDia" native="true"/>
    </item>
    <item row="4" column="1">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
    </item>
    <item row="5" column="1">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
    </item>
    <item row="6" column="1">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringPadsMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMin" native="true"/>
    </item>
    <item row="7" column="1">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringViasMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMin" native="true"/>
    </item>
    <item row="4" column="3">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtStopMaskClrMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMax" native="true"/>
    </item>
    <item row="5" column="3">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtCreamMaskClrMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMax" native="true"/>
    </item>
    <item row="6" column="3">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringPadsMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMax" native="true"/>
    </item>
    <item row="7" column="3">
-    <widget class="librepcb::UnsignedLengthEdit" name="edtRestringViasMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMax" native="true"/>
    </item>
    <item row="4" column="2">
-    <widget class="librepcb::UnsignedRatioEdit" name="edtStopMaskClrRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtStopMaskClrRatio" native="true"/>
    </item>
    <item row="5" column="2">
-    <widget class="librepcb::UnsignedRatioEdit" name="edtCreamMaskClrRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtCreamMaskClrRatio" native="true"/>
    </item>
    <item row="6" column="2">
-    <widget class="librepcb::UnsignedRatioEdit" name="edtRestringPadsRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringPadsRatio" native="true"/>
    </item>
    <item row="7" column="2">
-    <widget class="librepcb::UnsignedRatioEdit" name="edtRestringViasRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringViasRatio" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::UnsignedLengthEdit</class>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/unsignedlengthedit.h</header>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::UnsignedRatioEdit</class>
+   <class>librepcb::editor::UnsignedRatioEdit</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/common/widgets/unsignedratioedit.h</header>
+   <header location="global">librepcb/editor/widgets/unsignedratioedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -181,7 +181,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::BoardDesignRulesDialog</receiver>
+   <receiver>librepcb::editor::BoardDesignRulesDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -197,7 +197,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::BoardDesignRulesDialog</receiver>
+   <receiver>librepcb::editor::BoardDesignRulesDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

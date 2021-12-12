@@ -17,20 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_FOOTPRINT_H
-#define LIBREPCB_LIBRARY_FOOTPRINT_H
+#ifndef LIBREPCB_CORE_FOOTPRINT_H
+#define LIBREPCB_CORE_FOOTPRINT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../geometry/circle.h"
+#include "../../geometry/hole.h"
+#include "../../geometry/polygon.h"
+#include "../../geometry/stroketext.h"
+#include "../../serialization/serializablekeyvaluemap.h"
+#include "../../serialization/serializableobjectlist.h"
 #include "footprintpad.h"
-
-#include <librepcb/common/fileio/serializablekeyvaluemap.h>
-#include <librepcb/common/fileio/serializableobjectlist.h>
-#include <librepcb/common/geometry/circle.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/stroketext.h>
 
 #include <QtCore>
 
@@ -38,7 +37,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 class FootprintGraphicsItem;
 
@@ -109,7 +107,7 @@ public:
 
   // General Methods
 
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
@@ -179,7 +177,6 @@ using FootprintList =
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

@@ -22,16 +22,15 @@
  ******************************************************************************/
 #include "projectlibrary.h"
 
-#include "../project.h"
-
-#include <librepcb/common/application.h>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/fileio/transactionalfilesystem.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/dev/device.h>
-#include <librepcb/library/pkg/package.h>
-#include <librepcb/library/sym/symbol.h>
+#include "../application.h"
+#include "../exceptions.h"
+#include "../fileio/filepath.h"
+#include "../fileio/transactionalfilesystem.h"
+#include "../library/cmp/component.h"
+#include "../library/dev/device.h"
+#include "../library/pkg/package.h"
+#include "../library/sym/symbol.h"
+#include "project.h"
 
 #include <QtCore>
 
@@ -39,9 +38,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace project {
-
-using namespace library;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -78,10 +74,10 @@ ProjectLibrary::~ProjectLibrary() noexcept {
  *  Getters: Special Queries
  ******************************************************************************/
 
-QHash<Uuid, library::Device*> ProjectLibrary::getDevicesOfComponent(
+QHash<Uuid, Device*> ProjectLibrary::getDevicesOfComponent(
     const Uuid& compUuid) const noexcept {
-  QHash<Uuid, library::Device*> list;
-  foreach (library::Device* device, mDevices) {
+  QHash<Uuid, Device*> list;
+  foreach (Device* device, mDevices) {
     if (device->getComponentUuid() == compUuid) {
       list.insert(device->getUuid(), device);
     }
@@ -93,35 +89,35 @@ QHash<Uuid, library::Device*> ProjectLibrary::getDevicesOfComponent(
  *  Add/Remove Methods
  ******************************************************************************/
 
-void ProjectLibrary::addSymbol(library::Symbol& s) {
+void ProjectLibrary::addSymbol(Symbol& s) {
   addElement<Symbol>(s, mSymbols);
 }
 
-void ProjectLibrary::addPackage(library::Package& p) {
+void ProjectLibrary::addPackage(Package& p) {
   addElement<Package>(p, mPackages);
 }
 
-void ProjectLibrary::addComponent(library::Component& c) {
+void ProjectLibrary::addComponent(Component& c) {
   addElement<Component>(c, mComponents);
 }
 
-void ProjectLibrary::addDevice(library::Device& d) {
+void ProjectLibrary::addDevice(Device& d) {
   addElement<Device>(d, mDevices);
 }
 
-void ProjectLibrary::removeSymbol(library::Symbol& s) {
+void ProjectLibrary::removeSymbol(Symbol& s) {
   removeElement<Symbol>(s, mSymbols);
 }
 
-void ProjectLibrary::removePackage(library::Package& p) {
+void ProjectLibrary::removePackage(Package& p) {
   removeElement<Package>(p, mPackages);
 }
 
-void ProjectLibrary::removeComponent(library::Component& c) {
+void ProjectLibrary::removeComponent(Component& c) {
   removeElement<Component>(c, mComponents);
 }
 
-void ProjectLibrary::removeDevice(library::Device& d) {
+void ProjectLibrary::removeDevice(Device& d) {
   removeElement<Device>(d, mDevices);
 }
 
@@ -207,5 +203,4 @@ void ProjectLibrary::removeElement(ElementType& element,
  *  End of File
  ******************************************************************************/
 
-}  // namespace project
 }  // namespace librepcb

@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_LIBRARY_H
-#define LIBREPCB_LIBRARY_LIBRARY_H
+#ifndef LIBREPCB_CORE_LIBRARY_H
+#define LIBREPCB_CORE_LIBRARY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../types/uuid.h"
 #include "librarybaseelement.h"
-
-#include <librepcb/common/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 
 /*******************************************************************************
  *  Class Library
@@ -89,7 +87,7 @@ public:
   }
 
 private:  // Methods
-  /// @copydoc librepcb::SerializableObject::serialize()
+  /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
 private:  // Data
@@ -102,7 +100,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace library
 }  // namespace librepcb
 
 #endif

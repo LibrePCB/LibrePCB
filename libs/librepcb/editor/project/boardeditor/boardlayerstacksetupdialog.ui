@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::BoardLayerStackSetupDialog</class>
- <widget class="QDialog" name="librepcb::project::editor::BoardLayerStackSetupDialog">
+ <class>librepcb::editor::BoardLayerStackSetupDialog</class>
+ <widget class="QDialog" name="librepcb::editor::BoardLayerStackSetupDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -44,7 +44,7 @@
        <property name="styleSheet">
         <string notr="true">QLabel {
 	background-color: rgb(255, 255, 127);
-	
+
 	color: rgb(170, 0, 0);
 };</string>
        </property>
@@ -75,7 +75,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>librepcb::project::editor::BoardLayerStackSetupDialog</receiver>
+   <receiver>librepcb::editor::BoardLayerStackSetupDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -91,7 +91,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>librepcb::project::editor::BoardLayerStackSetupDialog</receiver>
+   <receiver>librepcb::editor::BoardLayerStackSetupDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

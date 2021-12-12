@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::project::editor::BoardEditor</class>
- <widget class="QMainWindow" name="librepcb::project::editor::BoardEditor">
+ <class>librepcb::editor::BoardEditor</class>
+ <widget class="QMainWindow" name="librepcb::editor::BoardEditor">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -184,7 +184,7 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="librepcb::StatusBar" name="statusbar"/>
+  <widget class="librepcb::editor::StatusBar" name="statusbar"/>
   <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
     <string>File</string>
@@ -255,7 +255,7 @@
    </attribute>
    <addaction name="actionGrid"/>
   </widget>
-  <widget class="librepcb::project::editor::SearchToolBar" name="searchToolbar">
+  <widget class="librepcb::editor::SearchToolBar" name="searchToolbar">
    <property name="windowTitle">
     <string>Search</string>
    </property>
@@ -948,9 +948,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::StatusBar</class>
+   <class>librepcb::editor::StatusBar</class>
    <extends>QStatusBar</extends>
-   <header location="global">librepcb/common/widgets/statusbar.h</header>
+   <header location="global">librepcb/editor/widgets/statusbar.h</header>
   </customwidget>
   <customwidget>
    <class>QTabBar</class>
@@ -958,9 +958,9 @@
    <header>qtabbar.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::project::editor::SearchToolBar</class>
+   <class>librepcb::editor::SearchToolBar</class>
    <extends>QToolBar</extends>
-   <header location="global">librepcb/projecteditor/toolbars/searchtoolbar.h</header>
+   <header location="global">librepcb/editor/widgets/searchtoolbar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "componenteditorwidget.h"
 
+#include "../../widgets/signalrolecombobox.h"
+#include "../cmd/cmdcomponentedit.h"
+#include "../cmd/cmdcomponentsymbolvariantedit.h"
 #include "componentsymbolvarianteditdialog.h"
 #include "ui_componenteditorwidget.h"
 
-#include <librepcb/common/widgets/signalrolecombobox.h>
-#include <librepcb/library/cmp/cmd/cmdcomponentedit.h>
-#include <librepcb/library/cmp/cmd/cmdcomponentsymbolvariantedit.h>
-#include <librepcb/library/cmp/component.h>
-#include <librepcb/library/cmp/msg/msgmissingcomponentdefaultvalue.h>
-#include <librepcb/library/cmp/msg/msgmissingsymbolvariant.h>
-#include <librepcb/library/msg/msgmissingauthor.h>
-#include <librepcb/library/msg/msgmissingcategories.h>
-#include <librepcb/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/cmp/msg/msgmissingcomponentdefaultvalue.h>
+#include <librepcb/core/library/cmp/msg/msgmissingsymbolvariant.h>
+#include <librepcb/core/library/msg/msgmissingauthor.h>
+#include <librepcb/core/library/msg/msgmissingcategories.h>
+#include <librepcb/core/library/msg/msgnamenottitlecase.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,7 +42,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace library {
 namespace editor {
 
 /*******************************************************************************
@@ -345,5 +344,4 @@ bool ComponentEditorWidget::processCheckMessage(
  ******************************************************************************/
 
 }  // namespace editor
-}  // namespace library
 }  // namespace librepcb
