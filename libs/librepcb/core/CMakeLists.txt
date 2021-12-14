@@ -1,0 +1,518 @@
+# Enable Qt MOC/UIC/RCC
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC OFF)
+set(CMAKE_AUTORCC OFF)
+
+# Allow overriding the share directory path
+set(LIBREPCB_SHARE
+    "../share/librepcb"
+    CACHE STRING "Path to the LibrePCB share directory."
+)
+
+# Set this to YES to disable some features that make builds non-reproducible
+# (like embedding the git commit hash or the path to the source directory in
+# the binary).
+set(LIBREPCB_REPRODUCIBLE
+    NO
+    CACHE BOOL "Disable feature that make builds non-reproducible"
+)
+
+if(LIBREPCB_REPRODUCIBLE)
+  message(STATUS "Creating a potentially reproducible build")
+else()
+  # Detect git commit hash
+  find_package(Git)
+  if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+      COMMAND ${GIT_EXECUTABLE} -C "${CMAKE_SOURCE_DIR}" rev-parse --short
+              --verify HEAD
+      OUTPUT_VARIABLE SHORT_SHA
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(GIT_COMMIT_SHA ${SHORT_SHA})
+  else()
+    message(STATUS "Git not found, cannot set version info")
+  endif()
+
+  # Detect path to source share directory
+  set(LIBREPCB_SHARE_SOURCE "${CMAKE_SOURCE_DIR}/share")
+
+  # Detect path to binary output directory
+  set(LIBREPCB_BINARY_DIR "${CMAKE_BINARY_DIR}")
+endif()
+
+# Generate build_env.h file
+configure_file(build_env.h.in build_env.h @ONLY)
+
+# Export library
+add_library(
+  librepcb_core STATIC
+  algorithm/airwiresbuilder.cpp
+  algorithm/airwiresbuilder.h
+  application.cpp
+  application.h
+  attribute/attribute.cpp
+  attribute/attribute.h
+  attribute/attributekey.h
+  attribute/attributeprovider.cpp
+  attribute/attributeprovider.h
+  attribute/attributesubstitutor.cpp
+  attribute/attributesubstitutor.h
+  attribute/attributetype.cpp
+  attribute/attributetype.h
+  attribute/attributeunit.cpp
+  attribute/attributeunit.h
+  attribute/attrtypecapacitance.cpp
+  attribute/attrtypecapacitance.h
+  attribute/attrtypecurrent.cpp
+  attribute/attrtypecurrent.h
+  attribute/attrtypefrequency.cpp
+  attribute/attrtypefrequency.h
+  attribute/attrtypeinductance.cpp
+  attribute/attrtypeinductance.h
+  attribute/attrtypepower.cpp
+  attribute/attrtypepower.h
+  attribute/attrtyperesistance.cpp
+  attribute/attrtyperesistance.h
+  attribute/attrtypestring.cpp
+  attribute/attrtypestring.h
+  attribute/attrtypevoltage.cpp
+  attribute/attrtypevoltage.h
+  debug.cpp
+  debug.h
+  exceptions.cpp
+  exceptions.h
+  export/bom.cpp
+  export/bom.h
+  export/bomcsvwriter.cpp
+  export/bomcsvwriter.h
+  export/excellongenerator.cpp
+  export/excellongenerator.h
+  export/gerberaperturelist.cpp
+  export/gerberaperturelist.h
+  export/gerberattribute.cpp
+  export/gerberattribute.h
+  export/gerberattributewriter.cpp
+  export/gerberattributewriter.h
+  export/gerbergenerator.cpp
+  export/gerbergenerator.h
+  export/pickplacecsvwriter.cpp
+  export/pickplacecsvwriter.h
+  export/pickplacedata.cpp
+  export/pickplacedata.h
+  fileio/asynccopyoperation.cpp
+  fileio/asynccopyoperation.h
+  fileio/csvfile.cpp
+  fileio/csvfile.h
+  fileio/directorylock.cpp
+  fileio/directorylock.h
+  fileio/filepath.cpp
+  fileio/filepath.h
+  fileio/filesystem.h
+  fileio/fileutils.cpp
+  fileio/fileutils.h
+  fileio/transactionaldirectory.cpp
+  fileio/transactionaldirectory.h
+  fileio/transactionalfilesystem.cpp
+  fileio/transactionalfilesystem.h
+  fileio/versionfile.cpp
+  fileio/versionfile.h
+  font/strokefont.cpp
+  font/strokefont.h
+  font/strokefontpool.cpp
+  font/strokefontpool.h
+  geometry/circle.cpp
+  geometry/circle.h
+  geometry/hole.cpp
+  geometry/hole.h
+  geometry/junction.cpp
+  geometry/junction.h
+  geometry/netlabel.cpp
+  geometry/netlabel.h
+  geometry/netline.cpp
+  geometry/netline.h
+  geometry/path.cpp
+  geometry/path.h
+  geometry/polygon.cpp
+  geometry/polygon.h
+  geometry/stroketext.cpp
+  geometry/stroketext.h
+  geometry/text.cpp
+  geometry/text.h
+  geometry/trace.cpp
+  geometry/trace.h
+  geometry/vertex.cpp
+  geometry/vertex.h
+  geometry/via.cpp
+  geometry/via.h
+  graphics/circlegraphicsitem.cpp
+  graphics/circlegraphicsitem.h
+  graphics/defaultgraphicslayerprovider.cpp
+  graphics/defaultgraphicslayerprovider.h
+  graphics/graphicslayer.cpp
+  graphics/graphicslayer.h
+  graphics/graphicslayername.h
+  graphics/graphicslayerstackappearancesettings.cpp
+  graphics/graphicslayerstackappearancesettings.h
+  graphics/graphicsscene.cpp
+  graphics/graphicsscene.h
+  graphics/holegraphicsitem.cpp
+  graphics/holegraphicsitem.h
+  graphics/linegraphicsitem.cpp
+  graphics/linegraphicsitem.h
+  graphics/origincrossgraphicsitem.cpp
+  graphics/origincrossgraphicsitem.h
+  graphics/polygongraphicsitem.cpp
+  graphics/polygongraphicsitem.h
+  graphics/primitivecirclegraphicsitem.cpp
+  graphics/primitivecirclegraphicsitem.h
+  graphics/primitivepathgraphicsitem.cpp
+  graphics/primitivepathgraphicsitem.h
+  graphics/primitivetextgraphicsitem.cpp
+  graphics/primitivetextgraphicsitem.h
+  graphics/stroketextgraphicsitem.cpp
+  graphics/stroketextgraphicsitem.h
+  graphics/textgraphicsitem.cpp
+  graphics/textgraphicsitem.h
+  import/dxfreader.cpp
+  import/dxfreader.h
+  library/cat/componentcategory.cpp
+  library/cat/componentcategory.h
+  library/cat/librarycategory.cpp
+  library/cat/librarycategory.h
+  library/cat/packagecategory.cpp
+  library/cat/packagecategory.h
+  library/cmp/cmpsigpindisplaytype.cpp
+  library/cmp/cmpsigpindisplaytype.h
+  library/cmp/component.cpp
+  library/cmp/component.h
+  library/cmp/componentcheck.cpp
+  library/cmp/componentcheck.h
+  library/cmp/componentpinsignalmap.cpp
+  library/cmp/componentpinsignalmap.h
+  library/cmp/componentprefix.h
+  library/cmp/componentsignal.cpp
+  library/cmp/componentsignal.h
+  library/cmp/componentsymbolvariant.cpp
+  library/cmp/componentsymbolvariant.h
+  library/cmp/componentsymbolvariantitem.cpp
+  library/cmp/componentsymbolvariantitem.h
+  library/cmp/componentsymbolvariantitemsuffix.h
+  library/cmp/msg/msgduplicatesignalname.cpp
+  library/cmp/msg/msgduplicatesignalname.h
+  library/cmp/msg/msgmissingcomponentdefaultvalue.cpp
+  library/cmp/msg/msgmissingcomponentdefaultvalue.h
+  library/cmp/msg/msgmissingcomponentprefix.cpp
+  library/cmp/msg/msgmissingcomponentprefix.h
+  library/cmp/msg/msgmissingsymbolvariant.cpp
+  library/cmp/msg/msgmissingsymbolvariant.h
+  library/cmp/msg/msgmissingsymbolvariantitem.cpp
+  library/cmp/msg/msgmissingsymbolvariantitem.h
+  library/dev/device.cpp
+  library/dev/device.h
+  library/dev/devicecheck.cpp
+  library/dev/devicecheck.h
+  library/dev/devicepadsignalmap.cpp
+  library/dev/devicepadsignalmap.h
+  library/dev/msg/msgnopadsindeviceconnected.cpp
+  library/dev/msg/msgnopadsindeviceconnected.h
+  library/library.cpp
+  library/library.h
+  library/librarybaseelement.cpp
+  library/librarybaseelement.h
+  library/librarybaseelementcheck.cpp
+  library/librarybaseelementcheck.h
+  library/libraryelement.cpp
+  library/libraryelement.h
+  library/libraryelementcheck.cpp
+  library/libraryelementcheck.h
+  library/msg/libraryelementcheckmessage.cpp
+  library/msg/libraryelementcheckmessage.h
+  library/msg/msgmissingauthor.cpp
+  library/msg/msgmissingauthor.h
+  library/msg/msgmissingcategories.cpp
+  library/msg/msgmissingcategories.h
+  library/msg/msgnamenottitlecase.cpp
+  library/msg/msgnamenottitlecase.h
+  library/pkg/footprint.cpp
+  library/pkg/footprint.h
+  library/pkg/footprintgraphicsitem.cpp
+  library/pkg/footprintgraphicsitem.h
+  library/pkg/footprintpad.cpp
+  library/pkg/footprintpad.h
+  library/pkg/footprintpadgraphicsitem.cpp
+  library/pkg/footprintpadgraphicsitem.h
+  library/pkg/msg/msgduplicatepadname.cpp
+  library/pkg/msg/msgduplicatepadname.h
+  library/pkg/msg/msgmissingfootprint.cpp
+  library/pkg/msg/msgmissingfootprint.h
+  library/pkg/msg/msgmissingfootprintname.cpp
+  library/pkg/msg/msgmissingfootprintname.h
+  library/pkg/msg/msgmissingfootprintvalue.cpp
+  library/pkg/msg/msgmissingfootprintvalue.h
+  library/pkg/msg/msgpadclearanceviolation.cpp
+  library/pkg/msg/msgpadclearanceviolation.h
+  library/pkg/msg/msgpadoverlapswithplacement.cpp
+  library/pkg/msg/msgpadoverlapswithplacement.h
+  library/pkg/msg/msgwrongfootprinttextlayer.cpp
+  library/pkg/msg/msgwrongfootprinttextlayer.h
+  library/pkg/package.cpp
+  library/pkg/package.h
+  library/pkg/packagecheck.cpp
+  library/pkg/packagecheck.h
+  library/pkg/packagepad.cpp
+  library/pkg/packagepad.h
+  library/sym/msg/msgduplicatepinname.cpp
+  library/sym/msg/msgduplicatepinname.h
+  library/sym/msg/msgmissingsymbolname.cpp
+  library/sym/msg/msgmissingsymbolname.h
+  library/sym/msg/msgmissingsymbolvalue.cpp
+  library/sym/msg/msgmissingsymbolvalue.h
+  library/sym/msg/msgoverlappingsymbolpins.cpp
+  library/sym/msg/msgoverlappingsymbolpins.h
+  library/sym/msg/msgsymbolpinnotongrid.cpp
+  library/sym/msg/msgsymbolpinnotongrid.h
+  library/sym/msg/msgwrongsymboltextlayer.cpp
+  library/sym/msg/msgwrongsymboltextlayer.h
+  library/sym/symbol.cpp
+  library/sym/symbol.h
+  library/sym/symbolcheck.cpp
+  library/sym/symbolcheck.h
+  library/sym/symbolgraphicsitem.cpp
+  library/sym/symbolgraphicsitem.h
+  library/sym/symbolpin.cpp
+  library/sym/symbolpin.h
+  library/sym/symbolpingraphicsitem.cpp
+  library/sym/symbolpingraphicsitem.h
+  network/filedownload.cpp
+  network/filedownload.h
+  network/networkaccessmanager.cpp
+  network/networkaccessmanager.h
+  network/networkrequest.cpp
+  network/networkrequest.h
+  network/networkrequestbase.cpp
+  network/networkrequestbase.h
+  network/orderpcbapirequest.cpp
+  network/orderpcbapirequest.h
+  network/repository.cpp
+  network/repository.h
+  norms.h
+  project/board/board.cpp
+  project/board/board.h
+  project/board/boardairwiresbuilder.cpp
+  project/board/boardairwiresbuilder.h
+  project/board/boarddesignrules.cpp
+  project/board/boarddesignrules.h
+  project/board/boardfabricationoutputsettings.cpp
+  project/board/boardfabricationoutputsettings.h
+  project/board/boardgerberexport.cpp
+  project/board/boardgerberexport.h
+  project/board/boardlayerstack.cpp
+  project/board/boardlayerstack.h
+  project/board/boardpickplacegenerator.cpp
+  project/board/boardpickplacegenerator.h
+  project/board/boardplanefragmentsbuilder.cpp
+  project/board/boardplanefragmentsbuilder.h
+  project/board/boardselectionquery.cpp
+  project/board/boardselectionquery.h
+  project/board/boardusersettings.cpp
+  project/board/boardusersettings.h
+  project/board/drc/boardclipperpathgenerator.cpp
+  project/board/drc/boardclipperpathgenerator.h
+  project/board/drc/boarddesignrulecheck.cpp
+  project/board/drc/boarddesignrulecheck.h
+  project/board/drc/boarddesignrulecheckmessage.cpp
+  project/board/drc/boarddesignrulecheckmessage.h
+  project/board/graphicsitems/bgi_airwire.cpp
+  project/board/graphicsitems/bgi_airwire.h
+  project/board/graphicsitems/bgi_base.cpp
+  project/board/graphicsitems/bgi_base.h
+  project/board/graphicsitems/bgi_footprint.cpp
+  project/board/graphicsitems/bgi_footprint.h
+  project/board/graphicsitems/bgi_footprintpad.cpp
+  project/board/graphicsitems/bgi_footprintpad.h
+  project/board/graphicsitems/bgi_netline.cpp
+  project/board/graphicsitems/bgi_netline.h
+  project/board/graphicsitems/bgi_netpoint.cpp
+  project/board/graphicsitems/bgi_netpoint.h
+  project/board/graphicsitems/bgi_plane.cpp
+  project/board/graphicsitems/bgi_plane.h
+  project/board/graphicsitems/bgi_via.cpp
+  project/board/graphicsitems/bgi_via.h
+  project/board/items/bi_airwire.cpp
+  project/board/items/bi_airwire.h
+  project/board/items/bi_base.cpp
+  project/board/items/bi_base.h
+  project/board/items/bi_device.cpp
+  project/board/items/bi_device.h
+  project/board/items/bi_footprint.cpp
+  project/board/items/bi_footprint.h
+  project/board/items/bi_footprintpad.cpp
+  project/board/items/bi_footprintpad.h
+  project/board/items/bi_hole.cpp
+  project/board/items/bi_hole.h
+  project/board/items/bi_netline.cpp
+  project/board/items/bi_netline.h
+  project/board/items/bi_netpoint.cpp
+  project/board/items/bi_netpoint.h
+  project/board/items/bi_netsegment.cpp
+  project/board/items/bi_netsegment.h
+  project/board/items/bi_plane.cpp
+  project/board/items/bi_plane.h
+  project/board/items/bi_polygon.cpp
+  project/board/items/bi_polygon.h
+  project/board/items/bi_stroketext.cpp
+  project/board/items/bi_stroketext.h
+  project/board/items/bi_via.cpp
+  project/board/items/bi_via.h
+  project/bomgenerator.cpp
+  project/bomgenerator.h
+  project/circuit/circuit.cpp
+  project/circuit/circuit.h
+  project/circuit/componentinstance.cpp
+  project/circuit/componentinstance.h
+  project/circuit/componentsignalinstance.cpp
+  project/circuit/componentsignalinstance.h
+  project/circuit/netclass.cpp
+  project/circuit/netclass.h
+  project/circuit/netsignal.cpp
+  project/circuit/netsignal.h
+  project/erc/ercmsg.cpp
+  project/erc/ercmsg.h
+  project/erc/ercmsglist.cpp
+  project/erc/ercmsglist.h
+  project/erc/if_ercmsgprovider.h
+  project/project.cpp
+  project/project.h
+  project/projectlibrary.cpp
+  project/projectlibrary.h
+  project/projectmetadata.cpp
+  project/projectmetadata.h
+  project/projectsettings.cpp
+  project/projectsettings.h
+  project/schematic/graphicsitems/sgi_base.cpp
+  project/schematic/graphicsitems/sgi_base.h
+  project/schematic/graphicsitems/sgi_netlabel.cpp
+  project/schematic/graphicsitems/sgi_netlabel.h
+  project/schematic/graphicsitems/sgi_netline.cpp
+  project/schematic/graphicsitems/sgi_netline.h
+  project/schematic/graphicsitems/sgi_netpoint.cpp
+  project/schematic/graphicsitems/sgi_netpoint.h
+  project/schematic/graphicsitems/sgi_symbol.cpp
+  project/schematic/graphicsitems/sgi_symbol.h
+  project/schematic/graphicsitems/sgi_symbolpin.cpp
+  project/schematic/graphicsitems/sgi_symbolpin.h
+  project/schematic/items/si_base.cpp
+  project/schematic/items/si_base.h
+  project/schematic/items/si_netlabel.cpp
+  project/schematic/items/si_netlabel.h
+  project/schematic/items/si_netline.cpp
+  project/schematic/items/si_netline.h
+  project/schematic/items/si_netpoint.cpp
+  project/schematic/items/si_netpoint.h
+  project/schematic/items/si_netsegment.cpp
+  project/schematic/items/si_netsegment.h
+  project/schematic/items/si_polygon.cpp
+  project/schematic/items/si_polygon.h
+  project/schematic/items/si_symbol.cpp
+  project/schematic/items/si_symbol.h
+  project/schematic/items/si_symbolpin.cpp
+  project/schematic/items/si_symbolpin.h
+  project/schematic/items/si_text.cpp
+  project/schematic/items/si_text.h
+  project/schematic/schematic.cpp
+  project/schematic/schematic.h
+  project/schematic/schematiclayerprovider.cpp
+  project/schematic/schematiclayerprovider.h
+  project/schematic/schematicselectionquery.cpp
+  project/schematic/schematicselectionquery.h
+  serialization/serializablekeyvaluemap.h
+  serialization/serializableobject.h
+  serialization/serializableobjectlist.h
+  serialization/sexpression.cpp
+  serialization/sexpression.h
+  sqlitedatabase.cpp
+  sqlitedatabase.h
+  systeminfo.cpp
+  systeminfo.h
+  types/alignment.cpp
+  types/alignment.h
+  types/angle.cpp
+  types/angle.h
+  types/circuitidentifier.h
+  types/elementname.h
+  types/gridproperties.cpp
+  types/gridproperties.h
+  types/length.cpp
+  types/length.h
+  types/lengthunit.cpp
+  types/lengthunit.h
+  types/point.cpp
+  types/point.h
+  types/ratio.cpp
+  types/ratio.h
+  types/signalrole.cpp
+  types/signalrole.h
+  types/uuid.cpp
+  types/uuid.h
+  types/version.cpp
+  types/version.h
+  utils/clipperhelpers.cpp
+  utils/clipperhelpers.h
+  utils/mathparser.cpp
+  utils/mathparser.h
+  utils/scopeguard.h
+  utils/scopeguardlist.h
+  utils/signalslot.h
+  utils/tangentpathjoiner.cpp
+  utils/tangentpathjoiner.h
+  utils/toolbox.cpp
+  utils/toolbox.h
+  workspace/workspace.cpp
+  workspace/workspace.h
+  workspace/workspacelibrarydb.cpp
+  workspace/workspacelibrarydb.h
+  workspace/workspacelibraryscanner.cpp
+  workspace/workspacelibraryscanner.h
+  workspace/workspacesettings.cpp
+  workspace/workspacesettings.h
+  workspace/workspacesettingsitem.cpp
+  workspace/workspacesettingsitem.h
+  workspace/workspacesettingsitem_genericvalue.h
+  workspace/workspacesettingsitem_genericvaluelist.h
+)
+target_include_directories(
+  librepcb_core
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+)
+target_link_libraries(
+  librepcb_core
+  PRIVATE common
+          # Third party
+          DelaunayTriangulation::DelaunayTriangulation
+          Dxflib::Dxflib
+          FontoBene::FontoBeneQt5
+          MuParser::MuParser
+          QuaZip::QuaZip
+)
+target_link_libraries(
+  librepcb_core
+  PUBLIC # Third party
+         Optional::Optional
+         Polyclipping::Polyclipping
+         TypeSafe::TypeSafe
+         # Qt
+         Qt5::Concurrent
+         Qt5::Core
+         Qt5::Gui
+         Qt5::Network
+         Qt5::PrintSupport
+         Qt5::Sql
+         Qt5::Widgets
+         # Link with -lproc on SunOS / Solaris / Illumos
+         # This is required for proc_get_psinfo
+         $<$<STREQUAL:$<PLATFORM_ID>,SunOS>:proc>
+)
+
+# Alias to namespaced variant
+add_library(LibrePCB::Core ALIAS librepcb_core)

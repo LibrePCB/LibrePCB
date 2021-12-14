@@ -1,7 +1,0 @@
-#include "cat/componentcategory.h"
-#include "cat/packagecategory.h"
-#include "cmp/component.h"
-#include "dev/device.h"
-#include "library.h"
-#include "pkg/package.h"
-#include "sym/symbol.h"

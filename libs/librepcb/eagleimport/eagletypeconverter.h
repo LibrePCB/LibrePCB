@@ -23,20 +23,20 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/common/circuitidentifier.h>
-#include <librepcb/common/elementname.h>
-#include <librepcb/common/geometry/circle.h>
-#include <librepcb/common/geometry/hole.h>
-#include <librepcb/common/geometry/path.h>
-#include <librepcb/common/geometry/polygon.h>
-#include <librepcb/common/geometry/stroketext.h>
-#include <librepcb/common/geometry/text.h>
-#include <librepcb/common/graphics/graphicslayername.h>
-#include <librepcb/common/units/all_length_units.h>
-#include <librepcb/library/cmp/componentsymbolvariantitemsuffix.h>
-#include <librepcb/library/pkg/footprintpad.h>
-#include <librepcb/library/pkg/packagepad.h>
-#include <librepcb/library/sym/symbolpin.h>
+#include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/geometry/path.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/geometry/text.h>
+#include <librepcb/core/graphics/graphicslayername.h>
+#include <librepcb/core/library/cmp/componentsymbolvariantitemsuffix.h>
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/packagepad.h>
+#include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/types/circuitidentifier.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/point.h>
 #include <optional/tl/optional.hpp>
 
 #include <QtCore>
@@ -118,8 +118,7 @@ public:
    *
    * @return LibrePCB component symbol variant item suffix
    */
-  static library::ComponentSymbolVariantItemSuffix convertGateName(
-      const QString& n);
+  static ComponentSymbolVariantItemSuffix convertGateName(const QString& n);
 
   /**
    * @brief Convert a pin or pad name
@@ -275,8 +274,7 @@ public:
    *
    * @return LibrePCB pin
    */
-  static std::shared_ptr<library::SymbolPin> convertSymbolPin(
-      const parseagle::Pin& p);
+  static std::shared_ptr<SymbolPin> convertSymbolPin(const parseagle::Pin& p);
 
   /**
    * @brief Convert a THT pad
@@ -285,8 +283,7 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  static std::pair<std::shared_ptr<library::PackagePad>,
-                   std::shared_ptr<library::FootprintPad> >
+  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
       convertThtPad(const parseagle::ThtPad& p);
 
   /**
@@ -296,8 +293,7 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  static std::pair<std::shared_ptr<library::PackagePad>,
-                   std::shared_ptr<library::FootprintPad> >
+  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
       convertSmtPad(const parseagle::SmtPad& p);
 
   // Operator Overloadings

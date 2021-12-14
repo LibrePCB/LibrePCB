@@ -138,13 +138,8 @@ if(Qt5Core_VERSION VERSION_LESS 5.14)
 endif()
 
 # Add libs
-add_subdirectory(libs/librepcb/common)
-add_subdirectory(libs/librepcb/library)
-add_subdirectory(libs/librepcb/project)
-add_subdirectory(libs/librepcb/workspace)
-add_subdirectory(libs/librepcb/projecteditor)
-add_subdirectory(libs/librepcb/libraryeditor)
-add_subdirectory(libs/librepcb/librarymanager)
+add_subdirectory(libs/librepcb/core)
+add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
 add_subdirectory(libs/parseagle)
 

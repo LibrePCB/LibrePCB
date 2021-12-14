@@ -17,8 +17,9 @@ target_link_libraries(
   uuid_generator
   PRIVATE common
           # LibrePCB
-          LibrePCB::Common
+          LibrePCB::Core
           # Qt
+          Qt5::Core
           Qt5::Gui
           Qt5::Widgets
 )

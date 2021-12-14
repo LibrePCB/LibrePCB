@@ -13,90 +13,89 @@ find_package(Threads REQUIRED)
 # Main executable
 add_executable(
   librepcb_unittests
-  common/algorithm/airwiresbuildertest.cpp
-  common/alignmenttest.cpp
-  common/applicationtest.cpp
-  common/attributes/attributekeytest.cpp
-  common/attributes/attributeproviderdummy.h
-  common/attributes/attributesubstitutortest.cpp
-  common/attributes/attributetest.cpp
-  common/attributes/attributetypetest.cpp
-  common/attributes/attributeunittest.cpp
-  common/boarddesignrulestest.cpp
-  common/cam/gerberaperturelisttest.cpp
-  common/cam/gerberattributetest.cpp
-  common/cam/gerberattributewritertest.cpp
-  common/cam/gerbergeneratortest.cpp
-  common/circuitidentifiertest.cpp
-  common/dialogs/dxfimportdialogtest.cpp
-  common/fileio/asynccopyoperationtest.cpp
-  common/fileio/csvfiletest.cpp
-  common/fileio/directorylocktest.cpp
-  common/fileio/filepathtest.cpp
-  common/fileio/serializableobjectlisttest.cpp
-  common/fileio/serializableobjectmock.h
-  common/fileio/sexpressiontest.cpp
-  common/fileio/transactionaldirectorytest.cpp
-  common/fileio/transactionalfilesystemtest.cpp
-  common/geometry/pathmodeltest.cpp
-  common/geometry/pathtest.cpp
-  common/geometry/polygontest.cpp
-  common/geometry/stroketexttest.cpp
-  common/geometry/texttest.cpp
-  common/geometry/tracetest.cpp
-  common/geometry/vertextest.cpp
-  common/geometry/viatest.cpp
-  common/graphics/graphicslayernametest.cpp
-  common/import/dxfreadertest.cpp
-  common/network/filedownloadtest.cpp
-  common/network/networkrequestbasesignalreceiver.h
-  common/network/networkrequesttest.cpp
-  common/pnp/pickplacecsvwritertest.cpp
-  common/scopeguardtest.cpp
-  common/signalroletest.cpp
-  common/signalslottest.cpp
-  common/sqlitedatabasetest.cpp
-  common/systeminfotest.cpp
-  common/toolboxtest.cpp
-  common/units/angletest.cpp
-  common/units/lengthsnaptest.cpp
-  common/units/lengthtest.cpp
-  common/units/pointtest.cpp
-  common/units/ratiotest.cpp
-  common/utils/mathparsertest.cpp
-  common/utils/tangentpathjoinertest.cpp
-  common/uuidtest.cpp
-  common/versiontest.cpp
-  common/widgets/editabletablewidgetreceiver.h
-  common/widgets/editabletablewidgettest.cpp
-  common/widgets/lengthedittest.cpp
-  common/widgets/positivelengthedittest.cpp
-  common/widgets/unsignedlengthedittest.cpp
+  core/algorithm/airwiresbuildertest.cpp
+  core/applicationtest.cpp
+  core/attribute/attributekeytest.cpp
+  core/attribute/attributeproviderdummy.h
+  core/attribute/attributesubstitutortest.cpp
+  core/attribute/attributetest.cpp
+  core/attribute/attributetypetest.cpp
+  core/attribute/attributeunittest.cpp
+  core/export/gerberaperturelisttest.cpp
+  core/export/gerberattributetest.cpp
+  core/export/gerberattributewritertest.cpp
+  core/export/gerbergeneratortest.cpp
+  core/export/pickplacecsvwritertest.cpp
+  core/fileio/asynccopyoperationtest.cpp
+  core/fileio/csvfiletest.cpp
+  core/fileio/directorylocktest.cpp
+  core/fileio/filepathtest.cpp
+  core/fileio/transactionaldirectorytest.cpp
+  core/fileio/transactionalfilesystemtest.cpp
+  core/geometry/pathtest.cpp
+  core/geometry/polygontest.cpp
+  core/geometry/stroketexttest.cpp
+  core/geometry/texttest.cpp
+  core/geometry/tracetest.cpp
+  core/geometry/vertextest.cpp
+  core/geometry/viatest.cpp
+  core/graphics/graphicslayernametest.cpp
+  core/import/dxfreadertest.cpp
+  core/library/cmp/componentprefixtest.cpp
+  core/library/cmp/componentsymbolvariantitemsuffixtest.cpp
+  core/library/cmp/componentsymbolvariantitemtest.cpp
+  core/library/librarybaseelementtest.cpp
+  core/library/pkg/footprintpadtest.cpp
+  core/library/sym/symbolpintest.cpp
+  core/network/filedownloadtest.cpp
+  core/network/networkrequestbasesignalreceiver.h
+  core/network/networkrequesttest.cpp
+  core/project/board/boarddesignrulestest.cpp
+  core/project/board/boardfabricationoutputsettingstest.cpp
+  core/project/board/boardgerberexporttest.cpp
+  core/project/board/boardpickplacegeneratortest.cpp
+  core/project/board/boardplanefragmentsbuildertest.cpp
+  core/project/projectlibrarytest.cpp
+  core/project/projecttest.cpp
+  core/serialization/serializableobjectlisttest.cpp
+  core/serialization/serializableobjectmock.h
+  core/serialization/sexpressiontest.cpp
+  core/sqlitedatabasetest.cpp
+  core/systeminfotest.cpp
+  core/types/alignmenttest.cpp
+  core/types/angletest.cpp
+  core/types/circuitidentifiertest.cpp
+  core/types/lengthtest.cpp
+  core/types/pointtest.cpp
+  core/types/ratiotest.cpp
+  core/types/signalroletest.cpp
+  core/types/uuidtest.cpp
+  core/types/versiontest.cpp
+  core/utils/mathparsertest.cpp
+  core/utils/scopeguardtest.cpp
+  core/utils/signalslottest.cpp
+  core/utils/tangentpathjoinertest.cpp
+  core/utils/toolboxtest.cpp
+  core/workspace/workspacesettingstest.cpp
+  core/workspace/workspacetest.cpp
   eagleimport/eaglelibraryimporttest.cpp
   eagleimport/eagletypeconvertertest.cpp
-  library/cmp/componentprefixtest.cpp
-  library/cmp/componentsymbolvariantitemsuffixtest.cpp
-  library/cmp/componentsymbolvariantitemtest.cpp
-  library/librarybaseelementtest.cpp
-  library/pkg/footprintpadtest.cpp
-  library/sym/symbolpintest.cpp
-  libraryeditor/pkg/footprintclipboarddatatest.cpp
-  libraryeditor/sym/symbolclipboarddatatest.cpp
-  librarymanager/librarydownloadtest.cpp
+  editor/dialogs/dxfimportdialogtest.cpp
+  editor/library/pkg/footprintclipboarddatatest.cpp
+  editor/library/sym/symbolclipboarddatatest.cpp
+  editor/modelview/pathmodeltest.cpp
+  editor/project/boardeditor/boardclipboarddatatest.cpp
+  editor/project/orderpcbdialogtest.cpp
+  editor/project/schematiceditor/schematicclipboarddatatest.cpp
+  editor/widgets/editabletablewidgetreceiver.h
+  editor/widgets/editabletablewidgettest.cpp
+  editor/widgets/lengthedittest.cpp
+  editor/widgets/positivelengthedittest.cpp
+  editor/widgets/unsignedlengthedittest.cpp
+  editor/workspace/librarymanager/librarydownloadtest.cpp
   main.cpp
-  project/boards/boardfabricationoutputsettingstest.cpp
-  project/boards/boardgerberexporttest.cpp
-  project/boards/boardpickplacegeneratortest.cpp
-  project/boards/boardplanefragmentsbuildertest.cpp
-  project/library/projectlibrarytest.cpp
-  project/projecttest.cpp
-  projecteditor/boardeditor/boardclipboarddatatest.cpp
-  projecteditor/dialog/orderpcbdialogtest.cpp
-  projecteditor/schematiceditor/schematicclipboarddatatest.cpp
   testhelpers.cpp
   testhelpers.h
-  workspace/settings/workspacesettingstest.cpp
-  workspace/workspacetest.cpp
 )
 target_include_directories(
   librepcb_unittests
@@ -106,22 +105,19 @@ target_link_libraries(
   librepcb_unittests
   PRIVATE common
           # LibrePCB
-          LibrePCB::EagleImport
-          LibrePCB::LibraryManager
-          LibrePCB::LibraryEditor
-          LibrePCB::ProjectEditor
-          LibrePCB::Workspace
-          LibrePCB::Project
-          LibrePCB::Library
-          LibrePCB::Common
+          LibrePCB::Editor
+          LibrePCB::Core
           # Third party
-          ParsEagle::ParsEagle
-          QuaZip::QuaZip
           GTest::GTest
           GTest::GMock
+          ParsEagle::ParsEagle
+          QuaZip::QuaZip
           # Qt
           Qt5::Concurrent
+          Qt5::Core
+          Qt5::Gui
           Qt5::Test
+          Qt5::Widgets
           # System
           Threads::Threads
 )

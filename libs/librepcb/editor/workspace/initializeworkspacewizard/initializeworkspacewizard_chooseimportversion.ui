@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::InitializeWorkspaceWizard_ChooseImportVersion</class>
+ <widget class="QWizardPage" name="librepcb::editor::InitializeWorkspaceWizard_ChooseImportVersion">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>449</width>
+    <height>215</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Choose version to import</string>
+  </property>
+  <property name="title">
+   <string>Initialize Workspace</string>
+  </property>
+  <property name="subTitle">
+   <string>Choose how to initialize libraries and settings.</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>The selected workspace was not opened yet with this version of LibrePCB. To keep the workspace compatible with older versions, LibrePCB stores libraries and settings for each file format version independendly. Since there are libraries and settings available from older LibrePCB versions, you can import them now.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Import from:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="cbxVersions"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

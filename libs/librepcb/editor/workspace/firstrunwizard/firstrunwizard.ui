@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::FirstRunWizard</class>
+ <widget class="QWizard" name="librepcb::editor::FirstRunWizard">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>621</width>
+    <height>335</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Choose LibrePCB Workspace</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/img/app/librepcb.png</normaloff>:/img/app/librepcb.png</iconset>
+  </property>
+  <property name="wizardStyle">
+   <enum>QWizard::ModernStyle</enum>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

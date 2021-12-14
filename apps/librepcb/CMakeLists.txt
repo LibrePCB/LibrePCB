@@ -10,39 +10,7 @@ add_executable(
   WIN32
   # When building on macOS, create a bundle
   MACOSX_BUNDLE
-  ../../img/images.qrc
-  controlpanel/controlpanel.cpp
-  controlpanel/controlpanel.h
-  controlpanel/controlpanel.ui
-  firstrunwizard/firstrunwizard.cpp
-  firstrunwizard/firstrunwizard.h
-  firstrunwizard/firstrunwizard.ui
-  firstrunwizard/firstrunwizardpage_welcome.cpp
-  firstrunwizard/firstrunwizardpage_welcome.h
-  firstrunwizard/firstrunwizardpage_welcome.ui
-  firstrunwizard/firstrunwizardpage_workspacepath.cpp
-  firstrunwizard/firstrunwizardpage_workspacepath.h
-  firstrunwizard/firstrunwizardpage_workspacepath.ui
-  initializeworkspacewizard/initializeworkspacewizard.cpp
-  initializeworkspacewizard/initializeworkspacewizard.h
-  initializeworkspacewizard/initializeworkspacewizard.ui
-  initializeworkspacewizard/initializeworkspacewizard_chooseimportversion.cpp
-  initializeworkspacewizard/initializeworkspacewizard_chooseimportversion.h
-  initializeworkspacewizard/initializeworkspacewizard_chooseimportversion.ui
-  initializeworkspacewizard/initializeworkspacewizard_choosesettings.cpp
-  initializeworkspacewizard/initializeworkspacewizard_choosesettings.h
-  initializeworkspacewizard/initializeworkspacewizard_choosesettings.ui
-  initializeworkspacewizard/initializeworkspacewizard_finalizeimport.cpp
-  initializeworkspacewizard/initializeworkspacewizard_finalizeimport.h
-  initializeworkspacewizard/initializeworkspacewizard_finalizeimport.ui
-  initializeworkspacewizard/initializeworkspacewizardcontext.cpp
-  initializeworkspacewizard/initializeworkspacewizardcontext.h
-  main.cpp
-  markdown/markdownconverter.cpp
-  markdown/markdownconverter.h
-  projectlibraryupdater/projectlibraryupdater.cpp
-  projectlibraryupdater/projectlibraryupdater.h
-  projectlibraryupdater/projectlibraryupdater.ui
+  ../../img/images.qrc main.cpp
 )
 target_include_directories(
   librepcb
@@ -52,26 +20,13 @@ target_link_libraries(
   librepcb
   PRIVATE common
           # LibrePCB
-          LibrePCB::LibraryManager
-          LibrePCB::LibraryEditor
-          LibrePCB::ProjectEditor
-          LibrePCB::Workspace
-          LibrePCB::Project
-          LibrePCB::Library
-          LibrePCB::Common
-          # Third party
-          Optional::Optional
-          TypeSafe::TypeSafe
-          Polyclipping::Polyclipping
+          LibrePCB::Editor
+          LibrePCB::Core
           # Qt
+          Qt5::Core
           Qt5::Gui
           Qt5::Widgets
 )
-
-# Hoedown is only needed on Qt <5.14
-if(Qt5Core_VERSION_MAJOR EQUAL 5 AND Qt5Core_VERSION_MINOR LESS 14)
-  target_link_libraries(librepcb PRIVATE Hoedown::Hoedown)
-endif()
 
 # Install target
 install(
