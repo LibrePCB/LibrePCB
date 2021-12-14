@@ -23,7 +23,7 @@
 #include "testhelpers.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/common/toolbox.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtTest>

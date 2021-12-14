@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::NewElementWizardPage_ComponentPinSignalMap</class>
+ <widget class="QWizardPage" name="librepcb::editor::NewElementWizardPage_ComponentPinSignalMap">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>342</width>
+    <height>195</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Component Pin-Signal-Map</string>
+  </property>
+  <property name="title">
+   <string>Component Pin-Signal-Map</string>
+  </property>
+  <property name="subTitle">
+   <string>Connect the symbol pins to their corresponding component signals.</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="librepcb::editor::CompSymbVarPinSignalMapEditorWidget" name="pinSignalMapEditorWidget" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::CompSymbVarPinSignalMapEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/library/cmp/compsymbvarpinsignalmapeditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

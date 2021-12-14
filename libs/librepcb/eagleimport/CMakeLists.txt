@@ -21,8 +21,7 @@ target_link_libraries(
 target_link_libraries(
   librepcb_eagleimport
   PUBLIC # LibrePCB
-         LibrePCB::Library
-         LibrePCB::Common
+         LibrePCB::Core
          # Qt
          Qt5::Core
 )

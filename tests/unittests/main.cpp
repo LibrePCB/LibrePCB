@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gmock/gmock.h>
-#include <librepcb/common/application.h>
-#include <librepcb/common/debug.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/debug.h>
 
 #include <QtCore>
 
