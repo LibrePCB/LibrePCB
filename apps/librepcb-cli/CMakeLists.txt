@@ -16,8 +16,11 @@ target_link_libraries(
   librepcb_cli
   PRIVATE common
           # LibrePCB
-          LibrePCB::LibraryManager
-          LibrePCB::ProjectEditor
+          LibrePCB::Core
+          # Third party
+          Optional::Optional
+          # Qt
+          Qt5::Core
 )
 set_target_properties(librepcb_cli PROPERTIES OUTPUT_NAME librepcb-cli)
 
