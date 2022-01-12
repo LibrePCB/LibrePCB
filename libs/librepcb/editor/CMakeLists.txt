@@ -624,6 +624,8 @@ add_library(
   undocommandgroup.h
   undostack.cpp
   undostack.h
+  utils/editortoolbox.cpp
+  utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
   utils/exclusiveactiongroup.h
   utils/halignactiongroup.cpp
