@@ -105,9 +105,22 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
 
   // Reset GUI to state of nothing selected
   setSelectedComponent(nullptr);
+
+  // Restore client settings.
+  QSettings clientSettings;
+  QSize windowSize =
+      clientSettings.value("schematic_editor/add_component_dialog/window_size")
+          .toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 }
 
 AddComponentDialog::~AddComponentDialog() noexcept {
+  // Save client settings.
+  QSettings clientSettings;
+  clientSettings.setValue("schematic_editor/add_component_dialog/window_size",
+                          size());
 }
 
 /*******************************************************************************
