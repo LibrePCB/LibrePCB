@@ -130,9 +130,6 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   if (!abortCommand(true)) return false;
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  // Delete the "Add Component" dialog
-  mAddComponentDialog.reset();
-
   // Remove actions / widgets from the "command" toolbar
   mAttributeUnitComboBoxAction = nullptr;
   mAttributeValueEditAction = nullptr;
