@@ -45,6 +45,7 @@ class SQLiteDatabase final : public QObject {
 
 public:
   // Types
+  typedef QVector<std::pair<QString, QString>> Replacements;
   class TransactionScopeGuard final {
   public:
     TransactionScopeGuard() = delete;
@@ -72,7 +73,8 @@ public:
   void clearTable(const QString& table);
 
   // General Methods
-  QSqlQuery prepareQuery(const QString& query) const;
+  QSqlQuery prepareQuery(QString query,
+                         const Replacements& replacements = {}) const;
   int count(QSqlQuery& query);
   int insert(QSqlQuery& query);
   void exec(QSqlQuery& query);

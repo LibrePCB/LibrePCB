@@ -135,7 +135,12 @@ void SQLiteDatabase::clearTable(const QString& table) {
  *  General Methods
  ******************************************************************************/
 
-QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const {
+QSqlQuery SQLiteDatabase::prepareQuery(QString query,
+                                       const Replacements& replacements) const {
+  for (auto it = replacements.begin(); it != replacements.end(); it++) {
+    query.replace(it->first, it->second);
+  }
+
   QSqlQuery q(mDb);
   if (!q.prepare(query)) {
     qCritical() << "SQLiteDatabase query:" << query;
