@@ -60,9 +60,8 @@ SQLiteDatabase::TransactionScopeGuard::~TransactionScopeGuard() noexcept {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SQLiteDatabase::SQLiteDatabase(const FilePath& filepath)
-  : QObject(nullptr)  //, mNestedTransactionCount(0)
-{
+SQLiteDatabase::SQLiteDatabase(const FilePath& filepath, QObject* parent)
+  : QObject(parent) {
   // create database (use random UUID as connection name)
   mDb = QSqlDatabase::addDatabase("QSQLITE", Uuid::createRandom().toStr());
   mDb.setDatabaseName(filepath.toStr());
@@ -75,6 +74,7 @@ SQLiteDatabase::SQLiteDatabase(const FilePath& filepath)
 
   // open the database
   if (!mDb.open()) {
+    qCritical() << "SQLiteDatabase error:" << mDb.lastError().text();
     throw RuntimeError(
         __FILE__, __LINE__,
         tr("Could not open database: \"%1\"").arg(filepath.toNative()));
@@ -89,7 +89,7 @@ SQLiteDatabase::SQLiteDatabase(const FilePath& filepath)
   Q_ASSERT(mDb.driver() &&
            mDb.driver()->hasFeature(QSqlDriver::PreparedQueries));
   Q_ASSERT(mDb.driver() && mDb.driver()->hasFeature(QSqlDriver::LastInsertId));
-  Q_ASSERT(getSqliteCompileOptions()["THREADSAFE"] == "1");  // can throw
+  Q_ASSERT(getSqliteCompileOptions().value("THREADSAFE") == "1");  // can throw
 }
 
 SQLiteDatabase::~SQLiteDatabase() noexcept {
@@ -101,43 +101,30 @@ SQLiteDatabase::~SQLiteDatabase() noexcept {
  ******************************************************************************/
 
 void SQLiteDatabase::beginTransaction() {
-  // Q_ASSERT(mNestedTransactionCount >= 0);
-  // if (mNestedTransactionCount == 0) {
   if (!mDb.transaction()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Could not start database transaction."));
+    qCritical() << "SQLiteDatabase error:" << mDb.lastError().text();
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        "Could not start database transaction: " % mDb.lastError().text());
   }
-  //}
-  // mNestedTransactionCount++;
 }
 
 void SQLiteDatabase::commitTransaction() {
-  // Q_ASSERT(mNestedTransactionCount >= 0);
-  // if (mNestedTransactionCount == 1) {
   if (!mDb.commit()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Could not commit database transaction."));
+    qCritical() << "SQLiteDatabase error:" << mDb.lastError().text();
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        "Could not commit database transaction: " % mDb.lastError().text());
   }
-  //} else if (mNestedTransactionCount == 0) {
-  //    throw RuntimeError(__FILE__, __LINE__,
-  //        tr("Cannot commit database transaction because no one is active."));
-  //}
-  // mNestedTransactionCount--;
 }
 
 void SQLiteDatabase::rollbackTransaction() {
-  // Q_ASSERT(mNestedTransactionCount >= 0);
-  // if (mNestedTransactionCount == 1) {
   if (!mDb.rollback()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Could not rollback database transaction."));
+    qCritical() << "SQLiteDatabase error:" << mDb.lastError().text();
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        "Could not rollback database transaction: " % mDb.lastError().text());
   }
-  //} else if (mNestedTransactionCount == 0) {
-  //    throw RuntimeError(__FILE__, __LINE__,
-  //        tr("Cannot rollback database transaction because no one is
-  //        active."));
-  //}
-  // mNestedTransactionCount--;
 }
 
 void SQLiteDatabase::clearTable(const QString& table) {
@@ -151,10 +138,11 @@ void SQLiteDatabase::clearTable(const QString& table) {
 QSqlQuery SQLiteDatabase::prepareQuery(const QString& query) const {
   QSqlQuery q(mDb);
   if (!q.prepare(query)) {
-    qDebug() << q.lastError().databaseText();
-    qDebug() << q.lastError().driverText();
+    qCritical() << "SQLiteDatabase query:" << query;
+    qCritical() << "SQLiteDatabase error:" << q.lastError().text();
     throw RuntimeError(__FILE__, __LINE__,
-                       tr("Error while preparing SQL query: %1").arg(query));
+                       "Error while preparing SQL query: " % query % "\n" %
+                           q.lastError().text());
   }
   return q;
 }
@@ -182,19 +170,18 @@ int SQLiteDatabase::insert(QSqlQuery& query) {
   if (ok) {
     return id;
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Error while executing SQL query: %1").arg(query.lastQuery()));
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Error while executing SQL query: " % query.lastQuery());
   }
 }
 
 void SQLiteDatabase::exec(QSqlQuery& query) {
   if (!query.exec()) {
-    qDebug() << query.lastError().databaseText();
-    qDebug() << query.lastError().driverText();
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Error while executing SQL query: %1").arg(query.lastQuery()));
+    qCritical() << "SQLiteDatabase query:" << query.lastQuery();
+    qCritical() << "SQLiteDatabase error:" << query.lastError().text();
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Error while executing SQL query: " % query.lastQuery() %
+                           "\n" % query.lastError().text());
   }
 }
 
@@ -213,9 +200,9 @@ void SQLiteDatabase::enableSqliteWriteAheadLogging() {
   bool success = query.first();
   QString result = query.value(0).toString();
   if ((!success) || (result != "wal")) {
-    throw LogicError(
+    throw RuntimeError(
         __FILE__, __LINE__,
-        tr("Could not enable SQLite Write-Ahead Logging: \"%1\"").arg(result));
+        "Could not enable SQLite Write-Ahead Logging: " % result);
   }
 }
 
