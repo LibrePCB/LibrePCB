@@ -34,6 +34,7 @@
 #include "../serialization/sexpression.h"
 #include "../sqlitedatabase.h"
 #include "workspace.h"
+#include "workspacelibrarydbwriter.h"
 #include "workspacelibraryscanner.h"
 
 #include <QtCore>
@@ -66,8 +67,9 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(Workspace& ws)
     mDb.reset();
     QFile(mFilePath.toStr()).remove();
     mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
-    createAllTables();  // can throw
-    setDbVersion(sCurrentDbVersion);  // can throw
+    WorkspaceLibraryDbWriter writer(ws.getLibrariesPath(), *mDb);
+    writer.createAllTables();  // can throw
+    writer.addInternalData("version", sCurrentDbVersion);  // can throw
   }
 
   // create library scanner object
@@ -758,210 +760,6 @@ QList<FilePath> WorkspaceLibraryDb::getLibraryElements(
   return elements;
 }
 
-void WorkspaceLibraryDb::createAllTables() {
-  QStringList queries;
-
-  // internal
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS internal ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`key` TEXT UNIQUE NOT NULL, "
-      "`value_text` TEXT, "
-      "`value_int` INTEGER, "
-      "`value_real` REAL, "
-      "`value_blob` BLOB "
-      ")");
-
-  // libraries
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS libraries ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL, "
-      "`icon_png` BLOB "
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS libraries_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER "
-      "REFERENCES libraries(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(lib_id, locale)"
-      ")");
-
-  // component categories
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS component_categories ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL, "
-      "`parent_uuid` TEXT"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS component_categories_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`cat_id` INTEGER "
-      "REFERENCES component_categories(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(cat_id, locale)"
-      ")");
-
-  // package categories
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS package_categories ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL, "
-      "`parent_uuid` TEXT"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS package_categories_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`cat_id` INTEGER "
-      "REFERENCES package_categories(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(cat_id, locale)"
-      ")");
-
-  // symbols
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS symbols ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS symbols_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`symbol_id` INTEGER "
-      "REFERENCES symbols(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(symbol_id, locale)"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS symbols_cat ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`symbol_id` INTEGER "
-      "REFERENCES symbols(id) ON DELETE CASCADE NOT NULL, "
-      "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(symbol_id, category_uuid)"
-      ")");
-
-  // packages
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS packages ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL "
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS packages_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`package_id` INTEGER "
-      "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(package_id, locale)"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS packages_cat ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`package_id` INTEGER "
-      "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
-      "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(package_id, category_uuid)"
-      ")");
-
-  // components
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS components ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS components_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`component_id` INTEGER "
-      "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(component_id, locale)"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS components_cat ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`component_id` INTEGER "
-      "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
-      "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(component_id, category_uuid)"
-      ")");
-
-  // devices
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS devices ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
-      "`filepath` TEXT UNIQUE NOT NULL, "
-      "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL, "
-      "`component_uuid` TEXT NOT NULL, "
-      "`package_uuid` TEXT NOT NULL"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS devices_tr ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`device_id` INTEGER "
-      "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
-      "`locale` TEXT NOT NULL, "
-      "`name` TEXT, "
-      "`description` TEXT, "
-      "`keywords` TEXT, "
-      "UNIQUE(device_id, locale)"
-      ")");
-  queries << QString(
-      "CREATE TABLE IF NOT EXISTS devices_cat ("
-      "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`device_id` INTEGER "
-      "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
-      "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(device_id, category_uuid)"
-      ")");
-
-  // execute queries
-  foreach (const QString& string, queries) {
-    QSqlQuery query = mDb->prepareQuery(string);  // can throw
-    mDb->exec(query);  // can throw
-  }
-}
-
 int WorkspaceLibraryDb::getDbVersion() const noexcept {
   try {
     QSqlQuery query = mDb->prepareQuery(
@@ -978,14 +776,6 @@ int WorkspaceLibraryDb::getDbVersion() const noexcept {
   } catch (const Exception& e) {
     return -1;
   }
-}
-
-void WorkspaceLibraryDb::setDbVersion(int version) {
-  QSqlQuery query = mDb->prepareQuery(
-      "INSERT INTO internal (key, value_int) "
-      "VALUES ('version', :version)");
-  query.bindValue(":version", version);
-  mDb->insert(query);  // can throw
 }
 
 /*******************************************************************************

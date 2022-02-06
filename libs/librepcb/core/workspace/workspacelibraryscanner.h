@@ -37,8 +37,8 @@ namespace librepcb {
 class Library;
 class SQLiteDatabase;
 class TransactionalFileSystem;
-class Uuid;
 class Workspace;
+class WorkspaceLibraryDbWriter;
 
 /*******************************************************************************
  *  Class WorkspaceLibraryScanner
@@ -78,36 +78,26 @@ signals:
 private:  // Methods
   void run() noexcept override;
   void scan() noexcept;
-  QHash<QString, int> updateLibraries(
-      SQLiteDatabase& db, const QHash<QString, std::shared_ptr<Library>>& libs);
-  void clearAllTables(SQLiteDatabase& db);
-  void getLibrariesOfDirectory(
-      std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
-      QHash<QString, std::shared_ptr<Library>>& libs) noexcept;
+  void getLibrariesOfDirectory(std::shared_ptr<TransactionalFileSystem> fs,
+                               const QString& root,
+                               QList<std::shared_ptr<Library>>& libs) noexcept;
+  QHash<FilePath, int> updateLibraries(
+      SQLiteDatabase& db, WorkspaceLibraryDbWriter& writer,
+      const QList<std::shared_ptr<Library>>& libs);
   template <typename ElementType>
-  int addCategoriesToDb(SQLiteDatabase& db,
-                        std::shared_ptr<TransactionalFileSystem> fs,
-                        const QString& libPath, const QStringList& dirs,
-                        const QString& table, const QString& idColumn,
-                        int libId);
-  template <typename ElementType>
-  int addElementsToDb(SQLiteDatabase& db,
+  int addElementsToDb(WorkspaceLibraryDbWriter& writer,
                       std::shared_ptr<TransactionalFileSystem> fs,
-                      const QString& libPath, const QStringList& dirs,
-                      const QString& table, const QString& idColumn, int libId);
+                      const FilePath& libPath, const QStringList& dirs,
+                      int libId);
   template <typename ElementType>
-  void addElementToDb(SQLiteDatabase& db, const QString& table,
-                      const QString& idColumn, int libId, const QString& path,
-                      const ElementType& element);
+  int addElementToDb(WorkspaceLibraryDbWriter& writer, int libId,
+                     const ElementType& element);
   template <typename ElementType>
-  void addElementTranslationsToDb(SQLiteDatabase& db, const QString& table,
-                                  const QString& idColumn, int id,
-                                  const ElementType& element);
-  void addElementCategoriesToDb(SQLiteDatabase& db, const QString& table,
-                                const QString& idColumn, int id,
-                                const QSet<Uuid>& categories);
-  template <typename T>
-  static QVariant optionalToVariant(const T& opt) noexcept;
+  void addTranslationsToDb(WorkspaceLibraryDbWriter& writer, int elementId,
+                           const ElementType& element);
+  template <typename ElementType>
+  void addToCategories(WorkspaceLibraryDbWriter& writer, int elementId,
+                       const ElementType& element);
 
 private:  // Data
   Workspace& mWorkspace;

@@ -176,8 +176,6 @@ private:
   int getLibraryId(const FilePath& lib) const;
   QList<FilePath> getLibraryElements(const FilePath& lib,
                                      const QString& tablename) const;
-  void createAllTables();
-  void setDbVersion(int version);
   int getDbVersion() const noexcept;
 
   // Attributes
