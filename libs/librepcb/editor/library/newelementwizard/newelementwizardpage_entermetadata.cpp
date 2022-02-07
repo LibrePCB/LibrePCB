@@ -169,33 +169,40 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
     rootCategoryUuid = mContext.mElementCategoryUuids.values().first();
   }
 
+  bool nulloptIsRootCategory = false;
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory:
+      nulloptIsRootCategory = true;
+      // fallthrough
     case NewElementWizardContext::ElementType::Symbol:
     case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
       ComponentCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),
           mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
-          *mUi->lblCategoryTree);
-      builder.setHighlightLastLine(true);
+          nulloptIsRootCategory, *mUi->lblCategoryTree);
       builder.setOneLine(true);
+      builder.setPleaseChooseIfEmpty(true);
       builder.updateText(rootCategoryUuid);
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory:
+      nulloptIsRootCategory = true;
+      // fallthrough
     case NewElementWizardContext::ElementType::Package: {
       PackageCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),
           mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
-          *mUi->lblCategoryTree);
-      builder.setHighlightLastLine(true);
+          nulloptIsRootCategory, *mUi->lblCategoryTree);
       builder.setOneLine(true);
+      builder.setPleaseChooseIfEmpty(true);
       builder.updateText(rootCategoryUuid);
       break;
     }
     default: {
-      mUi->lblCategoryTree->setText(tr("Root category"));
+      qCritical()
+          << "NewElementWizardPage_EnterMetadata: Unhandled switch-case value:"
+          << static_cast<int>(mContext.mElementType);
       break;
     }
   }

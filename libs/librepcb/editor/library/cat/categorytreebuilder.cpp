@@ -20,10 +20,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "categorytreelabeltextbuilder.h"
+#include "categorytreebuilder.h"
+
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -36,18 +39,16 @@ namespace editor {
  ******************************************************************************/
 
 template <typename ElementType>
-CategoryTreeLabelTextBuilder<ElementType>::CategoryTreeLabelTextBuilder(
+CategoryTreeBuilder<ElementType>::CategoryTreeBuilder(
     const WorkspaceLibraryDb& db, const QStringList& localeOrder,
-    bool nulloptIsRootCategory, QLabel& label) noexcept
-  : mBuilder(db, localeOrder, nulloptIsRootCategory),
-    mLabel(label),
-    mOneLine(false),
-    mChooseIfEmpty(false) {
+    bool nulloptIsRootCategory) noexcept
+  : mDb(db),
+    mLocaleOrder(localeOrder),
+    mNulloptIsRootCategory(nulloptIsRootCategory) {
 }
 
 template <typename ElementType>
-CategoryTreeLabelTextBuilder<
-    ElementType>::~CategoryTreeLabelTextBuilder() noexcept {
+CategoryTreeBuilder<ElementType>::~CategoryTreeBuilder() noexcept {
 }
 
 /*******************************************************************************
@@ -55,67 +56,60 @@ CategoryTreeLabelTextBuilder<
  ******************************************************************************/
 
 template <typename ElementType>
-void CategoryTreeLabelTextBuilder<ElementType>::setText(
-    const QString& text) noexcept {
-  mLabel.setText(text);
-  mLabel.setStyleSheet(QString());
-}
-
-template <typename ElementType>
-void CategoryTreeLabelTextBuilder<ElementType>::setErrorText(
-    const QString& error) noexcept {
-  mLabel.setText(error);
-  mLabel.setStyleSheet("QLabel { color: red; }");
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-template <typename ElementType>
-bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
-    const tl::optional<Uuid>& category) noexcept {
-  try {
-    QStringList lines = mBuilder.buildTree(category);
-    if (lines.isEmpty() && mChooseIfEmpty) {
-      setText("<i>" % tr("Please choose a category.") % "</i>");
-    } else {
-      setText(lines);
-    }
-    return true;
-  } catch (const Exception& e) {
-    setErrorText(e.getMsg());
-    return false;
+QStringList CategoryTreeBuilder<ElementType>::buildTree(
+    const tl::optional<Uuid>& category) const {
+  QList<Uuid> uuids;
+  if (category) {
+    uuids.append(*category);
+    uuids.append(getCategoryParents(*category));  // can throw
   }
+  QStringList names;
+  foreach (const Uuid& uuid, uuids) {
+    FilePath filepath = getLatestCategory(uuid);  // can throw
+    QString name;
+    mDb.getElementTranslations<ElementType>(filepath, mLocaleOrder,
+                                            &name);  // can throw
+    names.prepend(name);
+  }
+  if (mNulloptIsRootCategory) {
+    names.prepend(tr("Root category"));
+  }
+  return names;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-template <typename ElementType>
-void CategoryTreeLabelTextBuilder<ElementType>::setText(
-    const QStringList& lines) noexcept {
-  QString text;
-  for (int i = 0; i < lines.count(); ++i) {
-    if (i > 0) {
-      QString spaces = QString("&nbsp;").repeated(i * 2);
-      text += mOneLine ? QString(" &rArr; ") : QString("<br>%1⤷ ").arg(spaces);
-    }
-    if ((lines.count() > 1) && (i == lines.count() - 1)) {
-      text += "<b>" % lines.value(i) % "</b>";
-    } else {
-      text += lines.value(i);
-    }
-  }
-  setText(text);
+template <>
+FilePath CategoryTreeBuilder<ComponentCategory>::getLatestCategory(
+    const Uuid& category) const {
+  return mDb.getLatestComponentCategory(category);
+}
+
+template <>
+FilePath CategoryTreeBuilder<PackageCategory>::getLatestCategory(
+    const Uuid& category) const {
+  return mDb.getLatestPackageCategory(category);
+}
+
+template <>
+QList<Uuid> CategoryTreeBuilder<ComponentCategory>::getCategoryParents(
+    const Uuid& category) const {
+  return mDb.getComponentCategoryParents(category);
+}
+
+template <>
+QList<Uuid> CategoryTreeBuilder<PackageCategory>::getCategoryParents(
+    const Uuid& category) const {
+  return mDb.getPackageCategoryParents(category);
 }
 
 /*******************************************************************************
  *  Explicit template instantiations
  ******************************************************************************/
-template class CategoryTreeLabelTextBuilder<ComponentCategory>;
-template class CategoryTreeLabelTextBuilder<PackageCategory>;
+template class CategoryTreeBuilder<ComponentCategory>;
+template class CategoryTreeBuilder<PackageCategory>;
 
 /*******************************************************************************
  *  End of File

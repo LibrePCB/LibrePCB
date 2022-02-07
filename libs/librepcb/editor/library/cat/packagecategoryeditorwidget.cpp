@@ -219,11 +219,9 @@ void PackageCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
 
 void PackageCategoryEditorWidget::updateCategoryLabel() noexcept {
   const WorkspaceLibraryDb& db = mContext.workspace.getLibraryDb();
-  PackageCategoryTreeLabelTextBuilder textBuilder(db, getLibLocaleOrder(),
+  PackageCategoryTreeLabelTextBuilder textBuilder(db, getLibLocaleOrder(), true,
                                                   *mUi->lblParentCategories);
-  textBuilder.setEndlessRecursionUuid(mCategory->getUuid());
-  textBuilder.setHighlightLastLine(true);
-  textBuilder.updateText(mParentUuid, mUi->edtName->text());
+  textBuilder.updateText(mParentUuid);
 }
 
 /*******************************************************************************
