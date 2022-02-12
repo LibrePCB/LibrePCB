@@ -472,6 +472,8 @@ add_library(
   workspace/workspace.h
   workspace/workspacelibrarydb.cpp
   workspace/workspacelibrarydb.h
+  workspace/workspacelibrarydbwriter.cpp
+  workspace/workspacelibrarydbwriter.h
   workspace/workspacelibraryscanner.cpp
   workspace/workspacelibraryscanner.h
   workspace/workspacesettings.cpp

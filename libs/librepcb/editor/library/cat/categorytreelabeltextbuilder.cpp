@@ -22,10 +22,6 @@
  ******************************************************************************/
 #include "categorytreelabeltextbuilder.h"
 
-#include <librepcb/core/library/cat/componentcategory.h>
-#include <librepcb/core/library/cat/packagecategory.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -42,13 +38,11 @@ namespace editor {
 template <typename ElementType>
 CategoryTreeLabelTextBuilder<ElementType>::CategoryTreeLabelTextBuilder(
     const WorkspaceLibraryDb& db, const QStringList& localeOrder,
-    QLabel& label) noexcept
-  : mDb(db),
-    mLocaleOrder(localeOrder),
+    bool nulloptIsRootCategory, QLabel& label) noexcept
+  : mBuilder(db, localeOrder, nulloptIsRootCategory),
     mLabel(label),
-    mHighlightLastLine(false),
-    mEndlessRecursionUuid(),
-    mOneLine(false) {
+    mOneLine(false),
+    mChooseIfEmpty(false) {
 }
 
 template <typename ElementType>
@@ -80,18 +74,15 @@ void CategoryTreeLabelTextBuilder<ElementType>::setErrorText(
 
 template <typename ElementType>
 bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
-    const tl::optional<Uuid>& category, const QString& lastLine) noexcept {
+    const tl::optional<Uuid>& category) noexcept {
   try {
-    QList<Uuid> uuids;
-    if (category) {
-      uuids.append(*category);
-      uuids.append(getCategoryParents(*category));  // can throw
-      if (mEndlessRecursionUuid && uuids.contains(*mEndlessRecursionUuid)) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Endless recursion detected!"));
-      }
+    QStringList lines = mBuilder.buildTree(category);
+    if (lines.isEmpty() && mChooseIfEmpty) {
+      setText("<i>" % tr("Please choose a category.") % "</i>");
+    } else {
+      setText(lines);
     }
-    return updateText(uuids, lastLine);
+    return true;
   } catch (const Exception& e) {
     setErrorText(e.getMsg());
     return false;
@@ -103,71 +94,21 @@ bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
  ******************************************************************************/
 
 template <typename ElementType>
-bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
-    const QList<Uuid>& uuids, const QString& lastLine) noexcept {
-  try {
-    QStringList lines;
-    foreach (const Uuid& uuid, uuids) {
-      FilePath filepath = getLatestCategory(uuid);  // can throw
-      QString name;
-      mDb.getElementTranslations<ElementType>(filepath, mLocaleOrder,
-                                              &name);  // can throw
-      lines.prepend(name);
-    }
-    lines.prepend(tr("Root category"));
-    if (!lastLine.isNull()) {
-      lines.append(lastLine);
-    }
-    setText(lines);
-    return true;
-  } catch (const Exception& e) {
-    setErrorText(e.getMsg());
-    return false;
-  }
-}
-
-template <typename ElementType>
 void CategoryTreeLabelTextBuilder<ElementType>::setText(
     const QStringList& lines) noexcept {
   QString text;
   for (int i = 0; i < lines.count(); ++i) {
-    QString line = lines.value(i);
-    QString spaces = QString("&nbsp;").repeated(i * 2);
-    QString separator =
-        mOneLine ? QString(" &rArr; ") : QString("<br>%1⤷ ").arg(spaces);
-    if (i == 0) {
-      text.append(line);
-    } else if ((i == lines.count() - 1) && mHighlightLastLine) {
-      text.append(QString("%1<b>%2</b>").arg(separator, line));
+    if (i > 0) {
+      QString spaces = QString("&nbsp;").repeated(i * 2);
+      text += mOneLine ? QString(" &rArr; ") : QString("<br>%1⤷ ").arg(spaces);
+    }
+    if ((lines.count() > 1) && (i == lines.count() - 1)) {
+      text += "<b>" % lines.value(i) % "</b>";
     } else {
-      text.append(QString("%1%2").arg(separator, line));
+      text += lines.value(i);
     }
   }
   setText(text);
-}
-
-template <>
-FilePath CategoryTreeLabelTextBuilder<ComponentCategory>::getLatestCategory(
-    const Uuid& category) const {
-  return mDb.getLatestComponentCategory(category);
-}
-
-template <>
-FilePath CategoryTreeLabelTextBuilder<PackageCategory>::getLatestCategory(
-    const Uuid& category) const {
-  return mDb.getLatestPackageCategory(category);
-}
-
-template <>
-QList<Uuid> CategoryTreeLabelTextBuilder<ComponentCategory>::getCategoryParents(
-    const Uuid& category) const {
-  return mDb.getComponentCategoryParents(category);
-}
-
-template <>
-QList<Uuid> CategoryTreeLabelTextBuilder<PackageCategory>::getCategoryParents(
-    const Uuid& category) const {
-  return mDb.getPackageCategoryParents(category);
 }
 
 /*******************************************************************************

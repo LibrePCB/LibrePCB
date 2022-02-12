@@ -26,7 +26,6 @@
 #include "ui_categorylisteditorwidget.h"
 
 #include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -43,9 +42,8 @@ namespace editor {
  ******************************************************************************/
 
 CategoryListEditorWidgetBase::CategoryListEditorWidgetBase(
-    const Workspace& ws, QWidget* parent) noexcept
+    QWidget* parent) noexcept
   : QWidget(parent),
-    mWorkspace(ws),
     mUi(new Ui::CategoryListEditorWidget),
     mRequiresMinimumOneEntry(false) {
   mUi->setupUi(this);
@@ -111,20 +109,9 @@ void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
 void CategoryListEditorWidgetBase::addItem(
     const tl::optional<Uuid>& category) noexcept {
   try {
-    QStringList lines;
-    if (category) {
-      QList<Uuid> parents = getCategoryParents(*category);
-      parents.prepend(*category);
-      foreach (const Uuid& parent, parents) {
-        FilePath filepath = getLatestCategory(parent);  // can throw
-        lines.prepend(getCategoryName(filepath));  // can throw
-      }
-    }
-    lines.prepend(tr("Root category"));
-    addItem(category, lines);
+    addItem(category, buildTree(category));  // can throw
   } catch (const Exception& e) {
-    QString categoryStr = category ? category->toStr() : QString();
-    addItem(category, QString("%1: %2").arg(categoryStr, e.getMsg()));
+    addItem(category, "ERROR: " % e.getMsg());
   }
 }
 
@@ -144,8 +131,10 @@ void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
 
 void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
                                            const QString& text) noexcept {
+  QString uuidStr = category ? category->toStr() : QString();
   QListWidgetItem* item = new QListWidgetItem(text, mUi->listWidget);
-  item->setData(Qt::UserRole, category ? category->toStr() : QString());
+  item->setData(Qt::UserRole, uuidStr);
+  item->setToolTip(uuidStr);
   updateColor();
 }
 
@@ -164,7 +153,10 @@ void CategoryListEditorWidgetBase::updateColor() noexcept {
 template <typename ElementType>
 CategoryListEditorWidget<ElementType>::CategoryListEditorWidget(
     const Workspace& ws, QWidget* parent) noexcept
-  : CategoryListEditorWidgetBase(ws, parent) {
+  : CategoryListEditorWidgetBase(parent),
+    mWorkspace(ws),
+    mBuilder(ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(),
+             false) {
 }
 
 template <typename ElementType>
@@ -182,38 +174,10 @@ tl::optional<Uuid>
   }
 }
 
-template <>
-FilePath CategoryListEditorWidget<ComponentCategory>::getLatestCategory(
-    const Uuid& category) const {
-  return mWorkspace.getLibraryDb().getLatestComponentCategory(category);
-}
-
-template <>
-FilePath CategoryListEditorWidget<PackageCategory>::getLatestCategory(
-    const Uuid& category) const {
-  return mWorkspace.getLibraryDb().getLatestPackageCategory(category);
-}
-
-template <>
-QList<Uuid> CategoryListEditorWidget<ComponentCategory>::getCategoryParents(
-    const Uuid& category) const {
-  return mWorkspace.getLibraryDb().getComponentCategoryParents(category);
-}
-
-template <>
-QList<Uuid> CategoryListEditorWidget<PackageCategory>::getCategoryParents(
-    const Uuid& category) const {
-  return mWorkspace.getLibraryDb().getPackageCategoryParents(category);
-}
-
 template <typename ElementType>
-QString CategoryListEditorWidget<ElementType>::getCategoryName(
-    const FilePath& fp) const {
-  QString name;
-  mWorkspace.getLibraryDb().template getElementTranslations<ElementType>(
-      fp, mWorkspace.getSettings().libraryLocaleOrder.get(),
-      &name);  // can throw
-  return name;
+QStringList CategoryListEditorWidget<ElementType>::buildTree(
+    const tl::optional<Uuid>& category) const {
+  return mBuilder.buildTree(category);
 }
 
 template class CategoryListEditorWidget<ComponentCategory>;

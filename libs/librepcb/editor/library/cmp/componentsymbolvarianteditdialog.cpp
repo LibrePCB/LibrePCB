@@ -131,7 +131,7 @@ void ComponentSymbolVariantEditDialog::updateGraphicsItems() noexcept {
   mSymbols.clear();
   for (const ComponentSymbolVariantItem& item : mSymbVar.getSymbolItems()) {
     try {
-      FilePath fp = mWorkspace.getLibraryDb().getLatestSymbol(
+      FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
           item.getSymbolUuid());  // can throw
       std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(

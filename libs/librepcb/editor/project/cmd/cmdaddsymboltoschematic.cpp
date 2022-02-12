@@ -82,7 +82,7 @@ bool CmdAddSymbolToSchematic::performExecute() {
   // if there is no such symbol in the project's library, copy it from the
   // workspace library to the project's library
   if (!mSchematic.getProject().getLibrary().getSymbol(symbolUuid)) {
-    FilePath symFp = mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid);
+    FilePath symFp = mWorkspace.getLibraryDb().getLatest<Symbol>(symbolUuid);
     if (!symFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,

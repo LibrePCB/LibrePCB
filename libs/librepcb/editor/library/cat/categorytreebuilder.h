@@ -17,78 +17,79 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
-#define LIBREPCB_EDITOR_CATEGORYTREELABELTEXTBUILDER_H
+#ifndef LIBREPCB_EDITOR_CATEGORYTREEBUILDER_H
+#define LIBREPCB_EDITOR_CATEGORYTREEBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "categorytreebuilder.h"
-
-#include <librepcb/core/library/cat/componentcategory.h>
-#include <librepcb/core/library/cat/packagecategory.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class FilePath;
+class Uuid;
 class WorkspaceLibraryDb;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CategoryTreeLabelTextBuilder
+ *  Class CategoryTreeBuilder
  ******************************************************************************/
 
 /**
- * @brief The CategoryTreeLabelTextBuilder class
+ * @brief Helper class to extract a category tree from
+ *        ::librepcb::WorkspaceLibraryDb
  */
 template <typename ElementType>
-class CategoryTreeLabelTextBuilder final {
-  Q_DECLARE_TR_FUNCTIONS(CategoryTreeLabelTextBuilder)
+class CategoryTreeBuilder final {
+  Q_DECLARE_TR_FUNCTIONS(CategoryTreeBuilder)
 
 public:
   // Constructors / Destructor
-  CategoryTreeLabelTextBuilder() = delete;
-  CategoryTreeLabelTextBuilder(const CategoryTreeLabelTextBuilder& other) =
-      delete;
-  CategoryTreeLabelTextBuilder(const WorkspaceLibraryDb& db,
-                               const QStringList& localeOrder,
-                               bool nulloptIsRootCategory,
-                               QLabel& label) noexcept;
-  ~CategoryTreeLabelTextBuilder() noexcept;
-
-  // Setters
-  void setOneLine(bool oneLine) noexcept { mOneLine = oneLine; }
-  void setPleaseChooseIfEmpty(bool choose) noexcept { mChooseIfEmpty = choose; }
-  void setText(const QString& text) noexcept;
-  void setErrorText(const QString& error) noexcept;
+  CategoryTreeBuilder() = delete;
+  CategoryTreeBuilder(const CategoryTreeBuilder& other) = delete;
+  CategoryTreeBuilder(const WorkspaceLibraryDb& db,
+                      const QStringList& localeOrder,
+                      bool nulloptIsRootCategory) noexcept;
+  ~CategoryTreeBuilder() noexcept;
 
   // General Methods
-  bool updateText(const tl::optional<Uuid>& category) noexcept;
+
+  /**
+   * @brief Build the parents tree for a specific category
+   *
+   * @param category  The category to get the tree from. If tl::nullopt,
+   *                  it is assumed to represent the root category.
+   * @param success   If not sullptr, this is set to whether the tree was
+   *                  successfully built or not.
+   * @return All category names. The top level category comes first (root
+   *         category if `nulloptIsRootCategory=true` passed to the
+   *         constructor), then down the tree, with the passed category as
+   *         the last element. In case of invalid categories, the returned list
+   *         is either empty or contains error messages.
+   * @throw In case of database errors.
+   */
+  QStringList buildTree(const tl::optional<Uuid>& category,
+                        bool* success = nullptr) const;
 
   // Operator Overloadings
-  CategoryTreeLabelTextBuilder& operator=(
-      const CategoryTreeLabelTextBuilder& rhs) = delete;
+  CategoryTreeBuilder& operator=(const CategoryTreeBuilder& rhs) = delete;
 
 private:  // Methods
-  void setText(const QStringList& lines) noexcept;
+  bool getParentNames(const tl::optional<Uuid>& category, QStringList& names,
+                      QSet<FilePath>& filePaths) const;
 
 private:  // Data
-  CategoryTreeBuilder<ElementType> mBuilder;
-  QLabel& mLabel;
-  bool mOneLine;
-  bool mChooseIfEmpty;
+  const WorkspaceLibraryDb& mDb;
+  const QStringList& mLocaleOrder;
+  const bool mNulloptIsRootCategory;
 };
-
-typedef CategoryTreeLabelTextBuilder<ComponentCategory>
-    ComponentCategoryTreeLabelTextBuilder;
-typedef CategoryTreeLabelTextBuilder<PackageCategory>
-    PackageCategoryTreeLabelTextBuilder;
 
 /*******************************************************************************
  *  End of File

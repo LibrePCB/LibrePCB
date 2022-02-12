@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "categorytreebuilder.h"
+
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
 
@@ -55,8 +57,7 @@ class CategoryListEditorWidgetBase : public QWidget {
 public:
   // Constructors / Destructor
   CategoryListEditorWidgetBase() = delete;
-  explicit CategoryListEditorWidgetBase(const Workspace& ws,
-                                        QWidget* parent = nullptr) noexcept;
+  explicit CategoryListEditorWidgetBase(QWidget* parent = nullptr) noexcept;
   CategoryListEditorWidgetBase(const CategoryListEditorWidgetBase& other) =
       delete;
   virtual ~CategoryListEditorWidgetBase() noexcept;
@@ -78,9 +79,7 @@ public:
 
 protected:
   virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept = 0;
-  virtual FilePath getLatestCategory(const Uuid& category) const = 0;
-  virtual QList<Uuid> getCategoryParents(const Uuid& category) const = 0;
-  virtual QString getCategoryName(const FilePath& fp) const = 0;
+  virtual QStringList buildTree(const tl::optional<Uuid>& category) const = 0;
 
 private:
   void btnAddClicked() noexcept;
@@ -98,7 +97,6 @@ signals:
   void categoryRemoved(const Uuid& category);
 
 protected:  // Data
-  const Workspace& mWorkspace;
   QScopedPointer<Ui::CategoryListEditorWidget> mUi;
   bool mRequiresMinimumOneEntry;
   QSet<Uuid> mUuids;
@@ -125,11 +123,13 @@ public:
   CategoryListEditorWidget& operator=(const CategoryListEditorWidget& rhs) =
       delete;
 
-private:
+private:  // Methods
   tl::optional<Uuid> chooseCategoryWithDialog() noexcept override;
-  FilePath getLatestCategory(const Uuid& category) const override;
-  QList<Uuid> getCategoryParents(const Uuid& category) const override;
-  QString getCategoryName(const FilePath& fp) const override;
+  QStringList buildTree(const tl::optional<Uuid>& category) const override;
+
+private:  // Data
+  const Workspace& mWorkspace;
+  CategoryTreeBuilder<ElementType> mBuilder;
 };
 
 typedef CategoryListEditorWidget<ComponentCategory>

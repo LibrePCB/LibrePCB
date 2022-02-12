@@ -129,15 +129,13 @@ void PackageChooserDialog::searchPackages(const QString& input) {
 
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
-    QList<Uuid> packages =
-        mWorkspace.getLibraryDb().getElementsBySearchKeyword<Package>(input);
+    QList<Uuid> packages = mWorkspace.getLibraryDb().find<Package>(input);
     foreach (const Uuid& uuid, packages) {
       FilePath fp =
-          mWorkspace.getLibraryDb().getLatestPackage(uuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Package>(uuid);  // can throw
       QString name;
-      mWorkspace.getLibraryDb().getElementTranslations<Package>(
-          fp, localeOrder(),
-          &name);  // can throw
+      mWorkspace.getLibraryDb().getTranslations<Package>(fp, localeOrder(),
+                                                         &name);  // can throw
       QListWidgetItem* item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, uuid.toStr());
       mUi->listPackages->addItem(item);
@@ -156,15 +154,14 @@ void PackageChooserDialog::setSelectedCategory(
 
   try {
     QSet<Uuid> packages =
-        mWorkspace.getLibraryDb().getPackagesByCategory(uuid);  // can throw
+        mWorkspace.getLibraryDb().getByCategory<Package>(uuid);  // can throw
     foreach (const Uuid& pkgUuid, packages) {
       try {
         FilePath fp =
-            mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
+            mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);  // can throw
         QString name;
-        mWorkspace.getLibraryDb().getElementTranslations<Package>(
-            fp, localeOrder(),
-            &name);  // can throw
+        mWorkspace.getLibraryDb().getTranslations<Package>(fp, localeOrder(),
+                                                           &name);  // can throw
         QListWidgetItem* item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, pkgUuid.toStr());
         mUi->listPackages->addItem(item);
@@ -186,8 +183,8 @@ void PackageChooserDialog::setSelectedPackage(
 
   if (uuid) {
     try {
-      fp = mWorkspace.getLibraryDb().getLatestPackage(*uuid);  // can throw
-      mWorkspace.getLibraryDb().getElementTranslations<Package>(
+      fp = mWorkspace.getLibraryDb().getLatest<Package>(*uuid);  // can throw
+      mWorkspace.getLibraryDb().getTranslations<Package>(
           fp, localeOrder(), &name, &desc);  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Could not load package metadata"),

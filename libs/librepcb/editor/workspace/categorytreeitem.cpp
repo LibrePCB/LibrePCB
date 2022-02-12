@@ -23,6 +23,10 @@
 #include "categorytreeitem.h"
 
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
@@ -51,15 +55,15 @@ CategoryTreeItem<ElementType>::CategoryTreeItem(
     mIsVisible(false) {
   try {
     if (mUuid) {
-      FilePath fp = getLatestCategory(library);
+      FilePath fp = library.getLatest<ElementType>(*mUuid);
       if (fp.isValid()) {
-        library.getElementTranslations<ElementType>(fp, localeOrder, &mName,
-                                                    &mDescription);
+        library.getTranslations<ElementType>(fp, localeOrder, &mName,
+                                             &mDescription);
       }
     }
 
     if (mUuid || (!mParent)) {
-      QSet<Uuid> childs = getCategoryChilds(library);
+      QSet<Uuid> childs = library.getChilds<ElementType>(mUuid);
       foreach (const Uuid& childUuid, childs) {
         ChildType child(new CategoryTreeItem(library, localeOrder, this,
                                              childUuid, filter));
@@ -155,45 +159,21 @@ QVariant CategoryTreeItem<ElementType>::data(int role) const noexcept {
  ******************************************************************************/
 
 template <>
-FilePath CategoryTreeItem<ComponentCategory>::getLatestCategory(
-    const WorkspaceLibraryDb& lib) const {
-  return lib.getLatestComponentCategory(*mUuid);
-}
-
-template <>
-FilePath CategoryTreeItem<PackageCategory>::getLatestCategory(
-    const WorkspaceLibraryDb& lib) const {
-  return lib.getLatestPackageCategory(*mUuid);
-}
-
-template <>
-QSet<Uuid> CategoryTreeItem<ComponentCategory>::getCategoryChilds(
-    const WorkspaceLibraryDb& lib) const {
-  return lib.getComponentCategoryChilds(mUuid);
-}
-
-template <>
-QSet<Uuid> CategoryTreeItem<PackageCategory>::getCategoryChilds(
-    const WorkspaceLibraryDb& lib) const {
-  return lib.getPackageCategoryChilds(mUuid);
-}
-
-template <>
 bool CategoryTreeItem<ComponentCategory>::matchesFilter(
     const WorkspaceLibraryDb& lib, CategoryTreeFilter::Flags filter) const {
   if (filter.testFlag(CategoryTreeFilter::ALL)) {
     return true;
   }
-  int categories = 0, symbols = 0, components = 0, devices = 0;
-  lib.getComponentCategoryElementCount(mUuid, &categories, &symbols,
-                                       &components, &devices);
-  if (filter.testFlag(CategoryTreeFilter::SYMBOLS) && (symbols > 0)) {
+  if (filter.testFlag(CategoryTreeFilter::SYMBOLS) &&
+      (lib.getByCategory<Symbol>(mUuid, 1).count() > 0)) {
     return true;
   }
-  if (filter.testFlag(CategoryTreeFilter::COMPONENTS) && (components > 0)) {
+  if (filter.testFlag(CategoryTreeFilter::COMPONENTS) &&
+      (lib.getByCategory<Component>(mUuid, 1).count() > 0)) {
     return true;
   }
-  if (filter.testFlag(CategoryTreeFilter::DEVICES) && (devices > 0)) {
+  if (filter.testFlag(CategoryTreeFilter::DEVICES) &&
+      (lib.getByCategory<Device>(mUuid, 1).count() > 0)) {
     return true;
   }
   return false;
@@ -205,9 +185,8 @@ bool CategoryTreeItem<PackageCategory>::matchesFilter(
   if (filter.testFlag(CategoryTreeFilter::ALL)) {
     return true;
   }
-  int categories = 0, packages = 0;
-  lib.getPackageCategoryElementCount(mUuid, &categories, &packages);
-  if (filter.testFlag(CategoryTreeFilter::PACKAGES) && (packages > 0)) {
+  if (filter.testFlag(CategoryTreeFilter::PACKAGES) &&
+      (lib.getByCategory<Package>(mUuid, 1).count() > 0)) {
     return true;
   }
   return false;

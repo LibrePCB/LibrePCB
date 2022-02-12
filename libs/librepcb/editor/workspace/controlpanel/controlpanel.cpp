@@ -244,7 +244,7 @@ void ControlPanel::loadSettings() {
 void ControlPanel::updateNoLibrariesWarningVisibility() noexcept {
   bool showWarning = false;
   try {
-    showWarning = mWorkspace.getLibraryDb().getLibraries().isEmpty();
+    showWarning = mWorkspace.getLibraryDb().getAll<Library>().isEmpty();
   } catch (const Exception& e) {
     qCritical() << "Could not get library list:" << e.getMsg();
   }

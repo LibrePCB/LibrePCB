@@ -240,7 +240,7 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
     if (cmpUuid && (*cmpUuid != mDevice->getComponentUuid())) {
       try {
         // load component
-        FilePath fp = mContext.workspace.getLibraryDb().getLatestComponent(
+        FilePath fp = mContext.workspace.getLibraryDb().getLatest<Component>(
             *cmpUuid);  // can throw
         if (!fp.isValid()) {
           throw RuntimeError(__FILE__, __LINE__, tr("Component not found!"));
@@ -280,7 +280,7 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
     if (pkgUuid && (*pkgUuid != mDevice->getPackageUuid())) {
       try {
         // load package
-        FilePath fp = mContext.workspace.getLibraryDb().getLatestPackage(
+        FilePath fp = mContext.workspace.getLibraryDb().getLatest<Package>(
             *pkgUuid);  // can throw
         if (!fp.isValid()) {
           throw RuntimeError(__FILE__, __LINE__, tr("Package not found!"));
@@ -321,7 +321,7 @@ void DeviceEditorWidget::updateDeviceComponentUuid(const Uuid& uuid) noexcept {
   mSymbolGraphicsItems.clear();
   mSymbols.clear();
   try {
-    FilePath fp = mContext.workspace.getLibraryDb().getLatestComponent(
+    FilePath fp = mContext.workspace.getLibraryDb().getLatest<Component>(
         uuid);  // can throw
     if (!fp.isValid()) {
       throw RuntimeError(__FILE__, __LINE__, tr("Component not found!"));
@@ -350,7 +350,7 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
         *mComponent->getSymbolVariants().first();
     for (const ComponentSymbolVariantItem& item : symbVar.getSymbolItems()) {
       try {
-        FilePath fp = mContext.workspace.getLibraryDb().getLatestSymbol(
+        FilePath fp = mContext.workspace.getLibraryDb().getLatest<Symbol>(
             item.getSymbolUuid());  // can throw
         std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
             std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
@@ -375,8 +375,8 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
 void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
   mFootprintGraphicsItem.reset();
   try {
-    FilePath fp =
-        mContext.workspace.getLibraryDb().getLatestPackage(uuid);  // can throw
+    FilePath fp = mContext.workspace.getLibraryDb().getLatest<Package>(
+        uuid);  // can throw
     if (!fp.isValid()) {
       throw RuntimeError(__FILE__, __LINE__, tr("Package not found!"));
     }

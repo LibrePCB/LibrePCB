@@ -75,12 +75,12 @@ LibraryListEditorWidget::LibraryListEditorWidget(const Workspace& ws,
   try {
     QList<Uuid> uuids;
     QMultiMap<Version, FilePath> libs =
-        ws.getLibraryDb().getLibraries();  // can throw
+        ws.getLibraryDb().getAll<Library>();  // can throw
     foreach (const FilePath& fp, libs) {
       Uuid uuid = Uuid::createRandom();
-      ws.getLibraryDb().getElementMetadata<Library>(fp, &uuid);  // can throw
+      ws.getLibraryDb().getMetadata<Library>(fp, &uuid);  // can throw
       QString name;
-      ws.getLibraryDb().getElementTranslations<Library>(
+      ws.getLibraryDb().getTranslations<Library>(
           fp, ws.getSettings().libraryLocaleOrder.get(),
           &name);  // can throw
       mModel->setDisplayText(uuid, name);

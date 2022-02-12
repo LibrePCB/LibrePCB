@@ -78,7 +78,7 @@ bool CmdAddComponentToCircuit::performExecute() {
   // workspace library to the project's library
   if (!mProject.getLibrary().getComponent(mComponentUuid)) {
     FilePath cmpFp =
-        mWorkspace.getLibraryDb().getLatestComponent(mComponentUuid);
+        mWorkspace.getLibraryDb().getLatest<Component>(mComponentUuid);
     if (!cmpFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,
