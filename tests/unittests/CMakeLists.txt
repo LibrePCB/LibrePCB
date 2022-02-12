@@ -82,6 +82,7 @@ add_executable(
   eagleimport/eaglelibraryimporttest.cpp
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
+  editor/library/cat/categorytreebuildertest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp
   editor/modelview/pathmodeltest.cpp
