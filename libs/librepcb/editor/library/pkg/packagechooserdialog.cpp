@@ -59,8 +59,9 @@ PackageChooserDialog::PackageChooserDialog(
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
-  mCategoryTreeModel.reset(new PackageCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder(), CategoryTreeFilter::PACKAGES));
+  mCategoryTreeModel.reset(
+      new CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder(),
+                            CategoryTreeModel::Filter::PkgCatWithPackages));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

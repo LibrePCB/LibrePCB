@@ -23,9 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "categorytreeitem.h"
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -43,47 +45,85 @@ namespace editor {
 /**
  * @brief The CategoryTreeModel class
  */
-template <typename ElementType>
 class CategoryTreeModel final : public QAbstractItemModel {
+  struct Item {
+    std::weak_ptr<Item> parent;  ///< nullptr for root categories
+    tl::optional<Uuid> uuid;  ///< tl::nullopt for items without category
+    QString text;
+    QString tooltip;
+    QVector<std::shared_ptr<Item>> childs;
+  };
+
 public:
+  // Types
+  enum class Filter {
+    /// Show all component categories, even empty ones
+    CmpCat = 1 << 0,
+    /// Show component categories containing symbols
+    CmpCatWithSymbols = 1 << 1,
+    /// Show component categories containing components
+    CmpCatWithComponents = 1 << 2,
+    /// Show component categories containing devices
+    CmpCatWithDevices = 1 << 3,
+    /// Show all package categories, even empty ones
+    PkgCat = 1 << 4,
+    /// Show package categories containing packages
+    PkgCatWithPackages = 1 << 5,
+  };
+  Q_DECLARE_FLAGS(Filters, Filter)
+
   // Constructors / Destructor
   CategoryTreeModel() = delete;
   CategoryTreeModel(const CategoryTreeModel& other) = delete;
   explicit CategoryTreeModel(const WorkspaceLibraryDb& library,
                              const QStringList& localeOrder,
-                             CategoryTreeFilter::Flags filter) noexcept;
+                             Filters filters) noexcept;
   ~CategoryTreeModel() noexcept;
 
-  // Getters
-  CategoryTreeItem<ElementType>* getItem(const QModelIndex& index) const;
-
   // Inherited Methods
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual QModelIndex index(int row, int column,
-                            const QModelIndex& parent = QModelIndex()) const;
-  virtual QModelIndex parent(const QModelIndex& index) const;
-  virtual QVariant headerData(int section, Qt::Orientation orientation,
-                              int role = Qt::DisplayRole) const;
-  virtual QVariant data(const QModelIndex& index,
-                        int role = Qt::DisplayRole) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const
+      noexcept override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const
+      noexcept override;
+  QModelIndex index(int row, int column,
+                    const QModelIndex& parent = QModelIndex()) const
+      noexcept override;
+  QModelIndex parent(const QModelIndex& index) const noexcept override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const noexcept override;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
+      noexcept override;
 
   // Operator Overloadings
   CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
 
-private:
-  // Attributes
-  QScopedPointer<CategoryTreeItem<ElementType>> mRootItem;
+private:  // Methods
+  void update() noexcept;
+  QVector<std::shared_ptr<Item>> getChilds(std::shared_ptr<Item> parent) const
+      noexcept;
+  bool containsItems(const tl::optional<Uuid>& uuid) const;
+  bool listAll() const noexcept;
+  bool listPackageCategories() const noexcept;
+  void updateModelItem(
+      std::shared_ptr<Item> parentItem,
+      const QVector<std::shared_ptr<Item>>& newChilds) noexcept;
+  Item* itemFromIndex(const QModelIndex& index) const noexcept;
+  QModelIndex indexFromItem(const Item* item) const noexcept;
+
+private:  // Data
+  const WorkspaceLibraryDb& mLibrary;
+  const QStringList mLocaleOrder;
+  const Filters mFilters;
+  std::shared_ptr<Item> mRootItem;
 };
 
-typedef CategoryTreeModel<ComponentCategory> ComponentCategoryTreeModel;
-typedef CategoryTreeModel<PackageCategory> PackageCategoryTreeModel;
+}  // namespace editor
+}  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::CategoryTreeModel::Filters);
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace editor
-}  // namespace librepcb
 
 #endif

@@ -205,7 +205,8 @@ bool ComponentCategoryEditorWidget::processCheckMessage(
 }
 
 void ComponentCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {
-  ComponentCategoryChooserDialog dialog(mContext.workspace);
+  CategoryChooserDialog dialog(mContext.workspace,
+                               CategoryChooserDialog::Filter::CmpCat);
   if (dialog.exec()) {
     mParentUuid = dialog.getSelectedCategoryUuid();
     commitMetadata();

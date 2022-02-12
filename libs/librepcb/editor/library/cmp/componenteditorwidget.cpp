@@ -71,8 +71,9 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   setWindowIcon(QIcon(":/img/library/component.png"));
 
   // Insert category list editor widget.
-  mCategoriesEditorWidget.reset(
-      new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
+      mContext.workspace, CategoryListEditorWidget::Categories::Component,
+      this));
   mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
@@ -117,9 +118,8 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
           &ComponentEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &ComponentEditorWidget::commitMetadata);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::edited, this,
-          &ComponentEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(), &CategoryListEditorWidget::edited,
+          this, &ComponentEditorWidget::commitMetadata);
   connect(mUi->cbxSchematicOnly, &QCheckBox::clicked, this,
           &ComponentEditorWidget::commitMetadata);
   connect(mUi->edtPrefix, &QLineEdit::editingFinished, this,

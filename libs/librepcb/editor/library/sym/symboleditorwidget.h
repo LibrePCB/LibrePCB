@@ -113,7 +113,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::SymbolEditorWidget> mUi;
-  QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<Symbol> mSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;

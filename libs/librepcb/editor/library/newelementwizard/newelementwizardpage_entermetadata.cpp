@@ -133,14 +133,16 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
     case NewElementWizardContext::ElementType::Symbol:
     case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
-      ComponentCategoryChooserDialog dialog(mContext.getWorkspace(), this);
+      CategoryChooserDialog dialog(mContext.getWorkspace(),
+                                   CategoryChooserDialog::Filter::CmpCat, this);
       if (dialog.exec() != QDialog::Accepted) return;
       categoryUuid = dialog.getSelectedCategoryUuid();
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory:
     case NewElementWizardContext::ElementType::Package: {
-      PackageCategoryChooserDialog dialog(mContext.getWorkspace(), this);
+      CategoryChooserDialog dialog(mContext.getWorkspace(),
+                                   CategoryChooserDialog::Filter::PkgCat, this);
       if (dialog.exec() != QDialog::Accepted) return;
       categoryUuid = dialog.getSelectedCategoryUuid();
       break;

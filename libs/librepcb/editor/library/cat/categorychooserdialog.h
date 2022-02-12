@@ -50,13 +50,17 @@ class CategoryChooserDialog;
 /**
  * @brief The CategoryChooserDialog class
  */
-template <typename ElementType>
 class CategoryChooserDialog final : public QDialog {
+  Q_OBJECT
+
 public:
+  using Filter = CategoryTreeModel::Filter;
+  using Filters = CategoryTreeModel::Filters;
+
   // Constructors / Destructor
   CategoryChooserDialog() = delete;
   CategoryChooserDialog(const CategoryChooserDialog& other) = delete;
-  explicit CategoryChooserDialog(const Workspace& ws,
+  explicit CategoryChooserDialog(const Workspace& ws, Filters filters,
                                  QWidget* parent = 0) noexcept;
   ~CategoryChooserDialog() noexcept;
 
@@ -68,11 +72,8 @@ public:
 
 private:  // Data
   QScopedPointer<Ui::CategoryChooserDialog> mUi;
-  QScopedPointer<CategoryTreeModel<ElementType>> mModel;
+  QScopedPointer<CategoryTreeModel> mModel;
 };
-
-typedef CategoryChooserDialog<ComponentCategory> ComponentCategoryChooserDialog;
-typedef CategoryChooserDialog<PackageCategory> PackageCategoryChooserDialog;
 
 /*******************************************************************************
  *  End of File

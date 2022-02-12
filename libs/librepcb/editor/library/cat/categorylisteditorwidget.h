@@ -45,22 +45,27 @@ class CategoryListEditorWidget;
 }
 
 /*******************************************************************************
- *  Class CategoryListEditorWidgetBase
+ *  Class CategoryListEditorWidget
  ******************************************************************************/
 
 /**
- * @brief The CategoryListEditorWidgetBase class
+ * @brief The CategoryListEditorWidget class
  */
-class CategoryListEditorWidgetBase : public QWidget {
+class CategoryListEditorWidget : public QWidget {
   Q_OBJECT
 
 public:
+  enum class Categories {
+    Component,
+    Package,
+  };
+
   // Constructors / Destructor
-  CategoryListEditorWidgetBase() = delete;
-  explicit CategoryListEditorWidgetBase(QWidget* parent = nullptr) noexcept;
-  CategoryListEditorWidgetBase(const CategoryListEditorWidgetBase& other) =
-      delete;
-  virtual ~CategoryListEditorWidgetBase() noexcept;
+  CategoryListEditorWidget() = delete;
+  explicit CategoryListEditorWidget(const Workspace& ws, Categories categories,
+                                    QWidget* parent = nullptr) noexcept;
+  CategoryListEditorWidget(const CategoryListEditorWidget& other) = delete;
+  virtual ~CategoryListEditorWidget() noexcept;
 
   // Getters
   const QSet<Uuid>& getUuids() const noexcept { return mUuids; }
@@ -74,14 +79,15 @@ public:
   void openAddCategoryDialog() noexcept { btnAddClicked(); }
 
   // Operator Overloadings
-  CategoryListEditorWidgetBase& operator=(
-      const CategoryListEditorWidgetBase& rhs) = delete;
+  CategoryListEditorWidget& operator=(const CategoryListEditorWidget& rhs) =
+      delete;
 
-protected:
-  virtual tl::optional<Uuid> chooseCategoryWithDialog() noexcept = 0;
-  virtual QStringList buildTree(const tl::optional<Uuid>& category) const = 0;
+signals:
+  void edited();
+  void categoryAdded(const Uuid& category);
+  void categoryRemoved(const Uuid& category);
 
-private:
+private:  // Methods
   void btnAddClicked() noexcept;
   void btnRemoveClicked() noexcept;
   void addItem(const tl::optional<Uuid>& category) noexcept;
@@ -90,52 +96,16 @@ private:
   void addItem(const tl::optional<Uuid>& category,
                const QString& text) noexcept;
   void updateColor() noexcept;
+  QStringList buildTree(const tl::optional<Uuid>& category) const;
+  tl::optional<Uuid> chooseCategoryWithDialog() noexcept;
 
-signals:
-  void edited();
-  void categoryAdded(const Uuid& category);
-  void categoryRemoved(const Uuid& category);
-
-protected:  // Data
+private:  // Data
+  const Workspace& mWorkspace;
+  const Categories mCategories;
   QScopedPointer<Ui::CategoryListEditorWidget> mUi;
   bool mRequiresMinimumOneEntry;
   QSet<Uuid> mUuids;
 };
-
-/*******************************************************************************
- *  Class CategoryListEditorWidget
- ******************************************************************************/
-
-/**
- * @brief The CategoryListEditorWidget class
- */
-template <typename ElementType>
-class CategoryListEditorWidget final : public CategoryListEditorWidgetBase {
-public:
-  // Constructors / Destructor
-  CategoryListEditorWidget() = delete;
-  explicit CategoryListEditorWidget(const Workspace& ws,
-                                    QWidget* parent = nullptr) noexcept;
-  CategoryListEditorWidget(const CategoryListEditorWidget& other) = delete;
-  ~CategoryListEditorWidget() noexcept;
-
-  // Operator Overloadings
-  CategoryListEditorWidget& operator=(const CategoryListEditorWidget& rhs) =
-      delete;
-
-private:  // Methods
-  tl::optional<Uuid> chooseCategoryWithDialog() noexcept override;
-  QStringList buildTree(const tl::optional<Uuid>& category) const override;
-
-private:  // Data
-  const Workspace& mWorkspace;
-  CategoryTreeBuilder<ElementType> mBuilder;
-};
-
-typedef CategoryListEditorWidget<ComponentCategory>
-    ComponentCategoryListEditorWidget;
-typedef CategoryListEditorWidget<PackageCategory>
-    PackageCategoryListEditorWidget;
 
 /*******************************************************************************
  *  End of File

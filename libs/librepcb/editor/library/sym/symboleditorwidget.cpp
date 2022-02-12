@@ -91,8 +91,9 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   }
 
   // Insert category list editor widget.
-  mCategoriesEditorWidget.reset(
-      new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
+      mContext.workspace, CategoryListEditorWidget::Categories::Component,
+      this));
   mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
@@ -127,9 +128,8 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
           &SymbolEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &SymbolEditorWidget::commitMetadata);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::edited, this,
-          &SymbolEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(), &CategoryListEditorWidget::edited,
+          this, &SymbolEditorWidget::commitMetadata);
 
   // Load graphics items recursively.
   mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mContext.layerProvider));

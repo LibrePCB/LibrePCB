@@ -59,8 +59,8 @@ ComponentChooserDialog::ComponentChooserDialog(
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(
-      new ComponentCategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder(),
-                                     CategoryTreeFilter::COMPONENTS));
+      new CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder(),
+                            CategoryTreeModel::Filter::CmpCatWithComponents));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

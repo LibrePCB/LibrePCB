@@ -16,9 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTreeView" name="treeView">
-     <property name="sortingEnabled">
-      <bool>true</bool>
-     </property>
      <property name="animated">
       <bool>true</bool>
      </property>
