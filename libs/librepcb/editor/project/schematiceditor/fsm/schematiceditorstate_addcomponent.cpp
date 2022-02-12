@@ -196,19 +196,21 @@ bool SchematicEditorState_AddComponent::processRotateCcw() noexcept {
 }
 
 bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
-  if (mAddComponentDialog) {
-    try {
-      if (!abortCommand(true)) return false;
+  try {
+    if (!abortCommand(true)) {
+      return false;
+    }
+    if (mAddComponentDialog && mAddComponentDialog->getAutoOpenAgain()) {
       mLastAngle.setAngleMicroDeg(0);  // reset the angle
       startAddingComponent();
       return true;
-    } catch (UserCanceled& exc) {
-    } catch (Exception& exc) {
-      QMessageBox::critical(parentWidget(), tr("Error"), exc.getMsg());
     }
+  } catch (UserCanceled& exc) {
+  } catch (Exception& exc) {
+    QMessageBox::critical(parentWidget(), tr("Error"), exc.getMsg());
   }
 
-  return false;
+  return false;  // FSM will handle the event and exit this state.
 }
 
 bool SchematicEditorState_AddComponent::processGraphicsSceneMouseMoved(

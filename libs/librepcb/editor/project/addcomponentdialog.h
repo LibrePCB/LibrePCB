@@ -94,6 +94,18 @@ public:
   tl::optional<Uuid> getSelectedSymbVarUuid() const noexcept;
   tl::optional<Uuid> getSelectedDeviceUuid() const noexcept;
 
+  /**
+   * @brief Check if dialog shall be opened again after the current component
+   *
+   * Returns the checked state of the "Add More" checkbox, i.e. whether the
+   * caller should open this dialog again after finishing placement of the
+   * component.
+   *
+   * @retval true   Must open this dialog again after placing the component.
+   * @retval false  Shall not open this dialog again, exit placement tool.
+   */
+  bool getAutoOpenAgain() const noexcept;
+
   // Setters
   void setLocaleOrder(const QStringList& order) noexcept;
   void setNormOrder(const QStringList& order) noexcept { mNormOrder = order; }
@@ -123,6 +135,7 @@ private:
   QStringList mLocaleOrder;
   QStringList mNormOrder;
   QScopedPointer<Ui::AddComponentDialog> mUi;
+  QPointer<QCheckBox> mAddMoreCheckbox;
   QScopedPointer<GraphicsScene> mComponentPreviewScene;
   QScopedPointer<GraphicsScene> mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
