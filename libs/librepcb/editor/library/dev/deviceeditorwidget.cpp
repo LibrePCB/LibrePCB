@@ -84,8 +84,9 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
   // Insert category list editor widget.
-  mCategoriesEditorWidget.reset(
-      new ComponentCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
+      mContext.workspace, CategoryListEditorWidget::Categories::Component,
+      this));
   mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
@@ -134,9 +135,8 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
           &DeviceEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &DeviceEditorWidget::commitMetadata);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::edited, this,
-          &DeviceEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(), &CategoryListEditorWidget::edited,
+          this, &DeviceEditorWidget::commitMetadata);
 }
 
 DeviceEditorWidget::~DeviceEditorWidget() noexcept {

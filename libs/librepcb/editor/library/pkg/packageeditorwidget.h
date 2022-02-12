@@ -119,7 +119,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
-  QScopedPointer<PackageCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<Package> mPackage;
   QScopedPointer<PackageEditorFsm> mFsm;

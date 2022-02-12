@@ -682,8 +682,6 @@ add_library(
   widgets/unsignedlengthedit.h
   widgets/unsignedratioedit.cpp
   widgets/unsignedratioedit.h
-  workspace/categorytreeitem.cpp
-  workspace/categorytreeitem.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
   workspace/controlpanel/controlpanel.cpp

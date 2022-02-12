@@ -205,7 +205,8 @@ bool PackageCategoryEditorWidget::processCheckMessage(
 }
 
 void PackageCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {
-  PackageCategoryChooserDialog dialog(mContext.workspace);
+  CategoryChooserDialog dialog(mContext.workspace,
+                               CategoryChooserDialog::Filter::PkgCat);
   if (dialog.exec()) {
     mParentUuid = dialog.getSelectedCategoryUuid();
     commitMetadata();

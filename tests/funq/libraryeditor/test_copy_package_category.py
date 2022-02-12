@@ -23,14 +23,15 @@ def test(library_editor, helpers):
 
     # Choose category
     category_tree = le.widget('libraryEditorNewElementWizardCopyFromCategoriesTree')
-    helpers.wait_for_model_items_count(category_tree, 1)
-    category = category_tree.model().items().items[0]
+    helpers.wait_for_model_items_count(category_tree, 4)
+    category = category_tree.model().items().items[2]
     category_tree.select_item(category)
     le.widget('libraryEditorNewElementWizardNextButton').click()
 
     # Check metadata
     widget_properties = {
-        ('NameEdit', 'text'): 'C-SMT',
+        # Note: C-SMT/Crystals are buggy due to Qt/ICU bug in sort algorithm!
+        ('NameEdit', 'text'): 'R-SMT',
         ('DescriptionEdit', 'plainText'): '',
         ('KeywordsEdit', 'text'): '',
         ('VersionEdit', 'text'): '0.1',
@@ -50,7 +51,7 @@ def test(library_editor, helpers):
     assert tab_props['currentIndex'] == 1
 
     # Check metadata
-    assert le.widget('libraryEditorPkgCatNameEdit').properties()['text'] == 'C-SMT'
+    assert le.widget('libraryEditorPkgCatNameEdit').properties()['text'] == 'R-SMT'
     assert le.widget('libraryEditorPkgCatDescriptionEdit').properties()['plainText'] == ''
     assert le.widget('libraryEditorPkgCatKeywordsEdit').properties()['text'] == ''
     assert le.widget('libraryEditorPkgCatVersionEdit').properties()['text'] == '0.1'

@@ -104,8 +104,9 @@ AddComponentDialog::AddComponentDialog(Workspace& workspace, Project& project,
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
 
   const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-  mCategoryTreeModel = new ComponentCategoryTreeModel(
-      mWorkspace.getLibraryDb(), localeOrder, CategoryTreeFilter::COMPONENTS);
+  mCategoryTreeModel =
+      new CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder,
+                            CategoryTreeModel::Filter::CmpCatWithComponents);
   mUi->treeCategories->setModel(mCategoryTreeModel);
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

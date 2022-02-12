@@ -92,7 +92,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::ComponentEditorWidget> mUi;
-  QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QSharedPointer<Component> mComponent;
 
   // broken interface detection

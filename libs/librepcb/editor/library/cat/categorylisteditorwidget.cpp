@@ -41,36 +41,39 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CategoryListEditorWidgetBase::CategoryListEditorWidgetBase(
-    QWidget* parent) noexcept
+CategoryListEditorWidget::CategoryListEditorWidget(const Workspace& ws,
+                                                   Categories categories,
+                                                   QWidget* parent) noexcept
   : QWidget(parent),
+    mWorkspace(ws),
+    mCategories(categories),
     mUi(new Ui::CategoryListEditorWidget),
     mRequiresMinimumOneEntry(false) {
   mUi->setupUi(this);
   connect(mUi->btnAdd, &QPushButton::clicked, this,
-          &CategoryListEditorWidgetBase::btnAddClicked);
+          &CategoryListEditorWidget::btnAddClicked);
   connect(mUi->btnRemove, &QPushButton::clicked, this,
-          &CategoryListEditorWidgetBase::btnRemoveClicked);
+          &CategoryListEditorWidget::btnRemoveClicked);
 }
 
-CategoryListEditorWidgetBase::~CategoryListEditorWidgetBase() noexcept {
+CategoryListEditorWidget::~CategoryListEditorWidget() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CategoryListEditorWidgetBase::setReadOnly(bool readOnly) noexcept {
+void CategoryListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mUi->btnAdd->setHidden(readOnly);
   mUi->btnRemove->setHidden(readOnly);
 }
 
-void CategoryListEditorWidgetBase::setRequiresMinimumOneEntry(bool v) noexcept {
+void CategoryListEditorWidget::setRequiresMinimumOneEntry(bool v) noexcept {
   mRequiresMinimumOneEntry = v;
   updateColor();
 }
 
-void CategoryListEditorWidgetBase::setUuids(const QSet<Uuid>& uuids) noexcept {
+void CategoryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept {
   mUuids = uuids;
   mUi->listWidget->clear();
   foreach (const Uuid& category, mUuids) { addItem(category); }
@@ -80,7 +83,7 @@ void CategoryListEditorWidgetBase::setUuids(const QSet<Uuid>& uuids) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void CategoryListEditorWidgetBase::btnAddClicked() noexcept {
+void CategoryListEditorWidget::btnAddClicked() noexcept {
   tl::optional<Uuid> uuid = chooseCategoryWithDialog();
   if (uuid && !mUuids.contains(*uuid)) {
     mUuids.insert(*uuid);
@@ -90,7 +93,7 @@ void CategoryListEditorWidgetBase::btnAddClicked() noexcept {
   }
 }
 
-void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
+void CategoryListEditorWidget::btnRemoveClicked() noexcept {
   QListWidgetItem* item = mUi->listWidget->currentItem();
   tl::optional<Uuid> uuid = item
       ? Uuid::tryFromString(item->data(Qt::UserRole).toString())
@@ -106,7 +109,7 @@ void CategoryListEditorWidgetBase::btnRemoveClicked() noexcept {
   }
 }
 
-void CategoryListEditorWidgetBase::addItem(
+void CategoryListEditorWidget::addItem(
     const tl::optional<Uuid>& category) noexcept {
   try {
     addItem(category, buildTree(category));  // can throw
@@ -115,8 +118,8 @@ void CategoryListEditorWidgetBase::addItem(
   }
 }
 
-void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
-                                           const QStringList& lines) noexcept {
+void CategoryListEditorWidget::addItem(const tl::optional<Uuid>& category,
+                                       const QStringList& lines) noexcept {
   QString text;
   for (int i = 0; i < lines.count(); ++i) {
     QString line = lines.value(i);
@@ -129,8 +132,8 @@ void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
   addItem(category, text);
 }
 
-void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
-                                           const QString& text) noexcept {
+void CategoryListEditorWidget::addItem(const tl::optional<Uuid>& category,
+                                       const QString& text) noexcept {
   QString uuidStr = category ? category->toStr() : QString();
   QListWidgetItem* item = new QListWidgetItem(text, mUi->listWidget);
   item->setData(Qt::UserRole, uuidStr);
@@ -138,7 +141,7 @@ void CategoryListEditorWidgetBase::addItem(const tl::optional<Uuid>& category,
   updateColor();
 }
 
-void CategoryListEditorWidgetBase::updateColor() noexcept {
+void CategoryListEditorWidget::updateColor() noexcept {
   if (mRequiresMinimumOneEntry && (mUi->listWidget->count() == 0)) {
     mUi->listWidget->setStyleSheet("background-color: #FF5555;");
   } else {
@@ -146,42 +149,34 @@ void CategoryListEditorWidgetBase::updateColor() noexcept {
   }
 }
 
-/*******************************************************************************
- *  Class CategoryListEditorWidget
- ******************************************************************************/
-
-template <typename ElementType>
-CategoryListEditorWidget<ElementType>::CategoryListEditorWidget(
-    const Workspace& ws, QWidget* parent) noexcept
-  : CategoryListEditorWidgetBase(parent),
-    mWorkspace(ws),
-    mBuilder(ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(),
-             false) {
+QStringList CategoryListEditorWidget::buildTree(
+    const tl::optional<Uuid>& category) const {
+  if (mCategories == Categories::Package) {
+    CategoryTreeBuilder<PackageCategory> builder(
+        mWorkspace.getLibraryDb(),
+        mWorkspace.getSettings().libraryLocaleOrder.get(), false);
+    return builder.buildTree(category);
+  } else {
+    CategoryTreeBuilder<ComponentCategory> builder(
+        mWorkspace.getLibraryDb(),
+        mWorkspace.getSettings().libraryLocaleOrder.get(), false);
+    return builder.buildTree(category);
+  }
 }
 
-template <typename ElementType>
-CategoryListEditorWidget<ElementType>::~CategoryListEditorWidget() noexcept {
-}
-
-template <typename ElementType>
 tl::optional<Uuid>
-    CategoryListEditorWidget<ElementType>::chooseCategoryWithDialog() noexcept {
-  CategoryChooserDialog<ElementType> dialog(mWorkspace, this);
+    CategoryListEditorWidget::chooseCategoryWithDialog() noexcept {
+  CategoryChooserDialog dialog(mWorkspace,
+                               (mCategories == Categories::Package)
+                                   ? CategoryChooserDialog::Filter::PkgCat
+                                   : CategoryChooserDialog::Filter::CmpCat,
+                               this);
   if (dialog.exec() == QDialog::Accepted) {
     return dialog.getSelectedCategoryUuid();
   } else {
     return tl::nullopt;
   }
 }
-
-template <typename ElementType>
-QStringList CategoryListEditorWidget<ElementType>::buildTree(
-    const tl::optional<Uuid>& category) const {
-  return mBuilder.buildTree(category);
-}
-
-template class CategoryListEditorWidget<ComponentCategory>;
-template class CategoryListEditorWidget<PackageCategory>;
 
 /*******************************************************************************
  *  End of File
