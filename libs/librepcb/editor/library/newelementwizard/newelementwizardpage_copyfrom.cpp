@@ -250,40 +250,40 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory: {
       mIsCategoryElement = true;
-      setCategoryTreeModel(new ComponentCategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeFilter::ALL));
+          CategoryTreeModel::Filter::CmpCat));
       break;
     }
     case NewElementWizardContext::ElementType::Symbol: {
-      setCategoryTreeModel(new ComponentCategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeFilter::SYMBOLS));
+          CategoryTreeModel::Filter::CmpCatWithSymbols));
       break;
     }
     case NewElementWizardContext::ElementType::Component: {
-      setCategoryTreeModel(new ComponentCategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeFilter::COMPONENTS));
+          CategoryTreeModel::Filter::CmpCatWithComponents));
       break;
     }
     case NewElementWizardContext::ElementType::Device: {
-      setCategoryTreeModel(new ComponentCategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeFilter::DEVICES));
+          CategoryTreeModel::Filter::CmpCatWithDevices));
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory: {
       mIsCategoryElement = true;
-      setCategoryTreeModel(new PackageCategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeFilter::ALL));
+          CategoryTreeModel::Filter::PkgCat));
       break;
     }
     case NewElementWizardContext::ElementType::Package: {
-      setCategoryTreeModel(new PackageCategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModel(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeFilter::PACKAGES));
+          CategoryTreeModel::Filter::PkgCatWithPackages));
       break;
     }
     default: {

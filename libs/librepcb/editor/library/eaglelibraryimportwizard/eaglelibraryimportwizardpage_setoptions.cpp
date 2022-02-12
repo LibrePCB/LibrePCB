@@ -59,21 +59,24 @@ EagleLibraryImportWizardPage_SetOptions::
   setCommitPage(true);
   connect(mUi->cbxAddNamePrefix, &QCheckBox::toggled, mContext.get(),
           &EagleLibraryImportWizardContext::setAddNamePrefix);
-  connect(
-      mUi->btnChooseComponentCategory, &QToolButton::clicked, this, [this]() {
-        ComponentCategoryChooserDialog dialog(mContext->getWorkspace(), this);
-        if (dialog.exec() == QDialog::Accepted) {
-          mContext->setComponentCategory(dialog.getSelectedCategoryUuid());
-          updateComponentCategoryTreeLabel();
-        }
-      });
+  connect(mUi->btnChooseComponentCategory, &QToolButton::clicked, this,
+          [this]() {
+            CategoryChooserDialog dialog(mContext->getWorkspace(),
+                                         CategoryChooserDialog::Filter::CmpCat,
+                                         this);
+            if (dialog.exec() == QDialog::Accepted) {
+              mContext->setComponentCategory(dialog.getSelectedCategoryUuid());
+              updateComponentCategoryTreeLabel();
+            }
+          });
   connect(mUi->btnResetComponentCategory, &QToolButton::clicked, this,
           [this]() {
             mContext->setComponentCategory(tl::nullopt);
             updateComponentCategoryTreeLabel();
           });
   connect(mUi->btnChoosePackageCategory, &QToolButton::clicked, this, [this]() {
-    PackageCategoryChooserDialog dialog(mContext->getWorkspace(), this);
+    CategoryChooserDialog dialog(mContext->getWorkspace(),
+                                 CategoryChooserDialog::Filter::PkgCat, this);
     if (dialog.exec() == QDialog::Accepted) {
       mContext->setPackageCategory(dialog.getSelectedCategoryUuid());
       updatePackageCategoryTreeLabel();

@@ -208,10 +208,16 @@ inline uint qHash(const Uuid& key, uint seed) noexcept {
   return ::qHash(key.toStr(), seed);
 }
 
+}  // namespace librepcb
+
+namespace tl {
+inline uint qHash(const optional<librepcb::Uuid>& key, uint seed) noexcept {
+  return ::qHash(key ? key->toStr() : QString(), seed);
+}
+}  // namespace tl
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace librepcb
 
 #endif

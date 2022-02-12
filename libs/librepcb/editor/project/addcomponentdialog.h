@@ -120,7 +120,7 @@ private:
   GraphicsScene* mComponentPreviewScene;
   GraphicsScene* mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
-  ComponentCategoryTreeModel* mCategoryTreeModel;
+  CategoryTreeModel* mCategoryTreeModel;
 
   // Attributes
   tl::optional<Uuid> mSelectedCategoryUuid;

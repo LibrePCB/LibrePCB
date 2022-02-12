@@ -40,46 +40,32 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-template <typename ElementType>
-CategoryChooserDialog<ElementType>::CategoryChooserDialog(
-    const Workspace& ws, QWidget* parent) noexcept
+CategoryChooserDialog::CategoryChooserDialog(const Workspace& ws,
+                                             Filters filters,
+                                             QWidget* parent) noexcept
   : QDialog(parent), mUi(new Ui::CategoryChooserDialog) {
   mUi->setupUi(this);
   connect(mUi->treeView, &QTreeView::doubleClicked, this,
-          &CategoryChooserDialog<ElementType>::accept);
+          &CategoryChooserDialog::accept);
 
-  mModel.reset(new CategoryTreeModel<ElementType>(
-      ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(),
-      CategoryTreeFilter::ALL));
+  mModel.reset(new CategoryTreeModel(
+      ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(), filters));
   mUi->treeView->setModel(mModel.data());
   mUi->treeView->setRootIndex(QModelIndex());
 }
 
-template <typename ElementType>
-CategoryChooserDialog<ElementType>::~CategoryChooserDialog() noexcept {
+CategoryChooserDialog::~CategoryChooserDialog() noexcept {
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-template <typename ElementType>
-tl::optional<Uuid> CategoryChooserDialog<ElementType>::getSelectedCategoryUuid()
-    const noexcept {
+tl::optional<Uuid> CategoryChooserDialog::getSelectedCategoryUuid() const
+    noexcept {
   QModelIndex index = mUi->treeView->currentIndex();
-  if (index.isValid() && index.internalPointer()) {
-    CategoryTreeItem<ElementType>* item = mModel->getItem(index);
-    return item ? item->getUuid() : tl::nullopt;
-  } else {
-    return tl::nullopt;
-  }
+  return Uuid::tryFromString(index.data(Qt::UserRole).toString());
 }
-
-/*******************************************************************************
- *  Explicit template instantiations
- ******************************************************************************/
-template class CategoryChooserDialog<ComponentCategory>;
-template class CategoryChooserDialog<PackageCategory>;
 
 /*******************************************************************************
  *  End of File

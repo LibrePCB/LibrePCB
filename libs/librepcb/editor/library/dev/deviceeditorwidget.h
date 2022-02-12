@@ -102,7 +102,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget> mUi;
-  QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+  QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<Device> mDevice;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
 

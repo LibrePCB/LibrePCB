@@ -92,8 +92,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   }
 
   // Insert category list editor widget.
-  mCategoriesEditorWidget.reset(
-      new PackageCategoryListEditorWidget(mContext.workspace, this));
+  mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
+      mContext.workspace, CategoryListEditorWidget::Categories::Package, this));
   mCategoriesEditorWidget->setReadOnly(mContext.readOnly);
   mCategoriesEditorWidget->setRequiresMinimumOneEntry(true);
   int row;
@@ -139,9 +139,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
           &PackageEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &PackageEditorWidget::commitMetadata);
-  connect(mCategoriesEditorWidget.data(),
-          &ComponentCategoryListEditorWidget::edited, this,
-          &PackageEditorWidget::commitMetadata);
+  connect(mCategoriesEditorWidget.data(), &CategoryListEditorWidget::edited,
+          this, &PackageEditorWidget::commitMetadata);
 
   // Load finite state machine (FSM).
   PackageEditorFsm::Context fsmContext{mContext.workspace,
