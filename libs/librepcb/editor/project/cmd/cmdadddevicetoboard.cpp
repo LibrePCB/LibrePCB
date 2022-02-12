@@ -81,7 +81,7 @@ bool CmdAddDeviceToBoard::performExecute() {
   // workspace library to the project's library
   Device* dev = mBoard.getProject().getLibrary().getDevice(mDeviceUuid);
   if (!dev) {
-    FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(mDeviceUuid);
+    FilePath devFp = mWorkspace.getLibraryDb().getLatest<Device>(mDeviceUuid);
     if (!devFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -103,7 +103,7 @@ bool CmdAddDeviceToBoard::performExecute() {
   Uuid pkgUuid = dev->getPackageUuid();
   Package* pkg = mBoard.getProject().getLibrary().getPackage(pkgUuid);
   if (!pkg) {
-    FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
+    FilePath pkgFp = mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);
     if (!pkgFp.isValid()) {
       throw RuntimeError(
           __FILE__, __LINE__,

@@ -78,180 +78,187 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL, "
       "`icon_png` BLOB "
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS libraries_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES libraries(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(lib_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
 
   // component categories
   queries << QString(
       "CREATE TABLE IF NOT EXISTS component_categories ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL, "
       "`parent_uuid` TEXT"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS component_categories_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`cat_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES component_categories(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(cat_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
 
   // package categories
   queries << QString(
       "CREATE TABLE IF NOT EXISTS package_categories ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL, "
       "`parent_uuid` TEXT"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS package_categories_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`cat_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES package_categories(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(cat_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
 
   // symbols
   queries << QString(
       "CREATE TABLE IF NOT EXISTS symbols ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL"
+      "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS symbols_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`symbol_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES symbols(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(symbol_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS symbols_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`symbol_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES symbols(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(symbol_id, category_uuid)"
+      "UNIQUE(element_id, category_uuid)"
       ")");
 
   // packages
   queries << QString(
       "CREATE TABLE IF NOT EXISTS packages ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL "
+      "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS packages_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`package_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(package_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS packages_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`package_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(package_id, category_uuid)"
+      "UNIQUE(element_id, category_uuid)"
       ")");
 
   // components
   queries << QString(
       "CREATE TABLE IF NOT EXISTS components ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
-      "`version` TEXT NOT NULL"
+      "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS components_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`component_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(component_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS components_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`component_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(component_id, category_uuid)"
+      "UNIQUE(element_id, category_uuid)"
       ")");
 
   // devices
   queries << QString(
       "CREATE TABLE IF NOT EXISTS devices ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`lib_id` INTEGER NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL, "
       "`component_uuid` TEXT NOT NULL, "
       "`package_uuid` TEXT NOT NULL"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS devices_tr ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`device_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
       "`locale` TEXT NOT NULL, "
       "`name` TEXT, "
       "`description` TEXT, "
       "`keywords` TEXT, "
-      "UNIQUE(device_id, locale)"
+      "UNIQUE(element_id, locale)"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS devices_cat ("
       "`id` INTEGER PRIMARY KEY NOT NULL, "
-      "`device_id` INTEGER "
+      "`element_id` INTEGER "
       "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
-      "UNIQUE(device_id, category_uuid)"
+      "UNIQUE(element_id, category_uuid)"
       ")");
 
   // execute queries
@@ -272,14 +279,16 @@ void WorkspaceLibraryDbWriter::addInternalData(const QString& key, int value) {
 
 int WorkspaceLibraryDbWriter::addLibrary(const FilePath& fp, const Uuid& uuid,
                                          const Version& version,
+                                         bool deprecated,
                                          const QByteArray& iconPng) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO libraries "
-      "(filepath, uuid, version, icon_png) VALUES "
-      "(:filepath, :uuid, :version, :icon_png)");
+      "(filepath, uuid, version, deprecated, icon_png) VALUES "
+      "(:filepath, :uuid, :version, :deprecated, :icon_png)");
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
   query.bindValue(":icon_png", iconPng);
   return mDb.insert(query);
 }
@@ -287,31 +296,37 @@ int WorkspaceLibraryDbWriter::addLibrary(const FilePath& fp, const Uuid& uuid,
 void WorkspaceLibraryDbWriter::updateLibrary(const FilePath& fp,
                                              const Uuid& uuid,
                                              const Version& version,
+                                             bool deprecated,
                                              const QByteArray& iconPng) {
   QSqlQuery query = mDb.prepareQuery(
       "UPDATE libraries "
-      "SET uuid = :uuid, version = :version, icon_png = :icon_png "
+      "SET uuid = :uuid, version = :version, deprecated = :deprecated, "
+      "icon_png = :icon_png "
       "WHERE filepath = :filepath");
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
   query.bindValue(":icon_png", iconPng);
   mDb.exec(query);
 }
 
 int WorkspaceLibraryDbWriter::addDevice(int libId, const FilePath& fp,
                                         const Uuid& uuid,
-                                        const Version& version,
+                                        const Version& version, bool deprecated,
                                         const Uuid& component,
                                         const Uuid& package) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO devices "
-      "(lib_id, filepath, uuid, version, component_uuid, package_uuid) VALUES "
-      "(:lib_id, :filepath, :uuid, :version, :component_uuid, :package_uuid)");
-  query.bindValue(":lib_id", libId);
+      "(library_id, filepath, uuid, version, deprecated, component_uuid, "
+      "package_uuid) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :component_uuid, "
+      ":package_uuid)");
+  query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
   query.bindValue(":component_uuid", component.toStr());
   query.bindValue(":package_uuid", package.toStr());
   return mDb.insert(query);
@@ -358,43 +373,6 @@ QString WorkspaceLibraryDbWriter::getElementTable<Device>() noexcept {
 }
 
 template <>
-QString WorkspaceLibraryDbWriter::getElementIdColumn<Library>() noexcept {
-  return "lib_id";
-}
-
-template <>
-QString
-    WorkspaceLibraryDbWriter::getElementIdColumn<ComponentCategory>() noexcept {
-  return "cat_id";
-}
-
-template <>
-QString
-    WorkspaceLibraryDbWriter::getElementIdColumn<PackageCategory>() noexcept {
-  return "cat_id";
-}
-
-template <>
-QString WorkspaceLibraryDbWriter::getElementIdColumn<Symbol>() noexcept {
-  return "symbol_id";
-}
-
-template <>
-QString WorkspaceLibraryDbWriter::getElementIdColumn<Package>() noexcept {
-  return "package_id";
-}
-
-template <>
-QString WorkspaceLibraryDbWriter::getElementIdColumn<Component>() noexcept {
-  return "component_id";
-}
-
-template <>
-QString WorkspaceLibraryDbWriter::getElementIdColumn<Device>() noexcept {
-  return "device_id";
-}
-
-template <>
 QString WorkspaceLibraryDbWriter::getCategoryTable<Symbol>() noexcept {
   return getElementTable<ComponentCategory>();
 }
@@ -421,18 +399,20 @@ QString WorkspaceLibraryDbWriter::getCategoryTable<Device>() noexcept {
 int WorkspaceLibraryDbWriter::addElement(const QString& elementsTable,
                                          int libId, const FilePath& fp,
                                          const Uuid& uuid,
-                                         const Version& version) {
+                                         const Version& version,
+                                         bool deprecated) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %elements "
-      "(lib_id, filepath, uuid, version) VALUES "
-      "(:lib_id, :filepath, :uuid, :version)",
+      "(library_id, filepath, uuid, version, deprecated) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated)",
       {
           {"%elements", elementsTable},
       });
-  query.bindValue(":lib_id", libId);
+  query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
   return mDb.insert(query);
 }
 
@@ -440,18 +420,20 @@ int WorkspaceLibraryDbWriter::addCategory(const QString& categoriesTable,
                                           int libId, const FilePath& fp,
                                           const Uuid& uuid,
                                           const Version& version,
+                                          bool deprecated,
                                           const tl::optional<Uuid>& parent) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %categories "
-      "(lib_id, filepath, uuid, version, parent_uuid) VALUES "
-      "(:lib_id, :filepath, :uuid, :version, :parent_uuid)",
+      "(library_id, filepath, uuid, version, deprecated, parent_uuid) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :parent_uuid)",
       {
           {"%categories", categoriesTable},
       });
-  query.bindValue(":lib_id", libId);
+  query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
   query.bindValue(":parent_uuid",
                   parent ? parent->toStr() : QVariant(QVariant::String));
   return mDb.insert(query);
@@ -474,17 +456,16 @@ void WorkspaceLibraryDbWriter::removeAllElements(const QString& elementsTable) {
 }
 
 int WorkspaceLibraryDbWriter::addTranslation(
-    const QString& elementsTable, const QString& idColumn, int elementId,
-    const QString& locale, const tl::optional<ElementName>& name,
+    const QString& elementsTable, int elementId, const QString& locale,
+    const tl::optional<ElementName>& name,
     const tl::optional<QString>& description,
     const tl::optional<QString>& keywords) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %elements_tr "
-      "(%id, locale, name, description, keywords) VALUES "
+      "(element_id, locale, name, description, keywords) VALUES "
       "(:element_id, :locale, :name, :description, :keywords)",
       {
           {"%elements", elementsTable},
-          {"%id", idColumn},
       });
   query.bindValue(":element_id", elementId);
   query.bindValue(":locale", locale);
@@ -502,16 +483,14 @@ void WorkspaceLibraryDbWriter::removeAllTranslations(
 }
 
 int WorkspaceLibraryDbWriter::addToCategory(const QString& elementsTable,
-                                            const QString& idColumn,
                                             int elementId,
                                             const Uuid& category) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %elements_cat "
-      "(%id, category_uuid) VALUES "
+      "(element_id, category_uuid) VALUES "
       "(:element_id, :category_uuid)",
       {
           {"%elements", elementsTable},
-          {"%id", idColumn},
       });
   query.bindValue(":element_id", elementId);
   query.bindValue(":category_uuid", category.toStr());

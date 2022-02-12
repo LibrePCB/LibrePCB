@@ -89,11 +89,11 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
   QString dependencies;
   foreach (const Uuid& uuid, lib.getDependencies()) {
     QString line = dependencies.isEmpty() ? "" : "<br>";
-    FilePath fp = ws.getLibraryDb().getLatestLibrary(uuid);  // can throw
+    FilePath fp = ws.getLibraryDb().getLatest<Library>(uuid);  // can throw
     if (fp.isValid()) {
       QString name;
-      ws.getLibraryDb().getElementTranslations<Library>(fp, localeOrder,
-                                                        &name);  // can throw
+      ws.getLibraryDb().getTranslations<Library>(fp, localeOrder,
+                                                 &name);  // can throw
       line += QString(" <font color=\"green\">%1 ✔</font>").arg(name);
     } else {
       line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());

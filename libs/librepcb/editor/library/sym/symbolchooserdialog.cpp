@@ -146,15 +146,13 @@ void SymbolChooserDialog::searchSymbols(const QString& input) {
 
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
-    QList<Uuid> symbols =
-        mWorkspace.getLibraryDb().getElementsBySearchKeyword<Symbol>(input);
+    QList<Uuid> symbols = mWorkspace.getLibraryDb().find<Symbol>(input);
     foreach (const Uuid& uuid, symbols) {
       FilePath fp =
-          mWorkspace.getLibraryDb().getLatestSymbol(uuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Symbol>(uuid);  // can throw
       QString name;
-      mWorkspace.getLibraryDb().getElementTranslations<Symbol>(
-          fp, localeOrder(),
-          &name);  // can throw
+      mWorkspace.getLibraryDb().getTranslations<Symbol>(fp, localeOrder(),
+                                                        &name);  // can throw
       QListWidgetItem* item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, fp.toStr());
       mUi->listSymbols->addItem(item);
@@ -173,13 +171,13 @@ void SymbolChooserDialog::setSelectedCategory(
 
   try {
     QSet<Uuid> symbols =
-        mWorkspace.getLibraryDb().getSymbolsByCategory(uuid);  // can throw
+        mWorkspace.getLibraryDb().getByCategory<Symbol>(uuid);  // can throw
     foreach (const Uuid& symbolUuid, symbols) {
       try {
         QString symName;
-        FilePath symFp =
-            mWorkspace.getLibraryDb().getLatestSymbol(symbolUuid);  // can throw
-        mWorkspace.getLibraryDb().getElementTranslations<Symbol>(
+        FilePath symFp = mWorkspace.getLibraryDb().getLatest<Symbol>(
+            symbolUuid);  // can throw
+        mWorkspace.getLibraryDb().getTranslations<Symbol>(
             symFp, localeOrder(), &symName);  // can throw
         QListWidgetItem* item = new QListWidgetItem(symName);
         item->setData(Qt::UserRole, symFp.toStr());

@@ -134,16 +134,16 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
       mUi->cbxPreselectedDevice->addItem(name, device->getUuid().toStr());
     }
     // Then add remaining devices from workspace library (lower priority)
-    QSet<Uuid> wsLibDevices = mWorkspace.getLibraryDb().getDevicesOfComponent(
+    QSet<Uuid> wsLibDevices = mWorkspace.getLibraryDb().getComponentDevices(
         mComponentInstance.getLibComponent().getUuid());  // can throw
     wsLibDevices -= Toolbox::toSet(prjLibDevices.keys());  // avoid duplicates
     foreach (const Uuid& deviceUuid, wsLibDevices) {
       FilePath devFp =
-          mWorkspace.getLibraryDb().getLatestDevice(deviceUuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Device>(deviceUuid);  // can throw
       if (devFp.isValid()) {
         QString name;
-        mWorkspace.getLibraryDb().getElementTranslations<Device>(
-            devFp, localeOrder, &name);  // can throw
+        mWorkspace.getLibraryDb().getTranslations<Device>(devFp, localeOrder,
+                                                          &name);  // can throw
         mUi->cbxPreselectedDevice->addItem(name, deviceUuid.toStr());
       }
     }

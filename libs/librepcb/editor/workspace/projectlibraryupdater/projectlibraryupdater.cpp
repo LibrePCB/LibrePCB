@@ -101,10 +101,10 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
               &TransactionalFileSystem::RestoreMode::abort);
 
       // update all elements
-      updateElements(fs, "cmp", &WorkspaceLibraryDb::getLatestComponent);
-      updateElements(fs, "dev", &WorkspaceLibraryDb::getLatestDevice);
-      updateElements(fs, "pkg", &WorkspaceLibraryDb::getLatestPackage);
-      updateElements(fs, "sym", &WorkspaceLibraryDb::getLatestSymbol);
+      updateElements<Component>(fs, "cmp");
+      updateElements<Device>(fs, "dev");
+      updateElements<Package>(fs, "pkg");
+      updateElements<Symbol>(fs, "sym");
 
       // check whether project can still be opened of if we broke something
       try {
@@ -151,14 +151,14 @@ QString ProjectLibraryUpdater::prettyPath(const FilePath& fp) const noexcept {
   return fp.toRelative(mProjectFilePath.getParentDir());
 }
 
+template <typename T>
 void ProjectLibraryUpdater::updateElements(
-    std::shared_ptr<TransactionalFileSystem> fs, const QString& type,
-    FilePath (WorkspaceLibraryDb::*getter)(const Uuid&) const) {
+    std::shared_ptr<TransactionalFileSystem> fs, const QString& type) {
   QString dirpath = "library/" % type;
   foreach (const QString& dirname, fs->getDirs(dirpath)) {
     tl::optional<Uuid> uuid = Uuid::tryFromString(dirname);
     FilePath src =
-        uuid ? (mWorkspace.getLibraryDb().*getter)(*uuid) : FilePath();
+        uuid ? mWorkspace.getLibraryDb().getLatest<T>(*uuid) : FilePath();
     QString dst = dirpath % "/" % dirname;
     TransactionalDirectory dstDir(fs, dst);
     if (src.isValid() && (!dstDir.getFiles().isEmpty())) {

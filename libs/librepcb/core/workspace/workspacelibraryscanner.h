@@ -37,7 +37,6 @@ namespace librepcb {
 class Library;
 class SQLiteDatabase;
 class TransactionalFileSystem;
-class Workspace;
 class WorkspaceLibraryDbWriter;
 
 /*******************************************************************************
@@ -56,7 +55,8 @@ class WorkspaceLibraryScanner final : public QThread {
 
 public:
   // Constructors / Destructor
-  WorkspaceLibraryScanner(Workspace& ws, const FilePath& dbFilePath) noexcept;
+  WorkspaceLibraryScanner(const FilePath& librariesPath,
+                          const FilePath& dbFilePath) noexcept;
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
   ~WorkspaceLibraryScanner() noexcept;
 
@@ -100,8 +100,8 @@ private:  // Methods
                        const ElementType& element);
 
 private:  // Data
-  Workspace& mWorkspace;
-  FilePath mDbFilePath;
+  const FilePath mLibrariesPath;  ///< Path to workspace libraries directory.
+  const FilePath mDbFilePath;  ///< Path to the SQLite database file.
   QSemaphore mSemaphore;
   volatile bool mAbort;
 };

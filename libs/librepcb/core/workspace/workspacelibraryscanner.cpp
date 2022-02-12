@@ -32,7 +32,6 @@
 #include "../library/sym/symbol.h"
 #include "../sqlitedatabase.h"
 #include "../utils/toolbox.h"
-#include "workspace.h"
 #include "workspacelibrarydbwriter.h"
 
 #include <QtCore>
@@ -47,9 +46,9 @@ namespace librepcb {
  ******************************************************************************/
 
 WorkspaceLibraryScanner::WorkspaceLibraryScanner(
-    Workspace& ws, const FilePath& dbFilePath) noexcept
+    const FilePath& librariesPath, const FilePath& dbFilePath) noexcept
   : QThread(nullptr),
-    mWorkspace(ws),
+    mLibrariesPath(librariesPath),
     mDbFilePath(dbFilePath),
     mSemaphore(0),
     mAbort(false) {
@@ -105,11 +104,11 @@ void WorkspaceLibraryScanner::scan() noexcept {
 
     // open SQLite database
     SQLiteDatabase db(mDbFilePath);  // can throw
-    WorkspaceLibraryDbWriter writer(mWorkspace.getLibrariesPath(), db);
+    WorkspaceLibraryDbWriter writer(mLibrariesPath, db);
 
     // update list of libraries
     std::shared_ptr<TransactionalFileSystem> fs =
-        TransactionalFileSystem::openRO(mWorkspace.getLibrariesPath());
+        TransactionalFileSystem::openRO(mLibrariesPath);
     QList<std::shared_ptr<Library>> libraries;
     getLibrariesOfDirectory(fs, "local", libraries);
     getLibrariesOfDirectory(fs, "remote", libraries);
@@ -222,8 +221,7 @@ QHash<FilePath, int> WorkspaceLibraryScanner::updateLibraries(
   db.exec(query);
   while (query.next()) {
     int id = query.value(0).toInt();
-    FilePath fp =
-        mWorkspace.getLibrariesPath().getPathTo(query.value(1).toString());
+    FilePath fp = mLibrariesPath.getPathTo(query.value(1).toString());
     if (!fp.isValid()) throw LogicError(__FILE__, __LINE__);
     dbLibIds.insert(fp, id);
   }
@@ -233,10 +231,10 @@ QHash<FilePath, int> WorkspaceLibraryScanner::updateLibraries(
     FilePath fp = lib->getDirectory().getAbsPath();
     if (dbLibIds.contains(fp)) {
       writer.updateLibrary(fp, lib->getUuid(), lib->getVersion(),
-                           lib->getIcon());
+                           lib->isDeprecated(), lib->getIcon());
     } else {
       int id = writer.addLibrary(fp, lib->getUuid(), lib->getVersion(),
-                                 lib->getIcon());
+                                 lib->isDeprecated(), lib->getIcon());
       dbLibIds.insert(fp, id);
     }
   }
@@ -288,9 +286,9 @@ template <typename ElementType>
 int WorkspaceLibraryScanner::addElementToDb(WorkspaceLibraryDbWriter& writer,
                                             int libId,
                                             const ElementType& element) {
-  const int id =
-      writer.addElement<ElementType>(libId, element.getDirectory().getAbsPath(),
-                                     element.getUuid(), element.getVersion());
+  const int id = writer.addElement<ElementType>(
+      libId, element.getDirectory().getAbsPath(), element.getUuid(),
+      element.getVersion(), element.isDeprecated());
   addToCategories(writer, id, element);
   return id;
 }
@@ -301,7 +299,7 @@ int WorkspaceLibraryScanner::addElementToDb<ComponentCategory>(
     const ComponentCategory& element) {
   return writer.addCategory<ComponentCategory>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.getParentUuid());
+      element.getVersion(), element.isDeprecated(), element.getParentUuid());
 }
 
 template <>
@@ -310,16 +308,16 @@ int WorkspaceLibraryScanner::addElementToDb<PackageCategory>(
     const PackageCategory& element) {
   return writer.addCategory<PackageCategory>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.getParentUuid());
+      element.getVersion(), element.isDeprecated(), element.getParentUuid());
 }
 
 template <>
 int WorkspaceLibraryScanner::addElementToDb<Device>(
     WorkspaceLibraryDbWriter& writer, int libId, const Device& element) {
-  const int id =
-      writer.addDevice(libId, element.getDirectory().getAbsPath(),
-                       element.getUuid(), element.getVersion(),
-                       element.getComponentUuid(), element.getPackageUuid());
+  const int id = writer.addDevice(
+      libId, element.getDirectory().getAbsPath(), element.getUuid(),
+      element.getVersion(), element.isDeprecated(), element.getComponentUuid(),
+      element.getPackageUuid());
   addToCategories(writer, id, element);
   return id;
 }

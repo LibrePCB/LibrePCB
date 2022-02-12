@@ -127,11 +127,11 @@ void LibraryManager::updateLibraryList() noexcept {
   // add all existing libraries
   try {
     QMultiMap<Version, FilePath> libraries =
-        mWorkspace.getLibraryDb().getLibraries();  // can throw
+        mWorkspace.getLibraryDb().getAll<Library>();  // can throw
 
     foreach (const FilePath& libDir, libraries) {
       QString name, description, keywords;
-      mWorkspace.getLibraryDb().getElementTranslations<Library>(
+      mWorkspace.getLibraryDb().getTranslations<Library>(
           libDir, mWorkspace.getSettings().libraryLocaleOrder.get(), &name,
           &description, &keywords);  // can throw
       QPixmap icon;

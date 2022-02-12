@@ -66,20 +66,24 @@ public:
    *
    * @param category  The category to get the tree from. If tl::nullopt,
    *                  it is assumed to represent the root category.
+   * @param success   If not sullptr, this is set to whether the tree was
+   *                  successfully built or not.
    * @return All category names. The top level category comes first (root
    *         category if `nulloptIsRootCategory=true` passed to the
    *         constructor), then down the tree, with the passed category as
-   *         the last element.
+   *         the last element. In case of invalid categories, the returned list
+   *         is either empty or contains error messages.
    * @throw In case of database errors.
    */
-  QStringList buildTree(const tl::optional<Uuid>& category) const;
+  QStringList buildTree(const tl::optional<Uuid>& category,
+                        bool* success = nullptr) const;
 
   // Operator Overloadings
   CategoryTreeBuilder& operator=(const CategoryTreeBuilder& rhs) = delete;
 
 private:  // Methods
-  FilePath getLatestCategory(const Uuid& category) const;
-  QList<Uuid> getCategoryParents(const Uuid& category) const;
+  bool getParentNames(const tl::optional<Uuid>& category, QStringList& names,
+                      QSet<FilePath>& filePaths) const;
 
 private:  // Data
   const WorkspaceLibraryDb& mDb;

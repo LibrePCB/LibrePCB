@@ -86,7 +86,7 @@ Workspace::Workspace(const FilePath& wsPath,
                             qApp->getFileFormatVersion(), this));
 
   // load library database
-  mLibraryDb.reset(new WorkspaceLibraryDb(*this));  // can throw
+  mLibraryDb.reset(new WorkspaceLibraryDb(getLibrariesPath()));  // can throw
 }
 
 Workspace::~Workspace() noexcept {

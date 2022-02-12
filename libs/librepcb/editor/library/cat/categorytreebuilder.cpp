@@ -57,22 +57,12 @@ CategoryTreeBuilder<ElementType>::~CategoryTreeBuilder() noexcept {
 
 template <typename ElementType>
 QStringList CategoryTreeBuilder<ElementType>::buildTree(
-    const tl::optional<Uuid>& category) const {
-  QList<Uuid> uuids;
-  if (category) {
-    uuids.append(*category);
-    uuids.append(getCategoryParents(*category));  // can throw
-  }
+    const tl::optional<Uuid>& category, bool* success) const {
   QStringList names;
-  foreach (const Uuid& uuid, uuids) {
-    FilePath filepath = getLatestCategory(uuid);  // can throw
-    QString name;
-    mDb.getElementTranslations<ElementType>(filepath, mLocaleOrder,
-                                            &name);  // can throw
-    names.prepend(name);
-  }
-  if (mNulloptIsRootCategory) {
-    names.prepend(tr("Root category"));
+  QSet<FilePath> paths;
+  bool isSuccessful = getParentNames(category, names, paths);  // can throw
+  if (success) {
+    *success = isSuccessful;
   }
   return names;
 }
@@ -81,28 +71,33 @@ QStringList CategoryTreeBuilder<ElementType>::buildTree(
  *  Private Methods
  ******************************************************************************/
 
-template <>
-FilePath CategoryTreeBuilder<ComponentCategory>::getLatestCategory(
-    const Uuid& category) const {
-  return mDb.getLatestComponentCategory(category);
-}
-
-template <>
-FilePath CategoryTreeBuilder<PackageCategory>::getLatestCategory(
-    const Uuid& category) const {
-  return mDb.getLatestPackageCategory(category);
-}
-
-template <>
-QList<Uuid> CategoryTreeBuilder<ComponentCategory>::getCategoryParents(
-    const Uuid& category) const {
-  return mDb.getComponentCategoryParents(category);
-}
-
-template <>
-QList<Uuid> CategoryTreeBuilder<PackageCategory>::getCategoryParents(
-    const Uuid& category) const {
-  return mDb.getPackageCategoryParents(category);
+template <typename ElementType>
+bool CategoryTreeBuilder<ElementType>::getParentNames(
+    const tl::optional<Uuid>& category, QStringList& names,
+    QSet<FilePath>& filePaths) const {
+  if (category) {
+    QString name;
+    tl::optional<Uuid> parent;
+    FilePath fp = mDb.getLatest<ElementType>(*category);
+    if (filePaths.contains(fp)) {
+      names.prepend("ERROR: Endless recursion");
+      return false;
+    } else {
+      filePaths.insert(fp);
+    }
+    if (fp.isValid() &&
+        mDb.getTranslations<ElementType>(fp, mLocaleOrder, &name) &&
+        mDb.getCategoryMetadata<ElementType>(fp, &parent)) {
+      names.prepend(name);
+      return getParentNames(parent, names, filePaths);
+    } else {
+      names.prepend(tr("ERROR: %1 not found").arg(category->toStr().left(8)));
+      return false;
+    }
+  } else if (mNulloptIsRootCategory) {
+    names.prepend(tr("Root category"));
+  }
+  return true;
 }
 
 /*******************************************************************************

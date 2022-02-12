@@ -83,11 +83,12 @@ public:
    * @param fp            Filepath of the library.
    * @param uuid          UUID of the library.
    * @param version       Version of the library.
+   * @param deprecated    Whether the library is deprecated or not.
    * @param iconPng       Icon as a PNG.
    * @return ID of the added library.
    */
   int addLibrary(const FilePath& fp, const Uuid& uuid, const Version& version,
-                 const QByteArray& iconPng);
+                 bool deprecated, const QByteArray& iconPng);
 
   /**
    * @brief Update library metadata
@@ -95,10 +96,12 @@ public:
    * @param fp            Filepath of the library to update.
    * @param uuid          New UUID of the library.
    * @param version       New version of the library.
+   * @param deprecated    Whether the library is deprecated or not.
    * @param iconPng       New icon as a PNG.
    */
   void updateLibrary(const FilePath& fp, const Uuid& uuid,
-                     const Version& version, const QByteArray& iconPng);
+                     const Version& version, bool deprecated,
+                     const QByteArray& iconPng);
 
   /**
    * @brief Add a library element
@@ -108,16 +111,18 @@ public:
    * @param fp            Filepath of the element.
    * @param uuid          UUID of the element.
    * @param version       Version of the element.
+   * @param deprecated    Whether the element is deprecated or not.
    * @return ID of the added element.
    */
   template <typename ElementType>
   int addElement(int libId, const FilePath& fp, const Uuid& uuid,
-                 const Version& version) {
+                 const Version& version, bool deprecated) {
     static_assert(std::is_same<ElementType, Symbol>::value ||
                       std::is_same<ElementType, Package>::value ||
                       std::is_same<ElementType, Component>::value,
                   "Unsupported ElementType");
-    return addElement(getElementTable<ElementType>(), libId, fp, uuid, version);
+    return addElement(getElementTable<ElementType>(), libId, fp, uuid, version,
+                      deprecated);
   }
 
   /**
@@ -128,17 +133,19 @@ public:
    * @param fp            Filepath of the category.
    * @param uuid          UUID of the category.
    * @param version       Version of the category.
+   * @param deprecated    Whether the category is deprecated or not.
    * @param parent        Parent of the category.
    * @return ID of the added category.
    */
   template <typename ElementType>
   int addCategory(int libId, const FilePath& fp, const Uuid& uuid,
-                  const Version& version, const tl::optional<Uuid>& parent) {
+                  const Version& version, bool deprecated,
+                  const tl::optional<Uuid>& parent) {
     static_assert(std::is_same<ElementType, ComponentCategory>::value ||
                       std::is_same<ElementType, PackageCategory>::value,
                   "Unsupported ElementType");
     return addCategory(getElementTable<ElementType>(), libId, fp, uuid, version,
-                       parent);
+                       deprecated, parent);
   }
 
   /**
@@ -148,12 +155,13 @@ public:
    * @param fp            Filepath of the device.
    * @param uuid          UUID of the device.
    * @param version       Version of the device.
+   * @param deprecated    Whether the device is deprecated or not.
    * @param component     Component UUID of the device.
    * @param package       Package UUID of the device.
    * @return ID of the added device.
    */
   int addDevice(int libId, const FilePath& fp, const Uuid& uuid,
-                const Version& version, const Uuid& component,
+                const Version& version, bool deprecated, const Uuid& component,
                 const Uuid& package);
 
   /**
@@ -199,8 +207,7 @@ public:
                      const tl::optional<ElementName>& name,
                      const tl::optional<QString>& description,
                      const tl::optional<QString>& keywords) {
-    return addTranslation(getElementTable<ElementType>(),
-                          getElementIdColumn<ElementType>(), elementId, locale,
+    return addTranslation(getElementTable<ElementType>(), elementId, locale,
                           name, description, keywords);
   }
 
@@ -229,9 +236,7 @@ public:
                       std::is_same<ElementType, Component>::value ||
                       std::is_same<ElementType, Device>::value,
                   "Unsupported ElementType");
-    return addToCategory(getElementTable<ElementType>(),
-                         getElementIdColumn<ElementType>(), elementId,
-                         category);
+    return addToCategory(getElementTable<ElementType>(), elementId, category);
   }
 
   // Helper Functions
@@ -244,15 +249,6 @@ public:
    */
   template <typename ElementType>
   static QString getElementTable() noexcept;
-
-  /**
-   * @brief Get the ID column name of an element type
-   *
-   * @tparam ElementType  Type of element to get the column name of.
-   * @return Column name (e.g. "symbol_id" for ::librepcb::Symbol).
-   */
-  template <typename ElementType>
-  static QString getElementIdColumn() noexcept;
 
   /**
    * @brief Get the category table name of an element type
@@ -270,20 +266,20 @@ public:
 
 private:  // Methods
   int addElement(const QString& elementsTable, int libId, const FilePath& fp,
-                 const Uuid& uuid, const Version& version);
+                 const Uuid& uuid, const Version& version, bool deprecated);
   int addCategory(const QString& categoriesTable, int libId, const FilePath& fp,
-                  const Uuid& uuid, const Version& version,
+                  const Uuid& uuid, const Version& version, bool deprecated,
                   const tl::optional<Uuid>& parent);
   void removeElement(const QString& elementsTable, const FilePath& fp);
   void removeAllElements(const QString& elementsTable);
-  int addTranslation(const QString& elementsTable, const QString& idColumn,
-                     int elementId, const QString& locale,
+  int addTranslation(const QString& elementsTable, int elementId,
+                     const QString& locale,
                      const tl::optional<ElementName>& name,
                      const tl::optional<QString>& description,
                      const tl::optional<QString>& keywords);
   void removeAllTranslations(const QString& elementsTable);
-  int addToCategory(const QString& elementsTable, const QString& idColumn,
-                    int elementId, const Uuid& category);
+  int addToCategory(const QString& elementsTable, int elementId,
+                    const Uuid& category);
   QString filePathToString(const FilePath& fp) const noexcept;
 
 private:  // Data

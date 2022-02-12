@@ -193,11 +193,11 @@ void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
     tl::optional<Version> installedVersion;
     try {
       FilePath fp =
-          mWorkspace.getLibraryDb().getLatestLibrary(*mUuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Library>(*mUuid);  // can throw
       if (fp.isValid()) {
         Version v = Version::fromString("0.1");  // only for initialization
-        mWorkspace.getLibraryDb().getElementMetadata<Library>(fp, nullptr,
-                                                              &v);  // can throw
+        mWorkspace.getLibraryDb().getMetadata<Library>(fp, nullptr,
+                                                       &v);  // can throw
         installedVersion = v;
       }
     } catch (const Exception& e) {

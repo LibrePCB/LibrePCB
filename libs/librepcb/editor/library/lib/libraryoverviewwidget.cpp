@@ -318,12 +318,13 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
 
   try {
     // get all library element names
-    QList<FilePath> elements =
-        mContext.workspace.getLibraryDb().getLibraryElements<ElementType>(
+    QMultiMap<Version, FilePath> elements =
+        mContext.workspace.getLibraryDb().getAll<ElementType>(
+            tl::nullopt,
             mLibrary->getDirectory().getAbsPath());  // can throw
     foreach (const FilePath& filepath, elements) {
       QString name;
-      mContext.workspace.getLibraryDb().getElementTranslations<ElementType>(
+      mContext.workspace.getLibraryDb().getTranslations<ElementType>(
           filepath, getLibLocaleOrder(), &name);  // can throw
       elementNames.insert(filepath, name);
     }
@@ -620,12 +621,12 @@ QList<LibraryOverviewWidget::LibraryMenuItem>
   QList<LibraryMenuItem> libs;
   try {
     QMultiMap<Version, FilePath> libraries =
-        mContext.workspace.getLibraryDb().getLibraries();  // can throw
+        mContext.workspace.getLibraryDb().getAll<Library>();  // can throw
     foreach (const FilePath& libDir, libraries) {
       // Don't list remote libraries since they are read-only!
       if (libDir.isLocatedInDir(mContext.workspace.getLocalLibrariesPath())) {
         QString name;
-        mContext.workspace.getLibraryDb().getElementTranslations<Library>(
+        mContext.workspace.getLibraryDb().getTranslations<Library>(
             libDir, getLibLocaleOrder(), &name);  // can throw
         QPixmap icon;
         mContext.workspace.getLibraryDb().getLibraryMetadata(

@@ -57,34 +57,32 @@ LibraryElementCache::~LibraryElementCache() noexcept {
 
 std::shared_ptr<const ComponentCategory>
     LibraryElementCache::getComponentCategory(const Uuid& uuid) const noexcept {
-  return getElement(&WorkspaceLibraryDb::getLatestComponentCategory, mCmpCat,
-                    uuid);
+  return getElement(mCmpCat, uuid);
 }
 
 std::shared_ptr<const PackageCategory> LibraryElementCache::getPackageCategory(
     const Uuid& uuid) const noexcept {
-  return getElement(&WorkspaceLibraryDb::getLatestPackageCategory, mPkgCat,
-                    uuid);
+  return getElement(mPkgCat, uuid);
 }
 
 std::shared_ptr<const Symbol> LibraryElementCache::getSymbol(
     const Uuid& uuid) const noexcept {
-  return getElement(&WorkspaceLibraryDb::getLatestSymbol, mSym, uuid);
+  return getElement(mSym, uuid);
 }
 
 std::shared_ptr<const Package> LibraryElementCache::getPackage(
     const Uuid& uuid) const noexcept {
-  return getElement(&WorkspaceLibraryDb::getLatestPackage, mPkg, uuid);
+  return getElement(mPkg, uuid);
 }
 
 std::shared_ptr<const Component> LibraryElementCache::getComponent(
     const Uuid& uuid) const noexcept {
-  return getElement(&WorkspaceLibraryDb::getLatestComponent, mCmp, uuid);
+  return getElement(mCmp, uuid);
 }
 
 std::shared_ptr<const Device> LibraryElementCache::getDevice(
     const Uuid& uuid) const noexcept {
-  return getElement(&WorkspaceLibraryDb::getLatestDevice, mDev, uuid);
+  return getElement(mDev, uuid);
 }
 
 /*******************************************************************************
@@ -93,13 +91,12 @@ std::shared_ptr<const Device> LibraryElementCache::getDevice(
 
 template <typename T>
 std::shared_ptr<const T> LibraryElementCache::getElement(
-    FilePath (WorkspaceLibraryDb::*getter)(const Uuid&) const,
     QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
     noexcept {
   std::shared_ptr<const T> element = container.value(uuid);
   if ((!element) && mDb) {
     try {
-      FilePath fp = (mDb->*getter)(uuid);
+      FilePath fp = mDb->getLatest<T>(uuid);
       element = std::make_shared<T>(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
       container.insert(uuid, element);

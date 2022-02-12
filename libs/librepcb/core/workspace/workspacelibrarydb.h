@@ -25,17 +25,24 @@
  ******************************************************************************/
 #include "../fileio/filepath.h"
 #include "../types/uuid.h"
+#include "../types/version.h"
 
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
+class QSqlQuery;
+
 namespace librepcb {
 
+class Component;
+class ComponentCategory;
+class Device;
+class Package;
+class PackageCategory;
 class SQLiteDatabase;
-class Version;
-class Workspace;
+class Symbol;
 class WorkspaceLibraryScanner;
 
 /*******************************************************************************
@@ -56,74 +63,227 @@ public:
   /**
    * @brief Constructor to open the library database of an existing workspace
    *
-   * @param ws     The workspace object
+   * @param librariesPath   Path to the workspace libraries directory.
    *
    * @throw Exception If the library could not be opened, this constructor
    * throws an exception.
    */
-  explicit WorkspaceLibraryDb(Workspace& ws);
+  explicit WorkspaceLibraryDb(const FilePath& librariesPath);
   ~WorkspaceLibraryDb() noexcept;
 
-  // Getters: Attributes
+  // Getters
+
+  /**
+   * @brief Get the file path of the SQLite database
+   *
+   * @return Path to the *.sqlite file
+   */
   const FilePath& getFilePath() const noexcept { return mFilePath; }
 
-  // Getters: Libraries
-  QMultiMap<Version, FilePath> getLibraries() const;
-
-  // Getters: Library Elements by their UUID
-  QMultiMap<Version, FilePath> getLibraries(const Uuid& uuid) const;
-  QMultiMap<Version, FilePath> getComponentCategories(const Uuid& uuid) const;
-  QMultiMap<Version, FilePath> getPackageCategories(const Uuid& uuid) const;
-  QMultiMap<Version, FilePath> getSymbols(const Uuid& uuid) const;
-  QMultiMap<Version, FilePath> getPackages(const Uuid& uuid) const;
-  QMultiMap<Version, FilePath> getComponents(const Uuid& uuid) const;
-  QMultiMap<Version, FilePath> getDevices(const Uuid& uuid) const;
-
-  // Getters: Best Match Library Elements by their UUID
-  FilePath getLatestLibrary(const Uuid& uuid) const;
-  FilePath getLatestComponentCategory(const Uuid& uuid) const;
-  FilePath getLatestPackageCategory(const Uuid& uuid) const;
-  FilePath getLatestSymbol(const Uuid& uuid) const;
-  FilePath getLatestPackage(const Uuid& uuid) const;
-  FilePath getLatestComponent(const Uuid& uuid) const;
-  FilePath getLatestDevice(const Uuid& uuid) const;
-
-  // Getters: Library elements by search keyword
+  /**
+   * @brief Get elements, optionally matching some criteria
+   *
+   * @tparam ElementType  Type of the library element.
+   *
+   * @param uuid  If not nullopt, only elements with this UUID are returned.
+   * @param lib   If valid, only elements from this library are returned.
+   *              Attention: Must not be used when ElementType is Library!
+   *
+   * @return Version and filepath of all elements matching the criteria.
+   */
   template <typename ElementType>
-  QList<Uuid> getElementsBySearchKeyword(const QString& keyword) const;
+  QMultiMap<Version, FilePath> getAll(
+      const tl::optional<Uuid>& uuid = tl::nullopt,
+      const FilePath& lib = FilePath()) const {
+    return getAll(getTable<ElementType>(), uuid, lib);
+  }
 
-  // Getters: Library elements of a specified library
+  /**
+   * @brief Get an element of a specific UUID and the highest version
+   *
+   * @param uuid  The UUID of the element to get.
+   *
+   * @return  Filepath of the element with the highest version number and the
+   *          specified UUID. If no element is found, an invalid filepath
+   *          will be returned.
+   */
   template <typename ElementType>
-  QList<FilePath> getLibraryElements(const FilePath& lib) const;
+  FilePath getLatest(const Uuid& uuid) const {
+    return getLatestVersionFilePath(getAll<ElementType>(uuid));
+  }
 
-  // Getters: Element Metadata
+  /**
+   * @brief Find elements by keyword
+   *
+   * @param keyword   Keyword to search for. Note that the translations for
+   *                  all languages will be taken into account.
+   *
+   * @return  UUIDs of elements matching the filter, sorted alphabetically
+   *          and without duplicates. Empty if no elements were found.
+   */
   template <typename ElementType>
-  void getElementTranslations(const FilePath& elemDir,
-                              const QStringList& localeOrder,
-                              QString* name = nullptr, QString* desc = nullptr,
-                              QString* keywords = nullptr) const;
-  template <typename ElementType>
-  void getElementMetadata(const FilePath elemDir, Uuid* uuid = nullptr,
-                          Version* version = nullptr) const;
-  void getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr) const;
-  void getDeviceMetadata(const FilePath& devDir, Uuid* pkgUuid = nullptr,
-                         Uuid* cmpUuid = nullptr) const;
+  QList<Uuid> find(const QString& keyword) const {
+    return find(getTable<ElementType>(), keyword);
+  }
 
-  // Getters: Special
-  QSet<Uuid> getComponentCategoryChilds(const tl::optional<Uuid>& parent) const;
-  QSet<Uuid> getPackageCategoryChilds(const tl::optional<Uuid>& parent) const;
-  QList<Uuid> getComponentCategoryParents(const Uuid& category) const;
-  QList<Uuid> getPackageCategoryParents(const Uuid& category) const;
-  void getComponentCategoryElementCount(const tl::optional<Uuid>& category,
-                                        int* categories, int* symbols,
-                                        int* components, int* devices) const;
-  void getPackageCategoryElementCount(const tl::optional<Uuid>& category,
-                                      int* categories, int* packages) const;
-  QSet<Uuid> getSymbolsByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid> getPackagesByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid> getComponentsByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid> getDevicesByCategory(const tl::optional<Uuid>& category) const;
-  QSet<Uuid> getDevicesOfComponent(const Uuid& component) const;
+  /**
+   * @brief Get translations of a specific element
+   *
+   * @tparam ElementType  Type of the library element.
+   *
+   * @param elemDir       Library element directory. If it does not exist,
+   *                      all translations will be set to an empty string.
+   * @param localeOrder   Locale order (highest priority first).
+   * @param name          If not nullptr, name will be written here. Set to
+   *                      an empty string if the requested data does not exist.
+   * @param description   If not nullptr, desc. will be written here. Set to
+   *                      an empty string if the requested data does not exist.
+   * @param keywords      If not nullptr, keywords will be written here. Set to
+   *                      an empty string if the requested data does not exist.
+   *
+   * @retval true         If the element and corresponding translations were
+   *                      found in the database.
+   * @retval false        If the element was not found or contains no
+   *                      translations ar all.
+   */
+  template <typename ElementType>
+  bool getTranslations(const FilePath& elemDir, const QStringList& localeOrder,
+                       QString* name = nullptr, QString* description = nullptr,
+                       QString* keywords = nullptr) const {
+    return getTranslations(getTable<ElementType>(), elemDir, localeOrder, name,
+                           description, keywords);
+  }
+
+  /**
+   * @brief Get metadata of a specific element
+   *
+   * @tparam ElementType  Type of the library element.
+   *
+   * @param elemDir       Library element directory.
+   * @param uuid          If not nullptr and the element was found, its
+   *                      UUID will be written here.
+   * @param version       If not nullptr and the element was found, its
+   *                      version will be written here.
+   * @param deprecated    If not nullptr and the element was found, its
+   *                      deprecation flag will be written here.
+   *
+   * @retval true If the element was found in the database.
+   * @retval false If the element was not found.
+   */
+  template <typename ElementType>
+  bool getMetadata(const FilePath elemDir, Uuid* uuid = nullptr,
+                   Version* version = nullptr,
+                   bool* deprecated = nullptr) const {
+    return getMetadata(getTable<ElementType>(), elemDir, uuid, version,
+                       deprecated);
+  }
+
+  /**
+   * @brief Get additional metadata of a specific library
+   *
+   * @param libDir        Library directory.
+   * @param icon          If not nullptr and the library was found, its
+   *                      icon will be written here.
+   *
+   * @retval true If the library was found in the database.
+   * @retval false If the library was not found.
+   */
+  bool getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr) const;
+
+  /**
+   * @brief Get additional metadata of a specific category
+   *
+   * @tparam ElementType  Type of the library element.
+   *
+   * @param catDir        Category directory.
+   * @param parent        If not nullptr and the category was found, its
+   *                      parent will be written here.
+   *
+   * @retval true If the category was found in the database.
+   * @retval false If the category was not found.
+   */
+  template <typename ElementType>
+  bool getCategoryMetadata(const FilePath catDir,
+                           tl::optional<Uuid>* parent = nullptr) const {
+    static_assert(std::is_same<ElementType, ComponentCategory>::value ||
+                      std::is_same<ElementType, PackageCategory>::value,
+                  "Unsupported ElementType");
+    return getCategoryMetadata(getTable<ElementType>(), catDir, parent);
+  }
+
+  /**
+   * @brief Get additional metadata of a specific device
+   *
+   * @param devDir        Device directory.
+   * @param pkgUuid       If not nullptr and the device was found, its
+   *                      package UUID will be written here.
+   * @param cmpUuid       If not nullptr and the device was found, its
+   *                      component UUID will be written here.
+   *
+   * @retval true If the device was found in the database.
+   * @retval false If the device was not found.
+   */
+  bool getDeviceMetadata(const FilePath& devDir, Uuid* cmpUuid = nullptr,
+                         Uuid* pkgUuid = nullptr) const;
+
+  /**
+   * @brief Get children categories of a specific category
+   *
+   * @tparam ElementType  Type of the category.
+   *
+   * @param parent        Category to get the children of. If nullopt,
+   *                      all root categories, and categories with inexistent
+   *                      parent will be returned (this ensures that all
+   *                      elements are discoverable by #getByCategory()).
+   *
+   * @return  UUIDs of children categories. Empty if the passed category
+   *          doesn't exist.
+   */
+  template <typename ElementType>
+  QSet<Uuid> getChilds(const tl::optional<Uuid>& parent) const {
+    static_assert(std::is_same<ElementType, ComponentCategory>::value ||
+                      std::is_same<ElementType, PackageCategory>::value,
+                  "Unsupported ElementType");
+    return getChilds(getTable<ElementType>(), parent);
+  }
+
+  /**
+   * @brief Get elements of a specific category
+   *
+   * @tparam ElementType  Type of the library element.
+   *
+   * @param category      Category to get the elements of. If nullopt,
+   *                      all elements with no category at all, or with only
+   *                      inexistent categories are returned.
+   * @param limit         If not -1, the number of results is limited to this
+   *                      value. This can be used for performance reasons,
+   *                      for example if you only want to know if there are
+   *                      *any* elements in the given category, the limit can
+   *                      be set to 1, which is much faster than retrieving
+   *                      all results.
+   *
+   * @return UUIDs of elements. Empty if the passed category doesn't exist.
+   */
+  template <typename ElementType>
+  QSet<Uuid> getByCategory(const tl::optional<Uuid>& category,
+                           int limit = -1) const {
+    static_assert(std::is_same<ElementType, Symbol>::value ||
+                      std::is_same<ElementType, Package>::value ||
+                      std::is_same<ElementType, Component>::value ||
+                      std::is_same<ElementType, Device>::value,
+                  "Unsupported ElementType");
+    return getByCategory(getTable<ElementType>(),
+                         getCategoryTable<ElementType>(), category, limit);
+  }
+
+  /**
+   * @brief Get all devices of a specific component
+   *
+   * @param component   Component UUID to get the devices of.
+   *
+   * @return UUIDs of devices. Empty if the passed component doesn't exist.
+   */
+  QSet<Uuid> getComponentDevices(const Uuid& component) const;
 
   // General Methods
 
@@ -136,7 +296,6 @@ public:
   WorkspaceLibraryDb& operator=(const WorkspaceLibraryDb& rhs) = delete;
 
 signals:
-
   void scanStarted();
   void scanLibraryListUpdated(int libraryCount);
   void scanProgressUpdate(int percent);
@@ -146,46 +305,40 @@ signals:
 
 private:
   // Private Methods
-  void getElementTranslations(const QString& table, const QString& idRow,
-                              const FilePath& elemDir,
-                              const QStringList& localeOrder, QString* name,
-                              QString* desc, QString* keywords) const;
-  void getElementMetadata(const QString& table, const FilePath elemDir,
-                          Uuid* uuid, Version* version) const;
-  QMultiMap<Version, FilePath> getElementFilePathsFromDb(
-      const QString& tablename, const Uuid& uuid) const;
+  QMultiMap<Version, FilePath> getAll(const QString& elementsTable,
+                                      const tl::optional<Uuid>& uuid,
+                                      const FilePath& lib) const;
   FilePath getLatestVersionFilePath(
       const QMultiMap<Version, FilePath>& list) const noexcept;
-  QSet<Uuid> getCategoryChilds(const QString& tablename,
-                               const tl::optional<Uuid>& categoryUuid) const;
-  QList<Uuid> getCategoryParents(const QString& tablename,
-                                 const Uuid& category) const;
-  tl::optional<Uuid> getCategoryParent(const QString& tablename,
-                                       const Uuid& category) const;
-  int getCategoryChildCount(const QString& tablename,
-                            const tl::optional<Uuid>& category) const;
-  int getCategoryElementCount(const QString& tablename,
-                              const QString& idrowname,
-                              const tl::optional<Uuid>& category) const;
-  QSet<Uuid> getElementsByCategory(
-      const QString& tablename, const QString& idrowname,
-      const tl::optional<Uuid>& categoryUuid) const;
-  QList<Uuid> getElementsBySearchKeyword(const QString& tablename,
-                                         const QString& idrowname,
-                                         const QString& keyword) const;
-  int getLibraryId(const FilePath& lib) const;
-  QList<FilePath> getLibraryElements(const FilePath& lib,
-                                     const QString& tablename) const;
+  QList<Uuid> find(const QString& elementsTable, const QString& keyword) const;
+  bool getTranslations(const QString& elementsTable, const FilePath& elemDir,
+                       const QStringList& localeOrder, QString* name,
+                       QString* description, QString* keywords) const;
+  bool getMetadata(const QString& elementsTable, const FilePath elemDir,
+                   Uuid* uuid, Version* version, bool* deprecated) const;
+  bool getCategoryMetadata(const QString& categoriesTable,
+                           const FilePath catDir,
+                           tl::optional<Uuid>* parent) const;
+  QSet<Uuid> getChilds(const QString& categoriesTable,
+                       const tl::optional<Uuid>& categoryUuid) const;
+  QSet<Uuid> getByCategory(const QString& elementsTable,
+                           const QString& categoryTable,
+                           const tl::optional<Uuid>& category, int limit) const;
+  static QSet<Uuid> getUuidSet(QSqlQuery& query);
   int getDbVersion() const noexcept;
+  template <typename ElementType>
+  static QString getTable() noexcept;
+  template <typename ElementType>
+  static QString getCategoryTable() noexcept;
 
   // Attributes
-  Workspace& mWorkspace;
-  FilePath mFilePath;  ///< path to the SQLite database
-  QScopedPointer<SQLiteDatabase> mDb;  ///< the SQLite database
+  const FilePath mLibrariesPath;  ///< Path to workspace libraries directory.
+  const FilePath mFilePath;  ///< Path to the SQLite database file.
+  QScopedPointer<SQLiteDatabase> mDb;  ///< The SQLite database.
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants
-  static const int sCurrentDbVersion = 2;
+  static const int sCurrentDbVersion = 3;
 };
 
 /*******************************************************************************

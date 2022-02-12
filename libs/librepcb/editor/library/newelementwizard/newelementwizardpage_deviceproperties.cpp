@@ -99,10 +99,10 @@ void NewElementWizardPage_DeviceProperties::setComponent(
   mContext.mDeviceComponentUuid = uuid;
   if (uuid) {
     try {
-      FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestComponent(
+      FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Component>(
           *uuid);  // can throw
       QString name, desc;
-      mContext.getWorkspace().getLibraryDb().getElementTranslations<Component>(
+      mContext.getWorkspace().getLibraryDb().getTranslations<Component>(
           fp, mContext.getLibLocaleOrder(), &name, &desc);  // can throw
       mUi->lblComponentName->setText(name);
       mUi->lblComponentDescription->setText(desc);
@@ -122,7 +122,7 @@ void NewElementWizardPage_DeviceProperties::setPackage(
   mContext.mDevicePackageUuid = uuid;
   if (uuid) {
     try {
-      FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestPackage(
+      FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Package>(
           *uuid);  // can throw
       Package package(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
