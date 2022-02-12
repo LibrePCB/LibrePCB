@@ -294,21 +294,20 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
 
   // add matching devices and their corresponding components
   QList<Uuid> devices =
-      mWorkspace.getLibraryDb().getElementsBySearchKeyword<Device>(
-          input);  // can throw
+      mWorkspace.getLibraryDb().find<Device>(input);  // can throw
   foreach (const Uuid& devUuid, devices) {
     FilePath devFp =
-        mWorkspace.getLibraryDb().getLatestDevice(devUuid);  // can throw
+        mWorkspace.getLibraryDb().getLatest<Device>(devUuid);  // can throw
     if (!devFp.isValid()) continue;
     Uuid cmpUuid = Uuid::createRandom();
     Uuid pkgUuid = Uuid::createRandom();
-    mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid,
-                                                &cmpUuid);  // can throw
+    mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &cmpUuid,
+                                                &pkgUuid);  // can throw
     FilePath cmpFp =
-        mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);  // can throw
+        mWorkspace.getLibraryDb().getLatest<Component>(cmpUuid);  // can throw
     if (!cmpFp.isValid()) continue;
     FilePath pkgFp =
-        mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
+        mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);  // can throw
     SearchResultDevice& resDev = result[cmpFp].devices[devFp];
     resDev.pkgFp = pkgFp;
     resDev.match = true;
@@ -316,26 +315,25 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
 
   // add matching components and all their devices
   QList<Uuid> components =
-      mWorkspace.getLibraryDb().getElementsBySearchKeyword<Component>(
-          input);  // can throw
+      mWorkspace.getLibraryDb().find<Component>(input);  // can throw
   foreach (const Uuid& cmpUuid, components) {
     FilePath cmpFp =
-        mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);  // can throw
+        mWorkspace.getLibraryDb().getLatest<Component>(cmpUuid);  // can throw
     if (!cmpFp.isValid()) continue;
     QSet<Uuid> devices =
-        mWorkspace.getLibraryDb().getDevicesOfComponent(cmpUuid);  // can throw
+        mWorkspace.getLibraryDb().getComponentDevices(cmpUuid);  // can throw
     SearchResultComponent& resCmp = result[cmpFp];
     resCmp.match = true;
     foreach (const Uuid& devUuid, devices) {
       FilePath devFp =
-          mWorkspace.getLibraryDb().getLatestDevice(devUuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Device>(devUuid);  // can throw
       if (!devFp.isValid()) continue;
       if (resCmp.devices.contains(devFp)) continue;
       Uuid pkgUuid = Uuid::createRandom();
-      mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid,
-                                                  nullptr);  // can throw
+      mWorkspace.getLibraryDb().getDeviceMetadata(devFp, nullptr,
+                                                  &pkgUuid);  // can throw
       FilePath pkgFp =
-          mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);  // can throw
       SearchResultDevice& resDev = resCmp.devices[devFp];
       resDev.pkgFp = pkgFp;
     }
@@ -345,16 +343,16 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
   QMutableHashIterator<FilePath, SearchResultComponent> resultIt(result);
   while (resultIt.hasNext()) {
     resultIt.next();
-    mWorkspace.getLibraryDb().getElementTranslations<Component>(
+    mWorkspace.getLibraryDb().getTranslations<Component>(
         resultIt.key(), localeOrder, &resultIt.value().name);
     QMutableHashIterator<FilePath, SearchResultDevice> devIt(
         resultIt.value().devices);
     while (devIt.hasNext()) {
       devIt.next();
-      mWorkspace.getLibraryDb().getElementTranslations<Device>(
+      mWorkspace.getLibraryDb().getTranslations<Device>(
           devIt.key(), localeOrder, &devIt.value().name);
       if (devIt.value().pkgFp.isValid()) {
-        mWorkspace.getLibraryDb().getElementTranslations<Package>(
+        mWorkspace.getLibraryDb().getTranslations<Package>(
             devIt.value().pkgFp, localeOrder, &devIt.value().pkgName);
       }
     }
@@ -372,39 +370,38 @@ void AddComponentDialog::setSelectedCategory(
 
   mSelectedCategoryUuid = categoryUuid;
   QSet<Uuid> components =
-      mWorkspace.getLibraryDb().getComponentsByCategory(categoryUuid);
+      mWorkspace.getLibraryDb().getByCategory<Component>(categoryUuid);
   foreach (const Uuid& cmpUuid, components) {
     // component
-    FilePath cmpFp = mWorkspace.getLibraryDb().getLatestComponent(cmpUuid);
+    FilePath cmpFp = mWorkspace.getLibraryDb().getLatest<Component>(cmpUuid);
     if (!cmpFp.isValid()) continue;
     QString cmpName;
-    mWorkspace.getLibraryDb().getElementTranslations<Component>(
-        cmpFp, localeOrder, &cmpName);
+    mWorkspace.getLibraryDb().getTranslations<Component>(cmpFp, localeOrder,
+                                                         &cmpName);
     QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
     cmpItem->setText(0, cmpName);
     cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
     // devices
-    QSet<Uuid> devices =
-        mWorkspace.getLibraryDb().getDevicesOfComponent(cmpUuid);
+    QSet<Uuid> devices = mWorkspace.getLibraryDb().getComponentDevices(cmpUuid);
     foreach (const Uuid& devUuid, devices) {
       try {
-        FilePath devFp = mWorkspace.getLibraryDb().getLatestDevice(devUuid);
+        FilePath devFp = mWorkspace.getLibraryDb().getLatest<Device>(devUuid);
         if (!devFp.isValid()) continue;
         QString devName;
-        mWorkspace.getLibraryDb().getElementTranslations<Device>(
-            devFp, localeOrder, &devName);
+        mWorkspace.getLibraryDb().getTranslations<Device>(devFp, localeOrder,
+                                                          &devName);
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
         devItem->setText(0, devName);
         devItem->setData(0, Qt::UserRole, devFp.toStr());
         // package
         Uuid pkgUuid = Uuid::createRandom();  // only for initialization, will
                                               // be overwritten
-        mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
-        FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(pkgUuid);
+        mWorkspace.getLibraryDb().getDeviceMetadata(devFp, nullptr, &pkgUuid);
+        FilePath pkgFp = mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);
         if (pkgFp.isValid()) {
           QString pkgName;
-          mWorkspace.getLibraryDb().getElementTranslations<Package>(
-              pkgFp, localeOrder, &pkgName);
+          mWorkspace.getLibraryDb().getTranslations<Package>(pkgFp, localeOrder,
+                                                             &pkgName);
           devItem->setText(1, pkgName);
           devItem->setTextAlignment(1, Qt::AlignRight);
         }
@@ -470,7 +467,7 @@ void AddComponentDialog::setSelectedSymbVar(
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
     for (const ComponentSymbolVariantItem& item : symbVar->getSymbolItems()) {
       FilePath symbolFp =
-          mWorkspace.getLibraryDb().getLatestSymbol(item.getSymbolUuid());
+          mWorkspace.getLibraryDb().getLatest<Symbol>(item.getSymbolUuid());
       if (!symbolFp.isValid()) continue;  // TODO: show warning
       const Symbol* symbol = new Symbol(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(TransactionalFileSystem::openRO(
@@ -501,7 +498,7 @@ void AddComponentDialog::setSelectedDevice(const Device* dev) {
   if (dev) {
     mSelectedDevice = dev;
     const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    FilePath pkgFp = mWorkspace.getLibraryDb().getLatestPackage(
+    FilePath pkgFp = mWorkspace.getLibraryDb().getLatest<Package>(
         mSelectedDevice->getPackageUuid());
     if (pkgFp.isValid()) {
       mSelectedPackage = new Package(std::unique_ptr<TransactionalDirectory>(

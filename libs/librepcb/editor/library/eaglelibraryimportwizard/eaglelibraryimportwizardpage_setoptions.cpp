@@ -113,9 +113,8 @@ void EagleLibraryImportWizardPage_SetOptions::
     updateComponentCategoryTreeLabel() noexcept {
   ComponentCategoryTreeLabelTextBuilder builder(
       mContext->getWorkspace().getLibraryDb(),
-      mContext->getWorkspace().getSettings().libraryLocaleOrder.get(),
+      mContext->getWorkspace().getSettings().libraryLocaleOrder.get(), false,
       *mUi->lblComponentCategoryTree);
-  builder.setHighlightLastLine(true);
   builder.setOneLine(true);
   builder.updateText(mContext->getComponentCategory());
 }
@@ -124,9 +123,8 @@ void EagleLibraryImportWizardPage_SetOptions::
     updatePackageCategoryTreeLabel() noexcept {
   PackageCategoryTreeLabelTextBuilder builder(
       mContext->getWorkspace().getLibraryDb(),
-      mContext->getWorkspace().getSettings().libraryLocaleOrder.get(),
+      mContext->getWorkspace().getSettings().libraryLocaleOrder.get(), false,
       *mUi->lblPackageCategoryTree);
-  builder.setHighlightLastLine(true);
   builder.setOneLine(true);
   builder.updateText(mContext->getPackageCategory());
 }

@@ -1339,20 +1339,20 @@ QList<BoardEditorState_Select::DeviceMenuItem>
   QList<BoardEditorState_Select::DeviceMenuItem> items;
   try {
     QIcon icon(":/img/library/device.png");
-    QSet<Uuid> devices =
-        mContext.workspace.getLibraryDb().getDevicesOfComponent(
-            cmpInst.getLibComponent().getUuid());  // can throw
+    QSet<Uuid> devices = mContext.workspace.getLibraryDb().getComponentDevices(
+        cmpInst.getLibComponent().getUuid());  // can throw
     foreach (const Uuid& deviceUuid, devices) {
       QString devName, pkgName;
       FilePath devFp =
-          mContext.workspace.getLibraryDb().getLatestDevice(deviceUuid);
-      mContext.workspace.getLibraryDb().getElementTranslations<Device>(
+          mContext.workspace.getLibraryDb().getLatest<Device>(deviceUuid);
+      mContext.workspace.getLibraryDb().getTranslations<Device>(
           devFp, mContext.project.getSettings().getLocaleOrder(), &devName);
       Uuid pkgUuid = Uuid::createRandom();  // only for initialization...
-      mContext.workspace.getLibraryDb().getDeviceMetadata(devFp, &pkgUuid);
+      mContext.workspace.getLibraryDb().getDeviceMetadata(devFp, nullptr,
+                                                          &pkgUuid);
       FilePath pkgFp =
-          mContext.workspace.getLibraryDb().getLatestPackage(pkgUuid);
-      mContext.workspace.getLibraryDb().getElementTranslations<Package>(
+          mContext.workspace.getLibraryDb().getLatest<Package>(pkgUuid);
+      mContext.workspace.getLibraryDb().getTranslations<Package>(
           pkgFp, mContext.project.getSettings().getLocaleOrder(), &pkgName);
       items.append(DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName),
                                   icon, deviceUuid});

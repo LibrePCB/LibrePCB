@@ -130,15 +130,13 @@ void ComponentChooserDialog::searchComponents(const QString& input) {
 
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
-    QList<Uuid> components =
-        mWorkspace.getLibraryDb().getElementsBySearchKeyword<Component>(input);
+    QList<Uuid> components = mWorkspace.getLibraryDb().find<Component>(input);
     foreach (const Uuid& uuid, components) {
       FilePath fp =
-          mWorkspace.getLibraryDb().getLatestComponent(uuid);  // can throw
+          mWorkspace.getLibraryDb().getLatest<Component>(uuid);  // can throw
       QString name;
-      mWorkspace.getLibraryDb().getElementTranslations<Component>(
-          fp, localeOrder(),
-          &name);  // can throw
+      mWorkspace.getLibraryDb().getTranslations<Component>(fp, localeOrder(),
+                                                           &name);  // can throw
       QListWidgetItem* item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, uuid.toStr());
       mUi->listComponents->addItem(item);
@@ -156,13 +154,13 @@ void ComponentChooserDialog::setSelectedCategory(
   mSelectedCategoryUuid = uuid;
   try {
     QSet<Uuid> components =
-        mWorkspace.getLibraryDb().getComponentsByCategory(uuid);  // can throw
+        mWorkspace.getLibraryDb().getByCategory<Component>(uuid);  // can throw
     foreach (const Uuid& uuid, components) {
       try {
         FilePath fp =
-            mWorkspace.getLibraryDb().getLatestComponent(uuid);  // can throw
+            mWorkspace.getLibraryDb().getLatest<Component>(uuid);  // can throw
         QString name;
-        mWorkspace.getLibraryDb().getElementTranslations<Component>(
+        mWorkspace.getLibraryDb().getTranslations<Component>(
             fp, localeOrder(),
             &name);  // can throw
         QListWidgetItem* item = new QListWidgetItem(name);
@@ -186,8 +184,8 @@ void ComponentChooserDialog::setSelectedComponent(
 
   if (uuid) {
     try {
-      fp = mWorkspace.getLibraryDb().getLatestComponent(*uuid);  // can throw
-      mWorkspace.getLibraryDb().getElementTranslations<Component>(
+      fp = mWorkspace.getLibraryDb().getLatest<Component>(*uuid);  // can throw
+      mWorkspace.getLibraryDb().getTranslations<Component>(
           fp, localeOrder(), &name, &desc);  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Could not load component metadata"),
@@ -216,7 +214,7 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
         for (const ComponentSymbolVariantItem& item :
              symbVar.getSymbolItems()) {
           try {
-            FilePath fp = mWorkspace.getLibraryDb().getLatestSymbol(
+            FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
                 item.getSymbolUuid());  // can throw
             std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
                 std::unique_ptr<TransactionalDirectory>(

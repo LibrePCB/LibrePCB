@@ -56,6 +56,8 @@ add_library(
   library/cat/categorylisteditorwidget.cpp
   library/cat/categorylisteditorwidget.h
   library/cat/categorylisteditorwidget.ui
+  library/cat/categorytreebuilder.cpp
+  library/cat/categorytreebuilder.h
   library/cat/categorytreelabeltextbuilder.cpp
   library/cat/categorytreelabeltextbuilder.h
   library/cat/componentcategoryeditorwidget.cpp

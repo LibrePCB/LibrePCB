@@ -26,6 +26,8 @@
 #include "ui_newelementwizardpage_copyfrom.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
@@ -175,10 +177,11 @@ FilePath NewElementWizardPage_CopyFrom::getCategoryFilePath(
       case NewElementWizardContext::ElementType::ComponentCategory:
         return mContext.getWorkspace()
             .getLibraryDb()
-            .getLatestComponentCategory(*category);
+            .getLatest<ComponentCategory>(*category);
       case NewElementWizardContext::ElementType::PackageCategory:
-        return mContext.getWorkspace().getLibraryDb().getLatestPackageCategory(
-            *category);
+        return mContext.getWorkspace()
+            .getLibraryDb()
+            .getLatest<PackageCategory>(*category);
       default:
         throw LogicError(__FILE__, __LINE__);
     }
@@ -191,16 +194,16 @@ QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
     const tl::optional<Uuid>& category) const {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::Symbol:
-      return mContext.getWorkspace().getLibraryDb().getSymbolsByCategory(
+      return mContext.getWorkspace().getLibraryDb().getByCategory<Symbol>(
           category);
     case NewElementWizardContext::ElementType::Component:
-      return mContext.getWorkspace().getLibraryDb().getComponentsByCategory(
+      return mContext.getWorkspace().getLibraryDb().getByCategory<Component>(
           category);
     case NewElementWizardContext::ElementType::Device:
-      return mContext.getWorkspace().getLibraryDb().getDevicesByCategory(
+      return mContext.getWorkspace().getLibraryDb().getByCategory<Device>(
           category);
     case NewElementWizardContext::ElementType::Package:
-      return mContext.getWorkspace().getLibraryDb().getPackagesByCategory(
+      return mContext.getWorkspace().getLibraryDb().getByCategory<Package>(
           category);
     default:
       throw LogicError(__FILE__, __LINE__);
@@ -212,27 +215,27 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
                                                        QString& name) const {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::Symbol:
-      fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(
+      fp = mContext.getWorkspace().getLibraryDb().getLatest<Symbol>(
           uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getElementTranslations<Symbol>(
+      mContext.getWorkspace().getLibraryDb().getTranslations<Symbol>(
           fp, mContext.getLibLocaleOrder(), &name);  // can throw
       return;
     case NewElementWizardContext::ElementType::Component:
-      fp = mContext.getWorkspace().getLibraryDb().getLatestComponent(
+      fp = mContext.getWorkspace().getLibraryDb().getLatest<Component>(
           uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getElementTranslations<Component>(
+      mContext.getWorkspace().getLibraryDb().getTranslations<Component>(
           fp, mContext.getLibLocaleOrder(), &name);  // can throw
       return;
     case NewElementWizardContext::ElementType::Device:
-      fp = mContext.getWorkspace().getLibraryDb().getLatestDevice(
+      fp = mContext.getWorkspace().getLibraryDb().getLatest<Device>(
           uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getElementTranslations<Device>(
+      mContext.getWorkspace().getLibraryDb().getTranslations<Device>(
           fp, mContext.getLibLocaleOrder(), &name);  // can throw
       return;
     case NewElementWizardContext::ElementType::Package:
-      fp = mContext.getWorkspace().getLibraryDb().getLatestPackage(
+      fp = mContext.getWorkspace().getLibraryDb().getLatest<Package>(
           uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getElementTranslations<Package>(
+      mContext.getWorkspace().getLibraryDb().getTranslations<Package>(
           fp, mContext.getLibLocaleOrder(), &name);  // can throw
       return;
     default:

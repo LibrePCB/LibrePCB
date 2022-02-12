@@ -79,7 +79,6 @@ public:
 private:  // Methods
   template <typename T>
   std::shared_ptr<const T> getElement(
-      FilePath (WorkspaceLibraryDb::*getter)(const Uuid&) const,
       QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
       noexcept;
 

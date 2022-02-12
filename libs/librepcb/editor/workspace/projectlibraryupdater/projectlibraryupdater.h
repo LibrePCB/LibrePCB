@@ -73,10 +73,9 @@ private slots:
 private:
   void log(const QString& msg) noexcept;
   QString prettyPath(const FilePath& fp) const noexcept;
+  template <typename T>
   void updateElements(std::shared_ptr<TransactionalFileSystem> fs,
-                      const QString& type,
-                      FilePath (WorkspaceLibraryDb::*getter)(const Uuid&)
-                          const);
+                      const QString& type);
 
 private:
   Workspace& mWorkspace;

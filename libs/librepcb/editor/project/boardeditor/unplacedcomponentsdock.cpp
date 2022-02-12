@@ -283,7 +283,7 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
     if (!package) {
       // If package does not exist in project library, use workspace library.
       FilePath pkgFp =
-          mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(
+          mProjectEditor.getWorkspace().getLibraryDb().getLatest<Package>(
               device.packageUuid);
       if (pkgFp.isValid()) {
         package = new Package(
@@ -547,23 +547,22 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
   // Get matching devices in workspace library.
   try {
     QSet<Uuid> wsLibDev =
-        mProjectEditor.getWorkspace().getLibraryDb().getDevicesOfComponent(
+        mProjectEditor.getWorkspace().getLibraryDb().getComponentDevices(
             cmpUuid);  // can throw
     wsLibDev -= Toolbox::toSet(prjLibDev.keys());
     foreach (const Uuid& deviceUuid, wsLibDev) {
       // Get device metadata.
       FilePath devFp =
-          mProjectEditor.getWorkspace().getLibraryDb().getLatestDevice(
+          mProjectEditor.getWorkspace().getLibraryDb().getLatest<Device>(
               deviceUuid);  // can throw
       if (!devFp.isValid()) continue;
       QString devName;
-      mProjectEditor.getWorkspace()
-          .getLibraryDb()
-          .getElementTranslations<Device>(devFp, localeOrder,
-                                          &devName);  // can throw
+      mProjectEditor.getWorkspace().getLibraryDb().getTranslations<Device>(
+          devFp, localeOrder,
+          &devName);  // can throw
       Uuid pkgUuid = Uuid::createRandom();  // Temporary.
       mProjectEditor.getWorkspace().getLibraryDb().getDeviceMetadata(
-          devFp,
+          devFp, nullptr,
           &pkgUuid);  // can throw
 
       devices.append(
@@ -583,13 +582,12 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
     } else {
       try {
         FilePath pkgFp =
-            mProjectEditor.getWorkspace().getLibraryDb().getLatestPackage(
+            mProjectEditor.getWorkspace().getLibraryDb().getLatest<Package>(
                 device.packageUuid);  // can throw
         if (!pkgFp.isValid()) continue;
-        mProjectEditor.getWorkspace()
-            .getLibraryDb()
-            .getElementTranslations<Package>(pkgFp, localeOrder,
-                                             &device.packageName);  // can throw
+        mProjectEditor.getWorkspace().getLibraryDb().getTranslations<Package>(
+            pkgFp, localeOrder,
+            &device.packageName);  // can throw
       } catch (const Exception& e) {
         qCritical()
             << "Error while querying packages in unplaced components dock:"

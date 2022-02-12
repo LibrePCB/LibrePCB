@@ -20,16 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementcache.h"
+#include "categorytreebuilder.h"
 
-#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
-#include <librepcb/core/library/cmp/component.h>
-#include <librepcb/core/library/dev/device.h>
-#include <librepcb/core/library/library.h>
-#include <librepcb/core/library/pkg/package.h>
-#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
@@ -44,68 +38,73 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryElementCache::LibraryElementCache(const WorkspaceLibraryDb& db) noexcept
-  : mDb(&db) {
+template <typename ElementType>
+CategoryTreeBuilder<ElementType>::CategoryTreeBuilder(
+    const WorkspaceLibraryDb& db, const QStringList& localeOrder,
+    bool nulloptIsRootCategory) noexcept
+  : mDb(db),
+    mLocaleOrder(localeOrder),
+    mNulloptIsRootCategory(nulloptIsRootCategory) {
 }
 
-LibraryElementCache::~LibraryElementCache() noexcept {
+template <typename ElementType>
+CategoryTreeBuilder<ElementType>::~CategoryTreeBuilder() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Setters
  ******************************************************************************/
 
-std::shared_ptr<const ComponentCategory>
-    LibraryElementCache::getComponentCategory(const Uuid& uuid) const noexcept {
-  return getElement(mCmpCat, uuid);
-}
-
-std::shared_ptr<const PackageCategory> LibraryElementCache::getPackageCategory(
-    const Uuid& uuid) const noexcept {
-  return getElement(mPkgCat, uuid);
-}
-
-std::shared_ptr<const Symbol> LibraryElementCache::getSymbol(
-    const Uuid& uuid) const noexcept {
-  return getElement(mSym, uuid);
-}
-
-std::shared_ptr<const Package> LibraryElementCache::getPackage(
-    const Uuid& uuid) const noexcept {
-  return getElement(mPkg, uuid);
-}
-
-std::shared_ptr<const Component> LibraryElementCache::getComponent(
-    const Uuid& uuid) const noexcept {
-  return getElement(mCmp, uuid);
-}
-
-std::shared_ptr<const Device> LibraryElementCache::getDevice(
-    const Uuid& uuid) const noexcept {
-  return getElement(mDev, uuid);
+template <typename ElementType>
+QStringList CategoryTreeBuilder<ElementType>::buildTree(
+    const tl::optional<Uuid>& category, bool* success) const {
+  QStringList names;
+  QSet<FilePath> paths;
+  bool isSuccessful = getParentNames(category, names, paths);  // can throw
+  if (success) {
+    *success = isSuccessful;
+  }
+  return names;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-template <typename T>
-std::shared_ptr<const T> LibraryElementCache::getElement(
-    QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
-    noexcept {
-  std::shared_ptr<const T> element = container.value(uuid);
-  if ((!element) && mDb) {
-    try {
-      FilePath fp = mDb->getLatest<T>(uuid);
-      element = std::make_shared<T>(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
-      container.insert(uuid, element);
-    } catch (const Exception& e) {
-      qWarning() << "Could not open library element:" << e.getMsg();
+template <typename ElementType>
+bool CategoryTreeBuilder<ElementType>::getParentNames(
+    const tl::optional<Uuid>& category, QStringList& names,
+    QSet<FilePath>& filePaths) const {
+  if (category) {
+    QString name;
+    tl::optional<Uuid> parent;
+    FilePath fp = mDb.getLatest<ElementType>(*category);
+    if (filePaths.contains(fp)) {
+      names.prepend("ERROR: Endless recursion");
+      return false;
+    } else {
+      filePaths.insert(fp);
     }
+    if (fp.isValid() &&
+        mDb.getTranslations<ElementType>(fp, mLocaleOrder, &name) &&
+        mDb.getCategoryMetadata<ElementType>(fp, &parent)) {
+      names.prepend(name);
+      return getParentNames(parent, names, filePaths);
+    } else {
+      names.prepend(tr("ERROR: %1 not found").arg(category->toStr().left(8)));
+      return false;
+    }
+  } else if (mNulloptIsRootCategory) {
+    names.prepend(tr("Root category"));
   }
-  return element;
+  return true;
 }
+
+/*******************************************************************************
+ *  Explicit template instantiations
+ ******************************************************************************/
+template class CategoryTreeBuilder<ComponentCategory>;
+template class CategoryTreeBuilder<PackageCategory>;
 
 /*******************************************************************************
  *  End of File

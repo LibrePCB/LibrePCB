@@ -93,8 +93,6 @@ private:
   using ChildType = QSharedPointer<CategoryTreeItem<ElementType>>;
 
   // Methods
-  FilePath getLatestCategory(const WorkspaceLibraryDb& lib) const;
-  QSet<Uuid> getCategoryChilds(const WorkspaceLibraryDb& lib) const;
   bool matchesFilter(const WorkspaceLibraryDb& lib,
                      CategoryTreeFilter::Flags filter) const;
 

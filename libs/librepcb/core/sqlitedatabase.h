@@ -45,6 +45,7 @@ class SQLiteDatabase final : public QObject {
 
 public:
   // Types
+  typedef QVector<std::pair<QString, QString>> Replacements;
   class TransactionScopeGuard final {
   public:
     TransactionScopeGuard() = delete;
@@ -62,7 +63,7 @@ public:
   // Constructors / Destructor
   SQLiteDatabase() = delete;
   SQLiteDatabase(const SQLiteDatabase& other) = delete;
-  SQLiteDatabase(const FilePath& filepath);
+  SQLiteDatabase(const FilePath& filepath, QObject* parent = nullptr);
   ~SQLiteDatabase() noexcept;
 
   // SQL Commands
@@ -72,7 +73,8 @@ public:
   void clearTable(const QString& table);
 
   // General Methods
-  QSqlQuery prepareQuery(const QString& query) const;
+  QSqlQuery prepareQuery(QString query,
+                         const Replacements& replacements = {}) const;
   int count(QSqlQuery& query);
   int insert(QSqlQuery& query);
   void exec(QSqlQuery& query);
@@ -85,9 +87,9 @@ private:  // Methods
   /**
    * @brief Enable the "Write-Ahead Logging" (WAL) feature of SQLite
    *
-   * @note LibrePCB requires to enable WAL to avoid blocking readers by writers.
-   * If not enabled, the library scanner would also block all read-only accesses
-   *       to the library database.
+   * @note  LibrePCB requires to enable WAL to avoid blocking readers by
+   *        writers. If not enabled, the library scanner would also block
+   *        all read-only accesses to the library database.
    *
    * @see http://www.sqlite.org/wal.html
    */
@@ -104,7 +106,6 @@ private:  // Methods
 
 private:  // Data
   QSqlDatabase mDb;
-  // int mNestedTransactionCount;
 };
 
 /*******************************************************************************

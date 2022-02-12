@@ -75,11 +75,13 @@ add_executable(
   core/utils/signalslottest.cpp
   core/utils/tangentpathjoinertest.cpp
   core/utils/toolboxtest.cpp
+  core/workspace/workspacelibrarydbtest.cpp
   core/workspace/workspacesettingstest.cpp
   core/workspace/workspacetest.cpp
   eagleimport/eaglelibraryimporttest.cpp
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
+  editor/library/cat/categorytreebuildertest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp
   editor/modelview/pathmodeltest.cpp

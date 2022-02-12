@@ -77,7 +77,7 @@ QHash<Uuid, CircuitIdentifier>
         const Uuid& symbol, const QString& suffix) const noexcept {
   QHash<Uuid, CircuitIdentifier> names;
   try {
-    FilePath fp = mContext.getWorkspace().getLibraryDb().getLatestSymbol(
+    FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Symbol>(
         symbol);  // can throw
     Symbol sym(
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
