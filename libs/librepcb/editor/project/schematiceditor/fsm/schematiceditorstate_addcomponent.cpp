@@ -35,7 +35,10 @@
 #include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -333,9 +336,17 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       mCurrentComponent = cmd->getComponentInstance();
     } else {
       // show component chooser dialog
-      if (!mAddComponentDialog)
+      if (mAddComponentDialog) {
+        mAddComponentDialog->setLocaleOrder(
+            mContext.project.getSettings().getLocaleOrder());
+        mAddComponentDialog->setNormOrder(
+            mContext.project.getSettings().getNormOrder());
+      } else {
         mAddComponentDialog.reset(new AddComponentDialog(
-            mContext.workspace, mContext.project, parentWidget()));
+            mContext.workspace.getLibraryDb(),
+            mContext.project.getSettings().getLocaleOrder(),
+            mContext.project.getSettings().getNormOrder(), parentWidget()));
+      }
       if (mAddComponentDialog->exec() != QDialog::Accepted)
         throw UserCanceled(__FILE__, __LINE__);  // abort
       if (!mAddComponentDialog->getSelectedComponentUuid())

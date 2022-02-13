@@ -32,22 +32,12 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariant.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
-#include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/project/projectsettings.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
-#include <librepcb/core/types/gridproperties.h>
-#include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -62,15 +52,20 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-AddComponentDialog::AddComponentDialog(Workspace& workspace, Project& project,
+AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
+                                       const QStringList& localeOrder,
+                                       const QStringList& normOrder,
                                        QWidget* parent)
   : QDialog(parent),
-    mWorkspace(workspace),
-    mProject(project),
+    mDb(db),
+    mLocaleOrder(localeOrder),
+    mNormOrder(normOrder),
     mUi(new Ui::AddComponentDialog),
-    mComponentPreviewScene(nullptr),
-    mDevicePreviewScene(nullptr),
-    mCategoryTreeModel(nullptr),
+    mComponentPreviewScene(new GraphicsScene()),
+    mDevicePreviewScene(new GraphicsScene()),
+    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
+    mCategoryTreeModel(new CategoryTreeModel(
+        mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
     mSelectedComponent(nullptr),
     mSelectedSymbVar(nullptr),
     mSelectedDevice(nullptr),
@@ -91,23 +86,19 @@ AddComponentDialog::AddComponentDialog(Workspace& workspace, Project& project,
           &AddComponentDialog::treeComponents_currentItemChanged);
   connect(mUi->treeComponents, &QTreeWidget::itemDoubleClicked, this,
           &AddComponentDialog::treeComponents_itemDoubleClicked);
+  connect(
+      mUi->cbxSymbVar,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &AddComponentDialog::cbxSymbVar_currentIndexChanged);
 
-  mComponentPreviewScene = new GraphicsScene();
-  mUi->viewComponent->setScene(mComponentPreviewScene);
+  mUi->viewComponent->setScene(mComponentPreviewScene.data());
   mUi->viewComponent->setOriginCrossVisible(false);
 
-  mDevicePreviewScene = new GraphicsScene();
-  mUi->viewDevice->setScene(mDevicePreviewScene);
+  mUi->viewDevice->setScene(mDevicePreviewScene.data());
   mUi->viewDevice->setOriginCrossVisible(false);
   mUi->viewDevice->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
 
-  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
-
-  const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-  mCategoryTreeModel =
-      new CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder,
-                            CategoryTreeModel::Filter::CmpCatWithComponents);
-  mUi->treeCategories->setModel(mCategoryTreeModel);
+  mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,
           &AddComponentDialog::treeCategories_currentItemChanged);
@@ -117,25 +108,15 @@ AddComponentDialog::AddComponentDialog(Workspace& workspace, Project& project,
 }
 
 AddComponentDialog::~AddComponentDialog() noexcept {
-  delete mPreviewFootprintGraphicsItem;
-  mPreviewFootprintGraphicsItem = nullptr;
-  qDeleteAll(mPreviewSymbolGraphicsItems);
-  mPreviewSymbolGraphicsItems.clear();
-  delete mSelectedPackage;
-  mSelectedPackage = nullptr;
-  delete mSelectedDevice;
-  mSelectedDevice = nullptr;
-  mSelectedSymbVar = nullptr;
-  delete mSelectedComponent;
-  mSelectedComponent = nullptr;
-  delete mCategoryTreeModel;
-  mCategoryTreeModel = nullptr;
-  delete mDevicePreviewScene;
-  mDevicePreviewScene = nullptr;
-  delete mComponentPreviewScene;
-  mComponentPreviewScene = nullptr;
-  delete mUi;
-  mUi = nullptr;
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void AddComponentDialog::setLocaleOrder(const QStringList& order) noexcept {
+  mLocaleOrder = order;
+  mCategoryTreeModel->setLocaleOrder(mLocaleOrder);
 }
 
 /*******************************************************************************
@@ -238,7 +219,7 @@ void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
     accept();  // only accept device items (not components)
 }
 
-void AddComponentDialog::on_cbxSymbVar_currentIndexChanged(int index) noexcept {
+void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
   if ((mSelectedComponent) && (index >= 0)) {
     tl::optional<Uuid> uuid =
         Uuid::tryFromString(mUi->cbxSymbVar->itemData(index).toString());
@@ -291,50 +272,39 @@ void AddComponentDialog::searchComponents(const QString& input) {
 AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
     const QString& input) {
   SearchResult result;
-  const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-
   // add matching devices and their corresponding components
-  QList<Uuid> devices =
-      mWorkspace.getLibraryDb().find<Device>(input);  // can throw
+  QList<Uuid> devices = mDb.find<Device>(input);  // can throw
   foreach (const Uuid& devUuid, devices) {
-    FilePath devFp =
-        mWorkspace.getLibraryDb().getLatest<Device>(devUuid);  // can throw
+    FilePath devFp = mDb.getLatest<Device>(devUuid);  // can throw
     if (!devFp.isValid()) continue;
     Uuid cmpUuid = Uuid::createRandom();
     Uuid pkgUuid = Uuid::createRandom();
-    mWorkspace.getLibraryDb().getDeviceMetadata(devFp, &cmpUuid,
-                                                &pkgUuid);  // can throw
-    FilePath cmpFp =
-        mWorkspace.getLibraryDb().getLatest<Component>(cmpUuid);  // can throw
+    mDb.getDeviceMetadata(devFp, &cmpUuid,
+                          &pkgUuid);  // can throw
+    FilePath cmpFp = mDb.getLatest<Component>(cmpUuid);  // can throw
     if (!cmpFp.isValid()) continue;
-    FilePath pkgFp =
-        mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);  // can throw
+    FilePath pkgFp = mDb.getLatest<Package>(pkgUuid);  // can throw
     SearchResultDevice& resDev = result[cmpFp].devices[devFp];
     resDev.pkgFp = pkgFp;
     resDev.match = true;
   }
 
   // add matching components and all their devices
-  QList<Uuid> components =
-      mWorkspace.getLibraryDb().find<Component>(input);  // can throw
+  QList<Uuid> components = mDb.find<Component>(input);  // can throw
   foreach (const Uuid& cmpUuid, components) {
-    FilePath cmpFp =
-        mWorkspace.getLibraryDb().getLatest<Component>(cmpUuid);  // can throw
+    FilePath cmpFp = mDb.getLatest<Component>(cmpUuid);  // can throw
     if (!cmpFp.isValid()) continue;
-    QSet<Uuid> devices =
-        mWorkspace.getLibraryDb().getComponentDevices(cmpUuid);  // can throw
+    QSet<Uuid> devices = mDb.getComponentDevices(cmpUuid);  // can throw
     SearchResultComponent& resCmp = result[cmpFp];
     resCmp.match = true;
     foreach (const Uuid& devUuid, devices) {
-      FilePath devFp =
-          mWorkspace.getLibraryDb().getLatest<Device>(devUuid);  // can throw
+      FilePath devFp = mDb.getLatest<Device>(devUuid);  // can throw
       if (!devFp.isValid()) continue;
       if (resCmp.devices.contains(devFp)) continue;
       Uuid pkgUuid = Uuid::createRandom();
-      mWorkspace.getLibraryDb().getDeviceMetadata(devFp, nullptr,
-                                                  &pkgUuid);  // can throw
-      FilePath pkgFp =
-          mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);  // can throw
+      mDb.getDeviceMetadata(devFp, nullptr,
+                            &pkgUuid);  // can throw
+      FilePath pkgFp = mDb.getLatest<Package>(pkgUuid);  // can throw
       SearchResultDevice& resDev = resCmp.devices[devFp];
       resDev.pkgFp = pkgFp;
     }
@@ -344,17 +314,17 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
   QMutableHashIterator<FilePath, SearchResultComponent> resultIt(result);
   while (resultIt.hasNext()) {
     resultIt.next();
-    mWorkspace.getLibraryDb().getTranslations<Component>(
-        resultIt.key(), localeOrder, &resultIt.value().name);
+    mDb.getTranslations<Component>(resultIt.key(), mLocaleOrder,
+                                   &resultIt.value().name);
     QMutableHashIterator<FilePath, SearchResultDevice> devIt(
         resultIt.value().devices);
     while (devIt.hasNext()) {
       devIt.next();
-      mWorkspace.getLibraryDb().getTranslations<Device>(
-          devIt.key(), localeOrder, &devIt.value().name);
+      mDb.getTranslations<Device>(devIt.key(), mLocaleOrder,
+                                  &devIt.value().name);
       if (devIt.value().pkgFp.isValid()) {
-        mWorkspace.getLibraryDb().getTranslations<Package>(
-            devIt.value().pkgFp, localeOrder, &devIt.value().pkgName);
+        mDb.getTranslations<Package>(devIt.value().pkgFp, mLocaleOrder,
+                                     &devIt.value().pkgName);
       }
     }
   }
@@ -367,42 +337,36 @@ void AddComponentDialog::setSelectedCategory(
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
 
-  const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-
   mSelectedCategoryUuid = categoryUuid;
-  QSet<Uuid> components =
-      mWorkspace.getLibraryDb().getByCategory<Component>(categoryUuid);
+  QSet<Uuid> components = mDb.getByCategory<Component>(categoryUuid);
   foreach (const Uuid& cmpUuid, components) {
     // component
-    FilePath cmpFp = mWorkspace.getLibraryDb().getLatest<Component>(cmpUuid);
+    FilePath cmpFp = mDb.getLatest<Component>(cmpUuid);
     if (!cmpFp.isValid()) continue;
     QString cmpName;
-    mWorkspace.getLibraryDb().getTranslations<Component>(cmpFp, localeOrder,
-                                                         &cmpName);
+    mDb.getTranslations<Component>(cmpFp, mLocaleOrder, &cmpName);
     QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
     cmpItem->setText(0, cmpName);
     cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
     // devices
-    QSet<Uuid> devices = mWorkspace.getLibraryDb().getComponentDevices(cmpUuid);
+    QSet<Uuid> devices = mDb.getComponentDevices(cmpUuid);
     foreach (const Uuid& devUuid, devices) {
       try {
-        FilePath devFp = mWorkspace.getLibraryDb().getLatest<Device>(devUuid);
+        FilePath devFp = mDb.getLatest<Device>(devUuid);
         if (!devFp.isValid()) continue;
         QString devName;
-        mWorkspace.getLibraryDb().getTranslations<Device>(devFp, localeOrder,
-                                                          &devName);
+        mDb.getTranslations<Device>(devFp, mLocaleOrder, &devName);
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
         devItem->setText(0, devName);
         devItem->setData(0, Qt::UserRole, devFp.toStr());
         // package
         Uuid pkgUuid = Uuid::createRandom();  // only for initialization, will
                                               // be overwritten
-        mWorkspace.getLibraryDb().getDeviceMetadata(devFp, nullptr, &pkgUuid);
-        FilePath pkgFp = mWorkspace.getLibraryDb().getLatest<Package>(pkgUuid);
+        mDb.getDeviceMetadata(devFp, nullptr, &pkgUuid);
+        FilePath pkgFp = mDb.getLatest<Package>(pkgUuid);
         if (pkgFp.isValid()) {
           QString pkgName;
-          mWorkspace.getLibraryDb().getTranslations<Package>(pkgFp, localeOrder,
-                                                             &pkgName);
+          mDb.getTranslations<Package>(pkgFp, mLocaleOrder, &pkgName);
           devItem->setText(1, pkgName);
           devItem->setTextAlignment(1, Qt::AlignRight);
         }
@@ -418,26 +382,22 @@ void AddComponentDialog::setSelectedCategory(
 }
 
 void AddComponentDialog::setSelectedComponent(const Component* cmp) {
-  if (cmp && (cmp == mSelectedComponent)) return;
+  if (cmp && (cmp == mSelectedComponent.data())) return;
 
   mUi->lblCompName->setText(tr("No component selected"));
   mUi->lblCompDescription->clear();
   mUi->cbxSymbVar->clear();
   setSelectedDevice(nullptr);
   setSelectedSymbVar(nullptr);
-  delete mSelectedComponent;
-  mSelectedComponent = nullptr;
+  mSelectedComponent.reset(cmp);
 
-  if (cmp) {
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-
-    mUi->lblCompName->setText(*cmp->getNames().value(localeOrder));
-    mUi->lblCompDescription->setText(cmp->getDescriptions().value(localeOrder));
-
-    mSelectedComponent = cmp;
+  if (mSelectedComponent) {
+    mUi->lblCompName->setText(*cmp->getNames().value(mLocaleOrder));
+    mUi->lblCompDescription->setText(
+        cmp->getDescriptions().value(mLocaleOrder));
 
     for (const ComponentSymbolVariant& symbVar : cmp->getSymbolVariants()) {
-      QString text = *symbVar.getNames().value(localeOrder);
+      QString text = *symbVar.getNames().value(mLocaleOrder);
       if (!symbVar.getNorm().isEmpty()) {
         text += " [" + symbVar.getNorm() + "]";
       }
@@ -445,9 +405,7 @@ void AddComponentDialog::setSelectedComponent(const Component* cmp) {
     }
     if (!cmp->getSymbolVariants().isEmpty()) {
       mUi->cbxSymbVar->setCurrentIndex(
-          qMax(0,
-               cmp->getSymbolVariantIndexByNorm(
-                   mProject.getSettings().getNormOrder())));
+          qMax(0, cmp->getSymbolVariantIndexByNorm(mNormOrder)));
     }
   }
 
@@ -460,22 +418,19 @@ void AddComponentDialog::setSelectedComponent(const Component* cmp) {
 void AddComponentDialog::setSelectedSymbVar(
     const ComponentSymbolVariant* symbVar) {
   if (symbVar && (symbVar == mSelectedSymbVar)) return;
-  qDeleteAll(mPreviewSymbolGraphicsItems);
   mPreviewSymbolGraphicsItems.clear();
   mSelectedSymbVar = symbVar;
 
-  if (mSelectedComponent && symbVar) {
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+  if (mSelectedComponent && mSelectedSymbVar) {
     for (const ComponentSymbolVariantItem& item : symbVar->getSymbolItems()) {
-      FilePath symbolFp =
-          mWorkspace.getLibraryDb().getLatest<Symbol>(item.getSymbolUuid());
+      FilePath symbolFp = mDb.getLatest<Symbol>(item.getSymbolUuid());
       if (!symbolFp.isValid()) continue;  // TODO: show warning
       const Symbol* symbol = new Symbol(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(TransactionalFileSystem::openRO(
               symbolFp))));  // TODO: fix memory leak...
-      SymbolPreviewGraphicsItem* graphicsItem = new SymbolPreviewGraphicsItem(
-          *mGraphicsLayerProvider, localeOrder, *symbol, mSelectedComponent,
-          symbVar->getUuid(), item.getUuid());
+      auto graphicsItem = std::make_shared<SymbolPreviewGraphicsItem>(
+          *mGraphicsLayerProvider, mLocaleOrder, *symbol,
+          mSelectedComponent.data(), symbVar->getUuid(), item.getUuid());
       graphicsItem->setPos(item.getSymbolPosition().toPxQPointF());
       graphicsItem->setRotation(-item.getSymbolRotation().toDeg());
       mPreviewSymbolGraphicsItems.append(graphicsItem);
@@ -486,26 +441,21 @@ void AddComponentDialog::setSelectedSymbVar(
 }
 
 void AddComponentDialog::setSelectedDevice(const Device* dev) {
-  if (dev && (dev == mSelectedDevice)) return;
+  if (dev && (dev == mSelectedDevice.data())) return;
 
   mUi->lblDeviceName->setText(tr("No device selected"));
-  delete mPreviewFootprintGraphicsItem;
-  mPreviewFootprintGraphicsItem = nullptr;
-  delete mSelectedPackage;
-  mSelectedPackage = nullptr;
-  delete mSelectedDevice;
-  mSelectedDevice = nullptr;
+  mPreviewFootprintGraphicsItem.reset();
+  mSelectedPackage.reset();
+  mSelectedDevice.reset(dev);
 
-  if (dev) {
-    mSelectedDevice = dev;
-    const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
-    FilePath pkgFp = mWorkspace.getLibraryDb().getLatest<Package>(
-        mSelectedDevice->getPackageUuid());
+  if (mSelectedDevice) {
+    FilePath pkgFp = mDb.getLatest<Package>(mSelectedDevice->getPackageUuid());
     if (pkgFp.isValid()) {
-      mSelectedPackage = new Package(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(TransactionalFileSystem::openRO(pkgFp))));
-      QString devName = *mSelectedDevice->getNames().value(localeOrder);
-      QString pkgName = *mSelectedPackage->getNames().value(localeOrder);
+      mSelectedPackage.reset(new Package(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(pkgFp)))));
+      QString devName = *mSelectedDevice->getNames().value(mLocaleOrder);
+      QString pkgName = *mSelectedPackage->getNames().value(mLocaleOrder);
       if (devName.contains(pkgName, Qt::CaseInsensitive)) {
         // Package name is already contained in device name, no need to show it.
         mUi->lblDeviceName->setText(devName);
@@ -513,10 +463,10 @@ void AddComponentDialog::setSelectedDevice(const Device* dev) {
         mUi->lblDeviceName->setText(QString("%1 [%2]").arg(devName, pkgName));
       }
       if (mSelectedPackage->getFootprints().count() > 0) {
-        mPreviewFootprintGraphicsItem = new FootprintPreviewGraphicsItem(
-            *mGraphicsLayerProvider, localeOrder,
-            *mSelectedPackage->getFootprints().first(), mSelectedPackage,
-            mSelectedComponent);
+        mPreviewFootprintGraphicsItem.reset(new FootprintPreviewGraphicsItem(
+            *mGraphicsLayerProvider, mLocaleOrder,
+            *mSelectedPackage->getFootprints().first(), mSelectedPackage.data(),
+            mSelectedComponent.data()));
         mDevicePreviewScene->addItem(*mPreviewFootprintGraphicsItem);
         mUi->viewDevice->zoomAll();
       }
