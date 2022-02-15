@@ -80,6 +80,9 @@ public:
                              Filters filters) noexcept;
   ~CategoryTreeModel() noexcept;
 
+  // Setters
+  void setLocaleOrder(const QStringList& order) noexcept;
+
   // Inherited Methods
   int columnCount(const QModelIndex& parent = QModelIndex()) const
       noexcept override;
@@ -112,7 +115,7 @@ private:  // Methods
 
 private:  // Data
   const WorkspaceLibraryDb& mLibrary;
-  const QStringList mLocaleOrder;
+  QStringList mLocaleOrder;
   const Filters mFilters;
   std::shared_ptr<Item> mRootItem;
 };

@@ -35,7 +35,10 @@
 #include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -127,9 +130,6 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   if (!abortCommand(true)) return false;
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  // Delete the "Add Component" dialog
-  mAddComponentDialog.reset();
-
   // Remove actions / widgets from the "command" toolbar
   mAttributeUnitComboBoxAction = nullptr;
   mAttributeValueEditAction = nullptr;
@@ -193,19 +193,21 @@ bool SchematicEditorState_AddComponent::processRotateCcw() noexcept {
 }
 
 bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
-  if (mAddComponentDialog) {
-    try {
-      if (!abortCommand(true)) return false;
+  try {
+    if (!abortCommand(true)) {
+      return false;
+    }
+    if (mAddComponentDialog && mAddComponentDialog->getAutoOpenAgain()) {
       mLastAngle.setAngleMicroDeg(0);  // reset the angle
       startAddingComponent();
       return true;
-    } catch (UserCanceled& exc) {
-    } catch (Exception& exc) {
-      QMessageBox::critical(parentWidget(), tr("Error"), exc.getMsg());
     }
+  } catch (UserCanceled& exc) {
+  } catch (Exception& exc) {
+    QMessageBox::critical(parentWidget(), tr("Error"), exc.getMsg());
   }
 
-  return false;
+  return false;  // FSM will handle the event and exit this state.
 }
 
 bool SchematicEditorState_AddComponent::processGraphicsSceneMouseMoved(
@@ -333,9 +335,17 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       mCurrentComponent = cmd->getComponentInstance();
     } else {
       // show component chooser dialog
-      if (!mAddComponentDialog)
+      if (mAddComponentDialog) {
+        mAddComponentDialog->setLocaleOrder(
+            mContext.project.getSettings().getLocaleOrder());
+        mAddComponentDialog->setNormOrder(
+            mContext.project.getSettings().getNormOrder());
+      } else {
         mAddComponentDialog.reset(new AddComponentDialog(
-            mContext.workspace, mContext.project, parentWidget()));
+            mContext.workspace.getLibraryDb(),
+            mContext.project.getSettings().getLocaleOrder(),
+            mContext.project.getSettings().getNormOrder(), parentWidget()));
+      }
       if (mAddComponentDialog->exec() != QDialog::Accepted)
         throw UserCanceled(__FILE__, __LINE__);  // abort
       if (!mAddComponentDialog->getSelectedComponentUuid())

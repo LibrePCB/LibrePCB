@@ -55,6 +55,17 @@ CategoryTreeModel::~CategoryTreeModel() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void CategoryTreeModel::setLocaleOrder(const QStringList& order) noexcept {
+  if (order != mLocaleOrder) {
+    mLocaleOrder = order;
+    update();
+  }
+}
+
+/*******************************************************************************
  *  Inherited Methods
  ******************************************************************************/
 
@@ -229,37 +240,14 @@ bool CategoryTreeModel::listPackageCategories() const noexcept {
 void CategoryTreeModel::updateModelItem(
     std::shared_ptr<Item> parentItem,
     const QVector<std::shared_ptr<Item>>& newChilds) noexcept {
-  // Update parent of new items and get list of UUIDs.
-  QSet<tl::optional<Uuid>> newUUids;
-  foreach (std::shared_ptr<Item> item, newChilds) {
-    newUUids.insert(item->uuid);
-    item->parent = parentItem;
-  }
-
-  // Step 1: Remove no longer exsting categories from model.
-  for (int i = parentItem->childs.count() - 1; i >= 0; --i) {
-    if (!newUUids.contains(parentItem->childs.at(i)->uuid)) {
-      QModelIndex idx = indexFromItem(parentItem.get());
-      Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
-      beginRemoveRows(idx, i, i);
-      parentItem->childs.removeAt(i);
-      endRemoveRows();
-    }
-  }
-
-  // Step 2: Add new categories to model and update existing categories.
   for (int i = 0; i < newChilds.count(); ++i) {
     std::shared_ptr<Item> item = parentItem->childs.value(i);  // Might be null.
     std::shared_ptr<Item> newItem = newChilds.at(i);
-    if ((!item) || (item->uuid != newItem->uuid)) {
-      QModelIndex idx = indexFromItem(parentItem.get());
-      Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
-      beginInsertRows(idx, i, i);
-      parentItem->childs.insert(i, newItem);
-      endInsertRows();
-    } else {
-      if ((item->text != newItem->text) ||
+    if (item) {
+      // Update existing item.
+      if ((item->uuid != newItem->uuid) || (item->text != newItem->text) ||
           (item->tooltip != newItem->tooltip)) {
+        item->uuid = newItem->uuid;
         item->text = newItem->text;
         item->tooltip = newItem->tooltip;
         QModelIndex idx = indexFromItem(item.get());
@@ -267,9 +255,29 @@ void CategoryTreeModel::updateModelItem(
         emit dataChanged(idx, idx);
       }
       updateModelItem(item, newItem->childs);
+    } else {
+      // Add new item.
+      newItem->parent = parentItem;  // Update parent of item.
+      QModelIndex idx = indexFromItem(parentItem.get());
+      Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
+      beginInsertRows(idx, i, i);
+      parentItem->childs.insert(i, newItem);
+      endInsertRows();
     }
   }
 
+  // Remove no longer existing items.
+  const int removeCount = parentItem->childs.count() - newChilds.count();
+  if (removeCount > 0) {
+    QModelIndex idx = indexFromItem(parentItem.get());
+    Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
+    const int removeFrom = newChilds.count();
+    beginRemoveRows(idx, removeFrom, removeFrom + removeCount - 1);
+    parentItem->childs.remove(removeFrom, removeCount);
+    endRemoveRows();
+  }
+
+  // Sanity check that the number of childs is now correct.
   Q_ASSERT(parentItem->childs.count() == newChilds.count());
 }
 
