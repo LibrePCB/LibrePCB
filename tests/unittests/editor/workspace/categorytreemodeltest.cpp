@@ -569,7 +569,7 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
 
-  // Show a the model in a QTreeView and select an item which gets removed,
+  // Show the model in a QTreeView and select an item which gets removed,
   // just to ensure the model update also works while a view is connected.
   QTreeView view;
   view.setModel(&model);
@@ -614,9 +614,38 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
 
-  // Verify that "cat 1 renamed" (the parent of the removed item) is now
-  // selected.
-  EXPECT_EQ(model.index(0, 0), view.currentIndex());
+  // Verify that the selection was updated in a reasonable way.
+  EXPECT_EQ("cat 5", str(view.currentIndex().data()));
+}
+
+TEST_F(CategoryTreeModelTest, testSetLocaleOrder) {
+  // - cat 1
+  // - cat 2, cat 0 (de_CH)
+  int cat = mWriter->addCategory<ComponentCategory>(
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
+                                             tl::nullopt, tl::nullopt);
+  cat = mWriter->addCategory<ComponentCategory>(
+      0, toAbs("cat2"), uuid(2), version("0.1"), false, tl::nullopt);
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
+                                             tl::nullopt, tl::nullopt);
+  mWriter->addTranslation<ComponentCategory>(cat, "de_CH", ElementName("cat 0"),
+                                             tl::nullopt, tl::nullopt);
+
+  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  QVector<Item> expected = {
+      {"cat 1", {}},
+      {"cat 2", {}},
+  };
+  EXPECT_EQ(str(expected), str(getItems(model)));
+
+  model.setLocaleOrder({"de_CH"});
+
+  expected = {
+      {"cat 0", {}},
+      {"cat 1", {}},
+  };
+  EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
 /*******************************************************************************

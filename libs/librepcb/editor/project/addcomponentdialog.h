@@ -31,21 +31,20 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
 class Component;
-class ComponentCategory;
 class ComponentSymbolVariant;
 class DefaultGraphicsLayerProvider;
 class Device;
 class GraphicsScene;
 class Package;
-class Project;
-class Symbol;
-class Workspace;
+class WorkspaceLibraryDb;
 
 namespace editor {
 
@@ -84,7 +83,9 @@ class AddComponentDialog final : public QDialog {
 
 public:
   // Constructors / Destructor
-  explicit AddComponentDialog(Workspace& workspace, Project& project,
+  explicit AddComponentDialog(const WorkspaceLibraryDb& db,
+                              const QStringList& localeOrder,
+                              const QStringList& normOrder,
                               QWidget* parent = nullptr);
   ~AddComponentDialog() noexcept;
 
@@ -92,6 +93,22 @@ public:
   tl::optional<Uuid> getSelectedComponentUuid() const noexcept;
   tl::optional<Uuid> getSelectedSymbVarUuid() const noexcept;
   tl::optional<Uuid> getSelectedDeviceUuid() const noexcept;
+
+  /**
+   * @brief Check if dialog shall be opened again after the current component
+   *
+   * Returns the checked state of the "Add More" checkbox, i.e. whether the
+   * caller should open this dialog again after finishing placement of the
+   * component.
+   *
+   * @retval true   Must open this dialog again after placing the component.
+   * @retval false  Shall not open this dialog again, exit placement tool.
+   */
+  bool getAutoOpenAgain() const noexcept;
+
+  // Setters
+  void setLocaleOrder(const QStringList& order) noexcept;
+  void setNormOrder(const QStringList& order) noexcept { mNormOrder = order; }
 
 private slots:
   void searchEditTextChanged(const QString& text) noexcept;
@@ -101,7 +118,7 @@ private slots:
                                          QTreeWidgetItem* previous) noexcept;
   void treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
                                         int column) noexcept;
-  void on_cbxSymbVar_currentIndexChanged(int index) noexcept;
+  void cbxSymbVar_currentIndexChanged(int index) noexcept;
 
 private:
   // Private Methods
@@ -114,22 +131,24 @@ private:
   void accept() noexcept;
 
   // General
-  Workspace& mWorkspace;
-  Project& mProject;
-  Ui::AddComponentDialog* mUi;
-  GraphicsScene* mComponentPreviewScene;
-  GraphicsScene* mDevicePreviewScene;
+  const WorkspaceLibraryDb& mDb;
+  QStringList mLocaleOrder;
+  QStringList mNormOrder;
+  QScopedPointer<Ui::AddComponentDialog> mUi;
+  QPointer<QCheckBox> mAddMoreCheckbox;
+  QScopedPointer<GraphicsScene> mComponentPreviewScene;
+  QScopedPointer<GraphicsScene> mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
-  CategoryTreeModel* mCategoryTreeModel;
+  QScopedPointer<CategoryTreeModel> mCategoryTreeModel;
 
   // Attributes
   tl::optional<Uuid> mSelectedCategoryUuid;
-  const Component* mSelectedComponent;
+  QScopedPointer<const Component> mSelectedComponent;
   const ComponentSymbolVariant* mSelectedSymbVar;
-  const Device* mSelectedDevice;
-  const Package* mSelectedPackage;
-  QList<SymbolPreviewGraphicsItem*> mPreviewSymbolGraphicsItems;
-  FootprintPreviewGraphicsItem* mPreviewFootprintGraphicsItem;
+  QScopedPointer<const Device> mSelectedDevice;
+  QScopedPointer<const Package> mSelectedPackage;
+  QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mPreviewSymbolGraphicsItems;
+  QScopedPointer<FootprintPreviewGraphicsItem> mPreviewFootprintGraphicsItem;
 };
 
 /*******************************************************************************

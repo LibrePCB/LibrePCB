@@ -85,6 +85,7 @@ add_executable(
   editor/library/pkg/footprintclipboarddatatest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp
   editor/modelview/pathmodeltest.cpp
+  editor/project/addcomponentdialogtest.cpp
   editor/project/boardeditor/boardclipboarddatatest.cpp
   editor/project/orderpcbdialogtest.cpp
   editor/project/schematiceditor/schematicclipboarddatatest.cpp
