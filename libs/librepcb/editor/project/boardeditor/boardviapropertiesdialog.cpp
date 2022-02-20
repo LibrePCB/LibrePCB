@@ -61,6 +61,8 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
                           settingsPrefix % "/pos_x");
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
+  connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
+          &BoardViaPropertiesDialog::buttonBoxClicked);
 
   // shape combobox
   mUi->cbxShape->addItem(tr("Round"), static_cast<int>(Via::Shape::Round));
@@ -91,16 +93,22 @@ BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void BoardViaPropertiesDialog::keyPressEvent(QKeyEvent* e) {
-  switch (e->key()) {
-    case Qt::Key_Return:
-      accept();
+void BoardViaPropertiesDialog::buttonBoxClicked(
+    QAbstractButton* button) noexcept {
+  switch (mUi->buttonBox->buttonRole(button)) {
+    case QDialogButtonBox::ApplyRole:
+      applyChanges();
       break;
-    case Qt::Key_Escape:
+    case QDialogButtonBox::AcceptRole:
+      if (applyChanges()) {
+        accept();
+      }
+      break;
+    case QDialogButtonBox::RejectRole:
       reject();
       break;
     default:
-      QDialog::keyPressEvent(e);
+      Q_ASSERT(false);
       break;
   }
 }

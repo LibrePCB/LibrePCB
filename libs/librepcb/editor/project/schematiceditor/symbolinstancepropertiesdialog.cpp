@@ -74,6 +74,8 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
                                   settingsPrefix % "/pos_y");
   mUi->edtSymbInstRotation->setSingleStep(90.0);  // [°]
   setWindowTitle(tr("Properties of %1").arg(mSymbol.getName()));
+  connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
+          &SymbolInstancePropertiesDialog::buttonBoxClicked);
 
   // Component Instance Attributes
   mUi->edtCompInstName->setText(*mComponentInstance.getName());
@@ -175,16 +177,22 @@ SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void SymbolInstancePropertiesDialog::keyPressEvent(QKeyEvent* e) {
-  switch (e->key()) {
-    case Qt::Key_Return:
-      accept();
+void SymbolInstancePropertiesDialog::buttonBoxClicked(
+    QAbstractButton* button) noexcept {
+  switch (mUi->buttonBox->buttonRole(button)) {
+    case QDialogButtonBox::ApplyRole:
+      applyChanges();
       break;
-    case Qt::Key_Escape:
+    case QDialogButtonBox::AcceptRole:
+      if (applyChanges()) {
+        accept();
+      }
+      break;
+    case QDialogButtonBox::RejectRole:
       reject();
       break;
     default:
-      QDialog::keyPressEvent(e);
+      Q_ASSERT(false);
       break;
   }
 }
