@@ -67,7 +67,7 @@ public:
 
 private:
   // Private Methods
-  void keyPressEvent(QKeyEvent* e);
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
   void accept();
   bool applyChanges() noexcept;
 
