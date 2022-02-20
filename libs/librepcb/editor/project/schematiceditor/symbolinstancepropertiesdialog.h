@@ -76,7 +76,7 @@ public:
       const SymbolInstancePropertiesDialog& rhs) = delete;
 
 private:  // Methods
-  void keyPressEvent(QKeyEvent* e);
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
   void accept();
   bool applyChanges() noexcept;
 
