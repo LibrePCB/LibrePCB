@@ -34,42 +34,23 @@ namespace librepcb {
 namespace tests {
 
 /*******************************************************************************
- *  Test Data Type
- ******************************************************************************/
-
-typedef struct {
-  Point pA;
-  Point pB;
-  Point pCenter;
-  Angle aRot;
-} PointTestData_t;
-
-/*******************************************************************************
  *  Test Class
  ******************************************************************************/
 
-class PointTest : public ::testing::TestWithParam<PointTestData_t> {};
+class PointTest : public ::testing::Test {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
 
-TEST_P(PointTest, testDefaultConstructor) {
+TEST(PointTest, testDefaultConstructor) {
   Point p;
   EXPECT_EQ(0, p.getX().toNm());
   EXPECT_EQ(0, p.getY().toNm());
   EXPECT_TRUE(p.isOrigin());
 }
 
-TEST_P(PointTest, testRotate) {
-  const PointTestData_t& data = GetParam();
-
-  Point p(data.pA);
-  p.rotate(data.aRot, data.pCenter);
-  EXPECT_EQ(data.pB, p);
-}
-
-TEST_P(PointTest, testOperatorLessThan) {
+TEST(PointTest, testOperatorLessThan) {
   EXPECT_FALSE(Point(Length(0), Length(0)) < Point(Length(0), Length(0)));
   EXPECT_FALSE(Point(Length(10), Length(20)) < Point(Length(9), Length(19)));
   EXPECT_FALSE(Point(Length(10), Length(20)) < Point(Length(9), Length(21)));
@@ -83,7 +64,7 @@ TEST_P(PointTest, testOperatorLessThan) {
   EXPECT_TRUE(Point(Length(-1), Length(-2)) < Point(Length(-1), Length(-1)));
 }
 
-TEST_P(PointTest, testOperatorLessEqual) {
+TEST(PointTest, testOperatorLessEqual) {
   EXPECT_FALSE(Point(Length(10), Length(20)) <= Point(Length(9), Length(19)));
   EXPECT_FALSE(Point(Length(10), Length(20)) <= Point(Length(9), Length(21)));
   EXPECT_FALSE(Point(Length(10), Length(20)) <= Point(Length(10), Length(19)));
@@ -97,7 +78,7 @@ TEST_P(PointTest, testOperatorLessEqual) {
   EXPECT_TRUE(Point(Length(-1), Length(-2)) <= Point(Length(-1), Length(-1)));
 }
 
-TEST_P(PointTest, testOperatorGreaterThan) {
+TEST(PointTest, testOperatorGreaterThan) {
   EXPECT_FALSE(Point(Length(0), Length(0)) > Point(Length(0), Length(0)));
   EXPECT_FALSE(Point(Length(0), Length(0)) > Point(Length(0), Length(1)));
   EXPECT_FALSE(Point(Length(0), Length(0)) > Point(Length(1), Length(0)));
@@ -111,7 +92,7 @@ TEST_P(PointTest, testOperatorGreaterThan) {
   EXPECT_TRUE(Point(Length(-10), Length(20)) > Point(Length(-11), Length(0)));
 }
 
-TEST_P(PointTest, testOperatorGreaterEqual) {
+TEST(PointTest, testOperatorGreaterEqual) {
   EXPECT_FALSE(Point(Length(0), Length(0)) >= Point(Length(0), Length(1)));
   EXPECT_FALSE(Point(Length(0), Length(0)) >= Point(Length(1), Length(0)));
   EXPECT_FALSE(Point(Length(10), Length(20)) >= Point(Length(11), Length(19)));
@@ -126,23 +107,52 @@ TEST_P(PointTest, testOperatorGreaterEqual) {
 }
 
 /*******************************************************************************
- *  Test Data
+ *  Tests for rotate()
  ******************************************************************************/
 
-// clang-format off
-INSTANTIATE_TEST_SUITE_P(PointTest, PointTest, ::testing::Values(
-    //              {pA,                     pB,                     pCenter,                aRot}
-    PointTestData_t({Point::fromMm(0, 0),    Point::fromMm(0, 0),    Point::fromMm(0, 0),    Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(10, 0),   Point::fromMm(0, 10),   Point::fromMm(0, 0),    Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(0, 10),   Point::fromMm(-10, 0),  Point::fromMm(0, 0),    Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(-10, 0),  Point::fromMm(0, -10),  Point::fromMm(0, 0),    Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(0, -10),  Point::fromMm(10, 0),   Point::fromMm(0, 0),    Angle::fromDeg(90)}),
+struct PointRotateTestData {
+  Point input;
+  Angle angle;
+  Point center;
+  Point output;
+};
 
-    PointTestData_t({Point::fromMm(100, 50), Point::fromMm(100, 50), Point::fromMm(100, 50), Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(110, 50), Point::fromMm(100, 60), Point::fromMm(100, 50), Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(100, 60), Point::fromMm(90, 50),  Point::fromMm(100, 50), Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(90, 50),  Point::fromMm(100, 40), Point::fromMm(100, 50), Angle::fromDeg(90)}),
-    PointTestData_t({Point::fromMm(100, 40), Point::fromMm(110, 50), Point::fromMm(100, 50), Angle::fromDeg(90)})
+class PointRotateTest : public ::testing::TestWithParam<PointRotateTestData> {};
+
+TEST_P(PointRotateTest, test) {
+  const PointRotateTestData& data = GetParam();
+
+  Point p(data.input);
+  p.rotate(data.angle, data.center);
+  EXPECT_EQ(data.output, p);
+}
+
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(PointRotateTest, PointRotateTest, ::testing::Values(
+    //                  {input,                  angle,               center,                 output}
+    PointRotateTestData({Point::fromMm(10, 0),   Angle::fromDeg(0),   Point::fromMm(0, 0),    Point::fromMm(10, 0)  }),
+    PointRotateTestData({Point::fromMm(10, 0),   Angle::fromDeg(180), Point::fromMm(0, 0),    Point::fromMm(-10, 0) }),
+    PointRotateTestData({Point::fromMm(10, 0),   Angle::fromDeg(270), Point::fromMm(0, 0),    Point::fromMm(0, -10) }),
+    PointRotateTestData({Point::fromMm(10, 0),   Angle::fromDeg(0),   Point::fromMm(0, 0),    Point::fromMm(10, 0)  }),
+
+    PointRotateTestData({Point::fromMm(0, 0),    Angle::fromDeg(90),  Point::fromMm(0, 0),    Point::fromMm(0, 0)   }),
+    PointRotateTestData({Point::fromMm(10, 0),   Angle::fromDeg(90),  Point::fromMm(0, 0),    Point::fromMm(0, 10)  }),
+    PointRotateTestData({Point::fromMm(0, 10),   Angle::fromDeg(90),  Point::fromMm(0, 0),    Point::fromMm(-10, 0) }),
+    PointRotateTestData({Point::fromMm(-10, 0),  Angle::fromDeg(90),  Point::fromMm(0, 0),    Point::fromMm(0, -10) }),
+    PointRotateTestData({Point::fromMm(0, -10),  Angle::fromDeg(90),  Point::fromMm(0, 0),    Point::fromMm(10, 0)  }),
+
+    PointRotateTestData({Point::fromMm(100, 50), Angle::fromDeg(90),  Point::fromMm(100, 50), Point::fromMm(100, 50)}),
+    PointRotateTestData({Point::fromMm(110, 50), Angle::fromDeg(90),  Point::fromMm(100, 50), Point::fromMm(100, 60)}),
+    PointRotateTestData({Point::fromMm(100, 60), Angle::fromDeg(90),  Point::fromMm(100, 50), Point::fromMm(90, 50) }),
+    PointRotateTestData({Point::fromMm(90, 50),  Angle::fromDeg(90),  Point::fromMm(100, 50), Point::fromMm(100, 40)}),
+    PointRotateTestData({Point::fromMm(100, 40), Angle::fromDeg(90),  Point::fromMm(100, 50), Point::fromMm(110, 50)}),
+
+    PointRotateTestData({Point(10, 0),           Angle::fromDeg(1),   Point(0, 0),            Point(10, 0)  }),
+    PointRotateTestData({Point(10, 0),           Angle::fromDeg(2),   Point(0, 0),            Point(10, 0)  }),
+    PointRotateTestData({Point(10, 0),           Angle::fromDeg(3),   Point(0, 0),            Point(10, 1)  }),
+    PointRotateTestData({Point(10, 0),           Angle::fromDeg(4),   Point(0, 0),            Point(10, 1)  }),
+    PointRotateTestData({Point(10, 0),           Angle::fromDeg(18),  Point(0, 0),            Point(10, 3)  }),
+    PointRotateTestData({Point(10, 0),           Angle::fromDeg(19),  Point(0, 0),            Point(9, 3)   })
 ));
 // clang-format on
 
