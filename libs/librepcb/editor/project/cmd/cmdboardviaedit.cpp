@@ -109,7 +109,11 @@ void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter,
 bool CmdBoardViaEdit::performExecute() {
   performRedo();  // can throw
 
-  return true;  // TODO: determine if the via was really modified
+  if (mNewPos != mOldPos) return true;
+  if (mNewShape != mOldShape) return true;
+  if (mNewSize != mOldSize) return true;
+  if (mNewDrillDiameter != mOldDrillDiameter) return true;
+  return false;
 }
 
 void CmdBoardViaEdit::performUndo() {
