@@ -56,14 +56,22 @@ void Vertex::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool Vertex::operator==(const Vertex& rhs) const noexcept {
-  return mPos == rhs.mPos && mAngle == rhs.mAngle;
-}
-
 Vertex& Vertex::operator=(const Vertex& rhs) noexcept {
   mPos = rhs.mPos;
   mAngle = rhs.mAngle;
   return *this;
+}
+
+bool Vertex::operator==(const Vertex& rhs) const noexcept {
+  return mPos == rhs.mPos && mAngle == rhs.mAngle;
+}
+
+bool Vertex::operator<(const Vertex& rhs) const noexcept {
+  if (mPos != rhs.mPos) {
+    return mPos < rhs.mPos;
+  } else {
+    return mAngle < rhs.mAngle;
+  }
 }
 
 /*******************************************************************************
