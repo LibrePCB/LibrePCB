@@ -115,6 +115,20 @@ TEST_F(PathTest, testReversed) {
   EXPECT_EQ(str(expected), str(actual));
 }
 
+TEST_F(PathTest, testOperatorCompareLess) {
+  EXPECT_FALSE(Path() < Path());
+  EXPECT_FALSE(Path({Vertex(Point(1, 2))}) < Path());
+  EXPECT_FALSE(Path({Vertex(Point(1, 2))}) < Path({Vertex(Point(1, 2))}));
+  EXPECT_FALSE(Path({Vertex(Point(2, 2))}) < Path({Vertex(Point(1, 2))}));
+  EXPECT_FALSE(Path({Vertex(Point(0, 0), Angle::deg90())}) <
+               Path({Vertex(Point(0, 0), Angle::deg0())}));
+
+  EXPECT_TRUE(Path() < Path({Vertex(Point(1, 2))}));
+  EXPECT_TRUE(Path({Vertex(Point(1, 2))}) < Path({Vertex(Point(2, 2))}));
+  EXPECT_TRUE(Path({Vertex(Point(0, 0), Angle::deg0())}) <
+              Path({Vertex(Point(0, 0), Angle::deg90())}));
+}
+
 TEST_F(PathTest, testLine) {
   Point p1(Length(12), Length(34));
   Point p2(Length(56), Length(78));

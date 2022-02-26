@@ -65,9 +65,21 @@ public:
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
+  Vertex& operator=(const Vertex& rhs) noexcept;
   bool operator==(const Vertex& rhs) const noexcept;
   bool operator!=(const Vertex& rhs) const noexcept { return !(*this == rhs); }
-  Vertex& operator=(const Vertex& rhs) noexcept;
+
+  /**
+   * @brief The "<" operator to compare two ::librepcb::Vertex objects
+   *
+   * Useful for sorting vertex lists/sets (e.g. to for canonical order in
+   * files), or to store them in a QMap.
+   *
+   * @param rhs The right hand side object.
+   *
+   * @return true if this vertex is smaller, else false
+   */
+  bool operator<(const Vertex& rhs) const noexcept;
 
 private:  // Data
   Point mPos;
