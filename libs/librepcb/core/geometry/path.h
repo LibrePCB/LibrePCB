@@ -99,11 +99,23 @@ public:
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
+  Path& operator=(const Path& rhs) noexcept;
   bool operator==(const Path& rhs) const noexcept {
     return mVertices == rhs.mVertices;
   }
   bool operator!=(const Path& rhs) const noexcept { return !(*this == rhs); }
-  Path& operator=(const Path& rhs) noexcept;
+
+  /**
+   * @brief The "<" operator to compare two ::librepcb::Path objects
+   *
+   * Useful for sorting path lists/sets (e.g. to for canonical order in
+   * files), or to store them in a QMap.
+   *
+   * @param rhs The right hand side object.
+   *
+   * @return true if this path is smaller, else false
+   */
+  bool operator<(const Path& rhs) const noexcept;
 
   // Static Methods
   static Path line(const Point& p1, const Point& p2,

@@ -85,30 +85,19 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
     SExpression child = SExpression::createList("plane");
     child.appendChild(uuid);
-    foreach (const Path& fragment, actualPlaneFragments[uuid]) {
+    foreach (const Path& fragment,
+             Toolbox::sortedQSet(actualPlaneFragments[uuid])) {
       child.appendChild(fragment.serializeToDomElement("fragment"), true);
     }
     actualSexpr.appendChild(child, true);
   }
-  FileUtils::writeFile(testDataDir.getPathTo("actual.lp"),
-                       actualSexpr.toByteArray());
+  QByteArray actual = actualSexpr.toByteArray();
+  FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actual);
 
-  // load expected plane fragments from file
+  // compare with expected plane fragments loaded from file
   FilePath expectedFp = testDataDir.getPathTo("expected.lp");
-  SExpression expectedSexpr =
-      SExpression::parse(FileUtils::readFile(expectedFp), expectedFp);
-  QMap<Uuid, QSet<Path>> expectedPlaneFragments;
-  foreach (const SExpression& child, expectedSexpr.getChildren("plane")) {
-    Uuid uuid =
-        deserialize<Uuid>(child.getChild("@0"), qApp->getFileFormatVersion());
-    foreach (const SExpression& fragmentChild, child.getChildren("fragment")) {
-      expectedPlaneFragments[uuid].insert(
-          Path(fragmentChild, qApp->getFileFormatVersion()));
-    }
-  }
-
-  // compare
-  EXPECT_EQ(expectedPlaneFragments, actualPlaneFragments);
+  QByteArray expected = FileUtils::readFile(expectedFp);
+  EXPECT_EQ(expected.toStdString(), actual.toStdString());
 }
 
 /*******************************************************************************

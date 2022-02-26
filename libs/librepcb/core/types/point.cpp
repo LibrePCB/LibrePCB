@@ -102,8 +102,10 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept {
     // arithmetic
     qreal sin = qSin(angle.toRad());
     qreal cos = qCos(angle.toRad());
-    setX(Length(center.getX().toNm() + cos * dx.toNm() - sin * dy.toNm()));
-    setY(Length(center.getY().toNm() + sin * dx.toNm() + cos * dy.toNm()));
+    setX(Length::fromMm(center.getX().toMm() + cos * dx.toMm() -
+                        sin * dy.toMm()));
+    setY(Length::fromMm(center.getY().toMm() + sin * dx.toMm() +
+                        cos * dy.toMm()));
   }  // else: angle == 0°, nothing to do...
 
   return *this;
