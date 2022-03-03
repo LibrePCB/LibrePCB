@@ -78,7 +78,13 @@ void CmdDeviceInstanceEditAll::translate(const Point& deltaPos,
 void CmdDeviceInstanceEditAll::setRotation(const Angle& angle,
                                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  rotate(angle - mDevEditCmd->mNewRotation, mDevEditCmd->mNewPos, immediate);
+  const Angle delta = mDevEditCmd->mNewMirrored
+      ? (mDevEditCmd->mNewRotation - angle)  // Mirrored -> inverted rotation!
+      : (angle - mDevEditCmd->mNewRotation);
+  mDevEditCmd->setRotation(angle, immediate);
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->rotate(delta, mDevEditCmd->mNewPos, immediate);
+  }
 }
 
 void CmdDeviceInstanceEditAll::rotate(const Angle& angle, const Point& center,
