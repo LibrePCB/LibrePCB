@@ -73,10 +73,6 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::Polygon; }
-  const Point& getPosition() const noexcept override {
-    static Point p(0, 0);
-    return p;
-  }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 

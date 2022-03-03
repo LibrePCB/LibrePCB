@@ -58,6 +58,7 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mText.getUuid(); }
+  const Point& getPosition() const noexcept { return mText.getPosition(); }
   const Angle& getRotation() const noexcept { return mText.getRotation(); }
   Text& getText() noexcept { return mText; }
   const Text& getText() const noexcept { return mText; }
@@ -71,9 +72,6 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::Text; }
-  const Point& getPosition() const noexcept override {
-    return mText.getPosition();
-  }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 

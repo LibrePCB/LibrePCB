@@ -66,6 +66,7 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
+  const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   bool getMirrored() const noexcept { return mMirrored; }
   QString getName() const noexcept;
@@ -94,9 +95,6 @@ public:
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  // Helper Methods
-  Point mapToScene(const Point& relativePos) const noexcept;
-
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
@@ -106,7 +104,6 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::Symbol; }
-  const Point& getPosition() const noexcept override { return mPosition; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
