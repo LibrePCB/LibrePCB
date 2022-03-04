@@ -468,6 +468,8 @@ add_library(
   utils/tangentpathjoiner.h
   utils/toolbox.cpp
   utils/toolbox.h
+  utils/transform.cpp
+  utils/transform.h
   workspace/workspace.cpp
   workspace/workspace.h
   workspace/workspacelibrarydb.cpp

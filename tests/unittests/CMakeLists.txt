@@ -76,6 +76,7 @@ add_executable(
   core/utils/signalslottest.cpp
   core/utils/tangentpathjoinertest.cpp
   core/utils/toolboxtest.cpp
+  core/utils/transformtest.cpp
   core/workspace/workspacelibrarydbtest.cpp
   core/workspace/workspacesettingstest.cpp
   core/workspace/workspacetest.cpp
