@@ -435,7 +435,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
     BI_Footprint& footprint = device->getFootprint();
     if (footprint.isSelectable() &&
         footprint.getGrabAreaScenePx().contains(scenePosPx)) {
-      if (footprint.getIsMirrored()) {
+      if (footprint.getMirrored()) {
         list.append(&footprint);
       } else {
         list.prepend(&footprint);
@@ -444,7 +444,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
     foreach (BI_FootprintPad* pad, footprint.getPads()) {
       if (pad->isSelectable() &&
           pad->getGrabAreaScenePx().contains(scenePosPx)) {
-        if (pad->getIsMirrored()) {
+        if (pad->getMirrored()) {
           list.append(pad);
         } else {
           list.insert(1, pad);

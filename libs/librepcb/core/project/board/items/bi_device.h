@@ -80,14 +80,16 @@ public:
   const Package& getLibPackage() const noexcept { return *mLibPackage; }
   const Footprint& getLibFootprint() const noexcept { return *mLibFootprint; }
   BI_Footprint& getFootprint() const noexcept { return *mFootprint; }
+  const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
+  bool getMirrored() const noexcept { return mMirrored; }
   bool isSelectable() const noexcept override;
   bool isUsed() const noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
-  void setIsMirrored(bool mirror);
+  void setMirrored(bool mirror);
 
   // General Methods
   void addToBoard() override;
@@ -108,8 +110,6 @@ public:
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Device; }
-  const Point& getPosition() const noexcept override { return mPosition; }
-  bool getIsMirrored() const noexcept override { return mIsMirrored; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
@@ -143,7 +143,7 @@ private:
   // Attributes
   Point mPosition;
   Angle mRotation;
-  bool mIsMirrored;
+  bool mMirrored;
   AttributeList
       mAttributes;  ///< not yet used, but already specified in file format
 };

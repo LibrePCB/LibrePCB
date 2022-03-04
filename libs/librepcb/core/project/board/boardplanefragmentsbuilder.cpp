@@ -26,6 +26,7 @@
 #include "../../library/pkg/footprint.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../utils/clipperhelpers.h"
+#include "../../utils/transform.h"
 #include "items/bi_device.h"
 #include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
@@ -99,13 +100,10 @@ void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
     }
   }
   foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
+    Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
-        Path path = polygon.getPath();
-        path.rotate(footprint.getRotation());
-        if (footprint.getIsMirrored()) path.mirror(Qt::Horizontal);
-        path.translate(footprint.getPosition());
+        Path path = transform.map(polygon.getPath());
         ClipperLib::Path clipperPath =
             ClipperHelpers::convert(path, maxArcTolerance());
         boardAreaClipper.AddPath(clipperPath, ClipperLib::ptSubject, true);
@@ -149,9 +147,10 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
 
   // subtract holes and pads from devices
   foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
+    Transform transform(*device);
     for (const Hole& hole :
          device->getFootprint().getLibFootprint().getHoles()) {
-      Point pos = device->getFootprint().mapToScene(hole.getPosition());
+      Point pos = transform.map(hole.getPosition());
       PositiveLength dia(hole.getDiameter() + mPlane.getMinClearance() * 2);
       Path path = Path::circle(dia).translated(pos);
       c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),

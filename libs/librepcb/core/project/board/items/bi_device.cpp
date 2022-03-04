@@ -55,7 +55,7 @@ BI_Device::BI_Device(Board& board, const BI_Device& other)
     mLibFootprint(other.mLibFootprint),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
-    mIsMirrored(other.mIsMirrored),
+    mMirrored(other.mMirrored),
     mAttributes(other.mAttributes) {
   mFootprint.reset(new BI_Footprint(*this, *other.mFootprint));
 
@@ -90,7 +90,7 @@ BI_Device::BI_Device(Board& board, const SExpression& node,
   // get position, rotation and mirrored
   mPosition = Point(node.getChild("position"), fileFormat);
   mRotation = deserialize<Angle>(node.getChild("rotation/@0"), fileFormat);
-  mIsMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
+  mMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
 
   // load attributes
   mAttributes.loadFromSExpression(node, fileFormat);  // can throw
@@ -111,7 +111,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mLibFootprint(nullptr),
     mPosition(position),
     mRotation(rotation),
-    mIsMirrored(mirror) {
+    mMirrored(mirror) {
   initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
   // add attributes
@@ -215,13 +215,13 @@ void BI_Device::setRotation(const Angle& rot) noexcept {
   }
 }
 
-void BI_Device::setIsMirrored(bool mirror) {
-  if (mirror != mIsMirrored) {
+void BI_Device::setMirrored(bool mirror) {
+  if (mirror != mMirrored) {
     if (isUsed()) {
       throw LogicError(__FILE__, __LINE__);
     }
-    mIsMirrored = mirror;
-    emit mirrored(mIsMirrored);
+    mMirrored = mirror;
+    emit mirrored(mMirrored);
   }
 }
 
@@ -257,7 +257,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.appendChild("lib_footprint", mLibFootprint->getUuid(), true);
   root.appendChild(mPosition.serializeToDomElement("position"), true);
   root.appendChild("rotation", mRotation, false);
-  root.appendChild("mirror", mIsMirrored, false);
+  root.appendChild("mirror", mMirrored, false);
   mAttributes.serialize(root);
   mFootprint->serialize(root);
 }

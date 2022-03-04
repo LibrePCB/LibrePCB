@@ -43,7 +43,7 @@ CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(BI_Device& dev) noexcept
     mNewPos(mOldPos),
     mOldRotation(mDevice.getRotation()),
     mNewRotation(mOldRotation),
-    mOldMirrored(mDevice.getIsMirrored()),
+    mOldMirrored(mDevice.getMirrored()),
     mNewMirrored(mOldMirrored) {
 }
 
@@ -52,7 +52,7 @@ CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept {
     try {
       mDevice.setPosition(mOldPos);
       mDevice.setRotation(mOldRotation);
-      mDevice.setIsMirrored(mOldMirrored);  // can throw
+      mDevice.setMirrored(mOldMirrored);  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not revert all changes:" << e.getMsg();
     }
@@ -100,7 +100,7 @@ void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center,
 void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) {
   Q_ASSERT(!wasEverExecuted());
   if (immediate) {
-    mDevice.setIsMirrored(mirrored);  // can throw
+    mDevice.setMirrored(mirrored);  // can throw
   }
   mNewMirrored = mirrored;
 }
@@ -130,7 +130,7 @@ void CmdDeviceInstanceEdit::mirror(const Point& center,
     }
   }
   if (immediate) {
-    mDevice.setIsMirrored(mirror);  // can throw
+    mDevice.setMirrored(mirror);  // can throw
     mDevice.setPosition(position);
     mDevice.setRotation(rotation);
   }
@@ -153,13 +153,13 @@ bool CmdDeviceInstanceEdit::performExecute() {
 }
 
 void CmdDeviceInstanceEdit::performUndo() {
-  mDevice.setIsMirrored(mOldMirrored);  // can throw
+  mDevice.setMirrored(mOldMirrored);  // can throw
   mDevice.setPosition(mOldPos);
   mDevice.setRotation(mOldRotation);
 }
 
 void CmdDeviceInstanceEdit::performRedo() {
-  mDevice.setIsMirrored(mNewMirrored);  // can throw
+  mDevice.setMirrored(mNewMirrored);  // can throw
   mDevice.setPosition(mNewPos);
   mDevice.setRotation(mNewRotation);
 }

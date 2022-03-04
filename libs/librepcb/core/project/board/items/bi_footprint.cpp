@@ -23,12 +23,12 @@
 #include "bi_footprint.h"
 
 #include "../../../font/strokefontpool.h"
-#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/package.h"
 #include "../../../utils/scopeguardlist.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/circuit.h"
 #include "../../project.h"
 #include "../../projectlibrary.h"
@@ -181,22 +181,18 @@ StrokeTextList BI_Footprint::getDefaultStrokeTexts() const noexcept {
   // (not relative to the footprint). The original UUIDs are kept for future
   // identification.
   StrokeTextList texts = mDevice.getLibFootprint().getStrokeTexts();
+  Transform transform(*this);
   for (StrokeText& text : texts) {
-    if (getIsMirrored()) {
-      text.setLayerName(GraphicsLayerName(
-          GraphicsLayer::getMirroredLayerName(*text.getLayerName())));
+    text.setPosition(transform.map(text.getPosition()));
+    if (getMirrored()) {
       text.setRotation(text.getRotation() +
                        (text.getMirrored() ? -getRotation() : getRotation()));
-      text.setMirrored(!text.getMirrored());
-      text.setPosition(
-          getPosition() +
-          text.getPosition().rotated(getRotation()).mirrored(Qt::Horizontal));
     } else {
       text.setRotation(text.getRotation() +
                        (text.getMirrored() ? -getRotation() : getRotation()));
-      text.setPosition(getPosition() +
-                       text.getPosition().rotated(getRotation()));
     }
+    text.setMirrored(transform.map(text.getMirrored()));
+    text.setLayerName(transform.map(text.getLayerName()));
   }
   return texts;
 }
@@ -272,21 +268,6 @@ void BI_Footprint::serialize(SExpression& root) const {
 }
 
 /*******************************************************************************
- *  Helper Methods
- ******************************************************************************/
-
-Point BI_Footprint::mapToScene(const Point& relativePos) const noexcept {
-  if (mDevice.getIsMirrored()) {
-    return (mDevice.getPosition() + relativePos)
-        .rotated(mDevice.getRotation(), mDevice.getPosition())
-        .mirrored(Qt::Horizontal, mDevice.getPosition());
-  } else {
-    return (mDevice.getPosition() + relativePos)
-        .rotated(mDevice.getRotation(), mDevice.getPosition());
-  }
-}
-
-/*******************************************************************************
  *  Inherited from AttributeProvider
  ******************************************************************************/
 
@@ -303,8 +284,8 @@ const Point& BI_Footprint::getPosition() const noexcept {
   return mDevice.getPosition();
 }
 
-bool BI_Footprint::getIsMirrored() const noexcept {
-  return mDevice.getIsMirrored();
+bool BI_Footprint::getMirrored() const noexcept {
+  return mDevice.getMirrored();
 }
 
 QPainterPath BI_Footprint::getGrabAreaScenePx() const noexcept {
@@ -369,7 +350,7 @@ void BI_Footprint::deviceInstanceMirrored(bool mirrored) {
 
 void BI_Footprint::updateGraphicsItemTransform() noexcept {
   QTransform t;
-  if (mDevice.getIsMirrored()) t.scale(qreal(-1), qreal(1));
+  if (mDevice.getMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mDevice.getRotation().toDeg());
   mGraphicsItem->setTransform(t);
 }
