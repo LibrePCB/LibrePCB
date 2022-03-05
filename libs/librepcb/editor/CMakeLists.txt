@@ -699,6 +699,8 @@ add_library(
   workspace/controlpanel/projecttreemodel.h
   workspace/controlpanel/recentprojectsmodel.cpp
   workspace/controlpanel/recentprojectsmodel.h
+  workspace/desktopservices.cpp
+  workspace/desktopservices.h
   workspace/firstrunwizard/firstrunwizard.cpp
   workspace/firstrunwizard/firstrunwizard.h
   workspace/firstrunwizard/firstrunwizard.ui
