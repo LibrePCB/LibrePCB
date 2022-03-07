@@ -270,6 +270,8 @@ schematicEditorDockErcMsg = {schematicEditor}::librepcb__editor__ErcMsgDock
 # Actions
 schematicEditorActionCloseProject = {schematicEditor}::actionClose_Project
 schematicEditorActionAddComponent = {schematicEditor}::actionToolAddComponent
+schematicEditorActionExportImage = {schematicEditor}::actionExportImage
+schematicEditorActionExportPdf = {schematicEditor}::actionExportPdf
 
 # Graphics view
 schematicEditorGraphicsView = {schematicEditor}::librepcb:_:GraphicsView
@@ -287,6 +289,26 @@ schematicEditorAddComponentDialogSymVarCombobox = {schematicEditorAddComponentDi
 schematicEditorAddComponentDialogComponentNameLabel = {schematicEditorAddComponentDialog}::lblCompName
 schematicEditorAddComponentDialogComponentDescriptionLabel = {schematicEditorAddComponentDialog}::lblCompDescription
 schematicEditorAddComponentDialogDeviceNameLabel = {schematicEditorAddComponentDialog}::lblDeviceName
+
+# Graphics export dialog
+schematicEditorGraphicsExportDialog = {schematicEditor}::librepcb__editor__GraphicsExportDialog
+schematicEditorGraphicsExportDialogButtonBox = {schematicEditorGraphicsExportDialog}::buttonBox
+schematicEditorGraphicsExportDialogButtonBoxLeft = {schematicEditorGraphicsExportDialog}::buttonBoxLeft
+schematicEditorGraphicsExportDialogButtonRestoreDefaults = {schematicEditorGraphicsExportDialogButtonBoxLeft}::QPushButton
+schematicEditorGraphicsExportDialogButtonAccept = {schematicEditorGraphicsExportDialogButtonBox}::QPushButton
+schematicEditorGraphicsExportDialogButtonCancel = {schematicEditorGraphicsExportDialogButtonBox}::QPushButton-1
+schematicEditorGraphicsExportDialogButtonCopyToClipboard = {schematicEditorGraphicsExportDialogButtonBox}::btnCopyToClipboard
+schematicEditorGraphicsExportDialogOpenFileCheckbox = {schematicEditorGraphicsExportDialog}::cbxOpenExportedFiles
+schematicEditorGraphicsExportDialogTabWidget = {schematicEditorGraphicsExportDialog}::tabWidget
+schematicEditorGraphicsExportDialogTabBar = {schematicEditorGraphicsExportDialogTabWidget}::qt_tabwidget_tabbar
+schematicEditorGraphicsExportDialogStackedWidget = {schematicEditorGraphicsExportDialogTabWidget}::qt_tabwidget_stackedwidget
+schematicEditorGraphicsExportDialogTabGeneral = {schematicEditorGraphicsExportDialogStackedWidget}::tabGeneral
+schematicEditorGraphicsExportDialogPageSizeComboBox = {schematicEditorGraphicsExportDialogTabGeneral}::cbxPageSize
+
+# Graphics export save file dialog
+schematicEditorGraphicsExportSaveFileDialog = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
+schematicEditorGraphicsExportSaveFileDialogFileNameEdit = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+schematicEditorGraphicsExportSaveFileDialogOkButton = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
 
 
 ################################################################################
