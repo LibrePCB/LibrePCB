@@ -26,6 +26,7 @@
 #include <librepcb/core/exceptions.h>
 
 #include <QtCore>
+#include <QtTest>
 
 /*******************************************************************************
  *  Namespace
@@ -51,6 +52,35 @@ public:
   TestHelpers& operator=(const TestHelpers& rhs) = delete;
 
   // Static Methods
+
+  /**
+   * @brief Wait for a particular state
+   *
+   * Same as `QTest::qWaitFor()`, but with own implementation for Qt < 5.10.
+   *
+   * @param predicate   Function which must return `true` once the desired
+   *                    condition is met.
+   * @param timeoutMs   Timeout [ms].
+   * @retval true   If the condition is met within the timeout.
+   * @retval false  On timeout.
+   */
+  template <typename Functor>
+  static bool waitFor(Functor predicate, int timeoutMs = 5000) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+    return QTest::qWaitFor(predicate, timeoutMs);
+#else
+    QElapsedTimer timer;
+    timer.start();
+    do {
+      if (predicate()) {
+        return true;
+      }
+      QCoreApplication::processEvents(QEventLoop::AllEvents);
+      QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    } while (!timer.hasExpired(timeoutMs));
+    return predicate();
+#endif
+  }
 
   /**
    * @brief Get a child object of a given parent object by path specification

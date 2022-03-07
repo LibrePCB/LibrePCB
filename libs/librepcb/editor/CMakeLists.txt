@@ -35,6 +35,9 @@ add_library(
   dialogs/dxfimportdialog.ui
   dialogs/filedialog.cpp
   dialogs/filedialog.h
+  dialogs/graphicsexportdialog.cpp
+  dialogs/graphicsexportdialog.h
+  dialogs/graphicsexportdialog.ui
   dialogs/gridsettingsdialog.cpp
   dialogs/gridsettingsdialog.h
   dialogs/gridsettingsdialog.ui
@@ -653,6 +656,8 @@ add_library(
   widgets/doublespinbox.h
   widgets/editabletablewidget.cpp
   widgets/editabletablewidget.h
+  widgets/graphicsexportpreviewwidget.cpp
+  widgets/graphicsexportpreviewwidget.h
   widgets/graphicslayercombobox.cpp
   widgets/graphicslayercombobox.h
   widgets/graphicsview.cpp
