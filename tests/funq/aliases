@@ -325,3 +325,17 @@ boardEditorDockErcMsg = {boardEditor}::librepcb__editor__ErcMsgDock
 
 # Actions
 boardEditorActionCloseProject = {boardEditor}::actionClose_Project
+boardEditorActionExportImage = {boardEditor}::actionExportImage
+boardEditorActionExportPdf = {boardEditor}::actionExportPdf
+
+# Graphics export dialog
+boardEditorGraphicsExportDialog = {boardEditor}::librepcb__editor__GraphicsExportDialog
+boardEditorGraphicsExportDialogButtonBox = {boardEditorGraphicsExportDialog}::buttonBox
+boardEditorGraphicsExportDialogButtonAccept = {boardEditorGraphicsExportDialogButtonBox}::QPushButton
+boardEditorGraphicsExportDialogButtonCancel = {boardEditorGraphicsExportDialogButtonBox}::QPushButton-1
+boardEditorGraphicsExportDialogOpenFileCheckbox = {boardEditorGraphicsExportDialog}::cbxOpenExportedFiles
+
+# Graphics export save file dialog
+boardEditorGraphicsExportSaveFileDialog = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
+boardEditorGraphicsExportSaveFileDialogFileNameEdit = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+boardEditorGraphicsExportSaveFileDialogOkButton = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
