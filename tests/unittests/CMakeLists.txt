@@ -25,6 +25,8 @@ add_executable(
   core/export/gerberattributetest.cpp
   core/export/gerberattributewritertest.cpp
   core/export/gerbergeneratortest.cpp
+  core/export/graphicsexporttest.cpp
+  core/export/graphicsexporttest.h
   core/export/pickplacecsvwritertest.cpp
   core/fileio/asynccopyoperationtest.cpp
   core/fileio/csvfiletest.cpp
