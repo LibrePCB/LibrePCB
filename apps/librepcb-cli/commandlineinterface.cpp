@@ -27,6 +27,7 @@
 #include <librepcb/core/debug.h>
 #include <librepcb/core/export/bom.h>
 #include <librepcb/core/export/bomcsvwriter.h>
+#include <librepcb/core/export/graphicsexport.h>
 #include <librepcb/core/fileio/csvfile.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -44,6 +45,8 @@
 #include <librepcb/core/project/erc/ercmsg.h>
 #include <librepcb/core/project/erc/ercmsglist.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/project/schematic/schematicpainter.h>
 
 #include <QtCore>
 
@@ -96,7 +99,7 @@ int CommandLineInterface::execute() noexcept {
       "export-schematics",
       tr("Export schematics to given file(s). Existing files will be "
          "overwritten. Supported file extensions: %1")
-          .arg("pdf"),
+          .arg(GraphicsExport::getSupportedExtensions().join(", ")),
       tr("file"));
   QCommandLineOption exportBomOption(
       "export-bom",
@@ -375,19 +378,31 @@ bool CommandLineInterface::openProject(
     // Export schematics
     foreach (const QString& destStr, exportSchematicsFiles) {
       print(tr("Export schematics to '%1'...").arg(destStr));
-      QString suffix = destStr.split('.').last().toLower();
-      if (suffix == "pdf") {
-        QString destPathStr = AttributeSubstitutor::substitute(
-            destStr, &project, [&](const QString& str) {
-              return FilePath::cleanFileName(
-                  str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-            });
-        FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
-        project.exportSchematicsAsPdf(destPath);  // can throw
-        print(QString("  => '%1'").arg(prettyPath(destPath, destPathStr)));
-        writtenFilesCounter[destPath]++;
-      } else {
-        printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+      QString destPathStr = AttributeSubstitutor::substitute(
+          destStr, &project, [&](const QString& str) {
+            return FilePath::cleanFileName(
+                str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+          });
+      FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
+      GraphicsExport graphicsExport;
+      graphicsExport.setDocumentName(*project.getMetadata().getName());
+      QObject::connect(
+          &graphicsExport, &GraphicsExport::savingFile,
+          [&destPathStr, &writtenFilesCounter](const FilePath& fp) {
+            print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
+            writtenFilesCounter[fp]++;
+          });
+      std::shared_ptr<GraphicsExportSettings> settings =
+          std::make_shared<GraphicsExportSettings>();
+      GraphicsExport::Pages pages;
+      foreach (const Schematic* schematic, project.getSchematics()) {
+        pages.append(std::make_pair(
+            std::make_shared<SchematicPainter>(*schematic), settings));
+      }
+      graphicsExport.startExport(pages, destPath);
+      const QString errorMsg = graphicsExport.waitForFinished();
+      if (!errorMsg.isEmpty()) {
+        printErr("  " % tr("ERROR") % ": " % errorMsg);
         success = false;
       }
     }
