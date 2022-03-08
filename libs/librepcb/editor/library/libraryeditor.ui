@@ -97,11 +97,24 @@
      <addaction name="actionImportDxf"/>
      <addaction name="actionImportEagleLibrary"/>
     </widget>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>&amp;Export</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/export.png</normaloff>:/img/actions/export.png</iconset>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionExportPdf"/>
+     <addaction name="actionExportImage"/>
+    </widget>
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionShowElementInFileManager"/>
     <addaction name="separator"/>
     <addaction name="menuImport"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionRescanLibraries"/>
     <addaction name="separator"/>
@@ -180,6 +193,8 @@
    </attribute>
    <addaction name="actionNew"/>
    <addaction name="actionSave"/>
+   <addaction name="actionPrint"/>
+   <addaction name="actionExportPdf"/>
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
    <addaction name="actionRedo"/>
@@ -745,6 +760,48 @@
    </property>
    <property name="shortcut">
     <string notr="true"/>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Print</string>
+   </property>
+   <property name="toolTip">
+    <string>Print</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionExportPdf">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export &amp;PDF</string>
+   </property>
+   <property name="toolTip">
+    <string>Export as PDF file</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionExportImage">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export &amp;image</string>
+   </property>
+   <property name="toolTip">
+    <string>Export as image file</string>
    </property>
   </action>
  </widget>

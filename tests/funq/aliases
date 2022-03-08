@@ -98,6 +98,7 @@ libraryEditorWidget = {libraryEditor}::centralWidget
 libraryEditorActionNewElement = {libraryEditor}::actionNew
 libraryEditorActionRemove = {libraryEditor}::actionRemove
 libraryEditorActionImportEagleLibrary = {libraryEditor}::actionImportEagleLibrary
+libraryEditorActionExportImage = {libraryEditor}::actionExportImage
 
 # Tab widget
 libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
@@ -253,6 +254,18 @@ libraryEditorEagleLibraryImportWizardSetOptionsPrefixCheckBox = {libraryEditorEa
 libraryEditorEagleLibraryImportWizardSetOptionsComponentCategoryChooseButton = {libraryEditorEagleLibraryImportWizardSetOptionsPage}::gbxComponentCategory::btnChooseComponentCategory
 libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryDialog = {libraryEditorEagleLibraryImportWizardSetOptionsPage}::librepcb__editor__CategoryChooserDialog
 libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryTree = {libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryDialog}::treeView
+
+# Graphics export dialog
+libraryEditorGraphicsExportDialog = librepcb__editor__GraphicsExportDialog
+libraryEditorGraphicsExportDialogButtonBox = {libraryEditorGraphicsExportDialog}::buttonBox
+libraryEditorGraphicsExportDialogButtonAccept = {libraryEditorGraphicsExportDialogButtonBox}::QPushButton
+libraryEditorGraphicsExportDialogButtonCancel = {libraryEditorGraphicsExportDialogButtonBox}::QPushButton-1
+libraryEditorGraphicsExportDialogOpenFileCheckbox = {libraryEditorGraphicsExportDialog}::cbxOpenExportedFiles
+
+# Graphics export save file dialog
+libraryEditorGraphicsExportSaveFileDialog = {libraryEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
+libraryEditorGraphicsExportSaveFileDialogFileNameEdit = {libraryEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+libraryEditorGraphicsExportSaveFileDialogOkButton = {libraryEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
 
 
 ################################################################################

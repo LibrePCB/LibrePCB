@@ -27,6 +27,7 @@
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../widgets/statusbar.h"
+#include "../../workspace/desktopservices.h"
 #include "../cmd/cmdsymbolpinedit.h"
 #include "fsm/symboleditorfsm.h"
 #include "ui_symboleditorwidget.h"
@@ -44,6 +45,7 @@
 #include <librepcb/core/library/sym/msg/msgwrongsymboltextlayer.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/library/sym/symbolgraphicsitem.h>
+#include <librepcb/core/library/sym/symbolpainter.h>
 #include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -489,6 +491,38 @@ bool SymbolEditorWidget::processCheckMessage(
   if (fixMsgHelper<MsgWrongSymbolTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgSymbolPinNotOnGrid>(msg, applyFix)) return true;
   return false;
+}
+
+bool SymbolEditorWidget::execGraphicsExportDialog(
+    GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {
+  try {
+    // Determine default file path.
+    QString symbolName =
+        FilePath::cleanFileName(*mSymbol->getNames().getDefaultValue(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    FilePath defaultFilePath(QDir::homePath() % "/" % symbolName % "_Symbol");
+
+    // Copy symbol items to allow processing them in worker threads.
+    QList<std::shared_ptr<GraphicsPagePainter>> pages = {
+        std::make_shared<SymbolPainter>(*mSymbol),
+    };
+
+    // Show dialog, which will do all the work.
+    GraphicsExportDialog dialog(
+        GraphicsExportDialog::Mode::Schematic, output, pages, 0,
+        *mSymbol->getNames().getDefaultValue(), 0, defaultFilePath,
+        mContext.workspace.getSettings().defaultLengthUnit.get(),
+        "symbol_editor/" % settingsKey, this);
+    connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
+            [this](const FilePath& fp) {
+              DesktopServices services(mContext.workspace.getSettings(), true);
+              services.openFile(fp);
+            });
+    dialog.exec();
+  } catch (const Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
+  return true;
 }
 
 /*******************************************************************************

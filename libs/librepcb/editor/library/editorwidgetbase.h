@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../dialogs/graphicsexportdialog.h"
 #include "../undostack.h"
 #include "libraryelementchecklistwidget.h"
 
@@ -123,6 +124,9 @@ public slots:
   virtual bool zoomAll() noexcept { return false; }
   virtual bool abortCommand() noexcept { return false; }
   virtual bool importDxf() noexcept { return false; }
+  virtual bool exportImage() noexcept;
+  virtual bool exportPdf() noexcept;
+  virtual bool print() noexcept;
   virtual bool editGridProperties() noexcept { return false; }
 
 protected:  // Methods
@@ -134,6 +138,12 @@ protected:  // Methods
     return false;
   }
   virtual bool runChecks(LibraryElementCheckMessageList& msgs) const = 0;
+  virtual bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
+                                        const QString& settingsKey) noexcept {
+    Q_UNUSED(output);
+    Q_UNUSED(settingsKey);
+    return false;
+  }
   void undoStackStateModified() noexcept;
   const QStringList& getLibLocaleOrder() const noexcept;
   QString getWorkspaceSettingsUserName() noexcept;

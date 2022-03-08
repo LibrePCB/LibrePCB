@@ -79,6 +79,15 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   connect(mUi->actionImportDxf, &QAction::triggered, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->importDxf();
   });
+  connect(mUi->actionExportImage, &QAction::triggered, this, [this]() {
+    if (mCurrentEditorWidget) mCurrentEditorWidget->exportImage();
+  });
+  connect(mUi->actionExportPdf, &QAction::triggered, this, [this]() {
+    if (mCurrentEditorWidget) mCurrentEditorWidget->exportPdf();
+  });
+  connect(mUi->actionPrint, &QAction::triggered, this, [this]() {
+    if (mCurrentEditorWidget) mCurrentEditorWidget->print();
+  });
   connect(mUi->actionImportEagleLibrary, &QAction::triggered, this,
           [this, libFp]() {
             EagleLibraryImportWizard wizard(mWorkspace, libFp, this);
@@ -684,6 +693,9 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   mUi->menuImport->setEnabled(!mIsOpenedReadOnly);
   mUi->actionImportDxf->setEnabled((!mIsOpenedReadOnly) && hasGraphicalEditor);
   mUi->actionImportEagleLibrary->setEnabled(!mIsOpenedReadOnly);
+  mUi->actionExportImage->setEnabled(hasGraphicalEditor);
+  mUi->actionExportPdf->setEnabled(hasGraphicalEditor);
+  mUi->actionPrint->setEnabled(hasGraphicalEditor);
   foreach (QAction* action, mUi->viewToolbar->actions()) {
     action->setEnabled(hasGraphicalEditor);
   }
