@@ -115,6 +115,11 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
   }
 }
 
+std::shared_ptr<Footprint> PackageEditorFsm::getCurrentFootprint() const
+    noexcept {
+  return mContext.currentFootprint;
+}
+
 /*******************************************************************************
  *  Event Handlers
  ******************************************************************************/

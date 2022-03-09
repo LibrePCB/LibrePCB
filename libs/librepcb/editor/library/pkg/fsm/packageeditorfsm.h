@@ -100,6 +100,7 @@ public:
 
   // Getters
   EditorWidgetBase::Tool getCurrentTool() const noexcept;
+  std::shared_ptr<Footprint> getCurrentFootprint() const noexcept;
 
   // Event Handlers
   bool processChangeCurrentFootprint(

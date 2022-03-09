@@ -25,6 +25,7 @@
 #include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../library/sym/symbolpin.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -222,10 +223,11 @@ void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
 }
 
 void SI_SymbolPin::updatePosition() noexcept {
-  mPosition = mSymbol.mapToScene(mSymbolPin->getPosition());
-  mRotation = mSymbol.getRotation() + mSymbolPin->getRotation();
+  Transform transform(mSymbol);
+  mPosition = transform.map(mSymbolPin->getPosition());
+  mRotation = transform.map(mSymbolPin->getRotation());
   mGraphicsItem->setPos(mPosition.toPxQPointF());
-  updateGraphicsItemTransform();
+  mGraphicsItem->setRotation(-mRotation.toDeg());
   mGraphicsItem->updateCacheAndRepaint();
   foreach (SI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
 }
@@ -260,13 +262,6 @@ void SI_SymbolPin::updateErcMessages() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void SI_SymbolPin::updateGraphicsItemTransform() noexcept {
-  QTransform t;
-  if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
-  t.rotate(-mRotation.toDeg());
-  mGraphicsItem->setTransform(t);
-}
 
 QString SI_SymbolPin::getLibraryComponentName() const noexcept {
   return *mSymbol.getComponentInstance()

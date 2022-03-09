@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::GraphicsExportDialog</class>
+ <widget class="QDialog" name="librepcb::editor::GraphicsExportDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>839</width>
+    <height>374</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true"/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabGeneral">
+        <attribute name="title">
+         <string>General</string>
+        </attribute>
+        <layout class="QFormLayout" name="layoutGeometry">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblPrinter">
+           <property name="text">
+            <string>Printer:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="cbxPrinter"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblPageSize">
+           <property name="text">
+            <string>Page size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="cbxPageSize"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblDuplex">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Duplex:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="cbxDuplex">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblResolution">
+           <property name="text">
+            <string>Resolution:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="spbxResolutionDpi">
+           <property name="suffix">
+            <string notr="true"> dpi</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>2000</number>
+           </property>
+           <property name="singleStep">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>600</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblOrientation">
+           <property name="text">
+            <string>Orientation:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="layoutOrientation">
+           <item>
+            <widget class="QRadioButton" name="rbtnOrientationAuto">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Auto</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupOrientation</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbtnOrientationLandscape">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Landscape</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupOrientation</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbtnOrientationPortrait">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Portrait</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupOrientation</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblScale">
+           <property name="text">
+            <string>Scale factor:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <layout class="QHBoxLayout" name="layoutScale">
+           <item>
+            <widget class="QCheckBox" name="cbxScaleAuto">
+             <property name="text">
+              <string>Fit to page size</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="librepcb::editor::DoubleSpinBox" name="spbxScaleFactor">
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>0.000001000000000</double>
+             </property>
+             <property name="maximum">
+              <double>100000.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="lblBackground">
+           <property name="text">
+            <string>Background:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QRadioButton" name="rbtnBackgroundNone">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>None</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupBackground</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbtnBackgroundWhite">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>White</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupBackground</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbtnBackgroundBlack">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Black</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupBackground</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="lblMargins">
+           <property name="text">
+            <string>Margins:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <layout class="QGridLayout" name="gridLayout">
+           <property name="verticalSpacing">
+            <number>3</number>
+           </property>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string notr="true">⇔</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMarginRight" native="true"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMarginLeft" native="true"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMarginTop" native="true"/>
+           </item>
+           <item row="1" column="2">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMarginBottom" native="true"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="label_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string notr="true">⇕</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabAdvanced">
+        <attribute name="title">
+         <string>Advanced</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblTransformation">
+           <property name="text">
+            <string>Transformation:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QCheckBox" name="cbxRotate">
+             <property name="text">
+              <string>Rotate</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbxMirror">
+             <property name="text">
+              <string>Mirror</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Minimum line width:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinLineWidth" native="true"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblColors">
+           <property name="text">
+            <string>Colors:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="cbxBlackWhite">
+           <property name="text">
+            <string>Black/White</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblCopies">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Copies:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="spbxCopies">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabColors">
+        <attribute name="title">
+         <string>Colors</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QListWidget" name="lstLayerColors">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabContent">
+        <attribute name="title">
+         <string>Content</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTreeWidget" name="treeContent">
+           <property name="contextMenuPolicy">
+            <enum>Qt::ActionsContextMenu</enum>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::InternalMove</enum>
+           </property>
+           <property name="animated">
+            <bool>true</bool>
+           </property>
+           <attribute name="headerMinimumSectionSize">
+            <number>10</number>
+           </attribute>
+           <attribute name="headerStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Page</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Mirror</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabPages">
+        <attribute name="title">
+         <string>Pages</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="layoutPages">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="rbtnRangeAll">
+           <property name="text">
+            <string>All pages</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupPages</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>3</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnRangeCurrent">
+           <property name="text">
+            <string>Current page</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupPages</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="rbtnRangeCustom">
+             <property name="text">
+              <string>Custom:</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">btnGroupPages</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="edtPageRange">
+             <property name="maxLength">
+              <number>50</number>
+             </property>
+             <property name="clearButtonEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblNoteMultiplePagesSuffix">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>The page number will be appended to the filename.</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="librepcb::editor::GraphicsExportWidget" name="previewWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBoxLeft">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::RestoreDefaults</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbxOpenExportedFiles">
+       <property name="toolTip">
+        <string>Open the exported file or their parent directory if multiple files were exported.</string>
+       </property>
+       <property name="text">
+        <string>Open exported file(s)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::GraphicsExportWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/graphicsexportpreviewwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::DoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">librepcb/editor/widgets/doublespinbox.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>cbxPageSize</tabstop>
+  <tabstop>rbtnOrientationAuto</tabstop>
+  <tabstop>rbtnOrientationLandscape</tabstop>
+  <tabstop>rbtnOrientationPortrait</tabstop>
+  <tabstop>cbxScaleAuto</tabstop>
+  <tabstop>spbxScaleFactor</tabstop>
+  <tabstop>rbtnBackgroundNone</tabstop>
+  <tabstop>rbtnBackgroundWhite</tabstop>
+  <tabstop>rbtnBackgroundBlack</tabstop>
+  <tabstop>edtMarginLeft</tabstop>
+  <tabstop>edtMarginRight</tabstop>
+  <tabstop>edtMarginTop</tabstop>
+  <tabstop>edtMarginBottom</tabstop>
+  <tabstop>cbxRotate</tabstop>
+  <tabstop>cbxMirror</tabstop>
+  <tabstop>edtMinLineWidth</tabstop>
+  <tabstop>cbxBlackWhite</tabstop>
+  <tabstop>lstLayerColors</tabstop>
+  <tabstop>treeContent</tabstop>
+  <tabstop>rbtnRangeAll</tabstop>
+  <tabstop>rbtnRangeCurrent</tabstop>
+  <tabstop>rbtnRangeCustom</tabstop>
+  <tabstop>edtPageRange</tabstop>
+  <tabstop>buttonBoxLeft</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="btnGroupOrientation"/>
+  <buttongroup name="btnGroupBackground"/>
+  <buttongroup name="btnGroupPages"/>
+ </buttongroups>
+</ui>

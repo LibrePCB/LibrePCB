@@ -64,6 +64,21 @@ public:
   ~SI_SymbolPin();
 
   // Getters
+
+  /**
+   * @brief Get the absolute position of the pin (scene coordinates)
+   *
+   * @return Absolute pin position
+   */
+  const Point& getPosition() const noexcept override { return mPosition; }
+
+  /**
+   * @brief Get the absolute rotation of the pin (scene coordinates)
+   *
+   * @return Absolute pin rotation
+   */
+  const Angle& getRotation() const noexcept { return mRotation; }
+
   const Uuid& getLibPinUuid() const noexcept;
   QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
                          bool returnPinNameIfEmpty = false) const noexcept;
@@ -88,7 +103,6 @@ public:
   Type_t getType() const noexcept override {
     return SI_Base::Type_t::SymbolPin;
   }
-  const Point& getPosition() const noexcept override { return mPosition; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
@@ -107,7 +121,6 @@ private slots:
   void updateErcMessages() noexcept;
 
 private:
-  void updateGraphicsItemTransform() noexcept;
   QString getLibraryComponentName() const noexcept;
   QString getComponentSignalNameOrPinUuid() const noexcept;
   QString getNetSignalName() const noexcept;

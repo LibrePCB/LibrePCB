@@ -187,7 +187,6 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
  ******************************************************************************/
 
 GraphicsLayer* BGI_Plane::getLayer(QString name) const noexcept {
-  if (mPlane.getIsMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
   return mPlane.getBoard().getLayerStack().getLayer(name);
 }
 

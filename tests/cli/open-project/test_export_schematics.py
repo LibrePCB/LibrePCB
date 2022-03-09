@@ -21,7 +21,7 @@ def test_if_unknown_file_extension_fails(cli, project):
                                    project.path)
     assert code == 1
     assert len(stderr) == 1
-    assert 'Unknown extension' in stderr[0]
+    assert 'Failed to export image' in stderr[0]
     assert len(stdout) > 0
     assert stdout[-1] == 'Finished with errors!'
 
@@ -51,6 +51,25 @@ def test_exporting_pdf_with_relative_path(cli, project):
 def test_exporting_pdf_with_absolute_path(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     path = cli.abspath('schematic with spaces.pdf')
+    assert not os.path.exists(path)
+    code, stdout, stderr = cli.run('open-project',
+                                   '--export-schematics={}'.format(path),
+                                   project.path)
+    assert code == 0
+    assert len(stderr) == 0
+    assert len(stdout) > 0
+    assert stdout[-1] == 'SUCCESS'
+    assert os.path.exists(path)
+
+
+@pytest.mark.parametrize("file_extension", [
+    'svg',
+    'png',
+])
+def test_exporting_images(cli, file_extension):
+    project = params.PROJECT_WITH_TWO_BOARDS_LPPZ
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    path = cli.abspath('schematic with spaces.' + file_extension)
     assert not os.path.exists(path)
     code, stdout, stderr = cli.run('open-project',
                                    '--export-schematics={}'.format(path),

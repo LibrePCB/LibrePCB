@@ -32,6 +32,7 @@
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/undostackactiongroup.h"
 #include "../../widgets/graphicsview.h"
+#include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
@@ -52,6 +53,7 @@
 #include <librepcb/core/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
@@ -215,6 +217,16 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   connect(mUi->actionProjectSave, &QAction::triggered, &mProjectEditor,
           &ProjectEditor::saveProject);
   connect(mUi->actionQuit, &QAction::triggered, this, &BoardEditor::close);
+  connect(mUi->actionPrint, &QAction::triggered, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
+  });
+  connect(mUi->actionExportPdf, &QAction::triggered, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+  });
+  connect(mUi->actionExportImage, &QAction::triggered, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
+                             "image_export");
+  });
   connect(mUi->actionOpenWebsite, &QAction::triggered,
           []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
   connect(mUi->actionOnlineDocumentation, &QAction::triggered, []() {
@@ -499,158 +511,6 @@ void BoardEditor::on_actionGrid_triggered() {
       // board instead of all, so we can use different grids for each board.
       activeBoard->setGridProperties(dialog.getGrid());
     }
-  }
-}
-
-void BoardEditor::on_actionPrint_triggered() {
-  try {
-    Board* board = getActiveBoard();
-    if (!board) {
-      throw Exception(__FILE__, __LINE__, tr("No board selected."));
-    }
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPaperSize(QPrinter::A4);
-    printer.setOrientation(QPrinter::Landscape);
-    printer.setCreator(QString("LibrePCB %1").arg(qApp->applicationVersion()));
-    printer.setDocName(*mProject.getMetadata().getName());
-    QPrintDialog printDialog(&printer, this);
-    printDialog.setOption(QAbstractPrintDialog::PrintSelection, false);
-    printDialog.setMinMax(1, 1);
-    if (printDialog.exec() == QDialog::Accepted) {
-      board->print(printer);  // can throw
-    }
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
-  }
-}
-
-void BoardEditor::on_actionExportAsPdf_triggered() {
-  try {
-    Board* board = getActiveBoard();
-    if (!board) {
-      throw Exception(__FILE__, __LINE__, tr("No board selected."));
-    }
-    QString projectName =
-        FilePath::cleanFileName(*mProject.getMetadata().getName(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString projectVersion =
-        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString relativePath =
-        QString("output/%1/%2_Board.pdf").arg(projectVersion, projectName);
-    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
-    QDir().mkpath(defaultFilePath.getParentDir().toStr());
-    QString filename = FileDialog::getSaveFileName(
-        this, tr("PDF Export"), defaultFilePath.toNative(), "*.pdf");
-    if (filename.isEmpty()) return;
-    if (!filename.endsWith(".pdf")) filename.append(".pdf");
-    FilePath filepath(filename);
-
-    // Create output directory first because QPrinter silently fails if it
-    // doesn't exist.
-    FileUtils::makePath(filepath.getParentDir());  // can throw
-
-    // Print (use local block scope to ensure the PDF is fully written & closed
-    // after leaving the block - without this, opening the PDF could fail)
-    {
-      QPrinter printer(QPrinter::HighResolution);
-      printer.setPaperSize(QPrinter::A4);
-      printer.setOrientation(QPrinter::Landscape);
-      printer.setOutputFormat(QPrinter::PdfFormat);
-      printer.setCreator(
-          QString("LibrePCB %1").arg(qApp->applicationVersion()));
-      printer.setOutputFileName(filepath.toStr());
-      board->print(printer);  // can throw
-    }
-
-    // Open PDF
-    {
-      const WorkspaceSettings& workspaceSettings =
-          mProjectEditor.getWorkspace().getSettings();
-
-      WorkspaceSettings::PdfOpenBehavior bhv =
-          workspaceSettings.pdfOpenBehavior.get();
-
-      if (bhv == WorkspaceSettings::PdfOpenBehavior::NEVER) {
-        // do nothing
-      } else {
-        // TODO: refractor into FileUtils::askUserAndOpen or something similar
-        //       to avoid duplicated code in SchematicEditor
-
-        bool doOpenPdf = true;
-        if (bhv == WorkspaceSettings::PdfOpenBehavior::ASK) {
-          int openPdf = QMessageBox::information(
-              this, tr("PDF Export"), tr("PDF exported successfully"),
-              QMessageBox::Ok | QMessageBox::Open);
-
-          if (openPdf == QMessageBox::Ok) doOpenPdf = false;
-        } else if (bhv != WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
-          // this is the last possible state, otherwise there is an error
-          throw LogicError(__FILE__, __LINE__);
-        }
-
-        if (doOpenPdf) {
-          if (workspaceSettings.useCustomPdfReader.get()) {
-            QString pdfCmd = workspaceSettings.pdfReaderCommand.get();
-            // TODO: make it smarter to detect or insert quotes for path
-            //        containing spaces
-            QProcess::startDetached(
-                pdfCmd.replace("{{FILEPATH}}", filepath.toNative()));
-          } else {
-            QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
-          }
-        }
-      }
-    }
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
-  }
-}
-
-void BoardEditor::on_actionExportAsSvg_triggered() {
-  try {
-    Board* board = getActiveBoard();
-    if (!board) {
-      throw Exception(__FILE__, __LINE__, tr("No board selected."));
-    }
-    QString projectName =
-        FilePath::cleanFileName(*mProject.getMetadata().getName(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString projectVersion =
-        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString relativePath =
-        QString("output/%1/%2_Board.svg").arg(projectVersion, projectName);
-    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
-    QDir().mkpath(defaultFilePath.getParentDir().toStr());
-    QString filename = FileDialog::getSaveFileName(
-        this, tr("SVG Export"), defaultFilePath.toNative(), "*.svg");
-    if (filename.isEmpty()) return;
-    if (!filename.endsWith(".svg")) filename.append(".svg");
-    FilePath filepath(filename);
-
-    // Create output directory first because QSvgGenerator might not create it.
-    FileUtils::makePath(filepath.getParentDir());  // can throw
-
-    // Export
-    int dpi = 254;
-    QRectF rectPx = board->getGraphicsScene().itemsBoundingRect();
-    QRectF rectSvg(Length::fromPx(rectPx.left()).toInch() * dpi,
-                   Length::fromPx(rectPx.top()).toInch() * dpi,
-                   Length::fromPx(rectPx.width()).toInch() * dpi,
-                   Length::fromPx(rectPx.height()).toInch() * dpi);
-    rectSvg.moveTo(0, 0);  // seems to be required for the SVG viewbox
-    QSvgGenerator generator;
-    generator.setTitle(filepath.getFilename());
-    generator.setDescription(*mProject.getMetadata().getName());
-    generator.setFileName(filepath.toStr());
-    generator.setSize(rectSvg.toAlignedRect().size());
-    generator.setViewBox(rectSvg);
-    generator.setResolution(dpi);
-    QPainter painter(&generator);
-    board->renderToQPainter(painter, dpi);
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 
@@ -1000,6 +860,54 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
     qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
     rect.adjust(-margin, -margin, margin, margin);
     mGraphicsView->zoomToRect(rect);
+  }
+}
+
+void BoardEditor::execGraphicsExportDialog(
+    GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {
+  try {
+    // Determine default file path.
+    QString projectName =
+        FilePath::cleanFileName(*mProject.getMetadata().getName(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectVersion =
+        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString relativePath =
+        QString("output/%1/%2_Board").arg(projectVersion, projectName);
+    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
+
+    // Copy board to allow processing it in worker threads.
+    QList<std::shared_ptr<GraphicsPagePainter>> pages;
+    if (mActiveBoard) {
+      QProgressDialog progress(tr("Preparing board..."), tr("Cancel"), 0, 1,
+                               this);
+      progress.setWindowModality(Qt::WindowModal);
+      progress.setMinimumDuration(100);
+      pages.append(std::make_shared<BoardPainter>(*mActiveBoard));
+      progress.setValue(1);
+      if (progress.wasCanceled()) {
+        return;
+      }
+    }
+
+    // Show dialog, which will do all the work.
+    GraphicsExportDialog dialog(
+        GraphicsExportDialog::Mode::Board, output, pages, 0,
+        *mProject.getMetadata().getName(),
+        mActiveBoard ? mActiveBoard->getLayerStack().getInnerLayerCount() : 0,
+        defaultFilePath,
+        mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get(),
+        "board_editor/" % settingsKey, this);
+    connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
+            [this](const FilePath& fp) {
+              DesktopServices services(
+                  mProjectEditor.getWorkspace().getSettings(), true);
+              services.openFile(fp);
+            });
+    dialog.exec();
+  } catch (const Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 

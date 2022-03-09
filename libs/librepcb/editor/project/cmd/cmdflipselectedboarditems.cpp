@@ -103,8 +103,9 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     ++count;
   }
   foreach (BI_NetLine* netline, query->getNetLines()) {
-    center += netline->getPosition();
-    ++count;
+    center += netline->getStartPoint().getPosition();
+    center += netline->getEndPoint().getPosition();
+    count += 2;
   }
   foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
     center += netpoint->getPosition();

@@ -25,6 +25,8 @@ add_executable(
   core/export/gerberattributetest.cpp
   core/export/gerberattributewritertest.cpp
   core/export/gerbergeneratortest.cpp
+  core/export/graphicsexporttest.cpp
+  core/export/graphicsexporttest.h
   core/export/pickplacecsvwritertest.cpp
   core/fileio/asynccopyoperationtest.cpp
   core/fileio/csvfiletest.cpp
@@ -76,12 +78,14 @@ add_executable(
   core/utils/signalslottest.cpp
   core/utils/tangentpathjoinertest.cpp
   core/utils/toolboxtest.cpp
+  core/utils/transformtest.cpp
   core/workspace/workspacelibrarydbtest.cpp
   core/workspace/workspacesettingstest.cpp
   core/workspace/workspacetest.cpp
   eagleimport/eaglelibraryimporttest.cpp
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
+  editor/dialogs/graphicsexportdialogtest.cpp
   editor/library/cat/categorytreebuildertest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp

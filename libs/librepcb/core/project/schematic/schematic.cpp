@@ -563,12 +563,6 @@ void Schematic::updateAllNetLabelAnchors() noexcept {
   }
 }
 
-void Schematic::renderToQPainter(QPainter& painter) const noexcept {
-  mGraphicsScene->render(&painter, QRectF(),
-                         mGraphicsScene->itemsBoundingRect(),
-                         Qt::KeepAspectRatio);
-}
-
 std::unique_ptr<SchematicSelectionQuery> Schematic::createSelectionQuery() const
     noexcept {
   return std::unique_ptr<SchematicSelectionQuery>(new SchematicSelectionQuery(

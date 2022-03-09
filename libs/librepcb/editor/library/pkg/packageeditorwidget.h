@@ -116,6 +116,8 @@ private:  // Methods
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
       bool applyFix) override;
+  bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
+                                const QString& settingsKey) noexcept override;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;

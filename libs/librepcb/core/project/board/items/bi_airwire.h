@@ -63,8 +63,6 @@ public:
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::AirWire; }
-  const Point& getPosition() const noexcept override { return mP1; }
-  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
   bool isSelectable() const noexcept override;

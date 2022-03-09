@@ -225,20 +225,6 @@ void SI_Symbol::serialize(SExpression& root) const {
 }
 
 /*******************************************************************************
- *  Helper Methods
- ******************************************************************************/
-
-Point SI_Symbol::mapToScene(const Point& relativePos) const noexcept {
-  if (mMirrored) {
-    return (mPosition + relativePos)
-        .rotated(mRotation, mPosition)
-        .mirrored(Qt::Horizontal, mPosition);
-  } else {
-    return (mPosition + relativePos).rotated(mRotation, mPosition);
-  }
-}
-
-/*******************************************************************************
  *  Inherited from AttributeProvider
  ******************************************************************************/
 

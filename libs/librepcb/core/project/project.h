@@ -36,9 +36,6 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
-class QPrinter;
-
 namespace librepcb {
 
 class Board;
@@ -254,27 +251,6 @@ public:
    * @throw Exception     On error
    */
   void removeSchematic(Schematic& schematic, bool deleteSchematic = false);
-
-  /**
-   * @brief Export the schematic pages as a PDF
-   *
-   * @param filepath  The filepath where the PDF should be saved. If the file
-   * exists already, it will be overwritten.
-   *
-   * @throw Exception     On error
-   */
-  void exportSchematicsAsPdf(const FilePath& filepath);
-
-  /**
-   * @brief Print some schematics to a QPrinter (printer or file)
-   *
-   * @param printer   The QPrinter where to print the schematic pages
-   * @param pages     A list with all schematic page indexes which should be
-   * printed
-   *
-   * @throw Exception     On error
-   */
-  void printSchematicPages(QPrinter& printer, QList<int>& pages);
 
   // Board Methods
 

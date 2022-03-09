@@ -48,7 +48,6 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node,
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
     mNetLine(node, fileFormat),
-    mPosition(),
     mStartPoint(getAnchor(mNetLine.getStartPoint())),
     mEndPoint(getAnchor(mNetLine.getEndPoint())) {
   if ((!mStartPoint) || (!mEndPoint)) {
@@ -64,7 +63,6 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
     mNetSegment(segment),
     mNetLine(Uuid::createRandom(), width, startPoint.toNetLineAnchor(),
              endPoint.toNetLineAnchor()),
-    mPosition(),
     mStartPoint(&startPoint),
     mEndPoint(&endPoint) {
   init();
@@ -149,7 +147,6 @@ void SI_NetLine::removeFromSchematic() {
 }
 
 void SI_NetLine::updateLine() noexcept {
-  mPosition = (mStartPoint->getPosition() + mEndPoint->getPosition()) / 2;
   mGraphicsItem->updateCacheAndRepaint();
 }
 

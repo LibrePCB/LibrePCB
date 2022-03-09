@@ -32,6 +32,7 @@
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/undostackactiongroup.h"
 #include "../../widgets/graphicsview.h"
+#include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
@@ -40,7 +41,6 @@
 #include "schematicpagesdock.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
@@ -48,6 +48,7 @@
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -116,11 +117,23 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mUi->menuView->addAction(mErcMsgDock->toggleViewAction());
 
   // connect some actions which are created with the Qt Designer
-  connect(mUi->actionNew_Schematic_Page, &QAction::triggered, this,
-          &SchematicEditor::addSchematic);
   connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor,
           &ProjectEditor::saveProject);
   connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
+  connect(mUi->actionPrint, &QAction::triggered, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
+  });
+  connect(mUi->actionExportPdf, &QAction::triggered, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+  });
+  connect(mUi->actionExportImage, &QAction::triggered, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
+                             "image_export");
+  });
+  connect(mUi->actionNewSheet, &QAction::triggered, this,
+          &SchematicEditor::addSchematic);
+  connect(mUi->actionRenameSheet, &QAction::triggered, this,
+          [this]() { renameSchematic(mActiveSchematicIndex); });
   connect(mUi->actionOpenWebsite, &QAction::triggered,
           []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
   connect(mUi->actionOnlineDocumentation, &QAction::triggered, []() {
@@ -343,10 +356,6 @@ void SchematicEditor::on_actionClose_Project_triggered() {
   mProjectEditor.closeAndDestroy(true, this);
 }
 
-void SchematicEditor::on_actionRenameSheet_triggered() {
-  renameSchematic(mActiveSchematicIndex);
-}
-
 void SchematicEditor::on_actionGrid_triggered() {
   if (const Schematic* activeSchematic = getActiveSchematic()) {
     GridSettingsDialog dialog(activeSchematic->getGridProperties(), this);
@@ -360,152 +369,6 @@ void SchematicEditor::on_actionGrid_triggered() {
         schematic->setGridProperties(dialog.getGrid());
       }
     }
-  }
-}
-
-void SchematicEditor::on_actionPrint_triggered() {
-  try {
-    int pageCount = mProject.getSchematics().count();
-    if (pageCount <= 0) {
-      throw Exception(__FILE__, __LINE__, tr("No pages to print."));
-    }
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPaperSize(QPrinter::A4);
-    printer.setOrientation(QPrinter::Landscape);
-    printer.setCreator(QString("LibrePCB %1").arg(qApp->applicationVersion()));
-    printer.setDocName(*mProject.getMetadata().getName());
-    QPrintDialog printDialog(&printer, this);
-    printDialog.setOption(QAbstractPrintDialog::PrintSelection, false);
-    printDialog.setMinMax(1, pageCount);
-    if (printDialog.exec() == QDialog::Accepted) {
-      int minPageIndex = 0;
-      int maxPageIndex = 0;
-      switch (printDialog.printRange()) {
-        case QAbstractPrintDialog::PrintRange::PageRange: {
-          minPageIndex = qMax(printDialog.fromPage() - 1, 0);
-          maxPageIndex = qMax(printDialog.toPage() - 1, 0);
-          break;
-        }
-        case QAbstractPrintDialog::PrintRange::CurrentPage: {
-          minPageIndex = getActiveSchematicIndex();
-          maxPageIndex = getActiveSchematicIndex();
-          break;
-        }
-        default: {
-          minPageIndex = 0;
-          maxPageIndex = pageCount - 1;
-          break;
-        }
-      }
-      QList<int> pages;
-      for (int i = minPageIndex; i <= maxPageIndex; ++i) pages.append(i);
-      mProject.printSchematicPages(printer, pages);  // can throw
-    }
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
-  }
-}
-
-void SchematicEditor::on_actionPDF_Export_triggered() {
-  try {
-    QString projectName =
-        FilePath::cleanFileName(*mProject.getMetadata().getName(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString projectVersion =
-        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString relativePath =
-        QString("output/%1/%2_Schematics.pdf").arg(projectVersion, projectName);
-    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
-    QDir().mkpath(defaultFilePath.getParentDir().toStr());
-    QString filename = FileDialog::getSaveFileName(
-        this, tr("PDF Export"), defaultFilePath.toNative(), "*.pdf");
-    if (filename.isEmpty()) return;
-    if (!filename.endsWith(".pdf")) filename.append(".pdf");
-    FilePath filepath(filename);
-    mProject.exportSchematicsAsPdf(
-        filepath);  // this method can throw an exception
-
-    // Open PDF
-    {
-      const WorkspaceSettings& workspaceSettings =
-          mProjectEditor.getWorkspace().getSettings();
-
-      WorkspaceSettings::PdfOpenBehavior bhv =
-          workspaceSettings.pdfOpenBehavior.get();
-
-      if (bhv == WorkspaceSettings::PdfOpenBehavior::NEVER) {
-        // do nothing
-      } else {
-        bool doOpenPdf = true;
-        if (bhv == WorkspaceSettings::PdfOpenBehavior::ASK) {
-          int openPdf = QMessageBox::information(
-              this, tr("PDF Export"), tr("PDF exported successfully"),
-              QMessageBox::Ok | QMessageBox::Open);
-
-          if (openPdf == QMessageBox::Ok) doOpenPdf = false;
-        } else if (bhv != WorkspaceSettings::PdfOpenBehavior::ALWAYS) {
-          throw LogicError(__FILE__, __LINE__);
-        }
-
-        if (doOpenPdf) {
-          if (workspaceSettings.useCustomPdfReader.get()) {
-            QString pdfCmd = workspaceSettings.pdfReaderCommand.get();
-            QProcess::startDetached(
-                pdfCmd.replace("{{FILEPATH}}", filepath.toNative()));
-          } else {
-            QDesktopServices::openUrl(QUrl::fromLocalFile(filepath.toNative()));
-          }
-        }
-      }
-    }
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
-  }
-}
-
-void SchematicEditor::on_actionExportAsSvg_triggered() {
-  try {
-    Schematic* schematic = getActiveSchematic();
-    if (!schematic) return;
-
-    QString projectName =
-        FilePath::cleanFileName(*mProject.getMetadata().getName(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString projectVersion =
-        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString schematicName = FilePath::cleanFileName(
-        *schematic->getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString relativePath = QString("output/%1/%2_%3.svg")
-                               .arg(projectVersion, projectName, schematicName);
-    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
-    QDir().mkpath(defaultFilePath.getParentDir().toStr());
-    QString filename = FileDialog::getSaveFileName(
-        this, tr("SVG Export"), defaultFilePath.toNative(), "*.svg");
-    if (filename.isEmpty()) return;
-    if (!filename.endsWith(".svg")) filename.append(".svg");
-    FilePath filepath(filename);
-
-    // Export
-    int dpi = 254;
-    QRectF rectPx = schematic->getGraphicsScene().itemsBoundingRect();
-    QRectF rectSvg(Length::fromPx(rectPx.left()).toInch() * dpi,
-                   Length::fromPx(rectPx.top()).toInch() * dpi,
-                   Length::fromPx(rectPx.width()).toInch() * dpi,
-                   Length::fromPx(rectPx.height()).toInch() * dpi);
-    rectSvg.moveTo(0, 0);  // seems to be required for the SVG viewbox
-    QSvgGenerator generator;
-    generator.setTitle(filepath.getFilename());
-    generator.setDescription(*mProject.getMetadata().getName());
-    generator.setFileName(filepath.toStr());
-    generator.setSize(rectSvg.toAlignedRect().size());
-    generator.setViewBox(rectSvg);
-    generator.setResolution(dpi);
-    QPainter painter(&generator);
-    schematic->renderToQPainter(painter);
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 
@@ -788,6 +651,55 @@ void SchematicEditor::updateComponentToolbarIcons() noexcept {
       QIcon(":/img/library/bipolar_capacitor_" % suffix % ".png"));
   mUi->actionAddComp_UnipolarCapacitor->setIcon(
       QIcon(":/img/library/unipolar_capacitor_" % suffix % ".png"));
+}
+
+void SchematicEditor::execGraphicsExportDialog(
+    GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {
+  try {
+    // Determine default file path.
+    QString projectName =
+        FilePath::cleanFileName(*mProject.getMetadata().getName(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectVersion =
+        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString relativePath =
+        QString("output/%1/%2_Schematics").arg(projectVersion, projectName);
+    FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
+
+    // Copy all schematic pages to allow processing them in worker threads.
+    const int count = mProject.getSchematics().count();
+    QProgressDialog progress(tr("Preparing schematics..."), tr("Cancel"), 0,
+                             count, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(100);
+    QList<std::shared_ptr<GraphicsPagePainter>> pages;
+    for (int i = 0; i < count; ++i) {
+      pages.append(
+          std::make_shared<SchematicPainter>(*mProject.getSchematicByIndex(i)));
+      progress.setValue(i + 1);
+      if (progress.wasCanceled()) {
+        return;
+      }
+    }
+
+    // Show dialog, which will do all the work.
+    GraphicsExportDialog dialog(
+        GraphicsExportDialog::Mode::Schematic, output, pages,
+        getActiveSchematicIndex(), *mProject.getMetadata().getName(), 0,
+        defaultFilePath,
+        mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get(),
+        "schematic_editor/" % settingsKey, this);
+    connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
+            [this](const FilePath& fp) {
+              DesktopServices services(
+                  mProjectEditor.getWorkspace().getSettings(), true);
+              services.openFile(fp);
+            });
+    dialog.exec();
+  } catch (const Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
 }
 
 bool SchematicEditor::useIeee315Symbols() const noexcept {

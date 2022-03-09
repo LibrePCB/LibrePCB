@@ -84,7 +84,6 @@ public:
   const Point& getPosition() const noexcept override {
     return mJunction.getPosition();
   }
-  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
