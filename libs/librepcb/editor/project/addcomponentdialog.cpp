@@ -61,7 +61,6 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mLocaleOrder(localeOrder),
     mNormOrder(normOrder),
     mUi(new Ui::AddComponentDialog),
-    mAddMoreCheckbox(new QCheckBox(tr("&Add more"), this)),
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
     mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
@@ -104,19 +103,12 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
           &QItemSelectionModel::currentChanged, this,
           &AddComponentDialog::treeCategories_currentItemChanged);
 
-  // Add "Add more"-checkbox to button group.
-  mAddMoreCheckbox->setObjectName("cbxAddMore");  // For automated tests.
-  mAddMoreCheckbox->setToolTip(
-      tr("If checked, this dialog will automatically be opened again after "
-         "finishing placement of the current component."));
-  mUi->buttonBox->addButton(mAddMoreCheckbox, QDialogButtonBox::ActionRole);
-
   // Reset GUI to state of nothing selected.
   setSelectedComponent(nullptr);
 
   // Restore client settings.
   QSettings clientSettings;
-  mAddMoreCheckbox->setChecked(
+  mUi->cbxAddMore->setChecked(
       clientSettings
           .value("schematic_editor/add_component_dialog/add_more", true)
           .toBool());
@@ -132,7 +124,7 @@ AddComponentDialog::~AddComponentDialog() noexcept {
   // Save client settings.
   QSettings clientSettings;
   clientSettings.setValue("schematic_editor/add_component_dialog/add_more",
-                          mAddMoreCheckbox->isChecked());
+                          mUi->cbxAddMore->isChecked());
   clientSettings.setValue("schematic_editor/add_component_dialog/window_size",
                           size());
 }
@@ -173,8 +165,7 @@ tl::optional<Uuid> AddComponentDialog::getSelectedDeviceUuid() const noexcept {
 }
 
 bool AddComponentDialog::getAutoOpenAgain() const noexcept {
-  Q_ASSERT(mAddMoreCheckbox);
-  return mAddMoreCheckbox->isChecked();
+  return mUi->cbxAddMore->isChecked();
 }
 
 /*******************************************************************************
